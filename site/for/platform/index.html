@@ -79,8 +79,7 @@
     /* Capability cards */
     .cap-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 2rem 0; }
     .cap-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; }
-    .cap-card h4 { font-size: 0.92rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem; line-height: 1.4; }
-    .cap-card h4 strong { color: var(--teal); }
+    .cap-card h4 { font-size: 0.95rem; font-weight: 600; color: var(--teal); margin-bottom: 0.35rem; line-height: 1.4; }
     .cap-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.7; }
 
     /* Use case linked cards */
@@ -129,7 +128,7 @@
   <div class="hero">
     <div class="hero-tag">For Platform &amp; DevEx Teams</div>
     <h1>Centralize Architectural Standards Across AI Coding Workflows</h1>
-    <p class="hero-sub">Every team has their own .cursorrules, their own system prompts, their own interpretation of the standards. Mneme HQ gives you one structured decision corpus that all AI agents query &mdash; consistently.</p>
+    <p class="hero-sub">Every team has their own .cursorrules, their own system prompts, their own interpretation of the standards. Mneme HQ gives you one structured decision corpus that all AI agents query, consistently.</p>
     <div class="cta-group">
       <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub</a>
       <a href="/use-cases/" class="btn-ghost">See all use cases</a>
@@ -154,7 +153,7 @@
       </div>
       <div class="pain-card">
         <div class="pain-card-num">03</div>
-        <h4>Prompt templates diverge over time &mdash; no versioning, no conflict resolution</h4>
+        <h4>Prompt templates diverge over time: no versioning, no conflict resolution</h4>
         <p>Templates are copied, modified, and forgotten. There is no audit trail and no way to know which version is current.</p>
       </div>
       <div class="pain-card">
@@ -172,19 +171,19 @@
 
     <div class="cap-grid">
       <div class="cap-card">
-        <h4><strong>Single source of truth</strong></h4>
+        <h4>Single source of truth</h4>
         <p><code>project_memory.json</code> is the canonical architecture source, queried by all agents. One file to maintain. One place to update.</p>
       </div>
       <div class="cap-card">
-        <h4><strong>Scoped rules</strong></h4>
+        <h4>Scoped rules</h4>
         <p>Payments team gets payments rules, analytics team gets analytics rules. Per-file pattern matching ensures each agent sees exactly what it needs.</p>
       </div>
       <div class="cap-card">
-        <h4><strong>Conflict resolution</strong></h4>
+        <h4>Conflict resolution</h4>
         <p>The precedence engine resolves org-level vs team-level exceptions automatically. No manual arbitration. No ambiguity about which rule wins.</p>
       </div>
       <div class="cap-card">
-        <h4><strong>Universal enforcement</strong></h4>
+        <h4>Universal enforcement</h4>
         <p>Claude Code hook integration means you install once and enforce everywhere. Standards propagate to every team without any per-team setup.</p>
       </div>
     </div>
