@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>For Platform &amp; DevEx Teams — Mneme HQ</title>
+  <meta name="description" content="Centralize architectural standards across every AI coding workflow. One decision corpus. All agents. All tools. No rules sprawl." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/for/platform/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="For Platform &amp; DevEx Teams — Mneme HQ" />
+  <meta property="og:description" content="Centralize architectural standards across every AI coding workflow. One decision corpus. All agents. All tools. No rules sprawl." />
+  <meta property="og:url" content="https://mnemehq.com/for/platform/" />
+  <meta property="og:image" content="https://mnemehq.com/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="For Platform &amp; DevEx Teams — Mneme HQ" />
+  <meta name="twitter:description" content="Centralize architectural standards across every AI coding workflow. One decision corpus. All agents. All tools. No rules sprawl." />
+  <meta name="twitter:image" content="https://mnemehq.com/og.png" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #88889a;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.75rem 1.75rem; border-radius: 8px; font-size: 0.88rem; font-weight: 500; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--accent-dim); }
+    .btn-ghost { display: inline-block; background: transparent; border: 1px solid var(--border2); color: var(--text); padding: 0.75rem 1.75rem; border-radius: 8px; font-size: 0.88rem; text-decoration: none; transition: border-color 0.15s, color 0.15s; }
+    .btn-ghost:hover { border-color: var(--teal); color: var(--teal); }
+    .hero { max-width: 800px; margin: 0 auto; padding: 5rem 2rem 4rem; text-align: center; }
+    .hero-tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid rgba(200,240,96,0.22);
+      background: rgba(200,240,96,0.07);
+      padding: 0.3rem 0.9rem;
+      border-radius: 999px;
+      margin-bottom: 1rem;
+    }
+    .hero h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.25rem; }
+    .hero-sub { font-size: 1rem; color: var(--muted); max-width: 580px; margin: 0 auto 2.5rem; line-height: 1.7; }
+    .cta-group { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+    .section-wrap { max-width: 900px; margin: 0 auto; padding: 4.5rem 2rem; border-top: 1px solid var(--border); }
+    .section-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
+    .section-title { font-family: 'Inter', sans-serif; font-size: clamp(1.5rem, 2.8vw, 2rem); font-weight: 600; letter-spacing: -0.02em; margin-bottom: 2rem; }
+    .prose { font-size: 0.88rem; color: var(--muted); line-height: 1.9; max-width: 680px; }
+    .prose + .prose { margin-top: 1rem; }
+
+    /* Pain points cards */
+    .pain-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 2rem 0; }
+    .pain-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; }
+    .pain-card-num { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--accent); margin-bottom: 0.6rem; letter-spacing: 0.06em; }
+    .pain-card h4 { font-size: 0.92rem; font-weight: 600; color: var(--text); margin-bottom: 0.4rem; line-height: 1.4; }
+    .pain-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.7; }
+
+    /* Capability cards */
+    .cap-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 2rem 0; }
+    .cap-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; }
+    .cap-card h4 { font-size: 0.92rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem; line-height: 1.4; }
+    .cap-card h4 strong { color: var(--teal); }
+    .cap-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.7; }
+
+    /* Use case linked cards */
+    .use-case-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 2rem 0; }
+    .use-case-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; text-decoration: none; transition: border-color 0.15s; display: block; }
+    .use-case-card:hover { border-color: var(--border2); }
+    .use-case-card h4 { font-size: 0.92rem; font-weight: 600; color: var(--accent); margin-bottom: 0.5rem; line-height: 1.4; }
+    .use-case-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.7; }
+    .use-case-card .card-arrow { font-size: 0.78rem; color: var(--muted); margin-top: 0.75rem; display: block; }
+
+    /* CTA footer */
+    .cta-footer { border-top: 1px solid var(--border); text-align: center; padding: 5rem 2rem; }
+    .cta-footer h2 { font-family: 'Inter', sans-serif; font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 600; letter-spacing: -0.02em; margin-bottom: 2rem; }
+
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 640px) {
+      nav { padding: 1rem 1.25rem; }
+      .nav-links { gap: 1rem; }
+      .hero { padding: 3.5rem 1.25rem 3rem; }
+      .section-wrap { padding: 3rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/#benchmarks">Benchmarks</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/demo.html">Demo</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">For Platform &amp; DevEx Teams</div>
+    <h1>Centralize Architectural Standards Across AI Coding Workflows</h1>
+    <p class="hero-sub">Every team has their own .cursorrules, their own system prompts, their own interpretation of the standards. Mneme HQ gives you one structured decision corpus that all AI agents query &mdash; consistently.</p>
+    <div class="cta-group">
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub</a>
+      <a href="/use-cases/" class="btn-ghost">See all use cases</a>
+    </div>
+  </div>
+
+  <!-- SECTION 1: THE PROBLEM -->
+  <div class="section-wrap">
+    <div class="section-eyebrow">The Problem</div>
+    <h2 class="section-title">Rules sprawl is the hidden cost of AI-assisted development.</h2>
+
+    <div class="pain-grid">
+      <div class="pain-card">
+        <div class="pain-card-num">01</div>
+        <h4>Every team maintains separate Cursor Rules, CLAUDE.md, and system prompts</h4>
+        <p>Fragmented rule files multiply across repos and teams. No team knows what the others have defined.</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-card-num">02</div>
+        <h4>No single source of truth for what the AI "knows" about your architecture</h4>
+        <p>Each agent operates on a different subset of standards. Outputs diverge in ways that are hard to trace back.</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-card-num">03</div>
+        <h4>Prompt templates diverge over time &mdash; no versioning, no conflict resolution</h4>
+        <p>Templates are copied, modified, and forgotten. There is no audit trail and no way to know which version is current.</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-card-num">04</div>
+        <h4>Onboarding new teams to AI coding means re-documenting the same standards</h4>
+        <p>Platform teams repeat the same setup work for every new team. There is no reusable distribution mechanism.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: WHAT PLATFORM TEAMS GET -->
+  <div class="section-wrap">
+    <div class="section-eyebrow">What Platform Teams Get</div>
+    <h2 class="section-title">One corpus. Every agent. Every tool.</h2>
+
+    <div class="cap-grid">
+      <div class="cap-card">
+        <h4><strong>Single source of truth</strong></h4>
+        <p><code>project_memory.json</code> is the canonical architecture source, queried by all agents. One file to maintain. One place to update.</p>
+      </div>
+      <div class="cap-card">
+        <h4><strong>Scoped rules</strong></h4>
+        <p>Payments team gets payments rules, analytics team gets analytics rules. Per-file pattern matching ensures each agent sees exactly what it needs.</p>
+      </div>
+      <div class="cap-card">
+        <h4><strong>Conflict resolution</strong></h4>
+        <p>The precedence engine resolves org-level vs team-level exceptions automatically. No manual arbitration. No ambiguity about which rule wins.</p>
+      </div>
+      <div class="cap-card">
+        <h4><strong>Universal enforcement</strong></h4>
+        <p>Claude Code hook integration means you install once and enforce everywhere. Standards propagate to every team without any per-team setup.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: USE CASE EXAMPLES -->
+  <div class="section-wrap">
+    <div class="section-eyebrow">Use Cases</div>
+    <h2 class="section-title">Built for platform and governance use cases.</h2>
+
+    <div class="use-case-grid">
+      <a href="/use-cases/coding-assistant-governance/" class="use-case-card">
+        <h4>AI Coding Assistant Governance</h4>
+        <p>Enforce architectural standards across every AI coding assistant in your organization from a single decision corpus.</p>
+        <span class="card-arrow">Read use case &rarr;</span>
+      </a>
+      <a href="/use-cases/multi-agent-workflow-governance/" class="use-case-card">
+        <h4>Multi-Agent Workflow Governance</h4>
+        <p>Maintain consistent standards across orchestrated multi-agent pipelines where multiple models collaborate on the same codebase.</p>
+        <span class="card-arrow">Read use case &rarr;</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- SECTION 4: CTA -->
+  <div class="cta-footer">
+    <h2>One corpus. All agents. All tools.</h2>
+    <div class="cta-group">
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub</a>
+      <a href="/use-cases/" class="btn-ghost">See all use cases</a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>
+    <a href="/use-cases/">Use cases</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/insights/">Insights</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/for/cto/">For CTOs</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/founder/">Founder</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/contact/">Contact</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/privacy/">Privacy</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    &nbsp;&middot;&nbsp;
+    Open source
+    &nbsp;&middot;&nbsp;
+    MIT License
+  </p>
+</footer>
+</body>
+</html>
