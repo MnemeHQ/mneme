@@ -1,0 +1,98 @@
+name: Staged buyer page rollout
+
+# Publishes one buyer page per week over 3 weeks:
+#   May 11 → CTO/VP Engineering
+#   May 18 → Platform/DevEx
+#   May 25 → Staff/Principal Engineer
+#
+# The publish script is idempotent — if a page is already live it skips cleanly.
+# Can also be triggered manually via workflow_dispatch for testing or early publish.
+
+on:
+  schedule:
+    - cron: "0 9 11 5 *"   # May 11, 9:00 UTC — CTO page
+    - cron: "0 9 18 5 *"   # May 18, 9:00 UTC — Platform page
+    - cron: "0 9 25 5 *"   # May 25, 9:00 UTC — Principal Engineer page
+  workflow_dispatch:
+    inputs:
+      page:
+        description: "Buyer page to publish"
+        required: true
+        type: choice
+        options:
+          - cto
+          - platform
+          - principal-engineer
+
+permissions:
+  contents: write
+
+jobs:
+  publish-cto:
+    name: Publish CTO page
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'schedule' && startsWith(github.event.schedule, '0 9 11')) ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.page == 'cto')
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run publish script
+        run: python scripts/publish_buyer_page.py cto
+
+      - name: Commit and push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add site/
+          git diff --staged --quiet && echo "Nothing to commit — page already published" && exit 0
+          git commit -m "feat(site): publish CTO/VP Engineering buyer page"
+          git push
+
+  publish-platform:
+    name: Publish Platform page
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'schedule' && startsWith(github.event.schedule, '0 9 18')) ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.page == 'platform')
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run publish script
+        run: python scripts/publish_buyer_page.py platform
+
+      - name: Commit and push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add site/
+          git diff --staged --quiet && echo "Nothing to commit — page already published" && exit 0
+          git commit -m "feat(site): publish Platform/DevEx buyer page"
+          git push
+
+  publish-principal-engineer:
+    name: Publish Principal Engineer page
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'schedule' && startsWith(github.event.schedule, '0 9 25')) ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.page == 'principal-engineer')
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run publish script
+        run: python scripts/publish_buyer_page.py principal-engineer
+
+      - name: Commit and push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add site/
+          git diff --staged --quiet && echo "Nothing to commit — page already published" && exit 0
+          git commit -m "feat(site): publish Staff/Principal Engineer buyer page"
+          git push
