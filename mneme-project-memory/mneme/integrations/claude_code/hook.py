@@ -108,7 +108,7 @@ def _run_check(event: ToolEvent, proposed_content: str, memory: Path, stderr: Te
         try:
             proc = subprocess.run(
                 [
-                    "mneme", "check",
+                    sys.executable, "-m", "mneme", "check",
                     "--memory", str(memory),
                     "--input", input_path,
                     "--query", f"edit to {rel}",
@@ -121,8 +121,8 @@ def _run_check(event: ToolEvent, proposed_content: str, memory: Path, stderr: Te
             )
         except FileNotFoundError:
             print(
-                "mneme-hook: 'mneme' not found on PATH. "
-                "Install with `pip install mneme` or unset the hook. Failing open.",
+                "mneme-hook: could not launch mneme check (interpreter not found). "
+                "Failing open.",
                 file=stderr,
             )
             return 0

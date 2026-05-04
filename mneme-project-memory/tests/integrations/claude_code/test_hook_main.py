@@ -1,6 +1,7 @@
 import json
 import io
 import subprocess
+import sys
 from unittest.mock import patch, MagicMock
 import pytest
 from mneme.integrations.claude_code.hook import main
@@ -59,7 +60,10 @@ def test_strict_fail_returns_two(tmp_path):
         rc = main(stdin=io.StringIO(_edit_envelope(tmp_path, target)))
     assert rc == 2
     args = mrun.call_args.args[0]
-    assert args[0] == "mneme" and args[1] == "check"
+    assert args[0] == sys.executable
+    assert args[1] == "-m"
+    assert args[2] == "mneme"
+    assert args[3] == "check"
     assert "--memory" in args and str(mem) in args
     assert "--mode" in args
 
@@ -112,3 +116,24 @@ def test_subprocess_timeout_fails_open(tmp_path):
     ):
         rc = main(stdin=io.StringIO(_edit_envelope(tmp_path, target)))
     assert rc == 0
+
+
+# --- Regression: subprocess must use sys.executable -m, not bare "mneme" ---
+# On Windows (Microsoft Store Python) the Scripts directory may not be on PATH
+# when Claude Code launches mneme-hook.exe. Using sys.executable -m mneme
+# guarantees the child process shares the same Python environment as the hook.
+
+def test_subprocess_uses_sys_executable_not_bare_mneme(tmp_path):
+    """Hook must invoke `sys.executable -m mneme check`, never `mneme check`."""
+    mem, target = _project_with_memory(tmp_path)
+    fake = MagicMock(returncode=0, stdout="", stderr="")
+    with patch("mneme.integrations.claude_code.hook.subprocess.run", return_value=fake) as mrun:
+        main(stdin=io.StringIO(_edit_envelope(tmp_path, target)))
+    cmd = mrun.call_args.args[0]
+    assert cmd[0] == sys.executable, (
+        f"Expected sys.executable ({sys.executable!r}) as first arg, got {cmd[0]!r}. "
+        "Bare 'mneme' breaks on Windows when Scripts is not on PATH."
+    )
+    assert cmd[1] == "-m"
+    assert cmd[2] == "mneme"
+    assert cmd[3] == "check"
