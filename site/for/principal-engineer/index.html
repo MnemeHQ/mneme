@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>For Staff &amp; Principal Engineers — Mneme HQ</title>
+  <meta name="description" content="Stop repeating architectural decisions in every PR review. Record them once. Enforce them automatically." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/for/principal-engineer/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="For Staff &amp; Principal Engineers — Mneme HQ" />
+  <meta property="og:description" content="Stop repeating architectural decisions in every PR review. Record them once. Enforce them automatically." />
+  <meta property="og:url" content="https://mnemehq.com/for/principal-engineer/" />
+  <meta property="og:image" content="https://mnemehq.com/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="For Staff &amp; Principal Engineers — Mneme HQ" />
+  <meta name="twitter:description" content="Stop repeating architectural decisions in every PR review. Record them once. Enforce them automatically." />
+  <meta name="twitter:image" content="https://mnemehq.com/og.png" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #88889a;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.75rem 1.75rem; border-radius: 8px; font-size: 0.88rem; font-weight: 500; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--accent-dim); }
+    .link-ghost { display: inline-block; color: var(--accent); font-size: 0.88rem; text-decoration: none; transition: color 0.15s; }
+    .link-ghost:hover { color: var(--accent-dim); }
+    .hero { max-width: 800px; margin: 0 auto; padding: 5rem 2rem 4rem; text-align: center; }
+    .hero-tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid rgba(200,240,96,0.22);
+      background: rgba(200,240,96,0.07);
+      padding: 0.3rem 0.9rem;
+      border-radius: 999px;
+      margin-bottom: 1rem;
+    }
+    .hero h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.25rem; }
+    .hero-sub { font-size: 1rem; color: var(--muted); max-width: 580px; margin: 0 auto 2.5rem; line-height: 1.7; }
+    .cta-group { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; align-items: center; }
+    .section-wrap { max-width: 900px; margin: 0 auto; padding: 4.5rem 2rem; border-top: 1px solid var(--border); }
+    .section-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
+    .section-title { font-family: 'Inter', sans-serif; font-size: clamp(1.5rem, 2.8vw, 2rem); font-weight: 600; letter-spacing: -0.02em; margin-bottom: 2rem; }
+
+    /* Pain points cards */
+    .pain-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 2rem 0; }
+    .pain-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; }
+    .pain-card-num { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--accent); margin-bottom: 0.6rem; letter-spacing: 0.06em; }
+    .pain-card p { font-size: 0.88rem; color: var(--muted); line-height: 1.7; }
+
+    /* Callout */
+    .callout {
+      background: rgba(200,240,96,0.06);
+      border-left: 3px solid var(--accent);
+      padding: 1.25rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+      font-style: italic;
+      color: var(--text);
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin: 1.5rem 0;
+    }
+
+    /* Steps */
+    .steps { display: flex; flex-direction: column; gap: 1.25rem; margin: 2rem 0; }
+    .step { display: flex; gap: 1.25rem; align-items: flex-start; }
+    .step-num { flex-shrink: 0; width: 32px; height: 32px; border: 1px solid rgba(200,240,96,0.28); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .step-body p { font-size: 0.88rem; color: var(--muted); line-height: 1.7; }
+
+    /* Before/after scenarios */
+    .scenarios { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1.5rem 0; }
+    .scenario { flex: 1; min-width: 260px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; }
+    .scenario.without { border-color: rgba(255,100,100,0.25); }
+    .scenario.with { border-color: rgba(139,224,200,0.35); }
+    .scenario-label { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; font-family: 'DM Mono', monospace; margin-bottom: 0.75rem; }
+    .scenario.without .scenario-label { color: rgba(255,120,120,0.8); }
+    .scenario.with .scenario-label { color: var(--teal); }
+    .scenario p { font-size: 0.875rem; color: var(--muted); line-height: 1.75; }
+
+    /* CTA footer */
+    .cta-footer { border-top: 1px solid var(--border); text-align: center; padding: 5rem 2rem; }
+    .cta-footer h3 { font-family: 'Inter', sans-serif; font-size: clamp(1.4rem, 2.6vw, 2rem); font-weight: 600; letter-spacing: -0.02em; margin-bottom: 2rem; }
+
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 640px) {
+      nav { padding: 1rem 1.25rem; }
+      .nav-links { gap: 1rem; }
+      .hero { padding: 3.5rem 1.25rem 3rem; }
+      .section-wrap { padding: 3rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/#benchmarks">Benchmarks</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/demo.html">Demo</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">For Staff &amp; Principal Engineers</div>
+    <h1>Stop Repeating Architectural Decisions in Every PR Review</h1>
+    <p class="hero-sub">You've explained the service boundary three times this sprint. The AI didn't know. The developer didn't check. Mneme HQ puts your decisions in the loop — before the code is written.</p>
+  </div>
+
+  <!-- SECTION 1: THE PROBLEM -->
+  <div class="section-wrap">
+    <div class="section-eyebrow">The Problem</div>
+    <h2 class="section-title">Your review time is being consumed by violations the AI caused.</h2>
+
+    <div class="pain-grid">
+      <div class="pain-card">
+        <div class="pain-card-num">01</div>
+        <p>Repeated PR comments for the same violations — different developers, same mistake</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-card-num">02</div>
+        <p>AI coding assistants have no memory of past reviews</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-card-num">03</div>
+        <p>Every session starts from zero — no institutional context</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-card-num">04</div>
+        <p>Senior engineer time consumed by architectural correction that should be automatic</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: THE FIX -->
+  <div class="section-wrap">
+    <div class="section-eyebrow">The Fix</div>
+    <h2 class="section-title">Record decisions once. Enforce them everywhere.</h2>
+
+    <div class="callout">
+      "An ADR in a docs folder informs. An ADR in Mneme HQ enforces."
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <p>Record architectural decisions in <code>project_memory.json</code> (or import existing ADRs)</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <p>Set scope patterns so decisions fire only where relevant</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <p>Install the Claude Code hook — violations are blocked before the file is written</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <p>Decision stays enforced across all developers, all sessions, all agents</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: BEFORE/AFTER -->
+  <div class="section-wrap">
+    <div class="section-eyebrow">What This Looks Like</div>
+    <h2 class="section-title">Before and after</h2>
+
+    <div class="scenarios">
+      <div class="scenario without">
+        <div class="scenario-label">Without Mneme</div>
+        <p>AI writes payments handler using raw SQL &rarr; reviewer catches it &rarr; back-and-forth on PR &rarr; merged 3 days later &rarr; pattern repeats next sprint</p>
+      </div>
+      <div class="scenario with">
+        <div class="scenario-label">With Mneme</div>
+        <p>AI attempts raw SQL write &rarr; hook fires &rarr; violation blocked &rarr; constraint surfaced in-context &rarr; developer fixes before PR opens</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: CTA -->
+  <div class="cta-footer">
+    <h3>Stop reviewing the same violations twice.</h3>
+    <div class="cta-group">
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub</a>
+      <a href="/insights/why-code-review-cannot-scale-with-ai-output/" class="link-ghost">Read: Why Code Review Cannot Scale &rarr;</a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>
+    <a href="/use-cases/">Use cases</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/insights/">Insights</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/for/cto/">For CTOs</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/founder/">Founder</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/contact/">Contact</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/privacy/">Privacy</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    &nbsp;&middot;&nbsp;
+    Open source
+    &nbsp;&middot;&nbsp;
+    MIT License
+  </p>
+</footer>
+</body>
+</html>
