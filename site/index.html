@@ -615,6 +615,7 @@
     <a href="#how-it-works">How it works</a>
     <a href="#benchmarks">Benchmarks</a>
     <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
     <a href="/demo.html">Demo</a>
     <a href="https://github.com/TheoV823/mneme">GitHub</a>
     <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
@@ -793,40 +794,45 @@
       </div>
     </div>
     <div class="rag-subsection">
-      <div class="section-eyebrow" style="margin-bottom:0.75rem;">Why not just RAG?</div>
-      <p style="color:var(--muted);font-size:0.95rem;line-height:1.6;margin-bottom:1.5rem;max-width:520px;">RAG retrieves information. Mneme HQ retrieves decisions.</p>
+      <div class="section-eyebrow" style="margin-bottom:0.5rem;">Why Existing Approaches Fail</div>
+      <p style="color:var(--muted);font-size:0.88rem;line-height:1.6;margin-bottom:1.5rem;max-width:540px;">
+        Every current approach shares a common flaw: none of them enforce decisions before the model writes the code.
+      </p>
       <div class="rag-table-wrap">
         <table class="rag-table">
           <thead>
             <tr>
-              <th></th>
-              <th>RAG</th>
+              <th>Approach</th>
+              <th>Why It Breaks at Scale</th>
               <th>Mneme HQ</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>Input</td>
-              <td>Documents, chunks, embeddings</td>
-              <td>Rules, constraints, decision records</td>
+              <td>Rules Files</td>
+              <td>Static, manually maintained, silently ignored by tools</td>
+              <td rowspan="4" style="color:var(--teal);vertical-align:middle;font-weight:500;">
+                Deterministic pre-generation enforcement. Structured decisions with a precedence engine, scope-aware retrieval, and hook-level blocking.
+              </td>
             </tr>
             <tr>
-              <td>Goal</td>
-              <td>Inform the response</td>
-              <td>Shape the response</td>
+              <td>Prompt Templates</td>
+              <td>Drift between sessions, omitted by integrators, inconsistent across agents</td>
             </tr>
             <tr>
-              <td>Output effect</td>
-              <td>Model knows more</td>
-              <td>Model follows your decisions</td>
+              <td>RAG / Vector Search</td>
+              <td>Probabilistic retrieval, no authority model, no enforcement</td>
             </tr>
             <tr>
-              <td>Evaluation</td>
-              <td>"Did it use the right source?"</td>
-              <td>"Did it respect the constraint?"</td>
+              <td>Code Review</td>
+              <td>Reactive, linear capacity, too late to prevent architectural debt</td>
             </tr>
           </tbody>
         </table>
+      </div>
+      <div style="margin-top:1.25rem;display:flex;gap:1rem;flex-wrap:wrap;">
+        <a href="/insights/why-rag-fails-for-architectural-governance/" style="color:var(--accent);font-size:0.82rem;text-decoration:none;">Why RAG fails →</a>
+        <a href="/insights/why-code-review-cannot-scale-with-ai-output/" style="color:var(--accent);font-size:0.82rem;text-decoration:none;">Why code review doesn't scale →</a>
       </div>
     </div>
   </div>
@@ -912,6 +918,8 @@ response = LLMAdapter().complete(
 <footer>
   <p>
     <a href="/use-cases/">Use cases</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/insights/">Insights</a>
     &nbsp;&middot;&nbsp;
     <a href="/founder/">Founder</a>
     &nbsp;&middot;&nbsp;
