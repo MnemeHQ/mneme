@@ -89,11 +89,11 @@
     .nav-links a:hover { color: var(--text); }
     .btn-nav-cta {
       background: var(--accent);
-      color: #0c0c0d;
+      color: #000;
       padding: 0.45rem 1.1rem;
       border-radius: 6px;
       font-size: 0.82rem;
-      font-weight: 500;
+      font-weight: 700;
       font-family: 'DM Mono', monospace;
       text-decoration: none;
       transition: background 0.15s;
@@ -284,9 +284,10 @@
       font-family: 'DM Mono', monospace;
       font-size: 0.78rem;
       color: var(--teal);
-      overflow-x: auto;
       margin-bottom: 2.5rem;
-      white-space: nowrap;
+      white-space: normal;
+      line-height: 1.9;
+      word-break: break-word;
     }
     .steps { display: flex; flex-direction: column; gap: 1.5rem; }
     .step { display: flex; gap: 1.25rem; align-items: flex-start; }
@@ -474,16 +475,18 @@
       transition: border-color 0.15s, transform 0.15s;
     }
     .problem-card:hover { border-color: rgba(200,240,96,0.28); transform: translateY(-2px); }
-    .how-it-works-grid {
+    .steps-2col {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 3rem;
-      align-items: start;
-      margin-top: 2.5rem;
+      gap: 1.25rem 3rem;
+      margin-bottom: 3rem;
     }
-    .how-it-works-grid > div { min-width: 0; }
-    @media (max-width: 800px) {
-      .how-it-works-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+    @media (max-width: 680px) {
+      .steps-2col { grid-template-columns: 1fr; gap: 1.25rem; }
+    }
+    .rag-subsection {
+      border-top: 1px solid var(--border);
+      padding-top: 2.5rem;
     }
     .case-card {
       background: var(--surface);
@@ -637,7 +640,8 @@
     </div>
   </div>
 
-  <div class="section-wrap" id="problem" style="background:var(--surface2);border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);padding-top:4.25rem;padding-bottom:4.25rem;">
+  <div style="background:var(--surface2);border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);">
+  <div class="section-wrap" id="problem" style="border-top:none;padding-top:4.25rem;padding-bottom:4.25rem;">
     <div class="section-eyebrow">The bottleneck</div>
     <h2 class="section-title" style="margin-bottom:0.5rem;">AI increased code output.<br><span style="color:#ff7070;">Review capacity did not.</span></h2>
     <p style="max-width:620px;margin-bottom:2.5rem;color:var(--muted);font-size:1.05rem;line-height:1.55;">
@@ -662,6 +666,7 @@
         <div style="font-size:0.78rem;color:var(--muted);line-height:1.5;">Coding agents forget prior decisions unless re-prompted every time.</div>
       </div>
     </div>
+  </div>
   </div>
 
   <!-- BEFORE / AFTER DEMO -->
@@ -743,90 +748,88 @@
   </div>
 
   <!-- HOW IT WORKS + RAG COMPARISON -->
-  <div class="section-wrap" id="how-it-works" style="background:var(--surface2);border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);">
+  <div style="background:var(--surface2);border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);">
+  <div class="section-wrap" id="how-it-works" style="border-top:none;">
     <div class="section-eyebrow">How it works</div>
     <h2 class="section-title">Five stages. No vector store. No ML.</h2>
-    <div class="how-it-works-grid">
-      <div>
-        <div class="pipeline-block">
-          project_memory.json → MemoryStore → Retriever → ContextBuilder → LLMAdapter → Evaluator
-        </div>
-        <div class="steps">
-          <div class="step">
-            <div class="step-num">1</div>
-            <div class="step-body">
-              <h4>Load</h4>
-              <p>Load structured project memory from a human-editable JSON file — rules, constraints, facts, and prior decision records.</p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num">2</div>
-            <div class="step-body">
-              <h4>Retrieve</h4>
-              <p>Retrieve only the rules and decision examples relevant to the current task using deterministic keyword scoring. Same query always returns the same result.</p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num">3</div>
-            <div class="step-body">
-              <h4>Build</h4>
-              <p>Build a compact context packet containing only what the model needs to know about your project's established decisions.</p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num">4</div>
-            <div class="step-body">
-              <h4>Inject</h4>
-              <p>Inject the context packet as the system prompt before every LLM call — regardless of which tool or platform makes the call.</p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num">5</div>
-            <div class="step-body">
-              <h4>Evaluate</h4>
-              <p>Score the response against the injected context. Check whether the model respected your decisions and surface any violations.</p>
-            </div>
-          </div>
+    <div class="pipeline-block">
+      project_memory.json → MemoryStore → Retriever → ContextBuilder → LLMAdapter → Evaluator
+    </div>
+    <div class="steps-2col">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Load</h4>
+          <p>Load structured project memory from a human-editable JSON file — rules, constraints, facts, and prior decision records.</p>
         </div>
       </div>
-      <div>
-        <div class="section-eyebrow" style="margin-bottom:1rem;">Why not just RAG?</div>
-        <p style="color:var(--muted);font-size:0.95rem;line-height:1.6;margin-bottom:1.5rem;">RAG retrieves information. Mneme HQ retrieves decisions.</p>
-        <div class="rag-table-wrap">
-          <table class="rag-table">
-            <thead>
-              <tr>
-                <th></th>
-                <th>RAG</th>
-                <th>Mneme HQ</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Input</td>
-                <td>Documents, chunks, embeddings</td>
-                <td>Rules, constraints, decision records</td>
-              </tr>
-              <tr>
-                <td>Goal</td>
-                <td>Inform the response</td>
-                <td>Shape the response</td>
-              </tr>
-              <tr>
-                <td>Output effect</td>
-                <td>Model knows more</td>
-                <td>Model follows your decisions</td>
-              </tr>
-              <tr>
-                <td>Evaluation</td>
-                <td>"Did it use the right source?"</td>
-                <td>"Did it respect the constraint?"</td>
-              </tr>
-            </tbody>
-          </table>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Retrieve</h4>
+          <p>Retrieve only the rules relevant to the current task using deterministic keyword scoring. Same query, same result.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Build</h4>
+          <p>Build a compact context packet containing only what the model needs to know about your project's established decisions.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>Inject</h4>
+          <p>Inject the context packet as the system prompt before every LLM call — regardless of which tool or platform makes the call.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h4>Evaluate</h4>
+          <p>Score the response against the injected context. Surface any violations before code reaches review.</p>
         </div>
       </div>
     </div>
+    <div class="rag-subsection">
+      <div class="section-eyebrow" style="margin-bottom:0.75rem;">Why not just RAG?</div>
+      <p style="color:var(--muted);font-size:0.95rem;line-height:1.6;margin-bottom:1.5rem;max-width:520px;">RAG retrieves information. Mneme HQ retrieves decisions.</p>
+      <div class="rag-table-wrap">
+        <table class="rag-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>RAG</th>
+              <th>Mneme HQ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Input</td>
+              <td>Documents, chunks, embeddings</td>
+              <td>Rules, constraints, decision records</td>
+            </tr>
+            <tr>
+              <td>Goal</td>
+              <td>Inform the response</td>
+              <td>Shape the response</td>
+            </tr>
+            <tr>
+              <td>Output effect</td>
+              <td>Model knows more</td>
+              <td>Model follows your decisions</td>
+            </tr>
+            <tr>
+              <td>Evaluation</td>
+              <td>"Did it use the right source?"</td>
+              <td>"Did it respect the constraint?"</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
   </div>
 
   <!-- WORKS WITH -->
