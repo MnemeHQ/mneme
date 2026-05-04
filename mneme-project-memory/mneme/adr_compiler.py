@@ -210,33 +210,116 @@ def _check_no_supersession_cycles(adrs: list[ADR]) -> list[str]:
     return out
 
 
-# ── Compile orchestrator (precedence to be added in milestone 3) ──────────────
+# ── Precedence resolution ────────────────────────────────────────────────────
+
+
+def resolve_precedence(adrs: list[ADR]) -> list[ADR]:
+    """Resolve ADR precedence and return the active constraint set.
+
+    Hierarchy applied (in order):
+        1. Status filter — only ``status == "accepted"`` survives.
+        2. Explicit supersedes — any ADR whose id is referenced by another
+           accepted ADR's ``supersedes`` is removed.
+        3. Same-scope conflicts — within a scope group, higher priority
+           wins; on a priority tie, the newer date wins.
+        4. Specificity — does NOT cause compile-time conflicts; broader
+           and narrower scopes coexist in the active set. The output is
+           sorted most-specific-first so consumers can apply constraints
+           in the natural overriding order.
+        5. Ambiguity — if same-scope precedence cannot be broken,
+           ``ADRPrecedenceError`` is raised. The compiler never silently
+           picks a winner.
+
+    Args:
+        adrs: A validated list of parsed ADR records. Callers should run
+              ``validate_corpus`` first; this function trusts its input.
+
+    Returns:
+        The active constraint set, sorted by scope specificity (desc),
+        priority (desc), and id (asc) for stable output.
+
+    Raises:
+        ADRPrecedenceError: If two accepted ADRs share a scope and tie on
+                            both priority and date.
+    """
+    # 1. Status filter.
+    accepted = [a for a in adrs if a.status == "accepted"]
+
+    # 2. Apply explicit supersedes.
+    superseded_ids: set[str] = set()
+    for a in accepted:
+        for ref in a.supersedes:
+            superseded_ids.add(ref)
+    surviving = [a for a in accepted if a.id not in superseded_ids]
+
+    # 3. Group by scope and resolve same-scope conflicts.
+    by_scope: dict[str, list[ADR]] = {}
+    for a in surviving:
+        by_scope.setdefault(a.scope, []).append(a)
+
+    winners: list[ADR] = []
+    for scope, group in by_scope.items():
+        winners.append(_pick_within_scope(scope, group))
+
+    # 5. Stable, deterministic output ordering.
+    winners.sort(
+        key=lambda a: (-_specificity(a.scope), -PRIORITY_RANK[a.priority], a.id)
+    )
+    return winners
+
+
+def _pick_within_scope(scope: str, group: list[ADR]) -> ADR:
+    """Pick the single winner for a scope group via priority then date."""
+    if len(group) == 1:
+        return group[0]
+
+    max_rank = max(PRIORITY_RANK[a.priority] for a in group)
+    top_priority = [a for a in group if PRIORITY_RANK[a.priority] == max_rank]
+    if len(top_priority) == 1:
+        return top_priority[0]
+
+    newest_date = max(a.date for a in top_priority)
+    newest = [a for a in top_priority if a.date == newest_date]
+    if len(newest) == 1:
+        return newest[0]
+
+    raise ADRPrecedenceError(scope=scope, ids=[a.id for a in newest])
+
+
+def _specificity(scope: str) -> int:
+    """Return the depth (segment count) of a scope. Empty == 0 (global)."""
+    if scope == "":
+        return 0
+    return scope.count(".") + 1
+
+
+# ── Compile orchestrator ─────────────────────────────────────────────────────
 
 
 def compile_adrs(adr_dir: str | Path) -> list[ADR]:
     """Parse, validate, and resolve precedence over a directory of ADRs.
 
-    NOTE: precedence resolution is implemented in milestone 3. For now,
-    this function performs parse + validate and returns the raw parsed
-    list. The signature is stable so callers can adopt early.
-
     Args:
         adr_dir: Path to a directory containing ADR markdown files.
 
     Returns:
-        Parsed (and, in milestone 3+, precedence-resolved) ADR records.
+        The compiled active constraint set, ordered by scope specificity
+        (desc), priority (desc), and id (asc).
 
     Raises:
         ADRParseError:      If any file fails to parse.
         ADRValidationError: If the corpus fails schema validation.
+        ADRPrecedenceError: If two accepted ADRs share a scope and tie on
+                            both priority and date.
     """
     adrs = parse_adr_directory(adr_dir)
     validate_corpus(adrs)
-    return adrs
+    return resolve_precedence(adrs)
 
 
 __all__ = [
     "validate_corpus",
+    "resolve_precedence",
     "compile_adrs",
     "ADRPrecedenceError",
 ]
