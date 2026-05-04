@@ -60,7 +60,8 @@ Before adding any tooling or code to the public repository, classify it:
 - Growth / marketing MCP servers
 - Internal dashboards and analytics scripts
 - Private enrichment or prospecting automation
-- Outreach sequence tooling
+- Outreach sequence tooling (validation targets, LinkedIn messages, CRM exports)
+- Customer discovery materials (interview target lists, call notes, pain signal tracking)
 - Internal ops runbooks with implementation detail
 
 **Category 1 — Core OSS (public):**
@@ -89,4 +90,6 @@ Before adding any tooling or code to the public repository, classify it:
 ## Related
 
 - ADR-001: Positioning and Messaging
-- Private repo: `mneme-growth-ops` (internal tooling home)
+- Private repo: [`mneme-growth-ops`](https://github.com/TheoV823/mneme-growth-ops) — internal tooling home  
+  Local path: `/c/dev/mneme-growth-ops`  
+  Scope: growth automation, outreach, validation research, LinkedIn content, customer discovery materials
