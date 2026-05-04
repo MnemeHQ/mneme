@@ -27,10 +27,10 @@ Mneme HQ turns those decisions into structured, retrievable constraints that can
 This repository demonstrates the first core capability: injecting structured architectural decisions into LLM calls so outputs stay consistent with prior engineering decisions.
 
 ```python
-from Mneme HQ.memory_store import MemoryStore
-from Mneme HQ.retriever import Retriever
-from Mneme HQ.context_builder import format_context_packet
-from Mneme HQ.llm_adapter import LLMAdapter
+from mneme.memory_store import MemoryStore
+from mneme.retriever import Retriever
+from mneme.context_builder import format_context_packet
+from mneme.llm_adapter import LLMAdapter
 
 memory = MemoryStore("examples/project_memory.json").load()
 packet = Retriever(memory).retrieve("Should we rebuild from scratch?")
@@ -215,7 +215,7 @@ into `Decision` objects at load time; no changes needed to existing JSON files.
 
 ```json
 {
-  "id": "Mneme HQ_storage_json",
+  "id": "mneme_storage_json",
   "decision": "Use JSON storage only",
   "rationale": "Avoid infra complexity and keep local-first.",
   "scope": ["storage", "backend"],
@@ -247,7 +247,7 @@ Only the top-scoring decisions are injected. The default cap is
 `DEFAULT_MAX_DECISIONS = 3`. Override per call:
 
 ```python
-from Mneme HQ.pipeline import Pipeline
+from mneme.pipeline import Pipeline
 
 result = Pipeline("examples/project_memory.json", dry_run=True, max_decisions=5).run(query)
 print(result.system_prompt)   # formatted block injected as system prompt
@@ -260,7 +260,7 @@ print(result.injected_decisions)  # list[Decision] actually sent
 violations **after** the call. It is a detector, not a blocker:
 
 ```python
-from Mneme HQ.conflict_detector import ConflictDetector
+from mneme.conflict_detector import ConflictDetector
 conflicts = ConflictDetector().detect(response.content, injected_decisions)
 # Conflict(violated_decision_id, reason, snippet) per match
 ```
@@ -272,15 +272,15 @@ A term is only flagged when it appears **without** a negation signal nearby.
 
 ```bash
 # List all decisions (native + auto-migrated legacy items)
-Mneme HQ list_decisions --memory examples/project_memory.json
+mneme list_decisions --memory examples/project_memory.json
 
 # Append a new decision (file write only — does not mutate a live Pipeline)
-Mneme HQ add_decision --memory examples/project_memory.json \
-    --id Mneme HQ_042 --decision "No GraphQL in v1" \
+mneme add_decision --memory examples/project_memory.json \
+    --id adr-042 --decision "No GraphQL in v1" \
     --scope api --constraint "REST only" --anti-pattern "introduce graphql"
 
 # Score a query and preview the injected block
-Mneme HQ test_query --memory examples/project_memory.json \
+mneme test_query --memory examples/project_memory.json \
     --query "should I add postgres?" --top 3
 ```
 
@@ -289,8 +289,8 @@ Mneme HQ test_query --memory examples/project_memory.json \
 ## Quick demo
 
 ```bash
-python -m Mneme HQ.cli list_decisions --memory examples/project_memory.json
-python -m Mneme HQ.cli test_query --memory examples/project_memory.json --query "should I use Postgres?" --top 3
+python -m mneme.cli list_decisions --memory examples/project_memory.json
+python -m mneme.cli test_query --memory examples/project_memory.json --query "should I use Postgres?" --top 3
 python demo.py --dry-run
 ```
 

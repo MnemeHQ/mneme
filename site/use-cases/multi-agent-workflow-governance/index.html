@@ -170,6 +170,7 @@
     <a href="/#how-it-works">How it works</a>
     <a href="/#benchmarks">Benchmarks</a>
     <a href="/use-cases/" class="active">Use cases</a>
+    <a href="/insights/">Insights</a>
     <a href="/demo.html">Demo</a>
     <a href="https://github.com/TheoV823/mneme">GitHub</a>
     <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
@@ -343,7 +344,7 @@
       <pre><span class="cc"># Before invoking coder agent</span>
 <span class="ck">plan</span> = planner_agent.run(task)
 
-<span class="cs">check</span> = Mneme HQ.check(plan, mode=<span class="cs">"strict"</span>, stage=<span class="cs">"plan"</span>)
+<span class="cs">check</span> = mneme.check(plan, mode=<span class="cs">"strict"</span>, stage=<span class="cs">"plan"</span>)
 <span class="ck">if</span> check.has_violations():
     <span class="cc"># Return violations to planner for revision</span>
     plan = planner_agent.revise(plan, violations=check.violations)
@@ -351,7 +352,7 @@
 <span class="cc"># Before invoking reviewer agent</span>
 <span class="ck">code</span> = coder_agent.run(plan)
 
-<span class="cs">check</span> = Mneme HQ.check(code, mode=<span class="cs">"strict"</span>, stage=<span class="cs">"code"</span>)
+<span class="cs">check</span> = mneme.check(code, mode=<span class="cs">"strict"</span>, stage=<span class="cs">"code"</span>)
 <span class="ck">if</span> check.has_violations():
     <span class="cc"># Block reviewer; return to coder with context</span>
     code = coder_agent.fix(code, violations=check.violations)</pre>
@@ -415,6 +416,8 @@
 <footer>
   <p>
     <a href="/use-cases/">Use cases</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/insights/">Insights</a>
     &nbsp;&middot;&nbsp;
     <a href="/founder/">Founder</a>
     &nbsp;&middot;&nbsp;
