@@ -1,5 +1,46 @@
 # Changelog
 
+## v0.4.2 — 2026-05-05
+
+**Fix: module execution and exit propagation (completes hook reliability)**
+
+> **Install this, not v0.4.1.** v0.4.1 fixed PATH lookup but left exit-code
+> propagation broken — `python -m mneme check` could exit 0 on a FAIL verdict,
+> silently allowing violating edits through in strict mode. v0.4.2 is the first
+> fully reliable hook release.
+
+### Fixed
+
+- Added `mneme/__main__.py` so `python -m mneme` dispatches correctly.
+- `sys.exit(main())` propagates CLI exit codes through the module entrypoint.
+
+### Tests
+
+- Full suite: 218 passed, 2 skipped.
+
+---
+
+## v0.4.1 — 2026-05-04
+
+**Fix: Claude Code hook PATH lookup (incomplete — upgrade to v0.4.2)**
+
+> **Do not use v0.4.1 alone.** Exit-code propagation was not fixed in this
+> release. Upgrade to v0.4.2 for the complete fix.
+
+### Fixed
+
+- Hook subprocess changed from `["mneme", "check", ...]` to
+  `[sys.executable, "-m", "mneme", "check", ...]`. On Windows (Microsoft Store
+  Python) the Scripts directory may not be on `PATH` when Claude Code launches
+  `mneme-hook.exe`, causing the bare `mneme` subprocess to fail with
+  `FileNotFoundError` and the hook to fail open silently.
+
+### Tests
+
+- Regression test added: `test_subprocess_uses_sys_executable_not_bare_mneme`.
+
+---
+
 ## v0.4.0 — 2026-05-04
 
 **Architectural Compiler Foundation**
