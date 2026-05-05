@@ -542,6 +542,48 @@
       border-radius: 6px;
     }
 
+    /* ── ROADMAP TEASER ── */
+    .roadmap-phases {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    @media (max-width: 680px) {
+      .roadmap-phases { grid-template-columns: 1fr; }
+    }
+    .roadmap-phase {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem 1.5rem 1.25rem;
+      transition: border-color 0.15s;
+    }
+    .roadmap-phase:hover { border-color: rgba(200,240,96,0.22); }
+    .roadmap-phase.active { border-color: rgba(200,240,96,0.28); }
+    .roadmap-phase.active:hover { border-color: rgba(200,240,96,0.44); }
+    .phase-tag {
+      font-size: 0.68rem;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+    .roadmap-phase.active .phase-tag { color: var(--accent); }
+    .phase-name {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.35rem;
+    }
+    .phase-desc {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
     /* ── CTA FOOTER ── */
     .cta-footer {
       border-top: 1px solid var(--border);
@@ -617,6 +659,7 @@
     <a href="#benchmarks">Benchmarks</a>
     <a href="/use-cases/">Use cases</a>
     <a href="/insights/">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
     <a href="/demo.html">Demo</a>
     <a href="https://github.com/TheoV823/mneme">GitHub</a>
     <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
@@ -905,6 +948,40 @@ response = LLMAdapter().complete(
     </div>
   </div>
 
+  <!-- ROADMAP TEASER -->
+  <div style="background:var(--surface2);border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);">
+  <div class="section-wrap" style="border-top:none;padding-top:4.25rem;padding-bottom:4.25rem;">
+    <div class="section-eyebrow">Vision &amp; roadmap</div>
+    <h2 class="section-title">Building the governance layer<br>for AI-assisted development.</h2>
+    <p style="max-width:600px;margin-bottom:2.75rem;color:var(--muted);font-size:1rem;line-height:1.7;">
+      Mneme is evolving from local governance tooling into the governance infrastructure layer for AI-assisted software development. As coding workflows mature, teams will need more than prompt files to maintain architectural consistency at scale.
+    </p>
+    <div class="roadmap-phases">
+      <div class="roadmap-phase active">
+        <div class="phase-tag">Phase 1 — Current</div>
+        <div class="phase-name">OSS Developer Wedge</div>
+        <div class="phase-desc">Architectural governance for individual developers and early engineering adopters.</div>
+      </div>
+      <div class="roadmap-phase">
+        <div class="phase-tag">Phase 2</div>
+        <div class="phase-name">Team Governance Layer</div>
+        <div class="phase-desc">Shared policy and decision stores for teams adopting AI-assisted development.</div>
+      </div>
+      <div class="roadmap-phase">
+        <div class="phase-tag">Phase 3</div>
+        <div class="phase-name">Agent Platform Integrations</div>
+        <div class="phase-desc">Governance for enterprise agent workflows and managed coding platforms.</div>
+      </div>
+      <div class="roadmap-phase">
+        <div class="phase-tag">Phase 4</div>
+        <div class="phase-name">Governance Infrastructure</div>
+        <div class="phase-desc">Policy-as-code enforcement and drift analytics across engineering organizations.</div>
+      </div>
+    </div>
+    <a href="/roadmap/" class="demo-link">See full roadmap →</a>
+  </div>
+  </div>
+
   <!-- CTA FOOTER -->
   <div class="cta-footer">
     <h2>Ready to give your LLM workflows a memory?</h2>
@@ -921,7 +998,8 @@ response = LLMAdapter().complete(
     <a href="/use-cases/">Use cases</a>
     &nbsp;&middot;&nbsp;
     <a href="/insights/">Insights</a>
-
+    &nbsp;&middot;&nbsp;
+    <a href="/roadmap/">Roadmap</a>
     &nbsp;&middot;&nbsp;
     <a href="/founder/">Founder</a>
     &nbsp;&middot;&nbsp;

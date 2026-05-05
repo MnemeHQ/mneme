@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roadmap — Mneme HQ</title>
+  <meta name="description" content="Mneme HQ is evolving from local governance tooling into the governance infrastructure layer for AI-assisted software development. See our strategic direction." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/roadmap/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Roadmap — Mneme HQ" />
+  <meta property="og:description" content="Mneme HQ is evolving from local governance tooling into the governance infrastructure layer for AI-assisted software development." />
+  <meta property="og:url" content="https://mnemehq.com/roadmap/" />
+  <meta property="og:image" content="https://mnemehq.com/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Roadmap — Mneme HQ" />
+  <meta name="twitter:description" content="Mneme HQ is evolving from local governance tooling into the governance infrastructure layer for AI-assisted software development." />
+  <meta name="twitter:image" content="https://mnemehq.com/og.png" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #88889a;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+
+    /* NAV */
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #000; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 700; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    /* BUTTONS */
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.75rem 1.75rem; border-radius: 8px; font-size: 0.88rem; font-weight: 500; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--accent-dim); }
+    .btn-ghost { display: inline-block; background: transparent; border: 1px solid var(--border2); color: var(--text); padding: 0.75rem 1.75rem; border-radius: 8px; font-size: 0.88rem; font-family: 'DM Mono', monospace; text-decoration: none; transition: border-color 0.15s, color 0.15s; }
+    .btn-ghost:hover { border-color: var(--teal); color: var(--teal); }
+
+    /* HERO */
+    .hero { max-width: 800px; margin: 0 auto; padding: 5.5rem 2rem 4.5rem; text-align: center; }
+    .hero-tag { display: inline-block; background: rgba(200,240,96,0.07); border: 1px solid rgba(200,240,96,0.22); color: var(--accent); font-size: 0.72rem; font-family: 'DM Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.3rem 0.9rem; border-radius: 999px; margin-bottom: 1.75rem; }
+    .hero h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.25rem; color: var(--text); }
+    .hero-sub { font-size: 1rem; color: var(--muted); max-width: 580px; margin: 0 auto 2.5rem; line-height: 1.75; }
+    .cta-group { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+
+    /* SECTION SHARED */
+    .section-wrap { max-width: 900px; margin: 0 auto; padding: 4.5rem 2rem; border-top: 1px solid var(--border); }
+    .section-eyebrow { font-size: 0.72rem; font-family: 'DM Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
+    .section-title { font-family: 'Inter', sans-serif; font-size: clamp(1.5rem, 2.8vw, 2rem); font-weight: 600; letter-spacing: -0.02em; margin-bottom: 1.25rem; color: var(--text); }
+
+    /* PHASE CARDS */
+    .phases { display: flex; flex-direction: column; gap: 1.5rem; }
+    .phase-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: border-color 0.15s; }
+    .phase-card.current { border-color: rgba(200,240,96,0.28); }
+    .phase-card:hover { border-color: rgba(200,240,96,0.22); }
+    .phase-card.current:hover { border-color: rgba(200,240,96,0.44); }
+    .phase-header { display: flex; align-items: baseline; gap: 1rem; padding: 1.5rem 1.75rem 1.25rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    .phase-label { font-size: 0.72rem; font-family: 'DM Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+    .phase-card.current .phase-label { color: var(--accent); }
+    .phase-status { font-size: 0.68rem; font-family: 'DM Mono', monospace; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.2rem 0.65rem; border-radius: 999px; background: rgba(200,240,96,0.1); color: var(--accent); border: 1px solid rgba(200,240,96,0.22); }
+    .phase-status.planned { background: rgba(139,224,200,0.07); color: var(--teal); border-color: rgba(139,224,200,0.18); }
+    .phase-title { font-family: 'Instrument Serif', serif; font-size: clamp(1.3rem, 2.5vw, 1.6rem); font-weight: 400; color: var(--text); margin-left: auto; width: 100%; padding-top: 0.1rem; }
+    .phase-body { padding: 1.5rem 1.75rem; }
+    .phase-desc { font-size: 0.9rem; color: var(--muted); line-height: 1.75; margin-bottom: 1.25rem; max-width: 680px; }
+    .phase-capabilities { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+    .phase-capabilities li { display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.82rem; font-family: 'DM Mono', monospace; color: var(--muted); line-height: 1.55; }
+    .phase-capabilities li::before { content: '—'; color: var(--border2); flex-shrink: 0; margin-top: 0.05rem; }
+    .phase-card.current .phase-capabilities li::before { color: rgba(200,240,96,0.4); }
+    .phase-card.current .phase-capabilities li { color: var(--text); }
+
+    /* THESIS */
+    .thesis-block { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2.25rem; }
+    .thesis-item { display: flex; gap: 1.25rem; align-items: flex-start; padding: 1rem 0; border-bottom: 1px solid var(--border); }
+    .thesis-item:first-child { padding-top: 0; }
+    .thesis-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .thesis-arrow { flex-shrink: 0; font-family: 'DM Mono', monospace; font-size: 0.88rem; color: var(--accent); margin-top: 0.15rem; }
+    .thesis-text { font-size: 0.92rem; color: var(--text); line-height: 1.65; }
+    .thesis-text em { color: var(--muted); font-style: normal; }
+
+    /* CTA FOOTER */
+    .cta-footer { border-top: 1px solid var(--border); text-align: center; padding: 5.5rem 2rem; }
+    .cta-footer h2 { font-family: 'Inter', sans-serif; font-size: clamp(1.5rem, 3vw, 2.2rem); font-weight: 600; letter-spacing: -0.02em; margin-bottom: 0.75rem; color: var(--text); }
+    .cta-footer p { font-size: 0.88rem; color: var(--muted); margin-bottom: 2rem; }
+
+    /* DISCLAIMER */
+    .roadmap-note { font-size: 0.75rem; font-family: 'DM Mono', monospace; color: var(--muted); opacity: 0.7; text-align: center; padding: 0 2rem 1rem; }
+
+    /* FOOTER */
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 640px) {
+      nav { padding: 1rem 1.25rem; }
+      .nav-links { gap: 1rem; }
+      .hero { padding: 3.5rem 1.25rem 3rem; }
+      .section-wrap { padding: 3rem 1.25rem; }
+      .phase-header { padding: 1.25rem; }
+      .phase-body { padding: 1.25rem; }
+      .thesis-block { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/#benchmarks">Benchmarks</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/roadmap/" class="active">Roadmap</a>
+    <a href="/demo.html">Demo</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">Vision &amp; roadmap</div>
+    <h1>Building the Governance Layer<br>for AI-Assisted Development</h1>
+    <p class="hero-sub">Mneme is evolving from local governance tooling into the governance infrastructure layer for AI-assisted software development. As AI coding workflows mature, engineering teams will need more than prompt files to maintain architectural consistency at scale.</p>
+    <div class="cta-group">
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub</a>
+      <a href="/contact/" class="btn-ghost">Talk to us</a>
+    </div>
+  </div>
+
+  <!-- PHASES -->
+  <div class="section-wrap">
+    <div class="section-eyebrow">Strategic phases</div>
+    <h2 class="section-title">Where we are. Where we're going.</h2>
+
+    <div class="phases">
+
+      <!-- Phase 1 -->
+      <div class="phase-card current">
+        <div class="phase-header">
+          <span class="phase-label">Phase 1</span>
+          <span class="phase-status">Current focus</span>
+          <div class="phase-title">OSS Developer Wedge</div>
+        </div>
+        <div class="phase-body">
+          <p class="phase-desc">Architectural governance for individual developers and early engineering adopters. Mneme starts where the problem is most visible — individual AI coding workflows — and builds the foundation that team and enterprise governance will run on.</p>
+          <ul class="phase-capabilities">
+            <li>Architectural decision retrieval at prompt time</li>
+            <li>Constraint injection into coding workflows</li>
+            <li>Governance benchmark validation</li>
+            <li>Cursor Rules and CLAUDE.md integration</li>
+            <li>CI enforcement gate for AI-generated code</li>
+            <li>Deterministic keyword scoring — no ML dependencies</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Phase 2 -->
+      <div class="phase-card">
+        <div class="phase-header">
+          <span class="phase-label">Phase 2</span>
+          <span class="phase-status planned">Planned</span>
+          <div class="phase-title">Team Governance Layer</div>
+        </div>
+        <div class="phase-body">
+          <p class="phase-desc">Shared governance for engineering teams adopting AI-assisted development at scale. The same enforcement model that works for one developer, extended to coordinate decisions across a team without manual synchronization.</p>
+          <ul class="phase-capabilities">
+            <li>Shared policy and decision stores</li>
+            <li>Centralized rule management and versioning</li>
+            <li>Team synchronization and conflict resolution</li>
+            <li>Organization-wide governance controls</li>
+            <li>Role-scoped decision visibility</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Phase 3 -->
+      <div class="phase-card">
+        <div class="phase-header">
+          <span class="phase-label">Phase 3</span>
+          <span class="phase-status planned">Planned</span>
+          <div class="phase-title">Agent Platform Integrations</div>
+        </div>
+        <div class="phase-body">
+          <p class="phase-desc">Governance for enterprise agent workflows. As organizations deploy managed coding agent platforms, governance moves from the individual session to the platform level — enforcing constraints across every agent invocation.</p>
+          <ul class="phase-capabilities">
+            <li>Managed coding agent platform integrations</li>
+            <li>Enterprise AI development environment support</li>
+            <li>Internal engineering agent system hooks</li>
+            <li>Agent orchestration framework governance</li>
+            <li>API-level constraint enforcement</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Phase 4 -->
+      <div class="phase-card">
+        <div class="phase-header">
+          <span class="phase-label">Phase 4</span>
+          <span class="phase-status planned">Planned</span>
+          <div class="phase-title">Governance Infrastructure</div>
+        </div>
+        <div class="phase-body">
+          <p class="phase-desc">Constraint infrastructure for AI software development at the organizational level. Governance becomes a first-class infrastructure concern — not a tool bolted onto a workflow, but a layer that every coding agent runs against.</p>
+          <ul class="phase-capabilities">
+            <li>Policy-as-code for engineering agents</li>
+            <li>Drift analytics and adherence reporting</li>
+            <li>Cross-agent governance enforcement</li>
+            <li>Workflow and CI/CD governance hooks</li>
+            <li>Architectural audit trails across teams</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- THESIS -->
+  <div style="background:var(--surface2);border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);">
+  <div class="section-wrap" style="border-top:none;">
+    <div class="section-eyebrow">Our thesis</div>
+    <h2 class="section-title">Why governance is the next engineering bottleneck.</h2>
+    <div class="thesis-block">
+      <div class="thesis-item">
+        <span class="thesis-arrow">01</span>
+        <p class="thesis-text">AI-assisted development increases code generation throughput faster than reviewer bandwidth. <em>The output volume problem is already here.</em></p>
+      </div>
+      <div class="thesis-item">
+        <span class="thesis-arrow">02</span>
+        <p class="thesis-text">Architectural review is becoming the next engineering bottleneck. <em>Senior engineers spend their capacity on decisions that were already made.</em></p>
+      </div>
+      <div class="thesis-item">
+        <span class="thesis-arrow">03</span>
+        <p class="thesis-text">Mneme exists to move governance upstream — from post-generation review to pre-generation architectural constraint. <em>Catch drift before the code exists, not after it reaches review.</em></p>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- CTA FOOTER -->
+  <div class="cta-footer">
+    <h2>Interested in shaping this roadmap?</h2>
+    <p>We're speaking with engineering leaders and early adopters exploring governance for AI-assisted development.</p>
+    <div class="cta-group">
+      <a href="/contact/" class="btn-primary">Talk to us</a>
+      <a href="https://github.com/TheoV823/mneme" class="btn-ghost">View on GitHub</a>
+    </div>
+  </div>
+
+  <p class="roadmap-note">Roadmap reflects current strategic direction and may evolve based on user feedback and adoption.</p>
+
+</main>
+
+<footer>
+  <p>
+    <a href="/use-cases/">Use cases</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/insights/">Insights</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/roadmap/">Roadmap</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/founder/">Founder</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/contact/">Contact</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/privacy/">Privacy</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    &nbsp;&middot;&nbsp;
+    Open source
+    &nbsp;&middot;&nbsp;
+    MIT License
+  </p>
+</footer>
+
+</body>
+</html>
