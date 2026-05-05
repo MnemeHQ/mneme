@@ -613,10 +613,13 @@
     .answer-capsule strong { color: var(--accent); }
 
     @media (max-width: 640px) {
+      html, body { overflow-x: hidden; }
       nav { padding: 1rem 1.25rem; }
       .nav-links a:not(.btn-nav-cta) { display: none; }
       .hero { padding: 4rem 1.25rem 3.5rem; }
       .section-wrap { padding: 3rem 1.25rem; }
+      .alignment-block > div { grid-template-columns: 1fr !important; }
+      .alignment-block > div > div + div { margin-top: 1.25rem; }
     }
   </style>
 <script type="application/ld+json">
