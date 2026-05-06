@@ -1,4 +1,4 @@
-import urllib.request, urllib.parse, ssl, json, os, subprocess
+import urllib.request, urllib.parse, urllib.error, ssl, json, os, subprocess, xml.etree.ElementTree as ET
 from pathlib import Path
 
 # Load .env if present (never committed — credentials stay local)
@@ -11,37 +11,32 @@ if _env.exists():
             os.environ.setdefault(k.strip(), v.strip())
 
 # ── Deploy guards ────────────────────────────────────────────────────────────
-# Production deploys must originate from the canonical site working tree on
-# main. Feature worktrees are never valid production deploy sources.
-
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_LOCAL  = os.path.normpath(os.path.join(SCRIPT_DIR, '..', 'site'))
 
 def _git(args, cwd):
     return subprocess.check_output(['git'] + args, cwd=cwd).decode().strip()
 
-# 1. Script repo must be on main and clean
 script_branch = _git(['rev-parse', '--abbrev-ref', 'HEAD'], SCRIPT_DIR)
 script_dirty  = '\n'.join(
     l for l in _git(['status', '--porcelain'], SCRIPT_DIR).splitlines()
-    if not l.startswith('??')          # untracked files don't affect deploys
+    if not l.startswith('??')
 )
 if script_branch != 'main':
     raise SystemExit(f"ERROR: repo is on '{script_branch}' — must be on main to deploy.")
 if script_dirty:
     raise SystemExit(f"ERROR: working tree has uncommitted changes — commit or stash before deploying.")
 
-# 2. site/ dir must also be on main if it is a separate git repo
 try:
     site_branch = _git(['rev-parse', '--abbrev-ref', 'HEAD'], BASE_LOCAL)
     if site_branch != 'main':
         raise SystemExit(f"ERROR: site/ is on '{site_branch}' — must be on main to deploy.")
 except subprocess.CalledProcessError:
-    pass  # site/ is not a separate repo — fine
+    pass
 
 print(f"[OK] Branch: main  |  Clean: yes  |  Source: {BASE_LOCAL}")
 
-# ── cPanel credentials — read from .env, never hardcoded ─────────────────────
+# ── cPanel credentials ────────────────────────────────────────────────────────
 HOST  = os.environ.get('CPANEL_HOST',  '152.89.79.37')
 PORT  = os.environ.get('CPANEL_PORT',  '2083')
 USER  = os.environ.get('CPANEL_USER',  'cadafdd1')
@@ -54,40 +49,10 @@ ctx = ssl.create_default_context()
 ctx.check_hostname = False
 ctx.verify_mode = ssl.CERT_NONE
 
-BASE_REMOTE = '/home/cadafdd1/mnemehq.com'
+BASE_REMOTE  = '/home/cadafdd1/mnemehq.com'
+BINARY_EXTS  = {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico', '.svg'}
 
-# ── File manifest ────────────────────────────────────────────────────────────
-FILES = [
-    ('index.html',                                                                ''),
-    ('sitemap.xml',                                                               ''),
-    ('og.png',                                                                    ''),
-    ('favicon.png',                                                               ''),
-    ('logo-v2.png',                                                               ''),
-    ('demo.html',                                                                 ''),
-    (os.path.join('founder',   'index.html'),                                    'founder'),
-    (os.path.join('contact',   'index.html'),                                    'contact'),
-    (os.path.join('privacy',   'index.html'),                                    'privacy'),
-    (os.path.join('use-cases', 'index.html'),                                    'use-cases'),
-    (os.path.join('use-cases', 'coding-assistant-governance',  'index.html'),    'use-cases/coding-assistant-governance'),
-    (os.path.join('use-cases', 'data-platform-governance',     'index.html'),    'use-cases/data-platform-governance'),
-    (os.path.join('use-cases', 'design-system-governance',     'index.html'),    'use-cases/design-system-governance'),
-    (os.path.join('use-cases', 'legacy-codebase-memory',       'index.html'),    'use-cases/legacy-codebase-memory'),
-    (os.path.join('use-cases', 'multi-agent-workflow-governance', 'index.html'), 'use-cases/multi-agent-workflow-governance'),
-    (os.path.join('use-cases', 'security-compliance-guardrails',  'index.html'), 'use-cases/security-compliance-guardrails'),
-    (os.path.join('roadmap',   'index.html'),                                    'roadmap'),
-    (os.path.join('insights',  'index.html'),                                    'insights'),
-    (os.path.join('insights', 'why-rag-fails-for-architectural-governance',  'index.html'), 'insights/why-rag-fails-for-architectural-governance'),
-    (os.path.join('insights', 'why-code-review-cannot-scale-with-ai-output', 'index.html'), 'insights/why-code-review-cannot-scale-with-ai-output'),
-    (os.path.join('insights', 'mneme-vs-cursor-rules',                       'index.html'), 'insights/mneme-vs-cursor-rules'),
-    (os.path.join('insights', 'prompt-engineering-is-not-governance',        'index.html'), 'insights/prompt-engineering-is-not-governance'),
-    (os.path.join('for', 'cto',                'index.html'),                    'for/cto'),
-    (os.path.join('for', 'platform',           'index.html'),                    'for/platform'),
-    (os.path.join('for', 'principal-engineer', 'index.html'),                    'for/principal-engineer'),
-]
-
-BINARY_EXTS = {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico', '.svg'}
-
-# ── Helpers ──────────────────────────────────────────────────────────────────
+# ── Helpers ───────────────────────────────────────────────────────────────────
 def mkdir(remote_path):
     parent, name = remote_path.rsplit('/', 1)
     params = {
@@ -105,18 +70,15 @@ def mkdir(remote_path):
 def upload(local_path, remote_subdir):
     ext = os.path.splitext(local_path)[1].lower()
     is_binary = ext in BINARY_EXTS
-    mode = 'rb' if is_binary else 'r'
-    enc  = {} if is_binary else {'encoding': 'utf-8'}
-    with open(local_path, mode, **enc) as f:
+    with open(local_path, 'rb' if is_binary else 'r', **({} if is_binary else {'encoding': 'utf-8'})) as f:
         content = f.read()
     if not is_binary:
         content = content.encode('utf-8')
 
-    filename    = os.path.basename(local_path)
-    remote_dir  = BASE_REMOTE + ('/' + remote_subdir if remote_subdir else '')
+    filename     = os.path.basename(local_path)
+    remote_dir   = BASE_REMOTE + ('/' + remote_subdir if remote_subdir else '')
     content_type = 'image/png' if ext == '.png' else 'text/html'
-    boundary    = '----MnemeDeploy2026'
-
+    boundary     = '----MnemeDeploy2026'
     header = (
         f'--{boundary}\r\n'
         f'Content-Disposition: form-data; name="dir"\r\n\r\n{remote_dir}\r\n'
@@ -127,7 +89,6 @@ def upload(local_path, remote_subdir):
         f'Content-Type: {content_type}\r\n\r\n'
     ).encode('utf-8')
     body = header + content + f'\r\n--{boundary}--'.encode('utf-8')
-
     req = urllib.request.Request(
         f'https://{HOST}:{PORT}/execute/Fileman/upload_files', data=body,
         headers={'Authorization': AUTH, 'Content-Type': f'multipart/form-data; boundary={boundary}'},
@@ -137,28 +98,66 @@ def upload(local_path, remote_subdir):
     ok = result.get('status') == 1 and result.get('data', {}).get('failed', 1) == 0
     return 'OK' if ok else f'FAIL: {result.get("errors", result)}'
 
-# ── Deploy ───────────────────────────────────────────────────────────────────
-for d in [
-    BASE_REMOTE + '/founder',
-    BASE_REMOTE + '/contact',
-    BASE_REMOTE + '/privacy',
-    BASE_REMOTE + '/use-cases/data-platform-governance',
-    BASE_REMOTE + '/use-cases/design-system-governance',
-    BASE_REMOTE + '/use-cases/multi-agent-workflow-governance',
-    BASE_REMOTE + '/roadmap',
-    BASE_REMOTE + '/insights',
-    BASE_REMOTE + '/insights/why-rag-fails-for-architectural-governance',
-    BASE_REMOTE + '/insights/why-code-review-cannot-scale-with-ai-output',
-    BASE_REMOTE + '/insights/mneme-vs-cursor-rules',
-    BASE_REMOTE + '/insights/prompt-engineering-is-not-governance',
-    BASE_REMOTE + '/for',
-    BASE_REMOTE + '/for/cto',
-    BASE_REMOTE + '/for/platform',
-    BASE_REMOTE + '/for/principal-engineer',
-]:
-    mkdir(d)
+# ── Deploy: walk site/ — every file auto-included, zero manual maintenance ───
+print(f"\n── Deploying {BASE_LOCAL} → {BASE_REMOTE} ───────────────────────────────")
 
-for rel_path, subdir in FILES:
-    local = os.path.normpath(os.path.join(BASE_LOCAL, rel_path))
-    label = rel_path.replace(os.sep, '/')
-    print(f'{label}: {upload(local, subdir)}')
+# Collect dirs (sorted so parents are created before children) and files
+remote_dirs = set()
+files_to_upload = []
+for dirpath, dirnames, filenames in os.walk(BASE_LOCAL):
+    dirnames.sort()
+    rel_dir = os.path.relpath(dirpath, BASE_LOCAL).replace(os.sep, '/')
+    if rel_dir != '.':
+        remote_dirs.add(rel_dir)
+    for filename in sorted(filenames):
+        local_path   = os.path.join(dirpath, filename)
+        remote_subdir = '' if rel_dir == '.' else rel_dir
+        label         = (rel_dir + '/' + filename) if rel_dir != '.' else filename
+        files_to_upload.append((local_path, remote_subdir, label))
+
+for d in sorted(remote_dirs):
+    mkdir(BASE_REMOTE + '/' + d)
+
+failures = []
+for local_path, remote_subdir, label in files_to_upload:
+    result = upload(local_path, remote_subdir)
+    print(f'{label}: {result}')
+    if result != 'OK':
+        failures.append(label)
+
+if failures:
+    print(f"\nDEPLOY FAILED — {len(failures)} upload(s) failed:")
+    for f in failures:
+        print(f'  FAIL  {f}')
+    raise SystemExit(1)
+
+print(f"\n[OK] {len(files_to_upload)} files uploaded")
+
+# ── Post-deploy verification: every sitemap URL must return 200 ───────────────
+print("\n── Post-deploy verification ─────────────────────────────────────────────")
+sitemap_path = os.path.join(BASE_LOCAL, 'sitemap.xml')
+tree = ET.parse(sitemap_path)
+urls = [loc.text for loc in tree.findall('.//{http://www.sitemaps.org/schemas/sitemap/0.9}loc')]
+
+verify_failures = []
+for url in urls:
+    try:
+        req = urllib.request.Request(url, method='HEAD')
+        with urllib.request.urlopen(req, timeout=10) as r:
+            status = r.status
+    except urllib.error.HTTPError as e:
+        status = e.code
+    except Exception as e:
+        status = str(e)
+    ok = status == 200
+    print(f'{"OK" if ok else "FAIL"}  {status}  {url}')
+    if not ok:
+        verify_failures.append((url, status))
+
+if verify_failures:
+    print(f"\nVERIFICATION FAILED — {len(verify_failures)} URL(s) not returning 200:")
+    for url, status in verify_failures:
+        print(f'  {status}  {url}')
+    raise SystemExit(1)
+
+print(f"\n[OK] All {len(urls)} sitemap URLs verified — deploy complete")
