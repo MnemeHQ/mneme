@@ -31,7 +31,7 @@ All in location `US`.
 | Dataset | Purpose |
 |---|---|
 | `analytics_<property_id>` | GA4 daily export — auto-created by GA4, not manually managed |
-| `analytics_raw` | Reserved for processed / normalized GA4 data from pipelines |
+| `analytics_raw` | Raw imports that are not GA4 (e.g. CSV uploads, manual exports) |
 | `searchconsole` | Google Search Console bulk export |
 | `growth_ops` | CRM / outreach data from mneme-growth-ops |
 | `staging` | Scratch / intermediate tables |
