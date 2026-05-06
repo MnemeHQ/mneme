@@ -23,14 +23,14 @@ script_dirty  = '\n'.join(
     if not l.startswith('??')
 )
 if script_branch != 'main':
-    raise SystemExit(f"ERROR: repo is on '{script_branch}' — must be on main to deploy.")
+    raise SystemExit(f"ERROR: repo is on '{script_branch}' - must be on main to deploy.")
 if script_dirty:
-    raise SystemExit(f"ERROR: working tree has uncommitted changes — commit or stash before deploying.")
+    raise SystemExit(f"ERROR: working tree has uncommitted changes - commit or stash before deploying.")
 
 try:
     site_branch = _git(['rev-parse', '--abbrev-ref', 'HEAD'], BASE_LOCAL)
     if site_branch != 'main':
-        raise SystemExit(f"ERROR: site/ is on '{site_branch}' — must be on main to deploy.")
+        raise SystemExit(f"ERROR: site/ is on '{site_branch}' - must be on main to deploy.")
 except subprocess.CalledProcessError:
     pass
 
@@ -42,7 +42,7 @@ PORT  = os.environ.get('CPANEL_PORT',  '2083')
 USER  = os.environ.get('CPANEL_USER',  'cadafdd1')
 TOKEN = os.environ.get('CPANEL_API_TOKEN', '')
 if not TOKEN:
-    raise SystemExit('ERROR: CPANEL_API_TOKEN not set — add it to .env')
+    raise SystemExit('ERROR: CPANEL_API_TOKEN not set - add it to .env')
 AUTH = f'cpanel {USER}:{TOKEN}'
 
 ctx = ssl.create_default_context()
@@ -126,7 +126,7 @@ for local_path, remote_subdir, label in files_to_upload:
         failures.append(label)
 
 if failures:
-    print(f"\nDEPLOY FAILED — {len(failures)} upload(s) failed:")
+    print(f"\nDEPLOY FAILED - {len(failures)} upload(s) failed:")
     for f in failures:
         print(f'  FAIL  {f}')
     raise SystemExit(1)
@@ -142,7 +142,7 @@ urls = [loc.text for loc in tree.findall('.//{http://www.sitemaps.org/schemas/si
 verify_failures = []
 for url in urls:
     try:
-        req = urllib.request.Request(url, method='HEAD')
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=10) as r:
             status = r.status
     except urllib.error.HTTPError as e:
@@ -155,9 +155,9 @@ for url in urls:
         verify_failures.append((url, status))
 
 if verify_failures:
-    print(f"\nVERIFICATION FAILED — {len(verify_failures)} URL(s) not returning 200:")
+    print(f"\nVERIFICATION FAILED - {len(verify_failures)} URL(s) not returning 200:")
     for url, status in verify_failures:
         print(f'  {status}  {url}')
     raise SystemExit(1)
 
-print(f"\n[OK] All {len(urls)} sitemap URLs verified — deploy complete")
+print(f"\n[OK] All {len(urls)} sitemap URLs verified - deploy complete")
