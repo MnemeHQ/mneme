@@ -26,6 +26,33 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
   <link rel="icon" href="/favicon.png" type="image/png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Insights", "item": "https://mnemehq.com/insights/"}
+        ]
+      },
+      {
+        "@type": "CollectionPage",
+        "name": "Insights — Mneme HQ",
+        "description": "Engineering notes on architectural governance, AI coding drift, and the future of constraint enforcement in LLM-assisted development.",
+        "url": "https://mnemehq.com/insights/",
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "hasPart": [
+          {"@type": "Article", "name": "Why RAG Fails for Architectural Governance", "url": "https://mnemehq.com/insights/why-rag-fails-for-architectural-governance/"},
+          {"@type": "Article", "name": "Why Code Review Cannot Scale With AI Output", "url": "https://mnemehq.com/insights/why-code-review-cannot-scale-with-ai-output/"},
+          {"@type": "Article", "name": "Prompt Engineering Is Not Governance", "url": "https://mnemehq.com/insights/prompt-engineering-is-not-governance/"},
+          {"@type": "Article", "name": "Mneme vs Cursor Rules", "url": "https://mnemehq.com/insights/mneme-vs-cursor-rules/"}
+        ]
+      }
+    ]
+  }
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -131,10 +158,10 @@
   <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><svg width="18" height="14" viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 1h16M1 7h16M1 13h16"/></svg></button>
   <div class="nav-links">
     <a href="/#how-it-works">How it works</a>
-    <a href="/#benchmarks">Benchmarks</a>
     <a href="/use-cases/">Use cases</a>
     <a href="/insights/" class="active">Insights</a>
     <a href="/demo.html">Demo</a>
+    <a href="/#benchmarks">Benchmarks</a>
     <a href="https://github.com/TheoV823/mneme">GitHub</a>
     <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
   </div>
