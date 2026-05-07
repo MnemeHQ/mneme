@@ -1,0 +1,72 @@
+# Mneme HQ: full reference
+
+> Mneme HQ is the architectural governance layer for AI-assisted development. It compiles your team's architectural intent into enforceable constraints that govern AI coding agents at the pre-generation stage, before architectural drift reaches review.
+
+## What Mneme is
+
+Mneme HQ is the architectural governance layer for AI-assisted development. As agent platforms proliferate, governance becomes infrastructure, and Mneme is positioned as the pre-generation governance layer of that stack.
+
+The enterprise framing: a governance and control plane for AI coding agents operating within Azure and GitHub-based engineering workflows. The long-term vision: Mneme integrates with your engineering stack and compiles architectural intent into enforceable AI coding constraints across generation, pull request, and CI workflows.
+
+## What Mneme is not
+
+Mneme is not a memory tool. Mneme is not a rules file like Cursor Rules or CLAUDE.md. Mneme is not a RAG system or a vector database for code. Each of those exists for a reason. None of them govern implementation.
+
+The locked category positioning:
+
+1. Rules files document standards. Mneme enforces them.
+2. Memory tools recall context. Mneme governs implementation.
+3. RAG retrieves knowledge. Mneme operationalizes decisions.
+
+## The AI coding governance stack
+
+Pre-generation governance is Mneme. Mneme compiles architectural intent into enforceable constraints before the agent generates code.
+
+Generation and runtime is the agent framework and runtime harness layer. This includes Cursor, Claude Code, agent frameworks, and managed agent platforms.
+
+Post-generation observability is the layer above. Tools like SentRux operate here. SentRux tells you when the agent violated architecture. Mneme helps prevent the violation from being proposed in the first place. Pre-generation governance and post-generation observability are complementary layers of the AI coding stack, not competitors.
+
+## The problem Mneme addresses
+
+AI increased code output. Review capacity did not. Coding assistants generate code faster than teams can review it, but review bandwidth has not increased. That means more surface area to validate, more architectural drift to catch, and more governance pushed downstream into pull request review.
+
+The issue is not model quality. The issue is that coding agents do not retain architectural decisions by default. Three observable symptoms: more pull request surface area for reviewers to validate, reactive governance where architectural violations are caught after generation, and session amnesia where coding agents forget prior decisions unless re-prompted every time.
+
+## How Mneme works
+
+Five stages. No vector store. No ML.
+
+The pipeline: project_memory.json into MemoryStore into Retriever into ContextBuilder into LLMAdapter into Evaluator.
+
+1. Load. Load structured project memory from a human-editable JSON file: rules, constraints, facts, and prior decision records.
+2. Retrieve. Retrieve only the rules relevant to the current task using deterministic keyword scoring. Same query, same result.
+3. Build. Build a context packet that injects the relevant constraints into the prompt before generation.
+4. Adapt. Pass the context to the LLM adapter, which works with direct API integrations, IDE coding assistants, agent frameworks, managed agent platforms, and internal prompt pipelines.
+5. Evaluate. Validate the generated output against the rule set before the code reaches the repository.
+
+Retrieval is deterministic. There is no embedding model, no vector store, and no ML dependency in the governance path. This is a deliberate architectural commitment.
+
+
+## Roadmap
+
+Phase 1, current. OSS developer wedge. Architectural governance for individual developers and early engineering adopters.
+
+Phase 2. Team governance layer. Shared policy and decision stores for teams adopting AI-assisted development.
+
+Phase 3. Agent platform integrations. Governance for enterprise agent workflows and managed coding platforms.
+
+Phase 4. Governance infrastructure. Policy as code enforcement and drift analytics across engineering organizations, spanning generation, pull request, and CI workflows.
+
+## Compatibility
+
+Mneme works with direct LLM API integrations, IDE coding assistants such as Cursor and Claude Code, agent frameworks, managed agent platforms, and internal prompt pipelines.
+
+## Project links
+
+- Homepage: https://mnemehq.com/
+- Demo: https://mnemehq.com/demo.html
+- Use cases: https://mnemehq.com/use-cases/
+- Insights: https://mnemehq.com/insights/
+- Roadmap: https://mnemehq.com/roadmap/
+- Source: https://github.com/TheoV823/mneme
+- Benchmarks: https://github.com/TheoV823/mneme/tree/main/examples/benchmarks

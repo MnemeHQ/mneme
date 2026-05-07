@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -493,6 +493,105 @@
       transition: border-color 0.15s, transform 0.15s;
     }
     .problem-card:hover { border-color: rgba(200,240,96,0.28); transform: translateY(-2px); }
+
+    /* Category positioning block */
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    @media (max-width: 680px) {
+      .category-grid { grid-template-columns: 1fr; }
+    }
+    .category-card {
+      background: rgba(255,255,255,0.035);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      padding: 1.4rem 1.5rem;
+    }
+    .category-card .cat-other {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      margin-bottom: 0.4rem;
+    }
+    .category-card .cat-mneme {
+      font-size: 1.02rem;
+      color: var(--text);
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    .category-stack {
+      margin-top: 2.5rem;
+      padding: 1.5rem 1.75rem;
+      background: rgba(139,224,200,0.04);
+      border: 1px solid rgba(139,224,200,0.18);
+      border-radius: 10px;
+    }
+    .category-stack h4 {
+      font-size: 0.72rem;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 0.9rem;
+      font-weight: 500;
+    }
+    .stack-row {
+      display: flex;
+      gap: 1rem;
+      align-items: baseline;
+      padding: 0.55rem 0;
+      font-size: 0.92rem;
+      color: var(--text);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .stack-row:last-child { border-bottom: none; }
+    .stack-stage {
+      flex: 0 0 220px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+    }
+    .stack-stage.is-mneme { color: var(--accent); }
+    .stack-tool { color: var(--text); }
+
+    /* FAQ */
+    .faq-list { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.5rem; }
+    .faq-item {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 10px;
+      padding: 1.1rem 1.4rem;
+    }
+    .faq-item summary {
+      cursor: pointer;
+      list-style: none;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after {
+      content: "+";
+      color: var(--accent);
+      font-family: 'DM Mono', monospace;
+      font-size: 1.2rem;
+      transition: transform 0.2s;
+    }
+    .faq-item[open] summary::after { content: "−"; }
+    .faq-item p {
+      margin-top: 0.85rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.65;
+    }
     .steps-2col {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -689,29 +788,107 @@
       "name": "Mneme HQ",
       "applicationCategory": "DeveloperApplication",
       "operatingSystem": "Linux, macOS, Windows",
-      "description": "Persistent project memory and decision enforcement for LLM-powered development workflows. Mneme HQ stores architectural decisions, constraints, and anti-patterns as structured YAML and enforces them before AI-generated code reaches your repository.",
+      "description": "Mneme HQ is the architectural governance layer for AI-assisted development. It compiles architectural intent into enforceable constraints that govern AI coding agents before code is generated, preventing architectural drift at the source rather than catching it in review.",
       "url": "https://mnemehq.com/",
       "downloadUrl": "https://github.com/TheoV823/mneme",
       "isAccessibleForFree": true,
       "featureList": [
-        "Semantic decision retrieval at prompt time",
+        "Pre-generation architectural governance for AI coding agents",
+        "Decision graphs compiled into enforceable constraints",
         "CI enforcement gate for AI-generated code",
-        "YAML-based decision store in version control",
-        "Cursor Rules integration",
-        "CLAUDE.md integration",
-        "Multi-agent pipeline support",
-        "Tag-scoped rule enforcement"
+        "Version-controlled architectural decision store",
+        "Works with Cursor, Claude Code, and agent frameworks",
+        "Tag-scoped rule enforcement",
+        "Pre-generation governance complementary to post-generation observability"
+      ],
+      "about": [
+        { "@type": "Thing", "name": "Architectural governance" },
+        { "@type": "Thing", "name": "AI coding assistants" },
+        { "@type": "Thing", "name": "Architectural Decision Records" },
+        { "@type": "Thing", "name": "AI code review bottleneck" }
+      ],
+      "mentions": [
+        { "@type": "Thing", "name": "Cursor Rules" },
+        { "@type": "Thing", "name": "CLAUDE.md" },
+        { "@type": "Thing", "name": "Agent Skills" },
+        { "@type": "Thing", "name": "Retrieval-augmented generation" }
       ],
       "author": {
         "@type": "Person",
-        "name": "TheoV823",
+        "name": "Theo Valmis",
         "url": "https://github.com/TheoV823"
-      }
+      },
+      "publisher": { "@id": "https://mnemehq.com/#organization" }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://mnemehq.com/#organization",
+      "name": "Mneme HQ",
+      "url": "https://mnemehq.com/",
+      "logo": "https://mnemehq.com/logo-v2.png",
+      "description": "Mneme HQ builds the architectural governance layer for AI-assisted development. We help engineering teams govern AI coding agents at the pre-generation stage, before architectural drift reaches review.",
+      "sameAs": [
+        "https://github.com/TheoV823/mneme"
+      ]
     },
     {
       "@type": "WebSite",
       "name": "Mneme HQ",
-      "url": "https://mnemehq.com/"
+      "url": "https://mnemehq.com/",
+      "publisher": { "@id": "https://mnemehq.com/#organization" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is Mneme HQ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Mneme HQ is the architectural governance layer for AI-assisted development. It compiles architectural intent into enforceable constraints that govern AI coding agents before code is generated. As agent platforms proliferate, governance becomes infrastructure, and Mneme is positioned as the pre-generation governance layer of that stack."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How is Mneme different from Cursor Rules or CLAUDE.md?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Rules files document standards. Mneme enforces them. Cursor Rules and CLAUDE.md are prompt files that describe preferences to the model. Mneme is a governance layer that compiles architectural decisions into enforceable constraints, retrieves them at prompt time based on what the agent is doing, and validates outputs against them."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How is Mneme different from RAG or vector databases?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "RAG retrieves knowledge. Mneme operationalizes decisions. RAG systems surface documents that the model may or may not act on. Mneme compiles architectural decisions into structured rules and evaluates AI-generated code against them. There is no embedding model, no vector store, and no probabilistic retrieval in the governance path."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How is Mneme different from observability tools like SentRux?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "SentRux tells you when the agent violated architecture. Mneme helps prevent the violation from being proposed in the first place. Pre-generation governance and post-generation observability are complementary layers of the AI coding stack."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does Mneme require a vector store or ML infrastructure?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Mneme uses deterministic, version-controlled decision graphs and tag-scoped retrieval. There is no vector store, no embedding model, and no ML dependency in the governance path. This is a deliberate architectural commitment."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What stacks does Mneme work with?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Mneme works with direct LLM API integrations, IDE coding assistants like Cursor and Claude Code, agent frameworks, managed agent platforms, and internal prompt pipelines. The enterprise framing is a governance control plane for AI coding agents operating within Azure and GitHub-based engineering workflows."
+          }
+        }
+      ]
     }
   ]
 }
@@ -739,14 +916,14 @@
 
 <!-- GEO / LLM answer capsule -->
 <div class="answer-capsule">
-  <strong>Mneme HQ</strong> is a decision memory and governance layer for AI-assisted development workflows. It stores architectural decisions, constraints, and anti-patterns as structured YAML in version control, then surfaces the relevant rules at prompt time — so AI coding assistants generate code that fits your architecture. Violations are flagged before code reaches review.
+  <strong>Mneme HQ</strong> is the architectural governance layer for AI-assisted development. It compiles your team's architectural intent into enforceable constraints that govern AI coding agents at the pre-generation stage, before architectural drift reaches review. Rules files document standards. Memory tools recall context. RAG retrieves knowledge. Mneme governs implementation.
 </div>
 
   <!-- HERO -->
   <div class="hero">
-    <div class="hero-tag">Persistent project memory for LLM workflows</div>
-    <h1>Stop LLMs from forgetting<br>how your project is built.</h1>
-    <p class="hero-sub">Mneme HQ adds persistent project memory and guardrails to LLM-powered development workflows.</p>
+    <div class="hero-tag">Architectural governance for AI-assisted development</div>
+    <h1>Govern AI coding agents <br>before they generate the code.</h1>
+    <p class="hero-sub">Mneme is the architectural governance layer for AI-assisted development. It compiles your architectural intent into enforceable constraints that AI coding agents must respect at the pre-generation stage.</p>
     <p class="hero-support">Works with direct API integrations, coding assistants, agent frameworks, and managed agent platforms.</p>
     <div class="cta-group">
       <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub</a>
@@ -781,6 +958,48 @@
       </div>
     </div>
   </div>
+  </div>
+
+  <!-- CATEGORY POSITIONING -->
+  <div class="section-wrap" id="positioning">
+    <div class="section-eyebrow">Where Mneme sits</div>
+    <h2 class="section-title">Adjacent tools solve adjacent problems.</h2>
+    <p style="max-width:620px;margin-bottom:1rem;color:var(--muted);font-size:1.05rem;line-height:1.6;">
+      Mneme is not a memory tool, not a rules file, and not a RAG system. Each of those exists for a reason. None of them govern implementation.
+    </p>
+    <div class="category-grid">
+      <div class="category-card">
+        <div class="cat-other">Rules files document standards.</div>
+        <div class="cat-mneme">Mneme enforces them.</div>
+      </div>
+      <div class="category-card">
+        <div class="cat-other">Memory tools recall context.</div>
+        <div class="cat-mneme">Mneme governs implementation.</div>
+      </div>
+      <div class="category-card">
+        <div class="cat-other">RAG retrieves knowledge.</div>
+        <div class="cat-mneme">Mneme operationalizes decisions.</div>
+      </div>
+    </div>
+
+    <div class="category-stack">
+      <h4>The AI coding governance stack</h4>
+      <div class="stack-row">
+        <div class="stack-stage is-mneme">Pre-generation governance</div>
+        <div class="stack-tool"><strong>Mneme.</strong> Compiles architectural intent into enforceable constraints before the agent generates code.</div>
+      </div>
+      <div class="stack-row">
+        <div class="stack-stage">Generation and runtime</div>
+        <div class="stack-tool">Agent frameworks and runtime harnesses. Cursor, Claude Code, agent platforms.</div>
+      </div>
+      <div class="stack-row">
+        <div class="stack-stage">Post-generation observability</div>
+        <div class="stack-tool">Tools like SentRux. Detect violations after the agent has acted.</div>
+      </div>
+      <p style="margin-top:1.1rem;font-size:0.88rem;color:var(--muted);line-height:1.6;">
+        SentRux tells you when the agent violated architecture. Mneme helps prevent the violation from being proposed in the first place. The two layers are complementary.
+      </p>
+    </div>
   </div>
 
   <!-- HOW IT WORKS + RAG COMPARISON -->
@@ -973,9 +1192,41 @@ response = LLMAdapter().complete(
   </div>
   </div>
 
+  <!-- FAQ -->
+  <div class="section-wrap" id="faq">
+    <div class="section-eyebrow">Frequently asked</div>
+    <h2 class="section-title">Common questions.</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>What is Mneme HQ?</summary>
+        <p>Mneme HQ is the architectural governance layer for AI-assisted development. It compiles architectural intent into enforceable constraints that govern AI coding agents before code is generated. As agent platforms proliferate, governance becomes infrastructure, and Mneme is positioned as the pre-generation governance layer of that stack.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How is Mneme different from Cursor Rules or CLAUDE.md?</summary>
+        <p>Rules files document standards. Mneme enforces them. Cursor Rules and CLAUDE.md are prompt files that describe preferences to the model. Mneme is a governance layer that compiles architectural decisions into enforceable constraints, retrieves them at prompt time based on what the agent is doing, and validates outputs against them.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How is Mneme different from RAG or vector databases?</summary>
+        <p>RAG retrieves knowledge. Mneme operationalizes decisions. RAG systems surface documents that the model may or may not act on. Mneme compiles architectural decisions into structured rules and evaluates AI-generated code against them. There is no embedding model, no vector store, and no probabilistic retrieval in the governance path.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How is Mneme different from observability tools like SentRux?</summary>
+        <p>SentRux tells you when the agent violated architecture. Mneme helps prevent the violation from being proposed in the first place. Pre-generation governance and post-generation observability are complementary layers of the AI coding stack.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Does Mneme require a vector store or ML infrastructure?</summary>
+        <p>No. Mneme uses deterministic, version-controlled decision graphs and tag-scoped retrieval. There is no vector store, no embedding model, and no ML dependency in the governance path. This is a deliberate architectural commitment.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What stacks does Mneme work with?</summary>
+        <p>Mneme works with direct LLM API integrations, IDE coding assistants like Cursor and Claude Code, agent frameworks, managed agent platforms, and internal prompt pipelines. The enterprise framing is a governance control plane for AI coding agents operating within Azure and GitHub-based engineering workflows.</p>
+      </details>
+    </div>
+  </div>
+
   <!-- CTA FOOTER -->
   <div class="cta-footer">
-    <h2>Ready to give your LLM workflows a memory?</h2>
+    <h2>Ready to govern your AI coding agents?</h2>
     <div class="cta-group">
       <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub</a>
       <a href="/demo.html" class="btn-ghost">Watch demo</a>

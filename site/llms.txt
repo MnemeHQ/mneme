@@ -1,0 +1,39 @@
+# Mneme HQ
+
+> Mneme HQ is the architectural governance layer for AI-assisted development. It compiles your team's architectural intent into enforceable constraints that govern AI coding agents at the pre-generation stage, before architectural drift reaches review.
+
+## Category positioning
+
+Rules files document standards. Mneme enforces them.
+Memory tools recall context. Mneme governs implementation.
+RAG retrieves knowledge. Mneme operationalizes decisions.
+
+## How Mneme fits the AI coding stack
+
+Pre-generation governance is Mneme. Generation and runtime are agent frameworks and runtime harnesses such as Cursor, Claude Code, and managed agent platforms. Post-generation observability is tools like SentRux. SentRux tells you when the agent violated architecture. Mneme helps prevent the violation from being proposed in the first place. The two layers are complementary.
+
+## Enterprise framing
+
+A governance and control plane for AI coding agents operating within Azure and GitHub-based engineering workflows. Mneme integrates with your engineering stack and compiles architectural intent into enforceable AI coding constraints.
+
+## Architecture
+
+Five stages. No vector store. No ML.
+project_memory.json into MemoryStore into Retriever into ContextBuilder into LLMAdapter into Evaluator. Retrieval is deterministic keyword scoring. Same query returns the same result every time.
+
+## Key pages
+
+- [Homepage](https://mnemehq.com/): Product overview and category positioning.
+- [Use cases](https://mnemehq.com/use-cases/): Coding assistant governance, legacy codebase memory, security and compliance guardrails, data platform governance, design system governance.
+- [Insights](https://mnemehq.com/insights/): Technical deep dives and comparison content on AI coding governance.
+- [Roadmap](https://mnemehq.com/roadmap/): Phase 1 OSS developer wedge through Phase 4 governance infrastructure.
+- [Demo](https://mnemehq.com/demo.html): Seventeen-second demonstration of constraint enforcement.
+
+## Source and benchmarks
+
+- [GitHub repository](https://github.com/TheoV823/mneme)
+- [Benchmark scenarios](https://github.com/TheoV823/mneme/tree/main/examples/benchmarks)
+
+## Reported benchmark
+
+Governance Benchmark v1.1 methodology is published. The benchmark is deterministic and reproducible, measuring violation prevention rate, false positive rate, retrieval recall and precision, and the gap between end-to-end and oracle enforcement, across 36 scenarios in six categories including controls and ambiguous cases. Full results publish after scenario suite validation. Methodology and harness are public.
