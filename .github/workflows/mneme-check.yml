@@ -1,0 +1,160 @@
+name: mneme self-check (warn mode)
+
+# Runs the mneme self-governance check against files changed in a PR.
+#
+# Mode is intentionally `warn`: the CLI returns exit code 0 for every
+# verdict, so verdicts are surfaced as a sticky PR comment but never
+# block a merge. Strict mode for narrow paths (.mneme/, mneme-project-memory/mneme/,
+# docs/adr/) is a planned follow-up after we accumulate clean warn-history,
+# per the rollout plan in `.mneme/README.md`.
+#
+# Path filter: we only check files where rules can plausibly apply
+# (package code, ADRs, .mneme/ itself, the marketing site, and automation
+# scripts). This keeps comment noise low. Auto-generated files (lockfiles,
+# binary assets) are excluded.
+#
+# Query construction: the mneme retriever scores rules by keyword overlap
+# with the `--query` arg, so we combine the PR title (intent) with the
+# changed file path (subsystem). PR title alone is too narrow to match
+# subsystem-specific rules like the no-vector-db / no-langchain anti-pattern.
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  mneme-check:
+    name: mneme check --mode warn
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install local mneme package
+        run: pip install -e mneme-project-memory
+
+      - name: Verify enforcement memory exists
+        id: verify-memory
+        shell: bash
+        run: |
+          if [ -f .mneme/project_memory.json ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::.mneme/project_memory.json not present on this branch — skipping check."
+          fi
+
+      - name: Compute changed files (filtered)
+        if: steps.verify-memory.outputs.present == 'true'
+        id: files
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${{ github.base_ref }}" --depth=1 >/dev/null 2>&1
+          base_sha="$(git rev-parse "origin/${{ github.base_ref }}")"
+          mkdir -p /tmp/mneme
+          : > /tmp/mneme/files.txt
+          # diff-filter=ACMR: Added, Copied, Modified, Renamed (skip Deleted)
+          git diff --name-only --diff-filter=ACMR "$base_sha"...HEAD > /tmp/mneme/raw.txt
+          while IFS= read -r f; do
+            [ -z "$f" ] && continue
+            case "$f" in
+              mneme-project-memory/mneme/*|docs/adr/*|.mneme/*|site/*|scripts/*) ;;
+              *) continue ;;
+            esac
+            case "$f" in
+              *.lock|*.png|*.jpg|*.jpeg|*.gif|*.ico|*.svg|*.webp|*.woff|*.woff2|*.ttf|*.eot|*.docx|*.xlsx|*.pdf|*.zip|*.tar|*.gz) continue ;;
+              package-lock.json|yarn.lock|pnpm-lock.yaml|poetry.lock|Pipfile.lock|uv.lock) continue ;;
+            esac
+            [ -f "$f" ] || continue
+            echo "$f" >> /tmp/mneme/files.txt
+          done < /tmp/mneme/raw.txt
+          count=$(wc -l < /tmp/mneme/files.txt | tr -d ' ')
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+          echo "Files in scope ($count):"
+          cat /tmp/mneme/files.txt || true
+
+      - name: Run mneme check on each file
+        if: steps.verify-memory.outputs.present == 'true'
+        id: run-check
+        shell: bash
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          set -uo pipefail
+          summary=/tmp/mneme/summary.md
+          {
+            echo "## mneme self-governance check"
+            echo ""
+            echo "_Mode: \`warn\` - verdicts are visible but **do not block merge**. Rollout plan: \`.mneme/README.md\`._"
+            echo ""
+          } > "$summary"
+
+          if [ ! -s /tmp/mneme/files.txt ]; then
+            echo "_No files in scope. Filter: \`mneme-project-memory/mneme/\`, \`docs/adr/\`, \`.mneme/\`, \`site/\`, \`scripts/\`._" >> "$summary"
+            cat "$summary"
+            exit 0
+          fi
+
+          pass=0; warn=0; fail=0
+          : > /tmp/mneme/rows.txt
+          : > /tmp/mneme/details.txt
+          while IFS= read -r f; do
+            [ -z "$f" ] && continue
+            query="${PR_TITLE:-} ${f}"
+            out="$(python -m mneme.cli check \
+              --memory .mneme/project_memory.json \
+              --input "$f" \
+              --query "$query" \
+              --mode warn 2>&1 || true)"
+            verdict="$(printf '%s\n' "$out" | tr -d '\r' | awk -F': ' '/^Result:/ {print $2; exit}')"
+            verdict="${verdict:-UNKNOWN}"
+            case "$verdict" in
+              PASS) pass=$((pass+1)); icon=":white_check_mark:" ;;
+              WARN) warn=$((warn+1)); icon=":warning:" ;;
+              FAIL) fail=$((fail+1)); icon=":x:" ;;
+              *)    icon=":grey_question:" ;;
+            esac
+            printf '| %s %s | `%s` |\n' "$icon" "$verdict" "$f" >> /tmp/mneme/rows.txt
+            if [ "$verdict" = "FAIL" ] || [ "$verdict" = "WARN" ]; then
+              {
+                printf '\n<details><summary><code>%s</code> — %s</summary>\n\n' "$f" "$verdict"
+                printf '```\n%s\n```\n\n</details>\n' "$out"
+              } >> /tmp/mneme/details.txt
+            fi
+          done < /tmp/mneme/files.txt
+
+          {
+            echo "**Summary:** ${pass} pass, ${warn} warn, ${fail} fail"
+            echo ""
+            echo "| verdict | file |"
+            echo "| :--- | :--- |"
+            cat /tmp/mneme/rows.txt
+            if [ -s /tmp/mneme/details.txt ]; then
+              echo ""
+              echo "### Details"
+              cat /tmp/mneme/details.txt
+            fi
+            echo ""
+            echo "<sub>Generated by \`.github/workflows/mneme-check.yml\` · query = PR title + file path · scope = repo-governance paths.</sub>"
+          } >> "$summary"
+          cat "$summary"
+
+      - name: Post sticky PR comment
+        if: steps.verify-memory.outputs.present == 'true'
+        uses: marocchino/sticky-pull-request-comment@v2
+        continue-on-error: true
+        with:
+          header: mneme-check
+          path: /tmp/mneme/summary.md

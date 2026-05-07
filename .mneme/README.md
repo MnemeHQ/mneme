@@ -62,7 +62,8 @@ on a narrow set of paths once we have a clean warn history.
 
 CI runs `mneme check` in `--mode warn` against changed files. Warn mode
 exits 0 on every verdict; conflicts are surfaced as PR comments only and do
-not block merges.
+not block merges. The workflow that drives this lives at
+[`.github/workflows/mneme-check.yml`](../.github/workflows/mneme-check.yml).
 
 ```bash
 mneme check --memory .mneme/project_memory.json \
