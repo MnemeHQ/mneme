@@ -1235,33 +1235,32 @@ response = LLMAdapter().complete(
 
   <!-- BEFORE / AFTER DEMO -->
   <div class="section-wrap" id="benchmarks">
-    <div class="section-eyebrow">See the difference</div>
-    <h2 class="section-title">Same prompt. Same model. Different answer.</h2>
+    <div class="section-eyebrow">Benchmark</div>
+    <h2 class="section-title">Governance Benchmark v1.1 published.</h2>
 
-    <div class="bench-stat-row">
-      <div>
-        <div class="bench-stat">94%</div>
-        <div class="bench-stat-label">constraint enforcement rate<br>across 30 real-world governance scenarios</div>
-      </div>
-    </div>
-    <div class="bench-categories">
-      <div class="bench-cat">architectural decisions <span>/ 8 rules</span></div>
-      <div class="bench-cat">API contracts <span>/ 6 rules</span></div>
-      <div class="bench-cat">dependency constraints <span>/ 7 rules</span></div>
-      <div class="bench-cat">testing standards <span>/ 5 rules</span></div>
-      <div class="bench-cat">naming conventions <span>/ 4 rules</span></div>
-    </div>
-    <div class="bench-scenarios">
-      <div class="bench-scenario-item"><div class="bench-pass-dot"></div>no embeddings / no ML dependencies — enforced</div>
-      <div class="bench-scenario-item"><div class="bench-pass-dot"></div>extend before rebuild — enforced</div>
-      <div class="bench-scenario-item"><div class="bench-pass-dot"></div>keyword scoring stays deterministic — enforced</div>
-      <div class="bench-scenario-item"><div class="bench-pass-dot"></div>no new runtime dependencies without ADR — enforced</div>
-      <div class="bench-scenario-item"><div class="bench-pass-dot"></div>REST API versioning conventions — enforced</div>
-      <div class="bench-scenario-item"><div class="bench-pass-dot"></div>test coverage threshold ≥ 80% — enforced</div>
-    </div>
-    <div class="bench-note" style="margin-bottom:2.5rem;">Benchmarks run against 30 real-world governance scenarios. Source: <a href="https://github.com/TheoV823/mneme/tree/main/examples/benchmarks" style="color:var(--teal);">examples/benchmarks/</a></div>
+    <p style="max-width:640px;margin-bottom:2rem;color:var(--muted);font-size:1.05rem;line-height:1.6;">
+      We have published the methodology for Mneme's deterministic governance benchmark, measuring architectural drift prevention, false positive rate, and retrieval quality across real-world coding scenarios.
+    </p>
 
-    <h3 style="font-family:'DM Mono',monospace;font-size:0.8rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:1.5rem;">Same prompt. Same model. Different answer.</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:0.6rem;margin-bottom:1.75rem;">
+      <span class="bench-cat">violation prevention rate</span>
+      <span class="bench-cat">false positive rate</span>
+      <span class="bench-cat">retrieval recall and precision</span>
+      <span class="bench-cat">oracle vs end-to-end gap</span>
+    </div>
+
+    <p style="max-width:640px;margin-bottom:1rem;color:var(--text);font-size:0.95rem;line-height:1.6;">
+      Deterministic, reproducible, and fully auditable. No subjective scoring. Full results publish after scenario suite validation.
+    </p>
+
+    <div style="margin-bottom:3rem;">
+      <a href="/benchmark/" style="color:var(--teal);font-family:'DM Mono',monospace;font-size:0.88rem;text-decoration:none;border-bottom:1px solid var(--teal);padding-bottom:1px;">Read benchmark methodology &rarr;</a>
+    </div>
+
+    <div style="font-family:'DM Mono',monospace;font-size:0.8rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:0.75rem;">Illustrative example</div>
+    <p style="max-width:620px;margin-bottom:1.5rem;color:var(--muted);font-size:0.9rem;line-height:1.55;">
+      Same prompt, same model, different answer. The example below shows what governance changes about agent behavior.
+    </p>
 
     <div class="demo-panels">
       <div class="panel">
@@ -1320,6 +1319,8 @@ response = LLMAdapter().complete(
     <a href="/insights/">Insights</a>
     &nbsp;&middot;&nbsp;
     <a href="/roadmap/">Roadmap</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/benchmark/">Benchmark</a>
     &nbsp;&middot;&nbsp;
     <a href="/founder/">Founder</a>
     &nbsp;&middot;&nbsp;

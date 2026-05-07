@@ -46,6 +46,19 @@ The pipeline: project_memory.json into MemoryStore into Retriever into ContextBu
 
 Retrieval is deterministic. There is no embedding model, no vector store, and no ML dependency in the governance path. This is a deliberate architectural commitment.
 
+## Governance Benchmark v1.1
+
+Governance Benchmark v1.1 methodology is published. The benchmark is deterministic and reproducible. It measures violation prevention rate, baseline drift rate, false positive rate, retrieval recall and precision at K, irrelevant injection rate, and the gap between end-to-end enforcement and oracle enforcement.
+
+Suite composition: 36 scenarios across six categories. 8 architectural violation scenarios, 6 scope and boundary scenarios, 6 anti-pattern scenarios, 4 dependency and tooling scenarios, 4 ambiguous and borderline scenarios, and 8 control scenarios where the rule does not apply.
+
+Source mix: 33 percent synthetic canonical, 28 percent real drift incidents from production codebases, 17 percent adversarial, 22 percent controls.
+
+Verdict thresholds, all four required: violation prevention at or above 75 percent, baseline drift at or above 50 percent, false positive rate at or below 10 percent, oracle gap within 10 percentage points.
+
+Verifiers operate on structured JSON output, not on freeform prose. The model is required to emit a response conforming to a fixed schema, and verifiers inspect the artifact directly. This closes the prose-gaming attack on benchmark verification.
+
+Full benchmark results publish after scenario suite validation. Methodology, scenarios, verifiers, and harness are public.
 
 ## Roadmap
 
@@ -64,6 +77,7 @@ Mneme works with direct LLM API integrations, IDE coding assistants such as Curs
 ## Project links
 
 - Homepage: https://mnemehq.com/
+- Governance Benchmark v1.1 methodology: https://mnemehq.com/benchmark/
 - Demo: https://mnemehq.com/demo.html
 - Use cases: https://mnemehq.com/use-cases/
 - Insights: https://mnemehq.com/insights/

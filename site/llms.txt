@@ -24,6 +24,7 @@ project_memory.json into MemoryStore into Retriever into ContextBuilder into LLM
 ## Key pages
 
 - [Homepage](https://mnemehq.com/): Product overview and category positioning.
+- [Governance Benchmark v1.1 Methodology](https://mnemehq.com/benchmark/): Deterministic, reproducible benchmark methodology with structured-output verification, layered metrics, and pre-registered thresholds.
 - [Use cases](https://mnemehq.com/use-cases/): Coding assistant governance, legacy codebase memory, security and compliance guardrails, data platform governance, design system governance.
 - [Insights](https://mnemehq.com/insights/): Technical deep dives and comparison content on AI coding governance.
 - [Roadmap](https://mnemehq.com/roadmap/): Phase 1 OSS developer wedge through Phase 4 governance infrastructure.
