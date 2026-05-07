@@ -50,8 +50,8 @@ for html in sorted(SITE.rglob("*.html")):
     # 1. Replace nav
     text = NAV_PAT.sub(adapt(NAV_HTML), text)
 
-    # 2. Inject hamburger CSS if missing
-    if ".nav-hamburger" not in text:
+    # 2. Inject hamburger CSS if missing (use CSS rule sentinel, not HTML class attr)
+    if ".nav-hamburger {" not in text:
         if "</style>" in text:
             css_block = adapt("\n    " + HAMBURGER_CSS.replace("\n", "\n    "))
             text = text.replace("</style>", css_block + "\n  </style>", 1)
