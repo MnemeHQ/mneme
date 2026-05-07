@@ -87,5 +87,21 @@
       "rationale": "Coupled changes to retrieval and benchmark harness make regressions invisible. Splitting preserves an auditable benchmark history and forces the retrieval change to stand on its own evidence.",
       "tags": ["benchmark", "retrieval", "pr-discipline", "regression"]
     }
+  ],
+  "decisions": [
+    {
+      "id": "workflow-001",
+      "decision": "All meaningful governance or architectural changes must go through PR review before merging to main.",
+      "rationale": "Prevents silent architectural drift during AI-assisted development and preserves auditable governance history.",
+      "scope": ["workflow", "governance", "repository"],
+      "constraints": [
+        "do not merge enforcement changes directly to main",
+        "do not bypass CI for governance-related changes"
+      ],
+      "anti_patterns": [
+        "direct-to-main governance edits",
+        "unreviewed enforcement changes"
+      ]
+    }
   ]
 }
