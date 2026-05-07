@@ -3,26 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mneme vs Cursor Rules — Mneme HQ</title>
-  <meta name="description" content="Cursor Rules are per-repo text files. Mneme HQ is a structured decision memory with a precedence engine and hook-level enforcement. The comparison that matters." />
+  <title>Mneme HQ + Cursor — Mneme HQ</title>
+  <meta name="description" content="Keep architectural decisions in Mneme HQ. Surface them as Cursor Rules every session — with conflict resolution and versioning that .cursorrules files lack." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
-  <link rel="canonical" href="https://mnemehq.com/insights/mneme-vs-cursor-rules/" />
+  <link rel="canonical" href="https://mnemehq.com/integrations/cursor/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Mneme vs Cursor Rules" />
-  <meta property="og:description" content="Cursor Rules are per-repo text files. Mneme HQ is a structured decision memory with a precedence engine and hook-level enforcement. The comparison that matters." />
-  <meta property="og:url" content="https://mnemehq.com/insights/mneme-vs-cursor-rules/" />
-  <meta property="og:image" content="https://mnemehq.com/insights/mneme-vs-cursor-rules/og.png" />
+  <meta property="og:title" content="Mneme HQ + Cursor" />
+  <meta property="og:description" content="Keep architectural decisions in Mneme HQ. Surface them as Cursor Rules every session — with conflict resolution and versioning that .cursorrules files lack." />
+  <meta property="og:url" content="https://mnemehq.com/integrations/cursor/" />
+  <meta property="og:image" content="https://mnemehq.com/integrations/cursor/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Mneme vs Cursor Rules" />
-  <meta name="twitter:description" content="Cursor Rules are per-repo text files. Mneme HQ is a structured decision memory with a precedence engine and hook-level enforcement. The comparison that matters." />
-  <meta name="twitter:image" content="https://mnemehq.com/insights/mneme-vs-cursor-rules/og.png" />
+  <meta name="twitter:title" content="Mneme HQ + Cursor" />
+  <meta name="twitter:description" content="Keep architectural decisions in Mneme HQ. Surface them as Cursor Rules every session — with conflict resolution and versioning that .cursorrules files lack." />
+  <meta name="twitter:image" content="https://mnemehq.com/integrations/cursor/og.png" />
   <meta name="author" content="Theo Valmis" />
-  <meta property="article:published_time" content="2026-05-05T00:00:00Z" />
+  <meta property="article:published_time" content="2026-05-07T00:00:00Z" />
   <meta property="article:author" content="https://mnemehq.com/founder/" />
-  <meta property="article:section" content="Engineering" />
+  <meta property="article:section" content="Integration" />
   <!-- Google Tag Manager -->
   <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
   <!-- End Google Tag Manager -->
@@ -65,17 +65,24 @@
     .article-body ul, .article-body ol { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
     .article-body li { margin-bottom: 0.5rem; }
     .article-body li strong { color: var(--text); font-weight: 500; }
+    .article-body pre {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: var(--teal);
+    }
+    .article-body pre code { font-size: 1em; color: var(--teal); background: none; border: none; padding: 0; }
+    .article-body code { font-family: 'DM Mono', monospace; font-size: 0.82em; color: var(--teal); background: none; }
 
     .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
     .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
     .callout p strong { color: var(--accent); }
-
-    .comparison-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.85rem; }
-    .comparison-table th { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border2); color: var(--muted); font-weight: 500; }
-    .comparison-table td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
-    .comparison-table td:first-child { color: var(--muted); white-space: nowrap; }
-    .comparison-table td:nth-child(2) { color: var(--text); opacity: 0.5; }
-    .comparison-table td:nth-child(3) { color: var(--teal); }
 
     .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
     .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
@@ -85,6 +92,8 @@
     .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
     .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
     .btn-primary:hover { background: var(--accent-dim); }
+    .cta-secondary { display: block; margin-top: 0.75rem; font-size: 0.82rem; color: var(--muted); text-decoration: none; }
+    .cta-secondary:hover { color: var(--text); }
 
     footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
     footer a { color: var(--muted); text-decoration: none; }
@@ -117,21 +126,21 @@
         "@type": "BreadcrumbList",
         "itemListElement": [
           {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
-          {"@type": "ListItem", "position": 2, "name": "Insights", "item": "https://mnemehq.com/insights/"},
-          {"@type": "ListItem", "position": 3, "name": "Mneme vs Cursor Rules", "item": "https://mnemehq.com/insights/mneme-vs-cursor-rules/"}
+          {"@type": "ListItem", "position": 2, "name": "Integrations", "item": "https://mnemehq.com/integrations/"},
+          {"@type": "ListItem", "position": 3, "name": "Cursor", "item": "https://mnemehq.com/integrations/cursor/"}
         ]
       },
       {
         "@type": "Article",
-        "headline": "Mneme vs Cursor Rules",
-        "description": "Cursor Rules are per-repo text files. Mneme HQ is a structured decision memory with a precedence engine and hook-level enforcement. The comparison that matters.",
-        "url": "https://mnemehq.com/insights/mneme-vs-cursor-rules/",
-        "datePublished": "2026-05-05",
-        "dateModified": "2026-05-05",
+        "headline": "Mneme HQ + Cursor",
+        "description": "Keep architectural decisions in Mneme HQ. Surface them as Cursor Rules every session — with conflict resolution and versioning that .cursorrules files lack.",
+        "url": "https://mnemehq.com/integrations/cursor/",
+        "datePublished": "2026-05-07",
+        "dateModified": "2026-05-07",
         "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
-        "image": "https://mnemehq.com/og.png",
-        "mainEntityOfPage": "https://mnemehq.com/insights/mneme-vs-cursor-rules/"
+        "image": "https://mnemehq.com/integrations/cursor/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/integrations/cursor/"
       }
     ]
   }
@@ -148,7 +157,7 @@
   <div class="nav-links">
     <a href="/#how-it-works">How it works</a>
     <a href="/use-cases/">Use cases</a>
-    <a href="/insights/" class="active">Insights</a>
+    <a href="/insights/">Insights</a>
     <a href="/roadmap/">Roadmap</a>
     <a href="/demo.html">Demo</a>
     <a href="/#benchmarks">Benchmarks</a>
@@ -161,115 +170,79 @@
 <nav aria-label="Breadcrumb" class="breadcrumb-nav">
   <ol class="breadcrumb">
     <li><a href="/">Home</a></li>
-    <li><a href="/insights/">Insights</a></li>
-    <li aria-current="page">Mneme vs Cursor Rules</li>
+    <li><a href="/integrations/">Integrations</a></li>
+    <li aria-current="page">Cursor</li>
   </ol>
 </nav>
 <article class="article-wrap">
   <header class="article-header">
     <div class="article-eyebrow">
-      <span class="eyebrow-tag">Comparative</span>
+      <span class="eyebrow-tag">Integration &middot; Cursor</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">5 min read &nbsp;·&nbsp; May 2026</span>
+      <span class="eyebrow-meta">4 min read &nbsp;·&nbsp; May 2026</span>
     </div>
-    <h1>Mneme vs Cursor Rules</h1>
-    <p class="article-lede">Both inject context into AI coding sessions. They solve different problems. Here's how they differ — and when the difference matters.</p>
+    <h1>Mneme HQ + Cursor</h1>
+    <p class="article-lede">Cursor Rules inject context into every Cursor session. Mneme HQ is where that context lives — structured, versioned, and resolved across conflicting rules before it reaches Cursor.</p>
   </header>
 
   <div class="article-body">
 
-    <h2>What Cursor Rules are</h2>
+    <h2>How it works together</h2>
 
     <ul>
-      <li>Per-repo <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.cursorrules</code> file (plain text instructions)</li>
-      <li>Injected as system prompt preamble by Cursor</li>
-      <li>Written manually, no schema, no version control enforcement</li>
-      <li>Single file per repo — same rules applied everywhere regardless of context</li>
-      <li>The model can still ignore them</li>
+      <li>Mneme HQ stores architectural decisions in <code>.mneme/project_memory.json</code> — typed, scoped, versioned</li>
+      <li>A single export command generates a <code>.cursorrules</code> file from the active decision corpus</li>
+      <li>Mneme's precedence engine resolves conflicts before export — Cursor sees a clean, non-contradictory rule set</li>
+      <li>You edit decisions in Mneme; re-export to update Cursor Rules</li>
     </ul>
 
-    <h2>What Mneme HQ does differently</h2>
+    <h2>What Mneme adds to the workflow</h2>
 
-    <div style="overflow-x:auto;margin:2rem 0;">
-    <table class="comparison-table">
-      <thead>
-        <tr>
-          <th>Dimension</th>
-          <th>Cursor Rules</th>
-          <th>Mneme HQ</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Storage</td>
-          <td>.cursorrules flat text file</td>
-          <td>Structured JSON with typed fields (id, scope, status, rationale, supersedes)</td>
-        </tr>
-        <tr>
-          <td>Enforcement</td>
-          <td>Suggestion — model can ignore</td>
-          <td>Hook-level blocking on Edit/Write operations</td>
-        </tr>
-        <tr>
-          <td>Scope</td>
-          <td>Whole repo — same rules everywhere</td>
-          <td>Per-file pattern matching (e.g. <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">services/payments/**</code>)</td>
-        </tr>
-        <tr>
-          <td>Conflict resolution</td>
-          <td>None — you manage conflicts manually</td>
-          <td>Precedence engine resolves conflicts deterministically</td>
-        </tr>
-        <tr>
-          <td>Multi-agent support</td>
-          <td>One file per repo</td>
-          <td>Shared decision corpus queryable by all agents</td>
-        </tr>
-        <tr>
-          <td>Decision versioning</td>
-          <td>Plain text, no status tracking</td>
-          <td>Status field (draft/active/superseded) with supersedes chain</td>
-        </tr>
-      </tbody>
-    </table>
+    <ul>
+      <li><strong>Source of truth is structured JSON</strong> — not the <code>.cursorrules</code> file itself</li>
+      <li><strong>Conflict resolution happens in Mneme</strong> before Cursor ever sees the rules</li>
+      <li>Decisions carry <code>rationale</code>, <code>supersedes</code>, and <code>status</code> fields — <code>.cursorrules</code> carries none of this</li>
+      <li>When you add Claude Code to the stack, Mneme's hook-level enforcement applies automatically — no migration</li>
+    </ul>
+
+    <h2>Setup</h2>
+
+    <pre><code>pip install mneme
+# Export active decisions to .cursorrules
+mneme export --format cursor-rules > .cursorrules</code></pre>
+
+    <h2>Recommended workflow</h2>
+
+    <ol>
+      <li>Record decisions via <code>/mneme-record</code> (Claude Code) or edit <code>project_memory.json</code> directly</li>
+      <li>Re-export before opening Cursor: <code>mneme export --format cursor-rules &gt; .cursorrules</code></li>
+      <li>Commit both files — Mneme corpus is the source, <code>.cursorrules</code> is the derived surface</li>
+    </ol>
+
+    <h2>If you use Cursor and Claude Code</h2>
+
+    <p>Running both editors against the same codebase? Mneme keeps them consistent without duplication:</p>
+
+    <ul>
+      <li>Cursor sessions use the <code>.cursorrules</code> export for context injection</li>
+      <li>Claude Code sessions use the PreToolUse hook for enforcement</li>
+      <li>Both draw from the same Mneme corpus — one authoritative source, two surfaces</li>
+    </ul>
+
+    <div class="callout">
+      <p><strong>See how they compare.</strong> For a detailed breakdown of what each tool does and where they overlap, read the full comparison: <a href="/compare/cursor-rules/" style="color:var(--accent);text-decoration:none;">Mneme HQ vs Cursor Rules &rarr;</a></p>
     </div>
-
-    <h2>When Cursor Rules are sufficient</h2>
-
-    <ul>
-      <li>Single developer, single repo, no enforcement requirement</li>
-      <li>Rules that apply uniformly to every file in the project</li>
-      <li>Suggestions are fine — you don't need a violation to actually block</li>
-      <li>No multi-agent workflows, no conflicting rule sets</li>
-    </ul>
-
-    <h2>When the difference matters</h2>
-
-    <ul>
-      <li>Multiple engineers or agents editing the same codebase simultaneously</li>
-      <li>Service-boundary-specific rules (payments team has different storage rules than analytics)</li>
-      <li>You need a violation to be stopped, not merely suggested against</li>
-      <li>Rules conflict (org policy vs. team exception) and you need deterministic resolution rather than model judgment</li>
-      <li>Decision history matters — when a rule changed, why it changed, what it superseded</li>
-    </ul>
-
-    <h2>The fundamental distinction</h2>
-
-    <p><strong>Cursor Rules are configuration. Mneme HQ is enforcement.</strong></p>
-
-    <p>The distinction matters when the cost of a violation is more than a PR comment — when an architectural boundary is crossed, a compliance rule is broken, or a service dependency is introduced that will take a quarter to untangle.</p>
 
   </div>
 
   <footer class="article-footer">
-    <a href="/insights/" class="back-link">← Back to Insights</a>
+    <a href="/integrations/" class="back-link">&#8592; All integrations</a>
 
     <div class="cta-block">
-      <h3>Mneme HQ enforces architectural decisions at the source</h3>
-      <p>Structured decision schema, deterministic precedence engine, and hook-level enforcement for Claude Code. Open source.</p>
-      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub →</a>
-      <a href="/compare/cursor-rules/" style="display:block;margin-top:0.75rem;font-size:0.82rem;color:var(--muted);text-decoration:none;">Mneme HQ vs Cursor Rules — full comparison →</a>
-      <a href="/integrations/cursor/" style="display:block;margin-top:0.5rem;font-size:0.82rem;color:var(--muted);text-decoration:none;">Mneme + Cursor — integration guide →</a>
+      <h3>One corpus. Every AI editor.</h3>
+      <p>Maintain decisions in Mneme HQ. Export to Cursor Rules, enforce via Claude Code hooks — same source of truth, no duplication.</p>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
+      <a href="/compare/cursor-rules/" class="cta-secondary">See full comparison: Mneme HQ vs Cursor Rules &rarr;</a>
     </div>
   </footer>
 </article>
@@ -280,6 +253,8 @@
     <a href="/use-cases/">Use cases</a>
     &nbsp;&middot;&nbsp;
     <a href="/insights/">Insights</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/integrations/">Integrations</a>
     &nbsp;&middot;&nbsp;
     <a href="/founder/">Founder</a>
     &nbsp;&middot;&nbsp;

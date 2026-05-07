@@ -3,26 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mneme vs Cursor Rules — Mneme HQ</title>
-  <meta name="description" content="Cursor Rules are per-repo text files. Mneme HQ is a structured decision memory with a precedence engine and hook-level enforcement. The comparison that matters." />
+  <title>Architectural Governance in GitHub Actions — Mneme HQ</title>
+  <meta name="description" content="Run Mneme HQ's checks in your CI pipeline. Block pull requests that violate architectural decisions before they merge — direct enforcement after generation." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
-  <link rel="canonical" href="https://mnemehq.com/insights/mneme-vs-cursor-rules/" />
+  <link rel="canonical" href="https://mnemehq.com/integrations/github-actions/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Mneme vs Cursor Rules" />
-  <meta property="og:description" content="Cursor Rules are per-repo text files. Mneme HQ is a structured decision memory with a precedence engine and hook-level enforcement. The comparison that matters." />
-  <meta property="og:url" content="https://mnemehq.com/insights/mneme-vs-cursor-rules/" />
-  <meta property="og:image" content="https://mnemehq.com/insights/mneme-vs-cursor-rules/og.png" />
+  <meta property="og:title" content="Architectural Governance in GitHub Actions" />
+  <meta property="og:description" content="Run Mneme HQ's checks in your CI pipeline. Block pull requests that violate architectural decisions before they merge — direct enforcement after generation." />
+  <meta property="og:url" content="https://mnemehq.com/integrations/github-actions/" />
+  <meta property="og:image" content="https://mnemehq.com/integrations/github-actions/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Mneme vs Cursor Rules" />
-  <meta name="twitter:description" content="Cursor Rules are per-repo text files. Mneme HQ is a structured decision memory with a precedence engine and hook-level enforcement. The comparison that matters." />
-  <meta name="twitter:image" content="https://mnemehq.com/insights/mneme-vs-cursor-rules/og.png" />
+  <meta name="twitter:title" content="Architectural Governance in GitHub Actions" />
+  <meta name="twitter:description" content="Run Mneme HQ's checks in your CI pipeline. Block pull requests that violate architectural decisions before they merge — direct enforcement after generation." />
+  <meta name="twitter:image" content="https://mnemehq.com/integrations/github-actions/og.png" />
   <meta name="author" content="Theo Valmis" />
-  <meta property="article:published_time" content="2026-05-05T00:00:00Z" />
+  <meta property="article:published_time" content="2026-05-07T00:00:00Z" />
   <meta property="article:author" content="https://mnemehq.com/founder/" />
-  <meta property="article:section" content="Engineering" />
+  <meta property="article:section" content="Integration" />
   <!-- Google Tag Manager -->
   <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
   <!-- End Google Tag Manager -->
@@ -65,17 +65,24 @@
     .article-body ul, .article-body ol { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
     .article-body li { margin-bottom: 0.5rem; }
     .article-body li strong { color: var(--text); font-weight: 500; }
+    .article-body pre {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: var(--teal);
+    }
+    .article-body pre code { font-size: 1em; color: var(--teal); background: none; border: none; padding: 0; }
+    .article-body code { font-family: 'DM Mono', monospace; font-size: 0.82em; color: var(--teal); background: none; }
 
     .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
     .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
     .callout p strong { color: var(--accent); }
-
-    .comparison-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.85rem; }
-    .comparison-table th { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border2); color: var(--muted); font-weight: 500; }
-    .comparison-table td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
-    .comparison-table td:first-child { color: var(--muted); white-space: nowrap; }
-    .comparison-table td:nth-child(2) { color: var(--text); opacity: 0.5; }
-    .comparison-table td:nth-child(3) { color: var(--teal); }
 
     .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
     .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
@@ -85,6 +92,8 @@
     .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
     .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
     .btn-primary:hover { background: var(--accent-dim); }
+    .cta-secondary { display: block; margin-top: 0.75rem; font-size: 0.82rem; color: var(--muted); text-decoration: none; }
+    .cta-secondary:hover { color: var(--text); }
 
     footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
     footer a { color: var(--muted); text-decoration: none; }
@@ -117,21 +126,21 @@
         "@type": "BreadcrumbList",
         "itemListElement": [
           {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
-          {"@type": "ListItem", "position": 2, "name": "Insights", "item": "https://mnemehq.com/insights/"},
-          {"@type": "ListItem", "position": 3, "name": "Mneme vs Cursor Rules", "item": "https://mnemehq.com/insights/mneme-vs-cursor-rules/"}
+          {"@type": "ListItem", "position": 2, "name": "Integrations", "item": "https://mnemehq.com/integrations/"},
+          {"@type": "ListItem", "position": 3, "name": "GitHub Actions", "item": "https://mnemehq.com/integrations/github-actions/"}
         ]
       },
       {
         "@type": "Article",
-        "headline": "Mneme vs Cursor Rules",
-        "description": "Cursor Rules are per-repo text files. Mneme HQ is a structured decision memory with a precedence engine and hook-level enforcement. The comparison that matters.",
-        "url": "https://mnemehq.com/insights/mneme-vs-cursor-rules/",
-        "datePublished": "2026-05-05",
-        "dateModified": "2026-05-05",
+        "headline": "Architectural Governance in GitHub Actions",
+        "description": "Run Mneme HQ's checks in your CI pipeline. Block pull requests that violate architectural decisions before they merge — direct enforcement after generation.",
+        "url": "https://mnemehq.com/integrations/github-actions/",
+        "datePublished": "2026-05-07",
+        "dateModified": "2026-05-07",
         "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
-        "image": "https://mnemehq.com/og.png",
-        "mainEntityOfPage": "https://mnemehq.com/insights/mneme-vs-cursor-rules/"
+        "image": "https://mnemehq.com/integrations/github-actions/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/integrations/github-actions/"
       }
     ]
   }
@@ -148,7 +157,7 @@
   <div class="nav-links">
     <a href="/#how-it-works">How it works</a>
     <a href="/use-cases/">Use cases</a>
-    <a href="/insights/" class="active">Insights</a>
+    <a href="/insights/">Insights</a>
     <a href="/roadmap/">Roadmap</a>
     <a href="/demo.html">Demo</a>
     <a href="/#benchmarks">Benchmarks</a>
@@ -161,115 +170,93 @@
 <nav aria-label="Breadcrumb" class="breadcrumb-nav">
   <ol class="breadcrumb">
     <li><a href="/">Home</a></li>
-    <li><a href="/insights/">Insights</a></li>
-    <li aria-current="page">Mneme vs Cursor Rules</li>
+    <li><a href="/integrations/">Integrations</a></li>
+    <li aria-current="page">GitHub Actions</li>
   </ol>
 </nav>
 <article class="article-wrap">
   <header class="article-header">
     <div class="article-eyebrow">
-      <span class="eyebrow-tag">Comparative</span>
+      <span class="eyebrow-tag">Integration &middot; GitHub Actions</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">5 min read &nbsp;·&nbsp; May 2026</span>
+      <span class="eyebrow-meta">4 min read &nbsp;&middot;&nbsp; May 2026</span>
     </div>
-    <h1>Mneme vs Cursor Rules</h1>
-    <p class="article-lede">Both inject context into AI coding sessions. They solve different problems. Here's how they differ — and when the difference matters.</p>
+    <h1>Architectural Governance in GitHub Actions</h1>
+    <p class="article-lede">Pre-generation enforcement catches most violations before code is written. CI enforcement catches the rest — running Mneme's checks against every PR diff, blocking merges that violate architectural decisions.</p>
   </header>
 
   <div class="article-body">
 
-    <h2>What Cursor Rules are</h2>
+    <h2>Why CI enforcement matters</h2>
 
     <ul>
-      <li>Per-repo <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.cursorrules</code> file (plain text instructions)</li>
-      <li>Injected as system prompt preamble by Cursor</li>
-      <li>Written manually, no schema, no version control enforcement</li>
-      <li>Single file per repo — same rules applied everywhere regardless of context</li>
-      <li>The model can still ignore them</li>
+      <li>Generation-time hooks cover interactive and agentic Claude Code sessions</li>
+      <li>Code can also arrive from manual edits, other tools, or agents without hook coverage</li>
+      <li>CI enforcement is the backstop — every commit checked regardless of how it was produced</li>
+      <li>Positions governance at three layers: generation time &rarr; PR review &rarr; CI gate</li>
     </ul>
 
-    <h2>What Mneme HQ does differently</h2>
+    <h2>How it works</h2>
 
-    <div style="overflow-x:auto;margin:2rem 0;">
-    <table class="comparison-table">
-      <thead>
-        <tr>
-          <th>Dimension</th>
-          <th>Cursor Rules</th>
-          <th>Mneme HQ</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Storage</td>
-          <td>.cursorrules flat text file</td>
-          <td>Structured JSON with typed fields (id, scope, status, rationale, supersedes)</td>
-        </tr>
-        <tr>
-          <td>Enforcement</td>
-          <td>Suggestion — model can ignore</td>
-          <td>Hook-level blocking on Edit/Write operations</td>
-        </tr>
-        <tr>
-          <td>Scope</td>
-          <td>Whole repo — same rules everywhere</td>
-          <td>Per-file pattern matching (e.g. <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">services/payments/**</code>)</td>
-        </tr>
-        <tr>
-          <td>Conflict resolution</td>
-          <td>None — you manage conflicts manually</td>
-          <td>Precedence engine resolves conflicts deterministically</td>
-        </tr>
-        <tr>
-          <td>Multi-agent support</td>
-          <td>One file per repo</td>
-          <td>Shared decision corpus queryable by all agents</td>
-        </tr>
-        <tr>
-          <td>Decision versioning</td>
-          <td>Plain text, no status tracking</td>
-          <td>Status field (draft/active/superseded) with supersedes chain</td>
-        </tr>
-      </tbody>
-    </table>
+    <ul>
+      <li><code>mneme check</code> validates a file or diff against the decision corpus in <code>.mneme/project_memory.json</code></li>
+      <li>Run against changed files in a PR to surface any architectural violations</li>
+      <li><strong>Exit code 2</strong> = violation found &rarr; CI step fails &rarr; PR blocked</li>
+      <li><strong>Exit code 0</strong> = no violations &rarr; CI step passes</li>
+    </ul>
+
+    <h2>Example workflow</h2>
+
+    <pre><code># .github/workflows/mneme-governance.yml
+name: Architectural Governance
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  governance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install mneme
+      - name: Check changed files
+        run: |
+          git diff --name-only origin/main...HEAD | \
+            xargs -I{} mneme check {}</code></pre>
+
+    <h2>Status</h2>
+
+    <ul>
+      <li>CI enforcement gate is Phase 1 current focus — see the <a href="/roadmap/" style="color:var(--accent);text-decoration:none;">roadmap</a></li>
+      <li>The <code>mneme check</code> command is available today via <code>pip install mneme</code></li>
+      <li>The GitHub Actions workflow above is the reference integration pattern</li>
+      <li>Managed GitHub Actions workflow artifact coming in Q3 2026</li>
+    </ul>
+
+    <h2>Layered governance model</h2>
+
+    <div class="callout">
+      <p>
+        <strong>Layer 1:</strong> Generation-time enforcement via Claude Code hooks<br>
+        <strong>Layer 2:</strong> PR review (human + AI)<br>
+        <strong>Layer 3:</strong> CI gate via Mneme in GitHub Actions
+      </p>
     </div>
-
-    <h2>When Cursor Rules are sufficient</h2>
-
-    <ul>
-      <li>Single developer, single repo, no enforcement requirement</li>
-      <li>Rules that apply uniformly to every file in the project</li>
-      <li>Suggestions are fine — you don't need a violation to actually block</li>
-      <li>No multi-agent workflows, no conflicting rule sets</li>
-    </ul>
-
-    <h2>When the difference matters</h2>
-
-    <ul>
-      <li>Multiple engineers or agents editing the same codebase simultaneously</li>
-      <li>Service-boundary-specific rules (payments team has different storage rules than analytics)</li>
-      <li>You need a violation to be stopped, not merely suggested against</li>
-      <li>Rules conflict (org policy vs. team exception) and you need deterministic resolution rather than model judgment</li>
-      <li>Decision history matters — when a rule changed, why it changed, what it superseded</li>
-    </ul>
-
-    <h2>The fundamental distinction</h2>
-
-    <p><strong>Cursor Rules are configuration. Mneme HQ is enforcement.</strong></p>
-
-    <p>The distinction matters when the cost of a violation is more than a PR comment — when an architectural boundary is crossed, a compliance rule is broken, or a service dependency is introduced that will take a quarter to untangle.</p>
 
   </div>
 
   <footer class="article-footer">
-    <a href="/insights/" class="back-link">← Back to Insights</a>
+    <a href="/integrations/" class="back-link">&#8592; All integrations</a>
 
     <div class="cta-block">
-      <h3>Mneme HQ enforces architectural decisions at the source</h3>
-      <p>Structured decision schema, deterministic precedence engine, and hook-level enforcement for Claude Code. Open source.</p>
-      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub →</a>
-      <a href="/compare/cursor-rules/" style="display:block;margin-top:0.75rem;font-size:0.82rem;color:var(--muted);text-decoration:none;">Mneme HQ vs Cursor Rules — full comparison →</a>
-      <a href="/integrations/cursor/" style="display:block;margin-top:0.5rem;font-size:0.82rem;color:var(--muted);text-decoration:none;">Mneme + Cursor — integration guide →</a>
+      <h3>Add architectural governance to your CI pipeline</h3>
+      <p>Mneme check runs anywhere Python runs. The reference workflow is three steps.</p>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
+      <a href="/insights/ai-code-review-does-not-scale-linearly/" class="cta-secondary">Read: AI Code Review Does Not Scale Linearly &rarr;</a>
     </div>
   </footer>
 </article>
@@ -280,6 +267,8 @@
     <a href="/use-cases/">Use cases</a>
     &nbsp;&middot;&nbsp;
     <a href="/insights/">Insights</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/integrations/">Integrations</a>
     &nbsp;&middot;&nbsp;
     <a href="/founder/">Founder</a>
     &nbsp;&middot;&nbsp;

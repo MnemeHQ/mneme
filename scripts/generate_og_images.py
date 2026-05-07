@@ -42,6 +42,15 @@ TEMPLATE_MAP = {
     "og-for-cto.html": "for-cto/og.png",
     "og-for-platform.html": "for-platform/og.png",
     "og-for-principal.html": "for-principal/og.png",
+    "og-compare-index.html": "compare/og.png",
+    "og-compare-coderabbit.html": "compare/coderabbit/og.png",
+    "og-compare-cursor-rules.html": "compare/cursor-rules/og.png",
+    "og-compare-claude-code-memory.html": "compare/claude-code-memory/og.png",
+    "og-compare-rag-vs-governance.html": "compare/rag-vs-governance/og.png",
+    "og-integration-index.html": "integrations/og.png",
+    "og-integration-claude-code.html": "integrations/claude-code/og.png",
+    "og-integration-cursor.html": "integrations/cursor/og.png",
+    "og-integration-github-actions.html": "integrations/github-actions/og.png",
 }
 
 PORT = 8765
