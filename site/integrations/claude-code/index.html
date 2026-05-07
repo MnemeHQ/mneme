@@ -78,6 +78,7 @@
       color: var(--teal);
     }
     .article-body pre code { font-size: 1em; color: var(--teal); background: none; border: none; padding: 0; }
+    .article-body code { font-family: 'DM Mono', monospace; font-size: 0.82em; color: var(--teal); background: none; }
 
     .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
     .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
@@ -195,7 +196,7 @@
 
     <h2>How the hook works</h2>
 
-    <p>Every Edit, Write, or MultiEdit Claude Code attempts is intercepted by <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">mneme-hook</code> before it writes to disk. The hook reconstructs the full post-edit file content, checks it against your recorded decisions, and returns a verdict.</p>
+    <p>Every Edit, Write, or MultiEdit Claude Code attempts is intercepted by <code>mneme-hook</code> before it writes to disk. The hook reconstructs the full post-edit file content, checks it against your recorded decisions, and returns a verdict.</p>
 
     <p>The exit code semantics are deterministic: <strong>exit 0 allows the edit</strong>; <strong>exit 2 blocks it</strong> and surfaces the violated decision id as feedback to Claude Code. Claude Code sees the block as an error message, reads the decision id and rule, and adjusts its approach without you having to intervene.</p>
 
@@ -208,7 +209,7 @@
     exit 0   # allow</code></pre>
 
     <div class="callout">
-      <p><strong>Fail-open by design.</strong> The hook never blocks on Mneme malfunction. If <code style="font-family:'DM Mono',monospace;font-size:0.82em;">mneme</code> is not found, the file can't be read, or <code style="font-family:'DM Mono',monospace;font-size:0.82em;">mneme check</code> times out (10 s limit), the hook exits 0 and allows the edit.</p>
+      <p><strong>Fail-open by design.</strong> The hook never blocks on Mneme malfunction. If <code>mneme</code> is not found, the file can't be read, or <code>mneme check</code> times out (10 s limit), the hook exits 0 and allows the edit.</p>
     </div>
 
     <h2>Install</h2>
@@ -284,39 +285,39 @@
       <tbody>
         <tr>
           <td>strict (default)</td>
-          <td>Block on any non-zero verdict from <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">mneme check</code></td>
-          <td><code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">export MNEME_HOOK_MODE=strict</code></td>
+          <td>Block on any non-zero verdict from <code>mneme check</code></td>
+          <td><code>export MNEME_HOOK_MODE=strict</code></td>
         </tr>
         <tr>
           <td>warn</td>
           <td>Surface warning to Claude, never block</td>
-          <td><code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">export MNEME_HOOK_MODE=warn</code></td>
+          <td><code>export MNEME_HOOK_MODE=warn</code></td>
         </tr>
       </tbody>
     </table>
     </div>
 
-    <p>Switch to <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">warn</code> while you're iterating on decisions to avoid friction:</p>
+    <p>Switch to <code>warn</code> while you're iterating on decisions to avoid friction:</p>
     <pre><code>export MNEME_HOOK_MODE=warn</code></pre>
 
     <h2>Retrieval: what the hook checks and what it misses</h2>
 
-    <p>The hook query is <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">"edit to &lt;file_path&gt;"</code> — tokens from the target file name determine which decisions are retrieved and checked. Decisions are scored by keyword overlap between the query and their <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">scope</code>, <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">id</code>, decision text, and anti-pattern fields.</p>
+    <p>The hook query is <code>"edit to &lt;file_path&gt;"</code> — tokens from the target file name determine which decisions are retrieved and checked. Decisions are scored by keyword overlap between the query and their <code>scope</code>, <code>id</code>, decision text, and anti-pattern fields.</p>
 
     <p><strong>What this means in practice:</strong></p>
 
     <ul>
-      <li>A decision with <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">scope: ["storage", "database"]</code> and a file named <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">storage_layer.py</code> will reliably be retrieved — "storage" appears in both the query and the scope.</li>
-      <li>The same decision may <strong>not</strong> be retrieved for an edit to <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">models.py</code> — neither token overlaps with the scope.</li>
-      <li>Generic file names like <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">utils.py</code> or <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">helpers.py</code> will rarely retrieve any decisions at all.</li>
+      <li>A decision with <code>scope: ["storage", "database"]</code> and a file named <code>storage_layer.py</code> will reliably be retrieved — "storage" appears in both the query and the scope.</li>
+      <li>The same decision may <strong>not</strong> be retrieved for an edit to <code>models.py</code> — neither token overlaps with the scope.</li>
+      <li>Generic file names like <code>utils.py</code> or <code>helpers.py</code> will rarely retrieve any decisions at all.</li>
     </ul>
 
     <p><strong>Mitigations:</strong></p>
 
     <ol>
-      <li>Choose scope keywords when recording decisions that match file names in your project. Use <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">/mneme-record</code> and follow the scope tip in the command.</li>
-      <li>Run <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">/mneme-context</code> before non-trivial edits with a descriptive phrase describing the domain (e.g. "storage layer", "auth middleware"). This uses a richer query than the hook and surfaces decisions the hook might miss.</li>
-      <li>Run <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">/mneme-review</code> after a batch of edits to catch violations the per-edit hook missed due to retrieval gaps.</li>
+      <li>Choose scope keywords when recording decisions that match file names in your project. Use <code>/mneme-record</code> and follow the scope tip in the command.</li>
+      <li>Run <code>/mneme-context</code> before non-trivial edits with a descriptive phrase describing the domain (e.g. "storage layer", "auth middleware"). This uses a richer query than the hook and surfaces decisions the hook might miss.</li>
+      <li>Run <code>/mneme-review</code> after a batch of edits to catch violations the per-edit hook missed due to retrieval gaps.</li>
     </ol>
 
     <p>The hook is a first line of defence, not a complete audit. Use the slash commands for coverage on domains where file names are not self-describing.</p>
@@ -326,40 +327,40 @@
     <p>The hook <strong>never blocks</strong> on execution errors. It exits 0 (allow) when:</p>
 
     <ul>
-      <li><code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">mneme</code> is not found on <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">$PATH</code></li>
+      <li><code>mneme</code> is not found on <code>$PATH</code></li>
       <li>The target file cannot be read (common for Write — the file doesn't exist yet)</li>
-      <li><code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">mneme check</code> times out (limit: 10 s)</li>
+      <li><code>mneme check</code> times out (limit: 10 s)</li>
       <li>Any other OS-level error occurs</li>
     </ul>
 
-    <p>Only a real verdict returned by <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">mneme check</code> can cause a block.</p>
+    <p>Only a real verdict returned by <code>mneme check</code> can cause a block.</p>
 
     <h2>Troubleshooting</h2>
 
     <h3>Hook is not firing</h3>
     <ul>
-      <li>Confirm <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">mneme-hook</code> is on <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">$PATH</code>: <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">which mneme-hook</code> (or <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">where mneme-hook</code> on Windows).</li>
-      <li>If not, the pip scripts directory may not be on <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">$PATH</code>. Add it, or install with <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">pipx</code>.</li>
-      <li>Confirm <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.claude/settings.json</code> contains the <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">PreToolUse</code> entry (run the installer again).</li>
+      <li>Confirm <code>mneme-hook</code> is on <code>$PATH</code>: <code>which mneme-hook</code> (or <code>where mneme-hook</code> on Windows).</li>
+      <li>If not, the pip scripts directory may not be on <code>$PATH</code>. Add it, or install with <code>pipx</code>.</li>
+      <li>Confirm <code>.claude/settings.json</code> contains the <code>PreToolUse</code> entry (run the installer again).</li>
     </ul>
 
     <h3>Hook fires but nothing is blocked</h3>
     <ul>
-      <li>Confirm <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.mneme/project_memory.json</code> exists in the project root (or a parent directory).</li>
+      <li>Confirm <code>.mneme/project_memory.json</code> exists in the project root (or a parent directory).</li>
       <li>Check your decision scope keywords against the file names being edited — see the retrieval section above.</li>
-      <li>Switch to warn mode temporarily and check stderr output from <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">mneme-hook</code> for clues.</li>
+      <li>Switch to warn mode temporarily and check stderr output from <code>mneme-hook</code> for clues.</li>
     </ul>
 
     <h3>Too many false positives / blocks</h3>
     <ul>
-      <li>Switch to <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">MNEME_HOOK_MODE=warn</code> while refining your decisions.</li>
-      <li>Review the triggered anti-patterns with <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">/mneme-context</code> to see if they're too broad.</li>
+      <li>Switch to <code>MNEME_HOOK_MODE=warn</code> while refining your decisions.</li>
+      <li>Review the triggered anti-patterns with <code>/mneme-context</code> to see if they're too broad.</li>
     </ul>
 
   </div>
 
   <footer class="article-footer">
-    <a href="/integrations/" class="back-link">&#8592; Back to Integrations</a>
+    <a href="/integrations/" class="back-link">&#8592; All integrations</a>
 
     <div class="cta-block">
       <h3>Start enforcing architectural decisions in Claude Code</h3>
