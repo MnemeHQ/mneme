@@ -51,17 +51,26 @@ for html in sorted(SITE.rglob("*.html")):
     text = NAV_PAT.sub(adapt(NAV_HTML), text)
 
     # 2. Inject hamburger CSS if missing
-    if "nav-hamburger" not in text:
-        css_block = adapt("\n    " + HAMBURGER_CSS.replace("\n", "\n    "))
-        text = text.replace("</style>", css_block + "\n  </style>", 1)
+    if ".nav-hamburger" not in text:
+        if "</style>" in text:
+            css_block = adapt("\n    " + HAMBURGER_CSS.replace("\n", "\n    "))
+            text = text.replace("</style>", css_block + "\n  </style>", 1)
+        else:
+            print(f"  WARN: no </style> in {html.relative_to(SITE)} — hamburger CSS not injected")
 
     # 3. Inject hamburger JS if missing (but only after CSS is confirmed present)
     if adapt(HAMBURGER_JS_BLOCK) not in text:
-        text = text.replace("</body>", adapt(HAMBURGER_JS_BLOCK) + adapt("\n") + "</body>", 1)
+        if "</body>" in text:
+            text = text.replace("</body>", adapt(HAMBURGER_JS_BLOCK) + adapt("\n") + "</body>", 1)
+        else:
+            print(f"  WARN: no </body> in {html.relative_to(SITE)} — hamburger JS not injected")
 
     # 4. Inject active-link JS if missing
     if "nav-active" not in text:
-        text = text.replace("</body>", adapt(ACTIVE_JS_BLOCK) + adapt("\n") + "</body>", 1)
+        if "</body>" in text:
+            text = text.replace("</body>", adapt(ACTIVE_JS_BLOCK) + adapt("\n") + "</body>", 1)
+        else:
+            print(f"  WARN: no </body> in {html.relative_to(SITE)} — active-link JS not injected")
 
     # 5. Replace footer (plain <footer> only, not <footer class=...>)
     text = FOOTER_PAT.sub(adapt(FOOTER_HTML), text)
