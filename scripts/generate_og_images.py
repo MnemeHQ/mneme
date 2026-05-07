@@ -46,6 +46,10 @@ TEMPLATE_MAP = {
     "og-compare-cursor-rules.html": "compare/cursor-rules/og.png",
     "og-compare-claude-code-memory.html": "compare/claude-code-memory/og.png",
     "og-compare-rag-vs-governance.html": "compare/rag-vs-governance/og.png",
+    "og-integration-index.html": "integrations/og.png",
+    "og-integration-claude-code.html": "integrations/claude-code/og.png",
+    "og-integration-cursor.html": "integrations/cursor/og.png",
+    "og-integration-github-actions.html": "integrations/github-actions/og.png",
 }
 
 PORT = 8765
