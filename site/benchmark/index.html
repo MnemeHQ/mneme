@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Governance Benchmark v1.1 Methodology — Mneme HQ</title>
+  <meta name="description" content="The deterministic methodology behind Mneme's architectural governance benchmark. 36 scenarios across six categories, structured-output verification, layered retrieval and enforcement metrics. Pre-registered thresholds and reproducible." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/benchmark/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Governance Benchmark v1.1 Methodology — Mneme HQ" />
+  <meta property="og:description" content="The deterministic methodology behind Mneme's architectural governance benchmark. 36 scenarios, six categories, structured-output verification, pre-registered thresholds." />
+  <meta property="og:url" content="https://mnemehq.com/benchmark/" />
+  <meta property="og:image" content="https://mnemehq.com/og.png" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Governance Benchmark v1.1 Methodology — Mneme HQ" />
+  <meta name="twitter:description" content="The deterministic methodology behind Mneme's architectural governance benchmark." />
+  <meta name="twitter:image" content="https://mnemehq.com/og.png" />
+
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.png" type="image/png">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0c0c0d;
+      --surface: #141416;
+      --surface2: #1a1a1d;
+      --border: #222226;
+      --border2: #2e2e34;
+      --text: #e8e8ec;
+      --muted: #88889a;
+      --accent: #c8f060;
+      --accent-dim: #a8d040;
+      --teal: #8be0c8;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 2.5rem;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(12,12,13,0.95);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      transition: color 0.15s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .btn-nav-cta {
+      background: var(--accent);
+      color: #000 !important;
+      padding: 0.45rem 1.1rem;
+      border-radius: 6px;
+      font-weight: 700;
+      font-family: 'DM Mono', monospace;
+    }
+    .btn-nav-cta:hover { background: var(--accent-dim); }
+
+    .nav-hamburger {
+      display: none;
+      background: none;
+      border: 1px solid var(--border2);
+      color: var(--text);
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: 0;
+        flex-direction: column;
+        align-items: stretch;
+        background: var(--bg);
+        border-top: 1px solid var(--border);
+        padding: 1rem 1.25rem;
+        gap: 0.75rem;
+      }
+      .nav-links.open { display: flex; }
+      .nav-links a:not(.btn-nav-cta) { padding: 0.5rem 0; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+    }
+
+    /* GEO answer capsule */
+    .answer-capsule {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 1.5rem 2rem;
+      background: var(--surface);
+      border-bottom: 1px solid rgba(200,240,96,0.18);
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+    .answer-capsule strong { color: var(--accent); }
+
+    /* HERO */
+    .doc-hero {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 5rem 2rem 3rem;
+    }
+    .doc-eyebrow {
+      font-size: 0.72rem;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+    .doc-hero h1 {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(2rem, 4.5vw, 3rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 1.25rem;
+      color: var(--text);
+    }
+    .doc-hero .doc-meta {
+      display: flex;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--muted);
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+    .doc-meta span strong { color: var(--text); font-weight: 500; }
+
+    .doc-lede {
+      font-size: 1.1rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 2.5rem;
+    }
+
+    /* CONTENT */
+    .doc-body {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 0 2rem 5rem;
+    }
+    .doc-body h2 {
+      font-family: 'Inter', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      color: var(--text);
+      margin-top: 3.5rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .doc-body h3 {
+      font-family: 'Inter', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      margin-top: 2rem;
+      margin-bottom: 0.6rem;
+    }
+    .doc-body p {
+      color: var(--text);
+      margin-bottom: 1.1rem;
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+    .doc-body p.muted { color: var(--muted); }
+    .doc-body strong { color: var(--accent); font-weight: 600; }
+    .doc-body em { color: var(--teal); font-style: normal; font-family: 'DM Mono', monospace; font-size: 0.92em; }
+    .doc-body a {
+      color: var(--teal);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(139,224,200,0.4);
+      transition: border-color 0.15s;
+    }
+    .doc-body a:hover { border-color: var(--teal); }
+
+    .doc-body ul, .doc-body ol {
+      color: var(--text);
+      margin-bottom: 1.25rem;
+      padding-left: 1.4rem;
+      line-height: 1.75;
+    }
+    .doc-body ul li, .doc-body ol li {
+      margin-bottom: 0.4rem;
+    }
+    .doc-body ul li::marker { color: var(--accent); }
+
+    .doc-body table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.25rem 0 2rem;
+      font-size: 0.92rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .doc-body th, .doc-body td {
+      text-align: left;
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    .doc-body th {
+      background: var(--surface2);
+      color: var(--text);
+      font-weight: 600;
+      font-size: 0.82rem;
+      letter-spacing: 0.02em;
+    }
+    .doc-body tr:last-child td { border-bottom: none; }
+    .doc-body td:first-child {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .doc-body pre {
+      background: #0a0a0c;
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      padding: 1.1rem 1.25rem;
+      margin: 1.25rem 0 1.75rem;
+      overflow-x: auto;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--teal);
+      line-height: 1.6;
+    }
+    .doc-body code {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.88em;
+      background: rgba(139,224,200,0.08);
+      color: var(--teal);
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+    }
+    .doc-body pre code { background: none; padding: 0; color: inherit; }
+
+    .callout {
+      background: rgba(200,240,96,0.05);
+      border: 1px solid rgba(200,240,96,0.20);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0 1.75rem;
+    }
+    .callout p { color: var(--text); margin-bottom: 0; font-size: 0.95rem; line-height: 1.65; }
+    .callout p + p { margin-top: 0.75rem; }
+    .callout strong { color: var(--accent); }
+
+    .threshold-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.85rem;
+      margin: 1.25rem 0 1.75rem;
+    }
+    @media (max-width: 600px) {
+      .threshold-grid { grid-template-columns: 1fr; }
+    }
+    .threshold-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.1rem 1.25rem;
+    }
+    .threshold-card .t-num {
+      font-family: 'Instrument Serif', serif;
+      font-size: 1.6rem;
+      color: var(--accent);
+      letter-spacing: -0.02em;
+      margin-bottom: 0.2rem;
+    }
+    .threshold-card .t-label {
+      font-size: 0.85rem;
+      color: var(--text);
+      font-weight: 500;
+      margin-bottom: 0.35rem;
+    }
+    .threshold-card .t-desc {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 1rem 0 1.75rem;
+    }
+    .pill {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 999px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.8rem;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* Table of contents */
+    .toc {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+    .toc-label {
+      font-size: 0.72rem;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+    .toc ol {
+      list-style: none;
+      padding-left: 0;
+      column-count: 2;
+      column-gap: 1.5rem;
+      margin-bottom: 0;
+    }
+    @media (max-width: 600px) { .toc ol { column-count: 1; } }
+    .toc li {
+      font-size: 0.88rem;
+      margin-bottom: 0.4rem;
+      break-inside: avoid;
+    }
+    .toc a {
+      color: var(--text);
+      text-decoration: none;
+      border-bottom: none;
+    }
+    .toc a:hover { color: var(--teal); }
+    .toc .toc-num {
+      font-family: 'DM Mono', monospace;
+      color: var(--muted);
+      margin-right: 0.55rem;
+      font-size: 0.78rem;
+    }
+
+    /* CTA footer to homepage */
+    .doc-cta {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 4rem 2rem 5rem;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    .doc-cta h2 {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 0.75rem;
+      border: none;
+      padding: 0;
+    }
+    .doc-cta p { color: var(--muted); margin-bottom: 1.5rem; }
+    .cta-group { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-block;
+      background: var(--accent);
+      color: #0c0c0d !important;
+      padding: 0.75rem 1.75rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      font-family: 'DM Mono', monospace;
+      text-decoration: none;
+      border-bottom: none;
+      transition: background 0.15s;
+    }
+    .btn-primary:hover { background: var(--accent-dim); }
+    .btn-ghost {
+      display: inline-block;
+      background: transparent;
+      border: 1px solid var(--border2);
+      color: var(--text) !important;
+      padding: 0.75rem 1.75rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-family: 'DM Mono', monospace;
+      text-decoration: none;
+      border-bottom: 1px solid var(--border2);
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-ghost:hover { border-color: var(--teal); color: var(--teal) !important; }
+
+    /* footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 2rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-align: center;
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+  </style>
+
+  <!-- JSON-LD: TechArticle + Dataset + reuse Organization -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "TechArticle",
+        "headline": "Mneme Governance Benchmark v1.1 Methodology",
+        "description": "The deterministic methodology behind Mneme's architectural governance benchmark for AI-assisted development. 36 scenarios across six categories, structured-output verification, layered retrieval and enforcement metrics, pre-registered thresholds, and reproducible runs.",
+        "url": "https://mnemehq.com/benchmark/",
+        "mainEntityOfPage": "https://mnemehq.com/benchmark/",
+        "datePublished": "2026-05-06",
+        "dateModified": "2026-05-06",
+        "inLanguage": "en",
+        "author": {
+          "@type": "Person",
+          "name": "Theo Valmis",
+          "url": "https://github.com/TheoV823"
+        },
+        "publisher": { "@id": "https://mnemehq.com/#organization" },
+        "about": [
+          { "@type": "Thing", "name": "Architectural governance benchmark" },
+          { "@type": "Thing", "name": "AI coding assistants" },
+          { "@type": "Thing", "name": "Benchmark methodology" },
+          { "@type": "Thing", "name": "Architectural drift" }
+        ],
+        "mentions": [
+          { "@type": "Thing", "name": "Architectural Decision Records" },
+          { "@type": "Thing", "name": "Cursor Rules" },
+          { "@type": "Thing", "name": "CLAUDE.md" },
+          { "@type": "Thing", "name": "Retrieval-augmented generation" }
+        ],
+        "isPartOf": {
+          "@type": "WebSite",
+          "name": "Mneme HQ",
+          "url": "https://mnemehq.com/"
+        }
+      },
+      {
+        "@type": "Dataset",
+        "name": "Mneme Governance Benchmark v1.1 Scenario Suite",
+        "description": "Deterministic, version-controlled YAML scenario suite for measuring architectural rule violation prevention in AI-generated code. 36 scenarios across six categories: architectural violations, scope and boundary violations, anti-pattern violations, dependency and tooling violations, ambiguous and borderline cases, and controls.",
+        "url": "https://mnemehq.com/benchmark/",
+        "license": "https://opensource.org/licenses/MIT",
+        "creator": { "@id": "https://mnemehq.com/#organization" },
+        "isAccessibleForFree": true,
+        "version": "1.1"
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://mnemehq.com/#organization",
+        "name": "Mneme HQ",
+        "url": "https://mnemehq.com/",
+        "logo": "https://mnemehq.com/logo-v2.png"
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Governance Benchmark", "item": "https://mnemehq.com/benchmark/" }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What does the Mneme Governance Benchmark measure?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "It measures whether Mneme reduces architectural rule violations in AI-generated code under controlled conditions, separately from whether the right rule was retrieved. The benchmark reports violation prevention rate, baseline drift rate, false positive rate, retrieval recall and precision at K, irrelevant injection rate, and the gap between end-to-end and oracle enforcement."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why structured-output verification instead of grading prose?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Prose grading is gameable. A model can earn credit by writing the right words while still violating in the code. Mneme requires the model to emit structured JSON conforming to a fixed response schema, and verifiers operate on that artifact. Verdicts are based on observable facts in the output, not on claims about the output."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why are controls 22 percent of the suite?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Controls are scenarios where the rule does not apply and the correct behavior is no intervention. Without controls, a governance system can appear effective by simply over-blocking, which would be unhelpful in production. Controls are the only credible way to measure false positive rate. Anything below 20 percent makes the false positive number suspect."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What are the verdict thresholds?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "All four are required: violation prevention rate at or above 75 percent, baseline drift rate at or above 50 percent, false positive rate at or below 10 percent, and end-to-end enforcement within 10 percentage points of oracle enforcement. Thresholds are pre-registered and will not move at decision time."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why publish methodology before results?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Methodology gameability is a bigger risk than slow results. Publishing the methodology first lets the community pressure-test it before numbers exist. Publishing numbers without methodology invites attacks the publisher cannot win. The order is deliberate and signals that Mneme treats benchmark rigor as a first-class concern."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><svg width="18" height="14" viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 1h16M1 7h16M1 13h16"/></svg></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo.html">Demo</a>
+    <a href="/benchmark/">Benchmark</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- GEO answer capsule -->
+<div class="answer-capsule">
+  <strong>Governance Benchmark v1.1</strong> is a deterministic, reproducible benchmark measuring whether Mneme reduces architectural rule violations in AI-generated code. 36 scenarios across six categories. Structured-output verification, layered retrieval and enforcement metrics, pre-registered thresholds, and fully auditable scoring. No subjective grading.
+</div>
+
+<!-- HERO -->
+<header class="doc-hero">
+  <div class="doc-eyebrow">Methodology &middot; v1.1</div>
+  <h1>Governance Benchmark v1.1 methodology.</h1>
+  <div class="doc-meta">
+    <span><strong>Published</strong> May 6, 2026</span>
+    <span><strong>Status</strong> Methodology live, full results pending suite validation</span>
+    <span><strong>License</strong> MIT</span>
+  </div>
+  <p class="doc-lede">
+    This is the methodology specification for the Mneme governance benchmark. It describes what we measure, how we score, what we explicitly do not claim, and how anyone can reproduce the numbers. The intent is methodology before metrics. We are publishing the spec first so it can be pressure-tested before any numbers attach to it.
+  </p>
+
+  <div class="toc">
+    <div class="toc-label">Contents</div>
+    <ol>
+      <li><span class="toc-num">01</span><a href="#purpose">Purpose</a></li>
+      <li><span class="toc-num">02</span><a href="#scope">Scope</a></li>
+      <li><span class="toc-num">03</span><a href="#layered">Layered measurement</a></li>
+      <li><span class="toc-num">04</span><a href="#structured">Structured output protocol</a></li>
+      <li><span class="toc-num">05</span><a href="#suite">Suite composition</a></li>
+      <li><span class="toc-num">06</span><a href="#sources">Source mix</a></li>
+      <li><span class="toc-num">07</span><a href="#difficulty">Difficulty calibration</a></li>
+      <li><span class="toc-num">08</span><a href="#thresholds">Verdict thresholds</a></li>
+      <li><span class="toc-num">09</span><a href="#metrics">Metrics</a></li>
+      <li><span class="toc-num">10</span><a href="#protocol">Run protocol</a></li>
+      <li><span class="toc-num">11</span><a href="#claims">What this proves and does not prove</a></li>
+      <li><span class="toc-num">12</span><a href="#repro">Reproducibility</a></li>
+      <li><span class="toc-num">13</span><a href="#versioning">Versioning</a></li>
+      <li><span class="toc-num">14</span><a href="#limitations">Limitations</a></li>
+      <li><span class="toc-num">15</span><a href="#changelog">Changelog from v1.0</a></li>
+    </ol>
+  </div>
+</header>
+
+<article class="doc-body">
+
+  <h2 id="purpose">01 — Purpose</h2>
+  <p>The Mneme Governance Benchmark validates whether Mneme reduces architectural rule violations in AI-generated code. It answers one question:</p>
+  <p><strong>When an AI coding agent is asked to make a change in a codebase that has known architectural constraints, does Mneme produce code that respects those constraints more often than the same agent without Mneme, without over-enforcing on changes where the constraints do not apply?</strong></p>
+  <p>The "without over-enforcing" clause is doing real work. A governance system that catches violations by refusing every change is not helpful, and the original v1.0 draft did not measure this rigorously enough. v1.1 corrects that.</p>
+
+  <h2 id="scope">02 — Scope</h2>
+  <p><strong>In scope.</strong> Pre-generation governance. The benchmark measures the rate at which the model's generated output respects a given architectural rule when Mneme injects the relevant rule, versus when it does not, separately from whether Mneme retrieved the right rule in the first place.</p>
+  <p><strong>Out of scope.</strong> Post-generation observability, runtime enforcement, security scanning, performance optimization, code style preferences. Those are separate measurements with separate tooling.</p>
+
+  <h2 id="layered">03 — Layered measurement</h2>
+  <p>v1.0 measured a single end-to-end outcome. v1.1 separates this into two layers because conflating them hides real product issues.</p>
+
+  <h3>Layer 1: retrieval</h3>
+  <p>Did Mneme surface the right rules for this prompt? Each scenario specifies which rules from the project's decision store should be retrieved. Mneme's retrieval is run independently and scored against ground truth.</p>
+  <ul>
+    <li><strong>Recall at K.</strong> Of the rules that should have been retrieved, what fraction made it into the top K. K is typically 5.</li>
+    <li><strong>Precision at K.</strong> Of the rules retrieved into the top K, what fraction were actually relevant.</li>
+    <li><strong>Irrelevant injection rate.</strong> Fraction of governed runs where Mneme injected at least one rule the scenario marks as irrelevant.</li>
+  </ul>
+
+  <h3>Layer 2: enforcement</h3>
+  <p>Given the right rule was retrieved, did the governed output respect it? Two sub-measurements:</p>
+  <ul>
+    <li><strong>End-to-end enforcement.</strong> Run the governed pipeline end-to-end. Score the output.</li>
+    <li><strong>Oracle enforcement.</strong> Bypass retrieval. Inject ground-truth rules directly. Score the output.</li>
+  </ul>
+  <p>The delta between end-to-end and oracle enforcement attributes failures to retrieval versus injection-and-judgment.</p>
+
+  <div class="callout">
+    <p><strong>Why this matters.</strong> A user who hits a violation needs to know which layer broke. Without the layer split, a benchmark publishes a single number that hides which part of the system failed. With the layer split, retrieval issues and enforcement issues are diagnosed separately and fixed independently.</p>
+  </div>
+
+  <h2 id="structured">04 — Structured output protocol</h2>
+  <p>v1.0 verified by parsing freeform model output. This is gameable: a model can write the right words in prose while violating the rule in code. v1.1 closes this attack surface by requiring the model to emit a structured artifact.</p>
+
+  <h3>Response schema</h3>
+  <p>The system prompt instructs the model to respond with JSON conforming to this schema. Verifiers operate on the parsed artifact, not on prose.</p>
+  <pre><code>{
+  "files_to_modify": [
+    { "path": "src/foo.py", "new_content": "..." }
+  ],
+  "files_to_create": [
+    { "path": "src/bar.py", "content": "..." }
+  ],
+  "files_to_delete": [
+    { "path": "src/old.py" }
+  ],
+  "new_dependencies": [
+    { "name": "requests", "version_constraint": "&gt;=2.31" }
+  ],
+  "rationale": "Free text. Not used for scoring.",
+  "refused": false,
+  "refusal_reason": null,
+  "implementation_plan": [
+    "Step 1: ...",
+    "Step 2: ..."
+  ]
+}</code></pre>
+
+  <p>Verifiers never read <em>rationale</em> or <em>implementation_plan</em> for scoring. Those fields exist for human auditing of borderline cases. The single exception is the verifier for ambiguous scenarios, which IS allowed to inspect rationale because the question being asked is whether the model surfaced ambiguity at all.</p>
+  <p>If the model refuses, <em>refused: true</em> and <em>refusal_reason</em> is required. A refusal is a candidate respected outcome only if the rule actually applied; on a control scenario, a refusal is a false positive.</p>
+
+  <h3>Why this closes gaming</h3>
+  <p>A model cannot earn a respected verdict by writing the right words. It must produce code that, when parsed, contains the right files, the right imports, and no forbidden patterns. The verifier inspects facts about the artifact, not claims about it.</p>
+
+  <h2 id="suite">05 — Suite composition</h2>
+  <p>36 scenarios across six categories. Controls and ambiguous cases are first-class.</p>
+  <table>
+    <thead>
+      <tr><th>Category</th><th>Count</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Architectural violations</td><td>8</td><td>Core architectural rules: extend before rebuild, no parallel systems, layering</td></tr>
+      <tr><td>Scope and boundary</td><td>6</td><td>Module boundaries, API contracts, public surface stability</td></tr>
+      <tr><td>Anti-pattern violations</td><td>6</td><td>Singletons, god objects, hidden globals, banned approaches</td></tr>
+      <tr><td>Dependency and tooling</td><td>4</td><td>Forbidden imports, banned libraries, lockfile changes</td></tr>
+      <tr><td>Ambiguous / borderline</td><td>4</td><td>Multiple rules apply, partial conflicts, unclear scope</td></tr>
+      <tr><td>Control / non-applicable</td><td>8</td><td>Rules exist, prompts unrelated, correct behavior is no intervention</td></tr>
+    </tbody>
+  </table>
+  <p>Controls at 22 percent of the suite. Anything below 20 percent makes false positive rate non-credible.</p>
+
+  <h2 id="sources">06 — Source mix</h2>
+  <p>A synthetic-only suite is not credible. v1.1 requires real-incident scenarios.</p>
+  <table>
+    <thead>
+      <tr><th>Source</th><th>Count</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Synthetic canonical</td><td>12</td><td>Constructed to test specific rules cleanly</td></tr>
+      <tr><td>Real Mneme repo drift</td><td>6</td><td>Drawn from prompts that produced drift in development</td></tr>
+      <tr><td>Real CannabisDealsUS drift</td><td>4</td><td>Same source, different domain</td></tr>
+      <tr><td>Adversarial / edge</td><td>6</td><td>Prompts crafted to look innocent but hit a rule</td></tr>
+      <tr><td>Controls</td><td>8</td><td>Rule exists, prompt unrelated</td></tr>
+    </tbody>
+  </table>
+  <p>Real-incident scenarios are 28 percent of the suite, satisfying the credibility floor.</p>
+
+  <h2 id="difficulty">07 — Difficulty calibration</h2>
+  <ul>
+    <li><strong>Easy</strong> (30 percent of non-controls). Baseline LLM violates 20 to 40 percent of the time. Tests that Mneme does not regress easy cases.</li>
+    <li><strong>Medium</strong> (50 percent of non-controls). Baseline violates 40 to 70 percent. The meaningful scenarios.</li>
+    <li><strong>Hard</strong> (20 percent of non-controls). Baseline violates above 70 percent. Where Mneme provides the most lift.</li>
+  </ul>
+  <p>Calibration is verified empirically by running the baseline against the suite before publication. If the actual baseline violation rate on a "medium" scenario is 90 percent, it is reclassified as hard. The labels describe observed difficulty, not assumed difficulty.</p>
+
+  <h2 id="thresholds">08 — Verdict thresholds</h2>
+  <p>All four are required. Pre-committed and will not move at decision time.</p>
+  <div class="threshold-grid">
+    <div class="threshold-card">
+      <div class="t-num">≥ 75%</div>
+      <div class="t-label">Violation prevention rate</div>
+      <div class="t-desc">On non-control scenarios where the baseline violated. Did Mneme catch real drift?</div>
+    </div>
+    <div class="threshold-card">
+      <div class="t-num">≥ 50%</div>
+      <div class="t-label">Baseline drift rate</div>
+      <div class="t-desc">Across non-control scenarios. Is there a real problem to catch?</div>
+    </div>
+    <div class="threshold-card">
+      <div class="t-num">≤ 10%</div>
+      <div class="t-label">False positive rate</div>
+      <div class="t-desc">On control scenarios. Does Mneme over-enforce?</div>
+    </div>
+    <div class="threshold-card">
+      <div class="t-num">≤ 10pp</div>
+      <div class="t-label">Oracle gap</div>
+      <div class="t-desc">End-to-end enforcement within 10 percentage points of oracle. Is retrieval doing its job?</div>
+    </div>
+  </div>
+  <div class="callout">
+    <p><strong>If results land below threshold, the published narrative is honest.</strong> "v1.1 measured X. Below the 75 percent target. Here is what we changed and what we will fix." Pre-registration is the point.</p>
+  </div>
+
+  <h2 id="metrics">09 — Metrics</h2>
+
+  <h3>Headline metrics</h3>
+  <ol>
+    <li>Violation prevention rate (Layer 2 outcome)</li>
+    <li>Baseline drift rate (problem severity)</li>
+    <li>False positive rate (overreach)</li>
+  </ol>
+
+  <h3>Diagnostic metrics</h3>
+  <ol start="4">
+    <li>Retrieval recall at 5 (Layer 1)</li>
+    <li>Retrieval precision at 5 (Layer 1)</li>
+    <li>Irrelevant injection rate (Layer 1)</li>
+    <li>End-to-end vs oracle enforcement gap (Layer split)</li>
+    <li>Ambiguous scenario escalation rate</li>
+    <li>Determinism variance</li>
+  </ol>
+
+  <h3>Reported but non-graded</h3>
+  <ol start="10">
+    <li>Mean tokens per request, governed vs baseline</li>
+    <li>Mean latency, governed vs baseline</li>
+  </ol>
+
+  <h2 id="protocol">10 — Run protocol</h2>
+  <ol>
+    <li>Each scenario runs in three iterations to measure determinism.</li>
+    <li>Two variants per iteration: baseline (no Mneme) and governed (Mneme end-to-end).</li>
+    <li>One additional pass per scenario for oracle enforcement (ground-truth rules injected, retrieval bypassed).</li>
+    <li>Total runs per scenario: 9. Total runs for the full suite at 36 scenarios: 324.</li>
+    <li>Same model, same temperature, same context window across baseline and governed.</li>
+    <li>Codebase context loaded from versioned fixture; fixture hashes recorded with results.</li>
+  </ol>
+
+  <h2 id="claims">11 — What this proves and does not prove</h2>
+
+  <h3>Does not prove</h3>
+  <ul>
+    <li>Production incident reduction. (Operational metric, design partner work.)</li>
+    <li>Developer velocity gains. (Operational metric, design partner work.)</li>
+    <li>Generalization to codebases outside the suite. (Phase 2.)</li>
+    <li>Suite representativeness across all real-world architectural rules. (Suite expansion ongoing in v1.2 and beyond.)</li>
+  </ul>
+
+  <h3>Does prove (if thresholds hit)</h3>
+  <p>Under controlled conditions on a 36-scenario suite covering six categories with 28 percent real-incident sourcing and 22 percent controls, Mneme reduces architectural rule violations by at least 75 percent relative to the same model without Mneme, while triggering false positives no more than 10 percent of the time on unrelated changes.</p>
+  <p>Narrow claim. Pre-registered thresholds. Reproducible.</p>
+
+  <h2 id="repro">12 — Reproducibility</h2>
+  <p>Published artifacts:</p>
+  <ol>
+    <li>Full scenario suite as YAML.</li>
+    <li>Verification functions as Python.</li>
+    <li>Harness runner as Python.</li>
+    <li>Exact model versions tested (vendor, model name, snapshot date).</li>
+    <li>Exact Mneme version and commit hash.</li>
+    <li>Codebase fixture archive with content hashes.</li>
+    <li>Raw structured outputs of every run.</li>
+    <li>Aggregated results with full metric breakdown.</li>
+    <li>This methodology document, version-tagged.</li>
+  </ol>
+  <p>Anyone clones the repository, pins the same model version, runs the harness, and confirms the numbers within determinism variance. If they cannot, the published numbers are wrong.</p>
+
+  <h2 id="versioning">13 — Versioning</h2>
+  <ul>
+    <li><strong>v1.0.</strong> Working draft. Superseded by v1.1.</li>
+    <li><strong>v1.1.</strong> Methodology hardening. Anti-gaming protocol, controls, ambiguous cases, retrieval and enforcement split. Publishable.</li>
+    <li><strong>v1.2 and beyond.</strong> Suite expansion. Public claims always cite the version measured.</li>
+  </ul>
+  <p>Comparing v1.1 results to v1.2 results is meaningful only on the scenario subset that exists unchanged in both. Publications make this explicit.</p>
+
+  <h2 id="limitations">14 — Limitations</h2>
+  <p>Honest limitations published alongside results:</p>
+  <ul>
+    <li>Synthetic codebases are smaller than production codebases. May overstate baseline ability to track context.</li>
+    <li>Real-incident scenarios are drawn from two codebases owned by the author. Domain coverage is limited.</li>
+    <li>One model under test in v1.1. Cross-model generalization is a v1.2 question.</li>
+    <li>Single-rule scenarios dominate. Multi-rule conflict is limited to four ambiguous cases.</li>
+    <li>The author also built Mneme. This is a self-evaluation. Phase 2 design partner validation provides external evidence.</li>
+  </ul>
+
+  <h2 id="changelog">15 — Changelog from v1.0 to v1.1</h2>
+  <table>
+    <thead>
+      <tr><th>Change</th><th>Reason</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Suite size 30 to 36</td><td>Add 8 control + 4 ambiguous scenarios</td></tr>
+      <tr><td>Single layer to two layers</td><td>Conflating retrieval and enforcement hid real failure modes</td></tr>
+      <tr><td>Prose verification to structured JSON</td><td>Closed verifier-gaming attack</td></tr>
+      <tr><td>5 categories to 6</td><td>Real governance is not always binary</td></tr>
+      <tr><td>Synthetic-only to mixed sourcing</td><td>Synthetic-only is not credible externally</td></tr>
+      <tr><td>3 thresholds to 4</td><td>Oracle gap prevents inflated end-to-end numbers</td></tr>
+      <tr><td>3 iterations + 1 oracle pass</td><td>Required for retrieval and enforcement separation</td></tr>
+    </tbody>
+  </table>
+
+  <div class="pill-row" style="margin-top:2.5rem;">
+    <span class="pill">deterministic</span>
+    <span class="pill">reproducible</span>
+    <span class="pill">pre-registered</span>
+    <span class="pill">structured-output</span>
+    <span class="pill">layered metrics</span>
+    <span class="pill">controls included</span>
+  </div>
+
+</article>
+
+<!-- CTA -->
+<section class="doc-cta">
+  <h2>Methodology before metrics.</h2>
+  <p>Full benchmark results publish after scenario suite validation. Methodology and harness are public now.</p>
+  <div class="cta-group">
+    <a href="https://github.com/TheoV823/mneme/tree/main/benchmarks/governance-v1.1" class="btn-primary">View on GitHub</a>
+    <a href="/" class="btn-ghost">Back to home</a>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>
+    <a href="/use-cases/">Use cases</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/insights/">Insights</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/roadmap/">Roadmap</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/benchmark/">Benchmark</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/founder/">Founder</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/contact/">Contact</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/privacy/">Privacy</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    &nbsp;&middot;&nbsp;
+    Open source
+    &nbsp;&middot;&nbsp;
+    MIT License
+  </p>
+</footer>
+
+<!-- GTM noscript -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<script>
+  // Hamburger nav (matches homepage)
+  document.querySelectorAll('.nav-hamburger').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const links = document.querySelector('.nav-links');
+      const open = links.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+</script>
+
+</body>
+</html>
