@@ -1,0 +1,91 @@
+{
+  "meta": {
+    "name": "mneme-repo",
+    "description": "Canonical live enforcement memory for the public Mneme repo. Mneme uses this file to govern its own repo. The flagship demo file at mneme-project-memory/examples/project_memory.json is a snapshot for documentation only - this file is the source of truth.",
+    "version": "1.0.0",
+    "owner": "Mneme HQ",
+    "created": "2026-05-06"
+  },
+  "items": [
+    {
+      "id": "rule-public-boundary",
+      "type": "rule",
+      "title": "Internal tooling stays in the private repo",
+      "content": "Per ADR-002, internal operational, growth, marketing, and automation tooling (tools/, internal MCP servers, planning docs) must not be committed to this public repo. The canonical home for that work is the private mneme-internal repo. When unsure, classify as internal and keep it out.",
+      "tags": ["adr-002", "boundary", "internal", "private-repo", "tooling", "mcp", "growth", "marketing"],
+      "priority": "high"
+    },
+    {
+      "id": "rule-site-scratch",
+      "type": "rule",
+      "title": "Scratch and working files are not deployed and not tracked",
+      "content": "Per ADR-003, working copies of HTML or assets downloaded for editing live in repo root or scratch/ during editing. They must not be committed under site/, must not be deployed via scripts/deploy.py, and are excluded by .gitignore. Site assets that belong on mnemehq.com live only under site/.",
+      "tags": ["adr-003", "site", "deploy", "scratch", "working-files", "publishing"],
+      "priority": "high"
+    },
+    {
+      "id": "rule-bench-retrieval-coupling",
+      "type": "rule",
+      "title": "Benchmark harness and core retrieval cannot change in the same PR",
+      "content": "Changes to the benchmark harness (mneme-project-memory/examples/benchmarks, scripts that drive benchmarking) must not land in the same PR as changes to core retrieval (mneme.retriever, mneme.context_builder, mneme.evaluator, mneme.pipeline). Splitting these PRs prevents a regression in retrieval from being silently absorbed by a tuned harness, and preserves an auditable benchmark history.",
+      "tags": ["benchmark", "retrieval", "pipeline", "evaluator", "regression", "pr-discipline"],
+      "priority": "high"
+    },
+    {
+      "id": "rule-pipeline-modules",
+      "type": "rule",
+      "title": "Pipeline stages stay in separate modules with no cross-imports",
+      "content": "MemoryStore, Retriever, ContextBuilder, LLMAdapter, and Evaluator each live in their own module under mneme/. They do not import each other. Composition happens in mneme.pipeline (or in caller code). Cross-imports between stages are a refactor smell and a violation of the v1 architecture.",
+      "tags": ["architecture", "modules", "pipeline", "imports", "stages"],
+      "priority": "medium"
+    },
+    {
+      "id": "rule-memory-pr-isolation",
+      "type": "rule",
+      "title": "Changes to .mneme/project_memory.json require an isolated [memory] PR",
+      "content": "Edits to .mneme/project_memory.json must land in a dedicated PR titled with a [memory] prefix and reviewed as a memory change, not bundled with feature work. Exception: if the change is paired with an ADR addition or amendment that explicitly updates the same decision, the ADR file and memory file may land together (PR title should still reference the ADR). This keeps the enforcement-memory diff legible and auditable.",
+      "tags": ["governance", "memory", "pr-discipline", "review", "adr"],
+      "priority": "high"
+    },
+    {
+      "id": "rule-no-gtm-in-repo",
+      "type": "rule",
+      "title": "No GTM, pricing, customer, investor, outreach, or positioning content in this repo",
+      "content": "This public repo holds the OSS product, ADRs, and the marketing site. It does not hold go-to-market plans, pricing strategy, customer notes, investor materials, outreach templates, sales collateral, or competitive positioning experiments. Those live in the private mneme-internal repo and are also excluded by .gitignore (/private/, /internal/, /strategy/, /gtm/, /competitors/, /investor-notes/, /customer-notes/, *.private.md, *.internal.md). See ADR-002.",
+      "tags": ["adr-002", "boundary", "gtm", "pricing", "customers", "investors", "outreach", "positioning"],
+      "priority": "high"
+    },
+    {
+      "id": "anti-vector-langchain-agents",
+      "type": "anti_pattern",
+      "title": "No vector DB, no agent loops, no litellm - Anthropic SDK only",
+      "content": "Mneme v1 retrieval is deterministic keyword scoring with tag boosting and priority weighting. Do not introduce a vector database, embeddings, semantic search, agentic tool-use loops, or provider-abstraction layers like litellm. The only LLM provider is Anthropic via the official anthropic SDK. Embedding-based retrieval and additional providers are explicitly deferred to v2 as opt-in upgrades.",
+      "tags": ["retrieval", "embeddings", "vector-db", "langchain", "litellm", "agents", "anthropic", "sdk", "v1-scope"],
+      "priority": "high"
+    },
+    {
+      "id": "arch-canonical-memory-location",
+      "type": "architecture_decision",
+      "title": "Canonical memory location is .mneme/ at repo root",
+      "content": "The canonical live enforcement memory for this repo is .mneme/project_memory.json at the repo root. The file at mneme-project-memory/examples/project_memory.json is a documentation snapshot used by the flagship example only and must not diverge from this canonical file in ways that imply a competing source of truth.",
+      "tags": ["meta", "memory", "canonical", "examples", "internal"],
+      "priority": "low"
+    }
+  ],
+  "examples": [
+    {
+      "id": "dec-public-boundary-001",
+      "task": "A contributor proposed adding a Slack outreach automation script under scripts/ to streamline beta-user onboarding.",
+      "decision": "Declined for this repo. Moved the work to the private mneme-internal repo. Linked ADR-002 in the PR comment.",
+      "rationale": "Outreach and growth automation is Category 3 internal tooling under ADR-002. Putting it in the public repo would expose internal workflows, dilute the OSS narrative, and confuse contributors who expect repo contents to be product code or approved examples.",
+      "tags": ["adr-002", "boundary", "outreach", "growth", "private-repo"]
+    },
+    {
+      "id": "dec-bench-retrieval-001",
+      "task": "A PR proposed changing the retriever's tag-boost weight and, in the same diff, adjusting the benchmark scenario thresholds so existing tests would continue to pass.",
+      "decision": "Split into two PRs. The retriever change landed first against the unchanged harness and surfaced a real regression on two scenarios. The harness adjustment was then reviewed on its own merits.",
+      "rationale": "Coupled changes to retrieval and benchmark harness make regressions invisible. Splitting preserves an auditable benchmark history and forces the retrieval change to stand on its own evidence.",
+      "tags": ["benchmark", "retrieval", "pr-discipline", "regression"]
+    }
+  ]
+}

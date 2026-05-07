@@ -40,6 +40,11 @@ Thumbs.db
 *.private.md
 *.internal.md
 
+# Local-only Mneme memory (canonical .mneme/project_memory.json IS tracked)
+.mneme/private*
+.mneme/*.local.json
+.mneme/secrets*
+
 # Working / scratch files (ADR-003 — not for deploy, not tracked)
 theovalmis_index.html
 why-i-built-mneme.html
