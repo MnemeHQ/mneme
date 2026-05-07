@@ -36,6 +36,28 @@ except subprocess.CalledProcessError:
 
 print(f"[OK] Branch: main  |  Clean: yes  |  Source: {BASE_LOCAL}")
 
+# ── Cloudflare credentials ───────────────────────────────────────────────────
+CF_TOKEN   = os.environ.get('CF_API_TOKEN', '')
+CF_ZONE_ID = os.environ.get('CF_ZONE_ID', '')
+
+def purge_cf_cache():
+    if not CF_TOKEN or not CF_ZONE_ID:
+        print('[SKIP] Cloudflare cache purge - CF_API_TOKEN or CF_ZONE_ID not set')
+        return
+    payload = json.dumps({'purge_everything': True}).encode()
+    req = urllib.request.Request(
+        f'https://api.cloudflare.com/client/v4/zones/{CF_ZONE_ID}/purge_cache',
+        data=payload,
+        headers={'Authorization': f'Bearer {CF_TOKEN}', 'Content-Type': 'application/json'},
+        method='POST',
+    )
+    with urllib.request.urlopen(req) as r:
+        result = json.loads(r.read())
+    if result.get('success'):
+        print('[OK] Cloudflare cache purged')
+    else:
+        print(f'[WARN] Cloudflare purge failed: {result.get("errors")}')
+
 # ── cPanel credentials ────────────────────────────────────────────────────────
 HOST  = os.environ.get('CPANEL_HOST',  '152.89.79.37')
 PORT  = os.environ.get('CPANEL_PORT',  '2083')
@@ -161,3 +183,7 @@ if verify_failures:
     raise SystemExit(1)
 
 print(f"\n[OK] All {len(urls)} sitemap URLs verified - deploy complete")
+
+# ── Purge Cloudflare cache ────────────────────────────────────────────────────
+print("\n-- Purging Cloudflare cache --")
+purge_cf_cache()
