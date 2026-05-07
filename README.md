@@ -1,6 +1,6 @@
 ﻿# Mneme HQ
 
-**Stop LLMs from forgetting how your project is built.**
+**Architectural decisions, enforced on every AI call.**
 
 Mneme HQ is the architectural governance layer for AI-assisted development.
 
@@ -8,7 +8,7 @@ Mneme HQ is the architectural governance layer for AI-assisted development.
 
 ## Demo
 
-**[▶ Watch the 17-second demo — same prompt, two outcomes](https://www.loom.com/share/7c4064a0019d4036a42e8075b87d313b)**
+**[▶ See the demo: same prompt, two outcomes](https://mnemehq.com/demo.html)**
 
 *Same prompt. Same model. Different answer — because it has your project's decisions.*
 
@@ -116,7 +116,7 @@ project_memory.json -> MemoryStore -> Retriever -> ContextBuilder -> LLMAdapter 
 4. **Call** the LLM (or dry-run without an API key)
 5. **Evaluate** whether the response followed your rules
 
-The demo runs each task twice -- once without memory (baseline) and once with memory injected -- so you can see the delta.
+The demo runs each task twice -- once without governance (baseline) and once with the decision corpus enforced -- so you can see the delta.
 
 ## Why not just RAG?
 
@@ -137,9 +137,11 @@ Mneme HQ is not a search engine for your docs. It is a structured rule system th
 
 ## Architecture
 
+Mneme HQ uses structured project memory as the retrieval mechanism, but its purpose is governance: enforcing architectural decisions and preventing drift during AI-assisted development.
+
 ```
-Mneme HQ-project-memory/
-  Mneme HQ/
+mneme-project-memory/
+  mneme/
     schemas.py              Dataclasses: MemoryItem, Decision, DecisionExample, ContextPacket
     memory_store.py         Load project_memory.json; auto-migrate legacy rule/anti_pattern items
     retriever.py            v1: keyword overlap + tag match + priority weight (unchanged)
@@ -150,16 +152,18 @@ Mneme HQ-project-memory/
     adr_schema.py           v0.4: ADR dataclass, status/priority enums, errors
     adr_parser.py           v0.4: YAML frontmatter parser
     adr_compiler.py         v0.4: validate_corpus, resolve_precedence, compile_adrs
+    cursor_generator.py     v0.3: Cursor rules generator
+    enforcer.py             v0.3: configurable enforcement modes (strict / warn)
     llm_adapter.py          Thin Anthropic API wrapper with dry-run mode
     evaluator.py            v1: deterministic alignment checker (unchanged)
-    cli.py                  v2: add_decision / list_decisions / test_query commands
+    cli.py                  v2: add_decision / list_decisions / test_query / check
   examples/
     project_memory.json     20 items + 5 examples + 3 native decisions for this repo
     demo_tasks.json         3 decision-oriented tasks for the before/after demo
-  demo.py                   CLI runner: baseline vs. Mneme HQ-enhanced, with alignment scoring
+  demo.py                   CLI runner: baseline vs. Mneme-enhanced, with alignment scoring
 ```
 
-### Memory item types
+### Decision item types
 
 | Type | What it is | Evaluator behavior |
 |------|-----------|-------------------|
@@ -209,8 +213,8 @@ The evaluator is deterministic, fast, and auditable. The upgrade path to a model
 
 ## v2: Decision enforcement layer
 
-Mneme HQ v0.2 adds structured `Decision` records, field-weighted retrieval, top-N
-injection, post-response conflict detection, and a CLI — all additive. The v1
+Mneme HQ v0.2 added structured `Decision` records, field-weighted retrieval, top-N
+injection, post-response conflict detection, and a CLI, all additive. The v1
 pipeline is unchanged. Legacy `rule` and `anti_pattern` items are auto-migrated
 into `Decision` objects at load time; no changes needed to existing JSON files.
 
@@ -358,6 +362,30 @@ corpora without code changes.
 
 ---
 
+## Repo-level enforcement: `.mneme/` and `mneme check`
+
+This repository governs itself with Mneme. The canonical enforcement memory
+lives at `.mneme/project_memory.json` and is the source of truth for repo-level
+governance. Repo-level instructions for contributors and AI assistants live in
+the root `CLAUDE.md`.
+
+`mneme check` is the CLI entry point for running a governance pass over a
+diff or a working tree. It supports two modes:
+
+* `--mode warn`: surfaces violations without failing
+* `--mode strict`: fails on any violation
+
+```bash
+# Run a warn-mode check before opening a PR
+mneme check --mode warn
+```
+
+The PR workflow runs `mneme check --mode warn` automatically, so contributors
+see governance feedback on every pull request without it blocking merges
+during the warn-first rollout.
+
+---
+
 ## Quick demo
 
 ```bash
@@ -371,8 +399,8 @@ python demo.py --dry-run
 ## Quickstart
 
 ```bash
-git clone https://github.com/Mneme HQ-project/Mneme HQ-project-memory
-cd Mneme HQ-project-memory
+git clone https://github.com/TheoV823/mneme
+cd mneme/mneme-project-memory
 
 # Core only
 pip install -e .
@@ -416,8 +444,8 @@ The included example describes this repo itself. Abbreviated:
 ```json
 {
   "meta": {
-    "name": "Mneme HQ-context-engine",
-    "description": "Inject structured project memory into LLM API calls.",
+    "name": "mneme-context-engine",
+    "description": "Enforce architectural decisions on every LLM API call.",
     "version": "0.1.0"
   },
   "items": [
@@ -460,11 +488,11 @@ The full file has 20 items and 5 decision examples. Edit it for your own project
 
 ## Why this matters
 
-- **LLM calls are stateless.** Every API call starts from zero. Without explicit project context, the model gives plausible answers that routinely contradict your established decisions. Mneme HQ makes the context explicit and the injection automatic.
+- **Contradiction prevention.** LLM calls are stateless. Every call starts from zero, so models routinely propose changes that contradict decisions your team already made: reintroducing rejected technologies, rebuilding what was meant to be extended, suggesting patterns the project has explicitly ruled out. Mneme HQ injects the relevant prior decisions on every call so the model's output aligns with established architecture instead of drifting away from it.
 
-- **Project memory is a structured artifact, not a blob.** Dumping raw content into a system prompt does not scale. Mneme HQ types each piece of memory (rule, anti-pattern, decision example), assigns priority, and retrieves only what is relevant. The context stays compact.
+- **Architectural continuity at AI velocity.** AI-assisted development has increased code output without increasing review capacity. The bottleneck is not generation; it is keeping generated code consistent with the architecture the team agreed on. Mneme HQ enforces that consistency at generation time, before the diff lands in review, which reduces the review burden and keeps architectural drift from compounding.
 
-- **Evaluation closes the loop.** Injecting context is half the problem. The other half is knowing whether it worked. The evaluator checks the response against the rules that were injected and returns a score. This is the beginning of measurable LLM alignment at the project level.
+- **Measurable enforcement, not vibes.** Injecting context is half the problem. The other half is knowing whether it worked. The evaluator checks each response against the decisions that were actually injected and returns a deterministic alignment score. Anti-patterns and constraint violations are flagged explicitly. This turns "did the AI follow our decisions?" from a subjective judgment into something you can track, score, and regress-test.
 
 ## Roadmap
 
@@ -472,16 +500,17 @@ See the [Adoption and Enhancement Roadmap](docs/roadmap/2026-04-24-adoption-and-
 
 | Version | Capability |
 |---------|-----------|
-| **v0.1** ✓ | JSON-backed memory, keyword retrieval, deterministic evaluation, before/after demo |
+| **v0.1** ✓ | JSON-backed decision corpus, keyword retrieval, deterministic evaluation, before/after demo |
 | **v0.2** ✓ | Decision enforcement layer: structured `Decision`, field-weighted retrieval, conflict detector, CLI |
 | **v0.3** ✓ | Configurable enforcement modes (`strict` / `warn`); Cursor rules generator; Claude Code hook + slash commands (v0.3.2) |
 | **v0.4** ✓ | Architectural compiler: ADR frontmatter schema, corpus validation, deterministic precedence engine, Decision-bridge integration |
-| **v1.0** | Multi-project support, memory versioning, CI integration for alignment checks |
+| **v0.5** ✓ | Repo-level governance: `.mneme/` canonical enforcement memory, `mneme check`, GitHub PR workflow integration (warn mode) |
+| **v1.0** | Multi-project support, memory versioning, strict-mode CI rollout |
 | **Beyond** | LLM-judge evaluator mode, learned retrieval ranking, cross-project memory |
 
 ## Use Mneme HQ via API
 
-Mneme HQ now includes a minimal API layer so other workflows can call it directly.
+Mneme HQ includes a minimal API layer so other workflows can call it directly.
 
 ### Endpoint
 
