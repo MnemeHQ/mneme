@@ -40,11 +40,28 @@ print(f"[OK] Branch: main  |  Clean: yes  |  Source: {BASE_LOCAL}")
 CF_TOKEN   = os.environ.get('CF_API_TOKEN', '')
 CF_ZONE_ID = os.environ.get('CF_ZONE_ID', '')
 
-def purge_cf_cache():
+BASE_URL = 'https://mnemehq.com'
+
+def label_to_url(label):
+    """Convert a site-relative file label to its public URL. Returns None for non-public files."""
+    if label.startswith('_snippets/'):
+        return None
+    if label == 'index.html':
+        return f'{BASE_URL}/'
+    if label.endswith('/index.html'):
+        return f'{BASE_URL}/{label[:-len("index.html")]}'
+    return f'{BASE_URL}/{label}'
+
+def purge_cf_cache(urls=None):
     if not CF_TOKEN or not CF_ZONE_ID:
         print('[SKIP] Cloudflare cache purge - CF_API_TOKEN or CF_ZONE_ID not set')
         return
-    payload = json.dumps({'purge_everything': True}).encode()
+    if urls:
+        payload = json.dumps({'files': urls}).encode()
+        desc = f'{len(urls)} URL(s): {", ".join(urls)}'
+    else:
+        payload = json.dumps({'purge_everything': True}).encode()
+        desc = 'everything'
     req = urllib.request.Request(
         f'https://api.cloudflare.com/client/v4/zones/{CF_ZONE_ID}/purge_cache',
         data=payload,
@@ -54,7 +71,7 @@ def purge_cf_cache():
     with urllib.request.urlopen(req) as r:
         result = json.loads(r.read())
     if result.get('success'):
-        print('[OK] Cloudflare cache purged')
+        print(f'[OK] Cloudflare cache purged ({desc})')
     else:
         print(f'[WARN] Cloudflare purge failed: {result.get("errors")}')
 
@@ -159,7 +176,6 @@ if last_sha:
     changed = get_changed_site_files(last_sha)
     if not changed:
         print(f'\n[OK] No site/ changes since last deploy ({last_sha[:8]}) - nothing to upload')
-        purge_cf_cache()
         raise SystemExit(0)
     print(f"\n-- Delta deploy: {len(changed)} changed file(s) since {last_sha[:8]} -> {BASE_REMOTE} --")
     full_deploy = False
@@ -214,16 +230,21 @@ if failures:
     raise SystemExit(1)
 
 print(f"\n[OK] {len(files_to_upload)} files uploaded")
+
+# Collect public URLs for targeted cache purge (delta only)
+if not full_deploy:
+    purge_urls = [u for u in (label_to_url(label) for _, _, label in files_to_upload) if u]
+
 tag_deployed()
 
 # ── Post-deploy verification: every sitemap URL must return 200 ───────────────
 print("\n-- Post-deploy verification --")
 sitemap_path = os.path.join(BASE_LOCAL, 'sitemap.xml')
 tree = ET.parse(sitemap_path)
-urls = [loc.text for loc in tree.findall('.//{http://www.sitemaps.org/schemas/sitemap/0.9}loc')]
+sitemap_urls = [loc.text for loc in tree.findall('.//{http://www.sitemaps.org/schemas/sitemap/0.9}loc')]
 
 verify_failures = []
-for url in urls:
+for url in sitemap_urls:
     try:
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=10) as r:
@@ -243,8 +264,11 @@ if verify_failures:
         print(f'  {status}  {url}')
     raise SystemExit(1)
 
-print(f"\n[OK] All {len(urls)} sitemap URLs verified - deploy complete")
+print(f"\n[OK] All {len(sitemap_urls)} sitemap URLs verified - deploy complete")
 
 # ── Purge Cloudflare cache ────────────────────────────────────────────────────
 print("\n-- Purging Cloudflare cache --")
-purge_cf_cache()
+if full_deploy:
+    purge_cf_cache()
+else:
+    purge_cf_cache(urls=purge_urls if purge_urls else None)
