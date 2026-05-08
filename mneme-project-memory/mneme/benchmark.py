@@ -7,11 +7,24 @@ A scenario is a directory containing:
   with_mneme.txt    — Canned response with memory injected (enhanced)
   scenario.json     — Metadata: name, description, expected_failure_terms
 
+v1.1 Step 2 adds an optional structured-output protocol. A scenario may also
+provide:
+  with_mneme.json     — JSON variant; preferred over with_mneme.txt
+  without_mneme.json  — JSON variant; preferred over without_mneme.txt
+  scenario.json["assertions"] — list of forbidden_dependency /
+                                forbidden_path_pattern checks
+
+Each side (with / without) is evaluated independently: structured if a
+.json file is present and parses, TXT otherwise. Missing .json files
+silently fall back to TXT — no warning, no MALFORMED.
+
 Verdict logic (Layer 2 — enforcement):
   PASS            — baseline has >= 1 violation; enhanced has 0 violations
   FAIL            — enhanced still has >= 1 violation
   WEAK            — baseline has 0 violations (scenario too weak to prove anything)
   WEAK_RETRIEVAL  — enhanced is clean but expected decisions were missed by retrieval
+  MALFORMED       — a structured fixture exists but failed JSON parse, type
+                    validation, or referenced an unknown assertion type.
 
 Layer 1 (retrieval) is scored independently on each scenario per the v1.1
 methodology page (site/benchmark/index.html §03, §09). Layer 1 numbers are
@@ -25,6 +38,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 
+from mneme.benchmark_schemas import Assertion, StructuredOutput
+from mneme.benchmark_verifier import verify
 from mneme.decision_retriever import DecisionRetriever, ScoredDecision
 from mneme.enforcer import check_prompt
 from mneme.memory_store import MemoryStore
@@ -35,6 +50,7 @@ class ScenarioVerdict(str, Enum):
     FAIL = "FAIL"
     WEAK = "WEAK"
     WEAK_RETRIEVAL = "WEAK_RETRIEVAL"
+    MALFORMED = "MALFORMED"
 
 
 @dataclass
@@ -44,6 +60,14 @@ class Scenario:
     without_mneme: str
     with_mneme: str
     metadata: dict
+    # v1.1 Step 2 — optional structured fixtures and assertion list.
+    # When None / [] the runner uses the legacy TXT keyword path.
+    without_mneme_structured: StructuredOutput | None = None
+    with_mneme_structured: StructuredOutput | None = None
+    assertions: list[Assertion] = field(default_factory=list)
+    # If non-empty, run_scenario short-circuits to ScenarioVerdict.MALFORMED
+    # with this string in the explanation.
+    malformed_reason: str = ""
 
 
 @dataclass
@@ -69,6 +93,43 @@ class ScenarioResult:
     layer1_irrelevant_injection: bool = False
 
 
+def _load_optional_structured(json_path: Path) -> tuple[StructuredOutput | None, str]:
+    """Load an optional structured fixture sibling.
+
+    Returns (parsed, reason). Reason is non-empty only when the file exists
+    but failed to parse — in which case parsed is None and the caller should
+    surface ScenarioVerdict.MALFORMED.
+    """
+    if not json_path.exists():
+        return None, ""
+    try:
+        return StructuredOutput.from_json(
+            json_path.read_text(encoding="utf-8")
+        ), ""
+    except ValueError as e:
+        return None, f"{json_path.name}: {e}"
+
+
+def _load_optional_assertions(metadata: dict) -> tuple[list[Assertion], str]:
+    """Parse the optional ``assertions`` array from scenario.json.
+
+    Returns (assertions, reason). Reason is non-empty when the field exists
+    but is malformed (not a list, or contains an unknown assertion type).
+    """
+    raw = metadata.get("assertions")
+    if raw is None:
+        return [], ""
+    if not isinstance(raw, list):
+        return [], "scenario.json 'assertions' must be a list"
+    parsed: list[Assertion] = []
+    for i, entry in enumerate(raw):
+        try:
+            parsed.append(Assertion.from_dict(entry))
+        except ValueError as e:
+            return [], f"scenario.json assertions[{i}]: {e}"
+    return parsed, ""
+
+
 def load_scenario(path: str | Path) -> Scenario:
     """Load a benchmark scenario from a directory.
 
@@ -81,12 +142,29 @@ def load_scenario(path: str | Path) -> Scenario:
         if not (p / fname).exists():
             raise FileNotFoundError(f"Missing required file: {p / fname}")
 
+    metadata = json.loads((p / "scenario.json").read_text(encoding="utf-8"))
+
+    without_structured, without_reason = _load_optional_structured(
+        p / "without_mneme.json"
+    )
+    with_structured, with_reason = _load_optional_structured(
+        p / "with_mneme.json"
+    )
+    assertions, assertions_reason = _load_optional_assertions(metadata)
+
+    reasons = [r for r in (without_reason, with_reason, assertions_reason) if r]
+    malformed_reason = "; ".join(reasons)
+
     return Scenario(
         path=p,
         query=(p / "query.txt").read_text(encoding="utf-8").strip(),
         without_mneme=(p / "without_mneme.txt").read_text(encoding="utf-8").strip(),
         with_mneme=(p / "with_mneme.txt").read_text(encoding="utf-8").strip(),
-        metadata=json.loads((p / "scenario.json").read_text(encoding="utf-8")),
+        metadata=metadata,
+        without_mneme_structured=without_structured,
+        with_mneme_structured=with_structured,
+        assertions=assertions,
+        malformed_reason=malformed_reason,
     )
 
 
@@ -178,6 +256,35 @@ class BenchmarkRunner:
         self.retriever = DecisionRetriever(store.decisions())
         self.top = top
 
+    def _evaluate_side(
+        self,
+        text: str,
+        structured: StructuredOutput | None,
+        assertions: list[Assertion],
+        scored: list[ScoredDecision],
+    ) -> tuple[int, list[str]]:
+        """Evaluate one side (baseline or enhanced).
+
+        Prefers the structured path when ``structured`` is provided; falls
+        back to the legacy keyword-based ``check_prompt`` otherwise. Returns
+        ``(violation_count, trigger_list)``.
+        """
+        if structured is not None:
+            result = verify(structured, assertions)
+            if result.refused:
+                return 0, []
+            triggers: list[str] = []
+            for ar in result.assertion_results:
+                if not ar.passed:
+                    triggers.extend(ar.triggers)
+            return len(result.violations), triggers
+
+        enforcement = check_prompt(text, scored, top=self.top)
+        return (
+            len(enforcement.violations),
+            [v.trigger for v in enforcement.violations],
+        )
+
     def run_scenario(self, scenario: Scenario) -> ScenarioResult:
         scored = self.retriever.retrieve(scenario.query)
 
@@ -193,14 +300,46 @@ class BenchmarkRunner:
         # Layer 1: retrieval scoring, independent of enforcement.
         l1 = score_layer1(scored, expected_ids, acceptable_ids, self.top)
 
-        # Layer 2: enforcement against the same top-K window.
-        baseline_result = check_prompt(scenario.without_mneme, scored, top=self.top)
-        enhanced_result = check_prompt(scenario.with_mneme, scored, top=self.top)
+        # MALFORMED short-circuit (v1.1 Step 2): structured fixture or
+        # assertion list failed to parse / validate. Layer 1 is still
+        # recorded so retrieval signal is not lost.
+        if scenario.malformed_reason:
+            return ScenarioResult(
+                name=name,
+                category=category,
+                verdict=ScenarioVerdict.MALFORMED,
+                baseline_violation_count=0,
+                enhanced_violation_count=0,
+                explanation=(
+                    f"Malformed structured fixture(s): {scenario.malformed_reason}"
+                ),
+                baseline_triggers=[],
+                enhanced_triggers=[],
+                protected_decision_ids_hit=[
+                    d for d in expected_ids if d in l1.retrieved_ids
+                ],
+                layer1_k=l1.k,
+                layer1_retrieved_ids=l1.retrieved_ids,
+                layer1_expected_ids=l1.expected_ids,
+                layer1_acceptable_ids=l1.acceptable_ids,
+                layer1_recall=l1.recall,
+                layer1_precision=l1.precision,
+                layer1_irrelevant_injection=l1.irrelevant_injection,
+            )
 
-        baseline_count = len(baseline_result.violations)
-        enhanced_count = len(enhanced_result.violations)
-        baseline_triggers = [v.trigger for v in baseline_result.violations]
-        enhanced_triggers = [v.trigger for v in enhanced_result.violations]
+        # Layer 2: enforcement, per side, structured-or-TXT.
+        baseline_count, baseline_triggers = self._evaluate_side(
+            scenario.without_mneme,
+            scenario.without_mneme_structured,
+            scenario.assertions,
+            scored,
+        )
+        enhanced_count, enhanced_triggers = self._evaluate_side(
+            scenario.with_mneme,
+            scenario.with_mneme_structured,
+            scenario.assertions,
+            scored,
+        )
 
         protected_hit = [did for did in expected_ids if did in l1.retrieved_ids]
         intended_decisions_retrieved = (not expected_ids) or l1.recall == 1.0

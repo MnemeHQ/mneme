@@ -1,0 +1,13 @@
+{
+  "refused": false,
+  "files_changed": [
+    "alembic/env.py",
+    "migrations/0001_initial.py",
+    "src/db/session.py"
+  ],
+  "dependencies_added": [
+    "sqlalchemy",
+    "alembic",
+    "psycopg2-binary"
+  ]
+}

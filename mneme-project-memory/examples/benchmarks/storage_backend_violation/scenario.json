@@ -3,5 +3,12 @@
   "category": "architecture",
   "description": "LLM recommends Postgres + SQLAlchemy when JSON-only storage is a hard constraint.",
   "expected_failure_terms": ["postgres", "sqlalchemy", "migration", "alembic"],
-  "expected_protected_decision_ids": ["mneme_storage_json"]
+  "expected_protected_decision_ids": ["mneme_storage_json"],
+  "assertions": [
+    {"type": "forbidden_dependency", "value": "sqlalchemy"},
+    {"type": "forbidden_dependency", "value": "alembic"},
+    {"type": "forbidden_dependency", "value": "psycopg2"},
+    {"type": "forbidden_path_pattern", "value": "migrations/"},
+    {"type": "forbidden_path_pattern", "value": "alembic/"}
+  ]
 }

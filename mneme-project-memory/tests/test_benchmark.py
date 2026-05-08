@@ -359,3 +359,111 @@ def test_runner_acceptable_decision_ids_field_is_picked_up(tmp_path):
     runner = BenchmarkRunner(store)
     result = runner.run_scenario(load_scenario(tmp_path))
     assert result.layer1_acceptable_ids == ["mneme_retrieval_deterministic"]
+
+
+# ── v1.1 Step 2: structured-output protocol coexistence ───────────────────
+
+def _write_minimal_txt_pair(tmp_path):
+    """Write a minimal valid query.txt + with/without_mneme.txt + scenario.json.
+
+    Used as scaffolding so each Step 2 integration test only needs to drop
+    the .json files (and assertions) it cares about.
+    """
+    (tmp_path / "query.txt").write_text("Should we use postgres?")
+    (tmp_path / "without_mneme.txt").write_text(
+        "Use Postgres. SQLAlchemy migration is the best approach."
+    )
+    (tmp_path / "with_mneme.txt").write_text(
+        "Keep using JSON files. No databases."
+    )
+
+
+def test_runner_falls_back_to_txt_when_no_json_present(tmp_path):
+    """Missing .json siblings silently fall back to TXT — no MALFORMED."""
+    _write_minimal_txt_pair(tmp_path)
+    (tmp_path / "scenario.json").write_text(json.dumps({
+        "name": "txt_only_scenario",
+        "category": "architecture",
+        "description": "Pure TXT path — no structured siblings.",
+        "expected_failure_terms": ["postgres"],
+        "expected_protected_decision_ids": ["mneme_storage_json"],
+    }))
+    store = MemoryStore(EXAMPLE_MEMORY)
+    store.load()
+    runner = BenchmarkRunner(store)
+    result = runner.run_scenario(load_scenario(tmp_path))
+    # TXT keyword path catches "sqlalchemy" / "migration" via the
+    # mneme_storage_json anti_patterns.
+    assert result.verdict == ScenarioVerdict.PASS
+    assert result.baseline_violation_count >= 1
+
+
+def test_runner_mixed_txt_baseline_json_enhanced_coexists(tmp_path):
+    """One side TXT, the other side structured (refused=true) — both valid."""
+    _write_minimal_txt_pair(tmp_path)
+    (tmp_path / "with_mneme.json").write_text(json.dumps({
+        "refused": True,
+        "files_changed": [],
+        "dependencies_added": [],
+    }))
+    (tmp_path / "scenario.json").write_text(json.dumps({
+        "name": "mixed_scenario",
+        "category": "architecture",
+        "description": "Baseline TXT, enhanced JSON+refused.",
+        "expected_failure_terms": ["postgres"],
+        "expected_protected_decision_ids": ["mneme_storage_json"],
+        "assertions": [
+            {"type": "forbidden_dependency", "value": "sqlalchemy"},
+        ],
+    }))
+    store = MemoryStore(EXAMPLE_MEMORY)
+    store.load()
+    runner = BenchmarkRunner(store)
+    result = runner.run_scenario(load_scenario(tmp_path))
+    # Baseline (TXT) triggers; enhanced (JSON refused) is short-circuit PASS.
+    assert result.verdict == ScenarioVerdict.PASS
+    assert result.baseline_violation_count >= 1
+    assert result.enhanced_violation_count == 0
+
+
+def test_runner_returns_malformed_on_invalid_json(tmp_path):
+    """An existing-but-broken with_mneme.json => ScenarioVerdict.MALFORMED."""
+    _write_minimal_txt_pair(tmp_path)
+    (tmp_path / "with_mneme.json").write_text("{not valid json}")
+    (tmp_path / "scenario.json").write_text(json.dumps({
+        "name": "malformed_scenario",
+        "category": "architecture",
+        "description": "Broken JSON in with_mneme.json.",
+        "expected_failure_terms": ["postgres"],
+        "expected_protected_decision_ids": ["mneme_storage_json"],
+    }))
+    store = MemoryStore(EXAMPLE_MEMORY)
+    store.load()
+    runner = BenchmarkRunner(store)
+    result = runner.run_scenario(load_scenario(tmp_path))
+    assert result.verdict == ScenarioVerdict.MALFORMED
+    assert "with_mneme.json" in result.explanation
+
+
+def test_runner_storage_backend_uses_structured_path():
+    """The migrated fixture must run through the structured Layer 2 path
+    and produce baseline triggers from forbidden_dependency / forbidden_path
+    matches (not from keyword enforcement).
+    """
+    store = MemoryStore(EXAMPLE_MEMORY)
+    store.load()
+    runner = BenchmarkRunner(store)
+    fixture = BENCHMARKS_DIR / "storage_backend_violation"
+    scenario = load_scenario(fixture)
+    # Structured fixtures present → load_scenario populates them.
+    assert scenario.with_mneme_structured is not None
+    assert scenario.with_mneme_structured.refused is True
+    assert scenario.without_mneme_structured is not None
+    assert scenario.without_mneme_structured.refused is False
+    assert scenario.assertions, "scenario.json must declare assertions"
+
+    result = runner.run_scenario(scenario)
+    assert result.verdict == ScenarioVerdict.PASS
+    # Triggers come from the asserted dep/path values, not enforcer keywords.
+    joined = " ".join(result.baseline_triggers).lower()
+    assert "sqlalchemy" in joined or "alembic" in joined or "migrations/" in joined
