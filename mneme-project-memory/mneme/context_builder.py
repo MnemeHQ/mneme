@@ -129,35 +129,34 @@ DEFAULT_MAX_DECISIONS = 3
 def format_decisions(
     scored: list[ScoredDecision],
     max_items: int = DEFAULT_MAX_DECISIONS,
+    min_score: float = 0.0,
 ) -> str:
     """Format the top-N scored decisions as a system-prompt fragment.
 
-    Skips decisions with score == 0. Deduplicates by decision id. Returns
-    an empty string when no decisions qualify.
-
-    Output shape::
-
-        [Mneme decisions applied]
-
-        DECISION [id]: <decision>
-          Why:          <rationale>
-          Scope:        <scope joined by comma>
-          Constraints:  - <c1>
-                        - <c2>
-          Avoid:        - <a1>
+    Skips decisions with score <= ``min_score``. Deduplicates by decision id.
+    Returns an empty string when no decisions qualify.
 
     Args:
         scored:    Pre-scored decisions from DecisionRetriever.retrieve().
                    Assumed to be sorted descending by score.
         max_items: Hard cap on number injected. Defaults to 3.
+        min_score: Floor (exclusive) for inclusion. Defaults to 0.0, which
+                   preserves the historical "skip score == 0" behavior.
+                   Higher values let callers gate noisy retrievals.
 
     Returns:
         A formatted multi-section string, or "" if nothing qualifies.
+
+    Raises:
+        ValueError: if ``min_score`` is negative.
     """
+    if min_score < 0.0:
+        raise ValueError(f"min_score must be >= 0.0, got {min_score!r}")
+
     seen: set[str] = set()
     kept: list[ScoredDecision] = []
     for s in scored:
-        if s.score <= 0:
+        if s.score <= min_score:
             continue
         if s.decision.id in seen:
             continue

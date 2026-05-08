@@ -105,3 +105,23 @@ def test_pipeline_strict_mode_returns_result_when_no_conflicts():
     )
     assert result.conflicts == []
     assert result.response.content.startswith("Stay with")
+
+
+def test_pipeline_default_min_score_is_zero():
+    """Default behavior: only score == 0 is filtered (preserves existing semantics)."""
+    p = Pipeline(memory_path=EXAMPLE, dry_run=True)
+    assert p.min_score == 0.0
+
+
+def test_pipeline_min_score_above_zero_filters_low_scores():
+    """A min_score above 0 must drop decisions whose score is at or below it."""
+    p = Pipeline(memory_path=EXAMPLE, dry_run=True, min_score=10.0)
+    result = p.run("Should I switch storage to Postgres?")
+    # With a high threshold, no decisions should be injected.
+    assert result.injected_decisions == []
+
+
+def test_pipeline_min_score_negative_raises():
+    """A negative threshold makes no sense; reject at construction."""
+    with pytest.raises(ValueError, match="min_score"):
+        Pipeline(memory_path=EXAMPLE, dry_run=True, min_score=-1.0)
