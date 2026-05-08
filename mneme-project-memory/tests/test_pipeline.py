@@ -119,6 +119,9 @@ def test_pipeline_min_score_above_zero_filters_low_scores():
     result = p.run("Should I switch storage to Postgres?")
     # With a high threshold, no decisions should be injected.
     assert result.injected_decisions == []
+    # Also prove min_score was threaded through to format_decisions: with no
+    # decisions surviving the threshold, the system_prompt must be empty.
+    assert result.system_prompt == ""
 
 
 def test_pipeline_min_score_negative_raises():

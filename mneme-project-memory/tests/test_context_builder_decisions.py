@@ -80,3 +80,11 @@ def test_format_decisions_negative_threshold_raises():
     scored = [_scored("a", score=1.0)]
     with pytest.raises(ValueError, match="min_score"):
         format_decisions(scored, max_items=3, min_score=-0.5)
+
+
+def test_format_decisions_score_at_threshold_is_dropped():
+    """Floor is exclusive: a score equal to min_score is excluded."""
+    scored = [_scored("a", score=2.0), _scored("b", score=2.5)]
+    out = format_decisions(scored, max_items=3, min_score=2.0)
+    assert "Decision a" not in out
+    assert "Decision b" in out
