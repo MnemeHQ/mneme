@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — Mneme HQ | Architectural Governance Layer for AI Development</title>
+  <meta name="description" content="Mneme HQ is a lightweight architectural governance layer that helps coding agents follow your project's architectural decisions. Built for determinism and auditability." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/about/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="About — Mneme HQ" />
+  <meta property="og:description" content="A lightweight architectural governance layer that helps coding agents follow your project's architectural decisions." />
+  <meta property="og:url" content="https://mnemehq.com/about/" />
+  <meta property="og:image" content="https://mnemehq.com/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="About — Mneme HQ" />
+  <meta name="twitter:description" content="A lightweight architectural governance layer that helps coding agents follow your project's architectural decisions." />
+  <meta name="twitter:image" content="https://mnemehq.com/og.png" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.png" type="image/png">
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://mnemehq.com/#org",
+        "name": "Mneme HQ",
+        "url": "https://mnemehq.com/",
+        "logo": "https://mnemehq.com/logo-v2.png",
+        "description": "Architectural governance layer for AI-assisted development. Enforces architectural decisions on AI-generated code before review.",
+        "sameAs": [
+          "https://github.com/TheoV823/mneme",
+          "https://www.linkedin.com/company/mnemehq"
+        ]
+      },
+      {
+        "@type": "AboutPage",
+        "@id": "https://mnemehq.com/about/#page",
+        "url": "https://mnemehq.com/about/",
+        "name": "About Mneme HQ",
+        "description": "A lightweight architectural governance layer that helps coding agents follow your project's architectural decisions.",
+        "isPartOf": { "@id": "https://mnemehq.com/#org" }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Mneme HQ", "item": "https://mnemehq.com/" },
+          { "@type": "ListItem", "position": 2, "name": "About", "item": "https://mnemehq.com/about/" }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0c0c0d;
+      --surface: #141416;
+      --surface2: #1a1a1d;
+      --border: #222226;
+      --border2: #2e2e34;
+      --text: #e8e8ec;
+      --muted: #88889a;
+      --accent: #c8f060;
+      --accent-dim: #a8d040;
+      --teal: #8be0c8;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 2.5rem;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(12,12,13,0.95);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+    }
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-family: 'Inter', sans-serif;
+      transition: color 0.15s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--text); }
+    .btn-nav-cta {
+      background: var(--accent);
+      color: #0c0c0d;
+      padding: 0.45rem 1.1rem;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      font-family: 'DM Mono', monospace;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    /* ── BUTTONS ── */
+    .btn-primary {
+      display: inline-block;
+      background: var(--accent);
+      color: #0c0c0d;
+      padding: 0.75rem 1.75rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      font-family: 'DM Mono', monospace;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .btn-primary:hover { background: var(--accent-dim); }
+    .btn-ghost {
+      display: inline-block;
+      background: transparent;
+      border: 1px solid var(--border2);
+      color: var(--text);
+      padding: 0.75rem 1.75rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-family: 'DM Mono', monospace;
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-ghost:hover { border-color: var(--teal); color: var(--teal); }
+
+    /* ── LAYOUT ── */
+    .page-wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 5rem 2rem 6rem;
+    }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 3rem;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb span { color: var(--border2); }
+
+    /* ── HEADER ── */
+    .page-tag {
+      display: inline-block;
+      background: rgba(200,240,96,0.07);
+      border: 1px solid rgba(200,240,96,0.22);
+      color: var(--accent);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.9rem;
+      border-radius: 999px;
+      margin-bottom: 1.5rem;
+    }
+    .page-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 0.75rem;
+    }
+    .page-subtitle {
+      font-size: 0.88rem;
+      color: var(--teal);
+      margin-bottom: 3rem;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2.5rem 0;
+    }
+
+    /* ── PROSE ── */
+    .prose h2 {
+      font-family: 'Inter', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      margin-top: 3rem;
+      margin-bottom: 1rem;
+    }
+    .prose p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 1.1rem;
+      line-height: 1.75;
+    }
+    .prose p strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+    .prose .lede {
+      font-size: 1.02rem;
+      color: var(--text);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+    .prose ul {
+      list-style: none;
+      margin: 0.75rem 0 1.25rem;
+      padding: 0;
+    }
+    .prose ul li {
+      font-size: 0.88rem;
+      color: var(--muted);
+      padding: 0.2rem 0 0.2rem 1.25rem;
+      position: relative;
+      line-height: 1.65;
+    }
+    .prose ul li::before {
+      content: "›";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* ── CALLOUT ── */
+    .callout {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      padding: 1.5rem 1.75rem;
+      margin: 2rem 0;
+    }
+    .callout p {
+      font-size: 0.95rem;
+      color: var(--text);
+      line-height: 1.7;
+      margin: 0;
+      font-weight: 500;
+    }
+
+    /* ── PILLARS ── */
+    .pillars {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.85rem;
+      margin: 2rem 0 2.5rem;
+    }
+    .pillar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.1rem 1.15rem;
+    }
+    .pillar-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+    .pillar-text {
+      font-size: 0.82rem;
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    /* ── LINKS SECTION ── */
+    .links-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      margin-top: 1.25rem;
+    }
+    .link-row {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      font-size: 0.85rem;
+    }
+    .link-row-label {
+      color: var(--muted);
+      min-width: 90px;
+      font-size: 0.75rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .link-row a {
+      color: var(--teal);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .link-row a:hover { color: var(--text); }
+
+    /* ── CTA FOOTER ── */
+    .cta-footer {
+      text-align: center;
+      padding: 4rem 2rem;
+      border-top: 1px solid var(--border);
+      max-width: 600px;
+      margin: 5rem auto 0;
+    }
+    .cta-footer h2 {
+      font-family: 'Inter', sans-serif;
+      font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+      font-weight: 600;
+      margin-bottom: 1.75rem;
+      letter-spacing: -0.02em;
+    }
+    .cta-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    /* ── DIAGRAMS ── */
+    figure.diagram {
+      margin: 2.5rem 0 2rem;
+    }
+    figure.diagram .diagram-frame {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem 1rem;
+      overflow-x: auto;
+    }
+    figure.diagram svg.diagram-svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-width: 100%;
+    }
+    figure.diagram figcaption {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 0.85rem;
+      letter-spacing: 0.04em;
+    }
+    figure.diagram figcaption .fig-num {
+      color: var(--accent);
+      margin-right: 0.5rem;
+    }
+
+    /* ── TAGLINE ── */
+    .tagline {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--accent);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      padding-left: 0.85rem;
+      border-left: 2px solid var(--accent);
+    }
+
+    @media (max-width: 720px) {
+      .pillars { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      nav { padding: 1rem 1.25rem; }
+      .page-wrap { padding: 3rem 1.25rem 5rem; }
+    }
+
+    /* ── HAMBURGER ── */
+    .nav-hamburger {
+      display: none;
+      background: none;
+      border: 1px solid var(--border2);
+      color: var(--text);
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 640px) {
+      nav { padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      nav { position: relative; }
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        gap: 0;
+        background: rgba(12,12,13,0.98);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: 0.5rem 1.25rem 1.25rem;
+        z-index: 99;
+      }
+      .nav-links.open { display: flex; }
+      .nav-links a:not(.btn-nav-cta) {
+        display: block;
+        color: var(--text);
+        font-size: 0.88rem;
+        padding: 0.7rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<!-- NAV -->
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><svg width="18" height="14" viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 1h16M1 7h16M1 13h16"/></svg></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo.html">Demo</a>
+    <a href="/#benchmarks">Benchmarks</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<div class="page-wrap">
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <a href="/">Mneme HQ</a>
+    <span>/</span>
+    <span>About</span>
+  </div>
+
+  <!-- HEADER -->
+  <div class="page-tag">About</div>
+  <h1 class="page-title">Architectural governance for AI&#8209;assisted development.</h1>
+  <p class="page-subtitle">Enforcing decisions before code is generated, not after drift reaches review.</p>
+
+  <hr class="divider">
+
+  <div class="prose">
+
+    <p class="tagline">Governance before generation. Not after review.</p>
+
+    <p class="lede"><strong>Mneme HQ</strong> is a lightweight architectural governance layer that helps coding agents follow your project's architectural decisions.</p>
+
+    <p>AI coding agents generate code at high speed but lack continuity with prior architectural decisions. As AI output scales faster than human review capacity, architectural drift becomes a major bottleneck.</p>
+
+    <figure class="diagram">
+      <div class="diagram-frame">
+<svg viewBox="0 0 780 440" role="img" aria-labelledby="bottleneck-title bottleneck-desc"
+     xmlns="http://www.w3.org/2000/svg" class="diagram-svg">
+  <title id="bottleneck-title">Reviewer Bottleneck</title>
+  <desc id="bottleneck-desc">A chart showing AI code output rising sharply over time while human review capacity rises only slightly. The widening gap is the architectural drift problem. Mneme is inserted before review to evaluate output against constraints upstream.</desc>
+
+  <defs>
+    <linearGradient id="gap-fill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e88b6e" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#e88b6e" stop-opacity="0.02"/>
+    </linearGradient>
+    <linearGradient id="ai-line-fill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8be0c8" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#8be0c8" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <style>
+    .axis { stroke: #2e2e34; stroke-width: 1; }
+    .grid { stroke: #1a1a1d; stroke-width: 1; }
+    .axis-label { font-family: 'DM Mono', 'Menlo', monospace; font-size: 10px; fill: #88889a; letter-spacing: 0.04em; text-transform: uppercase; }
+    .legend-text { font-family: 'Inter', sans-serif; font-size: 11px; fill: #e8e8ec; }
+    .legend-muted { fill: #88889a; }
+    .annotation-text { font-family: 'Inter', sans-serif; font-size: 11px; fill: #88889a; }
+    .annotation-strong { font-family: 'Inter', sans-serif; font-size: 12px; fill: #c8f060; font-weight: 500; }
+    .ai-line { stroke: #8be0c8; stroke-width: 2; fill: none; }
+    .review-line { stroke: #88889a; stroke-width: 2; fill: none; stroke-dasharray: 4 4; }
+    .mneme-line { stroke: #c8f060; stroke-width: 1.5; stroke-dasharray: 2 3; }
+    .gap-label-bg { fill: #141416; stroke: #e88b6e; stroke-width: 1; }
+    .gap-label-text { font-family: 'Inter', sans-serif; font-size: 11px; fill: #e88b6e; font-weight: 500; }
+    .mneme-tag { fill: rgba(200,240,96,0.08); stroke: #c8f060; stroke-width: 1; }
+  </style>
+
+  <!-- Chart area: x: 80..640, y: 60..360 -->
+
+  <!-- Subtle gridlines -->
+  <line class="grid" x1="80" y1="120" x2="640" y2="120"/>
+  <line class="grid" x1="80" y1="180" x2="640" y2="180"/>
+  <line class="grid" x1="80" y1="240" x2="640" y2="240"/>
+  <line class="grid" x1="80" y1="300" x2="640" y2="300"/>
+
+  <!-- Y-axis -->
+  <line class="axis" x1="80" y1="60" x2="80" y2="360"/>
+  <text class="axis-label" x="80" y="46" text-anchor="start">Volume / capacity →</text>
+
+  <!-- X-axis -->
+  <line class="axis" x1="80" y1="360" x2="640" y2="360"/>
+  <text class="axis-label" x="640" y="380" text-anchor="end">Time →</text>
+
+  <!-- Origin point -->
+  <text class="axis-label" x="74" y="370" text-anchor="end">0</text>
+
+  <!--
+    AI OUTPUT CURVE (exponential-ish rise)
+    Path: smooth curve from (80, 340) up to (640, 90)
+  -->
+  <path class="ai-line"
+        d="M 80 340 Q 220 330, 320 290 T 480 180 Q 560 130, 640 90"
+        stroke-linecap="round"/>
+
+  <!-- AI output area fill (subtle) -->
+  <path fill="url(#ai-line-fill)" stroke="none"
+        d="M 80 340 Q 220 330, 320 290 T 480 180 Q 560 130, 640 90 L 640 360 L 80 360 Z"/>
+
+  <!--
+    HUMAN REVIEW CAPACITY CURVE (shallow linear-ish)
+    From (80, 340) gently up to (640, 270)
+  -->
+  <path class="review-line"
+        d="M 80 340 L 200 330 L 340 315 L 480 295 L 640 270"
+        stroke-linecap="round"/>
+
+  <!--
+    THE GAP — shaded area between the two curves on the right side
+  -->
+  <path fill="url(#gap-fill)" stroke="none"
+        d="M 320 290 T 480 180 Q 560 130, 640 90 L 640 270 L 480 295 L 340 315 L 320 290 Z"/>
+
+  <!-- Gap label -->
+  <g transform="translate(500, 175)">
+    <rect class="gap-label-bg" x="0" y="0" width="92" height="44" rx="4"/>
+    <text class="gap-label-text" x="46" y="18" text-anchor="middle">drift gap</text>
+    <text class="annotation-text" x="46" y="34" text-anchor="middle" fill="#88889a" font-size="9px">review can't keep up</text>
+  </g>
+
+  <!-- MNEME INSERTION POINT — vertical line at midway through the gap -->
+  <line class="mneme-line" x1="420" y1="60" x2="420" y2="360"/>
+
+  <!-- Mneme tag/box at the top of the line -->
+  <g transform="translate(360, 60)">
+    <rect class="mneme-tag" x="0" y="0" width="120" height="28" rx="4"/>
+    <text class="annotation-strong" x="60" y="18" text-anchor="middle">Mneme inserted</text>
+  </g>
+
+  <!-- Sub-label below mneme tag -->
+  <text class="axis-label" x="420" y="100" text-anchor="middle" fill="#c8f060">before review</text>
+
+  <!-- Curve labels (placed near each line) -->
+  <g transform="translate(660, 90)">
+    <circle cx="-12" cy="-4" r="3" fill="#8be0c8"/>
+    <text class="legend-text" x="-2" y="0">AI code output</text>
+  </g>
+  <g transform="translate(660, 270)">
+    <circle cx="-12" cy="-4" r="3" fill="#88889a"/>
+    <text class="legend-text legend-muted" x="-2" y="0">Review capacity</text>
+  </g>
+
+  <!-- Bottom annotation -->
+  <text class="annotation-text" x="390" y="410" text-anchor="middle">
+    AI output scales faster than human review capacity. Mneme governs upstream.
+  </text>
+
+</svg>
+
+      </div>
+      <figcaption><span class="fig-num">Fig 01</span>The reviewer bottleneck: AI output rises sharply, review capacity does not.</figcaption>
+    </figure>
+
+    <p>Mneme solves this by shifting governance left, enforcing decisions <strong>before</strong> code is generated rather than after drift reaches review.</p>
+
+    <h2>How It Works</h2>
+
+    <p>Mneme stores your project's architectural decisions, constraints, approved patterns, and anti&#8209;patterns as structured, repo&#8209;native governance records that live alongside your code.</p>
+
+    <p>It then deterministically retrieves the most relevant decisions, injects compact context into LLM prompts at generation time, and evaluates output against your architectural constraints before review.</p>
+
+    <figure class="diagram">
+      <div class="diagram-frame">
+<svg viewBox="0 0 720 560" role="img" aria-labelledby="flow-title flow-desc"
+     xmlns="http://www.w3.org/2000/svg" class="diagram-svg">
+  <title id="flow-title">Governance Flow Diagram</title>
+  <desc id="flow-desc">A vertical pipeline showing six stages: codebase decisions, Mneme retrieval, constraint injection, coding agent, generated code, governance check. Mneme intervenes before code is generated and again before review.</desc>
+
+  <defs>
+    <marker id="arrow-muted" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2e2e34"/>
+    </marker>
+    <marker id="arrow-accent" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#c8f060"/>
+    </marker>
+  </defs>
+
+  <style>
+    .node-bg-default { fill: #1a1a1d; stroke: #2e2e34; stroke-width: 1; }
+    .node-bg-mneme { fill: rgba(200,240,96,0.06); stroke: #c8f060; stroke-width: 1.25; }
+    .node-bg-output { fill: #141416; stroke: #2e2e34; stroke-width: 1; stroke-dasharray: 3 3; }
+    .node-label { font-family: 'Inter', sans-serif; font-size: 13px; fill: #e8e8ec; font-weight: 500; }
+    .node-sublabel { font-family: 'DM Mono', 'Menlo', monospace; font-size: 10px; fill: #88889a; letter-spacing: 0.04em; }
+    .mneme-label { fill: #c8f060; }
+    .phase-marker { font-family: 'DM Mono', 'Menlo', monospace; font-size: 10px; fill: #c8f060; letter-spacing: 0.06em; text-transform: uppercase; }
+    .phase-line { stroke: #c8f060; stroke-width: 1; stroke-dasharray: 2 3; opacity: 0.5; }
+    .step-num { font-family: 'DM Mono', 'Menlo', monospace; font-size: 10px; fill: #88889a; }
+  </style>
+
+  <!-- Stage 1: Codebase Decisions -->
+  <g transform="translate(180,30)">
+    <rect class="node-bg-default" width="280" height="56" rx="6"/>
+    <text class="step-num" x="14" y="20">01</text>
+    <text class="node-label" x="14" y="36">Codebase decisions</text>
+    <text class="node-sublabel" x="14" y="50">.mneme/  ·  governance records</text>
+  </g>
+
+  <!-- Connector 1->2 -->
+  <line x1="320" y1="86" x2="320" y2="106" stroke="#2e2e34" stroke-width="1" marker-end="url(#arrow-muted)"/>
+
+  <!-- PHASE MARKER: before generation (top) -->
+  <g transform="translate(490, 105)">
+    <line class="phase-line" x1="-160" y1="0" x2="0" y2="0"/>
+    <text class="phase-marker" x="6" y="4">before generation</text>
+  </g>
+
+  <!-- Stage 2: Mneme Retrieval -->
+  <g transform="translate(180,116)">
+    <rect class="node-bg-mneme" width="280" height="56" rx="6"/>
+    <text class="step-num" x="14" y="20" fill="#c8f060">02</text>
+    <text class="node-label mneme-label" x="14" y="36">Mneme retrieval</text>
+    <text class="node-sublabel" x="14" y="50">deterministic  ·  decision-relevant</text>
+  </g>
+
+  <!-- Connector 2->3 -->
+  <line x1="320" y1="172" x2="320" y2="192" stroke="#c8f060" stroke-width="1" marker-end="url(#arrow-accent)"/>
+
+  <!-- Stage 3: Constraint Injection -->
+  <g transform="translate(180,202)">
+    <rect class="node-bg-mneme" width="280" height="56" rx="6"/>
+    <text class="step-num" x="14" y="20" fill="#c8f060">03</text>
+    <text class="node-label mneme-label" x="14" y="36">Constraint injection</text>
+    <text class="node-sublabel" x="14" y="50">compact context into LLM prompt</text>
+  </g>
+
+  <!-- Connector 3->4 -->
+  <line x1="320" y1="258" x2="320" y2="278" stroke="#2e2e34" stroke-width="1" marker-end="url(#arrow-muted)"/>
+
+  <!-- Stage 4: Coding Agent -->
+  <g transform="translate(180,288)">
+    <rect class="node-bg-default" width="280" height="56" rx="6"/>
+    <text class="step-num" x="14" y="20">04</text>
+    <text class="node-label" x="14" y="36">Coding agent</text>
+    <text class="node-sublabel" x="14" y="50">Cursor  ·  Claude Code  ·  Copilot</text>
+  </g>
+
+  <!-- Connector 4->5 -->
+  <line x1="320" y1="344" x2="320" y2="364" stroke="#2e2e34" stroke-width="1" marker-end="url(#arrow-muted)"/>
+
+  <!-- Stage 5: Generated Code -->
+  <g transform="translate(180,374)">
+    <rect class="node-bg-output" width="280" height="56" rx="6"/>
+    <text class="step-num" x="14" y="20">05</text>
+    <text class="node-label" x="14" y="36">Generated code</text>
+    <text class="node-sublabel" x="14" y="50">candidate output</text>
+  </g>
+
+  <!-- Connector 5->6 -->
+  <line x1="320" y1="430" x2="320" y2="450" stroke="#c8f060" stroke-width="1" marker-end="url(#arrow-accent)"/>
+
+  <!-- PHASE MARKER: before review -->
+  <g transform="translate(490, 449)">
+    <line class="phase-line" x1="-160" y1="0" x2="0" y2="0"/>
+    <text class="phase-marker" x="6" y="4">before review</text>
+  </g>
+
+  <!-- Stage 6: Governance Check -->
+  <g transform="translate(180,460)">
+    <rect class="node-bg-mneme" width="280" height="56" rx="6"/>
+    <text class="step-num" x="14" y="20" fill="#c8f060">06</text>
+    <text class="node-label mneme-label" x="14" y="36">Governance check</text>
+    <text class="node-sublabel" x="14" y="50">evaluate against constraints</text>
+  </g>
+
+</svg>
+
+      </div>
+      <figcaption><span class="fig-num">Fig 02</span>The governance pipeline. Mneme intervenes upstream of generation and ahead of review.</figcaption>
+    </figure>
+
+    <div class="callout">
+      <p>Built for determinism and auditability, not opaque semantic memory layers.</p>
+    </div>
+
+    <h2>Repo&#8209;native by design</h2>
+
+    <p>Governance records live in the repository as structured JSON, version&#8209;controlled alongside the code they govern. The CLI retrieves matching decisions, evaluates output, and surfaces violations before review.</p>
+
+    <figure class="diagram">
+      <div class="diagram-frame">
+<svg viewBox="0 0 720 470" role="img" aria-labelledby="repo-title repo-desc"
+     xmlns="http://www.w3.org/2000/svg" class="diagram-svg">
+  <title id="repo-title">Repo-Native Governance Example</title>
+  <desc id="repo-desc">A mockup showing the .mneme directory in a project tree, the contents of a project_memory.json governance record, and the output of running mneme check from the command line.</desc>
+
+  <style>
+    .panel-bg { fill: #141416; stroke: #222226; stroke-width: 1; }
+    .panel-header-bg { fill: #1a1a1d; stroke: #222226; stroke-width: 1; }
+    .panel-label { font-family: 'DM Mono', 'Menlo', monospace; font-size: 10px; fill: #88889a; letter-spacing: 0.06em; }
+    .mono { font-family: 'DM Mono', 'Menlo', 'Consolas', monospace; font-size: 11px; }
+    .text-muted { fill: #88889a; }
+    .text-default { fill: #e8e8ec; }
+    .text-accent { fill: #c8f060; }
+    .text-teal { fill: #8be0c8; }
+    .text-key { fill: #b8a4d4; }
+    .text-string { fill: #d4c8a4; }
+    .text-warn { fill: #e88b6e; }
+    .traffic { fill: #2e2e34; }
+    .folder-icon { fill: #88889a; }
+  </style>
+
+  <!-- ====== TOP-LEFT: FILE TREE ====== -->
+  <g transform="translate(20, 20)">
+    <!-- Header bar -->
+    <rect class="panel-header-bg" width="220" height="26" rx="6"/>
+    <rect class="panel-header-bg" x="0" y="14" width="220" height="12"/>
+    <circle class="traffic" cx="14" cy="13" r="4"/>
+    <circle class="traffic" cx="28" cy="13" r="4"/>
+    <circle class="traffic" cx="42" cy="13" r="4"/>
+    <text class="mono panel-label" x="62" y="17">project</text>
+
+    <!-- Tree body -->
+    <rect class="panel-bg" y="26" width="220" height="210"/>
+
+    <g transform="translate(14, 48)">
+      <text class="mono text-muted" x="0" y="0">▾ <tspan class="text-default">project/</tspan></text>
+      <text class="mono text-muted" x="14" y="20">▾ <tspan class="text-accent">.mneme/</tspan></text>
+      <text class="mono text-default" x="32" y="40">project_memory.json</text>
+      <text class="mono text-default" x="32" y="60">decisions/</text>
+      <text class="mono text-default" x="32" y="80">constraints/</text>
+      <text class="mono text-default" x="32" y="100">anti_patterns/</text>
+      <text class="mono text-muted" x="14" y="120">▸ <tspan class="text-default">src/</tspan></text>
+      <text class="mono text-muted" x="14" y="140">▸ <tspan class="text-default">tests/</tspan></text>
+      <text class="mono text-muted" x="14" y="160">▸ <tspan class="text-default">.git/</tspan></text>
+    </g>
+  </g>
+
+  <!-- ====== TOP-RIGHT: JSON CONTENT ====== -->
+  <g transform="translate(260, 20)">
+    <!-- Header bar -->
+    <rect class="panel-header-bg" width="440" height="26" rx="6"/>
+    <rect class="panel-header-bg" x="0" y="14" width="440" height="12"/>
+    <text class="mono panel-label" x="14" y="17">.mneme/project_memory.json</text>
+
+    <!-- JSON body -->
+    <rect class="panel-bg" y="26" width="440" height="210"/>
+
+    <g transform="translate(20, 48)">
+      <text class="mono text-muted" x="0" y="0">{</text>
+      <text class="mono" x="14" y="18"><tspan class="text-key">"id"</tspan><tspan class="text-muted">: </tspan><tspan class="text-string">"adr-014-event-bus"</tspan><tspan class="text-muted">,</tspan></text>
+      <text class="mono" x="14" y="36"><tspan class="text-key">"status"</tspan><tspan class="text-muted">: </tspan><tspan class="text-string">"accepted"</tspan><tspan class="text-muted">,</tspan></text>
+      <text class="mono" x="14" y="54"><tspan class="text-key">"decision"</tspan><tspan class="text-muted">: </tspan><tspan class="text-string">"All cross-service events</tspan></text>
+      <text class="mono text-string" x="14" y="72">  publish via the central event bus."<tspan class="text-muted">,</tspan></text>
+      <text class="mono" x="14" y="90"><tspan class="text-key">"applies_to"</tspan><tspan class="text-muted">: [</tspan><tspan class="text-string">"src/services/**"</tspan><tspan class="text-muted">],</tspan></text>
+      <text class="mono" x="14" y="108"><tspan class="text-key">"anti_patterns"</tspan><tspan class="text-muted">: [</tspan></text>
+      <text class="mono text-muted" x="14" y="126">  <tspan class="text-string">"direct service-to-service HTTP"</tspan>,</text>
+      <text class="mono text-muted" x="14" y="144">  <tspan class="text-string">"shared database writes"</tspan></text>
+      <text class="mono text-muted" x="14" y="162">]</text>
+      <text class="mono text-muted" x="0" y="180">}</text>
+    </g>
+  </g>
+
+  <!-- ====== BOTTOM: CLI OUTPUT ====== -->
+  <g transform="translate(20, 256)">
+    <!-- Header bar -->
+    <rect class="panel-header-bg" width="680" height="26" rx="6"/>
+    <rect class="panel-header-bg" x="0" y="14" width="680" height="12"/>
+    <circle class="traffic" cx="14" cy="13" r="4"/>
+    <circle class="traffic" cx="28" cy="13" r="4"/>
+    <circle class="traffic" cx="42" cy="13" r="4"/>
+    <text class="mono panel-label" x="62" y="17">terminal</text>
+
+    <!-- Body -->
+    <rect class="panel-bg" y="26" width="680" height="184"/>
+
+    <g transform="translate(20, 48)">
+      <!-- Command -->
+      <text class="mono"><tspan class="text-accent">$</tspan> <tspan class="text-default">mneme check src/services/orders.py</tspan></text>
+
+      <!-- Output -->
+      <text class="mono text-muted" x="0" y="22">retrieving relevant decisions...</text>
+
+      <text class="mono" x="0" y="44"><tspan class="text-teal">→</tspan> <tspan class="text-default">adr-014-event-bus</tspan> <tspan class="text-muted">  matched scope: src/services/**</tspan></text>
+      <text class="mono" x="0" y="62"><tspan class="text-teal">→</tspan> <tspan class="text-default">adr-007-error-envelope</tspan> <tspan class="text-muted">  matched scope: src/services/**</tspan></text>
+
+      <text class="mono text-muted" x="0" y="84">evaluating output...</text>
+
+      <text class="mono" x="0" y="106"><tspan class="text-warn">✗</tspan> <tspan class="text-default">violates adr-014-event-bus</tspan></text>
+      <text class="mono text-muted" x="14" y="124">  found direct HTTP call to inventory-service</text>
+      <text class="mono text-muted" x="14" y="142">  expected: publish via event bus</text>
+
+      <text class="mono" x="0" y="164"><tspan class="text-warn">governance check failed</tspan> <tspan class="text-muted"> · 1 violation · before review</tspan></text>
+    </g>
+  </g>
+
+</svg>
+
+      </div>
+      <figcaption><span class="fig-num">Fig 03</span>A governance record, the directory it lives in, and a check that catches a violation.</figcaption>
+    </figure>
+
+    <h2>Why this matters</h2>
+
+    <p>Without enforced architectural continuity, AI&#8209;assisted development drifts. Patterns diverge across iterations. Frameworks conflict. Reviewers absorb the cost. With governance enforced upstream, decisions stay aligned across sessions, contributors, and agents.</p>
+
+    <figure class="diagram">
+      <div class="diagram-frame">
+<svg viewBox="0 0 720 380" role="img" aria-labelledby="drift-title drift-desc"
+     xmlns="http://www.w3.org/2000/svg" class="diagram-svg">
+  <title id="drift-title">Architectural Drift Visualisation</title>
+  <desc id="drift-desc">Two panels comparing AI-assisted development without Mneme versus with Mneme. Without Mneme, patterns diverge across iterations and drift accumulates. With Mneme, decisions stay aligned across iterations.</desc>
+
+  <style>
+    .panel-bg { fill: #141416; stroke: #222226; stroke-width: 1; }
+    .panel-label { font-family: 'DM Mono', 'Menlo', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
+    .panel-header { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; fill: #e8e8ec; }
+    .commit-row-bad { fill: #1a1a1d; stroke: #2e2e34; stroke-width: 1; }
+    .commit-row-good { fill: rgba(200,240,96,0.04); stroke: rgba(200,240,96,0.25); stroke-width: 1; }
+    .pattern-block { rx: 2; ry: 2; }
+    .axis-label { font-family: 'DM Mono', 'Menlo', monospace; font-size: 9px; fill: #88889a; letter-spacing: 0.04em; }
+    .iter-label { font-family: 'DM Mono', 'Menlo', monospace; font-size: 9px; fill: #88889a; }
+    .summary-text { font-family: 'Inter', sans-serif; font-size: 11px; fill: #88889a; }
+  </style>
+
+  <!-- ====== LEFT PANEL: WITHOUT MNEME ====== -->
+  <g transform="translate(20, 20)">
+    <!-- Panel background -->
+    <rect class="panel-bg" width="330" height="340" rx="8"/>
+
+    <!-- Header -->
+    <text class="panel-label" x="20" y="32" fill="#e88b6e">Without Mneme</text>
+    <text class="panel-header" x="20" y="56">Drift accumulates</text>
+
+    <!-- Time axis label -->
+    <text class="axis-label" x="20" y="86">ITERATION →</text>
+
+    <!-- Iteration rows: each row has 5 small blocks, colors diverge over time -->
+    <!-- Row 1 (early — fairly aligned) -->
+    <g transform="translate(20, 100)">
+      <text class="iter-label" x="0" y="11">01</text>
+      <rect class="pattern-block" x="30" y="0" width="48" height="14" fill="#3a4a3a"/>
+      <rect class="pattern-block" x="84" y="0" width="48" height="14" fill="#3a4a3a"/>
+      <rect class="pattern-block" x="138" y="0" width="48" height="14" fill="#3a4a3a"/>
+      <rect class="pattern-block" x="192" y="0" width="48" height="14" fill="#3a4a3a"/>
+      <rect class="pattern-block" x="246" y="0" width="48" height="14" fill="#4a5a3a"/>
+    </g>
+    <!-- Row 2 -->
+    <g transform="translate(20, 122)">
+      <text class="iter-label" x="0" y="11">02</text>
+      <rect class="pattern-block" x="30" y="0" width="48" height="14" fill="#3a4a3a"/>
+      <rect class="pattern-block" x="84" y="0" width="48" height="14" fill="#4a4a4a"/>
+      <rect class="pattern-block" x="138" y="0" width="48" height="14" fill="#3a4a3a"/>
+      <rect class="pattern-block" x="192" y="0" width="48" height="14" fill="#5a4a3a"/>
+      <rect class="pattern-block" x="246" y="0" width="48" height="14" fill="#4a5a3a"/>
+    </g>
+    <!-- Row 3 -->
+    <g transform="translate(20, 144)">
+      <text class="iter-label" x="0" y="11">03</text>
+      <rect class="pattern-block" x="30" y="0" width="48" height="14" fill="#5a4a3a"/>
+      <rect class="pattern-block" x="84" y="0" width="48" height="14" fill="#4a4a4a"/>
+      <rect class="pattern-block" x="138" y="0" width="48" height="14" fill="#3a4a4a"/>
+      <rect class="pattern-block" x="192" y="0" width="48" height="14" fill="#5a3a3a"/>
+      <rect class="pattern-block" x="246" y="0" width="48" height="14" fill="#4a3a4a"/>
+    </g>
+    <!-- Row 4 -->
+    <g transform="translate(20, 166)">
+      <text class="iter-label" x="0" y="11">04</text>
+      <rect class="pattern-block" x="30" y="0" width="48" height="14" fill="#5a3a3a"/>
+      <rect class="pattern-block" x="84" y="0" width="48" height="14" fill="#3a4a4a"/>
+      <rect class="pattern-block" x="138" y="0" width="48" height="14" fill="#5a3a3a"/>
+      <rect class="pattern-block" x="192" y="0" width="48" height="14" fill="#4a3a4a"/>
+      <rect class="pattern-block" x="246" y="0" width="48" height="14" fill="#4a4a3a"/>
+    </g>
+    <!-- Row 5 -->
+    <g transform="translate(20, 188)">
+      <text class="iter-label" x="0" y="11">05</text>
+      <rect class="pattern-block" x="30" y="0" width="48" height="14" fill="#6a3a3a"/>
+      <rect class="pattern-block" x="84" y="0" width="48" height="14" fill="#5a3a4a"/>
+      <rect class="pattern-block" x="138" y="0" width="48" height="14" fill="#3a3a5a"/>
+      <rect class="pattern-block" x="192" y="0" width="48" height="14" fill="#5a4a3a"/>
+      <rect class="pattern-block" x="246" y="0" width="48" height="14" fill="#4a3a5a"/>
+    </g>
+    <!-- Row 6 -->
+    <g transform="translate(20, 210)">
+      <text class="iter-label" x="0" y="11">06</text>
+      <rect class="pattern-block" x="30" y="0" width="48" height="14" fill="#7a3a3a"/>
+      <rect class="pattern-block" x="84" y="0" width="48" height="14" fill="#5a3a4a"/>
+      <rect class="pattern-block" x="138" y="0" width="48" height="14" fill="#3a3a6a"/>
+      <rect class="pattern-block" x="192" y="0" width="48" height="14" fill="#6a4a3a"/>
+      <rect class="pattern-block" x="246" y="0" width="48" height="14" fill="#5a3a6a"/>
+    </g>
+
+    <!-- Bottom indicators -->
+    <g transform="translate(20, 250)">
+      <circle cx="6" cy="6" r="3" fill="#e88b6e"/>
+      <text class="summary-text" x="18" y="10" fill="#e88b6e">Inconsistent patterns</text>
+    </g>
+    <g transform="translate(20, 270)">
+      <circle cx="6" cy="6" r="3" fill="#e88b6e"/>
+      <text class="summary-text" x="18" y="10" fill="#e88b6e">Conflicting frameworks</text>
+    </g>
+    <g transform="translate(20, 290)">
+      <circle cx="6" cy="6" r="3" fill="#e88b6e"/>
+      <text class="summary-text" x="18" y="10" fill="#e88b6e">Reviewer overload</text>
+    </g>
+    <g transform="translate(20, 310)">
+      <circle cx="6" cy="6" r="3" fill="#e88b6e"/>
+      <text class="summary-text" x="18" y="10" fill="#e88b6e">Drift accumulation</text>
+    </g>
+  </g>
+
+  <!-- ====== RIGHT PANEL: WITH MNEME ====== -->
+  <g transform="translate(370, 20)">
+    <!-- Panel background with subtle accent border -->
+    <rect class="panel-bg" width="330" height="340" rx="8" stroke="rgba(200,240,96,0.25)"/>
+
+    <!-- Header -->
+    <text class="panel-label" x="20" y="32" fill="#c8f060">With Mneme</text>
+    <text class="panel-header" x="20" y="56">Architecture stays aligned</text>
+
+    <!-- Time axis label -->
+    <text class="axis-label" x="20" y="86">ITERATION →</text>
+
+    <!-- Iteration rows: each row has 5 small blocks, all aligned (same accent color) -->
+    <g transform="translate(20, 100)">
+      <text class="iter-label" x="0" y="11">01</text>
+      <rect class="pattern-block" x="30" y="0" width="48" height="14" fill="#5a6a3a"/>
+      <rect class="pattern-block" x="84" y="0" width="48" height="14" fill="#5a6a3a"/>
+      <rect class="pattern-block" x="138" y="0" width="48" height="14" fill="#5a6a3a"/>
+      <rect class="pattern-block" x="192" y="0" width="48" height="14" fill="#5a6a3a"/>
+      <rect class="pattern-block" x="246" y="0" width="48" height="14" fill="#5a6a3a"/>
+    </g>
+    <g transform="translate(20, 122)">
+      <text class="iter-label" x="0" y="11">02</text>
+      <rect class="pattern-block" x="30" y="0" width="48" height="14" fill="#5a6a3a"/>
+      <rect class="pattern-block" x="84" y="0" width="48" height="14" fill="#5a6a3a"/>
+      <rect class="pattern-block" x="138" y="0" width="48" height="14" fill="#5a6a3a"/>
+      <rect class="pattern-block" x="192" y="0" width="48" height="14" fill="#5a6a3a"/>
+      <rect class="pattern-block" x="246" y="0" width="48" height="14" fill="#5a6a3a"/>
+    </g>
+    <g transform="translate(20, 144)">
+      <text class="iter-label" x="0" y="11">03</text>
+      <rect class="pattern-block" x="30" y="0" width="48" height="14" fill="#5a6a3a"/>
+      <rect class="pattern-block" x="84" y="0" width="48" height="14" fill="#5a6a3a"/>
+      <rect class="pattern-block" x="138" y="0" width="48" height="14" fill="#5a6a3a"/>
+      <rect class="pattern-block" x="192" y="0" width="48" height="14" fill="#5a6a3a"/>
+      <rect class="pattern-block" x="246" y="0" width="48" height="14" fill="#5a6a3a"/>
+    </g>
+    <g transform="translate(20, 166)">
+      <text class="iter-label" x="0" y="11">04</text>
+      <rect class="pattern-block" x="30" y="0" width="48" height="14" fill="#5a6a3a"/>
+      <rect class="pattern-block" x="84" y="0" width="48" height="14" fill="#5a6a3a"/>
+      <rect class="pattern-block" x="138" y="0" width="48" height="14" fill="#5a6a3a"/>
+      <rect class="pattern-block" x="192" y="0" width="48" height="14" fill="#5a6a3a"/>
+      <rect class="pattern-block" x="246" y="0" width="48" height="14" fill="#5a6a3a"/>
+    </g>
+    <g transform="translate(20, 188)">
+      <text class="iter-label" x="0" y="11">05</text>
+      <rect class="pattern-block" x="30" y="0" width="48" height="14" fill="#5a6a3a"/>
+      <rect class="pattern-block" x="84" y="0" width="48" height="14" fill="#5a6a3a"/>
+      <rect class="pattern-block" x="138" y="0" width="48" height="14" fill="#5a6a3a"/>
+      <rect class="pattern-block" x="192" y="0" width="48" height="14" fill="#5a6a3a"/>
+      <rect class="pattern-block" x="246" y="0" width="48" height="14" fill="#5a6a3a"/>
+    </g>
+    <g transform="translate(20, 210)">
+      <text class="iter-label" x="0" y="11">06</text>
+      <rect class="pattern-block" x="30" y="0" width="48" height="14" fill="#5a6a3a"/>
+      <rect class="pattern-block" x="84" y="0" width="48" height="14" fill="#5a6a3a"/>
+      <rect class="pattern-block" x="138" y="0" width="48" height="14" fill="#5a6a3a"/>
+      <rect class="pattern-block" x="192" y="0" width="48" height="14" fill="#5a6a3a"/>
+      <rect class="pattern-block" x="246" y="0" width="48" height="14" fill="#5a6a3a"/>
+    </g>
+
+    <!-- Bottom indicators -->
+    <g transform="translate(20, 250)">
+      <circle cx="6" cy="6" r="3" fill="#c8f060"/>
+      <text class="summary-text" x="18" y="10" fill="#c8f060">Aligned decisions</text>
+    </g>
+    <g transform="translate(20, 270)">
+      <circle cx="6" cy="6" r="3" fill="#c8f060"/>
+      <text class="summary-text" x="18" y="10" fill="#c8f060">Continuity across sessions</text>
+    </g>
+    <g transform="translate(20, 290)">
+      <circle cx="6" cy="6" r="3" fill="#c8f060"/>
+      <text class="summary-text" x="18" y="10" fill="#c8f060">Enforced constraints</text>
+    </g>
+    <g transform="translate(20, 310)">
+      <circle cx="6" cy="6" r="3" fill="#c8f060"/>
+      <text class="summary-text" x="18" y="10" fill="#c8f060">Stable architecture</text>
+    </g>
+  </g>
+
+</svg>
+
+      </div>
+      <figcaption><span class="fig-num">Fig 04</span>Drift accumulates without enforcement. With Mneme, architecture stays aligned.</figcaption>
+    </figure>
+
+    <h2>Our mission</h2>
+
+    <p>To give teams reliable architectural continuity across sessions, contributors, and agents, so they can scale AI&#8209;assisted development without losing architectural consistency.</p>
+
+    <h2>What Mneme is not</h2>
+
+    <p>Mneme is positioned deliberately. It is not:</p>
+
+    <ul>
+      <li>An AI memory tool or prompt persistence layer.</li>
+      <li>A general&#8209;purpose context manager for chat sessions.</li>
+      <li>A RAG or vector database for code retrieval.</li>
+      <li>A rules file replacement that documents standards without enforcement.</li>
+    </ul>
+
+    <p><strong>Rules files document standards. Mneme enforces them.</strong></p>
+    <p><strong>Memory tools recall context. Mneme governs implementation.</strong></p>
+    <p><strong>RAG retrieves knowledge. Mneme operationalises decisions.</strong></p>
+
+    <hr class="divider">
+
+    <h2>Get involved</h2>
+
+    <p>Mneme HQ is built openly, in public, and grounded in real implementation work on production systems. If governance, continuity, or reliability for AI&#8209;assisted development workflows is something you care about, get in touch.</p>
+
+    <div class="links-grid">
+      <div class="link-row">
+        <span class="link-row-label">GitHub</span>
+        <a href="https://github.com/TheoV823/mneme" target="_blank" rel="noopener">github.com/TheoV823/mneme</a>
+      </div>
+      <div class="link-row">
+        <span class="link-row-label">Founder</span>
+        <a href="/founder/">Theo Valmis</a>
+      </div>
+      <div class="link-row">
+        <span class="link-row-label">Roadmap</span>
+        <a href="/roadmap/">Public roadmap</a>
+      </div>
+      <div class="link-row">
+        <span class="link-row-label">Insights</span>
+        <a href="/insights/">Technical writing</a>
+      </div>
+      <div class="link-row">
+        <span class="link-row-label">Contact</span>
+        <a href="/contact/">mnemehq.com/contact</a>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- CTA FOOTER -->
+<div class="cta-footer">
+  <h2>Ready to enforce your architecture across every AI coding session?</h2>
+  <div class="cta-group">
+    <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub</a>
+    <a href="/use-cases/" class="btn-ghost">See use cases</a>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <p>
+    <a href="/use-cases/">Use cases</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/insights/">Insights</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/compare/">Compare</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/integrations/">Integrations</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/founder/">Founder</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/about/">About</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/contact/">Contact</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/privacy/">Privacy</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a>
+    &nbsp;&middot;&nbsp;
+    Open source
+    &nbsp;&middot;&nbsp;
+    MIT License
+  </p>
+</footer>
+
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  btn.addEventListener('click', function(){
+    var open = links.classList.toggle('open');
+    btn.setAttribute('aria-expanded', String(open));
+  });
+})();
+</script>
+<script><!-- nav-active -->
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
+</body>
+</html>
