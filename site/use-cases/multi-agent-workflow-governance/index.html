@@ -191,7 +191,7 @@
 </nav>
 
 <div class="answer-capsule">
-  <strong>Mneme HQ</strong> governs multi-step AI development workflows by acting as a shared decision layer that every agent in the pipeline can query. Whether a planner agent is scoping work, a coder agent is generating implementation, or a reviewer agent is evaluating output — all stages check the same decision store, ensuring architectural rules and anti-patterns are respected across the entire automated workflow.
+  <strong>Mneme HQ</strong> governs multi-step AI development workflows by acting as a shared governance layer that every agent in the pipeline can query. Whether a planner agent is scoping work, a coder agent is generating implementation, or a reviewer agent is evaluating output — all stages check the same decision store, ensuring architectural rules and anti-patterns are respected across the entire automated workflow. Memory tools recall context. Mneme governs implementation.
 </div>
 
 <main>
@@ -339,7 +339,7 @@
 
   <div class="section-wrap" id="how-it-works">
     <div class="section-eyebrow">How Mneme HQ Solves It</div>
-    <h2 class="section-title">A shared decision memory layer for every agent in the pipeline.</h2>
+    <h2 class="section-title">A shared architectural governance layer for every agent in the pipeline.</h2>
     <div class="steps">
       <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Build a shared decision store</h4><p>All architectural decisions, constraints, and anti-patterns live in one <code>decisions/</code> directory — a single source of truth every agent can query.</p></div></div>
       <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Gate each pipeline stage</h4><p>Add a <code>mneme check</code> call before invoking the next agent. If the plan violates decisions, stop before the coder runs. If code violates decisions, stop before the reviewer runs.</p></div></div>
