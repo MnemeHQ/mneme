@@ -3,21 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Use Cases — Mneme HQ</title>
-  <meta name="description" content="Reference architectures showing how teams use Mneme HQ to enforce architectural decisions, preserve tribal knowledge, and prevent compliance violations in LLM-powered development." />
+  <title>AI Governance Use Cases for Coding Agents and AI-Assisted Development — Mneme HQ</title>
+  <meta name="description" content="AI engineering governance use cases for coding agents and AI-assisted development. Mneme HQ enforces architectural decisions, prevents drift, and applies governance before generation across Cursor, Claude Code, Copilot, LangGraph, and CrewAI workflows." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/use-cases/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Use Cases — Mneme HQ" />
-  <meta property="og:description" content="Reference architectures showing how teams use Mneme HQ to enforce architectural decisions, preserve tribal knowledge, and prevent compliance violations in LLM-powered development." />
+  <meta property="og:title" content="AI Governance Use Cases for Coding Agents — Mneme HQ" />
+  <meta property="og:description" content="Architectural governance use cases for AI coding workflows. Enforce ADRs, security boundaries, and engineering standards across Cursor, Claude Code, Copilot, LangGraph, and CrewAI." />
   <meta property="og:url" content="https://mnemehq.com/use-cases/" />
   <meta property="og:image" content="https://mnemehq.com/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Use Cases — Mneme HQ" />
-  <meta name="twitter:description" content="Reference architectures showing how teams use Mneme HQ to enforce architectural decisions, preserve tribal knowledge, and prevent compliance violations in LLM-powered development." />
+  <meta name="twitter:title" content="AI Governance Use Cases for Coding Agents — Mneme HQ" />
+  <meta name="twitter:description" content="Architectural governance use cases for AI coding workflows. Enforce ADRs, security boundaries, and engineering standards across Cursor, Claude Code, Copilot, LangGraph, and CrewAI." />
   <meta name="twitter:image" content="https://mnemehq.com/og.png" />
   <link rel="canonical" href="https://mnemehq.com/use-cases/" />
   <!-- Google Tag Manager -->
@@ -60,12 +60,51 @@
         }
       },
       {
+        "@type": "SoftwareApplication",
+        "name": "Mneme HQ",
+        "applicationCategory": "DeveloperApplication",
+        "applicationSubCategory": "AI Engineering Governance",
+        "operatingSystem": "Cross-platform",
+        "description": "Architectural governance layer for AI-assisted development. Compiles architectural intent into deterministic, pre-generation constraints that govern AI coding agents — preventing architectural drift before it reaches review.",
+        "url": "https://mnemehq.com/",
+        "softwareRequirements": "Git, Python 3.10+",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "featureList": [
+          "ADR enforcement for AI coding agents",
+          "Architectural drift prevention",
+          "Governance-before-generation pipeline",
+          "Security and compliance guardrails",
+          "Multi-agent workflow governance",
+          "Deterministic decision continuity"
+        ]
+      },
+      {
         "@type": "FAQPage",
         "mainEntity": [
           {
             "@type": "Question",
             "name": "What is Mneme HQ?",
             "acceptedAnswer": { "@type": "Answer", "text": "Mneme HQ is the architectural governance layer for AI-assisted development. It compiles architectural intent into enforceable constraints that govern AI coding agents at the pre-generation stage, before architectural drift reaches review." }
+          },
+          {
+            "@type": "Question",
+            "name": "What is AI engineering governance?",
+            "acceptedAnswer": { "@type": "Answer", "text": "AI engineering governance is the discipline of enforcing architectural decisions, security boundaries, and engineering standards on AI-generated code. Unlike code review or prompt engineering, governance operates before generation: it constrains what coding agents can produce, ensuring operational consistency and decision continuity across sessions." }
+          },
+          {
+            "@type": "Question",
+            "name": "What is architectural drift in AI-assisted development?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Architectural drift is the gradual divergence between an AI agent's generated code and the team's architectural decisions — service boundaries, naming conventions, ADRs, framework constraints. Drift compounds session over session because coding agents have no persistent enforcement layer. Mneme prevents drift by making decisions machine-readable and deterministically enforced at prompt time." }
+          },
+          {
+            "@type": "Question",
+            "name": "How is Mneme different from RAG memory or generic AI memory systems?",
+            "acceptedAnswer": { "@type": "Answer", "text": "RAG retrieves knowledge probabilistically. Generic memory systems recall context. Mneme is not a memory system: it is a governance layer that enforces architectural constraints deterministically before code is generated. Memory helps recall; governance enforces." }
+          },
+          {
+            "@type": "Question",
+            "name": "What is governance before generation?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Governance before generation is the principle of constraining AI coding agents at the pre-generation stage — compiling architectural intent into machine-readable rules that flag conflicts before the model produces code. It contrasts with post-generation review, which catches violations only after engineering effort has been spent." }
           },
           {
             "@type": "Question",
@@ -107,6 +146,9 @@
     .case-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.7; flex: 1; }
     .case-card a.read-link { color: var(--accent); font-size: 0.82rem; text-decoration: none; margin-top: 0.5rem; }
     .case-card a.read-link:hover { color: var(--accent-dim); }
+    .case-card-upcoming { border-style: dashed; opacity: 0.85; }
+    .case-card-upcoming .case-card-eyebrow { color: var(--teal); }
+    .case-card .read-link.upcoming { color: var(--teal); font-size: 0.82rem; margin-top: 0.5rem; cursor: default; }
 
     .hub-intro { font-size: 0.88rem; color: var(--muted); line-height: 1.8; max-width: 660px; margin: 0 auto; padding-bottom: 0; }
     footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
@@ -124,7 +166,43 @@
     .faq-wrap details[open] summary { border-bottom: 1px solid var(--border); }
     .faq-wrap .faq-body { padding: 1.25rem; font-size: 0.86rem; color: var(--muted); line-height: 1.8; }
 
-    
+    /* ── GOVERNS GRID ── */
+    .section-block { max-width: 900px; margin: 0 auto; padding: 3rem 2rem 1rem; }
+    .section-block h2 { font-family: 'Instrument Serif', serif; font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 400; letter-spacing: -0.02em; text-align: center; margin-bottom: 0.5rem; }
+    .section-block .section-lede { font-size: 0.88rem; color: var(--muted); text-align: center; max-width: 620px; margin: 0 auto 2rem; line-height: 1.8; }
+    .governs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; }
+    .governs-tile { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.1rem; }
+    .governs-tile-title { font-size: 0.86rem; font-weight: 600; color: var(--text); margin-bottom: 0.3rem; letter-spacing: -0.005em; }
+    .governs-tile-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
+    /* ── ECOSYSTEMS STRIP ── */
+    .ecosystem-strip { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin: 0 auto; max-width: 760px; }
+    .ecosystem-chip { display: inline-flex; align-items: center; padding: 0.5rem 0.95rem; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; font-size: 0.8rem; color: var(--text); text-decoration: none; transition: border-color 0.15s, color 0.15s; }
+    .ecosystem-chip:hover { border-color: var(--teal); color: var(--teal); }
+    .ecosystem-chip.static { color: var(--muted); cursor: default; }
+    /* ── DIAGRAM ── */
+    .diagram-wrap { max-width: 860px; margin: 0 auto; padding: 2rem 2rem 1rem; }
+    .diagram-frame { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
+    .diagram-frame svg { width: 100%; height: auto; max-width: 760px; display: block; margin: 0 auto; }
+    .diagram-caption { font-size: 0.78rem; color: var(--muted); text-align: center; margin-top: 1rem; line-height: 1.7; }
+    /* ── DISAMBIG TABLE ── */
+    .disambig-wrap { max-width: 860px; margin: 0 auto; padding: 1rem 2rem 1rem; }
+    .disambig-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .disambig-table th { text-align: left; padding: 0.85rem 1.1rem; border-bottom: 1px solid var(--border2); color: var(--muted); font-weight: 500; font-size: 0.74rem; letter-spacing: 0.04em; text-transform: uppercase; background: var(--surface2); }
+    .disambig-table td { padding: 0.95rem 1.1rem; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.6; }
+    .disambig-table td:first-child { color: var(--muted); white-space: nowrap; font-weight: 500; }
+    .disambig-table td:nth-child(2) { color: var(--text); opacity: 0.65; }
+    .disambig-table td:nth-child(3) { color: var(--accent); }
+    .disambig-table tr:last-child td { border-bottom: none; }
+    @media (max-width: 640px) { .disambig-table th, .disambig-table td { padding: 0.7rem 0.75rem; font-size: 0.78rem; } }
+    /* ── HUB LINKS ── */
+    .hub-links-wrap { max-width: 860px; margin: 0 auto; padding: 1rem 2rem 3rem; }
+    .hub-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.75rem; margin-top: 1.5rem; }
+    .hub-link { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.1rem; text-decoration: none; color: var(--text); transition: border-color 0.15s; display: block; }
+    .hub-link:hover { border-color: var(--teal); }
+    .hub-link-eyebrow { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.3rem; }
+    .hub-link-title { font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 0.2rem; }
+    .hub-link-desc { font-size: 0.76rem; color: var(--muted); line-height: 1.5; }
+
     /* ── HAMBURGER ── */
     .nav-hamburger {
       display: none;
@@ -193,13 +271,88 @@
 <main>
 <!-- GEO / LLM answer capsule -->
 <div class="answer-capsule">
-  <strong>Mneme HQ</strong> is the architectural governance layer for AI-assisted development. It compiles your team's architectural intent into enforceable constraints that govern AI coding agents at the pre-generation stage, before architectural drift reaches review. Rules files document standards. Memory tools recall context. RAG retrieves knowledge. Mneme governs implementation. Each use case below applies that governance layer to a specific surface area — from coding assistants and legacy codebases to multi-agent pipelines and design systems.
+  <strong>Mneme HQ</strong> is the architectural governance layer for AI-assisted development. It compiles your team's architectural intent — ADRs, service boundaries, security rules, framework constraints — into deterministic, machine-readable constraints that govern coding agents at the pre-generation stage. This is governance before generation: architectural drift prevention applied to AI coding workflows before code is written, not after review. The use cases below apply that governance layer to specific surfaces — coding assistants, multi-agent pipelines, legacy codebases, security and compliance, data platforms, and design systems.
 </div>
   <div class="hero">
     <div class="section-eyebrow">Use Cases</div>
-    <h1>How teams use Mneme HQ</h1>
-    <p class="hero-sub">Reference architectures for enforcing architectural decisions in LLM-powered development workflows. All scenarios are simulated.</p>
+    <h1>AI Governance Use Cases for Coding Agents and AI-Assisted Development</h1>
+    <p class="hero-sub">Architectural governance reference architectures for AI coding workflows. Enforce ADRs, security boundaries, and engineering standards across Cursor, Claude Code, Copilot, and multi-agent pipelines. All scenarios are simulated.</p>
   </div>
+
+  <!-- What Mneme Governs -->
+  <section class="section-block" aria-labelledby="governs-heading">
+    <h2 id="governs-heading">What Mneme governs</h2>
+    <p class="section-lede">Architectural governance is broader than a rules file. Mneme HQ compiles six categories of engineering intent into deterministic constraints applied to every AI coding session.</p>
+    <div class="governs-grid">
+      <div class="governs-tile">
+        <div class="governs-tile-title">Architectural decisions</div>
+        <div class="governs-tile-desc">ADR enforcement at prompt time. Decision continuity across sessions, repos, and agents.</div>
+      </div>
+      <div class="governs-tile">
+        <div class="governs-tile-title">Security boundaries</div>
+        <div class="governs-tile-desc">PII handling, auth flows, secret access, and compliance controls enforced before generation.</div>
+      </div>
+      <div class="governs-tile">
+        <div class="governs-tile-title">Repository policies</div>
+        <div class="governs-tile-desc">Service boundaries, layering rules, and module ownership made machine-readable.</div>
+      </div>
+      <div class="governs-tile">
+        <div class="governs-tile-title">Framework constraints</div>
+        <div class="governs-tile-desc">Approved libraries, forbidden patterns, and version pins applied to AI-generated code.</div>
+      </div>
+      <div class="governs-tile">
+        <div class="governs-tile-title">Workflow standards</div>
+        <div class="governs-tile-desc">Naming conventions, test scaffolding, and engineering standards enforced uniformly.</div>
+      </div>
+      <div class="governs-tile">
+        <div class="governs-tile-title">Anti-pattern prevention</div>
+        <div class="governs-tile-desc">Architectural drift, prompt-induced regressions, and known bad patterns flagged pre-generation.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Governance pipeline diagram -->
+  <section class="diagram-wrap" aria-labelledby="diagram-heading">
+    <h2 id="diagram-heading" style="font-family:'Instrument Serif',serif;font-size:clamp(1.5rem,3vw,2rem);font-weight:400;letter-spacing:-0.02em;text-align:center;margin-bottom:1rem;">Governance before generation</h2>
+    <div class="diagram-frame">
+      <svg viewBox="0 0 760 240" role="img" aria-label="Governance-before-generation pipeline: AI coding agent sends a request to the Mneme governance layer, which compiles ADRs, security rules, and repository policies into deterministic constraints. Constraints are enforced before code generation. Generated code is checked for architectural drift and the result feeds back into the governance layer.">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#88889a"/>
+          </marker>
+          <marker id="arrow-accent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#c8f060"/>
+          </marker>
+        </defs>
+        <!-- Stage 1: AI Agent -->
+        <rect x="20" y="80" width="150" height="80" rx="10" fill="#141416" stroke="#2e2e34"/>
+        <text x="95" y="115" text-anchor="middle" fill="#e8e8ec" font-family="Inter,sans-serif" font-size="13" font-weight="600">AI Coding Agent</text>
+        <text x="95" y="135" text-anchor="middle" fill="#88889a" font-family="Inter,sans-serif" font-size="11">Cursor · Claude Code</text>
+        <text x="95" y="150" text-anchor="middle" fill="#88889a" font-family="Inter,sans-serif" font-size="11">Copilot · LangGraph</text>
+        <!-- Arrow 1 -->
+        <line x1="170" y1="120" x2="225" y2="120" stroke="#88889a" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <text x="197" y="110" text-anchor="middle" fill="#88889a" font-family="DM Mono,monospace" font-size="10">prompt</text>
+        <!-- Stage 2: Mneme Governance Layer -->
+        <rect x="225" y="60" width="290" height="120" rx="10" fill="#141416" stroke="#c8f060" stroke-opacity="0.5"/>
+        <text x="370" y="90" text-anchor="middle" fill="#c8f060" font-family="Inter,sans-serif" font-size="13" font-weight="600">Mneme Governance Layer</text>
+        <text x="370" y="112" text-anchor="middle" fill="#88889a" font-family="Inter,sans-serif" font-size="11">ADR enforcement · security rules</text>
+        <text x="370" y="128" text-anchor="middle" fill="#88889a" font-family="Inter,sans-serif" font-size="11">framework constraints · repo policies</text>
+        <text x="370" y="155" text-anchor="middle" fill="#8be0c8" font-family="DM Mono,monospace" font-size="10">→ deterministic constraints</text>
+        <!-- Arrow 2 -->
+        <line x1="515" y1="120" x2="570" y2="120" stroke="#c8f060" stroke-width="1.5" marker-end="url(#arrow-accent)"/>
+        <text x="542" y="110" text-anchor="middle" fill="#c8f060" font-family="DM Mono,monospace" font-size="10">enforce</text>
+        <!-- Stage 3: Code Generation -->
+        <rect x="570" y="80" width="170" height="80" rx="10" fill="#141416" stroke="#2e2e34"/>
+        <text x="655" y="115" text-anchor="middle" fill="#e8e8ec" font-family="Inter,sans-serif" font-size="13" font-weight="600">Code Generation</text>
+        <text x="655" y="135" text-anchor="middle" fill="#88889a" font-family="Inter,sans-serif" font-size="11">drift-free output</text>
+        <text x="655" y="150" text-anchor="middle" fill="#88889a" font-family="Inter,sans-serif" font-size="11">aligned with intent</text>
+        <!-- Feedback loop arrow -->
+        <path d="M 655 160 Q 655 215 370 215 Q 95 215 95 160" fill="none" stroke="#88889a" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
+        <text x="370" y="232" text-anchor="middle" fill="#88889a" font-family="DM Mono,monospace" font-size="10">drift detected → governance updated</text>
+      </svg>
+    </div>
+    <p class="diagram-caption">The governance-before-generation pipeline: architectural intent compiles into deterministic constraints before any AI coding agent generates code. Drift detected post-generation feeds back into the governance layer, preventing the same violation across future sessions.</p>
+  </section>
 
   <div class="cards-wrap">
     <h2 style="font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:600;letter-spacing:-0.01em;text-align:center;margin-bottom:1rem;">Reference architectures</h2>
@@ -248,14 +401,137 @@
         <a href="/use-cases/multi-agent-workflow-governance/" class="read-link">Read →</a>
       </div>
 
+      <div class="case-card case-card-upcoming">
+        <div class="case-card-eyebrow">Coming up</div>
+        <h3>ADR Enforcement</h3>
+        <p>Deterministic ADR enforcement for AI coding agents — turning architectural decision records into pre-generation constraints with CI gates and drift telemetry. Dedicated reference architecture in progress.</p>
+        <span class="read-link upcoming">In progress →</span>
+      </div>
+
     </div>
   </div>
+
+  <!-- Ecosystem associations -->
+  <section class="section-block" aria-labelledby="ecosystems-heading">
+    <h2 id="ecosystems-heading">Works across AI coding ecosystems</h2>
+    <p class="section-lede">Mneme HQ is ecosystem-neutral. The same governance layer enforces deployment governance and engineering standards across every major AI coding agent and orchestration framework.</p>
+    <div class="ecosystem-strip">
+      <a href="/integrations/cursor/" class="ecosystem-chip">Cursor</a>
+      <a href="/integrations/claude-code/" class="ecosystem-chip">Claude Code</a>
+      <span class="ecosystem-chip static">GitHub Copilot</span>
+      <a href="/integrations/github-actions/" class="ecosystem-chip">GitHub Actions</a>
+      <span class="ecosystem-chip static">LangGraph</span>
+      <span class="ecosystem-chip static">CrewAI</span>
+      <span class="ecosystem-chip static">OpenAI API workflows</span>
+    </div>
+  </section>
+
+  <!-- Mneme is not... -->
+  <section class="disambig-wrap" aria-labelledby="disambig-heading">
+    <h2 id="disambig-heading" style="font-family:'Instrument Serif',serif;font-size:clamp(1.5rem,3vw,2rem);font-weight:400;letter-spacing:-0.02em;text-align:center;margin-bottom:0.5rem;">Mneme is not a generic AI memory system</h2>
+    <p class="section-lede" style="font-size:0.88rem;color:var(--muted);text-align:center;max-width:620px;margin:0 auto 1.5rem;line-height:1.8;">Memory recalls. Governance enforces. Mneme focuses on deterministic decision continuity for AI-assisted development — not probabilistic recall.</p>
+    <table class="disambig-table">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>What it does</th>
+          <th>What Mneme does</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>RAG memory</td>
+          <td>Probabilistic retrieval of relevant context chunks at inference time.</td>
+          <td>Deterministic enforcement of architectural constraints before generation.</td>
+        </tr>
+        <tr>
+          <td>AI memory tools</td>
+          <td>Recall prior conversation context across sessions.</td>
+          <td>Operationalize architectural decisions as machine-readable rules.</td>
+        </tr>
+        <tr>
+          <td>Rules files (Cursor, etc.)</td>
+          <td>Human-readable standards documented per-repo.</td>
+          <td>Compiled, validated, version-controlled governance with CI enforcement.</td>
+        </tr>
+        <tr>
+          <td>Code review</td>
+          <td>Catches violations after generation has consumed engineering effort.</td>
+          <td>Prevents violations before generation — governance before generation.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Internal linking hub -->
+  <section class="hub-links-wrap" aria-labelledby="hub-heading">
+    <h2 id="hub-heading" style="font-family:'Instrument Serif',serif;font-size:clamp(1.5rem,3vw,2rem);font-weight:400;letter-spacing:-0.02em;text-align:center;margin-bottom:0.5rem;">Continue reading</h2>
+    <p class="section-lede" style="font-size:0.88rem;color:var(--muted);text-align:center;max-width:620px;margin:0 auto;line-height:1.8;">Explore the governance cluster: insights on architectural integrity, comparisons against adjacent tools, integrations, and benchmark methodology.</p>
+    <div class="hub-links">
+      <a href="/insights/prompt-engineering-is-not-governance/" class="hub-link">
+        <div class="hub-link-eyebrow">Insight</div>
+        <div class="hub-link-title">Why prompt engineering is not governance</div>
+        <div class="hub-link-desc">Prompts steer; governance enforces. Why architectural integrity needs deterministic constraints.</div>
+      </a>
+      <a href="/insights/why-rag-fails-for-architectural-governance/" class="hub-link">
+        <div class="hub-link-eyebrow">Insight</div>
+        <div class="hub-link-title">Why RAG fails for architectural governance</div>
+        <div class="hub-link-desc">Probabilistic recall is not enforcement. The structural reason RAG cannot prevent drift.</div>
+      </a>
+      <a href="/insights/review-is-not-governance/" class="hub-link">
+        <div class="hub-link-eyebrow">Insight</div>
+        <div class="hub-link-title">Why code review cannot scale with AI output</div>
+        <div class="hub-link-desc">Linear review against non-linear generation. Governance shifts the constraint left.</div>
+      </a>
+      <a href="/integrations/" class="hub-link">
+        <div class="hub-link-eyebrow">Integrations</div>
+        <div class="hub-link-title">Mneme across coding agents</div>
+        <div class="hub-link-desc">Cursor, Claude Code, GitHub Actions, and more — one governance layer, every surface.</div>
+      </a>
+      <a href="/compare/" class="hub-link">
+        <div class="hub-link-eyebrow">Compare</div>
+        <div class="hub-link-title">Mneme vs. adjacent tools</div>
+        <div class="hub-link-desc">Cursor rules, Claude Code memory, RAG, CodeRabbit — where each fits and where Mneme starts.</div>
+      </a>
+      <a href="/benchmark/" class="hub-link">
+        <div class="hub-link-eyebrow">Benchmark</div>
+        <div class="hub-link-title">Governance benchmark methodology</div>
+        <div class="hub-link-desc">Pass/fail examples and deterministic enforcement measured across simulated AI development workflows.</div>
+      </a>
+      <a href="/roadmap/" class="hub-link">
+        <div class="hub-link-eyebrow">Roadmap</div>
+        <div class="hub-link-title">What's next for Mneme</div>
+        <div class="hub-link-desc">Scalable AI development with operational consistency and decision continuity at the core.</div>
+      </a>
+      <a href="/founder/" class="hub-link">
+        <div class="hub-link-eyebrow">Founder</div>
+        <div class="hub-link-title">Why we built Mneme</div>
+        <div class="hub-link-desc">The architectural integrity gap in AI-assisted development — and how to close it.</div>
+      </a>
+    </div>
+  </section>
 
   <div class="faq-wrap">
     <h2>Common questions</h2>
     <details>
       <summary>What is Mneme HQ?</summary>
       <div class="faq-body">Mneme HQ is the architectural governance layer for AI-assisted development. It compiles architectural intent into enforceable constraints that govern AI coding agents at the pre-generation stage, before architectural drift reaches review.</div>
+    </details>
+    <details>
+      <summary>What is AI engineering governance?</summary>
+      <div class="faq-body">AI engineering governance is the discipline of enforcing architectural decisions, security boundaries, and engineering standards on AI-generated code. Unlike code review or prompt engineering, governance operates before generation: it constrains what coding agents can produce, ensuring operational consistency and decision continuity across sessions.</div>
+    </details>
+    <details>
+      <summary>What is architectural drift in AI-assisted development?</summary>
+      <div class="faq-body">Architectural drift is the gradual divergence between an AI agent's generated code and the team's architectural decisions — service boundaries, naming conventions, ADRs, framework constraints. Drift compounds session over session because coding agents have no persistent enforcement layer. Mneme prevents drift by making decisions machine-readable and deterministically enforced at prompt time.</div>
+    </details>
+    <details>
+      <summary>How is Mneme different from RAG memory or generic AI memory systems?</summary>
+      <div class="faq-body">RAG retrieves knowledge probabilistically. Generic memory systems recall context. Mneme is not a memory system: it is a governance layer that enforces architectural constraints deterministically before code is generated. Memory helps recall; governance enforces.</div>
+    </details>
+    <details>
+      <summary>What is governance before generation?</summary>
+      <div class="faq-body">Governance before generation is the principle of constraining AI coding agents at the pre-generation stage — compiling architectural intent into machine-readable rules that flag conflicts before the model produces code. It contrasts with post-generation review, which catches violations only after engineering effort has been spent.</div>
     </details>
     <details>
       <summary>How does Mneme HQ differ from rules files, memory tools, and RAG?</summary>
