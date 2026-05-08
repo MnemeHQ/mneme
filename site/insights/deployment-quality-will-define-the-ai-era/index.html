@@ -159,7 +159,7 @@
   <div class="nav-links">
     <a href="/#how-it-works">How it works</a>
     <a href="/use-cases/">Use cases</a>
-    <a href="/insights/" class="active">Insights</a>
+    <a href="/insights/">Insights</a>
     <a href="/roadmap/">Roadmap</a>
     <a href="/demo.html">Demo</a>
     <a href="/#benchmarks">Benchmarks</a>
@@ -309,6 +309,10 @@
     &nbsp;&middot;&nbsp;
     <a href="/insights/">Insights</a>
     &nbsp;&middot;&nbsp;
+    <a href="/compare/">Compare</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/integrations/">Integrations</a>
+    &nbsp;&middot;&nbsp;
     <a href="/founder/">Founder</a>
     &nbsp;&middot;&nbsp;
     <a href="/contact/">Contact</a>
@@ -333,6 +337,17 @@
   btn.addEventListener('click', function(){
     var open = links.classList.toggle('open');
     btn.setAttribute('aria-expanded', String(open));
+  });
+})();
+</script>
+<script><!-- nav-active -->
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
   });
 })();
 </script>
