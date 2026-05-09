@@ -717,3 +717,214 @@ def test_runner_malformed_concatenates_both_sides(tmp_path):
     assert "with_mneme.json" in result.explanation
     assert "without_mneme.json" in result.explanation
     assert "; " in result.explanation
+
+
+# ── Group B: governance-integrity adversarial coverage ────────────────────
+
+
+def test_layer1_irrelevant_injection_stress_at_default_k():
+    """At K=DEFAULT_MAX_DECISIONS, K-1 irrelevant retrievals drop precision to
+    1/K, recall stays 1.0, and the irrelevant_injection flag fires.
+
+    Stress shape: one expected ID at top score, K-1 noise IDs in the next
+    slots, one further expected ID just below K (proving the K cutoff is
+    enforced and outside-K relevant decisions don't rescue precision)."""
+    scored = _scored(
+        ("d1", 5.0),         # expected, in top-K
+        ("noise1", 4.0),
+        ("noise2", 3.0),     # K=3 cutoff falls here
+        ("d2_offcut", 2.0),  # expected but outside top-K
+    )
+    s = score_layer1(
+        scored,
+        expected_ids=["d1", "d2_offcut"],
+        acceptable_ids=[],
+        k=DEFAULT_MAX_DECISIONS,
+    )
+    assert s.k == DEFAULT_MAX_DECISIONS == 3
+    assert s.retrieved_ids == ["d1", "noise1", "noise2"]
+    assert s.recall == 0.5  # 1 of 2 expected made the cut
+    assert abs(s.precision - (1 / DEFAULT_MAX_DECISIONS)) < 1e-9
+    assert s.irrelevant_injection is True
+
+
+def test_layer1_handles_empty_id_decision_robustly():
+    """A retrieval result whose Decision has an empty id is treated as a
+    distinct id (empty string). It does not crash scoring; it is included
+    in retrieved_ids and counted toward irrelevant_injection if not
+    expected. Documents current robustness — score_layer1 makes no
+    well-formedness assumptions about Decision.id beyond hashability."""
+    valid = _decision("d1")
+    corrupted = _decision("")
+    scored = [
+        ScoredDecision(decision=valid, score=5.0, matches={}),
+        ScoredDecision(decision=corrupted, score=4.0, matches={}),
+    ]
+    s = score_layer1(
+        scored, expected_ids=["d1"], acceptable_ids=[], k=DEFAULT_MAX_DECISIONS,
+    )
+    assert "d1" in s.retrieved_ids
+    assert "" in s.retrieved_ids
+    assert s.recall == 1.0
+    assert s.irrelevant_injection is True  # empty id is not in expected ∪ acceptable
+
+
+def test_layer1_dedups_decisions_with_duplicate_ids_first_seen_wins():
+    """When the same id appears multiple times with different scores, the
+    higher-score occurrence is retained (it appears first in the sorted-desc
+    list passed by the runner). Documents score_layer1's seen-set dedup
+    behavior at benchmark.py:213."""
+    scored = _scored(
+        ("d1", 5.0),  # higher-score d1, retained
+        ("d1", 4.0),  # duplicate id, dropped
+        ("d2", 3.0),
+    )
+    s = score_layer1(
+        scored, expected_ids=["d1", "d2"], acceptable_ids=[],
+        k=DEFAULT_MAX_DECISIONS,
+    )
+    assert s.retrieved_ids == ["d1", "d2"]
+    assert len(s.retrieved_ids) == 2
+    assert s.recall == 1.0
+    assert s.precision == 1.0
+
+
+def test_runner_handles_contradictory_decisions_in_retrieval(tmp_path):
+    """When memory contains two decisions with overlapping scope and
+    conflicting anti_patterns, the runner surfaces BOTH in retrieved_ids
+    and lets the scenario's own assertions drive the Layer 2 verdict.
+
+    Governance-integrity property: the runner does NOT silently drop one
+    decision to resolve the contradiction — that is an ADR-precedence
+    concern, intentionally deferred per the v1.1 methodology. The runner
+    is faithful to what was retrieved."""
+    memory_data = {
+        "meta": {
+            "name": "contradictory-memory", "description": "test",
+            "version": "0.1.0", "owner": "test", "created": "2026-05-09",
+        },
+        "items": [],
+        "examples": [],
+        "decisions": [
+            {
+                "id": "policy_json_only",
+                "decision": "Use JSON storage only",
+                "rationale": "Local-first, zero-setup install.",
+                "scope": ["storage", "backend"],
+                "constraints": ["no postgres"],
+                "anti_patterns": ["sqlalchemy", "alembic"],
+                "created_at": "2026-04-24T00:00:00Z",
+                "updated_at": "2026-04-24T00:00:00Z",
+            },
+            {
+                "id": "policy_postgres_required",
+                "decision": "Use Postgres storage",
+                "rationale": "Relational integrity and transactions.",
+                "scope": ["storage", "backend"],
+                "constraints": ["no json file storage"],
+                "anti_patterns": ["json file storage", "flat file"],
+                "created_at": "2026-04-24T00:00:00Z",
+                "updated_at": "2026-04-24T00:00:00Z",
+            },
+        ],
+    }
+    memory_file = tmp_path / "contradictory_memory.json"
+    memory_file.write_text(json.dumps(memory_data))
+
+    fixture_dir = tmp_path / "fixture"
+    fixture_dir.mkdir()
+    (fixture_dir / "query.txt").write_text(
+        "How should we handle storage backend persistence?"
+    )
+    (fixture_dir / "without_mneme.txt").write_text(
+        "Use Postgres with SQLAlchemy."
+    )
+    (fixture_dir / "with_mneme.txt").write_text(
+        "Two contradicting policies retrieved; deferring."
+    )
+    (fixture_dir / "scenario.json").write_text(json.dumps({
+        "name": "contradictory_scenario",
+        "category": "architecture",
+        "description": "Memory has contradictory storage decisions.",
+        "expected_failure_terms": ["postgres"],
+        "expected_protected_decision_ids": [
+            "policy_json_only", "policy_postgres_required",
+        ],
+    }))
+
+    store = MemoryStore(memory_file)
+    store.load()
+    runner = BenchmarkRunner(store)
+    result = runner.run_scenario(load_scenario(fixture_dir))
+
+    # BOTH contradictory decisions are retrieved — runner does not pick a winner.
+    assert "policy_json_only" in result.layer1_retrieved_ids
+    assert "policy_postgres_required" in result.layer1_retrieved_ids
+    # Recall is 1.0 because both expected IDs are retrieved.
+    assert result.layer1_recall == 1.0
+    # Verdict still resolves deterministically (verdict semantics depend on
+    # whether the TXT enforcer caught the violation in this constructed
+    # scenario — assert only on the governance-integrity property: the
+    # scenario completes without crashing and both contradictory decisions
+    # are visible in the retrieved set for the operator to resolve).
+    assert result.verdict in {
+        ScenarioVerdict.PASS, ScenarioVerdict.FAIL, ScenarioVerdict.WEAK,
+    }
+
+
+def test_runner_dedups_decisions_with_duplicate_ids_via_memory_file(tmp_path):
+    """MemoryStore.load() preserves duplicate-id decisions in the
+    decisions[] array (no load-time uniqueness check). The runner's
+    score_layer1 dedups via its seen-set, so the retrieved_ids list never
+    contains duplicates regardless of upstream input quality.
+
+    Governance-integrity property: a buggy or merged memory file with
+    duplicate decision IDs does not produce inflated retrieval counts."""
+    memory_data = {
+        "meta": {
+            "name": "duplicate-id-memory", "description": "test",
+            "version": "0.1.0", "owner": "test", "created": "2026-05-09",
+        },
+        "items": [], "examples": [],
+        "decisions": [
+            {
+                "id": "dupe_id", "decision": "First copy",
+                "scope": ["storage"], "constraints": [],
+                "anti_patterns": ["postgres"],
+                "created_at": "", "updated_at": "",
+            },
+            {
+                "id": "dupe_id", "decision": "Second copy with different content",
+                "scope": ["storage"], "constraints": [],
+                "anti_patterns": ["sqlalchemy"],
+                "created_at": "", "updated_at": "",
+            },
+        ],
+    }
+    memory_file = tmp_path / "dupe_memory.json"
+    memory_file.write_text(json.dumps(memory_data))
+
+    fixture_dir = tmp_path / "fixture"
+    fixture_dir.mkdir()
+    (fixture_dir / "query.txt").write_text("How should we handle storage backend?")
+    (fixture_dir / "without_mneme.txt").write_text("Use Postgres with SQLAlchemy.")
+    (fixture_dir / "with_mneme.txt").write_text("Use JSON storage only.")
+    (fixture_dir / "scenario.json").write_text(json.dumps({
+        "name": "duplicate_id_scenario",
+        "category": "architecture",
+        "description": "Memory has two decisions sharing the same id.",
+        "expected_failure_terms": ["postgres"],
+        "expected_protected_decision_ids": ["dupe_id"],
+    }))
+
+    store = MemoryStore(memory_file)
+    store.load()
+    # MemoryStore is honest about what it loaded.
+    assert len(store.decisions()) == 2
+    runner = BenchmarkRunner(store)
+    result = runner.run_scenario(load_scenario(fixture_dir))
+
+    # Despite two decisions with id="dupe_id" in memory, retrieved_ids
+    # contains "dupe_id" exactly once.
+    assert result.layer1_retrieved_ids.count("dupe_id") == 1
+    assert result.layer1_recall == 1.0
