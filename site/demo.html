@@ -17,12 +17,12 @@
   <meta property="og:title" content="Mneme HQ — Architectural Governance Demo" />
   <meta property="og:description" content="Watch Mneme HQ enforce architectural decisions in real time. Same prompt, same model — compliant output when the governance layer is active." />
   <meta property="og:url" content="https://mnemehq.com/demo.html" />
-  <meta property="og:image" content="https://mnemehq.com/og.png" />
+  <meta property="og:image" content="https://mnemehq.com/demo-og.png" />
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Mneme HQ — Architectural Governance Demo" />
   <meta name="twitter:description" content="Watch Mneme HQ enforce architectural decisions in real time. Same prompt, same model — compliant output when the governance layer is active." />
-  <meta name="twitter:image" content="https://mnemehq.com/og.png" />
+  <meta name="twitter:image" content="https://mnemehq.com/demo-og.png" />
   <!-- Google Tag Manager -->
   <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
   <!-- End Google Tag Manager -->
@@ -49,7 +49,7 @@
         "dateModified": "2026-05-09",
         "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
-        "primaryImageOfPage": "https://mnemehq.com/og.png",
+        "primaryImageOfPage": "https://mnemehq.com/demo-og.png",
         "mainEntity": {"@id": "https://mnemehq.com/#mneme-software"}
       },
       {
@@ -184,9 +184,20 @@
       color: var(--muted);
       font-size: 0.9rem;
       text-align: center;
-      margin-bottom: 2.5rem;
+      margin-bottom: 1rem;
       max-width: 520px;
     }
+    .demo-meta {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    .demo-meta a { color: var(--muted); text-decoration: none; }
+    .demo-meta a:hover { color: var(--text); }
+    .demo-meta .sep { color: var(--border2); margin: 0 0.5rem; }
 
     /* ── STEP INDICATOR ── */
     .step-indicator {
@@ -626,6 +637,13 @@
     <div class="demo-eyebrow">Interactive demo</div>
     <h1 class="demo-title">Same prompt. Same model.<br>Different answer.</h1>
     <p class="demo-subtitle">Because it has your project's architectural decisions.</p>
+    <p class="demo-meta">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-04-01">Published Apr 2026</time>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-09">Updated May 2026</time>
+    </p>
 
     <div class="step-indicator">
       <div class="step-dot active" id="dot0"></div>

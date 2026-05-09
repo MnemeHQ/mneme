@@ -74,11 +74,36 @@ Phase 4. Governance infrastructure. Policy as code enforcement and drift analyti
 
 Mneme works with direct LLM API integrations, IDE coding assistants such as Cursor and Claude Code, agent frameworks, managed agent platforms, and internal prompt pipelines.
 
+## Demo
+
+The interactive demo at https://mnemehq.com/demo.html runs the same prompt through the same model twice. The prompt: "Refactor the storage backend for scalability."
+
+Without Mneme. The model recommends migrating JSON storage to PostgreSQL or Redis, introducing an ORM, and adding a migration layer. The advice is reasonable in the abstract and ignores three architectural decisions this codebase has already made.
+
+With Mneme. The relevant decision records are injected into the model's context before generation: ADR-001 (JSON storage only — no external DB), ADR-003 (no ORM in v1), ADR-005 (extend before rebuild). The model proposes extending the existing JSON storage module instead of replacing it. Same prompt, same model, different answer.
+
+The third panel runs `mneme check --mode strict` against the generated diff and produces a structured verdict: PASS on the storage decision (JSON only, no new databases), PASS on the auth pattern (JWT middleware unchanged), WARN on a new dependency (prisma not in approved list), and FAIL on a Repository pattern violation (ADR-004 bypassed in user.service.ts).
+
+The demo illustrates the difference between context injection and architectural governance. Injection makes the rules visible to the model. Enforcement makes generated output answer to them. Mneme does both, in one tool-agnostic layer that works across Claude Code, Cursor, GitHub Copilot, Windsurf, and custom SDK agents.
+
+## Standards landscape
+
+Three efforts are forming the credible foundation for a future cross-tool agent governance standard. The standards landscape page at https://mnemehq.com/standards/ tracks all three with links to organizational primary sources only.
+
+NIST CAISI AI Agent Standards Initiative. Launched February 2026 by the Center for AI Standards and Innovation at NIST. Stated aim: AI agents that "interoperate smoothly across the digital ecosystem." Concrete artifacts so far: a January 2026 RFI on securing AI agent systems (closed March 9, 2026), the NCCoE concept paper on AI agent identity and authorization, and listening sessions on barriers to AI adoption in healthcare, finance, and education. Current scope is identity and authorization; output-policy enforcement is adjacent and likely to follow.
+
+Model Context Protocol. Open, JSON-RPC-based protocol for exposing context, tools, and resources to AI clients. Latest specification dated 2025-11-25. Does not specify a governance content format, but is the substrate over which a structured decision store can be made queryable to any compliant agent.
+
+AGENTS.md. Markdown convention for per-repo instructions, stewarded by the Agentic AI Foundation under the Linux Foundation. Adopted across OpenAI Codex, Cursor, Aider, Factory, Google Gemini CLI and Jules, Zed. As a static-context format, AGENTS.md does not resolve precedence between conflicting decisions or enforce anything at the hook layer, but it is the most credible cross-vendor baseline that exists today for the static portion of the problem.
+
+Mneme alignment is honest: tracking, design-aligned, planning to engage with future RFIs. Mneme is not currently NIST-endorsed, not a Linux Foundation member, and has not filed contributions. The standards page draws this line explicitly.
+
 ## Project links
 
 - Homepage: https://mnemehq.com/
 - Governance Benchmark v1.1 methodology: https://mnemehq.com/benchmark/
 - Demo: https://mnemehq.com/demo.html
+- Standards landscape: https://mnemehq.com/standards/
 - Use cases: https://mnemehq.com/use-cases/
 - Insights: https://mnemehq.com/insights/
 - Roadmap: https://mnemehq.com/roadmap/
