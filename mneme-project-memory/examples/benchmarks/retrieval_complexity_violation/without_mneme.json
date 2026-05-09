@@ -1,0 +1,5 @@
+{
+  "refused": false,
+  "files_changed": ["src/embeddings/encoder.py", "src/vector_store/chroma_index.py"],
+  "dependencies_added": ["sentence-transformers", "chromadb"]
+}

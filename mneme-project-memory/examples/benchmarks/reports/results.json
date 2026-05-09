@@ -1,21 +1,21 @@
 {
   "summary": {
-    "total": 5,
-    "passed": 5,
+    "total": 7,
+    "passed": 7,
     "failed": 0,
     "weak": 0,
     "weak_retrieval": 0,
     "pass_rate": 1.0,
     "by_category": {
       "scope": {
+        "pass": 3,
+        "fail": 0,
+        "total": 3
+      },
+      "anti_pattern": {
         "pass": 2,
         "fail": 0,
         "total": 2
-      },
-      "anti_pattern": {
-        "pass": 1,
-        "fail": 0,
-        "total": 1
       },
       "architecture": {
         "pass": 2,
@@ -31,7 +31,7 @@
       "scored_count": 5
     },
     "layer2": {
-      "passed": 5,
+      "passed": 7,
       "failed": 0,
       "weak": 0,
       "weak_retrieval": 0,
@@ -42,16 +42,16 @@
     {
       "name": "feature_boundary_violation",
       "verdict": "PASS",
-      "baseline_violation_count": 4,
+      "baseline_violation_count": 3,
       "enhanced_violation_count": 0,
       "baseline_triggers": [
-        "tool",
-        "function",
-        "multi",
-        "between"
+        "autogen",
+        "crewai",
+        "src/agents/coordinator.py",
+        "src/agents/worker.py"
       ],
       "enhanced_triggers": [],
-      "explanation": "Mneme prevented the violation. Baseline triggered 4 violation(s) (tool, function, multi); enhanced response had none. Retrieved: anti-002.",
+      "explanation": "Mneme prevented the violation. Baseline triggered 3 violation(s) (autogen, crewai, src/agents/coordinator.py); enhanced response had none. Retrieved: anti-002.",
       "layer1": {
         "k": 3,
         "retrieved_ids": [
@@ -69,13 +69,13 @@
       },
       "layer2": {
         "verdict": "PASS",
-        "baseline_violation_count": 4,
+        "baseline_violation_count": 3,
         "enhanced_violation_count": 0,
         "baseline_triggers": [
-          "tool",
-          "function",
-          "multi",
-          "between"
+          "autogen",
+          "crewai",
+          "src/agents/coordinator.py",
+          "src/agents/worker.py"
         ],
         "enhanced_triggers": [],
         "protected_decision_ids_hit": [
@@ -86,13 +86,16 @@
     {
       "name": "framework_abstraction_violation",
       "verdict": "PASS",
-      "baseline_violation_count": 1,
+      "baseline_violation_count": 2,
       "enhanced_violation_count": 0,
       "baseline_triggers": [
-        "langchain"
+        "langchain",
+        "langchain-anthropic",
+        "src/chains/main.py",
+        "src/chains/retrieval_chain.py"
       ],
       "enhanced_triggers": [],
-      "explanation": "Mneme prevented the violation. Baseline triggered 1 violation(s) (langchain); enhanced response had none. Retrieved: anti-001.",
+      "explanation": "Mneme prevented the violation. Baseline triggered 2 violation(s) (langchain, langchain-anthropic, src/chains/main.py); enhanced response had none. Retrieved: anti-001.",
       "layer1": {
         "k": 3,
         "retrieved_ids": [
@@ -110,10 +113,13 @@
       },
       "layer2": {
         "verdict": "PASS",
-        "baseline_violation_count": 1,
+        "baseline_violation_count": 2,
         "enhanced_violation_count": 0,
         "baseline_triggers": [
-          "langchain"
+          "langchain",
+          "langchain-anthropic",
+          "src/chains/main.py",
+          "src/chains/retrieval_chain.py"
         ],
         "enhanced_triggers": [],
         "protected_decision_ids_hit": [
@@ -127,13 +133,13 @@
       "baseline_violation_count": 4,
       "enhanced_violation_count": 0,
       "baseline_triggers": [
-        "agentic",
-        "tool",
-        "function",
-        "multi"
+        "redis",
+        "celery",
+        "src/agents/worker.py",
+        "src/orchestration/coordinator.py"
       ],
       "enhanced_triggers": [],
-      "explanation": "Mneme prevented the violation. Baseline triggered 4 violation(s) (agentic, tool, function); enhanced response had none. Retrieved: anti-002.",
+      "explanation": "Mneme prevented the violation. Baseline triggered 4 violation(s) (redis, celery, src/agents/worker.py); enhanced response had none. Retrieved: anti-002.",
       "layer1": {
         "k": 3,
         "retrieved_ids": [
@@ -154,10 +160,10 @@
         "baseline_violation_count": 4,
         "enhanced_violation_count": 0,
         "baseline_triggers": [
-          "agentic",
-          "tool",
-          "function",
-          "multi"
+          "redis",
+          "celery",
+          "src/agents/worker.py",
+          "src/orchestration/coordinator.py"
         ],
         "enhanced_triggers": [],
         "protected_decision_ids_hit": [
@@ -166,17 +172,86 @@
       }
     },
     {
-      "name": "retrieval_complexity_violation",
+      "name": "openai_provider_violation",
       "verdict": "PASS",
-      "baseline_violation_count": 3,
+      "baseline_violation_count": 2,
       "enhanced_violation_count": 0,
       "baseline_triggers": [
-        "sentence",
-        "vector",
-        "embeddings"
+        "openai",
+        "mneme/providers/openai.py"
       ],
       "enhanced_triggers": [],
-      "explanation": "Mneme prevented the violation. Baseline triggered 3 violation(s) (sentence, vector, embeddings); enhanced response had none. Retrieved: mneme_retrieval_deterministic.",
+      "explanation": "Mneme prevented the violation. Baseline triggered 2 violation(s) (openai, mneme/providers/openai.py); enhanced response had none. Retrieved: .",
+      "layer1": {
+        "k": 3,
+        "retrieved_ids": [],
+        "expected_ids": [],
+        "acceptable_ids": [],
+        "recall_at_k": 1.0,
+        "precision_at_k": 1.0,
+        "irrelevant_injection": false
+      },
+      "layer2": {
+        "verdict": "PASS",
+        "baseline_violation_count": 2,
+        "enhanced_violation_count": 0,
+        "baseline_triggers": [
+          "openai",
+          "mneme/providers/openai.py"
+        ],
+        "enhanced_triggers": [],
+        "protected_decision_ids_hit": []
+      }
+    },
+    {
+      "name": "pydantic_dependency_creep",
+      "verdict": "PASS",
+      "baseline_violation_count": 2,
+      "enhanced_violation_count": 0,
+      "baseline_triggers": [
+        "pydantic",
+        "mneme/schemas.py"
+      ],
+      "enhanced_triggers": [],
+      "explanation": "Mneme prevented the violation. Baseline triggered 2 violation(s) (pydantic, mneme/schemas.py); enhanced response had none. Retrieved: .",
+      "layer1": {
+        "k": 3,
+        "retrieved_ids": [
+          "rule-003",
+          "rule-002",
+          "rule-005"
+        ],
+        "expected_ids": [],
+        "acceptable_ids": [],
+        "recall_at_k": 1.0,
+        "precision_at_k": 0.0,
+        "irrelevant_injection": true
+      },
+      "layer2": {
+        "verdict": "PASS",
+        "baseline_violation_count": 2,
+        "enhanced_violation_count": 0,
+        "baseline_triggers": [
+          "pydantic",
+          "mneme/schemas.py"
+        ],
+        "enhanced_triggers": [],
+        "protected_decision_ids_hit": []
+      }
+    },
+    {
+      "name": "retrieval_complexity_violation",
+      "verdict": "PASS",
+      "baseline_violation_count": 4,
+      "enhanced_violation_count": 0,
+      "baseline_triggers": [
+        "sentence-transformers",
+        "chromadb",
+        "src/embeddings/encoder.py",
+        "src/vector_store/chroma_index.py"
+      ],
+      "enhanced_triggers": [],
+      "explanation": "Mneme prevented the violation. Baseline triggered 4 violation(s) (sentence-transformers, chromadb, src/embeddings/encoder.py); enhanced response had none. Retrieved: mneme_retrieval_deterministic.",
       "layer1": {
         "k": 3,
         "retrieved_ids": [
@@ -194,12 +269,13 @@
       },
       "layer2": {
         "verdict": "PASS",
-        "baseline_violation_count": 3,
+        "baseline_violation_count": 4,
         "enhanced_violation_count": 0,
         "baseline_triggers": [
-          "sentence",
-          "vector",
-          "embeddings"
+          "sentence-transformers",
+          "chromadb",
+          "src/embeddings/encoder.py",
+          "src/vector_store/chroma_index.py"
         ],
         "enhanced_triggers": [],
         "protected_decision_ids_hit": [

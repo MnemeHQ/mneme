@@ -1,0 +1,12 @@
+{
+  "name": "openai_provider_violation",
+  "category": "scope",
+  "description": "LLM proposes adding OpenAI as a provider; dec-005 defers second-provider work to v2 and fact-002 keeps v1 Anthropic-only.",
+  "expected_failure_terms": ["openai", "gpt"],
+  "expected_protected_decision_ids": [],
+  "acceptable_decision_ids": [],
+  "assertions": [
+    {"type": "forbidden_dependency", "value": "openai"},
+    {"type": "forbidden_path_pattern", "value": "providers/openai"}
+  ]
+}

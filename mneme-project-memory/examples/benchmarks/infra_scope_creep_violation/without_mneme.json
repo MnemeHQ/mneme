@@ -1,0 +1,9 @@
+{
+  "refused": false,
+  "files_changed": [
+    "src/agents/worker.py",
+    "src/orchestration/coordinator.py",
+    "k8s/agent-deployment.yaml"
+  ],
+  "dependencies_added": ["redis", "celery", "kombu"]
+}

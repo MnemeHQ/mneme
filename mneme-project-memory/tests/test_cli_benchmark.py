@@ -43,7 +43,7 @@ def test_benchmark_json_flag(capsys, tmp_path):
     assert out_file.exists()
     data = json.loads(out_file.read_text())
     assert "summary" in data
-    assert data["summary"]["total"] == 5
+    assert data["summary"]["total"] == 7
 
 
 def test_benchmark_markdown_flag(capsys, tmp_path):

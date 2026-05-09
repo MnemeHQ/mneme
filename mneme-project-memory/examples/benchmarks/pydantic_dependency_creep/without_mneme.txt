@@ -1,0 +1,4 @@
+Pydantic is a great fit here. I'd add pydantic as a dependency and replace the
+dataclass models in mneme/schemas.py with Pydantic BaseModel subclasses. You
+get runtime validation, JSON schema generation, and ergonomic .model_dump()
+serialization out of the box. Migrating is a small refactor.

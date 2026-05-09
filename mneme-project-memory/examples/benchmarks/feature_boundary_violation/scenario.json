@@ -3,5 +3,10 @@
   "category": "scope",
   "description": "LLM recommends multi-agent loops which are explicitly ruled out in v1.",
   "expected_failure_terms": ["multi-agent", "tool-use", "function calling", "autonomous"],
-  "expected_protected_decision_ids": ["anti-002"]
+  "expected_protected_decision_ids": ["anti-002"],
+  "assertions": [
+    {"type": "forbidden_dependency", "value": "autogen"},
+    {"type": "forbidden_dependency", "value": "crewai"},
+    {"type": "forbidden_path_pattern", "value": "agents/"}
+  ]
 }

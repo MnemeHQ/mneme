@@ -3,5 +3,10 @@
   "category": "anti_pattern",
   "description": "LLM recommends LangChain orchestration which is an explicit anti-pattern.",
   "expected_failure_terms": ["langchain", "llamaindex", "chain"],
-  "expected_protected_decision_ids": ["anti-001"]
+  "expected_protected_decision_ids": ["anti-001"],
+  "assertions": [
+    {"type": "forbidden_dependency", "value": "langchain"},
+    {"type": "forbidden_dependency", "value": "llama-index"},
+    {"type": "forbidden_path_pattern", "value": "chains/"}
+  ]
 }

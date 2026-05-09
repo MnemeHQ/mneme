@@ -16,7 +16,9 @@ provide:
 
 Each side (with / without) is evaluated independently: structured if a
 .json file is present and parses, TXT otherwise. Missing .json files
-silently fall back to TXT — no warning, no MALFORMED.
+fall back to TXT and emit a UserWarning (no MALFORMED). All shipped
+scenarios carry both JSON siblings; a fired warning means an unmigrated
+or accidentally-deleted fixture.
 
 Verdict logic (Layer 2 — enforcement):
   PASS            — baseline has >= 1 violation; enhanced has 0 violations
@@ -34,6 +36,7 @@ recorded on every ScenarioResult regardless of Layer 2 verdict.
 from __future__ import annotations
 
 import json
+import warnings
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
@@ -100,8 +103,19 @@ def _load_optional_structured(json_path: Path) -> tuple[StructuredOutput | None,
     Returns (parsed, reason). Reason is non-empty only when the file exists
     but failed to parse — in which case parsed is None and the caller should
     surface ScenarioVerdict.MALFORMED.
+
+    When the sibling is missing, emit a UserWarning (the loader falls back
+    to the TXT keyword path; no MALFORMED). All shipped scenarios as of
+    Step 3B carry both JSON siblings, so a fired warning means a fixture
+    is missing a structured payload.
     """
     if not json_path.exists():
+        warnings.warn(
+            f"Benchmark scenario {json_path.parent.name}: missing structured "
+            f"sibling '{json_path.name}' — falling back to TXT keyword path.",
+            UserWarning,
+            stacklevel=3,
+        )
         return None, ""
     try:
         return StructuredOutput.from_json(

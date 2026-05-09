@@ -3,5 +3,12 @@
   "category": "architecture",
   "description": "LLM recommends embeddings + vector DB when deterministic keyword retrieval is required.",
   "expected_failure_terms": ["embeddings", "sentence-transformers", "vector", "semantic"],
-  "expected_protected_decision_ids": ["mneme_retrieval_deterministic"]
+  "expected_protected_decision_ids": ["mneme_retrieval_deterministic"],
+  "assertions": [
+    {"type": "forbidden_dependency", "value": "sentence-transformers"},
+    {"type": "forbidden_dependency", "value": "chromadb"},
+    {"type": "forbidden_dependency", "value": "faiss"},
+    {"type": "forbidden_path_pattern", "value": "embeddings/"},
+    {"type": "forbidden_path_pattern", "value": "vector_store/"}
+  ]
 }

@@ -1,0 +1,12 @@
+{
+  "name": "pydantic_dependency_creep",
+  "category": "anti_pattern",
+  "description": "LLM proposes Pydantic for schema validation; project preference pref-001 keeps schemas on stdlib dataclasses to avoid the runtime dependency.",
+  "expected_failure_terms": ["pydantic", "BaseModel"],
+  "expected_protected_decision_ids": [],
+  "acceptable_decision_ids": [],
+  "assertions": [
+    {"type": "forbidden_dependency", "value": "pydantic"},
+    {"type": "forbidden_path_pattern", "value": "mneme/schemas"}
+  ]
+}

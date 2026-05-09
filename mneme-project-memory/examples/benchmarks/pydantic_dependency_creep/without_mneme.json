@@ -1,0 +1,5 @@
+{
+  "refused": false,
+  "files_changed": ["mneme/schemas.py"],
+  "dependencies_added": ["pydantic"]
+}

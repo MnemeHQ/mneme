@@ -1,0 +1,5 @@
+{
+  "refused": false,
+  "files_changed": ["src/chains/main.py", "src/chains/retrieval_chain.py"],
+  "dependencies_added": ["langchain", "langchain-anthropic"]
+}
