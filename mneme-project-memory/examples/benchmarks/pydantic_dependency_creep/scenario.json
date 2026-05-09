@@ -7,6 +7,6 @@
   "acceptable_decision_ids": [],
   "assertions": [
     {"type": "forbidden_dependency", "value": "pydantic"},
-    {"type": "forbidden_path_pattern", "value": "mneme/schemas.py"}
+    {"type": "forbidden_path_pattern", "value": "mneme/schemas"}
   ]
 }

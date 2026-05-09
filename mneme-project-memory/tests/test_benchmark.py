@@ -332,8 +332,10 @@ def test_runner_existing_fixtures_still_pass():
     # Each scenario that declares expected protected IDs must achieve
     # recall = 1.0 (the PASS verdict already proves the expected ID was
     # retrieved). Scenarios with empty expected_protected_decision_ids
-    # have vacuous-true recall = 1.0 by definition.
+    # are excluded — vacuous-true recall would mask a real regression.
     for r in results:
+        if not r.layer1_expected_ids:
+            continue
         assert r.layer1_recall == 1.0, (
             f"{r.name} recall@{r.layer1_k}={r.layer1_recall}, expected 1.0"
         )
