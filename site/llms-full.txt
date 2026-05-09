@@ -76,7 +76,7 @@ Mneme works with direct LLM API integrations, IDE coding assistants such as Curs
 
 ## Demo
 
-The interactive demo at https://mnemehq.com/demo.html runs the same prompt through the same model twice. The prompt: "Refactor the storage backend for scalability."
+The interactive demo at https://mnemehq.com/demo/ runs the same prompt through the same model twice. The prompt: "Refactor the storage backend for scalability."
 
 Without Mneme. The model recommends migrating JSON storage to PostgreSQL or Redis, introducing an ORM, and adding a migration layer. The advice is reasonable in the abstract and ignores three architectural decisions this codebase has already made.
 
@@ -102,7 +102,7 @@ Mneme alignment is honest: tracking, design-aligned, planning to engage with fut
 
 - Homepage: https://mnemehq.com/
 - Governance Benchmark v1.1 methodology: https://mnemehq.com/benchmark/
-- Demo: https://mnemehq.com/demo.html
+- Demo: https://mnemehq.com/demo/
 - Standards landscape: https://mnemehq.com/standards/
 - Use cases: https://mnemehq.com/use-cases/
 - Insights: https://mnemehq.com/insights/

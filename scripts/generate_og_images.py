@@ -22,7 +22,7 @@ from pathlib import Path
 # Map from og-<slug>.html to output og.png path (relative to site/)
 TEMPLATE_MAP = {
     "og-homepage.html": "og.png",
-    "og-demo.html": "demo-og.png",
+    "og-demo.html": "demo/og.png",
     "og-use-cases-gen.html": "use-cases/og.png",
     "og-coding-assistant-governance.html": "use-cases/coding-assistant-governance/og.png",
     "og-legacy-codebase-memory.html": "use-cases/legacy-codebase-memory/og.png",

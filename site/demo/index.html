@@ -9,20 +9,20 @@
   <meta name="description" content="Watch Mneme HQ enforce architectural decisions in real time. Same prompt, same model — compliant output when the governance layer is active." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
-  <link rel="canonical" href="https://mnemehq.com/demo.html" />
+  <link rel="canonical" href="https://mnemehq.com/demo/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Mneme HQ" />
   <meta property="og:title" content="Mneme HQ — Architectural Governance Demo" />
   <meta property="og:description" content="Watch Mneme HQ enforce architectural decisions in real time. Same prompt, same model — compliant output when the governance layer is active." />
-  <meta property="og:url" content="https://mnemehq.com/demo.html" />
-  <meta property="og:image" content="https://mnemehq.com/demo-og.png" />
+  <meta property="og:url" content="https://mnemehq.com/demo/" />
+  <meta property="og:image" content="https://mnemehq.com/demo/og.png" />
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Mneme HQ — Architectural Governance Demo" />
   <meta name="twitter:description" content="Watch Mneme HQ enforce architectural decisions in real time. Same prompt, same model — compliant output when the governance layer is active." />
-  <meta name="twitter:image" content="https://mnemehq.com/demo-og.png" />
+  <meta name="twitter:image" content="https://mnemehq.com/demo/og.png" />
   <!-- Google Tag Manager -->
   <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
   <!-- End Google Tag Manager -->
@@ -37,19 +37,19 @@
         "@type": "BreadcrumbList",
         "itemListElement": [
           {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
-          {"@type": "ListItem", "position": 2, "name": "Demo", "item": "https://mnemehq.com/demo.html"}
+          {"@type": "ListItem", "position": 2, "name": "Demo", "item": "https://mnemehq.com/demo/"}
         ]
       },
       {
         "@type": "WebPage",
         "name": "Mneme HQ — Architectural Governance Demo",
         "description": "Interactive demonstration of pre-generation architectural governance for AI coding agents. The same prompt to the same model yields compliant output when project decisions are injected, and mneme check validates the generated code against the decision corpus.",
-        "url": "https://mnemehq.com/demo.html",
+        "url": "https://mnemehq.com/demo/",
         "datePublished": "2026-04-01",
         "dateModified": "2026-05-09",
         "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
-        "primaryImageOfPage": "https://mnemehq.com/demo-og.png",
+        "primaryImageOfPage": "https://mnemehq.com/demo/og.png",
         "mainEntity": {"@id": "https://mnemehq.com/#mneme-software"}
       },
       {
@@ -626,7 +626,7 @@
     <a href="/insights/">Insights</a>
     <a href="/standards/">Standards</a>
     <a href="/roadmap/">Roadmap</a>
-    <a href="/demo.html">Demo</a>
+    <a href="/demo/">Demo</a>
     <a href="/#benchmarks">Benchmarks</a>
     <a href="https://github.com/TheoV823/mneme">GitHub</a>
     <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
@@ -650,6 +650,13 @@
       <div class="step-dot" id="dot1"></div>
       <div class="step-dot" id="dot2"></div>
     </div>
+
+    <noscript>
+      <div style="width:100%;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;padding:1rem 1.25rem;margin-bottom:1.5rem;font-size:0.85rem;color:var(--muted);line-height:1.7;">
+        <strong style="color:var(--accent);font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;display:block;margin-bottom:0.5rem;">JavaScript disabled</strong>
+        The interactive panels below need JavaScript to animate the comparison. The full transcript &mdash; including the prompt, both model outputs, and the <code style="font-family:'DM Mono',monospace;background:var(--surface2);padding:0.05rem 0.4rem;border-radius:4px;">mneme check</code> verdict &mdash; is reproduced as static text under <a href="#explainer" style="color:var(--accent);">"What you're seeing"</a> further down this page.
+      </div>
+    </noscript>
 
     <div class="demo-wrap">
       <!-- WITHOUT MNEME -->
@@ -716,7 +723,7 @@
               <span class="benchmark-desc">passing tests in v0.3.0</span>
             </div>
           </div>
-          <p class="benchmark-coming">Formal benchmark suite with third-party verification &mdash; coming soon.</p>
+          <p class="benchmark-coming">Methodology and full scenario suite at <a href="/benchmark/" style="color:var(--accent);text-decoration:none;">/benchmark/</a>. Formal third-party verification &mdash; coming soon.</p>
         </div>
       </div>
     </div>

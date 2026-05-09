@@ -8,7 +8,7 @@ Mneme HQ is the architectural governance layer for AI-assisted development.
 
 ## Demo
 
-**[▶ See the demo: same prompt, two outcomes](https://mnemehq.com/demo.html)**
+**[▶ See the demo: same prompt, two outcomes](https://mnemehq.com/demo/)**
 
 *Same prompt. Same model. Different answer — because it has your project's decisions.*
 
