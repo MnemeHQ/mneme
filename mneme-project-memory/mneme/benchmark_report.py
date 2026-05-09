@@ -13,6 +13,7 @@ import json
 from dataclasses import dataclass
 
 from mneme.benchmark import ScenarioResult, ScenarioVerdict
+from mneme.context_builder import DEFAULT_MAX_DECISIONS
 
 
 _WIDTH = 72
@@ -41,7 +42,7 @@ class BenchmarkSummary:
     mean_precision_at_k: float = 0.0
     irrelevant_injection_rate: float = 0.0
     layer1_scored_count: int = 0
-    k: int = 5
+    k: int = DEFAULT_MAX_DECISIONS
 
 
 def compute_summary(results: list[ScenarioResult]) -> BenchmarkSummary:
@@ -82,7 +83,7 @@ def compute_summary(results: list[ScenarioResult]) -> BenchmarkSummary:
         injection_rate = 0.0
 
     k_values = {r.layer1_k for r in results if r.layer1_k}
-    k = next(iter(k_values)) if len(k_values) == 1 else (max(k_values) if k_values else 5)
+    k = next(iter(k_values)) if len(k_values) == 1 else (max(k_values) if k_values else DEFAULT_MAX_DECISIONS)
 
     return BenchmarkSummary(
         total=len(results),
