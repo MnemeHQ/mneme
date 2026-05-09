@@ -535,3 +535,27 @@ def test_runner_feature_boundary_uses_structured_path():
         or "agents/" in joined
         or "coordinator" in joined
     )
+
+
+def test_runner_infra_scope_creep_uses_structured_path():
+    """infra_scope_creep_violation runs through structured Layer 2 path."""
+    store = MemoryStore(EXAMPLE_MEMORY)
+    store.load()
+    runner = BenchmarkRunner(store)
+    fixture = BENCHMARKS_DIR / "infra_scope_creep_violation"
+    scenario = load_scenario(fixture)
+    assert scenario.with_mneme_structured is not None
+    assert scenario.with_mneme_structured.refused is True
+    assert scenario.without_mneme_structured is not None
+    assert scenario.without_mneme_structured.refused is False
+    assert scenario.assertions, "scenario.json must declare assertions"
+
+    result = runner.run_scenario(scenario)
+    assert result.verdict == ScenarioVerdict.PASS
+    joined = " ".join(result.baseline_triggers).lower()
+    assert (
+        "redis" in joined
+        or "celery" in joined
+        or "agents/" in joined
+        or "orchestration/" in joined
+    )

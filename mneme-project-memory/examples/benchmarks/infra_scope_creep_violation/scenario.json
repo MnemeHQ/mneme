@@ -3,5 +3,11 @@
   "category": "scope",
   "description": "LLM recommends agentic workers, tool-use loops, and multi-agent orchestration which are explicitly ruled out in v1.",
   "expected_failure_terms": ["agentic", "agent workers", "tool-use", "function calling", "multi-turn"],
-  "expected_protected_decision_ids": ["anti-002"]
+  "expected_protected_decision_ids": ["anti-002"],
+  "assertions": [
+    {"type": "forbidden_dependency", "value": "redis"},
+    {"type": "forbidden_dependency", "value": "celery"},
+    {"type": "forbidden_path_pattern", "value": "agents/"},
+    {"type": "forbidden_path_pattern", "value": "orchestration/"}
+  ]
 }
