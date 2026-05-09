@@ -1,0 +1,9 @@
+{
+  "refused": false,
+  "files_changed": [
+    "src/agents/coordinator.py",
+    "src/agents/worker.py",
+    "src/tools/mneme_tool.py"
+  ],
+  "dependencies_added": ["autogen", "crewai"]
+}
