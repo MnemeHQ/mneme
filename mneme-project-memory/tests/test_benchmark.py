@@ -612,3 +612,108 @@ def test_openai_provider_violation_uses_structured_path():
     # The structured-only file path is the strict signal; bare 'openai' would
     # also be produced by the TXT keyword path.
     assert "mneme/providers/openai" in joined
+
+
+# ── Group A: parser-trivia MALFORMED coverage ─────────────────────────────
+
+
+def test_runner_returns_malformed_on_invalid_without_mneme_json(tmp_path):
+    """Broken JSON in without_mneme.json => MALFORMED, explanation names file."""
+    _write_minimal_txt_pair(tmp_path)
+    (tmp_path / "without_mneme.json").write_text("{not valid json}")
+    (tmp_path / "scenario.json").write_text(json.dumps({
+        "name": "malformed_baseline",
+        "category": "architecture",
+        "description": "Broken JSON in without_mneme.json.",
+        "expected_failure_terms": ["postgres"],
+        "expected_protected_decision_ids": ["mneme_storage_json"],
+    }))
+    store = MemoryStore(EXAMPLE_MEMORY)
+    store.load()
+    runner = BenchmarkRunner(store)
+    result = runner.run_scenario(load_scenario(tmp_path))
+    assert result.verdict == ScenarioVerdict.MALFORMED
+    assert "without_mneme.json" in result.explanation
+
+
+def test_runner_malformed_on_type_mismatch_refused_not_bool(tmp_path):
+    """refused: 'no' (string, not bool) => MALFORMED."""
+    _write_minimal_txt_pair(tmp_path)
+    (tmp_path / "with_mneme.json").write_text(
+        '{"refused": "no", "files_changed": [], "dependencies_added": []}'
+    )
+    (tmp_path / "scenario.json").write_text(json.dumps({
+        "name": "type_mismatch_refused",
+        "category": "architecture",
+        "description": "refused must be bool.",
+        "expected_failure_terms": ["postgres"],
+        "expected_protected_decision_ids": ["mneme_storage_json"],
+    }))
+    store = MemoryStore(EXAMPLE_MEMORY)
+    store.load()
+    runner = BenchmarkRunner(store)
+    result = runner.run_scenario(load_scenario(tmp_path))
+    assert result.verdict == ScenarioVerdict.MALFORMED
+    assert "refused" in result.explanation
+
+
+def test_runner_malformed_on_assertions_not_a_list(tmp_path):
+    """scenario.json assertions: a dict (not a list) => MALFORMED."""
+    _write_minimal_txt_pair(tmp_path)
+    (tmp_path / "scenario.json").write_text(json.dumps({
+        "name": "assertions_not_list",
+        "category": "architecture",
+        "description": "assertions must be a list.",
+        "expected_failure_terms": ["postgres"],
+        "expected_protected_decision_ids": ["mneme_storage_json"],
+        "assertions": {"type": "forbidden_dependency", "value": "sqlalchemy"},
+    }))
+    store = MemoryStore(EXAMPLE_MEMORY)
+    store.load()
+    runner = BenchmarkRunner(store)
+    result = runner.run_scenario(load_scenario(tmp_path))
+    assert result.verdict == ScenarioVerdict.MALFORMED
+    assert "assertions" in result.explanation
+
+
+def test_runner_malformed_on_unknown_assertion_type_via_fixture(tmp_path):
+    """An unknown assertion type at scenario level => MALFORMED with index."""
+    _write_minimal_txt_pair(tmp_path)
+    (tmp_path / "scenario.json").write_text(json.dumps({
+        "name": "unknown_assertion_type",
+        "category": "architecture",
+        "description": "forbidden_function is not a known assertion type.",
+        "expected_failure_terms": ["postgres"],
+        "expected_protected_decision_ids": ["mneme_storage_json"],
+        "assertions": [
+            {"type": "forbidden_function", "value": "create_engine"},
+        ],
+    }))
+    store = MemoryStore(EXAMPLE_MEMORY)
+    store.load()
+    runner = BenchmarkRunner(store)
+    result = runner.run_scenario(load_scenario(tmp_path))
+    assert result.verdict == ScenarioVerdict.MALFORMED
+    assert "assertions[0]" in result.explanation
+
+
+def test_runner_malformed_concatenates_both_sides(tmp_path):
+    """Both sides broken => explanation lists both filenames separated by '; '."""
+    _write_minimal_txt_pair(tmp_path)
+    (tmp_path / "with_mneme.json").write_text("{not json}")
+    (tmp_path / "without_mneme.json").write_text("{also not json}")
+    (tmp_path / "scenario.json").write_text(json.dumps({
+        "name": "both_sides_malformed",
+        "category": "architecture",
+        "description": "Both sides have broken JSON.",
+        "expected_failure_terms": ["postgres"],
+        "expected_protected_decision_ids": ["mneme_storage_json"],
+    }))
+    store = MemoryStore(EXAMPLE_MEMORY)
+    store.load()
+    runner = BenchmarkRunner(store)
+    result = runner.run_scenario(load_scenario(tmp_path))
+    assert result.verdict == ScenarioVerdict.MALFORMED
+    assert "with_mneme.json" in result.explanation
+    assert "without_mneme.json" in result.explanation
+    assert "; " in result.explanation
