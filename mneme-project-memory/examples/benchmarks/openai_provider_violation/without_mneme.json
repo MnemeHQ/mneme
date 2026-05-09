@@ -1,0 +1,5 @@
+{
+  "refused": false,
+  "files_changed": ["mneme/llm_adapter.py", "mneme/providers/openai.py"],
+  "dependencies_added": ["openai"]
+}

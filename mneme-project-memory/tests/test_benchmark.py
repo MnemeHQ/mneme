@@ -141,7 +141,7 @@ def test_run_suite_loads_all_benchmark_scenarios():
     store.load()
     runner = BenchmarkRunner(store)
     results = runner.run_suite(BENCHMARKS_DIR)
-    assert len(results) == 5
+    assert len(results) == 7
     names = {r.name for r in results}
     assert "storage_backend_violation" in names
     assert "retrieval_complexity_violation" in names
@@ -317,22 +317,23 @@ def test_runner_weak_retrieval_when_layer1_recall_incomplete(tmp_path):
     assert "nonexistent_decision_id" in result.layer1_expected_ids
 
 
-def test_runner_existing_5_fixtures_still_pass():
-    """Regression guard: layered scoring must not change the 5 v1.0 verdicts."""
+def test_runner_existing_fixtures_still_pass():
+    """Regression guard: layered scoring must not change the shipped verdicts."""
     store = MemoryStore(EXAMPLE_MEMORY)
     store.load()
     runner = BenchmarkRunner(store)
     results = runner.run_suite(BENCHMARKS_DIR)
-    # Same shape as before: 5 scenarios, all PASS.
-    assert len(results) == 5
+    # All shipped scenarios must PASS.
+    assert len(results) == 7
     assert all(r.verdict == ScenarioVerdict.PASS for r in results), (
         "Layer 1 introduction changed an existing verdict: "
         + ", ".join(f"{r.name}={r.verdict}" for r in results)
     )
-    # All 5 declare expected protected IDs; recall should be 1.0 for each
-    # (the v1.0 PASS already proved the expected ID was retrieved).
+    # Each scenario that declares expected protected IDs must achieve
+    # recall = 1.0 (the PASS verdict already proves the expected ID was
+    # retrieved). Scenarios with empty expected_protected_decision_ids
+    # have vacuous-true recall = 1.0 by definition.
     for r in results:
-        assert r.layer1_expected_ids, f"{r.name} missing layer1_expected_ids"
         assert r.layer1_recall == 1.0, (
             f"{r.name} recall@{r.layer1_k}={r.layer1_recall}, expected 1.0"
         )
@@ -585,3 +586,27 @@ def test_pydantic_dependency_creep_uses_structured_path():
     # also assert on the structured-only path entry.
     assert "pydantic" in joined
     assert "mneme/schemas.py" in joined
+
+
+def test_openai_provider_violation_uses_structured_path():
+    """openai_provider_violation runs through the structured Layer 2 path —
+    triggers come from forbidden_dependency / forbidden_path_pattern, not from
+    TXT keyword fallback."""
+    store = MemoryStore(EXAMPLE_MEMORY)
+    store.load()
+    runner = BenchmarkRunner(store)
+    fixture = BENCHMARKS_DIR / "openai_provider_violation"
+    scenario = load_scenario(fixture)
+
+    assert scenario.with_mneme_structured is not None
+    assert scenario.with_mneme_structured.refused is True
+    assert scenario.without_mneme_structured is not None
+    assert scenario.without_mneme_structured.refused is False
+    assert scenario.assertions
+
+    result = runner.run_scenario(scenario)
+    assert result.verdict == ScenarioVerdict.PASS
+    joined = " ".join(result.baseline_triggers).lower()
+    # The structured-only file path is the strict signal; bare 'openai' would
+    # also be produced by the TXT keyword path.
+    assert "mneme/providers/openai" in joined

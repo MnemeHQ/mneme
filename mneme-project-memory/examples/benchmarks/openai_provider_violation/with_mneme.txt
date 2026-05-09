@@ -1,0 +1,3 @@
+Project decision dec-005 defers a second LLM provider to v2 (fact-002 keeps v1
+on Anthropic only). Add the abstraction layer when the second provider is
+actually requested by a partner, not speculatively in v1.

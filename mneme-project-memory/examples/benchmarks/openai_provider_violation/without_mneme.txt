@@ -1,0 +1,2 @@
+Sure. Add openai as a dependency and create a thin LLMAdapter subclass that
+routes by provider name. Most of the existing call sites won't need to change.
