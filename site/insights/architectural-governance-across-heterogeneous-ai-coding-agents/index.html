@@ -196,7 +196,8 @@
           {"@type": "Question", "name": "How does MCP fit in?", "acceptedAnswer": {"@type": "Answer", "text": "MCP is the substrate. Exposing a decision store as an MCP server makes it queryable by any MCP-aware client without per-tool integration. The governance schema, precedence rules, and enforcement layer still need to live somewhere. MCP solves connectivity, not content."}},
           {"@type": "Question", "name": "What does NIST's work mean for engineering teams today?", "acceptedAnswer": {"@type": "Answer", "text": "Near term, limited operational impact — the initiative is in RFI / concept-paper / listening-session phase. Medium term, identity and authorization patterns harden first, followed by audit and behavioral controls. Regulated industries should track it; others can treat it as a multi-year tailwind."}},
           {"@type": "Question", "name": "What if our org standardizes on one AI tool?", "acceptedAnswer": {"@type": "Answer", "text": "In practice, engineering orgs of meaningful size do not standardize on one tool. Inline completion, interactive coding, and async PR-opening agents tend to coexist because each is best-in-class at a different task. Procurement is one decision; what engineers actually use is another."}},
-          {"@type": "Question", "name": "Will the eventual standard make Mneme redundant?", "acceptedAnswer": {"@type": "Answer", "text": "No, in the same way OCI did not make Docker redundant and OAuth did not make Okta redundant. A standard defines the contract; vendors and open-source projects implement it. Mneme is designed to align with whatever cross-tool format emerges and to be the structured decision-store implementation that consumes and exports it."}}
+          {"@type": "Question", "name": "Will the eventual standard make Mneme redundant?", "acceptedAnswer": {"@type": "Answer", "text": "No, in the same way OCI did not make Docker redundant and OAuth did not make Okta redundant. A standard defines the contract; vendors and open-source projects implement it. Mneme is designed to align with whatever cross-tool format emerges and to be the structured decision-store implementation that consumes and exports it."}},
+          {"@type": "Question", "name": "How does an agnostic layer protect against tool churn?", "acceptedAnswer": {"@type": "Answer", "text": "The leading AI coding tool has changed roughly every eighteen months — Copilot dominant in 2022, Cursor through 2024, Claude Code reshaping things in 2025–26. A team whose architectural memory lives inside one tool's native format pays a rewrite cost every migration. A team whose memory lives in an agnostic layer can swap the tool underneath without touching governance."}}
         ]
       }
     ]
@@ -237,7 +238,7 @@
     <div class="article-eyebrow">
       <span class="eyebrow-tag">Category Education</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">12 min read &nbsp;&middot;&nbsp; May 2026</span>
+      <span class="eyebrow-meta">13 min read &nbsp;&middot;&nbsp; May 2026</span>
     </div>
     <h1>Architectural governance across heterogeneous AI coding agents</h1>
     <p class="article-lede">Most engineering orgs are no longer one-tool shops. One engineer is in Claude Code, another in Cursor, the platform team is running Copilot in CI, and somebody just shipped a bespoke agent built on the Claude Agent SDK. They all touch the same codebase. They all carry their own memory format. Architectural governance dies at the seams.</p>
@@ -254,6 +255,7 @@
         <li><a href="#history">How other categories solved this</a></li>
         <li><a href="#standards">Where the standards landscape stands today</a></li>
         <li><a href="#requirements">What governance has to look like to survive heterogeneity</a></li>
+        <li><a href="#lock-in">Lock-in is the second cost</a></li>
         <li><a href="#category">The category framing</a></li>
         <li><a href="#faq">FAQ</a></li>
       </ol>
@@ -523,6 +525,20 @@
 
     <p>This is the layering that makes heterogeneity safe. Each agent can keep its own strengths. The architecture is enforced by infrastructure that does not care which agent emitted the code.</p>
 
+    <h2 id="lock-in">Lock-in is the second cost</h2>
+
+    <p>The seam problem is the operational cost of running multiple AI coding agents against one codebase: drift, format mismatch, no shared enforcement. There is a second cost that accrues more quietly and tends to surface only when a team tries to swap a tool. It is vendor lock-in, and for any codebase expected to live more than a year or two it is the more expensive of the two.</p>
+
+    <p>A team that builds its architectural memory inside one tool's native format &mdash; <code>CLAUDE.md</code>, <code>.cursor/rules</code>, <code>.github/copilot-instructions.md</code>, a vendor's proprietary memory product &mdash; is structurally betting that the chosen tool will still be the right tool for the lifetime of the codebase. The AI coding category does not behave that way. GitHub Copilot was the default in 2022. Cursor took the interactive-coding lead through 2024. Claude Code's terminal- and web-native model has been reshaping the picture through 2025 and 2026. Windsurf, Codex, and a steady drip of new agents continue to enter. The leading tool has changed roughly every eighteen months, and nothing in the market suggests the cycle is slowing.</p>
+
+    <p>Codebases outlive tooling fashion. A service written in 2023 is still in production in 2026, governed by decisions that were correct then and may need refinement now. If those decisions live inside a tool the team no longer uses, the cost of switching is not just retraining engineers. It is rewriting the architectural memory itself, in whatever format the new tool prefers, hoping nothing is lost in the translation. The codebase's architectural truth becomes hostage to whichever vendor was dominant the year it was first written.</p>
+
+    <div class="callout">
+      <p><strong>The same agnostic layer that solves the seam problem also solves the lock-in problem.</strong> A team running Claude Code for backend, Cursor for frontend, and a custom SDK agent in CI can &mdash; if the memory layer lives outside any of them &mdash; switch any one of those tools tomorrow without touching the architectural truth. The tools become interchangeable; the governance does not.</p>
+    </div>
+
+    <p>This is the second reason the governance layer has to be tool-independent. The first reason is operational. This one is structural. Owning the architectural truth, in a format the team controls, is the only durable position when the tools underneath are themselves changing every cycle.</p>
+
     <h2 id="category">The category framing</h2>
 
     <p>The conversation about "the best AI coding tool" is the wrong conversation for any team large enough to have an architecture worth defending. There is no best tool — there is a portfolio, and the portfolio is going to grow. The question that matters is whether your governance layer is coupled to any one of them.</p>
@@ -562,6 +578,11 @@
       <details class="faq-item">
         <summary>Will the eventual standard make Mneme redundant?</summary>
         <div class="faq-body">No, in the same way that OCI did not make Docker redundant and OAuth did not make Okta redundant. A standard defines the wire format and the contract; vendors and open-source projects implement it. Mneme's design intent is to align with whatever cross-tool format emerges (likely some superset of AGENTS.md, MCP, and a NIST-influenced audit envelope) and to be the structured-decision-store implementation that consumes and exports it.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>How does an agnostic layer protect against tool churn?</summary>
+        <div class="faq-body">The leading AI coding tool has changed roughly every eighteen months &mdash; Copilot dominant in 2022, Cursor through 2024, Claude Code reshaping things in 2025&ndash;26, with Windsurf and Codex behind. A team whose architectural memory lives inside one tool's native format pays a rewrite cost every time it migrates. A team whose memory lives in an agnostic layer can swap the tool underneath without touching the governance &mdash; same decisions, same enforcement, different agent. Tool independence is operational hygiene and structural insurance at the same time.</div>
       </details>
     </div>
 
