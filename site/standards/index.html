@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Standards Landscape — Mneme HQ</title>
+  <meta name="description" content="The emerging standards for AI agent governance — NIST CAISI, the Model Context Protocol, AGENTS.md — and how Mneme HQ aligns with them. Verified, organizational sources only." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/standards/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Standards Landscape — Mneme HQ" />
+  <meta property="og:description" content="The emerging standards for AI agent governance — NIST CAISI, the Model Context Protocol, AGENTS.md — and how Mneme HQ aligns with them." />
+  <meta property="og:url" content="https://mnemehq.com/standards/" />
+  <meta property="og:image" content="https://mnemehq.com/standards/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Standards Landscape — Mneme HQ" />
+  <meta name="twitter:description" content="The emerging standards for AI agent governance — NIST CAISI, the Model Context Protocol, AGENTS.md — and how Mneme HQ aligns with them." />
+  <meta name="twitter:image" content="https://mnemehq.com/standards/og.png" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Standards", "item": "https://mnemehq.com/standards/"}
+        ]
+      },
+      {
+        "@type": "WebPage",
+        "name": "Standards Landscape — Mneme HQ",
+        "description": "The emerging standards for AI agent governance and how Mneme HQ aligns with them.",
+        "url": "https://mnemehq.com/standards/",
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/"}
+      }
+    ]
+  }
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #88889a;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav.site-nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .breadcrumb-nav { max-width: 880px; margin: 0 auto; padding: 1.25rem 2rem 0; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.75rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .hero { max-width: 880px; margin: 0 auto; padding: 4rem 2rem 2rem; }
+    .section-eyebrow { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; font-family: 'DM Mono', monospace; }
+    .hero h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.25rem; }
+    .hero p.lede { font-size: 1.05rem; color: var(--muted); line-height: 1.75; max-width: 720px; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+
+    .wrap { max-width: 880px; margin: 0 auto; padding: 3rem 2rem 6rem; font-size: 0.92rem; line-height: 1.85; }
+    .wrap h2 { font-family: 'Inter', sans-serif; font-size: 1.3rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .wrap h3 { font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 600; margin: 2rem 0 0.6rem; color: var(--text); }
+    .wrap p { margin-bottom: 1.1rem; color: var(--muted); }
+    .wrap p strong { color: var(--text); font-weight: 500; }
+    .wrap ul { margin: 0 0 1.2rem 1.5rem; color: var(--muted); }
+    .wrap ul li { margin-bottom: 0.5rem; line-height: 1.8; }
+    .wrap ul li strong { color: var(--text); font-weight: 500; }
+    .wrap a.ext { color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(200,240,96,0.4); }
+    .wrap a.ext:hover { color: var(--accent-dim); border-bottom-color: rgba(200,240,96,0.7); }
+
+    .standards-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; margin: 2rem 0; }
+    .std-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; }
+    .std-card .std-meta { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.7rem; flex-wrap: wrap; }
+    .std-card .std-tag { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--border2); border-radius: 100px; padding: 3px 10px; }
+    .std-card .std-tag.live { color: var(--accent); border-color: rgba(200,240,96,0.4); }
+    .std-card .std-tag.forming { color: var(--teal); border-color: rgba(139,224,200,0.35); }
+    .std-card h3 { font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 600; margin: 0; color: var(--text); }
+    .std-card p { font-size: 0.86rem; color: var(--muted); margin: 0.4rem 0 0.8rem; line-height: 1.75; }
+    .std-card .std-links { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; font-size: 0.78rem; }
+    .std-card .std-links a { color: var(--accent); text-decoration: none; font-family: 'DM Mono', monospace; }
+    .std-card .std-links a:hover { color: var(--accent-dim); }
+
+    .align-table { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin: 2rem 0; overflow-x: auto; }
+    .align-table .at-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+    .align-table table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 540px; }
+    .align-table th, .align-table td { text-align: left; padding: 0.65rem 0.75rem; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; }
+    .align-table th { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+    .align-table td:first-child { color: var(--text); font-weight: 500; }
+    .align-table tr:last-child td { border-bottom: none; }
+
+    .principles { display: grid; grid-template-columns: 1fr; gap: 1rem; margin: 2rem 0; }
+    @media (min-width: 720px) { .principles { grid-template-columns: 1fr 1fr; } }
+    .principle { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.1rem 1.4rem; }
+    .principle .num { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--accent); letter-spacing: 0.06em; }
+    .principle h4 { font-size: 0.95rem; font-weight: 600; color: var(--text); margin: 0.3rem 0 0.4rem; }
+    .principle p { font-size: 0.82rem; color: var(--muted); margin: 0; line-height: 1.7; }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout p strong { color: var(--accent); }
+
+    .cta-block { margin-top: 3rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; }
+    .cta-block h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text); }
+    .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.6rem 1.4rem; border-radius: 8px; font-size: 0.82rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--accent-dim); }
+
+    footer.site-footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer.site-footer a { color: var(--muted); text-decoration: none; }
+    footer.site-footer a:hover { color: var(--text); }
+
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 36px; height: 36px; border-radius: 6px; cursor: pointer; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; }
+    @media (max-width: 640px) {
+      nav.site-nav { padding: 1rem 1.25rem; position: relative; }
+      .hero { padding: 3rem 1.25rem 1.5rem; }
+      .wrap { padding: 2rem 1.25rem 4rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0.5rem 1.25rem 1.25rem; z-index: 99; }
+      .nav-links.open { display: flex; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.88rem; padding: 0.7rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+    }
+  </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav class="site-nav">
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><svg width="18" height="14" viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 1h16M1 7h16M1 13h16"/></svg></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/standards/">Standards</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo.html">Demo</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li aria-current="page">Standards</li>
+  </ol>
+</nav>
+
+<section class="hero">
+  <div class="section-eyebrow">Standards landscape</div>
+  <h1>Where the standards for AI agent governance are forming</h1>
+  <p class="lede">Cross-tool agent governance is not yet a finalized standard. Three efforts &mdash; one government-led, two community-led &mdash; are the credible foundations for what eventually lands. This page tracks them honestly: what is published, what is still in progress, and how Mneme HQ's design aligns with the direction each is taking.</p>
+</section>
+
+<div class="wrap">
+
+  <h2>Why this page exists</h2>
+  <p>Engineering leaders evaluating governance tooling reasonably want to know whether what they adopt today will be compatible with whatever standard emerges. Marketing claims of "standards alignment" are cheap; verifiable references to organizational sources are not. This page links only to primary sources: NIST, the Linux Foundation, and the open specifications themselves.</p>
+  <p>It also draws a line between three things that often get conflated: standards that exist, standards that are forming, and what Mneme has actually contributed versus what we plan to. We do not claim NIST endorsement, foundation membership we have not joined, or contributions we have not filed. Where the answer is "tracking, not yet engaged," we say so.</p>
+
+  <h2>The three efforts worth tracking</h2>
+
+  <div class="standards-grid">
+
+    <div class="std-card">
+      <div class="std-meta">
+        <span class="std-tag forming">Government &middot; forming</span>
+        <span class="std-tag">U.S. NIST &middot; CAISI</span>
+      </div>
+      <h3>NIST AI Agent Standards Initiative</h3>
+      <p>Launched February 2026 by the Center for AI Standards and Innovation (CAISI) at NIST, with the stated aim of helping AI agents "interoperate smoothly across the digital ecosystem." Current scope is identity, authorization, and agent security; output-policy enforcement is adjacent and likely to follow. Concrete artifacts so far: a January 2026 RFI on securing AI agent systems (closed March 9, 2026), the NCCoE concept paper on AI agent identity and authorization (February 2026), and listening sessions on barriers to AI adoption in healthcare, finance, and education.</p>
+      <div class="std-links">
+        <a href="https://www.nist.gov/caisi/ai-agent-standards-initiative" target="_blank" rel="noopener">Initiative page &rarr;</a>
+        <a href="https://www.nist.gov/news-events/news/2026/02/announcing-ai-agent-standards-initiative-interoperable-and-secure" target="_blank" rel="noopener">Announcement (Feb 2026) &rarr;</a>
+        <a href="https://www.nist.gov/news-events/news/2026/01/caisi-issues-request-information-about-securing-ai-agent-systems" target="_blank" rel="noopener">RFI on agent security &rarr;</a>
+        <a href="https://www.nccoe.nist.gov/sites/default/files/2026-02/accelerating-the-adoption-of-software-and-ai-agent-identity-and-authorization-concept-paper.pdf" target="_blank" rel="noopener">NCCoE concept paper (PDF) &rarr;</a>
+        <a href="https://www.nist.gov/caisi" target="_blank" rel="noopener">CAISI overview &rarr;</a>
+      </div>
+    </div>
+
+    <div class="std-card">
+      <div class="std-meta">
+        <span class="std-tag live">Open protocol &middot; published</span>
+        <span class="std-tag">Spec 2025-11-25</span>
+      </div>
+      <h3>Model Context Protocol (MCP)</h3>
+      <p>An open, JSON-RPC-based protocol for exposing context, tools, and resources to AI clients. MCP does not specify a governance content format, but it is the substrate over which a structured decision store can be made queryable to any compliant agent. A decision corpus exposed as an MCP server is consumable by every MCP-aware client (Claude Code, Cursor's MCP support, custom SDK agents) without per-tool integration.</p>
+      <div class="std-links">
+        <a href="https://modelcontextprotocol.io/specification/" target="_blank" rel="noopener">Specification &rarr;</a>
+        <a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener">Project home &rarr;</a>
+      </div>
+    </div>
+
+    <div class="std-card">
+      <div class="std-meta">
+        <span class="std-tag live">Community spec &middot; published</span>
+        <span class="std-tag">Linux Foundation</span>
+      </div>
+      <h3>AGENTS.md</h3>
+      <p>A markdown convention for per-repo instructions that AI coding agents can read. Adopted across OpenAI Codex, Cursor, Aider, Factory's Droids, Google's Gemini CLI and Jules, Zed, and others; stewarded by the Agentic AI Foundation under the Linux Foundation. As a static-context format, AGENTS.md does not resolve precedence between conflicting decisions or enforce anything at the hook layer, but it is the most credible cross-vendor baseline that exists today for the static portion of the problem.</p>
+      <div class="std-links">
+        <a href="https://agents.md/" target="_blank" rel="noopener">Spec &amp; supported tools &rarr;</a>
+        <a href="https://developers.openai.com/codex/guides/agents-md" target="_blank" rel="noopener">OpenAI Codex docs &rarr;</a>
+      </div>
+    </div>
+
+  </div>
+
+  <h2>How Mneme HQ aligns with the direction</h2>
+  <p>Mneme HQ is a structured decision store and pre-generation enforcement layer for AI coding. Its design predates these standards efforts, but the architectural choices align with the direction each is taking. The table below maps the alignment honestly.</p>
+
+  <div class="align-table">
+    <div class="at-title">Mneme &times; emerging standards</div>
+    <table>
+      <thead>
+        <tr><th>Standard</th><th>What it specifies</th><th>How Mneme aligns</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>NIST CAISI</td>
+          <td>Agent identity, authorization, security, and (forthcoming) governance scope.</td>
+          <td>Decision store is auditable, scoped, and emits structured records suitable for downstream identity-bound enforcement. Tracking the initiative; planning to engage with future RFIs as scope expands toward output policy.</td>
+        </tr>
+        <tr>
+          <td>MCP</td>
+          <td>JSON-RPC protocol for exposing context, tools, and resources to AI clients.</td>
+          <td>Mneme's decision store is designed to be exposed as an MCP server so any MCP-aware agent can query it. Active integration work; see the GitHub roadmap.</td>
+        </tr>
+        <tr>
+          <td>AGENTS.md</td>
+          <td>Markdown convention for per-repo instructions, vendor-portable.</td>
+          <td>Mneme treats AGENTS.md as a first-class export target: scoped, precedence-resolved decisions can be rendered to AGENTS.md for tools that read it, while the structured store remains source of truth.</td>
+        </tr>
+        <tr>
+          <td>OAuth 2.0 / OIDC</td>
+          <td>Identity standards NIST is adapting to agent identities.</td>
+          <td>Out of scope for the governance store itself; deployment guidance follows whatever pattern the deploying organization already uses.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Design principles that pre-date the standards work</h2>
+  <p>Mneme HQ was built on assumptions that the emerging standards happen to validate. Naming them explicitly makes the alignment legible, and gives buyers a basis on which to evaluate any future governance tool against the same criteria.</p>
+
+  <div class="principles">
+    <div class="principle">
+      <div class="num">01</div>
+      <h4>Tool-agnostic representation</h4>
+      <p>Decisions are stored in a structured format that is not coupled to any one assistant's prompt convention. Markdown is an export, not the source of truth.</p>
+    </div>
+    <div class="principle">
+      <div class="num">02</div>
+      <h4>One canonical store, many readers</h4>
+      <p>Every agent &mdash; interactive, async, third-party, in-house &mdash; queries the same store. Updates are made once, not fanned out across per-tool rule files.</p>
+    </div>
+    <div class="principle">
+      <div class="num">03</div>
+      <h4>Pre-generation injection, scoped</h4>
+      <p>The relevant decisions for the current task are surfaced into whatever agent is running, in a format that agent can consume. Decisions are scoped, not dumped wholesale.</p>
+    </div>
+    <div class="principle">
+      <div class="num">04</div>
+      <h4>Post-generation enforcement at the seam</h4>
+      <p>Generated diffs, from any agent, are checked against the same governance store before they are accepted. Enforcement lives at the file write, the commit, or the PR &mdash; not inside the model.</p>
+    </div>
+  </div>
+
+  <h2>What Mneme has done, and what we plan to do</h2>
+  <p>To be clear and verifiable, here is the current state of participation. This will be updated as it changes.</p>
+
+  <h3>Done</h3>
+  <ul>
+    <li><strong>Open source under MIT license.</strong> The decision-store schema, the precedence engine, and the Claude Code hook integration are public on <a class="ext" href="https://github.com/TheoV823/mneme" target="_blank" rel="noopener">GitHub</a>. Anyone evaluating an emerging standard can read, fork, and reference the design.</li>
+    <li><strong>Structured project memory format.</strong> Mneme's <code>project_memory.json</code> schema is documented and stable; it is the artifact a future cross-tool format would either consume or be compared against.</li>
+    <li><strong>Public benchmark methodology.</strong> The Mneme governance benchmark is published with reproducible methodology, intended as a citable reference for evaluating governance-layer behavior.</li>
+  </ul>
+
+  <h3>Planned</h3>
+  <ul>
+    <li><strong>MCP server for the decision store.</strong> Expose Mneme's decision store via MCP so any MCP-aware client can query it without bespoke integration. Tracked on the <a class="ext" href="/roadmap/">public roadmap</a>.</li>
+    <li><strong>AGENTS.md export.</strong> First-class export of scoped, precedence-resolved decisions to AGENTS.md for tools that read it.</li>
+    <li><strong>Engagement with NIST RFIs.</strong> When CAISI opens RFIs whose scope touches output-policy or governance &mdash; rather than identity alone &mdash; Mneme will submit a technical contribution describing what we have learned operating a governance-memory layer in production.</li>
+  </ul>
+
+  <h3>Explicitly not claimed</h3>
+  <ul>
+    <li>Mneme HQ is not a NIST-endorsed product and has not been evaluated by CAISI.</li>
+    <li>Mneme HQ is not currently a member organization of the Agentic AI Foundation or the Linux Foundation.</li>
+    <li>No commitment of NIST, Linux Foundation, or any standards body is implied by the alignment described above.</li>
+  </ul>
+
+  <div class="callout">
+    <p><strong>Watch the second pillar.</strong> The most relevant NIST workstream for code-governance teams is the community-led open-protocol pillar &mdash; where MCP and similar protocols sit. The current published work centers on agent identity. If and when CAISI's scope expands toward behavioral and output policy, that is the moment to engage actively rather than passively track.</p>
+  </div>
+
+  <h2>How to verify any of this</h2>
+  <p>Every claim above links to a primary, organizational source: NIST, NCCoE, the MCP project, agents.md, OpenAI Codex documentation. Claims about Mneme link to the open-source repository or the public roadmap. If you find a claim on this page that you cannot trace to a primary source, that is a bug; please <a class="ext" href="/contact/">tell us</a> and we will fix it or remove it.</p>
+
+  <div class="cta-block">
+    <h3>Read the deep-dive</h3>
+    <p>The full argument for why heterogeneous AI agents require a shared governance layer &mdash; with historical context from OCI, OpenTelemetry, and LSP &mdash; is in the article below.</p>
+    <a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/" class="btn-primary">Read the article &rarr;</a>
+  </div>
+
+</div>
+</main>
+
+<footer class="site-footer">
+  <p>
+    <a href="/use-cases/">Use cases</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/insights/">Insights</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/standards/">Standards</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/compare/">Compare</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/integrations/">Integrations</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/founder/">Founder</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/about/">About</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/contact/">Contact</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/privacy/">Privacy</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a>
+    &nbsp;&middot;&nbsp;
+    Open source
+    &nbsp;&middot;&nbsp;
+    MIT License
+  </p>
+</footer>
+
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  btn.addEventListener('click', function(){
+    var open = links.classList.toggle('open');
+    btn.setAttribute('aria-expanded', String(open));
+  });
+})();
+</script>
+<script><!-- nav-active -->
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
+</body>
+</html>
