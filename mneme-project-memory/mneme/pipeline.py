@@ -57,6 +57,8 @@ class Pipeline:
         enforcement_mode: "warn" (default) returns conflicts on PipelineResult.
                           "strict" raises MnemeConflictError when any conflict
                           is detected. Future modes (e.g. "retry") are deferred.
+        min_score:        Floor (exclusive) for decision inclusion. Default 0.0
+                          preserves the legacy "skip score == 0" behavior.
     """
 
     def __init__(
@@ -65,11 +67,16 @@ class Pipeline:
         dry_run: bool = False,
         max_decisions: int = DEFAULT_MAX_DECISIONS,
         enforcement_mode: str = "warn",
+        min_score: float = 0.0,
     ) -> None:
         if enforcement_mode not in ("warn", "strict"):
             raise ValueError(
                 f"enforcement_mode must be 'warn' or 'strict', "
                 f"got {enforcement_mode!r}"
+            )
+        if min_score < 0.0:
+            raise ValueError(
+                f"min_score must be >= 0.0, got {min_score!r}"
             )
         self.store = MemoryStore(memory_path)
         self.store.load()
@@ -78,6 +85,9 @@ class Pipeline:
         self.detector = ConflictDetector()
         self.max_decisions = max_decisions
         self.enforcement_mode = enforcement_mode
+        # Decisions with score <= min_score are dropped from injection.
+        # Default 0.0 preserves the legacy "skip score == 0" behavior.
+        self.min_score = min_score
 
     def run(
         self,
@@ -95,12 +105,16 @@ class Pipeline:
             A PipelineResult with every stage's output recorded.
         """
         scored = self.retriever.retrieve(query)
-        system_prompt = format_decisions(scored, max_items=self.max_decisions)
+        system_prompt = format_decisions(
+            scored,
+            max_items=self.max_decisions,
+            min_score=self.min_score,
+        )
 
         injected: list[Decision] = []
         seen: set[str] = set()
         for s in scored:
-            if s.score <= 0:
+            if s.score <= self.min_score:
                 continue
             if s.decision.id in seen:
                 continue

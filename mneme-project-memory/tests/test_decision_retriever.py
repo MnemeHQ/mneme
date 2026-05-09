@@ -104,3 +104,41 @@ def test_legacy_migrated_item_does_not_outrank_native_via_stopword():
     migrated = next(r for r in ranked if r.decision.id == "migrated")
     # "add" is a stopword — migrated has no other token that overlaps the query
     assert migrated.score == 0
+
+
+def test_empty_query_returns_fallback_with_positive_score():
+    """All-stopword queries must surface decisions, not silently return nothing.
+
+    `_tokenize` filters out short tokens and stopwords. Queries like "add use"
+    produce an empty token set; without a fallback every decision scores 0
+    and the pipeline filter drops everything. Mirror retriever.py:184–190.
+    """
+    decisions = [
+        Decision(id="a", decision="Use JSON storage"),
+        Decision(id="b", decision="Avoid postgres"),
+    ]
+    ranked = _retriever(decisions).retrieve("add use")
+    # All decisions surfaced (in insertion order) with a positive score so they
+    # survive the `score <= 0` filter downstream.
+    assert [r.decision.id for r in ranked] == ["a", "b"]
+    assert all(r.score > 0 for r in ranked)
+
+
+def test_empty_query_fallback_is_deterministic():
+    """Repeated calls with an empty query produce identical output."""
+    decisions = [Decision(id=str(i), decision=f"d{i}") for i in range(5)]
+    r = _retriever(decisions)
+    assert r.retrieve("") == r.retrieve("")
+    assert r.retrieve("the and for") == r.retrieve("the and for")
+
+
+def test_non_empty_query_unaffected_by_fallback():
+    """Existing scoring behavior must not change for queries with real tokens."""
+    decisions = [
+        Decision(id="a", decision="Use JSON storage", scope=["storage"]),
+        Decision(id="b", decision="Keep storage simple", scope=["other"]),
+    ]
+    ranked = _retriever(decisions).retrieve("How should I handle storage?")
+    # Scope-match still wins; not all decisions surface as in the fallback.
+    assert ranked[0].decision.id == "a"
+    assert ranked[0].score > ranked[1].score

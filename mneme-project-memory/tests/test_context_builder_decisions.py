@@ -56,3 +56,35 @@ def test_deduplicates_by_id():
     scored = [_scored("a", score=5.0), _scored("a", score=4.0)]
     out = format_decisions(scored, max_items=3)
     assert out.count("Decision a") == 1
+
+
+def test_format_decisions_default_min_score_is_zero():
+    """Default behavior unchanged: only score == 0 is filtered."""
+    scored = [_scored("a", score=0.0), _scored("b", score=2.0)]
+    out = format_decisions(scored, max_items=3)
+    assert "Decision a" not in out
+    assert "Decision b" in out
+
+
+def test_format_decisions_threshold_drops_low_scores():
+    """A min_score above 0 must drop decisions with score <= threshold."""
+    scored = [_scored("a", score=1.0), _scored("b", score=5.0)]
+    out = format_decisions(scored, max_items=3, min_score=2.0)
+    assert "Decision a" not in out
+    assert "Decision b" in out
+
+
+def test_format_decisions_negative_threshold_raises():
+    """Reject nonsensical thresholds at the call site."""
+    import pytest
+    scored = [_scored("a", score=1.0)]
+    with pytest.raises(ValueError, match="min_score"):
+        format_decisions(scored, max_items=3, min_score=-0.5)
+
+
+def test_format_decisions_score_at_threshold_is_dropped():
+    """Floor is exclusive: a score equal to min_score is excluded."""
+    scored = [_scored("a", score=2.0), _scored("b", score=2.5)]
+    out = format_decisions(scored, max_items=3, min_score=2.0)
+    assert "Decision a" not in out
+    assert "Decision b" in out

@@ -36,6 +36,13 @@ _WEIGHTS: dict[str, float] = {
 # content, causing false-positive score contributions.
 _STOPWORDS: frozenset[str] = frozenset({"add", "use", "not", "get", "set", "run"})
 
+# When a query tokenizes to nothing (all stopwords / too-short tokens),
+# surface every decision in insertion order with this floor score so they
+# survive the downstream `score <= 0` filter. Mirrors the spirit of the
+# legacy Retriever fallback (retriever.py:184–190); Decision has no weight
+# field, so insertion order is the deterministic key.
+_FALLBACK_SCORE: float = 1.0
+
 
 def _tokenize(text: str) -> set[str]:
     """Lowercase tokens, length >= 4, excluding high-frequency stopwords."""
@@ -79,8 +86,23 @@ class DecisionRetriever:
         self.decisions = list(decisions)
 
     def retrieve(self, query: str) -> list[ScoredDecision]:
-        """Return all decisions, scored and sorted descending by score."""
+        """Return all decisions, scored and sorted descending by score.
+
+        When the query tokenizes to an empty set (all-stopword, punctuation-only,
+        or only-short-token queries), fall back to surfacing every decision in
+        insertion order with a positive floor score, so downstream callers
+        always see a deterministic top-K instead of silently retrieving nothing.
+        """
         query_tokens = _tokenize(query)
+        if not query_tokens:
+            return [
+                ScoredDecision(
+                    decision=d,
+                    score=_FALLBACK_SCORE,
+                    matches={name: 0 for name in _WEIGHTS},
+                )
+                for d in self.decisions
+            ]
         scored = [self._score(d, query_tokens) for d in self.decisions]
         scored.sort(key=lambda s: s.score, reverse=True)
         return scored
