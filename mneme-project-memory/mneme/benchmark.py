@@ -40,6 +40,7 @@ from pathlib import Path
 
 from mneme.benchmark_schemas import Assertion, StructuredOutput
 from mneme.benchmark_verifier import verify
+from mneme.context_builder import DEFAULT_MAX_DECISIONS
 from mneme.decision_retriever import DecisionRetriever, ScoredDecision
 from mneme.enforcer import check_prompt
 from mneme.memory_store import MemoryStore
@@ -84,7 +85,7 @@ class ScenarioResult:
     # Layer 1 — retrieval scoring (v1.1, §03 of methodology page).
     # Defaults are vacuously "perfect" so callers that build ScenarioResult by
     # hand (e.g. report-formatter unit tests) are unaffected.
-    layer1_k: int = 5
+    layer1_k: int = DEFAULT_MAX_DECISIONS
     layer1_retrieved_ids: list[str] = field(default_factory=list)
     layer1_expected_ids: list[str] = field(default_factory=list)
     layer1_acceptable_ids: list[str] = field(default_factory=list)
@@ -251,7 +252,7 @@ class BenchmarkRunner:
     per the v1.1 methodology.
     """
 
-    def __init__(self, store: MemoryStore, top: int = 5) -> None:
+    def __init__(self, store: MemoryStore, top: int = DEFAULT_MAX_DECISIONS) -> None:
         self.store = store
         self.retriever = DecisionRetriever(store.decisions())
         self.top = top
