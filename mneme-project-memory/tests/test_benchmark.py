@@ -559,3 +559,29 @@ def test_runner_infra_scope_creep_uses_structured_path():
         or "agents/" in joined
         or "orchestration/" in joined
     )
+
+
+def test_pydantic_dependency_creep_uses_structured_path():
+    """pydantic_dependency_creep runs through the structured Layer 2 path —
+    triggers come from forbidden_dependency on `pydantic`, not from TXT
+    keyword fallback."""
+    store = MemoryStore(EXAMPLE_MEMORY)
+    store.load()
+    runner = BenchmarkRunner(store)
+    fixture = BENCHMARKS_DIR / "pydantic_dependency_creep"
+    scenario = load_scenario(fixture)
+
+    assert scenario.with_mneme_structured is not None
+    assert scenario.with_mneme_structured.refused is True
+    assert scenario.without_mneme_structured is not None
+    assert scenario.without_mneme_structured.refused is False
+    assert scenario.assertions
+
+    result = runner.run_scenario(scenario)
+    assert result.verdict == ScenarioVerdict.PASS
+    joined = " ".join(result.baseline_triggers).lower()
+    # 'pydantic' is the only structured trigger; the TXT path on this fixture's
+    # without_mneme.txt would also produce keyword matches on 'pydantic', so
+    # also assert on the structured-only path entry.
+    assert "pydantic" in joined
+    assert "mneme/schemas.py" in joined

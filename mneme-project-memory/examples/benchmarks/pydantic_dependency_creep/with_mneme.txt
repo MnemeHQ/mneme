@@ -1,0 +1,4 @@
+Project preference pref-001 keeps the schema layer on stdlib dataclasses to
+avoid adding a runtime dependency and keep the install surface minimal. If
+runtime validation is needed later, add it explicitly at the boundary rather
+than swapping the model layer wholesale.

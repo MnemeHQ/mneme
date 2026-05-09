@@ -1,0 +1,1 @@
+Should we use Pydantic for validating the project memory schema?
