@@ -311,7 +311,7 @@
   </div>
 
   <!-- SECTION 3.5: How it works in practice -->
-  <div class="section">
+  <div class="section-wrap">
     <h2 class="section-title">How it works in practice</h2>
     <p style="color:var(--muted); line-height:1.85; margin-bottom:1.1rem;">Most principal engineers we talk to are not short on architectural taste. They are short on time to repeat themselves. The arc is consistent: a decision gets made, an ADR gets written, six weeks pass, three new engineers join, the AI session does not know any of this, and the same review comment appears on a new PR for the third time.</p>
     <p style="color:var(--muted); line-height:1.85; margin-bottom:1.1rem;">Mneme HQ inverts that loop. Architectural decisions live in <code style="font-family:'DM Mono',monospace;font-size:0.82em;">project_memory.json</code> as typed records (id, scope, status, rationale, supersedes). The retriever scores each prompt against the corpus and surfaces only the relevant constraints to the AI session. The hook intercepts every Edit, Write, and MultiEdit before the file lands &mdash; violations come back as feedback the model can act on, not as a blocked operation a human has to debug.</p>
@@ -320,7 +320,7 @@
   </div>
 
   <!-- SECTION 3.7: FAQ -->
-  <div class="section">
+  <div class="section-wrap">
     <h2 class="section-title">FAQ</h2>
     <div class="faq-list" style="margin-top:0.5rem;">
       <details class="faq-item" style="border-top:1px solid var(--border); padding:1.05rem 0;">
