@@ -7,7 +7,10 @@ import pytest
 from mneme.cli import main
 from mneme.decision_retriever import DecisionRetriever, ScoredDecision
 from mneme.enforcer import EnforcementResult, Severity, Violation, check_prompt
+from mneme.memory_store import MemoryStore
 from mneme.schemas import Decision
+
+EXAMPLE_MEMORY = Path(__file__).parent.parent / "examples" / "project_memory.json"
 
 
 # ── shared fixtures ───────────────────────────────────────────────────────────
@@ -222,6 +225,165 @@ def test_severity_enum_values():
     assert Severity.PASS == "PASS"
     assert Severity.WARN == "WARN"
     assert Severity.FAIL == "FAIL"
+
+
+# ── H1 regression: migrated anti-pattern enforcement behavior ─────────────────
+#
+# Stage 1 (PR #21, squash 096b8be) moved legacy `anti_pattern.content` into
+# `Decision.constraints` instead of `Decision.rationale`. Side effect (H1): when
+# the migrated content begins with "No ..." it now matches the enforcer's
+# `^no\s+(.+)$` constraint regex and produces WARN-severity violations on input
+# tokens drawn from the content body.
+#
+# This is real, intended system behavior — constraints constrain. These tests
+# pin it so a future enforcer regex change, stopword tweak, or migration
+# refactor can't silently revert it without a failing test.
+
+
+def test_migrated_anti_pattern_with_no_prefix_content_warns_via_constraint(
+    tmp_path,
+):
+    """A legacy anti_pattern whose content starts with "No ..." migrates into
+    `constraints` and triggers WARN-severity enforcement on terms drawn from
+    that content body — via the enforcer's `^no\\s+` constraint pathway.
+
+    Pre-Stage-1 (content -> rationale), this WARN was impossible: the enforcer
+    only inspects constraints + anti_patterns, never rationale.
+    """
+    memory_file = tmp_path / "memory.json"
+    memory_file.write_text(json.dumps({
+        "meta": {"name": "h1-test", "description": "h1 fixture"},
+        "items": [
+            {
+                "id": "anti-h1",
+                "type": "anti_pattern",
+                "title": "Do not add background workers",
+                "content": "No background workers, message queues, or daemon processes.",
+                "tags": ["forbidden"],
+                "priority": "high",
+            },
+        ],
+        "examples": [],
+    }))
+    store = MemoryStore(memory_file); store.load()
+    decision = next(d for d in store.decisions() if d.id == "anti-h1")
+
+    # Sanity: the migration shape Stage 1 fixed.
+    assert decision.constraints == [
+        "No background workers, message queues, or daemon processes."
+    ]
+    assert decision.rationale == ""
+
+    # Input uses tokens unique to the constraint body — none appear in the
+    # title-derived anti_patterns entry "Do not add background workers"
+    # (which tokenizes to {background, workers}). This isolates the WARN
+    # constraint pathway from the FAIL anti_patterns pathway so the verdict
+    # is purely WARN.
+    scored = [_scored(decision)]
+    result = check_prompt(
+        "Add message queues and daemon processes for async work.",
+        scored,
+    )
+    assert result.verdict == Severity.WARN
+    warn = next(v for v in result.violations if v.severity == Severity.WARN)
+    assert warn.decision_id == "anti-h1"
+    assert warn.rule.startswith("No background workers"), (
+        f"WARN must cite the migrated constraint; got rule={warn.rule!r}"
+    )
+    assert warn.trigger in {"message", "queues", "daemon", "processes"}
+
+
+def test_migrated_anti_pattern_without_no_prefix_does_not_warn_via_constraint(
+    tmp_path,
+):
+    """Inverse boundary: when migrated content does NOT begin with "No ...",
+    the enforcer's `^no\\s+` constraint pathway is correctly inert. The
+    title-as-anti_pattern FAIL pathway is unaffected — this test isolates the
+    constraint side specifically."""
+    memory_file = tmp_path / "memory.json"
+    memory_file.write_text(json.dumps({
+        "meta": {"name": "h1-inverse-test", "description": "h1 inverse fixture"},
+        "items": [
+            {
+                "id": "anti-h1-inv",
+                "type": "anti_pattern",
+                "title": "Some forbidden thing",
+                # Content deliberately does NOT begin with "No ".
+                "content": "Background workers and message queues add operational weight.",
+                "tags": ["forbidden"],
+                "priority": "high",
+            },
+        ],
+        "examples": [],
+    }))
+    store = MemoryStore(memory_file); store.load()
+    decision = next(d for d in store.decisions() if d.id == "anti-h1-inv")
+    assert decision.constraints == [
+        "Background workers and message queues add operational weight."
+    ]
+
+    scored = [_scored(decision)]
+    result = check_prompt(
+        "We could add a background worker queue to handle this.",
+        scored,
+    )
+    # No constraint-driven WARN: the only constraint doesn't begin with "No ".
+    constraint_warns = [
+        v for v in result.violations
+        if v.severity == Severity.WARN and v.decision_id == "anti-h1-inv"
+    ]
+    assert constraint_warns == [], (
+        f"Constraint without `^no\\s+` prefix must not produce WARN; "
+        f"got {[v.rule for v in constraint_warns]}"
+    )
+
+
+def test_shipped_anti_002_warns_via_migrated_constraint_on_anchor_term():
+    """Pin H1 on the live shipped fixture: anti-002 ("Do not add agentic loops
+    in v1") migrates into a constraint beginning with "No tool-use, function
+    calling, or multi-turn agent loops…", which produces WARN enforcement on
+    inputs containing anchor terms like "function calling" or "tool-use".
+
+    This is the real, observable system behavior introduced by Stage 1
+    (PR #21, squash 096b8be) and visible only via direct `check_prompt`
+    (the shipped benchmark suite uses the structured Layer 2 path)."""
+    store = MemoryStore(EXAMPLE_MEMORY); store.load()
+    retriever = DecisionRetriever(store.decisions())
+    scored = retriever.retrieve(
+        "Should we add multi-agent support to Mneme so it can coordinate between agents?"
+    )
+    # anti-002 must be in the top-3 retrieval (Stage 1 locks rank 1 here via
+    # tests/test_benchmark.py::test_feature_boundary_violation_retrieves_anti_002_at_rank_1).
+    top3_ids = [s.decision.id for s in scored if s.score > 0][:3]
+    assert "anti-002" in top3_ids, (
+        f"Test premise broken: anti-002 not in top-3; got {top3_ids}"
+    )
+
+    # Anchor term "function calling" maps to constraint terms "function" and
+    # "calling" via the enforcer's `_rule_terms` tokenizer.
+    result = check_prompt(
+        "Use function calling and a tool-use loop to coordinate workers.",
+        scored,
+        top=3,
+    )
+    anti_002_warns = [
+        v for v in result.violations
+        if v.severity == Severity.WARN and v.decision_id == "anti-002"
+    ]
+    assert anti_002_warns, (
+        f"Expected WARN from anti-002's migrated constraint; got violations="
+        f"{[(v.severity, v.decision_id, v.trigger) for v in result.violations]}"
+    )
+    rule = anti_002_warns[0].rule
+    assert rule.lower().startswith("no tool-use"), (
+        f"WARN must cite the migrated constraint beginning 'No tool-use…'; "
+        f"got rule={rule!r}"
+    )
+    assert anti_002_warns[0].trigger in {
+        "tool", "function", "calling", "multi", "turn", "agent", "loops",
+        "module", "mneme", "single", "call", "response", "pipeline",
+        "agentic", "behaviour", "separate", "concern", "product", "layer",
+    }
 
 
 # ── CLI integration tests ─────────────────────────────────────────────────────
