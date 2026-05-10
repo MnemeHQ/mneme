@@ -163,6 +163,13 @@
     .byline a { color: var(--muted); text-decoration: none; }
     .byline a:hover { color: var(--text); }
     .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    /* Mid-document CTA */
+    .mid-cta-wrap { max-width: 900px; margin: 0 auto; padding: 1rem 2rem; }
+    .mid-cta { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; }
+    .mid-cta-text { font-size: 0.9rem; color: var(--muted); line-height: 1.6; flex: 1; min-width: 260px; }
+    .mid-cta-text strong { color: var(--text); font-weight: 500; }
+    @media (max-width: 640px) { .mid-cta-wrap { padding: 1rem 1.25rem; } .mid-cta { padding: 1.5rem; } }
   </style>
   <script type="application/ld+json">
   {
@@ -224,7 +231,7 @@
       <time datetime="2026-05-10">Updated May 2026</time>
     </p>
     <div class="cta-group">
-      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub</a>
+      <a href="/contact/" class="btn-primary">Talk to the founder</a>
       <a href="/use-cases/" class="btn-ghost">See use cases</a>
     </div>
   </div>
@@ -299,48 +306,50 @@
     </div>
   </div>
 
-  <!-- SECTION 3: HOW MNEME HQ WORKS -->
+  <!-- SECTION 3: HOW MNEME HQ WORKS (SLT-level) -->
   <div class="section-wrap">
-    <div class="section-eyebrow">How Mneme HQ Works</div>
-    <h2 class="section-title">Before the model writes a single line, it knows your architectural standards.</h2>
-    <p class="prose">The enforcement pipeline runs before generation. By the time the assistant receives the prompt, the relevant constraints are already in context and violations are already surfaced.</p>
+    <div class="section-eyebrow">How It Works</div>
+    <h2 class="section-title">Architectural decisions become rules. Rules become a gate.</h2>
+    <p class="prose">Your team's architectural decisions — service boundaries, data handling, vendor choices, naming and review standards — live as structured records in the same repository as the code. Every AI coding session, in any tool your engineers use, reads from that single source before it generates anything.</p>
+    <p class="prose">When a generation would violate a decision, the violation is surfaced before the change lands &mdash; not after a senior engineer has spent twenty minutes catching it in a PR. When a decision changes, you update it once, and every AI agent across the org picks it up on the next session. No per-tool configuration sprawl. No drift between teams using different assistants.</p>
+    <p class="prose">Mneme HQ is the layer between your architectural standards and the AI-generated code that has to honor them. It is the only place a decision needs to live.</p>
+  </div>
 
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-body">
-          <h4>Decision stored</h4>
-          <p>Architectural decisions, constraints, and anti-patterns are captured in structured YAML inside <code>decisions/</code> — with a rule, rationale, scope, and enforcement level.</p>
-        </div>
+  <!-- SECTION 3.5: BUSINESS OUTCOMES -->
+  <div class="section-wrap">
+    <div class="section-eyebrow">Business Outcomes</div>
+    <h2 class="section-title">Where the budget actually moves.</h2>
+    <p class="prose">Adding AI coding tools without governance shifts cost from typing to reviewing &mdash; and from this quarter to the next two. Mneme HQ is what stops that line item from growing.</p>
+
+    <div class="pain-grid">
+      <div class="pain-card">
+        <div class="pain-card-num">ROI 01</div>
+        <h4>Senior engineering hours back on the calendar</h4>
+        <p>Drift caught pre-generation is drift the principal engineer never has to explain in PR review for the third time. Hours that compounded out of the team return to it &mdash; without adding headcount.</p>
       </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-body">
-          <h4>Scope matched</h4>
-          <p>When a prompt is issued, Mneme HQ retrieves only the decisions relevant to the current query and codebase scope — not the full history.</p>
-        </div>
+      <div class="pain-card">
+        <div class="pain-card-num">ROI 02</div>
+        <h4>Throughput without architectural debt</h4>
+        <p>The point of AI tooling is more output per engineer. The unspoken cost is the technical debt that comes with it. Governance keeps the throughput and removes the rework cycle.</p>
       </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-body">
-          <h4>Hook fires</h4>
-          <p><code>mneme check --mode strict</code> runs pre-flight. Violations are flagged before any code is generated. In CI, failing checks block the build.</p>
-        </div>
+      <div class="pain-card">
+        <div class="pain-card-num">ROI 03</div>
+        <h4>One governance layer instead of N rules files</h4>
+        <p>Cursor rules, Copilot instructions, Claude memory, internal SDK agents &mdash; every tool your team adopts compounds the maintenance burden. Mneme replaces the sprawl with a single artifact.</p>
       </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <div class="step-body">
-          <h4>Constraint injected</h4>
-          <p>Matched decisions are injected into the assistant's context via generated rules files (<code>.cursor/rules/mneme.mdc</code>, <code>CLAUDE.md</code>, or similar).</p>
-        </div>
+      <div class="pain-card">
+        <div class="pain-card-num">ROI 04</div>
+        <h4>Audit-ready by construction</h4>
+        <p>Every architectural decision and every override is a structured, version-controlled record. Compliance, security, and architecture review read from the same artifact engineering already maintains.</p>
       </div>
-      <div class="step">
-        <div class="step-num">5</div>
-        <div class="step-body">
-          <h4>Code generated against actual standards</h4>
-          <p>The model now has the architectural constraints it needs. Output is consistent with your decisions — not with whatever the model inferred from the codebase alone.</p>
-        </div>
-      </div>
+    </div>
+  </div>
+
+  <!-- MID-DOC ROADMAP CTA -->
+  <div class="mid-cta-wrap">
+    <div class="mid-cta">
+      <p class="mid-cta-text"><strong>Where this is going.</strong> The public roadmap covers enforcement modes, the standards landscape (NIST CAISI, MCP, AGENTS.md), and the integrations queued for the next quarters &mdash; the same view your platform team will plan against.</p>
+      <a href="/roadmap/" class="btn-ghost">See the roadmap &rarr;</a>
     </div>
   </div>
 
@@ -362,8 +371,8 @@
   <div class="cta-footer">
     <h2>Enforce your architecture before the code is written.</h2>
     <div class="cta-group">
-      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub</a>
-      <a href="/use-cases/" class="btn-ghost">See use cases</a>
+      <a href="/contact/" class="btn-primary">Talk to the founder</a>
+      <a href="/roadmap/" class="btn-ghost">See the roadmap</a>
     </div>
   </div>
 </main>
