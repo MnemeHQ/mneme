@@ -111,12 +111,17 @@ class MemoryStore:
                     )
                 )
             elif item.type == "anti_pattern":
+                # Step 3C Stage 1: mirror the rule migration (content ->
+                # constraints). Previously anti_pattern.content landed in
+                # rationale, leaving migrated anti-patterns invisible to the
+                # constraints-weighted retrieval signal (1.5x vs 0.5x).
                 migrated.append(
                     Decision(
                         id=item.id,
                         decision=f"Avoid: {item.title}",
-                        rationale=item.content,
+                        rationale="",
                         scope=["general"],
+                        constraints=[item.content] if item.content else [],
                         anti_patterns=[item.title],
                     )
                 )

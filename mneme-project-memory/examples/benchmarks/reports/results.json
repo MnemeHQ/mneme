@@ -55,9 +55,9 @@
       "layer1": {
         "k": 3,
         "retrieved_ids": [
+          "anti-002",
           "mneme_no_agents_v1",
-          "anti-003",
-          "anti-002"
+          "anti-003"
         ],
         "expected_ids": [
           "anti-002"
@@ -100,8 +100,8 @@
         "k": 3,
         "retrieved_ids": [
           "anti-001",
-          "mneme_storage_json",
-          "anti-002"
+          "anti-002",
+          "mneme_storage_json"
         ],
         "expected_ids": [
           "anti-001"

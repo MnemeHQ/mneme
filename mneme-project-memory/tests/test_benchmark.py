@@ -996,6 +996,27 @@ def test_load_scenario_no_warning_when_both_json_present(tmp_path):
     )
 
 
+def test_feature_boundary_violation_retrieves_anti_002_at_rank_1():
+    """Step 3C Stage 1 regression: with anti_pattern.content migrated into
+    `constraints` (1.5x weight) instead of `rationale` (0.5x weight), the
+    feature_boundary_violation scenario must retrieve anti-002 ("Do not
+    add agentic loops in v1") at rank 1 — its content includes "tool-use,
+    function calling, multi-turn agent loops" which directly answers the
+    "Should we add multi-agent support" query.
+
+    Before the fix anti-002 ranked behind mneme_no_agents_v1 because its
+    content lived only in rationale. Locking rank 1 here prevents silent
+    re-introduction of the migration asymmetry."""
+    store = MemoryStore(EXAMPLE_MEMORY); store.load()
+    runner = BenchmarkRunner(store)
+    fixture = BENCHMARKS_DIR / "feature_boundary_violation"
+    result = runner.run_scenario(load_scenario(fixture))
+    assert result.layer1_retrieved_ids[0] == "anti-002", (
+        f"Expected anti-002 at rank 1 after Stage 1 migration symmetry fix; "
+        f"got retrieved_ids={result.layer1_retrieved_ids}"
+    )
+
+
 def test_run_suite_on_shipped_fixtures_emits_no_warnings():
     """Regression guard: every shipped fixture now has both JSON siblings,
     so a clean suite run must emit no UserWarning. If this fires, someone
