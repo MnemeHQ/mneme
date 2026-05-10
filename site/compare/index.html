@@ -195,13 +195,26 @@
         <span class="card-tag">6 min read</span>
       </div>
       <h3>RAG vs Governance</h3>
-      <p>Retrieval-augmented generation can surface relevant context. It cannot enforce it. Governance enforces architectural constraints before generation — deterministically, without retrieval drift.</p>
+      <p>Retrieval-augmented generation can surface relevant context. It cannot enforce it. Governance enforces architectural constraints before generation &mdash; deterministically, without retrieval drift.</p>
       <div class="card-footer">
         <span class="soon-label">Coming soon</span>
       </div>
     </div>
 
   </div>
+
+  <h2 style="font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text); letter-spacing: -0.01em; margin: 4rem auto 1rem; max-width: 660px;">How to read these comparisons</h2>
+
+  <p style="font-size: 0.88rem; color: var(--muted); line-height: 1.85; max-width: 660px; margin: 0 auto 1.1rem;">Each comparison page follows the same template. We describe what the alternative tool does (in the alternative tool's own words, not ours), name the dimensions where the two approaches differ, and give an explicit decision matrix for when each tool is the right fit. The goal is to be useful to a buyer who has not yet decided &mdash; not to win every comparison.</p>
+
+  <p style="font-size: 0.88rem; color: var(--muted); line-height: 1.85; max-width: 660px; margin: 0 auto 1.1rem;">Most comparisons resolve to "use both": Mneme operates pre-generation; the alternative usually operates either as a different surface (Cursor Rules in the editor) or at a different stage (CodeRabbit at PR review). The pages name where the categories overlap, where they don't, and the typical operational pattern teams settle on. The migration / dual-stack instructions are shipped as <code style="font-family:'DM Mono',monospace;font-size:0.82em;">HowTo</code> structured data so search engines and LLMs can surface the steps directly.</p>
+
+  <h2 style="font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text); letter-spacing: -0.01em; margin: 3rem auto 1rem; max-width: 660px;">Related reading</h2>
+
+  <p style="font-size: 0.88rem; color: var(--muted); line-height: 1.85; max-width: 660px; margin: 0 auto 1.1rem;">For the broader argument that no single AI coding tool can carry architectural governance on its own, see <a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/" style="color: var(--accent); text-decoration: none;">architectural governance across heterogeneous AI coding agents</a>. For the operational case that review tooling cannot absorb the AI generation rate, see <a href="/insights/why-code-review-cannot-scale-with-ai-output/" style="color: var(--accent); text-decoration: none;">why code review cannot scale with AI output</a>. For the standards landscape that any of these tools will eventually have to align with, see <a href="/standards/" style="color: var(--accent); text-decoration: none;">the standards page</a>.</p>
+
+  <p style="font-size: 0.88rem; color: var(--muted); line-height: 1.85; max-width: 660px; margin: 0 auto 1.1rem;">A note on which comparison to read first: if your team is currently using Cursor or evaluating Cursor Rules, start with the <a href="/compare/cursor-rules/" style="color: var(--accent); text-decoration: none;">Cursor Rules comparison</a> &mdash; it includes the migration path from a per-repo rules file to a structured decision corpus, with the <code style="font-family:'DM Mono',monospace;font-size:0.82em;">HowTo</code> steps shipped as schema.org structured data. If your team uses CodeRabbit or similar AI PR review, start with the <a href="/compare/coderabbit/" style="color: var(--accent); text-decoration: none;">CodeRabbit comparison</a> &mdash; it covers the dual-stack pattern most teams settle on, where pre-generation enforcement (Mneme) and post-generation review (CodeRabbit) operate as complementary layers rather than alternatives.</p>
+
 </div>
 </main>
 

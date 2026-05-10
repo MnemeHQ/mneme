@@ -25,6 +25,7 @@ project_memory.json into MemoryStore into Retriever into ContextBuilder into LLM
 
 Structured comparisons between Mneme HQ and alternative approaches — for engineering teams actively evaluating governance tools.
 
+- [Compare hub](https://mnemehq.com/compare/): Index of all comparison pages with the decision template each one follows.
 - [Mneme HQ vs CodeRabbit](https://mnemehq.com/compare/coderabbit/): CodeRabbit reviews code after it's written. Mneme HQ enforces architectural constraints before generation.
 - [Mneme HQ vs Cursor Rules](https://mnemehq.com/compare/cursor-rules/): Cursor Rules are plain-text suggestions. Mneme HQ is structured enforcement with a precedence engine and hook-level blocking.
 
@@ -32,6 +33,7 @@ Structured comparisons between Mneme HQ and alternative approaches — for engin
 
 How Mneme HQ fits into the tools engineering teams already use.
 
+- [Integrations hub](https://mnemehq.com/integrations/): Index of all integrations with the layered governance pattern (editor + CI + custom agents).
 - [Claude Code integration](https://mnemehq.com/integrations/claude-code/): Hook-level enforcement for every Edit, Write, and MultiEdit Claude Code attempts.
 - [Cursor integration](https://mnemehq.com/integrations/cursor/): Mneme HQ as the authoritative corpus behind Cursor Rules sessions.
 - [GitHub Actions integration](https://mnemehq.com/integrations/github-actions/): CI enforcement gate — block PRs that violate architectural decisions before they merge.
@@ -40,7 +42,15 @@ How Mneme HQ fits into the tools engineering teams already use.
 
 - [Homepage](https://mnemehq.com/): Product overview and category positioning.
 - [Governance Benchmark v1.1 Methodology](https://mnemehq.com/benchmark/): Deterministic, reproducible benchmark methodology with structured-output verification, layered metrics, and pre-registered thresholds.
-- [Use cases](https://mnemehq.com/use-cases/): Coding assistant governance, legacy codebase memory, security and compliance guardrails, data platform governance, design system governance.
+- [Use cases](https://mnemehq.com/use-cases/): Index of governance use cases for AI coding agents.
+- [Coding assistant governance](https://mnemehq.com/use-cases/coding-assistant-governance/): Mneme as the governance layer above Claude Code, Cursor, Copilot — enforcing architectural decisions before code is generated.
+- [Legacy codebase memory](https://mnemehq.com/use-cases/legacy-codebase-memory/): Compile a legacy codebase's architectural decisions into a structured corpus AI agents can query.
+- [Security and compliance guardrails](https://mnemehq.com/use-cases/security-compliance-guardrails/): Encode security patterns and compliance constraints as structured decisions enforced at every AI-generated diff.
+- [Data platform governance](https://mnemehq.com/use-cases/data-platform-governance/): Architectural enforcement for data pipelines, ETL, and analytics services.
+- [Design system governance](https://mnemehq.com/use-cases/design-system-governance/): Token usage, component boundaries, and accessibility rules enforced at the AI-generation layer.
+- [Multi-agent workflow governance](https://mnemehq.com/use-cases/multi-agent-workflow-governance/): A shared decision corpus every agent in the pipeline can query — planner, coder, reviewer.
+- [Founder](https://mnemehq.com/founder/): Theo Valmis on why Mneme HQ exists, the principles behind it, and how to engage with the project.
+- [About](https://mnemehq.com/about/): Mneme HQ at a glance — open source, MIT-licensed, framework-agnostic.
 - [Insights](https://mnemehq.com/insights/): Technical deep dives and comparison content on AI coding governance.
 - [Roadmap](https://mnemehq.com/roadmap/): Phase 1 OSS developer wedge through Phase 4 governance infrastructure.
 - [Demo](https://mnemehq.com/demo/): Interactive demonstration of pre-generation governance. The same prompt — "Refactor the storage backend for scalability" — sent to the same model produces architecturally compliant output when Mneme injects the project's decision records (ADR-001 JSON storage only, ADR-003 no ORM in v1, ADR-005 extend before rebuild) and unconstrained "migrate to Postgres / Redis / ORM" output when it does not. Includes a sample `mneme check --mode strict` verdict showing PASS / PASS / WARN / FAIL across storage, JWT auth, an unapproved dependency (prisma), and a Repository-pattern violation (ADR-004).

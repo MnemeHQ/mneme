@@ -251,6 +251,10 @@
 
   <p style="font-size: 0.88rem; color: var(--muted); line-height: 1.85; max-width: 660px; margin: 0 auto 1.1rem;">For the architectural argument behind this design, see <a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/" style="color: var(--accent); text-decoration: none;">architectural governance across heterogeneous AI coding agents</a>. For how Mneme aligns with the emerging cross-tool standards (NIST CAISI, MCP, AGENTS.md), see <a href="/standards/" style="color: var(--accent); text-decoration: none;">the standards landscape</a>.</p>
 
+  <p style="font-size: 0.88rem; color: var(--muted); line-height: 1.85; max-width: 660px; margin: 0 auto 1.1rem;">Practical setup follows the same pattern across every integration: install with <code style="font-family:'DM Mono',monospace;font-size:0.82em;">pip install mneme</code>, scaffold the decision corpus with <code style="font-family:'DM Mono',monospace;font-size:0.82em;">mneme init</code>, and wire the integration's adapter (PreToolUse hook for Claude Code, rules export for Cursor, GitHub Action for CI). Each integration page links its own concrete steps; the corpus itself is the same file.</p>
+
+  <p style="font-size: 0.88rem; color: var(--muted); line-height: 1.85; max-width: 660px; margin: 0 auto 1.1rem;">If your team is evaluating which integration to start with, the typical sequence is: Claude Code first (interactive enforcement gives the fastest feedback loop), then GitHub Actions in warn mode (catches what slips through), then strict mode in CI on the most architecturally-stable repos. Cursor sits alongside Claude Code for engineers who prefer that editor &mdash; the underlying corpus is identical.</p>
+
 </div>
 </main>
 
