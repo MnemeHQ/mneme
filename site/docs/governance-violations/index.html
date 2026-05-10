@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What Mneme Prevents &mdash; Governance Violation Examples &mdash; Mneme HQ</title>
+  <meta name="description" content="Twelve concrete examples of the architectural governance violations Mneme HQ enforces against, organized into five categories: architecture, security, workflow, dependency, and platform governance." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/docs/governance-violations/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="What Mneme Prevents &mdash; Governance Violation Examples" />
+  <meta property="og:description" content="Concrete examples of architectural governance violations Mneme HQ catches before generation. Architecture, security, workflow, dependency, and platform categories." />
+  <meta property="og:url" content="https://mnemehq.com/docs/governance-violations/" />
+  <meta property="og:image" content="https://mnemehq.com/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="What Mneme Prevents &mdash; Governance Violation Examples" />
+  <meta name="twitter:description" content="Concrete examples of architectural governance violations Mneme HQ catches before generation." />
+  <meta name="twitter:image" content="https://mnemehq.com/og.png" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Docs", "item": "https://mnemehq.com/docs/"},
+          {"@type": "ListItem", "position": 3, "name": "Governance Violations", "item": "https://mnemehq.com/docs/governance-violations/"}
+        ]
+      },
+      {
+        "@type": "TechArticle",
+        "headline": "What Mneme Prevents &mdash; Governance Violation Examples",
+        "description": "Concrete examples of architectural governance violations Mneme HQ catches before generation.",
+        "url": "https://mnemehq.com/docs/governance-violations/",
+        "datePublished": "2026-05-10",
+        "dateModified": "2026-05-10",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}}
+      }
+    ]
+  }
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #88889a;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+      --warn: #ff9d6e;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav.site-nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .breadcrumb-nav { max-width: 880px; margin: 0 auto; padding: 1.25rem 2rem 0; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.75rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .hero { max-width: 880px; margin: 0 auto; padding: 4rem 2rem 2rem; }
+    .section-eyebrow { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; font-family: 'DM Mono', monospace; }
+    .hero h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.25rem; }
+    .hero p.lede { font-size: 1.05rem; color: var(--muted); line-height: 1.75; max-width: 720px; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+
+    .frame-note { max-width: 880px; margin: 2rem auto 0; padding: 0 2rem; }
+    .frame-note .fn-inner { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.1rem 1.4rem; font-size: 0.88rem; color: var(--muted); line-height: 1.75; }
+    .frame-note .fn-inner strong { color: var(--accent); }
+
+    .wrap { max-width: 880px; margin: 0 auto; padding: 3rem 2rem 4rem; font-size: 0.92rem; line-height: 1.85; }
+
+    .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin-bottom: 3rem; }
+    .toc-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.9rem; }
+    .toc ol { list-style: none; counter-reset: toc; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 0.4rem; }
+    .toc ol li { counter-increment: toc; font-size: 0.86rem; padding-left: 2.2rem; position: relative; line-height: 1.5; }
+    .toc ol li::before { content: counter(toc, decimal-leading-zero); position: absolute; left: 0; top: 0.05rem; font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--border2); letter-spacing: 0.05em; }
+    .toc ol li.cat { padding-left: 0; font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-top: 0.65rem; }
+    .toc ol li.cat:first-child { margin-top: 0; }
+    .toc ol li.cat::before { content: ''; }
+    .toc a { color: var(--muted); text-decoration: none; transition: color 0.15s; }
+    .toc a:hover { color: var(--accent); }
+    @media (min-width: 720px) { .toc ol { grid-template-columns: 1fr 1fr; gap: 0.5rem 1.5rem; } }
+
+    .category { margin-top: 3.5rem; }
+    .category:first-of-type { margin-top: 0; }
+    .category .cat-header { display: flex; align-items: baseline; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+    .category .cat-tag { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+    .category h2 { font-family: 'Inter', sans-serif; font-size: 1.4rem; font-weight: 600; letter-spacing: -0.015em; color: var(--text); }
+    .category .cat-sub { font-size: 0.92rem; color: var(--muted); margin: 0.25rem 0 1.5rem; max-width: 720px; line-height: 1.75; }
+
+    .violation { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.6rem 1.75rem; margin-bottom: 1.25rem; }
+    .violation .vh { display: flex; align-items: baseline; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.4rem; }
+    .violation .vnum { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.06em; }
+    .violation h3 { font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text); letter-spacing: -0.005em; }
+    .violation .rule { font-family: 'DM Mono', monospace; font-size: 0.82rem; color: var(--muted); margin: 0.5rem 0 0.9rem; line-height: 1.65; }
+    .violation .rule strong { color: var(--accent); }
+    .violation pre { background: var(--surface2); border: 1px solid var(--border); border-left: 3px solid var(--warn); border-radius: 0 6px 6px 0; padding: 0.85rem 1rem; font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--text); overflow-x: auto; line-height: 1.6; margin: 0.5rem 0 0.9rem; }
+    .violation pre .comment { color: var(--muted); }
+    .violation .flags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+    .violation .flag { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--accent); background: rgba(200,240,96,0.08); border: 1px solid rgba(200,240,96,0.25); border-radius: 100px; padding: 3px 10px; letter-spacing: 0.03em; }
+
+    .closer { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.4rem 1.6rem; margin: 3rem 0 0; }
+    .closer p { font-size: 0.9rem; color: var(--muted); margin: 0 0 0.75rem; line-height: 1.75; }
+    .closer p:last-child { margin-bottom: 0; }
+    .closer p strong { color: var(--accent); }
+
+    .cross-links { margin-top: 3rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+    .cross-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.4rem; text-decoration: none; color: var(--text); display: flex; flex-direction: column; gap: 0.4rem; transition: border-color 0.15s; }
+    .cross-card:hover { border-color: rgba(200,240,96,0.4); }
+    .cross-card .cl-label { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+    .cross-card .cl-title { font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; }
+    .cross-card .cl-sub { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 36px; height: 36px; border-radius: 6px; cursor: pointer; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; }
+    @media (max-width: 640px) {
+      nav.site-nav { padding: 1rem 1.25rem; position: relative; }
+      .hero { padding: 3rem 1.25rem 1.5rem; }
+      .wrap { padding: 2rem 1.25rem 3rem; }
+      .frame-note { padding: 0 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0.5rem 1.25rem 1.25rem; z-index: 99; }
+      .nav-links.open { display: flex; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.88rem; padding: 0.7rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+    }
+  </style>
+</head>
+<body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<nav class="site-nav">
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><svg width="18" height="14" viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 1h16M1 7h16M1 13h16"/></svg></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/standards/">Standards</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/#benchmarks">Benchmarks</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/docs/">Docs</a></li>
+    <li aria-current="page">Governance violations</li>
+  </ol>
+</nav>
+
+<section class="hero">
+  <div class="section-eyebrow">What Mneme prevents</div>
+  <h1>Governance violations Mneme catches before generation</h1>
+  <p class="lede">Concrete examples of the architectural decisions Mneme enforces against. These are not generic lint rules &mdash; they are organizational decisions encoded as structured constraints, injected into the agent's context, and checked at the file-write seam before the code exists.</p>
+</section>
+
+<div class="frame-note">
+  <div class="fn-inner">
+    <strong>The frame.</strong> Mneme injects your organization's architectural decisions into AI-assisted generation workflows. Each example below is a decision the team has already made &mdash; an ADR, a layering rule, a security policy, an ownership boundary &mdash; that Mneme keeps the agent honest about. The decision corpus is the source of truth; the violations below are what happens without it.
+  </div>
+</div>
+
+<div class="wrap">
+
+  <nav class="toc" aria-label="Table of contents">
+    <div class="toc-title">Twelve examples &middot; five categories</div>
+    <ol>
+      <li class="cat">Architecture governance</li>
+      <li><a href="#v1">Forbidden architecture patterns</a></li>
+      <li><a href="#v2">Layer boundary violations</a></li>
+      <li><a href="#v3">Unauthorized framework introduction</a></li>
+      <li class="cat">Workflow governance</li>
+      <li><a href="#v4">Monorepo scope violations</a></li>
+      <li><a href="#v10">Agent workflow violations</a></li>
+      <li><a href="#v11">Prompt-level governance</a></li>
+      <li class="cat">Security governance</li>
+      <li><a href="#v5">Security policy violations</a></li>
+      <li class="cat">Dependency governance</li>
+      <li><a href="#v8">Dependency licensing</a></li>
+      <li><a href="#v9">ADR supersession violations</a></li>
+      <li class="cat">Platform governance</li>
+      <li><a href="#v6">Infra governance violations</a></li>
+      <li><a href="#v7">API contract violations</a></li>
+      <li><a href="#v12">Organizational consistency</a></li>
+    </ol>
+  </nav>
+
+  <!-- ARCHITECTURE GOVERNANCE -->
+  <section class="category" id="architecture">
+    <div class="cat-header">
+      <span class="cat-tag">Category 01</span>
+      <h2>Architecture governance</h2>
+    </div>
+    <p class="cat-sub">Layer boundaries, forbidden patterns, deprecated architectures. The decisions that define how the system is shaped &mdash; not what it does, but how its parts are allowed to relate.</p>
+
+    <div class="violation" id="v1">
+      <div class="vh"><span class="vnum">01</span><h3>Forbidden architecture patterns</h3></div>
+      <p class="rule"><strong>Rule.</strong> Do not access BigQuery directly from frontend routes.</p>
+      <pre><span class="comment">// AI generates inside a Next.js API route</span>
+const client = new BigQuery();</pre>
+      <div class="flags">
+        <span class="flag">forbidden dependency</span>
+        <span class="flag">ADR violation</span>
+        <span class="flag">architectural boundary breach</span>
+      </div>
+    </div>
+
+    <div class="violation" id="v2">
+      <div class="vh"><span class="vnum">02</span><h3>Layer boundary violations</h3></div>
+      <p class="rule"><strong>Rule.</strong> Controllers must not contain business logic.</p>
+      <pre>@app.post("/checkout")
+def checkout():
+    <span class="comment"># pricing logic</span>
+    <span class="comment"># tax logic</span>
+    <span class="comment"># inventory logic</span></pre>
+      <div class="flags">
+        <span class="flag">logic in presentation layer</span>
+        <span class="flag">missing service abstraction</span>
+      </div>
+    </div>
+
+    <div class="violation" id="v3">
+      <div class="vh"><span class="vnum">03</span><h3>Unauthorized framework introduction</h3></div>
+      <p class="rule"><strong>Rule.</strong> React app standardized on Zustand. No Redux.</p>
+      <pre>import { createStore } from "redux";</pre>
+      <div class="flags">
+        <span class="flag">non-approved state management</span>
+        <span class="flag">stack divergence</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORKFLOW GOVERNANCE -->
+  <section class="category" id="workflow">
+    <div class="cat-header">
+      <span class="cat-tag">Category 02</span>
+      <h2>Workflow governance</h2>
+    </div>
+    <p class="cat-sub">Protected directories, ownership boundaries, migration restrictions, prompt-level policies. The decisions that govern <em>who</em> &mdash; or <em>which agent</em> &mdash; is allowed to touch <em>what</em>.</p>
+
+    <div class="violation" id="v4">
+      <div class="vh"><span class="vnum">04</span><h3>Monorepo scope violations</h3></div>
+      <p class="rule"><strong>Rule.</strong> Billing agent cannot modify the auth package.</p>
+      <pre><span class="comment"># AI agent edits</span>
+packages/auth/*</pre>
+      <div class="flags">
+        <span class="flag">scoped ownership breach</span>
+        <span class="flag">out-of-domain modification</span>
+      </div>
+    </div>
+
+    <div class="violation" id="v10">
+      <div class="vh"><span class="vnum">10</span><h3>Agent workflow violations</h3></div>
+      <p class="rule"><strong>Rule.</strong> Codegen agents cannot write directly to production migration folders.</p>
+      <pre><span class="comment"># Agent modifies</span>
+db/prod/migrations/*</pre>
+      <div class="flags">
+        <span class="flag">restricted execution scope</span>
+        <span class="flag">protected path mutation</span>
+      </div>
+    </div>
+
+    <div class="violation" id="v11">
+      <div class="vh"><span class="vnum">11</span><h3>Prompt-level governance</h3></div>
+      <p class="rule"><strong>Rule.</strong> Do not generate mock auth implementations.</p>
+      <pre><span class="comment"># User prompt</span>
+"Just create a quick fake JWT validator."</pre>
+      <div class="flags">
+        <span class="flag">policy conflict before generation</span>
+        <span class="flag">governance-before-generation</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECURITY GOVERNANCE -->
+  <section class="category" id="security">
+    <div class="cat-header">
+      <span class="cat-tag">Category 03</span>
+      <h2>Security governance</h2>
+    </div>
+    <p class="cat-sub">Unsafe query construction, credential handling, insecure auth patterns. The decisions where a violation is not just architectural debt but a vulnerability the team has already chosen not to ship.</p>
+
+    <div class="violation" id="v5">
+      <div class="vh"><span class="vnum">05</span><h3>Security policy violations</h3></div>
+      <p class="rule"><strong>Rule.</strong> No raw SQL string concatenation.</p>
+      <pre>query = f"SELECT * FROM users WHERE id = {user_id}"</pre>
+      <div class="flags">
+        <span class="flag">unsafe query construction</span>
+        <span class="flag">secure coding rule breach</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEPENDENCY GOVERNANCE -->
+  <section class="category" id="dependency">
+    <div class="cat-header">
+      <span class="cat-tag">Category 04</span>
+      <h2>Dependency governance</h2>
+    </div>
+    <p class="cat-sub">Banned libraries, licensing constraints, version pins, and the supersession history of decisions the team has already revisited. Dependencies are decisions; Mneme treats them as such.</p>
+
+    <div class="violation" id="v8">
+      <div class="vh"><span class="vnum">08</span><h3>Dependency licensing</h3></div>
+      <p class="rule"><strong>Rule.</strong> No GPL dependencies.</p>
+      <pre><span class="comment">// AI adds to package.json</span>
+"some-gpl-library": "^2.1.0"</pre>
+      <div class="flags">
+        <span class="flag">licensing policy violation</span>
+        <span class="flag">approved-list deviation</span>
+      </div>
+    </div>
+
+    <div class="violation" id="v9">
+      <div class="vh"><span class="vnum">09</span><h3>ADR supersession violations</h3></div>
+      <p class="rule"><strong>Rule.</strong> ADR-002: all async jobs use Pub/Sub. (Supersedes an older ADR that allowed Celery.)</p>
+      <pre>from celery import Celery</pre>
+      <div class="flags">
+        <span class="flag">superseded decision</span>
+        <span class="flag">outdated architecture pattern</span>
+        <span class="flag">precedence-aware enforcement</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLATFORM GOVERNANCE -->
+  <section class="category" id="platform">
+    <div class="cat-header">
+      <span class="cat-tag">Category 05</span>
+      <h2>Platform governance</h2>
+    </div>
+    <p class="cat-sub">Observability requirements, infra standards, deployment policies, API contracts. The decisions platform teams ship to keep services consistent across the org.</p>
+
+    <div class="violation" id="v6">
+      <div class="vh"><span class="vnum">06</span><h3>Infra governance violations</h3></div>
+      <p class="rule"><strong>Rule.</strong> All infrastructure changes must use Terraform modules.</p>
+      <pre>gcloud compute instances create ...</pre>
+      <div class="flags">
+        <span class="flag">bypassing approved infra workflow</span>
+        <span class="flag">untracked change surface</span>
+      </div>
+    </div>
+
+    <div class="violation" id="v7">
+      <div class="vh"><span class="vnum">07</span><h3>API contract violations</h3></div>
+      <p class="rule"><strong>Rule.</strong> Internal APIs must version under <code>/v1/</code>.</p>
+      <pre>@app.route("/users")</pre>
+      <div class="flags">
+        <span class="flag">routing convention breach</span>
+        <span class="flag">API governance mismatch</span>
+      </div>
+    </div>
+
+    <div class="violation" id="v12">
+      <div class="vh"><span class="vnum">12</span><h3>Organizational consistency violations</h3></div>
+      <p class="rule"><strong>Rule.</strong> All services must emit OpenTelemetry traces.</p>
+      <pre><span class="comment"># AI creates a new service with no tracing middleware</span>
+def create_app():
+    app = FastAPI()
+    return app</pre>
+      <div class="flags">
+        <span class="flag">observability standard breach</span>
+        <span class="flag">platform compliance failure</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="closer">
+    <p><strong>The distinction that matters.</strong> Mneme injects organizational architectural decisions into AI-assisted generation workflows. The examples above are not static lint rules; they are decisions the team has already made, in the form the agent needs to see them, at the moment it is about to generate.</p>
+    <p>This is the difference between "we scan for bad code" and "we keep the agent honest about the decisions you've already made." The first is a check after the fact. The second is the layer that makes drift structurally harder.</p>
+  </div>
+
+  <div class="cross-links">
+    <a class="cross-card" href="/benchmark/">
+      <span class="cl-label">Benchmark</span>
+      <span class="cl-title">Scenarios mapped to these categories &rarr;</span>
+      <span class="cl-sub">The governance benchmark suite is organized around the violation hierarchy above.</span>
+    </a>
+    <a class="cross-card" href="/insights/why-prompt-memory-fails-at-scale/">
+      <span class="cl-label">Background</span>
+      <span class="cl-title">Why prompt memory isn't enough &rarr;</span>
+      <span class="cl-sub">Why CLAUDE.md and rules files cannot enforce the decisions above at scale.</span>
+    </a>
+    <a class="cross-card" href="/works-with/">
+      <span class="cl-label">Compatibility</span>
+      <span class="cl-title">Works with &rarr;</span>
+      <span class="cl-sub">The models, agents, and frameworks Mneme is designed to enforce these rules across.</span>
+    </a>
+  </div>
+
+</div>
+</main>
+
+<footer>
+  <p>
+    <a href="/use-cases/">Use cases</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/insights/">Insights</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/standards/">Standards</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/works-with/">Works with</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/for/">For</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/compare/">Compare</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/integrations/">Integrations</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/founder/">Founder</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/about/">About</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/contact/">Contact</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/privacy/">Privacy</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a>
+    &nbsp;&middot;&nbsp;
+    Open source
+    &nbsp;&middot;&nbsp;
+    MIT License
+  </p>
+</footer>
+
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  btn.addEventListener('click', function(){
+    var open = links.classList.toggle('open');
+    btn.setAttribute('aria-expanded', String(open));
+  });
+})();
+</script>
+</body>
+</html>

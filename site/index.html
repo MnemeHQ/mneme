@@ -1093,6 +1093,44 @@
   </div>
   </div>
 
+  <!-- WHAT MNEME PREVENTS -->
+  <div class="section-wrap" id="what-it-prevents">
+    <div class="section-eyebrow">What Mneme prevents</div>
+    <h2 class="section-title">Concrete violations, not abstract rules.</h2>
+    <p style="color:var(--muted);font-size:0.92rem;line-height:1.7;margin:-1.5rem 0 2rem;max-width:620px;">
+      Mneme injects your team's architectural decisions into AI-assisted generation. Below is what that catches in practice &mdash; the kinds of changes an agent will otherwise ship, because nothing told it not to.
+    </p>
+    <div class="works-grid">
+      <div class="works-card">
+        <h3>Unauthorized framework introduction</h3>
+        <p>Redux pulled into a Zustand-standardized app. Banned ORM imported into a service that already chose another.</p>
+      </div>
+      <div class="works-card">
+        <h3>Cross-boundary architecture violations</h3>
+        <p>BigQuery client instantiated inside a frontend route. Business logic dropped into a controller. Layering decisions ignored.</p>
+      </div>
+      <div class="works-card">
+        <h3>ADR supersession conflicts</h3>
+        <p>Celery re-introduced after the team moved to Pub/Sub. Old decisions reappearing because the agent didn't see the new one.</p>
+      </div>
+      <div class="works-card">
+        <h3>Restricted path modifications</h3>
+        <p>Codegen agent writing to <code style="font-family:'DM Mono',monospace;font-size:0.74rem;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:0.05rem 0.35rem;color:var(--text);">db/prod/migrations/*</code>. Billing agent touching the auth package.</p>
+      </div>
+      <div class="works-card">
+        <h3>Security policy violations</h3>
+        <p>Raw SQL string concatenation. Mock auth shipped in production paths. Credentials handled outside the approved surface.</p>
+      </div>
+      <div class="works-card">
+        <h3>Non-approved dependency usage</h3>
+        <p>GPL packages added to a license-restricted repo. Internal-only libraries imported into externally-shipped services.</p>
+      </div>
+    </div>
+    <p style="margin-top:1.5rem;font-size:0.86rem;color:var(--muted);">
+      <a href="/docs/governance-violations/" style="color:var(--accent);text-decoration:none;">See all twelve examples across five governance categories &rarr;</a>
+    </p>
+  </div>
+
   <!-- WORKS WITH -->
   <div class="section-wrap">
     <div class="section-eyebrow">Integrations</div>
