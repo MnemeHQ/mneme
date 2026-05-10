@@ -142,3 +142,64 @@ def test_non_empty_query_unaffected_by_fallback():
     # Scope-match still wins; not all decisions surface as in the fallback.
     assert ranked[0].decision.id == "a"
     assert ranked[0].score > ranked[1].score
+
+
+def test_score_ties_resolved_by_insertion_order():
+    """Tied scores MUST resolve in insertion order (Python sort stability).
+
+    Why this matters for Step 3C
+    ----------------------------
+    The Step 3C charter (PR #19, 0b1bb7a) pins recall@1 (currently 0.8) as
+    the sharpest tuning dial under a frozen 11-Decision pool with K=3.
+    recall@1 is determined entirely by which Decision lands at index 0 of
+    the retriever's output. When two or more Decisions share the top score,
+    the index-0 slot is decided by the sort tie-break — so any
+    non-deterministic tie-break would inject flakiness into recall@1
+    unrelated to the algorithmic change being measured.
+
+    Stage 1 (anti_pattern.content migration symmetry, moving content from
+    `rationale` to `constraints`) shifts which field contributes the
+    matching tokens for several scenarios, almost certainly producing new
+    tie configurations at the top of the ranked list. Pinning insertion
+    order as the deterministic tie-break here ensures that any Stage 1
+    recall@1 movement is genuinely from the migration fix, not from
+    accidental sort instability.
+
+    Pinned guarantee
+    ----------------
+    `DecisionRetriever.retrieve` calls `list.sort(key=..., reverse=True)`,
+    and Python's `list.sort` is documented stable: equal-key items keep
+    their input order. The input order is `self.decisions` set in
+    `__init__` (a copy via `list(decisions)`). benchmark.py:225 then walks
+    the returned list with no further sort, so this ordering is what the
+    suite metrics see. If anyone ever swaps to an unstable algorithm,
+    extends the sort key with arbitrary fields, or reorders
+    `self.decisions`, this test fails before that change can pollute
+    Stage 1's recall@1 measurement.
+    """
+    # Two tie groups separated by score. All five Decisions are also in a
+    # known insertion order so we can assert the full ranked sequence.
+    #   Top group  (score = 2.0): a, b, c — both query tokens hit `decision`
+    #   Bottom group (score = 0): d, e — no tokens overlap
+    decisions = [
+        Decision(id="a", decision="Storage uses JSON format"),
+        Decision(id="b", decision="Storage uses JSON format"),
+        Decision(id="c", decision="Storage uses JSON format"),
+        Decision(id="d", decision="Wholly unrelated content here"),
+        Decision(id="e", decision="Wholly unrelated content here"),
+    ]
+    ranked = _retriever(decisions).retrieve("storage format")
+
+    # Insertion order preserved across the entire ranked list:
+    assert [r.decision.id for r in ranked] == ["a", "b", "c", "d", "e"]
+
+    # The top three are genuinely tied (otherwise the test is vacuous):
+    assert ranked[0].score == ranked[1].score == ranked[2].score
+    assert ranked[0].score > 0
+    # And confirm we are on the scoring path, not the empty-token fallback:
+    # the fallback floor is 1.0 and would tie *every* Decision; here the
+    # bottom group must score strictly less than the top group.
+    assert ranked[2].score > ranked[3].score
+    # Bottom two are also tied, confirming stability holds at every score
+    # level — not just at the top.
+    assert ranked[3].score == ranked[4].score
