@@ -123,6 +123,11 @@
       .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.88rem; padding: 0.7rem 0; border-bottom: 1px solid var(--border); }
       .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
     }
+  
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
   </style>
   <script type="application/ld+json">
   {
@@ -189,8 +194,9 @@
     <a href="/#how-it-works">How it works</a>
     <a href="/use-cases/">Use cases</a>
     <a href="/insights/">Insights</a>
+    <a href="/standards/">Standards</a>
     <a href="/roadmap/">Roadmap</a>
-    <a href="/demo.html">Demo</a>
+    <a href="/demo/">Demo</a>
     <a href="/#benchmarks">Benchmarks</a>
     <a href="https://github.com/TheoV823/mneme">GitHub</a>
     <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
@@ -217,6 +223,13 @@
     </div>
     <h1>Why RAG Fails for Architectural Governance</h1>
     <p class="article-lede">Retrieval-augmented generation is an excellent tool for knowledge lookup. It is the wrong tool for enforcing architectural decisions. The distinction matters — and most teams building AI coding workflows haven't confronted it yet.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-05">Published May 2026</time>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-05">Updated May 2026</time>
+    </p>
   </header>
 
   <div class="article-body">
@@ -385,6 +398,14 @@
     </details>
   </section>
 
+  
+    <h2 id="related-reading" style="margin-top:3rem;">Related reading</h2>
+    <ul style="margin:0 0 1.25rem 1.5rem;">
+        <li><a href="/insights/why-prompt-memory-fails-at-scale/">why prompt memory fails at scale</a></li>
+        <li><a href="/insights/prompt-engineering-is-not-governance/">prompt engineering is not governance</a></li>
+        <li><a href="/insights/review-is-not-governance/">review is not governance</a></li>
+    </ul>
+
   <footer class="article-footer">
     <a href="/insights/" class="back-link">← Back to Insights</a>
 
@@ -402,6 +423,8 @@
     <a href="/use-cases/">Use cases</a>
     &nbsp;&middot;&nbsp;
     <a href="/insights/">Insights</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/standards/">Standards</a>
     &nbsp;&middot;&nbsp;
     <a href="/compare/">Compare</a>
     &nbsp;&middot;&nbsp;

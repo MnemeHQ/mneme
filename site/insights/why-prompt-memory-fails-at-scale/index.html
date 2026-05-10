@@ -119,6 +119,11 @@
       .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.88rem; padding: 0.7rem 0; border-bottom: 1px solid var(--border); }
       .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
     }
+  
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
   </style>
   <script type="application/ld+json">
   {
@@ -160,8 +165,9 @@
     <a href="/#how-it-works">How it works</a>
     <a href="/use-cases/">Use cases</a>
     <a href="/insights/">Insights</a>
+    <a href="/standards/">Standards</a>
     <a href="/roadmap/">Roadmap</a>
-    <a href="/demo.html">Demo</a>
+    <a href="/demo/">Demo</a>
     <a href="/#benchmarks">Benchmarks</a>
     <a href="https://github.com/TheoV823/mneme">GitHub</a>
     <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
@@ -185,6 +191,13 @@
     </div>
     <h1>Why Prompt Memory Fails at Scale</h1>
     <p class="article-lede">Teams paste their architectural rules into CLAUDE.md and call it governance. At small scale it half-works. At large scale it collapses. Context injection is not governance memory, and the difference matters more as your codebase grows.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-08">Published May 2026</time>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-08">Updated May 2026</time>
+    </p>
   </header>
 
   <div class="article-body">
@@ -309,6 +322,14 @@
 
   </div>
 
+  
+    <h2 id="related-reading" style="margin-top:3rem;">Related reading</h2>
+    <ul style="margin:0 0 1.25rem 1.5rem;">
+        <li><a href="/insights/mneme-vs-cursor-rules/">why rule files don't survive scale</a></li>
+        <li><a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/">the heterogeneous-agents argument</a></li>
+        <li><a href="/insights/why-rag-fails-for-architectural-governance/">why RAG falls short for governance</a></li>
+    </ul>
+
   <footer class="article-footer">
     <a href="/insights/" class="back-link">&larr; Back to Insights</a>
 
@@ -326,6 +347,8 @@
     <a href="/use-cases/">Use cases</a>
     &nbsp;&middot;&nbsp;
     <a href="/insights/">Insights</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/standards/">Standards</a>
     &nbsp;&middot;&nbsp;
     <a href="/compare/">Compare</a>
     &nbsp;&middot;&nbsp;

@@ -141,6 +141,14 @@
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
         "image": "https://mnemehq.com/integrations/cursor/og.png",
         "mainEntityOfPage": "https://mnemehq.com/integrations/cursor/"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {"@type": "Question", "name": "Does Mneme replace Cursor Rules entirely?", "acceptedAnswer": {"@type": "Answer", "text": "No — Mneme generates the Cursor Rules file from a structured source. Cursor still reads .cursor/rules/ at session start; the difference is that the file is now a derived artifact with precedence resolution and version history rather than a manual document."}},
+          {"@type": "Question", "name": "Can I edit .cursorrules directly while Mneme is in place?", "acceptedAnswer": {"@type": "Answer", "text": "You can, but the next regenerate will overwrite it. The recommended workflow is to update project_memory.json and re-run mneme cursor generate. That way the change is tracked as a decision-record edit rather than a quiet rule-file change."}},
+          {"@type": "Question", "name": "Does this work with Cursor's MCP integration?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Mneme is on the roadmap to expose its decision store as an MCP server; once shipped, Cursor's MCP-aware sessions can query the corpus directly without going through the rules file."}}
+        ]
       }
     ]
   }
@@ -158,8 +166,9 @@
     <a href="/#how-it-works">How it works</a>
     <a href="/use-cases/">Use cases</a>
     <a href="/insights/">Insights</a>
+    <a href="/standards/">Standards</a>
     <a href="/roadmap/">Roadmap</a>
-    <a href="/demo.html">Demo</a>
+    <a href="/demo/">Demo</a>
     <a href="/#benchmarks">Benchmarks</a>
     <a href="https://github.com/TheoV823/mneme">GitHub</a>
     <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
@@ -182,7 +191,14 @@
       <span class="eyebrow-meta">4 min read &nbsp;·&nbsp; May 2026</span>
     </div>
     <h1>Mneme HQ + Cursor</h1>
-    <p class="article-lede">Cursor Rules inject context into every Cursor session. Mneme HQ is where that context lives — structured, versioned, and resolved across conflicting rules before it reaches Cursor.</p>
+    <p class="article-lede">Cursor Rules inject context into every Cursor session. Mneme HQ is where that context lives &mdash; structured, versioned, and resolved across conflicting rules before it reaches Cursor.</p>
+    <p class="byline" style="font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem;">
+      By <a href="/founder/" style="color:var(--muted); text-decoration:none;">Theo Valmis</a>
+      <span style="color: var(--border2); margin: 0 0.5rem;">&middot;</span>
+      <time datetime="2026-04-15">Published Apr 2026</time>
+      <span style="color: var(--border2); margin: 0 0.5rem;">&middot;</span>
+      <time datetime="2026-05-10">Updated May 2026</time>
+    </p>
   </header>
 
   <div class="article-body">
@@ -233,7 +249,43 @@ mneme export --format cursor-rules > .cursorrules</code></pre>
       <p><strong>See how they compare.</strong> For a detailed breakdown of what each tool does and where they overlap, read the full comparison: <a href="/compare/cursor-rules/" style="color:var(--accent);text-decoration:none;">Mneme HQ vs Cursor Rules &rarr;</a></p>
     </div>
 
+    <h2>What changes when you wire Mneme into Cursor</h2>
+
+    <p>Cursor's strength is interactive coding: an engineer types intent, the editor surfaces context, the model responds. The <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.cursorrules</code> file is how that context arrives at the model. Without governance, the file accumulates ad-hoc rules that the editor injects on every session &mdash; useful for personal preferences, weak as architectural enforcement.</p>
+
+    <p>With Mneme, the rules become a <em>generated artifact</em> rather than a hand-edited file. The decision corpus in <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">project_memory.json</code> is the source of truth; <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">mneme cursor generate</code> writes a scoped <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.cursor/rules/mneme.mdc</code> file that Cursor picks up automatically. Three things change in practice:</p>
+
+    <ul>
+      <li><strong>Rules get version-controlled with the code.</strong> Architectural decisions live in the same repo and same review process as the rest of the codebase. Changes show up in PR diffs.</li>
+      <li><strong>Conflicts get resolved deterministically.</strong> When two rules overlap (e.g. team-wide vs service-specific), the precedence engine picks the more specific scope. Cursor sees a single resolved view.</li>
+      <li><strong>The same corpus drives every other surface.</strong> Claude Code hooks and the GitHub Actions enforcement gate read the same JSON. The Cursor session, the terminal session, and CI all enforce the same decisions without duplication.</li>
+    </ul>
+
+    <h2>FAQ</h2>
+
+    <div class="faq-list" style="margin-top:1.5rem;">
+      <details class="faq-item" style="border-top:1px solid var(--border); padding:1.05rem 0;">
+        <summary style="cursor:pointer; font-size:0.92rem; color:var(--text); font-weight:500; list-style:none; position:relative; padding-right:2rem;">Does Mneme replace Cursor Rules entirely?</summary>
+        <div style="padding-top:0.85rem; font-size:0.85rem; color:var(--muted); line-height:1.8;">No &mdash; Mneme generates the Cursor Rules file from a structured source. Cursor still reads <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.cursor/rules/</code> at session start; the difference is that the file is now a derived artifact with precedence resolution and version history rather than a manual document. See <a href="/compare/cursor-rules/" style="color:var(--accent);">the full comparison</a>.</div>
+      </details>
+      <details class="faq-item" style="border-top:1px solid var(--border); padding:1.05rem 0;">
+        <summary style="cursor:pointer; font-size:0.92rem; color:var(--text); font-weight:500; list-style:none; position:relative; padding-right:2rem;">Can I edit <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.cursorrules</code> directly while Mneme is in place?</summary>
+        <div style="padding-top:0.85rem; font-size:0.85rem; color:var(--muted); line-height:1.8;">You can, but the next regenerate will overwrite it. The recommended workflow is to update <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">project_memory.json</code> and re-run <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">mneme cursor generate</code>. That way the change is tracked as a decision-record edit rather than a quiet rule-file change.</div>
+      </details>
+      <details class="faq-item" style="border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:1.05rem 0;">
+        <summary style="cursor:pointer; font-size:0.92rem; color:var(--text); font-weight:500; list-style:none; position:relative; padding-right:2rem;">Does this work with Cursor's MCP integration?</summary>
+        <div style="padding-top:0.85rem; font-size:0.85rem; color:var(--muted); line-height:1.8;">Yes. Mneme is on the roadmap to expose its decision store as an MCP server; once shipped, Cursor's MCP-aware sessions can query the corpus directly without going through the rules file. See the <a href="/standards/" style="color:var(--accent);">standards landscape</a>.</div>
+      </details>
+    </div>
+
   </div>
+
+  
+    <h2 id="related-reading" style="margin-top:3rem;">Related reading</h2>
+    <ul style="margin:0 0 1.25rem 1.5rem;">
+        <li><a href="/integrations/claude-code/">the Claude Code hook</a></li>
+        <li><a href="/integrations/github-actions/">the GitHub Actions enforcement gate</a></li>
+    </ul>
 
   <footer class="article-footer">
     <a href="/integrations/" class="back-link">&#8592; All integrations</a>
@@ -253,6 +305,8 @@ mneme export --format cursor-rules > .cursorrules</code></pre>
     <a href="/use-cases/">Use cases</a>
     &nbsp;&middot;&nbsp;
     <a href="/insights/">Insights</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/standards/">Standards</a>
     &nbsp;&middot;&nbsp;
     <a href="/compare/">Compare</a>
     &nbsp;&middot;&nbsp;

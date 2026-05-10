@@ -56,6 +56,21 @@
     .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
     .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
     .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    .faq-list { margin-top: 1.5rem; }
+    .faq-item { border-top: 1px solid var(--border); padding: 1.05rem 0; }
+    .faq-item:last-child { border-bottom: 1px solid var(--border); }
+    .faq-item summary { cursor: pointer; font-size: 0.92rem; color: var(--text); font-weight: 500; list-style: none; position: relative; padding-right: 2rem; }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; font-family: 'DM Mono', monospace; color: var(--muted); font-size: 1.1rem; position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
+    .faq-item[open] summary::after { content: '\2212'; }
+    .faq-body { padding-top: 0.85rem; font-size: 0.85rem; color: var(--muted); line-height: 1.8; }
+    .faq-body a { color: var(--accent); text-decoration: none; }
+    .faq-body a:hover { color: var(--accent-dim); }
 
     .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
     .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
@@ -134,6 +149,26 @@
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
         "image": "https://mnemehq.com/compare/cursor-rules/og.png",
         "mainEntityOfPage": "https://mnemehq.com/compare/cursor-rules/"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {"@type": "Question", "name": "Can I use Mneme HQ alongside Cursor Rules?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. They operate on different layers and do not conflict. Cursor Rules inject context into Cursor sessions; Mneme HQ runs as a hook on Edit and Write operations regardless of the editor. Many teams keep their .cursorrules file and add Mneme on top to gain structured enforcement, precedence resolution, and CI gating."}},
+          {"@type": "Question", "name": "Do I have to migrate my .cursorrules file to use Mneme HQ?", "acceptedAnswer": {"@type": "Answer", "text": "Migration is the typical path but not required. Existing .cursorrules text becomes the starting input for project_memory.json — each rule is converted to a typed entry with id, scope (file glob), status (active / superseded), and rationale. The mneme init command scaffolds the schema; populating it is a one-time conversion."}},
+          {"@type": "Question", "name": "Does Mneme HQ work in editors other than Cursor and Claude Code?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The decision corpus is tool-agnostic. Native hooks ship for Claude Code; Cursor uses standard rules export from the same corpus; GitHub Copilot, Windsurf, and custom SDK agents are governed via the post-generation enforcement step in CI. The architectural argument for tool independence is on the heterogeneous-agents article."}},
+          {"@type": "Question", "name": "Is Cursor Rules ever the right tool on its own?", "acceptedAnswer": {"@type": "Answer", "text": "For a solo developer in a single repo, with rules that apply uniformly to every file, no precedence conflicts, and no requirement for hard blocking — Cursor Rules are sufficient. The moment any of those conditions fails, hook-level enforcement and structured precedence become load-bearing."}}
+        ]
+      },
+      {
+        "@type": "HowTo",
+        "name": "Migrate from Cursor Rules to Mneme HQ",
+        "description": "Convert an existing .cursorrules file into a structured Mneme decision corpus and enable hook-level enforcement.",
+        "step": [
+          {"@type": "HowToStep", "name": "Install", "text": "pip install mneme && mneme init — scaffolds project_memory.json at the repo root."},
+          {"@type": "HowToStep", "name": "Convert each rule", "text": "For every rule in .cursorrules, create a typed entry: id, type (architectural_pattern / dependency_policy / etc.), scope (file glob), status (active), rationale, and supersedes (if it replaces an earlier rule)."},
+          {"@type": "HowToStep", "name": "Enable Claude Code hook", "text": "Add the mneme-hook entry to your Claude Code hooks configuration so Edit, Write, and MultiEdit operations check the decision corpus before applying changes."},
+          {"@type": "HowToStep", "name": "Wire CI", "text": "Add mneme check --mode strict to your CI pipeline so PRs are blocked on hard FAIL verdicts — see the GitHub Actions integration for the canonical setup."}
+        ]
       }
     ]
   }
@@ -151,8 +186,9 @@
     <a href="/#how-it-works">How it works</a>
     <a href="/use-cases/">Use cases</a>
     <a href="/insights/">Insights</a>
+    <a href="/standards/">Standards</a>
     <a href="/roadmap/">Roadmap</a>
-    <a href="/demo.html">Demo</a>
+    <a href="/demo/">Demo</a>
     <a href="/#benchmarks">Benchmarks</a>
     <a href="https://github.com/TheoV823/mneme">GitHub</a>
     <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
@@ -175,7 +211,14 @@
       <span class="eyebrow-meta">5 min read &nbsp;·&nbsp; May 2026</span>
     </div>
     <h1>Mneme HQ vs Cursor Rules</h1>
-    <p class="article-lede">Both inject architectural context into AI coding sessions. One is a suggestion file. The other is enforcement infrastructure. Here is how they differ — and when the difference matters.</p>
+    <p class="article-lede">Both inject architectural context into AI coding sessions. One is a suggestion file. The other is enforcement infrastructure. Here is how they differ &mdash; and when the difference matters.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-07">Published May 2026</time>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-10">Updated May 2026</time>
+    </p>
   </header>
 
   <div class="article-body">
@@ -292,7 +335,58 @@
 
     <p>For a deeper look at how the two differ in practice, see the editorial comparison: <a href="/insights/mneme-vs-cursor-rules/" style="color:var(--accent);text-decoration:none;">Mneme vs Cursor Rules</a>.</p>
 
+    <h2>Decision matrix &mdash; choose one in 30 seconds</h2>
+
+    <p>If most of these statements are true, <strong>Cursor Rules alone are sufficient</strong>:</p>
+    <ul>
+      <li>You are a solo developer, or a 2&ndash;3 engineer team that all use the same editor.</li>
+      <li>Your project conventions apply uniformly to every file in the repo.</li>
+      <li>You have not yet hit a case where the model ignored a rule and shipped the violation anyway.</li>
+      <li>You are not running async or CI agents that touch the codebase outside an editor session.</li>
+      <li>You do not need an audit trail of when a rule changed or why.</li>
+    </ul>
+
+    <p>If any of these statements is true, <strong>you have outgrown Cursor Rules</strong> and need hook-level enforcement:</p>
+    <ul>
+      <li>You use Claude Code, Windsurf, GitHub Copilot, or a custom SDK agent in addition to (or instead of) Cursor.</li>
+      <li>Different parts of the codebase have different rules &mdash; payments services have stricter constraints than analytics, for example.</li>
+      <li>You have rules that <em>must</em> hold &mdash; a violation should block the diff, not be a suggestion the model can override.</li>
+      <li>Two rules sometimes contradict each other and the team currently resolves it through Slack rather than a precedence model.</li>
+      <li>You run an agent in CI that opens PRs, and you want the same governance applied there as in interactive sessions.</li>
+    </ul>
+
+    <h2>FAQ</h2>
+
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Can I use Mneme HQ alongside Cursor Rules?</summary>
+        <div class="faq-body">Yes. They operate on different layers and do not conflict. Cursor Rules inject context into Cursor sessions; Mneme HQ runs as a hook on Edit and Write operations regardless of the editor. Many teams keep their <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.cursorrules</code> file and add Mneme on top to gain structured enforcement, precedence resolution, and CI gating &mdash; see the <a href="/integrations/cursor/">Cursor integration guide</a>.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Do I have to migrate my <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.cursorrules</code> file to use Mneme HQ?</summary>
+        <div class="faq-body">Migration is the typical path but not required. Existing <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.cursorrules</code> text becomes the starting input for <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">project_memory.json</code> &mdash; each rule is converted to a typed entry with id, scope (file glob), status (active / superseded), and rationale. The <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">mneme init</code> command scaffolds the schema; populating it is a one-time conversion.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Does Mneme HQ work in editors other than Cursor and Claude Code?</summary>
+        <div class="faq-body">Yes. The decision corpus is tool-agnostic. Native hooks ship for Claude Code; Cursor uses standard rules export from the same corpus; GitHub Copilot, Windsurf, and custom SDK agents are governed via the post-generation enforcement step in CI. The architectural argument for tool independence is on the <a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/">heterogeneous-agents article</a>.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Is Cursor Rules ever the right tool on its own?</summary>
+        <div class="faq-body">For a solo developer in a single repo, with rules that apply uniformly to every file, no precedence conflicts, and no requirement for hard blocking &mdash; Cursor Rules are sufficient. The moment any of those conditions fails, hook-level enforcement and structured precedence become load-bearing. See <a href="/insights/why-prompt-memory-fails-at-scale/">why prompt memory fails at scale</a> for the structural argument.</div>
+      </details>
+    </div>
+
   </div>
+
+  
+    <h2 id="related-reading" style="margin-top:3rem;">Related reading</h2>
+    <ul style="margin:0 0 1.25rem 1.5rem;">
+        <li><a href="/compare/coderabbit/">Mneme HQ vs CodeRabbit</a></li>
+        <li><a href="/compare/">all comparison pages</a></li>
+    </ul>
 
   <footer class="article-footer">
     <a href="/compare/" class="back-link">← Back to Compare</a>
@@ -313,6 +407,8 @@
     <a href="/use-cases/">Use cases</a>
     &nbsp;&middot;&nbsp;
     <a href="/insights/">Insights</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/standards/">Standards</a>
     &nbsp;&middot;&nbsp;
     <a href="/compare/">Compare</a>
     &nbsp;&middot;&nbsp;

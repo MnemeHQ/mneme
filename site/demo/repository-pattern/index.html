@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Repository Pattern Enforcement — Demo Scenario | Mneme HQ</title>
+  <meta name="description" content="A walkthrough of how Mneme blocks an ADR-004 violation when an AI coding agent bypasses the Repository pattern in user.service.ts. FAIL verdict that hard-blocks the diff in CI." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/demo/repository-pattern/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Repository Pattern Enforcement — Demo Scenario" />
+  <meta property="og:description" content="How Mneme blocks an ADR-004 violation when an AI agent bypasses the Repository pattern in user.service.ts. Hard FAIL verdict that gates the PR." />
+  <meta property="og:url" content="https://mnemehq.com/demo/repository-pattern/" />
+  <meta property="og:image" content="https://mnemehq.com/demo/repository-pattern/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Repository Pattern Enforcement — Demo Scenario" />
+  <meta name="twitter:description" content="How Mneme blocks an ADR-004 violation when an AI agent bypasses the Repository pattern in user.service.ts. Hard FAIL verdict that gates the PR." />
+  <meta name="twitter:image" content="https://mnemehq.com/demo/repository-pattern/og.png" />
+  <meta name="author" content="Theo Valmis" />
+  <meta property="article:published_time" content="2026-05-09T00:00:00Z" />
+  <meta property="article:author" content="https://mnemehq.com/founder/" />
+  <meta property="article:section" content="Demo" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Demo", "item": "https://mnemehq.com/demo/"},
+          {"@type": "ListItem", "position": 3, "name": "Repository pattern enforcement", "item": "https://mnemehq.com/demo/repository-pattern/"}
+        ]
+      },
+      {
+        "@type": "Article",
+        "headline": "Repository Pattern Enforcement — Demo Scenario",
+        "description": "How Mneme blocks an ADR-004 violation when an AI coding agent bypasses the Repository pattern in user.service.ts. Hard FAIL verdict that gates the PR.",
+        "url": "https://mnemehq.com/demo/repository-pattern/",
+        "datePublished": "2026-05-09",
+        "dateModified": "2026-05-09",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "image": "https://mnemehq.com/demo/repository-pattern/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/demo/repository-pattern/",
+        "isPartOf": {"@type": "WebPage", "@id": "https://mnemehq.com/demo/"}
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {"@type": "Question", "name": "What is the Repository pattern in this scenario?", "acceptedAnswer": {"@type": "Answer", "text": "The Repository pattern is an architectural rule recorded as ADR-004: all data access goes through repository classes, never directly from service or controller layers. Services depend on the repository interface, not on the underlying storage. ADR-004 makes this constraint explicit so it can be referenced, queried, and enforced by Mneme rather than living only in code review folklore."}},
+          {"@type": "Question", "name": "Why is this a FAIL and not a WARN?", "acceptedAnswer": {"@type": "Answer", "text": "Architectural pattern violations have outsized downstream cost. Once one service bypasses the repository layer, the next refactor copies the pattern, and within six months the abstraction is dead. Mneme returns FAIL on architectural-pattern violations by default to keep the cost localized to the diff that introduced it."}},
+          {"@type": "Question", "name": "Does the FAIL verdict block the PR?", "acceptedAnswer": {"@type": "Answer", "text": "Yes — when the GitHub Actions enforcement gate is configured for strict mode. The FAIL exit code from mneme check fails the CI job, which blocks the PR from merging until the violation is resolved or an explicit override decision record is added. Override events are themselves tracked, so weakening the rule is a visible decision rather than a silent one."}}
+        ]
+      }
+    ]
+  }
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #88889a;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+      --term-bg: #0a0a0d; --term-bad: #ff8585;
+      --pass: #c8f060; --warn: #f59e0b; --fail: #ef4444;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .breadcrumb-nav { max-width: 720px; margin: 0 auto; padding: 1.25rem 2rem 0; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.75rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .article-wrap { max-width: 720px; margin: 0 auto; padding: 4rem 2rem 6rem; }
+    .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .verdict-pill { font-family: 'DM Mono', monospace; font-size: 0.65rem; padding: 0.18rem 0.55rem; border-radius: 4px; letter-spacing: 0.06em; }
+    .verdict-pill.pass { background: rgba(200,240,96,0.14); color: var(--pass); border: 1px solid rgba(200,240,96,0.3); }
+    .verdict-pill.warn { background: rgba(245,158,11,0.14); color: var(--warn); border: 1px solid rgba(245,158,11,0.3); }
+    .verdict-pill.fail { background: rgba(239,68,68,0.14); color: var(--fail); border: 1px solid rgba(239,68,68,0.3); }
+    h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 2.6rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.18; margin-bottom: 1.25rem; }
+    .lede { font-size: 1.05rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--fail); padding-left: 1.25rem; margin-bottom: 1.25rem; }
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-bottom: 3rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    .body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
+    .body h2 { font-family: 'Inter', sans-serif; font-size: 1.2rem; font-weight: 600; letter-spacing: -0.015em; margin: 2.75rem 0 1rem; color: var(--text); }
+    .body p { margin-bottom: 1.1rem; color: var(--muted); }
+    .body p strong { color: var(--text); font-weight: 500; }
+    .body code { font-family: 'DM Mono', monospace; font-size: 0.82rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 0.05rem 0.4rem; color: var(--text); }
+    .body a { color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(200,240,96,0.4); }
+    .body a:hover { color: var(--accent-dim); border-bottom-color: rgba(200,240,96,0.7); }
+
+    .panel { background: var(--term-bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin: 1.5rem 0; }
+    .panel-header { display: flex; align-items: center; gap: 0.5rem; padding: 0.55rem 1rem; background: #0d0d10; border-bottom: 1px solid var(--border); font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; font-family: 'DM Mono', monospace; }
+    .panel-header.bad { color: var(--fail); }
+    .panel-header.good { color: var(--accent); }
+    .panel-header.neutral { color: var(--teal); }
+    .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .d-r { background: #ff5f57; }
+    .d-y { background: #febc2e; }
+    .d-g { background: #28c840; }
+    .panel-body { padding: 1rem 1.25rem; font-family: 'DM Mono', monospace; font-size: 0.78rem; line-height: 1.85; }
+    .panel-body .out-bad { color: var(--term-bad); }
+    .panel-body .out-fail { color: var(--fail); }
+    .panel-body .out-good { color: var(--accent); }
+    .panel-body .out-muted { color: var(--muted); }
+    .panel-body .diff-add { color: var(--term-bad); }
+    .panel-body .diff-add::before { content: '+ '; color: var(--term-bad); }
+    .panel-body .diff-rem { color: var(--muted); }
+    .panel-body .diff-rem::before { content: '- '; color: var(--muted); }
+    .panel-body .diff-ctx { color: var(--muted); }
+    .panel-body .diff-ctx::before { content: '  '; }
+
+    .check-row { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border); font-family: 'Inter', sans-serif; font-size: 0.85rem; line-height: 1.7; }
+    .check-row:last-child { border-bottom: none; }
+    .check-row .verdict { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.06em; padding: 0.15rem 0.5rem; border-radius: 4px; flex-shrink: 0; }
+    .check-row .verdict.pass { background: rgba(200,240,96,0.12); color: var(--accent); border: 1px solid rgba(200,240,96,0.25); }
+    .check-row .verdict.warn { background: rgba(245,158,11,0.12); color: var(--warn); border: 1px solid rgba(245,158,11,0.25); }
+    .check-row .verdict.fail { background: rgba(239,68,68,0.12); color: var(--fail); border: 1px solid rgba(239,68,68,0.25); }
+    .check-row .desc { color: var(--muted); }
+    .check-row .desc strong { color: var(--text); font-weight: 500; }
+    .check-results { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.25rem; margin: 1.5rem 0; }
+    .check-results .cr-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.65rem; }
+
+    .faq-list { margin-top: 1.5rem; }
+    .faq-item { border-top: 1px solid var(--border); padding: 1.05rem 0; }
+    .faq-item:last-child { border-bottom: 1px solid var(--border); }
+    .faq-item summary { cursor: pointer; font-size: 0.92rem; color: var(--text); font-weight: 500; list-style: none; position: relative; padding-right: 2rem; }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; font-family: 'DM Mono', monospace; color: var(--muted); font-size: 1.1rem; position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
+    .faq-item[open] summary::after { content: '\2212'; }
+    .faq-body { padding-top: 0.8rem; font-size: 0.85rem; color: var(--muted); line-height: 1.8; }
+    .faq-body a { color: var(--accent); text-decoration: none; }
+    .faq-body a:hover { color: var(--accent-dim); }
+
+    .scenario-cta { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .scenario-cta a { color: var(--muted); font-size: 0.82rem; text-decoration: none; font-family: 'DM Mono', monospace; }
+    .scenario-cta a:hover { color: var(--text); }
+    .scenario-cta .next { color: var(--accent); }
+    .scenario-cta .next:hover { color: var(--accent-dim); }
+
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 36px; height: 36px; border-radius: 6px; cursor: pointer; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; }
+    @media (max-width: 640px) {
+      nav { padding: 1rem 1.25rem; position: relative; }
+      .article-wrap { padding: 2.5rem 1.25rem 4rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0.5rem 1.25rem 1.25rem; z-index: 99; }
+      .nav-links.open { display: flex; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.88rem; padding: 0.7rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+    }
+  </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><svg width="18" height="14" viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 1h16M1 7h16M1 13h16"/></svg></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/standards/">Standards</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/#benchmarks">Benchmarks</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/demo/">Demo</a></li>
+    <li aria-current="page">Repository pattern</li>
+  </ol>
+</nav>
+
+<article class="article-wrap">
+  <header>
+    <div class="article-eyebrow">
+      <span class="eyebrow-tag">Demo &middot; Scenario 3 of 3</span>
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-meta">5 min read</span>
+      <span class="eyebrow-dot"></span>
+      <span class="verdict-pill fail">FAIL</span>
+    </div>
+    <h1>Repository pattern enforcement</h1>
+    <p class="lede">An AI coding agent refactors <code>user.service.ts</code> and reaches straight into the database connection &mdash; bypassing the Repository abstraction <code>ADR-004</code> exists to protect. The diff looks clean in the editor. Mneme's enforcement layer hard-fails it before it can land.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-09">Published May 2026</time>
+      <span class="sep">&middot;</span>
+      <a href="/demo/">All scenarios</a>
+    </p>
+  </header>
+
+  <div class="body">
+    <h2>The scenario</h2>
+    <p>The codebase uses the Repository pattern as its data-access boundary. <code>ADR-004</code> records the rule:</p>
+    <p><strong>ADR-004 &middot; Repository pattern is the only data-access boundary.</strong> All persistence flows through repository classes (<code>UserRepository</code>, <code>OrderRepository</code>, etc). Service classes depend on repository interfaces, not on the underlying storage layer. Direct database access from a service or controller is a violation.</p>
+    <p>An engineer asks the AI assistant to "speed up <code>user.service.ts</code> by inlining the lookup." The agent obliges. The diff opens cleanly:</p>
+
+    <div class="panel">
+      <div class="panel-header bad">
+        <span class="dot d-r"></span><span class="dot d-y"></span><span class="dot d-g"></span>
+        user.service.ts &middot; diff
+      </div>
+      <div class="panel-body">
+        <div class="diff-ctx">export class UserService {</div>
+        <div class="diff-rem">  constructor(private users: UserRepository) {}</div>
+        <div class="diff-add">  constructor(private db: Database) {}</div>
+        <div class="diff-ctx">  async getActive(id: string) {</div>
+        <div class="diff-rem">    return this.users.findActive(id);</div>
+        <div class="diff-add">    return this.db.query('SELECT * FROM users WHERE id = $1 AND active = true', [id]);</div>
+        <div class="diff-ctx">  }</div>
+        <div class="diff-ctx">}</div>
+      </div>
+    </div>
+
+    <p>Locally, this is faster. Architecturally, it dissolves the abstraction <code>ADR-004</code> exists to maintain. Once <code>UserService</code> talks to the database directly, the next refactor copies the pattern, and the repository layer becomes a residue rather than a contract.</p>
+
+    <h2>Without Mneme</h2>
+    <p>The diff reaches review. The reviewer is moving fast on a Friday afternoon. The change is small, the SQL looks correct, the test passes. The PR merges. Three months later, four services have grown direct database calls, the repository layer has unused methods that nobody refactors out, and a new engineer asks why there's a Repository pattern that nobody uses.</p>
+    <p>This is the failure mode architectural decisions exist to prevent. It is not caught by a linter (the SQL is fine), not caught by tests (the behavior is correct), not caught by typing (the types check). The only signal is the architectural rule itself, and that rule lives in human memory unless something operationalizes it.</p>
+
+    <h2>With Mneme</h2>
+    <p>Mneme intercepts the diff post-generation. The retriever surfaces <code>ADR-004</code> as relevant to changes touching <code>*.service.ts</code> files. The evaluator inspects the diff for direct database access patterns and matches the violation. <code>mneme check --mode strict</code> exits non-zero with a structured verdict:</p>
+
+    <div class="check-results">
+      <div class="cr-title">mneme check &middot; repository row</div>
+      <div class="check-row">
+        <span class="verdict fail">FAIL</span>
+        <div class="desc"><strong>Violates ADR-004</strong> &mdash; Repository pattern bypassed in <code>user.service.ts</code>.</div>
+      </div>
+    </div>
+
+    <p>The verdict carries the originating decision ID (<code>ADR-004</code>) and the file path of the violation. A reviewer reading the CI output can navigate directly to the decision record, see the rationale, and either fix the diff or open an explicit override decision &mdash; which is itself a tracked event in <code>project_memory.json</code>.</p>
+
+    <h2>Why FAIL and not WARN</h2>
+    <p>Architectural pattern violations have outsized downstream cost. Once one service bypasses the repository layer, the next refactor copies the pattern, and within six months the abstraction is dead. Mneme returns <strong>FAIL</strong> on architectural-pattern violations by default to keep the cost localized to the diff that introduced it. The override path exists, but it is a tracked decision rather than a silent merge.</p>
+
+    <h2>How to wire this up in your repo</h2>
+    <p>Add an architectural-pattern decision to <code>project_memory.json</code> with <code>type: "architectural_pattern"</code>, the boundary it protects (e.g., "data-access via repository only"), the file scope (<code>**/*.service.ts</code>), and the violations to detect (direct database imports, raw SQL, ORM calls outside the repository layer).</p>
+    <p>Hook it in CI via the <a href="/integrations/github-actions/">GitHub Actions integration</a>: a failed <code>mneme check</code> in strict mode exits non-zero, which fails the workflow, which blocks the PR. For interactive enforcement during the editor session, the <a href="/integrations/claude-code/">Claude Code hook</a> intercepts <code>Edit</code> and <code>Write</code> calls and surfaces the constraint to the agent before the diff is even proposed.</p>
+    <p>For the broader argument that this enforcement layer has to live outside any single AI coding tool, see <a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/">architectural governance across heterogeneous AI coding agents</a>.</p>
+
+    <h2>FAQ</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>What is the Repository pattern in this scenario?</summary>
+        <div class="faq-body">An architectural rule recorded as ADR-004: all data access goes through repository classes, never directly from service or controller layers. Services depend on the repository interface, not on the underlying storage. ADR-004 makes this constraint explicit so it can be referenced, queried, and enforced by Mneme rather than living only in code review folklore.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Why is this a FAIL and not a WARN?</summary>
+        <div class="faq-body">Architectural pattern violations have outsized downstream cost. Once one service bypasses the repository layer, the next refactor copies the pattern, and within six months the abstraction is dead. Mneme returns FAIL on architectural-pattern violations by default to keep the cost localized to the diff that introduced it.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Does the FAIL verdict block the PR?</summary>
+        <div class="faq-body">Yes &mdash; when the GitHub Actions enforcement gate is configured for strict mode. The FAIL exit code from <code>mneme check</code> fails the CI job, which blocks the PR from merging until the violation is resolved or an explicit override decision record is added. Override events are themselves tracked, so weakening the rule is a visible decision rather than a silent one.</div>
+      </details>
+    </div>
+
+    
+    <h2 id="related-reading" style="margin-top:3rem;">Related reading</h2>
+    <ul style="margin:0 0 1.25rem 1.5rem;">
+        <li><a href="/demo/storage-decision/">the PASS scenario (storage decision)</a></li>
+    </ul>
+
+    <div class="scenario-cta">
+      <a href="/demo/dependency-policy/">&larr; Previous &middot; Dependency policy (WARN)</a>
+      <a href="/demo/" class="next">Back to demo &rarr;</a>
+    </div>
+  </div>
+</article>
+</main>
+
+<footer>
+  <p>
+    <a href="/use-cases/">Use cases</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/insights/">Insights</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/standards/">Standards</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/compare/">Compare</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/integrations/">Integrations</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/founder/">Founder</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/about/">About</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/contact/">Contact</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/privacy/">Privacy</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a>
+    &nbsp;&middot;&nbsp;
+    Open source
+    &nbsp;&middot;&nbsp;
+    MIT License
+  </p>
+</footer>
+
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  btn.addEventListener('click', function(){
+    var open = links.classList.toggle('open');
+    btn.setAttribute('aria-expanded', String(open));
+  });
+})();
+</script>
+<script><!-- nav-active -->
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
+</body>
+</html>

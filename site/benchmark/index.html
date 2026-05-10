@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Governance Benchmark v1.1 Methodology — Mneme HQ</title>
-  <meta name="description" content="The deterministic methodology behind Mneme's architectural governance benchmark. 36 scenarios across six categories, structured-output verification, layered retrieval and enforcement metrics. Pre-registered thresholds and reproducible." />
+  <meta name="description" content="Mneme's architectural governance benchmark — 36 scenarios, structured-output verification, layered metrics, pre-registered thresholds. Deterministic and reproducible." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/benchmark/" />
@@ -572,8 +572,9 @@
     <a href="/#how-it-works">How it works</a>
     <a href="/use-cases/">Use cases</a>
     <a href="/insights/">Insights</a>
+    <a href="/standards/">Standards</a>
     <a href="/roadmap/">Roadmap</a>
-    <a href="/demo.html">Demo</a>
+    <a href="/demo/">Demo</a>
     <a href="/#benchmarks">Benchmarks</a>
     <a href="https://github.com/TheoV823/mneme">GitHub</a>
     <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
@@ -591,8 +592,10 @@
 <header class="doc-hero">
   <div class="doc-eyebrow">Methodology &middot; v1.1</div>
   <h1>Governance Benchmark v1.1 methodology.</h1>
-  <div class="doc-meta">
-    <span><strong>Published</strong> May 6, 2026</span>
+  <div class="doc-meta byline">
+    <span><strong>Published</strong> <time datetime="2026-05-06">May 6, 2026</time></span>
+    <span><strong>Updated</strong> <time datetime="2026-05-10">May 10, 2026</time></span>
+    <span><strong>Author</strong> <a href="/founder/" style="color:inherit;text-decoration:none;border-bottom:1px dotted currentColor;">Theo Valmis</a></span>
     <span><strong>Status</strong> Methodology live, full results pending suite validation</span>
     <span><strong>License</strong> MIT</span>
   </div>
@@ -869,12 +872,32 @@
 
 <!-- CTA -->
 <section class="doc-cta">
+  <h2 id="faq" style="font-family:'Inter',sans-serif;font-size:1.25rem;font-weight:600;letter-spacing:-0.015em;margin-bottom:1.25rem;">FAQ</h2>
+  <div style="text-align:left;max-width:720px;margin:0 auto 3rem;">
+    <details style="border-top:1px solid var(--border);padding:1.05rem 0;">
+      <summary style="cursor:pointer;font-size:0.92rem;color:var(--text);font-weight:500;list-style:none;position:relative;padding-right:2rem;">What does the Mneme Governance Benchmark measure?</summary>
+      <div style="padding-top:0.85rem;font-size:0.85rem;color:var(--muted);line-height:1.8;">It measures whether Mneme reduces architectural rule violations in AI-generated code under controlled conditions, separately from whether the right rule was retrieved. The benchmark reports violation prevention rate, baseline drift rate, false positive rate, retrieval recall and precision at K, irrelevant injection rate, and the gap between end-to-end and oracle enforcement.</div>
+    </details>
+    <details style="border-top:1px solid var(--border);padding:1.05rem 0;">
+      <summary style="cursor:pointer;font-size:0.92rem;color:var(--text);font-weight:500;list-style:none;position:relative;padding-right:2rem;">Why structured-output verification instead of grading prose?</summary>
+      <div style="padding-top:0.85rem;font-size:0.85rem;color:var(--muted);line-height:1.8;">Prose grading is gameable. A model can earn credit by writing the right words while still violating in the code. Mneme requires the model to emit structured JSON conforming to a fixed response schema, and verifiers operate on that artifact. Verdicts are based on observable facts in the output, not on claims about the output.</div>
+    </details>
+    <details style="border-top:1px solid var(--border);padding:1.05rem 0;">
+      <summary style="cursor:pointer;font-size:0.92rem;color:var(--text);font-weight:500;list-style:none;position:relative;padding-right:2rem;">Why are controls 22 percent of the suite?</summary>
+      <div style="padding-top:0.85rem;font-size:0.85rem;color:var(--muted);line-height:1.8;">Controls are scenarios where the rule does not apply and the correct behavior is no intervention. Without controls, a governance system can appear effective by simply over-blocking, which would be unhelpful in production. Controls are the only credible way to measure false positive rate. Anything below 20 percent makes the false positive number suspect.</div>
+    </details>
+    <details style="border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:1.05rem 0;">
+      <summary style="cursor:pointer;font-size:0.92rem;color:var(--text);font-weight:500;list-style:none;position:relative;padding-right:2rem;">Why publish methodology before results?</summary>
+      <div style="padding-top:0.85rem;font-size:0.85rem;color:var(--muted);line-height:1.8;">Methodology gameability is a bigger risk than slow results. Publishing the methodology first lets the community pressure-test it before numbers exist. Publishing numbers without methodology invites attacks the publisher cannot win. The order is deliberate and signals that Mneme treats benchmark rigor as a first-class concern.</div>
+    </details>
+  </div>
   <h2>Methodology before metrics.</h2>
   <p>Full benchmark results publish after scenario suite validation. Methodology and harness are public now.</p>
   <div class="cta-group">
     <a href="https://github.com/TheoV823/mneme/tree/main/benchmarks/governance-v1.1" class="btn-primary">View on GitHub</a>
     <a href="/" class="btn-ghost">Back to home</a>
   </div>
+  <p style="margin-top:2rem; font-size:0.85rem; color:var(--muted); line-height:1.8;">Related: the architectural argument behind the layer this benchmark measures is in <a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/" style="color:var(--accent);text-decoration:none;">architectural governance across heterogeneous AI coding agents</a>. The standards landscape this benchmark methodology is intended to be evaluable against is at <a href="/standards/" style="color:var(--accent);text-decoration:none;">/standards/</a>. The full set of governance use cases is at <a href="/use-cases/" style="color:var(--accent);text-decoration:none;">/use-cases/</a>.</p>
 </section>
 
 </main>
@@ -884,6 +907,8 @@
     <a href="/use-cases/">Use cases</a>
     &nbsp;&middot;&nbsp;
     <a href="/insights/">Insights</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/standards/">Standards</a>
     &nbsp;&middot;&nbsp;
     <a href="/compare/">Compare</a>
     &nbsp;&middot;&nbsp;

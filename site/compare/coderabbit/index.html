@@ -56,6 +56,21 @@
     .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
     .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
     .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    .faq-list { margin-top: 1.5rem; }
+    .faq-item { border-top: 1px solid var(--border); padding: 1.05rem 0; }
+    .faq-item:last-child { border-bottom: 1px solid var(--border); }
+    .faq-item summary { cursor: pointer; font-size: 0.92rem; color: var(--text); font-weight: 500; list-style: none; position: relative; padding-right: 2rem; }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; font-family: 'DM Mono', monospace; color: var(--muted); font-size: 1.1rem; position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
+    .faq-item[open] summary::after { content: '\2212'; }
+    .faq-body { padding-top: 0.85rem; font-size: 0.85rem; color: var(--muted); line-height: 1.8; }
+    .faq-body a { color: var(--accent); text-decoration: none; }
+    .faq-body a:hover { color: var(--accent-dim); }
 
     .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
     .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
@@ -134,6 +149,26 @@
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
         "image": "https://mnemehq.com/compare/coderabbit/og.png",
         "mainEntityOfPage": "https://mnemehq.com/compare/coderabbit/"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {"@type": "Question", "name": "Should we replace CodeRabbit with Mneme HQ, or use both?", "acceptedAnswer": {"@type": "Answer", "text": "Use both, in most cases. They operate at different stages of the same problem. Mneme HQ enforces architectural decisions before code is generated; CodeRabbit reviews what was generated for quality, security, and stylistic issues. The combination compresses the review loop from days to minutes — Mneme catches violations the agent would have proposed, CodeRabbit catches the rest."}},
+          {"@type": "Question", "name": "Can CodeRabbit enforce architectural decisions on its own?", "acceptedAnswer": {"@type": "Answer", "text": "CodeRabbit is excellent at surfacing architectural concerns in PR review and can be configured with custom review rules. What it cannot do is prevent the violation from being generated in the first place — by the time CodeRabbit sees the diff, the cost is already in flight (engineer time on the PR, reviewer attention, branch turbulence). Pre-generation enforcement closes that gap."}},
+          {"@type": "Question", "name": "Does Mneme HQ replace code review entirely?", "acceptedAnswer": {"@type": "Answer", "text": "No. Mneme replaces the architectural-rule-checking part of review, which is the most automatable and the most easily missed at AI-generation velocity. Human review and tools like CodeRabbit still cover correctness, security, naming, test coverage, and judgment calls that no rule corpus encodes. The argument for shifting governance left is in the review-is-not-governance article."}},
+          {"@type": "Question", "name": "What is the cost difference?", "acceptedAnswer": {"@type": "Answer", "text": "Mneme HQ is open source, self-hosted, MIT-licensed — there is no per-seat or per-PR pricing. CodeRabbit is a managed SaaS with seat- and review-based pricing. The cost models are not directly comparable: Mneme's cost is engineering time to operate; CodeRabbit's is recurring spend. Most teams that adopt Mneme do not drop CodeRabbit because the categories are complementary."}}
+        ]
+      },
+      {
+        "@type": "HowTo",
+        "name": "Run Mneme HQ alongside CodeRabbit",
+        "description": "Use Mneme as the pre-generation enforcement layer and CodeRabbit as the post-generation review layer. The two operate on different stages and do not conflict.",
+        "step": [
+          {"@type": "HowToStep", "name": "Install Mneme on the developer side", "text": "pip install mneme && mneme init seeds project_memory.json. Add the mneme-hook entry to Claude Code or wire the Cursor rules export."},
+          {"@type": "HowToStep", "name": "Add Mneme to CI", "text": "Add a mneme check --mode strict step to the CI pipeline so PRs are blocked on hard FAIL verdicts before they reach review."},
+          {"@type": "HowToStep", "name": "Keep CodeRabbit as the review layer", "text": "Leave CodeRabbit's PR review running as-is. With Mneme catching architectural violations pre-generation, CodeRabbit's review surface shrinks to correctness, security, and stylistic concerns — the load decreases per PR."},
+          {"@type": "HowToStep", "name": "Track override events", "text": "When a Mneme rule is overridden via an explicit decision record, that override is itself tracked. CodeRabbit reviewers can see the override rationale in the diff history when evaluating the PR."}
+        ]
       }
     ]
   }
@@ -151,8 +186,9 @@
     <a href="/#how-it-works">How it works</a>
     <a href="/use-cases/">Use cases</a>
     <a href="/insights/">Insights</a>
+    <a href="/standards/">Standards</a>
     <a href="/roadmap/">Roadmap</a>
-    <a href="/demo.html">Demo</a>
+    <a href="/demo/">Demo</a>
     <a href="/#benchmarks">Benchmarks</a>
     <a href="https://github.com/TheoV823/mneme">GitHub</a>
     <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
@@ -175,7 +211,14 @@
       <span class="eyebrow-meta">6 min read &nbsp;·&nbsp; May 2026</span>
     </div>
     <h1>Mneme HQ vs CodeRabbit</h1>
-    <p class="article-lede">CodeRabbit is an AI PR reviewer. Mneme HQ is a pre-generation enforcement layer. They operate at different stages of the same problem — and they are not mutually exclusive.</p>
+    <p class="article-lede">CodeRabbit is an AI PR reviewer. Mneme HQ is a pre-generation enforcement layer. They operate at different stages of the same problem &mdash; and they are not mutually exclusive.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-07">Published May 2026</time>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-10">Updated May 2026</time>
+    </p>
   </header>
 
   <div class="article-body">
@@ -291,7 +334,47 @@
 
     <p>For more on why review cannot absorb the governance load at AI coding scale, see <a href="/insights/ai-code-review-does-not-scale-linearly/" style="color:var(--accent);text-decoration:none;">AI Code Review Does Not Scale Linearly</a> and <a href="/insights/why-code-review-cannot-scale-with-ai-output/" style="color:var(--accent);text-decoration:none;">Why Code Review Cannot Scale With AI Output</a>.</p>
 
+    <h2>Decision matrix &mdash; choose in 30 seconds</h2>
+
+    <p>Both tools earn their cost. The question is what each is best at, not which one wins. Use this as the starting point:</p>
+    <ul>
+      <li><strong>Use CodeRabbit alone</strong> if your team is small, your AI-generated PR volume is low, and your architectural rules live in human memory rather than as enforceable artifacts. The review-time catch is sufficient when there are not many PRs and the team can hold the rules in their heads.</li>
+      <li><strong>Use Mneme HQ alone</strong> if you want pre-generation enforcement and your team accepts post-generation review as a manual practice rather than an automated layer. Most teams that go this route eventually re-add review tooling once architectural enforcement is solid.</li>
+      <li><strong>Use both</strong> &mdash; the typical pattern at engineering organizations beyond a handful of contributors. Mneme catches architectural violations before they're proposed; CodeRabbit catches correctness, security, and style during review. The combination compresses the review loop without removing review.</li>
+    </ul>
+
+    <h2>FAQ</h2>
+
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Should we replace CodeRabbit with Mneme HQ, or use both?</summary>
+        <div class="faq-body">Use both, in most cases. They operate at different stages of the same problem. Mneme HQ enforces architectural decisions before code is generated; CodeRabbit reviews what was generated for quality, security, and stylistic issues. The combination compresses the review loop from days to minutes &mdash; Mneme catches violations the agent would have proposed, CodeRabbit catches the rest.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Can CodeRabbit enforce architectural decisions on its own?</summary>
+        <div class="faq-body">CodeRabbit is excellent at surfacing architectural concerns in PR review and can be configured with custom review rules. What it cannot do is prevent the violation from being generated in the first place &mdash; by the time CodeRabbit sees the diff, the cost is already in flight (engineer time on the PR, reviewer attention, branch turbulence). Pre-generation enforcement closes that gap. See <a href="/insights/review-is-not-governance/">review is not governance</a> for the broader argument.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Does Mneme HQ replace code review entirely?</summary>
+        <div class="faq-body">No. Mneme replaces the architectural-rule-checking part of review, which is the most automatable and the most easily missed at AI-generation velocity. Human review and tools like CodeRabbit still cover correctness, security, naming, test coverage, and judgment calls that no rule corpus encodes.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>What is the cost difference?</summary>
+        <div class="faq-body">Mneme HQ is open source, self-hosted, MIT-licensed &mdash; there is no per-seat or per-PR pricing. CodeRabbit is a managed SaaS with seat- and review-based pricing. The cost models are not directly comparable: Mneme's cost is engineering time to operate; CodeRabbit's is recurring spend. Most teams that adopt Mneme do not drop CodeRabbit because the categories are complementary.</div>
+      </details>
+    </div>
+
   </div>
+
+  
+    <h2 id="related-reading" style="margin-top:3rem;">Related reading</h2>
+    <ul style="margin:0 0 1.25rem 1.5rem;">
+        <li><a href="/compare/cursor-rules/">Mneme HQ vs Cursor Rules</a></li>
+        <li><a href="/compare/">all comparison pages</a></li>
+    </ul>
 
   <footer class="article-footer">
     <a href="/compare/" class="back-link">← Back to Compare</a>
@@ -311,6 +394,8 @@
     <a href="/use-cases/">Use cases</a>
     &nbsp;&middot;&nbsp;
     <a href="/insights/">Insights</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/standards/">Standards</a>
     &nbsp;&middot;&nbsp;
     <a href="/compare/">Compare</a>
     &nbsp;&middot;&nbsp;

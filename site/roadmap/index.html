@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Roadmap — Mneme HQ</title>
+  <title>Roadmap &mdash; Mneme HQ Governance Layer for AI Coding</title>
   <meta name="description" content="Mneme HQ is evolving from local governance tooling into the governance infrastructure layer for AI-assisted software development. See our strategic direction." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
@@ -26,6 +26,30 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
   <link rel="icon" href="/favicon.png" type="image/png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Roadmap", "item": "https://mnemehq.com/roadmap/"}
+        ]
+      },
+      {
+        "@type": "WebPage",
+        "name": "Roadmap — Mneme HQ Governance Layer for AI Coding",
+        "description": "Mneme HQ is evolving from local governance tooling into the governance infrastructure layer for AI-assisted software development. Strategic direction across four phases.",
+        "url": "https://mnemehq.com/roadmap/",
+        "datePublished": "2026-04-01",
+        "dateModified": "2026-05-10",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}}
+      }
+    ]
+  }
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -171,8 +195,9 @@
     <a href="/#how-it-works">How it works</a>
     <a href="/use-cases/">Use cases</a>
     <a href="/insights/">Insights</a>
+    <a href="/standards/">Standards</a>
     <a href="/roadmap/">Roadmap</a>
-    <a href="/demo.html">Demo</a>
+    <a href="/demo/">Demo</a>
     <a href="/#benchmarks">Benchmarks</a>
     <a href="https://github.com/TheoV823/mneme">GitHub</a>
     <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
@@ -301,6 +326,15 @@
   </div>
   </div>
 
+  <!-- CONTEXT: how the roadmap connects to current work -->
+  <div class="section-wrap" style="border-top:none;">
+    <div class="section-eyebrow">How this connects to what's shipped today</div>
+    <h2 class="section-title">The roadmap is not speculative.</h2>
+    <p style="color:var(--muted); font-size:0.92rem; line-height:1.85; max-width:720px; margin:0 auto 1.1rem;">Each phase builds on something already in production. The OSS developer wedge ships today as the open-source <code style="font-family:'DM Mono',monospace;font-size:0.82em;">mneme</code> CLI, the Claude Code hook, the Cursor rules export, and the GitHub Actions enforcement gate &mdash; see the <a href="/integrations/" style="color:var(--accent);text-decoration:none;">integrations index</a>. The architectural argument behind why this layer has to exist outside any single AI coding tool is in the <a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/" style="color:var(--accent);text-decoration:none;">heterogeneous-agents article</a>.</p>
+    <p style="color:var(--muted); font-size:0.92rem; line-height:1.85; max-width:720px; margin:0 auto 1.1rem;">The team-governance phase extends the same decision corpus into shared org-wide policies with deterministic precedence resolution &mdash; the design pattern is described on the <a href="/for/platform/" style="color:var(--accent);text-decoration:none;">platform engineering page</a>. The agent-platform-integrations phase aligns with the cross-tool standards forming around AGENTS.md, the Model Context Protocol, and NIST CAISI; we track that landscape on the <a href="/standards/" style="color:var(--accent);text-decoration:none;">standards page</a> and the public benchmark methodology behind enforcement claims is at <a href="/benchmark/" style="color:var(--accent);text-decoration:none;">/benchmark/</a>.</p>
+    <p style="color:var(--muted); font-size:0.92rem; line-height:1.85; max-width:720px; margin:0 auto;">The governance-infrastructure phase is the long-term bet: that policy-as-code and drift analytics across engineering organizations will become an operational requirement, not a nice-to-have. That bet is informed by the <a href="/insights/deployment-quality-will-define-the-ai-era/" style="color:var(--accent);text-decoration:none;">deployment-quality argument</a> and the regulatory direction NIST CAISI is taking. Phases ship in order; nothing later is gated on the discovery work.</p>
+  </div>
+
   <!-- CTA FOOTER -->
   <div class="cta-footer">
     <h2>Interested in shaping this roadmap?</h2>
@@ -320,6 +354,8 @@
     <a href="/use-cases/">Use cases</a>
     &nbsp;&middot;&nbsp;
     <a href="/insights/">Insights</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/standards/">Standards</a>
     &nbsp;&middot;&nbsp;
     <a href="/compare/">Compare</a>
     &nbsp;&middot;&nbsp;

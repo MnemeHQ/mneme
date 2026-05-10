@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 1200px; height: 630px; background: #0c0c0d; font-family: 'DM Mono', monospace; overflow: hidden; position: relative; }
+  .grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(200,240,96,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(200,240,96,0.04) 1px, transparent 1px); background-size: 60px 60px; pointer-events: none; }
+  .glow { position: absolute; top: -120px; right: -80px; width: 600px; height: 600px; background: radial-gradient(circle at top right, rgba(200,240,96,0.07), transparent 65%); pointer-events: none; }
+  .container { position: relative; z-index: 1; width: 100%; height: 100%; padding: 44px 52px; display: flex; flex-direction: column; justify-content: space-between; }
+  .top { display: flex; align-items: center; justify-content: space-between; }
+  .logo { font-family: 'Instrument Serif', serif; font-size: 26px; color: #e8e8ec; letter-spacing: -0.3px; }
+  .tag { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; color: #c8f060; background: rgba(200,240,96,0.08); border: 1px solid rgba(200,240,96,0.25); border-radius: 100px; padding: 5px 14px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .middle { flex: 1; display: flex; flex-direction: column; justify-content: center; max-width: 1040px; padding-top: 8px; }
+  .heading { font-family: 'Instrument Serif', serif; font-size: 56px; line-height: 1.1; color: #e8e8ec; letter-spacing: -1px; margin-bottom: 22px; }
+  .heading em { font-style: italic; color: #c8f060; }
+  .schema-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+  .pill { font-family: 'DM Mono', monospace; font-size: 12px; color: #88889a; border: 1px solid #2e2e34; border-radius: 6px; padding: 7px 12px; background: #141416; letter-spacing: 0.02em; }
+  .pill strong { color: #e8e8ec; font-weight: 500; }
+  .arrow { color: #44444e; font-family: 'DM Mono', monospace; font-size: 14px; }
+  .endpoint { font-family: 'DM Mono', monospace; font-size: 12px; color: #c8f060; border: 1px solid rgba(200,240,96,0.35); border-radius: 6px; padding: 7px 12px; background: rgba(200,240,96,0.06); letter-spacing: 0.02em; }
+  .conclusion { font-family: 'DM Mono', monospace; font-size: 13px; color: #c8f060; border-top: 1px solid #222226; padding-top: 14px; letter-spacing: 0.02em; }
+  .bottom { display: flex; align-items: flex-end; justify-content: space-between; }
+  .url { font-family: 'DM Mono', monospace; font-size: 12px; color: #55555f; letter-spacing: 0.01em; }
+  .principle { font-family: 'DM Mono', monospace; font-size: 11px; color: #c8f060; letter-spacing: 0.02em; }
+</style>
+</head>
+<body>
+  <div class="grid"></div>
+  <div class="glow"></div>
+  <div class="container">
+    <div class="top">
+      <span class="logo">Mneme HQ</span>
+      <span class="tag">Industry Analysis</span>
+    </div>
+    <div class="middle">
+      <div class="heading">OpenAI-compatible APIs<br>are <em>commoditizing</em> models</div>
+      <div class="schema-row">
+        <span class="pill"><strong>NVIDIA NIM</strong></span>
+        <span class="pill"><strong>DeepSeek</strong></span>
+        <span class="pill"><strong>Kimi</strong></span>
+        <span class="pill"><strong>GPT-OSS</strong></span>
+        <span class="pill"><strong>Groq &middot; Together &middot; vLLM</strong></span>
+      </div>
+      <div class="schema-row">
+        <span class="arrow">&#x2192;</span>
+        <span class="endpoint">/v1/chat/completions &middot; one base URL away</span>
+      </div>
+      <div class="conclusion" style="margin-top: 20px;">
+        And creating a governance problem.
+      </div>
+    </div>
+    <div class="bottom">
+      <span class="principle">the model becomes configuration &middot; the governance layer is what survives the swap</span>
+      <div class="url">mnemehq.com/insights/openai-compatible-apis-are-commoditizing-models</div>
+    </div>
+  </div>
+</body>
+</html>

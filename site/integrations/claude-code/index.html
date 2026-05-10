@@ -56,6 +56,21 @@
     .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
     .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
     .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    .faq-list { margin-top: 1.5rem; }
+    .faq-item { border-top: 1px solid var(--border); padding: 1.05rem 0; }
+    .faq-item:last-child { border-bottom: 1px solid var(--border); }
+    .faq-item summary { cursor: pointer; font-size: 0.92rem; color: var(--text); font-weight: 500; list-style: none; position: relative; padding-right: 2rem; }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; font-family: 'DM Mono', monospace; color: var(--muted); font-size: 1.1rem; position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
+    .faq-item[open] summary::after { content: '\2212'; }
+    .faq-body { padding-top: 0.85rem; font-size: 0.85rem; color: var(--muted); line-height: 1.8; }
+    .faq-body a { color: var(--accent); text-decoration: none; }
+    .faq-body a:hover { color: var(--accent-dim); }
 
     .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
     .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
@@ -148,6 +163,26 @@
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
         "image": "https://mnemehq.com/integrations/claude-code/og.png",
         "mainEntityOfPage": "https://mnemehq.com/integrations/claude-code/"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {"@type": "Question", "name": "How is the Mneme hook different from CLAUDE.md?", "acceptedAnswer": {"@type": "Answer", "text": "CLAUDE.md is static context: text injected at session start that the model is asked to respect. The Mneme hook runs as a PreToolUse hook — it intercepts every Edit, Write, and MultiEdit before they touch the filesystem and can return exit code 2 to block the operation outright. CLAUDE.md is advisory; the hook is enforcement. The two are complementary: CLAUDE.md gives the model context, Mneme blocks violations regardless of whether the model attended to that context."}},
+          {"@type": "Question", "name": "Does the hook slow down Claude Code sessions?", "acceptedAnswer": {"@type": "Answer", "text": "The retriever is deterministic keyword scoring with no embedding model and no vector store, so per-call latency is in the low milliseconds for typical projects. The hook runs locally; there is no network round trip. For projects with very large decision corpora, scope filters and tag indices keep retrieval bounded."}},
+          {"@type": "Question", "name": "What happens if Mneme itself fails?", "acceptedAnswer": {"@type": "Answer", "text": "The hook is designed fail-open: if the Mneme process errors, returns invalid output, or times out, Claude Code is allowed to proceed rather than being blocked. This is a deliberate safety choice — a broken governance layer should not lock the team out of editing their codebase. Strict mode (mneme check --mode strict) in CI is where hard-blocking lives; the editor-time hook prioritizes availability."}},
+          {"@type": "Question", "name": "Can I use the hook without committing project_memory.json?", "acceptedAnswer": {"@type": "Answer", "text": "Technically yes, but you lose the value. The decision corpus is the source of truth; committing it to the repo means every team member sees the same enforcement, and changes to architectural rules show up in PR review like any other change. Local-only memory recreates the per-engineer drift problem the layer exists to solve."}}
+        ]
+      },
+      {
+        "@type": "HowTo",
+        "name": "Wire Mneme HQ into Claude Code",
+        "description": "Install Mneme, register the PreToolUse hook with Claude Code, and verify enforcement on a test diff.",
+        "step": [
+          {"@type": "HowToStep", "name": "Install", "text": "pip install mneme && mneme init scaffolds project_memory.json at the repo root."},
+          {"@type": "HowToStep", "name": "Register the hook", "text": "Add the mneme-hook command as a PreToolUse hook in your Claude Code hooks configuration so Edit, Write, and MultiEdit operations check the corpus before applying changes."},
+          {"@type": "HowToStep", "name": "Populate decisions", "text": "Replace the placeholder ADRs in project_memory.json with the team's real decisions, including scope (file globs), status, and rationale."},
+          {"@type": "HowToStep", "name": "Verify enforcement", "text": "Trigger a test edit that violates one of the decisions. The hook should block the edit and surface the decision id as feedback. Adjust mode (warn / strict) per environment."}
+        ]
       }
     ]
   }
@@ -165,8 +200,9 @@
     <a href="/#how-it-works">How it works</a>
     <a href="/use-cases/">Use cases</a>
     <a href="/insights/">Insights</a>
+    <a href="/standards/">Standards</a>
     <a href="/roadmap/">Roadmap</a>
-    <a href="/demo.html">Demo</a>
+    <a href="/demo/">Demo</a>
     <a href="/#benchmarks">Benchmarks</a>
     <a href="https://github.com/TheoV823/mneme">GitHub</a>
     <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
@@ -189,7 +225,14 @@
       <span class="eyebrow-meta">6 min read &nbsp;·&nbsp; May 2026</span>
     </div>
     <h1>Governing Claude Code Workflows</h1>
-    <p class="article-lede">Mneme HQ registers a PreToolUse hook with Claude Code. Every Edit, Write, and MultiEdit is intercepted before it reaches disk — violations surface the decision id as feedback and exit 2 (block). Claude Code adjusts its approach without manual intervention.</p>
+    <p class="article-lede">Mneme HQ registers a PreToolUse hook with Claude Code. Every Edit, Write, and MultiEdit is intercepted before it reaches disk &mdash; violations surface the decision id as feedback and exit 2 (block). Claude Code adjusts its approach without manual intervention.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-07">Published May 2026</time>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-10">Updated May 2026</time>
+    </p>
   </header>
 
   <div class="article-body">
@@ -357,7 +400,38 @@
       <li>Review the triggered anti-patterns with <code>/mneme-context</code> to see if they're too broad.</li>
     </ul>
 
+    <h2>FAQ</h2>
+
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>How is the Mneme hook different from CLAUDE.md?</summary>
+        <div class="faq-body">CLAUDE.md is static context: text injected at session start that the model is asked to respect. The Mneme hook runs as a PreToolUse hook &mdash; it intercepts every Edit, Write, and MultiEdit before they touch the filesystem and can return exit code 2 to block the operation outright. CLAUDE.md is advisory; the hook is enforcement. The two are complementary: CLAUDE.md gives the model context, Mneme blocks violations regardless of whether the model attended to that context. See <a href="/insights/why-prompt-memory-fails-at-scale/">why prompt memory fails at scale</a>.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Does the hook slow down Claude Code sessions?</summary>
+        <div class="faq-body">The retriever is deterministic keyword scoring with no embedding model and no vector store, so per-call latency is in the low milliseconds for typical projects. The hook runs locally; there is no network round trip. For projects with very large decision corpora, scope filters and tag indices keep retrieval bounded.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>What happens if Mneme itself fails?</summary>
+        <div class="faq-body">The hook is designed fail-open: if the Mneme process errors, returns invalid output, or times out, Claude Code is allowed to proceed rather than being blocked. This is a deliberate safety choice &mdash; a broken governance layer should not lock the team out of editing their codebase. Strict mode (<code>mneme check --mode strict</code>) in CI is where hard-blocking lives; the editor-time hook prioritizes availability.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Can I use the hook without committing project_memory.json?</summary>
+        <div class="faq-body">Technically yes, but you lose the value. The decision corpus is the source of truth; committing it to the repo means every team member sees the same enforcement, and changes to architectural rules show up in PR review like any other change. Local-only memory recreates the per-engineer drift problem the layer exists to solve.</div>
+      </details>
+    </div>
+
   </div>
+
+  
+    <h2 id="related-reading" style="margin-top:3rem;">Related reading</h2>
+    <ul style="margin:0 0 1.25rem 1.5rem;">
+        <li><a href="/integrations/cursor/">the Cursor integration</a></li>
+        <li><a href="/integrations/github-actions/">the GitHub Actions enforcement gate</a></li>
+    </ul>
 
   <footer class="article-footer">
     <a href="/integrations/" class="back-link">&#8592; All integrations</a>
@@ -377,6 +451,8 @@
     <a href="/use-cases/">Use cases</a>
     &nbsp;&middot;&nbsp;
     <a href="/insights/">Insights</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/standards/">Standards</a>
     &nbsp;&middot;&nbsp;
     <a href="/compare/">Compare</a>
     &nbsp;&middot;&nbsp;

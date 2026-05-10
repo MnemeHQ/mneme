@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Integrations — Mneme HQ</title>
+  <title>Integrations &mdash; Claude Code, Cursor, GitHub Actions &mdash; Mneme HQ</title>
   <meta name="description" content="Mneme HQ fits into your existing AI coding stack. Native integration with Claude Code, Cursor, and GitHub Actions — one authoritative corpus, multiple surfaces." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
@@ -125,8 +125,9 @@
     <a href="/#how-it-works">How it works</a>
     <a href="/use-cases/">Use cases</a>
     <a href="/insights/">Insights</a>
+    <a href="/standards/">Standards</a>
     <a href="/roadmap/">Roadmap</a>
-    <a href="/demo.html">Demo</a>
+    <a href="/demo/">Demo</a>
     <a href="/#benchmarks">Benchmarks</a>
     <a href="https://github.com/TheoV823/mneme">GitHub</a>
     <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
@@ -145,7 +146,10 @@
 </div>
 
 <div class="cards-wrap">
+  <h2 style="font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text); letter-spacing: -0.01em; margin: 0 auto 1rem; max-width: 660px;">Where Mneme fits in your AI coding stack</h2>
   <p class="hub-intro">Mneme HQ is the governance layer above your AI coding stack, not a replacement for the tools in it. Each integration connects Mneme's enforcement engine to a different point in your development workflow.</p>
+
+  <h2 style="font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 500; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; margin: 2.5rem auto 1rem; max-width: 900px;">Available integrations</h2>
 
   <div class="cards-grid">
 
@@ -238,6 +242,19 @@
     </div>
 
   </div>
+
+  <h2 style="font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text); letter-spacing: -0.01em; margin: 4rem auto 1rem; max-width: 660px;">How the integrations fit together</h2>
+
+  <p style="font-size: 0.88rem; color: var(--muted); line-height: 1.85; max-width: 660px; margin: 0 auto 1.1rem;">Mneme is the same decision corpus across every integration. The Claude Code hook intercepts <code style="font-family:'DM Mono',monospace;font-size:0.82em;">Edit</code>, <code style="font-family:'DM Mono',monospace;font-size:0.82em;">Write</code>, and <code style="font-family:'DM Mono',monospace;font-size:0.82em;">MultiEdit</code> at the editor layer; the Cursor rules export gives that same corpus to Cursor sessions; the GitHub Actions gate runs <code style="font-family:'DM Mono',monospace;font-size:0.82em;">mneme check</code> against every PR diff in CI. One <code style="font-family:'DM Mono',monospace;font-size:0.82em;">project_memory.json</code>, three enforcement points, no per-tool duplication.</p>
+
+  <p style="font-size: 0.88rem; color: var(--muted); line-height: 1.85; max-width: 660px; margin: 0 auto 1.1rem;">The reason this matters in practice: most engineering orgs are no longer one-tool shops. An engineer pairs with Claude Code in the terminal, opens Cursor for a frontend touchup, and a Claude Agent SDK bot in CI opens PRs while they sleep. Without a tool-agnostic governance layer, every additional tool is a new place for architectural decisions to drift. With one, every additional tool is net additive: more capability, same enforcement.</p>
+
+  <p style="font-size: 0.88rem; color: var(--muted); line-height: 1.85; max-width: 660px; margin: 0 auto 1.1rem;">For the architectural argument behind this design, see <a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/" style="color: var(--accent); text-decoration: none;">architectural governance across heterogeneous AI coding agents</a>. For how Mneme aligns with the emerging cross-tool standards (NIST CAISI, MCP, AGENTS.md), see <a href="/standards/" style="color: var(--accent); text-decoration: none;">the standards landscape</a>.</p>
+
+  <p style="font-size: 0.88rem; color: var(--muted); line-height: 1.85; max-width: 660px; margin: 0 auto 1.1rem;">Practical setup follows the same pattern across every integration: install with <code style="font-family:'DM Mono',monospace;font-size:0.82em;">pip install mneme</code>, scaffold the decision corpus with <code style="font-family:'DM Mono',monospace;font-size:0.82em;">mneme init</code>, and wire the integration's adapter (PreToolUse hook for Claude Code, rules export for Cursor, GitHub Action for CI). Each integration page links its own concrete steps; the corpus itself is the same file.</p>
+
+  <p style="font-size: 0.88rem; color: var(--muted); line-height: 1.85; max-width: 660px; margin: 0 auto 1.1rem;">If your team is evaluating which integration to start with, the typical sequence is: Claude Code first (interactive enforcement gives the fastest feedback loop), then GitHub Actions in warn mode (catches what slips through), then strict mode in CI on the most architecturally-stable repos. Cursor sits alongside Claude Code for engineers who prefer that editor &mdash; the underlying corpus is identical.</p>
+
 </div>
 </main>
 
@@ -246,6 +263,8 @@
     <a href="/use-cases/">Use cases</a>
     &nbsp;&middot;&nbsp;
     <a href="/insights/">Insights</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/standards/">Standards</a>
     &nbsp;&middot;&nbsp;
     <a href="/compare/">Compare</a>
     &nbsp;&middot;&nbsp;

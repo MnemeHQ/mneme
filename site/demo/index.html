@@ -9,26 +9,75 @@
   <meta name="description" content="Watch Mneme HQ enforce architectural decisions in real time. Same prompt, same model — compliant output when the governance layer is active." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
-  <link rel="canonical" href="https://mnemehq.com/demo.html" />
+  <link rel="canonical" href="https://mnemehq.com/demo/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Mneme HQ" />
   <meta property="og:title" content="Mneme HQ — Architectural Governance Demo" />
   <meta property="og:description" content="Watch Mneme HQ enforce architectural decisions in real time. Same prompt, same model — compliant output when the governance layer is active." />
-  <meta property="og:url" content="https://mnemehq.com/demo.html" />
-  <meta property="og:image" content="https://mnemehq.com/og.png" />
+  <meta property="og:url" content="https://mnemehq.com/demo/" />
+  <meta property="og:image" content="https://mnemehq.com/demo/og.png" />
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Mneme HQ — Architectural Governance Demo" />
   <meta name="twitter:description" content="Watch Mneme HQ enforce architectural decisions in real time. Same prompt, same model — compliant output when the governance layer is active." />
-  <meta name="twitter:image" content="https://mnemehq.com/og.png" />
+  <meta name="twitter:image" content="https://mnemehq.com/demo/og.png" />
   <!-- Google Tag Manager -->
   <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
   <!-- End Google Tag Manager -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Demo", "item": "https://mnemehq.com/demo/"}
+        ]
+      },
+      {
+        "@type": "WebPage",
+        "name": "Mneme HQ — Architectural Governance Demo",
+        "description": "Interactive demonstration of pre-generation architectural governance for AI coding agents. The same prompt to the same model yields compliant output when project decisions are injected, and mneme check validates the generated code against the decision corpus.",
+        "url": "https://mnemehq.com/demo/",
+        "datePublished": "2026-04-01",
+        "dateModified": "2026-05-09",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "primaryImageOfPage": "https://mnemehq.com/demo/og.png",
+        "mainEntity": {"@id": "https://mnemehq.com/#mneme-software"}
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://mnemehq.com/#mneme-software",
+        "name": "Mneme HQ",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Linux, macOS, Windows",
+        "description": "Open-source architectural governance layer for AI coding agents. Compiles project architectural decisions into enforceable, precedence-aware constraints that govern Claude Code, Cursor, GitHub Copilot, Windsurf, and custom SDK agents at the pre-generation stage.",
+        "url": "https://mnemehq.com/",
+        "downloadUrl": "https://github.com/TheoV823/mneme",
+        "license": "https://opensource.org/licenses/MIT",
+        "softwareVersion": "0.4.0",
+        "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"}
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {"@type": "Question", "name": "What does this demo show?", "acceptedAnswer": {"@type": "Answer", "text": "The same prompt sent to the same model produces architecturally compliant output when Mneme injects the project's decision records before generation. A third panel demonstrates mneme check, which validates generated code against those decisions and produces a structured PASS / WARN / FAIL report."}},
+          {"@type": "Question", "name": "What is mneme check?", "acceptedAnswer": {"@type": "Answer", "text": "A CLI command that validates a code change against the project's decision corpus. It runs as a pre-commit hook, in CI, or interactively. Output is structured — PASS, WARN, or FAIL with decision IDs — so it can gate pull requests or feed dashboards."}},
+          {"@type": "Question", "name": "Does this work with Claude Code, Cursor, and GitHub Copilot?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Mneme is tool-agnostic. Hooks for Claude Code intercept Edit, Write, and MultiEdit calls; Cursor reads the same decision corpus through standard rules export; Copilot and other agents are governed via the post-generation enforcement step. See the integrations pages for each tool."}},
+          {"@type": "Question", "name": "How is this different from CLAUDE.md or .cursor/rules?", "acceptedAnswer": {"@type": "Answer", "text": "CLAUDE.md and .cursor/rules are static text files the model is asked to respect. Mneme is a structured decision store with a precedence engine and hook-level enforcement, so compliance is not probabilistic. See the heterogeneous-agents article for the full argument and the cursor-rules comparison page for the head-to-head."}}
+        ]
+      }
+    ]
+  }
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -135,9 +184,20 @@
       color: var(--muted);
       font-size: 0.9rem;
       text-align: center;
-      margin-bottom: 2.5rem;
+      margin-bottom: 1rem;
       max-width: 520px;
     }
+    .demo-meta {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    .demo-meta a { color: var(--muted); text-decoration: none; }
+    .demo-meta a:hover { color: var(--text); }
+    .demo-meta .sep { color: var(--border2); margin: 0 0.5rem; }
 
     /* ── STEP INDICATOR ── */
     .step-indicator {
@@ -342,6 +402,171 @@
       margin-top: 0.5rem;
     }
 
+    /* ── STATIC PROSE SECTIONS ── */
+    .demo-prose {
+      width: 100%;
+      max-width: 720px;
+      margin: 4rem auto 0;
+      font-size: 0.92rem;
+      line-height: 1.85;
+      color: var(--muted);
+    }
+    .demo-prose h2 {
+      font-family: 'Inter', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      margin: 3rem 0 1rem;
+      color: var(--text);
+    }
+    .demo-prose h2:first-child { margin-top: 0; }
+    .demo-prose p { margin-bottom: 1.1rem; }
+    .demo-prose p strong { color: var(--text); font-weight: 500; }
+    .demo-prose code {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.05rem 0.4rem;
+      color: var(--text);
+    }
+    .demo-prose a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px dotted rgba(200,240,96,0.4);
+    }
+    .demo-prose a:hover { color: var(--accent-dim); border-bottom-color: rgba(200,240,96,0.7); }
+
+    .scenario-table {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem 1.75rem;
+      margin: 1.75rem 0;
+    }
+    .scenario-table .st-prompt {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--text);
+      background: var(--term-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.7rem 1rem;
+      margin-bottom: 1.25rem;
+    }
+    .scenario-table .st-prompt::before {
+      content: "> ";
+      color: #a78bfa;
+    }
+    .scenario-row {
+      display: grid;
+      grid-template-columns: 9rem 1fr;
+      gap: 1rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+    .scenario-row:last-child { border-bottom: none; }
+    .scenario-row .label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding-top: 0.1rem;
+    }
+    .scenario-row.bad .label { color: var(--fail); }
+    .scenario-row.good .label { color: var(--accent); }
+    .scenario-row .body { color: var(--muted); line-height: 1.7; }
+    .scenario-row .body strong { color: var(--text); font-weight: 500; }
+    @media (max-width: 540px) {
+      .scenario-row { grid-template-columns: 1fr; gap: 0.3rem; }
+    }
+
+    .check-results {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin: 1.75rem 0;
+      font-size: 0.85rem;
+    }
+    .check-results .cr-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.85rem;
+    }
+    .check-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border);
+      line-height: 1.6;
+    }
+    .check-row:last-child { border-bottom: none; }
+    .check-row .verdict {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.06em;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .check-row .verdict.pass { background: rgba(200,240,96,0.12); color: var(--accent); border: 1px solid rgba(200,240,96,0.25); }
+    .check-row .verdict.warn { background: rgba(245,158,11,0.12); color: var(--warn); border: 1px solid rgba(245,158,11,0.25); }
+    .check-row .verdict.fail { background: rgba(239,68,68,0.12); color: var(--fail); border: 1px solid rgba(239,68,68,0.25); }
+    .check-row .desc strong { color: var(--text); font-weight: 500; }
+
+    .scenarios-grid { display: grid; grid-template-columns: 1fr; gap: 0.85rem; margin: 1.5rem 0 0.5rem; }
+    @media (min-width: 640px) { .scenarios-grid { grid-template-columns: repeat(3, 1fr); } }
+    .scenario-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.2rem; text-decoration: none; display: flex; flex-direction: column; gap: 0.55rem; transition: border-color 0.15s, transform 0.15s; }
+    .scenario-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+    .scenario-card .sc-meta { display: flex; align-items: center; gap: 0.55rem; }
+    .scenario-card .sc-num { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+    .scenario-card .sc-verdict { font-family: 'DM Mono', monospace; font-size: 0.6rem; padding: 0.13rem 0.5rem; border-radius: 4px; letter-spacing: 0.06em; }
+    .scenario-card .sc-verdict.pass { background: rgba(200,240,96,0.12); color: var(--accent); border: 1px solid rgba(200,240,96,0.25); }
+    .scenario-card .sc-verdict.warn { background: rgba(245,158,11,0.12); color: var(--warn); border: 1px solid rgba(245,158,11,0.25); }
+    .scenario-card .sc-verdict.fail { background: rgba(239,68,68,0.12); color: var(--fail); border: 1px solid rgba(239,68,68,0.25); }
+    .scenario-card h3 { font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; color: var(--text); margin: 0; line-height: 1.35; }
+    .scenario-card p { font-size: 0.78rem; color: var(--muted); line-height: 1.55; margin: 0; }
+    .scenario-card .sc-arrow { color: var(--accent); font-family: 'DM Mono', monospace; font-size: 0.78rem; margin-top: auto; }
+
+    .faq-list { margin-top: 1.5rem; }
+    .faq-item { border-top: 1px solid var(--border); padding: 1.05rem 0; }
+    .faq-item:last-child { border-bottom: 1px solid var(--border); }
+    .faq-item summary {
+      cursor: pointer;
+      font-size: 0.92rem;
+      color: var(--text);
+      font-weight: 500;
+      list-style: none;
+      position: relative;
+      padding-right: 2rem;
+    }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after {
+      content: '+';
+      font-family: 'DM Mono', monospace;
+      color: var(--muted);
+      font-size: 1.1rem;
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .faq-item[open] summary::after { content: '\2212'; }
+    .faq-body {
+      padding-top: 0.85rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
     /* ── FOOTER ── */
     footer {
       border-top: 1px solid var(--border);
@@ -413,8 +638,9 @@
     <a href="/#how-it-works">How it works</a>
     <a href="/use-cases/">Use cases</a>
     <a href="/insights/">Insights</a>
+    <a href="/standards/">Standards</a>
     <a href="/roadmap/">Roadmap</a>
-    <a href="/demo.html">Demo</a>
+    <a href="/demo/">Demo</a>
     <a href="/#benchmarks">Benchmarks</a>
     <a href="https://github.com/TheoV823/mneme">GitHub</a>
     <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
@@ -425,12 +651,26 @@
     <div class="demo-eyebrow">Interactive demo</div>
     <h1 class="demo-title">Same prompt. Same model.<br>Different answer.</h1>
     <p class="demo-subtitle">Because it has your project's architectural decisions.</p>
+    <p class="demo-meta">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-04-01">Published Apr 2026</time>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-09">Updated May 2026</time>
+    </p>
 
     <div class="step-indicator">
       <div class="step-dot active" id="dot0"></div>
       <div class="step-dot" id="dot1"></div>
       <div class="step-dot" id="dot2"></div>
     </div>
+
+    <noscript>
+      <div style="width:100%;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;padding:1rem 1.25rem;margin-bottom:1.5rem;font-size:0.85rem;color:var(--muted);line-height:1.7;">
+        <strong style="color:var(--accent);font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;display:block;margin-bottom:0.5rem;">JavaScript disabled</strong>
+        The interactive panels below need JavaScript to animate the comparison. The full transcript &mdash; including the prompt, both model outputs, and the <code style="font-family:'DM Mono',monospace;background:var(--surface2);padding:0.05rem 0.4rem;border-radius:4px;">mneme check</code> verdict &mdash; is reproduced as static text under <a href="#explainer" style="color:var(--accent);">"What you're seeing"</a> further down this page.
+      </div>
+    </noscript>
 
     <div class="demo-wrap">
       <!-- WITHOUT MNEME -->
@@ -497,10 +737,125 @@
               <span class="benchmark-desc">passing tests in v0.3.0</span>
             </div>
           </div>
-          <p class="benchmark-coming">Formal benchmark suite with third-party verification — coming soon.</p>
+          <p class="benchmark-coming">Methodology and full scenario suite at <a href="/benchmark/" style="color:var(--accent);text-decoration:none;">/benchmark/</a>. Formal third-party verification &mdash; coming soon.</p>
         </div>
       </div>
     </div>
+
+    <!-- STATIC PROSE: indexable mirror of the interactive demo -->
+    <section class="demo-prose" id="explainer">
+      <h2>What you're seeing</h2>
+
+      <p>The interactive panel above runs the same prompt &mdash; <em>"Refactor the storage backend for scalability"</em> &mdash; through the same model twice. The two outputs disagree because one of them is governed by the project's architectural decisions and the other is not.</p>
+
+      <p><strong>Without Mneme</strong>, the model recommends what its training data suggests for a generic backend refactor: migrate JSON storage to PostgreSQL or Redis, introduce an ORM, add a migration layer. It is reasonable advice in the abstract. It also ignores three architectural decisions this codebase has already made.</p>
+
+      <p><strong>With Mneme</strong>, the relevant decision records are injected into the model's context before generation:</p>
+
+      <div class="scenario-table">
+        <div class="st-prompt">Refactor the storage backend for scalability.</div>
+        <div class="scenario-row bad">
+          <div class="label">Without Mneme</div>
+          <div class="body">Recommends Postgres or Redis. Recommends introducing an ORM. Recommends a migration layer. <strong>Ignores ADR-001, ADR-003, ADR-005.</strong></div>
+        </div>
+        <div class="scenario-row good">
+          <div class="label">With Mneme</div>
+          <div class="body">Per <strong>ADR-001</strong> (JSON storage only &mdash; no external DB), <strong>ADR-003</strong> (no ORM in v1), and <strong>ADR-005</strong> (extend before rebuild), the model proposes extending the existing JSON storage module instead of replacing it. Same prompt, same model, different answer.</div>
+        </div>
+      </div>
+
+      <p>Context injection makes the rules visible to the model. That is half the problem. The other half is enforcement &mdash; ensuring generated code that <em>does</em> reach disk is checked against the same decision corpus. The third panel runs <code>mneme check --mode strict</code>, which reads the generated diff and produces a structured verdict:</p>
+
+      <div class="check-results" aria-label="mneme check sample output">
+        <div class="cr-title">mneme check &middot; sample output</div>
+        <div class="check-row">
+          <span class="verdict pass">PASS</span>
+          <div class="desc"><strong>Storage decision enforced</strong> &mdash; JSON only, no new databases.</div>
+        </div>
+        <div class="check-row">
+          <span class="verdict pass">PASS</span>
+          <div class="desc"><strong>Auth pattern respected</strong> &mdash; JWT middleware unchanged.</div>
+        </div>
+        <div class="check-row">
+          <span class="verdict warn">WARN</span>
+          <div class="desc"><strong>New dependency introduced</strong> &mdash; <code>prisma</code> not in approved list.</div>
+        </div>
+        <div class="check-row">
+          <span class="verdict fail">FAIL</span>
+          <div class="desc"><strong>Violates ADR-004</strong> &mdash; Repository pattern bypassed in <code>user.service.ts</code>.</div>
+        </div>
+      </div>
+
+      <p>This is the difference between context injection and architectural governance. Injection makes the decisions readable. Enforcement makes generated output answer to them. Mneme HQ does both, in one tool-agnostic layer that works across Claude Code, Cursor, GitHub Copilot, Windsurf, and custom SDK agents.</p>
+
+      <h2>Try it yourself</h2>
+
+      <p>Install and run the same flow against your own repository:</p>
+
+      <p><code>pip install mneme &amp;&amp; mneme init &amp;&amp; mneme check</code></p>
+
+      <p>The full source, hook integrations for <a href="/integrations/claude-code/">Claude Code</a> and <a href="/integrations/cursor/">Cursor</a>, the GitHub Actions enforcement gate, and the <code>project_memory.json</code> schema are open source under the MIT license on <a href="https://github.com/TheoV823/mneme" target="_blank" rel="noopener">GitHub</a>.</p>
+
+      <p>For the methodology behind the 18-scenario drift test, see the <a href="/benchmark/">benchmark page</a>. For how Mneme aligns with NIST CAISI, the Model Context Protocol, and AGENTS.md, see the <a href="/standards/">standards landscape</a>. For the long-form argument that governance has to live outside any one AI coding tool, see <a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/">architectural governance across heterogeneous AI coding agents</a>.</p>
+
+      <h2 id="scenarios">More scenarios</h2>
+
+      <p>Each scenario walks through one verdict the demo above produces &mdash; what the AI agent is asked to do, what it would generate without Mneme, what changes when the relevant decision records are injected, and what <code>mneme check</code> emits afterward.</p>
+
+      <div class="scenarios-grid">
+        <a class="scenario-card" href="/demo/storage-decision/">
+          <div class="sc-meta">
+            <span class="sc-num">Scenario 1</span>
+            <span class="sc-verdict pass">PASS</span>
+          </div>
+          <h3>Storage decision enforcement</h3>
+          <p>ADR-001 keeps the codebase on JSON storage. The model proposes extending the existing module instead of migrating to Postgres or Redis.</p>
+          <span class="sc-arrow">Read &rarr;</span>
+        </a>
+        <a class="scenario-card" href="/demo/dependency-policy/">
+          <div class="sc-meta">
+            <span class="sc-num">Scenario 2</span>
+            <span class="sc-verdict warn">WARN</span>
+          </div>
+          <h3>Dependency policy enforcement</h3>
+          <p>An unapproved dependency (<code>prisma</code>) is flagged with a structured WARN, the originating decision ID, and a tracked override path.</p>
+          <span class="sc-arrow">Read &rarr;</span>
+        </a>
+        <a class="scenario-card" href="/demo/repository-pattern/">
+          <div class="sc-meta">
+            <span class="sc-num">Scenario 3</span>
+            <span class="sc-verdict fail">FAIL</span>
+          </div>
+          <h3>Repository pattern enforcement</h3>
+          <p>An ADR-004 violation in <code>user.service.ts</code> hard-fails <code>mneme check</code> in CI, blocking the PR until resolved or explicitly overridden.</p>
+          <span class="sc-arrow">Read &rarr;</span>
+        </a>
+      </div>
+
+      <h2>Frequently asked questions</h2>
+
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>What does this demo show?</summary>
+          <div class="faq-body">The same prompt sent to the same model produces architecturally compliant output when Mneme injects the project's decision records before generation. The third panel demonstrates <code>mneme check</code>, which validates generated code against those decisions and produces a structured PASS / WARN / FAIL report.</div>
+        </details>
+
+        <details class="faq-item">
+          <summary>What is <code>mneme check</code>?</summary>
+          <div class="faq-body">A CLI command that validates a code change against the project's decision corpus. It runs as a pre-commit hook, in CI, or interactively. Output is structured &mdash; PASS, WARN, or FAIL with decision IDs &mdash; so it can gate pull requests, feed dashboards, or block deploys. See the <a href="/integrations/github-actions/">GitHub Actions integration</a> for the CI pattern.</div>
+        </details>
+
+        <details class="faq-item">
+          <summary>Does this work with Claude Code, Cursor, and GitHub Copilot?</summary>
+          <div class="faq-body">Yes. Mneme is tool-agnostic. Hooks for Claude Code intercept Edit, Write, and MultiEdit calls; Cursor reads the same decision corpus through standard rules export; Copilot and other agents are governed via the post-generation enforcement step. See the <a href="/integrations/">integrations index</a> and the <a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/">heterogeneous-agents article</a> for the full design rationale.</div>
+        </details>
+
+        <details class="faq-item">
+          <summary>How is this different from CLAUDE.md or .cursor/rules?</summary>
+          <div class="faq-body">CLAUDE.md and <code>.cursor/rules</code> are static text files the model is asked to respect. Mneme is a structured decision store with a precedence engine and hook-level enforcement, so compliance is not probabilistic. The full breakdown is in <a href="/insights/why-prompt-memory-fails-at-scale/">why prompt memory fails at scale</a>; the head-to-head comparison is at <a href="/compare/cursor-rules/">Mneme vs Cursor Rules</a>.</div>
+        </details>
+      </div>
+    </section>
   </main>
 
   <footer>
@@ -508,6 +863,8 @@
     <a href="/use-cases/">Use cases</a>
     &nbsp;&middot;&nbsp;
     <a href="/insights/">Insights</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/standards/">Standards</a>
     &nbsp;&middot;&nbsp;
     <a href="/compare/">Compare</a>
     &nbsp;&middot;&nbsp;

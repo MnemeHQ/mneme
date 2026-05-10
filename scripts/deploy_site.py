@@ -150,6 +150,27 @@ sync_lines = [l for l in result.stdout.splitlines() if l.strip() and not l.start
 if sync_lines:
     print(f"[sync] {sync_lines[0]}")
 
+# Pre-flight SEO/GEO audit (warn-only — never blocks deploy)
+seo_result = subprocess.run(
+    [sys.executable, str(Path(__file__).parent / "seo_check.py"),
+     "--mode", "warn", "--no-color"],
+    capture_output=True, text=True
+)
+if seo_result.returncode == 0 and seo_result.stdout:
+    summary_line = next(
+        (l for l in seo_result.stdout.splitlines() if l.startswith("Summary:")),
+        ""
+    )
+    fail_lines = [l for l in seo_result.stdout.splitlines() if l.lstrip().startswith(("FAIL", "WARN"))]
+    if summary_line:
+        print(f"[seo] {summary_line}")
+    if fail_lines:
+        print(f"[seo] {len(fail_lines)} non-PASS findings — run "
+              f"`python scripts/seo_check.py` for details")
+elif seo_result.returncode != 0:
+    print("[seo] check skipped (script error):")
+    print(seo_result.stderr.strip()[:500])
+
 # ── Deploy: delta upload — only files changed since last deploy ───────────────
 DEPLOY_TAG = 'site-deployed'
 

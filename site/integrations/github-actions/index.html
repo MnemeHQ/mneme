@@ -141,6 +141,14 @@
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
         "image": "https://mnemehq.com/integrations/github-actions/og.png",
         "mainEntityOfPage": "https://mnemehq.com/integrations/github-actions/"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {"@type": "Question", "name": "Should we run this on every PR or only on main?", "acceptedAnswer": {"@type": "Answer", "text": "Every PR. The point of CI enforcement is to surface violations at PR time when the cost of fixing is lowest. Running only on main means failures land after merge, which defeats the gating purpose. The check is fast — deterministic keyword scoring, no embedding model — so per-PR cost is negligible."}},
+          {"@type": "Question", "name": "What if a PR needs to override a decision intentionally?", "acceptedAnswer": {"@type": "Answer", "text": "Add an override record to project_memory.json as part of the same PR — with rationale, scope, and expiry. The check picks it up automatically. The override is reviewable in the PR diff like any other change, so weakening a constraint is a visible decision rather than a silent merge."}},
+          {"@type": "Question", "name": "How does this compare to running CodeRabbit or a custom linter in CI?", "acceptedAnswer": {"@type": "Answer", "text": "Different layers. Linters check syntax and style; CodeRabbit reviews PRs for correctness and security; Mneme enforces architectural decisions against the project's own decision corpus. They compose: typical CI sequence is lint → mneme check → tests → CodeRabbit review."}}
+        ]
       }
     ]
   }
@@ -158,8 +166,9 @@
     <a href="/#how-it-works">How it works</a>
     <a href="/use-cases/">Use cases</a>
     <a href="/insights/">Insights</a>
+    <a href="/standards/">Standards</a>
     <a href="/roadmap/">Roadmap</a>
-    <a href="/demo.html">Demo</a>
+    <a href="/demo/">Demo</a>
     <a href="/#benchmarks">Benchmarks</a>
     <a href="https://github.com/TheoV823/mneme">GitHub</a>
     <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
@@ -182,7 +191,14 @@
       <span class="eyebrow-meta">4 min read &nbsp;&middot;&nbsp; May 2026</span>
     </div>
     <h1>Architectural Governance in GitHub Actions</h1>
-    <p class="article-lede">Pre-generation enforcement catches most violations before code is written. CI enforcement catches the rest — running Mneme's checks against every PR diff, blocking merges that violate architectural decisions.</p>
+    <p class="article-lede">Pre-generation enforcement catches most violations before code is written. CI enforcement catches the rest &mdash; running Mneme's checks against every PR diff, blocking merges that violate architectural decisions.</p>
+    <p class="byline" style="font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem;">
+      By <a href="/founder/" style="color:var(--muted); text-decoration:none;">Theo Valmis</a>
+      <span style="color: var(--border2); margin: 0 0.5rem;">&middot;</span>
+      <time datetime="2026-04-15">Published Apr 2026</time>
+      <span style="color: var(--border2); margin: 0 0.5rem;">&middot;</span>
+      <time datetime="2026-05-10">Updated May 2026</time>
+    </p>
   </header>
 
   <div class="article-body">
@@ -247,7 +263,43 @@ jobs:
       </p>
     </div>
 
+    <h2>What the gate actually checks</h2>
+
+    <p>The CI step runs <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">mneme check --mode strict</code> against the PR diff and the project's decision corpus. The check returns a structured verdict per touched file, with three possible outcomes:</p>
+
+    <ul>
+      <li><strong>PASS</strong> &mdash; the diff respects the relevant decisions. Exit code 0, CI green.</li>
+      <li><strong>WARN</strong> &mdash; the diff introduces something the corpus flags as policy-bordering (an unapproved dependency, a scope-boundary edge case). Exit code 0 in default mode, surfaces a structured comment via the action's PR-comment step.</li>
+      <li><strong>FAIL</strong> &mdash; the diff violates a hard architectural decision. Exit code 2 in strict mode, fails the workflow, blocks the PR until resolved or explicitly overridden.</li>
+    </ul>
+
+    <p>Override events are themselves tracked: an override is a decision record with a rationale, scope, and expiry, committed as part of the same PR. Weakening a constraint costs the same as introducing one &mdash; a structured edit reviewers can see, not a quiet bypass.</p>
+
+    <h2>FAQ</h2>
+
+    <div class="faq-list" style="margin-top:1.5rem;">
+      <details class="faq-item" style="border-top:1px solid var(--border); padding:1.05rem 0;">
+        <summary style="cursor:pointer; font-size:0.92rem; color:var(--text); font-weight:500; list-style:none; position:relative; padding-right:2rem;">Should we run this on every PR or only on main?</summary>
+        <div style="padding-top:0.85rem; font-size:0.85rem; color:var(--muted); line-height:1.8;">Every PR. The point of CI enforcement is to surface violations at PR time when the cost of fixing is lowest. Running only on main means failures land after merge, which defeats the gating purpose. The check is fast (deterministic keyword scoring, no embedding model) so per-PR cost is negligible.</div>
+      </details>
+      <details class="faq-item" style="border-top:1px solid var(--border); padding:1.05rem 0;">
+        <summary style="cursor:pointer; font-size:0.92rem; color:var(--text); font-weight:500; list-style:none; position:relative; padding-right:2rem;">What if a PR needs to override a decision intentionally?</summary>
+        <div style="padding-top:0.85rem; font-size:0.85rem; color:var(--muted); line-height:1.8;">Add an override record to <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">project_memory.json</code> as part of the same PR &mdash; with rationale, scope, and expiry. The check picks it up automatically. The override is reviewable in the PR diff like any other change, so weakening a constraint is a visible decision rather than a silent merge.</div>
+      </details>
+      <details class="faq-item" style="border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:1.05rem 0;">
+        <summary style="cursor:pointer; font-size:0.92rem; color:var(--text); font-weight:500; list-style:none; position:relative; padding-right:2rem;">How does this compare to running CodeRabbit or a custom linter in CI?</summary>
+        <div style="padding-top:0.85rem; font-size:0.85rem; color:var(--muted); line-height:1.8;">Different layers. Linters check syntax and style; CodeRabbit reviews PRs for correctness and security; Mneme enforces architectural decisions against the project's own decision corpus. They compose: the typical CI sequence is lint &rarr; mneme check &rarr; tests &rarr; CodeRabbit review. See the <a href="/compare/coderabbit/" style="color:var(--accent);">CodeRabbit comparison</a> for the detail.</div>
+      </details>
+    </div>
+
   </div>
+
+  
+    <h2 id="related-reading" style="margin-top:3rem;">Related reading</h2>
+    <ul style="margin:0 0 1.25rem 1.5rem;">
+        <li><a href="/integrations/claude-code/">the Claude Code hook</a></li>
+        <li><a href="/integrations/cursor/">the Cursor integration</a></li>
+    </ul>
 
   <footer class="article-footer">
     <a href="/integrations/" class="back-link">&#8592; All integrations</a>
@@ -267,6 +319,8 @@ jobs:
     <a href="/use-cases/">Use cases</a>
     &nbsp;&middot;&nbsp;
     <a href="/insights/">Insights</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/standards/">Standards</a>
     &nbsp;&middot;&nbsp;
     <a href="/compare/">Compare</a>
     &nbsp;&middot;&nbsp;

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OpenAI-Compatible APIs Are Commoditizing Models &mdash; Mneme HQ</title>
+  <meta name="description" content="NVIDIA's NIM platform exposes 80+ frontier models behind a single OpenAI-compatible endpoint. Models are becoming interchangeable infrastructure. The governance layer is what survives the swap." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/insights/openai-compatible-apis-are-commoditizing-models/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="OpenAI-Compatible APIs Are Commoditizing Models" />
+  <meta property="og:description" content="NVIDIA's NIM platform exposes 80+ frontier models behind a single OpenAI-compatible endpoint. Models are becoming interchangeable infrastructure. The governance layer is what survives the swap." />
+  <meta property="og:url" content="https://mnemehq.com/insights/openai-compatible-apis-are-commoditizing-models/" />
+  <meta property="og:image" content="https://mnemehq.com/insights/openai-compatible-apis-are-commoditizing-models/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="OpenAI-Compatible APIs Are Commoditizing Models" />
+  <meta name="twitter:description" content="NVIDIA's NIM platform exposes 80+ frontier models behind a single OpenAI-compatible endpoint. Models are becoming interchangeable infrastructure. The governance layer is what survives the swap." />
+  <meta name="twitter:image" content="https://mnemehq.com/insights/openai-compatible-apis-are-commoditizing-models/og.png" />
+  <meta name="author" content="Theo Valmis" />
+  <meta property="article:published_time" content="2026-05-10T00:00:00Z" />
+  <meta property="article:author" content="https://mnemehq.com/founder/" />
+  <meta property="article:section" content="Industry Analysis" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Insights", "item": "https://mnemehq.com/insights/"},
+          {"@type": "ListItem", "position": 3, "name": "OpenAI-Compatible APIs Are Commoditizing Models", "item": "https://mnemehq.com/insights/openai-compatible-apis-are-commoditizing-models/"}
+        ]
+      },
+      {
+        "@type": "Article",
+        "headline": "OpenAI-Compatible APIs Are Commoditizing Models — And Creating a Governance Problem",
+        "description": "NVIDIA's NIM platform exposes 80+ frontier models behind a single OpenAI-compatible endpoint. Model interoperability accelerates, the swap cost approaches zero, and the layer that survives the swap is governance — not the model.",
+        "url": "https://mnemehq.com/insights/openai-compatible-apis-are-commoditizing-models/",
+        "datePublished": "2026-05-10",
+        "dateModified": "2026-05-10",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "image": "https://mnemehq.com/insights/openai-compatible-apis-are-commoditizing-models/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/insights/openai-compatible-apis-are-commoditizing-models/"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {"@type": "Question", "name": "Does this mean OpenAI's API moat is gone?", "acceptedAnswer": {"@type": "Answer", "text": "The API surface is gone as a moat. The OpenAI Chat Completions schema is now the de facto neutral protocol — adopted by NVIDIA NIM, Together, Groq, DeepSeek, and most open-source inference servers including vLLM. OpenAI's product moats (model quality on specific tasks, fine-tuning ergonomics, distribution) are still real. The interface is no longer one of them."}},
+          {"@type": "Question", "name": "If models are interchangeable, why does which model matter?", "acceptedAnswer": {"@type": "Answer", "text": "Models stay interchangeable in the API sense and become more variable in the architectural sense. Claude tends toward different abstractions than GPT, which tends toward different patterns than DeepSeek or Kimi. The cost of switching models is now low enough that teams will switch frequently — for cost, latency, capability, or compliance — and the architectural drift each model introduces compounds. The decision about which model is no longer load-bearing; the decision about how the codebase stays consistent across models is."}},
+          {"@type": "Question", "name": "Isn't governance just better evaluators?", "acceptedAnswer": {"@type": "Answer", "text": "Evaluators measure whether the output is good. Governance enforces that the output respects decisions the team has already made. They are different problems. An eval can tell you the model produced clean code; only a governance layer can tell you it produced clean code that uses your repository pattern, your approved dependencies, and your existing service boundaries. As models become interchangeable, the eval surface will get more uniform. The governance surface stays project-specific."}},
+          {"@type": "Question", "name": "What's the practical action for engineering teams?", "acceptedAnswer": {"@type": "Answer", "text": "Two things. First, treat model and runtime as configuration, not architecture — get comfortable swapping them, because procurement will demand it within the year. Second, invest the engineering effort in the governance layer that does not move when the model moves: a structured decision corpus, hook-level enforcement, CI gating. The architectural truth has to live somewhere that survives the swap."}}
+        ]
+      }
+    ]
+  }
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #88889a;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .article-wrap { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 7rem; }
+    .article-header { margin-bottom: 3rem; }
+    .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(1.85rem, 4.6vw, 2.7rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.18; margin-bottom: 1.5rem; }
+    .article-lede { font-size: 1.08rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
+    .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
+    .article-body p strong { color: var(--text); font-weight: 500; }
+    .article-body ul { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body ul li { margin-bottom: 0.55rem; line-height: 1.8; }
+    .article-body ul li strong { color: var(--text); font-weight: 500; }
+    .article-body code { font-family: 'DM Mono', monospace; font-size: 0.82rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 0.05rem 0.4rem; color: var(--text); }
+    .article-body a.ext { color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(200,240,96,0.4); }
+    .article-body a.ext:hover { color: var(--accent-dim); border-bottom-color: rgba(200,240,96,0.7); }
+
+    .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin: 0 0 3rem; }
+    .toc .toc-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.9rem; }
+    .toc ol { list-style: none; counter-reset: toc; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 0.45rem; }
+    .toc ol li { counter-increment: toc; font-size: 0.85rem; padding-left: 2.2rem; position: relative; line-height: 1.5; }
+    .toc ol li::before { content: counter(toc, decimal-leading-zero); position: absolute; left: 0; top: 0.05rem; font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--border2); letter-spacing: 0.05em; }
+    .toc a { color: var(--muted); text-decoration: none; transition: color 0.15s; }
+    .toc a:hover { color: var(--accent); }
+    @media (min-width: 720px) { .toc ol { grid-template-columns: 1fr 1fr; gap: 0.55rem 1.5rem; } }
+
+    .answer-capsule { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 0 0 2.5rem; }
+    .answer-capsule p { margin: 0; font-size: 0.92rem; color: var(--muted); line-height: 1.8; }
+    .answer-capsule p strong { color: var(--accent); }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .callout p strong { color: var(--accent); }
+
+    .stack-block { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem; margin: 2rem 0; }
+    .stack-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.1rem; }
+    .stack-row { display: grid; grid-template-columns: 9rem 1fr; gap: 1rem; padding: 0.7rem 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+    .stack-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .stack-row:first-of-type { padding-top: 0; }
+    .stack-row .col-label { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--muted); letter-spacing: 0.04em; }
+    .stack-row .col-text { color: var(--muted); line-height: 1.7; }
+    .stack-row .col-text strong { color: var(--text); font-weight: 500; }
+    @media (max-width: 540px) { .stack-row { grid-template-columns: 1fr; gap: 0.3rem; } }
+
+    .faq-list { margin-top: 1.5rem; }
+    .faq-item { border-top: 1px solid var(--border); padding: 1.05rem 0; }
+    .faq-item:last-child { border-bottom: 1px solid var(--border); }
+    .faq-item summary { cursor: pointer; font-size: 0.92rem; color: var(--text); font-weight: 500; list-style: none; position: relative; padding-right: 2rem; }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; font-family: 'DM Mono', monospace; color: var(--muted); font-size: 1.1rem; position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
+    .faq-item[open] summary::after { content: '\2212'; }
+    .faq-body { padding-top: 0.85rem; font-size: 0.85rem; color: var(--muted); line-height: 1.8; }
+    .faq-body a { color: var(--accent); text-decoration: none; }
+    .faq-body a:hover { color: var(--accent-dim); }
+
+    .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; }
+    .back-link:hover { color: var(--text); }
+    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; }
+    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; }
+    .btn-primary:hover { background: var(--accent-dim); }
+
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .breadcrumb-nav { max-width: 720px; margin: 0 auto; padding: 1.25rem 2rem 0; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.75rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 36px; height: 36px; border-radius: 6px; cursor: pointer; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; }
+    @media (max-width: 640px) {
+      nav { padding: 1rem 1.25rem; position: relative; }
+      .article-wrap { padding: 3rem 1.25rem 5rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0.5rem 1.25rem 1.25rem; z-index: 99; }
+      .nav-links.open { display: flex; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.88rem; padding: 0.7rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+    }
+  </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><svg width="18" height="14" viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 1h16M1 7h16M1 13h16"/></svg></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/standards/">Standards</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/#benchmarks">Benchmarks</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/insights/">Insights</a></li>
+    <li aria-current="page">OpenAI-compatible APIs are commoditizing models</li>
+  </ol>
+</nav>
+<article class="article-wrap">
+  <header class="article-header">
+    <div class="article-eyebrow">
+      <span class="eyebrow-tag">Industry Analysis</span>
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-meta">10 min read &nbsp;&middot;&nbsp; May 2026</span>
+    </div>
+    <h1>OpenAI-compatible APIs are commoditizing models &mdash; and creating a governance problem</h1>
+    <p class="article-lede">NVIDIA's <a class="ext" href="https://build.nvidia.com/models" target="_blank" rel="noopener">NIM platform</a> exposes 80+ frontier models behind a single OpenAI-compatible endpoint. The shape of the moat just changed. When swapping a model is one base-URL away, the layer that matters is no longer the model &mdash; it is whatever survives the swap. For engineering organizations shipping AI-assisted code, that layer is governance.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-10">Published May 2026</time>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-10">Updated May 2026</time>
+    </p>
+  </header>
+
+  <div class="article-body">
+
+    <div class="answer-capsule">
+      <p><strong>The thesis.</strong> The OpenAI Chat Completions schema has become the de facto neutral protocol for LLM inference. NVIDIA's NIM platform now serves 80+ frontier models &mdash; including DeepSeek, Kimi, GLM, GPT-OSS-120B, and Nemotron &mdash; behind that single interface. Models are interchangeable infrastructure. The strategically scarce layer is no longer the model. It is the system that preserves engineering continuity across constantly changing models and agents.</p>
+    </div>
+
+    <nav class="toc" aria-label="Table of contents">
+      <div class="toc-title">In this article</div>
+      <ol>
+        <li><a href="#trigger">The trigger: NVIDIA's NIM platform</a></li>
+        <li><a href="#interchangeable">Why interchangeable models change the stack</a></li>
+        <li><a href="#heterogeneous">Teams will run heterogeneous coding agents</a></li>
+        <li><a href="#tendencies">Different models, different architectural tendencies</a></li>
+        <li><a href="#continuity">Continuity becomes the hardest problem</a></li>
+        <li><a href="#governance">Governance shifts model-specific &rarr; architecture-specific</a></li>
+        <li><a href="#pre-generation">Why pre-generation governance matters</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="trigger">The trigger: NVIDIA's NIM platform</h2>
+
+    <p>NVIDIA's <a class="ext" href="https://build.nvidia.com/models" target="_blank" rel="noopener">build.nvidia.com</a> catalog hosts NIMs &mdash; NVIDIA Inference Microservices &mdash; that expose <a class="ext" href="https://docs.nvidia.com/nim/large-language-models/latest/api-reference.html" target="_blank" rel="noopener">OpenAI-compatible endpoints</a> backed by vLLM. The schema is unambiguous: <code>/v1/chat/completions</code> and <code>/v1/completions</code> in OpenAI's exact format, with optional <code>/v1/messages</code> for Anthropic-format compatibility. The same models you would otherwise pay frontier-API prices for &mdash; or self-host on your own hardware &mdash; now answer to the same code that points at api.openai.com.</p>
+
+    <p>This is not a small announcement dressed up. It is an architectural commitment from the company whose chips run nearly all of those models anyway. NVIDIA is taking the position that the inference layer should not be a vendor-specific contract, and they are backing it with the catalog and the SDK ergonomics to make it stick.</p>
+
+    <p>The press treatment of moves like this tends to focus on the cost story (free tier, GPU access, model availability). The cost story is real but secondary. The structural story is interface convergence. Once every serious inference provider exposes the same endpoint, the model becomes a configuration value.</p>
+
+    <h2 id="interchangeable">Why interchangeable models change the stack</h2>
+
+    <p>The OpenAI Chat Completions schema is now adopted by NVIDIA NIM, <a class="ext" href="https://docs.together.ai/" target="_blank" rel="noopener">Together AI</a>, <a class="ext" href="https://console.groq.com/docs/openai" target="_blank" rel="noopener">Groq</a>, DeepSeek, Mistral, most open-source inference servers including <a class="ext" href="https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html" target="_blank" rel="noopener">vLLM</a>, and a long tail of regional providers. Anthropic's API is the largest holdout for a reason &mdash; the message format is genuinely different &mdash; but vLLM ships an Anthropic-compatible endpoint too, and the gap is narrowing.</p>
+
+    <p>For engineering teams, this collapses the model question from "which provider do we contract with for the next eighteen months" to "which base URL do we point at this week." Switching costs that used to be measured in re-architecting now measure in environment variables. That changes three things at once:</p>
+
+    <ul>
+      <li><strong>Procurement gets simpler and faster.</strong> Buying decisions stop being multi-quarter commitments. They become quarterly cost-and-capability reviews.</li>
+      <li><strong>The model stops being the differentiator.</strong> If every provider hosts the leading open-weights models on the same interface, the answer to "what model are you using" is no longer interesting. The follow-up &mdash; "how is it integrated into your engineering workflow" &mdash; is.</li>
+      <li><strong>The variability moves up the stack.</strong> What used to be a single procurement decision becomes a runtime variable, and runtime variables compound differently than configuration ones.</li>
+    </ul>
+
+    <h2 id="heterogeneous">Teams will run heterogeneous coding agents</h2>
+
+    <p>The same forces that make models interchangeable make coding agents interchangeable. <a class="ext" href="https://docs.anthropic.com/en/docs/claude-code/overview" target="_blank" rel="noopener">Claude Code</a> for the terminal, <a class="ext" href="https://www.cursor.com/" target="_blank" rel="noopener">Cursor</a> for the editor, GitHub Copilot for inline completion, Windsurf for plan-and-edit, custom SDK agents for CI &mdash; each is configurable to point at whichever model the team prefers, on whichever runtime is cheapest or fastest this quarter.</p>
+
+    <p>This is the multi-tool reality the <a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/">heterogeneous-agents article</a> describes, and the NIM-style interface convergence accelerates it. A team that picked Claude in 2025 because their Claude Code workflow worked is now one configuration change away from running the same workflow against DeepSeek V3, Kimi K2, or a self-hosted Llama variant. The tool stays. The model rotates. The codebase has to be ready for both.</p>
+
+    <h2 id="tendencies">Different models, different architectural tendencies</h2>
+
+    <p>The interface is uniform. The behavior is not. Every frontier model has architectural tendencies it picked up from its training distribution &mdash; ways it prefers to structure code, abstractions it reaches for, idioms it considers normal. These tendencies are not bugs. They are stable model characteristics that a team feels as "this one writes code I like, that one writes code I have to clean up."</p>
+
+    <div class="stack-block">
+      <div class="stack-title">Architectural drift across models, observable today</div>
+      <div class="stack-row">
+        <div class="col-label">Claude (Anthropic)</div>
+        <div class="col-text">Prefers explicit type annotations, conservative refactors, patterns from idiomatic Python and TypeScript. Tendency to extract helpers earlier than necessary.</div>
+      </div>
+      <div class="stack-row">
+        <div class="col-label">GPT (OpenAI)</div>
+        <div class="col-text">More aggressive on completion of partial code; reaches for popular libraries by default. Tendency to introduce dependencies the team has not approved.</div>
+      </div>
+      <div class="stack-row">
+        <div class="col-label">DeepSeek / Qwen / Kimi</div>
+        <div class="col-text">Strong on systems and lower-level code; abstractions chosen from a different training distribution. Tendency to introduce idioms that are correct but unusual for a Western codebase.</div>
+      </div>
+      <div class="stack-row">
+        <div class="col-label">Inline-completion models (Copilot)</div>
+        <div class="col-text">Optimized for sub-second completions; minimal context. Tendency to scaffold the same patterns the surrounding code uses, including its mistakes.</div>
+      </div>
+    </div>
+
+    <p>None of these tendencies is a problem in isolation. They become a problem when the same codebase is touched by three of them in the same week. The result is a repository that quietly accumulates inconsistent abstractions, a dependency graph that drifts based on which model was prompted last, and a review queue that has to police architectural choices that should have been made once.</p>
+
+    <h2 id="continuity">Continuity becomes the hardest problem</h2>
+
+    <p>If models are interchangeable infrastructure and tools route to whichever model is configured today, the architectural layer of the codebase has to be the part that stays still. That is not how most teams currently operate. The architectural layer for AI-assisted code today usually lives in:</p>
+
+    <ul>
+      <li>A <code>CLAUDE.md</code> file that the model reads at session start (advisory).</li>
+      <li>A <code>.cursor/rules</code> directory that Cursor injects into prompts (advisory).</li>
+      <li>A <code>.github/copilot-instructions.md</code> file Copilot may or may not consult (advisory).</li>
+      <li>The institutional memory of senior engineers who catch violations during review (under-resourced).</li>
+    </ul>
+
+    <p>Each of these is fine for a single tool with a single model. None of them survives the swap. When the team rotates models for cost or capability reasons, the per-tool memory files do not change with the model, but the architectural tendencies the model brings do. The drift is not loud. It is quiet and structural, and it shows up months later as a codebase nobody can quite explain.</p>
+
+    <div class="callout">
+      <p><strong>The structural read.</strong> The winning layer may not be the model. It may be the system that preserves engineering continuity across constantly changing models and agents.</p>
+    </div>
+
+    <h2 id="governance">Governance shifts from model-specific to architecture-specific</h2>
+
+    <p>For most of the last two years, "AI governance" in practice meant "decisions about which model and provider to use." That framing made sense when the choice was load-bearing. It is no longer load-bearing. The decisions that matter now are not about the model. They are about the architecture the model has to respect, regardless of which model is wired up at the moment.</p>
+
+    <p>That shift has concrete implications:</p>
+
+    <ul>
+      <li><strong>Architectural decisions become first-class artifacts.</strong> ADRs, dependency policies, service-boundary rules &mdash; the things that used to live in design docs &mdash; now have to live in a corpus the agent can query, regardless of which model is on the other end of the API.</li>
+      <li><strong>Enforcement moves to the seam.</strong> The reliable enforcement point is no longer the model's prompt context. It is the file write, the commit, the PR &mdash; places where every model eventually has to agree to the same constraint.</li>
+      <li><strong>Governance becomes tool-agnostic by necessity.</strong> A governance layer that only works with one model or one agent re-creates the lock-in problem the OpenAI-compatible interface just solved at the inference layer.</li>
+    </ul>
+
+    <p>This is not a prediction. It is a description of where engineering organizations that ship AI-assisted code at scale are already moving. The teams that figured out CI in 2014 did not wait for the build-tool wars to end &mdash; they wrote pipelines against whichever runner was current and let the runner be replaceable. The same play is available now for AI-coding governance, and the conditions for it are getting more favorable every month.</p>
+
+    <h2 id="pre-generation">Why pre-generation governance matters when models are commoditized</h2>
+
+    <p>The temptation, when models are interchangeable, is to push governance to post-generation review. "Let any model write whatever; we'll catch issues in CI or at PR review." This works for a while. It breaks for the same reason review-as-governance breaks at AI generation rates: the throughput of generation outpaces the throughput of review, and the most architecturally invasive violations are the ones that look fine in a diff but compound into incoherent codebases over months. The argument is in <a href="/insights/why-code-review-cannot-scale-with-ai-output/">why code review cannot scale with AI output</a> and <a href="/insights/review-is-not-governance/">review is not governance</a>.</p>
+
+    <p>Pre-generation governance &mdash; injecting the relevant decision records into the model's context before generation, then enforcing them at the file-write hook &mdash; works because it is the last layer that does not care which model is on the other side. The decision corpus stays the same when the team switches from Claude to DeepSeek. The hook stays the same when the team switches from Claude Code to Cursor. The CI gate stays the same when the runtime moves from OpenAI to NIM. Everything underneath becomes configuration; the architectural truth is the durable artifact.</p>
+
+    <p>This is the strategic read on the NIM announcement. NVIDIA accelerated a transition that was already underway. The transition makes the model less important and the governance layer above it more important. For engineering organizations: invest the engineering effort in the layer that does not move when the model moves. For the field: expect the next two years of AI-coding category formation to happen at the governance layer, not at the model layer.</p>
+
+    <p>Mneme HQ is built around exactly this thesis: a tool-agnostic, model-agnostic decision corpus with hook-level enforcement that works across Claude Code, Cursor, Copilot, Windsurf, and custom SDK agents &mdash; regardless of whether the inference is happening at Anthropic, OpenAI, NVIDIA NIM, or a self-hosted vLLM server. The argument behind that design is on the <a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/">heterogeneous-agents article</a> and the alignment with emerging standards is on the <a href="/standards/">standards landscape</a>.</p>
+
+    <h2 id="faq">FAQ</h2>
+
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Does this mean OpenAI's API moat is gone?</summary>
+        <div class="faq-body">The API surface is gone as a moat. The OpenAI Chat Completions schema is now the de facto neutral protocol &mdash; adopted by NVIDIA NIM, Together, Groq, DeepSeek, and most open-source inference servers including <a href="https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html" target="_blank" rel="noopener">vLLM</a>. OpenAI's product moats (model quality on specific tasks, fine-tuning ergonomics, distribution) are still real. The interface is no longer one of them.</div>
+      </details>
+      <details class="faq-item">
+        <summary>If models are interchangeable, why does which model matter?</summary>
+        <div class="faq-body">Models stay interchangeable in the API sense and become more variable in the architectural sense. Claude tends toward different abstractions than GPT, which tends toward different patterns than DeepSeek or Kimi. The cost of switching models is now low enough that teams will switch frequently &mdash; for cost, latency, capability, or compliance &mdash; and the architectural drift each model introduces compounds. The decision about which model is no longer load-bearing; the decision about how the codebase stays consistent across models is.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Isn't governance just better evaluators?</summary>
+        <div class="faq-body">Evaluators measure whether the output is good. Governance enforces that the output respects decisions the team has already made. They are different problems. An eval can tell you the model produced clean code; only a governance layer can tell you it produced clean code that uses your repository pattern, your approved dependencies, and your existing service boundaries. As models become interchangeable, the eval surface will get more uniform. The governance surface stays project-specific.</div>
+      </details>
+      <details class="faq-item">
+        <summary>What's the practical action for engineering teams?</summary>
+        <div class="faq-body">Two things. First, treat model and runtime as configuration, not architecture &mdash; get comfortable swapping them, because procurement will demand it within the year. Second, invest the engineering effort in the governance layer that does not move when the model moves: a structured decision corpus, hook-level enforcement, CI gating. The architectural truth has to live somewhere that survives the swap. See <a href="/insights/why-prompt-memory-fails-at-scale/">why prompt memory fails at scale</a> and the <a href="/standards/">standards landscape</a>.</div>
+      </details>
+    </div>
+
+  </div>
+
+  <footer class="article-footer">
+    <a href="/insights/" class="back-link">&larr; Back to Insights</a>
+
+    <div class="cta-block">
+      <h3>The layer that survives the model swap</h3>
+      <p>Mneme HQ is the open-source decision corpus and pre-generation enforcement layer. Tool-agnostic, model-agnostic, framework-independent &mdash; built for codebases that change models without changing architecture.</p>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
+    </div>
+  </footer>
+</article>
+</main>
+
+<footer>
+  <p>
+    <a href="/use-cases/">Use cases</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/insights/">Insights</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/standards/">Standards</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/compare/">Compare</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/integrations/">Integrations</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/founder/">Founder</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/about/">About</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/contact/">Contact</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/privacy/">Privacy</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a>
+    &nbsp;&middot;&nbsp;
+    Open source
+    &nbsp;&middot;&nbsp;
+    MIT License
+  </p>
+</footer>
+
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  btn.addEventListener('click', function(){
+    var open = links.classList.toggle('open');
+    btn.setAttribute('aria-expanded', String(open));
+  });
+})();
+</script>
+<script><!-- nav-active -->
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Architectural Governance Across Heterogeneous AI Coding Agents — Mneme HQ</title>
+  <meta name="description" content="Most engineering orgs run multiple AI coding tools — Claude Code, Cursor, Copilot, Windsurf, SDK agents — against one codebase. Per-tool memory fails at the seams." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/insights/architectural-governance-across-heterogeneous-ai-coding-agents/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Architectural Governance Across Heterogeneous AI Coding Agents" />
+  <meta property="og:description" content="Most engineering orgs run multiple AI coding tools — Claude Code, Cursor, Copilot, Windsurf, SDK agents — against one codebase. Per-tool memory fails at the seams." />
+  <meta property="og:url" content="https://mnemehq.com/insights/architectural-governance-across-heterogeneous-ai-coding-agents/" />
+  <meta property="og:image" content="https://mnemehq.com/insights/architectural-governance-across-heterogeneous-ai-coding-agents/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Architectural Governance Across Heterogeneous AI Coding Agents" />
+  <meta name="twitter:description" content="Most engineering orgs run multiple AI coding tools — Claude Code, Cursor, Copilot, Windsurf, SDK agents — against one codebase. Per-tool memory fails at the seams." />
+  <meta name="twitter:image" content="https://mnemehq.com/insights/architectural-governance-across-heterogeneous-ai-coding-agents/og.png" />
+  <meta name="author" content="Theo Valmis" />
+  <meta property="article:published_time" content="2026-05-09T00:00:00Z" />
+  <meta property="article:author" content="https://mnemehq.com/founder/" />
+  <meta property="article:section" content="Engineering" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #88889a;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .article-wrap { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 7rem; }
+    .article-header { margin-bottom: 3.5rem; }
+    .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+
+    .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
+    .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
+    .article-body p strong { color: var(--text); font-weight: 500; }
+    .article-body ul { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body ul li { margin-bottom: 0.5rem; line-height: 1.8; }
+    .article-body ul li strong { color: var(--text); font-weight: 500; }
+    .article-body code { font-family: 'DM Mono', monospace; font-size: 0.82rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 0.05rem 0.4rem; color: var(--text); }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout p strong { color: var(--accent); }
+
+    .failure-stack { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2rem; margin: 2.5rem 0; }
+    .failure-stack .stack-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
+    .stack-row { display: flex; align-items: flex-start; gap: 1rem; padding: 0.9rem 0; border-bottom: 1px solid var(--border); }
+    .stack-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .stack-row:first-of-type { padding-top: 0; }
+    .stack-num { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--border2); flex-shrink: 0; padding-top: 0.1rem; min-width: 1.5rem; }
+    .stack-content { flex: 1; }
+    .stack-label { font-size: 0.82rem; font-weight: 600; color: var(--text); margin-bottom: 0.25rem; }
+    .stack-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.7; }
+
+    .agents-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border-radius: 12px; overflow: hidden; margin: 2.5rem 0; }
+    .agent-cell { background: var(--surface); padding: 1.5rem 1.5rem; }
+    .agent-cell .label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+    .agent-cell .tool { font-size: 0.92rem; font-weight: 600; color: var(--text); margin-bottom: 0.4rem; }
+    .agent-cell .desc { font-size: 0.78rem; color: var(--muted); line-height: 1.65; }
+    @media (max-width: 540px) { .agents-grid { grid-template-columns: 1fr; } }
+
+    .contrast-block { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border-radius: 12px; overflow: hidden; margin: 2.5rem 0; }
+    .contrast-cell { background: var(--surface); padding: 1.75rem; }
+    .contrast-cell .label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem; }
+    .contrast-cell .tool { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem; }
+    .contrast-cell .desc { font-size: 0.82rem; color: var(--muted); line-height: 1.65; }
+    .contrast-cell.accent-left { border-left: 3px solid var(--border2); }
+    .contrast-cell.accent-right { border-left: 3px solid var(--accent); }
+    @media (max-width: 540px) { .contrast-block { grid-template-columns: 1fr; } }
+
+    .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .back-link:hover { color: var(--text); }
+    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2rem; }
+    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--accent-dim); }
+
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .breadcrumb-nav { max-width: 720px; margin: 0 auto; padding: 1.25rem 2rem 0; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.75rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin: 0 0 3rem; }
+    .toc .toc-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.9rem; }
+    .toc ol { list-style: none; counter-reset: toc; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 0.45rem; }
+    .toc ol li { counter-increment: toc; font-size: 0.85rem; padding-left: 2.2rem; position: relative; line-height: 1.5; }
+    .toc ol li::before { content: counter(toc, decimal-leading-zero); position: absolute; left: 0; top: 0.05rem; font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--border2); letter-spacing: 0.05em; }
+    .toc a { color: var(--muted); text-decoration: none; transition: color 0.15s; }
+    .toc a:hover { color: var(--accent); }
+    @media (min-width: 720px) { .toc ol { grid-template-columns: 1fr 1fr; gap: 0.55rem 1.5rem; } }
+
+    .figure { margin: 2.5rem 0; }
+    .figure svg { display: block; width: 100%; height: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+    .figure figcaption { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-top: 0.75rem; padding-left: 0.25rem; }
+
+    .timeline-table { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin: 2.5rem 0; overflow-x: auto; }
+    .timeline-table .tl-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+    .timeline-table table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .timeline-table th, .timeline-table td { text-align: left; padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; }
+    .timeline-table th { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+    .timeline-table td:first-child { color: var(--text); font-weight: 500; min-width: 9rem; }
+    .timeline-table td.ai-row { color: var(--accent); }
+    .timeline-table tr:last-child td { border-bottom: none; }
+
+    .faq-list { margin: 2rem 0 0; }
+    .faq-item { border-top: 1px solid var(--border); padding: 1.1rem 0; }
+    .faq-item:last-child { border-bottom: 1px solid var(--border); }
+    .faq-item summary { cursor: pointer; font-size: 0.92rem; color: var(--text); font-weight: 500; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; font-family: 'DM Mono', monospace; color: var(--muted); font-size: 1.1rem; transition: transform 0.15s; }
+    .faq-item[open] summary::after { content: '\2212'; }
+    .faq-body { padding-top: 0.9rem; font-size: 0.85rem; color: var(--muted); line-height: 1.8; }
+    .faq-body a { color: var(--accent); text-decoration: none; }
+    .faq-body a:hover { color: var(--accent-dim); }
+
+    .article-body a.ext { color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(200,240,96,0.4); }
+    .article-body a.ext:hover { color: var(--accent-dim); border-bottom-color: rgba(200,240,96,0.7); }
+
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 36px; height: 36px; border-radius: 6px; cursor: pointer; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; }
+
+    @media (max-width: 640px) {
+      nav { padding: 1rem 1.25rem; position: relative; }
+      .article-wrap { padding: 3rem 1.25rem 5rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0.5rem 1.25rem 1.25rem; z-index: 99; }
+      .nav-links.open { display: flex; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.88rem; padding: 0.7rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+    }
+  
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Insights", "item": "https://mnemehq.com/insights/"},
+          {"@type": "ListItem", "position": 3, "name": "Architectural Governance Across Heterogeneous AI Coding Agents", "item": "https://mnemehq.com/insights/architectural-governance-across-heterogeneous-ai-coding-agents/"}
+        ]
+      },
+      {
+        "@type": "Article",
+        "headline": "Architectural Governance Across Heterogeneous AI Coding Agents",
+        "description": "Most engineering orgs run multiple AI coding tools — Claude Code, Cursor, Copilot, Windsurf, SDK agents — against one codebase. Per-tool memory fails at the seams.",
+        "url": "https://mnemehq.com/insights/architectural-governance-across-heterogeneous-ai-coding-agents/",
+        "datePublished": "2026-05-09",
+        "dateModified": "2026-05-09",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "image": "https://mnemehq.com/insights/architectural-governance-across-heterogeneous-ai-coding-agents/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/insights/architectural-governance-across-heterogeneous-ai-coding-agents/"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {"@type": "Question", "name": "Is this only a problem for large engineering orgs?", "acceptedAnswer": {"@type": "Answer", "text": "No, but the pain compounds with team size. A two-engineer team using both Cursor and Claude Code can keep rule files aligned manually. With multiple repos, several engineers, and any async agent, the cost of maintaining duplicated per-tool memory exceeds the cost of running a shared decision store."}},
+          {"@type": "Question", "name": "Doesn't AGENTS.md already solve this?", "acceptedAnswer": {"@type": "Answer", "text": "AGENTS.md solves the static-instructions-in-a-portable-format problem and Mneme treats it as a first-class export target. It does not solve precedence between conflicting decisions, scope-aware injection, or pre-generation enforcement. A markdown file is read; it is not queried and it is not an enforcement point."}},
+          {"@type": "Question", "name": "How does MCP fit in?", "acceptedAnswer": {"@type": "Answer", "text": "MCP is the substrate. Exposing a decision store as an MCP server makes it queryable by any MCP-aware client without per-tool integration. The governance schema, precedence rules, and enforcement layer still need to live somewhere. MCP solves connectivity, not content."}},
+          {"@type": "Question", "name": "What does NIST's work mean for engineering teams today?", "acceptedAnswer": {"@type": "Answer", "text": "Near term, limited operational impact — the initiative is in RFI / concept-paper / listening-session phase. Medium term, identity and authorization patterns harden first, followed by audit and behavioral controls. Regulated industries should track it; others can treat it as a multi-year tailwind."}},
+          {"@type": "Question", "name": "What if our org standardizes on one AI tool?", "acceptedAnswer": {"@type": "Answer", "text": "In practice, engineering orgs of meaningful size do not standardize on one tool. Inline completion, interactive coding, and async PR-opening agents tend to coexist because each is best-in-class at a different task. Procurement is one decision; what engineers actually use is another."}},
+          {"@type": "Question", "name": "Will the eventual standard make Mneme redundant?", "acceptedAnswer": {"@type": "Answer", "text": "No, in the same way OCI did not make Docker redundant and OAuth did not make Okta redundant. A standard defines the contract; vendors and open-source projects implement it. Mneme is designed to align with whatever cross-tool format emerges and to be the structured decision-store implementation that consumes and exports it."}},
+          {"@type": "Question", "name": "How does an agnostic layer protect against tool churn?", "acceptedAnswer": {"@type": "Answer", "text": "The leading AI coding tool has changed roughly every eighteen months — Copilot dominant in 2022, Cursor through 2024, Claude Code reshaping things in 2025–26. A team whose architectural memory lives inside one tool's native format pays a rewrite cost every migration. A team whose memory lives in an agnostic layer can swap the tool underneath without touching governance."}}
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><svg width="18" height="14" viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 1h16M1 7h16M1 13h16"/></svg></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/standards/">Standards</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/#benchmarks">Benchmarks</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/insights/">Insights</a></li>
+    <li aria-current="page">Architectural Governance Across Heterogeneous AI Coding Agents</li>
+  </ol>
+</nav>
+<article class="article-wrap">
+  <header class="article-header">
+    <div class="article-eyebrow">
+      <span class="eyebrow-tag">Category Education</span>
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-meta">13 min read &nbsp;&middot;&nbsp; May 2026</span>
+    </div>
+    <h1>Architectural governance across heterogeneous AI coding agents</h1>
+    <p class="article-lede">Most engineering orgs are no longer one-tool shops. One engineer is in Claude Code, another in Cursor, the platform team is running Copilot in CI, and somebody just shipped a bespoke agent built on the Claude Agent SDK. They all touch the same codebase. They all carry their own memory format. Architectural governance dies at the seams.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-09">Published May 2026</time>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-09">Updated May 2026</time>
+    </p>
+  </header>
+
+  <div class="article-body">
+
+    <nav class="toc" aria-label="Table of contents">
+      <div class="toc-title">In this article</div>
+      <ol>
+        <li><a href="#fragmentation">The fragmentation that already happened</a></li>
+        <li><a href="#silo">Why each tool's native memory is a silo</a></li>
+        <li><a href="#seam">The seam problem</a></li>
+        <li><a href="#history">How other categories solved this</a></li>
+        <li><a href="#standards">Where the standards landscape stands today</a></li>
+        <li><a href="#requirements">What governance has to look like to survive heterogeneity</a></li>
+        <li><a href="#lock-in">Lock-in is the second cost</a></li>
+        <li><a href="#category">The category framing</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ol>
+    </nav>
+
+    <p>Three years ago, the AI coding question for engineering leaders was "which assistant should we standardize on." That question is dead. The realistic answer in 2026 is "all of them, in different parts of the stack, often by the same engineer in the same week." A backend engineer pairs with Claude Code in the terminal, opens Cursor for a frontend touchup, lets Copilot autocomplete inside the JetBrains IDE, and reviews a PR opened by a Claude Agent SDK bot that the platform team wrote.</p>
+
+    <p>Each of these tools has its own idea of what "memory" means. CLAUDE.md for Claude Code. <code>.cursor/rules/</code> for Cursor. <code>.github/copilot-instructions.md</code> for Copilot. Custom system prompts for whatever the platform team built. The instructions overlap. They drift. They contradict each other. And nobody owns the union.</p>
+
+    <p>This is the multi-tool reality that architectural governance has to survive. It will not survive in any single tool's native memory format.</p>
+
+    <h2 id="fragmentation">The fragmentation that already happened</h2>
+
+    <p>Engineering orgs do not adopt AI coding tools the way they adopt CI runners. There is no "we standardized on Jenkins" moment. Adoption is bottom-up, per-engineer, per-task, and increasingly per-stage of the SDLC. The result is a stack that looks like this in most teams running AI seriously:</p>
+
+    <div class="agents-grid">
+      <div class="agent-cell">
+        <div class="label">Interactive coding</div>
+        <div class="tool">Claude Code, Cursor, Windsurf</div>
+        <div class="desc">Engineer-driven sessions in the editor or terminal. Memory lives in CLAUDE.md, .cursor/rules, .windsurfrules.</div>
+      </div>
+      <div class="agent-cell">
+        <div class="label">Inline completion</div>
+        <div class="tool">GitHub Copilot, Codeium, Tabnine</div>
+        <div class="desc">Always-on, sub-second completions. Limited or no project memory. Often configured per-IDE, not per-repo.</div>
+      </div>
+      <div class="agent-cell">
+        <div class="label">CI / async agents</div>
+        <div class="tool">Claude Code on the web, Copilot Workspace, custom SDK bots</div>
+        <div class="desc">Agents that open PRs, triage issues, run reviews. Often run with a different system prompt than what the engineer sees locally.</div>
+      </div>
+      <div class="agent-cell">
+        <div class="label">Domain-specific agents</div>
+        <div class="tool">Migration bots, codemod agents, security scanners</div>
+        <div class="desc">Built in-house on Claude Agent SDK, LangGraph, AutoGen. Each carries its own prompt, its own scope, its own opinion.</div>
+      </div>
+    </div>
+
+    <p>Each tool was designed to be excellent in isolation. None of them was designed to share a single canonical view of the architectural decisions the codebase is supposed to obey.</p>
+
+    <figure class="figure" aria-labelledby="fig1-cap">
+      <svg viewBox="0 0 720 360" role="img" aria-label="Diagram showing five AI coding tools each with their own memory format, all writing into one shared codebase">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="#88889a"/>
+          </marker>
+          <marker id="arrAccent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="#c8f060"/>
+          </marker>
+        </defs>
+        <g font-family="DM Mono, monospace" font-size="11" fill="#88889a">
+          <text x="32" y="28" fill="#88889a" font-size="10" letter-spacing="1.2">AGENT</text>
+          <text x="248" y="28" fill="#88889a" font-size="10" letter-spacing="1.2">NATIVE MEMORY FORMAT</text>
+          <text x="568" y="28" fill="#88889a" font-size="10" letter-spacing="1.2">TARGET</text>
+        </g>
+        <g font-family="Inter, sans-serif" font-size="13">
+          <!-- Row 1 -->
+          <rect x="24" y="48" width="180" height="40" rx="6" fill="#1a1a1d" stroke="#2e2e34"/>
+          <text x="40" y="73" fill="#e8e8ec">Claude Code</text>
+          <rect x="240" y="48" width="280" height="40" rx="6" fill="#141416" stroke="#222226"/>
+          <text x="256" y="73" fill="#88889a" font-family="DM Mono, monospace" font-size="12">CLAUDE.md</text>
+          <line x1="204" y1="68" x2="240" y2="68" stroke="#88889a" stroke-width="1" marker-end="url(#arr)"/>
+          <!-- Row 2 -->
+          <rect x="24" y="100" width="180" height="40" rx="6" fill="#1a1a1d" stroke="#2e2e34"/>
+          <text x="40" y="125" fill="#e8e8ec">Cursor</text>
+          <rect x="240" y="100" width="280" height="40" rx="6" fill="#141416" stroke="#222226"/>
+          <text x="256" y="125" fill="#88889a" font-family="DM Mono, monospace" font-size="12">.cursor/rules/*.mdc</text>
+          <line x1="204" y1="120" x2="240" y2="120" stroke="#88889a" stroke-width="1" marker-end="url(#arr)"/>
+          <!-- Row 3 -->
+          <rect x="24" y="152" width="180" height="40" rx="6" fill="#1a1a1d" stroke="#2e2e34"/>
+          <text x="40" y="177" fill="#e8e8ec">GitHub Copilot</text>
+          <rect x="240" y="152" width="280" height="40" rx="6" fill="#141416" stroke="#222226"/>
+          <text x="256" y="177" fill="#88889a" font-family="DM Mono, monospace" font-size="12">.github/copilot-instructions.md</text>
+          <line x1="204" y1="172" x2="240" y2="172" stroke="#88889a" stroke-width="1" marker-end="url(#arr)"/>
+          <!-- Row 4 -->
+          <rect x="24" y="204" width="180" height="40" rx="6" fill="#1a1a1d" stroke="#2e2e34"/>
+          <text x="40" y="229" fill="#e8e8ec">Windsurf / Codex</text>
+          <rect x="240" y="204" width="280" height="40" rx="6" fill="#141416" stroke="#222226"/>
+          <text x="256" y="229" fill="#88889a" font-family="DM Mono, monospace" font-size="12">AGENTS.md / .windsurfrules</text>
+          <line x1="204" y1="224" x2="240" y2="224" stroke="#88889a" stroke-width="1" marker-end="url(#arr)"/>
+          <!-- Row 5 -->
+          <rect x="24" y="256" width="180" height="40" rx="6" fill="#1a1a1d" stroke="#2e2e34"/>
+          <text x="40" y="281" fill="#e8e8ec">Custom SDK agents</text>
+          <rect x="240" y="256" width="280" height="40" rx="6" fill="#141416" stroke="#222226"/>
+          <text x="256" y="281" fill="#88889a" font-family="DM Mono, monospace" font-size="12">bespoke system prompts</text>
+          <line x1="204" y1="276" x2="240" y2="276" stroke="#88889a" stroke-width="1" marker-end="url(#arr)"/>
+          <!-- target -->
+          <rect x="556" y="148" width="140" height="64" rx="8" fill="#0c0c0d" stroke="#c8f060" stroke-width="1.5"/>
+          <text x="626" y="178" fill="#c8f060" text-anchor="middle" font-family="DM Mono, monospace" font-size="12">one</text>
+          <text x="626" y="196" fill="#c8f060" text-anchor="middle" font-family="DM Mono, monospace" font-size="12">codebase</text>
+          <!-- arrows from formats to target -->
+          <path d="M520 68 C 540 68, 540 168, 556 168" fill="none" stroke="#c8f060" stroke-width="1" stroke-opacity="0.55" marker-end="url(#arrAccent)"/>
+          <path d="M520 120 C 540 120, 540 174, 556 174" fill="none" stroke="#c8f060" stroke-width="1" stroke-opacity="0.55" marker-end="url(#arrAccent)"/>
+          <path d="M520 172 L556 180" fill="none" stroke="#c8f060" stroke-width="1" stroke-opacity="0.55" marker-end="url(#arrAccent)"/>
+          <path d="M520 224 C 540 224, 540 188, 556 188" fill="none" stroke="#c8f060" stroke-width="1" stroke-opacity="0.55" marker-end="url(#arrAccent)"/>
+          <path d="M520 276 C 540 276, 540 196, 556 196" fill="none" stroke="#c8f060" stroke-width="1" stroke-opacity="0.55" marker-end="url(#arrAccent)"/>
+          <text x="360" y="334" text-anchor="middle" fill="#55555f" font-family="DM Mono, monospace" font-size="10">five formats &middot; five sources of truth &middot; one set of architectural rules to enforce</text>
+        </g>
+      </svg>
+      <figcaption id="fig1-cap">Fig 1 &middot; Per-tool memory formats fan out; the codebase they govern does not.</figcaption>
+    </figure>
+
+    <h2 id="silo">Why each tool's native memory is a silo</h2>
+
+    <p>The natural first instinct is to copy the same rules into every tool's preferred format. Write the architecture in <code>CLAUDE.md</code>, then mirror it into <code>.cursor/rules/</code>, then again into <code>.github/copilot-instructions.md</code>. Some teams script this with a shared markdown file and a generator. It looks clean for a sprint. Then it breaks for the same reasons every duplicated source of truth breaks.</p>
+
+    <div class="failure-stack">
+      <div class="stack-title">Why per-tool memory fails as governance</div>
+
+      <div class="stack-row">
+        <div class="stack-num">01</div>
+        <div class="stack-content">
+          <div class="stack-label">Format mismatch is not just syntactic</div>
+          <div class="stack-desc">Claude Code reads CLAUDE.md as a single context block. Cursor splits rules by glob and applies them only when matching files are touched. Copilot truncates aggressively. Two of those three will silently drop a rule that the third enforces. The same English sentence behaves differently in each tool.</div>
+        </div>
+      </div>
+
+      <div class="stack-row">
+        <div class="stack-num">02</div>
+        <div class="stack-content">
+          <div class="stack-label">Drift compounds per tool</div>
+          <div class="stack-desc">An engineer updates CLAUDE.md after a refactor. Nobody updates the Cursor rule file. The web agent that opens PRs is still running with last quarter's system prompt. Three tools, three different snapshots of "what the architecture is" — and reviewers cannot tell which one any given diff was generated against.</div>
+        </div>
+      </div>
+
+      <div class="stack-row">
+        <div class="stack-num">03</div>
+        <div class="stack-content">
+          <div class="stack-label">Precedence is per-tool, not per-decision</div>
+          <div class="stack-desc">When two rules conflict, Cursor resolves it by file glob, Claude Code by ordering in CLAUDE.md, Copilot by whatever the model attended to. None of them know that ADR-014 supersedes ADR-007 for the payments service specifically. Precedence is an architectural fact, not a tool feature.</div>
+        </div>
+      </div>
+
+      <div class="stack-row">
+        <div class="stack-num">04</div>
+        <div class="stack-content">
+          <div class="stack-label">No shared enforcement seam</div>
+          <div class="stack-desc">Even if every tool reads the rules correctly, compliance is still advisory inside each one. There is no shared point at which generated code from any agent — interactive, async, in-CI — has to pass the same governance check before being accepted. The seams between tools are where violations land.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <h2 id="seam">The seam problem</h2>
+
+    <p>Heterogeneous tooling does not just multiply the per-tool failure modes. It creates a new class of failure that exists only at the boundaries between tools.</p>
+
+    <p>An engineer prototypes a service in Cursor with a relaxed rule about external API calls because they were experimenting. They push. A Claude Agent SDK bot picks up the branch in CI and refactors it, generating code against the stricter system prompt the platform team wrote. The bot's diff and the engineer's diff disagree on the architectural rule. Reviewers see two patches that look reasonable in isolation and cannot tell which agent was operating under which assumption.</p>
+
+    <p>This is not a hypothetical. Every team running both interactive AI in the editor and async AI in CI has seen versions of it. The patches are individually sensible. The collision is structural.</p>
+
+    <div class="callout">
+      <p><strong>The seam between agents is where governance has to live.</strong> Inside each tool, there is no leverage — every model can be ignored, every text block can be misread. Between them, there is a natural enforcement point: the moment generated code is written to disk or proposed as a diff. That moment is the same regardless of which agent produced it.</p>
+    </div>
+
+    <h2 id="history">How other categories solved this</h2>
+
+    <p>The pattern of "many vendor-specific tools, one shared substrate underneath" is not new. Every prior infrastructure category that started fragmented has resolved through a recognizable sequence: vendor proliferation, then a community-led specification, then broad adoption that left vendors free to differentiate above the line.</p>
+
+    <ul>
+      <li><strong>Container runtimes.</strong> Docker dominated, but rkt, LXC, and others fragmented the ecosystem. The Linux Foundation's <a class="ext" href="https://opencontainers.org/" target="_blank" rel="noopener">Open Container Initiative</a> standardized image and runtime formats, and every major runtime today implements them. Docker did not lose; it became one OCI-compliant implementation among several.</li>
+      <li><strong>Tracing and observability.</strong> Vendor APMs (DataDog, New Relic, Dynatrace) all ran their own instrumentation libraries. <a class="ext" href="https://opentelemetry.io/" target="_blank" rel="noopener">OpenTelemetry</a>, a CNCF project, gave the industry a single instrumentation standard. Vendors compete on the backend; the wire format is shared.</li>
+      <li><strong>IDE language tooling.</strong> Every IDE shipped its own language integration. Microsoft's <a class="ext" href="https://microsoft.github.io/language-server-protocol/" target="_blank" rel="noopener">Language Server Protocol</a> defined a common interface so one language server could power VS Code, JetBrains, Vim, Emacs, and more. The fragmentation collapsed onto a shared protocol.</li>
+      <li><strong>Identity.</strong> Per-vendor SSO gave way to <a class="ext" href="https://datatracker.ietf.org/doc/html/rfc6749" target="_blank" rel="noopener">OAuth 2.0</a> and <a class="ext" href="https://openid.net/specs/openid-connect-core-1_0.html" target="_blank" rel="noopener">OpenID Connect</a>. Today no enterprise considers a tool that does not speak them.</li>
+    </ul>
+
+    <p>The phases are consistent across categories. Tools proliferate. Format incompatibility creates real operational pain. A community-led specification forms — usually under a foundation. Vendors implement the spec. Differentiation moves up the stack.</p>
+
+    <figure class="figure" aria-labelledby="fig2-cap">
+      <svg viewBox="0 0 720 320" role="img" aria-label="Timeline showing four categories — containers, tracing, IDE language servers, AI coding agents — moving through phases of fragmentation, convergence, standard, and adoption">
+        <defs>
+          <linearGradient id="phaseGrad" x1="0" x2="1">
+            <stop offset="0%" stop-color="#222226"/>
+            <stop offset="100%" stop-color="#c8f060" stop-opacity="0.5"/>
+          </linearGradient>
+        </defs>
+        <g font-family="DM Mono, monospace" fill="#88889a" font-size="10" letter-spacing="0.06em">
+          <text x="160" y="32">FRAGMENTATION</text>
+          <text x="320" y="32">CONVERGENCE</text>
+          <text x="470" y="32">STANDARD</text>
+          <text x="600" y="32">ADOPTION</text>
+        </g>
+        <!-- phase column dividers -->
+        <g stroke="#222226" stroke-width="1" stroke-dasharray="2 4">
+          <line x1="300" y1="44" x2="300" y2="290"/>
+          <line x1="450" y1="44" x2="450" y2="290"/>
+          <line x1="580" y1="44" x2="580" y2="290"/>
+        </g>
+        <g font-family="Inter, sans-serif" font-size="12">
+          <!-- Containers -->
+          <text x="20" y="78" fill="#e8e8ec" font-weight="500">Containers</text>
+          <rect x="150" y="64" width="540" height="20" rx="3" fill="url(#phaseGrad)"/>
+          <text x="160" y="78" fill="#0c0c0d" font-family="DM Mono, monospace" font-size="11">Docker</text>
+          <text x="320" y="78" fill="#0c0c0d" font-family="DM Mono, monospace" font-size="11">rkt &middot; OCI draft</text>
+          <text x="470" y="78" fill="#0c0c0d" font-family="DM Mono, monospace" font-size="11">OCI 1.0 (2017)</text>
+          <text x="600" y="78" fill="#0c0c0d" font-family="DM Mono, monospace" font-size="11">k8s native</text>
+          <!-- Tracing -->
+          <text x="20" y="128" fill="#e8e8ec" font-weight="500">Tracing</text>
+          <rect x="150" y="114" width="540" height="20" rx="3" fill="url(#phaseGrad)"/>
+          <text x="160" y="128" fill="#0c0c0d" font-family="DM Mono, monospace" font-size="11">vendor APMs</text>
+          <text x="320" y="128" fill="#0c0c0d" font-family="DM Mono, monospace" font-size="11">OpenTracing</text>
+          <text x="470" y="128" fill="#0c0c0d" font-family="DM Mono, monospace" font-size="11">OTel (2019)</text>
+          <text x="600" y="128" fill="#0c0c0d" font-family="DM Mono, monospace" font-size="11">CNCF graduated</text>
+          <!-- IDE -->
+          <text x="20" y="178" fill="#e8e8ec" font-weight="500">IDE language</text>
+          <rect x="150" y="164" width="540" height="20" rx="3" fill="url(#phaseGrad)"/>
+          <text x="160" y="178" fill="#0c0c0d" font-family="DM Mono, monospace" font-size="11">per-IDE plugins</text>
+          <text x="320" y="178" fill="#0c0c0d" font-family="DM Mono, monospace" font-size="11">LSP draft</text>
+          <text x="470" y="178" fill="#0c0c0d" font-family="DM Mono, monospace" font-size="11">LSP 3.0 (2017)</text>
+          <text x="600" y="178" fill="#0c0c0d" font-family="DM Mono, monospace" font-size="11">universal</text>
+          <!-- AI agents -->
+          <text x="20" y="228" fill="#c8f060" font-weight="500">AI coding agents</text>
+          <rect x="150" y="214" width="540" height="20" rx="3" fill="#1a1a1d" stroke="#2e2e34"/>
+          <rect x="150" y="214" width="300" height="20" rx="3" fill="#c8f060" fill-opacity="0.18"/>
+          <text x="160" y="228" fill="#c8f060" font-family="DM Mono, monospace" font-size="11">per-tool rule files</text>
+          <text x="320" y="228" fill="#c8f060" font-family="DM Mono, monospace" font-size="11">AGENTS.md / MCP / CAISI</text>
+          <text x="470" y="228" fill="#55555f" font-family="DM Mono, monospace" font-size="11">&mdash;</text>
+          <text x="600" y="228" fill="#55555f" font-family="DM Mono, monospace" font-size="11">&mdash;</text>
+          <!-- Marker: bracket below the AI coding agents row pointing at the highlighted span -->
+          <path d="M150 244 L150 252 L450 252 L450 244" fill="none" stroke="#c8f060" stroke-width="1" stroke-opacity="0.7"/>
+          <text x="300" y="266" fill="#c8f060" font-family="DM Mono, monospace" font-size="10" text-anchor="middle">you are here</text>
+          <text x="360" y="298" text-anchor="middle" fill="#55555f" font-family="DM Mono, monospace" font-size="10">historical pattern: vendor proliferation &rarr; community spec &rarr; foundation stewardship &rarr; default everywhere</text>
+        </g>
+      </svg>
+      <figcaption id="fig2-cap">Fig 2 &middot; Standardization phases for prior infrastructure categories, with AI coding agents mapped onto the same axis.</figcaption>
+    </figure>
+
+    <p>If the AI coding category follows the same arc — and the early signals say it is — the practical question for engineering leaders is not <em>whether</em> a shared format will arrive, but <em>what to do during the years before it lands</em>. The answer is the same one teams used during every prior cycle: build above the eventual standard, not inside any one vendor's format.</p>
+
+    <h2 id="standards">Where the standards landscape stands today</h2>
+
+    <p>Two community-led efforts and one government-led one are currently the most credible foundations for a future cross-tool agent governance standard. None are finalized. All are worth tracking.</p>
+
+    <p><strong>NIST's AI Agent Standards Initiative.</strong> The <a class="ext" href="https://www.nist.gov/caisi" target="_blank" rel="noopener">Center for AI Standards and Innovation (CAISI)</a> at NIST <a class="ext" href="https://www.nist.gov/news-events/news/2026/02/announcing-ai-agent-standards-initiative-interoperable-and-secure" target="_blank" rel="noopener">announced the AI Agent Standards Initiative</a> in February 2026, with the stated goal of helping AI agents "interoperate smoothly across the digital ecosystem." A <a class="ext" href="https://www.nist.gov/news-events/news/2026/01/caisi-issues-request-information-about-securing-ai-agent-systems" target="_blank" rel="noopener">request for information on securing AI agent systems</a> closed for public comment on March 9, 2026, and the <a class="ext" href="https://www.nccoe.nist.gov/sites/default/files/2026-02/accelerating-the-adoption-of-software-and-ai-agent-identity-and-authorization-concept-paper.pdf" target="_blank" rel="noopener">NCCoE concept paper on AI agent identity and authorization</a> proposes adapting existing identity standards (OAuth 2.0, OIDC) to non-human agent identities. The current scope is identity, authorization, and security — not output-policy enforcement directly — but it establishes the regulatory frame inside which governance protocols will eventually be evaluated.</p>
+
+    <p><strong>The Model Context Protocol.</strong> <a class="ext" href="https://modelcontextprotocol.io/specification/" target="_blank" rel="noopener">MCP</a> is an open, JSON-RPC-based protocol for exposing context, tools, and resources to AI clients. It does not specify a governance format, but it is increasingly the substrate over which a governance store can be made queryable to any compliant agent. A decision corpus exposed as an MCP server is consumable by every MCP-aware client without per-tool integration.</p>
+
+    <p><strong>AGENTS.md.</strong> The <a class="ext" href="https://agents.md/" target="_blank" rel="noopener">AGENTS.md</a> format — adopted across Codex, Cursor, Aider, Factory, Gemini CLI, Zed, and others, and stewarded by the Agentic AI Foundation under the Linux Foundation — is the closest thing to a shared per-repo instruction format that already works across vendors. <a class="ext" href="https://developers.openai.com/codex/guides/agents-md" target="_blank" rel="noopener">OpenAI's Codex documentation</a> treats it as the canonical instruction file. As a markdown convention, AGENTS.md cannot resolve precedence between conflicting decisions or enforce anything at the hook layer, but it is a credible baseline for the static-context portion of the problem and a likely component of any eventual full standard.</p>
+
+    <p>Mneme HQ tracks all three. Our <a class="ext" href="/standards/">standards landscape page</a> covers how the project's design aligns with the direction these efforts are taking, and where we plan to engage.</p>
+
+    <h2 id="requirements">What governance has to look like to survive heterogeneity</h2>
+
+    <p>If the goal is that the same architectural decision is enforced whether the code came from Claude Code, Cursor, Copilot, or a custom SDK agent, then the governance layer cannot be inside any of those tools. It has to be a separate artifact that each tool defers to.</p>
+
+    <div class="contrast-block">
+      <div class="contrast-cell accent-left">
+        <div class="label">Per-tool memory</div>
+        <div class="tool">Tool-coupled, duplicated, advisory</div>
+        <div class="desc">Each agent has its own rule file in its own format. Compliance depends on the agent reading correctly. Drift between tools is silent. The seams are unguarded.</div>
+      </div>
+      <div class="contrast-cell accent-right">
+        <div class="label">Shared governance memory</div>
+        <div class="tool">Tool-agnostic, single source, enforced</div>
+        <div class="desc">Decisions live in one structured store. Every agent — interactive, async, third-party, in-house — queries it before generating, and a hook checks output against it before code lands.</div>
+      </div>
+    </div>
+
+    <p>Concretely, an enforcement layer that survives heterogeneous agents has four properties:</p>
+
+    <ul>
+      <li><strong>Tool-agnostic representation.</strong> Decisions are stored in a structured format that is not coupled to any one assistant's prompt convention. Markdown is an export, not the source of truth.</li>
+      <li><strong>One canonical store, many readers.</strong> Claude Code, Cursor, Copilot, and custom agents all read from the same file. Updating an architectural decision once is sufficient — there is no fan-out duplication to keep in sync.</li>
+      <li><strong>Pre-generation injection.</strong> The relevant decisions for the current task are surfaced into whatever agent is running, in a format that agent can consume. The decisions are scoped, not dumped wholesale.</li>
+      <li><strong>Post-generation enforcement at the seam.</strong> Generated diffs — from any agent — are checked against the same governance store before they are accepted. The enforcement point is the file write, the commit, or the PR, not the model.</li>
+    </ul>
+
+    <p>This is the layering that makes heterogeneity safe. Each agent can keep its own strengths. The architecture is enforced by infrastructure that does not care which agent emitted the code.</p>
+
+    <h2 id="lock-in">Lock-in is the second cost</h2>
+
+    <p>The seam problem is the operational cost of running multiple AI coding agents against one codebase: drift, format mismatch, no shared enforcement. There is a second cost that accrues more quietly and tends to surface only when a team tries to swap a tool. It is vendor lock-in, and for any codebase expected to live more than a year or two it is the more expensive of the two.</p>
+
+    <p>A team that builds its architectural memory inside one tool's native format &mdash; <code>CLAUDE.md</code>, <code>.cursor/rules</code>, <code>.github/copilot-instructions.md</code>, a vendor's proprietary memory product &mdash; is structurally betting that the chosen tool will still be the right tool for the lifetime of the codebase. The AI coding category does not behave that way. GitHub Copilot was the default in 2022. Cursor took the interactive-coding lead through 2024. Claude Code's terminal- and web-native model has been reshaping the picture through 2025 and 2026. Windsurf, Codex, and a steady drip of new agents continue to enter. The leading tool has changed roughly every eighteen months, and nothing in the market suggests the cycle is slowing.</p>
+
+    <p>Codebases outlive tooling fashion. A service written in 2023 is still in production in 2026, governed by decisions that were correct then and may need refinement now. If those decisions live inside a tool the team no longer uses, the cost of switching is not just retraining engineers. It is rewriting the architectural memory itself, in whatever format the new tool prefers, hoping nothing is lost in the translation. The codebase's architectural truth becomes hostage to whichever vendor was dominant the year it was first written.</p>
+
+    <div class="callout">
+      <p><strong>The same agnostic layer that solves the seam problem also solves the lock-in problem.</strong> A team running Claude Code for backend, Cursor for frontend, and a custom SDK agent in CI can &mdash; if the memory layer lives outside any of them &mdash; switch any one of those tools tomorrow without touching the architectural truth. The tools become interchangeable; the governance does not.</p>
+    </div>
+
+    <p>This is the second reason the governance layer has to be tool-independent. The first reason is operational. This one is structural. Owning the architectural truth, in a format the team controls, is the only durable position when the tools underneath are themselves changing every cycle.</p>
+
+    <h2 id="category">The category framing</h2>
+
+    <p>The conversation about "the best AI coding tool" is the wrong conversation for any team large enough to have an architecture worth defending. There is no best tool — there is a portfolio, and the portfolio is going to grow. The question that matters is whether your governance layer is coupled to any one of them.</p>
+
+    <p>If it is, every new agent the team adopts becomes a new place for architectural decisions to drift. If it isn't, new agents are net additive: more capability, same enforcement, no extra coordination cost.</p>
+
+    <p>That is the infrastructure problem Mneme HQ is built around. A single decision store, queryable by any agent, enforced at the seam where every agent eventually has to write to disk.</p>
+
+    <h2 id="faq">FAQ</h2>
+
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Is this only a problem for large engineering orgs?</summary>
+        <div class="faq-body">No, but the pain compounds with team size. A two-engineer team using both Cursor and Claude Code can manually keep their rule files aligned. By the time a team has multiple repositories, several engineers, and any async agent (a CI bot, a PR reviewer agent, a migration script), the cost of maintaining duplicated per-tool memory exceeds the cost of running a shared store.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Doesn't AGENTS.md already solve this?</summary>
+        <div class="faq-body">AGENTS.md solves the &ldquo;static instructions in a portable format&rdquo; problem. It is a meaningful step forward, and Mneme treats it as a first-class export target. What it does not solve is precedence between conflicting decisions, scope-aware injection (only the relevant decisions for this task), or enforcement before generation. A markdown file is read; it is not queried, and it is not an enforcement point. See <a href="https://agents.md/" target="_blank" rel="noopener">agents.md</a> for the spec.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>How does MCP fit in?</summary>
+        <div class="faq-body">MCP is the substrate, not the standard for governance content. Exposing a decision store as an MCP server makes it queryable by any MCP-aware client (Claude Code, Cursor's MCP support, custom agents) without per-tool integration. MCP solves the connectivity half of the problem; the governance schema, precedence rules, and enforcement layer still need to live somewhere. See the <a href="https://modelcontextprotocol.io/specification/" target="_blank" rel="noopener">MCP specification</a>.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>What does NIST's work mean for engineering teams today?</summary>
+        <div class="faq-body">In the near term, very little operational impact &mdash; the initiative is in the RFI / concept-paper / listening-session phase, not the published-standard phase. In the medium term, expect agent identity and authorization patterns to be the first to harden, followed by audit and behavioral controls. Teams in regulated industries (healthcare, financial services, public sector) should track the work; everyone else can treat it as a multi-year tailwind for the &ldquo;governance is infrastructure&rdquo; thesis. The initiative landing page is at <a href="https://www.nist.gov/caisi/ai-agent-standards-initiative" target="_blank" rel="noopener">nist.gov/caisi/ai-agent-standards-initiative</a>.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>What if our org standardizes on one AI tool?</summary>
+        <div class="faq-body">In practice, no engineering org of meaningful size has standardized on one tool. Inline completion (Copilot), interactive coding (Cursor or Claude Code), and async PR-opening agents (Claude Code on the web, Copilot Workspace, custom SDK bots) tend to live alongside each other because each is best-in-class at a different task. Even teams that try to standardize discover that procurement is one decision and what engineers actually use is another.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Will the eventual standard make Mneme redundant?</summary>
+        <div class="faq-body">No, in the same way that OCI did not make Docker redundant and OAuth did not make Okta redundant. A standard defines the wire format and the contract; vendors and open-source projects implement it. Mneme's design intent is to align with whatever cross-tool format emerges (likely some superset of AGENTS.md, MCP, and a NIST-influenced audit envelope) and to be the structured-decision-store implementation that consumes and exports it.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>How does an agnostic layer protect against tool churn?</summary>
+        <div class="faq-body">The leading AI coding tool has changed roughly every eighteen months &mdash; Copilot dominant in 2022, Cursor through 2024, Claude Code reshaping things in 2025&ndash;26, with Windsurf and Codex behind. A team whose architectural memory lives inside one tool's native format pays a rewrite cost every time it migrates. A team whose memory lives in an agnostic layer can swap the tool underneath without touching the governance &mdash; same decisions, same enforcement, different agent. Tool independence is operational hygiene and structural insurance at the same time.</div>
+      </details>
+    </div>
+
+  </div>
+
+  
+    <h2 id="related-reading" style="margin-top:3rem;">Related reading</h2>
+    <ul style="margin:0 0 1.25rem 1.5rem;">
+        <li><a href="/insights/why-prompt-memory-fails-at-scale/">why prompt memory fails at scale</a></li>
+        <li><a href="/insights/mneme-vs-cursor-rules/">structured decisions vs rule files</a></li>
+        <li><a href="/insights/openai-compatible-apis-are-commoditizing-models/">the model is becoming configuration</a></li>
+    </ul>
+
+  <footer class="article-footer">
+    <a href="/insights/" class="back-link">&larr; Back to Insights</a>
+
+    <div class="cta-block">
+      <h3>One governance layer. Every agent.</h3>
+      <p>Mneme HQ is the tool-agnostic decision store and enforcement hook for codebases that are governed by architecture, not by which assistant happened to write the line. Open source.</p>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
+    </div>
+  </footer>
+</article>
+</main>
+
+<footer>
+  <p>
+    <a href="/use-cases/">Use cases</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/insights/">Insights</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/standards/">Standards</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/compare/">Compare</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/integrations/">Integrations</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/founder/">Founder</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/about/">About</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/contact/">Contact</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/privacy/">Privacy</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a>
+    &nbsp;&middot;&nbsp;
+    Open source
+    &nbsp;&middot;&nbsp;
+    MIT License
+  </p>
+</footer>
+
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  btn.addEventListener('click', function(){
+    var open = links.classList.toggle('open');
+    btn.setAttribute('aria-expanded', String(open));
+  });
+})();
+</script>
+<script><!-- nav-active -->
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
+</body>
+</html>

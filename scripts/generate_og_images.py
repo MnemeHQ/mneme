@@ -22,6 +22,10 @@ from pathlib import Path
 # Map from og-<slug>.html to output og.png path (relative to site/)
 TEMPLATE_MAP = {
     "og-homepage.html": "og.png",
+    "og-demo.html": "demo/og.png",
+    "og-demo-storage-decision.html": "demo/storage-decision/og.png",
+    "og-demo-dependency-policy.html": "demo/dependency-policy/og.png",
+    "og-demo-repository-pattern.html": "demo/repository-pattern/og.png",
     "og-use-cases-gen.html": "use-cases/og.png",
     "og-coding-assistant-governance.html": "use-cases/coding-assistant-governance/og.png",
     "og-legacy-codebase-memory.html": "use-cases/legacy-codebase-memory/og.png",
@@ -40,6 +44,10 @@ TEMPLATE_MAP = {
     "og-insights-nonlinear-review.html": "insights/ai-code-review-does-not-scale-linearly/og.png",
     "og-insights-review-not-governance.html": "insights/review-is-not-governance/og.png",
     "og-insights-prompt-memory-fails.html": "insights/why-prompt-memory-fails-at-scale/og.png",
+    "og-insights-heterogeneous-agents.html": "insights/architectural-governance-across-heterogeneous-ai-coding-agents/og.png",
+    "og-insights-agentic-education.html": "insights/rise-of-agentic-engineering-education/og.png",
+    "og-insights-openai-compatible-apis.html": "insights/openai-compatible-apis-are-commoditizing-models/og.png",
+    "og-standards.html": "standards/og.png",
     "og-for-cto.html": "for-cto/og.png",
     "og-for-platform.html": "for-platform/og.png",
     "og-for-principal.html": "for-principal/og.png",

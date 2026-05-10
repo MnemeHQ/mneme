@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Rise of Agentic Engineering Education &mdash; Mneme HQ</title>
+  <meta name="description" content="Universities, hackathons, and platform vendors are racing to launch agentic engineering programs. Almost none of them teach governance. The next AI engineering discipline has a curriculum gap." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/insights/rise-of-agentic-engineering-education/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="The Rise of Agentic Engineering Education" />
+  <meta property="og:description" content="Universities, hackathons, and platform vendors are racing to launch agentic engineering programs. Almost none of them teach governance. The next AI engineering discipline has a curriculum gap." />
+  <meta property="og:url" content="https://mnemehq.com/insights/rise-of-agentic-engineering-education/" />
+  <meta property="og:image" content="https://mnemehq.com/insights/rise-of-agentic-engineering-education/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="The Rise of Agentic Engineering Education" />
+  <meta name="twitter:description" content="Universities, hackathons, and platform vendors are racing to launch agentic engineering programs. Almost none of them teach governance. The next AI engineering discipline has a curriculum gap." />
+  <meta name="twitter:image" content="https://mnemehq.com/insights/rise-of-agentic-engineering-education/og.png" />
+  <meta name="author" content="Theo Valmis" />
+  <meta property="article:published_time" content="2026-05-10T00:00:00Z" />
+  <meta property="article:author" content="https://mnemehq.com/founder/" />
+  <meta property="article:section" content="Industry Analysis" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Insights", "item": "https://mnemehq.com/insights/"},
+          {"@type": "ListItem", "position": 3, "name": "The Rise of Agentic Engineering Education", "item": "https://mnemehq.com/insights/rise-of-agentic-engineering-education/"}
+        ]
+      },
+      {
+        "@type": "Article",
+        "headline": "The Rise of Agentic Engineering Education",
+        "description": "Universities, hackathons, and platform vendors are racing to launch agentic engineering programs. Almost none of them teach governance. The next AI engineering discipline has a curriculum gap that engineering organizations will pay for.",
+        "url": "https://mnemehq.com/insights/rise-of-agentic-engineering-education/",
+        "datePublished": "2026-05-10",
+        "dateModified": "2026-05-10",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "image": "https://mnemehq.com/insights/rise-of-agentic-engineering-education/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/insights/rise-of-agentic-engineering-education/"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {"@type": "Question", "name": "Is 'agentic engineering' a real discipline or rebranded prompt engineering?", "acceptedAnswer": {"@type": "Answer", "text": "It is a real shift. Prompt engineering optimized a single model call. Agentic engineering composes multi-step systems with planning, tool use, retrieval, evaluation, and persistence. The skills overlap by maybe 20 percent. The disciplines that map onto it cleanly — distributed systems, observability, software architecture — were not part of the prompt-engineering toolkit."}},
+          {"@type": "Question", "name": "Are these programs worth taking?", "acceptedAnswer": {"@type": "Answer", "text": "Many of them are taught by people who have actually shipped agentic systems and the material is current. The criticism in this article is not that the programs are bad — it is that the curriculum collectively has a blind spot. Take the program that fits your role; just don't assume completing it means you have learned how to govern these systems in production. That's the part that has not been written yet."}},
+          {"@type": "Question", "name": "Why is governance the gap, specifically?", "acceptedAnswer": {"@type": "Answer", "text": "Building an agent and operating an agent are different problems. Building covers tool selection, prompt design, evaluation, and deployment. Operating covers what happens when the agent encounters a decision the team has already made about its codebase: which patterns are allowed, which dependencies are approved, which architectural rules are non-negotiable. The educational stack today is heavy on building and almost silent on operating, because operational governance only becomes a felt problem at the scale where the building is already done."}},
+          {"@type": "Question", "name": "Will this gap close on its own as the field matures?", "acceptedAnswer": {"@type": "Answer", "text": "Eventually, but slowly. Standards work moves on multi-year timelines (NIST CAISI's AI Agent Standards Initiative is a useful watch). Universities do not typically build curricula around standards that haven't stabilized. The likely pattern: the gap closes from the practitioner side first — books, conference talks, OSS tools — and then filters into formal curricula three to five years later, the way DevOps and SRE eventually entered university courses."}}
+        ]
+      }
+    ]
+  }
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #88889a;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .article-wrap { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 7rem; }
+    .article-header { margin-bottom: 3rem; }
+    .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
+    .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .article-body h3 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; margin: 2rem 0 0.6rem; color: var(--text); }
+    .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
+    .article-body p strong { color: var(--text); font-weight: 500; }
+    .article-body ul { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body ul li { margin-bottom: 0.55rem; line-height: 1.8; }
+    .article-body ul li strong { color: var(--text); font-weight: 500; }
+    .article-body code { font-family: 'DM Mono', monospace; font-size: 0.82rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 0.05rem 0.4rem; color: var(--text); }
+    .article-body a.ext { color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(200,240,96,0.4); }
+    .article-body a.ext:hover { color: var(--accent-dim); border-bottom-color: rgba(200,240,96,0.7); }
+
+    .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin: 0 0 3rem; }
+    .toc .toc-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.9rem; }
+    .toc ol { list-style: none; counter-reset: toc; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 0.45rem; }
+    .toc ol li { counter-increment: toc; font-size: 0.85rem; padding-left: 2.2rem; position: relative; line-height: 1.5; }
+    .toc ol li::before { content: counter(toc, decimal-leading-zero); position: absolute; left: 0; top: 0.05rem; font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--border2); letter-spacing: 0.05em; }
+    .toc a { color: var(--muted); text-decoration: none; transition: color 0.15s; }
+    .toc a:hover { color: var(--accent); }
+    @media (min-width: 720px) { .toc ol { grid-template-columns: 1fr 1fr; gap: 0.55rem 1.5rem; } }
+
+    .answer-capsule { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 0 0 2.5rem; }
+    .answer-capsule p { margin: 0; font-size: 0.92rem; color: var(--muted); line-height: 1.8; }
+    .answer-capsule p strong { color: var(--accent); }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .callout p strong { color: var(--accent); }
+
+    .program-grid { display: grid; grid-template-columns: 1fr; gap: 0.75rem; margin: 1.5rem 0 0.5rem; }
+    .program { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; }
+    .program .label { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
+    .program h4 { font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; color: var(--text); margin: 0 0 0.35rem; line-height: 1.35; }
+    .program p { font-size: 0.82rem; color: var(--muted); margin: 0 0 0.55rem; line-height: 1.6; }
+    .program a.ext { color: var(--accent); text-decoration: none; font-family: 'DM Mono', monospace; font-size: 0.78rem; }
+    .program a.ext:hover { color: var(--accent-dim); }
+
+    .compare-stack { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem; margin: 2rem 0; }
+    .compare-stack .cs-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.1rem; }
+    .compare-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 0.8rem 0; border-bottom: 1px solid var(--border); }
+    .compare-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .compare-row:first-of-type { padding-top: 0; }
+    .compare-row .col-label { font-size: 0.78rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.04em; }
+    .compare-row .col-text { font-size: 0.85rem; color: var(--text); line-height: 1.7; }
+    @media (max-width: 540px) { .compare-row { grid-template-columns: 1fr; gap: 0.3rem; } }
+
+    .faq-list { margin-top: 1.5rem; }
+    .faq-item { border-top: 1px solid var(--border); padding: 1.05rem 0; }
+    .faq-item:last-child { border-bottom: 1px solid var(--border); }
+    .faq-item summary { cursor: pointer; font-size: 0.92rem; color: var(--text); font-weight: 500; list-style: none; position: relative; padding-right: 2rem; }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; font-family: 'DM Mono', monospace; color: var(--muted); font-size: 1.1rem; position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
+    .faq-item[open] summary::after { content: '\2212'; }
+    .faq-body { padding-top: 0.85rem; font-size: 0.85rem; color: var(--muted); line-height: 1.8; }
+    .faq-body a { color: var(--accent); text-decoration: none; }
+    .faq-body a:hover { color: var(--accent-dim); }
+
+    .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; }
+    .back-link:hover { color: var(--text); }
+    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; }
+    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; }
+    .btn-primary:hover { background: var(--accent-dim); }
+
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .breadcrumb-nav { max-width: 720px; margin: 0 auto; padding: 1.25rem 2rem 0; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.75rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 36px; height: 36px; border-radius: 6px; cursor: pointer; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; }
+    @media (max-width: 640px) {
+      nav { padding: 1rem 1.25rem; position: relative; }
+      .article-wrap { padding: 3rem 1.25rem 5rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0.5rem 1.25rem 1.25rem; z-index: 99; }
+      .nav-links.open { display: flex; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.88rem; padding: 0.7rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+    }
+  </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><svg width="18" height="14" viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 1h16M1 7h16M1 13h16"/></svg></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/standards/">Standards</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/#benchmarks">Benchmarks</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/insights/">Insights</a></li>
+    <li aria-current="page">Rise of agentic engineering education</li>
+  </ol>
+</nav>
+<article class="article-wrap">
+  <header class="article-header">
+    <div class="article-eyebrow">
+      <span class="eyebrow-tag">Industry Analysis</span>
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-meta">14 min read &nbsp;&middot;&nbsp; May 2026</span>
+    </div>
+    <h1>The rise of agentic engineering education</h1>
+    <p class="article-lede">For two years the AI fluency conversation has been "everyone needs to learn to prompt." That conversation is over. The next discipline &mdash; agentic engineering &mdash; is the one that actually maps to how production AI systems get built, and the educational supply chain has noticed. Programs are launching faster than curricula can stabilize, and almost all of them teach the same half of the problem.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-10">Published May 2026</time>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-10">Updated May 2026</time>
+    </p>
+  </header>
+
+  <div class="article-body">
+
+    <div class="answer-capsule">
+      <p><strong>The short answer.</strong> Agentic engineering is becoming a real discipline, with universities, hackathon platforms, and frontier labs all shipping curricula at speed. The shipped curriculum teaches building &mdash; tool use, orchestration, evaluation, deployment. It does not teach governing what these systems do once they are operating against real codebases. That gap is where the next category of engineering tooling and the next category of engineering hire both sit.</p>
+    </div>
+
+    <nav class="toc" aria-label="Table of contents">
+      <div class="toc-title">In this article</div>
+      <ol>
+        <li><a href="#what-it-is">What 'agentic engineering' actually means</a></li>
+        <li><a href="#why-now">Why education is racing to catch up</a></li>
+        <li><a href="#programs">The supply: programs forming the new curriculum</a></li>
+        <li><a href="#fluency-to-engineering">From AI fluency to agentic engineering</a></li>
+        <li><a href="#spec-driven">Spec-driven and AI-assisted workflows</a></li>
+        <li><a href="#governance-gap">The category gap: nobody is teaching governance</a></li>
+        <li><a href="#continuity">Why architectural continuity matters more as agents proliferate</a></li>
+        <li><a href="#future">What an honest agentic engineering curriculum should include</a></li>
+        <li><a href="#references">Programs and references (verified)</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="what-it-is">What 'agentic engineering' actually means</h2>
+
+    <p>"Agentic engineering" is the discipline of building and operating systems where an LLM &mdash; not a human &mdash; takes the next step. The agent reads, plans, calls tools, writes files, reviews its own output, retries, and persists state across sessions. The skills that matter are not prompt craft. They are the same skills that distributed-systems engineers have practiced for two decades, plus a small set of new ones.</p>
+
+    <p>The shift is most visible in coding. <a class="ext" href="https://docs.anthropic.com/en/docs/claude-code/overview" target="_blank" rel="noopener">Claude Code</a> ships as a CLI, a VS Code extension, and a scheduled-task runner. It edits files, runs commands, and operates across codebases. <a class="ext" href="https://www.deeplearning.ai/courses/agentic-ai" target="_blank" rel="noopener">Andrew Ng's "Agentic AI"</a> course frames the discipline around four design patterns &mdash; reflection, tool use, planning, multi-agent collaboration &mdash; and treats them as software engineering problems, not prompt engineering problems. The framing is correct. Once an agent has tools, the model is not the system; the system is the model plus the tools plus the contract between them.</p>
+
+    <p>This is what has changed. The work is now systems work. The output is now code. The accountability is now operational.</p>
+
+    <h2 id="why-now">Why education is racing to catch up</h2>
+
+    <p>The 2023&ndash;2024 wave of AI courses taught fluency: "use ChatGPT well, summarize documents, write a few RAG demos." Those courses have aged poorly because the fluency is now table stakes. The 2025&ndash;2026 wave is different. The new programs assume fluency and teach how to build something that runs without supervision.</p>
+
+    <p>The supply-side incentive is straightforward. Engineering organizations adopting AI agents face a hiring market where the candidates have read prompts but have not designed retry loops, evaluators, or observability hooks. The educational stack is rushing to fill the gap because the demand is now coming from procurement, not curiosity. The same pattern played out for cloud infrastructure (2010s) and DevOps (mid-2010s): the market moves first, certifications follow, and universities arrive last.</p>
+
+    <p>The notable detail in this cycle is how fast the platform vendors have moved. <a class="ext" href="https://huggingface.co/learn/agents-course/unit0/introduction" target="_blank" rel="noopener">Hugging Face</a> shipped a free, certified AI Agents course covering smolagents, LangGraph, and LlamaIndex. <a class="ext" href="https://www.deeplearning.ai/courses/agentic-ai" target="_blank" rel="noopener">DeepLearning.AI</a> partnered with Andrew Ng on the canonical agentic-AI curriculum. Hackathon platforms went from monthly contests to weekly ones, with prize pools that signal where venture money thinks the talent shortage is.</p>
+
+    <h2 id="programs">The supply: programs forming the new curriculum</h2>
+
+    <p>A non-exhaustive snapshot of what is currently teachable. These are real programs from organizational sources, not editorial lists. Each one represents one institution's bet on what the new discipline contains.</p>
+
+    <div class="program-grid">
+
+      <div class="program">
+        <div class="label">Frontier lab &middot; documentation as curriculum</div>
+        <h4>Anthropic Claude Code documentation</h4>
+        <p>Hooks API, slash commands, MCP integrations, scheduled routines. Read as a curriculum, the docs describe the operating model of an agentic coding system more concretely than any textbook.</p>
+        <a class="ext" href="https://docs.anthropic.com/en/docs/claude-code/overview" target="_blank" rel="noopener">docs.anthropic.com/en/docs/claude-code &rarr;</a>
+      </div>
+
+      <div class="program">
+        <div class="label">Free, certified, hands-on</div>
+        <h4>Hugging Face AI Agents Course</h4>
+        <p>Four-unit free course covering agent fundamentals, smolagents, LangGraph, LlamaIndex, and a practical capstone. Free certification track.</p>
+        <a class="ext" href="https://huggingface.co/learn/agents-course/unit0/introduction" target="_blank" rel="noopener">huggingface.co/learn/agents-course &rarr;</a>
+      </div>
+
+      <div class="program">
+        <div class="label">Canonical curriculum</div>
+        <h4>DeepLearning.AI &middot; Agentic AI with Andrew Ng</h4>
+        <p>The reference treatment. Reflection, tool use, planning, multi-agent. Frames agentic systems as software engineering with iteration patterns rather than prompt tricks.</p>
+        <a class="ext" href="https://www.deeplearning.ai/courses/agentic-ai" target="_blank" rel="noopener">deeplearning.ai/courses/agentic-ai &rarr;</a>
+      </div>
+
+      <div class="program">
+        <div class="label">University &middot; executive</div>
+        <h4>MIT Sloan Executive Education &middot; AI Executive Academy</h4>
+        <p>Two-week on-campus program from Sloan plus the Schwarzman College of Computing. Covers the technical and business surface for leaders deploying AI inside organizations.</p>
+        <a class="ext" href="https://executive.mit.edu/artificial-intelligence" target="_blank" rel="noopener">executive.mit.edu/artificial-intelligence &rarr;</a>
+      </div>
+
+      <div class="program">
+        <div class="label">University &middot; non-technical</div>
+        <h4>MIT Professional Education &middot; No-Code AI/ML</h4>
+        <p>Lower-friction entry path for non-engineers. Emblematic of the broader credentialing wave aimed at managers and analysts who need fluency without writing code.</p>
+        <a class="ext" href="https://professionalonline2.mit.edu/no-code-artificial-intelligence-machine-learning-online-program" target="_blank" rel="noopener">professionalonline2.mit.edu &rarr;</a>
+      </div>
+
+      <div class="program">
+        <div class="label">Community &middot; hackathons</div>
+        <h4>lablab.ai AI Agent Hackathons</h4>
+        <p>Continuous AI-agent hackathon series with prize pools sponsored by Google DeepMind, Google AI Studio, ElevenLabs, and others. Community of 36K+ followers; the most active "build an agent over a weekend" surface.</p>
+        <a class="ext" href="https://lablab.ai/ai-hackathons" target="_blank" rel="noopener">lablab.ai/ai-hackathons &rarr;</a>
+      </div>
+
+      <div class="program">
+        <div class="label">Conference &middot; community</div>
+        <h4>AI Engineer Summit &amp; World's Fair</h4>
+        <p>Started 2023 from Swyx's Latent Space; grew to 3,000+ attendees by 2024. Now seven AIE events globally in 2026 (NYC, World's Fair SF, Paris, CODE, etc.). The conference where the discipline talks to itself about what it actually contains.</p>
+        <a class="ext" href="https://www.ai.engineer/" target="_blank" rel="noopener">ai.engineer &rarr;</a>
+      </div>
+
+      <div class="program">
+        <div class="label">Practitioner media</div>
+        <h4>Latent Space (newsletter &amp; podcast)</h4>
+        <p>Where the term "AI Engineer" was coined in 2023. The pulse of what current practitioners are actually shipping, including ongoing coverage of the agent-engineering shift.</p>
+        <a class="ext" href="https://www.latent.space/" target="_blank" rel="noopener">latent.space &rarr;</a>
+      </div>
+
+    </div>
+
+    <p>Beyond these, several university-of-record continuing-education arms have launched agentic-AI postgraduate certificates &mdash; UT Austin McCombs and others have shipped programs in the past quarter. The format is consistent: a few months online, business-application framing, the same four design patterns, and a certificate. The credentialing layer is forming.</p>
+
+    <h2 id="fluency-to-engineering">From AI fluency to agentic engineering</h2>
+
+    <p>To make the shift concrete, here is what the curricula have moved from and to. The boundary is not technical depth alone &mdash; it is the kind of failure mode the engineer is now expected to handle.</p>
+
+    <div class="compare-stack">
+      <div class="cs-title">Curriculum drift, 2023 &rarr; 2026</div>
+      <div class="compare-row">
+        <div class="col-label">2023&ndash;2024 &middot; AI fluency</div>
+        <div class="col-text">Prompt patterns, single-shot completions, basic RAG. "Use ChatGPT effectively." Output evaluation by reading.</div>
+      </div>
+      <div class="compare-row">
+        <div class="col-label">2025&ndash;2026 &middot; Agentic engineering</div>
+        <div class="col-text">Multi-step workflows, planning, tool use, evaluator loops, observability. "Operate an agent that ships code." Output evaluation by structured verifiers.</div>
+      </div>
+      <div class="compare-row">
+        <div class="col-label">Tooling assumed</div>
+        <div class="col-text">Claude Code, Cursor, Copilot, Windsurf, MCP, LangGraph, smolagents. Custom SDK agents are no longer exotic.</div>
+      </div>
+      <div class="compare-row">
+        <div class="col-label">Failure mode</div>
+        <div class="col-text">2023: bad prompt. 2026: bad architecture, silent drift, untracked override, dependency the security team has not approved.</div>
+      </div>
+    </div>
+
+    <p>The 2023 failure mode is solved by re-prompting. The 2026 failure mode is not. It is solved by infrastructure that catches the failure before generation, or audits it after. That infrastructure is what the curricula consistently miss.</p>
+
+    <h2 id="spec-driven">Spec-driven and AI-assisted workflows</h2>
+
+    <p>The most credible practitioner-led work in this cycle is what gets called <em>spec-driven</em> development: write the specification first, generate the code from it, evaluate the generation against the spec, iterate. It is a return to a software engineering practice that pre-dates AI &mdash; design-by-contract, behavior-driven development, formal methods &mdash; with the difference that the generation step is now an LLM.</p>
+
+    <p>This pattern is showing up in two places. The first is inside frontier labs themselves: Anthropic's coding workflow guidance increasingly emphasizes plans before edits, structured outputs over freeform prose, and evaluators that operate on the artifact rather than the description. The second is in conference talks at the <a class="ext" href="https://www.ai.engineer/" target="_blank" rel="noopener">AI Engineer Summit</a> where practitioners describe production agentic workflows that look much more like CI pipelines than chat sessions.</p>
+
+    <p>The educational stack is starting to catch up. Hugging Face's course teaches evaluator patterns. DeepLearning.AI's curriculum makes evaluation-driven development a first-class topic. Spec-driven development is going to be a normal part of the curriculum within a year. What is still missing is the layer above: governance.</p>
+
+    <h2 id="governance-gap">The category gap: nobody is teaching governance</h2>
+
+    <p>Skim every program above. Find the section on <em>operating</em> an AI agent against a codebase that has architectural decisions. You will not find it. The curriculum teaches how to build the agent and how to evaluate its output. It does not teach how to make the agent answer to the project's existing decisions &mdash; the ADRs, the dependency policies, the service boundaries, the patterns the team agreed on six months ago.</p>
+
+    <p>This is not a small gap. It is the gap that determines whether AI-assisted development is a productivity win or a slow-rolling architectural-debt event. A team can hire ten engineers from the best agentic-engineering bootcamp on the planet, and on day one they will type the same prompt that ships a Postgres migration into a service that contractually uses JSON storage, because the agent does not know about the decision. The curriculum did not cover it.</p>
+
+    <div class="callout">
+      <p><strong>The wedge.</strong> Everyone is teaching how to build AI agents. Almost nobody is teaching how to govern AI-assisted engineering systems. That is the next category of work, and it is the category the educational supply chain will arrive at last because operational governance only becomes a felt problem at the scale where the building work is already done.</p>
+    </div>
+
+    <p>The historical analogue is DevOps. In 2010, you could find a hundred courses on writing web applications and almost none on operating them. The "Phoenix Project" generation of practitioners had to write the books themselves. The same arc is about to happen for agentic engineering, and the books are not written yet.</p>
+
+    <h2 id="continuity">Why architectural continuity matters more as agents proliferate</h2>
+
+    <p>The reason governance is the bottleneck is structural. As soon as AI agents start operating at human-or-faster pace against the codebase, the rate at which they can introduce architectural drift outpaces the rate at which review can catch it. The argument is laid out in detail in <a href="/insights/why-code-review-cannot-scale-with-ai-output/">why code review cannot scale with AI output</a> and <a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/">architectural governance across heterogeneous AI coding agents</a>; the short version is that the review queue is constant, the generation rate is exponential, and the math does not bend.</p>
+
+    <p>The second pressure is heterogeneity. Engineering orgs do not standardize on one AI tool. An engineer pairs with Claude Code in the terminal, opens Cursor for a frontend touchup, and a Claude Agent SDK bot in CI opens PRs while they sleep. Each tool has its own native memory format &mdash; <code>CLAUDE.md</code>, <code>.cursor/rules</code>, <code>.github/copilot-instructions.md</code>, custom system prompts. An education program that teaches one tool teaches one slice. The architectural truth lives across all of them, and it has to be enforced somewhere they all defer to.</p>
+
+    <p>The third pressure is regulatory. The <a class="ext" href="https://www.nist.gov/caisi/ai-agent-standards-initiative" target="_blank" rel="noopener">NIST CAISI AI Agent Standards Initiative</a> launched in February 2026 with a stated goal of helping AI agents "interoperate smoothly across the digital ecosystem." The current scope is identity and authorization, not output policy &mdash; but the direction of travel is clear, and the timeline of agentic-engineering hires now will be evaluated against the standards that land in 2027&ndash;2028. Teams that have not built governance into their workflows will be retrofitting it.</p>
+
+    <h2 id="future">What an honest agentic engineering curriculum should include</h2>
+
+    <p>If the next cohort of agentic engineers is going to ship systems that survive their first year in production, the curriculum has to cover the operational layer the current programs skip. A reasonable list of additions:</p>
+
+    <ul>
+      <li><strong>Decision corpora as code.</strong> How to encode architectural decisions as structured records the agent can query, not as paragraphs in a CLAUDE.md the model is asked to respect.</li>
+      <li><strong>Precedence resolution.</strong> What to do when two decisions conflict &mdash; org-wide policy versus team override versus per-PR exception. Real codebases hit this in week three.</li>
+      <li><strong>Pre-generation enforcement.</strong> Hooks at the seam where the agent writes to disk. Why this is structurally different from prompt instructions, and why one matters at scale and the other does not.</li>
+      <li><strong>Post-generation gating.</strong> CI checks that read structured output, not freeform prose, and gate the diff on architectural compliance before it merges.</li>
+      <li><strong>Tool-agnostic governance.</strong> How to build a layer that the editor, the CI agent, and the third-party SDK bot all defer to. The argument is in the <a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/">heterogeneous-agents article</a>.</li>
+      <li><strong>Standards literacy.</strong> What NIST CAISI, the Model Context Protocol, and AGENTS.md actually contain, and what aligning a workflow with them looks like in practice. Tracked on the <a href="/standards/">standards landscape page</a>.</li>
+      <li><strong>Override discipline.</strong> When you weaken a rule, how do you make it visible? An override that is not a tracked decision is a silent merge.</li>
+      <li><strong>Auditability and benchmarks.</strong> How to measure whether an agent's behavior is improving, regressing, or merely shifting. Methodology before metrics &mdash; see the <a href="/benchmark/">governance benchmark methodology</a>.</li>
+    </ul>
+
+    <p>The labs and platforms with the strongest curricula are well-positioned to add this layer. The pattern in DevOps was that the most credible educators were the ones who had operated the systems they taught. The same will be true here. The bootcamps that ship a governance unit first &mdash; with worked examples on real codebases, not toy scenarios &mdash; will become the credentialing reference for the next five years.</p>
+
+    <h2 id="references">Programs and references</h2>
+
+    <p>The list above is the verifiable core. Several adjacent programs are worth tracking even though they did not warrant a card above:</p>
+
+    <ul>
+      <li><a class="ext" href="https://learn.deeplearning.ai/courses/ai-agents-in-langgraph/information" target="_blank" rel="noopener">DeepLearning.AI &middot; AI Agents in LangGraph</a> &mdash; the framework-specific companion to the agentic-AI canonical course.</li>
+      <li><a class="ext" href="https://www.coursera.org/" target="_blank" rel="noopener">Coursera</a> hosts the <a class="ext" href="https://www.deeplearning.ai/courses/" target="_blank" rel="noopener">DeepLearning.AI catalog</a> alongside the Google AI Professional Certificate and a long tail of vendor-led programs targeting the AI-fluency end of the market.</li>
+      <li><a class="ext" href="https://huggingface.co/learn" target="_blank" rel="noopener">Hugging Face Learn</a> &mdash; beyond the agents course, includes NLP, RL, and computer vision tracks. The most active free curriculum in the practitioner ecosystem.</li>
+      <li><a class="ext" href="https://www.nist.gov/caisi/ai-agent-standards-initiative" target="_blank" rel="noopener">NIST CAISI AI Agent Standards Initiative</a> &mdash; not a course, but the regulatory frame that any serious organizational training should track.</li>
+    </ul>
+
+    <p>This list is intentionally short. The intent is to flag the programs the trend is actually being defined by, not to inflate a directory. For continuing additions, the public Mneme insights feed will track the gap between what these programs ship and what production teams need.</p>
+
+    <h2 id="faq">FAQ</h2>
+
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Is "agentic engineering" a real discipline or rebranded prompt engineering?</summary>
+        <div class="faq-body">It is a real shift. Prompt engineering optimized a single model call. Agentic engineering composes multi-step systems with planning, tool use, retrieval, evaluation, and persistence. The skills overlap by maybe 20 percent. The disciplines that map onto it cleanly &mdash; distributed systems, observability, software architecture &mdash; were not part of the prompt-engineering toolkit.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Are these programs worth taking?</summary>
+        <div class="faq-body">Many of them are taught by people who have actually shipped agentic systems and the material is current. The criticism here is not that the programs are bad &mdash; it is that the curriculum collectively has a blind spot. Take the program that fits your role; just don't assume completing it means you have learned how to govern these systems in production. That part has not been written yet.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Why is governance the gap, specifically?</summary>
+        <div class="faq-body">Building an agent and operating an agent are different problems. Building covers tool selection, prompt design, evaluation, and deployment. Operating covers what happens when the agent encounters a decision the team has already made about its codebase: which patterns are allowed, which dependencies are approved, which architectural rules are non-negotiable. The educational stack today is heavy on building and almost silent on operating, because operational governance only becomes a felt problem at the scale where the building is already done. See <a href="/insights/why-prompt-memory-fails-at-scale/">why prompt memory fails at scale</a>.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Will this gap close on its own as the field matures?</summary>
+        <div class="faq-body">Eventually, but slowly. Standards work moves on multi-year timelines (<a href="https://www.nist.gov/caisi/ai-agent-standards-initiative" target="_blank" rel="noopener">NIST CAISI's AI Agent Standards Initiative</a> is a useful watch). Universities don't typically build curricula around standards that haven't stabilized. The likely pattern: the gap closes from the practitioner side first &mdash; books, conference talks, OSS tools &mdash; and then filters into formal curricula three to five years later, the way DevOps and SRE eventually entered university courses. See the <a href="/standards/">standards landscape page</a>.</div>
+      </details>
+    </div>
+
+  </div>
+
+  <footer class="article-footer">
+    <a href="/insights/" class="back-link">&larr; Back to Insights</a>
+
+    <div class="cta-block">
+      <h3>The governance layer the curriculum is missing</h3>
+      <p>Mneme HQ is the open-source decision corpus and pre-generation enforcement layer that operates above whichever AI coding tool a team picks. Tool-agnostic, MIT-licensed, framework-independent.</p>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
+    </div>
+  </footer>
+</article>
+</main>
+
+<footer>
+  <p>
+    <a href="/use-cases/">Use cases</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/insights/">Insights</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/standards/">Standards</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/compare/">Compare</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/integrations/">Integrations</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/founder/">Founder</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/about/">About</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/contact/">Contact</a>
+    &nbsp;&middot;&nbsp;
+    <a href="/privacy/">Privacy</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a>
+    &nbsp;&middot;&nbsp;
+    Open source
+    &nbsp;&middot;&nbsp;
+    MIT License
+  </p>
+</footer>
+
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  btn.addEventListener('click', function(){
+    var open = links.classList.toggle('open');
+    btn.setAttribute('aria-expanded', String(open));
+  });
+})();
+</script>
+<script><!-- nav-active -->
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
+</body>
+</html>

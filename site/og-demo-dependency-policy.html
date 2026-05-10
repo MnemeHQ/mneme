@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 1200px; height: 630px; background: #0c0c0d; font-family: 'DM Mono', monospace; overflow: hidden; position: relative; }
+  .grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(200,240,96,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(200,240,96,0.04) 1px, transparent 1px); background-size: 60px 60px; pointer-events: none; }
+  .glow { position: absolute; top: -120px; right: -80px; width: 600px; height: 600px; background: radial-gradient(circle at top right, rgba(245,158,11,0.08), transparent 65%); pointer-events: none; }
+  .container { position: relative; z-index: 1; width: 100%; height: 100%; padding: 44px 52px; display: flex; flex-direction: column; justify-content: space-between; }
+  .top { display: flex; align-items: center; justify-content: space-between; }
+  .logo { font-family: 'Instrument Serif', serif; font-size: 26px; color: #e8e8ec; letter-spacing: -0.3px; }
+  .tag { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; color: #f59e0b; background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3); border-radius: 100px; padding: 5px 14px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .middle { flex: 1; display: flex; flex-direction: column; justify-content: center; max-width: 1000px; padding-top: 8px; }
+  .scenario-num { font-family: 'DM Mono', monospace; font-size: 12px; color: #88889a; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
+  .heading { font-family: 'Instrument Serif', serif; font-size: 64px; line-height: 1.08; color: #e8e8ec; letter-spacing: -1px; margin-bottom: 28px; }
+  .heading em { font-style: italic; color: #f59e0b; }
+  .verdict-card { display: inline-flex; align-items: center; gap: 14px; padding: 14px 20px; border-radius: 8px; background: #141416; border: 1px solid #2e2e34; max-width: max-content; }
+  .badge { font-family: 'DM Mono', monospace; font-size: 12px; padding: 5px 12px; border-radius: 4px; letter-spacing: 0.06em; font-weight: 500; }
+  .badge.warn { background: rgba(245,158,11,0.16); color: #f59e0b; border: 1px solid rgba(245,158,11,0.35); }
+  .verdict-text { color: #e8e8ec; font-size: 14px; font-family: 'DM Mono', monospace; }
+  .verdict-text .muted { color: #55555f; }
+  .bottom { display: flex; align-items: flex-end; justify-content: space-between; }
+  .url { font-family: 'DM Mono', monospace; font-size: 12px; color: #55555f; letter-spacing: 0.01em; }
+  .principle { font-family: 'DM Mono', monospace; font-size: 11px; color: #f59e0b; letter-spacing: 0.02em; }
+</style>
+</head>
+<body>
+  <div class="grid"></div>
+  <div class="glow"></div>
+  <div class="container">
+    <div class="top">
+      <span class="logo">Mneme HQ</span>
+      <span class="tag">Demo Scenario &middot; WARN</span>
+    </div>
+    <div class="middle">
+      <div class="scenario-num">Scenario 2 of 3</div>
+      <div class="heading">Dependency policy<br><em>flagged</em></div>
+      <div class="verdict-card">
+        <span class="badge warn">WARN</span>
+        <span class="verdict-text">Unapproved dependency <span class="muted">&middot; prisma not in approved list</span></span>
+      </div>
+    </div>
+    <div class="bottom">
+      <span class="principle">approved dependencies only &middot; tracked override path</span>
+      <div class="url">mnemehq.com/demo/dependency-policy/</div>
+    </div>
+  </div>
+</body>
+</html>

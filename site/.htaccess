@@ -5,6 +5,9 @@ RewriteEngine On
 RewriteCond %{HTTP:CF-Visitor} '"scheme":"http"'
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
+# URL hygiene: /demo.html (legacy) -> /demo/ (canonical)
+RewriteRule ^demo\.html$ /demo/ [R=301,L]
+
 # Brotli compression (falls back to gzip if unavailable)
 <IfModule mod_brotli.c>
     AddOutputFilterByType BROTLI_COMPRESS text/html text/css text/javascript application/javascript text/xml application/xml image/svg+xml

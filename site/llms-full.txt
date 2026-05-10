@@ -74,11 +74,48 @@ Phase 4. Governance infrastructure. Policy as code enforcement and drift analyti
 
 Mneme works with direct LLM API integrations, IDE coding assistants such as Cursor and Claude Code, agent frameworks, managed agent platforms, and internal prompt pipelines.
 
+## Demo
+
+The interactive demo at https://mnemehq.com/demo/ runs the same prompt through the same model twice. The prompt: "Refactor the storage backend for scalability."
+
+Without Mneme. The model recommends migrating JSON storage to PostgreSQL or Redis, introducing an ORM, and adding a migration layer. The advice is reasonable in the abstract and ignores three architectural decisions this codebase has already made.
+
+With Mneme. The relevant decision records are injected into the model's context before generation: ADR-001 (JSON storage only — no external DB), ADR-003 (no ORM in v1), ADR-005 (extend before rebuild). The model proposes extending the existing JSON storage module instead of replacing it. Same prompt, same model, different answer.
+
+The third panel runs `mneme check --mode strict` against the generated diff and produces a structured verdict: PASS on the storage decision (JSON only, no new databases), PASS on the auth pattern (JWT middleware unchanged), WARN on a new dependency (prisma not in approved list), and FAIL on a Repository pattern violation (ADR-004 bypassed in user.service.ts).
+
+The demo illustrates the difference between context injection and architectural governance. Injection makes the rules visible to the model. Enforcement makes generated output answer to them. Mneme does both, in one tool-agnostic layer that works across Claude Code, Cursor, GitHub Copilot, Windsurf, and custom SDK agents.
+
+## Demo scenarios
+
+Each scenario below walks through one verdict from the mneme check sample output. URLs are at https://mnemehq.com/demo/<slug>/.
+
+Storage decision (PASS) — slug: storage-decision. ADR-001 is the rule "JSON storage only — no external database" plus ADR-003 (no ORM in v1) and ADR-005 (extend before rebuild). Without Mneme, the model recommends migrating to PostgreSQL or Redis with an ORM and a migration layer, silently violating all three ADRs. With Mneme, the relevant decision records are injected before generation and the model proposes extending the existing JSON storage module. mneme check returns PASS on the storage decision, with the originating decision ID surfaced in structured output.
+
+Dependency policy (WARN) — slug: dependency-policy. The team's approved dependency list lives in project_memory.json with type "dependency_policy" and an explicit allowlist (FastAPI, Pydantic, httpx, pytest, ruff, internal packages). During an AI-assisted refactor, the agent reaches for prisma — a real, popular library, but not on the approved list. Without Mneme the import lands silently in the next PR. With Mneme, mneme check emits a structured WARN with the originating decision ID and a tracked override path. WARN rather than FAIL is intentional: dependency introductions often have legitimate reasons (security re-approval, deliberate spike), so the default is "flag for review" not "hard-block." Strict enforcement is available via mneme check --mode strict.
+
+Repository pattern (FAIL) — slug: repository-pattern. ADR-004 records the rule "Repository pattern is the only data-access boundary." Service classes depend on repository interfaces, never on the underlying storage. During a "speed up user.service.ts" refactor the agent inlines a direct database query, bypassing the abstraction. The diff looks clean in the editor; the linter is happy; the tests pass. mneme check --mode strict catches the architectural-pattern violation and emits a hard FAIL with file path and decision ID. In CI via the GitHub Actions integration the FAIL exit code blocks the PR until the violation is resolved or an explicit override decision record is added.
+
+The three scenarios cover the full PASS / WARN / FAIL verdict spectrum and demonstrate the governance loop end to end: decisions stored as structured records, injected pre-generation, enforced post-generation, with override events themselves tracked as first-class decisions.
+
+## Standards landscape
+
+Three efforts are forming the credible foundation for a future cross-tool agent governance standard. The standards landscape page at https://mnemehq.com/standards/ tracks all three with links to organizational primary sources only.
+
+NIST CAISI AI Agent Standards Initiative. Launched February 2026 by the Center for AI Standards and Innovation at NIST. Stated aim: AI agents that "interoperate smoothly across the digital ecosystem." Concrete artifacts so far: a January 2026 RFI on securing AI agent systems (closed March 9, 2026), the NCCoE concept paper on AI agent identity and authorization, and listening sessions on barriers to AI adoption in healthcare, finance, and education. Current scope is identity and authorization; output-policy enforcement is adjacent and likely to follow.
+
+Model Context Protocol. Open, JSON-RPC-based protocol for exposing context, tools, and resources to AI clients. Latest specification dated 2025-11-25. Does not specify a governance content format, but is the substrate over which a structured decision store can be made queryable to any compliant agent.
+
+AGENTS.md. Markdown convention for per-repo instructions, stewarded by the Agentic AI Foundation under the Linux Foundation. Adopted across OpenAI Codex, Cursor, Aider, Factory, Google Gemini CLI and Jules, Zed. As a static-context format, AGENTS.md does not resolve precedence between conflicting decisions or enforce anything at the hook layer, but it is the most credible cross-vendor baseline that exists today for the static portion of the problem.
+
+Mneme alignment is honest: tracking, design-aligned, planning to engage with future RFIs. Mneme is not currently NIST-endorsed, not a Linux Foundation member, and has not filed contributions. The standards page draws this line explicitly.
+
 ## Project links
 
 - Homepage: https://mnemehq.com/
 - Governance Benchmark v1.1 methodology: https://mnemehq.com/benchmark/
-- Demo: https://mnemehq.com/demo.html
+- Demo: https://mnemehq.com/demo/
+- Standards landscape: https://mnemehq.com/standards/
 - Use cases: https://mnemehq.com/use-cases/
 - Insights: https://mnemehq.com/insights/
 - Roadmap: https://mnemehq.com/roadmap/
