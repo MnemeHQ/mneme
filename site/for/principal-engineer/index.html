@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>For Staff &amp; Principal Engineers — Mneme HQ</title>
   <meta name="description" content="Stop repeating architectural decisions in every PR review. Record them once. Enforce them automatically." />
-  <meta name="robots" content="noindex, nofollow" />
+  <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/for/principal-engineer/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
@@ -157,7 +157,44 @@
       .hero { padding: 3.5rem 1.25rem 3rem; }
       .section-wrap { padding: 3rem 1.25rem; }
     }
+  
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
   </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "For Principal Engineers", "item": "https://mnemehq.com/for/principal-engineer/"}
+        ]
+      },
+      {
+        "@type": "WebPage",
+        "name": "For Principal Engineers — Mneme HQ",
+        "description": "Stop repeating architectural decisions in every PR review. Mneme HQ puts your decisions in the loop before the AI writes the code.",
+        "url": "https://mnemehq.com/for/principal-engineer/",
+        "datePublished": "2026-04-15",
+        "dateModified": "2026-05-10",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}}
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {"@type": "Question", "name": "How is this different from writing a stricter CLAUDE.md?", "acceptedAnswer": {"@type": "Answer", "text": "CLAUDE.md is static text injected at session start — the model reads it and is asked to respect it. The Mneme hook runs at every Edit, Write, and MultiEdit and can block the operation outright if it violates a decision. Compliance is not probabilistic."}},
+          {"@type": "Question", "name": "What if a rule needs to be temporarily overridden?", "acceptedAnswer": {"@type": "Answer", "text": "Override events are tracked. The override is itself a decision record with rationale, scope, and expiry — visible in PR review like any other diff. Weakening a constraint costs the same as introducing one. Silent overrides are not possible."}},
+          {"@type": "Question", "name": "Does this work in CI as well as the editor?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. mneme check --mode strict runs in CI via the GitHub Actions enforcement gate and blocks PRs on hard FAIL verdicts. The same decision corpus drives interactive Claude Code sessions and CI checks — no per-tool duplication."}}
+        ]
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
 <!-- Google Tag Manager (noscript) -->
@@ -185,6 +222,13 @@
     <div class="hero-tag">For Staff &amp; Principal Engineers</div>
     <h1>Stop Repeating Architectural Decisions in Every PR Review</h1>
     <p class="hero-sub">You've explained the service boundary three times this sprint. The AI didn't know. The developer didn't check. Mneme HQ puts your decisions in the loop — before the code is written.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-04-15">Published Apr 2026</time>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-10">Updated May 2026</time>
+    </p>
   </div>
 
   <!-- SECTION 1: THE PROBLEM -->
@@ -263,6 +307,34 @@
         <div class="scenario-label">With Mneme</div>
         <p>AI attempts raw SQL write &rarr; hook fires &rarr; violation blocked &rarr; constraint surfaced in-context &rarr; developer fixes before PR opens</p>
       </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3.5: How it works in practice -->
+  <div class="section">
+    <h2 class="section-title">How it works in practice</h2>
+    <p style="color:var(--muted); line-height:1.85; margin-bottom:1.1rem;">Most principal engineers we talk to are not short on architectural taste. They are short on time to repeat themselves. The arc is consistent: a decision gets made, an ADR gets written, six weeks pass, three new engineers join, the AI session does not know any of this, and the same review comment appears on a new PR for the third time.</p>
+    <p style="color:var(--muted); line-height:1.85; margin-bottom:1.1rem;">Mneme HQ inverts that loop. Architectural decisions live in <code style="font-family:'DM Mono',monospace;font-size:0.82em;">project_memory.json</code> as typed records (id, scope, status, rationale, supersedes). The retriever scores each prompt against the corpus and surfaces only the relevant constraints to the AI session. The hook intercepts every Edit, Write, and MultiEdit before the file lands &mdash; violations come back as feedback the model can act on, not as a blocked operation a human has to debug.</p>
+    <p style="color:var(--muted); line-height:1.85; margin-bottom:1.1rem;">When a decision changes, you update one record. The corpus is version-controlled with the code, so the change shows up in PR review the same way any other change does. Override events (overriding a rule explicitly for a specific PR) are themselves tracked, so weakening a constraint is a visible decision rather than a silent merge. None of this is configuration that the model can ignore. It is enforcement at the seam where every AI agent eventually has to write to disk.</p>
+    <p style="color:var(--muted); line-height:1.85;">The same corpus drives interactive sessions through Claude Code or Cursor and the GitHub Actions enforcement gate. You write the rule once. It applies in the editor, in CI, and in any custom SDK agent the platform team builds &mdash; without per-tool duplication. See the <a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/" style="color:var(--accent);text-decoration:none;">architectural governance article</a> for the design rationale.</p>
+  </div>
+
+  <!-- SECTION 3.7: FAQ -->
+  <div class="section">
+    <h2 class="section-title">FAQ</h2>
+    <div class="faq-list" style="margin-top:0.5rem;">
+      <details class="faq-item" style="border-top:1px solid var(--border); padding:1.05rem 0;">
+        <summary style="cursor:pointer; font-size:0.92rem; color:var(--text); font-weight:500; list-style:none; position:relative; padding-right:2rem;">How is this different from writing a stricter CLAUDE.md?</summary>
+        <div style="padding-top:0.85rem; font-size:0.85rem; color:var(--muted); line-height:1.8;">CLAUDE.md is static text injected at session start &mdash; the model reads it and is asked to respect it. The Mneme hook runs at every Edit, Write, and MultiEdit and can block the operation outright if it violates a decision. Compliance is not probabilistic. See <a href="/insights/why-prompt-memory-fails-at-scale/" style="color:var(--accent);">why prompt memory fails at scale</a>.</div>
+      </details>
+      <details class="faq-item" style="border-top:1px solid var(--border); padding:1.05rem 0;">
+        <summary style="cursor:pointer; font-size:0.92rem; color:var(--text); font-weight:500; list-style:none; position:relative; padding-right:2rem;">What if a rule needs to be temporarily overridden?</summary>
+        <div style="padding-top:0.85rem; font-size:0.85rem; color:var(--muted); line-height:1.8;">Override events are tracked. The override is itself a decision record with a rationale, scope, and expiry &mdash; visible in PR review like any other diff. Weakening a constraint costs the same as introducing one: a few lines of structured edit. Silent overrides are not possible.</div>
+      </details>
+      <details class="faq-item" style="border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:1.05rem 0;">
+        <summary style="cursor:pointer; font-size:0.92rem; color:var(--text); font-weight:500; list-style:none; position:relative; padding-right:2rem;">Does this work in CI as well as the editor?</summary>
+        <div style="padding-top:0.85rem; font-size:0.85rem; color:var(--muted); line-height:1.8;">Yes. <code style="font-family:'DM Mono',monospace;font-size:0.85em;">mneme check --mode strict</code> runs in CI via the <a href="/integrations/github-actions/" style="color:var(--accent);">GitHub Actions enforcement gate</a> and blocks PRs on hard FAIL verdicts. The same decision corpus drives interactive Claude Code sessions and CI checks &mdash; no per-tool duplication.</div>
+      </details>
     </div>
   </div>
 

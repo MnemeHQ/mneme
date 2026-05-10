@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Architectural Governance Across Heterogeneous AI Coding Agents — Mneme HQ</title>
-  <meta name="description" content="Most engineering orgs are no longer one-tool shops. Claude Code, Cursor, Copilot, Windsurf and bespoke agents all touch the same codebase — and each carries its own memory format. Architectural governance dies at the seams unless it lives outside the tool." />
+  <meta name="description" content="Most engineering orgs run multiple AI coding tools — Claude Code, Cursor, Copilot, Windsurf, SDK agents — against one codebase. Per-tool memory fails at the seams." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/insights/architectural-governance-across-heterogeneous-ai-coding-agents/" />
@@ -12,12 +12,12 @@
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
   <meta property="og:title" content="Architectural Governance Across Heterogeneous AI Coding Agents" />
-  <meta property="og:description" content="Most engineering orgs are no longer one-tool shops. Claude Code, Cursor, Copilot, Windsurf and bespoke agents all touch the same codebase — and each carries its own memory format. Architectural governance dies at the seams unless it lives outside the tool." />
+  <meta property="og:description" content="Most engineering orgs run multiple AI coding tools — Claude Code, Cursor, Copilot, Windsurf, SDK agents — against one codebase. Per-tool memory fails at the seams." />
   <meta property="og:url" content="https://mnemehq.com/insights/architectural-governance-across-heterogeneous-ai-coding-agents/" />
   <meta property="og:image" content="https://mnemehq.com/insights/architectural-governance-across-heterogeneous-ai-coding-agents/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Architectural Governance Across Heterogeneous AI Coding Agents" />
-  <meta name="twitter:description" content="Most engineering orgs are no longer one-tool shops. Claude Code, Cursor, Copilot, Windsurf and bespoke agents all touch the same codebase — and each carries its own memory format. Architectural governance dies at the seams unless it lives outside the tool." />
+  <meta name="twitter:description" content="Most engineering orgs run multiple AI coding tools — Claude Code, Cursor, Copilot, Windsurf, SDK agents — against one codebase. Per-tool memory fails at the seams." />
   <meta name="twitter:image" content="https://mnemehq.com/insights/architectural-governance-across-heterogeneous-ai-coding-agents/og.png" />
   <meta name="author" content="Theo Valmis" />
   <meta property="article:published_time" content="2026-05-09T00:00:00Z" />
@@ -163,6 +163,11 @@
       .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.88rem; padding: 0.7rem 0; border-bottom: 1px solid var(--border); }
       .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
     }
+  
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
   </style>
   <script type="application/ld+json">
   {
@@ -179,7 +184,7 @@
       {
         "@type": "Article",
         "headline": "Architectural Governance Across Heterogeneous AI Coding Agents",
-        "description": "Most engineering orgs are no longer one-tool shops. Claude Code, Cursor, Copilot, Windsurf and bespoke agents all touch the same codebase — and each carries its own memory format. Architectural governance dies at the seams unless it lives outside the tool.",
+        "description": "Most engineering orgs run multiple AI coding tools — Claude Code, Cursor, Copilot, Windsurf, SDK agents — against one codebase. Per-tool memory fails at the seams.",
         "url": "https://mnemehq.com/insights/architectural-governance-across-heterogeneous-ai-coding-agents/",
         "datePublished": "2026-05-09",
         "dateModified": "2026-05-09",
@@ -242,6 +247,13 @@
     </div>
     <h1>Architectural governance across heterogeneous AI coding agents</h1>
     <p class="article-lede">Most engineering orgs are no longer one-tool shops. One engineer is in Claude Code, another in Cursor, the platform team is running Copilot in CI, and somebody just shipped a bespoke agent built on the Claude Agent SDK. They all touch the same codebase. They all carry their own memory format. Architectural governance dies at the seams.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-09">Published May 2026</time>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-09">Updated May 2026</time>
+    </p>
   </header>
 
   <div class="article-body">

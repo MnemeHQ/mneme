@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>For Platform &amp; DevEx Teams — Mneme HQ</title>
   <meta name="description" content="Centralize architectural standards across every AI coding workflow. One decision corpus. All agents. All tools. No rules sprawl." />
-  <meta name="robots" content="noindex, nofollow" />
+  <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/for/platform/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
@@ -145,7 +145,44 @@
       .hero { padding: 3.5rem 1.25rem 3rem; }
       .section-wrap { padding: 3rem 1.25rem; }
     }
+  
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
   </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "For Platform Engineering", "item": "https://mnemehq.com/for/platform/"}
+        ]
+      },
+      {
+        "@type": "WebPage",
+        "name": "For Platform Engineering — Mneme HQ",
+        "description": "Mneme HQ as the architectural governance layer for AI-assisted development. Open source, framework-agnostic, hook-level enforcement.",
+        "url": "https://mnemehq.com/for/platform/",
+        "datePublished": "2026-04-15",
+        "dateModified": "2026-05-10",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}}
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {"@type": "Question", "name": "Does this replace our existing policy-as-code tooling?", "acceptedAnswer": {"@type": "Answer", "text": "No. Mneme governs AI-generated code at the moment of generation. Existing policy-as-code (OPA, Sentinel, custom linters) governs deployed configuration and infrastructure. They operate on different artifacts and complement each other — Mneme prevents architectural drift; OPA-style tooling prevents misconfigured deployments."}},
+          {"@type": "Question", "name": "How does this fit alongside CodeRabbit, Sentry, or post-generation reviewers?", "acceptedAnswer": {"@type": "Answer", "text": "Mneme operates pre-generation; review tools operate post-generation. Both layers are useful: Mneme catches architectural violations before they're proposed, freeing review tools to focus on correctness, security, and judgment calls."}},
+          {"@type": "Question", "name": "What does the rollout look like for a 50-engineer org?", "acceptedAnswer": {"@type": "Answer", "text": "Typical sequence: pilot in one repo with the platform team's own ADRs (week 1–2), wire up the GitHub Actions gate in warn mode (week 3), expand to two or three more repos with team-owned tier-2 decisions (month 2), turn the gate to strict on the most architecturally-stable repos (month 3)."}}
+        ]
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
 <!-- Google Tag Manager (noscript) -->
@@ -173,6 +210,13 @@
     <div class="hero-tag">For Platform &amp; DevEx Teams</div>
     <h1>Centralize Architectural Standards Across AI Coding Workflows</h1>
     <p class="hero-sub">Every team has their own .cursorrules, their own system prompts, their own interpretation of the standards. Mneme HQ gives you one structured decision corpus that all AI agents query, consistently.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-04-15">Published Apr 2026</time>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-10">Updated May 2026</time>
+    </p>
     <div class="cta-group">
       <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub</a>
       <a href="/use-cases/" class="btn-ghost">See all use cases</a>
@@ -249,6 +293,35 @@
         <p>Maintain consistent standards across orchestrated multi-agent pipelines where multiple models collaborate on the same codebase.</p>
         <span class="card-arrow">Read use case &rarr;</span>
       </a>
+    </div>
+  </div>
+
+  <!-- SECTION 3.5: How platform teams roll this out -->
+  <div class="section">
+    <h2 class="section-title">How platform teams roll this out</h2>
+    <p style="color:var(--muted); line-height:1.85; margin-bottom:1.1rem;">The deployment model platform engineering teams typically settle on has three tiers, each owned by different parts of the org but driven by the same decision corpus.</p>
+    <p style="color:var(--muted); line-height:1.85; margin-bottom:1.1rem;"><strong style="color:var(--text);">Tier 1 &mdash; org-wide policy.</strong> A small set of decisions every repo inherits: approved dependencies, security patterns, observability conventions. Owned by platform / security. Lives in a shared <code style="font-family:'DM Mono',monospace;font-size:0.82em;">project_memory.json</code> imported by each repo's local corpus.</p>
+    <p style="color:var(--muted); line-height:1.85; margin-bottom:1.1rem;"><strong style="color:var(--text);">Tier 2 &mdash; team architecture.</strong> Service boundaries, language and framework choices, data-access patterns. Owned by the team that operates the service. Lives in the repo's own <code style="font-family:'DM Mono',monospace;font-size:0.82em;">project_memory.json</code> with its own ADRs.</p>
+    <p style="color:var(--muted); line-height:1.85; margin-bottom:1.1rem;"><strong style="color:var(--text);">Tier 3 &mdash; per-feature exceptions.</strong> Tracked overrides for specific PRs, with rationale and expiry. Owned by the engineer making the change, reviewed in PR like any other diff. The override is a decision record itself, so weakening a constraint is visible.</p>
+    <p style="color:var(--muted); line-height:1.85;">Mneme's precedence engine resolves the three tiers deterministically: more-specific scope wins over less-specific scope, more-recent decision wins over superseded decision, explicit override wins for the duration of its expiry. The result is policy-as-code that is queryable by any agent, applied at the seam every agent eventually has to write to disk, and auditable in the same way as the rest of the codebase.</p>
+  </div>
+
+  <!-- SECTION 3.7: FAQ -->
+  <div class="section">
+    <h2 class="section-title">FAQ</h2>
+    <div class="faq-list" style="margin-top:0.5rem;">
+      <details class="faq-item" style="border-top:1px solid var(--border); padding:1.05rem 0;">
+        <summary style="cursor:pointer; font-size:0.92rem; color:var(--text); font-weight:500; list-style:none; position:relative; padding-right:2rem;">Does this replace our existing policy-as-code tooling?</summary>
+        <div style="padding-top:0.85rem; font-size:0.85rem; color:var(--muted); line-height:1.8;">No. Mneme governs AI-generated code at the moment of generation. Existing policy-as-code (OPA, Sentinel, custom linters) governs deployed configuration and infrastructure. They operate on different artifacts and complement each other &mdash; Mneme prevents architectural drift from being introduced; OPA-style tooling prevents misconfigured deployments from being applied.</div>
+      </details>
+      <details class="faq-item" style="border-top:1px solid var(--border); padding:1.05rem 0;">
+        <summary style="cursor:pointer; font-size:0.92rem; color:var(--text); font-weight:500; list-style:none; position:relative; padding-right:2rem;">How does this fit alongside CodeRabbit, Sentry, or post-generation reviewers?</summary>
+        <div style="padding-top:0.85rem; font-size:0.85rem; color:var(--muted); line-height:1.8;">Mneme operates pre-generation; review tools operate post-generation. Both layers are useful: Mneme catches architectural violations before they're proposed, freeing review tools to focus on correctness, security, and judgment calls. See <a href="/compare/coderabbit/" style="color:var(--accent);">Mneme vs CodeRabbit</a> and <a href="/insights/review-is-not-governance/" style="color:var(--accent);">review is not governance</a>.</div>
+      </details>
+      <details class="faq-item" style="border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:1.05rem 0;">
+        <summary style="cursor:pointer; font-size:0.92rem; color:var(--text); font-weight:500; list-style:none; position:relative; padding-right:2rem;">What does the rollout look like for a 50-engineer org?</summary>
+        <div style="padding-top:0.85rem; font-size:0.85rem; color:var(--muted); line-height:1.8;">Typical sequence: pilot in one repo with the platform team's own ADRs (week 1&mdash;2), wire up the GitHub Actions gate in warn mode (week 3), expand to two or three more repos with team-owned tier-2 decisions (month 2), turn the gate to strict on the most architecturally-stable repos (month 3). The cost curve is gentle because the corpus is human-editable JSON, not a custom DSL.</div>
+      </details>
     </div>
   </div>
 

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>For CTOs &amp; VP Engineering — Mneme HQ</title>
   <meta name="description" content="AI increases code throughput. Your review capacity does not. Mneme HQ enforces architectural governance before code reaches review." />
-  <meta name="robots" content="noindex, nofollow" />
+  <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/for/cto/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
@@ -158,7 +158,36 @@
       .section-wrap { padding: 3rem 1.25rem; }
       .proof-block { gap: 1.5rem; padding: 1.5rem; }
     }
+  
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
   </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "For CTOs", "item": "https://mnemehq.com/for/cto/"}
+        ]
+      },
+      {
+        "@type": "WebPage",
+        "name": "For CTOs and VP Engineering — Mneme HQ",
+        "description": "AI increases code throughput. Your review capacity does not. Mneme HQ enforces architectural governance before code reaches review.",
+        "url": "https://mnemehq.com/for/cto/",
+        "datePublished": "2026-04-15",
+        "dateModified": "2026-05-10",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}}
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
 <!-- Google Tag Manager (noscript) -->
@@ -186,6 +215,13 @@
     <div class="hero-tag">For CTOs &amp; VP Engineering</div>
     <h1>AI Increases Code Throughput. Your Review Capacity Does Not.</h1>
     <p class="hero-sub">Teams shipping 10&times; more AI-generated code with the same number of reviewers accumulate architectural debt at a pace that's invisible until it's expensive. Mneme HQ enforces architectural decisions before the code is written.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-04-15">Published Apr 2026</time>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-10">Updated May 2026</time>
+    </p>
     <div class="cta-group">
       <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub</a>
       <a href="/use-cases/" class="btn-ghost">See use cases</a>

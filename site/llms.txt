@@ -49,6 +49,26 @@ How Mneme HQ fits into the tools engineering teams already use.
 - [Demo &middot; Repository pattern (FAIL)](https://mnemehq.com/demo/repository-pattern/): How Mneme blocks an ADR-004 violation when an AI agent bypasses the Repository pattern in user.service.ts. Hard FAIL that gates the PR via the GitHub Actions enforcement gate.
 - [Standards landscape](https://mnemehq.com/standards/): NIST CAISI AI Agent Standards Initiative, the Model Context Protocol, and AGENTS.md — the three credible foundations for a future cross-tool agent governance standard. Verified primary sources only. Mneme aligns with the direction; not yet a filed contributor.
 
+## Buyer landing pages
+
+- [For CTOs and VP Engineering](https://mnemehq.com/for/cto/): The bottleneck for AI-assisted teams isn't generation — it's governance. Mneme HQ enforces architectural standards before code reaches review.
+- [For Platform Engineering](https://mnemehq.com/for/platform/): One decision corpus, every agent, every tool. Three-tier rollout (org policy / team architecture / per-feature override) with deterministic precedence resolution.
+- [For Principal Engineers](https://mnemehq.com/for/principal-engineer/): Stop repeating architectural decisions in every PR review. Mneme puts decisions in the loop before AI writes the code.
+
+## Insights articles
+
+Long-form writing on AI coding governance, in publication order.
+
+- [Why RAG Fails for Architectural Governance](https://mnemehq.com/insights/why-rag-fails-for-architectural-governance/): Retrieval-augmented generation works for documentation lookup. It breaks down for authoritative, precedence-aware constraint enforcement.
+- [Why Code Review Cannot Scale With AI Output](https://mnemehq.com/insights/why-code-review-cannot-scale-with-ai-output/): AI generates 10–100× human pace. Code review is still linear. The math creates a bottleneck no team can hire its way out of.
+- [Prompt Engineering Is Not Governance](https://mnemehq.com/insights/prompt-engineering-is-not-governance/): Prompt templates can nudge an LLM toward better output. They cannot enforce architectural invariants or resolve decision conflicts at scale.
+- [Mneme vs Cursor Rules (editorial)](https://mnemehq.com/insights/mneme-vs-cursor-rules/): Cursor Rules are per-repo text. Mneme is structured decision memory with a precedence engine and hook-level enforcement.
+- [AI Code Review Does Not Scale Linearly](https://mnemehq.com/insights/ai-code-review-does-not-scale-linearly/): AI code generation scales nearly infinitely; reviewer attention does not. The bottleneck demands enforcement at generation time, not more reviewers.
+- [Deployment Quality Will Define the AI Era](https://mnemehq.com/insights/deployment-quality-will-define-the-ai-era/): The first AI era rewarded early adoption. The next rewards operational quality. Deployment quality is the new differentiator.
+- [Review Is Not Governance](https://mnemehq.com/insights/review-is-not-governance/): CodeRabbit helps review AI-generated code. Mneme governs what the AI generates in the first place. Two different layers of the same problem.
+- [Why Prompt Memory Fails at Scale](https://mnemehq.com/insights/why-prompt-memory-fails-at-scale/): Teams paste architectural rules into CLAUDE.md and call it governance. Context injection has a ceiling: no precedence engine, no enforcement, no persistence.
+- [Architectural Governance Across Heterogeneous AI Coding Agents](https://mnemehq.com/insights/architectural-governance-across-heterogeneous-ai-coding-agents/): Most engineering orgs run Claude Code, Cursor, Copilot, Windsurf, and SDK agents against one codebase. Per-tool memory dies at the seams. Includes a historical pattern analysis (OCI, OpenTelemetry, LSP) and the standards landscape (NIST CAISI, MCP, AGENTS.md).
+
 ## Source and benchmarks
 
 - [GitHub repository](https://github.com/TheoV823/mneme)
