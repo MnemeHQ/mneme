@@ -34,6 +34,14 @@ Rules (each is one of: required / recommended / optional):
     - at least one cross-page link to /insights/, /standards/,
       /integrations/, /compare/, or /use-cases/             recommended
 
+  Internal linking pattern (sub-pages only)
+    Every section sub-page (/insights/<x>/, /use-cases/<x>/,
+    /compare/<x>/, /integrations/<x>/, /demo/<x>/) should link to:
+      - its parent hub (e.g. /insights/)                    required
+      - 2-4 related pages within the same section           recommended
+      - one proof surface: /demo/, /benchmark/, or GitHub   required
+    Hubs and root-level pages are exempt.
+
   JSON-LD structured data
     - BreadcrumbList present                                required (subpages)
     - WebPage / Article / SoftwareApplication present       required
@@ -329,6 +337,93 @@ def rule_internal_links(html: str, ctx: PageContext) -> RuleResult:
     return PASS, ""
 
 
+# Sections that have a section-hub at /<section>/index.html. Sub-pages
+# inside these sections are subject to the parent-hub + related + proof
+# linking pattern.
+LINK_SECTIONS = ("insights", "use-cases", "compare", "integrations", "demo")
+
+# Pages or URL prefixes that count as "proof" surfaces for the linking
+# pattern: the demo, the benchmark methodology, and the public source.
+PROOF_PATTERNS = ("/demo/", "/benchmark/", "github.com/TheoV823/mneme")
+
+
+def rule_linking_pattern(html: str, ctx: PageContext) -> RuleResult:
+    """Encodes the editorial linking rule:
+
+        Every section sub-page should link to:
+        1. its parent hub
+        2. 2-6 related pages within the same section
+        3. at least one proof surface (demo, benchmark, or GitHub repo)
+
+    Section hubs and root-level pages are exempt.
+    """
+    rel = ctx.rel_path
+    parts = rel.split("/")
+    if len(parts) < 3:
+        # Root-level page (e.g. index.html) or section hub
+        # (e.g. insights/index.html). Rule doesn't apply.
+        return PASS, ""
+    section = parts[0]
+    if section not in LINK_SECTIONS:
+        return PASS, ""
+
+    parent_hub = f"/{section}/"
+    self_url = "/" + rel.removesuffix("index.html")
+
+    # All anchor hrefs inside <main>
+    main_hrefs = re.findall(
+        r'<a\b[^>]*\bhref\s*=\s*["\']([^"\']*)["\']',
+        ctx.main_body,
+    )
+
+    has_parent_hub = any(
+        h == parent_hub or h.startswith(parent_hub + "#")
+        for h in main_hrefs
+    )
+
+    # Count distinct related pages (siblings under the same section,
+    # not self, not just the hub anchor)
+    related: set[str] = set()
+    for h in main_hrefs:
+        if not h.startswith(parent_hub) or h == parent_hub:
+            continue
+        base = h.split("#")[0].split("?")[0]
+        if base in (parent_hub, self_url):
+            continue
+        related.add(base)
+
+    has_proof = any(
+        any(pat in h for pat in PROOF_PATTERNS)
+        for h in main_hrefs
+    )
+
+    # Adapt the lower bound to the section's published size: a section
+    # with only two sub-pages cannot satisfy a strict 2-related minimum,
+    # since each page has at most one sibling. Cap min_related at
+    # (siblings_count) so the rule stays meaningful but achievable.
+    section_dir = SITE / section
+    siblings_count = sum(
+        1
+        for p in section_dir.glob("*/index.html")
+        if str(p.relative_to(SITE)) != rel
+    )
+    min_related = min(2, siblings_count)
+
+    issues: list[str] = []
+    if not has_parent_hub:
+        issues.append(f"missing parent-hub link to {parent_hub}")
+    if len(related) < min_related:
+        issues.append(f"{len(related)} related links in /{section}/ (target {min_related}-4)")
+    elif len(related) > 6:
+        issues.append(f"{len(related)} related links in /{section}/ (over the 2-4 target; risk of spammy mesh)")
+    if not has_proof:
+        issues.append("no proof link (/demo/, /benchmark/, or GitHub repo)")
+
+    if issues:
+        return WARN, "; ".join(issues)
+    return PASS, ""
+
+
 def rule_jsonld_breadcrumb(html: str, ctx: PageContext) -> RuleResult:
     # Skip the home page — it doesn't need a breadcrumb.
     if ctx.rel_path == "index.html":
@@ -427,6 +522,7 @@ RULES: list[tuple[str, RuleFn]] = [
     ("structure.h2",        rule_h2),
     ("structure.words",     rule_word_count),
     ("structure.links",     rule_internal_links),
+    ("links.pattern",       rule_linking_pattern),
     ("jsonld.breadcrumb",   rule_jsonld_breadcrumb),
     ("jsonld.main",         rule_jsonld_main),
     ("jsonld.author",       rule_jsonld_author),
