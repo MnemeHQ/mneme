@@ -61,6 +61,7 @@ How Mneme HQ fits into the tools engineering teams already use.
 
 ## Buyer landing pages
 
+- [Mneme HQ by role](https://mnemehq.com/for/): Hub page routing CTOs, Platform/DevEx teams, and Staff/Principal Engineers to the role-specific framing of architectural governance for AI-assisted engineering.
 - [For CTOs and VP Engineering](https://mnemehq.com/for/cto/): The bottleneck for AI-assisted teams isn't generation — it's governance. Mneme HQ enforces architectural standards before code reaches review.
 - [For Platform Engineering](https://mnemehq.com/for/platform/): One decision corpus, every agent, every tool. Three-tier rollout (org policy / team architecture / per-feature override) with deterministic precedence resolution.
 - [For Principal Engineers](https://mnemehq.com/for/principal-engineer/): Stop repeating architectural decisions in every PR review. Mneme puts decisions in the loop before AI writes the code.
