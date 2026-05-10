@@ -1133,30 +1133,30 @@
 
   <!-- WORKS WITH -->
   <div class="section-wrap">
-    <div class="section-eyebrow">Integrations</div>
-    <h2 class="section-title">Works with your entire LLM stack.</h2>
+    <div class="section-eyebrow">Works with</div>
+    <h2 class="section-title">Model-agnostic. Agent-agnostic.</h2>
+    <p style="color:var(--muted);font-size:0.92rem;line-height:1.7;margin:-1.5rem 0 2rem;max-width:620px;">
+      Frontier and open-weight models. IDE agents, CLI agents, and orchestration frameworks. The decision corpus is the constant; everything upstream of it can change.
+    </p>
     <div class="works-grid">
       <div class="works-card">
-        <h3>Direct LLM API integrations</h3>
-        <p>Wrap any Anthropic, OpenAI, or compatible API call with automatic project memory injection.</p>
+        <h3>Models</h3>
+        <p>OpenAI, Anthropic, Gemini, Llama, Qwen, DeepSeek, Mistral &mdash; direct APIs and OpenAI-compatible endpoints.</p>
       </div>
       <div class="works-card">
-        <h3>IDE coding assistants</h3>
-        <p>Cursor, GitHub Copilot, Cline — your project decisions become editor-level guardrails.</p>
+        <h3>Coding agents</h3>
+        <p>Claude Code &amp; Cursor (native). Copilot, Aider, Cline, OpenHands designed-to-support.</p>
       </div>
       <div class="works-card">
-        <h3>Agent frameworks</h3>
-        <p>LangChain, CrewAI, AutoGen — enforce project constraints across every step of a multi-step run.</p>
-      </div>
-      <div class="works-card">
-        <h3>Managed agent platforms</h3>
-        <p>Connect via the API layer to any platform that accepts a structured system prompt.</p>
-      </div>
-      <div class="works-card">
-        <h3>Internal prompt pipelines</h3>
-        <p>Drop the API layer into any internal pipeline that constructs or routes LLM calls.</p>
+        <h3>Frameworks &amp; CI</h3>
+        <p>LangGraph, CrewAI, AutoGen, OpenAI Agents SDK. GitHub Actions (native), self-hosted runners.</p>
       </div>
     </div>
+    <p style="margin-top:1.5rem;font-size:0.86rem;color:var(--muted);">
+      <a href="/works-with/" style="color:var(--accent);text-decoration:none;">Full compatibility surface &rarr;</a>
+      &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+      <a href="/integrations/" style="color:var(--accent);text-decoration:none;">Native integrations &rarr;</a>
+    </p>
   </div>
 
   <!-- GET STARTED -->
@@ -1176,32 +1176,17 @@
 <span class="cp">$</span> python demo.py --dry-run</pre>
       </div>
       <div class="code-block">
-        <div class="code-block-label">run governance benchmarks</div>
-        <pre><span class="cp">$</span> mneme benchmark examples/benchmarks/ --memory examples/project_memory.json</pre>
-      </div>
-      <div class="code-block">
         <div class="code-block-label">governance gate (CI)</div>
         <pre><span class="cp">$</span> mneme check --memory .mneme/project_memory.json \
     --input pr.diff --query <span class="cs">"$PR_TITLE"</span> --mode strict</pre>
       </div>
-      <div class="code-block">
-        <div class="code-block-label">usage example</div>
-        <pre><span class="ck">from</span> mneme.memory_store <span class="ck">import</span> MemoryStore
-<span class="ck">from</span> mneme.retriever <span class="ck">import</span> Retriever
-<span class="ck">from</span> mneme.context_builder <span class="ck">import</span> format_context_packet
-<span class="ck">from</span> mneme.llm_adapter <span class="ck">import</span> LLMAdapter
-
-memory = MemoryStore(<span class="cs">"examples/project_memory.json"</span>).load()
-packet = Retriever(memory).retrieve(<span class="cs">"Should we rebuild from scratch?"</span>)
-response = LLMAdapter().complete(
-    user=<span class="cs">"Should we rebuild from scratch?"</span>,
-    system=format_context_packet(packet),
-)
-<span class="ck">print</span>(response.content)</pre>
-      </div>
     </div>
     <p style="margin-top:1.5rem;font-size:0.86rem;color:var(--muted);">
-      <a href="/docs/cli/" style="color:var(--accent);text-decoration:none;">Full CLI reference &mdash; commands, flags, exit codes &rarr;</a>
+      <a href="/docs/cli/" style="color:var(--accent);text-decoration:none;">Full CLI reference &rarr;</a>
+      &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+      <a href="/benchmark/" style="color:var(--accent);text-decoration:none;">Run the benchmark &rarr;</a>
+      &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+      <a href="https://github.com/TheoV823/mneme#python-api" style="color:var(--accent);text-decoration:none;">Python API &rarr;</a>
     </p>
   </div>
 
