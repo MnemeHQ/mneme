@@ -95,6 +95,55 @@
     .read-link:hover { color: var(--accent-dim); }
     .soon-label { color: var(--muted); font-size: 0.78rem; font-family: 'DM Mono', monospace; }
 
+    .ww-divider { border-top: 1px solid var(--border); margin: 4.5rem auto 0; max-width: 660px; }
+    .ww-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); max-width: 660px; margin: 2.5rem auto 0.6rem; }
+    .ww-h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; color: var(--text); letter-spacing: -0.015em; margin: 0 auto 0.6rem; max-width: 660px; line-height: 1.3; }
+    .ww-sub-h2 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; color: var(--text); letter-spacing: -0.01em; margin: 2.5rem auto 0.5rem; max-width: 660px; }
+    .ww-intro { font-size: 0.86rem; color: var(--muted); line-height: 1.8; max-width: 660px; margin: 0 auto 1.25rem; }
+
+    .compat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; margin: 0 0 1rem; }
+    .compat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.15rem; display: flex; flex-direction: column; gap: 0.4rem; }
+    .compat-card .compat-name { font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; color: var(--text); letter-spacing: -0.005em; }
+    .compat-card .compat-meta { font-family: 'DM Mono', monospace; font-size: 0.64rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+    .compat-card .compat-note { font-size: 0.8rem; color: var(--muted); line-height: 1.6; margin: 0; }
+    .compat-card .compat-note a { color: var(--accent); text-decoration: none; }
+    .compat-card .compat-note a:hover { color: var(--accent-dim); }
+
+    .ww-messaging { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem 1.4rem; margin: 1rem 0 0; font-size: 0.86rem; color: var(--muted); line-height: 1.7; }
+    .ww-messaging strong { color: var(--accent); }
+
+    .ww-diagram { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 1.75rem; margin: 1.5rem 0 1rem; }
+    .ww-diagram .dt { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.5rem; text-align: center; }
+    .ww-diagram-row { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 0.85rem; align-items: stretch; }
+    .ww-diagram-node { background: var(--surface2); border: 1px solid var(--border2); border-radius: 10px; padding: 1rem 1rem; text-align: center; display: flex; flex-direction: column; justify-content: center; min-height: 110px; }
+    .ww-diagram-node.center { border-color: rgba(200,240,96,0.55); background: linear-gradient(180deg, rgba(200,240,96,0.07), var(--surface2) 70%); }
+    .ww-diagram-node .label { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
+    .ww-diagram-node.center .label { color: var(--accent); }
+    .ww-diagram-node .title { font-family: 'Inter', sans-serif; font-size: 0.92rem; font-weight: 600; color: var(--text); line-height: 1.3; }
+    .ww-diagram-node .sub { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--muted); margin-top: 0.35rem; line-height: 1.55; }
+    .ww-diagram-arrow { font-family: 'DM Mono', monospace; font-size: 1.1rem; color: var(--border2); align-self: center; }
+    @media (max-width: 720px) {
+      .ww-diagram-row { grid-template-columns: 1fr; }
+      .ww-diagram-arrow { transform: rotate(90deg); justify-self: center; padding: 0.25rem 0; }
+    }
+    .ww-diagram .caption { font-size: 0.82rem; color: var(--muted); text-align: center; margin: 1.4rem 0 0; line-height: 1.7; }
+
+    .ww-position { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 1.75rem; margin: 2rem 0 1rem; text-align: center; }
+    .ww-position .pb-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.85rem; }
+    .ww-position .pb-quote { font-family: 'Instrument Serif', serif; font-size: clamp(1.4rem, 3vw, 1.85rem); font-weight: 400; line-height: 1.3; color: var(--text); letter-spacing: -0.01em; }
+    .ww-position .pb-quote em { color: var(--accent); font-style: italic; }
+    .ww-position .pb-sub { font-size: 0.86rem; color: var(--muted); margin-top: 1rem; max-width: 560px; margin-left: auto; margin-right: auto; line-height: 1.7; }
+
+    .ww-cta-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.85rem; margin: 1rem 0 0; }
+    .ww-cta-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.3rem; text-decoration: none; color: var(--text); transition: border-color 0.15s; display: flex; flex-direction: column; gap: 0.35rem; }
+    .ww-cta-card:hover { border-color: rgba(200,240,96,0.4); }
+    .ww-cta-card .cta-label { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+    .ww-cta-card .cta-title { font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; color: var(--text); }
+    .ww-cta-card .cta-sub { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+
+    .ww-boundary { font-size: 0.78rem; color: var(--muted); border-top: 1px solid var(--border); padding-top: 1.25rem; margin-top: 3rem; line-height: 1.7; font-family: 'DM Mono', monospace; max-width: 660px; margin-left: auto; margin-right: auto; }
+    .ww-boundary a { color: var(--accent); text-decoration: none; }
+
     footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
     footer a { color: var(--muted); text-decoration: none; }
     footer a:hover { color: var(--text); }
@@ -254,6 +303,217 @@
   <p style="font-size: 0.88rem; color: var(--muted); line-height: 1.85; max-width: 660px; margin: 0 auto 1.1rem;">Practical setup follows the same pattern across every integration: install with <code style="font-family:'DM Mono',monospace;font-size:0.82em;">pip install mneme</code>, scaffold the decision corpus with <code style="font-family:'DM Mono',monospace;font-size:0.82em;">mneme init</code>, and wire the integration's adapter (PreToolUse hook for Claude Code, rules export for Cursor, GitHub Action for CI). Each integration page links its own concrete steps; the corpus itself is the same file.</p>
 
   <p style="font-size: 0.88rem; color: var(--muted); line-height: 1.85; max-width: 660px; margin: 0 auto 1.1rem;">If your team is evaluating which integration to start with, the typical sequence is: Claude Code first (interactive enforcement gives the fastest feedback loop), then GitHub Actions in warn mode (catches what slips through), then strict mode in CI on the most architecturally-stable repos. Cursor sits alongside Claude Code for engineers who prefer that editor &mdash; the underlying corpus is identical.</p>
+
+  <!-- Works With (temporary home) -->
+  <div class="ww-divider"></div>
+  <div class="ww-eyebrow">Works With</div>
+  <h2 class="ww-h2" id="works-with">Governance across AI coding models and agent frameworks</h2>
+  <p class="ww-intro">The integrations above are the native, documented ones. Beyond those, Mneme HQ is designed to operate across the broader AI coding ecosystem &mdash; frontier models, open-weight models, third-party coding agents, agent frameworks, and the environments engineering teams already run them in. The list below describes compatibility, not partnership.</p>
+
+  <h3 class="ww-sub-h2">Model providers</h3>
+  <p class="ww-intro">Mneme HQ is model-agnostic. The governance layer operates at the seam where the agent reads context and writes to disk, so it does not care which model produced the tokens.</p>
+
+  <div class="compat-grid">
+    <div class="compat-card">
+      <div class="compat-meta">Frontier</div>
+      <div class="compat-name">OpenAI</div>
+      <p class="compat-note">Compatible with GPT-class models via the OpenAI API and OpenAI-compatible endpoints.</p>
+    </div>
+    <div class="compat-card">
+      <div class="compat-meta">Frontier</div>
+      <div class="compat-name">Anthropic</div>
+      <p class="compat-note">Compatible with Claude models via the Anthropic API and Claude Code's native runtime.</p>
+    </div>
+    <div class="compat-card">
+      <div class="compat-meta">Frontier</div>
+      <div class="compat-name">Google Gemini</div>
+      <p class="compat-note">Designed to support Gemini models accessed via Google AI APIs and compatible runtimes.</p>
+    </div>
+    <div class="compat-card">
+      <div class="compat-meta">Open weight</div>
+      <div class="compat-name">GLM</div>
+      <p class="compat-note">Works alongside GLM-class models served through hosted or self-hosted inference.</p>
+    </div>
+    <div class="compat-card">
+      <div class="compat-meta">Open weight</div>
+      <div class="compat-name">Qwen</div>
+      <p class="compat-note">Compatible with Qwen models via OpenAI-compatible inference endpoints.</p>
+    </div>
+    <div class="compat-card">
+      <div class="compat-meta">Open weight</div>
+      <div class="compat-name">DeepSeek</div>
+      <p class="compat-note">Designed to support DeepSeek-class models in hosted and on-prem deployments.</p>
+    </div>
+    <div class="compat-card">
+      <div class="compat-meta">Open weight</div>
+      <div class="compat-name">Mistral</div>
+      <p class="compat-note">Works across Mistral-family models, including instruct and code-tuned variants.</p>
+    </div>
+    <div class="compat-card">
+      <div class="compat-meta">Open weight</div>
+      <div class="compat-name">Llama</div>
+      <p class="compat-note">Compatible with Llama-class models served via vLLM, Ollama, Together, Groq, and similar runtimes.</p>
+    </div>
+  </div>
+
+  <p class="ww-messaging"><strong>Mneme is model-agnostic and designed for heterogeneous agent environments.</strong> Decision context is injected at the runtime seam, not baked into a model-specific format.</p>
+
+  <h3 class="ww-sub-h2">Coding agent ecosystem</h3>
+  <p class="ww-intro">Beyond the native integrations above, Mneme is built to operate alongside the coding agents engineering teams already use. The governance layer can supply decision context to any agent that exposes hooks, file-system access, or a system-prompt seam &mdash; and can validate outputs at the CI boundary.</p>
+
+  <div class="compat-grid">
+    <div class="compat-card">
+      <div class="compat-meta">IDE agent</div>
+      <div class="compat-name">Cursor</div>
+      <p class="compat-note">Native rules-export integration available. See <a href="/integrations/cursor/">Cursor integration</a>.</p>
+    </div>
+    <div class="compat-card">
+      <div class="compat-meta">CLI / IDE agent</div>
+      <div class="compat-name">Claude Code</div>
+      <p class="compat-note">Native hook integration available. See <a href="/integrations/claude-code/">Claude Code integration</a>.</p>
+    </div>
+    <div class="compat-card">
+      <div class="compat-meta">IDE agent</div>
+      <div class="compat-name">GitHub Copilot</div>
+      <p class="compat-note">Designed to support governance alongside Copilot in the editor and in Copilot-driven CI workflows.</p>
+    </div>
+    <div class="compat-card">
+      <div class="compat-meta">Open-source agent</div>
+      <div class="compat-name">OpenHands &middot; OpenDevin</div>
+      <p class="compat-note">Works across open-source autonomous coding agents that expose tool-use boundaries.</p>
+    </div>
+    <div class="compat-card">
+      <div class="compat-meta">CLI agent</div>
+      <div class="compat-name">Aider</div>
+      <p class="compat-note">Compatible with Aider's repo-aware editing flow; decisions surfaced through context injection.</p>
+    </div>
+    <div class="compat-card">
+      <div class="compat-meta">IDE agent</div>
+      <div class="compat-name">Cline</div>
+      <p class="compat-note">Designed to support Cline's autonomous coding loops in VS Code-compatible environments.</p>
+    </div>
+    <div class="compat-card">
+      <div class="compat-meta">IDE agent</div>
+      <div class="compat-name">Roo Code</div>
+      <p class="compat-note">Works alongside Roo Code's agent surface for governance across its editing and execution paths.</p>
+    </div>
+  </div>
+
+  <h3 class="ww-sub-h2">Agent frameworks</h3>
+  <p class="ww-intro">For teams building custom agents, Mneme is designed to plug into common orchestration frameworks as a context source and a validation step. The governance corpus is the constant; the framework choice is operational.</p>
+
+  <div class="compat-grid">
+    <div class="compat-card">
+      <div class="compat-meta">Orchestration</div>
+      <div class="compat-name">LangGraph</div>
+      <p class="compat-note">Compatible as a context provider node and a post-step validator in LangGraph-defined flows.</p>
+    </div>
+    <div class="compat-card">
+      <div class="compat-meta">Multi-agent</div>
+      <div class="compat-name">AutoGen</div>
+      <p class="compat-note">Designed to support AutoGen agent groups by feeding shared decision context across roles.</p>
+    </div>
+    <div class="compat-card">
+      <div class="compat-meta">Multi-agent</div>
+      <div class="compat-name">CrewAI</div>
+      <p class="compat-note">Works alongside CrewAI crews as a governance layer that all crew members defer to.</p>
+    </div>
+    <div class="compat-card">
+      <div class="compat-meta">Orchestration</div>
+      <div class="compat-name">Semantic Kernel</div>
+      <p class="compat-note">Compatible with Semantic Kernel pipelines as a plugin-level constraint and context source.</p>
+    </div>
+    <div class="compat-card">
+      <div class="compat-meta">Orchestration</div>
+      <div class="compat-name">OpenAI Agents SDK</div>
+      <p class="compat-note">Designed to support Agents SDK builds via tool-call interception and structured guardrails.</p>
+    </div>
+  </div>
+
+  <h3 class="ww-sub-h2">Deployment environments</h3>
+  <p class="ww-intro">Mneme runs where engineering teams already work &mdash; the laptop, the CI runner, the self-hosted platform &mdash; without requiring a hosted control plane.</p>
+
+  <div class="compat-grid">
+    <div class="compat-card">
+      <div class="compat-meta">Local</div>
+      <div class="compat-name">Local developer workflows</div>
+      <p class="compat-note">Runs alongside the developer's editor and CLI agents; governance enforced before the file is written.</p>
+    </div>
+    <div class="compat-card">
+      <div class="compat-meta">Pipeline</div>
+      <div class="compat-name">CI/CD pipelines</div>
+      <p class="compat-note">Compatible with standard CI runners as a pre-merge governance check on AI-generated diffs.</p>
+    </div>
+    <div class="compat-card">
+      <div class="compat-meta">Pipeline</div>
+      <div class="compat-name">GitHub Actions</div>
+      <p class="compat-note">Native integration available. See <a href="/integrations/github-actions/">GitHub Actions integration</a>.</p>
+    </div>
+    <div class="compat-card">
+      <div class="compat-meta">Self-hosted</div>
+      <div class="compat-name">Self-hosted environments</div>
+      <p class="compat-note">Designed to support air-gapped and on-prem deployments with self-hosted inference.</p>
+    </div>
+    <div class="compat-card">
+      <div class="compat-meta">Enterprise</div>
+      <div class="compat-name">Enterprise development platforms</div>
+      <p class="compat-note">Can operate alongside enterprise IDE platforms and internal developer platforms (IDPs).</p>
+    </div>
+  </div>
+
+  <h3 class="ww-sub-h2">The governance layer</h3>
+  <p class="ww-intro">However the upstream choices are made &mdash; whichever model, whichever agent, whichever framework &mdash; the governance layer is the constant the codebase is protected by.</p>
+
+  <div class="ww-diagram">
+    <div class="dt">Architecture &middot; positioning</div>
+    <div class="ww-diagram-row">
+      <div class="ww-diagram-node">
+        <div class="label">Upstream</div>
+        <div class="title">Models &amp; agents</div>
+        <div class="sub">OpenAI &middot; Anthropic &middot; Gemini<br>Cursor &middot; Claude Code &middot; Copilot<br>LangGraph &middot; AutoGen &middot; CrewAI</div>
+      </div>
+      <div class="ww-diagram-arrow">&rarr;</div>
+      <div class="ww-diagram-node center">
+        <div class="label">Governance layer</div>
+        <div class="title">Mneme HQ</div>
+        <div class="sub">decision corpus &middot; precedence engine<br>pre-generation enforcement</div>
+      </div>
+      <div class="ww-diagram-arrow">&rarr;</div>
+      <div class="ww-diagram-node">
+        <div class="label">Downstream</div>
+        <div class="title">Codebase &amp; CI</div>
+        <div class="sub">repos &middot; PRs &middot; pipelines<br>review &middot; merge gates</div>
+      </div>
+    </div>
+    <p class="caption">Models change. Agents change. Frameworks change. The decision corpus is what survives the swap.</p>
+  </div>
+
+  <div class="ww-position">
+    <div class="pb-eyebrow">Core positioning</div>
+    <div class="pb-quote">Models will change.<br><em>Architectural governance must persist.</em></div>
+    <p class="pb-sub">Mneme HQ is built to be the layer that does not have to be re-chosen every time a frontier model, coding agent, or framework gets replaced.</p>
+  </div>
+
+  <h3 class="ww-sub-h2">Get started</h3>
+  <div class="ww-cta-row">
+    <a class="ww-cta-card" href="https://github.com/TheoV823/mneme">
+      <span class="cta-label">Source</span>
+      <span class="cta-title">GitHub &rarr;</span>
+      <span class="cta-sub">MIT-licensed. Read the implementation, file an issue, contribute.</span>
+    </a>
+    <a class="ww-cta-card" href="/demo/">
+      <span class="cta-label">See it run</span>
+      <span class="cta-title">Demo &rarr;</span>
+      <span class="cta-sub">Worked examples of pre-generation governance on real repos.</span>
+    </a>
+    <a class="ww-cta-card" href="/benchmark/">
+      <span class="cta-label">Methodology</span>
+      <span class="cta-title">Benchmark results &rarr;</span>
+      <span class="cta-sub">How governance adherence is measured and reported.</span>
+    </a>
+  </div>
+
+  <p class="ww-boundary">Compatibility statements above describe what Mneme HQ is designed to support and operate alongside. They do not imply official partnerships or vendor-blessed integrations. Where a native, documented integration exists, it is linked above under the available integrations.</p>
 
 </div>
 </main>
