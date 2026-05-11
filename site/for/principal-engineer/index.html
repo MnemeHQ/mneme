@@ -162,12 +162,12 @@
     .byline a { color: var(--muted); text-decoration: none; }
     .byline a:hover { color: var(--text); }
     .byline .sep { color: var(--border2); margin: 0 0.5rem; }
-    .breadcrumb { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.04em; max-width: 900px; margin: 0 auto; padding: 1.25rem 2rem 0; }
+    .breadcrumb-nav { max-width: 880px; margin: 0 auto; padding: 1.75rem 2rem 0.85rem; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.82rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
     .breadcrumb a { color: var(--muted); text-decoration: none; }
     .breadcrumb a:hover { color: var(--text); }
-    .breadcrumb .sep { color: var(--border2); margin: 0 0.5rem; }
-    .breadcrumb [aria-current] { color: var(--text); }
-    @media (max-width: 640px) { .breadcrumb { padding: 1rem 1.25rem 0; } }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
       /* class hygiene: definitions for previously inline-styled classes */
     .faq-list { margin: 1.5rem 0 0; }
     .faq-item { }
@@ -304,8 +304,12 @@
 </nav>
 
 <main>
-  <nav class="breadcrumb" aria-label="Breadcrumb">
-    <a href="/">Home</a><span class="sep">/</span><a href="/for/">For</a><span class="sep">/</span><span aria-current="page">For Principal Engineers</span>
+    <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+    <ol class="breadcrumb">
+      <li><a href="/">Home</a></li>
+      <li><a href="/for/">For</a></li>
+      <li aria-current="page">For Principal Engineers</li>
+    </ol>
   </nav>
   <!-- HERO -->
   <div class="hero">
