@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Generative AI Software Engineering Stack &mdash; Mneme HQ</title>
+  <meta name="description" content="A seven-layer reference frame for the Generative AI software engineering stack — from foundation models to human oversight. AI coding increased generation throughput. Governance and review did not scale at the same rate." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/insights/generative-ai-software-engineering-stack/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="The Generative AI Software Engineering Stack" />
+  <meta property="og:description" content="A seven-layer reference frame for the Generative AI software engineering stack. Almost everyone is competing in layers 1&ndash;3. Very few are building layer 5 seriously." />
+  <meta property="og:url" content="https://mnemehq.com/insights/generative-ai-software-engineering-stack/" />
+  <meta property="og:image" content="https://mnemehq.com/insights/generative-ai-software-engineering-stack/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="The Generative AI Software Engineering Stack" />
+  <meta name="twitter:description" content="A seven-layer reference frame for the Generative AI software engineering stack. Almost everyone is competing in layers 1&ndash;3. Very few are building layer 5 seriously." />
+  <meta name="twitter:image" content="https://mnemehq.com/insights/generative-ai-software-engineering-stack/og.png" />
+  <meta name="author" content="Theo Valmis" />
+  <meta property="article:published_time" content="2026-05-10T00:00:00Z" />
+  <meta property="article:author" content="https://mnemehq.com/founder/" />
+  <meta property="article:section" content="Industry Analysis" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Insights", "item": "https://mnemehq.com/insights/"},
+          {"@type": "ListItem", "position": 3, "name": "The Generative AI Software Engineering Stack", "item": "https://mnemehq.com/insights/generative-ai-software-engineering-stack/"}
+        ]
+      },
+      {
+        "@type": "Article",
+        "headline": "The Generative AI Software Engineering Stack",
+        "description": "A seven-layer reference frame for the Generative AI software engineering stack &mdash; from foundation models to human oversight. AI coding increased generation throughput. Governance and review did not scale at the same rate.",
+        "url": "https://mnemehq.com/insights/generative-ai-software-engineering-stack/",
+        "datePublished": "2026-05-10",
+        "dateModified": "2026-05-10",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "image": "https://mnemehq.com/insights/generative-ai-software-engineering-stack/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/insights/generative-ai-software-engineering-stack/"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {"@type": "Question", "name": "Why describe AI coding as a stack instead of a workflow?", "acceptedAnswer": {"@type": "Answer", "text": "Workflows describe how a single team uses tools today. A stack describes the layers any serious organization eventually has to operate, regardless of which vendors it picks. Stacks make it easier to see which layers are crowded with vendors, which are underbuilt, and where the architectural risk concentrates. The seven-layer frame here is a reference, not a product taxonomy."}},
+          {"@type": "Question", "name": "Which layer is the most strategically scarce?", "acceptedAnswer": {"@type": "Answer", "text": "Layer 5 &mdash; governance and architectural control. Layers 1 through 3 (models, retrieval, agent runtimes) are crowded with well-funded vendors. Layer 4 (tools and execution) is consolidating around MCP. Layer 6 (eval) and layer 7 (human oversight) have established practices. Layer 5 is the layer where almost no incumbents have a coherent answer, because operational governance only becomes a felt problem at the scale where building work is already done."}},
+          {"@type": "Question", "name": "Is governance just review or eval under a different name?", "acceptedAnswer": {"@type": "Answer", "text": "No. Eval (layer 6) measures whether an output is correct against a benchmark. Review (layer 7) checks whether a human approves the change. Governance (layer 5) operates before the output exists: it injects architectural constraints into context, blocks generations that would violate them, and keeps the decision corpus consistent across heterogeneous tools. The three layers are complementary, not substitutes."}},
+          {"@type": "Question", "name": "Why is layer 5 underbuilt if it's so important?", "acceptedAnswer": {"@type": "Answer", "text": "Two reasons. First, the building layers (1&ndash;3) had clearer customer pull early, because nothing else worked without them. Second, governance is structurally hard: it requires a precedence engine, persistence across sessions, tool-agnostic enforcement, and a decision corpus that doesn't degrade as the codebase grows. The category formed only once teams started shipping enough AI-generated code for drift to become measurable."}}
+        ]
+      }
+    ]
+  }
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #88889a;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .article-wrap { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 7rem; }
+    .article-header { margin-bottom: 3rem; }
+    .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
+    .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .article-body h3 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; margin: 2rem 0 0.6rem; color: var(--text); }
+    .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
+    .article-body p strong { color: var(--text); font-weight: 500; }
+    .article-body ul { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body ul li { margin-bottom: 0.55rem; line-height: 1.8; }
+    .article-body ul li strong { color: var(--text); font-weight: 500; }
+    .article-body code { font-family: 'DM Mono', monospace; font-size: 0.82rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 0.05rem 0.4rem; color: var(--text); }
+    .article-body a.ext { color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(200,240,96,0.4); }
+    .article-body a.ext:hover { color: var(--accent-dim); border-bottom-color: rgba(200,240,96,0.7); }
+
+    .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin: 0 0 3rem; }
+    .toc .toc-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.9rem; }
+    .toc ol { list-style: none; counter-reset: toc; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 0.45rem; }
+    .toc ol li { counter-increment: toc; font-size: 0.85rem; padding-left: 2.2rem; position: relative; line-height: 1.5; }
+    .toc ol li::before { content: counter(toc, decimal-leading-zero); position: absolute; left: 0; top: 0.05rem; font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--border2); letter-spacing: 0.05em; }
+    .toc a { color: var(--muted); text-decoration: none; transition: color 0.15s; }
+    .toc a:hover { color: var(--accent); }
+    @media (min-width: 720px) { .toc ol { grid-template-columns: 1fr 1fr; gap: 0.55rem 1.5rem; } }
+
+    .answer-capsule { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 0 0 2.5rem; }
+    .answer-capsule p { margin: 0; font-size: 0.92rem; color: var(--muted); line-height: 1.8; }
+    .answer-capsule p strong { color: var(--accent); }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .callout p strong { color: var(--accent); }
+
+    .stack-grid { display: grid; grid-template-columns: 1fr; gap: 0.75rem; margin: 1.5rem 0 0.5rem; }
+    .layer { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.3rem; position: relative; }
+    .layer.layer-mneme { border-color: rgba(200,240,96,0.45); background: linear-gradient(180deg, rgba(200,240,96,0.05), var(--surface) 60%); }
+    .layer .layer-num { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
+    .layer.layer-mneme .layer-num { color: var(--accent); }
+    .layer h4 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; color: var(--text); margin: 0 0 0.45rem; line-height: 1.35; }
+    .layer .layer-vendors { font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--muted); margin: 0 0 0.55rem; line-height: 1.6; }
+    .layer .layer-purpose { font-size: 0.86rem; color: var(--muted); margin: 0; line-height: 1.7; }
+    .layer .layer-purpose strong { color: var(--text); font-weight: 500; }
+    .layer ul.layer-bullets { margin: 0.4rem 0 0 1.25rem; color: var(--muted); }
+    .layer ul.layer-bullets li { font-size: 0.85rem; margin-bottom: 0.25rem; line-height: 1.65; }
+
+    .compare-stack { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem; margin: 2rem 0; }
+    .compare-stack .cs-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.1rem; }
+    .compare-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 0.8rem 0; border-bottom: 1px solid var(--border); }
+    .compare-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .compare-row:first-of-type { padding-top: 0; }
+    .compare-row .col-label { font-size: 0.78rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.04em; }
+    .compare-row .col-text { font-size: 0.85rem; color: var(--text); line-height: 1.7; }
+    @media (max-width: 540px) { .compare-row { grid-template-columns: 1fr; gap: 0.3rem; } }
+
+    .faq-list { margin-top: 1.5rem; }
+    .faq-item { border-top: 1px solid var(--border); padding: 1.05rem 0; }
+    .faq-item:last-child { border-bottom: 1px solid var(--border); }
+    .faq-item summary { cursor: pointer; font-size: 0.92rem; color: var(--text); font-weight: 500; list-style: none; position: relative; padding-right: 2rem; }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; font-family: 'DM Mono', monospace; color: var(--muted); font-size: 1.1rem; position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
+    .faq-item[open] summary::after { content: '\2212'; }
+    .faq-body { padding-top: 0.85rem; font-size: 0.85rem; color: var(--muted); line-height: 1.8; }
+    .faq-body a { color: var(--accent); text-decoration: none; }
+    .faq-body a:hover { color: var(--accent-dim); }
+
+    .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; }
+    .back-link:hover { color: var(--text); }
+    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; }
+    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; }
+    .btn-primary:hover { background: var(--accent-dim); }
+
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .breadcrumb-nav { max-width: 720px; margin: 0 auto; padding: 1.25rem 2rem 0; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.75rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 36px; height: 36px; border-radius: 6px; cursor: pointer; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; }
+    @media (max-width: 640px) {
+      nav { padding: 1rem 1.25rem; position: relative; }
+      .article-wrap { padding: 3rem 1.25rem 5rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0.5rem 1.25rem 1.25rem; z-index: 99; }
+      .nav-links.open { display: flex; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.88rem; padding: 0.7rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+    }
+/* === Nav upgrade (injected, overrides existing) === */
+.nav-hamburger {
+  display: none;
+  background: none;
+  border: 1px solid var(--border2);
+  color: var(--text);
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.nav-hamburger:hover { border-color: var(--accent); }
+.nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.nav-hamburger span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 1px;
+  transition: transform 0.25s ease, opacity 0.18s ease;
+  transform-origin: center;
+}
+.nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+@media (max-width: 900px) {
+  html, body { overflow-x: hidden; }
+  body.menu-open { overflow: hidden; }
+  nav, nav.site-nav { position: relative; padding: 1rem 1.25rem; }
+  .nav-hamburger { display: flex; }
+  .nav-links {
+    display: flex !important;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    gap: 0;
+    background: rgba(12,12,13,0.98);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.25rem;
+    z-index: 99;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s;
+  }
+  .nav-links.open {
+    max-height: 80vh;
+    opacity: 1;
+    visibility: visible;
+    padding: 0.5rem 1.25rem 1.25rem;
+    transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s;
+    overflow-y: auto;
+  }
+  .nav-links a:not(.btn-nav-cta) {
+    display: block;
+    color: var(--text);
+    font-size: 0.92rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+  .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+}
+  </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/#benchmarks">Benchmarks</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/insights/">Insights</a></li>
+    <li aria-current="page">The Generative AI software engineering stack</li>
+  </ol>
+</nav>
+<article class="article-wrap">
+  <header class="article-header">
+    <div class="article-eyebrow">
+      <span class="eyebrow-tag">Industry Analysis</span>
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-meta">10 min read &nbsp;&middot;&nbsp; May 2026</span>
+    </div>
+    <h1>The Generative AI software engineering stack</h1>
+    <p class="article-lede">AI coding increased generation throughput by an order of magnitude. Governance and review did not scale at the same rate. The seven-layer frame below is how we read the resulting stack: where the vendors are clustered, where the eval surface lives, and where the architectural risk concentrates &mdash; the layer almost no incumbent has shipped seriously.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-10">Published May 2026</time>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-10">Updated May 2026</time>
+    </p>
+  </header>
+
+  <div class="article-body">
+
+    <div class="answer-capsule">
+      <p><strong>The short answer.</strong> Generative AI software engineering is now a seven-layer stack: foundation models, context and retrieval, agent runtime, tooling and execution, governance and architectural control, validation and evaluation, and human oversight. Layers 1&ndash;3 are crowded with well-funded vendors. Layer 4 is consolidating around MCP. Layer 5 &mdash; governance &mdash; is structurally underbuilt because the problem only becomes felt at the scale where layers 1&ndash;4 have already done their work. That is the wedge.</p>
+    </div>
+
+    <nav class="toc" aria-label="Table of contents">
+      <div class="toc-title">In this article</div>
+      <ol>
+        <li><a href="#why-stack">Why a stack frame at all</a></li>
+        <li><a href="#stack">The seven layers</a></li>
+        <li><a href="#throughput-gap">The throughput vs. governance gap</a></li>
+        <li><a href="#layer-five">Layer 5, in detail</a></li>
+        <li><a href="#crowded-layers">Why layers 1&ndash;3 are crowded</a></li>
+        <li><a href="#serious-layer-five">What a serious layer 5 looks like</a></li>
+        <li><a href="#strategic">The strategic point</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="why-stack">Why a stack frame at all</h2>
+
+    <p>Workflows describe how one team uses tools today. Stacks describe the layers any serious organization eventually has to operate, regardless of which vendors it picks. A stack frame makes it easier to see which layers are crowded with capital, which are underbuilt, and where the architectural risk concentrates. It is also how engineering leaders actually think when they plan a 24-month bet: layer by layer, with explicit owners and explicit failure modes.</p>
+
+    <p>The seven-layer frame below is a reference, not a product taxonomy. It will read familiar to anyone who has shipped against agentic coding tooling in the last year &mdash; the layers are the ones the field has converged on, even if the labels have not.</p>
+
+    <h2 id="stack">The seven layers</h2>
+
+    <div class="stack-grid">
+
+      <div class="layer">
+        <div class="layer-num">Layer 01 &middot; Foundation models</div>
+        <h4>Raw reasoning and generation</h4>
+        <p class="layer-vendors">OpenAI, Anthropic, Google, Meta, DeepSeek, Mistral, xAI</p>
+        <p class="layer-purpose"><strong>Purpose.</strong> Raw reasoning and generation capability. The substrate every higher layer depends on. The frontier moves quarterly; the API surface is increasingly commoditized behind <a href="/insights/openai-compatible-apis-are-commoditizing-models/">OpenAI-compatible endpoints</a>.</p>
+      </div>
+
+      <div class="layer">
+        <div class="layer-num">Layer 02 &middot; Context &amp; retrieval</div>
+        <h4>Provide relevant context to models</h4>
+        <p class="layer-vendors">RAG pipelines, vector databases, embeddings, semantic search, memory systems</p>
+        <p class="layer-purpose"><strong>Purpose.</strong> Surface the right tokens at the right time so the model can answer with grounded context. Effective for documentation lookup; structurally <a href="/insights/why-rag-fails-for-architectural-governance/">insufficient for authoritative constraint enforcement</a>, which requires precedence and exactness rather than nearest-neighbor recall.</p>
+      </div>
+
+      <div class="layer">
+        <div class="layer-num">Layer 03 &middot; Agent runtime / orchestration</div>
+        <h4>Coordinate tools, steps, and agents</h4>
+        <p class="layer-vendors">LangGraph, CrewAI, AutoGen, OpenAI Agents SDK, Claude Agent SDK, Claude Code, Cursor Agent</p>
+        <p class="layer-purpose"><strong>Purpose.</strong> Plan multi-step work, route between tools, coordinate sub-agents, persist intermediate state. The layer where "agentic" actually happens. Crowded with frameworks &mdash; the runtime question is settling, but the choice still matters because each runtime exposes a different seam to the layer above.</p>
+      </div>
+
+      <div class="layer">
+        <div class="layer-num">Layer 04 &middot; Tooling &amp; execution</div>
+        <h4>Take actions in real systems</h4>
+        <p class="layer-vendors">MCP servers, REST &amp; gRPC APIs, databases, shells, browsers, CI/CD, cloud infrastructure</p>
+        <p class="layer-purpose"><strong>Purpose.</strong> Give the agent hands. Reading is cheap; writing is where blast radius lives. <a class="ext" href="https://modelcontextprotocol.io/" target="_blank" rel="noopener">Model Context Protocol</a> has emerged as the connective tissue, with the major coding tools converging on a shared interface for tool exposure. The execution surface is wider than most teams realize once the agents start running unattended.</p>
+      </div>
+
+      <div class="layer layer-mneme">
+        <div class="layer-num">Layer 05 &middot; Governance &amp; architectural control</div>
+        <h4>The Mneme category</h4>
+        <p class="layer-vendors">Decision corpora, precedence engines, pre-generation enforcement, override discipline, cross-tool governance</p>
+        <p class="layer-purpose"><strong>Purpose.</strong> Make the agent answer to the project's existing decisions before it generates.</p>
+        <ul class="layer-bullets">
+          <li>Enforce architectural decisions across heterogeneous tools.</li>
+          <li>Prevent silent drift between PRs, branches, and engineers.</li>
+          <li>Inject structured constraints into context <em>before</em> generation.</li>
+          <li>Preserve decision continuity as models, agents, and codebases churn.</li>
+          <li>Validate outputs against governance rules at the seam, not in review.</li>
+        </ul>
+      </div>
+
+      <div class="layer">
+        <div class="layer-num">Layer 06 &middot; Validation &amp; evaluation</div>
+        <h4>Measure correctness and adherence</h4>
+        <p class="layer-vendors">Benchmarks, policy tests, regression suites, eval harnesses, observability, tracing</p>
+        <p class="layer-purpose"><strong>Purpose.</strong> Quantify reliability, correctness, and governance adherence after the fact. Eval answers "did the system do the right thing?"; observability answers "what did it actually do?". Both presume layers below them are stable enough to measure.</p>
+      </div>
+
+      <div class="layer">
+        <div class="layer-num">Layer 07 &middot; Human oversight</div>
+        <h4>Organizational accountability</h4>
+        <p class="layer-vendors">Code review, architecture review, security review, approvals, escalation paths</p>
+        <p class="layer-purpose"><strong>Purpose.</strong> The accountability boundary. Humans approve, escalate, and own the consequences. <a href="/insights/why-code-review-cannot-scale-with-ai-output/">Linear in throughput by design</a>; this is the layer where the AI throughput delta becomes a queueing problem.</p>
+      </div>
+
+    </div>
+
+    <p>Each layer has a purpose, an emerging interface, and at least one credible vendor or pattern. They are not optional in any serious deployment. Even teams that "only use Cursor" are operating implicitly across all seven &mdash; they have just not separated the layers, which is why drift becomes structural rather than measurable.</p>
+
+    <h2 id="throughput-gap">The throughput vs. governance gap</h2>
+
+    <p>The cleanest framing for the entire stack is one sentence: <strong>AI coding increased generation throughput. Governance and review did not scale at the same rate.</strong> Layers 1&ndash;4 are throughput layers &mdash; they make more code happen, faster. Layer 7 is a human layer that scales linearly with people. Layers 5 and 6 are the only places where the asymmetry can be closed, and only one of them &mdash; layer 6 &mdash; is well-resourced.</p>
+
+    <div class="compare-stack">
+      <div class="cs-title">Throughput vs. control, by layer</div>
+      <div class="compare-row">
+        <div class="col-label">Layers 1&ndash;4 &middot; throughput</div>
+        <div class="col-text">Models, retrieval, agent runtimes, tools and execution. Each new generation of these layers <em>increases</em> the rate of code change. Vendor-funded, capital-rich, moving fast.</div>
+      </div>
+      <div class="compare-row">
+        <div class="col-label">Layer 5 &middot; control (pre-generation)</div>
+        <div class="col-text">Governance and architectural control. Operates <em>before</em> a write. The only layer that can keep architectural drift bounded as throughput scales. Structurally underbuilt today.</div>
+      </div>
+      <div class="compare-row">
+        <div class="col-label">Layer 6 &middot; control (post-generation)</div>
+        <div class="col-text">Eval, regression, observability. Measures what happened. Can close some of the gap, but cannot prevent the merge that should never have been generated. Necessary, not sufficient.</div>
+      </div>
+      <div class="compare-row">
+        <div class="col-label">Layer 7 &middot; control (human)</div>
+        <div class="col-text">Reviewers, architects, security. Headcount-bound. Rate constant; cannot absorb 10&times; throughput growth without becoming the bottleneck.</div>
+      </div>
+    </div>
+
+    <p>The implication is direct: as long as layers 1&ndash;4 keep accelerating, the only sustainable response on the control side is to push enforcement <em>earlier</em>. That is the structural argument for layer 5.</p>
+
+    <h2 id="layer-five">Layer 5, in detail</h2>
+
+    <p>Layer 5 is the layer that operates on the agent before it generates. It is not eval (that is layer 6) and not review (that is layer 7). It is the layer that holds the project's accumulated decisions &mdash; ADRs, dependency policies, service boundaries, naming conventions, security invariants &mdash; in a structured, queryable form that the agent has to traverse before producing output.</p>
+
+    <p>The five jobs of layer 5, in concrete terms:</p>
+
+    <ul>
+      <li><strong>Enforce architectural decisions.</strong> A decision the team made six months ago is treated as a hard constraint, not a passage in a CLAUDE.md the model is asked to respect. <a href="/insights/prompt-engineering-is-not-governance/">Prompt engineering is not governance</a>; the difference is whether the constraint is enforceable at the seam.</li>
+      <li><strong>Prevent drift.</strong> Two engineers prompting the same agent should not get architecturally divergent answers. The decision corpus is the shared anchor that keeps generations consistent across people, branches, and time.</li>
+      <li><strong>Inject constraints before generation.</strong> Hooks at the file-write seam, system-prompt augmentation at session start, and structured precedence resolution when decisions conflict. The point is that the agent does not need to "remember" the decision &mdash; the decision is presented to it.</li>
+      <li><strong>Preserve decision continuity.</strong> Models change. Agents change. Tools change. The decision corpus persists. Continuity across this churn is the compounding asset.</li>
+      <li><strong>Validate outputs against governance rules.</strong> Pre-merge gates that read structured artifacts (not freeform prose) and fail closed. Less "AI reviewed this" and more "the deterministic rule that always runs has cleared this."</li>
+    </ul>
+
+    <h2 id="crowded-layers">Why layers 1&ndash;3 are crowded</h2>
+
+    <p>The capital allocation in this cycle has been straightforward: the further down the stack a layer sits, the more it looks like classic infrastructure, and the more it has attracted infrastructure-scale investment. Foundation models (layer 1) absorbed the bulk. Context and retrieval (layer 2) took the second wave, with a vector-database boom that has since consolidated. Agent runtimes (layer 3) are the current frontier &mdash; the SDK and framework wars are happening here in 2026.</p>
+
+    <p>Layer 4 is settling on MCP as the default execution interface, which is why the long tail of "API connector" startups has compressed in the past year. Layer 6 has its own established ecosystem (Braintrust, Langfuse, OpenAI Evals, OSS harnesses). Layer 7 has existed for fifty years.</p>
+
+    <p>Layer 5 is the gap. It is not crowded for a structural reason: governance only becomes a felt problem at the scale where layers 1&ndash;4 have already done their work. Early adopters can get away with prompt-engineered style guides and CLAUDE.md files. Later adopters &mdash; the ones running multiple coding agents across multiple repos &mdash; cannot. The pull is now arriving, which is why the category is forming. <a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/">Heterogeneous-agent governance</a> is the felt version of the problem.</p>
+
+    <h2 id="serious-layer-five">What a serious layer 5 looks like</h2>
+
+    <p>A serious layer 5 is not a config file and not a prompt. It is an addressable, structured decision corpus with a precedence engine on top, accessed through hooks the agent runtimes and editors all defer to. Concretely, the things it has to do:</p>
+
+    <ul>
+      <li><strong>Structured decisions.</strong> Decisions encoded as records with status, scope, supersession history &mdash; not paragraphs in a markdown file. Queryable, not summarizable.</li>
+      <li><strong>Precedence resolution.</strong> When org policy and team override and per-PR exception conflict, a deterministic rule decides which one wins. Real teams hit this in week three.</li>
+      <li><strong>Pre-generation hooks.</strong> Enforcement at the seam where the agent writes &mdash; SessionStart, PreToolUse, file-write hooks. Structurally different from "we put it in the system prompt."</li>
+      <li><strong>Tool-agnostic surface.</strong> The same decision corpus is consulted by Claude Code in the terminal, by the Cursor agent, by the Copilot extension, and by the SDK bot opening PRs in CI. No re-encoding per tool.</li>
+      <li><strong>Override discipline.</strong> When a rule is weakened, the override is itself a tracked decision. An untracked override is a silent merge.</li>
+      <li><strong>Auditability.</strong> The system can answer "which decisions applied to this generation, and why?" after the fact &mdash; for retrospectives, for security review, for regressions.</li>
+    </ul>
+
+    <div class="callout">
+      <p><strong>The wedge.</strong> Almost everyone is competing in layers 1&ndash;3. Very few are building layer 5 seriously. The teams that ship a credible governance layer in 2026&ndash;2027 will be the reference for how engineering organizations operate AI coding once the building work is no longer the bottleneck.</p>
+    </div>
+
+    <h2 id="strategic">The strategic point</h2>
+
+    <p>Layers 1 through 3 are competitive markets with deep-pocketed incumbents. Building there means competing with frontier labs and venture-funded framework teams on their home ground. Layer 4 is consolidating around an open standard. Layer 6 has known patterns. Layer 7 cannot be vendored away.</p>
+
+    <p>Layer 5 is the layer where the product surface is still being defined, the customer pull is now arriving, and almost no one in the dominant ecosystems has shipped a coherent answer. That is the strategically scarce layer of this stack &mdash; and the one that determines, more than any other, whether AI-assisted engineering produces durable systems or expensive drift.</p>
+
+    <p>This is the frame the rest of the Mneme insights catalogue extends. <a href="/insights/why-rag-fails-for-architectural-governance/">Why RAG fails for governance</a> covers why layer 2 cannot substitute for layer 5. <a href="/insights/why-prompt-memory-fails-at-scale/">Why prompt memory fails at scale</a> covers why CLAUDE.md is not layer 5. <a href="/insights/why-code-review-cannot-scale-with-ai-output/">Why code review cannot scale</a> covers the layer-7 ceiling. <a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/">Heterogeneous-agent governance</a> covers the cross-tool surface layer 5 has to defend.</p>
+
+    <h2 id="faq">FAQ</h2>
+
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Why describe AI coding as a stack instead of a workflow?</summary>
+        <div class="faq-body">Workflows describe how a single team uses tools today. A stack describes the layers any serious organization eventually has to operate, regardless of which vendors it picks. Stacks make it easier to see which layers are crowded, which are underbuilt, and where the architectural risk concentrates. The seven-layer frame here is a reference, not a product taxonomy.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Which layer is the most strategically scarce?</summary>
+        <div class="faq-body">Layer 5 &mdash; governance and architectural control. Layers 1 through 3 are crowded with well-funded vendors. Layer 4 is consolidating around MCP. Layer 6 (eval) and layer 7 (human oversight) have established practices. Layer 5 is where almost no incumbent has a coherent answer, because operational governance only becomes a felt problem at the scale where building work is already done.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Is governance just review or eval under a different name?</summary>
+        <div class="faq-body">No. Eval (layer 6) measures whether an output is correct against a benchmark. Review (layer 7) checks whether a human approves the change. Governance (layer 5) operates <em>before</em> the output exists: it injects architectural constraints into context, blocks generations that would violate them, and keeps the decision corpus consistent across heterogeneous tools. The three layers are complementary, not substitutes. See <a href="/insights/review-is-not-governance/">review is not governance</a>.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Why is layer 5 underbuilt if it's so important?</summary>
+        <div class="faq-body">Two reasons. First, the building layers (1&ndash;3) had clearer customer pull early, because nothing else worked without them. Second, governance is structurally hard: it requires a precedence engine, persistence across sessions, tool-agnostic enforcement, and a decision corpus that doesn't degrade as the codebase grows. The category formed only once teams started shipping enough AI-generated code for drift to become measurable.</div>
+      </details>
+    </div>
+
+  </div>
+
+  <footer class="article-footer">
+    <a href="/insights/" class="back-link">&larr; Back to Insights</a>
+
+    <div class="cta-block">
+      <h3>Mneme HQ is layer 5</h3>
+      <p>Open-source decision corpus and pre-generation enforcement for AI-assisted engineering. Tool-agnostic, MIT-licensed, designed to sit above whichever combination of layers 1&ndash;4 your team picks.</p>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
+    </div>
+  </footer>
+</article>
+</main>
+
+<footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+  <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/use-cases/">Use cases</a></li>
+        <li><a href="/works-with/">Works with</a></li>
+        <li><a href="/integrations/">Integrations</a></li>
+        <li><a href="/compare/">Compare</a></li>
+        <li><a href="/demo/">Demo</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/insights/">Insights</a></li>
+        <li><a href="/standards/">Standards</a></li>
+        <li><a href="/benchmark/">Benchmark</a></li>
+        <li><a href="/docs/cli/">CLI reference</a></li>
+        <li><a href="/docs/governance-violations/">Governance violations</a></li>
+        <li><a href="/supported-languages/">Supported languages</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/for/">For teams</a></li>
+        <li><a href="/founder/">Founder</a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/roadmap/">Roadmap</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Code</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="https://github.com/TheoV823/mneme">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="/privacy/">Privacy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
+    <span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span>
+    <span>&copy; 2026</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  function setOpen(open){
+    links.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('menu-open', open);
+  }
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    setOpen(!links.classList.contains('open'));
+  });
+  document.addEventListener('click', function(e){
+    if (!links.classList.contains('open')) return;
+    if (links.contains(e.target) || btn.contains(e.target)) return;
+    setOpen(false);
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false);
+  });
+  links.addEventListener('click', function(e){
+    if (e.target.tagName === 'A') setOpen(false);
+  });
+  window.addEventListener('resize', function(){
+    if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false);
+  });
+})();
+</script>
+<script><!-- nav-active -->
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
+</body>
+</html>

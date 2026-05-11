@@ -116,8 +116,17 @@ Mneme alignment is honest: tracking, design-aligned, planning to engage with fut
 - Governance Benchmark v1.1 methodology: https://mnemehq.com/benchmark/
 - Demo: https://mnemehq.com/demo/
 - Standards landscape: https://mnemehq.com/standards/
+- Works with (compatibility surface): https://mnemehq.com/works-with/
+- CLI reference: https://mnemehq.com/docs/cli/
+- Governance violations (what Mneme prevents): https://mnemehq.com/docs/governance-violations/
 - Use cases: https://mnemehq.com/use-cases/
 - Insights: https://mnemehq.com/insights/
+- Generative AI software engineering stack (seven-layer frame): https://mnemehq.com/insights/generative-ai-software-engineering-stack/
+- Supported languages hub: https://mnemehq.com/supported-languages/
+- Python governance (Tier 1, production-grade): https://mnemehq.com/supported-languages/python-governance/
+- TypeScript governance (Tier 1, operationally supported): https://mnemehq.com/supported-languages/typescript-governance/
+- JavaScript governance (Tier 1, operationally supported): https://mnemehq.com/supported-languages/javascript-governance/
+- Supported languages canonical docs (coverage matrix, limitations, roadmap): https://mnemehq.com/docs/supported-languages/
 - Roadmap: https://mnemehq.com/roadmap/
 - Source: https://github.com/TheoV823/mneme
 - Benchmarks: https://github.com/TheoV823/mneme/tree/main/examples/benchmarks

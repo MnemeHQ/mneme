@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Supported Programming Languages &mdash; Governance Scope &mdash; Mneme HQ</title>
+  <meta name="description" content="Mneme HQ's architectural governance is language-agnostic by design. Repository, workflow, and CI-level enforcement across Python, TypeScript, JavaScript, Go, Java, C#, and Rust — without language-specific parsers." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/docs/supported-languages/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Supported Programming Languages &mdash; Mneme HQ" />
+  <meta property="og:description" content="Architectural governance is language-agnostic by design. Repository, workflow, and CI-level enforcement across Python, TypeScript, JavaScript, Go, Java, C#, and Rust." />
+  <meta property="og:url" content="https://mnemehq.com/docs/supported-languages/" />
+  <meta property="og:image" content="https://mnemehq.com/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Supported Programming Languages &mdash; Mneme HQ" />
+  <meta name="twitter:description" content="Architectural governance is language-agnostic by design." />
+  <meta name="twitter:image" content="https://mnemehq.com/og.png" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Docs", "item": "https://mnemehq.com/docs/"},
+          {"@type": "ListItem", "position": 3, "name": "Supported languages", "item": "https://mnemehq.com/docs/supported-languages/"}
+        ]
+      },
+      {
+        "@type": "TechArticle",
+        "headline": "Supported Programming Languages and Governance Scope",
+        "description": "Mneme's architectural governance is language-agnostic by design, with depth varying by runtime integration and ecosystem coverage.",
+        "url": "https://mnemehq.com/docs/supported-languages/",
+        "datePublished": "2026-05-10",
+        "dateModified": "2026-05-10",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}}
+      }
+    ]
+  }
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #88889a;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav.site-nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .breadcrumb-nav { max-width: 880px; margin: 0 auto; padding: 1.25rem 2rem 0; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.75rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .hero { max-width: 880px; margin: 0 auto; padding: 4rem 2rem 2rem; }
+    .section-eyebrow { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; font-family: 'DM Mono', monospace; }
+    .hero h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.25rem; }
+    .hero p.lede { font-size: 1.05rem; color: var(--muted); line-height: 1.75; max-width: 720px; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+
+    .wrap { max-width: 880px; margin: 0 auto; padding: 3rem 2rem 4rem; font-size: 0.92rem; line-height: 1.85; }
+    .wrap h2 { font-family: 'Inter', sans-serif; font-size: 1.3rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 0.75rem; color: var(--text); }
+    .wrap h2:first-child { margin-top: 0; }
+    .wrap h3 { font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 600; margin: 2rem 0 0.6rem; color: var(--text); }
+    .wrap p { margin-bottom: 1.1rem; color: var(--muted); }
+    .wrap p strong { color: var(--text); font-weight: 500; }
+    .wrap ul { margin: 0 0 1.2rem 1.5rem; color: var(--muted); }
+    .wrap ul li { margin-bottom: 0.4rem; line-height: 1.75; }
+    .wrap a.ext, .wrap a.in { color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(200,240,96,0.4); }
+    .wrap a.ext:hover, .wrap a.in:hover { color: var(--accent-dim); }
+
+    .lang-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin-bottom: 1.25rem; }
+    .lang-card.tier-1 { border-left: 3px solid var(--accent); }
+    .lang-card.tier-2 { border-left: 3px solid var(--teal); }
+    .lang-card.tier-3 { border-left: 3px solid var(--border2); }
+    .lang-card .lh { display: flex; align-items: baseline; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+    .lang-card .lname { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; color: var(--text); }
+    .lang-card .ltag { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid var(--border2); border-radius: 100px; padding: 3px 10px; color: var(--muted); }
+    .lang-card.tier-1 .ltag { color: var(--accent); border-color: rgba(200,240,96,0.4); }
+    .lang-card.tier-2 .ltag { color: var(--teal); border-color: rgba(139,224,200,0.4); }
+    .lang-card .sub-h { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-top: 1rem; margin-bottom: 0.4rem; }
+    .lang-card ul { margin: 0 0 0.6rem 1.25rem; }
+    .lang-card ul li { font-size: 0.85rem; }
+    .lang-card .lang-page-link { font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--accent); text-decoration: none; display: inline-block; margin-top: 0.6rem; }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.2rem 1.5rem; margin: 2rem 0; font-size: 0.9rem; color: var(--muted); line-height: 1.75; }
+    .callout strong { color: var(--accent); }
+
+    .compare-stack { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin: 2rem 0; }
+    .compare-stack .cs-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+    .compare-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border); }
+    .compare-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .compare-row:first-of-type { padding-top: 0; }
+    .compare-row .col-label { font-size: 0.78rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .compare-row .col-text { font-size: 0.86rem; color: var(--text); line-height: 1.7; }
+    @media (max-width: 540px) { .compare-row { grid-template-columns: 1fr; gap: 0.3rem; } }
+
+    .cross-links { margin-top: 3rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+    .cross-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.4rem; text-decoration: none; color: var(--text); display: flex; flex-direction: column; gap: 0.4rem; transition: border-color 0.15s; }
+    .cross-card:hover { border-color: rgba(200,240,96,0.4); }
+    .cross-card .cl-label { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+    .cross-card .cl-title { font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; }
+    .cross-card .cl-sub { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+
+/* === Nav upgrade (injected, overrides existing) === */
+.nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; padding: 0; flex-shrink: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; transition: border-color 0.15s, background 0.15s; }
+.nav-hamburger:hover { border-color: var(--accent); }
+.nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.nav-hamburger span { display: block; width: 18px; height: 2px; background: currentColor; border-radius: 1px; transition: transform 0.25s ease, opacity 0.18s ease; transform-origin: center; }
+.nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+@media (max-width: 900px) {
+  html, body { overflow-x: hidden; }
+  body.menu-open { overflow: hidden; }
+  nav, nav.site-nav { position: relative; padding: 1rem 1.25rem; }
+  .nav-hamburger { display: flex; }
+  .nav-links { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 1.25rem; z-index: 99; max-height: 0; overflow: hidden; opacity: 0; visibility: hidden; transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s; }
+  .nav-links.open { max-height: 80vh; opacity: 1; visibility: visible; padding: 0.5rem 1.25rem 1.25rem; transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s; overflow-y: auto; }
+  .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.92rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+  .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+  .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+}
+  </style>
+</head>
+<body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<nav class="site-nav">
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/#benchmarks">Benchmarks</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/docs/">Docs</a></li>
+    <li aria-current="page">Supported languages</li>
+  </ol>
+</nav>
+
+<section class="hero">
+  <div class="section-eyebrow">Reference</div>
+  <h1>Supported programming languages and governance scope</h1>
+  <p class="lede">Mneme is an architectural governance layer for AI-assisted development. It operates at the repository, workflow, and governance level &mdash; not at the language parser or compiler level. That means it is fundamentally language-agnostic today, while practical depth varies by runtime integration, benchmark coverage, and ecosystem-specific tooling.</p>
+</section>
+
+<div class="wrap">
+
+  <h2>Current support model</h2>
+  <p>Mneme provides:</p>
+  <ul>
+    <li><strong>Repository-aware governance</strong> over file paths, ownership scopes, and protected directories.</li>
+    <li><strong>Architectural decision enforcement</strong> via a structured decision corpus with precedence resolution.</li>
+    <li><strong>Workflow and policy validation</strong> at the pre-generation seam (Claude Code hooks, Cursor rules, CI checks).</li>
+    <li><strong>Anti-pattern detection</strong> on AI-generated diffs.</li>
+    <li><strong>Constraint injection</strong> into the agent's system prompt before generation.</li>
+    <li><strong>Governance checks</strong> for local workflows and CI pipelines.</li>
+  </ul>
+  <p>Mneme does not currently depend on a language-specific compiler or AST engine for core functionality. This is a deliberate design choice &mdash; see <a class="in" href="#strategic-positioning">strategic positioning</a>.</p>
+
+  <div class="callout">
+    <strong>The frame.</strong> "Mneme supports Python" is the wrong question. The right question is: <em>does Mneme provide architectural governance for AI-assisted Python development?</em> The answer is yes for every language listed below, with depth varying by integration tier.
+  </div>
+
+  <h2>Language coverage</h2>
+
+  <!-- Tier 1: Python -->
+  <div class="lang-card tier-1">
+    <div class="lh">
+      <span class="lname">Python</span>
+      <span class="ltag">Tier 1 &middot; production-grade</span>
+    </div>
+    <p style="font-size:0.9rem;color:var(--muted);margin:0;">Strongest support and validation coverage. Native CLI/runtime implementation, real-world benchmark coverage, and dogfooding in production repos.</p>
+
+    <div class="sub-h">Current capabilities</div>
+    <ul>
+      <li>Native CLI/runtime implementation</li>
+      <li>Real-world benchmark coverage</li>
+      <li>Governance enforcement validation</li>
+      <li>Claude Code hook integration</li>
+      <li>CI / GitHub Actions support</li>
+      <li>ADR-driven architectural enforcement</li>
+      <li>Dogfooding validation in production repositories</li>
+    </ul>
+
+    <div class="sub-h">Typical use cases</div>
+    <ul>
+      <li>Backend services and APIs (FastAPI, Django, Flask)</li>
+      <li>AI/ML pipelines</li>
+      <li>CLI tooling and automation</li>
+      <li>Governance enforcement in Python repos</li>
+    </ul>
+
+    <a class="lang-page-link" href="/supported-languages/python-governance/">Python governance page &rarr;</a>
+  </div>
+
+  <!-- Tier 1: TypeScript / JavaScript -->
+  <div class="lang-card tier-1">
+    <div class="lh">
+      <span class="lname">TypeScript &amp; JavaScript</span>
+      <span class="ltag">Tier 1 &middot; operationally supported</span>
+    </div>
+    <p style="font-size:0.9rem;color:var(--muted);margin:0;">Strong compatibility with Mneme's governance model. Repository-level enforcement works today; semantic and AST-aware layers are roadmap.</p>
+
+    <div class="sub-h">Current capabilities</div>
+    <ul>
+      <li>Repository-level governance</li>
+      <li>Architectural boundary enforcement</li>
+      <li>Forbidden dependency checks</li>
+      <li>Path and scope governance</li>
+      <li>Agent workflow governance</li>
+      <li>Compatible with Cursor, Claude Code, and Copilot workflows</li>
+    </ul>
+
+    <div class="sub-h">Current limitations</div>
+    <ul>
+      <li>No TypeScript semantic analysis layer yet</li>
+      <li>No AST-native governance engine yet</li>
+      <li>No framework-specific enforcement today (React, Next.js, Express patterns are governed at the file/dependency level, not the component level)</li>
+    </ul>
+
+    <div class="sub-h">Typical use cases</div>
+    <ul>
+      <li>React and Next.js applications</li>
+      <li>Node.js backends</li>
+      <li>Monorepos (npm/pnpm/yarn workspaces, Turborepo, Nx)</li>
+      <li>AI-assisted frontend development</li>
+    </ul>
+
+    <div style="margin-top:0.6rem;">
+      <a class="lang-page-link" href="/supported-languages/typescript-governance/">TypeScript governance page &rarr;</a>
+      &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+      <a class="lang-page-link" href="/supported-languages/javascript-governance/">JavaScript governance page &rarr;</a>
+    </div>
+  </div>
+
+  <!-- Tier 2: Go -->
+  <div class="lang-card tier-2">
+    <div class="lh">
+      <span class="lname">Go</span>
+      <span class="ltag">Tier 2 &middot; repo-level governance</span>
+    </div>
+    <p style="font-size:0.9rem;color:var(--muted);margin:0;">Conceptually supported through repo-level governance. Architectural and dependency rules apply; semantic checks are not yet specialized.</p>
+    <div class="sub-h">Current capabilities</div>
+    <ul>
+      <li>Architectural boundary enforcement (cmd/, internal/, pkg/ conventions)</li>
+      <li>Dependency governance (go.mod allow-listing, forbidden imports)</li>
+      <li>ADR enforcement</li>
+      <li>CI workflow governance</li>
+    </ul>
+  </div>
+
+  <!-- Tier 2: Java -->
+  <div class="lang-card tier-2">
+    <div class="lh">
+      <span class="lname">Java</span>
+      <span class="ltag">Tier 2 &middot; repo-level governance</span>
+    </div>
+    <p style="font-size:0.9rem;color:var(--muted);margin:0;">Compatible with Mneme's governance model. Layered architecture and ADR enforcement work; Spring/Maven-aware policy packs are roadmap.</p>
+    <div class="sub-h">Current capabilities</div>
+    <ul>
+      <li>Layering enforcement (controllers, services, repositories)</li>
+      <li>Architectural constraints</li>
+      <li>Repository-level governance</li>
+      <li>CI integration support</li>
+      <li>AI workflow governance across IntelliJ + agent surfaces</li>
+    </ul>
+  </div>
+
+  <!-- Tier 2: C# -->
+  <div class="lang-card tier-2">
+    <div class="lh">
+      <span class="lname">C#</span>
+      <span class="ltag">Tier 2 &middot; repo-level governance</span>
+    </div>
+    <p style="font-size:0.9rem;color:var(--muted);margin:0;">Compatible with Mneme's governance model. .NET solution layout and dependency rules work; Roslyn-assisted depth is roadmap.</p>
+    <div class="sub-h">Current capabilities</div>
+    <ul>
+      <li>Architectural governance (project boundaries, namespace rules)</li>
+      <li>Repository policy enforcement</li>
+      <li>Dependency constraints (NuGet allow-listing)</li>
+      <li>Workflow governance</li>
+    </ul>
+  </div>
+
+  <!-- Tier 2: Rust -->
+  <div class="lang-card tier-2">
+    <div class="lh">
+      <span class="lname">Rust</span>
+      <span class="ltag">Tier 2 &middot; repo-level governance</span>
+    </div>
+    <p style="font-size:0.9rem;color:var(--muted);margin:0;">Compatible with Mneme's governance model. Workspace and crate-level rules apply; clippy/rustc-assisted depth is roadmap.</p>
+    <div class="sub-h">Current capabilities</div>
+    <ul>
+      <li>Repository-level governance</li>
+      <li>Architectural enforcement (workspace structure, crate boundaries)</li>
+      <li>AI agent governance</li>
+      <li>Workflow validation</li>
+    </ul>
+  </div>
+
+  <h2>Integration-based compatibility</h2>
+  <p>Mneme operates above the model and runtime layer. Any development workflow using the following inherits governance support, regardless of underlying language:</p>
+  <ul>
+    <li>Cursor</li>
+    <li>Claude Code</li>
+    <li>GitHub Copilot</li>
+    <li>Custom AI coding agents (LangGraph, AutoGen, CrewAI, OpenAI Agents SDK)</li>
+    <li>Agent runtimes (Anthropic API, OpenAI API, OpenAI-compatible endpoints)</li>
+    <li>CI/CD pipelines (GitHub Actions, GitLab CI, CircleCI, others)</li>
+    <li>Hook-based development workflows</li>
+  </ul>
+  <p>See the <a class="in" href="/works-with/">Works With</a> page for the full compatibility surface.</p>
+
+  <h2>What Mneme governs today</h2>
+  <ul>
+    <li>Architectural decision continuity (ADR enforcement, supersession resolution)</li>
+    <li>Path restrictions (protected directories, ownership boundaries)</li>
+    <li>Dependency restrictions (banned libraries, licensing constraints)</li>
+    <li>Scope governance (which agent / which team / which PR can touch what)</li>
+    <li>Anti-pattern prevention</li>
+    <li>Workflow policy enforcement</li>
+    <li>Pre-generation governance checks</li>
+  </ul>
+  <p>For concrete worked examples, see <a class="in" href="/docs/governance-violations/">/docs/governance-violations/</a>.</p>
+
+  <h2>What Mneme does not yet provide</h2>
+  <ul>
+    <li>Compiler awareness</li>
+    <li>AST-aware enforcement</li>
+    <li>Framework-semantic awareness (React component-level, Spring annotation-level, etc.)</li>
+    <li>Language-parser-native checks</li>
+    <li>Deep static-analysis-native enforcement</li>
+  </ul>
+  <p>Today, Mneme governs architectural and workflow behavior rather than performing deep language semantics. That distinction is intentional &mdash; the next section covers why.</p>
+
+  <h2>Future direction</h2>
+  <p>Potential future capabilities under consideration:</p>
+  <ul>
+    <li>TypeScript semantic governance (AST-aware rules)</li>
+    <li>React architecture enforcement (component boundaries, hooks rules)</li>
+    <li>Spring Boot governance packs (controller/service/repository layering)</li>
+    <li>FastAPI architectural governance (route / service / data layer rules)</li>
+    <li>Terraform policy governance</li>
+    <li>Framework-specific policy packs</li>
+    <li>Compiler and AST-assisted enforcement</li>
+    <li>Semantic architectural validation</li>
+  </ul>
+  <p>This direction would evolve Mneme from repository-aware governance toward compiler-aware architectural governance. See the <a class="in" href="/roadmap/">roadmap</a>.</p>
+
+  <h2 id="strategic-positioning">Strategic positioning</h2>
+  <p>Mneme intentionally prioritizes cross-language governance before deep language specialization. This architecture allows:</p>
+  <ul>
+    <li>Faster ecosystem coverage</li>
+    <li>Runtime-agnostic governance</li>
+    <li>Lower integration maintenance burden</li>
+    <li>Consistent governance semantics across heterogeneous agent environments</li>
+    <li>Architectural governance across mixed-language repositories and teams</li>
+  </ul>
+  <p>The long-term direction is not simply language support. It is <strong>governed AI-assisted software development across heterogeneous engineering environments</strong>. Adding deeper language semantics where it pays off &mdash; not by default for every ecosystem at once.</p>
+
+  <div class="compare-stack">
+    <div class="cs-title">Why repo-first, not parser-first</div>
+    <div class="compare-row">
+      <div class="col-label">Parser-first governance</div>
+      <div class="col-text">Has to ship a new analyzer per language and per framework. Coverage gaps. Slower to extend.</div>
+    </div>
+    <div class="compare-row">
+      <div class="col-label">Repo-first governance (Mneme)</div>
+      <div class="col-text">One enforcement model covers every language a team writes. Adds semantic depth where benchmarks and demand justify it.</div>
+    </div>
+  </div>
+
+  <div class="cross-links">
+    <a class="cross-card" href="/supported-languages/">
+      <span class="cl-label">Marketing</span>
+      <span class="cl-title">Supported languages hub &rarr;</span>
+      <span class="cl-sub">The shorter, positioning-focused version of this page.</span>
+    </a>
+    <a class="cross-card" href="/docs/governance-violations/">
+      <span class="cl-label">What it catches</span>
+      <span class="cl-title">Governance violations &rarr;</span>
+      <span class="cl-sub">Twelve worked examples of the violations enforced regardless of language.</span>
+    </a>
+    <a class="cross-card" href="/docs/cli/">
+      <span class="cl-label">Operations</span>
+      <span class="cl-title">CLI reference &rarr;</span>
+      <span class="cl-sub">Commands and CI patterns that operate on any language repo.</span>
+    </a>
+  </div>
+
+</div>
+</main>
+
+<footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+  <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/use-cases/">Use cases</a></li>
+        <li><a href="/works-with/">Works with</a></li>
+        <li><a href="/integrations/">Integrations</a></li>
+        <li><a href="/compare/">Compare</a></li>
+        <li><a href="/demo/">Demo</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/insights/">Insights</a></li>
+        <li><a href="/standards/">Standards</a></li>
+        <li><a href="/benchmark/">Benchmark</a></li>
+        <li><a href="/docs/cli/">CLI reference</a></li>
+        <li><a href="/docs/governance-violations/">Governance violations</a></li>
+        <li><a href="/supported-languages/">Supported languages</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/for/">For teams</a></li>
+        <li><a href="/founder/">Founder</a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/roadmap/">Roadmap</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Code</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="https://github.com/TheoV823/mneme">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="/privacy/">Privacy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
+    <span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span>
+    <span>&copy; 2026</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  function setOpen(open){
+    links.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('menu-open', open);
+  }
+  btn.addEventListener('click', function(e){ e.stopPropagation(); setOpen(!links.classList.contains('open')); });
+  document.addEventListener('click', function(e){
+    if (!links.classList.contains('open')) return;
+    if (links.contains(e.target) || btn.contains(e.target)) return;
+    setOpen(false);
+  });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false); });
+  links.addEventListener('click', function(e){ if (e.target.tagName === 'A') setOpen(false); });
+  window.addEventListener('resize', function(){ if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false); });
+})();
+</script>
+</body>
+</html>

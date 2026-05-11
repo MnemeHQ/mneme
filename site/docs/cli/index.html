@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mneme CLI Reference &mdash; Commands, Flags, Exit Codes &mdash; Mneme HQ</title>
+  <meta name="description" content="Reference for the mneme command-line interface — list_decisions, add_decision, test_query, check, cursor generate, and benchmark. Flags, exit codes, and CI usage patterns." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/docs/cli/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Mneme CLI Reference" />
+  <meta property="og:description" content="Reference for the mneme command-line interface — list_decisions, add_decision, test_query, check, cursor generate, and benchmark." />
+  <meta property="og:url" content="https://mnemehq.com/docs/cli/" />
+  <meta property="og:image" content="https://mnemehq.com/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Mneme CLI Reference" />
+  <meta name="twitter:description" content="Commands, flags, and exit codes for the mneme CLI." />
+  <meta name="twitter:image" content="https://mnemehq.com/og.png" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Docs", "item": "https://mnemehq.com/docs/"},
+          {"@type": "ListItem", "position": 3, "name": "CLI", "item": "https://mnemehq.com/docs/cli/"}
+        ]
+      },
+      {
+        "@type": "TechArticle",
+        "headline": "Mneme CLI Reference",
+        "description": "Commands, flags, and exit codes for the mneme command-line interface.",
+        "url": "https://mnemehq.com/docs/cli/",
+        "datePublished": "2026-05-10",
+        "dateModified": "2026-05-10",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}}
+      }
+    ]
+  }
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #88889a;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav.site-nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .breadcrumb-nav { max-width: 880px; margin: 0 auto; padding: 1.25rem 2rem 0; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.75rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .hero { max-width: 880px; margin: 0 auto; padding: 4rem 2rem 2rem; }
+    .section-eyebrow { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; font-family: 'DM Mono', monospace; }
+    .hero h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.25rem; }
+    .hero p.lede { font-size: 1.05rem; color: var(--muted); line-height: 1.75; max-width: 720px; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+
+    .wrap { max-width: 880px; margin: 0 auto; padding: 3rem 2rem 4rem; font-size: 0.92rem; line-height: 1.8; }
+    .wrap p { color: var(--muted); margin-bottom: 1rem; }
+    .wrap p strong { color: var(--text); font-weight: 500; }
+    .wrap a.ext { color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(200,240,96,0.4); }
+    .wrap a.ext:hover { color: var(--accent-dim); }
+
+    .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin-bottom: 3rem; }
+    .toc-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.9rem; }
+    .toc ol { list-style: none; counter-reset: toc; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 0.45rem; }
+    .toc ol li { counter-increment: toc; font-size: 0.86rem; padding-left: 2.2rem; position: relative; line-height: 1.5; }
+    .toc ol li::before { content: counter(toc, decimal-leading-zero); position: absolute; left: 0; top: 0.05rem; font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--border2); letter-spacing: 0.05em; }
+    .toc a { color: var(--muted); text-decoration: none; }
+    .toc a:hover { color: var(--accent); }
+    @media (min-width: 720px) { .toc ol { grid-template-columns: 1fr 1fr; gap: 0.5rem 1.5rem; } }
+
+    .section { margin-top: 3.5rem; }
+    .section:first-of-type { margin-top: 0; }
+    .section h2 { font-family: 'Inter', sans-serif; font-size: 1.4rem; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 0.5rem; color: var(--text); }
+    .section .sub { font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--muted); margin: 0 0 1rem; }
+
+    .cmd-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin-bottom: 1.25rem; }
+    .cmd-card .ch { display: flex; align-items: baseline; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.35rem; }
+    .cmd-card .cname { font-family: 'DM Mono', monospace; font-size: 0.95rem; color: var(--accent); font-weight: 500; }
+    .cmd-card .ctag { font-family: 'DM Mono', monospace; font-size: 0.66rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid var(--border2); border-radius: 100px; padding: 2px 9px; }
+    .cmd-card .cdesc { font-size: 0.9rem; color: var(--muted); margin: 0.2rem 0 1rem; line-height: 1.7; }
+    .cmd-card pre { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 0.85rem 1rem; font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--text); overflow-x: auto; line-height: 1.6; margin: 0 0 0.85rem; }
+    .cmd-card pre .cp { color: var(--muted); }
+    .cmd-card pre .cc { color: var(--muted); font-style: italic; }
+    .cmd-card pre .ck { color: var(--accent); }
+    .cmd-card .flags-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0.85rem 0 0.45rem; }
+    .cmd-card table.flags { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .cmd-card table.flags th, .cmd-card table.flags td { text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border); vertical-align: top; color: var(--muted); }
+    .cmd-card table.flags th { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; font-weight: 500; }
+    .cmd-card table.flags td:first-child { font-family: 'DM Mono', monospace; color: var(--text); white-space: nowrap; }
+    .cmd-card table.flags tr:last-child td { border-bottom: none; }
+
+    .exit-table { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin: 1.25rem 0; }
+    .exit-table .et-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.85rem; }
+    .exit-table table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .exit-table th, .exit-table td { text-align: left; padding: 0.55rem 0.75rem; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; }
+    .exit-table th { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+    .exit-table td:first-child, .exit-table td:nth-child(2) { font-family: 'DM Mono', monospace; color: var(--text); }
+    .exit-table tr:last-child td { border-bottom: none; }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.1rem 1.4rem; margin: 1.5rem 0; }
+    .callout p { font-size: 0.88rem; color: var(--muted); margin: 0; line-height: 1.75; }
+    .callout p strong { color: var(--accent); }
+
+    .ci-block { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.4rem 1.6rem; margin: 1rem 0; }
+    .ci-block h3 { font-family: 'Inter', sans-serif; font-size: 0.98rem; font-weight: 600; color: var(--text); margin-bottom: 0.4rem; }
+    .ci-block p { font-size: 0.85rem; color: var(--muted); margin: 0 0 0.7rem; line-height: 1.7; }
+    .ci-block pre { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 0.85rem 1rem; font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--text); overflow-x: auto; line-height: 1.6; }
+
+    .cross-links { margin-top: 3rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+    .cross-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.4rem; text-decoration: none; color: var(--text); display: flex; flex-direction: column; gap: 0.4rem; transition: border-color 0.15s; }
+    .cross-card:hover { border-color: rgba(200,240,96,0.4); }
+    .cross-card .cl-label { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+    .cross-card .cl-title { font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; }
+    .cross-card .cl-sub { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 36px; height: 36px; border-radius: 6px; cursor: pointer; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; }
+    @media (max-width: 640px) {
+      nav.site-nav { padding: 1rem 1.25rem; position: relative; }
+      .hero { padding: 3rem 1.25rem 1.5rem; }
+      .wrap { padding: 2rem 1.25rem 3rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0.5rem 1.25rem 1.25rem; z-index: 99; }
+      .nav-links.open { display: flex; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.88rem; padding: 0.7rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+    }
+/* === Nav upgrade (injected, overrides existing) === */
+.nav-hamburger {
+  display: none;
+  background: none;
+  border: 1px solid var(--border2);
+  color: var(--text);
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.nav-hamburger:hover { border-color: var(--accent); }
+.nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.nav-hamburger span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 1px;
+  transition: transform 0.25s ease, opacity 0.18s ease;
+  transform-origin: center;
+}
+.nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+@media (max-width: 900px) {
+  html, body { overflow-x: hidden; }
+  body.menu-open { overflow: hidden; }
+  nav, nav.site-nav { position: relative; padding: 1rem 1.25rem; }
+  .nav-hamburger { display: flex; }
+  .nav-links {
+    display: flex !important;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    gap: 0;
+    background: rgba(12,12,13,0.98);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.25rem;
+    z-index: 99;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s;
+  }
+  .nav-links.open {
+    max-height: 80vh;
+    opacity: 1;
+    visibility: visible;
+    padding: 0.5rem 1.25rem 1.25rem;
+    transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s;
+    overflow-y: auto;
+  }
+  .nav-links a:not(.btn-nav-cta) {
+    display: block;
+    color: var(--text);
+    font-size: 0.92rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+  .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+}
+  </style>
+</head>
+<body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<nav class="site-nav">
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/#benchmarks">Benchmarks</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/docs/">Docs</a></li>
+    <li aria-current="page">CLI reference</li>
+  </ol>
+</nav>
+
+<section class="hero">
+  <div class="section-eyebrow">CLI reference</div>
+  <h1>The <code style="font-family:'DM Mono',monospace;font-size:0.78em;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:0.05em 0.4em;color:var(--accent);">mneme</code> command-line interface</h1>
+  <p class="lede">Reference for every subcommand the OSS <code>mneme</code> CLI ships with: managing the decision corpus, querying it, enforcing it against generated content, exporting to editor surfaces, and running the governance benchmark suite. The CLI is the deterministic surface; the same operations are available programmatically.</p>
+</section>
+
+<div class="wrap">
+
+  <nav class="toc" aria-label="Table of contents">
+    <div class="toc-title">Reference</div>
+    <ol>
+      <li><a href="#install">Install</a></li>
+      <li><a href="#cmd-list">mneme list_decisions</a></li>
+      <li><a href="#cmd-add">mneme add_decision</a></li>
+      <li><a href="#cmd-test">mneme test_query</a></li>
+      <li><a href="#cmd-check">mneme check</a></li>
+      <li><a href="#cmd-cursor">mneme cursor generate</a></li>
+      <li><a href="#cmd-benchmark">mneme benchmark</a></li>
+      <li><a href="#exit-codes">Exit codes</a></li>
+      <li><a href="#ci">CI usage</a></li>
+    </ol>
+  </nav>
+
+  <!-- INSTALL -->
+  <section class="section" id="install">
+    <h2>Install</h2>
+    <p class="sub">Python 3.10+. MIT-licensed. No vector store, no ML runtime.</p>
+    <div class="cmd-card">
+<pre><span class="cp">$</span> git clone https://github.com/TheoV823/mneme
+<span class="cp">$</span> cd mneme
+<span class="cp">$</span> pip install -e .</pre>
+      <p class="cdesc" style="margin-bottom:0;">After install, the <code>mneme</code> entry point is on your PATH. Every subcommand requires <code>--memory</code> pointing at a <code>project_memory.json</code> file. An example corpus ships at <code>examples/project_memory.json</code>.</p>
+    </div>
+  </section>
+
+  <!-- list_decisions -->
+  <section class="section" id="cmd-list">
+    <h2>list_decisions</h2>
+    <p class="sub">Print every decision in the memory file.</p>
+    <div class="cmd-card">
+      <div class="ch"><span class="cname">mneme list_decisions</span><span class="ctag">Read</span></div>
+      <p class="cdesc">Lists every decision in the corpus with id, summary, scope, and constraints. Read-only.</p>
+<pre><span class="cp">$</span> mneme list_decisions --memory examples/project_memory.json</pre>
+      <div class="flags-title">Flags</div>
+      <table class="flags">
+        <thead><tr><th>Flag</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>--memory</td><td>yes</td><td>Path to <code>project_memory.json</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- add_decision -->
+  <section class="section" id="cmd-add">
+    <h2>add_decision</h2>
+    <p class="sub">Append a new decision to the corpus.</p>
+    <div class="cmd-card">
+      <div class="ch"><span class="cname">mneme add_decision</span><span class="ctag">Write</span></div>
+      <p class="cdesc">Writes a new decision directly to the JSON file. The Pipeline runtime is never mutated &mdash; this is a file operation only. Fails with exit code 2 if the id already exists.</p>
+<pre><span class="cp">$</span> mneme add_decision --memory examples/project_memory.json \
+    --id mneme_042 \
+    --decision <span class="ck">"Use JSON storage"</span> \
+    --scope storage \
+    --constraint <span class="ck">"no postgres"</span> \
+    --anti-pattern <span class="ck">"sqlalchemy"</span></pre>
+      <div class="flags-title">Flags</div>
+      <table class="flags">
+        <thead><tr><th>Flag</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>--memory</td><td>yes</td><td>Path to <code>project_memory.json</code>.</td></tr>
+          <tr><td>--id</td><td>yes</td><td>Stable id for the decision (e.g. <code>mneme_042</code>).</td></tr>
+          <tr><td>--decision</td><td>yes</td><td>Short statement of the decision.</td></tr>
+          <tr><td>--rationale</td><td>no</td><td>Optional free-text explanation.</td></tr>
+          <tr><td>--scope</td><td>no, repeatable</td><td>One or more scope tags. Pass <code>--scope</code> multiple times.</td></tr>
+          <tr><td>--constraint</td><td>no, repeatable</td><td>One or more constraints the decision implies.</td></tr>
+          <tr><td>--anti-pattern</td><td>no, repeatable</td><td>One or more patterns to flag against.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- test_query -->
+  <section class="section" id="cmd-test">
+    <h2>test_query</h2>
+    <p class="sub">Run a query through the retriever and show scores plus the injected context.</p>
+    <div class="cmd-card">
+      <div class="ch"><span class="cname">mneme test_query</span><span class="ctag">Read</span></div>
+      <p class="cdesc">Useful for debugging which decisions are surfaced for a given task description before you wire enforcement into a workflow. Prints every decision ranked by score, plus the top-N context packet that would actually be injected.</p>
+<pre><span class="cp">$</span> mneme test_query --memory examples/project_memory.json \
+    --query <span class="ck">"should I add postgres?"</span></pre>
+      <div class="flags-title">Flags</div>
+      <table class="flags">
+        <thead><tr><th>Flag</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>--memory</td><td>yes</td><td>Path to <code>project_memory.json</code>.</td></tr>
+          <tr><td>--query</td><td>yes</td><td>The task description / prompt context to retrieve against.</td></tr>
+          <tr><td>--top</td><td>no</td><td>How many top decisions to show in the injected packet. Defaults to the package default.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- check -->
+  <section class="section" id="cmd-check">
+    <h2>check</h2>
+    <p class="sub">Enforce decisions against an input file. The command at the center of the governance loop.</p>
+    <div class="cmd-card">
+      <div class="ch"><span class="cname">mneme check</span><span class="ctag">Enforce</span></div>
+      <p class="cdesc">Reads an input file (a prompt, a generated diff, a draft), retrieves the relevant decisions for <code>--query</code>, and runs the enforcer. Prints any violations and exits with a code that reflects the verdict.</p>
+<pre><span class="cp">$</span> mneme check --memory examples/project_memory.json \
+    --input draft.md \
+    --query <span class="ck">"working on storage layer"</span> \
+    --mode strict</pre>
+      <div class="flags-title">Flags</div>
+      <table class="flags">
+        <thead><tr><th>Flag</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>--memory</td><td>yes</td><td>Path to <code>project_memory.json</code>.</td></tr>
+          <tr><td>--input</td><td>yes</td><td>Path to the file to check.</td></tr>
+          <tr><td>--query</td><td>yes</td><td>Context query for retrieval. Determines which decisions are in scope.</td></tr>
+          <tr><td>--top</td><td>no</td><td>How many top decisions to retrieve. Defaults to the package default.</td></tr>
+          <tr><td>--mode</td><td>no</td><td><code>strict</code> (default) or <code>warn</code>. See <a href="#exit-codes">exit codes</a>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <p><strong>Mode semantics.</strong> <code>strict</code> exits non-zero on any violation, making it suitable as a merge gate. <code>warn</code> always exits zero, useful while a team is still shaping its decision corpus and does not want a noisy corpus to block work.</p>
+    </div>
+  </section>
+
+  <!-- cursor generate -->
+  <section class="section" id="cmd-cursor">
+    <h2>cursor generate</h2>
+    <p class="sub">Export retrieved decisions to a Cursor <code>.mdc</code> rules file.</p>
+    <div class="cmd-card">
+      <div class="ch"><span class="cname">mneme cursor generate</span><span class="ctag">Export</span></div>
+      <p class="cdesc">Generates a Cursor-compatible rules file scoped to the supplied query. Writes the corpus into a format the Cursor agent reads directly, so the same decisions are surfaced to the IDE agent as to the rest of the toolchain. See the <a href="/integrations/cursor/">Cursor integration page</a> for end-to-end setup.</p>
+<pre><span class="cp">$</span> mneme cursor generate --memory examples/project_memory.json \
+    --query <span class="ck">"working on storage layer"</span> \
+    --output .cursor/rules/mneme.mdc</pre>
+      <div class="flags-title">Flags</div>
+      <table class="flags">
+        <thead><tr><th>Flag</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>--memory</td><td>yes</td><td>Path to <code>project_memory.json</code>.</td></tr>
+          <tr><td>--query</td><td>yes</td><td>Context query for retrieval.</td></tr>
+          <tr><td>--output</td><td>no</td><td>Output path. Defaults to <code>.cursor/rules/mneme.mdc</code>.</td></tr>
+          <tr><td>--top</td><td>no</td><td>How many top decisions to include.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- benchmark -->
+  <section class="section" id="cmd-benchmark">
+    <h2>benchmark</h2>
+    <p class="sub">Run the governance benchmark suite and report violation-detection results.</p>
+    <div class="cmd-card">
+      <div class="ch"><span class="cname">mneme benchmark</span><span class="ctag">Measure</span></div>
+      <p class="cdesc">Runs every scenario in the supplied directory against the decision corpus and prints a terminal report. Optional <code>--json</code> and <code>--markdown</code> flags emit machine- and human-readable reports for CI artifacts. Scenario categories map onto the <a href="/docs/governance-violations/">governance violation hierarchy</a>; the benchmark methodology is documented at <a href="/benchmark/">/benchmark/</a>.</p>
+<pre><span class="cp">$</span> mneme benchmark examples/benchmarks/ \
+    --memory examples/project_memory.json \
+    --json reports/bench.json \
+    --markdown reports/bench.md</pre>
+      <div class="flags-title">Flags</div>
+      <table class="flags">
+        <thead><tr><th>Flag</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>benchmarks_dir</td><td>yes (positional)</td><td>Directory containing benchmark scenario subdirectories.</td></tr>
+          <tr><td>--memory</td><td>yes</td><td>Path to <code>project_memory.json</code>.</td></tr>
+          <tr><td>--json</td><td>no</td><td>Write a JSON report to <code>FILE</code>.</td></tr>
+          <tr><td>--markdown</td><td>no</td><td>Write a Markdown report to <code>FILE</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- exit codes -->
+  <section class="section" id="exit-codes">
+    <h2>Exit codes</h2>
+    <p class="sub">Designed for CI gating. The codes are stable across releases.</p>
+
+    <div class="exit-table">
+      <div class="et-title">mneme check &middot; by mode</div>
+      <table>
+        <thead><tr><th>Verdict</th><th>strict (default)</th><th>warn</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td>PASS</td><td>0</td><td>0</td><td>No violations.</td></tr>
+          <tr><td>WARN</td><td>1</td><td>0</td><td>Constraint matched. Suggests friction but not a block in <code>warn</code> mode.</td></tr>
+          <tr><td>FAIL</td><td>2</td><td>0</td><td>Anti-pattern hit. In <code>strict</code> mode this is a hard fail.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="exit-table">
+      <div class="et-title">mneme benchmark</div>
+      <table>
+        <thead><tr><th>Code</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td>All scenarios passed.</td></tr>
+          <tr><td>1</td><td>At least one scenario failed.</td></tr>
+          <tr><td>2</td><td>Supplied <code>benchmarks_dir</code> is not a directory.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="exit-table">
+      <div class="et-title">mneme add_decision</div>
+      <table>
+        <thead><tr><th>Code</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td>Decision appended.</td></tr>
+          <tr><td>2</td><td>A decision with the supplied <code>--id</code> already exists.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- CI -->
+  <section class="section" id="ci">
+    <h2>CI usage</h2>
+    <p class="sub">The check command is designed to live as a pre-merge governance gate. The simplest viable wiring:</p>
+
+    <div class="ci-block">
+      <h3>GitHub Actions &mdash; PR diff gate</h3>
+      <p>Run <code>mneme check</code> against the PR diff in strict mode. Exit code 1 (WARN) or 2 (FAIL) blocks the merge.</p>
+<pre>name: governance
+on: [pull_request]
+jobs:
+  governance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -e .
+      - name: Render PR diff
+        run: git diff origin/${{ github.base_ref }}...HEAD &gt; pr.diff
+      - name: Governance check
+        run: |
+          mneme check \
+            --memory .mneme/project_memory.json \
+            --input pr.diff \
+            --query "${{ github.event.pull_request.title }}" \
+            --mode strict</pre>
+      <p style="margin-top:0.8rem;font-size:0.82rem;">Full example wired into a working repo: <a class="ext" href="/integrations/github-actions/">/integrations/github-actions/</a>.</p>
+    </div>
+
+    <div class="ci-block">
+      <h3>Pre-commit &mdash; local warn-mode</h3>
+      <p>Run in <code>warn</code> mode locally so the developer sees friction without blocking the commit. Pair with strict-mode CI for the actual gate.</p>
+<pre><span class="cc"># .git/hooks/pre-commit</span>
+<span class="cp">$</span> mneme check \
+    --memory .mneme/project_memory.json \
+    --input <span class="ck">"$(git diff --cached)"</span> \
+    --query <span class="ck">"$(git log -1 --pretty=%B)"</span> \
+    --mode warn</pre>
+    </div>
+  </section>
+
+  <div class="cross-links">
+    <a class="cross-card" href="/docs/governance-violations/">
+      <span class="cl-label">What it catches</span>
+      <span class="cl-title">Governance violations &rarr;</span>
+      <span class="cl-sub">Twelve worked examples of the violations the CLI is built to detect.</span>
+    </a>
+    <a class="cross-card" href="/integrations/github-actions/">
+      <span class="cl-label">CI wiring</span>
+      <span class="cl-title">GitHub Actions integration &rarr;</span>
+      <span class="cl-sub">End-to-end PR-diff governance using <code>mneme check</code>.</span>
+    </a>
+    <a class="cross-card" href="/benchmark/">
+      <span class="cl-label">Measurement</span>
+      <span class="cl-title">Benchmark methodology &rarr;</span>
+      <span class="cl-sub">How the suite the <code>benchmark</code> command runs is composed and scored.</span>
+    </a>
+  </div>
+
+</div>
+</main>
+
+<footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+  <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/use-cases/">Use cases</a></li>
+        <li><a href="/works-with/">Works with</a></li>
+        <li><a href="/integrations/">Integrations</a></li>
+        <li><a href="/compare/">Compare</a></li>
+        <li><a href="/demo/">Demo</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/insights/">Insights</a></li>
+        <li><a href="/standards/">Standards</a></li>
+        <li><a href="/benchmark/">Benchmark</a></li>
+        <li><a href="/docs/cli/">CLI reference</a></li>
+        <li><a href="/docs/governance-violations/">Governance violations</a></li>
+        <li><a href="/supported-languages/">Supported languages</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/for/">For teams</a></li>
+        <li><a href="/founder/">Founder</a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/roadmap/">Roadmap</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Code</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="https://github.com/TheoV823/mneme">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="/privacy/">Privacy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
+    <span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span>
+    <span>&copy; 2026</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  function setOpen(open){
+    links.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('menu-open', open);
+  }
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    setOpen(!links.classList.contains('open'));
+  });
+  document.addEventListener('click', function(e){
+    if (!links.classList.contains('open')) return;
+    if (links.contains(e.target) || btn.contains(e.target)) return;
+    setOpen(false);
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false);
+  });
+  links.addEventListener('click', function(e){
+    if (e.target.tagName === 'A') setOpen(false);
+  });
+  window.addEventListener('resize', function(){
+    if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false);
+  });
+})();
+</script>
+</body>
+</html>
