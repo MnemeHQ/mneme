@@ -45,6 +45,12 @@ ErrorDocument 404 /404.html
 </IfModule>
 
 <IfModule mod_headers.c>
+    # Strip any server-injected Vary: User-Agent (added by mod_deflate/mod_brotli
+    # on some cPanel stacks). Cloudflare refuses to cache responses with
+    # Vary: User-Agent, so we unset it and pin exactly what we want.
+    Header unset Vary
+    Header set Vary "Accept-Encoding"
+
     # HTML
     <FilesMatch "\.(html|htm)$">
         Header set Cache-Control "public, max-age=3600"
