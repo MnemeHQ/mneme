@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mneme HQ on Enterprise Developer Platforms &mdash; Azure, AWS, Google Cloud, Self-Hosted</title>
+  <meta name="description" content="Mneme HQ runs inside the enterprise developer platforms engineering organizations already use — Microsoft Azure & GitHub Enterprise, AWS, Google Cloud, and self-hosted environments. Governance for AI coding agents in CI/CD, runtime, and IDE surfaces." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/platforms/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Mneme HQ on Enterprise Developer Platforms" />
+  <meta property="og:description" content="Governance for AI coding agents running inside Azure & GitHub Enterprise, AWS, Google Cloud, and self-hosted environments." />
+  <meta property="og:url" content="https://mnemehq.com/platforms/" />
+  <meta property="og:image" content="https://mnemehq.com/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Mneme HQ on Enterprise Developer Platforms" />
+  <meta name="twitter:description" content="Governance for AI coding agents running inside Azure & GitHub Enterprise, AWS, Google Cloud, and self-hosted environments." />
+  <meta name="twitter:image" content="https://mnemehq.com/og.png" />
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Platforms", "item": "https://mnemehq.com/platforms/"}
+        ]
+      },
+      {
+        "@type": "WebPage",
+        "name": "Mneme HQ on Enterprise Developer Platforms",
+        "description": "How Mneme HQ runs across Microsoft Azure & GitHub Enterprise, AWS, Google Cloud, and self-hosted developer platforms — focused on AI coding governance, not cloud infrastructure provisioning.",
+        "url": "https://mnemehq.com/platforms/",
+        "datePublished": "2026-05-10",
+        "dateModified": "2026-05-10",
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}}
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {"@type": "Question", "name": "Is Mneme an infrastructure governance tool?", "acceptedAnswer": {"@type": "Answer", "text": "No. Mneme governs AI coding agents inside an engineering organization's existing developer platform. It does not provision cloud resources, manage IAM, or enforce infrastructure policy. It sits above the runtime and inside the developer workflow, regardless of which cloud the workflow lives on."}},
+          {"@type": "Question", "name": "Will this fit into our Azure / GitHub Enterprise / Copilot stack?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Mneme runs as a GitHub Actions check on PR diffs and as a context provider for Copilot, Claude Code, Cursor, and other agents operating in the Azure DevOps and GitHub Enterprise workflow. The decision corpus is a tracked file in the repo, so it inherits whatever access controls the platform already enforces."}},
+          {"@type": "Question", "name": "Does Mneme require a hosted control plane?", "acceptedAnswer": {"@type": "Answer", "text": "No. Mneme is an MIT-licensed CLI plus a structured decision corpus. It runs on the laptop, on a CI runner, or on a self-hosted runner inside an air-gapped environment. There is no hosted service to subscribe to and no telemetry that has to leave the network."}},
+          {"@type": "Question", "name": "How does Mneme compare to platform-native AI tooling?", "acceptedAnswer": {"@type": "Answer", "text": "Platform-native AI tooling (Copilot, CodeWhisperer-adjacent runtimes, Gemini Code Assist) is the agent. Mneme is the governance layer above the agent. It is designed to operate alongside any of them, providing one decision corpus and one enforcement surface even when an organization runs multiple AI coding tools across multiple clouds."}}
+        ]
+      }
+    ]
+  }
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d; --border: #222226; --border2: #2e2e34; --text: #e8e8ec; --muted: #88889a; --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .answer-capsule { max-width: 820px; margin: 0 auto; padding: 1.5rem 2rem; background: var(--surface); border-bottom: 1px solid rgba(200,240,96,0.18); font-size: 0.88rem; color: var(--muted); line-height: 1.8; }
+    .answer-capsule strong { color: var(--accent); }
+
+    .hero { max-width: 780px; margin: 0 auto; padding: 5rem 2rem 3rem; text-align: center; }
+    .section-eyebrow { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; font-family: 'DM Mono', monospace; }
+    .hero h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 4.8vw, 2.8rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.25rem; }
+    .hero h1 em { color: var(--accent); font-style: italic; }
+    .hero-sub { font-size: 0.98rem; color: var(--muted); max-width: 640px; margin: 0 auto; line-height: 1.7; }
+
+    .wrap { max-width: 1000px; margin: 0 auto; padding: 2rem 2rem 5rem; }
+
+    .group-title { font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 500; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; margin: 3.5rem 0 1.25rem; }
+    .group-title:first-of-type { margin-top: 0.5rem; }
+    .group-lede { font-size: 0.9rem; color: var(--muted); line-height: 1.8; max-width: 760px; margin: 0 0 1.75rem; }
+
+    .platform-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
+    @media (min-width: 900px) { .platform-grid { grid-template-columns: 1fr 1fr; } }
+
+    .platform { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.8rem 1.75rem; display: flex; flex-direction: column; gap: 0.7rem; }
+    .platform .ph { display: flex; align-items: baseline; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.2rem; }
+    .platform .pname { font-family: 'Inter', sans-serif; font-size: 1.15rem; font-weight: 600; color: var(--text); letter-spacing: -0.005em; }
+    .platform .ptag { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); border: 1px solid rgba(200,240,96,0.3); border-radius: 100px; padding: 3px 10px; }
+    .platform p { font-size: 0.88rem; color: var(--muted); line-height: 1.7; margin: 0; }
+    .platform .sub-h { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-top: 0.6rem; margin-bottom: 0.4rem; }
+    .platform ul { margin: 0 0 0 1.25rem; color: var(--muted); }
+    .platform ul li { font-size: 0.85rem; line-height: 1.7; margin-bottom: 0.3rem; }
+    .platform ul li strong { color: var(--text); font-weight: 500; }
+    .platform .stack-line { font-family: 'DM Mono', monospace; font-size: 0.74rem; color: var(--muted); }
+    .platform .stack-line strong { color: var(--text); }
+
+    .capabilities-strip { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.4rem 1.6rem; margin: 2.5rem 0 0; }
+    .capabilities-strip p { font-size: 0.9rem; color: var(--muted); margin: 0; line-height: 1.8; }
+    .capabilities-strip strong { color: var(--accent); }
+
+    .boundary { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.6rem 1.75rem; margin: 2.5rem 0 0; }
+    .boundary .bt { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+    .boundary .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+    @media (max-width: 720px) { .boundary .pair { grid-template-columns: 1fr; } }
+    .boundary .col h4 { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.65rem; }
+    .boundary .col.is h4 { color: var(--accent); }
+    .boundary .col.isnt h4 { color: var(--muted); }
+    .boundary .col ul { margin: 0 0 0 1.2rem; color: var(--muted); font-size: 0.85rem; }
+    .boundary .col ul li { margin-bottom: 0.4rem; line-height: 1.7; }
+
+    .position-block { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2.4rem 1.75rem; margin: 3rem 0 0; text-align: center; }
+    .position-block .pb-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+    .position-block .pb-quote { font-family: 'Instrument Serif', serif; font-size: clamp(1.4rem, 3vw, 1.85rem); font-weight: 400; line-height: 1.3; color: var(--text); letter-spacing: -0.01em; }
+    .position-block .pb-quote em { color: var(--accent); font-style: italic; }
+    .position-block .pb-sub { font-size: 0.86rem; color: var(--muted); margin-top: 1rem; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.75; }
+
+    .faq-list { margin-top: 2rem; }
+    .faq-item { border-top: 1px solid var(--border); padding: 1rem 0; }
+    .faq-item:last-child { border-bottom: 1px solid var(--border); }
+    .faq-item summary { cursor: pointer; font-size: 0.92rem; color: var(--text); font-weight: 500; list-style: none; position: relative; padding-right: 2rem; }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; font-family: 'DM Mono', monospace; color: var(--muted); font-size: 1.1rem; position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
+    .faq-item[open] summary::after { content: '\2212'; }
+    .faq-body { padding-top: 0.85rem; font-size: 0.86rem; color: var(--muted); line-height: 1.8; }
+    .faq-body a { color: var(--accent); text-decoration: none; }
+
+    .cta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin: 2rem 0 0; }
+    .cta-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.3rem 1.4rem; text-decoration: none; color: var(--text); display: flex; flex-direction: column; gap: 0.35rem; transition: border-color 0.15s; }
+    .cta-card:hover { border-color: rgba(200,240,96,0.4); }
+    .cta-card .cta-label { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+    .cta-card .cta-title { font-family: 'Inter', sans-serif; font-size: 0.96rem; font-weight: 600; }
+    .cta-card .cta-sub { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+
+.nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; padding: 0; flex-shrink: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; transition: border-color 0.15s; }
+.nav-hamburger:hover { border-color: var(--accent); }
+.nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.nav-hamburger span { display: block; width: 18px; height: 2px; background: currentColor; border-radius: 1px; transition: transform 0.25s ease, opacity 0.18s ease; transform-origin: center; }
+.nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+@media (max-width: 900px) {
+  html, body { overflow-x: hidden; }
+  body.menu-open { overflow: hidden; }
+  nav { position: relative; padding: 1rem 1.25rem; }
+  .nav-hamburger { display: flex; }
+  .nav-links { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 1.25rem; z-index: 99; max-height: 0; overflow: hidden; opacity: 0; visibility: hidden; transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s; }
+  .nav-links.open { max-height: 80vh; opacity: 1; visibility: visible; padding: 0.5rem 1.25rem 1.25rem; transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s; overflow-y: auto; }
+  .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.92rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+  .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+  .hero { padding: 3rem 1.25rem 2rem; }
+  .wrap { padding: 1.5rem 1.25rem 3rem; }
+}
+  </style>
+</head>
+<body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/#benchmarks">Benchmarks</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+
+<div class="answer-capsule">
+  <strong>Mneme HQ</strong> deploys inside the developer platforms engineering organizations already run &mdash; Microsoft Azure &amp; GitHub Enterprise, AWS, Google Cloud, and self-hosted environments. It does not provision cloud resources or manage IAM. It governs the AI coding agents that operate inside the platform, on every CI run and every editor session.
+</div>
+
+<section class="hero">
+  <div class="section-eyebrow">Platforms</div>
+  <h1>Works within <em>enterprise engineering</em> environments</h1>
+  <p class="hero-sub">Deploy Mneme HQ across your existing developer platform stack. Policy enforcement for AI coding agents in CI/CD, runtime, and IDE surfaces &mdash; portable across clouds, agents, and editors.</p>
+</section>
+
+<div class="wrap">
+
+  <h2 class="group-title">Platforms Mneme runs inside</h2>
+  <p class="group-lede">Four enterprise developer platform contexts where AI coding agents actually run. Mneme is the governance layer above the runtime in each.</p>
+
+  <div class="platform-grid">
+
+    <!-- Microsoft -->
+    <div class="platform">
+      <div class="ph"><span class="pname">Microsoft &middot; Azure AI &amp; GitHub Enterprise</span><span class="ptag">Enterprise</span></div>
+      <p class="stack-line"><strong>Where Mneme fits:</strong> as a GitHub Actions governance check on PR diffs and as a context provider for Copilot, Claude Code, and other agents operating in Azure DevOps and GitHub Enterprise.</p>
+      <div class="sub-h">Designed to support</div>
+      <ul>
+        <li><strong>GitHub Actions</strong> &mdash; <code>mneme check --mode strict</code> as a required check on every PR.</li>
+        <li><strong>GitHub Copilot governance</strong> &mdash; the decision corpus is the source of truth Copilot's suggestions get gated against in CI.</li>
+        <li><strong>Azure DevOps pipelines</strong> &mdash; the same CLI runs on Azure-hosted runners.</li>
+        <li><strong>Azure AI Foundry / OpenAI deployments</strong> &mdash; model-agnostic, so swapping the Azure-hosted model does not affect governance.</li>
+      </ul>
+    </div>
+
+    <!-- AWS -->
+    <div class="platform">
+      <div class="ph"><span class="pname">AWS &middot; Developer Environments</span><span class="ptag">Enterprise</span></div>
+      <p class="stack-line"><strong>Where Mneme fits:</strong> inside CodeCatalyst pipelines, on self-hosted Bedrock-backed agent workflows, and on EC2 / ECS-hosted CI runners.</p>
+      <div class="sub-h">Designed to support</div>
+      <ul>
+        <li><strong>CodeCatalyst CI workflows</strong> &mdash; same governance gate, AWS-hosted runner.</li>
+        <li><strong>Bedrock-hosted coding agents</strong> &mdash; OpenAI-compatible inference; governance applies regardless of the model behind the endpoint.</li>
+        <li><strong>Self-hosted GitHub Actions runners on AWS</strong> &mdash; for teams that want repo-platform on GitHub Enterprise but compute inside their AWS account.</li>
+        <li><strong>Lambda / Step Functions agent pipelines</strong> &mdash; the CLI is a small Python install; can run inside short-lived compute.</li>
+      </ul>
+    </div>
+
+    <!-- Google Cloud -->
+    <div class="platform">
+      <div class="ph"><span class="pname">Google Cloud &middot; AI Engineering</span><span class="ptag">Enterprise</span></div>
+      <p class="stack-line"><strong>Where Mneme fits:</strong> as a Cloud Build step, alongside Gemini Code Assist in the editor, and on Vertex-hosted agent runtimes.</p>
+      <div class="sub-h">Designed to support</div>
+      <ul>
+        <li><strong>Cloud Build pipelines</strong> &mdash; the governance gate runs as a step on every PR/merge.</li>
+        <li><strong>Gemini Code Assist</strong> &mdash; same decision corpus, same enforcement surface.</li>
+        <li><strong>Vertex AI Agent Builder / agent runtimes</strong> &mdash; context provider for custom agents operating on Vertex.</li>
+        <li><strong>Cloud Workstations</strong> &mdash; local-mode <code>mneme check --mode warn</code> in the developer's dev environment.</li>
+      </ul>
+    </div>
+
+    <!-- Self-Hosted / Air-Gapped -->
+    <div class="platform">
+      <div class="ph"><span class="pname">Self-Hosted / Air-Gapped</span><span class="ptag">On-prem</span></div>
+      <p class="stack-line"><strong>Where Mneme fits:</strong> on any internal developer platform that runs git, CI, and an inference endpoint. No outbound calls required.</p>
+      <div class="sub-h">Designed to support</div>
+      <ul>
+        <li><strong>Self-hosted inference</strong> &mdash; vLLM, Ollama, Triton, on-prem Anthropic or OpenAI-compatible gateways.</li>
+        <li><strong>Self-hosted GitLab CI / Jenkins / Bamboo</strong> &mdash; CLI is a single Python entry point; runs on any runner.</li>
+        <li><strong>Internal developer platforms (IDPs)</strong> &mdash; Backstage, Cortex, OpsLevel; the decision corpus is a tracked file the IDP can surface.</li>
+        <li><strong>No telemetry, no hosted control plane</strong> &mdash; the entire system runs inside the network.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="capabilities-strip">
+    <p><strong>Cross-cutting capabilities.</strong> The same governance surface applies on every platform above: CI/CD execution gates, agent and runtime context injection, enterprise developer workflow policy enforcement, and governance portability across heterogeneous coding agents. The decision corpus is a tracked file in the repo; whichever platform runs the CI and whichever agent generated the code, the rules are the same.</p>
+  </div>
+
+  <div class="boundary">
+    <div class="bt">Scope &middot; what Mneme is and is not</div>
+    <div class="pair">
+      <div class="col is">
+        <h4>What Mneme does on these platforms</h4>
+        <ul>
+          <li>Governs AI coding agents inside the developer workflow</li>
+          <li>Enforces architectural decisions at the file-write seam and in CI</li>
+          <li>Provides one decision corpus across multiple agents and clouds</li>
+          <li>Surfaces violations before merge, regardless of which model or agent generated the code</li>
+        </ul>
+      </div>
+      <div class="col isnt">
+        <h4>What Mneme is not</h4>
+        <ul>
+          <li>Not cloud infrastructure provisioning (no Terraform-replacement, no Kubernetes setup)</li>
+          <li>Not identity / access / posture management (no IAM, no CSPM, no secrets management)</li>
+          <li>Not a security or compliance scanner (no SAST, no SCA replacement)</li>
+          <li>Not a managed service &mdash; it's an open-source CLI plus a JSON corpus the team owns</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="position-block">
+    <div class="pb-eyebrow">Core positioning</div>
+    <div class="pb-quote">The platform runs the agents.<br><em>Mneme governs the agents.</em></div>
+    <p class="pb-sub">The cloud is downstream. The agent is downstream. The decision corpus is the constant your engineering org owns &mdash; portable across Azure, AWS, Google Cloud, and the air-gapped environment behind the firewall.</p>
+  </div>
+
+  <h2 class="group-title">Frequently asked</h2>
+
+  <div class="faq-list">
+    <details class="faq-item">
+      <summary>Is Mneme an infrastructure governance tool?</summary>
+      <div class="faq-body">No. Mneme governs AI coding agents inside an engineering organization's existing developer platform. It does not provision cloud resources, manage IAM, or enforce infrastructure policy. It sits above the runtime and inside the developer workflow, regardless of which cloud the workflow lives on. See <a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/">heterogeneous-agent governance</a> for the structural argument.</div>
+    </details>
+    <details class="faq-item">
+      <summary>Will this fit into our Azure / GitHub Enterprise / Copilot stack?</summary>
+      <div class="faq-body">Yes. Mneme runs as a GitHub Actions check on PR diffs and as a context provider for Copilot, Claude Code, Cursor, and other agents operating in the Azure DevOps and GitHub Enterprise workflow. The decision corpus is a tracked file in the repo, so it inherits whatever access controls the platform already enforces. See the <a href="/integrations/github-actions/">GitHub Actions integration</a>.</div>
+    </details>
+    <details class="faq-item">
+      <summary>Does Mneme require a hosted control plane?</summary>
+      <div class="faq-body">No. Mneme is an MIT-licensed CLI plus a structured decision corpus. It runs on the laptop, on a CI runner, or on a self-hosted runner inside an air-gapped environment. There is no hosted service to subscribe to and no telemetry that has to leave the network.</div>
+    </details>
+    <details class="faq-item">
+      <summary>How does Mneme compare to platform-native AI tooling?</summary>
+      <div class="faq-body">Platform-native AI tooling (Copilot, Bedrock-hosted agents, Gemini Code Assist) is the <em>agent</em>. Mneme is the <em>governance layer above the agent</em>. It is designed to operate alongside any of them, providing one decision corpus and one enforcement surface even when an organization runs multiple AI coding tools across multiple clouds. See <a href="/works-with/">Works With</a> for the full surface.</div>
+    </details>
+    <details class="faq-item">
+      <summary>What about multi-cloud organizations?</summary>
+      <div class="faq-body">The decision corpus is repo-local. A multi-cloud org running GitHub Enterprise repos with CI on AWS and dev environments on Google Cloud Workstations gets the same governance surface across all three, with no per-cloud encoding of the rules.</div>
+    </details>
+  </div>
+
+  <h2 class="group-title">Get started</h2>
+  <div class="cta-grid">
+    <a class="cta-card" href="https://github.com/TheoV823/mneme">
+      <span class="cta-label">Source</span>
+      <span class="cta-title">GitHub &rarr;</span>
+      <span class="cta-sub">MIT-licensed. Works on every platform listed above.</span>
+    </a>
+    <a class="cta-card" href="/integrations/github-actions/">
+      <span class="cta-label">CI wiring</span>
+      <span class="cta-title">GitHub Actions integration &rarr;</span>
+      <span class="cta-sub">End-to-end PR-diff governance using <code>mneme check</code>.</span>
+    </a>
+    <a class="cta-card" href="/docs/cli/">
+      <span class="cta-label">Reference</span>
+      <span class="cta-title">CLI &rarr;</span>
+      <span class="cta-sub">Commands and CI patterns &mdash; same surface across platforms.</span>
+    </a>
+    <a class="cta-card" href="/works-with/">
+      <span class="cta-label">Compatibility</span>
+      <span class="cta-title">Works with &rarr;</span>
+      <span class="cta-sub">The models, agents, and frameworks Mneme operates alongside.</span>
+    </a>
+  </div>
+
+</div>
+</main>
+
+<footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+  <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/use-cases/">Use cases</a></li>
+        <li><a href="/works-with/">Works with</a></li>
+        <li><a href="/platforms/">Platforms</a></li>
+        <li><a href="/integrations/">Integrations</a></li>
+        <li><a href="/compare/">Compare</a></li>
+        <li><a href="/demo/">Demo</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/insights/">Insights</a></li>
+        <li><a href="/standards/">Standards</a></li>
+        <li><a href="/benchmark/">Benchmark</a></li>
+        <li><a href="/docs/cli/">CLI reference</a></li>
+        <li><a href="/docs/governance-violations/">Governance violations</a></li>
+        <li><a href="/supported-languages/">Supported languages</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/for/">For teams</a></li>
+        <li><a href="/founder/">Founder</a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/roadmap/">Roadmap</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Code</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="https://github.com/TheoV823/mneme">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="/privacy/">Privacy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
+    <span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span>
+    <span>&copy; 2026</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  function setOpen(open){ links.classList.toggle('open', open); btn.setAttribute('aria-expanded', String(open)); document.body.classList.toggle('menu-open', open); }
+  btn.addEventListener('click', function(e){ e.stopPropagation(); setOpen(!links.classList.contains('open')); });
+  document.addEventListener('click', function(e){ if (!links.classList.contains('open')) return; if (links.contains(e.target) || btn.contains(e.target)) return; setOpen(false); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false); });
+  links.addEventListener('click', function(e){ if (e.target.tagName === 'A') setOpen(false); });
+  window.addEventListener('resize', function(){ if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false); });
+})();
+</script>
+</body>
+</html>

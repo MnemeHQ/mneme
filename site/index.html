@@ -1010,7 +1010,7 @@
   <div class="section-wrap" id="problem" style="border-top:none;padding-top:4.25rem;padding-bottom:4.25rem;">
     <div class="section-eyebrow">The bottleneck</div>
     <h2 class="section-title" style="margin-bottom:0.5rem;">AI increased code output.<br><span style="color:#ff7070;">Review capacity did not.</span></h2>
-    <p style="max-width:620px;margin-bottom:2.5rem;color:var(--muted);font-size:1.05rem;line-height:1.55;">
+    <p style="max-width:620px;margin-bottom:2rem;color:var(--muted);font-size:1.05rem;line-height:1.55;">
       Coding assistants generate code faster than teams can review it.<br>
       But review bandwidth has not increased.<br><br>
       That means more surface area to validate, more architectural drift to catch,
@@ -1018,6 +1018,37 @@
       The issue is not model quality.
       It is that coding agents do not retain your architectural decisions by default.
     </p>
+
+    <!-- Throughput vs review divergence chart -->
+    <figure style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem 1.5rem 1rem;margin:0 0 2.5rem;max-width:740px;">
+      <figcaption style="font-family:'DM Mono',monospace;font-size:0.66rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.85rem;">Throughput vs. review capacity &middot; 2023&ndash;2026</figcaption>
+      <svg viewBox="0 0 600 320" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="prob-chart-title prob-chart-desc" style="width:100%;height:auto;display:block;">
+        <title id="prob-chart-title">AI code generation throughput diverges from review capacity, 2023 to 2026</title>
+        <desc id="prob-chart-desc">An illustrative chart showing AI code generation throughput rising exponentially while review capacity stays roughly flat. The widening gap is the governance opportunity.</desc>
+        <!-- Y-axis label (rotated) -->
+        <text x="20" y="150" fill="#55555f" font-family="DM Mono, monospace" font-size="10" transform="rotate(-90 20 150)" text-anchor="middle">throughput &rarr;</text>
+        <!-- Axes -->
+        <line x1="60" y1="280" x2="580" y2="280" stroke="#2e2e34" stroke-width="1"></line>
+        <line x1="60" y1="20" x2="60" y2="280" stroke="#2e2e34" stroke-width="1"></line>
+        <!-- Gap shading between curves -->
+        <path d="M60,260 Q260,250 360,200 T580,40 L580,260 Z" fill="rgba(255,112,112,0.08)"></path>
+        <!-- Review capacity line (flat, muted) -->
+        <line x1="60" y1="260" x2="580" y2="260" stroke="#88889a" stroke-width="2"></line>
+        <!-- AI generation curve (red, exponential) -->
+        <path d="M60,260 Q260,250 360,200 T580,40" fill="none" stroke="#ff7070" stroke-width="2.5" stroke-linecap="round"></path>
+        <!-- End-point markers -->
+        <circle cx="580" cy="40" r="4" fill="#ff7070"></circle>
+        <circle cx="580" cy="260" r="4" fill="#88889a"></circle>
+        <!-- Labels -->
+        <text x="68" y="38" fill="#ff7070" font-family="DM Mono, monospace" font-size="11" font-weight="500">AI code generation</text>
+        <text x="68" y="252" fill="#88889a" font-family="DM Mono, monospace" font-size="11">Review capacity (linear in headcount)</text>
+        <text x="370" y="158" fill="rgba(255,180,180,0.85)" font-family="Instrument Serif, serif" font-size="14" font-style="italic">the gap is governance</text>
+        <!-- X-axis labels -->
+        <text x="60" y="302" fill="#55555f" font-family="DM Mono, monospace" font-size="10">2023</text>
+        <text x="580" y="302" fill="#55555f" font-family="DM Mono, monospace" font-size="10" text-anchor="end">2026</text>
+      </svg>
+    </figure>
+
     <div class="problem-grid">
       <div class="problem-card">
         <div style="font-size:0.95rem;font-weight:600;color:var(--text);margin-bottom:0.5rem;">More PR Surface Area</div>
@@ -1082,6 +1113,50 @@
   <div class="section-wrap" id="how-it-works" style="border-top:none;">
     <div class="section-eyebrow">How it works</div>
     <h2 class="section-title">Five stages. No vector store. No ML.</h2>
+
+    <!-- Where Mneme sits in the AI coding stack -->
+    <figure style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem 1.5rem;margin:0 0 2.5rem;max-width:740px;">
+      <figcaption style="font-family:'DM Mono',monospace;font-size:0.66rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.95rem;">Where Mneme sits &middot; generative AI software engineering stack</figcaption>
+      <div role="img" aria-label="Seven-layer Generative AI software engineering stack with Mneme highlighted at Layer 05 (governance and control)." style="display:flex;flex-direction:column;gap:5px;">
+        <div style="display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:center;padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);">
+          <span style="font-family:'DM Mono',monospace;font-size:0.66rem;color:#55555f;">07</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--text);">Human oversight</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);">review &middot; approvals</span>
+        </div>
+        <div style="display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:center;padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);">
+          <span style="font-family:'DM Mono',monospace;font-size:0.66rem;color:#55555f;">06</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--text);">Validation &amp; eval</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);">benchmarks &middot; tracing</span>
+        </div>
+        <div style="display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:center;padding:9px 10px;border:1px solid rgba(200,240,96,0.5);border-radius:6px;background:linear-gradient(90deg,rgba(200,240,96,0.08),rgba(200,240,96,0.02));">
+          <span style="font-family:'DM Mono',monospace;font-size:0.66rem;color:var(--accent);">05</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.82rem;color:var(--accent);font-weight:500;">Governance &amp; control</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.66rem;color:#0c0c0d;background:var(--accent);border-radius:100px;padding:2px 9px;letter-spacing:0.04em;">Mneme HQ</span>
+        </div>
+        <div style="display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:center;padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);">
+          <span style="font-family:'DM Mono',monospace;font-size:0.66rem;color:#55555f;">04</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--text);">Tooling &amp; execution</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);">MCP &middot; CI/CD &middot; shells</span>
+        </div>
+        <div style="display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:center;padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);">
+          <span style="font-family:'DM Mono',monospace;font-size:0.66rem;color:#55555f;">03</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--text);">Agent runtime</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);">LangGraph &middot; Claude Code</span>
+        </div>
+        <div style="display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:center;padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);">
+          <span style="font-family:'DM Mono',monospace;font-size:0.66rem;color:#55555f;">02</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--text);">Context &amp; retrieval</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);">RAG &middot; vectors &middot; memory</span>
+        </div>
+        <div style="display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:center;padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);">
+          <span style="font-family:'DM Mono',monospace;font-size:0.66rem;color:#55555f;">01</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--text);">Foundation models</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);">OpenAI &middot; Anthropic &middot; Gemini</span>
+        </div>
+      </div>
+      <p style="margin:0.95rem 0 0;font-size:0.82rem;color:var(--muted);line-height:1.65;">Almost everyone is competing in layers 01&ndash;03. Mneme is layer 05 &mdash; the governance layer above the agent runtime. <a href="/insights/generative-ai-software-engineering-stack/" style="color:var(--accent);text-decoration:none;">Read the full layer-by-layer breakdown &rarr;</a></p>
+    </figure>
+
     <div class="pipeline-block">
       project_memory.json → MemoryStore → Retriever → ContextBuilder → LLMAdapter → Evaluator
     </div>
@@ -1426,6 +1501,7 @@
       <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
         <li><a href="/use-cases/">Use cases</a></li>
         <li><a href="/works-with/">Works with</a></li>
+        <li><a href="/platforms/">Platforms</a></li>
         <li><a href="/integrations/">Integrations</a></li>
         <li><a href="/compare/">Compare</a></li>
         <li><a href="/demo/">Demo</a></li>

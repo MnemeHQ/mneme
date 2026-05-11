@@ -117,6 +117,7 @@ Mneme alignment is honest: tracking, design-aligned, planning to engage with fut
 - Demo: https://mnemehq.com/demo/
 - Standards landscape: https://mnemehq.com/standards/
 - Works with (compatibility surface): https://mnemehq.com/works-with/
+- Platforms (Azure & GitHub Enterprise, AWS, Google Cloud, self-hosted): https://mnemehq.com/platforms/
 - CLI reference: https://mnemehq.com/docs/cli/
 - Governance violations (what Mneme prevents): https://mnemehq.com/docs/governance-violations/
 - Use cases: https://mnemehq.com/use-cases/
