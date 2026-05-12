@@ -1536,6 +1536,25 @@
 
 </main>
 
+<!-- ADR IMPORT CALLOUT -->
+<section aria-label="ADR Import integration" style="border-top:1px solid var(--border);padding:4.5rem 2rem;">
+  <div style="max-width:900px;margin:0 auto;display:flex;align-items:flex-start;gap:3rem;flex-wrap:wrap;">
+    <div style="flex:1;min-width:240px;">
+      <div class="section-eyebrow" style="margin-bottom:0.6rem;">Integration</div>
+      <h2 style="font-family:'Inter',sans-serif;font-size:clamp(1.25rem,2.5vw,1.55rem);font-weight:600;letter-spacing:-0.02em;color:var(--text);margin-bottom:0.8rem;line-height:1.3;">Import Existing ADRs</h2>
+      <p style="font-size:0.88rem;color:var(--muted);line-height:1.7;margin-bottom:1.5rem;">Turn architectural decisions already written in <code style="font-family:'DM Mono',monospace;font-size:0.82rem;color:var(--teal);background:rgba(139,224,200,0.08);padding:0.1em 0.4em;border-radius:3px;">docs/adr/</code> into enforceable AI coding guardrails.</p>
+      <p style="font-size:0.74rem;font-family:'DM Mono',monospace;color:var(--muted);letter-spacing:0.02em;line-height:1.8;margin-bottom:1.75rem;">Deterministic import. Review-gated. No AI interpretation of governance rules.</p>
+      <a href="/integrations/adr-import/" style="font-family:'DM Mono',monospace;font-size:0.82rem;color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(200,240,96,0.3);padding-bottom:1px;">See ADR Import &rarr;</a>
+    </div>
+    <div style="flex:1;min-width:240px;max-width:420px;">
+      <div class="code-block">
+        <div class="code-block-label">import</div>
+        <pre><span class="cp">$</span> mneme adr import docs/adr --apply</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
 <footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
   <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
     <div>
