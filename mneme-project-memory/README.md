@@ -568,6 +568,49 @@ Both modes print the same structured output. Only the exit code differs.
 
 ---
 
+## ADR import
+
+Drop an existing ADR corpus into Mneme's enforceable memory:
+
+```bash
+mneme adr import docs/adr --memory .mneme/project_memory.json --dry-run
+```
+
+The default is dry-run: the preview shows the active set, the projected
+graph status of every ADR, the constraints that would be persisted, and
+any conflicts. Apply when you're satisfied:
+
+```bash
+mneme adr import docs/adr --memory .mneme/project_memory.json --apply
+```
+
+Conflict gates:
+- `--update-existing` -- required to overwrite a decisions[] entry whose id
+  matches an incoming ADR.
+- `--approve-conflicts` -- required to proceed when two accepted ADRs in
+  the corpus share a scope, priority, and date (an "active-active
+  contradiction" the compiler refuses to resolve silently).
+
+Supported ADR format: YAML frontmatter + markdown body. The body may
+include an optional `## Constraints` section with directives:
+
+```markdown
+## Constraints
+- FORBID_DEPENDENCY: mongodb
+- FORBID_PATH: src/legacy/**
+- REQUIRE_PATH: billing/**
+```
+
+Only `FORBID_DEPENDENCY` is currently end-to-end enforced (via
+`mneme check`); `FORBID_PATH` and `REQUIRE_PATH` persist into Decisions
+for retrieval visibility but glob-vs-changed-file enforcement is a
+follow-up.
+
+See [docs/integrations/adr-import.md](../docs/integrations/adr-import.md)
+for the full reference.
+
+---
+
 ## Quick demo
 
 ```bash
