@@ -69,28 +69,78 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    max-width: 800px;
-    padding-top: 8px;
+    max-width: 1000px;
+    padding-top: 4px;
+    gap: 24px;
   }
   .heading {
     font-family: 'Instrument Serif', serif;
-    font-size: 60px;
+    font-size: 56px;
     line-height: 1.08;
     color: #e8e8ec;
     letter-spacing: -1px;
-    margin-bottom: 20px;
   }
   .heading em {
     font-style: italic;
     color: #c8f060;
   }
-  .subtitle {
+  .pipeline {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+  }
+  .ps {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    text-align: center;
+  }
+  .ps-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(200,240,96,0.1);
+    border: 1px solid rgba(200,240,96,0.3);
+    color: #c8f060;
     font-family: 'DM Mono', monospace;
-    font-size: 15px;
-    line-height: 1.65;
-    color: #88889a;
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .ps-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: #e8e8ec;
+    letter-spacing: 0.01em;
+  }
+  .ps-hint {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
     font-weight: 300;
-    max-width: 680px;
+    color: #55555f;
+    line-height: 1.5;
+  }
+  .ps-arrow {
+    color: #2e2e34;
+    font-size: 16px;
+    padding: 0 16px;
+    align-self: flex-start;
+    padding-top: 6px;
+    flex-shrink: 0;
+  }
+  .badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 300;
+    color: #55555f;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
   }
   .bottom {
     display: flex;
@@ -116,7 +166,34 @@
     </div>
     <div class="middle">
       <div class="heading">Import existing <em>ADRs</em></div>
-      <div class="subtitle">Parse, compile, and activate your ADR corpus as enforceable guardrails.<br>One command. No manual rewriting.</div>
+      <div>
+        <div class="badge">2 commands &middot; zero rewriting &middot; atomic writes</div>
+        <div class="pipeline">
+          <div class="ps">
+            <div class="ps-num">1</div>
+            <div class="ps-label">Add constraints</div>
+            <div class="ps-hint">FORBID_DEPENDENCY: X</div>
+          </div>
+          <div class="ps-arrow">&rarr;</div>
+          <div class="ps">
+            <div class="ps-num">2</div>
+            <div class="ps-label">Preview</div>
+            <div class="ps-hint">--dry-run</div>
+          </div>
+          <div class="ps-arrow">&rarr;</div>
+          <div class="ps">
+            <div class="ps-num">3</div>
+            <div class="ps-label">Apply</div>
+            <div class="ps-hint">--apply</div>
+          </div>
+          <div class="ps-arrow">&rarr;</div>
+          <div class="ps">
+            <div class="ps-num">4</div>
+            <div class="ps-label">Verify</div>
+            <div class="ps-hint">mneme check fires WARN</div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="bottom">
       <div class="url">mnemehq.com/integrations/adr-import</div>

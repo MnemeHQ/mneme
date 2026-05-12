@@ -206,7 +206,16 @@
       .article-wrap { padding: 3rem 1.25rem 5rem; }
     }
 
-    h2#related-reading { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 400; margin-top: 3.5rem; margin-bottom: 0.75rem; }
+    .pipeline-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin: 2.5rem 0 3rem; }
+    .pipeline-badge { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.25rem; }
+    .pipeline-steps { display: flex; align-items: flex-start; overflow-x: auto; padding-bottom: 0.25rem; -webkit-overflow-scrolling: touch; }
+    .ps { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; flex: 1; min-width: 118px; text-align: center; padding: 0 0.25rem; }
+    .ps-num { width: 26px; height: 26px; border-radius: 50%; background: rgba(200,240,96,0.08); border: 1px solid rgba(200,240,96,0.25); color: var(--accent); font-family: 'DM Mono', monospace; font-size: 0.72rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .ps-label { font-size: 0.82rem; font-weight: 600; color: var(--text); line-height: 1.3; }
+    .ps-hint { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--muted); line-height: 1.45; margin-top: 0.1rem; }
+    .ps-arrow { color: var(--border2); font-size: 0.9rem; padding: 0 0.35rem; align-self: flex-start; padding-top: 0.45rem; flex-shrink: 0; }
+
+    h2#related-reading { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: none; color: var(--muted); font-weight: 400; margin-top: 3.5rem; margin-bottom: 0.75rem; }
     h2#related-reading + ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
     h2#related-reading + ul li { margin: 0; }
     h2#related-reading + ul li a { display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.1rem; background: var(--surface); color: var(--text); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.15s, color 0.15s; }
@@ -296,6 +305,35 @@
       <time datetime="2026-05-12">Published May 2026</time>
     </p>
   </header>
+
+  <div class="pipeline-wrap" role="img" aria-label="Four-step import pipeline: add constraints, preview, apply, verify">
+    <div class="pipeline-badge">2 commands &middot; zero rewriting &middot; atomic writes</div>
+    <div class="pipeline-steps">
+      <div class="ps">
+        <div class="ps-num">1</div>
+        <div class="ps-label">Add constraints</div>
+        <div class="ps-hint">FORBID_DEPENDENCY:<br>per ADR file</div>
+      </div>
+      <div class="ps-arrow">&rarr;</div>
+      <div class="ps">
+        <div class="ps-num">2</div>
+        <div class="ps-label">Preview</div>
+        <div class="ps-hint">--dry-run<br>nothing writes</div>
+      </div>
+      <div class="ps-arrow">&rarr;</div>
+      <div class="ps">
+        <div class="ps-num">3</div>
+        <div class="ps-label">Apply</div>
+        <div class="ps-hint">--apply<br>atomic write</div>
+      </div>
+      <div class="ps-arrow">&rarr;</div>
+      <div class="ps">
+        <div class="ps-num">4</div>
+        <div class="ps-label">Verify</div>
+        <div class="ps-hint">mneme check<br>WARN fires</div>
+      </div>
+    </div>
+  </div>
 
   <div class="article-body">
 
@@ -428,7 +466,7 @@ Result: WARN</code></pre>
 
   </div>
 
-  <h2 id="related-reading">Related reading</h2>
+  <h2 id="related-reading">Related Reading</h2>
   <ul>
     <li><a href="/integrations/claude-code/">governing Claude Code workflows with the PreToolUse hook</a></li>
     <li><a href="/integrations/github-actions/">architectural governance in GitHub Actions</a></li>
@@ -442,7 +480,6 @@ Result: WARN</code></pre>
       <h3>Turn your existing ADRs into enforceable guardrails</h3>
       <p>Open source, self-hosted. The runnable demo requires no API key.</p>
       <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
-      <a href="/integrations/claude-code/" class="cta-secondary">Read: governing Claude Code workflows &rarr;</a>
     </div>
   </footer>
 </article>
@@ -548,6 +585,17 @@ Result: WARN</code></pre>
   });
   window.addEventListener('resize', function(){
     if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false);
+  });
+})();
+</script>
+<script><!-- nav-active -->
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
   });
 })();
 </script>
