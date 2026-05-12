@@ -275,6 +275,86 @@ def format_preview(
     return "\n".join(lines)
 
 
+def apply_import(
+    report: ImportReport,
+    target_path: str | Path,
+    allow_update: bool = False,
+    approve_conflicts: bool = False,
+) -> list[str]:
+    """Write imported Decisions into ``target_path``'s ``decisions[]``.
+
+    Same-id collisions: if ``allow_update`` is False and any incoming
+    Decision id already exists in ``decisions[]`` of the target, raises
+    RuntimeError. If True, the colliding entry is replaced in place
+    (preserving its position in the array).
+
+    Active-active contradictions: if the report carries an unresolved
+    contradiction diagnostic and ``approve_conflicts`` is False, raises
+    RuntimeError.
+
+    Atomic: writes to a sibling tempfile and os.replace()s into place.
+
+    Returns the list of ids actually written, in input order.
+    """
+    target_path = Path(target_path)
+
+    has_active_active = any(
+        d.kind == "active_active_contradiction" for d in report.diagnostics
+    )
+    if has_active_active and not approve_conflicts:
+        raise RuntimeError(
+            "ADR import refused: active-active contradiction in corpus. "
+            "Pass approve_conflicts=True (or --approve-conflicts on the CLI) "
+            "to proceed, or fix the contradicting ADRs."
+        )
+
+    raw = _json.loads(target_path.read_text(encoding="utf-8"))
+    raw.setdefault("decisions", [])
+    existing_idx = {d.get("id"): i for i, d in enumerate(raw["decisions"])}
+
+    written_ids: list[str] = []
+    for decision in report.decisions:
+        entry = {
+            "id": decision.id,
+            "decision": decision.decision,
+            "rationale": decision.rationale,
+            "scope": list(decision.scope),
+            "constraints": list(decision.constraints),
+            "anti_patterns": list(decision.anti_patterns),
+            "created_at": decision.created_at,
+            "updated_at": decision.updated_at,
+        }
+        if decision.id in existing_idx:
+            if not allow_update:
+                raise RuntimeError(
+                    f"ADR import refused: id {decision.id!r} already exists "
+                    f"in target memory decisions[]. Pass --update-existing to "
+                    f"overwrite, or rename the incoming ADR."
+                )
+            raw["decisions"][existing_idx[decision.id]] = entry
+        else:
+            raw["decisions"].append(entry)
+        written_ids.append(decision.id)
+
+    # Atomic write: tempfile in the same directory, then os.replace().
+    serialized = _json.dumps(raw, indent=2) + "\n"
+    fd, tmp = tempfile.mkstemp(
+        prefix=target_path.name + ".", suffix=".tmp", dir=str(target_path.parent)
+    )
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as f:
+            f.write(serialized)
+        os.replace(tmp, str(target_path))
+    except Exception:
+        try:
+            os.unlink(tmp)
+        except FileNotFoundError:
+            pass
+        raise
+
+    return written_ids
+
+
 __all__ = [
     "DecisionNode",
     "GraphStatus",
@@ -285,4 +365,5 @@ __all__ = [
     "compile_for_import",
     "detect_collisions",
     "format_preview",
+    "apply_import",
 ]

@@ -162,3 +162,77 @@ def test_format_preview_shows_active_active_contradiction_block():
     out = format_preview(report, collisions=[])
     assert "Active-active contradiction" in out
     assert "--approve-conflicts" in out
+
+
+def test_apply_import_appends_decisions_to_target_memory(tmp_path):
+    """Persistence path: clean corpus + clean target -> appended decisions[]."""
+    import json
+    from mneme.adr_import import apply_import, compile_for_import
+
+    # Set up an empty target
+    target = tmp_path / "project_memory.json"
+    target.write_text(json.dumps({
+        "meta": {"name": "test", "description": "test", "version": "1.0.0", "owner": "test", "created": "2026-01-01"},
+        "items": [], "examples": [], "decisions": [],
+    }), encoding="utf-8")
+
+    report = compile_for_import(FIXTURES / "adrs_import_basic")
+    written_ids = apply_import(report, target_path=target, allow_update=False)
+
+    assert written_ids == ["ADR-101", "ADR-102"]
+    persisted = json.loads(target.read_text(encoding="utf-8"))
+    persisted_ids = [d["id"] for d in persisted["decisions"]]
+    assert persisted_ids == ["ADR-101", "ADR-102"]
+    # Constraints make the round-trip
+    by_id = {d["id"]: d for d in persisted["decisions"]}
+    assert "no mongodb" in by_id["ADR-101"]["constraints"]
+
+
+def test_apply_import_refuses_overwrite_without_allow_update(tmp_path):
+    """Same-id collision must block apply unless allow_update=True."""
+    import json
+    from mneme.adr_import import apply_import, compile_for_import
+
+    target = tmp_path / "project_memory.json"
+    # seed with a collision against ADR-101
+    target.write_text((FIXTURES / "memory_for_import_collision.json").read_text(encoding="utf-8"), encoding="utf-8")
+
+    report = compile_for_import(FIXTURES / "adrs_import_basic")
+    with pytest.raises(RuntimeError, match="ADR-101.*--update-existing"):
+        apply_import(report, target_path=target, allow_update=False)
+
+
+def test_apply_import_overwrites_with_allow_update(tmp_path):
+    """allow_update=True overwrites the colliding decisions[] entry in place."""
+    import json
+    from mneme.adr_import import apply_import, compile_for_import
+
+    target = tmp_path / "project_memory.json"
+    target.write_text((FIXTURES / "memory_for_import_collision.json").read_text(encoding="utf-8"), encoding="utf-8")
+
+    report = compile_for_import(FIXTURES / "adrs_import_basic")
+    written_ids = apply_import(report, target_path=target, allow_update=True)
+    assert "ADR-101" in written_ids
+
+    persisted = json.loads(target.read_text(encoding="utf-8"))
+    by_id = {d["id"]: d for d in persisted["decisions"]}
+    # ADR-101 was overwritten — the imported title wins
+    assert by_id["ADR-101"]["decision"] == "No MongoDB"
+    # No duplicate entry was created
+    assert sum(1 for d in persisted["decisions"] if d["id"] == "ADR-101") == 1
+
+
+def test_apply_import_refuses_when_unresolved_active_active(tmp_path):
+    """If the corpus has an active-active contradiction, apply must refuse."""
+    import json
+    from mneme.adr_import import apply_import, compile_for_import
+
+    target = tmp_path / "project_memory.json"
+    target.write_text(json.dumps({
+        "meta": {"name": "x", "description": "x", "version": "1.0.0", "owner": "x", "created": "2026-01-01"},
+        "items": [], "examples": [], "decisions": [],
+    }), encoding="utf-8")
+
+    report = compile_for_import(FIXTURES / "adrs_import_with_conflicts")
+    with pytest.raises(RuntimeError, match="active-active"):
+        apply_import(report, target_path=target, allow_update=False, approve_conflicts=False)
