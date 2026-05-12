@@ -1,0 +1,7 @@
+# Suppress WAF false-positives triggered by "import" in the URL path.
+# Imunify360 / ModSecurity injection-detection rules flag "import" as a
+# potential SQL/code injection keyword and intercept the request, then
+# fail to redirect back to the original URL (falling through to /).
+<IfModule security2_module>
+    SecRuleEngine Off
+</IfModule>

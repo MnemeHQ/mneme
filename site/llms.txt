@@ -37,6 +37,7 @@ How Mneme HQ fits into the tools engineering teams already use.
 - [Claude Code integration](https://mnemehq.com/integrations/claude-code/): Hook-level enforcement for every Edit, Write, and MultiEdit Claude Code attempts.
 - [Cursor integration](https://mnemehq.com/integrations/cursor/): Mneme HQ as the authoritative corpus behind Cursor Rules sessions.
 - [GitHub Actions integration](https://mnemehq.com/integrations/github-actions/): CI enforcement gate — block PRs that violate architectural decisions before they merge.
+- [ADR import integration](https://mnemehq.com/integrations/adr-import/): Import an existing ADR corpus into Mneme's enforcement pipeline. Add a Constraints section to any ADR, run one command to preview, one to apply — decisions become live guardrails without rewriting your ADRs.
 
 ## Key pages
 
