@@ -351,10 +351,10 @@ def adrs_to_decisions(adrs: list[ADR]) -> list[Decision]:
         ADR.scope   -> Decision.scope (wrapped in a single-element list)
         ADR.date    -> Decision.created_at and Decision.updated_at
 
-    ``Decision.constraints`` and ``Decision.anti_patterns`` are left
-    empty: ADR-003's v1 schema does not have structured fields for them
-    (the body is free-form markdown). Future iterations can extend the
-    schema and enrich this mapping.
+    ``Decision.constraints`` is populated from the ADR body's optional
+    ``## Constraints`` section via ``parse_constraints_section`` and the
+    ``_directive_to_constraint_string`` bridge. ``Decision.anti_patterns``
+    is left empty for v1 — anti-pattern modelling stays in manual memory.
 
     Args:
         adrs: List of compiled (active) ADR records.
