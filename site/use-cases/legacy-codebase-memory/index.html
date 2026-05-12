@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Legacy Codebase Memory — Mneme HQ</title>
+  <title>Legacy Codebase Memory â€” Mneme HQ</title>
   <meta name="description" content="How Mneme HQ preserves tribal knowledge in legacy codebases, preventing AI coding assistants from breaking fragile systems by surfacing hidden constraints at query time." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
@@ -248,12 +248,12 @@
         {
           "@type": "Question",
           "name": "Does this work without good test coverage?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Mneme HQ is a pre-flight layer on top of prompting — it doesn't require test coverage to enforce decisions. It operates before code is written, not after." }
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Mneme HQ is a pre-flight layer on top of prompting â€” it doesn't require test coverage to enforce decisions. It operates before code is written, not after." }
         },
         {
           "@type": "Question",
           "name": "Can we import from existing ADR documents?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Manual migration takes 2–3 minutes per decision. A future importer is on the roadmap. For now, treat existing ADRs as source material and transcribe the key rule and rationale into YAML." }
+          "acceptedAnswer": { "@type": "Answer", "text": "Manual migration takes 2â€“3 minutes per decision. A future importer is on the roadmap. For now, treat existing ADRs as source material and transcribe the key rule and rationale into YAML." }
         }
       ]
     }
@@ -282,7 +282,7 @@
 
 <!-- GEO / LLM answer capsule -->
 <div class="answer-capsule">
-  <strong>Mneme HQ</strong> solves the legacy codebase problem by capturing undocumented constraints, anti-patterns, and tribal knowledge in a structured decision store that AI coding assistants query before generating code. When an assistant proposes code that violates a hidden constraint — touching a deprecated adapter, bypassing a required flag, or ignoring a fragile dependency — Mneme HQ surfaces the violation before damage is done. Memory tools recall context. Mneme governs implementation.
+  <strong>Mneme HQ</strong> solves the legacy codebase problem by capturing undocumented constraints, anti-patterns, and tribal knowledge in a structured decision store that AI coding assistants query before generating code. When an assistant proposes code that violates a hidden constraint â€” touching a deprecated adapter, bypassing a required flag, or ignoring a fragile dependency â€” Mneme HQ surfaces the violation before damage is done. Memory tools recall context. Mneme governs implementation.
 </div>
 
 <main>
@@ -292,7 +292,7 @@
 
   <!-- HERO -->
   <div class="hero">
-    <div class="hero-tag">Reference Architecture · Simulated Scenario</div>
+    <div class="hero-tag">Reference Architecture Â· Simulated Scenario</div>
     <h1>Using Mneme HQ to Preserve Tribal Knowledge in Legacy Codebases</h1>
     <p class="hero-sub">The senior engineer bottleneck, solved. Give every coding assistant access to the undocumented rules that only your longest-tenured engineers know.</p>
     <div class="cta-group">
@@ -340,14 +340,14 @@
   <div class="section-wrap">
     <div class="section-eyebrow">The Problem</div>
     <h2 class="section-title">Legacy codebases run on invisible rules.</h2>
-    <p class="prose">Never call the billing adapter directly. Always use feature flags for payment changes. The v1 auth middleware was quietly deprecated in 2021 — use v2. These rules exist only in Slack threads and the memory of senior engineers.</p>
-    <p class="prose" style="margin-top:1rem;">When a coding assistant generates code for a legacy system, it works from the code it can see — not the rules it can't. The result is PRs that break things that "everyone knows" shouldn't be touched.</p>
+    <p class="prose">Never call the billing adapter directly. Always use feature flags for payment changes. The v1 auth middleware was quietly deprecated in 2021 â€” use v2. These rules exist only in Slack threads and the memory of senior engineers.</p>
+    <p class="prose" style="margin-top:1rem;">When a coding assistant generates code for a legacy system, it works from the code it can see â€” not the rules it can't. The result is PRs that break things that "everyone knows" shouldn't be touched.</p>
 
     <div class="demo-panels">
       <div class="panel">
         <div class="panel-header">
           <div class="panel-dot"></div><div class="panel-dot"></div><div class="panel-dot"></div>
-          <span class="panel-label bad">Without Mneme HQ — assistant suggests:</span>
+          <span class="panel-label bad">Without Mneme HQ â€” assistant suggests:</span>
         </div>
         <div class="panel-body">
           <div class="panel-prompt">Prompt: "Add a payment method to checkout"</div>
@@ -357,7 +357,7 @@
       <div class="panel">
         <div class="panel-header">
           <div class="panel-dot"></div><div class="panel-dot"></div><div class="panel-dot"></div>
-          <span class="panel-label good">With Mneme HQ — pre-flight check:</span>
+          <span class="panel-label good">With Mneme HQ â€” pre-flight check:</span>
         </div>
         <div class="panel-body good-response">
           <div class="panel-prompt">mneme check --mode strict</div>
@@ -443,7 +443,7 @@
         <div class="step-num">4</div>
         <div class="step-body">
           <h4>Gate CI on decision compliance</h4>
-          <p>Add <code>mneme check --mode strict</code> to CI. PRs that violate legacy constraints fail before review — no senior engineer required.</p>
+          <p>Add <code>mneme check --mode strict</code> to CI. PRs that violate legacy constraints fail before review â€” no senior engineer required.</p>
         </div>
       </div>
     </div>
@@ -467,7 +467,7 @@
     </div>
 
     <div class="code-block">
-      <div class="code-block-label">Terminal — mneme check output</div>
+      <div class="code-block-label">Terminal â€” mneme check output</div>
       <pre><span class="cc">$ </span><span class="ck">mneme check</span> <span class="cs">"add a payment method to checkout"</span> --mode strict
 
 <span class="cc">Retrieving relevant decisions... (4 matched)</span>
@@ -483,7 +483,7 @@
     </div>
 
     <div class="code-block">
-      <div class="code-block-label">Bulk capture session — 30 minutes with a senior engineer</div>
+      <div class="code-block-label">Bulk capture session â€” 30 minutes with a senior engineer</div>
       <pre><span class="cc"># Interview format: "What should no one ever touch directly?"</span>
 <span class="cc"># Each answer becomes a decision YAML.</span>
 
@@ -515,7 +515,7 @@ legacy-mailer-wrapper.yml  <span class="cc"># 6 decisions captured in one sessio
         <div class="metric-label">legacy violation PRs after enforcement goes live</div>
       </div>
     </div>
-    <div class="simulated-note">? These figures are based on a simulated reference scenario — not live customer data.</div>
+    <div class="simulated-note">? These figures are based on a simulated reference scenario â€” not live customer data.</div>
   </div>
 
   <!-- FAQ -->
@@ -535,12 +535,12 @@ legacy-mailer-wrapper.yml  <span class="cc"># 6 decisions captured in one sessio
 
     <details>
       <summary>Does this work without good test coverage?</summary>
-      <div class="faq-body">Yes. Mneme HQ is a pre-flight layer on top of prompting — it doesn't require test coverage to enforce decisions. It operates before code is written, not after.</div>
+      <div class="faq-body">Yes. Mneme HQ is a pre-flight layer on top of prompting â€” it doesn't require test coverage to enforce decisions. It operates before code is written, not after.</div>
     </details>
 
     <details>
       <summary>Can we import from existing ADR documents?</summary>
-      <div class="faq-body">Manual migration takes 2–3 minutes per decision. A future importer is on the roadmap. For now, treat existing ADRs as source material and transcribe the key rule and rationale into YAML.</div>
+      <div class="faq-body">Manual migration takes 2â€“3 minutes per decision. A future importer is on the roadmap. For now, treat existing ADRs as source material and transcribe the key rule and rationale into YAML.</div>
     </details>
   </div>
 

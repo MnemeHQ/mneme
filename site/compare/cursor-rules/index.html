@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mneme HQ vs Cursor Rules — Mneme HQ</title>
+  <title>Mneme HQ vs Cursor Rules â€” Mneme HQ</title>
   <meta name="description" content="Cursor Rules inject plain text into Cursor sessions. Mneme HQ is structured enforcement with a precedence engine and hook-level blocking. Here's how they compare." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
@@ -237,9 +237,9 @@
         "@type": "FAQPage",
         "mainEntity": [
           {"@type": "Question", "name": "Can I use Mneme HQ alongside Cursor Rules?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. They operate on different layers and do not conflict. Cursor Rules inject context into Cursor sessions; Mneme HQ runs as a hook on Edit and Write operations regardless of the editor. Many teams keep their .cursorrules file and add Mneme on top to gain structured enforcement, precedence resolution, and CI gating."}},
-          {"@type": "Question", "name": "Do I have to migrate my .cursorrules file to use Mneme HQ?", "acceptedAnswer": {"@type": "Answer", "text": "Migration is the typical path but not required. Existing .cursorrules text becomes the starting input for project_memory.json — each rule is converted to a typed entry with id, scope (file glob), status (active / superseded), and rationale. The mneme init command scaffolds the schema; populating it is a one-time conversion."}},
+          {"@type": "Question", "name": "Do I have to migrate my .cursorrules file to use Mneme HQ?", "acceptedAnswer": {"@type": "Answer", "text": "Migration is the typical path but not required. Existing .cursorrules text becomes the starting input for project_memory.json â€” each rule is converted to a typed entry with id, scope (file glob), status (active / superseded), and rationale. The mneme init command scaffolds the schema; populating it is a one-time conversion."}},
           {"@type": "Question", "name": "Does Mneme HQ work in editors other than Cursor and Claude Code?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The decision corpus is tool-agnostic. Native hooks ship for Claude Code; Cursor uses standard rules export from the same corpus; GitHub Copilot, Windsurf, and custom SDK agents are governed via the post-generation enforcement step in CI. The architectural argument for tool independence is on the heterogeneous-agents article."}},
-          {"@type": "Question", "name": "Is Cursor Rules ever the right tool on its own?", "acceptedAnswer": {"@type": "Answer", "text": "For a solo developer in a single repo, with rules that apply uniformly to every file, no precedence conflicts, and no requirement for hard blocking — Cursor Rules are sufficient. The moment any of those conditions fails, hook-level enforcement and structured precedence become load-bearing."}}
+          {"@type": "Question", "name": "Is Cursor Rules ever the right tool on its own?", "acceptedAnswer": {"@type": "Answer", "text": "For a solo developer in a single repo, with rules that apply uniformly to every file, no precedence conflicts, and no requirement for hard blocking â€” Cursor Rules are sufficient. The moment any of those conditions fails, hook-level enforcement and structured precedence become load-bearing."}}
         ]
       },
       {
@@ -247,10 +247,10 @@
         "name": "Migrate from Cursor Rules to Mneme HQ",
         "description": "Convert an existing .cursorrules file into a structured Mneme decision corpus and enable hook-level enforcement.",
         "step": [
-          {"@type": "HowToStep", "name": "Install", "text": "pip install mneme && mneme init — scaffolds project_memory.json at the repo root."},
+          {"@type": "HowToStep", "name": "Install", "text": "pip install mneme && mneme init â€” scaffolds project_memory.json at the repo root."},
           {"@type": "HowToStep", "name": "Convert each rule", "text": "For every rule in .cursorrules, create a typed entry: id, type (architectural_pattern / dependency_policy / etc.), scope (file glob), status (active), rationale, and supersedes (if it replaces an earlier rule)."},
           {"@type": "HowToStep", "name": "Enable Claude Code hook", "text": "Add the mneme-hook entry to your Claude Code hooks configuration so Edit, Write, and MultiEdit operations check the decision corpus before applying changes."},
-          {"@type": "HowToStep", "name": "Wire CI", "text": "Add mneme check --mode strict to your CI pipeline so PRs are blocked on hard FAIL verdicts — see the GitHub Actions integration for the canonical setup."}
+          {"@type": "HowToStep", "name": "Wire CI", "text": "Add mneme check --mode strict to your CI pipeline so PRs are blocked on hard FAIL verdicts â€” see the GitHub Actions integration for the canonical setup."}
         ]
       }
     ]
@@ -290,7 +290,7 @@
     <div class="article-eyebrow">
       <span class="eyebrow-tag">Comparative</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">5 min read &nbsp;·&nbsp; May 2026</span>
+      <span class="eyebrow-meta">5 min read &nbsp;Â·&nbsp; May 2026</span>
     </div>
     <h1>Mneme HQ vs Cursor Rules</h1>
     <p class="article-lede">Both inject architectural context into AI coding sessions. One is a suggestion file. The other is enforcement infrastructure. Here is how they differ &mdash; and when the difference matters.</p>
@@ -310,8 +310,8 @@
     <ul>
       <li>A <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.cursorrules</code> file (plain text) placed at the root of a repo</li>
       <li>Injected as system prompt preamble when Cursor opens a session in that directory</li>
-      <li>Written manually — no schema, no typed fields, no version tracking</li>
-      <li>One flat file per repo — the same rules apply to every file regardless of context</li>
+      <li>Written manually â€” no schema, no typed fields, no version tracking</li>
+      <li>One flat file per repo â€” the same rules apply to every file regardless of context</li>
       <li>Cursor-native: they only work in the Cursor editor</li>
       <li>Suggestions: the model receives them as instructions but can still ignore or contradict them</li>
     </ul>
@@ -337,17 +337,17 @@
         </tr>
         <tr>
           <td>Enforcement</td>
-          <td>Model suggestion — can be ignored</td>
+          <td>Model suggestion â€” can be ignored</td>
           <td>Hook-level blocking on Edit/Write operations</td>
         </tr>
         <tr>
           <td>Scope</td>
-          <td>Whole repo — same rules everywhere</td>
+          <td>Whole repo â€” same rules everywhere</td>
           <td>Per-file glob pattern matching (e.g. <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">services/payments/**</code>)</td>
         </tr>
         <tr>
           <td>Conflict resolution</td>
-          <td>None — conflicts resolved by the model</td>
+          <td>None â€” conflicts resolved by the model</td>
           <td>Deterministic precedence engine</td>
         </tr>
         <tr>
@@ -383,9 +383,9 @@
 
     <ul>
       <li>You use Cursor as your primary editor and have no plans to change</li>
-      <li>You are a solo developer — no multi-engineer or multi-agent workflows</li>
+      <li>You are a solo developer â€” no multi-engineer or multi-agent workflows</li>
       <li>Your rules apply uniformly to every file in the project</li>
-      <li>Suggestions are acceptable — you don't need a violation to actually block</li>
+      <li>Suggestions are acceptable â€” you don't need a violation to actually block</li>
       <li>You have no conflicting rule sets (org policy vs team exception, for example)</li>
       <li>You don't need to track when a decision changed or why it was superseded</li>
     </ul>
@@ -393,27 +393,27 @@
     <h2>When Mneme HQ is required</h2>
 
     <ul>
-      <li><strong>You use Claude Code.</strong> Cursor Rules only work in Cursor. Mneme HQ integrates directly with Claude Code's hooks API — it operates at the Edit/Write operation level, not at the editor level.</li>
+      <li><strong>You use Claude Code.</strong> Cursor Rules only work in Cursor. Mneme HQ integrates directly with Claude Code's hooks API â€” it operates at the Edit/Write operation level, not at the editor level.</li>
       <li><strong>Your rules are context-specific.</strong> A flat <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.cursorrules</code> file cannot distinguish between <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">services/payments/**</code> and <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">analytics/**</code>. Mneme HQ's glob-scoped rules enforce the right constraints for the right files.</li>
-      <li><strong>You need a violation to be stopped.</strong> Cursor Rules are injected as context — the model may still generate the forbidden thing. Mneme HQ's hooks block the Edit/Write operation before it lands.</li>
-      <li><strong>Your rules conflict.</strong> Org-wide policy vs team override vs individual exception — without a precedence model, conflict resolution falls to the model's judgment. Mneme HQ resolves conflicts deterministically.</li>
+      <li><strong>You need a violation to be stopped.</strong> Cursor Rules are injected as context â€” the model may still generate the forbidden thing. Mneme HQ's hooks block the Edit/Write operation before it lands.</li>
+      <li><strong>Your rules conflict.</strong> Org-wide policy vs team override vs individual exception â€” without a precedence model, conflict resolution falls to the model's judgment. Mneme HQ resolves conflicts deterministically.</li>
       <li><strong>You run AI agents.</strong> Agents don't read system prompts the way an interactive session does. Hook-level enforcement is the only governance that applies uniformly to both human and agent sessions.</li>
-      <li><strong>Decision history matters.</strong> When a rule was introduced, when it was superseded, and why — Mneme HQ tracks this. A rules file doesn't.</li>
+      <li><strong>Decision history matters.</strong> When a rule was introduced, when it was superseded, and why â€” Mneme HQ tracks this. A rules file doesn't.</li>
     </ul>
 
     <div class="callout">
-      <p><strong>The fundamental distinction:</strong> Cursor Rules are configuration — a text file the model is asked to respect. Mneme HQ is enforcement — a hook that runs at operation time and blocks violations before they happen. For teams where architectural boundaries must hold, configuration is not enough.</p>
+      <p><strong>The fundamental distinction:</strong> Cursor Rules are configuration â€” a text file the model is asked to respect. Mneme HQ is enforcement â€” a hook that runs at operation time and blocks violations before they happen. For teams where architectural boundaries must hold, configuration is not enough.</p>
     </div>
 
     <h2>If you use both Cursor and Claude Code</h2>
 
     <p>Many engineering teams use Cursor for interactive coding and Claude Code for agentic tasks (refactoring runs, code generation pipelines, automated PR workflows). In that setup, Cursor Rules cover the Cursor sessions and Mneme HQ covers the Claude Code sessions.</p>
 
-    <p>They don't conflict — they operate on different editors. But only Mneme HQ provides enforcement at the hook level. If a rule violation matters enough to block, it needs to be in Mneme HQ regardless of which editor it originated from.</p>
+    <p>They don't conflict â€” they operate on different editors. But only Mneme HQ provides enforcement at the hook level. If a rule violation matters enough to block, it needs to be in Mneme HQ regardless of which editor it originated from.</p>
 
     <h2>The migration path</h2>
 
-    <p>Teams that have already written <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.cursorrules</code> files can treat them as a starting point for Mneme HQ's decision corpus. The rules are the same — the difference is converting them into typed JSON entries with scope, status, and rationale fields, then enabling hook-level enforcement.</p>
+    <p>Teams that have already written <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.cursorrules</code> files can treat them as a starting point for Mneme HQ's decision corpus. The rules are the same â€” the difference is converting them into typed JSON entries with scope, status, and rationale fields, then enabling hook-level enforcement.</p>
 
     <p>For a deeper look at how the two differ in practice, see the editorial comparison: <a href="/insights/mneme-vs-cursor-rules/" style="color:var(--accent);text-decoration:none;">Mneme vs Cursor Rules</a>.</p>
 
@@ -478,7 +478,7 @@
       <p>Structured decision schema, deterministic precedence engine, and hook-level enforcement for Claude Code. Open source, self-hosted, MIT licence.</p>
       <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub ?</a>
       <a href="/insights/mneme-vs-cursor-rules/" class="cta-secondary">Read: Mneme vs Cursor Rules (editorial) ?</a>
-      <a href="/integrations/cursor/" style="display:block;margin-top:0.5rem;font-size:0.82rem;color:var(--muted);text-decoration:none;">Mneme + Cursor — integration guide ?</a>
+      <a href="/integrations/cursor/" style="display:block;margin-top:0.5rem;font-size:0.82rem;color:var(--muted);text-decoration:none;">Mneme + Cursor â€” integration guide ?</a>
     </div>
   </footer>
 </article>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Security &amp; Compliance Guardrails — Mneme HQ</title>
+  <title>Security &amp; Compliance Guardrails â€” Mneme HQ</title>
   <meta name="description" content="How Mneme HQ prevents AI coding assistants from introducing security vulnerabilities and compliance violations by enforcing security decisions at prompt time." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
@@ -238,12 +238,12 @@
         {
           "@type": "Question",
           "name": "Can security teams manage decisions without engineering access?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Yes. The decisions YAML files are plain text, stored in version control. Security teams can open PRs to add or update rules like any other change — no code required." }
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. The decisions YAML files are plain text, stored in version control. Security teams can open PRs to add or update rules like any other change â€” no code required." }
         },
         {
           "@type": "Question",
           "name": "Does Mneme HQ replace a SAST tool?",
-          "acceptedAnswer": { "@type": "Answer", "text": "No — they're complementary. SAST finds known vulnerability patterns in written code. Mneme HQ enforces business-specific compliance rules before code is written. Use both." }
+          "acceptedAnswer": { "@type": "Answer", "text": "No â€” they're complementary. SAST finds known vulnerability patterns in written code. Mneme HQ enforces business-specific compliance rules before code is written. Use both." }
         },
         {
           "@type": "Question",
@@ -253,7 +253,7 @@
         {
           "@type": "Question",
           "name": "What happens if a developer overrides a strict violation?",
-          "acceptedAnswer": { "@type": "Answer", "text": "In strict mode, the CI gate fails and the override is explicit — it must be merged with a documented exception. All violations are logged, creating an audit trail for security reviews." }
+          "acceptedAnswer": { "@type": "Answer", "text": "In strict mode, the CI gate fails and the override is explicit â€” it must be merged with a documented exception. All violations are logged, creating an audit trail for security reviews." }
         }
       ]
     }
@@ -282,7 +282,7 @@
 
 <!-- GEO / LLM answer capsule -->
 <div class="answer-capsule">
-  <strong>Mneme HQ</strong> enforces security and compliance decisions for AI-generated code by surfacing relevant rules at prompt time and flagging violations before code reaches review. Rules like "never log PII", "all endpoints require auth middleware", and "secrets must not appear in frontend code" are stored as structured decisions and checked against every AI-assisted change — giving security teams a scalable guardrail for LLM-powered development. Rules files document standards. Mneme enforces them.
+  <strong>Mneme HQ</strong> enforces security and compliance decisions for AI-generated code by surfacing relevant rules at prompt time and flagging violations before code reaches review. Rules like "never log PII", "all endpoints require auth middleware", and "secrets must not appear in frontend code" are stored as structured decisions and checked against every AI-assisted change â€” giving security teams a scalable guardrail for LLM-powered development. Rules files document standards. Mneme enforces them.
 </div>
 
 <main>
@@ -292,9 +292,9 @@
 
   <!-- HERO -->
   <div class="hero">
-    <div class="hero-tag">Reference Architecture · Simulated Scenario</div>
+    <div class="hero-tag">Reference Architecture Â· Simulated Scenario</div>
     <h1>Preventing LLMs from Introducing Security and Compliance Violations</h1>
-    <p class="hero-sub">Enforce encryption standards, auth requirements, PII handling rules, and secrets policies — before the LLM generates a single line of non-compliant code.</p>
+    <p class="hero-sub">Enforce encryption standards, auth requirements, PII handling rules, and secrets policies â€” before the LLM generates a single line of non-compliant code.</p>
     <div class="cta-group">
       <a href="https://github.com/TheoV823/mneme" class="btn-primary">Install Mneme HQ</a>
       <a href="https://github.com/TheoV823/mneme" class="btn-ghost">View GitHub</a>
@@ -334,7 +334,7 @@
       <!-- Pass box -->
       <rect x="10" y="136" width="184" height="40" rx="6" fill="#0d1a08" stroke="#1e3310" stroke-width="1"/>
       <text x="102" y="153" font-family="monospace" font-size="11" fill="#c8f060" text-anchor="middle">&#x2713; Pass</text>
-      <text x="102" y="169" font-family="monospace" font-size="9" fill="#88889a" text-anchor="middle">Generation proceeds — compliant</text>
+      <text x="102" y="169" font-family="monospace" font-size="9" fill="#88889a" text-anchor="middle">Generation proceeds â€” compliant</text>
       <!-- Fail box -->
       <rect x="478" y="136" width="188" height="40" rx="6" fill="#1a0808" stroke="#331010" stroke-width="1"/>
       <text x="572" y="153" font-family="monospace" font-size="11" fill="#ff7070" text-anchor="middle">&#x2717; Fail</text>
@@ -347,13 +347,13 @@
     <div class="section-eyebrow">The Problem</div>
     <h2 class="section-title">AI coding assistants don't know your compliance posture.</h2>
     <p class="prose">They don't know that your SOC 2 audit requires auth middleware on every endpoint. They don't know that GDPR prohibits logging user email addresses. They don't know that your secrets management policy was updated after last year's incident.</p>
-    <p class="prose" style="margin-top:1rem;">Security teams are discovering that standard code review is no longer sufficient when AI generates 10× more code at 10× the speed. You need enforcement earlier in the loop.</p>
+    <p class="prose" style="margin-top:1rem;">Security teams are discovering that standard code review is no longer sufficient when AI generates 10Ã— more code at 10Ã— the speed. You need enforcement earlier in the loop.</p>
 
     <div class="demo-panels">
       <div class="panel">
         <div class="panel-header">
           <div class="panel-dot"></div><div class="panel-dot"></div><div class="panel-dot"></div>
-          <span class="panel-label bad">Without Mneme HQ — assistant suggests:</span>
+          <span class="panel-label bad">Without Mneme HQ â€” assistant suggests:</span>
         </div>
         <div class="panel-body">
           <div class="panel-prompt">Prompt: "Add a debug logging endpoint that dumps recent user actions"</div>
@@ -363,7 +363,7 @@
       <div class="panel">
         <div class="panel-header">
           <div class="panel-dot"></div><div class="panel-dot"></div><div class="panel-dot"></div>
-          <span class="panel-label good">With Mneme HQ — pre-flight check:</span>
+          <span class="panel-label good">With Mneme HQ â€” pre-flight check:</span>
         </div>
         <div class="panel-body good-response">
           <div class="panel-prompt">mneme check --mode strict</div>
@@ -372,7 +372,7 @@
           Context: GDPR Article 5 compliance. Violations require DPA notification.<br><br>
           <span style="color:#ff7070">? FAIL</span> decision/auth-middleware-required<br>
           Rule: All API endpoints must use AuthMiddleware.<br>
-          Context: SOC 2 CC6.1 — unauthenticated endpoints are a critical finding.<br><br>
+          Context: SOC 2 CC6.1 â€” unauthenticated endpoints are a critical finding.<br><br>
           <span style="color:var(--accent)">? Surfaced 2 violations before code generation.</span>
         </div>
       </div>
@@ -406,7 +406,7 @@
           <tr>
             <td>Security training</td>
             <td>Periodic; not actionable at the point of code generation</td>
-            <td>Rule surfaced exactly when relevant — during coding</td>
+            <td>Rule surfaced exactly when relevant â€” during coding</td>
           </tr>
           <tr>
             <td>Static policy docs</td>
@@ -434,7 +434,7 @@
         <div class="step-num">2</div>
         <div class="step-body">
           <h4>Run <code>mneme check</code> before prompting</h4>
-          <p>Every AI-assisted change is checked against relevant security decisions before code is written — not after it's merged.</p>
+          <p>Every AI-assisted change is checked against relevant security decisions before code is written â€” not after it's merged.</p>
         </div>
       </div>
       <div class="step">
@@ -466,7 +466,7 @@
 <span class="ck">status</span>: accepted
 <span class="ck">rule</span>: User email, name, phone, and address must never appear in log output
   or API responses not explicitly requesting them.
-<span class="ck">rationale</span>: GDPR Article 5(1)(f) — data must be processed securely.
+<span class="ck">rationale</span>: GDPR Article 5(1)(f) â€” data must be processed securely.
   Violation requires DPA notification within 72 hours.
 <span class="ck">enforcement</span>: strict
 <span class="ck">tags</span>: [security, gdpr, pii, compliance]</pre>
@@ -485,13 +485,13 @@
     </div>
 
     <div class="code-block">
-      <div class="code-block-label">Terminal — scoped check with security tag filter</div>
+      <div class="code-block-label">Terminal â€” scoped check with security tag filter</div>
       <pre><span class="cc">$ </span><span class="ck">mneme check</span> <span class="cs">"add debug endpoint for user actions"</span> --tags gdpr,soc2
 
 <span class="cc">Checking against 6 security/compliance decisions...</span>
 
 <span style="color:#ff7070">? FAIL</span> decision/no-pii-in-logs
-  <span class="cc">Reason: Endpoint returns user_id, email — PII exposure detected.</span>
+  <span class="cc">Reason: Endpoint returns user_id, email â€” PII exposure detected.</span>
 <span style="color:#ff7070">? FAIL</span> decision/auth-middleware-required
   <span class="cc">Reason: No auth middleware referenced in proposed endpoint.</span>
 <span class="cs">? PASS</span> decision/no-secrets-in-frontend
@@ -519,7 +519,7 @@
         <div class="metric-label">PII or auth violations in AI-generated code after enforcement</div>
       </div>
     </div>
-    <div class="simulated-note">? These figures are based on a simulated reference scenario — not live customer data.</div>
+    <div class="simulated-note">? These figures are based on a simulated reference scenario â€” not live customer data.</div>
   </div>
 
   <!-- FAQ -->
@@ -529,12 +529,12 @@
 
     <details>
       <summary>Can security teams manage decisions without engineering access?</summary>
-      <div class="faq-body">Yes. The decisions YAML files are plain text, stored in version control. Security teams can open PRs to add or update rules like any other change — no code required.</div>
+      <div class="faq-body">Yes. The decisions YAML files are plain text, stored in version control. Security teams can open PRs to add or update rules like any other change â€” no code required.</div>
     </details>
 
     <details>
       <summary>Does Mneme HQ replace a SAST tool?</summary>
-      <div class="faq-body">No — they're complementary. SAST finds known vulnerability patterns in written code. Mneme HQ enforces business-specific compliance rules before code is written. Use both.</div>
+      <div class="faq-body">No â€” they're complementary. SAST finds known vulnerability patterns in written code. Mneme HQ enforces business-specific compliance rules before code is written. Use both.</div>
     </details>
 
     <details>
@@ -544,7 +544,7 @@
 
     <details>
       <summary>What happens if a developer overrides a strict violation?</summary>
-      <div class="faq-body">In strict mode, the CI gate fails and the override is explicit — it must be merged with a documented exception. All violations are logged, creating an audit trail for security reviews.</div>
+      <div class="faq-body">In strict mode, the CI gate fails and the override is explicit â€” it must be merged with a documented exception. All violations are logged, creating an audit trail for security reviews.</div>
     </details>
   </div>
 

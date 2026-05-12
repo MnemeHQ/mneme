@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Data Platform Governance — Mneme HQ</title>
-  <meta name="description" content="How Mneme HQ keeps AI assistants aligned with data platform architecture — enforcing warehouse standards, naming conventions, and pipeline constraints before code is written." />
+  <title>Data Platform Governance â€” Mneme HQ</title>
+  <meta name="description" content="How Mneme HQ keeps AI assistants aligned with data platform architecture â€” enforcing warehouse standards, naming conventions, and pipeline constraints before code is written." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/use-cases/data-platform-governance/" />
@@ -236,7 +236,7 @@
         {
           "@type": "Question",
           "name": "Does this work with dbt, Spark, and SQL-based pipelines?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Mneme HQ operates at the prompt level — it doesn't depend on your specific data tool. Whether you're generating dbt models, Spark jobs, or raw SQL, mneme check runs against the intent before you write any code." }
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Mneme HQ operates at the prompt level â€” it doesn't depend on your specific data tool. Whether you're generating dbt models, Spark jobs, or raw SQL, mneme check runs against the intent before you write any code." }
         },
         {
           "@type": "Question",
@@ -245,13 +245,13 @@
         },
         {
           "@type": "Question",
-          "name": "How do we handle schema evolution — rules that change over time?",
+          "name": "How do we handle schema evolution â€” rules that change over time?",
           "acceptedAnswer": { "@type": "Answer", "text": "Update the YAML and set the old decision to status: deprecated. The history is preserved; enforcement is disabled. New rules take effect immediately on the next check." }
         },
         {
           "@type": "Question",
           "name": "Can data engineers without Python experience manage decisions?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Decision files are plain YAML in version control. Any engineer comfortable opening a PR can add or update rules — no Python or programming required." }
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Decision files are plain YAML in version control. Any engineer comfortable opening a PR can add or update rules â€” no Python or programming required." }
         }
       ]
     }
@@ -277,7 +277,7 @@
 </nav>
 
 <div class="answer-capsule">
-  <strong>Mneme HQ</strong> keeps AI assistants aligned with data platform architecture by enforcing warehouse standards, naming conventions, and pipeline constraints as structured decisions. When an assistant proposes writing directly to raw tables, bypassing reporting views, or violating regional dataset rules, Mneme HQ flags the violation before any code is written — protecting data platform integrity in AI-assisted environments. Rules files document standards. Mneme enforces them.
+  <strong>Mneme HQ</strong> keeps AI assistants aligned with data platform architecture by enforcing warehouse standards, naming conventions, and pipeline constraints as structured decisions. When an assistant proposes writing directly to raw tables, bypassing reporting views, or violating regional dataset rules, Mneme HQ flags the violation before any code is written â€” protecting data platform integrity in AI-assisted environments. Rules files document standards. Mneme enforces them.
 </div>
 
 <main>
@@ -286,9 +286,9 @@
   </div>
 
   <div class="hero">
-    <div class="hero-tag">Reference Architecture · Simulated Scenario</div>
+    <div class="hero-tag">Reference Architecture Â· Simulated Scenario</div>
     <h1>Keeping AI Assistants Aligned with Data Platform Architecture</h1>
-    <p class="hero-sub">Enforce warehouse standards, naming conventions, and pipeline constraints — before an AI assistant writes a single query that breaks your data contracts.</p>
+    <p class="hero-sub">Enforce warehouse standards, naming conventions, and pipeline constraints â€” before an AI assistant writes a single query that breaks your data contracts.</p>
     <div class="cta-group">
       <a href="https://github.com/TheoV823/mneme" class="btn-primary">Install Mneme HQ</a>
       <a href="https://github.com/TheoV823/mneme" class="btn-ghost">View GitHub</a>
@@ -340,13 +340,13 @@
     <div class="section-eyebrow">The Problem</div>
     <h2 class="section-title">AI assistants treat your warehouse like a blank slate.</h2>
     <p class="prose">Your data platform has hard-won conventions: raw tables are append-only, reporting views are the only read layer, regional datasets must never be joined cross-region, and column naming follows a strict schema. None of that is visible to an AI assistant generating a dbt model or a Spark job.</p>
-    <p class="prose" style="margin-top:1rem;">The result is pipelines that write directly to raw tables, queries that bypass the semantic layer, and naming violations that break downstream consumers — discovered only after data quality alerts fire.</p>
+    <p class="prose" style="margin-top:1rem;">The result is pipelines that write directly to raw tables, queries that bypass the semantic layer, and naming violations that break downstream consumers â€” discovered only after data quality alerts fire.</p>
 
     <div class="demo-panels">
       <div class="panel">
         <div class="panel-header">
           <div class="panel-dot"></div><div class="panel-dot"></div><div class="panel-dot"></div>
-          <span class="panel-label bad">Without Mneme HQ — assistant suggests:</span>
+          <span class="panel-label bad">Without Mneme HQ â€” assistant suggests:</span>
         </div>
         <div class="panel-body">
           <div class="panel-prompt">Prompt: "Add daily active users to the analytics pipeline"</div>
@@ -356,7 +356,7 @@
       <div class="panel">
         <div class="panel-header">
           <div class="panel-dot"></div><div class="panel-dot"></div><div class="panel-dot"></div>
-          <span class="panel-label good">With Mneme HQ — pre-flight check:</span>
+          <span class="panel-label good">With Mneme HQ â€” pre-flight check:</span>
         </div>
         <div class="panel-body good-response">
           <div class="panel-prompt">mneme check --mode strict</div>
@@ -428,13 +428,13 @@
     </div>
 
     <div class="code-block">
-      <div class="code-block-label">Terminal — checking a dbt model prompt</div>
+      <div class="code-block-label">Terminal â€” checking a dbt model prompt</div>
       <pre><span class="cc">$ </span><span class="ck">mneme check</span> <span class="cs">"create a DAU model that reads from raw events"</span> --tags data-platform
 
 <span class="cc">Checking against 8 data-platform decisions...</span>
 
 <span style="color:#ff7070">? FAIL</span> decision/no-writes-to-raw-tables
-  <span class="cc">Reason: Model reads from raw.* — should use staging.events source.</span>
+  <span class="cc">Reason: Model reads from raw.* â€” should use staging.events source.</span>
 <span style="color:#ff7070">? FAIL</span> decision/use-staging-layer-for-aggregations
   <span class="cc">Reason: DAU aggregation should land in marts.*, not raw.*</span>
 <span class="cs">? PASS</span> decision/column-naming-snake-case
@@ -452,16 +452,16 @@
       <div class="metric"><div class="metric-value">0</div><div class="metric-label">raw table write incidents after decision enforcement</div></div>
       <div class="metric"><div class="metric-value">~3 min</div><div class="metric-label">to encode a new warehouse standard as an enforceable decision</div></div>
     </div>
-    <div class="simulated-note">These figures are based on a simulated reference scenario — not live customer data.</div>
+    <div class="simulated-note">These figures are based on a simulated reference scenario â€” not live customer data.</div>
   </div>
 
   <div class="section-wrap">
     <div class="section-eyebrow">FAQ</div>
     <h2 class="section-title">Common questions.</h2>
-    <details><summary>Does this work with dbt, Spark, and SQL-based pipelines?</summary><div class="faq-body">Yes. Mneme HQ operates at the prompt level — it doesn't depend on your specific data tool. Whether you're generating dbt models, Spark jobs, or raw SQL, <code>mneme check</code> runs against the intent before you write any code.</div></details>
+    <details><summary>Does this work with dbt, Spark, and SQL-based pipelines?</summary><div class="faq-body">Yes. Mneme HQ operates at the prompt level â€” it doesn't depend on your specific data tool. Whether you're generating dbt models, Spark jobs, or raw SQL, <code>mneme check</code> runs against the intent before you write any code.</div></details>
     <details><summary>Can we enforce regional data isolation rules?</summary><div class="faq-body">Yes. Encode regional constraints as tagged decisions (e.g., <code>--tags gdpr,eu-region</code>) and check with <code>mneme check --tags gdpr</code> to scope enforcement to region-specific rules.</div></details>
-    <details><summary>How do we handle schema evolution — rules that change over time?</summary><div class="faq-body">Update the YAML and set the old decision to <code>status: deprecated</code>. The history is preserved; enforcement is disabled. New rules take effect immediately on the next check.</div></details>
-    <details><summary>Can data engineers without Python experience manage decisions?</summary><div class="faq-body">Yes. Decision files are plain YAML in version control. Any engineer comfortable opening a PR can add or update rules — no Python or programming required.</div></details>
+    <details><summary>How do we handle schema evolution â€” rules that change over time?</summary><div class="faq-body">Update the YAML and set the old decision to <code>status: deprecated</code>. The history is preserved; enforcement is disabled. New rules take effect immediately on the next check.</div></details>
+    <details><summary>Can data engineers without Python experience manage decisions?</summary><div class="faq-body">Yes. Decision files are plain YAML in version control. Any engineer comfortable opening a PR can add or update rules â€” no Python or programming required.</div></details>
   </div>
 
   <div class="related-wrap">

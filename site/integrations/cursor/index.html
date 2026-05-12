@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mneme HQ + Cursor — Mneme HQ</title>
-  <meta name="description" content="Keep architectural decisions in Mneme HQ. Surface them as Cursor Rules every session — with conflict resolution and versioning that .cursorrules files lack." />
+  <title>Mneme HQ + Cursor â€” Mneme HQ</title>
+  <meta name="description" content="Keep architectural decisions in Mneme HQ. Surface them as Cursor Rules every session â€” with conflict resolution and versioning that .cursorrules files lack." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/integrations/cursor/" />
@@ -12,12 +12,12 @@
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
   <meta property="og:title" content="Mneme HQ + Cursor" />
-  <meta property="og:description" content="Keep architectural decisions in Mneme HQ. Surface them as Cursor Rules every session — with conflict resolution and versioning that .cursorrules files lack." />
+  <meta property="og:description" content="Keep architectural decisions in Mneme HQ. Surface them as Cursor Rules every session â€” with conflict resolution and versioning that .cursorrules files lack." />
   <meta property="og:url" content="https://mnemehq.com/integrations/cursor/" />
   <meta property="og:image" content="https://mnemehq.com/integrations/cursor/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Mneme HQ + Cursor" />
-  <meta name="twitter:description" content="Keep architectural decisions in Mneme HQ. Surface them as Cursor Rules every session — with conflict resolution and versioning that .cursorrules files lack." />
+  <meta name="twitter:description" content="Keep architectural decisions in Mneme HQ. Surface them as Cursor Rules every session â€” with conflict resolution and versioning that .cursorrules files lack." />
   <meta name="twitter:image" content="https://mnemehq.com/integrations/cursor/og.png" />
   <meta name="author" content="Theo Valmis" />
   <meta property="article:published_time" content="2026-05-07T00:00:00Z" />
@@ -226,7 +226,7 @@
       {
         "@type": "Article",
         "headline": "Mneme HQ + Cursor",
-        "description": "Keep architectural decisions in Mneme HQ. Surface them as Cursor Rules every session — with conflict resolution and versioning that .cursorrules files lack.",
+        "description": "Keep architectural decisions in Mneme HQ. Surface them as Cursor Rules every session â€” with conflict resolution and versioning that .cursorrules files lack.",
         "url": "https://mnemehq.com/integrations/cursor/",
         "datePublished": "2026-05-07",
         "dateModified": "2026-05-07",
@@ -238,7 +238,7 @@
       {
         "@type": "FAQPage",
         "mainEntity": [
-          {"@type": "Question", "name": "Does Mneme replace Cursor Rules entirely?", "acceptedAnswer": {"@type": "Answer", "text": "No — Mneme generates the Cursor Rules file from a structured source. Cursor still reads .cursor/rules/ at session start; the difference is that the file is now a derived artifact with precedence resolution and version history rather than a manual document."}},
+          {"@type": "Question", "name": "Does Mneme replace Cursor Rules entirely?", "acceptedAnswer": {"@type": "Answer", "text": "No â€” Mneme generates the Cursor Rules file from a structured source. Cursor still reads .cursor/rules/ at session start; the difference is that the file is now a derived artifact with precedence resolution and version history rather than a manual document."}},
           {"@type": "Question", "name": "Can I edit .cursorrules directly while Mneme is in place?", "acceptedAnswer": {"@type": "Answer", "text": "You can, but the next regenerate will overwrite it. The recommended workflow is to update project_memory.json and re-run mneme cursor generate. That way the change is tracked as a decision-record edit rather than a quiet rule-file change."}},
           {"@type": "Question", "name": "Does this work with Cursor's MCP integration?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Mneme is on the roadmap to expose its decision store as an MCP server; once shipped, Cursor's MCP-aware sessions can query the corpus directly without going through the rules file."}}
         ]
@@ -280,7 +280,7 @@
     <div class="article-eyebrow">
       <span class="eyebrow-tag">Integration &middot; Cursor</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">4 min read &nbsp;·&nbsp; May 2026</span>
+      <span class="eyebrow-meta">4 min read &nbsp;Â·&nbsp; May 2026</span>
     </div>
     <h1>Mneme HQ + Cursor</h1>
     <p class="article-lede">Cursor Rules inject context into every Cursor session. Mneme HQ is where that context lives &mdash; structured, versioned, and resolved across conflicting rules before it reaches Cursor.</p>
@@ -298,19 +298,19 @@
     <h2>How it works together</h2>
 
     <ul>
-      <li>Mneme HQ stores architectural decisions in <code>.mneme/project_memory.json</code> — typed, scoped, versioned</li>
+      <li>Mneme HQ stores architectural decisions in <code>.mneme/project_memory.json</code> â€” typed, scoped, versioned</li>
       <li>A single export command generates a <code>.cursorrules</code> file from the active decision corpus</li>
-      <li>Mneme's precedence engine resolves conflicts before export — Cursor sees a clean, non-contradictory rule set</li>
+      <li>Mneme's precedence engine resolves conflicts before export â€” Cursor sees a clean, non-contradictory rule set</li>
       <li>You edit decisions in Mneme; re-export to update Cursor Rules</li>
     </ul>
 
     <h2>What Mneme adds to the workflow</h2>
 
     <ul>
-      <li><strong>Source of truth is structured JSON</strong> — not the <code>.cursorrules</code> file itself</li>
+      <li><strong>Source of truth is structured JSON</strong> â€” not the <code>.cursorrules</code> file itself</li>
       <li><strong>Conflict resolution happens in Mneme</strong> before Cursor ever sees the rules</li>
-      <li>Decisions carry <code>rationale</code>, <code>supersedes</code>, and <code>status</code> fields — <code>.cursorrules</code> carries none of this</li>
-      <li>When you add Claude Code to the stack, Mneme's hook-level enforcement applies automatically — no migration</li>
+      <li>Decisions carry <code>rationale</code>, <code>supersedes</code>, and <code>status</code> fields â€” <code>.cursorrules</code> carries none of this</li>
+      <li>When you add Claude Code to the stack, Mneme's hook-level enforcement applies automatically â€” no migration</li>
     </ul>
 
     <h2>Setup</h2>
@@ -324,7 +324,7 @@ mneme export --format cursor-rules > .cursorrules</code></pre>
     <ol>
       <li>Record decisions via <code>/mneme-record</code> (Claude Code) or edit <code>project_memory.json</code> directly</li>
       <li>Re-export before opening Cursor: <code>mneme export --format cursor-rules &gt; .cursorrules</code></li>
-      <li>Commit both files — Mneme corpus is the source, <code>.cursorrules</code> is the derived surface</li>
+      <li>Commit both files â€” Mneme corpus is the source, <code>.cursorrules</code> is the derived surface</li>
     </ol>
 
     <h2>If you use Cursor and Claude Code</h2>
@@ -334,7 +334,7 @@ mneme export --format cursor-rules > .cursorrules</code></pre>
     <ul>
       <li>Cursor sessions use the <code>.cursorrules</code> export for context injection</li>
       <li>Claude Code sessions use the PreToolUse hook for enforcement</li>
-      <li>Both draw from the same Mneme corpus — one authoritative source, two surfaces</li>
+      <li>Both draw from the same Mneme corpus â€” one authoritative source, two surfaces</li>
     </ul>
 
     <div class="callout">
@@ -384,7 +384,7 @@ mneme export --format cursor-rules > .cursorrules</code></pre>
 
     <div class="cta-block">
       <h3>One corpus. Every AI editor.</h3>
-      <p>Maintain decisions in Mneme HQ. Export to Cursor Rules, enforce via Claude Code hooks — same source of truth, no duplication.</p>
+      <p>Maintain decisions in Mneme HQ. Export to Cursor Rules, enforce via Claude Code hooks â€” same source of truth, no duplication.</p>
       <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
       <a href="/compare/cursor-rules/" class="cta-secondary">See full comparison: Mneme HQ vs Cursor Rules &rarr;</a>
     </div>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mneme vs Cursor Rules — Mneme HQ</title>
+  <title>Mneme vs Cursor Rules â€” Mneme HQ</title>
   <meta name="description" content="Cursor Rules are per-repo text files. Mneme HQ is a structured decision memory with a precedence engine and hook-level enforcement. The comparison that matters." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
@@ -284,7 +284,7 @@
 
 <main>
 <div class="answer-capsule" style="max-width:820px;margin:0 auto;padding:1.5rem 2rem;background:var(--surface);border-bottom:1px solid rgba(200,240,96,0.18);font-size:0.88rem;color:var(--muted);line-height:1.8;">
-  <strong style="color:var(--accent);">Mneme HQ vs Cursor Rules.</strong> Cursor Rules are per-repo prompt files that describe preferences to the model. Mneme HQ is the architectural governance layer — it compiles decisions into enforceable constraints, retrieves them at prompt time based on what the agent is doing, and validates outputs against them. Rules files document standards. Mneme enforces them.
+  <strong style="color:var(--accent);">Mneme HQ vs Cursor Rules.</strong> Cursor Rules are per-repo prompt files that describe preferences to the model. Mneme HQ is the architectural governance layer â€” it compiles decisions into enforceable constraints, retrieves them at prompt time based on what the agent is doing, and validates outputs against them. Rules files document standards. Mneme enforces them.
 </div>
 <nav aria-label="Breadcrumb" class="breadcrumb-nav">
   <ol class="breadcrumb">
@@ -298,10 +298,10 @@
     <div class="article-eyebrow">
       <span class="eyebrow-tag">Comparative</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">5 min read &nbsp;·&nbsp; May 2026</span>
+      <span class="eyebrow-meta">5 min read &nbsp;Â·&nbsp; May 2026</span>
     </div>
     <h1>Mneme vs Cursor Rules</h1>
-    <p class="article-lede">Both inject context into AI coding sessions. They solve different problems. Here's how they differ — and when the difference matters.</p>
+    <p class="article-lede">Both inject context into AI coding sessions. They solve different problems. Here's how they differ â€” and when the difference matters.</p>
     <p class="byline">
       By <a href="/founder/">Theo Valmis</a>
       <span class="sep">&middot;</span>
@@ -319,7 +319,7 @@
       <li>Per-repo <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.cursorrules</code> file (plain text instructions)</li>
       <li>Injected as system prompt preamble by Cursor</li>
       <li>Written manually, no schema, no version control enforcement</li>
-      <li>Single file per repo — same rules applied everywhere regardless of context</li>
+      <li>Single file per repo â€” same rules applied everywhere regardless of context</li>
       <li>The model can still ignore them</li>
     </ul>
 
@@ -342,17 +342,17 @@
         </tr>
         <tr>
           <td>Enforcement</td>
-          <td>Suggestion — model can ignore</td>
+          <td>Suggestion â€” model can ignore</td>
           <td>Hook-level blocking on Edit/Write operations</td>
         </tr>
         <tr>
           <td>Scope</td>
-          <td>Whole repo — same rules everywhere</td>
+          <td>Whole repo â€” same rules everywhere</td>
           <td>Per-file pattern matching (e.g. <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">services/payments/**</code>)</td>
         </tr>
         <tr>
           <td>Conflict resolution</td>
-          <td>None — you manage conflicts manually</td>
+          <td>None â€” you manage conflicts manually</td>
           <td>Precedence engine resolves conflicts deterministically</td>
         </tr>
         <tr>
@@ -374,7 +374,7 @@
     <ul>
       <li>Single developer, single repo, no enforcement requirement</li>
       <li>Rules that apply uniformly to every file in the project</li>
-      <li>Suggestions are fine — you don't need a violation to actually block</li>
+      <li>Suggestions are fine â€” you don't need a violation to actually block</li>
       <li>No multi-agent workflows, no conflicting rule sets</li>
     </ul>
 
@@ -385,14 +385,14 @@
       <li>Service-boundary-specific rules (payments team has different storage rules than analytics)</li>
       <li>You need a violation to be stopped, not merely suggested against</li>
       <li>Rules conflict (org policy vs. team exception) and you need deterministic resolution rather than model judgment</li>
-      <li>Decision history matters — when a rule changed, why it changed, what it superseded</li>
+      <li>Decision history matters â€” when a rule changed, why it changed, what it superseded</li>
     </ul>
 
     <h2>The fundamental distinction</h2>
 
     <p><strong>Cursor Rules are configuration. Mneme HQ is enforcement.</strong></p>
 
-    <p>The distinction matters when the cost of a violation is more than a PR comment — when an architectural boundary is crossed, a compliance rule is broken, or a service dependency is introduced that will take a quarter to untangle.</p>
+    <p>The distinction matters when the cost of a violation is more than a PR comment â€” when an architectural boundary is crossed, a compliance rule is broken, or a service dependency is introduced that will take a quarter to untangle.</p>
 
   </div>
 
@@ -431,8 +431,8 @@
       <h3>Mneme HQ enforces architectural decisions at the source</h3>
       <p>Structured decision schema, deterministic precedence engine, and hook-level enforcement for Claude Code. Open source.</p>
       <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub ?</a>
-      <a href="/compare/cursor-rules/" style="display:block;margin-top:0.75rem;font-size:0.82rem;color:var(--muted);text-decoration:none;">Mneme HQ vs Cursor Rules — full comparison ?</a>
-      <a href="/integrations/cursor/" style="display:block;margin-top:0.5rem;font-size:0.82rem;color:var(--muted);text-decoration:none;">Mneme + Cursor — integration guide ?</a>
+      <a href="/compare/cursor-rules/" style="display:block;margin-top:0.75rem;font-size:0.82rem;color:var(--muted);text-decoration:none;">Mneme HQ vs Cursor Rules â€” full comparison ?</a>
+      <a href="/integrations/cursor/" style="display:block;margin-top:0.5rem;font-size:0.82rem;color:var(--muted);text-decoration:none;">Mneme + Cursor â€” integration guide ?</a>
     </div>
   </footer>
 </article>

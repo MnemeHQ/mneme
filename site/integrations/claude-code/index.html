@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Governing Claude Code Workflows — Mneme HQ</title>
-  <meta name="description" content="Mneme HQ hooks into every Edit, Write, and MultiEdit Claude Code attempts — intercepting architectural violations before they reach your codebase. Zero setup." />
+  <title>Governing Claude Code Workflows â€” Mneme HQ</title>
+  <meta name="description" content="Mneme HQ hooks into every Edit, Write, and MultiEdit Claude Code attempts â€” intercepting architectural violations before they reach your codebase. Zero setup." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/integrations/claude-code/" />
@@ -12,12 +12,12 @@
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
   <meta property="og:title" content="Governing Claude Code Workflows" />
-  <meta property="og:description" content="Mneme HQ hooks into every Edit, Write, and MultiEdit Claude Code attempts — intercepting architectural violations before they reach your codebase. Zero setup." />
+  <meta property="og:description" content="Mneme HQ hooks into every Edit, Write, and MultiEdit Claude Code attempts â€” intercepting architectural violations before they reach your codebase. Zero setup." />
   <meta property="og:url" content="https://mnemehq.com/integrations/claude-code/" />
   <meta property="og:image" content="https://mnemehq.com/integrations/claude-code/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Governing Claude Code Workflows" />
-  <meta name="twitter:description" content="Mneme HQ hooks into every Edit, Write, and MultiEdit Claude Code attempts — intercepting architectural violations before they reach your codebase. Zero setup." />
+  <meta name="twitter:description" content="Mneme HQ hooks into every Edit, Write, and MultiEdit Claude Code attempts â€” intercepting architectural violations before they reach your codebase. Zero setup." />
   <meta name="twitter:image" content="https://mnemehq.com/integrations/claude-code/og.png" />
   <meta name="author" content="Theo Valmis" />
   <meta property="article:published_time" content="2026-05-07T00:00:00Z" />
@@ -238,7 +238,7 @@
       {
         "@type": "Article",
         "headline": "Governing Claude Code Workflows",
-        "description": "Mneme HQ hooks into every Edit, Write, and MultiEdit Claude Code attempts — intercepting architectural violations before they reach your codebase.",
+        "description": "Mneme HQ hooks into every Edit, Write, and MultiEdit Claude Code attempts â€” intercepting architectural violations before they reach your codebase.",
         "url": "https://mnemehq.com/integrations/claude-code/",
         "datePublished": "2026-05-07",
         "dateModified": "2026-05-07",
@@ -250,9 +250,9 @@
       {
         "@type": "FAQPage",
         "mainEntity": [
-          {"@type": "Question", "name": "How is the Mneme hook different from CLAUDE.md?", "acceptedAnswer": {"@type": "Answer", "text": "CLAUDE.md is static context: text injected at session start that the model is asked to respect. The Mneme hook runs as a PreToolUse hook — it intercepts every Edit, Write, and MultiEdit before they touch the filesystem and can return exit code 2 to block the operation outright. CLAUDE.md is advisory; the hook is enforcement. The two are complementary: CLAUDE.md gives the model context, Mneme blocks violations regardless of whether the model attended to that context."}},
+          {"@type": "Question", "name": "How is the Mneme hook different from CLAUDE.md?", "acceptedAnswer": {"@type": "Answer", "text": "CLAUDE.md is static context: text injected at session start that the model is asked to respect. The Mneme hook runs as a PreToolUse hook â€” it intercepts every Edit, Write, and MultiEdit before they touch the filesystem and can return exit code 2 to block the operation outright. CLAUDE.md is advisory; the hook is enforcement. The two are complementary: CLAUDE.md gives the model context, Mneme blocks violations regardless of whether the model attended to that context."}},
           {"@type": "Question", "name": "Does the hook slow down Claude Code sessions?", "acceptedAnswer": {"@type": "Answer", "text": "The retriever is deterministic keyword scoring with no embedding model and no vector store, so per-call latency is in the low milliseconds for typical projects. The hook runs locally; there is no network round trip. For projects with very large decision corpora, scope filters and tag indices keep retrieval bounded."}},
-          {"@type": "Question", "name": "What happens if Mneme itself fails?", "acceptedAnswer": {"@type": "Answer", "text": "The hook is designed fail-open: if the Mneme process errors, returns invalid output, or times out, Claude Code is allowed to proceed rather than being blocked. This is a deliberate safety choice — a broken governance layer should not lock the team out of editing their codebase. Strict mode (mneme check --mode strict) in CI is where hard-blocking lives; the editor-time hook prioritizes availability."}},
+          {"@type": "Question", "name": "What happens if Mneme itself fails?", "acceptedAnswer": {"@type": "Answer", "text": "The hook is designed fail-open: if the Mneme process errors, returns invalid output, or times out, Claude Code is allowed to proceed rather than being blocked. This is a deliberate safety choice â€” a broken governance layer should not lock the team out of editing their codebase. Strict mode (mneme check --mode strict) in CI is where hard-blocking lives; the editor-time hook prioritizes availability."}},
           {"@type": "Question", "name": "Can I use the hook without committing project_memory.json?", "acceptedAnswer": {"@type": "Answer", "text": "Technically yes, but you lose the value. The decision corpus is the source of truth; committing it to the repo means every team member sees the same enforcement, and changes to architectural rules show up in PR review like any other change. Local-only memory recreates the per-engineer drift problem the layer exists to solve."}}
         ]
       },
@@ -304,7 +304,7 @@
     <div class="article-eyebrow">
       <span class="eyebrow-tag">Integration &middot; Claude Code</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">6 min read &nbsp;·&nbsp; May 2026</span>
+      <span class="eyebrow-meta">6 min read &nbsp;Â·&nbsp; May 2026</span>
     </div>
     <h1>Governing Claude Code Workflows</h1>
     <p class="article-lede">Mneme HQ registers a PreToolUse hook with Claude Code. Every Edit, Write, and MultiEdit is intercepted before it reaches disk &mdash; violations surface the decision id as feedback and exit 2 (block). Claude Code adjusts its approach without manual intervention.</p>
@@ -329,7 +329,7 @@
   content = reconstruct_full_file(tool_input)
   result  = mneme check --file &lt;path&gt; &lt;content&gt;
   if result.violation:
-    exit 2   # block — surfaces decision_id to Claude Code
+    exit 2   # block â€” surfaces decision_id to Claude Code
   else:
     exit 0   # allow</code></pre>
 
@@ -347,15 +347,15 @@
       <li>
         <strong>Initialise project memory (if you don't have one yet)</strong>
         <pre><code>mkdir .mneme
-# Create .mneme/project_memory.json — see examples/project_memory.json for the schema.</code></pre>
+# Create .mneme/project_memory.json â€” see examples/project_memory.json for the schema.</code></pre>
       </li>
       <li>
         <strong>Run the installer</strong>
-        <p>Project-scoped (recommended — only affects this project):</p>
+        <p>Project-scoped (recommended â€” only affects this project):</p>
         <pre><code>python scripts/install_claude_code.py</code></pre>
         <p>User-scoped (applies to all Claude Code sessions):</p>
         <pre><code>python scripts/install_claude_code.py --user</code></pre>
-        <p>The installer is idempotent — safe to run again after updates.</p>
+        <p>The installer is idempotent â€” safe to run again after updates.</p>
       </li>
       <li>
         <strong>Verify</strong>
@@ -427,13 +427,13 @@
 
     <h2>Retrieval: what the hook checks and what it misses</h2>
 
-    <p>The hook query is <code>"edit to &lt;file_path&gt;"</code> — tokens from the target file name determine which decisions are retrieved and checked. Decisions are scored by keyword overlap between the query and their <code>scope</code>, <code>id</code>, decision text, and anti-pattern fields.</p>
+    <p>The hook query is <code>"edit to &lt;file_path&gt;"</code> â€” tokens from the target file name determine which decisions are retrieved and checked. Decisions are scored by keyword overlap between the query and their <code>scope</code>, <code>id</code>, decision text, and anti-pattern fields.</p>
 
     <p><strong>What this means in practice:</strong></p>
 
     <ul>
-      <li>A decision with <code>scope: ["storage", "database"]</code> and a file named <code>storage_layer.py</code> will reliably be retrieved — "storage" appears in both the query and the scope.</li>
-      <li>The same decision may <strong>not</strong> be retrieved for an edit to <code>models.py</code> — neither token overlaps with the scope.</li>
+      <li>A decision with <code>scope: ["storage", "database"]</code> and a file named <code>storage_layer.py</code> will reliably be retrieved â€” "storage" appears in both the query and the scope.</li>
+      <li>The same decision may <strong>not</strong> be retrieved for an edit to <code>models.py</code> â€” neither token overlaps with the scope.</li>
       <li>Generic file names like <code>utils.py</code> or <code>helpers.py</code> will rarely retrieve any decisions at all.</li>
     </ul>
 
@@ -453,7 +453,7 @@
 
     <ul>
       <li><code>mneme</code> is not found on <code>$PATH</code></li>
-      <li>The target file cannot be read (common for Write — the file doesn't exist yet)</li>
+      <li>The target file cannot be read (common for Write â€” the file doesn't exist yet)</li>
       <li><code>mneme check</code> times out (limit: 10 s)</li>
       <li>Any other OS-level error occurs</li>
     </ul>
@@ -472,7 +472,7 @@
     <h3>Hook fires but nothing is blocked</h3>
     <ul>
       <li>Confirm <code>.mneme/project_memory.json</code> exists in the project root (or a parent directory).</li>
-      <li>Check your decision scope keywords against the file names being edited — see the retrieval section above.</li>
+      <li>Check your decision scope keywords against the file names being edited â€” see the retrieval section above.</li>
       <li>Switch to warn mode temporarily and check stderr output from <code>mneme-hook</code> for clues.</li>
     </ul>
 

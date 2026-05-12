@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Design System Governance — Mneme HQ</title>
-  <meta name="description" content="How Mneme HQ preserves design system and UX decisions for AI builders — preventing LLMs from violating design tokens, component hierarchy, and accessibility rules when generating UI code." />
+  <title>Design System Governance â€” Mneme HQ</title>
+  <meta name="description" content="How Mneme HQ preserves design system and UX decisions for AI builders â€” preventing LLMs from violating design tokens, component hierarchy, and accessibility rules when generating UI code." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/use-cases/design-system-governance/" />
@@ -236,7 +236,7 @@
         {
           "@type": "Question",
           "name": "Does this expand Mneme HQ beyond backend engineering?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Design system governance is one of the clearest examples of Mneme HQ's value for frontend and full-stack teams. Any discipline with enforced conventions — design, data, security — benefits from the same decision-enforcement model." }
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Design system governance is one of the clearest examples of Mneme HQ's value for frontend and full-stack teams. Any discipline with enforced conventions â€” design, data, security â€” benefits from the same decision-enforcement model." }
         },
         {
           "@type": "Question",
@@ -245,13 +245,13 @@
         },
         {
           "@type": "Question",
-          "name": "How do we handle design system evolution — new components, deprecated ones?",
+          "name": "How do we handle design system evolution â€” new components, deprecated ones?",
           "acceptedAnswer": { "@type": "Answer", "text": "Update the YAML. Set old decisions to status: deprecated to stop enforcing them. Add new decisions for new components. The version history in git serves as your audit trail of design system changes." }
         },
         {
           "@type": "Question",
           "name": "Does this work with Tailwind, CSS Modules, and CSS-in-JS?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Mneme HQ enforces intent, not implementation. Your decisions describe what's allowed — the AI assistant uses whatever styling approach your project uses, constrained by those rules." }
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Mneme HQ enforces intent, not implementation. Your decisions describe what's allowed â€” the AI assistant uses whatever styling approach your project uses, constrained by those rules." }
         }
       ]
     }
@@ -286,7 +286,7 @@
   </div>
 
   <div class="hero">
-    <div class="hero-tag">Reference Architecture · Simulated Scenario</div>
+    <div class="hero-tag">Reference Architecture Â· Simulated Scenario</div>
     <h1>Using Mneme HQ to Preserve Design System Decisions for AI Builders</h1>
     <p class="hero-sub">Stop AI assistants from inventing colors, breaking component hierarchy, and ignoring accessibility rules every time they generate a UI.</p>
     <div class="cta-group">
@@ -339,14 +339,14 @@
   <div class="section-wrap">
     <div class="section-eyebrow">The Problem</div>
     <h2 class="section-title">AI-generated UI ignores your design system every session.</h2>
-    <p class="prose">Your design system defines which colors are approved, which components must be used for which patterns, how spacing works, and what accessibility requirements apply. An AI assistant generating JSX has no awareness of any of it — it invents inline styles, reaches for arbitrary Tailwind classes, skips ARIA attributes, and creates one-off components instead of using existing ones.</p>
+    <p class="prose">Your design system defines which colors are approved, which components must be used for which patterns, how spacing works, and what accessibility requirements apply. An AI assistant generating JSX has no awareness of any of it â€” it invents inline styles, reaches for arbitrary Tailwind classes, skips ARIA attributes, and creates one-off components instead of using existing ones.</p>
     <p class="prose" style="margin-top:1rem;">Design system violations are expensive to catch in review and easy to miss entirely. They accumulate into inconsistent UIs that erode user trust and multiply future remediation work.</p>
 
     <div class="demo-panels">
       <div class="panel">
         <div class="panel-header">
           <div class="panel-dot"></div><div class="panel-dot"></div><div class="panel-dot"></div>
-          <span class="panel-label bad">Without Mneme HQ — assistant generates:</span>
+          <span class="panel-label bad">Without Mneme HQ â€” assistant generates:</span>
         </div>
         <div class="panel-body">
           <div class="panel-prompt">Prompt: "Add a confirmation modal for account deletion"</div>
@@ -356,7 +356,7 @@
       <div class="panel">
         <div class="panel-header">
           <div class="panel-dot"></div><div class="panel-dot"></div><div class="panel-dot"></div>
-          <span class="panel-label good">With Mneme HQ — pre-flight check:</span>
+          <span class="panel-label good">With Mneme HQ â€” pre-flight check:</span>
         </div>
         <div class="panel-body good-response">
           <div class="panel-prompt">mneme check --mode strict</div>
@@ -394,7 +394,7 @@
     <div class="steps">
       <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Encode design system rules as decisions</h4><p>Capture approved tokens, required components, spacing rules, and accessibility requirements as structured YAML decisions.</p></div></div>
       <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Check before generating UI code</h4><p>Run <code>mneme check</code> against your UI prompt. Relevant design decisions are retrieved and any violations flagged immediately.</p></div></div>
-      <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Inject design rules into assistant context</h4><p>Generate a rules file for Cursor or Claude Code that includes your design system constraints — so every UI generation session is token-aware.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Inject design rules into assistant context</h4><p>Generate a rules file for Cursor or Claude Code that includes your design system constraints â€” so every UI generation session is token-aware.</p></div></div>
       <div class="step"><div class="step-num">4</div><div class="step-body"><h4>Gate frontend PRs on design compliance</h4><p>Add <code>mneme check --mode strict --tags design-system</code> to CI. PRs introducing unapproved tokens or missing accessibility attributes fail automatically.</p></div></div>
     </div>
   </div>
@@ -429,7 +429,7 @@
     </div>
 
     <div class="code-block">
-      <div class="code-block-label">Terminal — checking a UI generation prompt</div>
+      <div class="code-block-label">Terminal â€” checking a UI generation prompt</div>
       <pre><span class="cc">$ </span><span class="ck">mneme check</span> <span class="cs">"add a delete account confirmation modal"</span> --tags design-system
 
 <span class="cc">Checking against 12 design-system decisions...</span>
@@ -452,16 +452,16 @@
       <div class="metric"><div class="metric-value">100%</div><div class="metric-label">of captured design rules enforced automatically in CI</div></div>
       <div class="metric"><div class="metric-value">Fewer</div><div class="metric-label">design review comments on token and accessibility violations after enforcement</div></div>
     </div>
-    <div class="simulated-note">These figures are based on a simulated reference scenario — not live customer data.</div>
+    <div class="simulated-note">These figures are based on a simulated reference scenario â€” not live customer data.</div>
   </div>
 
   <div class="section-wrap">
     <div class="section-eyebrow">FAQ</div>
     <h2 class="section-title">Common questions.</h2>
-    <details><summary>Does this expand Mneme HQ beyond backend engineering?</summary><div class="faq-body">Yes. Design system governance is one of the clearest examples of Mneme HQ's value for frontend and full-stack teams. Any discipline with enforced conventions — design, data, security — benefits from the same decision-enforcement model.</div></details>
+    <details><summary>Does this expand Mneme HQ beyond backend engineering?</summary><div class="faq-body">Yes. Design system governance is one of the clearest examples of Mneme HQ's value for frontend and full-stack teams. Any discipline with enforced conventions â€” design, data, security â€” benefits from the same decision-enforcement model.</div></details>
     <details><summary>Can designers manage decisions without engineering involvement?</summary><div class="faq-body">Yes. Decision YAML files are plain text in version control. Designers can open PRs to add token rules, component requirements, or accessibility constraints without writing any code.</div></details>
-    <details><summary>How do we handle design system evolution — new components, deprecated ones?</summary><div class="faq-body">Update the YAML. Set old decisions to <code>status: deprecated</code> to stop enforcing them. Add new decisions for new components. The version history in git serves as your audit trail of design system changes.</div></details>
-    <details><summary>Does this work with Tailwind, CSS Modules, and CSS-in-JS?</summary><div class="faq-body">Yes. Mneme HQ enforces intent, not implementation. Your decisions describe what's allowed — the AI assistant uses whatever styling approach your project uses, constrained by those rules.</div></details>
+    <details><summary>How do we handle design system evolution â€” new components, deprecated ones?</summary><div class="faq-body">Update the YAML. Set old decisions to <code>status: deprecated</code> to stop enforcing them. Add new decisions for new components. The version history in git serves as your audit trail of design system changes.</div></details>
+    <details><summary>Does this work with Tailwind, CSS Modules, and CSS-in-JS?</summary><div class="faq-body">Yes. Mneme HQ enforces intent, not implementation. Your decisions describe what's allowed â€” the AI assistant uses whatever styling approach your project uses, constrained by those rules.</div></details>
   </div>
 
   <div class="related-wrap">

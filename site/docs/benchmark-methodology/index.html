@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Benchmark Methodology Philosophy — Mneme HQ</title>
+  <title>Benchmark Methodology Philosophy â€” Mneme HQ</title>
   <meta name="description" content="Why the Mneme governance benchmark is deterministic, why recall@1 is reported but not optimized, and what Mneme intentionally does not solve. Layer 1 freeze framing." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
@@ -14,14 +14,14 @@
   <!-- Open Graph -->
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Benchmark Methodology Philosophy — Mneme HQ" />
+  <meta property="og:title" content="Benchmark Methodology Philosophy â€” Mneme HQ" />
   <meta property="og:description" content="Why Mneme's governance benchmark is intentionally constrained instead of accidentally weak. Determinism, reproducibility, and what the benchmark explicitly does not prove." />
   <meta property="og:url" content="https://mnemehq.com/docs/benchmark-methodology/" />
   <meta property="og:image" content="https://mnemehq.com/og.png" />
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Benchmark Methodology Philosophy — Mneme HQ" />
+  <meta name="twitter:title" content="Benchmark Methodology Philosophy â€” Mneme HQ" />
   <meta name="twitter:description" content="Why Mneme's governance benchmark is intentionally constrained instead of accidentally weak." />
   <meta name="twitter:image" content="https://mnemehq.com/og.png" />
 
@@ -449,7 +449,7 @@
   <div class="doc-meta byline">
     <span><strong>Published</strong> <time datetime="2026-05-10">May 10, 2026</time></span>
     <span><strong>Updated</strong> <time datetime="2026-05-10">May 10, 2026</time></span>
-    <span><strong>Phase</strong> Layer 1 — validation</span>
+    <span><strong>Phase</strong> Layer 1 â€” validation</span>
     <span><strong>Anchor</strong> e73ff7d</span>
   </div>
   <p class="doc-lede">
@@ -464,7 +464,7 @@
     LLMs are nondeterministic. A benchmark whose numbers vary between runs cannot detect a regression in the part of the system that Mneme actually owns: retrieval and enforcement against governed decisions. So Mneme's benchmark deliberately collapses the nondeterminism. Canned responses replace live model calls. Retrieval is bag-of-tokens with stable sort and explicit tiebreak. Enforcement is rule-text matching against retrieved decisions. The same memory and the same query produce byte-identical retrieval order on every run.
   </p>
   <p>
-    The job of the benchmark is not to prove that Mneme is smart. It is to prove that every change to retrieval or enforcement is <em>visible</em> and <em>reproducible</em> — that a regression cannot land silently, that a PASS cannot be coincidence, and that the numbers reported externally cannot drift away from what the code actually does.
+    The job of the benchmark is not to prove that Mneme is smart. It is to prove that every change to retrieval or enforcement is <em>visible</em> and <em>reproducible</em> â€” that a regression cannot land silently, that a PASS cannot be coincidence, and that the numbers reported externally cannot drift away from what the code actually does.
   </p>
 
   <h2 id="deterministic-governance">Deterministic governance</h2>
@@ -523,7 +523,7 @@
       <strong>This is the part that matters.</strong> recall@1 is the sharpest tuning dial under fixed methodology. Promoting it into the suite headline would make tuning weights to move recall@1 a continuous temptation. With seven scenarios and an eleven-decision pool, any further tuning would fit the suite, not the world.
     </p>
     <p>
-      So recall@1 is tracked and reported transparently — and explicitly excluded from pass/fail and any external scorecard. It is anti-overfitting discipline made visible.
+      So recall@1 is tracked and reported transparently â€” and explicitly excluded from pass/fail and any external scorecard. It is anti-overfitting discipline made visible.
     </p>
   </div>
   <p>
@@ -535,7 +535,7 @@
 
   <h2 id="not-solved">What Mneme intentionally does not solve</h2>
   <p>
-    A wedge is only meaningful if its boundary is explicit. The following are not on Mneme's roadmap. They are not "later" — they are <em>not Mneme</em>:
+    A wedge is only meaningful if its boundary is explicit. The following are not on Mneme's roadmap. They are not "later" â€” they are <em>not Mneme</em>:
   </p>
   <ul>
     <li><strong>Generalized agent memory.</strong> Mneme is not a vector store, not a conversational memory, not an "AI memory" product.</li>
@@ -548,12 +548,12 @@
     <li><strong>Auto-fixing code.</strong> Mneme does not edit code. It blocks. The human or the model fixes.</li>
   </ul>
   <p>
-    If a feature request maps onto this list, the answer is no — not "later," not "out of scope for now," but <em>not Mneme</em>.
+    If a feature request maps onto this list, the answer is no â€” not "later," not "out of scope for now," but <em>not Mneme</em>.
   </p>
 
   <h2 id="layer-1">Layer 1 framing</h2>
   <p>
-    Mneme is currently in Layer 1 — local-repo, single-developer, project-scoped architectural governance. The mechanism is frozen at <em>e73ff7d</em>. The validation phase tests the mechanism in real repos with real users; it does not extend the mechanism. Layer 2 territory (multi-repo, team sync, org policy distribution) opens only after Layer 1 exit criteria are met.
+    Mneme is currently in Layer 1 â€” local-repo, single-developer, project-scoped architectural governance. The mechanism is frozen at <em>e73ff7d</em>. The validation phase tests the mechanism in real repos with real users; it does not extend the mechanism. Layer 2 territory (multi-repo, team sync, org policy distribution) opens only after Layer 1 exit criteria are met.
   </p>
   <p>
     This page is a public summary of the philosophy. The full architectural freeze artifact lives in the repo at <a href="https://github.com/TheoV823/mneme/blob/main/docs/architecture/layer1-freeze-e73ff7d.md">docs/architecture/layer1-freeze-e73ff7d.md</a>. The full methodology specification with metric definitions, suite composition, verdict thresholds, and reproducibility protocol lives at <a href="/benchmark/">/benchmark/</a>.
@@ -564,9 +564,9 @@
     If you are evaluating Mneme as a design partner, technical buyer, or contributor, the artifacts to look at are:
   </p>
   <ul>
-    <li>The <strong>discipline</strong> shown by the freeze — refusing to promote recall@1, pinning the tie-order, splitting symmetry into its own PR.</li>
-    <li>The <strong>auditability</strong> of every PASS — which decision matched, which rule triggered, which term in the input fired it.</li>
-    <li>The <strong>reproducibility</strong> of the suite — same memory plus same query yields byte-identical retrieval order.</li>
+    <li>The <strong>discipline</strong> shown by the freeze â€” refusing to promote recall@1, pinning the tie-order, splitting symmetry into its own PR.</li>
+    <li>The <strong>auditability</strong> of every PASS â€” which decision matched, which rule triggered, which term in the input fired it.</li>
+    <li>The <strong>reproducibility</strong> of the suite â€” same memory plus same query yields byte-identical retrieval order.</li>
   </ul>
   <p>
     Mneme is not competing on eval-score inflation, model-performance leaderboards, or coding-benchmark culture. The competition is architectural continuity, governance reliability, reproducibility, and deterministic enforcement. The benchmark methodology exists to make those claims falsifiable.

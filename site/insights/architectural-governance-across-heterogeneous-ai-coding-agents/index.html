@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Architectural Governance Across Heterogeneous AI Coding Agents — Mneme HQ</title>
-  <meta name="description" content="Most engineering orgs run multiple AI coding tools — Claude Code, Cursor, Copilot, Windsurf, SDK agents — against one codebase. Per-tool memory fails at the seams." />
+  <title>Architectural Governance Across Heterogeneous AI Coding Agents â€” Mneme HQ</title>
+  <meta name="description" content="Most engineering orgs run multiple AI coding tools â€” Claude Code, Cursor, Copilot, Windsurf, SDK agents â€” against one codebase. Per-tool memory fails at the seams." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/insights/architectural-governance-across-heterogeneous-ai-coding-agents/" />
@@ -12,12 +12,12 @@
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
   <meta property="og:title" content="Architectural Governance Across Heterogeneous AI Coding Agents" />
-  <meta property="og:description" content="Most engineering orgs run multiple AI coding tools — Claude Code, Cursor, Copilot, Windsurf, SDK agents — against one codebase. Per-tool memory fails at the seams." />
+  <meta property="og:description" content="Most engineering orgs run multiple AI coding tools â€” Claude Code, Cursor, Copilot, Windsurf, SDK agents â€” against one codebase. Per-tool memory fails at the seams." />
   <meta property="og:url" content="https://mnemehq.com/insights/architectural-governance-across-heterogeneous-ai-coding-agents/" />
   <meta property="og:image" content="https://mnemehq.com/insights/architectural-governance-across-heterogeneous-ai-coding-agents/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Architectural Governance Across Heterogeneous AI Coding Agents" />
-  <meta name="twitter:description" content="Most engineering orgs run multiple AI coding tools — Claude Code, Cursor, Copilot, Windsurf, SDK agents — against one codebase. Per-tool memory fails at the seams." />
+  <meta name="twitter:description" content="Most engineering orgs run multiple AI coding tools â€” Claude Code, Cursor, Copilot, Windsurf, SDK agents â€” against one codebase. Per-tool memory fails at the seams." />
   <meta name="twitter:image" content="https://mnemehq.com/insights/architectural-governance-across-heterogeneous-ai-coding-agents/og.png" />
   <meta name="author" content="Theo Valmis" />
   <meta property="article:published_time" content="2026-05-09T00:00:00Z" />
@@ -267,7 +267,7 @@
       {
         "@type": "Article",
         "headline": "Architectural Governance Across Heterogeneous AI Coding Agents",
-        "description": "Most engineering orgs run multiple AI coding tools — Claude Code, Cursor, Copilot, Windsurf, SDK agents — against one codebase. Per-tool memory fails at the seams.",
+        "description": "Most engineering orgs run multiple AI coding tools â€” Claude Code, Cursor, Copilot, Windsurf, SDK agents â€” against one codebase. Per-tool memory fails at the seams.",
         "url": "https://mnemehq.com/insights/architectural-governance-across-heterogeneous-ai-coding-agents/",
         "datePublished": "2026-05-09",
         "dateModified": "2026-05-09",
@@ -282,10 +282,10 @@
           {"@type": "Question", "name": "Is this only a problem for large engineering orgs?", "acceptedAnswer": {"@type": "Answer", "text": "No, but the pain compounds with team size. A two-engineer team using both Cursor and Claude Code can keep rule files aligned manually. With multiple repos, several engineers, and any async agent, the cost of maintaining duplicated per-tool memory exceeds the cost of running a shared decision store."}},
           {"@type": "Question", "name": "Doesn't AGENTS.md already solve this?", "acceptedAnswer": {"@type": "Answer", "text": "AGENTS.md solves the static-instructions-in-a-portable-format problem and Mneme treats it as a first-class export target. It does not solve precedence between conflicting decisions, scope-aware injection, or pre-generation enforcement. A markdown file is read; it is not queried and it is not an enforcement point."}},
           {"@type": "Question", "name": "How does MCP fit in?", "acceptedAnswer": {"@type": "Answer", "text": "MCP is the substrate. Exposing a decision store as an MCP server makes it queryable by any MCP-aware client without per-tool integration. The governance schema, precedence rules, and enforcement layer still need to live somewhere. MCP solves connectivity, not content."}},
-          {"@type": "Question", "name": "What does NIST's work mean for engineering teams today?", "acceptedAnswer": {"@type": "Answer", "text": "Near term, limited operational impact — the initiative is in RFI / concept-paper / listening-session phase. Medium term, identity and authorization patterns harden first, followed by audit and behavioral controls. Regulated industries should track it; others can treat it as a multi-year tailwind."}},
+          {"@type": "Question", "name": "What does NIST's work mean for engineering teams today?", "acceptedAnswer": {"@type": "Answer", "text": "Near term, limited operational impact â€” the initiative is in RFI / concept-paper / listening-session phase. Medium term, identity and authorization patterns harden first, followed by audit and behavioral controls. Regulated industries should track it; others can treat it as a multi-year tailwind."}},
           {"@type": "Question", "name": "What if our org standardizes on one AI tool?", "acceptedAnswer": {"@type": "Answer", "text": "In practice, engineering orgs of meaningful size do not standardize on one tool. Inline completion, interactive coding, and async PR-opening agents tend to coexist because each is best-in-class at a different task. Procurement is one decision; what engineers actually use is another."}},
           {"@type": "Question", "name": "Will the eventual standard make Mneme redundant?", "acceptedAnswer": {"@type": "Answer", "text": "No, in the same way OCI did not make Docker redundant and OAuth did not make Okta redundant. A standard defines the contract; vendors and open-source projects implement it. Mneme is designed to align with whatever cross-tool format emerges and to be the structured decision-store implementation that consumes and exports it."}},
-          {"@type": "Question", "name": "How does an agnostic layer protect against tool churn?", "acceptedAnswer": {"@type": "Answer", "text": "The leading AI coding tool has changed roughly every eighteen months — Copilot dominant in 2022, Cursor through 2024, Claude Code reshaping things in 2025–26. A team whose architectural memory lives inside one tool's native format pays a rewrite cost every migration. A team whose memory lives in an agnostic layer can swap the tool underneath without touching governance."}}
+          {"@type": "Question", "name": "How does an agnostic layer protect against tool churn?", "acceptedAnswer": {"@type": "Answer", "text": "The leading AI coding tool has changed roughly every eighteen months â€” Copilot dominant in 2022, Cursor through 2024, Claude Code reshaping things in 2025â€“26. A team whose architectural memory lives inside one tool's native format pays a rewrite cost every migration. A team whose memory lives in an agnostic layer can swap the tool underneath without touching governance."}}
         ]
       }
     ]
@@ -471,7 +471,7 @@
         <div class="stack-num">02</div>
         <div class="stack-content">
           <div class="stack-label">Drift compounds per tool</div>
-          <div class="stack-desc">An engineer updates CLAUDE.md after a refactor. Nobody updates the Cursor rule file. The web agent that opens PRs is still running with last quarter's system prompt. Three tools, three different snapshots of "what the architecture is" — and reviewers cannot tell which one any given diff was generated against.</div>
+          <div class="stack-desc">An engineer updates CLAUDE.md after a refactor. Nobody updates the Cursor rule file. The web agent that opens PRs is still running with last quarter's system prompt. Three tools, three different snapshots of "what the architecture is" â€” and reviewers cannot tell which one any given diff was generated against.</div>
         </div>
       </div>
 
@@ -487,7 +487,7 @@
         <div class="stack-num">04</div>
         <div class="stack-content">
           <div class="stack-label">No shared enforcement seam</div>
-          <div class="stack-desc">Even if every tool reads the rules correctly, compliance is still advisory inside each one. There is no shared point at which generated code from any agent — interactive, async, in-CI — has to pass the same governance check before being accepted. The seams between tools are where violations land.</div>
+          <div class="stack-desc">Even if every tool reads the rules correctly, compliance is still advisory inside each one. There is no shared point at which generated code from any agent â€” interactive, async, in-CI â€” has to pass the same governance check before being accepted. The seams between tools are where violations land.</div>
         </div>
       </div>
 
@@ -502,7 +502,7 @@
     <p>This is not a hypothetical. Every team running both interactive AI in the editor and async AI in CI has seen versions of it. The patches are individually sensible. The collision is structural.</p>
 
     <div class="callout">
-      <p><strong>The seam between agents is where governance has to live.</strong> Inside each tool, there is no leverage — every model can be ignored, every text block can be misread. Between them, there is a natural enforcement point: the moment generated code is written to disk or proposed as a diff. That moment is the same regardless of which agent produced it.</p>
+      <p><strong>The seam between agents is where governance has to live.</strong> Inside each tool, there is no leverage â€” every model can be ignored, every text block can be misread. Between them, there is a natural enforcement point: the moment generated code is written to disk or proposed as a diff. That moment is the same regardless of which agent produced it.</p>
     </div>
 
     <h2 id="history">How other categories solved this</h2>
@@ -516,10 +516,10 @@
       <li><strong>Identity.</strong> Per-vendor SSO gave way to <a class="ext" href="https://datatracker.ietf.org/doc/html/rfc6749" target="_blank" rel="noopener">OAuth 2.0</a> and <a class="ext" href="https://openid.net/specs/openid-connect-core-1_0.html" target="_blank" rel="noopener">OpenID Connect</a>. Today no enterprise considers a tool that does not speak them.</li>
     </ul>
 
-    <p>The phases are consistent across categories. Tools proliferate. Format incompatibility creates real operational pain. A community-led specification forms — usually under a foundation. Vendors implement the spec. Differentiation moves up the stack.</p>
+    <p>The phases are consistent across categories. Tools proliferate. Format incompatibility creates real operational pain. A community-led specification forms â€” usually under a foundation. Vendors implement the spec. Differentiation moves up the stack.</p>
 
     <figure class="figure" aria-labelledby="fig2-cap">
-      <svg viewBox="0 0 720 320" role="img" aria-label="Timeline showing four categories — containers, tracing, IDE language servers, AI coding agents — moving through phases of fragmentation, convergence, standard, and adoption">
+      <svg viewBox="0 0 720 320" role="img" aria-label="Timeline showing four categories â€” containers, tracing, IDE language servers, AI coding agents â€” moving through phases of fragmentation, convergence, standard, and adoption">
         <defs>
           <linearGradient id="phaseGrad" x1="0" x2="1">
             <stop offset="0%" stop-color="#222226"/>
@@ -577,17 +577,17 @@
       <figcaption id="fig2-cap">Fig 2 &middot; Standardization phases for prior infrastructure categories, with AI coding agents mapped onto the same axis.</figcaption>
     </figure>
 
-    <p>If the AI coding category follows the same arc — and the early signals say it is — the practical question for engineering leaders is not <em>whether</em> a shared format will arrive, but <em>what to do during the years before it lands</em>. The answer is the same one teams used during every prior cycle: build above the eventual standard, not inside any one vendor's format.</p>
+    <p>If the AI coding category follows the same arc â€” and the early signals say it is â€” the practical question for engineering leaders is not <em>whether</em> a shared format will arrive, but <em>what to do during the years before it lands</em>. The answer is the same one teams used during every prior cycle: build above the eventual standard, not inside any one vendor's format.</p>
 
     <h2 id="standards">Where the standards landscape stands today</h2>
 
     <p>Two community-led efforts and one government-led one are currently the most credible foundations for a future cross-tool agent governance standard. None are finalized. All are worth tracking.</p>
 
-    <p><strong>NIST's AI Agent Standards Initiative.</strong> The <a class="ext" href="https://www.nist.gov/caisi" target="_blank" rel="noopener">Center for AI Standards and Innovation (CAISI)</a> at NIST <a class="ext" href="https://www.nist.gov/news-events/news/2026/02/announcing-ai-agent-standards-initiative-interoperable-and-secure" target="_blank" rel="noopener">announced the AI Agent Standards Initiative</a> in February 2026, with the stated goal of helping AI agents "interoperate smoothly across the digital ecosystem." A <a class="ext" href="https://www.nist.gov/news-events/news/2026/01/caisi-issues-request-information-about-securing-ai-agent-systems" target="_blank" rel="noopener">request for information on securing AI agent systems</a> closed for public comment on March 9, 2026, and the <a class="ext" href="https://www.nccoe.nist.gov/sites/default/files/2026-02/accelerating-the-adoption-of-software-and-ai-agent-identity-and-authorization-concept-paper.pdf" target="_blank" rel="noopener">NCCoE concept paper on AI agent identity and authorization</a> proposes adapting existing identity standards (OAuth 2.0, OIDC) to non-human agent identities. The current scope is identity, authorization, and security — not output-policy enforcement directly — but it establishes the regulatory frame inside which governance protocols will eventually be evaluated.</p>
+    <p><strong>NIST's AI Agent Standards Initiative.</strong> The <a class="ext" href="https://www.nist.gov/caisi" target="_blank" rel="noopener">Center for AI Standards and Innovation (CAISI)</a> at NIST <a class="ext" href="https://www.nist.gov/news-events/news/2026/02/announcing-ai-agent-standards-initiative-interoperable-and-secure" target="_blank" rel="noopener">announced the AI Agent Standards Initiative</a> in February 2026, with the stated goal of helping AI agents "interoperate smoothly across the digital ecosystem." A <a class="ext" href="https://www.nist.gov/news-events/news/2026/01/caisi-issues-request-information-about-securing-ai-agent-systems" target="_blank" rel="noopener">request for information on securing AI agent systems</a> closed for public comment on March 9, 2026, and the <a class="ext" href="https://www.nccoe.nist.gov/sites/default/files/2026-02/accelerating-the-adoption-of-software-and-ai-agent-identity-and-authorization-concept-paper.pdf" target="_blank" rel="noopener">NCCoE concept paper on AI agent identity and authorization</a> proposes adapting existing identity standards (OAuth 2.0, OIDC) to non-human agent identities. The current scope is identity, authorization, and security â€” not output-policy enforcement directly â€” but it establishes the regulatory frame inside which governance protocols will eventually be evaluated.</p>
 
     <p><strong>The Model Context Protocol.</strong> <a class="ext" href="https://modelcontextprotocol.io/specification/" target="_blank" rel="noopener">MCP</a> is an open, JSON-RPC-based protocol for exposing context, tools, and resources to AI clients. It does not specify a governance format, but it is increasingly the substrate over which a governance store can be made queryable to any compliant agent. A decision corpus exposed as an MCP server is consumable by every MCP-aware client without per-tool integration.</p>
 
-    <p><strong>AGENTS.md.</strong> The <a class="ext" href="https://agents.md/" target="_blank" rel="noopener">AGENTS.md</a> format — adopted across Codex, Cursor, Aider, Factory, Gemini CLI, Zed, and others, and stewarded by the Agentic AI Foundation under the Linux Foundation — is the closest thing to a shared per-repo instruction format that already works across vendors. <a class="ext" href="https://developers.openai.com/codex/guides/agents-md" target="_blank" rel="noopener">OpenAI's Codex documentation</a> treats it as the canonical instruction file. As a markdown convention, AGENTS.md cannot resolve precedence between conflicting decisions or enforce anything at the hook layer, but it is a credible baseline for the static-context portion of the problem and a likely component of any eventual full standard.</p>
+    <p><strong>AGENTS.md.</strong> The <a class="ext" href="https://agents.md/" target="_blank" rel="noopener">AGENTS.md</a> format â€” adopted across Codex, Cursor, Aider, Factory, Gemini CLI, Zed, and others, and stewarded by the Agentic AI Foundation under the Linux Foundation â€” is the closest thing to a shared per-repo instruction format that already works across vendors. <a class="ext" href="https://developers.openai.com/codex/guides/agents-md" target="_blank" rel="noopener">OpenAI's Codex documentation</a> treats it as the canonical instruction file. As a markdown convention, AGENTS.md cannot resolve precedence between conflicting decisions or enforce anything at the hook layer, but it is a credible baseline for the static-context portion of the problem and a likely component of any eventual full standard.</p>
 
     <p>Mneme HQ tracks all three. Our <a class="ext" href="/standards/">standards landscape page</a> covers how the project's design aligns with the direction these efforts are taking, and where we plan to engage.</p>
 
@@ -604,7 +604,7 @@
       <div class="contrast-cell accent-right">
         <div class="label">Shared governance memory</div>
         <div class="tool">Tool-agnostic, single source, enforced</div>
-        <div class="desc">Decisions live in one structured store. Every agent — interactive, async, third-party, in-house — queries it before generating, and a hook checks output against it before code lands.</div>
+        <div class="desc">Decisions live in one structured store. Every agent â€” interactive, async, third-party, in-house â€” queries it before generating, and a hook checks output against it before code lands.</div>
       </div>
     </div>
 
@@ -612,9 +612,9 @@
 
     <ul>
       <li><strong>Tool-agnostic representation.</strong> Decisions are stored in a structured format that is not coupled to any one assistant's prompt convention. Markdown is an export, not the source of truth.</li>
-      <li><strong>One canonical store, many readers.</strong> Claude Code, Cursor, Copilot, and custom agents all read from the same file. Updating an architectural decision once is sufficient — there is no fan-out duplication to keep in sync.</li>
+      <li><strong>One canonical store, many readers.</strong> Claude Code, Cursor, Copilot, and custom agents all read from the same file. Updating an architectural decision once is sufficient â€” there is no fan-out duplication to keep in sync.</li>
       <li><strong>Pre-generation injection.</strong> The relevant decisions for the current task are surfaced into whatever agent is running, in a format that agent can consume. The decisions are scoped, not dumped wholesale.</li>
-      <li><strong>Post-generation enforcement at the seam.</strong> Generated diffs — from any agent — are checked against the same governance store before they are accepted. The enforcement point is the file write, the commit, or the PR, not the model.</li>
+      <li><strong>Post-generation enforcement at the seam.</strong> Generated diffs â€” from any agent â€” are checked against the same governance store before they are accepted. The enforcement point is the file write, the commit, or the PR, not the model.</li>
     </ul>
 
     <p>This is the layering that makes heterogeneity safe. Each agent can keep its own strengths. The architecture is enforced by infrastructure that does not care which agent emitted the code.</p>
@@ -635,7 +635,7 @@
 
     <h2 id="category">The category framing</h2>
 
-    <p>The conversation about "the best AI coding tool" is the wrong conversation for any team large enough to have an architecture worth defending. There is no best tool — there is a portfolio, and the portfolio is going to grow. The question that matters is whether your governance layer is coupled to any one of them.</p>
+    <p>The conversation about "the best AI coding tool" is the wrong conversation for any team large enough to have an architecture worth defending. There is no best tool â€” there is a portfolio, and the portfolio is going to grow. The question that matters is whether your governance layer is coupled to any one of them.</p>
 
     <p>If it is, every new agent the team adopts becomes a new place for architectural decisions to drift. If it isn't, new agents are net additive: more capability, same enforcement, no extra coordination cost.</p>
 

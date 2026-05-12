@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Review Is Not Governance — Mneme HQ</title>
+  <title>Review Is Not Governance â€” Mneme HQ</title>
   <meta name="description" content="CodeRabbit helps review AI-generated code. Mneme helps govern what the AI generates in the first place. These are not competing tools. They are different layers of the same problem." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
@@ -286,9 +286,9 @@
 
     <p>Most teams using AI coding assistants have invested in the review layer. Tools like CodeRabbit, PR comment bots, and AI-assisted linters sit at the end of the pipeline, inspecting output after it surfaces in a pull request. That is useful work.</p>
 
-    <p>But it is reactive by design. You are reading the result of a generation process that already happened. The architectural violation, the naming drift, the deprecated dependency — they are already in the diff. Now you are deciding whether to accept them or ask for a rewrite.</p>
+    <p>But it is reactive by design. You are reading the result of a generation process that already happened. The architectural violation, the naming drift, the deprecated dependency â€” they are already in the diff. Now you are deciding whether to accept them or ask for a rewrite.</p>
 
-    <p>Governance operates differently. It runs before generation. It takes the architectural decisions your team has made — which services own which data, which dependencies are approved, which patterns are preferred — and makes them available to the AI assistant at the moment it is about to write code. Constraints are enforced at the source, not caught in review.</p>
+    <p>Governance operates differently. It runs before generation. It takes the architectural decisions your team has made â€” which services own which data, which dependencies are approved, which patterns are preferred â€” and makes them available to the AI assistant at the moment it is about to write code. Constraints are enforced at the source, not caught in review.</p>
 
     <div class="callout">
       <p><strong>The distinction matters at scale.</strong> When AI multiplies code output 10-50x, catching violations after generation means reviewing the same class of problems over and over. Preventing them before generation means they stop appearing.</p>
@@ -304,11 +304,11 @@
 
     <p><strong>Governance systems</strong> enforce architectural constraints before code is generated. They are the upstream layer that most teams are only beginning to build.</p>
 
-    <p>These layers are complementary. A team with strong generation tooling and strong review tooling but no governance layer will ship fast and review often — and still accumulate architectural drift at AI velocity. A team that adds the governance layer stops correcting and starts directing.</p>
+    <p>These layers are complementary. A team with strong generation tooling and strong review tooling but no governance layer will ship fast and review often â€” and still accumulate architectural drift at AI velocity. A team that adds the governance layer stops correcting and starts directing.</p>
 
     <h2>Why governance is infrastructure, not a feature</h2>
 
-    <p>Security engineering went through this same evolution. Code security was once a review concern: scan the output, flag the vulnerabilities, ask for fixes. Shift-left security moved those checks earlier — into the IDE, into the CI pipeline, into the generation process itself. The industry now treats security tooling as infrastructure, not an optional review enhancement.</p>
+    <p>Security engineering went through this same evolution. Code security was once a review concern: scan the output, flag the vulnerabilities, ask for fixes. Shift-left security moved those checks earlier â€” into the IDE, into the CI pipeline, into the generation process itself. The industry now treats security tooling as infrastructure, not an optional review enhancement.</p>
 
     <p>Architectural governance is at the same inflection point. As AI dramatically increases the volume of code entering a codebase, the constraints that govern that code must be embedded earlier in the process. Review catches what slips through. Governance determines what gets generated in the first place.</p>
 

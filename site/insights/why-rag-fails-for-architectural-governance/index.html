@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Why RAG Fails for Architectural Governance — Mneme HQ</title>
+  <title>Why RAG Fails for Architectural Governance â€” Mneme HQ</title>
   <meta name="description" content="RAG retrieves similar text. Architectural governance requires authoritative, precedence-aware constraint enforcement. Here's why they're fundamentally different problems." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
@@ -255,7 +255,7 @@
           {
             "@type": "Question",
             "name": "When is RAG the right tool?",
-            "acceptedAnswer": {"@type": "Answer", "text": "When the model needs background knowledge, examples, or context that informs but does not constrain its output — documentation lookups, related-code surfacing, prior-art retrieval. Knowledge augmentation is RAG's strength. Decision enforcement is not."}
+            "acceptedAnswer": {"@type": "Answer", "text": "When the model needs background knowledge, examples, or context that informs but does not constrain its output â€” documentation lookups, related-code surfacing, prior-art retrieval. Knowledge augmentation is RAG's strength. Decision enforcement is not."}
           },
           {
             "@type": "Question",
@@ -290,7 +290,7 @@
 
 <main>
 <div class="answer-capsule" style="max-width:820px;margin:0 auto;padding:1.5rem 2rem;background:var(--surface);border-bottom:1px solid rgba(200,240,96,0.18);font-size:0.88rem;color:var(--muted);line-height:1.8;">
-  <strong style="color:var(--accent);">Why RAG fails for architectural governance.</strong> Retrieval-augmented generation surfaces documents that the model may or may not act on. Governance requires deterministic enforcement — structured decisions evaluated against AI-generated code with no embedding model, no vector store, and no probabilistic retrieval in the path. RAG retrieves knowledge. Mneme operationalizes decisions.
+  <strong style="color:var(--accent);">Why RAG fails for architectural governance.</strong> Retrieval-augmented generation surfaces documents that the model may or may not act on. Governance requires deterministic enforcement â€” structured decisions evaluated against AI-generated code with no embedding model, no vector store, and no probabilistic retrieval in the path. RAG retrieves knowledge. Mneme operationalizes decisions.
 </div>
 <nav aria-label="Breadcrumb" class="breadcrumb-nav">
   <ol class="breadcrumb">
@@ -304,10 +304,10 @@
     <div class="article-eyebrow">
       <span class="eyebrow-tag">Category Education</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">8 min read &nbsp;·&nbsp; May 2026</span>
+      <span class="eyebrow-meta">8 min read &nbsp;Â·&nbsp; May 2026</span>
     </div>
     <h1>Why RAG Fails for Architectural Governance</h1>
-    <p class="article-lede">Retrieval-augmented generation is an excellent tool for knowledge lookup. It is the wrong tool for enforcing architectural decisions. The distinction matters — and most teams building AI coding workflows haven't confronted it yet.</p>
+    <p class="article-lede">Retrieval-augmented generation is an excellent tool for knowledge lookup. It is the wrong tool for enforcing architectural decisions. The distinction matters â€” and most teams building AI coding workflows haven't confronted it yet.</p>
     <p class="byline">
       By <a href="/founder/">Theo Valmis</a>
       <span class="sep">&middot;</span>
@@ -319,7 +319,7 @@
 
   <div class="article-body">
 
-    <p>When teams first encounter the problem of governing AI-generated code, RAG is the intuitive answer. You have a set of architectural decisions — ADRs, style guides, internal wikis, team conventions — and you want your AI coding assistant to respect them. RAG can retrieve relevant documents and inject them into the prompt. Problem solved, apparently.</p>
+    <p>When teams first encounter the problem of governing AI-generated code, RAG is the intuitive answer. You have a set of architectural decisions â€” ADRs, style guides, internal wikis, team conventions â€” and you want your AI coding assistant to respect them. RAG can retrieve relevant documents and inject them into the prompt. Problem solved, apparently.</p>
 
     <p>It isn't. The mismatch between what RAG provides and what architectural governance requires is deep, and fixing it requires a different kind of system entirely.</p>
 
@@ -328,10 +328,10 @@
     <p>RAG excels when the task is: given a query, find the most semantically relevant passages from a corpus and surface them to the model. It works well for:</p>
 
     <ul>
-      <li><strong>Documentation lookup</strong> — "How does our auth middleware work?" retrieves the relevant design doc.</li>
-      <li><strong>FAQ / support</strong> — surface the right answer from a knowledge base.</li>
-      <li><strong>Context injection</strong> — prime the model with background it wouldn't otherwise have.</li>
-      <li><strong>Summarization</strong> — condense a retrieved document for downstream consumption.</li>
+      <li><strong>Documentation lookup</strong> â€” "How does our auth middleware work?" retrieves the relevant design doc.</li>
+      <li><strong>FAQ / support</strong> â€” surface the right answer from a knowledge base.</li>
+      <li><strong>Context injection</strong> â€” prime the model with background it wouldn't otherwise have.</li>
+      <li><strong>Summarization</strong> â€” condense a retrieved document for downstream consumption.</li>
     </ul>
 
     <p>The common thread: RAG is a <strong>retrieval and suggestion</strong> mechanism. It finds relevant information. It does not enforce anything.</p>
@@ -341,11 +341,11 @@
     <p>Architectural governance is a different problem category. When you need to prevent an AI agent from making a decision that violates your service boundaries, your decisions need to be:</p>
 
     <ol>
-      <li><strong>Authoritative</strong> — not "here's something relevant," but "this is the rule that applies here."</li>
-      <li><strong>Precedence-aware</strong> — when two decisions conflict (project-level vs. org-level, newer vs. older), the system must resolve the conflict deterministically, not leave it to the model's judgment.</li>
-      <li><strong>Scope-aware</strong> — a decision about the payments service should not fire when the model is editing the analytics pipeline.</li>
-      <li><strong>Enforcement-capable</strong> — the system needs to block or flag violations, not merely suggest alternatives.</li>
-      <li><strong>Structurally validated</strong> — decisions need a schema, not just free-form text, so violations can be detected consistently.</li>
+      <li><strong>Authoritative</strong> â€” not "here's something relevant," but "this is the rule that applies here."</li>
+      <li><strong>Precedence-aware</strong> â€” when two decisions conflict (project-level vs. org-level, newer vs. older), the system must resolve the conflict deterministically, not leave it to the model's judgment.</li>
+      <li><strong>Scope-aware</strong> â€” a decision about the payments service should not fire when the model is editing the analytics pipeline.</li>
+      <li><strong>Enforcement-capable</strong> â€” the system needs to block or flag violations, not merely suggest alternatives.</li>
+      <li><strong>Structurally validated</strong> â€” decisions need a schema, not just free-form text, so violations can be detected consistently.</li>
     </ol>
 
     <p>RAG addresses exactly none of these requirements natively. Let's go through each failure mode.</p>
@@ -354,7 +354,7 @@
 
     <p>RAG retrieves documents based on embedding similarity to the query. "Which cache library should I use?" might retrieve three documents: a blog post about Redis, an ADR mandating Valkey, and a benchmark comparing both. The ADR is authoritative. The blog post is noise. RAG has no mechanism to distinguish them.</p>
 
-    <p>You can try to patch this by tagging documents with metadata and filtering by source type. But you've now built a lightweight decision registry on top of your RAG system — which is a separate architectural layer. And you still haven't solved the next problem.</p>
+    <p>You can try to patch this by tagging documents with metadata and filtering by source type. But you've now built a lightweight decision registry on top of your RAG system â€” which is a separate architectural layer. And you still haven't solved the next problem.</p>
 
     <div class="callout">
       <p><strong>The core issue:</strong> RAG ranks by similarity. Governance requires ranking by authority. These are orthogonal dimensions that need separate systems.</p>
@@ -362,9 +362,9 @@
 
     <h2>Failure mode 2: No precedence resolution</h2>
 
-    <p>Real architectural decision sets contain conflicts. An org-level decision from 2022 says "use PostgreSQL for all relational storage." A project-level decision from 2024 says "this service uses SQLite for simplicity — approved by the platform team." Which wins?</p>
+    <p>Real architectural decision sets contain conflicts. An org-level decision from 2022 says "use PostgreSQL for all relational storage." A project-level decision from 2024 says "this service uses SQLite for simplicity â€” approved by the platform team." Which wins?</p>
 
-    <p>The correct answer depends on scope, recency, and the explicit precedence relationship between the two decisions. A RAG system doesn't model any of this. It retrieves both, injects both, and leaves the model to interpret the contradiction. In practice, the model will pick whichever it finds more convincing in context — which is non-deterministic and ungovernable.</p>
+    <p>The correct answer depends on scope, recency, and the explicit precedence relationship between the two decisions. A RAG system doesn't model any of this. It retrieves both, injects both, and leaves the model to interpret the contradiction. In practice, the model will pick whichever it finds more convincing in context â€” which is non-deterministic and ungovernable.</p>
 
     <p>A proper governance system needs a precedence engine: an explicit, deterministic function that takes a set of retrieved decisions and produces a single authoritative answer for a given context. This is the architectural challenge RAG simply cannot address.</p>
 
@@ -372,11 +372,11 @@
 
     <p>RAG retrieval quality is a function of embedding model quality, corpus size, and query construction. In small corpora (&lt;100 documents), RAG works reasonably well. As your decision corpus grows to hundreds of ADRs, style guides, runbooks, and policy documents, retrieval precision drops and recall degrades.</p>
 
-    <p>More importantly, architectural decisions have precise scope signals — file patterns, service names, module boundaries — that embedding-based retrieval handles poorly. The embedding for "use dependency injection for service construction" is not significantly closer to a file path like <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">services/payments/handler.py</code> than it is to an unrelated document. Scope-aware retrieval requires structured matching, not vector similarity.</p>
+    <p>More importantly, architectural decisions have precise scope signals â€” file patterns, service names, module boundaries â€” that embedding-based retrieval handles poorly. The embedding for "use dependency injection for service construction" is not significantly closer to a file path like <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">services/payments/handler.py</code> than it is to an unrelated document. Scope-aware retrieval requires structured matching, not vector similarity.</p>
 
     <h2>Failure mode 4: Suggestion, not enforcement</h2>
 
-    <p>Even when RAG retrieves the right decision, the model can ignore it. In a RAG-augmented coding workflow, the model sees the retrieved context and generates output. Whether it respects the retrieved constraint depends on prompt construction, model behavior, and context window dynamics — none of which are deterministic.</p>
+    <p>Even when RAG retrieves the right decision, the model can ignore it. In a RAG-augmented coding workflow, the model sees the retrieved context and generates output. Whether it respects the retrieved constraint depends on prompt construction, model behavior, and context window dynamics â€” none of which are deterministic.</p>
 
     <p>This isn't a theoretical concern. In practice, models under instruction to complete a coding task will prioritize task completion over constraint adherence when the two are in tension. A suggestion system isn't a governance system.</p>
 
@@ -403,7 +403,7 @@
         </tr>
         <tr>
           <td>Authority model</td>
-          <td>None — all documents equal</td>
+          <td>None â€” all documents equal</td>
           <td>Explicit precedence hierarchy</td>
         </tr>
         <tr>
@@ -430,7 +430,7 @@
     </table>
     </div>
 
-    <p>A governance layer needs a structured decision schema — typed fields for scope, rationale, status, superseded-by, and the constraint itself. It needs a retrieval mechanism that matches on scope patterns before invoking semantic similarity. And it needs a precedence engine that resolves conflicts deterministically before injecting context into the model.</p>
+    <p>A governance layer needs a structured decision schema â€” typed fields for scope, rationale, status, superseded-by, and the constraint itself. It needs a retrieval mechanism that matches on scope patterns before invoking semantic similarity. And it needs a precedence engine that resolves conflicts deterministically before injecting context into the model.</p>
 
     <p>An example of what a structured decision record looks like at the schema level:</p>
 
@@ -449,15 +449,15 @@
 
     <h2>When RAG is still useful in this context</h2>
 
-    <p>This isn't an argument that RAG has no role in AI coding workflows. It does — for the right tasks.</p>
+    <p>This isn't an argument that RAG has no role in AI coding workflows. It does â€” for the right tasks.</p>
 
     <p>RAG is useful for surfacing relevant prior art, similar code patterns, and background context during generation. It's appropriate when you want to enrich the model's knowledge without binding it to specific constraints. It pairs well with a governance layer: RAG provides context, the governance layer provides constraints.</p>
 
-    <p>The error is conflating the two — assuming that injecting decision documents via RAG is equivalent to enforcing those decisions. It isn't. The retrieval problem and the enforcement problem require different architectures.</p>
+    <p>The error is conflating the two â€” assuming that injecting decision documents via RAG is equivalent to enforcing those decisions. It isn't. The retrieval problem and the enforcement problem require different architectures.</p>
 
     <h2>The underlying principle</h2>
 
-    <p>The distinction maps to a simple principle: <strong>suggestion systems and enforcement systems are architecturally incompatible.</strong> You cannot make a suggestion system into an enforcement system by improving retrieval quality. The enforcement guarantee requires a structural property — a deterministic check against structured constraints — that retrieval-based systems cannot provide by design.</p>
+    <p>The distinction maps to a simple principle: <strong>suggestion systems and enforcement systems are architecturally incompatible.</strong> You cannot make a suggestion system into an enforcement system by improving retrieval quality. The enforcement guarantee requires a structural property â€” a deterministic check against structured constraints â€” that retrieval-based systems cannot provide by design.</p>
 
     <p>Architectural governance for AI coding is an enforcement problem. It should be solved with enforcement architecture.</p>
 
@@ -475,7 +475,7 @@
     </details>
     <details>
       <summary>When is RAG the right tool?</summary>
-      <div class="faq-body">When the model needs background knowledge, examples, or context that informs but does not constrain its output — documentation lookups, related-code surfacing, prior-art retrieval. Knowledge augmentation is RAG's strength. Decision enforcement is not.</div>
+      <div class="faq-body">When the model needs background knowledge, examples, or context that informs but does not constrain its output â€” documentation lookups, related-code surfacing, prior-art retrieval. Knowledge augmentation is RAG's strength. Decision enforcement is not.</div>
     </details>
     <details>
       <summary>Does Mneme HQ use any retrieval or embedding model?</summary>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dependency Policy Enforcement — Demo Scenario | Mneme HQ</title>
+  <title>Dependency Policy Enforcement â€” Demo Scenario | Mneme HQ</title>
   <meta name="description" content="A walkthrough of how Mneme catches an unapproved dependency (Prisma) when an AI coding agent introduces it during a refactor. WARN verdict in mneme check, with the exact decision ID that flagged it." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
@@ -11,12 +11,12 @@
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Dependency Policy Enforcement — Demo Scenario" />
+  <meta property="og:title" content="Dependency Policy Enforcement â€” Demo Scenario" />
   <meta property="og:description" content="How Mneme flags unapproved dependencies (Prisma) when an AI agent introduces them mid-refactor. WARN verdict with the originating decision ID." />
   <meta property="og:url" content="https://mnemehq.com/demo/dependency-policy/" />
   <meta property="og:image" content="https://mnemehq.com/demo/dependency-policy/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Dependency Policy Enforcement — Demo Scenario" />
+  <meta name="twitter:title" content="Dependency Policy Enforcement â€” Demo Scenario" />
   <meta name="twitter:description" content="How Mneme flags unapproved dependencies (Prisma) when an AI agent introduces them mid-refactor. WARN verdict with the originating decision ID." />
   <meta name="twitter:image" content="https://mnemehq.com/demo/dependency-policy/og.png" />
   <meta name="author" content="Theo Valmis" />
@@ -44,7 +44,7 @@
       },
       {
         "@type": "Article",
-        "headline": "Dependency Policy Enforcement — Demo Scenario",
+        "headline": "Dependency Policy Enforcement â€” Demo Scenario",
         "description": "How Mneme catches an unapproved dependency (Prisma) when an AI coding agent introduces it during a refactor. Structured WARN verdict with the originating decision ID.",
         "url": "https://mnemehq.com/demo/dependency-policy/",
         "datePublished": "2026-05-09",
@@ -58,9 +58,9 @@
       {
         "@type": "FAQPage",
         "mainEntity": [
-          {"@type": "Question", "name": "Why is this a WARN and not a FAIL?", "acceptedAnswer": {"@type": "Answer", "text": "Dependency introductions are policy decisions that often have legitimate reasons — a security audit may approve a previously rejected library, or the team may have updated the approved list and not yet pushed it. Mneme returns WARN so the diff is flagged for review without hard-blocking the work. Teams that want strict enforcement can configure dependency-policy as FAIL via mneme check --mode strict."}},
+          {"@type": "Question", "name": "Why is this a WARN and not a FAIL?", "acceptedAnswer": {"@type": "Answer", "text": "Dependency introductions are policy decisions that often have legitimate reasons â€” a security audit may approve a previously rejected library, or the team may have updated the approved list and not yet pushed it. Mneme returns WARN so the diff is flagged for review without hard-blocking the work. Teams that want strict enforcement can configure dependency-policy as FAIL via mneme check --mode strict."}},
           {"@type": "Question", "name": "How does Mneme know which dependencies are approved?", "acceptedAnswer": {"@type": "Answer", "text": "The approved dependency list lives in project_memory.json as a structured rule: type 'dependency_policy', scope (Python packages, JS packages, system binaries), and an explicit allowlist. The list is human-editable and version-controlled with the rest of the repo. Adding or removing a dependency is a tracked decision, not a quiet config change."}},
-          {"@type": "Question", "name": "Can I scope the policy to specific paths?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Decision records carry a scope field. A dependency policy can apply to the whole repo, a specific service directory, or a particular layer (e.g. only the API layer can use HTTP clients). The precedence engine resolves overlapping rules deterministically — see the architectural governance article for the full design rationale."}}
+          {"@type": "Question", "name": "Can I scope the policy to specific paths?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Decision records carry a scope field. A dependency policy can apply to the whole repo, a specific service directory, or a particular layer (e.g. only the API layer can use HTTP clients). The precedence engine resolves overlapping rules deterministically â€” see the architectural governance article for the full design rationale."}}
         ]
       }
     ]

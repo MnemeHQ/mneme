@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Code Review Does Not Scale Linearly — Mneme HQ</title>
+  <title>AI Code Review Does Not Scale Linearly â€” Mneme HQ</title>
   <meta name="description" content="AI code generation scales nearly infinitely. Reviewer attention does not. The governance bottleneck this creates requires architectural enforcement at generation time, not more reviewers." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
@@ -275,7 +275,7 @@
       <span class="eyebrow-meta">8 min read &nbsp;&middot;&nbsp; May 2026</span>
     </div>
     <h1>AI Code Review Does Not Scale Linearly</h1>
-    <p class="article-lede">AI code generation scales nearly infinitely. Reviewer attention does not. The result is a new class of engineering bottleneck — and it requires a fundamentally different response than hiring more senior engineers.</p>
+    <p class="article-lede">AI code generation scales nearly infinitely. Reviewer attention does not. The result is a new class of engineering bottleneck â€” and it requires a fundamentally different response than hiring more senior engineers.</p>
     <p class="byline">
       By <a href="/founder/">Theo Valmis</a>
       <span class="sep">&middot;</span>
@@ -289,13 +289,13 @@
 
     <h2>AI massively increases code generation throughput</h2>
 
-    <p>The throughput gains from AI coding assistants are not incremental. They are structural. A single engineer using Claude Code, Cursor, or Copilot can produce multi-file changesets in minutes that would take half a day to write manually. Devin and similar autonomous agents push this further — generating entire feature implementations from a task description while the engineer works on something else.</p>
+    <p>The throughput gains from AI coding assistants are not incremental. They are structural. A single engineer using Claude Code, Cursor, or Copilot can produce multi-file changesets in minutes that would take half a day to write manually. Devin and similar autonomous agents push this further â€” generating entire feature implementations from a task description while the engineer works on something else.</p>
 
-    <p>This is not a speculative future. Teams running AI-assisted development at scale today routinely report 5–50x increases in raw code output for well-scoped tasks. The variance depends on task complexity, but the direction is uniform: code generation is no longer the bottleneck.</p>
+    <p>This is not a speculative future. Teams running AI-assisted development at scale today routinely report 5â€“50x increases in raw code output for well-scoped tasks. The variance depends on task complexity, but the direction is uniform: code generation is no longer the bottleneck.</p>
 
     <div class="stat-row">
       <div class="stat-block">
-        <div class="stat-num">5–50×</div>
+        <div class="stat-num">5â€“50Ã—</div>
         <div class="stat-label">Code output increase on well-scoped tasks with AI coding assistants</div>
       </div>
       <div class="stat-block">
@@ -304,7 +304,7 @@
       </div>
       <div class="stat-block">
         <div class="stat-num">Fixed</div>
-        <div class="stat-label">Reviewer capacity — bounded by human headcount and attention, not tooling</div>
+        <div class="stat-label">Reviewer capacity â€” bounded by human headcount and attention, not tooling</div>
       </div>
     </div>
 
@@ -312,9 +312,9 @@
 
     <p>Pull request review is a process designed around an implicit assumption: code arrives at roughly the pace a human can write it. One developer opens a PR. One or two reviewers read it. They leave comments. The author addresses them. The cycle takes hours to days, and the volume is manageable because human writing speed is the rate-limiting factor.</p>
 
-    <p>This assumption held for decades. Review processes, team structures, and engineering manager expectations were all calibrated to human throughput. A team of ten engineers might produce 15–30 meaningful PRs per week. Two or three senior reviewers could cover that load.</p>
+    <p>This assumption held for decades. Review processes, team structures, and engineering manager expectations were all calibrated to human throughput. A team of ten engineers might produce 15â€“30 meaningful PRs per week. Two or three senior reviewers could cover that load.</p>
 
-    <p>AI breaks this calibration entirely. The same team of ten engineers, each using an AI coding assistant, can produce 60–120 PRs per week. The code still needs review. The reviewers haven't multiplied.</p>
+    <p>AI breaks this calibration entirely. The same team of ten engineers, each using an AI coding assistant, can produce 60â€“120 PRs per week. The code still needs review. The reviewers haven't multiplied.</p>
 
     <h2>Review quality degrades as AI output scales</h2>
 
@@ -322,21 +322,21 @@
 
     <h3>Plausible but wrong</h3>
 
-    <p>AI-generated code is syntactically correct, compiles, and passes tests. It looks reasonable at a glance. But it lacks the institutional context that a human developer carries — the postmortem from last quarter, the verbal agreement about service boundaries, the naming convention that emerged from a Slack thread. The violations it introduces are subtle: a service reaching across a boundary via a shared utility, a new database table in a schema that was supposed to be read-only from that service, a dependency that was deprecated but not yet removed from the package registry.</p>
+    <p>AI-generated code is syntactically correct, compiles, and passes tests. It looks reasonable at a glance. But it lacks the institutional context that a human developer carries â€” the postmortem from last quarter, the verbal agreement about service boundaries, the naming convention that emerged from a Slack thread. The violations it introduces are subtle: a service reaching across a boundary via a shared utility, a new database table in a schema that was supposed to be read-only from that service, a dependency that was deprecated but not yet removed from the package registry.</p>
 
     <p>These violations don't trigger linters or type checkers. They require a reviewer who understands the <em>intent</em> behind the architecture, not just the syntax. That reviewer's attention is exactly the resource that doesn't scale.</p>
 
     <h3>Reviewer fatigue accelerates</h3>
 
-    <p>Cognitive load research is clear on this: review quality degrades sharply after the first 200–400 lines of code in a single session. When PR volume doubles or triples, reviewers either spend more hours reviewing (unsustainable) or review each PR less thoroughly (dangerous). In practice, most teams drift toward the second option without an explicit decision to do so.</p>
+    <p>Cognitive load research is clear on this: review quality degrades sharply after the first 200â€“400 lines of code in a single session. When PR volume doubles or triples, reviewers either spend more hours reviewing (unsustainable) or review each PR less thoroughly (dangerous). In practice, most teams drift toward the second option without an explicit decision to do so.</p>
 
     <div class="callout">
-      <p><strong>The core problem:</strong> AI increases the numerator (code output) while the denominator (reviewer attention) stays fixed. The ratio doesn't just get worse — it degrades the quality of each individual review as fatigue compounds across the growing queue.</p>
+      <p><strong>The core problem:</strong> AI increases the numerator (code output) while the denominator (reviewer attention) stays fixed. The ratio doesn't just get worse â€” it degrades the quality of each individual review as fatigue compounds across the growing queue.</p>
     </div>
 
     <h2>Architectural drift becomes probabilistic and cumulative</h2>
 
-    <p>When review quality degrades, violations don't stop at the PR boundary. They merge. And once a violation is in the codebase, it becomes a pattern that the AI assistant will replicate — because it reads the codebase for context, and now the violation <em>is</em> the context.</p>
+    <p>When review quality degrades, violations don't stop at the PR boundary. They merge. And once a violation is in the codebase, it becomes a pattern that the AI assistant will replicate â€” because it reads the codebase for context, and now the violation <em>is</em> the context.</p>
 
     <p>This creates a feedback loop:</p>
 
@@ -348,15 +348,15 @@
       <li>Future generations replicate and extend the violation</li>
     </ol>
 
-    <p>Drift under these conditions is not a risk to monitor. It is a statistical certainty that compounds with velocity. The faster you ship, the faster you drift — unless something intervenes before the code is written.</p>
+    <p>Drift under these conditions is not a risk to monitor. It is a statistical certainty that compounds with velocity. The faster you ship, the faster you drift â€” unless something intervenes before the code is written.</p>
 
     <h2>Manual review cannot be the sole governance layer</h2>
 
     <p>The intuitive response to this problem is to tighten review: require two approvals, mandate architect sign-off on structural changes, add checklists. Every engineering leader considers this first.</p>
 
-    <p>It doesn't work, for a reason that is structural rather than cultural. Tighter review requirements reduce velocity — which is precisely the benefit that AI-assisted development was supposed to deliver. You end up in a paradox: the faster AI generates code, the more review burden you add, until the review process itself becomes the bottleneck that negates the generation speed advantage.</p>
+    <p>It doesn't work, for a reason that is structural rather than cultural. Tighter review requirements reduce velocity â€” which is precisely the benefit that AI-assisted development was supposed to deliver. You end up in a paradox: the faster AI generates code, the more review burden you add, until the review process itself becomes the bottleneck that negates the generation speed advantage.</p>
 
-    <p>Teams that have tried to solve this with AI-assisted review tools report partial improvement. Automated reviewers catch mechanical issues — type errors, unused imports, obvious anti-patterns. They cannot catch architectural violations that depend on decisions specific to your team, your services, and your constraints. That context is not in the training data and cannot be injected effectively at review time.</p>
+    <p>Teams that have tried to solve this with AI-assisted review tools report partial improvement. Automated reviewers catch mechanical issues â€” type errors, unused imports, obvious anti-patterns. They cannot catch architectural violations that depend on decisions specific to your team, your services, and your constraints. That context is not in the training data and cannot be injected effectively at review time.</p>
 
     <div class="scenario-block">
       <div class="scenario-title">Where governance catches violations today vs. where it should</div>
@@ -389,9 +389,9 @@
 
     <h2>Governance must shift left into generation workflows</h2>
 
-    <p>Security engineering faced a structurally identical problem a decade ago. When application development accelerated, security reviews at the end of the pipeline couldn't keep up with the volume of vulnerabilities reaching production. The response — shift-left security — moved checks earlier in the development lifecycle, catching issues before they accumulated.</p>
+    <p>Security engineering faced a structurally identical problem a decade ago. When application development accelerated, security reviews at the end of the pipeline couldn't keep up with the volume of vulnerabilities reaching production. The response â€” shift-left security â€” moved checks earlier in the development lifecycle, catching issues before they accumulated.</p>
 
-    <p>Architectural governance is at the same inflection point. The answer is not better review. It is enforcement that operates <em>before</em> the AI agent writes the file — at generation time, not after the PR is opened.</p>
+    <p>Architectural governance is at the same inflection point. The answer is not better review. It is enforcement that operates <em>before</em> the AI agent writes the file â€” at generation time, not after the PR is opened.</p>
 
     <p>Pre-generation enforcement means the AI assistant receives the relevant architectural constraints for the specific file and module it's about to modify, and those constraints are injected as structured rules rather than advisory context. A service boundary violation is blocked before the code is written. A deprecated dependency is never introduced. A naming convention is enforced at the moment of generation, not caught in review three days later.</p>
 
@@ -404,15 +404,15 @@
     <div class="layer-stack">
       <div class="layer-item">
         <span class="layer-num">1</span>
-        <span class="layer-text"><strong>Generation-time enforcement</strong> — Architectural constraints injected into the AI agent's context before it writes. Blocks violations at the source. Handles 80–90% of governance.</span>
+        <span class="layer-text"><strong>Generation-time enforcement</strong> â€” Architectural constraints injected into the AI agent's context before it writes. Blocks violations at the source. Handles 80â€“90% of governance.</span>
       </div>
       <div class="layer-item">
         <span class="layer-num">2</span>
-        <span class="layer-text"><strong>PR-time validation</strong> — Automated and human review focused on intent, edge cases, and cross-cutting concerns that generation-time rules can't fully capture. Handles the remaining 10–20%.</span>
+        <span class="layer-text"><strong>PR-time validation</strong> â€” Automated and human review focused on intent, edge cases, and cross-cutting concerns that generation-time rules can't fully capture. Handles the remaining 10â€“20%.</span>
       </div>
       <div class="layer-item">
         <span class="layer-num">3</span>
-        <span class="layer-text"><strong>CI-time checks</strong> — Architectural rule validation in the pipeline, catching any violations that passed through the first two layers. The safety net.</span>
+        <span class="layer-text"><strong>CI-time checks</strong> â€” Architectural rule validation in the pipeline, catching any violations that passed through the first two layers. The safety net.</span>
       </div>
     </div>
 
@@ -424,7 +424,7 @@
 
     <p>Logging was once a developer responsibility. Then it became infrastructure. Testing was once manual. Then it became automated. Security was once end-of-pipeline. Then it shifted left and became embedded in the development process.</p>
 
-    <p>Architectural governance is on the same trajectory. As AI coding assistants become the default way code is written, the constraints that govern that code must be embedded in the generation layer — not held in the heads of senior engineers who review PRs on Friday afternoons.</p>
+    <p>Architectural governance is on the same trajectory. As AI coding assistants become the default way code is written, the constraints that govern that code must be embedded in the generation layer â€” not held in the heads of senior engineers who review PRs on Friday afternoons.</p>
 
     <p>This is not a tooling convenience. It is an infrastructure requirement for any team that intends to maintain architectural coherence while shipping at AI-assisted velocity. The teams that treat governance as infrastructure will compound their speed advantage. The teams that rely solely on manual review will compound their architectural debt.</p>
 
@@ -445,9 +445,9 @@
 
     <div class="cta-block">
       <h3>Move governance before generation</h3>
-      <p>Mneme HQ enforces architectural decisions at generation time — before the AI agent writes the file, not after the PR is opened. Open source, hook-level integration with Claude Code.</p>
+      <p>Mneme HQ enforces architectural decisions at generation time â€” before the AI agent writes the file, not after the PR is opened. Open source, hook-level integration with Claude Code.</p>
       <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
-      <a href="/compare/coderabbit/" style="display:block;margin-top:0.75rem;font-size:0.82rem;color:var(--muted);text-decoration:none;">Mneme HQ vs CodeRabbit — full comparison &rarr;</a>
+      <a href="/compare/coderabbit/" style="display:block;margin-top:0.75rem;font-size:0.82rem;color:var(--muted);text-decoration:none;">Mneme HQ vs CodeRabbit â€” full comparison &rarr;</a>
     </div>
   </footer>
 </article>

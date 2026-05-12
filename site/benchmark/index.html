@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Governance Benchmark v1.1 Methodology — Mneme HQ</title>
-  <meta name="description" content="Mneme's architectural governance benchmark — 36 scenarios, structured-output verification, layered metrics, pre-registered thresholds. Deterministic and reproducible." />
+  <title>Governance Benchmark v1.1 Methodology â€” Mneme HQ</title>
+  <meta name="description" content="Mneme's architectural governance benchmark â€” 36 scenarios, structured-output verification, layered metrics, pre-registered thresholds. Deterministic and reproducible." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/benchmark/" />
@@ -14,14 +14,14 @@
   <!-- Open Graph -->
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Governance Benchmark v1.1 Methodology — Mneme HQ" />
+  <meta property="og:title" content="Governance Benchmark v1.1 Methodology â€” Mneme HQ" />
   <meta property="og:description" content="The deterministic methodology behind Mneme's architectural governance benchmark. 36 scenarios, six categories, structured-output verification, pre-registered thresholds." />
   <meta property="og:url" content="https://mnemehq.com/benchmark/" />
   <meta property="og:image" content="https://mnemehq.com/og.png" />
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Governance Benchmark v1.1 Methodology — Mneme HQ" />
+  <meta name="twitter:title" content="Governance Benchmark v1.1 Methodology â€” Mneme HQ" />
   <meta name="twitter:description" content="The deterministic methodology behind Mneme's architectural governance benchmark." />
   <meta name="twitter:image" content="https://mnemehq.com/og.png" />
 
@@ -712,16 +712,16 @@
 
 <article class="doc-body">
 
-  <h2 id="purpose">01 — Purpose</h2>
+  <h2 id="purpose">01 â€” Purpose</h2>
   <p>The Mneme Governance Benchmark validates whether Mneme reduces architectural rule violations in AI-generated code. It answers one question:</p>
   <p><strong>When an AI coding agent is asked to make a change in a codebase that has known architectural constraints, does Mneme produce code that respects those constraints more often than the same agent without Mneme, without over-enforcing on changes where the constraints do not apply?</strong></p>
   <p>The "without over-enforcing" clause is doing real work. A governance system that catches violations by refusing every change is not helpful, and the original v1.0 draft did not measure this rigorously enough. v1.1 corrects that.</p>
 
-  <h2 id="scope">02 — Scope</h2>
+  <h2 id="scope">02 â€” Scope</h2>
   <p><strong>In scope.</strong> Pre-generation governance. The benchmark measures the rate at which the model's generated output respects a given architectural rule when Mneme injects the relevant rule, versus when it does not, separately from whether Mneme retrieved the right rule in the first place.</p>
   <p><strong>Out of scope.</strong> Post-generation observability, runtime enforcement, security scanning, performance optimization, code style preferences. Those are separate measurements with separate tooling.</p>
 
-  <h2 id="layered">03 — Layered measurement</h2>
+  <h2 id="layered">03 â€” Layered measurement</h2>
   <p>v1.0 measured a single end-to-end outcome. v1.1 separates this into two layers because conflating them hides real product issues.</p>
 
   <h3>Layer 1: retrieval</h3>
@@ -744,7 +744,7 @@
     <p><strong>Why this matters.</strong> A user who hits a violation needs to know which layer broke. Without the layer split, a benchmark publishes a single number that hides which part of the system failed. With the layer split, retrieval issues and enforcement issues are diagnosed separately and fixed independently.</p>
   </div>
 
-  <h2 id="structured">04 — Structured output protocol</h2>
+  <h2 id="structured">04 â€” Structured output protocol</h2>
   <p>v1.0 verified by parsing freeform model output. This is gameable: a model can write the right words in prose while violating the rule in code. v1.1 closes this attack surface by requiring the model to emit a structured artifact.</p>
 
   <h3>Response schema</h3>
@@ -777,7 +777,7 @@
   <h3>Why this closes gaming</h3>
   <p>A model cannot earn a respected verdict by writing the right words. It must produce code that, when parsed, contains the right files, the right imports, and no forbidden patterns. The verifier inspects facts about the artifact, not claims about it.</p>
 
-  <h2 id="suite">05 — Suite composition</h2>
+  <h2 id="suite">05 â€” Suite composition</h2>
   <p>36 scenarios across six categories. Controls and ambiguous cases are first-class.</p>
   <table>
     <thead>
@@ -795,7 +795,7 @@
   <p>Controls at 22 percent of the suite. Anything below 20 percent makes false positive rate non-credible.</p>
   <p>Scenario categories map onto the governance violation hierarchy at <a href="/docs/governance-violations/">/docs/governance-violations/</a> &mdash; architecture, security, workflow, dependency, and platform. Each benchmark scenario is an instance of one of the twelve worked examples there. The benchmark is not an arbitrary test harness; it is the violation catalogue under measurement.</p>
 
-  <h2 id="sources">06 — Source mix</h2>
+  <h2 id="sources">06 â€” Source mix</h2>
   <p>A synthetic-only suite is not credible. v1.1 requires real-incident scenarios.</p>
   <table>
     <thead>
@@ -811,7 +811,7 @@
   </table>
   <p>Real-incident scenarios are 28 percent of the suite, satisfying the credibility floor.</p>
 
-  <h2 id="difficulty">07 — Difficulty calibration</h2>
+  <h2 id="difficulty">07 â€” Difficulty calibration</h2>
   <ul>
     <li><strong>Easy</strong> (30 percent of non-controls). Baseline LLM violates 20 to 40 percent of the time. Tests that Mneme does not regress easy cases.</li>
     <li><strong>Medium</strong> (50 percent of non-controls). Baseline violates 40 to 70 percent. The meaningful scenarios.</li>
@@ -819,7 +819,7 @@
   </ul>
   <p>Calibration is verified empirically by running the baseline against the suite before publication. If the actual baseline violation rate on a "medium" scenario is 90 percent, it is reclassified as hard. The labels describe observed difficulty, not assumed difficulty.</p>
 
-  <h2 id="thresholds">08 — Verdict thresholds</h2>
+  <h2 id="thresholds">08 â€” Verdict thresholds</h2>
   <p>All four are required. Pre-committed and will not move at decision time.</p>
   <div class="threshold-grid">
     <div class="threshold-card">
@@ -847,7 +847,7 @@
     <p><strong>If results land below threshold, the published narrative is honest.</strong> "v1.1 measured X. Below the 75 percent target. Here is what we changed and what we will fix." Pre-registration is the point.</p>
   </div>
 
-  <h2 id="metrics">09 — Metrics</h2>
+  <h2 id="metrics">09 â€” Metrics</h2>
 
   <h3>Headline metrics</h3>
   <ol>
@@ -872,7 +872,7 @@
     <li>Mean latency, governed vs baseline</li>
   </ol>
 
-  <h2 id="protocol">10 — Run protocol</h2>
+  <h2 id="protocol">10 â€” Run protocol</h2>
   <ol>
     <li>Each scenario runs in three iterations to measure determinism.</li>
     <li>Two variants per iteration: baseline (no Mneme) and governed (Mneme end-to-end).</li>
@@ -882,7 +882,7 @@
     <li>Codebase context loaded from versioned fixture; fixture hashes recorded with results.</li>
   </ol>
 
-  <h2 id="claims">11 — What this proves and does not prove</h2>
+  <h2 id="claims">11 â€” What this proves and does not prove</h2>
 
   <h3>Does not prove</h3>
   <ul>
@@ -896,7 +896,7 @@
   <p>Under controlled conditions on a 36-scenario suite covering six categories with 28 percent real-incident sourcing and 22 percent controls, Mneme reduces architectural rule violations by at least 75 percent relative to the same model without Mneme, while triggering false positives no more than 10 percent of the time on unrelated changes.</p>
   <p>Narrow claim. Pre-registered thresholds. Reproducible.</p>
 
-  <h2 id="repro">12 — Reproducibility</h2>
+  <h2 id="repro">12 â€” Reproducibility</h2>
   <p>Published artifacts:</p>
   <ol>
     <li>Full scenario suite as YAML.</li>
@@ -911,7 +911,7 @@
   </ol>
   <p>Anyone clones the repository, pins the same model version, runs the harness, and confirms the numbers within determinism variance. If they cannot, the published numbers are wrong.</p>
 
-  <h2 id="versioning">13 — Versioning</h2>
+  <h2 id="versioning">13 â€” Versioning</h2>
   <ul>
     <li><strong>v1.0.</strong> Working draft. Superseded by v1.1.</li>
     <li><strong>v1.1.</strong> Methodology hardening. Anti-gaming protocol, controls, ambiguous cases, retrieval and enforcement split. Publishable.</li>
@@ -919,7 +919,7 @@
   </ul>
   <p>Comparing v1.1 results to v1.2 results is meaningful only on the scenario subset that exists unchanged in both. Publications make this explicit.</p>
 
-  <h2 id="limitations">14 — Limitations</h2>
+  <h2 id="limitations">14 â€” Limitations</h2>
   <p>Honest limitations published alongside results:</p>
   <ul>
     <li>Synthetic codebases are smaller than production codebases. May overstate baseline ability to track context.</li>
@@ -929,7 +929,7 @@
     <li>The author also built Mneme. This is a self-evaluation. Phase 2 design partner validation provides external evidence.</li>
   </ul>
 
-  <h2 id="changelog">15 — Changelog from v1.0 to v1.1</h2>
+  <h2 id="changelog">15 â€” Changelog from v1.0 to v1.1</h2>
   <table>
     <thead>
       <tr><th>Change</th><th>Reason</th></tr>
@@ -1054,7 +1054,7 @@
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <script>
-  // Hamburger nav (upgraded — ESC, outside-click, body-scroll lock, X morph)
+  // Hamburger nav (upgraded â€” ESC, outside-click, body-scroll lock, X morph)
   (function(){
     var btn = document.querySelector('.nav-hamburger');
     var links = document.querySelector('.nav-links');

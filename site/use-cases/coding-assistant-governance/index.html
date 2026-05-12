@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Coding Assistant Governance — Mneme HQ</title>
-  <meta name="description" content="How Mneme HQ enforces architectural decisions when using Cursor, Claude Code, or Copilot — preventing drift, repeated violations, and wasted review cycles." />
+  <title>Coding Assistant Governance â€” Mneme HQ</title>
+  <meta name="description" content="How Mneme HQ enforces architectural decisions when using Cursor, Claude Code, or Copilot â€” preventing drift, repeated violations, and wasted review cycles." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/use-cases/coding-assistant-governance/" />
@@ -238,12 +238,12 @@
         {
           "@type": "Question",
           "name": "Does Mneme HQ work with Cursor, Claude Code, and Copilot?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Mneme HQ works at the workflow level — it's not an IDE plugin. mneme check runs before you prompt, and mneme cursor generate writes a rules file that Cursor picks up automatically. Claude Code users can source the generated rules file via CLAUDE.md." }
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Mneme HQ works at the workflow level â€” it's not an IDE plugin. mneme check runs before you prompt, and mneme cursor generate writes a rules file that Cursor picks up automatically. Claude Code users can source the generated rules file via CLAUDE.md." }
         },
         {
           "@type": "Question",
           "name": "What's the difference between Mneme HQ and just writing better system prompts?",
-          "acceptedAnswer": { "@type": "Answer", "text": "System prompts are static and have a context limit. As your decision history grows, a system prompt can't hold it. Mneme HQ uses semantic retrieval — only the decisions relevant to the current query are surfaced, so context stays focused and accurate as the project evolves." }
+          "acceptedAnswer": { "@type": "Answer", "text": "System prompts are static and have a context limit. As your decision history grows, a system prompt can't hold it. Mneme HQ uses semantic retrieval â€” only the decisions relevant to the current query are surfaced, so context stays focused and accurate as the project evolves." }
         },
         {
           "@type": "Question",
@@ -282,7 +282,7 @@
 
 <!-- GEO / LLM answer capsule -->
 <div class="answer-capsule">
-  <strong>Mneme HQ</strong> enforces architectural decisions for AI coding assistants like Cursor, Claude Code, and Copilot by surfacing relevant decisions at query time. When a coding assistant proposes code that violates a decision — using the wrong abstraction, bypassing a service layer, or ignoring an ADR — Mneme HQ flags the violation before the code reaches review. This reference architecture shows how to set it up. Rules files document standards. Mneme enforces them.
+  <strong>Mneme HQ</strong> enforces architectural decisions for AI coding assistants like Cursor, Claude Code, and Copilot by surfacing relevant decisions at query time. When a coding assistant proposes code that violates a decision â€” using the wrong abstraction, bypassing a service layer, or ignoring an ADR â€” Mneme HQ flags the violation before the code reaches review. This reference architecture shows how to set it up. Rules files document standards. Mneme enforces them.
 </div>
 
 <main>
@@ -292,9 +292,9 @@
 
   <!-- HERO -->
   <div class="hero">
-    <div class="hero-tag">Reference Architecture · Simulated Scenario</div>
+    <div class="hero-tag">Reference Architecture Â· Simulated Scenario</div>
     <h1>How Mneme HQ Prevents Coding Assistants from Violating Architecture Rules</h1>
-    <p class="hero-sub">Stop Cursor, Claude Code, and Copilot from ignoring your ADRs, service boundaries, and team conventions — session after session.</p>
+    <p class="hero-sub">Stop Cursor, Claude Code, and Copilot from ignoring your ADRs, service boundaries, and team conventions â€” session after session.</p>
     <div class="cta-group">
       <a href="https://github.com/TheoV823/mneme" class="btn-primary">Install Mneme HQ</a>
       <a href="https://github.com/TheoV823/mneme" class="btn-ghost">View GitHub</a>
@@ -353,7 +353,7 @@
       <div class="panel">
         <div class="panel-header">
           <div class="panel-dot"></div><div class="panel-dot"></div><div class="panel-dot"></div>
-          <span class="panel-label bad">Without Mneme HQ — Cursor suggests:</span>
+          <span class="panel-label bad">Without Mneme HQ â€” Cursor suggests:</span>
         </div>
         <div class="panel-body">
           <div class="panel-prompt">Prompt: "Add a search endpoint to the API"</div>
@@ -363,7 +363,7 @@
       <div class="panel">
         <div class="panel-header">
           <div class="panel-dot"></div><div class="panel-dot"></div><div class="panel-dot"></div>
-          <span class="panel-label good">With Mneme HQ — pre-flight check:</span>
+          <span class="panel-label good">With Mneme HQ â€” pre-flight check:</span>
         </div>
         <div class="panel-body good-response">
           <div class="panel-prompt">mneme check --mode strict</div>
@@ -393,7 +393,7 @@
           <tr>
             <td>System prompt</td>
             <td>Truncated at context limit; can't cover full decision history; manually maintained</td>
-            <td>Decisions retrieved at query time — only relevant decisions are surfaced</td>
+            <td>Decisions retrieved at query time â€” only relevant decisions are surfaced</td>
           </tr>
           <tr>
             <td>RAG over docs</td>
@@ -438,7 +438,7 @@
         <div class="step-num">3</div>
         <div class="step-body">
           <h4>Generate assistant-specific rules files</h4>
-          <p><code>mneme cursor generate</code> outputs <code>.cursor/rules/mneme.mdc</code> — a distilled ruleset the assistant sees in every session.</p>
+          <p><code>mneme cursor generate</code> outputs <code>.cursor/rules/mneme.mdc</code> â€” a distilled ruleset the assistant sees in every session.</p>
         </div>
       </div>
       <div class="step">
@@ -469,7 +469,7 @@
     </div>
 
     <div class="code-block">
-      <div class="code-block-label">Terminal — mneme check output</div>
+      <div class="code-block-label">Terminal â€” mneme check output</div>
       <pre><span class="cc">$ </span><span class="ck">mneme check</span> <span class="cs">"add a search endpoint that filters by tag"</span> --mode strict
 
 <span class="cc">Retrieving relevant decisions... (3 matched)</span>
@@ -484,7 +484,7 @@
     </div>
 
     <div class="code-block">
-      <div class="code-block-label">CI — .github/workflows/mneme.yml</div>
+      <div class="code-block-label">CI â€” .github/workflows/mneme.yml</div>
       <pre><span class="ck">- name</span>: Check decision compliance
   <span class="ck">run</span>: mneme check --mode strict --ci</pre>
     </div>
@@ -508,7 +508,7 @@
         <div class="metric-label">to add a new decision to the enforcement layer</div>
       </div>
     </div>
-    <div class="simulated-note">? These figures are based on Mneme HQ's internal benchmark harness across 18 simulated violation scenarios — not live customer data.</div>
+    <div class="simulated-note">? These figures are based on Mneme HQ's internal benchmark harness across 18 simulated violation scenarios â€” not live customer data.</div>
   </div>
 
   <!-- FAQ -->
@@ -518,12 +518,12 @@
 
     <details>
       <summary>Does Mneme HQ work with Cursor, Claude Code, and Copilot?</summary>
-      <div class="faq-body">Yes. Mneme HQ works at the workflow level — it's not an IDE plugin. <code>mneme check</code> runs before you prompt, and <code>mneme cursor generate</code> writes a rules file that Cursor picks up automatically. Claude Code users can source the generated rules file via <code>CLAUDE.md</code>.</div>
+      <div class="faq-body">Yes. Mneme HQ works at the workflow level â€” it's not an IDE plugin. <code>mneme check</code> runs before you prompt, and <code>mneme cursor generate</code> writes a rules file that Cursor picks up automatically. Claude Code users can source the generated rules file via <code>CLAUDE.md</code>.</div>
     </details>
 
     <details>
       <summary>What's the difference between Mneme HQ and just writing better system prompts?</summary>
-      <div class="faq-body">System prompts are static and have a context limit. As your decision history grows, a system prompt can't hold it. Mneme HQ uses semantic retrieval — only the decisions relevant to the current query are surfaced, so context stays focused and accurate as the project evolves.</div>
+      <div class="faq-body">System prompts are static and have a context limit. As your decision history grows, a system prompt can't hold it. Mneme HQ uses semantic retrieval â€” only the decisions relevant to the current query are surfaced, so context stays focused and accurate as the project evolves.</div>
     </details>
 
     <details>

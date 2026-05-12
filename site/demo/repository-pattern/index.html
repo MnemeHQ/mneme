@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Repository Pattern Enforcement — Demo Scenario | Mneme HQ</title>
+  <title>Repository Pattern Enforcement â€” Demo Scenario | Mneme HQ</title>
   <meta name="description" content="A walkthrough of how Mneme blocks an ADR-004 violation when an AI coding agent bypasses the Repository pattern in user.service.ts. FAIL verdict that hard-blocks the diff in CI." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
@@ -11,12 +11,12 @@
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Repository Pattern Enforcement — Demo Scenario" />
+  <meta property="og:title" content="Repository Pattern Enforcement â€” Demo Scenario" />
   <meta property="og:description" content="How Mneme blocks an ADR-004 violation when an AI agent bypasses the Repository pattern in user.service.ts. Hard FAIL verdict that gates the PR." />
   <meta property="og:url" content="https://mnemehq.com/demo/repository-pattern/" />
   <meta property="og:image" content="https://mnemehq.com/demo/repository-pattern/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Repository Pattern Enforcement — Demo Scenario" />
+  <meta name="twitter:title" content="Repository Pattern Enforcement â€” Demo Scenario" />
   <meta name="twitter:description" content="How Mneme blocks an ADR-004 violation when an AI agent bypasses the Repository pattern in user.service.ts. Hard FAIL verdict that gates the PR." />
   <meta name="twitter:image" content="https://mnemehq.com/demo/repository-pattern/og.png" />
   <meta name="author" content="Theo Valmis" />
@@ -44,7 +44,7 @@
       },
       {
         "@type": "Article",
-        "headline": "Repository Pattern Enforcement — Demo Scenario",
+        "headline": "Repository Pattern Enforcement â€” Demo Scenario",
         "description": "How Mneme blocks an ADR-004 violation when an AI coding agent bypasses the Repository pattern in user.service.ts. Hard FAIL verdict that gates the PR.",
         "url": "https://mnemehq.com/demo/repository-pattern/",
         "datePublished": "2026-05-09",
@@ -60,7 +60,7 @@
         "mainEntity": [
           {"@type": "Question", "name": "What is the Repository pattern in this scenario?", "acceptedAnswer": {"@type": "Answer", "text": "The Repository pattern is an architectural rule recorded as ADR-004: all data access goes through repository classes, never directly from service or controller layers. Services depend on the repository interface, not on the underlying storage. ADR-004 makes this constraint explicit so it can be referenced, queried, and enforced by Mneme rather than living only in code review folklore."}},
           {"@type": "Question", "name": "Why is this a FAIL and not a WARN?", "acceptedAnswer": {"@type": "Answer", "text": "Architectural pattern violations have outsized downstream cost. Once one service bypasses the repository layer, the next refactor copies the pattern, and within six months the abstraction is dead. Mneme returns FAIL on architectural-pattern violations by default to keep the cost localized to the diff that introduced it."}},
-          {"@type": "Question", "name": "Does the FAIL verdict block the PR?", "acceptedAnswer": {"@type": "Answer", "text": "Yes — when the GitHub Actions enforcement gate is configured for strict mode. The FAIL exit code from mneme check fails the CI job, which blocks the PR from merging until the violation is resolved or an explicit override decision record is added. Override events are themselves tracked, so weakening the rule is a visible decision rather than a silent one."}}
+          {"@type": "Question", "name": "Does the FAIL verdict block the PR?", "acceptedAnswer": {"@type": "Answer", "text": "Yes â€” when the GitHub Actions enforcement gate is configured for strict mode. The FAIL exit code from mneme check fails the CI job, which blocks the PR from merging until the violation is resolved or an explicit override decision record is added. Override events are themselves tracked, so weakening the rule is a visible decision rather than a silent one."}}
         ]
       }
     ]

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>For CTOs &amp; VP Engineering — Mneme HQ</title>
+  <title>For CTOs &amp; VP Engineering â€” Mneme HQ</title>
   <meta name="description" content="AI increases code throughput. Your review capacity does not. Mneme HQ enforces architectural governance before code reaches review." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
@@ -11,12 +11,12 @@
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="For CTOs &amp; VP Engineering — Mneme HQ" />
+  <meta property="og:title" content="For CTOs &amp; VP Engineering â€” Mneme HQ" />
   <meta property="og:description" content="AI increases code throughput. Your review capacity does not. Mneme HQ enforces architectural governance before code reaches review." />
   <meta property="og:url" content="https://mnemehq.com/for/cto/" />
   <meta property="og:image" content="https://mnemehq.com/for/cto/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="For CTOs &amp; VP Engineering — Mneme HQ" />
+  <meta name="twitter:title" content="For CTOs &amp; VP Engineering â€” Mneme HQ" />
   <meta name="twitter:description" content="AI increases code throughput. Your review capacity does not. Mneme HQ enforces architectural governance before code reaches review." />
   <meta name="twitter:image" content="https://mnemehq.com/for/cto/og.png" />
   <!-- Google Tag Manager -->
@@ -266,7 +266,7 @@
       },
       {
         "@type": "WebPage",
-        "name": "For CTOs and VP Engineering — Mneme HQ",
+        "name": "For CTOs and VP Engineering â€” Mneme HQ",
         "description": "AI increases code throughput. Your review capacity does not. Mneme HQ enforces architectural governance before code reaches review.",
         "url": "https://mnemehq.com/for/cto/",
         "datePublished": "2026-04-15",
@@ -327,7 +327,7 @@
   <div class="section-wrap">
     <div class="section-eyebrow">The Problem</div>
     <h2 class="section-title">The bottleneck isn't generation. It's governance.</h2>
-    <p class="prose">AI coding assistants have eliminated the typing bottleneck. They haven't eliminated the governance bottleneck. Senior engineers are still the gate — reviewing more PRs, catching the same violations, and explaining the same decisions to tools that have no memory of them.</p>
+    <p class="prose">AI coding assistants have eliminated the typing bottleneck. They haven't eliminated the governance bottleneck. Senior engineers are still the gate â€” reviewing more PRs, catching the same violations, and explaining the same decisions to tools that have no memory of them.</p>
 
     <div class="pain-grid">
       <div class="pain-card">
@@ -371,22 +371,22 @@
           <tr>
             <td>Rules Files</td>
             <td>Flat text decays as teams add more rules. No semantic retrieval. Context limit hit as the project grows.</td>
-            <td>Structured decision store — only relevant decisions are surfaced at query time</td>
+            <td>Structured decision store â€” only relevant decisions are surfaced at query time</td>
           </tr>
           <tr>
             <td>Prompt Templates</td>
             <td>Static. Can't cover a growing decision history. Manually maintained and easily out of date.</td>
-            <td>Decisions retrieved dynamically — the constraint set stays current without manual curation</td>
+            <td>Decisions retrieved dynamically â€” the constraint set stays current without manual curation</td>
           </tr>
           <tr>
             <td>RAG</td>
             <td>Documents aren't decisions. Retrieves text, not enforceable rules. No violation detection layer. <a href="/insights/why-rag-fails-for-architectural-governance/">Why RAG fails &rarr;</a></td>
-            <td>Enforcement layer on top of retrieval — checks for violations, not just relevance</td>
+            <td>Enforcement layer on top of retrieval â€” checks for violations, not just relevance</td>
           </tr>
           <tr>
             <td>Code Review</td>
             <td>Catches violations after code is written. Wastes senior engineer time on avoidable corrections. <a href="/insights/why-code-review-cannot-scale-with-ai-output/">Why code review doesn't scale &rarr;</a></td>
-            <td>Pre-flight check surfaces violations before generation — review stays for judgment, not repetition</td>
+            <td>Pre-flight check surfaces violations before generation â€” review stays for judgment, not repetition</td>
           </tr>
         </tbody>
       </table>
@@ -397,7 +397,7 @@
   <div class="section-wrap">
     <div class="section-eyebrow">How It Works</div>
     <h2 class="section-title">Architectural decisions become rules. Rules become a gate.</h2>
-    <p class="prose">Your team's architectural decisions — service boundaries, data handling, vendor choices, naming and review standards — live as structured records in the same repository as the code. Every AI coding session, in any tool your engineers use, reads from that single source before it generates anything.</p>
+    <p class="prose">Your team's architectural decisions â€” service boundaries, data handling, vendor choices, naming and review standards â€” live as structured records in the same repository as the code. Every AI coding session, in any tool your engineers use, reads from that single source before it generates anything.</p>
     <p class="prose">When a generation would violate a decision, the violation is surfaced before the change lands &mdash; not after a senior engineer has spent twenty minutes catching it in a PR. When a decision changes, you update it once, and every AI agent across the org picks it up on the next session. No per-tool configuration sprawl. No drift between teams using different assistants.</p>
     <p class="prose">Mneme HQ is the layer between your architectural standards and the AI-generated code that has to honor them. It is the only place a decision needs to live.</p>
   </div>
@@ -449,7 +449,7 @@
     <div class="proof-block">
       <div>
         <div class="stat-large">170</div>
-        <div class="stat-desc">integration tests covering deterministic enforcement — violation detection, scope matching, precedence resolution, and CI gate behavior. <a href="/demo/">See the demo &rarr;</a></div>
+        <div class="stat-desc">integration tests covering deterministic enforcement â€” violation detection, scope matching, precedence resolution, and CI gate behavior. <a href="/demo/">See the demo &rarr;</a></div>
       </div>
     </div>
   </div>

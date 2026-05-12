@@ -3,20 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Storage Decision Enforcement — Demo Scenario | Mneme HQ</title>
-  <meta name="description" content="A walkthrough of how Mneme enforces ADR-001 — JSON-only storage, no external database — when an AI coding agent is asked to refactor a storage backend. Same prompt, same model, different answer." />
+  <title>Storage Decision Enforcement â€” Demo Scenario | Mneme HQ</title>
+  <meta name="description" content="A walkthrough of how Mneme enforces ADR-001 â€” JSON-only storage, no external database â€” when an AI coding agent is asked to refactor a storage backend. Same prompt, same model, different answer." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/demo/storage-decision/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Storage Decision Enforcement — Demo Scenario" />
+  <meta property="og:title" content="Storage Decision Enforcement â€” Demo Scenario" />
   <meta property="og:description" content="How Mneme enforces ADR-001 (JSON-only storage) when an AI agent proposes migrating to PostgreSQL or Redis. PASS verdict in mneme check." />
   <meta property="og:url" content="https://mnemehq.com/demo/storage-decision/" />
   <meta property="og:image" content="https://mnemehq.com/demo/storage-decision/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Storage Decision Enforcement — Demo Scenario" />
+  <meta name="twitter:title" content="Storage Decision Enforcement â€” Demo Scenario" />
   <meta name="twitter:description" content="How Mneme enforces ADR-001 (JSON-only storage) when an AI agent proposes migrating to PostgreSQL or Redis. PASS verdict in mneme check." />
   <meta name="twitter:image" content="https://mnemehq.com/demo/storage-decision/og.png" />
   <meta name="author" content="Theo Valmis" />
@@ -44,7 +44,7 @@
       },
       {
         "@type": "Article",
-        "headline": "Storage Decision Enforcement — Demo Scenario",
+        "headline": "Storage Decision Enforcement â€” Demo Scenario",
         "description": "Walkthrough of how Mneme enforces ADR-001 (JSON-only storage) when an AI coding agent proposes a database migration. Same prompt, same model, different answer.",
         "url": "https://mnemehq.com/demo/storage-decision/",
         "datePublished": "2026-05-09",
@@ -58,7 +58,7 @@
       {
         "@type": "FAQPage",
         "mainEntity": [
-          {"@type": "Question", "name": "What is ADR-001 in this scenario?", "acceptedAnswer": {"@type": "Answer", "text": "ADR-001 is a project decision record stating that the codebase uses JSON file storage only — no external database, no migration to PostgreSQL, Redis, or similar. The decision is stored in project_memory.json and surfaced to any AI coding agent that asks Mneme for relevant constraints before generating code."}},
+          {"@type": "Question", "name": "What is ADR-001 in this scenario?", "acceptedAnswer": {"@type": "Answer", "text": "ADR-001 is a project decision record stating that the codebase uses JSON file storage only â€” no external database, no migration to PostgreSQL, Redis, or similar. The decision is stored in project_memory.json and surfaced to any AI coding agent that asks Mneme for relevant constraints before generating code."}},
           {"@type": "Question", "name": "Why does the same model give a different answer with Mneme?", "acceptedAnswer": {"@type": "Answer", "text": "Without Mneme, the model relies on training-data priors that say 'JSON storage at scale should migrate to a real database.' With Mneme, the model receives ADR-001 in its context window before generating, so it proposes extending the existing storage module instead of replacing it. The model itself is unchanged; the context is enforced."}},
           {"@type": "Question", "name": "Does this work in CI as well as the editor?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The same decision corpus drives interactive coding sessions through Claude Code or Cursor and the GitHub Actions enforcement gate that runs mneme check on every pull request. A diff that contradicts ADR-001 would be flagged in CI even if it slipped past the editor-time hook."}}
         ]
