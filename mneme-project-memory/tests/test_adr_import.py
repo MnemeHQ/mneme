@@ -114,3 +114,51 @@ def test_compile_for_import_clean_corpus_has_no_diagnostics():
     assert report.diagnostics == []
     active_ids = {n.id for n in report.active_nodes}
     assert active_ids == {"ADR-101", "ADR-102"}
+
+
+def test_format_preview_lists_active_nodes_and_constraints():
+    from mneme.adr_import import compile_for_import, format_preview
+
+    report = compile_for_import(FIXTURES / "adrs_import_basic")
+    out = format_preview(report, collisions=[])
+
+    # Header
+    assert "ADR import preview" in out
+    # Active set
+    assert "ADR-101" in out
+    assert "ADR-102" in out
+    # Status projection (not the raw "accepted")
+    assert "active" in out
+    # The "no mongodb" constraint (FORBID_DEPENDENCY bridge)
+    assert "no mongodb" in out
+    # ADR-103 is superseded -> shown but flagged
+    assert "ADR-103" in out
+    assert "superseded" in out
+
+
+def test_format_preview_includes_collision_diagnostics():
+    from mneme.adr_import import (
+        compile_for_import,
+        detect_collisions,
+        format_preview,
+    )
+
+    report = compile_for_import(FIXTURES / "adrs_import_basic")
+    target = json.loads(
+        (FIXTURES / "memory_for_import_collision.json").read_text(encoding="utf-8")
+    )
+    collisions = detect_collisions(report.active_nodes, target)
+
+    out = format_preview(report, collisions=collisions)
+    assert "Conflicts" in out
+    assert "ADR-101" in out
+    assert "--update-existing" in out
+
+
+def test_format_preview_shows_active_active_contradiction_block():
+    from mneme.adr_import import compile_for_import, format_preview
+
+    report = compile_for_import(FIXTURES / "adrs_import_with_conflicts")
+    out = format_preview(report, collisions=[])
+    assert "Active-active contradiction" in out
+    assert "--approve-conflicts" in out

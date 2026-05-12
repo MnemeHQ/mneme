@@ -204,6 +204,77 @@ def detect_collisions(
     return out
 
 
+def format_preview(
+    report: ImportReport,
+    collisions: list[ImportDiagnostic],
+) -> str:
+    """Render an ImportReport + collision list as a deterministic preview.
+
+    Plain text, no colors, no unicode glyphs (CI- and Windows-console-safe).
+    Sections appear in a fixed order so output is diffable across runs.
+    """
+    lines: list[str] = []
+    lines.append("ADR import preview")
+    lines.append("=" * 60)
+    lines.append("")
+
+    # Section: active set
+    lines.append(f"Active set ({len(report.active_nodes)} ADRs):")
+    if not report.active_nodes:
+        lines.append("  (none -- see diagnostics below)")
+    for node in report.active_nodes:
+        lines.append(f"  [{node.id}] status={node.status}")
+        decision = next((d for d in report.decisions if d.id == node.id), None)
+        if decision:
+            for c in decision.constraints:
+                lines.append(f"      constraint: {c}")
+            if not decision.constraints:
+                lines.append("      (no ## Constraints directives)")
+    lines.append("")
+
+    # Section: full corpus (graph view)
+    inactive = [n for n in report.all_nodes if n.status != "active"]
+    if inactive:
+        lines.append(f"Non-active ADRs ({len(inactive)}):")
+        for node in inactive:
+            extra = (
+                f" (superseded_by {node.superseded_by})"
+                if node.superseded_by else ""
+            )
+            lines.append(f"  [{node.id}] status={node.status}{extra}")
+        lines.append("")
+
+    # Section: precedence diagnostics
+    precedence_diags = [
+        d for d in report.diagnostics
+        if d.kind == "active_active_contradiction"
+    ]
+    if precedence_diags:
+        lines.append("Active-active contradiction diagnostics:")
+        for d in precedence_diags:
+            lines.append(f"  - {d.message}")
+        lines.append("")
+        lines.append(
+            "  To proceed despite the contradiction, re-run with "
+            "--approve-conflicts."
+        )
+        lines.append("")
+
+    # Section: collisions vs existing memory
+    if collisions:
+        lines.append("Conflicts vs existing memory:")
+        for c in collisions:
+            lines.append(f"  - {c.message}")
+        lines.append("")
+        lines.append(
+            "  To overwrite existing decisions[] entries, re-run with "
+            "--update-existing."
+        )
+        lines.append("")
+
+    return "\n".join(lines)
+
+
 __all__ = [
     "DecisionNode",
     "GraphStatus",
@@ -213,4 +284,5 @@ __all__ = [
     "project_decision_graph",
     "compile_for_import",
     "detect_collisions",
+    "format_preview",
 ]
