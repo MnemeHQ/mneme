@@ -432,8 +432,7 @@
   <div class="pilot-form-wrap">
     <div class="form-heading">Tell us about your team</div>
 
-    <!-- Replace action with your form endpoint (Formspree, HubSpot, etc.) -->
-    <form class="field-group" method="POST" action="mailto:hi@theovalmis.com" enctype="text/plain">
+    <form class="field-group" id="pilot-form" method="POST" action="https://formspree.io/f/meennlwj">
 
       <div class="field-row">
         <div class="field">
@@ -476,11 +475,20 @@
       </div>
 
       <div class="submit-row">
-        <button type="submit" class="btn-submit">Submit pilot request</button>
+        <button type="submit" class="btn-submit" id="pilot-submit">Submit pilot request</button>
         <span class="submit-note">We respond within 1–2 business days.<br>Not sure if you fit? <a href="/for/" style="color: var(--muted); text-decoration: underline; text-decoration-color: var(--border2);">See who Mneme is for →</a></span>
       </div>
 
     </form>
+
+    <div id="pilot-success" style="display:none;margin-top:1.5rem;padding:1.25rem 1.5rem;background:rgba(200,240,96,0.06);border:1px solid rgba(200,240,96,0.25);border-radius:10px;">
+      <div style="font-family:'DM Mono',monospace;font-size:0.82rem;color:var(--accent);margin-bottom:0.4rem;">Request received</div>
+      <p style="font-size:0.88rem;color:var(--muted);margin:0;line-height:1.6;">We'll review your application and respond within 1–2 business days.</p>
+    </div>
+    <div id="pilot-error" style="display:none;margin-top:1.5rem;padding:1.25rem 1.5rem;background:rgba(255,112,112,0.06);border:1px solid rgba(255,112,112,0.25);border-radius:10px;">
+      <div style="font-family:'DM Mono',monospace;font-size:0.82rem;color:#ff7070;margin-bottom:0.4rem;">Submission failed</div>
+      <p style="font-size:0.88rem;color:var(--muted);margin:0;line-height:1.6;">Something went wrong. Please email <a href="mailto:theo@mnemehq.com" style="color:var(--accent);">theo@mnemehq.com</a> directly.</p>
+    </div>
   </div>
 
 </div>
@@ -586,6 +594,39 @@
   });
   window.addEventListener('resize', function(){
     if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false);
+  });
+})();
+</script>
+<script>
+(function(){
+  var form = document.getElementById('pilot-form');
+  var btn = document.getElementById('pilot-submit');
+  var success = document.getElementById('pilot-success');
+  var error = document.getElementById('pilot-error');
+  if (!form) return;
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    btn.disabled = true;
+    btn.textContent = 'Submitting…';
+    error.style.display = 'none';
+    fetch(form.action, {
+      method: 'POST',
+      body: new FormData(form),
+      headers: { 'Accept': 'application/json' }
+    }).then(function(res){
+      if (res.ok) {
+        form.style.display = 'none';
+        success.style.display = 'block';
+      } else {
+        return res.json().then(function(data){
+          throw new Error(data.error || 'error');
+        });
+      }
+    }).catch(function(){
+      btn.disabled = false;
+      btn.textContent = 'Submit pilot request';
+      error.style.display = 'block';
+    });
   });
 })();
 </script>

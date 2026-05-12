@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What Is the AI SDLC? — Mneme HQ</title>
+  <meta name="description" content="The AI SDLC isn't a new development methodology. It's the familiar lifecycle — redefined by the speed, scale, and autonomy of AI-native code generation, and the governance gap that creates." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/insights/what-is-the-ai-sdlc/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="What Is the AI SDLC?" />
+  <meta property="og:description" content="The AI SDLC isn't a new development methodology. It's the familiar lifecycle — redefined by the speed, scale, and autonomy of AI-native code generation, and the governance gap that creates." />
+  <meta property="og:url" content="https://mnemehq.com/insights/what-is-the-ai-sdlc/" />
+  <meta property="og:image" content="https://mnemehq.com/insights/what-is-the-ai-sdlc/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="What Is the AI SDLC?" />
+  <meta name="twitter:description" content="The AI SDLC isn't a new development methodology. It's the familiar lifecycle — redefined by the speed, scale, and autonomy of AI-native code generation, and the governance gap that creates." />
+  <meta name="twitter:image" content="https://mnemehq.com/insights/what-is-the-ai-sdlc/og.png" />
+  <meta name="author" content="Theo Valmis" />
+  <meta property="article:published_time" content="2026-05-12T00:00:00Z" />
+  <meta property="article:author" content="https://mnemehq.com/founder/" />
+  <meta property="article:section" content="Engineering" />
+  <meta property="article:tag" content="ai" />
+  <meta property="article:tag" content="sdlc" />
+  <meta property="article:tag" content="devtools" />
+  <meta property="article:tag" content="governance" />
+  <meta property="article:tag" content="engineering" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #88889a;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .article-wrap { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 7rem; }
+    .article-header { margin-bottom: 3.5rem; }
+    .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+
+    .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
+    .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
+    .article-body p strong { color: var(--text); font-weight: 500; }
+    .article-body a { color: var(--accent); text-decoration: none; }
+    .article-body a:hover { text-decoration: underline; }
+
+    .phase-list { display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 12px; overflow: hidden; margin: 2rem 0; }
+    .phase-row { background: var(--surface); padding: 1rem 1.25rem; display: flex; gap: 1.25rem; align-items: flex-start; }
+    .phase-label { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--accent); background: rgba(200,240,96,0.08); border: 1px solid rgba(200,240,96,0.2); border-radius: 6px; padding: 0.2rem 0.55rem; flex-shrink: 0; margin-top: 2px; white-space: nowrap; }
+    .phase-text { font-size: 0.85rem; color: var(--muted); line-height: 1.7; }
+    .phase-text strong { color: var(--text); font-weight: 500; }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; line-height: 1.75; }
+    .callout p strong { color: var(--accent); }
+
+    .governance-list { display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 12px; overflow: hidden; margin: 1.75rem 0; }
+    .gov-row { background: var(--surface); padding: 1rem 1.25rem; display: flex; gap: 1rem; align-items: flex-start; }
+    .gov-bullet { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; flex-shrink: 0; margin-top: 0.5rem; }
+    .gov-content .gov-title { font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 0.2rem; }
+    .gov-content .gov-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.65; }
+
+    .closing-statement { margin: 3rem 0 0; padding: 1.75rem 2rem; background: var(--surface); border: 1px solid var(--border2); border-radius: 12px; }
+    .closing-statement p { font-family: 'Instrument Serif', serif; font-size: 1.15rem; line-height: 1.65; color: var(--text); font-style: italic; margin: 0; }
+
+    .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .back-link:hover { color: var(--text); }
+    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2rem; }
+    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--accent-dim); }
+
+    .faq-list { margin-top: 3rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .faq-list h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 1.5rem; color: var(--text); }
+    .faq-item { margin: 0.75rem 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .faq-item summary { padding: 1rem 1.25rem; cursor: pointer; font-size: 0.88rem; color: var(--text); background: var(--surface); list-style: none; }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary:hover { background: var(--surface2); }
+    .faq-body { padding: 1rem 1.25rem 1.25rem; font-size: 0.85rem; color: var(--muted); line-height: 1.8; background: var(--surface); border-top: 1px solid var(--border); }
+    .faq-body a { color: var(--accent); text-decoration: none; }
+    .faq-body a:hover { text-decoration: underline; }
+
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .breadcrumb-nav { max-width: 720px; margin: 0 auto; padding: 1.75rem 2rem 0.85rem; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.82rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; padding: 0; flex-shrink: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; transition: border-color 0.15s, background 0.15s; }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span { display: block; width: 18px; height: 2px; background: currentColor; border-radius: 1px; transition: transform 0.25s ease, opacity 0.18s ease; transform-origin: center; }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    @media (max-width: 900px) {
+      html, body { overflow-x: hidden; }
+      body.menu-open { overflow: hidden; }
+      nav, nav.site-nav { position: relative; padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 1.25rem; z-index: 99; max-height: 0; overflow: hidden; opacity: 0; visibility: hidden; transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s; }
+      .nav-links.open { max-height: 80vh; opacity: 1; visibility: visible; padding: 0.5rem 1.25rem 1.25rem; transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s; overflow-y: auto; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.92rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+      .article-wrap { padding: 3rem 1.25rem 5rem; }
+    }
+    /* === Related reading === */
+    h2#related-reading { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 400; margin-top: 3.5rem; margin-bottom: 0.75rem; }
+    h2#related-reading + ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    h2#related-reading + ul li { margin: 0; }
+    h2#related-reading + ul li a { display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.1rem; background: var(--surface); color: var(--text); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.15s, color 0.15s; }
+    h2#related-reading + ul li a::after { content: '\2192'; opacity: 0.35; transition: opacity 0.15s, transform 0.15s; display: inline-block; margin-left: 0.5rem; }
+    h2#related-reading + ul li a:hover { background: var(--surface2); color: var(--accent); }
+    h2#related-reading + ul li a:hover::after { opacity: 1; transform: translateX(3px); }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Insights", "item": "https://mnemehq.com/insights/"},
+          {"@type": "ListItem", "position": 3, "name": "What Is the AI SDLC?", "item": "https://mnemehq.com/insights/what-is-the-ai-sdlc/"}
+        ]
+      },
+      {
+        "@type": "Article",
+        "headline": "What Is the AI SDLC?",
+        "description": "The AI SDLC isn't a new development methodology. It's the familiar lifecycle — redefined by the speed, scale, and autonomy of AI-native code generation, and the governance gap that creates.",
+        "datePublished": "2026-05-12",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "mainEntityOfPage": "https://mnemehq.com/insights/what-is-the-ai-sdlc/",
+        "image": "https://mnemehq.com/insights/what-is-the-ai-sdlc/og.png",
+        "keywords": ["AI SDLC", "software development lifecycle", "AI coding", "architectural governance", "devtools"]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+
+  <nav>
+    <a href="/" class="logo">
+      <img src="/logo-v2.png" alt="Mneme HQ" height="28" style="display:block;" />
+    </a>
+    <button class="nav-hamburger" aria-label="Toggle navigation" aria-expanded="false" aria-controls="nav-links-menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="nav-links" id="nav-links-menu">
+      <a href="/insights/" class="active">Insights</a>
+      <a href="/benchmark/">Benchmark</a>
+      <a href="/compare/">Compare</a>
+      <a href="/standards/">Standards</a>
+      <a href="/pilot/" class="btn-nav-cta">Request pilot</a>
+    </div>
+  </nav>
+
+  <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+    <ol class="breadcrumb">
+      <li><a href="/">Home</a></li>
+      <li><a href="/insights/">Insights</a></li>
+      <li aria-current="page">What Is the AI SDLC?</li>
+    </ol>
+  </nav>
+
+  <div class="article-wrap">
+    <header class="article-header">
+      <div class="article-eyebrow">
+        <span class="eyebrow-tag">Category Education</span>
+        <span class="eyebrow-dot"></span>
+        <span class="eyebrow-meta">5 min read</span>
+      </div>
+      <h1>What Is the AI SDLC?</h1>
+      <p class="article-lede">AI SDLC is the evolution of the traditional software development lifecycle once AI coding agents become active participants in the workflow. Not a new methodology &mdash; the same lifecycle, but every phase now involves AI systems that actively participate in implementation and decision-making. That changes how teams maintain quality, architecture, and velocity.</p>
+      <div class="byline">
+        <a href="/founder/">Theo Valmis</a>
+        <span class="sep">/</span>
+        May 2026
+      </div>
+    </header>
+
+    <div class="article-body">
+
+      <h2 id="phases">The phases, upgraded with AI</h2>
+
+      <p>The six-phase lifecycle that software teams have used for decades &mdash; plan, design, implement, test, review, maintain &mdash; is still intact. What's changed is that each phase now has an AI participant alongside the human one. The nature of that participation varies by phase, but the effect compounds across the full cycle.</p>
+
+      <div class="phase-list">
+        <div class="phase-row">
+          <span class="phase-label">Plan</span>
+          <div class="phase-text">AI helps draft specs, break down tasks, and propose architectures.</div>
+        </div>
+        <div class="phase-row">
+          <span class="phase-label">Design</span>
+          <div class="phase-text">AI proposes architectures, evaluates implementation patterns, and scaffolds system structure.</div>
+        </div>
+        <div class="phase-row">
+          <span class="phase-label">Implement</span>
+          <div class="phase-text">Agents like Cursor, Claude Code, and Copilot generate code, refactor, and scaffold modules &mdash; at a pace no human team can match alone.</div>
+        </div>
+        <div class="phase-row">
+          <span class="phase-label">Test</span>
+          <div class="phase-text">AI writes tests, fuzzes inputs, and reasons about edge cases.</div>
+        </div>
+        <div class="phase-row">
+          <span class="phase-label">Review</span>
+          <div class="phase-text">LLMs summarize diffs, flag inconsistencies, and enforce patterns &mdash; though not architectural invariants.</div>
+        </div>
+        <div class="phase-row">
+          <span class="phase-label">Maintain</span>
+          <div class="phase-text">AI assists with migrations, dependency updates, and documentation.</div>
+        </div>
+      </div>
+
+      <p>The lifecycle remains familiar. What changes is the speed, scale, and autonomy of code generation.</p>
+
+      <h2 id="why-the-term-exists">Why the term exists</h2>
+
+      <p>AI SDLC gives teams a common frame for a complex transition:</p>
+
+      <div class="callout">
+        <p>"We're modernizing the SDLC for AI-native engineering."</p>
+      </div>
+
+      <p>It's a category label &mdash; a way to talk about the shift without requiring everyone to understand architectural governance concepts first. The term maps an unfamiliar problem onto a familiar frame, which makes it useful for alignment across engineering, product, and leadership. That's why it travels: it meets people where they are before it asks them to think differently about where they're going.</p>
+
+      <p>The risk is that teams stop at the label. Adopting AI tooling across the SDLC without adapting the governance model that sits underneath it is how architectural drift becomes a structural problem rather than a sprint retrospective item.</p>
+
+      <h2 id="where-mneme-fits">Where Mneme fits</h2>
+
+      <p>Mneme isn't redefining the SDLC. Mneme is defining the <strong>governance layer</strong> required because AI is now part of the SDLC.</p>
+
+      <p>When AI agents participate in implementation and decision-making across the lifecycle, they generate code at a speed and volume that outpaces traditional quality controls. Review stays linear. Architecture gets complicated faster than it gets documented. Decisions made in one session don't carry forward into the next.</p>
+
+      <div class="governance-list">
+        <div class="gov-row">
+          <div class="gov-bullet"></div>
+          <div class="gov-content">
+            <div class="gov-title">Agent-side governance</div>
+            <div class="gov-desc">Injects architectural constraints before generation &mdash; so the AI writes within your decision boundaries, not around them.</div>
+          </div>
+        </div>
+        <div class="gov-row">
+          <div class="gov-bullet"></div>
+          <div class="gov-content">
+            <div class="gov-title">Deterministic enforcement in CI</div>
+            <div class="gov-desc">Validates architectural compliance before merge &mdash; a hard gate, not a suggestion.</div>
+          </div>
+        </div>
+        <div class="gov-row">
+          <div class="gov-bullet"></div>
+          <div class="gov-content">
+            <div class="gov-title">Benchmarks and ADR enforcement</div>
+            <div class="gov-desc">Maintains architectural continuity over time, across tools, and across engineers.</div>
+          </div>
+        </div>
+      </div>
+
+      <p>The AI SDLC introduced a new systems problem: architectural drift at machine speed. Mneme exists to govern that layer.</p>
+
+      <div class="closing-statement">
+        <p>As AI coding agents become infrastructure, architectural governance becomes part of the software lifecycle itself.</p>
+      </div>
+
+    </div>
+
+    <h2 id="related-reading">Related reading</h2>
+    <ul>
+        <li><a href="/insights/deployment-quality-will-define-the-ai-era/">Deployment Quality Will Define the AI Era</a></li>
+        <li><a href="/insights/review-is-not-governance/">Review Is Not Governance</a></li>
+        <li><a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/">Architectural Governance Across Heterogeneous AI Coding Agents</a></li>
+    </ul>
+
+    <div class="faq-list">
+      <h2>FAQ</h2>
+      <details class="faq-item">
+        <summary>Is the AI SDLC a new methodology like Agile or DevOps?</summary>
+        <div class="faq-body">No. Agile changed how teams organize work. DevOps changed how code moves from development to production. AI SDLC describes a shift in who &mdash; or what &mdash; participates in the existing lifecycle. The phases remain the same; the participants and the throughput change. What that participation requires operationally is the governance conversation, not a new process framework.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Does AI benefit every SDLC phase equally?</summary>
+        <div class="faq-body">No. The implementation phase sees the most immediate impact &mdash; agents can generate, refactor, and scaffold code at a pace that compresses timelines significantly. Planning and design benefit from AI as a thought partner, but remain human-judgment-heavy. Review and maintain phases are where the downstream risk concentrates: if implementation accelerates but review stays linear, the backlog of architectural decisions grows faster than it's resolved. That's the core structural tension in the AI SDLC.</div>
+      </details>
+      <details class="faq-item">
+        <summary>What goes wrong if you skip governance in the AI SDLC?</summary>
+        <div class="faq-body">Architectural drift. AI agents generate code that's syntactically correct and locally reasonable, but that accumulates decisions inconsistent with the broader architecture &mdash; wrong storage layers, dependency violations, pattern deviations &mdash; at a rate no review process can absorb. The problem is invisible until the codebase becomes expensive to change. See <a href="/insights/why-code-review-cannot-scale-with-ai-output/">Why Code Review Cannot Scale With AI Output</a> for the throughput math, and <a href="/insights/review-is-not-governance/">Review Is Not Governance</a> for why catching it at PR time is the wrong layer.</div>
+      </details>
+      <details class="faq-item">
+        <summary>How does Mneme fit into an existing CI/CD pipeline?</summary>
+        <div class="faq-body">Mneme operates at two points. At generation time, it injects relevant architectural decision records into the agent's context via tool hooks (Claude Code's PreToolUse, Cursor's rules export). At commit time, the CI gate validates the output against the same decision corpus and either warns or blocks, depending on configuration. It doesn't replace CI/CD &mdash; it adds an architectural compliance layer that runs before your existing quality gates. See the <a href="/integrations/github-actions/">GitHub Actions integration</a> for setup details.</div>
+      </details>
+    </div>
+
+    <footer class="article-footer">
+      <a href="/insights/" class="back-link">&larr; Back to Insights</a>
+
+      <div class="cta-block">
+        <h3>Govern what the AI generates</h3>
+        <p>Mneme HQ enforces your architectural decisions at generation time, via Claude Code's PreToolUse hook. Open source.</p>
+        <a href="/pilot/" class="btn-primary">Request pilot access</a>
+      </div>
+    </footer>
+  </div>
+
+  <footer>
+    <a href="/">Mneme HQ</a> &nbsp;&middot;&nbsp;
+    <a href="/insights/">Insights</a> &nbsp;&middot;&nbsp;
+    <a href="/benchmark/">Benchmark</a> &nbsp;&middot;&nbsp;
+    <a href="/pilot/">Pilot</a>
+  </footer>
+
+  <script>
+    const btn = document.querySelector('.nav-hamburger');
+    const links = document.getElementById('nav-links-menu');
+    if (btn && links) {
+      btn.addEventListener('click', () => {
+        const open = links.classList.toggle('open');
+        btn.setAttribute('aria-expanded', open);
+        document.body.classList.toggle('menu-open', open);
+      });
+    }
+  </script>
+</body>
+</html>

@@ -164,6 +164,30 @@
       margin: 0 auto 1.25rem;
       font-family: 'Inter', sans-serif;
     }
+    .hero-bullets {
+      list-style: none;
+      margin: 0 auto 1.25rem;
+      max-width: 480px;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+    .hero-bullets li {
+      font-size: 0.88rem;
+      color: var(--text);
+      padding-left: 1.4rem;
+      position: relative;
+      line-height: 1.5;
+    }
+    .hero-bullets li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
     .hero-support {
       font-size: 0.82rem;
       color: var(--teal);
@@ -998,7 +1022,12 @@
   <div class="hero">
     <div class="hero-tag">Architectural governance for AI-assisted development</div>
     <h1>Govern AI coding agents <br>before they generate the code.</h1>
-    <p class="hero-sub">Mneme is the architectural governance layer for AI-assisted development. It compiles your architectural intent into enforceable constraints that AI coding agents must respect at the pre-generation stage.</p>
+    <p class="hero-sub">Stop architectural drift before it reaches review. Mneme catches violations at the moment AI generates code — so your standards are enforced, not just documented.</p>
+    <ul class="hero-bullets">
+      <li>Block banned frameworks, cross-boundary calls, and superseded decisions before generation</li>
+      <li>No re-prompting — constraints apply on every call, every session, across every agent</li>
+      <li>Surface violations before the PR, not during it — cut review overhead at the source</li>
+    </ul>
     <p class="hero-support">Works with direct API integrations, coding assistants, agent frameworks, and managed agent platforms.</p>
     <div class="cta-group">
       <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub</a>
@@ -1165,35 +1194,35 @@
         <div class="step-num">1</div>
         <div class="step-body">
           <h4>Load</h4>
-          <p>Load structured project memory from a human-editable JSON file — rules, constraints, facts, and prior decision records.</p>
+          <p>Your decisions become durable rules. Engineers edit a JSON file once; Mneme loads it on every call — no re-prompting, no session amnesia.</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">2</div>
         <div class="step-body">
           <h4>Retrieve</h4>
-          <p>Retrieve only the rules relevant to the current task using deterministic keyword scoring. Same query, same result.</p>
+          <p>The right rules reach the agent every time. Deterministic scoring means the same task always surfaces the same constraints — no probabilistic gaps, no missed standards.</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">3</div>
         <div class="step-body">
           <h4>Build</h4>
-          <p>Build a compact context packet containing only what the model needs to know about your project's established decisions.</p>
+          <p>Only relevant constraints reach the agent. A targeted packet keeps latency low and prevents rule dilution — the agent gets what applies, not everything you've ever decided.</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">4</div>
         <div class="step-body">
           <h4>Inject</h4>
-          <p>Inject the context packet as the system prompt before every LLM call — regardless of which tool or platform makes the call.</p>
+          <p>Every AI call runs under your standards. The context packet is injected as the system prompt before generation — regardless of agent, IDE, or platform.</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">5</div>
         <div class="step-body">
           <h4>Evaluate</h4>
-          <p>Score the response against the injected context. Surface any violations before code reaches review.</p>
+          <p>Violations surface before review, not during it. Responses are scored against the injected constraints — giving you a blocking gate before code reaches your PR queue.</p>
         </div>
       </div>
     </div>
@@ -1249,6 +1278,18 @@
     <p style="color:var(--muted);font-size:0.92rem;line-height:1.7;margin:-1.5rem 0 2rem;max-width:620px;">
       Mneme injects your team's architectural decisions into AI-assisted generation. Below is what that catches in practice &mdash; the kinds of changes an agent will otherwise ship, because nothing told it not to.
     </p>
+
+    <!-- Scenario callout -->
+    <div style="background:rgba(200,240,96,0.04);border:1px solid rgba(200,240,96,0.18);border-radius:10px;padding:1.4rem 1.75rem;margin-bottom:2.5rem;max-width:720px;">
+      <div style="font-size:0.68rem;font-family:'DM Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:0.9rem;">Example scenario</div>
+      <p style="font-size:0.9rem;color:var(--text);line-height:1.65;margin-bottom:0.85rem;">
+        A developer asks Claude Code to add analytics to a checkout route. The agent proposes importing the BigQuery client directly into the frontend service &mdash; violating your layered architecture decision that data-platform calls belong in a backend service only.
+      </p>
+      <p style="font-size:0.88rem;color:var(--teal);line-height:1.55;">
+        Mneme detects the cross-boundary call before generation completes. The violation is flagged and blocked &mdash; the agent never writes the code, and nothing reaches your PR queue.
+      </p>
+    </div>
+
     <div class="works-grid">
       <div class="works-card">
         <h3>Unauthorized framework introduction</h3>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -199,6 +199,14 @@
   .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
   .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
 }
+      /* === Related reading === */
+    h2#related-reading { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 400; margin-top: 3.5rem; margin-bottom: 0.75rem; }
+    h2#related-reading + ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    h2#related-reading + ul li { margin: 0; }
+    h2#related-reading + ul li a { display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.1rem; background: var(--surface); color: var(--text); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.15s, color 0.15s; }
+    h2#related-reading + ul li a::after { content: '\2192'; opacity: 0.35; transition: opacity 0.15s, transform 0.15s; display: inline-block; margin-left: 0.5rem; }
+    h2#related-reading + ul li a:hover { background: var(--surface2); color: var(--accent); }
+    h2#related-reading + ul li a:hover::after { opacity: 1; transform: translateX(3px); }
   </style>
   <script type="application/ld+json">
   {
@@ -379,11 +387,11 @@
   </div>
 
   
-    <h2 id="related-reading" style="margin-top:3rem;">Related reading</h2>
-    <ul style="margin:0 0 1.25rem 1.5rem;">
-        <li><a href="/insights/why-code-review-cannot-scale-with-ai-output/">why code review cannot scale with AI output</a></li>
-        <li><a href="/insights/ai-code-review-does-not-scale-linearly/">review scales sub-linearly</a></li>
-        <li><a href="/insights/review-is-not-governance/">review is not governance</a></li>
+    <h2 id="related-reading">Related reading</h2>
+    <ul>
+        <li><a href="/insights/why-code-review-cannot-scale-with-ai-output/">Why Code Review Cannot Scale With AI Output</a></li>
+        <li><a href="/insights/ai-code-review-does-not-scale-linearly/">AI Code Review Does Not Scale Linearly</a></li>
+        <li><a href="/insights/review-is-not-governance/">Review Is Not Governance</a></li>
     </ul>
 
   <footer class="article-footer">
