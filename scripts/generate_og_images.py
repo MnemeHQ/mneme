@@ -60,6 +60,7 @@ TEMPLATE_MAP = {
     "og-integration-claude-code.html": "integrations/claude-code/og.png",
     "og-integration-cursor.html": "integrations/cursor/og.png",
     "og-integration-github-actions.html": "integrations/github-actions/og.png",
+    "og-integration-adr-import.html": "integrations/adr-import/og.png",
 }
 
 PORT = 8765
