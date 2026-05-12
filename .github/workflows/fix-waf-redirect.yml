@@ -8,6 +8,10 @@ name: Fix adr-import WAF redirect
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/fix_waf_redirect.py'
 
 jobs:
   fix-waf:

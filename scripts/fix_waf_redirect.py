@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# v2 — also triggers on push to main
 """
 Fix /integrations/adr-import/ WAF redirect.
 
