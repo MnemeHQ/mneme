@@ -30,6 +30,12 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
+from mneme.adr_import import (
+    apply_import,
+    compile_for_import,
+    detect_collisions,
+    format_preview,
+)
 from mneme.benchmark import BenchmarkRunner, ScenarioVerdict
 from mneme.benchmark_report import format_json, format_markdown, format_terminal
 from mneme.context_builder import DEFAULT_MAX_DECISIONS, format_decisions
@@ -204,6 +210,55 @@ def _cmd_benchmark(args: argparse.Namespace) -> int:
     return 1 if has_failures else 0
 
 
+# ── Subcommand: adr import ───────────────────────────────────────────────────
+
+def _cmd_adr_import(args: argparse.Namespace) -> int:
+    """Import ADRs from a directory into target memory.
+
+    Exit codes:
+        0 = success (preview shown in dry-run, or write completed in apply)
+        1 = diagnostics present (active-active contradiction or collisions)
+            in dry-run mode (informational; CI can use this to fail the PR)
+        2 = apply failed (refused due to unresolved diagnostics)
+    """
+    import sys
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+
+    adr_dir = Path(args.adr_dir)
+    if not adr_dir.is_dir():
+        print(f"ERROR: {adr_dir} is not a directory", file=sys.stderr)
+        return 2
+
+    target_path = Path(args.memory)
+    if not target_path.exists():
+        print(f"ERROR: memory file {target_path} does not exist", file=sys.stderr)
+        return 2
+
+    report = compile_for_import(adr_dir)
+    target_memory = json.loads(target_path.read_text(encoding="utf-8"))
+    collisions = detect_collisions(report.active_nodes, target_memory)
+
+    print(format_preview(report, collisions=collisions))
+
+    if args.apply:
+        try:
+            written = apply_import(
+                report,
+                target_path=target_path,
+                allow_update=args.update_existing,
+                approve_conflicts=args.approve_conflicts,
+            )
+        except RuntimeError as exc:
+            print(f"ERROR: {exc}", file=sys.stderr)
+            return 2
+        print(f"Wrote {len(written)} decisions to {target_path}")
+        return 0
+
+    has_diags = bool(report.diagnostics) or bool(collisions)
+    return 1 if has_diags else 0
+
+
 # ── Entry point ──────────────────────────────────────────────────────────────
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -274,6 +329,38 @@ def _build_parser() -> argparse.ArgumentParser:
     p_bench.add_argument("--markdown", metavar="FILE", default=None,
                          help="Write Markdown report to FILE")
     p_bench.set_defaults(func=_cmd_benchmark)
+
+    # adr (parent for adr subcommands)
+    p_adr = sub.add_parser("adr", help="ADR import and management commands")
+    adr_sub = p_adr.add_subparsers(dest="adr_cmd", required=True)
+
+    p_adr_import = adr_sub.add_parser(
+        "import", help="Import ADRs from a directory into project memory"
+    )
+    p_adr_import.add_argument(
+        "adr_dir", help="Path to a directory containing ADR markdown files"
+    )
+    p_adr_import.add_argument(
+        "--memory", required=True, help="Path to target project_memory.json"
+    )
+    grp = p_adr_import.add_mutually_exclusive_group()
+    grp.add_argument(
+        "--dry-run", action="store_true",
+        help="Print preview without writing (default)",
+    )
+    grp.add_argument(
+        "--apply", action="store_true",
+        help="Write imported decisions to --memory after preview",
+    )
+    p_adr_import.add_argument(
+        "--update-existing", action="store_true",
+        help="Allow same-id overwrite of existing decisions[] entries",
+    )
+    p_adr_import.add_argument(
+        "--approve-conflicts", action="store_true",
+        help="Proceed with apply even if active-active contradictions exist",
+    )
+    p_adr_import.set_defaults(func=_cmd_adr_import)
 
     return parser
 
