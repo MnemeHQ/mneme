@@ -1,0 +1,28 @@
+name: Fix adr-import WAF redirect
+
+# One-shot workflow: adds ModSecurity/Cloudflare exceptions so
+# /integrations/adr-import/ stops redirecting to homepage.
+#
+# Run manually after any WAF config change that needs re-applying.
+# Safe to re-run — existing rules are detected and skipped.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  fix-waf:
+    name: Add WAF exceptions (cPanel + Cloudflare)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Add ModSec / CF WAF exceptions
+        env:
+          CPANEL_API_TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
+        run: python scripts/fix_waf_redirect.py
