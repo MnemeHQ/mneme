@@ -6,8 +6,6 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import pytest
-
 from mneme.adr_import import apply_import, compile_for_import
 from mneme.cli import main as cli_main
 from mneme.decision_retriever import DecisionRetriever
