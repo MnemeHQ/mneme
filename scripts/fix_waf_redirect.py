@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# v2 — also triggers on push to main
+# v3 — use CF_WAF_TOKEN (zone-level) when available
 """
 Fix /integrations/adr-import/ WAF redirect.
 
@@ -24,8 +24,11 @@ import urllib.request
 TARGET_PATH = '/integrations/adr-import/'
 CF_URL_PATTERN = 'mnemehq.com/integrations/adr-import/*'
 
-CF_TOKEN = os.environ.get('CF_API_TOKEN', '')
+# Prefer CF_WAF_TOKEN (zone-level: Firewall Services + Page Rules + Cache Settings)
+# Fall back to CF_API_TOKEN if CF_WAF_TOKEN is not set.
+CF_TOKEN = os.environ.get('CF_WAF_TOKEN') or os.environ.get('CF_API_TOKEN', '')
 CF_ZONE  = os.environ.get('CF_ZONE_ID', '')
+print(f'CF token source: {"CF_WAF_TOKEN" if os.environ.get("CF_WAF_TOKEN") else "CF_API_TOKEN (fallback)"}')
 CP_HOST  = os.environ.get('CPANEL_HOST', '152.89.79.37')
 CP_PORT  = os.environ.get('CPANEL_PORT', '2083')
 CP_USER  = os.environ.get('CPANEL_USER', 'cadafdd1')
