@@ -102,3 +102,30 @@ def test_global_scope_adr_maps_to_empty_string_scope_list():
     )
     [d] = adrs_to_decisions([adr])
     assert d.scope == [""]
+
+
+def test_adrs_to_decisions_extracts_constraints_section():
+    """`## Constraints` directives must populate Decision.constraints."""
+    from mneme.adr_compiler import adrs_to_decisions, compile_adrs
+
+    decisions = adrs_to_decisions(compile_adrs(FIXTURES / "adrs_import_basic"))
+    by_id = {d.id: d for d in decisions}
+
+    # ADR-101: FORBID_DEPENDENCY: mongodb -> "no mongodb" (enforcer-compatible)
+    assert "no mongodb" in by_id["ADR-101"].constraints
+
+    # ADR-102: FORBID_PATH and REQUIRE_PATH persist as opaque strings
+    assert "FORBID_PATH src/legacy/billing/**" in by_id["ADR-102"].constraints
+    assert "REQUIRE_PATH billing/**" in by_id["ADR-102"].constraints
+
+    # ADR-103 is superseded -> excluded from the active set entirely
+    assert "ADR-103" not in by_id
+
+
+def test_adrs_to_decisions_no_constraints_section_yields_empty_constraints():
+    """ADRs without a ## Constraints section retain empty Decision.constraints."""
+    from mneme.adr_compiler import adrs_to_decisions, compile_adrs
+
+    decisions = adrs_to_decisions(compile_adrs(FIXTURES / "adrs_e2e_clean"))
+    for d in decisions:
+        assert d.constraints == []

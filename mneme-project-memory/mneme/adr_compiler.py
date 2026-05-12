@@ -26,6 +26,22 @@ from mneme.adr_schema import (
     ADRValidationError,
 )
 from mneme.schemas import Decision
+from mneme.adr_constraints import ConstraintDirective, parse_constraints_section
+
+
+def _directive_to_constraint_string(d: ConstraintDirective) -> str:
+    """Render a directive as a Decision.constraint string.
+
+    FORBID_DEPENDENCY is rendered in the ``"no X"`` form so the existing
+    enforcer (mneme.enforcer.check_prompt) triggers a WARN when the
+    forbidden term appears in a checked input. FORBID_PATH and REQUIRE_PATH
+    persist verbatim -- they're stored for retrieval visibility, but glob-
+    vs-changed-file enforcement is not implemented (out of scope for the
+    import MVP; the enforcer is a term-matcher, not a path-matcher).
+    """
+    if d.kind == "FORBID_DEPENDENCY":
+        return f"no {d.value}"
+    return f"{d.kind} {d.value}"
 
 
 # ── Validation ────────────────────────────────────────────────────────────────
@@ -335,10 +351,10 @@ def adrs_to_decisions(adrs: list[ADR]) -> list[Decision]:
         ADR.scope   -> Decision.scope (wrapped in a single-element list)
         ADR.date    -> Decision.created_at and Decision.updated_at
 
-    ``Decision.constraints`` and ``Decision.anti_patterns`` are left
-    empty: ADR-003's v1 schema does not have structured fields for them
-    (the body is free-form markdown). Future iterations can extend the
-    schema and enrich this mapping.
+    ``Decision.constraints`` is populated from the ADR body's optional
+    ``## Constraints`` section via ``parse_constraints_section`` and the
+    ``_directive_to_constraint_string`` bridge. ``Decision.anti_patterns``
+    is left empty for v1 — anti-pattern modelling stays in manual memory.
 
     Args:
         adrs: List of compiled (active) ADR records.
@@ -352,7 +368,10 @@ def adrs_to_decisions(adrs: list[ADR]) -> list[Decision]:
             decision=adr.title,
             rationale=adr.body,
             scope=[adr.scope],
-            constraints=[],
+            constraints=[
+                _directive_to_constraint_string(d)
+                for d in parse_constraints_section(adr.body)
+            ],
             anti_patterns=[],
             created_at=adr.date,
             updated_at=adr.date,
