@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -107,6 +107,11 @@
     .read-link { color: var(--accent); font-size: 0.82rem; text-decoration: none; }
     .read-link:hover { color: var(--accent-dim); }
     .soon-label { color: var(--muted); font-size: 0.78rem; font-family: 'DM Mono', monospace; }
+
+    .cards-section { margin-bottom: 3.5rem; }
+    .section-divider { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; }
+    .section-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+    .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
     footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
     footer a { color: var(--muted); text-decoration: none; }
@@ -269,258 +274,285 @@
   <h2 style="font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; color: var(--text); letter-spacing: -0.01em; margin: 0 auto 1rem; max-width: 660px;">Long-form writing on AI coding governance</h2>
   <p class="hub-intro">These articles explain the problem Mneme HQ is built to solve &mdash; and why existing tools fall short. Category education, comparative analysis, and technical deep-dives on governing AI coding at scale.</p>
 
-  <h2 style="font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 500; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; margin: 0 0 1.5rem; max-width: 900px;">All articles</h2>
+  <!-- Group 1 -->
+  <div class="cards-section">
+    <div class="section-divider"><span class="section-label">The governance problem</span></div>
+    <div class="cards-grid">
 
-  <div class="cards-grid">
+      <div class="insight-card">
+        <div class="card-meta">
+          <span class="card-tag">Category Education</span>
+          <span class="card-dot"></span>
+          <span class="card-read-time">7 min read</span>
+        </div>
+        <h3>Why Code Review Cannot Scale With AI Output</h3>
+        <p>AI coding assistants generate code at 10–100× human pace. Code review is still linear. The math creates a bottleneck no team can hire its way out of — and why shifting enforcement left is the only real answer.</p>
+        <div class="card-footer">
+          <a href="/insights/why-code-review-cannot-scale-with-ai-output/" class="read-link">Read →</a>
+        </div>
+      </div>
 
-    <div class="insight-card">
-      <div class="card-meta">
-        <span class="card-tag">Category Education</span>
-        <span class="card-dot"></span>
-        <span class="card-read-time">5 min read</span>
+      <div class="insight-card">
+        <div class="card-meta">
+          <span class="card-tag">Thought Leadership</span>
+          <span class="card-dot"></span>
+          <span class="card-read-time">3 min read</span>
+        </div>
+        <h3>Review Is Not Governance</h3>
+        <p>CodeRabbit helps review AI-generated code. Mneme helps govern what the AI generates in the first place. Two different layers of the same problem.</p>
+        <div class="card-footer">
+          <a href="/insights/review-is-not-governance/" class="read-link">Read →</a>
+        </div>
       </div>
-      <h3>What Is the AI SDLC?</h3>
-      <p>The AI SDLC isn't a new development methodology. It's the familiar lifecycle — redefined by the speed, scale, and autonomy of AI-native code generation, and the governance gap that creates.</p>
-      <div class="card-footer">
-        <a href="/insights/what-is-the-ai-sdlc/" class="read-link">Read →</a>
+
+      <div class="insight-card">
+        <div class="card-meta">
+          <span class="card-tag">Category Education</span>
+          <span class="card-dot"></span>
+          <span class="card-read-time">7 min read</span>
+        </div>
+        <h3>Why Prompt Memory Fails at Scale</h3>
+        <p>Teams paste architectural rules into CLAUDE.md and call it governance. Context injection has a ceiling: no precedence engine, no enforcement, no persistence across sessions. Here is where it breaks down.</p>
+        <div class="card-footer">
+          <a href="/insights/why-prompt-memory-fails-at-scale/" class="read-link">Read →</a>
+        </div>
       </div>
+
+      <div class="insight-card">
+        <div class="card-meta">
+          <span class="card-tag">Category Education</span>
+          <span class="card-dot"></span>
+          <span class="card-read-time">6 min read</span>
+        </div>
+        <h3>Prompt Engineering Is Not Governance</h3>
+        <p>Prompt templates can nudge an LLM toward better output. They cannot enforce architectural invariants, resolve decision conflicts, or prevent drift across a multi-engineer codebase.</p>
+        <div class="card-footer">
+          <a href="/insights/prompt-engineering-is-not-governance/" class="read-link">Read →</a>
+        </div>
+      </div>
+
+      <div class="insight-card">
+        <div class="card-meta">
+          <span class="card-tag">Category Education</span>
+          <span class="card-dot"></span>
+          <span class="card-read-time">8 min read</span>
+        </div>
+        <h3>Why RAG Fails for Architectural Governance</h3>
+        <p>Retrieval-augmented generation works well for documentation lookup. It breaks down entirely when you need authoritative, precedence-aware constraint enforcement. Here's why.</p>
+        <div class="card-footer">
+          <a href="/insights/why-rag-fails-for-architectural-governance/" class="read-link">Read →</a>
+        </div>
+      </div>
+
     </div>
-
-    <div class="insight-card">
-      <div class="card-meta">
-        <span class="card-tag">Productivity</span>
-        <span class="card-dot"></span>
-        <span class="card-read-time">7 min read</span>
-      </div>
-      <h3>Quantifying GitHub Copilot's Impact: What the SPACE Framework Actually Reveals</h3>
-      <p>Most Copilot ROI reports stop at accepted suggestions. The SPACE Framework — from GitHub, Microsoft Research, and University of Victoria — reveals the governance gap hiding beneath the activity gains.</p>
-      <div class="card-footer">
-        <a href="/insights/github-copilot-space-framework/" class="read-link">Read →</a>
-      </div>
-    </div>
-
-    <div class="insight-card">
-      <div class="card-meta">
-        <span class="card-tag">Architecture</span>
-        <span class="card-dot"></span>
-        <span class="card-read-time">7 min read</span>
-      </div>
-      <h3>AI Coding Governance Should Be Reviewable</h3>
-      <p>Traditional AI memory is opaque hidden state. Mneme treats governance as versioned engineering infrastructure — reviewable in a PR, auditable after an incident, and co-located with the code it governs.</p>
-      <div class="card-footer">
-        <a href="/insights/ai-coding-governance-should-be-reviewable/" class="read-link">Read →</a>
-      </div>
-    </div>
-
-    <div class="insight-card">
-      <div class="card-meta">
-        <span class="card-tag">Category Education</span>
-        <span class="card-dot"></span>
-        <span class="card-read-time">8 min read</span>
-      </div>
-      <h3>Why RAG Fails for Architectural Governance</h3>
-      <p>Retrieval-augmented generation works well for documentation lookup. It breaks down entirely when you need authoritative, precedence-aware constraint enforcement. Here's why.</p>
-      <div class="card-footer">
-        <a href="/insights/why-rag-fails-for-architectural-governance/" class="read-link">Read →</a>
-      </div>
-    </div>
-
-    <div class="insight-card">
-      <div class="card-meta">
-        <span class="card-tag">Category Education</span>
-        <span class="card-dot"></span>
-        <span class="card-read-time">7 min read</span>
-      </div>
-      <h3>Why Code Review Cannot Scale With AI Output</h3>
-      <p>AI coding assistants generate code at 10–100× human pace. Code review is still linear. The math creates a bottleneck no team can hire its way out of — and why shifting enforcement left is the only real answer.</p>
-      <div class="card-footer">
-        <a href="/insights/why-code-review-cannot-scale-with-ai-output/" class="read-link">Read →</a>
-      </div>
-    </div>
-
-    <div class="insight-card">
-      <div class="card-meta">
-        <span class="card-tag">Category Education</span>
-        <span class="card-dot"></span>
-        <span class="card-read-time">6 min read</span>
-      </div>
-      <h3>Prompt Engineering Is Not Governance</h3>
-      <p>Prompt templates can nudge an LLM toward better output. They cannot enforce architectural invariants, resolve decision conflicts, or prevent drift across a multi-engineer codebase.</p>
-      <div class="card-footer">
-        <a href="/insights/prompt-engineering-is-not-governance/" class="read-link">Read →</a>
-      </div>
-    </div>
-
-    <div class="insight-card">
-      <div class="card-meta">
-        <span class="card-tag">Comparative</span>
-        <span class="card-dot"></span>
-        <span class="card-read-time">5 min read</span>
-      </div>
-      <h3>Mneme vs Cursor Rules</h3>
-      <p>Cursor Rules are per-repo text files. Mneme HQ is a structured decision memory with a precedence engine and hook-level enforcement. The difference matters when your rules conflict or your team grows.</p>
-      <div class="card-footer">
-        <a href="/insights/mneme-vs-cursor-rules/" class="read-link">Read →</a>
-      </div>
-    </div>
-
-    <div class="insight-card">
-      <div class="card-meta">
-        <span class="card-tag">Thought Leadership</span>
-        <span class="card-dot"></span>
-        <span class="card-read-time">7 min read</span>
-      </div>
-      <h3>Deployment Quality Will Define the AI Era</h3>
-      <p>The first AI era rewarded early adoption. The next rewards operational quality. KPMG research points to deployment quality as the new differentiator — and for engineering teams, that starts with governance.</p>
-      <div class="card-footer">
-        <a href="/insights/deployment-quality-will-define-the-ai-era/" class="read-link">Read →</a>
-      </div>
-    </div>
-
-    <div class="insight-card">
-      <div class="card-meta">
-        <span class="card-tag">Thought Leadership</span>
-        <span class="card-dot"></span>
-        <span class="card-read-time">3 min read</span>
-      </div>
-      <h3>Review Is Not Governance</h3>
-      <p>CodeRabbit helps review AI-generated code. Mneme helps govern what the AI generates in the first place. Two different layers of the same problem.</p>
-      <div class="card-footer">
-        <a href="/insights/review-is-not-governance/" class="read-link">Read →</a>
-      </div>
-    </div>
-
-    <div class="insight-card">
-      <div class="card-meta">
-        <span class="card-tag">Thought Leadership</span>
-        <span class="card-dot"></span>
-        <span class="card-read-time">8 min read</span>
-      </div>
-      <h3>AI Code Review Does Not Scale Linearly</h3>
-      <p>AI code generation scales nearly infinitely. Reviewer attention does not. The governance bottleneck this creates requires enforcement at generation time — not more reviewers or tighter PR processes.</p>
-      <div class="card-footer">
-        <a href="/insights/ai-code-review-does-not-scale-linearly/" class="read-link">Read →</a>
-      </div>
-    </div>
-
-    <div class="insight-card">
-      <div class="card-meta">
-        <span class="card-tag">Category Education</span>
-        <span class="card-dot"></span>
-        <span class="card-read-time">7 min read</span>
-      </div>
-      <h3>Why Prompt Memory Fails at Scale</h3>
-      <p>Teams paste architectural rules into CLAUDE.md and call it governance. Context injection has a ceiling: no precedence engine, no enforcement, no persistence across sessions. Here is where it breaks down.</p>
-      <div class="card-footer">
-        <a href="/insights/why-prompt-memory-fails-at-scale/" class="read-link">Read &rarr;</a>
-      </div>
-    </div>
-
-    <div class="insight-card">
-      <div class="card-meta">
-        <span class="card-tag">Category Education</span>
-        <span class="card-dot"></span>
-        <span class="card-read-time">12 min read</span>
-      </div>
-      <h3>Architectural Governance Across Heterogeneous AI Coding Agents</h3>
-      <p>Most orgs are no longer one-tool shops. Claude Code, Cursor, Copilot, Windsurf and bespoke SDK agents all touch the same codebase. Why per-tool memory cannot govern at the seams — and what does.</p>
-      <div class="card-footer">
-        <a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/" class="read-link">Read &rarr;</a>
-      </div>
-    </div>
-
-    <div class="insight-card">
-      <div class="card-meta">
-        <span class="card-tag">Reference</span>
-        <span class="card-dot"></span>
-        <span class="card-read-time">Standards landscape</span>
-      </div>
-      <h3>Where the standards for AI agent governance are forming</h3>
-      <p>NIST CAISI, the Model Context Protocol, and AGENTS.md — the three credible foundations for a future cross-tool standard. What is published, what is still in progress, and how Mneme aligns. Verified, organizational sources only.</p>
-      <div class="card-footer">
-        <a href="/standards/" class="read-link">Open &rarr;</a>
-      </div>
-    </div>
-
-    <div class="insight-card">
-      <div class="card-meta">
-        <span class="card-tag">Industry Analysis</span>
-        <span class="card-dot"></span>
-        <span class="card-read-time">14 min read</span>
-      </div>
-      <h3>The Rise of Agentic Engineering Education</h3>
-      <p>Universities, hackathons, and frontier labs are racing to launch agentic engineering programs. Almost none of them teach governance. The next AI engineering discipline has a curriculum gap that engineering organizations will pay for.</p>
-      <div class="card-footer">
-        <a href="/insights/rise-of-agentic-engineering-education/" class="read-link">Read &rarr;</a>
-      </div>
-    </div>
-
-    <div class="insight-card">
-      <div class="card-meta">
-        <span class="card-tag">Industry Analysis</span>
-        <span class="card-dot"></span>
-        <span class="card-read-time">10 min read</span>
-      </div>
-      <h3>OpenAI-Compatible APIs Are Commoditizing Models</h3>
-      <p>NVIDIA's NIM platform exposes 80+ frontier models behind a single OpenAI-compatible endpoint. Models become interchangeable infrastructure. The strategically scarce layer is the system that preserves engineering continuity across constantly changing models and agents.</p>
-      <div class="card-footer">
-        <a href="/insights/openai-compatible-apis-are-commoditizing-models/" class="read-link">Read &rarr;</a>
-      </div>
-    </div>
-
-    <div class="insight-card">
-      <div class="card-meta">
-        <span class="card-tag">Industry Analysis</span>
-        <span class="card-dot"></span>
-        <span class="card-read-time">10 min read</span>
-      </div>
-      <h3>The Generative AI Software Engineering Stack</h3>
-      <p>A seven-layer reference frame for the GenAI software engineering stack &mdash; from foundation models to human oversight. Almost everyone is competing in layers 1&ndash;3. Very few are building layer 5 &mdash; governance and architectural control &mdash; seriously.</p>
-      <div class="card-footer">
-        <a href="/insights/generative-ai-software-engineering-stack/" class="read-link">Read &rarr;</a>
-      </div>
-    </div>
-
-    <div class="insight-card coming-soon">
-      <div class="card-meta">
-        <span class="card-tag">Thought Leadership</span>
-        <span class="card-dot"></span>
-        <span class="card-read-time">6 min read</span>
-      </div>
-      <h3>Stale Branches Are Architectural Debt</h3>
-      <p>AI-assisted development creates not only code drift, but governance drift. Branches diverge. Decisions get superseded. Architectural context decays across the repository lifecycle.</p>
-      <div class="card-footer">
-        <span class="soon-label">Coming soon</span>
-      </div>
-    </div>
-
-    <div class="insight-card coming-soon">
-      <div class="card-meta">
-        <span class="card-tag">Category Education</span>
-        <span class="card-dot"></span>
-        <span class="card-read-time">6 min read</span>
-      </div>
-      <h3>Architectural Drift Is the Hidden Cost of AI Coding</h3>
-      <p>Nobody budgets for drift. But every AI-generated file that violates a service boundary or naming convention compounds into technical debt that's expensive to unwind. How to measure and prevent it.</p>
-      <div class="card-footer">
-        <span class="soon-label">Coming soon</span>
-      </div>
-    </div>
-
-    <div class="insight-card coming-soon">
-      <div class="card-meta">
-        <span class="card-tag">Thought Leadership</span>
-        <span class="card-dot"></span>
-        <span class="card-read-time">5 min read</span>
-      </div>
-      <h3>Governance Must Shift Left in AI-Assisted Development</h3>
-      <p>Security shifted left a decade ago. Architectural governance is next. Why pre-generation enforcement is structurally superior to post-generation review — and what it requires technically.</p>
-      <div class="card-footer">
-        <span class="soon-label">Coming soon</span>
-      </div>
-    </div>
-
   </div>
+
+  <!-- Group 2 -->
+  <div class="cards-section">
+    <div class="section-divider"><span class="section-label">Market context</span></div>
+    <div class="cards-grid">
+
+      <div class="insight-card">
+        <div class="card-meta">
+          <span class="card-tag">Category Education</span>
+          <span class="card-dot"></span>
+          <span class="card-read-time">5 min read</span>
+        </div>
+        <h3>What Is the AI SDLC?</h3>
+        <p>The AI SDLC isn't a new development methodology. It's the familiar lifecycle — redefined by the speed, scale, and autonomy of AI-native code generation, and the governance gap that creates.</p>
+        <div class="card-footer">
+          <a href="/insights/what-is-the-ai-sdlc/" class="read-link">Read →</a>
+        </div>
+      </div>
+
+      <div class="insight-card">
+        <div class="card-meta">
+          <span class="card-tag">Industry Analysis</span>
+          <span class="card-dot"></span>
+          <span class="card-read-time">10 min read</span>
+        </div>
+        <h3>The Generative AI Software Engineering Stack</h3>
+        <p>A seven-layer reference frame for the GenAI software engineering stack — from foundation models to human oversight. Almost everyone is competing in layers 1–3. Very few are building layer 5 — governance and architectural control — seriously.</p>
+        <div class="card-footer">
+          <a href="/insights/generative-ai-software-engineering-stack/" class="read-link">Read →</a>
+        </div>
+      </div>
+
+      <div class="insight-card">
+        <div class="card-meta">
+          <span class="card-tag">Industry Analysis</span>
+          <span class="card-dot"></span>
+          <span class="card-read-time">10 min read</span>
+        </div>
+        <h3>OpenAI-Compatible APIs Are Commoditizing Models</h3>
+        <p>NVIDIA's NIM platform exposes 80+ frontier models behind a single OpenAI-compatible endpoint. Models become interchangeable infrastructure. The strategically scarce layer is the system that preserves engineering continuity across constantly changing models and agents.</p>
+        <div class="card-footer">
+          <a href="/insights/openai-compatible-apis-are-commoditizing-models/" class="read-link">Read →</a>
+        </div>
+      </div>
+
+      <div class="insight-card">
+        <div class="card-meta">
+          <span class="card-tag">Thought Leadership</span>
+          <span class="card-dot"></span>
+          <span class="card-read-time">7 min read</span>
+        </div>
+        <h3>Deployment Quality Will Define the AI Era</h3>
+        <p>The first AI era rewarded early adoption. The next rewards operational quality. KPMG research points to deployment quality as the new differentiator — and for engineering teams, that starts with governance.</p>
+        <div class="card-footer">
+          <a href="/insights/deployment-quality-will-define-the-ai-era/" class="read-link">Read →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Group 3 -->
+  <div class="cards-section">
+    <div class="section-divider"><span class="section-label">Mneme in depth</span></div>
+    <div class="cards-grid">
+
+      <div class="insight-card">
+        <div class="card-meta">
+          <span class="card-tag">Architecture</span>
+          <span class="card-dot"></span>
+          <span class="card-read-time">7 min read</span>
+        </div>
+        <h3>AI Coding Governance Should Be Reviewable</h3>
+        <p>Traditional AI memory is opaque hidden state. Mneme treats governance as versioned engineering infrastructure — reviewable in a PR, auditable after an incident, and co-located with the code it governs.</p>
+        <div class="card-footer">
+          <a href="/insights/ai-coding-governance-should-be-reviewable/" class="read-link">Read →</a>
+        </div>
+      </div>
+
+      <div class="insight-card">
+        <div class="card-meta">
+          <span class="card-tag">Category Education</span>
+          <span class="card-dot"></span>
+          <span class="card-read-time">12 min read</span>
+        </div>
+        <h3>Architectural Governance Across Heterogeneous AI Coding Agents</h3>
+        <p>Most orgs are no longer one-tool shops. Claude Code, Cursor, Copilot, Windsurf and bespoke SDK agents all touch the same codebase. Why per-tool memory cannot govern at the seams — and what does.</p>
+        <div class="card-footer">
+          <a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/" class="read-link">Read →</a>
+        </div>
+      </div>
+
+      <div class="insight-card">
+        <div class="card-meta">
+          <span class="card-tag">Comparative</span>
+          <span class="card-dot"></span>
+          <span class="card-read-time">5 min read</span>
+        </div>
+        <h3>Mneme vs Cursor Rules</h3>
+        <p>Cursor Rules are per-repo text files. Mneme HQ is a structured decision memory with a precedence engine and hook-level enforcement. The difference matters when your rules conflict or your team grows.</p>
+        <div class="card-footer">
+          <a href="/insights/mneme-vs-cursor-rules/" class="read-link">Read →</a>
+        </div>
+      </div>
+
+      <div class="insight-card">
+        <div class="card-meta">
+          <span class="card-tag">Thought Leadership</span>
+          <span class="card-dot"></span>
+          <span class="card-read-time">8 min read</span>
+        </div>
+        <h3>AI Code Review Does Not Scale Linearly</h3>
+        <p>AI code generation scales nearly infinitely. Reviewer attention does not. The governance bottleneck this creates requires enforcement at generation time — not more reviewers or tighter PR processes.</p>
+        <div class="card-footer">
+          <a href="/insights/ai-code-review-does-not-scale-linearly/" class="read-link">Read →</a>
+        </div>
+      </div>
+
+      <div class="insight-card">
+        <div class="card-meta">
+          <span class="card-tag">Productivity</span>
+          <span class="card-dot"></span>
+          <span class="card-read-time">7 min read</span>
+        </div>
+        <h3>Quantifying GitHub Copilot's Impact: What the SPACE Framework Actually Reveals</h3>
+        <p>Most Copilot ROI reports stop at accepted suggestions. The SPACE Framework — from GitHub, Microsoft Research, and University of Victoria — reveals the governance gap hiding beneath the activity gains.</p>
+        <div class="card-footer">
+          <a href="/insights/github-copilot-space-framework/" class="read-link">Read →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Group 4 -->
+  <div class="cards-section">
+    <div class="section-divider"><span class="section-label">Reference</span></div>
+    <div class="cards-grid">
+
+      <div class="insight-card">
+        <div class="card-meta">
+          <span class="card-tag">Reference</span>
+          <span class="card-dot"></span>
+          <span class="card-read-time">Standards landscape</span>
+        </div>
+        <h3>Where the standards for AI agent governance are forming</h3>
+        <p>NIST CAISI, the Model Context Protocol, and AGENTS.md — the three credible foundations for a future cross-tool standard. What is published, what is still in progress, and how Mneme aligns. Verified, organizational sources only.</p>
+        <div class="card-footer">
+          <a href="/standards/" class="read-link">Open →</a>
+        </div>
+      </div>
+
+      <div class="insight-card">
+        <div class="card-meta">
+          <span class="card-tag">Industry Analysis</span>
+          <span class="card-dot"></span>
+          <span class="card-read-time">14 min read</span>
+        </div>
+        <h3>The Rise of Agentic Engineering Education</h3>
+        <p>Universities, hackathons, and frontier labs are racing to launch agentic engineering programs. Almost none of them teach governance. The next AI engineering discipline has a curriculum gap that engineering organizations will pay for.</p>
+        <div class="card-footer">
+          <a href="/insights/rise-of-agentic-engineering-education/" class="read-link">Read →</a>
+        </div>
+      </div>
+
+      <div class="insight-card coming-soon">
+        <div class="card-meta">
+          <span class="card-tag">Thought Leadership</span>
+          <span class="card-dot"></span>
+          <span class="card-read-time">6 min read</span>
+        </div>
+        <h3>Stale Branches Are Architectural Debt</h3>
+        <p>AI-assisted development creates not only code drift, but governance drift. Branches diverge. Decisions get superseded. Architectural context decays across the repository lifecycle.</p>
+        <div class="card-footer">
+          <span class="soon-label">Coming soon</span>
+        </div>
+      </div>
+
+      <div class="insight-card coming-soon">
+        <div class="card-meta">
+          <span class="card-tag">Category Education</span>
+          <span class="card-dot"></span>
+          <span class="card-read-time">6 min read</span>
+        </div>
+        <h3>Architectural Drift Is the Hidden Cost of AI Coding</h3>
+        <p>Nobody budgets for drift. But every AI-generated file that violates a service boundary or naming convention compounds into technical debt that's expensive to unwind. How to measure and prevent it.</p>
+        <div class="card-footer">
+          <span class="soon-label">Coming soon</span>
+        </div>
+      </div>
+
+      <div class="insight-card coming-soon">
+        <div class="card-meta">
+          <span class="card-tag">Thought Leadership</span>
+          <span class="card-dot"></span>
+          <span class="card-read-time">5 min read</span>
+        </div>
+        <h3>Governance Must Shift Left in AI-Assisted Development</h3>
+        <p>Security shifted left a decade ago. Architectural governance is next. Why pre-generation enforcement is structurally superior to post-generation review — and what it requires technically.</p>
+        <div class="card-footer">
+          <span class="soon-label">Coming soon</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 </div>
 </main>
 
@@ -552,6 +584,7 @@
     <div>
       <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
       <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/pilot/" style="color:var(--accent);">Request pilot</a></li>
         <li><a href="/for/">For teams</a></li>
         <li><a href="/founder/">Founder</a></li>
         <li><a href="/about/">About</a></li>
