@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "name": "adr-import-demo",
+    "description": "Base memory file for the ADR import walkthrough. Starts empty -- the demo imports Mneme's own ADRs into this file and then shows enforcement in action.",
+    "version": "1.0.0",
+    "owner": "Mneme HQ",
+    "created": "2026-05-12"
+  },
+  "items": [],
+  "decisions": []
+}

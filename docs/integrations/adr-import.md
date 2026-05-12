@@ -90,6 +90,51 @@ mneme adr import docs/adr --memory .mneme/project_memory.json --apply --approve-
 
 ---
 
+## Walkthrough: dogfooding with Mneme's own ADRs
+
+The `examples/mneme-own-adrs/` directory in `mneme-project-memory` contains
+four of Mneme HQ's own architectural decisions converted to the expected format.
+Running the demo shows the full import-to-enforcement pipeline in one command.
+
+```bash
+cd mneme-project-memory
+python examples/demo-adr-import.py
+```
+
+**What the walkthrough covers:**
+
+1. **Dry-run preview** — scans the corpus, shows active decisions and parsed
+   constraints, exits without writing.
+
+2. **Apply import** — writes 4 decisions to a fresh memory file. Two have
+   machine-readable constraints:
+   - `ADR-002` (repo boundary): three `FORBID_PATH` directives stored for
+     visibility (path enforcement is out of scope for the MVP enforcer).
+   - `ADR-005` (namespace enforcement): `FORBID_DEPENDENCY: MnemeHQ` compiled
+     to `"no MnemeHQ"` and enforced by `mneme check`.
+
+3. **Enforcement check — violation**: the input contains
+   `from MnemeHQ.memory_store import MemoryStore`. ADR-005 fires:
+
+   ```
+   WARN  [ADR-005] constraint "no MnemeHQ" -- trigger: mnemehq
+         Brand vs Package Namespace Enforcement
+
+   Result: WARN
+   ```
+
+4. **Enforcement check — clean**: the correct `from mneme.memory_store import
+   MemoryStore` passes with `Result: PASS`.
+
+**Note on constraint term specificity.** `FORBID_DEPENDENCY: MnemeHQ` (camelCase)
+tokenizes to `"mnemehq"` — a precise 8-character term that only matches the
+wrong namespace identifier. The snake_case variant `mneme_hq` would tokenize to
+`"mneme"` (the underscore splits words; `"hq"` is filtered for length < 4),
+which is too broad to use as an enforcement term against a codebase that
+legitimately contains the word "mneme" everywhere.
+
+---
+
 ## Conflict model
 
 ### 1. Explicit supersession (silent)
