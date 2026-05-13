@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Memory Is Not Governance — Mneme HQ</title>
+  <meta name="description" content="The AI coding category conflates memory, context, retrieval, and governance into one word. They are four different systems with four different optimization targets. Memory optimizes recall. Governance optimizes constraint enforcement. The distinction matters." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/insights/memory-is-not-governance/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Memory Is Not Governance" />
+  <meta property="og:description" content="Memory systems optimize recall. Governance systems optimize constraint enforcement. Two different jobs, one word, and most of what is currently going wrong with AI coding governance." />
+  <meta property="og:url" content="https://mnemehq.com/insights/memory-is-not-governance/" />
+  <meta property="og:image" content="https://mnemehq.com/insights/memory-is-not-governance/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Memory Is Not Governance" />
+  <meta name="twitter:description" content="Memory systems optimize recall. Governance systems optimize constraint enforcement. Two different jobs, one word, and most of what is currently going wrong with AI coding governance." />
+  <meta name="twitter:image" content="https://mnemehq.com/insights/memory-is-not-governance/og.png" />
+  <meta name="author" content="Theo Valmis" />
+  <meta property="article:published_time" content="2026-05-13T00:00:00Z" />
+  <meta property="article:author" content="https://mnemehq.com/founder/" />
+  <meta property="article:section" content="Engineering" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #88889a;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .article-wrap { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 7rem; }
+    .article-header { margin-bottom: 3.5rem; }
+    .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+
+    .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
+    .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
+    .article-body p strong { color: var(--text); font-weight: 500; }
+    .article-body ul { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body ul li { margin-bottom: 0.5rem; line-height: 1.8; }
+    .article-body ul li strong { color: var(--text); font-weight: 500; }
+    .article-body code { font-family: 'DM Mono', monospace; font-size: 0.82rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 0.05rem 0.4rem; color: var(--text); }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout p strong { color: var(--accent); }
+
+    .failure-stack { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2rem; margin: 2.5rem 0; }
+    .failure-stack .stack-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
+    .stack-row { display: flex; align-items: flex-start; gap: 1rem; padding: 0.9rem 0; border-bottom: 1px solid var(--border); }
+    .stack-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .stack-row:first-of-type { padding-top: 0; }
+    .stack-num { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--border2); flex-shrink: 0; padding-top: 0.1rem; min-width: 1.5rem; }
+    .stack-content { flex: 1; }
+    .stack-label { font-size: 0.82rem; font-weight: 600; color: var(--text); margin-bottom: 0.25rem; }
+    .stack-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.7; }
+
+    .contrast-block { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border-radius: 12px; overflow: hidden; margin: 2.5rem 0; }
+    .contrast-cell { background: var(--surface); padding: 1.75rem; }
+    .contrast-cell .label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem; }
+    .contrast-cell .tool { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem; }
+    .contrast-cell .desc { font-size: 0.82rem; color: var(--muted); line-height: 1.65; }
+    .contrast-cell.accent-left { border-left: 3px solid var(--border2); }
+    .contrast-cell.accent-right { border-left: 3px solid var(--accent); }
+    @media (max-width: 540px) { .contrast-block { grid-template-columns: 1fr; } }
+
+    .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .back-link:hover { color: var(--text); }
+    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2rem; }
+    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--accent-dim); }
+
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .breadcrumb-nav { max-width: 720px; margin: 0 auto; padding: 1.75rem 2rem 0.85rem; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.82rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin: 0 0 3rem; }
+    .toc .toc-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.9rem; }
+    .toc ol { list-style: none; counter-reset: toc; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 0.45rem; }
+    .toc ol li { counter-increment: toc; font-size: 0.85rem; padding-left: 2.2rem; position: relative; line-height: 1.5; }
+    .toc ol li::before { content: counter(toc, decimal-leading-zero); position: absolute; left: 0; top: 0.05rem; font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--border2); letter-spacing: 0.05em; }
+    .toc a { color: var(--muted); text-decoration: none; transition: color 0.15s; }
+    .toc a:hover { color: var(--accent); }
+    @media (min-width: 720px) { .toc ol { grid-template-columns: 1fr 1fr; gap: 0.55rem 1.5rem; } }
+
+    .figure { margin: 2.5rem 0; }
+    .figure svg { display: block; width: 100%; height: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+    .figure figcaption { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-top: 0.75rem; padding-left: 0.25rem; }
+
+    .axis-table { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin: 2.5rem 0; overflow-x: auto; }
+    .axis-table .ax-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+    .axis-table table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .axis-table th, .axis-table td { text-align: left; padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; }
+    .axis-table th { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+    .axis-table td:first-child { color: var(--text); font-weight: 500; min-width: 8rem; }
+    .axis-table tr:last-child td { border-bottom: none; }
+
+    .faq-list { margin: 2rem 0 0; }
+    .faq-item { border-top: 1px solid var(--border); padding: 1.1rem 0; }
+    .faq-item:last-child { border-bottom: 1px solid var(--border); }
+    .faq-item summary { cursor: pointer; font-size: 0.92rem; color: var(--text); font-weight: 500; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; font-family: 'DM Mono', monospace; color: var(--muted); font-size: 1.1rem; transition: transform 0.15s; }
+    .faq-item[open] summary::after { content: '\2212'; }
+    .faq-body { padding-top: 0.9rem; font-size: 0.85rem; color: var(--muted); line-height: 1.8; }
+    .faq-body a { color: var(--accent); text-decoration: none; }
+    .faq-body a:hover { color: var(--accent-dim); }
+
+    .article-body a.ext { color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(200,240,96,0.4); }
+    .article-body a.ext:hover { color: var(--accent-dim); border-bottom-color: rgba(200,240,96,0.7); }
+
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 36px; height: 36px; border-radius: 6px; cursor: pointer; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; }
+
+    @media (max-width: 640px) {
+      nav { padding: 1rem 1.25rem; position: relative; }
+      .article-wrap { padding: 3rem 1.25rem 5rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0.5rem 1.25rem 1.25rem; z-index: 99; }
+      .nav-links.open { display: flex; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.88rem; padding: 0.7rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+    }
+
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    /* === Nav upgrade (parity with sibling articles) === */
+    .nav-hamburger {
+      display: none;
+      background: none;
+      border: 1px solid var(--border2);
+      color: var(--text);
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 0;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 4px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span {
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: currentColor;
+      border-radius: 1px;
+      transition: transform 0.25s ease, opacity 0.18s ease;
+      transform-origin: center;
+    }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    @media (max-width: 900px) {
+      html, body { overflow-x: hidden; }
+      body.menu-open { overflow: hidden; }
+      nav, nav.site-nav { position: relative; padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links {
+        display: flex !important;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        gap: 0;
+        background: rgba(12,12,13,0.98);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: 0 1.25rem;
+        z-index: 99;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        visibility: hidden;
+        transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s;
+      }
+      .nav-links.open {
+        max-height: 80vh;
+        opacity: 1;
+        visibility: visible;
+        padding: 0.5rem 1.25rem 1.25rem;
+        transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s;
+        overflow-y: auto;
+      }
+      .nav-links a:not(.btn-nav-cta) {
+        display: block;
+        color: var(--text);
+        font-size: 0.92rem;
+        padding: 0.85rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+    }
+
+    /* === Related reading === */
+    h2#related-reading { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 400; margin-top: 3.5rem; margin-bottom: 0.75rem; }
+    h2#related-reading + ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    h2#related-reading + ul li { margin: 0; }
+    h2#related-reading + ul li a { display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.1rem; background: var(--surface); color: var(--text); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.15s, color 0.15s; }
+    h2#related-reading + ul li a::after { content: '\2192'; opacity: 0.35; transition: opacity 0.15s, transform 0.15s; display: inline-block; margin-left: 0.5rem; }
+    h2#related-reading + ul li a:hover { background: var(--surface2); color: var(--accent); }
+    h2#related-reading + ul li a:hover::after { opacity: 1; transform: translateX(3px); }
+
+    /* Pull-quote for the canonical line */
+    .pull-quote { font-family: 'Instrument Serif', serif; font-size: 1.5rem; line-height: 1.45; color: var(--text); border-left: 2px solid var(--accent); padding: 0.25rem 0 0.25rem 1.25rem; margin: 2.5rem 0; font-style: italic; }
+    .pull-quote em { font-style: normal; color: var(--accent); }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Insights", "item": "https://mnemehq.com/insights/"},
+          {"@type": "ListItem", "position": 3, "name": "Memory Is Not Governance", "item": "https://mnemehq.com/insights/memory-is-not-governance/"}
+        ]
+      },
+      {
+        "@type": "Article",
+        "headline": "Memory Is Not Governance",
+        "description": "The AI coding category conflates memory, context, retrieval, and governance into one word. They are four different systems with four different optimization targets. Memory optimizes recall. Governance optimizes constraint enforcement. The distinction matters.",
+        "url": "https://mnemehq.com/insights/memory-is-not-governance/",
+        "datePublished": "2026-05-13",
+        "dateModified": "2026-05-13",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "image": "https://mnemehq.com/insights/memory-is-not-governance/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/insights/memory-is-not-governance/"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {"@type": "Question", "name": "Isn't this just semantics?", "acceptedAnswer": {"@type": "Answer", "text": "Words shape what gets built. As long as the category calls governance 'memory', vendors keep shipping recall systems and labeling them governance systems. Buyers keep evaluating recall metrics and assuming they measure enforcement. The conflation is not academic — it determines which problem the next year of engineering hours gets spent on."}},
+          {"@type": "Question", "name": "Don't memory systems include some governance features?", "acceptedAnswer": {"@type": "Answer", "text": "Some do. A memory system with structured fields and a retrieval policy is closer to governance than an opaque embedding store. But 'closer' is the wrong frame. Governance requires deterministic resolution between conflicting constraints. A memory system that adds tagging is still optimizing recall — it just adds metadata to the recall query. Until the system can answer 'which constraint applies here, deterministically,' it has not changed categories."}},
+          {"@type": "Question", "name": "What about Letta, Mem0, OpenAI memory, Claude projects?", "acceptedAnswer": {"@type": "Answer", "text": "These are real, useful memory systems for the problems they were built to solve — durable user context, session continuity, personalization. They are not governance systems and were never meant to be. The category error is not that these products exist; it is that the AI coding conversation has been borrowing their primitives and pretending the architectural-constraint problem is solved when it is not."}},
+          {"@type": "Question", "name": "So what is memory in a governance system?", "acceptedAnswer": {"@type": "Answer", "text": "An input. A governance system queries memory to discover which decisions exist, which ones touch the current scope, and what their declared properties are. That query is exactly the kind of thing memory systems are good at. What governance adds on top is the resolution layer — given the candidate decisions, compute the single one that applies, deterministically. Memory feeds the resolver. It is not the resolver."}},
+          {"@type": "Question", "name": "Does this mean retrieval is also not governance?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Retrieval is one mechanism a memory system uses to do recall well. It inherits all of memory's properties: optimizes for relevance, tolerates fuzziness, has no opinion on conflict. RAG over an ADR folder is a retrieval system pointed at architectural content, not a governance system. The article 'Why RAG Fails for Architectural Governance' covers the same point from the retrieval angle."}}
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/benchmark/">Benchmark</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/insights/">Insights</a></li>
+    <li aria-current="page">Memory Is Not Governance</li>
+  </ol>
+</nav>
+<article class="article-wrap">
+  <header class="article-header">
+    <div class="article-eyebrow">
+      <span class="eyebrow-tag">Thought Leadership</span>
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-meta">9 min read &nbsp;&middot;&nbsp; May 2026</span>
+    </div>
+    <h1>Memory is not governance</h1>
+    <p class="article-lede">The AI coding category has spent two years calling four different systems by the same word. Memory. Context. Retrieval. Governance. They share some primitives. They optimize for different things. And the most expensive mistake an engineering team can currently make is buying a memory system and expecting it to govern.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-13">Published May 2026</time>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-13">Updated May 2026</time>
+    </p>
+  </header>
+
+  <div class="article-body">
+
+    <nav class="toc" aria-label="Table of contents">
+      <div class="toc-title">In this article</div>
+      <ol>
+        <li><a href="#conflation">One word, four systems</a></li>
+        <li><a href="#recall">What memory actually optimizes</a></li>
+        <li><a href="#enforcement">What governance actually optimizes</a></li>
+        <li><a href="#axes">The optimization-target table</a></li>
+        <li><a href="#stack">Memory is an input to governance, not a substitute</a></li>
+        <li><a href="#category">Why the conflation persists</a></li>
+        <li><a href="#takeaway">The takeaway</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ol>
+    </nav>
+
+    <p>The AI coding category is awash in memory products. Letta. Mem0. OpenAI's memory feature. Cursor's per-user context. Claude's projects. Every agent framework ships a "long-term memory" primitive. They are all built on a similar conceptual core &mdash; durable storage of past interactions, embedding-based retrieval, opportunistic injection &mdash; and they all do recall well.</p>
+
+    <p>None of them governs.</p>
+
+    <p>That sentence sounds polemical and is meant to. The conflation of "memory" and "governance" in the AI coding category is the single biggest source of category confusion in 2026, and it is the reason most engineering teams are paying for tools that promise architectural consistency and shipping codebases that do not have any.</p>
+
+    <h2 id="conflation">One word, four systems</h2>
+
+    <p>Walk into ten engineering conversations about AI coding and you will hear the same four words used as if they meant the same thing.</p>
+
+    <ul>
+      <li><strong>Context.</strong> The window of tokens the model can see right now. A per-request property.</li>
+      <li><strong>Retrieval.</strong> The mechanism by which something gets into that window. An index lookup.</li>
+      <li><strong>Memory.</strong> The durable store of past interactions, decisions, preferences, and conversations that retrieval reads from.</li>
+      <li><strong>Governance.</strong> The rule system that decides which architectural constraints apply to which code, and enforces them.</li>
+    </ul>
+
+    <p>These four concepts get blurred because three of them are tightly coupled and the fourth happens to use the other three. Governance systems do read from memory. They do retrieve. They do inject into context. So at first glance, governance looks like a flavor of memory.</p>
+
+    <p>It is not. Memory and governance differ on the most important thing a system can differ on: what they are trying to be good at.</p>
+
+    <p class="pull-quote">Memory systems optimize for <em>recall</em>. Governance systems optimize for <em>constraint enforcement</em>. Different targets, different math, different failure modes.</p>
+
+    <h2 id="recall">What memory actually optimizes</h2>
+
+    <p>A well-designed memory system is judged on questions like:</p>
+
+    <ul>
+      <li>Given a query, did we surface the relevant past artifact?</li>
+      <li>How fuzzy can the query be before recall degrades?</li>
+      <li>How long does the system continue to find the right thing as the corpus grows?</li>
+      <li>How well does the system tolerate paraphrase, synonyms, near-duplicates?</li>
+    </ul>
+
+    <p>All four of these are <strong>recall metrics</strong>. The optimization target is: <em>given fuzzy input, return relevant material</em>. The corpus is allowed to be redundant. The output is allowed to be ranked, partial, probabilistic. The user is allowed to read multiple items and choose. The system is doing well if the right thing is somewhere in the top results.</p>
+
+    <p>That target is the right one for the problems memory systems were built to solve. Personal assistants need to remember a user's preferences across sessions. Agents need durable context between runs. Customer-support tools need to surface prior tickets. In every case, recall is the job, and fuzziness is acceptable because a human (or a reasoning model) is on the other end to filter.</p>
+
+    <p>None of those properties survive the move to governance.</p>
+
+    <h2 id="enforcement">What governance actually optimizes</h2>
+
+    <p>A governance system is judged on a different question entirely:</p>
+
+    <p>Given the current task, current file, current scope, and the full set of architectural decisions &mdash; <em>which decision applies here, and was the resulting code obedient to it?</em></p>
+
+    <p>The optimization target is <strong>constraint enforcement</strong>. Output a single resolved rule. Reject code that violates it. Produce an audit trail explaining why. The job is not to surface candidates. The job is to <em>pick</em>.</p>
+
+    <p>That distinction cascades through every property of the system:</p>
+
+    <div class="failure-stack">
+      <div class="stack-title">What changes when the target is enforcement, not recall</div>
+
+      <div class="stack-row">
+        <div class="stack-num">01</div>
+        <div class="stack-content">
+          <div class="stack-label">The output is one value, not a ranking</div>
+          <div class="stack-desc">Recall systems return top-<em>k</em>. Governance systems return top-1, by construction. "Here are five possibly-relevant ADRs" is a recall answer. "ADR-022 applies to <code>services/payments/charge.py</code>, and ADR-014 is overridden in that scope" is a governance answer.</div>
+        </div>
+      </div>
+
+      <div class="stack-row">
+        <div class="stack-num">02</div>
+        <div class="stack-content">
+          <div class="stack-label">The result has to be deterministic</div>
+          <div class="stack-desc">Recall can be probabilistic without harm &mdash; if the order of the top-3 shuffles between runs, the user reads them all anyway. Governance cannot. The same input must produce the same answer in every agent, every model, every temperature, or the codebase is not actually governed by anything.</div>
+        </div>
+      </div>
+
+      <div class="stack-row">
+        <div class="stack-num">03</div>
+        <div class="stack-content">
+          <div class="stack-label">Conflict is the central case, not an edge case</div>
+          <div class="stack-desc">Recall systems treat overlapping documents as a ranking nuisance. Governance systems treat overlap as the entire point &mdash; <a href="/insights/why-architectural-governance-needs-precedence-semantics/">conflict resolution is what makes governance deterministic</a>. A memory system has no opinion on which of two ADRs wins. A governance system must have one.</div>
+        </div>
+      </div>
+
+      <div class="stack-row">
+        <div class="stack-num">04</div>
+        <div class="stack-content">
+          <div class="stack-label">The audit surface is different</div>
+          <div class="stack-desc">A memory system's audit answer is "here is what we showed you, ranked by similarity." A governance system's audit answer is "this diff was generated under ADR-022, which won over ADR-014 because its scope is narrower." The first is a log. The second is an explanation. Engineering teams need the second.</div>
+        </div>
+      </div>
+
+      <div class="stack-row">
+        <div class="stack-num">05</div>
+        <div class="stack-content">
+          <div class="stack-label">The enforcement point exists</div>
+          <div class="stack-desc">Memory systems have no enforcement point. They surface and stop. Governance systems have a hook &mdash; pre-generation injection, post-generation check, CI gate &mdash; where output is rejected if it violates the resolved constraint. The hook is what turns governance into infrastructure rather than advice.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <h2 id="axes">The optimization-target table</h2>
+
+    <p>The clearest way to see the gap is to put the two systems next to each other on the properties that actually matter.</p>
+
+    <div class="axis-table">
+      <div class="ax-title">Memory vs governance &middot; what each is built to be good at</div>
+      <table>
+        <thead>
+          <tr><th>Property</th><th>Memory system</th><th>Governance system</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Optimization target</td><td>Recall under fuzziness</td><td>Constraint enforcement under conflict</td></tr>
+          <tr><td>Output shape</td><td>Top-<em>k</em> ranked list</td><td>Top-1 resolved rule</td></tr>
+          <tr><td>Determinism</td><td>Probabilistic, acceptable</td><td>Required, by construction</td></tr>
+          <tr><td>Conflict semantics</td><td>Ranking nuisance</td><td>Central concern (precedence)</td></tr>
+          <tr><td>Audit surface</td><td>"What we showed you"</td><td>"Which rule won and why"</td></tr>
+          <tr><td>Enforcement point</td><td>None &mdash; surfaces and stops</td><td>Hook at file write / commit / PR</td></tr>
+          <tr><td>Failure mode</td><td>Missed recall (false negative)</td><td>Silent drift, contradictory diffs</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>A team that buys row one of that table and assumes they got row seven has bought a recall system and labeled it governance. Six months later, the codebase has both versions of the rule in production, the embedder is rotating its index, and nobody knows which decision the last bot-generated PR was actually written under.</p>
+
+    <figure class="figure" aria-labelledby="fig1-cap">
+      <svg viewBox="0 0 720 360" role="img" aria-label="Diagram comparing the optimization target of memory systems (recall) against governance systems (constraint enforcement)">
+        <defs>
+          <marker id="arrM1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="#88889a"/>
+          </marker>
+          <marker id="arrM1Acc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="#c8f060"/>
+          </marker>
+        </defs>
+
+        <g font-family="DM Mono, monospace" fill="#88889a" font-size="10" letter-spacing="0.08em">
+          <text x="32" y="28">INPUT</text>
+          <text x="316" y="28">SYSTEM</text>
+          <text x="560" y="28">OUTPUT</text>
+        </g>
+
+        <!-- shared input -->
+        <g font-family="Inter, sans-serif" font-size="12">
+          <rect x="24" y="148" width="220" height="62" rx="8" fill="#1a1a1d" stroke="#2e2e34"/>
+          <text x="40" y="172" fill="#e8e8ec" font-weight="500">Same query</text>
+          <text x="40" y="192" fill="#88889a" font-size="11">"how does payments write a charge?"</text>
+
+          <!-- Memory lane -->
+          <rect x="304" y="56" width="232" height="98" rx="10" fill="#141416" stroke="#222226"/>
+          <text x="320" y="78" fill="#88889a" font-family="DM Mono, monospace" font-size="10" letter-spacing="0.08em">MEMORY SYSTEM</text>
+          <text x="320" y="102" fill="#e8e8ec" font-weight="500" font-size="13">Optimizes recall</text>
+          <text x="320" y="124" fill="#88889a" font-size="11">embed &middot; index &middot; rank top-k</text>
+          <text x="320" y="142" fill="#55555f" font-size="11" font-family="DM Mono, monospace">fuzzy in &rarr; ranked out</text>
+
+          <!-- Governance lane -->
+          <rect x="304" y="204" width="232" height="98" rx="10" fill="#0c0c0d" stroke="#c8f060" stroke-width="1.5"/>
+          <text x="320" y="226" fill="#c8f060" font-family="DM Mono, monospace" font-size="10" letter-spacing="0.08em">GOVERNANCE SYSTEM</text>
+          <text x="320" y="250" fill="#c8f060" font-weight="500" font-size="13">Optimizes enforcement</text>
+          <text x="320" y="272" fill="#88889a" font-size="11">resolve &middot; precedence &middot; pick top-1</text>
+          <text x="320" y="290" fill="#c8f060" font-size="11" font-family="DM Mono, monospace" opacity="0.85">conflict in &rarr; one rule out</text>
+
+          <!-- arrows from input -->
+          <line x1="244" y1="172" x2="304" y2="105" stroke="#88889a" stroke-width="1" marker-end="url(#arrM1)"/>
+          <line x1="244" y1="180" x2="304" y2="253" stroke="#c8f060" stroke-width="1.2" marker-end="url(#arrM1Acc)"/>
+
+          <!-- outputs: memory ranked list -->
+          <g font-family="DM Mono, monospace" font-size="11">
+            <rect x="568" y="60" width="124" height="22" rx="4" fill="#1a1a1d" stroke="#2e2e34"/>
+            <text x="580" y="76" fill="#88889a">ADR-014  &middot; 0.81</text>
+            <rect x="568" y="86" width="124" height="22" rx="4" fill="#1a1a1d" stroke="#2e2e34"/>
+            <text x="580" y="102" fill="#88889a">ADR-022  &middot; 0.79</text>
+            <rect x="568" y="112" width="124" height="22" rx="4" fill="#1a1a1d" stroke="#2e2e34"/>
+            <text x="580" y="128" fill="#88889a">ADR-007  &middot; 0.62</text>
+            <rect x="568" y="138" width="124" height="14" rx="4" fill="#141416" stroke="#222226"/>
+            <text x="580" y="149" fill="#55555f" font-size="9">user picks. or doesn't.</text>
+          </g>
+
+          <!-- output: governance single rule -->
+          <g font-family="DM Mono, monospace" font-size="11">
+            <rect x="568" y="226" width="124" height="32" rx="6" fill="#0c0c0d" stroke="#c8f060" stroke-width="1.2"/>
+            <text x="580" y="247" fill="#c8f060">ADR-022 wins</text>
+            <text x="580" y="270" fill="#88889a" font-size="9">because scope is narrower</text>
+            <text x="580" y="284" fill="#88889a" font-size="9">than ADR-014 in payments/</text>
+          </g>
+
+          <!-- connecting arrows -->
+          <line x1="536" y1="105" x2="566" y2="80" stroke="#88889a" stroke-width="1" stroke-opacity="0.6" marker-end="url(#arrM1)"/>
+          <line x1="536" y1="253" x2="566" y2="242" stroke="#c8f060" stroke-width="1.2" marker-end="url(#arrM1Acc)"/>
+
+          <!-- bottom caption -->
+          <text x="360" y="338" text-anchor="middle" fill="#55555f" font-family="DM Mono, monospace" font-size="10">same input &middot; two systems &middot; one returns a ranking, one returns a decision</text>
+        </g>
+      </svg>
+      <figcaption id="fig1-cap">Fig 1 &middot; The same query, two optimization targets. The memory system returns relevance; the governance system returns a rule. Different jobs.</figcaption>
+    </figure>
+
+    <h2 id="stack">Memory is an input to governance, not a substitute</h2>
+
+    <p>Naming the gap is not the same as saying memory does not belong in the picture. It does &mdash; just one layer below where the category currently puts it. Memory is one of the inputs a governance system reads from. It is not the governance system itself.</p>
+
+    <div class="contrast-block">
+      <div class="contrast-cell accent-left">
+        <div class="label">The current framing</div>
+        <div class="tool">Memory = governance</div>
+        <div class="desc">Buy a memory product. Index your ADRs. Hand the agent the top retrieved chunks. Call it AI coding governance. Discover six months in that the same constraint resolves differently across services and nobody can audit why.</div>
+      </div>
+      <div class="contrast-cell accent-right">
+        <div class="label">The correct framing</div>
+        <div class="tool">Memory &sub; inputs to governance</div>
+        <div class="desc">Memory stores decisions and their metadata. Governance queries memory to discover candidates, then resolves between them deterministically over a declared precedence order, then enforces the resolved rule at the file-write or PR boundary.</div>
+      </div>
+    </div>
+
+    <figure class="figure" aria-labelledby="fig2-cap">
+      <svg viewBox="0 0 720 340" role="img" aria-label="Stack diagram showing memory, context, and retrieval as inputs that flow into a governance layer that produces a single enforced constraint">
+        <defs>
+          <marker id="arrM2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="#c8f060"/>
+          </marker>
+        </defs>
+
+        <g font-family="DM Mono, monospace" fill="#88889a" font-size="10" letter-spacing="0.08em">
+          <text x="32" y="28">INPUTS</text>
+          <text x="316" y="28">LAYER</text>
+          <text x="568" y="28">CONTRACT</text>
+        </g>
+
+        <!-- Inputs column -->
+        <g font-family="Inter, sans-serif" font-size="12">
+          <rect x="24" y="56" width="220" height="44" rx="8" fill="#1a1a1d" stroke="#2e2e34"/>
+          <text x="40" y="74" fill="#e8e8ec" font-weight="500">Memory</text>
+          <text x="40" y="91" fill="#88889a" font-size="11">durable store of decisions</text>
+
+          <rect x="24" y="112" width="220" height="44" rx="8" fill="#1a1a1d" stroke="#2e2e34"/>
+          <text x="40" y="130" fill="#e8e8ec" font-weight="500">Retrieval</text>
+          <text x="40" y="147" fill="#88889a" font-size="11">index lookup &middot; candidates</text>
+
+          <rect x="24" y="168" width="220" height="44" rx="8" fill="#1a1a1d" stroke="#2e2e34"/>
+          <text x="40" y="186" fill="#e8e8ec" font-weight="500">Context</text>
+          <text x="40" y="203" fill="#88889a" font-size="11">per-request token window</text>
+
+          <rect x="24" y="224" width="220" height="44" rx="8" fill="#1a1a1d" stroke="#2e2e34"/>
+          <text x="40" y="242" fill="#e8e8ec" font-weight="500">Scope signals</text>
+          <text x="40" y="259" fill="#88889a" font-size="11">file path &middot; service &middot; layer</text>
+        </g>
+
+        <!-- Governance layer (big box) -->
+        <rect x="288" y="56" width="232" height="212" rx="12" fill="#0c0c0d" stroke="#c8f060" stroke-width="1.5"/>
+        <g font-family="DM Mono, monospace" fill="#c8f060" font-size="10" letter-spacing="0.08em">
+          <text x="304" y="78">GOVERNANCE LAYER</text>
+        </g>
+        <g font-family="Inter, sans-serif" font-size="12">
+          <text x="304" y="104" fill="#e8e8ec" font-weight="500" font-size="13">Deterministic resolver</text>
+          <text x="304" y="124" fill="#88889a" font-size="11">over status &middot; supersedes</text>
+          <text x="304" y="140" fill="#88889a" font-size="11">scope &middot; priority &middot; time</text>
+
+          <line x1="304" y1="156" x2="504" y2="156" stroke="#222226" stroke-width="1"/>
+
+          <text x="304" y="180" fill="#e8e8ec" font-weight="500" font-size="13">Enforcement hook</text>
+          <text x="304" y="200" fill="#88889a" font-size="11">pre-gen inject &middot; post-gen</text>
+          <text x="304" y="216" fill="#88889a" font-size="11">check at file write / PR</text>
+
+          <line x1="304" y1="232" x2="504" y2="232" stroke="#222226" stroke-width="1"/>
+
+          <text x="304" y="254" fill="#c8f060" font-size="11" font-family="DM Mono, monospace">picks one rule. enforces it.</text>
+        </g>
+
+        <!-- arrows from inputs to layer -->
+        <g stroke="#c8f060" stroke-opacity="0.6" stroke-width="1.1" fill="none">
+          <line x1="244" y1="78" x2="284" y2="120" marker-end="url(#arrM2)"/>
+          <line x1="244" y1="134" x2="284" y2="140" marker-end="url(#arrM2)"/>
+          <line x1="244" y1="190" x2="284" y2="160" marker-end="url(#arrM2)"/>
+          <line x1="244" y1="246" x2="284" y2="180" marker-end="url(#arrM2)"/>
+        </g>
+
+        <!-- Contract column (output) -->
+        <g font-family="Inter, sans-serif" font-size="12">
+          <rect x="556" y="120" width="148" height="84" rx="10" fill="#1a1a1d" stroke="#c8f060" stroke-width="1.2"/>
+          <text x="572" y="142" fill="#c8f060" font-family="DM Mono, monospace" font-size="10" letter-spacing="0.08em">RESOLVED RULE</text>
+          <text x="572" y="168" fill="#e8e8ec" font-weight="500" font-size="13">ADR-022</text>
+          <text x="572" y="186" fill="#88889a" font-size="11">scope: payments/**</text>
+          <text x="572" y="200" fill="#88889a" font-size="11">supersedes: ADR-014</text>
+        </g>
+        <line x1="520" y1="160" x2="552" y2="160" stroke="#c8f060" stroke-width="1.2" marker-end="url(#arrM2)"/>
+
+        <text x="360" y="312" text-anchor="middle" fill="#55555f" font-family="DM Mono, monospace" font-size="10">memory &middot; retrieval &middot; context are inputs &middot; governance is the layer that picks one rule</text>
+      </svg>
+      <figcaption id="fig2-cap">Fig 2 &middot; The layering most teams are missing. Memory feeds governance; governance resolves and enforces. The boxes on the left are necessary. The box in the middle is what makes them governance.</figcaption>
+    </figure>
+
+    <p>Once the layering is drawn this way, the category map snaps into focus. Memory products are real, useful, and almost universally available. The governance layer above them is mostly missing &mdash; not because it is impossible to build, but because the conflation of names has let vendors keep selling memory and call it governance, and let buyers keep buying memory and assume the architectural-constraint problem is solved.</p>
+
+    <h2 id="category">Why the conflation persists</h2>
+
+    <p>It is worth asking why the words have collapsed in the first place. Three reasons, roughly in order of weight.</p>
+
+    <p><strong>The primitives genuinely overlap.</strong> A governance system that does not read from a durable store of decisions and retrieve relevant ones is not a governance system &mdash; it is a hardcoded ruleset. So every governance system has a memory inside it. The reverse implication &mdash; that every memory system is therefore a governance system &mdash; is the false step, but it is an easy one to take when the substrate looks identical.</p>
+
+    <p><strong>The vendors are incentivized to blur the line.</strong> Memory is a solved product category with shipped tooling and growing budgets. Governance is a category that is still being defined. The path of least resistance for any incumbent is to relabel its memory product as governance and let the buyer discover the difference in production. The conflation is partly a marketing artifact and partly a substrate artifact.</p>
+
+    <p><strong>The buyers do not yet have a sharp ask.</strong> Engineering teams know they want their codebase to obey its architectural decisions across agents. Most of them have not yet articulated that as a separate problem from "the agent should remember things." Until the request is sharper than that, vendors will keep answering it with memory products, because that is what they already have to sell.</p>
+
+    <p>None of these is sinister. All of them are why the category is moving slowly on a problem that everyone agrees exists. Naming the gap is the first step out.</p>
+
+    <h2 id="takeaway">The takeaway</h2>
+
+    <p>The next time a vendor pitches "AI coding memory" for your architecture, the test is one question: <em>"What happens when two of the rules in your store disagree on the same file?"</em></p>
+
+    <p>If the answer is about retrieval scores, embedding quality, or chunking strategy &mdash; it is a memory system. Useful for some problems. Not the one being solved.</p>
+
+    <p>If the answer is about declared precedence axes, deterministic resolution, and an enforcement point that a generated diff actually has to pass through &mdash; it is a governance system. That is the category that matters for codebases governed by architecture, and it is the layer the AI coding ecosystem is still mostly missing.</p>
+
+    <div class="callout">
+      <p><strong>Memory systems optimize recall. Governance systems optimize constraint enforcement.</strong> Two different jobs. One word. The cost of that conflation is paid in silent drift, contradictory diffs, and codebases that look architected and behave sampled.</p>
+    </div>
+
+    <h2 id="faq">FAQ</h2>
+
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Isn't this just semantics?</summary>
+        <div class="faq-body">Words shape what gets built. As long as the category calls governance &ldquo;memory,&rdquo; vendors keep shipping recall systems and labeling them governance systems. Buyers keep evaluating recall metrics and assuming they measure enforcement. The conflation is not academic &mdash; it determines which problem the next year of engineering hours gets spent on.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Don't memory systems include some governance features?</summary>
+        <div class="faq-body">Some do. A memory system with structured fields and a retrieval policy is closer to governance than an opaque embedding store. But &ldquo;closer&rdquo; is the wrong frame. Governance requires deterministic resolution between conflicting constraints. A memory system that adds tagging is still optimizing recall &mdash; it just adds metadata to the recall query. Until the system can answer &ldquo;which constraint applies here, deterministically,&rdquo; it has not changed categories.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>What about Letta, Mem0, OpenAI memory, Claude projects?</summary>
+        <div class="faq-body">These are real, useful memory systems for the problems they were built to solve &mdash; durable user context, session continuity, personalization. They are not governance systems and were never meant to be. The category error is not that these products exist; it is that the AI coding conversation has been borrowing their primitives and pretending the architectural-constraint problem is solved when it is not.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>So what is memory in a governance system?</summary>
+        <div class="faq-body">An input. A governance system queries memory to discover which decisions exist, which ones touch the current scope, and what their declared properties are. That query is exactly the kind of thing memory systems are good at. What governance adds on top is the resolution layer &mdash; given the candidate decisions, compute the single one that applies, deterministically. Memory feeds the resolver. It is not the resolver.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Does this mean retrieval is also not governance?</summary>
+        <div class="faq-body">Yes. Retrieval is one mechanism a memory system uses to do recall well. It inherits all of memory's properties: optimizes for relevance, tolerates fuzziness, has no opinion on conflict. RAG over an ADR folder is a retrieval system pointed at architectural content, not a governance system. <a href="/insights/why-rag-fails-for-architectural-governance/">Why RAG Fails for Architectural Governance</a> covers the same point from the retrieval angle.</div>
+      </details>
+    </div>
+
+  </div>
+
+  <h2 id="related-reading">Related reading</h2>
+  <ul>
+    <li><a href="/insights/why-architectural-governance-needs-precedence-semantics/">Why AI Architectural Governance Needs Precedence Semantics</a></li>
+    <li><a href="/insights/why-rag-fails-for-architectural-governance/">Why RAG Fails for Architectural Governance</a></li>
+    <li><a href="/insights/why-prompt-memory-fails-at-scale/">Why Prompt Memory Fails at Scale</a></li>
+    <li><a href="/insights/prompt-engineering-is-not-governance/">Prompt Engineering Is Not Governance</a></li>
+  </ul>
+
+  <footer class="article-footer">
+    <a href="/insights/" class="back-link">&larr; Back to Insights</a>
+
+    <div class="cta-block">
+      <h3>Memory feeds it. Governance picks the rule.</h3>
+      <p>Mneme HQ is the layer above the memory store: a deterministic precedence engine and enforcement hook for codebases governed by architecture, not by whichever rule ranked highest in this morning's embedding. Open source.</p>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
+    </div>
+  </footer>
+</article>
+</main>
+
+<footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+  <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/use-cases/">Use cases</a></li>
+        <li><a href="/works-with/">Works with</a></li>
+        <li><a href="/platforms/">Platforms</a></li>
+        <li><a href="/integrations/">Integrations</a></li>
+        <li><a href="/compare/">Compare</a></li>
+        <li><a href="/demo/">Demo</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/insights/">Insights</a></li>
+        <li><a href="/standards/">Standards</a></li>
+        <li><a href="/benchmark/">Benchmark</a></li>
+        <li><a href="/docs/">Docs</a></li>
+        <li><a href="/docs/cli/">CLI reference</a></li>
+        <li><a href="/docs/governance-violations/">Governance violations</a></li>
+        <li><a href="/supported-languages/">Supported languages</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/pilot/" style="color:var(--accent);">Request pilot</a></li>
+        <li><a href="/for/">For teams</a></li>
+        <li><a href="/founder/">Founder</a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/roadmap/">Roadmap</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Code</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="https://github.com/TheoV823/mneme">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="/privacy/">Privacy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
+    <span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span>
+    <nav aria-label="Social media" style="display: flex; align-items: center; gap: 1rem;">
+      <a href="https://github.com/TheoV823/mneme" target="_blank" rel="noopener" aria-label="GitHub" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.16c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.27-1.69-1.27-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.34.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18.92-.26 1.91-.39 2.89-.39.98 0 1.97.13 2.89.39 2.2-1.49 3.17-1.18 3.17-1.18.62 1.58.23 2.75.12 3.04.73.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.26 5.68.41.35.78 1.05.78 2.12v3.15c0 .31.21.67.8.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener" aria-label="LinkedIn" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/@MnemeHQ" target="_blank" rel="noopener" aria-label="YouTube" style="color: var(--muted); display: inline-flex;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.12C19.55 3.5 12 3.5 12 3.5s-7.55 0-9.4.58A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.12c1.85.58 9.4.58 9.4.58s7.55 0 9.4-.58a3 3 0 0 0 2.1-2.12A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8zM9.6 15.57V8.43L15.82 12 9.6 15.57z"/></svg>
+      </a>
+    </nav>
+    <span>&copy; 2026</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  function setOpen(open){
+    links.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('menu-open', open);
+  }
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    setOpen(!links.classList.contains('open'));
+  });
+  document.addEventListener('click', function(e){
+    if (!links.classList.contains('open')) return;
+    if (links.contains(e.target) || btn.contains(e.target)) return;
+    setOpen(false);
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false);
+  });
+  links.addEventListener('click', function(e){
+    if (e.target.tagName === 'A') setOpen(false);
+  });
+  window.addEventListener('resize', function(){
+    if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false);
+  });
+})();
+</script>
+<script><!-- nav-active -->
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
+</body>
+</html>
