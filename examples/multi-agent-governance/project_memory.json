@@ -1,0 +1,50 @@
+{
+  "meta": {
+    "name": "multi-agent-governance-demo",
+    "description": "Decision corpus for the multi-actor governance walkthrough. Three actors will touch the same Python service against this shared invariant set. The constraints are deliberately dependency-specific so the enforcer fires on real violations, not on benign vocabulary.",
+    "version": "1.0.0",
+    "owner": "Mneme HQ",
+    "created": "2026-05-13"
+  },
+  "items": [],
+  "examples": [],
+  "decisions": [
+    {
+      "id": "ADR-001",
+      "decision": "JSON storage only -- no external database.",
+      "rationale": "The service runs on edge hardware where shipping a separate database is operationally unacceptable. Persistence stays in-process.",
+      "scope": ["storage", "backend", "persistence"],
+      "constraints": [
+        "no redis",
+        "no postgres",
+        "no mongodb",
+        "no psycopg2"
+      ],
+      "anti_patterns": [
+        "redis-py",
+        "psycopg2",
+        "mongoengine"
+      ],
+      "created_at": "2026-01-10",
+      "updated_at": "2026-01-10"
+    },
+    {
+      "id": "ADR-003",
+      "decision": "No ORM in v1. Direct module access against the JSON store.",
+      "rationale": "An ORM is operational complexity v1 does not justify. Direct module access keeps the storage abstraction one function-call wide.",
+      "scope": ["storage", "backend"],
+      "constraints": [
+        "no sqlalchemy",
+        "no alembic",
+        "no prisma"
+      ],
+      "anti_patterns": [
+        "sqlalchemy",
+        "alembic",
+        "prisma"
+      ],
+      "created_at": "2026-01-15",
+      "updated_at": "2026-01-15"
+    }
+  ]
+}

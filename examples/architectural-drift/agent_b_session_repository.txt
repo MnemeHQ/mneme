@@ -1,0 +1,14 @@
+# Agent B -- Wednesday (with governance):
+# Session storage built on the existing in-process store.
+
+from app.store import JsonStore
+
+class SessionStore(JsonStore):
+    namespace = "sessions"
+
+    def put(self, session_id: str, payload: dict, ttl_seconds: int = 3600) -> None:
+        self._write(session_id, {"payload": payload, "ttl": ttl_seconds})
+
+    def fetch(self, session_id: str) -> dict | None:
+        record = self._read(session_id)
+        return record.get("payload") if record else None

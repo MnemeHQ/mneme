@@ -1,0 +1,22 @@
+# Actor C -- session 3 -- remediation pass, ADR-003-aware version.
+# Consolidates user and session helpers into a shared JsonStore subclass.
+# No ORM. No new dependencies. The governance trace is clean.
+
+from app.store import JsonStore
+
+class _SharedStore(JsonStore):
+    """Common base for user- and session-scoped stores."""
+
+    def upsert(self, key: str, payload: dict) -> None:
+        self._write(key, payload)
+
+    def lookup(self, key: str) -> dict | None:
+        return self._read(key)
+
+
+class UserStore(_SharedStore):
+    namespace = "users"
+
+
+class SessionStore(_SharedStore):
+    namespace = "sessions"

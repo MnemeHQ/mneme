@@ -1,0 +1,14 @@
+# Actor A -- session 1 -- "speed up the user lookup endpoint"
+# First draft. No shared memory with the other actors.
+
+import redis
+
+_cache = redis.Redis(host="localhost", port=6379, decode_responses=True)
+
+def get_user(user_id: str) -> dict:
+    cached = _cache.get(f"user:{user_id}")
+    if cached:
+        return json.loads(cached)
+    user = _load_user_from_disk(user_id)
+    _cache.setex(f"user:{user_id}", 300, json.dumps(user))
+    return user
