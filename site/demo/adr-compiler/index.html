@@ -294,7 +294,7 @@
           <div class="panel-body" id="check-body" style="min-height:auto;"></div>
         </div>
       </div>
-      <button class="replay-btn" id="replay-btn" onclick="startDemo()">&larr; Replay</button>
+      <button class="replay-btn" type="button" id="replay-btn" onclick="startDemo(true)">&larr; Replay</button>
 
       <p>The model is the same. The prompt is the same. The decisions are the same on disk in both cases. The only difference is that one run uses the compiled corpus and the other does not.</p>
 
@@ -490,7 +490,7 @@ Result: WARN</code></pre>
       });
       if (onDone) timers.push(setTimeout(onDone, startDelay + lines[lines.length - 1].t + 600));
     }
-    function startDemo() {
+    function startDemo(fromReplay) {
       clearTimers();
       document.getElementById('replay-btn').style.display = 'none';
       const wPrompt = document.getElementById('w-prompt');
@@ -503,6 +503,15 @@ Result: WARN</code></pre>
       wOut.innerHTML = ''; wOut.classList.add('hidden');
       mOut.innerHTML = ''; mOut.classList.add('hidden');
       checkPanel.classList.add('hidden'); checkBody.innerHTML = '';
+      if (fromReplay) {
+        // The check panel just collapsed, so the page is now shorter and the
+        // demo wrap would otherwise fall above the viewport. Scroll it back
+        // into view so the user actually sees the replay.
+        const wrap = document.querySelector('.demo-wrap');
+        if (wrap && wrap.scrollIntoView) {
+          wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
       typeText(wPrompt, PROMPT, () => {
         wOut.classList.remove('hidden');
         appendLines('w-out', WITHOUT_LINES, 0);
