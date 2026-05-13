@@ -1,0 +1,13 @@
+# Agent B -- Wednesday: "add session storage"
+# In a no-governance world, Agent B sees Redis present and uses it.
+
+import redis
+
+_sessions = redis.Redis(host="localhost", port=6379, db=1, decode_responses=True)
+
+def put_session(session_id: str, payload: dict, ttl_seconds: int = 3600) -> None:
+    _sessions.setex(session_id, ttl_seconds, json.dumps(payload))
+
+def get_session(session_id: str) -> dict | None:
+    raw = _sessions.get(session_id)
+    return json.loads(raw) if raw else None
