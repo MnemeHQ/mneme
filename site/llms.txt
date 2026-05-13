@@ -31,13 +31,14 @@ Structured comparisons between Mneme HQ and alternative approaches — for engin
 
 ## Integration pages
 
-How Mneme HQ fits into the tools engineering teams already use.
+How Mneme HQ fits into the tools engineering teams already use. Two categories: AI coding stack integrations (Claude Code, Cursor, GitHub Actions, ADR import) and research & analysis assistants (Perplexity Enterprise — works alongside, governance context for research workflows).
 
 - [Integrations hub](https://mnemehq.com/integrations/): Index of all integrations with the layered governance pattern (editor + CI + custom agents).
 - [Claude Code integration](https://mnemehq.com/integrations/claude-code/): Hook-level enforcement for every Edit, Write, and MultiEdit Claude Code attempts.
 - [Cursor integration](https://mnemehq.com/integrations/cursor/): Mneme HQ as the authoritative corpus behind Cursor Rules sessions.
 - [GitHub Actions integration](https://mnemehq.com/integrations/github-actions/): CI enforcement gate — block PRs that violate architectural decisions before they merge.
 - [ADR import integration](https://mnemehq.com/integrations/adr-import/): Import an existing ADR corpus into Mneme's enforcement pipeline. Add a Constraints section to any ADR, run one command to preview, one to apply — decisions become live guardrails without rewriting your ADRs.
+- [Perplexity Enterprise](https://mnemehq.com/integrations/perplexity/): Research & analysis assistant. Works alongside, not a native integration. Perplexity helps teams understand why. Mneme helps teams preserve what must remain true. Workflow pattern: research in Perplexity → record decision in Mneme → enforce across every coding agent. Closes the gap between research rationale and governance constraint. No API handshake — the integration is the discipline.
 
 ## Key pages
 

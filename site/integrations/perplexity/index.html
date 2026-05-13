@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Perplexity &amp; Mneme HQ &mdash; Research Rationale Meets Architectural Enforcement</title>
+  <meta name="description" content="Perplexity helps teams understand why. Mneme helps teams preserve what must remain true. Research-to-enforcement workflow for architectural decision-making." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/integrations/perplexity/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Perplexity &amp; Mneme HQ — Research Rationale Meets Architectural Enforcement" />
+  <meta property="og:description" content="Perplexity helps teams understand why. Mneme helps teams preserve what must remain true. Research-to-enforcement workflow for architectural decision-making." />
+  <meta property="og:url" content="https://mnemehq.com/integrations/perplexity/" />
+  <meta property="og:image" content="https://mnemehq.com/integrations/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Perplexity &amp; Mneme HQ — Research Rationale Meets Architectural Enforcement" />
+  <meta name="twitter:description" content="Perplexity helps teams understand why. Mneme helps teams preserve what must remain true. Research-to-enforcement workflow for architectural decision-making." />
+  <meta name="twitter:image" content="https://mnemehq.com/integrations/og.png" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Integrations", "item": "https://mnemehq.com/integrations/"},
+          {"@type": "ListItem", "position": 3, "name": "Perplexity", "item": "https://mnemehq.com/integrations/perplexity/"}
+        ]
+      },
+      {
+        "@type": "TechArticle",
+        "headline": "Perplexity & Mneme HQ — Research Rationale Meets Architectural Enforcement",
+        "description": "Perplexity helps teams understand why. Mneme helps teams preserve what must remain true.",
+        "url": "https://mnemehq.com/integrations/perplexity/",
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}}
+      }
+    ]
+  }
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #88889a;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+      --perp: #20b2aa;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .breadcrumb-nav { max-width: 720px; margin: 0 auto; padding: 1.75rem 2rem 0.85rem; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.82rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .article-wrap { max-width: 720px; margin: 0 auto; padding: 3rem 2rem 7rem; }
+    .article-header { margin-bottom: 3.5rem; }
+    .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+
+    .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
+    .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .article-body h3 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--text); }
+    .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
+    .article-body p strong { color: var(--text); font-weight: 500; }
+    .article-body ul, .article-body ol { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body li { margin-bottom: 0.5rem; }
+    .article-body li strong { color: var(--text); font-weight: 500; }
+    .article-body code { font-family: 'DM Mono', monospace; font-size: 0.82em; color: var(--teal); background: none; }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout p strong { color: var(--accent); }
+    .callout.teal { border-left-color: var(--teal); }
+    .callout.teal p strong { color: var(--teal); }
+
+    .flow-diagram { margin: 2.5rem 0; display: flex; flex-direction: column; gap: 0; }
+    .flow-step { display: flex; align-items: flex-start; gap: 1rem; padding: 1.25rem 1.5rem; background: var(--surface); border: 1px solid var(--border); }
+    .flow-step:first-child { border-radius: 10px 10px 0 0; }
+    .flow-step:last-child { border-radius: 0 0 10px 10px; }
+    .flow-step + .flow-step { border-top: none; }
+    .flow-step-num { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted); min-width: 1.6rem; padding-top: 0.2rem; }
+    .flow-step-body { flex: 1; }
+    .flow-step-tool { font-size: 0.72rem; letter-spacing: 0.07em; text-transform: uppercase; font-family: 'DM Mono', monospace; margin-bottom: 0.3rem; }
+    .flow-step-tool.perplexity { color: var(--perp); }
+    .flow-step-tool.mneme { color: var(--accent); }
+    .flow-step-tool.agent { color: var(--muted); }
+    .flow-step-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.7; }
+    .flow-arrow { text-align: center; font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--border2); padding: 0.2rem 0; }
+
+    .layer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin: 2rem 0; }
+    .layer-cell { background: var(--surface); padding: 1.5rem; }
+    .layer-cell-label { font-size: 0.68rem; letter-spacing: 0.09em; text-transform: uppercase; font-family: 'DM Mono', monospace; margin-bottom: 0.65rem; }
+    .layer-cell-label.perplexity { color: var(--perp); }
+    .layer-cell-label.mneme { color: var(--accent); }
+    .layer-cell h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text); }
+    .layer-cell p { font-size: 0.8rem; color: var(--muted); line-height: 1.7; margin: 0; }
+
+    .quote-block { margin: 2.5rem 0; padding: 1.75rem 2rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+    .quote-text { font-family: 'Instrument Serif', serif; font-size: 1.35rem; font-weight: 400; font-style: italic; color: var(--text); line-height: 1.5; }
+
+    .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .back-link:hover { color: var(--text); }
+    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2rem; }
+    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--accent-dim); }
+    .cta-secondary { display: block; margin-top: 0.75rem; font-size: 0.82rem; color: var(--muted); text-decoration: none; }
+    .cta-secondary:hover { color: var(--text); }
+
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; padding: 0; flex-shrink: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; transition: border-color 0.15s; }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span { display: block; width: 18px; height: 2px; background: currentColor; border-radius: 1px; transition: transform 0.25s ease, opacity 0.18s ease; transform-origin: center; }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    @media (max-width: 900px) {
+      html, body { overflow-x: hidden; }
+      body.menu-open { overflow: hidden; }
+      nav { position: relative; padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 1.25rem; z-index: 99; max-height: 0; overflow: hidden; opacity: 0; visibility: hidden; transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s; }
+      .nav-links.open { max-height: 80vh; opacity: 1; visibility: visible; padding: 0.5rem 1.25rem 1.25rem; transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s; overflow-y: auto; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.92rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+      .layer-grid { grid-template-columns: 1fr; }
+      .article-wrap { padding: 3rem 1.25rem 5rem; }
+    }
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/benchmark/">Benchmark</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/integrations/">Integrations</a></li>
+    <li><span aria-current="page">Perplexity</span></li>
+  </ol>
+</nav>
+
+<main>
+<div class="article-wrap">
+  <header class="article-header">
+    <div class="article-eyebrow">
+      <span class="eyebrow-tag">Research &amp; analysis assistants</span>
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-meta">Works alongside</span>
+    </div>
+    <h1>Perplexity helps teams understand&nbsp;why.<br>Mneme helps teams preserve what must remain&nbsp;true.</h1>
+    <p class="article-lede">Perplexity Enterprise gives engineering teams cited, up-to-date answers about technology choices. Mneme takes those choices and makes them enforceable — turning research rationale into governance constraints every AI coding agent respects.</p>
+  </header>
+
+  <div class="article-body">
+
+    <div class="quote-block">
+      <div class="quote-text">"Perplexity helps teams understand why. Mneme helps teams preserve what must remain true."</div>
+    </div>
+
+    <h2>Two tools, two jobs</h2>
+
+    <p>These are not competing tools and there is no API handshake between them. They operate at different stages of the engineering decision cycle and solve genuinely different problems.</p>
+
+    <div class="layer-grid">
+      <div class="layer-cell">
+        <div class="layer-cell-label perplexity">Perplexity Enterprise</div>
+        <h4>Research &amp; rationale</h4>
+        <p>Cited answers to technology questions. Explore architectural options, compare libraries, understand tradeoffs. Output: insight with sources. Audience: the human making the decision.</p>
+      </div>
+      <div class="layer-cell">
+        <div class="layer-cell-label mneme">Mneme HQ</div>
+        <h4>Decision record &amp; enforcement</h4>
+        <p>Structured corpus of <em>made</em> decisions with precedence semantics. Governs every AI-generated diff downstream. Output: PASS / WARN / FAIL per-decision. Audience: every coding agent on the team.</p>
+      </div>
+    </div>
+
+    <p>The gap between them is where architectural drift lives. A team researches "should we use Redis or a JSON store?" in Perplexity, lands on an answer, and then that answer exists only in a Slack thread, a brain, or an ADR that no agent ever reads. The next time an agent touches the storage layer, it reaches its own conclusion — often the wrong one.</p>
+
+    <p>Mneme is the mechanism that closes that gap: take the decision the team arrived at after the research, record it as a structured constraint, and from that point forward every AI coding agent is bound by it.</p>
+
+    <h2>The research-to-enforcement workflow</h2>
+
+    <p>This is the practical sequence. No API required — just a disciplined hand-off between the research stage and the governance stage.</p>
+
+    <div class="flow-diagram">
+      <div class="flow-step">
+        <div class="flow-step-num">01</div>
+        <div class="flow-step-body">
+          <div class="flow-step-tool perplexity">Perplexity Enterprise</div>
+          <div class="flow-step-desc">Ask the question that needs an answer: "What are the operational tradeoffs between Redis and a filesystem JSON store for a lightweight session cache in a containerised service?" Get cited, current answers. Evaluate. Make the call.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">02</div>
+        <div class="flow-step-body">
+          <div class="flow-step-tool mneme">Mneme HQ &mdash; mneme add_decision</div>
+          <div class="flow-step-desc">Record the decision as a structured constraint. Include the rationale from the research (a summary, a link, the key tradeoff). The decision is now in <code>project_memory.json</code> with a decision ID, status, and precedence rank.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">03</div>
+        <div class="flow-step-body">
+          <div class="flow-step-tool mneme">Mneme HQ &mdash; Pre-generation hook</div>
+          <div class="flow-step-desc">Every subsequent AI-generated diff touching the storage layer is evaluated against the recorded decision. Redis gets blocked. The JSON store approach gets through. The team's research becomes structural — not a suggestion the agent can ignore.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">04</div>
+        <div class="flow-step-body">
+          <div class="flow-step-tool agent">Claude Code · Cursor · GitHub Actions CI</div>
+          <div class="flow-step-desc">Any agent on any tool operates within the constraint. The decision made via Perplexity research is now equally visible to a Claude Code hook at the editor layer and a GitHub Actions gate in CI — without being pasted into both.</div>
+        </div>
+      </div>
+    </div>
+
+    <h2>Why this pattern matters for AI-assisted teams</h2>
+
+    <p>Teams using Perplexity Enterprise for architectural research are usually doing so because they have high AI coding adoption. They're generating code faster than they're reviewing it. Research quality improves the initial decision — but it doesn't govern the downstream agents that implement it.</p>
+
+    <p><strong>The structural problem:</strong> a Perplexity answer is high-quality input to a human decision. But once the human moves on, the decision has no enforcement surface. The next agent — or the next human — has no deterministic way to know that the question was already answered and the answer is binding.</p>
+
+    <p>Mneme provides that enforcement surface. Once a decision is recorded in <code>project_memory.json</code>, every invocation of <code>mneme check</code> — whether from a Claude Code PreToolUse hook, a Cursor session, or a GitHub Actions gate — evaluates new code against it. The research rationale becomes architecture enforcement. Same input, structural output.</p>
+
+    <div class="callout teal">
+      <p><strong>Scope note:</strong> This is a workflow pattern, not a native API integration. Mneme does not call Perplexity and Perplexity does not call Mneme. The integration is the discipline: research in Perplexity, record in Mneme, enforce everywhere. That handoff is where most teams currently lose their decisions.</p>
+    </div>
+
+    <h2>What this does not replace</h2>
+
+    <p>Perplexity is a research tool with citations and search grounding. Mneme is a governance layer with precedence semantics and enforcement hooks. They don't substitute for each other:</p>
+
+    <ul>
+      <li>Mneme does not tell you which storage technology is better. It enforces the decision your team made after figuring that out.</li>
+      <li>Perplexity does not enforce decisions. It surfaces rationale. You still have to record and govern the decision.</li>
+      <li>Mneme's retrieval is deterministic keyword scoring — no fuzzy recall, no hallucination. What goes in comes back exactly as recorded.</li>
+      <li>Perplexity's output is stochastic by design — that's what makes it useful for open research questions. It's the wrong tool for constraint enforcement.</li>
+    </ul>
+
+    <h2>Where Perplexity Enterprise fits in the AI coding stack</h2>
+
+    <p>Research assistants like Perplexity Enterprise are increasingly part of engineering workflows — used to evaluate libraries, explore security postures, assess migration paths, and audit emerging dependencies. As these tools become more capable, the decisions they inform multiply. Each one is a potential constraint that needs to be recorded and enforced.</p>
+
+    <p>Mneme sits one layer below: it doesn't help you research; it helps you make research decisions durable. For teams serious about AI-assisted engineering at scale, both are necessary. Research without enforcement creates well-informed drift. Enforcement without research creates brittle rules with no grounding.</p>
+
+    <p>For more on the governance layer that connects research-stage decisions to generation-time enforcement, see <a href="/insights/memory-is-not-governance/" style="color: var(--accent); text-decoration: none;">Memory Is Not Governance</a> and <a href="/insights/why-architectural-governance-needs-precedence-semantics/" style="color: var(--accent); text-decoration: none;">Why AI Architectural Governance Needs Precedence Semantics</a>.</p>
+
+  </div>
+
+  <div class="article-footer">
+    <a href="/integrations/" class="back-link">← Back to integrations</a>
+
+    <div class="cta-block">
+      <h3>Record your next architectural decision</h3>
+      <p>The fastest way to move from research to enforcement: run <code>mneme init</code>, add your first decision with <code>mneme add_decision</code>, and wire a hook. The research rationale lives in the corpus; the constraint is live from the first <code>mneme check</code>.</p>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">Get started on GitHub</a>
+      <a href="/demo/adr-compiler/" class="cta-secondary">See the ADR compiler — how existing docs become live enforcement →</a>
+    </div>
+  </div>
+</div>
+</main>
+
+<footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+  <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/use-cases/">Use cases</a></li>
+        <li><a href="/works-with/">Works with</a></li>
+        <li><a href="/platforms/">Platforms</a></li>
+        <li><a href="/integrations/">Integrations</a></li>
+        <li><a href="/compare/">Compare</a></li>
+        <li><a href="/demo/">Demo</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/insights/">Insights</a></li>
+        <li><a href="/standards/">Standards</a></li>
+        <li><a href="/benchmark/">Benchmark</a></li>
+        <li><a href="/docs/">Docs</a></li>
+        <li><a href="/docs/cli/">CLI reference</a></li>
+        <li><a href="/docs/governance-violations/">Governance violations</a></li>
+        <li><a href="/supported-languages/">Supported languages</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/pilot/" style="color:var(--accent);">Request pilot</a></li>
+        <li><a href="/for/">For teams</a></li>
+        <li><a href="/founder/">Founder</a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/roadmap/">Roadmap</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Code</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="https://github.com/TheoV823/mneme">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="/privacy/">Privacy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
+    <span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span>
+    <nav aria-label="Social media" style="display: flex; align-items: center; gap: 1rem;">
+      <a href="https://github.com/TheoV823/mneme" target="_blank" rel="noopener" aria-label="GitHub" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.16c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.27-1.69-1.27-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.34.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18.92-.26 1.91-.39 2.89-.39.98 0 1.97.13 2.89.39 2.2-1.49 3.17-1.18 3.17-1.18.62 1.58.23 2.75.12 3.04.73.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.26 5.68.41.35.78 1.05.78 2.12v3.15c0 .31.21.67.8.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener" aria-label="LinkedIn" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/@MnemeHQ" target="_blank" rel="noopener" aria-label="YouTube" style="color: var(--muted); display: inline-flex;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.12C19.55 3.5 12 3.5 12 3.5s-7.55 0-9.4.58A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.12c1.85.58 9.4.58 9.4.58s7.55 0 9.4-.58a3 3 0 0 0 2.1-2.12A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8zM9.6 15.57V8.43L15.82 12 9.6 15.57z"/></svg>
+      </a>
+    </nav>
+    <span>&copy; 2026</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  function setOpen(open){
+    links.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('menu-open', open);
+  }
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    setOpen(!links.classList.contains('open'));
+  });
+  document.addEventListener('click', function(e){
+    if (!links.classList.contains('open')) return;
+    if (links.contains(e.target) || btn.contains(e.target)) return;
+    setOpen(false);
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false);
+  });
+  links.addEventListener('click', function(e){
+    if (e.target.tagName === 'A') setOpen(false);
+  });
+  window.addEventListener('resize', function(){
+    if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false);
+  });
+})();
+</script>
+</body>
+</html>
