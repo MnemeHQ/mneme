@@ -138,16 +138,18 @@
     .hero-sub { font-size: 0.95rem; color: var(--muted); max-width: 520px; margin: 0 auto; }
     .cards-wrap { max-width: 900px; margin: 0 auto; padding: 0 2rem 6rem; }
     .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.25rem; margin-top: 3rem; }
-    .case-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 1.75rem; display: flex; flex-direction: column; gap: 0.75rem; transition: border-color 0.15s; }
-    .case-card:hover { border-color: var(--border2); }
+    .case-card-link { display: flex; flex-direction: column; text-decoration: none; color: inherit; }
+    .case-card { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 1.75rem; display: flex; flex-direction: column; gap: 0.75rem; transition: border-color 0.15s, transform 0.18s ease, background 0.15s; }
+    .case-card-link:hover .case-card { border-color: var(--border2); transform: translateY(-2px); background: rgba(200, 240, 96, 0.025); }
     .case-card-eyebrow { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
     .case-card h3 { font-family: 'Inter', sans-serif; font-size: 1.15rem; font-weight: 600; letter-spacing: -0.01em; line-height: 1.3; }
     .case-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.7; flex: 1; }
-    .case-card a.read-link { color: var(--accent); font-size: 0.82rem; text-decoration: none; margin-top: 0.5rem; }
-    .case-card a.read-link:hover { color: var(--accent-dim); }
+    .case-card-footer { display: flex; align-items: center; margin-top: 0.25rem; }
+    .read-pill { display: inline-block; border: 1px solid var(--border2); border-radius: 20px; padding: 0.28rem 0.85rem; font-size: 0.72rem; font-family: 'DM Mono', monospace; color: var(--muted); letter-spacing: 0.03em; transition: border-color 0.15s, color 0.15s; }
+    .case-card-link:hover .read-pill { border-color: var(--accent); color: var(--accent); }
     .case-card-upcoming { border-style: dashed; opacity: 0.85; }
     .case-card-upcoming .case-card-eyebrow { color: var(--teal); }
-    .case-card .read-link.upcoming { color: var(--teal); font-size: 0.82rem; margin-top: 0.5rem; cursor: default; }
+    .soon-label { color: var(--muted); font-size: 0.78rem; font-family: 'DM Mono', monospace; }
 
     .hub-intro { font-size: 0.88rem; color: var(--muted); line-height: 1.8; max-width: 660px; margin: 0 auto; padding-bottom: 0; }
     footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
@@ -433,53 +435,65 @@
     <p class="hub-intro">Mneme HQ enforces architectural, security, design, and workflow decisions wherever AI generates code or structured output. These reference architectures show how teams apply pre-generation governance across different LLM-powered workflows.</p>
     <div class="cards-grid">
 
-      <div class="case-card">
-        <div class="case-card-eyebrow">Reference Architecture</div>
-        <h3>Coding Assistant Governance</h3>
-        <p>Prevent Cursor, Claude Code, and Copilot from violating architecture rules — session after session. Enforce ADRs, service boundaries, and naming conventions at prompt time.</p>
-        <a href="/use-cases/coding-assistant-governance/" class="read-link">Read ?</a>
-      </div>
+      <a href="/use-cases/coding-assistant-governance/" class="case-card-link">
+        <div class="case-card">
+          <div class="case-card-eyebrow">Reference Architecture</div>
+          <h3>Coding Assistant Governance</h3>
+          <p>Prevent Cursor, Claude Code, and Copilot from violating architecture rules — session after session. Enforce ADRs, service boundaries, and naming conventions at prompt time.</p>
+          <div class="case-card-footer"><span class="read-pill">Read</span></div>
+        </div>
+      </a>
 
-      <div class="case-card">
-        <div class="case-card-eyebrow">Reference Architecture</div>
-        <h3>Legacy Codebase Memory</h3>
-        <p>Give every coding assistant access to the undocumented rules that only your longest-tenured engineers know. Capture tribal knowledge once — enforce it forever.</p>
-        <a href="/use-cases/legacy-codebase-memory/" class="read-link">Read ?</a>
-      </div>
+      <a href="/use-cases/legacy-codebase-memory/" class="case-card-link">
+        <div class="case-card">
+          <div class="case-card-eyebrow">Reference Architecture</div>
+          <h3>Legacy Codebase Memory</h3>
+          <p>Give every coding assistant access to the undocumented rules that only your longest-tenured engineers know. Capture tribal knowledge once — enforce it forever.</p>
+          <div class="case-card-footer"><span class="read-pill">Read</span></div>
+        </div>
+      </a>
 
-      <div class="case-card">
-        <div class="case-card-eyebrow">Reference Architecture</div>
-        <h3>Security &amp; Compliance Guardrails</h3>
-        <p>Enforce PII handling rules, auth requirements, and compliance controls before the LLM generates a single line of non-compliant code. GDPR, SOC 2, and beyond.</p>
-        <a href="/use-cases/security-compliance-guardrails/" class="read-link">Read ?</a>
-      </div>
+      <a href="/use-cases/security-compliance-guardrails/" class="case-card-link">
+        <div class="case-card">
+          <div class="case-card-eyebrow">Reference Architecture</div>
+          <h3>Security &amp; Compliance Guardrails</h3>
+          <p>Enforce PII handling rules, auth requirements, and compliance controls before the LLM generates a single line of non-compliant code. GDPR, SOC 2, and beyond.</p>
+          <div class="case-card-footer"><span class="read-pill">Read</span></div>
+        </div>
+      </a>
 
-      <div class="case-card">
-        <div class="case-card-eyebrow">Reference Architecture</div>
-        <h3>Data Platform Governance</h3>
-        <p>Keep AI assistants aligned with warehouse layer boundaries, naming conventions, and pipeline constraints. Prevent raw table writes and schema drift before code is written.</p>
-        <a href="/use-cases/data-platform-governance/" class="read-link">Read ?</a>
-      </div>
+      <a href="/use-cases/data-platform-governance/" class="case-card-link">
+        <div class="case-card">
+          <div class="case-card-eyebrow">Reference Architecture</div>
+          <h3>Data Platform Governance</h3>
+          <p>Keep AI assistants aligned with warehouse layer boundaries, naming conventions, and pipeline constraints. Prevent raw table writes and schema drift before code is written.</p>
+          <div class="case-card-footer"><span class="read-pill">Read</span></div>
+        </div>
+      </a>
 
-      <div class="case-card">
-        <div class="case-card-eyebrow">Reference Architecture</div>
-        <h3>Design System Governance</h3>
-        <p>Stop AI from inventing colors, breaking component hierarchy, and ignoring accessibility rules when generating UI. Enforce design tokens and WCAG requirements at prompt time.</p>
-        <a href="/use-cases/design-system-governance/" class="read-link">Read ?</a>
-      </div>
+      <a href="/use-cases/design-system-governance/" class="case-card-link">
+        <div class="case-card">
+          <div class="case-card-eyebrow">Reference Architecture</div>
+          <h3>Design System Governance</h3>
+          <p>Stop AI from inventing colors, breaking component hierarchy, and ignoring accessibility rules when generating UI. Enforce design tokens and WCAG requirements at prompt time.</p>
+          <div class="case-card-footer"><span class="read-pill">Read</span></div>
+        </div>
+      </a>
 
-      <div class="case-card">
-        <div class="case-card-eyebrow">Reference Architecture</div>
-        <h3>Multi-Agent Workflow Governance</h3>
-        <p>Give every agent in your pipeline — planner, coder, reviewer — a shared memory of architectural decisions. One decision store enforced at every stage.</p>
-        <a href="/use-cases/multi-agent-workflow-governance/" class="read-link">Read ?</a>
-      </div>
+      <a href="/use-cases/multi-agent-workflow-governance/" class="case-card-link">
+        <div class="case-card">
+          <div class="case-card-eyebrow">Reference Architecture</div>
+          <h3>Multi-Agent Workflow Governance</h3>
+          <p>Give every agent in your pipeline — planner, coder, reviewer — a shared memory of architectural decisions. One decision store enforced at every stage.</p>
+          <div class="case-card-footer"><span class="read-pill">Read</span></div>
+        </div>
+      </a>
 
       <div class="case-card case-card-upcoming">
         <div class="case-card-eyebrow">Coming up</div>
         <h3>ADR Enforcement</h3>
         <p>Deterministic ADR enforcement for AI coding agents — turning architectural decision records into pre-generation constraints with CI gates and drift telemetry. Dedicated reference architecture in progress.</p>
-        <span class="read-link upcoming">In progress ?</span>
+        <div class="case-card-footer"><span class="soon-label">In progress</span></div>
       </div>
 
     </div>
