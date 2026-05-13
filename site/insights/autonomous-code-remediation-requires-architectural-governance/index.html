@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Autonomous Code Remediation Requires Architectural Governance — Mneme HQ</title>
+  <meta name="description" content="Autonomous remediation loops cannot stabilise without deterministic architectural constraints. Faster generation accelerates drift. Governance must become infrastructure." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/insights/autonomous-code-remediation-requires-architectural-governance/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Autonomous Code Remediation Requires Architectural Governance" />
+  <meta property="og:description" content="Autonomous remediation loops cannot stabilise without deterministic architectural constraints. Faster generation accelerates drift. Governance must become infrastructure." />
+  <meta property="og:url" content="https://mnemehq.com/insights/autonomous-code-remediation-requires-architectural-governance/" />
+  <meta property="og:image" content="https://mnemehq.com/insights/autonomous-code-remediation-requires-architectural-governance/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Autonomous Code Remediation Requires Architectural Governance" />
+  <meta name="twitter:description" content="Autonomous remediation loops cannot stabilise without deterministic architectural constraints. Faster generation accelerates drift. Governance must become infrastructure." />
+  <meta name="twitter:image" content="https://mnemehq.com/insights/autonomous-code-remediation-requires-architectural-governance/og.png" />
+  <meta name="author" content="Theo Valmis" />
+  <meta property="article:published_time" content="2026-05-13T00:00:00Z" />
+  <meta property="article:author" content="https://mnemehq.com/founder/" />
+  <meta property="article:section" content="Architecture" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #88889a;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .article-wrap { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 7rem; }
+    .article-header { margin-bottom: 3.5rem; }
+    .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+
+    .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
+    .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .article-body h3 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--text); }
+    .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
+    .article-body p strong { color: var(--text); font-weight: 500; }
+    .article-body ul, .article-body ol { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body li { margin-bottom: 0.5rem; }
+    .article-body li strong { color: var(--text); font-weight: 500; }
+    .article-body pre { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.5rem; margin: 1.5rem 0; overflow-x: auto; font-family: 'DM Mono', monospace; font-size: 0.82rem; color: var(--muted); line-height: 1.7; }
+    .article-body code { font-family: 'DM Mono', monospace; font-size: 0.85em; color: var(--teal); }
+    .article-body pre code { color: var(--muted); }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout p strong { color: var(--accent); }
+
+    .stack-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.85rem; }
+    .stack-table th { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 400; padding: 0.6rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+    .stack-table td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; }
+    .stack-table td:first-child { color: var(--text); font-weight: 500; white-space: nowrap; }
+    .stack-table tr:last-child td { border-bottom: none; }
+    .stack-table tr:last-child td:first-child { color: var(--accent); }
+    .stack-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin: 2rem 0; }
+
+    .loop-block { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.75rem; margin: 2rem 0; font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--muted); line-height: 2; }
+    .loop-block .step { display: flex; align-items: flex-start; gap: 0.75rem; }
+    .loop-block .arrow { color: var(--border2); flex-shrink: 0; padding-left: 0.5rem; }
+    .loop-block .step-label { color: var(--text); }
+    .loop-block .step-note { color: var(--muted); font-size: 0.75rem; }
+
+    .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .article-faq { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .article-faq h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 1.5rem; color: var(--text); }
+    .article-faq details { margin: 0.75rem 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .article-faq summary { padding: 1rem 1.25rem; cursor: pointer; font-size: 0.88rem; color: var(--text); background: var(--surface); list-style: none; }
+    .article-faq summary::-webkit-details-marker { display: none; }
+    .article-faq summary::before { content: '+ '; color: var(--accent); }
+    .article-faq details[open] summary::before { content: '- '; }
+    .article-faq details[open] summary { border-bottom: 1px solid var(--border); }
+    .article-faq .faq-body { padding: 1.25rem; font-size: 0.86rem; color: var(--muted); line-height: 1.85; }
+    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .back-link:hover { color: var(--text); }
+    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2rem; }
+    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--accent-dim); }
+
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .breadcrumb-nav { max-width: 720px; margin: 0 auto; padding: 1.75rem 2rem 0.85rem; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.82rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    .answer-capsule { max-width: 820px; margin: 0 auto; padding: 1.5rem 2rem; background: var(--surface); border-bottom: 1px solid rgba(200,240,96,0.18); font-size: 0.88rem; color: var(--muted); line-height: 1.8; }
+    .answer-capsule strong { color: var(--accent); }
+
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; padding: 0; flex-shrink: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; transition: border-color 0.15s, background 0.15s; }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span { display: block; width: 18px; height: 2px; background: currentColor; border-radius: 1px; transition: transform 0.25s ease, opacity 0.18s ease; transform-origin: center; }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    @media (max-width: 900px) {
+      html, body { overflow-x: hidden; }
+      body.menu-open { overflow: hidden; }
+      nav, nav.site-nav { position: relative; padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 1.25rem; z-index: 99; max-height: 0; overflow: hidden; opacity: 0; visibility: hidden; transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s; }
+      .nav-links.open { max-height: 80vh; opacity: 1; visibility: visible; padding: 0.5rem 1.25rem 1.25rem; transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s; overflow-y: auto; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.92rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+      .article-wrap { padding: 3rem 1.25rem 5rem; }
+      .stack-table { font-size: 0.8rem; }
+    }
+
+    h2#related-reading { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 400; margin-top: 3.5rem; margin-bottom: 0.75rem; }
+    h2#related-reading + ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    h2#related-reading + ul li { margin: 0; }
+    h2#related-reading + ul li a { display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.1rem; background: var(--surface); color: var(--text); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.15s, color 0.15s; }
+    h2#related-reading + ul li a::after { content: '\2192'; opacity: 0.35; transition: opacity 0.15s, transform 0.15s; display: inline-block; margin-left: 0.5rem; }
+    h2#related-reading + ul li a:hover { background: var(--surface2); color: var(--accent); }
+    h2#related-reading + ul li a:hover::after { opacity: 1; transform: translateX(3px); }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Insights", "item": "https://mnemehq.com/insights/"},
+          {"@type": "ListItem", "position": 3, "name": "Autonomous Code Remediation Requires Architectural Governance", "item": "https://mnemehq.com/insights/autonomous-code-remediation-requires-architectural-governance/"}
+        ]
+      },
+      {
+        "@type": "Article",
+        "headline": "Autonomous Code Remediation Requires Architectural Governance",
+        "description": "Autonomous remediation loops cannot stabilise without deterministic architectural constraints. Faster generation accelerates drift. Governance must become infrastructure.",
+        "url": "https://mnemehq.com/insights/autonomous-code-remediation-requires-architectural-governance/",
+        "datePublished": "2026-05-13",
+        "dateModified": "2026-05-13",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "image": "https://mnemehq.com/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/insights/autonomous-code-remediation-requires-architectural-governance/"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Why do autonomous remediation loops oscillate?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Each agent in a remediation loop optimises locally — it resolves the constraint it can observe. Without a durable, shared representation of architectural invariants, fixing one violation introduces another. The loop never converges because no single agent holds the full constraint space."}
+          },
+          {
+            "@type": "Question",
+            "name": "Can longer context windows solve the architectural drift problem?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Longer context helps individual agents recall more, but it does not make architectural constraints deterministic, persistent across agent handoffs, or enforceable at the tool-use layer. Context degrades across sessions and multi-agent handoffs; a governance layer does not."}
+          },
+          {
+            "@type": "Question",
+            "name": "Does governance replace review in an agentic workflow?",
+            "acceptedAnswer": {"@type": "Answer", "text": "No. Governance operates before generation: it ensures the code an agent writes satisfies architectural invariants before it enters the review queue. Review then handles what review is actually good at — design judgment, edge-case reasoning, intent alignment — instead of catching rule violations that should never have reached the PR."}
+          },
+          {
+            "@type": "Question",
+            "name": "What makes a governance constraint machine-readable?",
+            "acceptedAnswer": {"@type": "Answer", "text": "A constraint is machine-readable when it has explicit scope, a deterministic enforcement action, a reason trace an agent can act on, and precedence semantics for resolving conflicts. Free-form guidelines in a CLAUDE.md file are advisory. Structured enforcement rules with those four properties are governable."}
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/benchmark/">Benchmark</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<div class="answer-capsule">
+  <strong>Autonomous remediation loops need architectural constraints, not just better models.</strong> The industry is optimising generation, execution, and review. The missing layer is governance: deterministic, persistent constraints that prevent architectural drift from compounding across agentic iterations. Memory tools recall context. Mneme governs implementation.
+</div>
+<nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/insights/">Insights</a></li>
+    <li aria-current="page">Autonomous Code Remediation Requires Architectural Governance</li>
+  </ol>
+</nav>
+<article class="article-wrap">
+  <header class="article-header">
+    <div class="article-eyebrow">
+      <span class="eyebrow-tag">Architecture</span>
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-meta">8 min read &nbsp;·&nbsp; May 2026</span>
+    </div>
+    <h1>Autonomous Code Remediation Requires Architectural Governance</h1>
+    <p class="article-lede">The industry question has been whether AI can generate production-quality code. That question is largely answered. The next operational problem is harder: how do autonomous remediation loops stay architecturally stable while they do it?</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-13">Published May 2026</time>
+    </p>
+  </header>
+
+  <div class="article-body">
+
+    <h2>The software lifecycle is already partially autonomous</h2>
+
+    <p>This is not a future direction. It is the current operational state for engineering teams that moved early.</p>
+
+    <p>AI writes substantial portions of production code. CI pipelines are increasingly designed for machine consumption — linters, formatters, type checkers, and test runners that produce structured output for the next agent in the chain. GitHub and others are shipping auto-fix workflows. Orchestrators decompose complex tasks across multiple agents. Agents invoke other agents.</p>
+
+    <p>The feedback loops that used to run at human pace now run at machine pace. That matters because the rate of change is not the only thing that increased. The rate at which architectural violations can propagate, compound, and escape review also increased. The system is faster in every direction.</p>
+
+    <h2>The industry is optimising the wrong layer</h2>
+
+    <p>Current ecosystem investment concentrates on three layers:</p>
+
+    <ul>
+      <li><strong>Generation</strong> — better models, longer context windows, lower latency</li>
+      <li><strong>Execution</strong> — agent orchestration, task decomposition, multi-step tool use</li>
+      <li><strong>Review</strong> — PR review agents, inline suggestions, agentic comment threads</li>
+    </ul>
+
+    <p>Each of these layers is improving. None of them address the fourth layer: <strong>architectural intent preservation</strong>.</p>
+
+    <div class="callout">
+      <p><strong>Faster generation increases the rate of architectural drift.</strong> An agent producing ten times more code per hour, without deterministic architectural constraints, produces architectural violations at ten times the rate. Generation quality and architectural coherence are orthogonal problems.</p>
+    </div>
+
+    <p>Conflating them is a structural mistake that most current tooling makes. Better code-generating models do not produce more architecturally consistent code unless the constraints are machine-readable and enforced at generation time.</p>
+
+    <h2>Autonomous remediation has a stability problem</h2>
+
+    <p>Here is the loop that is becoming common in teams operating agentic CI:</p>
+
+    <div class="loop-block">
+      <div class="step"><span class="arrow">&#x25b6;</span><span><span class="step-label">Agent writes code</span></span></div>
+      <div class="step"><span class="arrow">&#x2193;</span><span><span class="step-label">CI fails</span> &nbsp;<span class="step-note">type violation, test failure, lint error</span></span></div>
+      <div class="step"><span class="arrow">&#x2193;</span><span><span class="step-label">Agent retries</span> &nbsp;<span class="step-note">resolves the visible constraint</span></span></div>
+      <div class="step"><span class="arrow">&#x2193;</span><span><span class="step-label">Another constraint breaks</span> &nbsp;<span class="step-note">downstream of the fix</span></span></div>
+      <div class="step"><span class="arrow">&#x2193;</span><span><span class="step-label">Second agent remediates</span> &nbsp;<span class="step-note">scoped to its own constraint set</span></span></div>
+      <div class="step"><span class="arrow">&#x2193;</span><span><span class="step-label">Original invariant reappears</span> &nbsp;<span class="step-note">the loop does not converge</span></span></div>
+    </div>
+
+    <p>This is not a model quality failure. It is a systems design failure.</p>
+
+    <p>Each agent in this loop optimises locally. It resolves the constraint it can observe: the failing test, the lint error, the type violation. It has no durable representation of the architectural invariants the original code was meant to satisfy. It has no memory that persists across remediation iterations or agent handoffs.</p>
+
+    <p>The result is oscillation. The system never converges because no single agent holds the full constraint space. Each agent resolves one violation and either introduces another, or restores a violation the previous agent had suppressed.</p>
+
+    <p>This is not fixable at the model layer. Larger context windows help individual agents see more, but they do not make constraints deterministic, persistent across sessions, or consistent across the multi-agent boundary. Architectural constraints need to be an infrastructure property, not a context property.</p>
+
+    <h2>Why review cannot govern autonomous loops</h2>
+
+    <p>Traditional code review works because it assumes bounded conditions that agentic workflows break:</p>
+
+    <ul>
+      <li>Change velocity is human-scaled — diffs arrive at a pace reviewers can process</li>
+      <li>Diffs are human-readable in a reasonable time budget</li>
+      <li>Workflows are serial or near-serial</li>
+      <li>Review is the primary quality gate before merge</li>
+    </ul>
+
+    <p>In an agentic remediation loop, diffs arrive faster than human review cycles. Remediation chains produce intermediate states that are never intended for review. The number of iterations between a human decision and its downstream effect grows unbounded as orchestration complexity increases.</p>
+
+    <p>Review, in this environment, becomes an audit layer. It operates after the fact, on code produced by a process the reviewer did not supervise and cannot fully reconstruct from the diff. This is not a criticism of review. Review remains valuable for design judgment, edge-case reasoning, and intent alignment. But the premise that review <em>governs</em> code quality fails when the generation process is autonomous and self-correcting.</p>
+
+    <p>Governance must move earlier in the loop — before generation, not after. Not as advisory text in a prompt. As deterministic, machine-readable constraints that agents consume, validate against, and are blocked by when they would violate architectural invariants.</p>
+
+    <h2>What machine-readable governance actually requires</h2>
+
+    <p>Governance that can operate inside an autonomous loop needs specific properties that free-form documentation, system prompts, and RAG pipelines do not provide.</p>
+
+    <p>A constraint is machine-readable when it has:</p>
+
+    <ul>
+      <li><strong>Explicit scope</strong> — which files, modules, or services it applies to</li>
+      <li><strong>A deterministic enforcement action</strong> — block, warn, or require approval, not "consider whether"</li>
+      <li><strong>A reason trace</strong> — structured output an agent can act on rather than a human-readable paragraph</li>
+      <li><strong>Precedence semantics</strong> — a resolution rule when multiple constraints apply to the same operation</li>
+    </ul>
+
+    <p>This is what structured enforcement looks like in practice:</p>
+
+<pre>{
+  "rule": "FORBID_DEPENDENCY",
+  "dependency": "requests",
+  "allowed_alternative": "httpx",
+  "reason": "ADR-004 mandates async-first HTTP — requests blocks the event loop",
+  "scope": "services/**",
+  "enforcement": "block"
+}</pre>
+
+    <p>This constraint survives context resets, agent handoffs, and multi-step orchestration. An agent generating an import can be blocked by it. A remediation agent can use the <code>allowed_alternative</code> field to choose the correct fix without needing to infer what "correct" means from surrounding context. A CI step can validate it independently. The constraint is not a suggestion; it is infrastructure.</p>
+
+    <p>Free-form guidelines in a CLAUDE.md file are advisory. A system prompt containing your ADR documents is advisory. A RAG pipeline retrieving them is advisory. None of these properties hold under adversarial input, context rotation, or multi-agent boundaries. Structured enforcement rules with the four properties above are not advisory.</p>
+
+    <h2>The four-layer delivery stack</h2>
+
+    <p>The software delivery stack in an autonomous environment has four layers, not three. The industry has built substantial tooling for the first three. The fourth is largely absent from production-ready infrastructure.</p>
+
+    <div class="stack-wrap">
+      <table class="stack-table">
+        <thead>
+          <tr>
+            <th>Layer</th>
+            <th>Purpose</th>
+            <th>Current investment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Models</td>
+            <td>Generate code</td>
+            <td>High — model quality improving rapidly</td>
+          </tr>
+          <tr>
+            <td>Agents / orchestrators</td>
+            <td>Execute workflows</td>
+            <td>High — frameworks maturing</td>
+          </tr>
+          <tr>
+            <td>CI / remediation loops</td>
+            <td>Retry and repair</td>
+            <td>Growing — agentic CI emerging</td>
+          </tr>
+          <tr>
+            <td>Governance layer</td>
+            <td>Preserve architectural intent</td>
+            <td>Low — largely absent from production tooling</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>The first three layers will saturate. Generation is already fast and cheap. Orchestration frameworks are converging on stable primitives. Agentic CI is becoming standard. When these layers saturate, the binding constraint becomes the fourth layer: whether architectural intent survives across all of them.</p>
+
+    <p>Teams building on the first three layers without the fourth are building systems that generate and repair code at machine speed while accumulating architectural drift at the same rate. The debt is invisible in the short term and expensive when it surfaces: a compliance audit, a production incident, a major refactor that consumes a quarter.</p>
+
+    <h2>Governance is infrastructure</h2>
+
+    <p>The problem is no longer whether AI can write software. It is whether autonomous systems can preserve architectural integrity while doing so.</p>
+
+    <p>These are not the same problem, and the second does not resolve by improving the first. A more capable generation model running inside a loop without architectural constraints produces more violations faster, not fewer. The constraint must be structural.</p>
+
+    <p>Governance is becoming infrastructure in the same way that observability became infrastructure: initially seen as optional instrumentation, eventually understood as load-bearing. The teams that treat it as infrastructure early are the ones whose autonomous systems remain stable as the loops speed up. The teams that treat it as advisory text are the ones whose review queues fill with drift that no one has the throughput to catch.</p>
+
+    <p>The sooner the industry builds governance as a first-class infrastructure layer, the more stable the autonomous systems built on top of it will be.</p>
+
+  </div>
+
+  <section class="article-faq">
+    <h2>Frequently asked questions</h2>
+    <details>
+      <summary>Why do autonomous remediation loops oscillate?</summary>
+      <div class="faq-body">Each agent in a remediation loop optimises locally — it resolves the constraint it can observe. Without a durable, shared representation of architectural invariants, fixing one violation introduces another. The loop never converges because no single agent holds the full constraint space.</div>
+    </details>
+    <details>
+      <summary>Can longer context windows solve the architectural drift problem?</summary>
+      <div class="faq-body">Longer context helps individual agents recall more, but it does not make architectural constraints deterministic, persistent across agent handoffs, or enforceable at the tool-use layer. Context degrades across sessions and multi-agent boundaries; a governance layer does not.</div>
+    </details>
+    <details>
+      <summary>Does governance replace review in an agentic workflow?</summary>
+      <div class="faq-body">No. Governance operates before generation: it ensures the code an agent writes satisfies architectural invariants before it enters the review queue. Review then handles what review is actually good at — design judgment, edge-case reasoning, intent alignment — instead of catching rule violations that should never have reached the PR.</div>
+    </details>
+    <details>
+      <summary>What makes a governance constraint machine-readable?</summary>
+      <div class="faq-body">A constraint is machine-readable when it has explicit scope, a deterministic enforcement action, a reason trace an agent can act on, and precedence semantics for resolving conflicts. Free-form guidelines in a CLAUDE.md file are advisory. Structured enforcement rules with those four properties are governable.</div>
+    </details>
+  </section>
+
+  <h2 id="related-reading">Related reading</h2>
+  <ul>
+    <li><a href="/insights/why-code-review-cannot-scale-with-ai-output/">Why Code Review Cannot Scale With AI Output</a></li>
+    <li><a href="/insights/review-is-not-governance/">Review Is Not Governance</a></li>
+    <li><a href="/insights/why-prompt-memory-fails-at-scale/">Why Prompt Memory Fails at Scale</a></li>
+    <li><a href="/insights/prompt-engineering-is-not-governance/">Prompt Engineering Is Not Governance</a></li>
+  </ul>
+
+  <footer class="article-footer">
+    <a href="/insights/" class="back-link">&#x2190; Back to Insights</a>
+
+    <div class="cta-block">
+      <h3>Stop architectural drift at the generation layer</h3>
+      <p>Mneme HQ integrates with Claude Code's PreToolUse hook — enforcing architectural constraints before code is written, not after it enters the review queue. Open source.</p>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &#x2192;</a>
+    </div>
+  </footer>
+</article>
+</main>
+
+<footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: center;">
+  <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/use-cases/">Use cases</a></li>
+        <li><a href="/works-with/">Works with</a></li>
+        <li><a href="/platforms/">Platforms</a></li>
+        <li><a href="/integrations/">Integrations</a></li>
+        <li><a href="/compare/">Compare</a></li>
+        <li><a href="/demo/">Demo</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/insights/">Insights</a></li>
+        <li><a href="/standards/">Standards</a></li>
+        <li><a href="/benchmark/">Benchmark</a></li>
+        <li><a href="/docs/">Docs</a></li>
+        <li><a href="/docs/cli/">CLI reference</a></li>
+        <li><a href="/docs/governance-violations/">Governance violations</a></li>
+        <li><a href="/supported-languages/">Supported languages</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/pilot/" style="color:var(--accent);">Request pilot</a></li>
+        <li><a href="/for/">For teams</a></li>
+        <li><a href="/founder/">Founder</a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/roadmap/">Roadmap</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Code</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="https://github.com/TheoV823/mneme">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="/privacy/">Privacy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
+    <span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span>
+    <nav aria-label="Social media" style="display: flex; align-items: center; gap: 1rem;">
+      <a href="https://github.com/TheoV823/mneme" target="_blank" rel="noopener" aria-label="GitHub" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.16c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.27-1.69-1.27-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.34.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18.92-.26 1.91-.39 2.89-.39.98 0 1.97.13 2.89.39 2.2-1.49 3.17-1.18 3.17-1.18.62 1.58.23 2.75.12 3.04.73.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.26 5.68.41.35.78 1.05.78 2.12v3.15c0 .31.21.67.8.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener" aria-label="LinkedIn" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 .79 0 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/@MnemeHQ" target="_blank" rel="noopener" aria-label="YouTube" style="color: var(--muted); display: inline-flex;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.12C19.55 3.5 12 3.5 12 3.5s-7.55 0-9.4.58A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.12c1.85.58 9.4.58 9.4.58s7.55 0 9.4-.58a3 3 0 0 0 2.1-2.12A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8zM9.6 15.57V8.43L15.82 12 9.6 15.57z"/></svg>
+      </a>
+    </nav>
+    <span>&copy; 2026</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  function setOpen(open){
+    links.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('menu-open', open);
+  }
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    setOpen(!links.classList.contains('open'));
+  });
+  document.addEventListener('click', function(e){
+    if (!links.classList.contains('open')) return;
+    if (links.contains(e.target) || btn.contains(e.target)) return;
+    setOpen(false);
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false);
+  });
+  links.addEventListener('click', function(e){
+    if (e.target.tagName === 'A') setOpen(false);
+  });
+  window.addEventListener('resize', function(){
+    if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false);
+  });
+})();
+</script>
+</body>
+</html>
