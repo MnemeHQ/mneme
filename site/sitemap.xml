@@ -111,6 +111,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://mnemehq.com/insights/why-architectural-governance-needs-precedence-semantics/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://mnemehq.com/insights/rise-of-agentic-engineering-education/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

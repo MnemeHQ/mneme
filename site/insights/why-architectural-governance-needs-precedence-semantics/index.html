@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Why AI Architectural Governance Needs Precedence Semantics — Mneme HQ</title>
+  <meta name="description" content="When two architectural decisions overlap, prompt rules, RAG, and PR review all resolve the conflict non-deterministically. Precedence semantics — specificity, supersedes, priority, status, temporal resolution — is the missing layer that makes AI governance deterministic." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/insights/why-architectural-governance-needs-precedence-semantics/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Why AI Architectural Governance Needs Precedence Semantics" />
+  <meta property="og:description" content="When two architectural decisions overlap, prompt rules, RAG, and PR review all resolve the conflict non-deterministically. Precedence semantics is the missing layer that makes AI governance deterministic." />
+  <meta property="og:url" content="https://mnemehq.com/insights/why-architectural-governance-needs-precedence-semantics/" />
+  <meta property="og:image" content="https://mnemehq.com/insights/why-architectural-governance-needs-precedence-semantics/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Why AI Architectural Governance Needs Precedence Semantics" />
+  <meta name="twitter:description" content="When two architectural decisions overlap, prompt rules, RAG, and PR review all resolve the conflict non-deterministically. Precedence semantics is the missing layer that makes AI governance deterministic." />
+  <meta name="twitter:image" content="https://mnemehq.com/insights/why-architectural-governance-needs-precedence-semantics/og.png" />
+  <meta name="author" content="Theo Valmis" />
+  <meta property="article:published_time" content="2026-05-13T00:00:00Z" />
+  <meta property="article:author" content="https://mnemehq.com/founder/" />
+  <meta property="article:section" content="Engineering" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #88889a;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .article-wrap { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 7rem; }
+    .article-header { margin-bottom: 3.5rem; }
+    .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+
+    .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
+    .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
+    .article-body p strong { color: var(--text); font-weight: 500; }
+    .article-body ul { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body ul li { margin-bottom: 0.5rem; line-height: 1.8; }
+    .article-body ul li strong { color: var(--text); font-weight: 500; }
+    .article-body code { font-family: 'DM Mono', monospace; font-size: 0.82rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 0.05rem 0.4rem; color: var(--text); }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout p strong { color: var(--accent); }
+
+    .failure-stack { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2rem; margin: 2.5rem 0; }
+    .failure-stack .stack-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
+    .stack-row { display: flex; align-items: flex-start; gap: 1rem; padding: 0.9rem 0; border-bottom: 1px solid var(--border); }
+    .stack-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .stack-row:first-of-type { padding-top: 0; }
+    .stack-num { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--border2); flex-shrink: 0; padding-top: 0.1rem; min-width: 1.5rem; }
+    .stack-content { flex: 1; }
+    .stack-label { font-size: 0.82rem; font-weight: 600; color: var(--text); margin-bottom: 0.25rem; }
+    .stack-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.7; }
+
+    .contrast-block { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border-radius: 12px; overflow: hidden; margin: 2.5rem 0; }
+    .contrast-cell { background: var(--surface); padding: 1.75rem; }
+    .contrast-cell .label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem; }
+    .contrast-cell .tool { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem; }
+    .contrast-cell .desc { font-size: 0.82rem; color: var(--muted); line-height: 1.65; }
+    .contrast-cell.accent-left { border-left: 3px solid var(--border2); }
+    .contrast-cell.accent-right { border-left: 3px solid var(--accent); }
+    @media (max-width: 540px) { .contrast-block { grid-template-columns: 1fr; } }
+
+    .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .back-link:hover { color: var(--text); }
+    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2rem; }
+    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--accent-dim); }
+
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .breadcrumb-nav { max-width: 720px; margin: 0 auto; padding: 1.75rem 2rem 0.85rem; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.82rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin: 0 0 3rem; }
+    .toc .toc-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.9rem; }
+    .toc ol { list-style: none; counter-reset: toc; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 0.45rem; }
+    .toc ol li { counter-increment: toc; font-size: 0.85rem; padding-left: 2.2rem; position: relative; line-height: 1.5; }
+    .toc ol li::before { content: counter(toc, decimal-leading-zero); position: absolute; left: 0; top: 0.05rem; font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--border2); letter-spacing: 0.05em; }
+    .toc a { color: var(--muted); text-decoration: none; transition: color 0.15s; }
+    .toc a:hover { color: var(--accent); }
+    @media (min-width: 720px) { .toc ol { grid-template-columns: 1fr 1fr; gap: 0.55rem 1.5rem; } }
+
+    .figure { margin: 2.5rem 0; }
+    .figure svg { display: block; width: 100%; height: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+    .figure figcaption { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-top: 0.75rem; padding-left: 0.25rem; }
+
+    .axis-table { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin: 2.5rem 0; overflow-x: auto; }
+    .axis-table .ax-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+    .axis-table table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .axis-table th, .axis-table td { text-align: left; padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; }
+    .axis-table th { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+    .axis-table td:first-child { color: var(--text); font-weight: 500; min-width: 8rem; }
+    .axis-table tr:last-child td { border-bottom: none; }
+
+    .faq-list { margin: 2rem 0 0; }
+    .faq-item { border-top: 1px solid var(--border); padding: 1.1rem 0; }
+    .faq-item:last-child { border-bottom: 1px solid var(--border); }
+    .faq-item summary { cursor: pointer; font-size: 0.92rem; color: var(--text); font-weight: 500; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; font-family: 'DM Mono', monospace; color: var(--muted); font-size: 1.1rem; transition: transform 0.15s; }
+    .faq-item[open] summary::after { content: '\2212'; }
+    .faq-body { padding-top: 0.9rem; font-size: 0.85rem; color: var(--muted); line-height: 1.8; }
+    .faq-body a { color: var(--accent); text-decoration: none; }
+    .faq-body a:hover { color: var(--accent-dim); }
+
+    .article-body a.ext { color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(200,240,96,0.4); }
+    .article-body a.ext:hover { color: var(--accent-dim); border-bottom-color: rgba(200,240,96,0.7); }
+
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 36px; height: 36px; border-radius: 6px; cursor: pointer; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; }
+
+    @media (max-width: 640px) {
+      nav { padding: 1rem 1.25rem; position: relative; }
+      .article-wrap { padding: 3rem 1.25rem 5rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0.5rem 1.25rem 1.25rem; z-index: 99; }
+      .nav-links.open { display: flex; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.88rem; padding: 0.7rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+    }
+
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    /* === Nav upgrade (parity with sibling articles) === */
+    .nav-hamburger {
+      display: none;
+      background: none;
+      border: 1px solid var(--border2);
+      color: var(--text);
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 0;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 4px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span {
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: currentColor;
+      border-radius: 1px;
+      transition: transform 0.25s ease, opacity 0.18s ease;
+      transform-origin: center;
+    }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    @media (max-width: 900px) {
+      html, body { overflow-x: hidden; }
+      body.menu-open { overflow: hidden; }
+      nav, nav.site-nav { position: relative; padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links {
+        display: flex !important;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        gap: 0;
+        background: rgba(12,12,13,0.98);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: 0 1.25rem;
+        z-index: 99;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        visibility: hidden;
+        transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s;
+      }
+      .nav-links.open {
+        max-height: 80vh;
+        opacity: 1;
+        visibility: visible;
+        padding: 0.5rem 1.25rem 1.25rem;
+        transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s;
+        overflow-y: auto;
+      }
+      .nav-links a:not(.btn-nav-cta) {
+        display: block;
+        color: var(--text);
+        font-size: 0.92rem;
+        padding: 0.85rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+    }
+
+    /* === Related reading === */
+    h2#related-reading { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 400; margin-top: 3.5rem; margin-bottom: 0.75rem; }
+    h2#related-reading + ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    h2#related-reading + ul li { margin: 0; }
+    h2#related-reading + ul li a { display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.1rem; background: var(--surface); color: var(--text); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.15s, color 0.15s; }
+    h2#related-reading + ul li a::after { content: '\2192'; opacity: 0.35; transition: opacity 0.15s, transform 0.15s; display: inline-block; margin-left: 0.5rem; }
+    h2#related-reading + ul li a:hover { background: var(--surface2); color: var(--accent); }
+    h2#related-reading + ul li a:hover::after { opacity: 1; transform: translateX(3px); }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Insights", "item": "https://mnemehq.com/insights/"},
+          {"@type": "ListItem", "position": 3, "name": "Why AI Architectural Governance Needs Precedence Semantics", "item": "https://mnemehq.com/insights/why-architectural-governance-needs-precedence-semantics/"}
+        ]
+      },
+      {
+        "@type": "Article",
+        "headline": "Why AI Architectural Governance Needs Precedence Semantics",
+        "description": "When two architectural decisions overlap, prompt rules, RAG, and PR review all resolve the conflict non-deterministically. Precedence semantics — specificity, supersedes, priority, status, temporal resolution — is the missing layer that makes AI governance deterministic.",
+        "url": "https://mnemehq.com/insights/why-architectural-governance-needs-precedence-semantics/",
+        "datePublished": "2026-05-13",
+        "dateModified": "2026-05-13",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "image": "https://mnemehq.com/insights/why-architectural-governance-needs-precedence-semantics/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/insights/why-architectural-governance-needs-precedence-semantics/"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {"@type": "Question", "name": "Isn't precedence just rule ordering?", "acceptedAnswer": {"@type": "Answer", "text": "No. Rule ordering is a single axis — the rule that comes last wins. Precedence semantics is multi-dimensional: scope specificity, supersedes relationships, explicit priority, decision status, and temporal resolution all interact. A more recent decision can be overridden by an older one with narrower scope. A higher-priority decision can be retired by status. Ordering cannot express any of that."}},
+          {"@type": "Question", "name": "Why can't an LLM just resolve the conflict at generation time?", "acceptedAnswer": {"@type": "Answer", "text": "An LLM resolving a conflict is, by definition, non-deterministic. The same conflict with the same inputs can resolve differently on different runs, in different agents, at different temperatures. Architectural decisions need a single answer that every agent and every reviewer can reproduce. That requires the resolution to happen before the model sees the constraints, not inside the model's reasoning."}},
+          {"@type": "Question", "name": "How is this different from policy-as-code?", "acceptedAnswer": {"@type": "Answer", "text": "Policy-as-code (OPA, Conftest, similar) is a downstream evaluator: given a policy and an artifact, return allow or deny. Precedence semantics sits upstream — it answers which policy actually applies when several overlap, before evaluation runs. The two compose. Precedence resolution decides what the rule is; policy-as-code decides whether the artifact obeys it."}},
+          {"@type": "Question", "name": "What does this require from how we write ADRs?", "acceptedAnswer": {"@type": "Answer", "text": "Less than it sounds. ADRs continue to be written as decisions with rationale. What changes is that they declare three additional facts in structured form: their scope (paths, services, layers), their relationship to prior decisions (supersedes, refines, exception-to), and their status (proposed, accepted, deprecated). Those three facts are what a precedence engine resolves over."}},
+          {"@type": "Question", "name": "Does this only matter for large codebases?", "acceptedAnswer": {"@type": "Answer", "text": "It matters as soon as you have two decisions whose scopes overlap. That happens earlier than most teams expect — usually around the time the first cross-service exception is granted. Small teams feel it as 'we keep relitigating this in code review.' Large teams feel it as silent drift between services."}}
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/benchmark/">Benchmark</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/insights/">Insights</a></li>
+    <li aria-current="page">Why AI Architectural Governance Needs Precedence Semantics</li>
+  </ol>
+</nav>
+<article class="article-wrap">
+  <header class="article-header">
+    <div class="article-eyebrow">
+      <span class="eyebrow-tag">Category Education</span>
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-meta">11 min read &nbsp;&middot;&nbsp; May 2026</span>
+    </div>
+    <h1>Why AI architectural governance needs precedence semantics</h1>
+    <p class="article-lede">Two architectural decisions overlap. An engineer in Cursor follows one. The async PR bot in CI follows the other. A reviewer signs off on a diff that flatly contradicts a decision that landed last week. Nobody is wrong. Nobody has the authority to be right. This is what AI coding governance looks like without a precedence layer &mdash; and it is the gap every system in the category is currently failing to close.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-13">Published May 2026</time>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-13">Updated May 2026</time>
+    </p>
+  </header>
+
+  <div class="article-body">
+
+    <nav class="toc" aria-label="Table of contents">
+      <div class="toc-title">In this article</div>
+      <ol>
+        <li><a href="#collision">The collision nobody owns</a></li>
+        <li><a href="#fails">Why current systems can't resolve it</a></li>
+        <li><a href="#semantics">What precedence semantics actually is</a></li>
+        <li><a href="#axes">The five axes of resolution</a></li>
+        <li><a href="#reframe">Governance is deterministic conflict resolution</a></li>
+        <li><a href="#compiler">Governance is a compiler problem</a></li>
+        <li><a href="#leaders">What this changes for engineering leaders</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ol>
+    </nav>
+
+    <p>Most of the conversation about "AI coding governance" in 2026 is still about the wrong layer. Prompt rules. CLAUDE.md. <code>.cursor/rules</code>. RAG over an ADR folder. A reviewer agent on PRs. Policy docs in a wiki. Every one of these answers the question <em>"how do we tell the model what we want?"</em> &mdash; and not one of them answers the prior question: <em>"when two of the things we want disagree, which one wins?"</em></p>
+
+    <p>That second question is not a corner case. It is the central question of any governance system that has to operate at the scale of a real codebase, with real exceptions, written by real teams over real years. And it is the question almost every tool in the category is currently dodging.</p>
+
+    <p>The missing layer has a name. It is precedence semantics. It is what makes governance deterministic, reviewable, and durable. Without it, "AI coding governance" is just a polite name for whichever rule the model happened to attend to this morning.</p>
+
+    <h2 id="collision">The collision nobody owns</h2>
+
+    <p>Consider a perfectly ordinary situation. A team's data layer is governed by <strong>ADR-014</strong>: <em>"All persistent data access goes through the repository pattern. No service may call an ORM session directly."</em> The decision is sound. It has been the law of the codebase for a year. Every reviewer can recite it.</p>
+
+    <p>Eight months later, the payments team writes <strong>ADR-022</strong>: <em>"The payments service may invoke the Stripe SDK directly inside an idempotency-key boundary. The repository abstraction does not compose with Stripe's at-most-once semantics, and the ledger requires raw call ordering."</em> Also sound. Also reviewed. Also accepted.</p>
+
+    <p>These two decisions overlap. Specifically, they overlap on the question <em>"how does the payments service write a charge to durable storage?"</em> Both apply. They disagree.</p>
+
+    <p>Now four things happen at once:</p>
+
+    <ul>
+      <li>An engineer in Cursor opens the payments service and writes a charge handler. Cursor reads <code>.cursor/rules</code>, sees ADR-014 because it was indexed first, and proposes a repository-based implementation.</li>
+      <li>An engineer in Claude Code, with a different CLAUDE.md, sees ADR-022 highlighted and writes a direct-SDK implementation. Both diffs are reviewed in isolation; both get approved.</li>
+      <li>An async PR bot built on the Agent SDK refactors an adjacent file and rewrites the call site to obey ADR-014, because that is what its system prompt encodes.</li>
+      <li>Six months later, a new engineer reads the codebase, sees both patterns in production, and asks the obvious question: <em>"which one are we supposed to follow?"</em> Nobody can answer without re-reading both ADRs and re-litigating the conflict from scratch.</li>
+    </ul>
+
+    <p>None of those four people are misbehaving. The codebase has two correct decisions and no mechanism to say which one wins where. That is the precedence problem, and it is exactly the problem that no prompt rule, no retrieval system, and no review process will ever resolve, because none of them are designed to resolve anything &mdash; they are designed to retrieve.</p>
+
+    <figure class="figure" aria-labelledby="fig1-cap">
+      <svg viewBox="0 0 720 380" role="img" aria-label="Diagram showing two overlapping ADRs producing non-deterministic resolution across prompt rules, RAG, and PR review, versus deterministic resolution via a precedence engine">
+        <defs>
+          <marker id="arrG1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="#88889a"/>
+          </marker>
+          <marker id="arrAccG1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="#c8f060"/>
+          </marker>
+        </defs>
+        <g font-family="DM Mono, monospace" fill="#88889a" font-size="10" letter-spacing="0.08em">
+          <text x="32" y="26">OVERLAPPING DECISIONS</text>
+          <text x="300" y="26">RESOLUTION LAYER</text>
+          <text x="568" y="26">OUTPUT</text>
+        </g>
+        <!-- ADRs -->
+        <g font-family="Inter, sans-serif" font-size="12">
+          <rect x="24" y="56" width="220" height="58" rx="8" fill="#1a1a1d" stroke="#2e2e34"/>
+          <text x="40" y="78" fill="#e8e8ec" font-weight="500">ADR-014</text>
+          <text x="40" y="98" fill="#88889a" font-size="11">repository pattern, all services</text>
+
+          <rect x="24" y="138" width="220" height="58" rx="8" fill="#1a1a1d" stroke="#2e2e34"/>
+          <text x="40" y="160" fill="#e8e8ec" font-weight="500">ADR-022</text>
+          <text x="40" y="180" fill="#88889a" font-size="11">payments may call Stripe SDK directly</text>
+
+          <!-- overlap brace -->
+          <path d="M250 100 Q 262 125, 250 152" fill="none" stroke="#88889a" stroke-width="1"/>
+          <text x="268" y="130" fill="#88889a" font-family="DM Mono, monospace" font-size="10">overlap</text>
+
+          <!-- resolution lanes -->
+          <!-- Prompt rules -->
+          <rect x="324" y="42" width="220" height="40" rx="6" fill="#141416" stroke="#222226"/>
+          <text x="338" y="59" fill="#e8e8ec" font-size="11.5">Prompt rules / CLAUDE.md</text>
+          <text x="338" y="74" fill="#55555f" font-family="DM Mono, monospace" font-size="10">file ordering &middot; attention</text>
+
+          <rect x="324" y="92" width="220" height="40" rx="6" fill="#141416" stroke="#222226"/>
+          <text x="338" y="109" fill="#e8e8ec" font-size="11.5">RAG over ADRs</text>
+          <text x="338" y="124" fill="#55555f" font-family="DM Mono, monospace" font-size="10">retrieval score &middot; chunking</text>
+
+          <rect x="324" y="142" width="220" height="40" rx="6" fill="#141416" stroke="#222226"/>
+          <text x="338" y="159" fill="#e8e8ec" font-size="11.5">PR review</text>
+          <text x="338" y="174" fill="#55555f" font-family="DM Mono, monospace" font-size="10">whichever reviewer caught it</text>
+
+          <!-- Precedence engine -->
+          <rect x="324" y="208" width="220" height="56" rx="8" fill="#0c0c0d" stroke="#c8f060" stroke-width="1.5"/>
+          <text x="338" y="228" fill="#c8f060" font-size="12" font-weight="500">Precedence engine</text>
+          <text x="338" y="246" fill="#c8f060" font-family="DM Mono, monospace" font-size="10">scope &middot; supersedes &middot; status</text>
+          <text x="338" y="260" fill="#c8f060" font-family="DM Mono, monospace" font-size="10" opacity="0.7">resolves before generation</text>
+
+          <!-- arrows from ADRs to each lane -->
+          <line x1="246" y1="84" x2="324" y2="62" stroke="#88889a" stroke-width="1" marker-end="url(#arrG1)"/>
+          <line x1="246" y1="84" x2="324" y2="112" stroke="#88889a" stroke-width="1" marker-end="url(#arrG1)"/>
+          <line x1="246" y1="84" x2="324" y2="162" stroke="#88889a" stroke-width="1" marker-end="url(#arrG1)"/>
+          <line x1="246" y1="166" x2="324" y2="62" stroke="#88889a" stroke-width="1" stroke-opacity="0.5"/>
+          <line x1="246" y1="166" x2="324" y2="112" stroke="#88889a" stroke-width="1" stroke-opacity="0.5"/>
+          <line x1="246" y1="166" x2="324" y2="162" stroke="#88889a" stroke-width="1" stroke-opacity="0.5"/>
+          <line x1="246" y1="166" x2="324" y2="232" stroke="#c8f060" stroke-width="1" stroke-opacity="0.6" marker-end="url(#arrAccG1)"/>
+          <line x1="246" y1="84" x2="324" y2="232" stroke="#c8f060" stroke-width="1" stroke-opacity="0.6" marker-end="url(#arrAccG1)"/>
+
+          <!-- Outputs -->
+          <g font-family="DM Mono, monospace" font-size="11">
+            <text x="568" y="60" fill="#88889a">?</text>
+            <text x="584" y="60" fill="#55555f" font-size="10">non-deterministic</text>
+            <text x="568" y="110" fill="#88889a">?</text>
+            <text x="584" y="110" fill="#55555f" font-size="10">non-deterministic</text>
+            <text x="568" y="160" fill="#88889a">?</text>
+            <text x="584" y="160" fill="#55555f" font-size="10">non-deterministic</text>
+            <text x="568" y="232" fill="#c8f060" font-size="12">&#10003;</text>
+            <text x="584" y="232" fill="#c8f060" font-size="10">one answer, reproducible</text>
+          </g>
+          <line x1="544" y1="62" x2="564" y2="62" stroke="#88889a" stroke-width="1" stroke-opacity="0.5"/>
+          <line x1="544" y1="112" x2="564" y2="112" stroke="#88889a" stroke-width="1" stroke-opacity="0.5"/>
+          <line x1="544" y1="162" x2="564" y2="162" stroke="#88889a" stroke-width="1" stroke-opacity="0.5"/>
+          <line x1="544" y1="232" x2="564" y2="232" stroke="#c8f060" stroke-width="1.2" marker-end="url(#arrAccG1)"/>
+
+          <!-- footer caption -->
+          <text x="360" y="350" text-anchor="middle" fill="#55555f" font-family="DM Mono, monospace" font-size="10">same two decisions &middot; four different resolutions &middot; only one of them is reproducible</text>
+        </g>
+      </svg>
+      <figcaption id="fig1-cap">Fig 1 &middot; Without precedence semantics, the same overlapping decisions resolve differently across every layer. With them, the answer is one value, computed before the model is asked.</figcaption>
+    </figure>
+
+    <h2 id="fails">Why current systems can't resolve it</h2>
+
+    <p>It is tempting to think that the conflict in the example above is a content problem &mdash; that if the team had written ADR-022 more carefully, or pasted it higher in CLAUDE.md, the right answer would emerge. It is not a content problem. It is a structural one. Every governance substrate currently in widespread use is fundamentally a retrieval substrate, and retrieval has no opinion on conflict.</p>
+
+    <div class="failure-stack">
+      <div class="stack-title">How today's substrates handle the same overlap</div>
+
+      <div class="stack-row">
+        <div class="stack-num">01</div>
+        <div class="stack-content">
+          <div class="stack-label">Prompt rules resolve by attention</div>
+          <div class="stack-desc">CLAUDE.md, <code>.cursor/rules</code>, <code>.github/copilot-instructions.md</code> all hand the model a block of text. When two rules disagree, the model picks one based on whichever it attended to more strongly under this temperature, this context length, this surrounding code. Reorder the file and the answer changes. That is not governance &mdash; it is a coin flip with extra steps.</div>
+        </div>
+      </div>
+
+      <div class="stack-row">
+        <div class="stack-num">02</div>
+        <div class="stack-content">
+          <div class="stack-label">RAG resolves by retrieval score</div>
+          <div class="stack-desc">Indexing the ADR folder and retrieving the top <em>k</em> chunks per query feels rigorous. It is not. When two ADRs both score highly for "payments writes a charge," whichever the embedder happens to rank higher gets injected. Re-embed the corpus and the resolution can flip silently. The architecture is now a function of the vector index.</div>
+        </div>
+      </div>
+
+      <div class="stack-row">
+        <div class="stack-num">03</div>
+        <div class="stack-content">
+          <div class="stack-label">PR review resolves by whoever was looking</div>
+          <div class="stack-desc">If the reviewer who happens to be assigned remembers ADR-022, the diff lands. If a different reviewer is assigned next time, the next diff lands the other way. The codebase ends up with both patterns and no record of which decision governed which file. The conflict is resolved by social process, and social process does not scale across async agents.</div>
+        </div>
+      </div>
+
+      <div class="stack-row">
+        <div class="stack-num">04</div>
+        <div class="stack-content">
+          <div class="stack-label">Policy docs resolve nothing at all</div>
+          <div class="stack-desc">The wiki page is updated, sometimes. The Notion entry is written, occasionally. Neither of them is on the path between a model and a diff. They are referenced when a human looks them up &mdash; which is exactly when the resolution is already most expensive.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <p>The common failure underneath all four is the same: <strong>none of them have an opinion on which rule applies when several do</strong>. They surface rules. They do not resolve between rules. The category has confused "the model has read the constraint" with "the constraint has been applied," and those two things are not the same thing.</p>
+
+    <h2 id="semantics">What precedence semantics actually is</h2>
+
+    <p>Precedence semantics is the small body of rules a governance system uses to answer one question, every time, the same way: <em>"given the current task, the current file, the current scope, and the full set of architectural decisions, which decision actually applies here, and which loses?"</em></p>
+
+    <p>The answer has to be deterministic. Not "the model probably picks the right one." Not "the reviewer usually catches it." Deterministic, in the engineering sense: same inputs in, same answer out, every time, regardless of which agent or model or temperature is on the other end.</p>
+
+    <p>It also has to be reviewable. The resolution has to be explainable as a chain of named facts &mdash; this scope was more specific, that decision supersedes the earlier one, this status retired the override &mdash; not as an opaque embedding score. A reviewer has to be able to read the resolution and either agree with it or, when it is wrong, point at the rule that produced the wrong answer and propose a fix.</p>
+
+    <div class="callout">
+      <p><strong>Governance is not memory retrieval.</strong> Governance is deterministic conflict resolution over architectural constraints. Retrieval is one input to that resolution &mdash; not a substitute for it.</p>
+    </div>
+
+    <h2 id="axes">The five axes of resolution</h2>
+
+    <p>A useful precedence engine resolves over a small, finite set of axes. Five of them carry almost all the weight in real codebases. None of them is novel on its own &mdash; what is missing in the AI-coding-governance category is the recognition that all five have to compose, and that the order in which they compose has to be explicit.</p>
+
+    <div class="axis-table">
+      <div class="ax-title">Resolution axes &middot; in priority order</div>
+      <table>
+        <thead>
+          <tr><th>Axis</th><th>What it answers</th><th>Example</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Status</td><td>Is the decision in force at all?</td><td>A <code>deprecated</code> ADR loses to any <code>accepted</code> ADR that touches the same scope, even if the deprecated one was more specific.</td></tr>
+          <tr><td>Supersedes</td><td>Does this decision explicitly retire an older one?</td><td>ADR-031 carries <code>supersedes: ADR-014</code>. Wherever they overlap, ADR-014 is treated as if it were deprecated.</td></tr>
+          <tr><td>Scope specificity</td><td>Whose scope is narrower?</td><td>ADR-022 (<code>services/payments/**</code>) beats ADR-014 (<code>services/**</code>) inside its narrower scope, by the same logic that makes a per-route override beat a global config.</td></tr>
+          <tr><td>Priority</td><td>When scopes are equal, who is authoritative?</td><td>A security-class ADR (<code>priority: critical</code>) wins over an ergonomics-class ADR (<code>priority: normal</code>) at the same scope. Priorities are declared, not inferred.</td></tr>
+          <tr><td>Temporal</td><td>If everything else ties, the newer decision wins.</td><td>Two equal-priority, equal-scope, neither-supersedes-the-other decisions resolve by acceptance date. This axis is the tiebreaker, not the primary driver.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Two things matter about that table more than the contents of any one row. First: the axes are evaluated in a declared order, not improvised per query. Second: each axis is a fact carried by the decision itself, not a heuristic about the decision. <code>status</code>, <code>supersedes</code>, <code>scope</code>, <code>priority</code>, <code>accepted_at</code> &mdash; these are properties an ADR declares, not inferences a model has to make. Once declared, resolution is a finite computation, not a guess.</p>
+
+    <p>This is why precedence semantics is the missing layer. Every term in the table is already familiar to anyone who has written ADRs for more than a year. What is new is the claim that resolving over them is a system responsibility, not a reviewer's job to do in their head.</p>
+
+    <h2 id="reframe">Governance is deterministic conflict resolution</h2>
+
+    <p>Once precedence semantics is named, the whole category reframes.</p>
+
+    <div class="contrast-block">
+      <div class="contrast-cell accent-left">
+        <div class="label">The retrieval framing</div>
+        <div class="tool">Surface the right rules to the model</div>
+        <div class="desc">Governance is about getting the relevant constraints into context. The model takes it from there. Conflict resolution is whatever the model produces, hopefully on most runs.</div>
+      </div>
+      <div class="contrast-cell accent-right">
+        <div class="label">The precedence framing</div>
+        <div class="tool">Resolve which rule applies before the model runs</div>
+        <div class="desc">Governance is about computing, deterministically, the single constraint that governs this scope. The model receives that constraint, not the conflict. The same inputs produce the same answer in every agent.</div>
+      </div>
+    </div>
+
+    <p>The retrieval framing makes the model the conflict-resolution engine. That is exactly the wrong place to put it. Models are excellent at code synthesis under a constraint and unreliable at choosing between constraints. The precedence framing keeps the model out of the resolution and lets it do what it is good at &mdash; generating code that conforms to a constraint that has already been chosen.</p>
+
+    <p>Said differently: the architectural truth of a codebase is not allowed to depend on which agent ran the query. If it does, the codebase does not have an architecture &mdash; it has a sample.</p>
+
+    <h2 id="compiler">Governance is a compiler problem</h2>
+
+    <p>The frame that follows from all of this is that an AI-era governance system is shaped like a compiler.</p>
+
+    <p>The input is the same kind of thing teams already write: ADRs, design documents, exceptions, and the relationships between them. The output is a single, queryable, scope-aware representation that every agent &mdash; interactive, async, in CI &mdash; can ask the same question of and get the same answer. Between the two is a pipeline: normalize, resolve, compile, enforce, trace.</p>
+
+    <figure class="figure" aria-labelledby="fig2-cap">
+      <svg viewBox="0 0 720 320" role="img" aria-label="Pipeline showing five stages from raw ADRs to enforcement and audit, with precedence resolution as the central stage">
+        <defs>
+          <marker id="arrG2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="#c8f060"/>
+          </marker>
+          <linearGradient id="laneG2" x1="0" x2="1">
+            <stop offset="0%" stop-color="#222226"/>
+            <stop offset="100%" stop-color="#c8f060" stop-opacity="0.35"/>
+          </linearGradient>
+        </defs>
+        <!-- lane -->
+        <rect x="30" y="86" width="660" height="48" rx="24" fill="url(#laneG2)" opacity="0.55"/>
+
+        <g font-family="DM Mono, monospace" fill="#88889a" font-size="10" letter-spacing="0.08em">
+          <text x="30" y="40">PIPELINE</text>
+          <text x="30" y="58" fill="#55555f" font-size="9.5">declared facts &rarr; one resolved constraint per scope</text>
+        </g>
+
+        <!-- 5 stages -->
+        <g font-family="Inter, sans-serif" font-size="12">
+          <!-- 1 Normalize -->
+          <circle cx="90" cy="110" r="22" fill="#0c0c0d" stroke="#2e2e34"/>
+          <text x="90" y="115" fill="#e8e8ec" text-anchor="middle" font-family="DM Mono, monospace" font-size="11">01</text>
+          <text x="90" y="158" fill="#e8e8ec" text-anchor="middle" font-weight="500">Normalize</text>
+          <text x="90" y="176" fill="#88889a" text-anchor="middle" font-size="10.5">ADRs &rarr; canonical</text>
+          <text x="90" y="190" fill="#88889a" text-anchor="middle" font-size="10.5">facts</text>
+
+          <!-- 2 Resolve -->
+          <circle cx="234" cy="110" r="22" fill="#0c0c0d" stroke="#c8f060" stroke-width="1.5"/>
+          <text x="234" y="115" fill="#c8f060" text-anchor="middle" font-family="DM Mono, monospace" font-size="11">02</text>
+          <text x="234" y="158" fill="#c8f060" text-anchor="middle" font-weight="500">Resolve</text>
+          <text x="234" y="176" fill="#88889a" text-anchor="middle" font-size="10.5">precedence over</text>
+          <text x="234" y="190" fill="#88889a" text-anchor="middle" font-size="10.5">the five axes</text>
+
+          <!-- 3 Compile -->
+          <circle cx="378" cy="110" r="22" fill="#0c0c0d" stroke="#2e2e34"/>
+          <text x="378" y="115" fill="#e8e8ec" text-anchor="middle" font-family="DM Mono, monospace" font-size="11">03</text>
+          <text x="378" y="158" fill="#e8e8ec" text-anchor="middle" font-weight="500">Compile</text>
+          <text x="378" y="176" fill="#88889a" text-anchor="middle" font-size="10.5">one constraint</text>
+          <text x="378" y="190" fill="#88889a" text-anchor="middle" font-size="10.5">per scope</text>
+
+          <!-- 4 Enforce -->
+          <circle cx="522" cy="110" r="22" fill="#0c0c0d" stroke="#2e2e34"/>
+          <text x="522" y="115" fill="#e8e8ec" text-anchor="middle" font-family="DM Mono, monospace" font-size="11">04</text>
+          <text x="522" y="158" fill="#e8e8ec" text-anchor="middle" font-weight="500">Enforce</text>
+          <text x="522" y="176" fill="#88889a" text-anchor="middle" font-size="10.5">pre-gen inject &middot;</text>
+          <text x="522" y="190" fill="#88889a" text-anchor="middle" font-size="10.5">post-gen check</text>
+
+          <!-- 5 Trace -->
+          <circle cx="666" cy="110" r="22" fill="#0c0c0d" stroke="#2e2e34"/>
+          <text x="666" y="115" fill="#e8e8ec" text-anchor="middle" font-family="DM Mono, monospace" font-size="11">05</text>
+          <text x="666" y="158" fill="#e8e8ec" text-anchor="middle" font-weight="500">Trace</text>
+          <text x="666" y="176" fill="#88889a" text-anchor="middle" font-size="10.5">"this diff applied</text>
+          <text x="666" y="190" fill="#88889a" text-anchor="middle" font-size="10.5">ADR-022 at ..."</text>
+        </g>
+
+        <!-- arrows -->
+        <g stroke="#c8f060" stroke-width="1.2" fill="none">
+          <line x1="113" y1="110" x2="210" y2="110" marker-end="url(#arrG2)" stroke-opacity="0.8"/>
+          <line x1="257" y1="110" x2="354" y2="110" marker-end="url(#arrG2)" stroke-opacity="0.8"/>
+          <line x1="401" y1="110" x2="498" y2="110" marker-end="url(#arrG2)" stroke-opacity="0.8"/>
+          <line x1="545" y1="110" x2="642" y2="110" marker-end="url(#arrG2)" stroke-opacity="0.8"/>
+        </g>
+
+        <!-- bracket for "the new layer" -->
+        <g stroke="#c8f060" stroke-opacity="0.6" fill="none">
+          <path d="M210 232 L210 240 L258 240 L258 232"/>
+        </g>
+        <text x="234" y="256" text-anchor="middle" fill="#c8f060" font-family="DM Mono, monospace" font-size="10">the missing layer</text>
+
+        <text x="360" y="298" text-anchor="middle" fill="#55555f" font-family="DM Mono, monospace" font-size="10">decisions are the source &middot; resolution is a computation &middot; enforcement is a hook &middot; every step is auditable</text>
+      </svg>
+      <figcaption id="fig2-cap">Fig 2 &middot; The governance compiler. Stage 02 is where precedence semantics lives &mdash; the layer the current category mostly does not have.</figcaption>
+    </figure>
+
+    <p>Each stage in that pipeline already has a recognizable analog in software engineering. Normalization is what a parser does. Resolution is what a type checker or a constraint solver does. Compilation is what an intermediate representation is for. Enforcement is what a pre-commit hook or a CI gate is for. Traceability is what build provenance is for. What is new in 2026 is that all five together describe a layer above the agent &mdash; not a feature inside any single one.</p>
+
+    <p>This is what makes the governance-as-compiler framing useful, and not just a metaphor. Compilers are deterministic by construction. Their outputs are reproducible. Their decisions are explainable. Their failures are localizable. Every property AI coding governance currently lacks is a property a compiler-shaped governance layer would have by default.</p>
+
+    <h2 id="leaders">What this changes for engineering leaders</h2>
+
+    <p>For an engineering leader looking at the category in 2026, the practical implication is that the question to ask of any "AI governance" pitch is no longer "does it read our rules?" It is: <em>"what does it do when two of our rules disagree?"</em></p>
+
+    <p>If the answer is "the model figures it out," the system is a retrieval layer with a governance label on it. If the answer involves embeddings, ranking scores, or "we tune the prompt," the system is doing statistics, not governance. If the answer involves a declared resolution order over status, supersedes, scope, priority, and time, the system is doing the actual job.</p>
+
+    <p>That distinction matters more than the surface-level tool category. A team can run Claude Code, Cursor, Copilot, Windsurf, and three in-house SDK agents on the same codebase &mdash; <a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/">as most engineering orgs already do</a> &mdash; and still have a coherent architecture, but only if the layer underneath has a deterministic answer to "which decision applies here." Otherwise the codebase ends up as a sample of whichever agent ran last.</p>
+
+    <div class="callout">
+      <p><strong>The category is moving up the stack.</strong> "AI coding tools" is becoming a portfolio decision. "How those tools resolve architectural conflict" is becoming the infrastructure decision underneath it. Precedence semantics is the name for that infrastructure layer.</p>
+    </div>
+
+    <p>The engineering teams that win the next cycle will not be the ones that picked the best assistant. They will be the ones whose architecture survived having a portfolio of assistants &mdash; because the layer that decided what the rules were did not live inside any of them.</p>
+
+    <h2 id="faq">FAQ</h2>
+
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Isn't precedence just rule ordering?</summary>
+        <div class="faq-body">No. Rule ordering is a single axis &mdash; the rule that comes last wins. Precedence semantics is multi-dimensional: scope specificity, supersedes relationships, explicit priority, decision status, and temporal resolution all interact. A more recent decision can be overridden by an older one with narrower scope. A higher-priority decision can be retired by status. Ordering cannot express any of that.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Why can't an LLM just resolve the conflict at generation time?</summary>
+        <div class="faq-body">An LLM resolving a conflict is, by definition, non-deterministic. The same conflict with the same inputs can resolve differently on different runs, in different agents, at different temperatures. Architectural decisions need a single answer that every agent and every reviewer can reproduce. That requires the resolution to happen <em>before</em> the model sees the constraints, not inside the model's reasoning.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>How is this different from policy-as-code?</summary>
+        <div class="faq-body">Policy-as-code (OPA, Conftest, similar) is a downstream evaluator: given a policy and an artifact, return allow or deny. Precedence semantics sits upstream &mdash; it answers which policy actually applies when several overlap, before evaluation runs. The two compose. Precedence resolution decides what the rule is; policy-as-code decides whether the artifact obeys it.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>What does this require from how we write ADRs?</summary>
+        <div class="faq-body">Less than it sounds. ADRs continue to be written as decisions with rationale. What changes is that they declare three additional facts in structured form: their <em>scope</em> (paths, services, layers), their <em>relationship</em> to prior decisions (supersedes, refines, exception-to), and their <em>status</em> (proposed, accepted, deprecated). Those three facts are what a precedence engine resolves over.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Does this only matter for large codebases?</summary>
+        <div class="faq-body">It matters as soon as you have two decisions whose scopes overlap. That happens earlier than most teams expect &mdash; usually around the time the first cross-service exception is granted. Small teams feel it as &ldquo;we keep relitigating this in code review.&rdquo; Large teams feel it as silent drift between services.</div>
+      </details>
+    </div>
+
+  </div>
+
+  <h2 id="related-reading">Related reading</h2>
+  <ul>
+    <li><a href="/insights/why-rag-fails-for-architectural-governance/">Why RAG Fails for Architectural Governance</a></li>
+    <li><a href="/insights/why-prompt-memory-fails-at-scale/">Why Prompt Memory Fails at Scale</a></li>
+    <li><a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/">Architectural Governance Across Heterogeneous AI Coding Agents</a></li>
+    <li><a href="/insights/prompt-engineering-is-not-governance/">Prompt Engineering Is Not Governance</a></li>
+  </ul>
+
+  <footer class="article-footer">
+    <a href="/insights/" class="back-link">&larr; Back to Insights</a>
+
+    <div class="cta-block">
+      <h3>One precedence engine. Every agent.</h3>
+      <p>Mneme HQ is the structured decision store and precedence engine for codebases governed by architecture, not by whichever assistant happened to read the file first. Open source.</p>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
+    </div>
+  </footer>
+</article>
+</main>
+
+<footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+  <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/use-cases/">Use cases</a></li>
+        <li><a href="/works-with/">Works with</a></li>
+        <li><a href="/platforms/">Platforms</a></li>
+        <li><a href="/integrations/">Integrations</a></li>
+        <li><a href="/compare/">Compare</a></li>
+        <li><a href="/demo/">Demo</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/insights/">Insights</a></li>
+        <li><a href="/standards/">Standards</a></li>
+        <li><a href="/benchmark/">Benchmark</a></li>
+        <li><a href="/docs/">Docs</a></li>
+        <li><a href="/docs/cli/">CLI reference</a></li>
+        <li><a href="/docs/governance-violations/">Governance violations</a></li>
+        <li><a href="/supported-languages/">Supported languages</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/pilot/" style="color:var(--accent);">Request pilot</a></li>
+        <li><a href="/for/">For teams</a></li>
+        <li><a href="/founder/">Founder</a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/roadmap/">Roadmap</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Code</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="https://github.com/TheoV823/mneme">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="/privacy/">Privacy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
+    <span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span>
+    <nav aria-label="Social media" style="display: flex; align-items: center; gap: 1rem;">
+      <a href="https://github.com/TheoV823/mneme" target="_blank" rel="noopener" aria-label="GitHub" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.16c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.27-1.69-1.27-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.34.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18.92-.26 1.91-.39 2.89-.39.98 0 1.97.13 2.89.39 2.2-1.49 3.17-1.18 3.17-1.18.62 1.58.23 2.75.12 3.04.73.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.26 5.68.41.35.78 1.05.78 2.12v3.15c0 .31.21.67.8.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener" aria-label="LinkedIn" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/@MnemeHQ" target="_blank" rel="noopener" aria-label="YouTube" style="color: var(--muted); display: inline-flex;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.12C19.55 3.5 12 3.5 12 3.5s-7.55 0-9.4.58A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.12c1.85.58 9.4.58 9.4.58s7.55 0 9.4-.58a3 3 0 0 0 2.1-2.12A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8zM9.6 15.57V8.43L15.82 12 9.6 15.57z"/></svg>
+      </a>
+    </nav>
+    <span>&copy; 2026</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  function setOpen(open){
+    links.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('menu-open', open);
+  }
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    setOpen(!links.classList.contains('open'));
+  });
+  document.addEventListener('click', function(e){
+    if (!links.classList.contains('open')) return;
+    if (links.contains(e.target) || btn.contains(e.target)) return;
+    setOpen(false);
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false);
+  });
+  links.addEventListener('click', function(e){
+    if (e.target.tagName === 'A') setOpen(false);
+  });
+  window.addEventListener('resize', function(){
+    if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false);
+  });
+})();
+</script>
+<script><!-- nav-active -->
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
+</body>
+</html>
