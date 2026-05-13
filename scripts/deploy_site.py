@@ -261,6 +261,20 @@ if not full_deploy:
 
 tag_deployed()
 
+# ── Purge Cloudflare cache BEFORE verification ────────────────────────────────
+# Purge first so verification hits fresh server responses, not stale CF cache.
+# A cached 404 for a newly uploaded URL would otherwise cause verification to
+# fail even though the file is live on the origin.
+print("\n-- Purging Cloudflare cache --")
+if full_deploy:
+    purge_cf_cache()
+else:
+    purge_cf_cache(urls=purge_urls if purge_urls else None)
+
+import time as _time
+if CF_TOKEN and CF_ZONE_ID:
+    _time.sleep(3)  # brief pause for CF edge nodes to propagate the purge
+
 # ── Post-deploy verification: every sitemap URL must return 200 ───────────────
 print("\n-- Post-deploy verification --")
 sitemap_path = os.path.join(BASE_LOCAL, 'sitemap.xml')
@@ -289,10 +303,3 @@ if verify_failures:
     raise SystemExit(1)
 
 print(f"\n[OK] All {len(sitemap_urls)} sitemap URLs verified - deploy complete")
-
-# ── Purge Cloudflare cache ────────────────────────────────────────────────────
-print("\n-- Purging Cloudflare cache --")
-if full_deploy:
-    purge_cf_cache()
-else:
-    purge_cf_cache(urls=purge_urls if purge_urls else None)
