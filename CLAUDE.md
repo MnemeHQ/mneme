@@ -2,7 +2,9 @@
 
 ## Branch Naming
 
-Use conventional prefixes: `feat/`, `fix/`, `site/`, `ci/`, `docs/`, `refactor/`. Never use `claude/` as a prefix. Keep slugs short, kebab-case, no random suffixes unless required for uniqueness.
+Use conventional prefixes: `feat/`, `fix/`, `site/`, `ci/`, `docs/`, `refactor/`. Keep slugs short, kebab-case, no random suffixes unless required for uniqueness.
+
+**Known exception — auto-generated worktree branches:** Claude Code's `--worktree` flag emits `claude/<adjective>-<noun>-<hash>` branch names. This is a hard-coded harness behavior with no configuration override. These branches are acceptable during development. Before opening a PR, rename to follow the taxonomy where practical. The squash commit title on `main` must follow the taxonomy regardless of source branch name. See ADR-010.
 
 ## Merging PRs
 
