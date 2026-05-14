@@ -8,22 +8,37 @@
   <url>
     <loc>https://mnemehq.com/demo/</loc>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/demo/adr-compiler/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/demo/architectural-drift/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/demo/multi-agent-governance/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/demo/storage-decision/</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.65</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/demo/dependency-policy/</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.65</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/demo/repository-pattern/</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.65</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/use-cases/</loc>
@@ -171,6 +186,11 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://mnemehq.com/integrations/perplexity/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://mnemehq.com/benchmark/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
@@ -252,12 +272,72 @@
   </url>
   <url>
     <loc>https://mnemehq.com/insights/autonomous-code-remediation-requires-architectural-governance/</loc>
+    <loc>https://mnemehq.com/architecture/</loc>
     <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/architecture/how-retrieval-works/</loc>    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/acceleration-whiplash-governance-gap/</loc>
+    <loc>https://mnemehq.com/architecture/decision-memory-vs-documentation/</loc>
     <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/concepts/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/concepts/architectural-governance/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/concepts/governance-before-generation/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/concepts/ai-native-sdlc/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/concepts/architectural-drift/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/concepts/verification-contracts/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/concepts/decision-continuity/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/concepts/architectural-compiler/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/concepts/deterministic-enforcement/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/concepts/agentic-development/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/concepts/governance-infrastructure/</loc>    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 </urlset>

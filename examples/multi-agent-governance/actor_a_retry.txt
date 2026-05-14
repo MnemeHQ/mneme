@@ -1,0 +1,14 @@
+# Actor A -- session 1 -- retry after ADR-001 was surfaced in context
+# Extends the in-process store with a simple memo layer.
+
+from app.store import JsonStore
+
+_memo: dict[str, dict] = {}
+
+def get_user(user_id: str, store: JsonStore) -> dict:
+    memoed = _memo.get(user_id)
+    if memoed is not None:
+        return memoed
+    user = store.get_user(user_id)
+    _memo[user_id] = user
+    return user

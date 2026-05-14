@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/favicon.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Governance continuity across multiple actors | Mneme HQ</title>
+  <meta name="description" content="As AI execution becomes distributed and persistent, governance becomes the coordination layer. Three agents act on the same codebase. Architectural invariants stay coherent across actors, sessions, and retries — because the invariants live outside the agents." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/demo/multi-agent-governance/" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Governance continuity across multiple actors" />
+  <meta property="og:description" content="As AI execution becomes distributed and persistent, governance becomes the coordination layer. Three agents act on the same codebase. Architectural invariants stay coherent across actors, sessions, and retries." />
+  <meta property="og:url" content="https://mnemehq.com/demo/multi-agent-governance/" />
+  <meta property="og:image" content="https://mnemehq.com/demo/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Governance continuity across multiple actors" />
+  <meta name="twitter:description" content="As AI execution becomes distributed and persistent, governance becomes the coordination layer." />
+  <meta name="twitter:image" content="https://mnemehq.com/demo/og.png" />
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Demo", "item": "https://mnemehq.com/demo/"},
+          {"@type": "ListItem", "position": 3, "name": "Governance continuity across actors", "item": "https://mnemehq.com/demo/multi-agent-governance/"}
+        ]
+      },
+      {
+        "@type": "Article",
+        "headline": "Governance continuity across multiple actors",
+        "description": "As AI execution becomes distributed and persistent, governance becomes the coordination layer. Three agents act on the same codebase against a shared invariant set.",
+        "url": "https://mnemehq.com/demo/multi-agent-governance/",
+        "datePublished": "2026-05-13",
+        "dateModified": "2026-05-13",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "image": "https://mnemehq.com/demo/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/demo/multi-agent-governance/"
+      }
+    ]
+  }
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #88889a;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+      --pass: #c8f060; --warn: #f59e0b; --fail: #ef4444;
+      --agent-a: #a78bfa; --agent-b: #f59e0b; --agent-c: #8be0c8;
+      --term-bad: #ff8585; --term-bg: #0a0a0d;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: #0c0c0d; backdrop-filter: blur(8px); z-index: 100; }
+    .logo { font-family: 'Instrument Serif', serif; font-size: 1.4rem; font-weight: 400; color: var(--text); text-decoration: none; letter-spacing: -0.01em; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--accent); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .breadcrumb-nav { max-width: 880px; margin: 1.5rem auto 0; padding: 0 2rem; }
+    .breadcrumb { display: flex; gap: 0.5rem; list-style: none; font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.04em; }
+    .breadcrumb li:not(:last-child)::after { content: ' / '; margin-left: 0.5rem; color: var(--border2); }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+
+    main { max-width: 880px; margin: 0 auto; padding: 2.5rem 2rem 5rem; }
+
+    .article-eyebrow { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .eyebrow-tag { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+    .eyebrow-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-family: 'DM Mono', monospace; font-size: 0.66rem; color: var(--muted); letter-spacing: 0.04em; }
+    .verdict-pill { font-family: 'DM Mono', monospace; font-size: 0.65rem; padding: 0.18rem 0.55rem; border-radius: 4px; letter-spacing: 0.06em; background: rgba(167,139,250,0.12); color: var(--agent-a); border: 1px solid rgba(167,139,250,0.3); }
+
+    h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.25rem; }
+    h1 em { font-style: italic; color: var(--accent); }
+    .lede { font-size: 1.05rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; margin-bottom: 1.25rem; }
+    .lede strong { color: var(--text); font-weight: 500; }
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-bottom: 3rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    .body { font-size: 0.95rem; line-height: 1.85; color: var(--text); }
+    .body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .body h3 { font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--text); }
+    .body p { margin-bottom: 1.1rem; color: var(--muted); }
+    .body p strong { color: var(--text); font-weight: 500; }
+    .body code { font-family: 'DM Mono', monospace; font-size: 0.82rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 0.05rem 0.4rem; color: var(--text); }
+    .body a { color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(200,240,96,0.4); }
+    .body a:hover { color: var(--accent-dim); border-bottom-color: rgba(200,240,96,0.7); }
+    .body pre { background: var(--term-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; overflow-x: auto; margin: 1.25rem 0; }
+    .body pre code { background: transparent; border: none; padding: 0; font-size: 0.78rem; line-height: 1.7; color: var(--text); }
+
+    /* ── INVARIANT LEDGER ── */
+    .invariants { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; margin: 1.75rem 0; }
+    .invariants .inv-title { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.85rem; }
+    .invariants ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.55rem; }
+    .invariants li { display: grid; grid-template-columns: 6rem 1fr; gap: 0.85rem; font-size: 0.85rem; color: var(--muted); padding: 0.45rem 0; border-bottom: 1px dashed var(--border); align-items: baseline; }
+    .invariants li:last-child { border-bottom: none; }
+    .invariants li .inv-id { font-family: 'DM Mono', monospace; font-size: 0.74rem; color: var(--text); letter-spacing: 0.04em; }
+    .invariants li .inv-text strong { color: var(--text); font-weight: 500; }
+
+    /* ── AGENT TRANSCRIPT ── */
+    .actor-step { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin: 1.5rem 0; overflow: hidden; }
+    .actor-header { padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap; }
+    .actor-header.a { background: rgba(167,139,250,0.06); }
+    .actor-header.b { background: rgba(245,158,11,0.06); }
+    .actor-header.c { background: rgba(139,224,200,0.06); }
+    .actor-name { font-family: 'DM Mono', monospace; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .actor-header.a .actor-name { color: var(--agent-a); }
+    .actor-header.b .actor-name { color: var(--agent-b); }
+    .actor-header.c .actor-name { color: var(--agent-c); }
+    .actor-task { font-size: 0.85rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .actor-task::before { content: '> '; opacity: 0.5; }
+    .actor-body { padding: 1.1rem 1.5rem; }
+    .actor-body h4 { font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem; }
+    .actor-body p { font-size: 0.86rem; color: var(--muted); margin-bottom: 0.85rem; line-height: 1.7; }
+    .actor-body p:last-child { margin-bottom: 0; }
+    .governance-trace { background: var(--term-bg); border: 1px solid var(--border); border-radius: 6px; padding: 0.7rem 0.9rem; font-family: 'DM Mono', monospace; font-size: 0.74rem; line-height: 1.85; margin: 0.75rem 0; }
+    .governance-trace .gt-label { color: var(--teal); margin-right: 0.5rem; }
+    .governance-trace .gt-pass { color: var(--accent); }
+    .governance-trace .gt-warn { color: var(--warn); }
+    .governance-trace .gt-fail { color: var(--fail); }
+    .governance-trace .gt-info { color: var(--muted); }
+    .governance-trace strong { color: var(--text); font-weight: 500; }
+
+    /* ── COMPARE BAR ── */
+    .compare-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 2rem 0; }
+    @media (max-width: 720px) { .compare-bar { grid-template-columns: 1fr; } }
+    .compare-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.4rem; }
+    .compare-card.bad { border-top: 2px solid var(--fail); }
+    .compare-card.good { border-top: 2px solid var(--accent); }
+    .compare-card h4 { font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 0.55rem; }
+    .compare-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.65; }
+
+    /* ── CALLOUT ── */
+    .callout { background: rgba(139,224,200,0.05); border: 1px solid rgba(139,224,200,0.2); border-left: 3px solid var(--teal); border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; }
+    .callout p { color: var(--muted); font-size: 0.88rem; margin: 0; }
+    .callout p strong { color: var(--text); font-weight: 500; }
+    .callout.purple { background: rgba(167,139,250,0.05); border-color: rgba(167,139,250,0.2); border-left-color: var(--agent-a); }
+    .callout.purple p strong { color: var(--agent-a); }
+
+    /* ── NEXT BAR ── */
+    .next-bar { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 640px) { .next-bar { grid-template-columns: 1fr; } }
+    .next-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; text-decoration: none; color: inherit; transition: border-color 0.15s, transform 0.15s; display: block; }
+    .next-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+    .next-card .nc-label { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+    .next-card h4 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 0.4rem; }
+    .next-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.6; margin-bottom: 0.5rem; }
+    .next-card .nc-arrow { color: var(--accent); font-family: 'DM Mono', monospace; font-size: 0.72rem; }
+
+    footer { border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left; }
+
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; padding: 0; flex-shrink: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; transition: border-color 0.15s, background 0.15s; }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span { display: block; width: 18px; height: 2px; background: currentColor; border-radius: 1px; transition: transform 0.25s ease, opacity 0.18s ease; transform-origin: center; }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+    @media (max-width: 900px) {
+      html, body { overflow-x: hidden; }
+      body.menu-open { overflow: hidden; }
+      nav { position: relative; padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 1.25rem; z-index: 99; max-height: 0; overflow: hidden; opacity: 0; visibility: hidden; transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s; }
+      .nav-links.open { max-height: 80vh; opacity: 1; visibility: visible; padding: 0.5rem 1.25rem 1.25rem; transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s; overflow-y: auto; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.92rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+      main { padding: 2rem 1.25rem 4rem; }
+      .breadcrumb-nav { padding: 0 1.25rem; }
+      .invariants li { grid-template-columns: 1fr; gap: 0.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <nav>
+    <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+    <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    <div class="nav-links">
+      <a href="/#how-it-works">How it works</a>
+      <a href="/use-cases/">Use cases</a>
+      <a href="/insights/">Insights</a>
+      <a href="/roadmap/">Roadmap</a>
+      <a href="/demo/">Demo</a>
+      <a href="/benchmark/">Benchmark</a>
+      <a href="https://github.com/TheoV823/mneme">GitHub</a>
+      <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+    </div>
+  </nav>
+
+  <nav aria-label="Breadcrumb" class="breadcrumb-nav">
+    <ol class="breadcrumb">
+      <li><a href="/">Home</a></li>
+      <li><a href="/demo/">Demo</a></li>
+      <li aria-current="page">Governance continuity</li>
+    </ol>
+  </nav>
+
+  <main>
+    <header>
+      <div class="article-eyebrow">
+        <span class="eyebrow-tag">Flagship 03</span>
+        <span class="eyebrow-dot"></span>
+        <span class="eyebrow-meta">7 min read</span>
+        <span class="eyebrow-dot"></span>
+        <span class="verdict-pill">FORWARD-LOOKING</span>
+      </div>
+      <h1>Governance continuity across <em>multiple actors</em>.</h1>
+      <p class="lede">As AI execution becomes distributed and persistent, the question is no longer "can one agent be guided?" It is "do our architectural invariants stay coherent across actors, sessions, and retries?" <strong>The point is not multi-agent runtime sophistication. The point is that the invariants live outside any single actor &mdash; in a governance layer that survives them.</strong></p>
+      <p class="byline">
+        By <a href="/founder/">Theo Valmis</a>
+        <span class="sep">&middot;</span>
+        <time datetime="2026-05-13">Published May 2026</time>
+        <span class="sep">&middot;</span>
+        <a href="/demo/">All demos</a>
+      </p>
+    </header>
+
+    <div class="body">
+
+      <h2>What this demo is &mdash; and is not</h2>
+
+      <p>This page does not claim a multi-agent runtime, an orchestration platform, or an autonomous coordination framework. Those are different categories. They are evolving rapidly, and most of them are out of Mneme's scope.</p>
+
+      <p>What this page <em>does</em> demonstrate is the shape of the problem those frameworks expose: <strong>once multiple actors touch the same codebase against shared architectural invariants, the governance layer becomes the coordination layer.</strong> If the invariants are encoded somewhere the actors can answer to, the system stays coherent. If they aren't, every actor reasons against its own context and drift becomes inevitable.</p>
+
+      <h2>The invariants the actors share</h2>
+
+      <p>Three actors will touch the same Python service over the course of one workflow. They share exactly one thing: the compiled decision corpus emitted by the <a href="/demo/adr-compiler/">ADR compiler</a>.</p>
+
+      <div class="invariants">
+        <div class="inv-title">Shared invariant set &middot; project_memory.json</div>
+        <ul>
+          <li>
+            <span class="inv-id">ADR-001</span>
+            <span class="inv-text"><strong>JSON storage only.</strong> No external database. No Redis. Persistence stays in-process.</span>
+          </li>
+          <li>
+            <span class="inv-id">ADR-003</span>
+            <span class="inv-text"><strong>No ORM in v1.</strong> Direct module access. Migrations are deferred until a usage threshold is crossed.</span>
+          </li>
+          <li>
+            <span class="inv-id">ADR-004</span>
+            <span class="inv-text"><strong>Repository pattern.</strong> All persistence flows through a Repository abstraction. No leakage of storage primitives into service layers.</span>
+          </li>
+        </ul>
+      </div>
+
+      <p>None of the three actors have memory of each other. They run in separate sessions. The invariants do not live in any of them &mdash; they live in the corpus the governance layer enforces against.</p>
+
+      <h2>Without the governance layer</h2>
+
+      <p>For contrast, run the scenario without Mneme. Each actor pattern-matches against training data, not against the invariants. The trajectory is unambiguous:</p>
+
+      <ul style="list-style: none; padding: 0; margin: 1rem 0 1.5rem; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.88rem; color: var(--muted);">
+        <li>&rarr; Actor A introduces a Redis dependency to "speed up lookups."</li>
+        <li>&rarr; Actor B sees Redis present and builds session storage on top of it.</li>
+        <li>&rarr; Actor C generates infra YAML for the new Redis service.</li>
+        <li>&rarr; All three changes are locally reasonable. <code>ADR-001</code> is silently dead.</li>
+      </ul>
+
+      <p>The full unconstrained walkthrough is on the <a href="/demo/architectural-drift/">drift prevention page</a> &mdash; that flagship covers the single-codebase failure mode end-to-end. This page extends the same logic to the case where the three actors are not the same agent.</p>
+
+      <h2>With the governance layer</h2>
+
+      <p>Same three actors. Same three tasks. The only difference is that every proposed change is evaluated against the shared invariant set before it lands, and the verdict trace persists across actors.</p>
+
+      <div class="actor-step">
+        <div class="actor-header a">
+          <span class="actor-name">Actor A &middot; pre-generation hook</span>
+          <span class="actor-task">"speed up the user lookup endpoint"</span>
+        </div>
+        <div class="actor-body">
+          <h4>Proposes Redis &middot; blocked by ADR-001</h4>
+          <p>The agent's first draft adds <code>redis-py</code>. The pre-generation hook scores the proposal against the corpus, surfaces <code>ADR-001</code>, and reroutes the agent to extending the JSON cache module that already exists. The diff that reaches CI uses the in-process abstraction.</p>
+          <div class="governance-trace">
+            <div><span class="gt-label">trace</span> <span class="gt-info">retriever.score(query, corpus) &rarr; <strong>ADR-001 [0.81]</strong>, ADR-004 [0.42]</span></div>
+            <div><span class="gt-label">trace</span> <span class="gt-warn">conflict</span> <strong>redis-py</strong> <span class="gt-info">violates "no external db"</span></div>
+            <div><span class="gt-label">trace</span> <span class="gt-info">retry.inject(ADR-001) &rarr; agent regenerates against JSON cache</span></div>
+            <div><span class="gt-label">trace</span> <span class="gt-pass">PASS</span> <span class="gt-info">storage_violation_count = 0 &middot; retries = 1</span></div>
+          </div>
+          <p>The corpus is unchanged. The verdict is appended to a structured trace that the next actor will inherit.</p>
+        </div>
+      </div>
+
+      <div class="actor-step">
+        <div class="actor-header b">
+          <span class="actor-name">Actor B &middot; new session, no shared memory with A</span>
+          <span class="actor-task">"add session storage"</span>
+        </div>
+        <div class="actor-body">
+          <h4>Builds on the correct primitive &middot; PASS by construction</h4>
+          <p>Actor B starts from a clean session. It does not "remember" what Actor A did. But the codebase it reads <em>does</em> &mdash; the JSON cache abstraction is now the obvious primitive to extend. The hook surfaces <code>ADR-001</code> and <code>ADR-004</code> alongside the prompt. Output uses the Repository abstraction over JSON.</p>
+          <div class="governance-trace">
+            <div><span class="gt-label">trace</span> <span class="gt-info">retriever.score(query, corpus) &rarr; <strong>ADR-001 [0.73]</strong>, ADR-004 [0.79]</span></div>
+            <div><span class="gt-label">trace</span> <span class="gt-info">context.inject(ADR-001, ADR-004)</span></div>
+            <div><span class="gt-label">trace</span> <span class="gt-pass">PASS</span> <span class="gt-info">repository_pattern_intact &middot; no new dependencies</span></div>
+          </div>
+          <p>Continuity here is not behavioral &mdash; it is structural. Actor B does not need to know what Actor A did. The corpus carries the invariant, and the codebase carries the compliant primitive.</p>
+        </div>
+      </div>
+
+      <div class="actor-step">
+        <div class="actor-header c">
+          <span class="actor-name">Actor C &middot; remediation pass</span>
+          <span class="actor-task">"reduce duplicated cache logic between user and session"</span>
+        </div>
+        <div class="actor-body">
+          <h4>Refactors across A and B's work &middot; conflict detector flags ambiguity</h4>
+          <p>Actor C is a remediation pass. It sees both cache layers and proposes consolidating them. The conflict detector notices the proposed refactor would change the Repository contract that <code>ADR-004</code> pins down, and emits a structured WARN. The verdict is not a rejection &mdash; it is an explicit decision point that requires either ADR amendment or a tracked override.</p>
+          <div class="governance-trace">
+            <div><span class="gt-label">trace</span> <span class="gt-info">refactor scope: <strong>user.cache</strong> + <strong>session.cache</strong></span></div>
+            <div><span class="gt-label">trace</span> <span class="gt-info">contract.check(Repository) &rarr; signature drift detected</span></div>
+            <div><span class="gt-label">trace</span> <span class="gt-warn">WARN</span> <span class="gt-info">[ADR-004] repository contract would change &middot; requires ADR amendment OR --approve-override</span></div>
+            <div><span class="gt-label">trace</span> <span class="gt-info">trace.persist(workflow_id) &middot; auditable across actors</span></div>
+          </div>
+          <p>This is the case the multi-actor demo exists to illustrate. The refactor is not wrong &mdash; it is architecturally consequential. The governance layer's job is to make that visible to a human, not to block silently.</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p><strong>What stayed coherent.</strong> Three actors. Zero shared memory. One shared corpus. The invariants held because they live outside the actors &mdash; in the artifact the governance layer evaluates against.</p>
+      </div>
+
+      <h2>Why this matters at the limit</h2>
+
+      <p>The market is moving toward parallel, persistent, semi-autonomous execution. Claude flows, OpenAI agents, autonomous retries, scheduled coding tasks &mdash; the shape varies, but the underlying property is the same: multiple actors touching the same codebase against constraints no single actor reliably remembers.</p>
+
+      <p>When this becomes routine, the bottleneck stops being "can a single agent produce good code?" The bottleneck becomes "do the constraints stay coherent across the actors?" Prompt files cannot answer that question. Vector stores cannot answer that question. A precedence-aware decision corpus with deterministic enforcement can.</p>
+
+      <div class="compare-bar">
+        <div class="compare-card bad">
+          <h4>Coordination via prompt files</h4>
+          <p>Each actor reads a slightly different version of the same text. The "rules" drift between sessions. There is no audit trace. There is no precedence model. Conflict resolution is whoever wrote the most recent prompt.</p>
+        </div>
+        <div class="compare-card good">
+          <h4>Coordination via governance layer</h4>
+          <p>Every actor evaluates against the same compiled corpus. Conflicts surface as structured verdicts with decision IDs. The trace persists across sessions. The invariants survive any individual actor.</p>
+        </div>
+      </div>
+
+      <h2>The runnable example</h2>
+
+      <p>The repo ships a Python script that simulates the three-actor workflow against the real Mneme pipeline. The "actors" are scripted diff producers &mdash; the script does not call any LLM. The enforcement, retrieval, and conflict-detection steps are the actual Mneme code that drives the editor hook and CI gate.</p>
+
+      <pre><code>git clone https://github.com/TheoV823/mneme
+cd mneme/examples/multi-agent-governance
+python run.py</code></pre>
+
+      <p>Output prints the without-governance trajectory first (drift accumulates across actors), then the with-governance trajectory (invariants hold). The verdict trace is the same structured PASS / WARN / FAIL format as <code>mneme check</code>.</p>
+
+      <div class="callout purple">
+        <p><strong>Honest framing.</strong> This is a forward-looking demo. The category insight &mdash; governance becomes the coordination layer as actors multiply &mdash; is real today. The full operational version, with persistent traces across long-running workflows, is on the <a href="/roadmap/" style="color:var(--accent);">roadmap</a>. The runnable example proves the invariant-persistence property using the existing pipeline.</p>
+      </div>
+
+      <h2>Where the rest of the picture lives</h2>
+
+      <ul style="list-style: none; margin: 1rem 0 1.5rem; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; color: var(--muted); font-size: 0.9rem;">
+        <li>&rarr; <a href="/demo/adr-compiler/">The ADR compiler</a> &mdash; how the invariant set the actors share is produced.</li>
+        <li>&rarr; <a href="/demo/architectural-drift/">Architectural drift prevention</a> &mdash; the single-actor version of the same problem, end-to-end.</li>
+        <li>&rarr; <a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/">Architectural governance across heterogeneous AI coding agents</a> &mdash; the longer-form argument for why the layer must live outside any one tool.</li>
+        <li>&rarr; <a href="/benchmark/">Governance Benchmark v1.1</a> &mdash; the deterministic scenario suite this enforcement is measured against.</li>
+      </ul>
+
+      <div class="next-bar">
+        <a class="next-card" href="/demo/adr-compiler/">
+          <div class="nc-label">Flagship 01 &middot; Centerpiece</div>
+          <h4>The ADR compiler</h4>
+          <p>The artifact that produces the corpus the actors here share. The upstream half of this loop.</p>
+          <span class="nc-arrow">Walk the compiler &rarr;</span>
+        </a>
+        <a class="next-card" href="/demo/architectural-drift/">
+          <div class="nc-label">Flagship 02</div>
+          <h4>Architectural drift prevention</h4>
+          <p>The single-codebase version of this story. Read it for the timeline of what drift looks like end-to-end.</p>
+          <span class="nc-arrow">Walk the timeline &rarr;</span>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+    <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+      <div>
+        <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div>
+        <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+          <li><a href="/use-cases/" style="color:var(--muted);text-decoration:none;">Use cases</a></li>
+          <li><a href="/integrations/" style="color:var(--muted);text-decoration:none;">Integrations</a></li>
+          <li><a href="/compare/" style="color:var(--muted);text-decoration:none;">Compare</a></li>
+          <li><a href="/demo/" style="color:var(--muted);text-decoration:none;">Demo</a></li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
+        <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+          <li><a href="/architecture/" style="color:var(--muted);text-decoration:none;">Architecture</a></li>
+        <li><a href="/insights/" style="color:var(--muted);text-decoration:none;">Insights</a></li>
+          <li><a href="/standards/" style="color:var(--muted);text-decoration:none;">Standards</a></li>
+          <li><a href="/benchmark/" style="color:var(--muted);text-decoration:none;">Benchmark</a></li>
+          <li><a href="/docs/" style="color:var(--muted);text-decoration:none;">Docs</a></li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
+        <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+          <li><a href="/pilot/" style="color:var(--accent);text-decoration:none;">Request pilot</a></li>
+          <li><a href="/founder/" style="color:var(--muted);text-decoration:none;">Founder</a></li>
+          <li><a href="/about/" style="color:var(--muted);text-decoration:none;">About</a></li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Code</div>
+        <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+          <li><a href="https://github.com/TheoV823/mneme" style="color:var(--muted);text-decoration:none;">GitHub</a></li>
+          <li><a href="/privacy/" style="color:var(--muted);text-decoration:none;">Privacy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
+      <span style="display:inline-flex;align-items:center;gap:0.75rem;"><a href="/" aria-label="Mneme HQ home" style="display:inline-flex;opacity:0.75;"><img src="/favicon.png" alt="Mneme HQ" height="22" style="display:block;"></a><span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span></span>
+      <span>&copy; 2026</span>
+    </div>
+  </footer>
+
+  <script>
+    (function(){
+      var path = window.location.pathname;
+      document.querySelectorAll('.nav-links a').forEach(function(a){
+        var href = a.getAttribute('href');
+        if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) a.classList.add('active');
+      });
+    })();
+  </script>
+  <script>
+    (function(){
+      var btn = document.querySelector('.nav-hamburger');
+      var links = document.querySelector('.nav-links');
+      if (!btn || !links) return;
+      function setOpen(open){ links.classList.toggle('open', open); btn.setAttribute('aria-expanded', String(open)); document.body.classList.toggle('menu-open', open); }
+      btn.addEventListener('click', function(e){ e.stopPropagation(); setOpen(!links.classList.contains('open')); });
+      document.addEventListener('click', function(e){ if (!links.classList.contains('open')) return; if (links.contains(e.target) || btn.contains(e.target)) return; setOpen(false); });
+      document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false); });
+      links.addEventListener('click', function(e){ if (e.target.tagName === 'A') setOpen(false); });
+      window.addEventListener('resize', function(){ if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false); });
+    })();
+  </script>
+</body>
+</html>

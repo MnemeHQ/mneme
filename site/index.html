@@ -1031,7 +1031,7 @@
     <p class="hero-support">Works with direct API integrations, coding assistants, agent frameworks, and managed agent platforms.</p>
     <div class="cta-group">
       <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub</a>
-      <a href="/demo/" class="btn-ghost">Watch 17-second demo</a>
+      <a href="/demo/" class="btn-ghost">Walk the flagship demos</a>
     </div>
   </div>
 
@@ -1321,6 +1321,59 @@
     </p>
   </div>
 
+  <!-- FLAGSHIP DEMOS -->
+  <div class="section-wrap" id="flagship-demos">
+    <div class="section-eyebrow">Operational proof</div>
+    <h2 class="section-title">Three flagship demos.<br>One worldview.</h2>
+    <p style="color:var(--muted);font-size:0.95rem;line-height:1.7;margin:-1rem 0 2.25rem;max-width:680px;">
+      Each flagship is a different manifestation of the same structural problem: AI accelerates entropy, review does not scale linearly with AI output, drift compounds. Together they sell the category, not a feature. Each ships with a runnable example that drives real Mneme enforcement against scripted diffs &mdash; deterministic, no LLM call required.
+    </p>
+
+    <div style="display:grid;grid-template-columns:1fr;gap:1.1rem;max-width:920px;">
+
+      <!-- Centerpiece: ADR Compiler -->
+      <a href="/demo/adr-compiler/" style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:2rem 2.1rem;text-decoration:none;color:inherit;display:block;position:relative;overflow:hidden;transition:border-color 0.15s, transform 0.15s;">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg, var(--accent), var(--teal));"></div>
+        <div style="display:flex;align-items:center;gap:0.65rem;margin-bottom:0.85rem;flex-wrap:wrap;">
+          <span style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;">Flagship 01 &middot; Centerpiece</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.6rem;padding:0.16rem 0.55rem;border-radius:999px;letter-spacing:0.06em;text-transform:uppercase;background:rgba(139,224,200,0.1);color:var(--teal);border:1px solid rgba(139,224,200,0.25);">Runnable</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.6rem;padding:0.16rem 0.55rem;border-radius:999px;letter-spacing:0.06em;text-transform:uppercase;background:rgba(200,240,96,0.1);color:var(--accent);border:1px solid rgba(200,240,96,0.25);">Mneme dogfoods this</span>
+        </div>
+        <h3 style="font-family:'Instrument Serif',serif;font-size:1.65rem;font-weight:400;color:var(--text);margin:0 0 0.55rem;line-height:1.25;letter-spacing:-0.01em;">The ADR compiler &mdash; turn architectural decisions into infrastructure</h3>
+        <p style="color:var(--muted);font-size:0.95rem;line-height:1.7;margin:0 0 1rem;">Most teams already have ADRs. They sit in <code style="font-family:'DM Mono',monospace;font-size:0.85em;background:var(--surface2);border-radius:3px;padding:0.05em 0.35em;color:var(--text);">docs/adr/</code> and are quietly ignored by every AI coding agent. The compiler reads the same files, parses an optional <code style="font-family:'DM Mono',monospace;font-size:0.85em;background:var(--surface2);border-radius:3px;padding:0.05em 0.35em;color:var(--text);">## Constraints</code> section, and emits enforceable, precedence-aware decisions that govern generation and CI. No rewrite.</p>
+        <span style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--accent);font-family:'DM Mono',monospace;font-size:0.78rem;">Walk through the compiler &rarr;</span>
+      </a>
+
+      <!-- Architectural drift -->
+      <a href="/demo/architectural-drift/" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.6rem 1.85rem;text-decoration:none;color:inherit;display:block;transition:border-color 0.15s, transform 0.15s;">
+        <div style="display:flex;align-items:center;gap:0.65rem;margin-bottom:0.7rem;flex-wrap:wrap;">
+          <span style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;">Flagship 02</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.6rem;padding:0.16rem 0.55rem;border-radius:999px;letter-spacing:0.06em;text-transform:uppercase;background:rgba(139,224,200,0.1);color:var(--teal);border:1px solid rgba(139,224,200,0.25);">Runnable</span>
+        </div>
+        <h3 style="font-family:'Instrument Serif',serif;font-size:1.4rem;font-weight:400;color:var(--text);margin:0 0 0.5rem;line-height:1.25;letter-spacing:-0.01em;">Architectural drift prevention &mdash; the AI SDLC entropy demo</h3>
+        <p style="color:var(--muted);font-size:0.92rem;line-height:1.7;margin:0 0 0.85rem;">Six-step timeline. An agent proposes reasonable-looking code that violates ADR-001. Three downstream changes amplify the divergence. A reviewer would plausibly miss it. Mneme blocks the first divergence upstream and the system converges instead of forking.</p>
+        <span style="color:var(--accent);font-family:'DM Mono',monospace;font-size:0.78rem;">Walk the timeline &rarr;</span>
+      </a>
+
+      <!-- Multi-agent governance -->
+      <a href="/demo/multi-agent-governance/" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.6rem 1.85rem;text-decoration:none;color:inherit;display:block;transition:border-color 0.15s, transform 0.15s;">
+        <div style="display:flex;align-items:center;gap:0.65rem;margin-bottom:0.7rem;flex-wrap:wrap;">
+          <span style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;">Flagship 03</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.6rem;padding:0.16rem 0.55rem;border-radius:999px;letter-spacing:0.06em;text-transform:uppercase;background:rgba(167,139,250,0.1);color:#a78bfa;border:1px solid rgba(167,139,250,0.25);">Forward-looking</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.6rem;padding:0.16rem 0.55rem;border-radius:999px;letter-spacing:0.06em;text-transform:uppercase;background:rgba(139,224,200,0.1);color:var(--teal);border:1px solid rgba(139,224,200,0.25);">Runnable</span>
+        </div>
+        <h3 style="font-family:'Instrument Serif',serif;font-size:1.4rem;font-weight:400;color:var(--text);margin:0 0 0.5rem;line-height:1.25;letter-spacing:-0.01em;">Governance continuity across multiple actors</h3>
+        <p style="color:var(--muted);font-size:0.92rem;line-height:1.7;margin:0 0 0.85rem;">Three actors act sequentially against the same codebase with no shared memory. The compiled corpus is the only thing they share. The architectural invariants stay coherent because they live outside any single actor &mdash; in the layer the governance evaluates against.</p>
+        <span style="color:var(--accent);font-family:'DM Mono',monospace;font-size:0.78rem;">See the governance trace &rarr;</span>
+      </a>
+
+    </div>
+
+    <p style="margin-top:1.75rem;font-size:0.86rem;color:var(--muted);">
+      <a href="/demo/" style="color:var(--accent);text-decoration:none;">All three flagships, supporting enforcement examples, and operational evidence on the demo hub &rarr;</a>
+    </p>
+  </div>
+
   <!-- WORKS WITH -->
   <div class="section-wrap">
     <div class="section-eyebrow">Works with</div>
@@ -1452,7 +1505,7 @@
     <div class="cta-group">
       <a href="/pilot/" class="btn-primary">Request pilot access</a>
       <a href="https://github.com/TheoV823/mneme" class="btn-ghost">View on GitHub</a>
-      <a href="/demo/" class="btn-ghost">Watch demo</a>
+      <a href="/demo/" class="btn-ghost">Walk the flagship demos</a>
     </div>
   </div>
 
@@ -1531,8 +1584,7 @@
       </div>
     </div>
 
-    <a href="/demo/" class="demo-link">Watch the full 17-second demo ?</a>
-  </div>
+    <a href="/demo/" class="demo-link">Walk all three flagship demos &rarr;</a>  </div>
 
 </main>
 
@@ -1571,6 +1623,8 @@
     <div>
       <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
       <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/concepts/">Concepts</a></li>
+        <li><a href="/architecture/">Architecture</a></li>
         <li><a href="/insights/">Insights</a></li>
         <li><a href="/standards/">Standards</a></li>
         <li><a href="/benchmark/">Benchmark</a></li>
@@ -1602,7 +1656,7 @@
     </div>
   </div>
   <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
-    <span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span>
+    <span style="display:inline-flex;align-items:center;gap:0.75rem;"><a href="/" aria-label="Mneme HQ home" style="display:inline-flex;opacity:0.75;"><img src="/favicon.png" alt="Mneme HQ" height="22" style="display:block;"></a><span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span></span>
     <nav aria-label="Social media" style="display: flex; align-items: center; gap: 1rem;">
       <a href="https://github.com/TheoV823/mneme" target="_blank" rel="noopener" aria-label="GitHub" style="color: var(--muted); display: inline-flex;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.16c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.27-1.69-1.27-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.34.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18.92-.26 1.91-.39 2.89-.39.98 0 1.97.13 2.89.39 2.2-1.49 3.17-1.18 3.17-1.18.62 1.58.23 2.75.12 3.04.73.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.26 5.68.41.35.78 1.05.78 2.12v3.15c0 .31.21.67.8.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/favicon.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Architectural drift prevention — the AI SDLC entropy demo | Mneme HQ</title>
+  <meta name="description" content="A six-step timeline. An agent proposes reasonable-looking code that violates an ADR. Downstream changes amplify the divergence. A reviewer would plausibly miss it. Mneme blocks the first divergence upstream and the system converges." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/demo/architectural-drift/" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Architectural drift prevention — the AI SDLC entropy demo" />
+  <meta property="og:description" content="A six-step timeline. An agent proposes reasonable-looking code that violates an ADR. Downstream changes amplify the divergence. A reviewer would plausibly miss it. Mneme blocks the first divergence upstream and the system converges." />
+  <meta property="og:url" content="https://mnemehq.com/demo/architectural-drift/" />
+  <meta property="og:image" content="https://mnemehq.com/demo/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Architectural drift prevention — the AI SDLC entropy demo" />
+  <meta name="twitter:description" content="A six-step timeline showing how drift compounds without a governance layer, and how Mneme blocks the first divergence upstream." />
+  <meta name="twitter:image" content="https://mnemehq.com/demo/og.png" />
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Demo", "item": "https://mnemehq.com/demo/"},
+          {"@type": "ListItem", "position": 3, "name": "Architectural drift prevention", "item": "https://mnemehq.com/demo/architectural-drift/"}
+        ]
+      },
+      {
+        "@type": "Article",
+        "headline": "Architectural drift prevention — the AI SDLC entropy demo",
+        "description": "Six-step timeline showing how drift compounds without a governance layer, and how Mneme blocks the first divergence upstream so the system converges.",
+        "url": "https://mnemehq.com/demo/architectural-drift/",
+        "datePublished": "2026-05-13",
+        "dateModified": "2026-05-13",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "image": "https://mnemehq.com/demo/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/demo/architectural-drift/"
+      }
+    ]
+  }
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #88889a;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+      --pass: #c8f060; --warn: #f59e0b; --fail: #ef4444;
+      --term-bad: #ff8585; --term-bg: #0a0a0d;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: #0c0c0d; backdrop-filter: blur(8px); z-index: 100; }
+    .logo { font-family: 'Instrument Serif', serif; font-size: 1.4rem; font-weight: 400; color: var(--text); text-decoration: none; letter-spacing: -0.01em; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--accent); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .breadcrumb-nav { max-width: 880px; margin: 1.5rem auto 0; padding: 0 2rem; }
+    .breadcrumb { display: flex; gap: 0.5rem; list-style: none; font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.04em; }
+    .breadcrumb li:not(:last-child)::after { content: ' / '; margin-left: 0.5rem; color: var(--border2); }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+
+    main { max-width: 880px; margin: 0 auto; padding: 2.5rem 2rem 5rem; }
+
+    .article-eyebrow { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .eyebrow-tag { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+    .eyebrow-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-family: 'DM Mono', monospace; font-size: 0.66rem; color: var(--muted); letter-spacing: 0.04em; }
+    .verdict-pill { font-family: 'DM Mono', monospace; font-size: 0.65rem; padding: 0.18rem 0.55rem; border-radius: 4px; letter-spacing: 0.06em; background: rgba(139,224,200,0.12); color: var(--teal); border: 1px solid rgba(139,224,200,0.3); }
+
+    h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.25rem; }
+    h1 em { font-style: italic; color: var(--accent); }
+    .lede { font-size: 1.05rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; margin-bottom: 1.25rem; }
+    .lede strong { color: var(--text); font-weight: 500; }
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-bottom: 3rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    .body { font-size: 0.95rem; line-height: 1.85; color: var(--text); }
+    .body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .body h3 { font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--text); }
+    .body p { margin-bottom: 1.1rem; color: var(--muted); }
+    .body p strong { color: var(--text); font-weight: 500; }
+    .body code { font-family: 'DM Mono', monospace; font-size: 0.82rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 0.05rem 0.4rem; color: var(--text); }
+    .body a { color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(200,240,96,0.4); }
+    .body a:hover { color: var(--accent-dim); border-bottom-color: rgba(200,240,96,0.7); }
+    .body pre { background: var(--term-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; overflow-x: auto; margin: 1.25rem 0; }
+    .body pre code { background: transparent; border: none; padding: 0; font-size: 0.78rem; line-height: 1.7; color: var(--text); }
+
+    /* ── TIMELINE ── */
+    .timeline { margin: 2rem 0 1rem; position: relative; }
+    .timeline::before { content: ''; position: absolute; left: 1.05rem; top: 0.5rem; bottom: 0.5rem; width: 1px; background: var(--border2); }
+    .timeline-step { display: grid; grid-template-columns: 2.5rem 1fr; gap: 0.75rem; margin-bottom: 0.65rem; position: relative; }
+    .timeline-num { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.06em; color: var(--bg); background: var(--border2); width: 2.1rem; height: 2.1rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; flex-shrink: 0; z-index: 1; }
+    .timeline-step.bad .timeline-num { background: var(--fail); color: #0c0c0d; }
+    .timeline-step.warn .timeline-num { background: var(--warn); color: #0c0c0d; }
+    .timeline-step.good .timeline-num { background: var(--accent); color: #0c0c0d; }
+    .timeline-step.block .timeline-num { background: var(--teal); color: #0c0c0d; }
+    .timeline-content { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.85rem 1.1rem; }
+    .timeline-step.bad .timeline-content { border-left: 2px solid var(--fail); }
+    .timeline-step.warn .timeline-content { border-left: 2px solid var(--warn); }
+    .timeline-step.good .timeline-content { border-left: 2px solid var(--accent); }
+    .timeline-step.block .timeline-content { border-left: 2px solid var(--teal); }
+    .timeline-actor { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.3rem; }
+    .timeline-step.bad .timeline-actor { color: var(--fail); }
+    .timeline-step.good .timeline-actor { color: var(--accent); }
+    .timeline-step.block .timeline-actor { color: var(--teal); }
+    .timeline-content h4 { font-family: 'Inter', sans-serif; font-size: 0.93rem; font-weight: 600; color: var(--text); margin: 0 0 0.3rem; line-height: 1.4; }
+    .timeline-content p { font-size: 0.82rem; color: var(--muted); margin: 0; line-height: 1.6; }
+    .timeline-content p code { font-size: 0.76rem; }
+    .timeline-content .ts-trace { margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed var(--border); font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted); }
+    .timeline-content .ts-trace strong { color: var(--text); font-weight: 500; }
+
+    .timeline-divider { display: flex; align-items: center; gap: 0.75rem; margin: 2rem 0 1.5rem; }
+    .timeline-divider .td-line { flex: 1; height: 1px; background: var(--border2); }
+    .timeline-divider .td-label { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+
+    /* ── COMPARE TWO PATHS ── */
+    .paths { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+    @media (max-width: 720px) { .paths { grid-template-columns: 1fr; } }
+    .path-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.4rem; }
+    .path-card.bad { border-top: 3px solid var(--fail); }
+    .path-card.good { border-top: 3px solid var(--accent); }
+    .path-card h3 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text); }
+    .path-card .pc-meta { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+    .path-card.bad .pc-meta { color: var(--fail); }
+    .path-card.good .pc-meta { color: var(--accent); }
+    .path-card ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.55rem; }
+    .path-card ul li { font-size: 0.83rem; color: var(--muted); line-height: 1.6; padding-left: 1.2rem; position: relative; }
+    .path-card ul li::before { content: '-'; position: absolute; left: 0; color: var(--border2); font-family: 'DM Mono', monospace; }
+    .path-card.bad ul li::before { color: var(--fail); }
+    .path-card.good ul li::before { color: var(--accent); }
+
+    /* ── CALLOUT ── */
+    .callout { background: rgba(239,68,68,0.04); border: 1px solid rgba(239,68,68,0.2); border-left: 3px solid var(--fail); border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; }
+    .callout.teal { background: rgba(139,224,200,0.05); border-color: rgba(139,224,200,0.2); border-left-color: var(--teal); }
+    .callout p { color: var(--muted); font-size: 0.88rem; margin: 0; }
+    .callout p strong { color: var(--text); font-weight: 500; }
+    .callout.teal p strong { color: var(--teal); }
+
+    /* ── NEXT BAR ── */
+    .next-bar { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 640px) { .next-bar { grid-template-columns: 1fr; } }
+    .next-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; text-decoration: none; color: inherit; transition: border-color 0.15s, transform 0.15s; display: block; }
+    .next-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+    .next-card .nc-label { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+    .next-card h4 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 0.4rem; }
+    .next-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.6; margin-bottom: 0.5rem; }
+    .next-card .nc-arrow { color: var(--accent); font-family: 'DM Mono', monospace; font-size: 0.72rem; }
+
+    footer { border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left; }
+
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; padding: 0; flex-shrink: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; transition: border-color 0.15s, background 0.15s; }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span { display: block; width: 18px; height: 2px; background: currentColor; border-radius: 1px; transition: transform 0.25s ease, opacity 0.18s ease; transform-origin: center; }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+    @media (max-width: 900px) {
+      html, body { overflow-x: hidden; }
+      body.menu-open { overflow: hidden; }
+      nav { position: relative; padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 1.25rem; z-index: 99; max-height: 0; overflow: hidden; opacity: 0; visibility: hidden; transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s; }
+      .nav-links.open { max-height: 80vh; opacity: 1; visibility: visible; padding: 0.5rem 1.25rem 1.25rem; transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s; overflow-y: auto; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.92rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+      main { padding: 2rem 1.25rem 4rem; }
+      .breadcrumb-nav { padding: 0 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <nav>
+    <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+    <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    <div class="nav-links">
+      <a href="/#how-it-works">How it works</a>
+      <a href="/use-cases/">Use cases</a>
+      <a href="/insights/">Insights</a>
+      <a href="/roadmap/">Roadmap</a>
+      <a href="/demo/">Demo</a>
+      <a href="/benchmark/">Benchmark</a>
+      <a href="https://github.com/TheoV823/mneme">GitHub</a>
+      <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+    </div>
+  </nav>
+
+  <nav aria-label="Breadcrumb" class="breadcrumb-nav">
+    <ol class="breadcrumb">
+      <li><a href="/">Home</a></li>
+      <li><a href="/demo/">Demo</a></li>
+      <li aria-current="page">Architectural drift</li>
+    </ol>
+  </nav>
+
+  <main>
+    <header>
+      <div class="article-eyebrow">
+        <span class="eyebrow-tag">Flagship 02</span>
+        <span class="eyebrow-dot"></span>
+        <span class="eyebrow-meta">6 min read</span>
+        <span class="eyebrow-dot"></span>
+        <span class="verdict-pill">RUNNABLE</span>
+      </div>
+      <h1>Architectural drift prevention &mdash; the AI SDLC <em>entropy</em> demo.</h1>
+      <p class="lede">AI accelerates entropy. Each agent-produced change is locally reasonable. The system as a whole still drifts because each change silently relaxes an invariant the team had already encoded. <strong>Without a governance layer, drift compounds faster than review can absorb it.</strong> This page walks the failure mode end-to-end and shows what changes when the first divergence is blocked upstream.</p>
+      <p class="byline">
+        By <a href="/founder/">Theo Valmis</a>
+        <span class="sep">&middot;</span>
+        <time datetime="2026-05-13">Published May 2026</time>
+        <span class="sep">&middot;</span>
+        <a href="/demo/">All demos</a>
+      </p>
+    </header>
+
+    <div class="body">
+
+      <h2>The scenario</h2>
+
+      <p>A small platform team maintains a single-binary Python service. The architectural truth is documented:</p>
+
+      <ul style="list-style: none; padding: 0; margin: 0 0 1.25rem; display: flex; flex-direction: column; gap: 0.45rem; font-size: 0.88rem; color: var(--muted);">
+        <li>&rarr; <code>ADR-001</code> &mdash; JSON storage only. No external database. No Redis.</li>
+        <li>&rarr; <code>ADR-003</code> &mdash; No ORM in v1. Direct module access.</li>
+        <li>&rarr; <code>ADR-004</code> &mdash; All persistence flows through a Repository abstraction.</li>
+      </ul>
+
+      <p>Three agents touch the codebase over the course of a week. Each one produces a reasonable-looking PR. Review is busy. By Friday the architecture has silently forked.</p>
+
+      <h2>Without a governance layer</h2>
+
+      <div class="timeline-divider">
+        <span class="td-label">Drift propagation</span>
+        <div class="td-line"></div>
+      </div>
+
+      <div class="timeline">
+        <div class="timeline-step bad">
+          <div class="timeline-num">1</div>
+          <div class="timeline-content">
+            <div class="timeline-actor">Monday &middot; Agent A</div>
+            <h4>Introduces Redis "for caching"</h4>
+            <p>Asked to "speed up the user lookup endpoint." Adds <code>redis-py</code>, wires a cache layer, ships a 60-line PR. Locally reasonable. Silently violates <code>ADR-001</code>.</p>
+          </div>
+        </div>
+        <div class="timeline-step bad">
+          <div class="timeline-num">2</div>
+          <div class="timeline-content">
+            <div class="timeline-actor">Monday &middot; Reviewer</div>
+            <h4>PR lands. ADR-001 not reread.</h4>
+            <p>Reviewer focused on the cache invalidation logic. The decision corpus is a separate file no one opens during review. Approved in 4 minutes.</p>
+          </div>
+        </div>
+        <div class="timeline-step bad">
+          <div class="timeline-num">3</div>
+          <div class="timeline-content">
+            <div class="timeline-actor">Wednesday &middot; Agent B</div>
+            <h4>Builds infrastructure around the new Redis dependency</h4>
+            <p>Asked to "add session storage." Discovers Redis is now in the codebase and uses it. Adds connection pooling, retry logic, a health check. The divergence is now load-bearing.</p>
+          </div>
+        </div>
+        <div class="timeline-step bad">
+          <div class="timeline-num">4</div>
+          <div class="timeline-content">
+            <div class="timeline-actor">Thursday &middot; Agent C</div>
+            <h4>Adds infra YAML for Redis</h4>
+            <p>Asked to "make the staging deploy reproducible." Generates a Redis container, a service definition, a backup policy. None of this should exist per <code>ADR-001</code>. None of it is flagged.</p>
+          </div>
+        </div>
+        <div class="timeline-step bad">
+          <div class="timeline-num">5</div>
+          <div class="timeline-content">
+            <div class="timeline-actor">Friday &middot; Architect</div>
+            <h4>Notices. Too late.</h4>
+            <p>Architecture has silently forked. Rolling back means three PRs, a deploy revert, and a conversation about why the decision corpus exists. The team eats the cost.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p><strong>This is the failure mode.</strong> No single agent did anything outrageous. Each PR was reviewed by a human. Each change was locally reasonable. The drift emerged from the <em>composition</em> of changes none of which individually triggered a review escalation.</p>
+      </div>
+
+      <h2>With Mneme's governance layer</h2>
+
+      <div class="timeline-divider">
+        <span class="td-label">Upstream block + convergence</span>
+        <div class="td-line"></div>
+      </div>
+
+      <div class="timeline">
+        <div class="timeline-step block">
+          <div class="timeline-num">1</div>
+          <div class="timeline-content">
+            <div class="timeline-actor">Monday &middot; Agent A &middot; pre-generation</div>
+            <h4>Hook intercepts the proposed change</h4>
+            <p>Before the diff lands, the Claude Code / Cursor hook scores the proposal against <code>project_memory.json</code> and surfaces <code>ADR-001</code> into the model's context. The agent reroutes to extending the existing JSON cache instead.</p>
+            <div class="ts-trace"><strong>trace</strong> &middot; PreToolUse hook &middot; matched ADR-001 &middot; injected 3 constraints</div>
+          </div>
+        </div>
+        <div class="timeline-step warn">
+          <div class="timeline-num">2</div>
+          <div class="timeline-content">
+            <div class="timeline-actor">Monday &middot; CI &middot; post-generation</div>
+            <h4>mneme check fires WARN on residual signal</h4>
+            <p>A leftover <code>import redis</code> survives in a draft commit. The CI gate emits a structured WARN with the decision id, so review sees the violation in the PR comments, not buried in a 200-line diff.</p>
+            <div class="ts-trace"><strong>WARN</strong> [ADR-001] no external db &mdash; trigger: redis</div>
+          </div>
+        </div>
+        <div class="timeline-step good">
+          <div class="timeline-num">3</div>
+          <div class="timeline-content">
+            <div class="timeline-actor">Monday &middot; Agent A &middot; retry</div>
+            <h4>Retry converges within constraints</h4>
+            <p>The hook re-runs with the violated decisions explicit in the prompt. The agent regenerates against the JSON cache abstraction. The new diff passes.</p>
+            <div class="ts-trace"><strong>PASS</strong> &middot; storage_violation_count = 0 &middot; retries = 1</div>
+          </div>
+        </div>
+        <div class="timeline-step good">
+          <div class="timeline-num">4</div>
+          <div class="timeline-content">
+            <div class="timeline-actor">Wednesday &middot; Agent B</div>
+            <h4>Session storage built on the correct primitive</h4>
+            <p>Asked to "add session storage." The hook surfaces <code>ADR-001</code>, <code>ADR-004</code>. Output uses the Repository abstraction over JSON. Compliant by construction.</p>
+            <div class="ts-trace"><strong>PASS</strong> &middot; ADR-001, ADR-004 satisfied</div>
+          </div>
+        </div>
+        <div class="timeline-step good">
+          <div class="timeline-num">5</div>
+          <div class="timeline-content">
+            <div class="timeline-actor">Friday &middot; Architect</div>
+            <h4>No drift to clean up</h4>
+            <p>The decision corpus stayed authoritative all week. Three PRs landed. None of them silently relaxed an invariant. The architect spends Friday on the next ADR, not on remediation.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout teal">
+        <p><strong>Same agents. Same prompts. Same model.</strong> The only difference is that <code>ADR-001</code> reaches the model before generation, and the verdict reaches CI after it. Drift gets blocked at the first divergence, not the third.</p>
+      </div>
+
+      <h2>Why this is the AI SDLC entropy problem</h2>
+
+      <p>Human-authored drift is bounded by human throughput. A team produces maybe ten meaningful PRs a day. An architect can read all of them. A reviewer can flag the one that smells wrong.</p>
+
+      <p>Agent-authored drift is not bounded by human throughput. The same architect now sees ten PRs per hour. Each one was generated by an agent that pattern-matched against training data, not against the project's decision corpus. Most of them are fine. The one that isn't is invisible because it looks like all the others.</p>
+
+      <p>This is why review-based governance starts to fail at AI velocity. The reviewer is doing the right thing &mdash; reading the diff &mdash; but the failure mode has moved upstream of the diff. The decisions that matter are now in the agent's context window, not in a comment thread. Governance has to be wherever the decisions are made.</p>
+
+      <h3>Two paths through the same week</h3>
+
+      <div class="paths">
+        <div class="path-card bad">
+          <h3>Without governance</h3>
+          <div class="pc-meta">Drift compounds</div>
+          <ul>
+            <li>3 PRs land that contradict ADR-001</li>
+            <li>Each one looks locally reasonable</li>
+            <li>Reviewer load: 12 PRs that week</li>
+            <li>Drift detected post-deploy</li>
+            <li>Remediation: revert + ADR rewrite + meeting</li>
+          </ul>
+        </div>
+        <div class="path-card good">
+          <h3>With Mneme</h3>
+          <div class="pc-meta">System converges</div>
+          <ul>
+            <li>First divergence blocked pre-generation</li>
+            <li>Retry converges within 1 round</li>
+            <li>Downstream agents see the corrected codebase</li>
+            <li>CI gate enforces on every PR</li>
+            <li>Architect time freed for the next decision</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>Run the reproducible example</h2>
+
+      <p>The repo ships a Python walkthrough that simulates the timeline above against the Mneme pipeline. Three sequential "agents" produce diff hunks. The same Mneme conflict detector and enforcer that drive the editor hook and the CI gate evaluate each step:</p>
+
+      <pre><code>git clone https://github.com/TheoV823/mneme
+cd mneme/examples/architectural-drift
+python run.py</code></pre>
+
+      <p>The script prints the without-governance timeline first (drift propagation), then the with-governance timeline (upstream block and retry convergence). Same decision corpus on disk for both runs. The script does not call any LLM; the architectural divergences are scripted so that the enforcement output is deterministic and reproducible.</p>
+
+      <div class="callout teal">
+        <p><strong>What this proves.</strong> The runnable example does not claim to demonstrate sophisticated autonomous agents. It demonstrates that <em>the governance layer stays coherent across multiple proposed changes</em>. That is the proof surface that matters for this category, and it is small enough to be deterministic.</p>
+      </div>
+
+      <h2>Where the governance lives</h2>
+
+      <p>The enforcement output above is generated by the same three artifacts that drive every other Mneme integration:</p>
+
+      <ul style="list-style: none; margin: 1rem 0 1.5rem; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; color: var(--muted); font-size: 0.9rem;">
+        <li>&rarr; <a href="/demo/adr-compiler/">The ADR compiler</a> emits the <code>project_memory.json</code> the timeline reads against.</li>
+        <li>&rarr; <a href="/integrations/claude-code/">Claude Code integration</a> intercepts the pre-generation step.</li>
+        <li>&rarr; <a href="/integrations/github-actions/">GitHub Actions integration</a> runs <code>mneme check</code> in CI.</li>
+      </ul>
+
+      <p>The drift demo is what happens when those three artifacts are missing. The convergent timeline is what happens when they are wired up.</p>
+
+      <div class="next-bar">
+        <a class="next-card" href="/demo/adr-compiler/">
+          <div class="nc-label">Flagship 01 &middot; Centerpiece</div>
+          <h4>The ADR compiler</h4>
+          <p>The artifact that produced the decision corpus the timeline reads against. Read this if you want the upstream half.</p>
+          <span class="nc-arrow">Walk the compiler &rarr;</span>
+        </a>
+        <a class="next-card" href="/demo/multi-agent-governance/">
+          <div class="nc-label">Flagship 03</div>
+          <h4>Governance continuity across actors</h4>
+          <p>The same timeline, scaled up: multiple agents acting on a shared invariant set. The category insight at the limit.</p>
+          <span class="nc-arrow">See the trace &rarr;</span>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+    <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+      <div>
+        <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div>
+        <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+          <li><a href="/use-cases/" style="color:var(--muted);text-decoration:none;">Use cases</a></li>
+          <li><a href="/integrations/" style="color:var(--muted);text-decoration:none;">Integrations</a></li>
+          <li><a href="/compare/" style="color:var(--muted);text-decoration:none;">Compare</a></li>
+          <li><a href="/demo/" style="color:var(--muted);text-decoration:none;">Demo</a></li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
+        <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+          <li><a href="/architecture/" style="color:var(--muted);text-decoration:none;">Architecture</a></li>
+        <li><a href="/insights/" style="color:var(--muted);text-decoration:none;">Insights</a></li>
+          <li><a href="/standards/" style="color:var(--muted);text-decoration:none;">Standards</a></li>
+          <li><a href="/benchmark/" style="color:var(--muted);text-decoration:none;">Benchmark</a></li>
+          <li><a href="/docs/" style="color:var(--muted);text-decoration:none;">Docs</a></li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
+        <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+          <li><a href="/pilot/" style="color:var(--accent);text-decoration:none;">Request pilot</a></li>
+          <li><a href="/founder/" style="color:var(--muted);text-decoration:none;">Founder</a></li>
+          <li><a href="/about/" style="color:var(--muted);text-decoration:none;">About</a></li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Code</div>
+        <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+          <li><a href="https://github.com/TheoV823/mneme" style="color:var(--muted);text-decoration:none;">GitHub</a></li>
+          <li><a href="/privacy/" style="color:var(--muted);text-decoration:none;">Privacy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
+      <span style="display:inline-flex;align-items:center;gap:0.75rem;"><a href="/" aria-label="Mneme HQ home" style="display:inline-flex;opacity:0.75;"><img src="/favicon.png" alt="Mneme HQ" height="22" style="display:block;"></a><span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span></span>
+      <span>&copy; 2026</span>
+    </div>
+  </footer>
+
+  <script>
+    (function(){
+      var path = window.location.pathname;
+      document.querySelectorAll('.nav-links a').forEach(function(a){
+        var href = a.getAttribute('href');
+        if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) a.classList.add('active');
+      });
+    })();
+  </script>
+  <script>
+    (function(){
+      var btn = document.querySelector('.nav-hamburger');
+      var links = document.querySelector('.nav-links');
+      if (!btn || !links) return;
+      function setOpen(open){ links.classList.toggle('open', open); btn.setAttribute('aria-expanded', String(open)); document.body.classList.toggle('menu-open', open); }
+      btn.addEventListener('click', function(e){ e.stopPropagation(); setOpen(!links.classList.contains('open')); });
+      document.addEventListener('click', function(e){ if (!links.classList.contains('open')) return; if (links.contains(e.target) || btn.contains(e.target)) return; setOpen(false); });
+      document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false); });
+      links.addEventListener('click', function(e){ if (e.target.tagName === 'A') setOpen(false); });
+      window.addEventListener('resize', function(){ if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false); });
+    })();
+  </script>
+</body>
+</html>

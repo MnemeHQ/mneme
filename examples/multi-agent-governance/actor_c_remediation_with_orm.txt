@@ -1,0 +1,17 @@
+# Actor C -- session 3 -- "reduce duplicated cache logic between user and session"
+# Remediation pass. Proposes consolidating the two stores by adopting an ORM
+# so a single Session.query(...) call replaces both repository methods.
+#
+# This touches the no-ORM invariant (ADR-003). The governance layer should
+# fire so a human can either amend the ADR or approve an explicit override.
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
+
+Base = declarative_base()
+_engine = create_engine("sqlite:///app.db")
+Session = sessionmaker(bind=_engine)
+
+class UnifiedStore(Base):
+    """One model to replace UserStore and SessionStore."""
+    pass

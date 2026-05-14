@@ -1,0 +1,50 @@
+{
+  "meta": {
+    "name": "drift-demo",
+    "description": "Minimal project memory for the architectural-drift flagship walkthrough. Encodes ADR-001 and ADR-003 as enforceable rules. Constraints are deliberately specific (dependency-level) so the enforcer fires on real violations rather than on benign vocabulary.",
+    "version": "1.0.0",
+    "owner": "Mneme HQ",
+    "created": "2026-05-13"
+  },
+  "items": [],
+  "examples": [],
+  "decisions": [
+    {
+      "id": "ADR-001",
+      "decision": "JSON storage only -- no external database.",
+      "rationale": "The service runs on edge hardware where shipping a separate database is operationally unacceptable. Persistence stays in-process until a usage threshold defined in ADR-005 is crossed.",
+      "scope": ["storage", "backend", "persistence"],
+      "constraints": [
+        "no redis",
+        "no postgres",
+        "no mongodb",
+        "no psycopg2",
+        "no sqlalchemy"
+      ],
+      "anti_patterns": [
+        "redis-py",
+        "psycopg2",
+        "mongoengine"
+      ],
+      "created_at": "2026-01-10",
+      "updated_at": "2026-01-10"
+    },
+    {
+      "id": "ADR-003",
+      "decision": "No ORM in v1. Direct module access against the JSON store.",
+      "rationale": "An ORM is operational complexity the v1 service does not justify. Direct module access keeps the storage abstraction one function-call wide.",
+      "scope": ["storage", "backend"],
+      "constraints": [
+        "no orm",
+        "no alembic",
+        "no prisma"
+      ],
+      "anti_patterns": [
+        "alembic",
+        "prisma"
+      ],
+      "created_at": "2026-01-15",
+      "updated_at": "2026-01-15"
+    }
+  ]
+}

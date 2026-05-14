@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Architecture — Mneme HQ</title>
+  <meta name="description" content="Technical deep dives into how Mneme works — the retrieval pipeline, decision memory, scoring mechanics, and the architectural choices behind deterministic governance." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/architecture/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Architecture — Mneme HQ" />
+  <meta property="og:description" content="Technical deep dives into how Mneme works — the retrieval pipeline, decision memory, scoring mechanics, and the architectural choices behind deterministic governance." />
+  <meta property="og:url" content="https://mnemehq.com/architecture/" />
+  <meta property="og:image" content="https://mnemehq.com/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Architecture — Mneme HQ" />
+  <meta name="twitter:description" content="Technical deep dives into how Mneme works — the retrieval pipeline, decision memory, and the architectural choices behind deterministic governance." />
+  <meta name="twitter:image" content="https://mnemehq.com/og.png" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #88889a;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .nav-hamburger {
+      display: none; background: none; border: 1px solid var(--border2); color: var(--text);
+      width: 40px; height: 40px; border-radius: 8px; cursor: pointer; padding: 0;
+      flex-shrink: 0; align-items: center; justify-content: center; flex-direction: column;
+      gap: 4px; transition: border-color 0.15s, background 0.15s;
+    }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span { display: block; width: 18px; height: 2px; background: currentColor; border-radius: 1px; transition: transform 0.25s ease, opacity 0.18s ease; transform-origin: center; }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    @media (max-width: 900px) {
+      html, body { overflow-x: hidden; }
+      body.menu-open { overflow: hidden; }
+      nav { position: relative; padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links {
+        display: flex !important; flex-direction: column; position: absolute;
+        top: 100%; left: 0; right: 0; gap: 0; background: rgba(12,12,13,0.98);
+        backdrop-filter: blur(12px); border-bottom: 1px solid var(--border);
+        padding: 0 1.25rem; z-index: 99; max-height: 0; overflow: hidden;
+        opacity: 0; visibility: hidden;
+        transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s;
+      }
+      .nav-links.open {
+        max-height: 80vh; opacity: 1; visibility: visible; padding: 0.5rem 1.25rem 1.25rem;
+        transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s;
+        overflow-y: auto;
+      }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.92rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+      .page-wrap { padding: 0 1.25rem 5rem; }
+    }
+
+    .page-wrap { max-width: 1080px; margin: 0 auto; padding: 0 2rem 6rem; }
+
+    .breadcrumb-nav { padding: 1.5rem 0 0.5rem; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.82rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .hero { padding: 4rem 0 3rem; max-width: 620px; }
+    .hero-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--teal); margin-bottom: 1.25rem; }
+    .hero h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2.2rem, 5vw, 3.25rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.12; margin-bottom: 1.25rem; }
+    .hero-desc { font-size: 1rem; color: var(--muted); line-height: 1.8; max-width: 520px; }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+    .section-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin: 3rem 0 1.25rem; }
+
+    .arch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1px; background: var(--border); border-radius: 12px; overflow: hidden; }
+    .arch-card { background: var(--surface); padding: 2rem 2rem 1.75rem; text-decoration: none; display: flex; flex-direction: column; gap: 0.6rem; transition: background 0.15s; }
+    .arch-card:hover { background: var(--surface2); }
+    .arch-card:hover .card-arrow { opacity: 1; transform: translateX(3px); }
+    .card-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal); }
+    .card-title { font-size: 1.1rem; font-weight: 600; color: var(--text); letter-spacing: -0.01em; line-height: 1.3; }
+    .card-desc { font-size: 0.84rem; color: var(--muted); line-height: 1.75; }
+    .card-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.25rem; }
+    .card-tag { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--border2); background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 0.2rem 0.5rem; }
+    .card-arrow { color: var(--teal); font-size: 0.85rem; opacity: 0.3; transition: opacity 0.15s, transform 0.15s; margin-top: auto; padding-top: 1rem; align-self: flex-end; }
+
+    /* Pipeline summary strip */
+    .pipeline-strip { margin: 3.5rem 0; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem 2rem; }
+    .pipeline-strip-label { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
+    .pipeline-stages { display: flex; flex-wrap: wrap; gap: 0; align-items: center; }
+    .pipeline-stage { display: flex; align-items: center; gap: 0; }
+    .stage-box { background: var(--surface2); border: 1px solid var(--border2); border-radius: 6px; padding: 0.5rem 0.9rem; font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--text); white-space: nowrap; }
+    .stage-box.highlight { border-color: var(--teal); color: var(--teal); }
+    .stage-arrow { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--border2); padding: 0 0.5rem; }
+    .pipeline-note { font-size: 0.79rem; color: var(--muted); margin-top: 1rem; line-height: 1.7; }
+    .pipeline-note strong { color: var(--text); font-weight: 500; }
+
+    /* Concepts cross-link */
+    .concepts-link { margin-top: 3.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem 2rem; display: flex; justify-content: space-between; align-items: center; gap: 2rem; flex-wrap: wrap; text-decoration: none; transition: background 0.15s, border-color 0.15s; }
+    .concepts-link:hover { background: var(--surface2); border-color: var(--border2); }
+    .concepts-link-text {}
+    .concepts-link-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem; }
+    .concepts-link-title { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 0.35rem; }
+    .concepts-link-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.65; }
+    .concepts-link-arrow { font-size: 1.1rem; color: var(--accent); opacity: 0.5; flex-shrink: 0; transition: opacity 0.15s, transform 0.15s; }
+    .concepts-link:hover .concepts-link-arrow { opacity: 1; transform: translateX(4px); }
+
+    .cta-block { margin-top: 2rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2.5rem; display: flex; justify-content: space-between; align-items: flex-end; gap: 2rem; flex-wrap: wrap; }
+    .cta-text h2 { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .cta-text p { font-size: 0.84rem; color: var(--muted); line-height: 1.7; max-width: 400px; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; white-space: nowrap; }
+    .btn-primary:hover { background: var(--accent-dim); }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Architecture", "item": "https://mnemehq.com/architecture/"}
+        ]
+      },
+      {
+        "@type": "CollectionPage",
+        "name": "Mneme HQ Architecture",
+        "description": "Technical deep dives into how Mneme works — the retrieval pipeline, decision memory, scoring mechanics, and the architectural choices behind deterministic governance.",
+        "url": "https://mnemehq.com/architecture/",
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/"},
+        "hasPart": [
+          {
+            "@type": "TechArticle",
+            "name": "How Retrieval Works",
+            "url": "https://mnemehq.com/architecture/how-retrieval-works/",
+            "description": "Five-stage pipeline deep dive — MemoryStore, DecisionRetriever, ContextBuilder, LLMAdapter, Evaluator. Deterministic keyword scoring with field weights, tag boost, top-K=3, and no embeddings."
+          },
+          {
+            "@type": "TechArticle",
+            "name": "Decision Memory vs. Documentation",
+            "url": "https://mnemehq.com/architecture/decision-memory-vs-documentation/",
+            "description": "The three-tier model (documentation, prompt memory, decision memory), schema comparison, precedence resolution mechanics, and the enforcement gap."
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/benchmark/">Benchmark</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<div class="page-wrap">
+  <nav aria-label="Breadcrumb" class="breadcrumb-nav">
+    <ol class="breadcrumb">
+      <li><a href="/">Home</a></li>
+      <li aria-current="page">Architecture</li>
+    </ol>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-eyebrow">Architecture</div>
+    <h1>How Mneme works, precisely</h1>
+    <p class="hero-desc">Technical deep dives into the pipeline — retrieval mechanics, scoring, decision memory, and the deliberate architectural choices behind deterministic governance. No embeddings, no ML, no approximations in the enforcement path.</p>
+  </header>
+
+  <hr style="border:none;border-top:1px solid var(--border);">
+
+  <div class="pipeline-strip">
+    <div class="pipeline-strip-label">Five-stage pipeline</div>
+    <div class="pipeline-stages">
+      <div class="pipeline-stage">
+        <div class="stage-box">MemoryStore</div>
+        <span class="stage-arrow">→</span>
+      </div>
+      <div class="pipeline-stage">
+        <div class="stage-box highlight">DecisionRetriever</div>
+        <span class="stage-arrow">→</span>
+      </div>
+      <div class="pipeline-stage">
+        <div class="stage-box">ContextBuilder</div>
+        <span class="stage-arrow">→</span>
+      </div>
+      <div class="pipeline-stage">
+        <div class="stage-box">LLMAdapter</div>
+        <span class="stage-arrow">→</span>
+      </div>
+      <div class="pipeline-stage">
+        <div class="stage-box highlight">Evaluator</div>
+      </div>
+    </div>
+    <p class="pipeline-note">Loads <strong>project_memory.json</strong> → scores decisions by field weights → injects top-K=3 into prompt → checks model output → emits <strong>PASS / FAIL / WEAK_RETRIEVAL</strong>. Same query, same corpus, same result every time.</p>
+  </div>
+
+  <div class="section-label">Deep dives</div>
+
+  <div class="arch-grid">
+    <a href="/architecture/how-retrieval-works/" class="arch-card">
+      <div class="card-eyebrow">Architecture · 12 min</div>
+      <div class="card-title">How Retrieval Works</div>
+      <p class="card-desc">The full DecisionRetriever walkthrough — tokenization, field weights (title×3.0, tags×2.5, constraint×1.5, content×1.0), tag boosting, top-K=3 selection, tie-break determinism, and why there are no embeddings. Includes Layer 1 vs. Layer 2 metric distinctions and WEAK_RETRIEVAL semantics.</p>
+      <div class="card-tags">
+        <span class="card-tag">retrieval</span>
+        <span class="card-tag">scoring</span>
+        <span class="card-tag">K=3</span>
+        <span class="card-tag">WEAK_RETRIEVAL</span>
+        <span class="card-tag">no embeddings</span>
+      </div>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="/architecture/decision-memory-vs-documentation/" class="arch-card">
+      <div class="card-eyebrow">Architecture · 10 min</div>
+      <div class="card-title">Decision Memory vs. Documentation</div>
+      <p class="card-desc">The three-tier model — documentation (prose, wikis, ADR bodies), prompt memory (CLAUDE.md, rules files, RAG injection), and decision memory (typed schema with scope, status, precedence, constraint fields). Why documentation retrieval ends in suggestion. Why decision memory enables enforcement.</p>
+      <div class="card-tags">
+        <span class="card-tag">decision memory</span>
+        <span class="card-tag">schema</span>
+        <span class="card-tag">precedence</span>
+        <span class="card-tag">ADR import</span>
+        <span class="card-tag">enforcement gap</span>
+      </div>
+      <span class="card-arrow">→</span>
+    </a>
+  </div>
+
+  <a href="/concepts/" class="concepts-link">
+    <div class="concepts-link-text">
+      <div class="concepts-link-eyebrow">Related</div>
+      <div class="concepts-link-title">Concepts — the terminology behind these architectural choices</div>
+      <p class="concepts-link-desc">Architectural Governance, Deterministic Enforcement, Architectural Compiler, Decision Continuity, and seven more. Systems-level explanations of why each concept exists in AI-native software delivery.</p>
+    </div>
+    <span class="concepts-link-arrow">→</span>
+  </a>
+
+  <div class="cta-block">
+    <div class="cta-text">
+      <h2>Read the source</h2>
+      <p>DecisionRetriever, MemoryStore, ContextBuilder, and the benchmark harness are all open source under MIT.</p>
+    </div>
+    <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub →</a>
+  </div>
+</div>
+</main>
+
+<footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+  <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/use-cases/" style="color:var(--muted);text-decoration:none;">Use cases</a></li>
+        <li><a href="/works-with/" style="color:var(--muted);text-decoration:none;">Works with</a></li>
+        <li><a href="/platforms/" style="color:var(--muted);text-decoration:none;">Platforms</a></li>
+        <li><a href="/integrations/" style="color:var(--muted);text-decoration:none;">Integrations</a></li>
+        <li><a href="/compare/" style="color:var(--muted);text-decoration:none;">Compare</a></li>
+        <li><a href="/demo/" style="color:var(--muted);text-decoration:none;">Demo</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/concepts/" style="color:var(--muted);text-decoration:none;">Concepts</a></li>
+        <li><a href="/architecture/" style="color:var(--muted);text-decoration:none;">Architecture</a></li>
+        <li><a href="/insights/" style="color:var(--muted);text-decoration:none;">Insights</a></li>
+        <li><a href="/standards/" style="color:var(--muted);text-decoration:none;">Standards</a></li>
+        <li><a href="/benchmark/" style="color:var(--muted);text-decoration:none;">Benchmark</a></li>
+        <li><a href="/docs/" style="color:var(--muted);text-decoration:none;">Docs</a></li>
+        <li><a href="/docs/cli/" style="color:var(--muted);text-decoration:none;">CLI reference</a></li>
+        <li><a href="/supported-languages/" style="color:var(--muted);text-decoration:none;">Supported languages</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/pilot/" style="color:var(--accent);text-decoration:none;">Request pilot</a></li>
+        <li><a href="/for/" style="color:var(--muted);text-decoration:none;">For teams</a></li>
+        <li><a href="/founder/" style="color:var(--muted);text-decoration:none;">Founder</a></li>
+        <li><a href="/about/" style="color:var(--muted);text-decoration:none;">About</a></li>
+        <li><a href="/roadmap/" style="color:var(--muted);text-decoration:none;">Roadmap</a></li>
+        <li><a href="/contact/" style="color:var(--muted);text-decoration:none;">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Code</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="https://github.com/TheoV823/mneme" style="color:var(--muted);text-decoration:none;">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener" style="color:var(--muted);text-decoration:none;">LinkedIn</a></li>
+        <li><a href="/privacy/" style="color:var(--muted);text-decoration:none;">Privacy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
+    <span style="display:inline-flex;align-items:center;gap:0.75rem;"><a href="/" aria-label="Mneme HQ home" style="display:inline-flex;opacity:0.75;"><img src="/favicon.png" alt="Mneme HQ" height="22" style="display:block;"></a><span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span></span>
+    <nav aria-label="Social media" style="display: flex; align-items: center; gap: 1rem;">
+      <a href="https://github.com/TheoV823/mneme" target="_blank" rel="noopener" aria-label="GitHub" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.16c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.27-1.69-1.27-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.34.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18.92-.26 1.91-.39 2.89-.39.98 0 1.97.13 2.89.39 2.2-1.49 3.17-1.18 3.17-1.18.62 1.58.23 2.75.12 3.04.73.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.26 5.68.41.35.78 1.05.78 2.12v3.15c0 .31.21.67.8.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener" aria-label="LinkedIn" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/@MnemeHQ" target="_blank" rel="noopener" aria-label="YouTube" style="color: var(--muted); display: inline-flex;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.12C19.55 3.5 12 3.5 12 3.5s-7.55 0-9.4.58A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.12c1.85.58 9.4.58 9.4.58s7.55 0 9.4-.58a3 3 0 0 0 2.1-2.12A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8zM9.6 15.57V8.43L15.82 12 9.6 15.57z"/></svg>
+      </a>
+    </nav>
+    <span>&copy; 2026</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  function setOpen(open){
+    links.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('menu-open', open);
+  }
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    setOpen(!links.classList.contains('open'));
+  });
+  document.addEventListener('click', function(e){
+    if (!links.classList.contains('open')) return;
+    if (links.contains(e.target) || btn.contains(e.target)) return;
+    setOpen(false);
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false);
+  });
+  links.addEventListener('click', function(e){
+    if (e.target.tagName === 'A') setOpen(false);
+  });
+  window.addEventListener('resize', function(){
+    if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false);
+  });
+})();
+</script>
+</body>
+</html>

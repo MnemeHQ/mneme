@@ -47,7 +47,8 @@
           {"@type": "WebPage", "name": "Claude Code", "url": "https://mnemehq.com/integrations/claude-code/"},
           {"@type": "WebPage", "name": "Cursor", "url": "https://mnemehq.com/integrations/cursor/"},
           {"@type": "WebPage", "name": "GitHub Actions", "url": "https://mnemehq.com/integrations/github-actions/"},
-          {"@type": "WebPage", "name": "ADR Import", "url": "https://mnemehq.com/integrations/adr-import/"}
+          {"@type": "WebPage", "name": "ADR Import", "url": "https://mnemehq.com/integrations/adr-import/"},
+          {"@type": "WebPage", "name": "Perplexity Enterprise", "url": "https://mnemehq.com/integrations/perplexity/"}
         ]
       }
     ]
@@ -224,7 +225,7 @@
   <h2 style="font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text); letter-spacing: -0.01em; margin: 0 auto 1rem; max-width: 660px;">Where Mneme fits in your AI coding stack</h2>
   <p class="hub-intro">Mneme HQ is the governance layer above your AI coding stack, not a replacement for the tools in it. Each integration connects Mneme's enforcement engine to a different point in your development workflow.</p>
 
-  <h2 style="font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 500; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; margin: 2.5rem auto 1rem; max-width: 900px;">Available integrations</h2>
+  <h2 style="font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 500; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; margin: 2.5rem auto 1rem; max-width: 900px;">AI coding stack integrations</h2>
 
   <div class="cards-grid">
 
@@ -329,6 +330,24 @@
 
   </div>
 
+  <h2 style="font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 500; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; margin: 3.5rem auto 0.6rem; max-width: 900px;">Research &amp; analysis assistants</h2>
+  <p style="font-size: 0.85rem; color: var(--muted); line-height: 1.8; max-width: 660px; margin: 0 auto 1.25rem;">These tools help engineering teams understand why a decision is right. Mneme preserves what must remain true after the decision is made. They sit at different stages of the decision cycle and work alongside each other.</p>
+
+  <div class="cards-grid" style="max-width: 900px; margin: 0 auto;">
+
+    <div class="compare-card">
+      <div class="card-meta">
+        <span class="card-tag">Works alongside</span>
+      </div>
+      <h3>Perplexity Enterprise</h3>
+      <p>Perplexity gives teams cited, up-to-date answers about technology choices. Mneme takes those choices and makes them enforceable — closing the gap between research rationale and governance constraint.</p>
+      <div class="card-footer">
+        <a href="/integrations/perplexity/" class="read-link">Learn more →</a>
+      </div>
+    </div>
+
+  </div>
+
   <h2 style="font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text); letter-spacing: -0.01em; margin: 4rem auto 1rem; max-width: 660px;">How the integrations fit together</h2>
 
   <p style="font-size: 0.88rem; color: var(--muted); line-height: 1.85; max-width: 660px; margin: 0 auto 1.1rem;">Mneme is the same decision corpus across every integration. The Claude Code hook intercepts <code style="font-family:'DM Mono',monospace;font-size:0.82em;">Edit</code>, <code style="font-family:'DM Mono',monospace;font-size:0.82em;">Write</code>, and <code style="font-family:'DM Mono',monospace;font-size:0.82em;">MultiEdit</code> at the editor layer; the Cursor rules export gives that same corpus to Cursor sessions; the GitHub Actions gate runs <code style="font-family:'DM Mono',monospace;font-size:0.82em;">mneme check</code> against every PR diff in CI. One <code style="font-family:'DM Mono',monospace;font-size:0.82em;">project_memory.json</code>, three enforcement points, no per-tool duplication.</p>
@@ -360,6 +379,8 @@
     <div>
       <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
       <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/concepts/">Concepts</a></li>
+        <li><a href="/architecture/">Architecture</a></li>
         <li><a href="/insights/">Insights</a></li>
         <li><a href="/standards/">Standards</a></li>
         <li><a href="/benchmark/">Benchmark</a></li>
@@ -391,7 +412,7 @@
     </div>
   </div>
   <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
-    <span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span>
+    <span style="display:inline-flex;align-items:center;gap:0.75rem;"><a href="/" aria-label="Mneme HQ home" style="display:inline-flex;opacity:0.75;"><img src="/favicon.png" alt="Mneme HQ" height="22" style="display:block;"></a><span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span></span>
     <nav aria-label="Social media" style="display: flex; align-items: center; gap: 1rem;">
       <a href="https://github.com/TheoV823/mneme" target="_blank" rel="noopener" aria-label="GitHub" style="color: var(--muted); display: inline-flex;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.16c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.27-1.69-1.27-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.34.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18.92-.26 1.91-.39 2.89-.39.98 0 1.97.13 2.89.39 2.2-1.49 3.17-1.18 3.17-1.18.62 1.58.23 2.75.12 3.04.73.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.26 5.68.41.35.78 1.05.78 2.12v3.15c0 .31.21.67.8.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>

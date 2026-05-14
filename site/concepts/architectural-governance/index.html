@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Architectural Governance — Mneme HQ Concepts</title>
+  <meta name="description" content="Architectural governance is the system that encodes team decisions as machine-evaluable constraints enforced at the point of AI code generation — before review, before drift compounds." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/concepts/architectural-governance/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Architectural Governance — Mneme HQ Concepts" />
+  <meta property="og:description" content="Architectural governance is the system that encodes team decisions as machine-evaluable constraints enforced at the point of AI code generation — before review, before drift compounds." />
+  <meta property="og:url" content="https://mnemehq.com/concepts/architectural-governance/" />
+  <meta property="og:image" content="https://mnemehq.com/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Architectural Governance — Mneme HQ Concepts" />
+  <meta name="twitter:description" content="Architectural governance is the system that encodes team decisions as machine-evaluable constraints enforced at the point of AI code generation — before review, before drift compounds." />
+  <meta name="twitter:image" content="https://mnemehq.com/og.png" />
+  <meta name="author" content="Theo Valmis" />
+  <meta property="article:published_time" content="2026-05-14T00:00:00Z" />
+  <meta property="article:author" content="https://mnemehq.com/founder/" />
+  <meta property="article:section" content="Concepts" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #88889a;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .article-wrap { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 7rem; }
+    .article-header { margin-bottom: 3.5rem; }
+    .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+
+    .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
+    .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .article-body h3 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--text); }
+    .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
+    .article-body p strong { color: var(--text); font-weight: 500; }
+    .article-body ul, .article-body ol { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body li { margin-bottom: 0.5rem; }
+    .article-body li strong { color: var(--text); font-weight: 500; }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout p strong { color: var(--accent); }
+
+    .callout-teal { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--teal); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout-teal p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout-teal p strong { color: var(--teal); }
+
+    .comparison-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.85rem; }
+    .comparison-table th { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border2); color: var(--muted); font-weight: 500; }
+    .comparison-table td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .comparison-table td:first-child { color: var(--muted); white-space: nowrap; }
+    .comparison-table td:nth-child(2) { color: var(--text); opacity: 0.5; }
+    .comparison-table td:nth-child(3) { color: var(--teal); }
+
+    .code-block { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.5rem; margin: 1.5rem 0; font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--muted); line-height: 1.7; overflow-x: auto; }
+    .code-block .comment { color: var(--border2); }
+    .code-block .key { color: var(--teal); }
+    .code-block .value { color: var(--accent); }
+    .code-block .str { color: #e8a87c; }
+    .code-block .num { color: #c8a0f0; }
+
+    .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .article-faq { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .article-faq h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 1.5rem; color: var(--text); }
+    .article-faq details { margin: 0.75rem 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .article-faq summary { padding: 1rem 1.25rem; cursor: pointer; font-size: 0.88rem; color: var(--text); background: var(--surface); list-style: none; }
+    .article-faq summary::-webkit-details-marker { display: none; }
+    .article-faq summary::before { content: '+ '; color: var(--accent); }
+    .article-faq details[open] summary::before { content: '− '; }
+    .article-faq details[open] summary { border-bottom: 1px solid var(--border); }
+    .article-faq .faq-body { padding: 1.25rem; font-size: 0.86rem; color: var(--muted); line-height: 1.85; }
+    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .back-link:hover { color: var(--text); }
+    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2rem; }
+    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--accent-dim); }
+
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    .answer-capsule { max-width: 820px; margin: 0 auto; padding: 1.5rem 2rem; background: var(--surface); border-bottom: 1px solid rgba(200,240,96,0.18); font-size: 0.88rem; color: var(--muted); line-height: 1.8; }
+    .answer-capsule strong { color: var(--accent); }
+
+    footer { border-top: 1px solid var(--border); padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .breadcrumb-nav { max-width: 720px; margin: 0 auto; padding: 1.75rem 2rem 0.85rem; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.82rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .nav-hamburger {
+      display: none;
+      background: none;
+      border: 1px solid var(--border2);
+      color: var(--text);
+      width: 40px; height: 40px;
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 0;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 4px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span { display: block; width: 18px; height: 2px; background: currentColor; border-radius: 1px; transition: transform 0.25s ease, opacity 0.18s ease; transform-origin: center; }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    @media (max-width: 900px) {
+      html, body { overflow-x: hidden; }
+      body.menu-open { overflow: hidden; }
+      nav { position: relative; padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links {
+        display: flex !important;
+        flex-direction: column;
+        position: absolute;
+        top: 100%; left: 0; right: 0;
+        gap: 0;
+        background: rgba(12,12,13,0.98);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: 0 1.25rem;
+        z-index: 99;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        visibility: hidden;
+        transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s;
+      }
+      .nav-links.open {
+        max-height: 80vh;
+        opacity: 1;
+        visibility: visible;
+        padding: 0.5rem 1.25rem 1.25rem;
+        transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s;
+        overflow-y: auto;
+      }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.92rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+      .article-wrap { padding: 3rem 1.25rem 5rem; }
+    }
+
+    h2#related-reading { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 400; margin-top: 3.5rem; margin-bottom: 0.75rem; }
+    h2#related-reading + ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    h2#related-reading + ul li { margin: 0; }
+    h2#related-reading + ul li a { display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.1rem; background: var(--surface); color: var(--text); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.15s, color 0.15s; }
+    h2#related-reading + ul li a::after { content: '\2192'; opacity: 0.35; transition: opacity 0.15s, transform 0.15s; display: inline-block; margin-left: 0.5rem; }
+    h2#related-reading + ul li a:hover { background: var(--surface2); color: var(--accent); }
+    h2#related-reading + ul li a:hover::after { opacity: 1; transform: translateX(3px); }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Concepts", "item": "https://mnemehq.com/concepts/"},
+          {"@type": "ListItem", "position": 3, "name": "Architectural Governance", "item": "https://mnemehq.com/concepts/architectural-governance/"}
+        ]
+      },
+      {
+        "@type": "TechArticle",
+        "headline": "Architectural Governance — Mneme HQ Concepts",
+        "description": "Architectural governance is the system that encodes team decisions as machine-evaluable constraints enforced at the point of AI code generation — before review, before drift compounds.",
+        "url": "https://mnemehq.com/concepts/architectural-governance/",
+        "datePublished": "2026-05-14",
+        "dateModified": "2026-05-14",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "image": "https://mnemehq.com/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/concepts/architectural-governance/",
+        "proficiencyLevel": "Expert",
+        "articleSection": "Concepts"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is architectural governance in AI coding?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Architectural governance in AI coding is the system that encodes team architectural decisions as machine-evaluable constraints and enforces those constraints before or at the moment of AI code generation — not after. It is distinct from code review, documentation, and conventions. It is an enforcement layer: the system that evaluates what an AI agent is about to write against the decisions the team has already made, and either shapes the agent's output or blocks the violation before it reaches review."}
+          },
+          {
+            "@type": "Question",
+            "name": "How is architectural governance different from code review?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Code review is a sample of AI output after it has been written. Architectural governance is the constraint layer that shapes what the AI proposes before it writes. When teams conflate the two, code review becomes the enforcement layer — but it can't scale linearly with AI output volume. Governance upstream of generation means the review layer receives architecturally coherent code, not a stream of violations that must be caught and corrected one PR at a time."}
+          },
+          {
+            "@type": "Question",
+            "name": "What does an architectural governance system enforce?",
+            "acceptedAnswer": {"@type": "Answer", "text": "An architectural governance system enforces machine-readable constraints derived from team decisions: which patterns are approved, which dependencies are permitted, which services can call which, which structural rules apply to which file paths. These constraints are encoded as decision records — not documentation, not style guides, but evaluable rules that a governance system can check against AI-generated code automatically."}
+          },
+          {
+            "@type": "Question",
+            "name": "Why can't prompt engineering substitute for architectural governance?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Prompt engineering shapes a single generation context. Architectural governance enforces constraints across every generation, every agent, every session — consistently and without requiring the human to re-specify constraints each time. Prompts are ephemeral; governance is persistent. Prompts can be overridden, misunderstood, or forgotten as context windows grow; governance constraints are structural and evaluated independently of what the user wrote in the prompt."}
+          },
+          {
+            "@type": "Question",
+            "name": "Where does architectural governance sit in the AI SDLC?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Architectural governance sits in the pre-generation layer — above the agent runtime (Claude Code, Cursor, Copilot) and below the human review layer. It is what the agent queries before writing, what the CI gate checks before merge, and what the hook fires before the agent's tool use completes. It is not part of the agent; it is the constraint layer the agent operates within."}
+          }
+        ]
+      },
+      {
+        "@type": "DefinedTerm",
+        "name": "Architectural Governance",
+        "description": "The system that encodes team architectural decisions as machine-evaluable constraints and enforces them before or at the moment of AI code generation.",
+        "inDefinedTermSet": {"@type": "DefinedTermSet", "name": "Mneme HQ Concepts", "url": "https://mnemehq.com/concepts/"},
+        "url": "https://mnemehq.com/concepts/architectural-governance/"
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/benchmark/">Benchmark</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<div class="answer-capsule">
+  <strong>Architectural governance for AI coding.</strong> The system that turns team decisions into machine-evaluable constraints, enforced before AI agents generate code — not reviewed after. Code review is a governance signal; architectural governance is the enforcement layer that makes code review tractable.
+</div>
+
+<nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/concepts/">Concepts</a></li>
+    <li aria-current="page">Architectural Governance</li>
+  </ol>
+</nav>
+
+<article class="article-wrap">
+  <header class="article-header">
+    <div class="article-eyebrow">
+      <span class="eyebrow-tag">Concepts</span>
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-meta">12 min read &nbsp;·&nbsp; May 2026</span>
+    </div>
+    <h1>Architectural Governance</h1>
+    <p class="article-lede">AI coding agents generate code faster than human review can keep pace with. Architectural governance is the structural answer to that mismatch — not a process improvement, not a cultural norm, but an enforcement layer that sits above the agent and below the reviewer.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-14">Published May 2026</time>
+    </p>
+  </header>
+
+  <div class="article-body">
+
+    <p>The term gets borrowed from traditional software engineering, where it tends to mean committees, documentation, and periodic architectural reviews. That meaning is not what matters here. In the context of AI-native development, <strong>architectural governance</strong> names a structural problem: how do you ensure that code generated by AI agents at high velocity remains consistent with the decisions your team has made — without building a review process that collapses under its own weight?</p>
+
+    <p>That is the problem this page is about. Not the term — the problem it names.</p>
+
+    <h2>What architectural governance actually means</h2>
+
+    <p>Governance is not review. It is not documentation. It is not a set of conventions your team maintains in a Confluence page or a style guide. These are all proxies for governance — they encode intent, but they don't enforce it.</p>
+
+    <p><strong>Architectural governance, properly construed, is the system that evaluates AI-generated code against machine-readable constraints before that code reaches human review.</strong> The key word is "before." Enforcement before generation changes what gets written. Enforcement after generation (code review, CI linting, PR checklists) catches what was already written. These produce fundamentally different outcomes at scale.</p>
+
+    <p>The distinction matters structurally, not just philosophically. When you enforce architectural constraints before code is generated, the AI agent receives the constraint as context and produces code shaped by it. When you enforce after generation, the AI agent produces code based on its training, the prompt, and whatever context it was given — and a human then reviews whether the result is acceptable. The review is a gate. The pre-generation enforcement is a shaping force.</p>
+
+    <div class="callout">
+      <p><strong>Governance is the enforcement layer, not the enforcement event.</strong> A single code review is an enforcement event. A governance system is the layer that determines what code reaches review in the first place — and what constraints were already applied before it got there.</p>
+    </div>
+
+    <p>A governance system in this sense has specific components: decision records (the encoded constraints), a retrieval mechanism (which decisions apply to the current code context), an injection layer (delivering those decisions to the agent before generation), and a verification layer (checking that the output respects the injected constraints). These are not metaphors — they are engineering components with specific responsibilities.</p>
+
+    <h2>Why this problem exists in AI-native development</h2>
+
+    <p>The governance problem is not new. Teams have always needed to maintain architectural coherence as codebases grow and teams scale. What changed is the generation rate.</p>
+
+    <p>A human engineer generates code at a pace that code review can track, roughly linearly. Add one more engineer, add roughly one more PR author. The review load scales with team size. Organizational norms, architectural reviews, and design documentation have historically been sufficient to keep architectural coherence intact at that scale.</p>
+
+    <p>AI coding agents break that linear relationship. A single engineer working with an AI agent can generate the equivalent of many human-paced PRs per day. Across a team, the total generation rate can be 10x to 100x what the same team would produce without AI assistance. Code review is still a linear human process. The ratio between generation rate and review capacity has inverted.</p>
+
+    <div style="overflow-x:auto;margin:2rem 0;">
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>Factor</th>
+          <th>Human-paced development</th>
+          <th>AI-assisted development</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Generation rate</td>
+          <td>Linear with team size</td>
+          <td>10–100x per engineer</td>
+        </tr>
+        <tr>
+          <td>Review capacity</td>
+          <td>Linear with team size</td>
+          <td>Linear with team size (unchanged)</td>
+        </tr>
+        <tr>
+          <td>Bottleneck</td>
+          <td>Generation</td>
+          <td>Governance and review</td>
+        </tr>
+        <tr>
+          <td>Drift risk</td>
+          <td>Low — violations are infrequent</td>
+          <td>High — violations compound faster than review catches</td>
+        </tr>
+        <tr>
+          <td>Governance approach</td>
+          <td>Documentation + periodic review</td>
+          <td>Machine-evaluable enforcement upstream</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>When generation rate exceeds review capacity by an order of magnitude, governance-by-review fails. The review queue becomes the bottleneck, but — more importantly — it becomes a sampling mechanism, not a comprehensive gate. Reviewers see a fraction of AI output. Violations that slip through are not anomalies; they are expected outcomes of any process that relies on human review to catch machine-speed output.</p>
+
+    <p>Architectural governance is the structural answer to this. Not a faster review process. Not a larger review team. A constraint layer that operates at generation speed, shapes what the agent proposes, and makes the review layer tractable by reducing the violation rate before review occurs.</p>
+
+    <h2>The common misread: treating code review as governance</h2>
+
+    <p>The most common failure mode teams fall into without a clear understanding of architectural governance is treating code review as the governance layer. The reasoning is intuitive: code review catches violations, code review is mandatory, therefore code review is governance. This is the misread.</p>
+
+    <p>Code review is a <em>sample</em> of AI output. Even a 100% PR-review policy means every PR is reviewed — it does not mean every architectural decision the AI made within that PR was evaluated against the team's constraints. A PR can pass code review and still contain architectural violations that reviewers didn't catch, didn't know to look for, or deprioritized under time pressure.</p>
+
+    <p>More fundamentally: code review happens after the AI has already made architectural choices. Which patterns to use. Which services to call. Which dependencies to introduce. Which abstractions to build on. By the time the PR is open, those choices are already committed — and reversing them is costly. Review can block the merge, but it cannot undo the architectural commitments already embedded in the diff.</p>
+
+    <div class="callout-teal">
+      <p><strong>When teams conflate code review with architectural governance,</strong> the review queue fills with architectural violations that should never have been generated. Reviewers spend their attention on structural problems the AI created, rather than on the logic and product decisions that require human judgment. The cognitive load of governance crowds out the cognitive load of review.</p>
+    </div>
+
+    <p>The correct model is: governance shapes what the agent generates; review evaluates whether the result is correct within the space governance defines. These are different problems, and conflating them overloads review with responsibilities it cannot efficiently carry at AI generation speeds.</p>
+
+    <h2>How this fits the AI SDLC</h2>
+
+    <p>Architectural governance sits at a specific layer in the AI software development lifecycle. Understanding where it lives — and what it does not do — is necessary for implementing it correctly.</p>
+
+    <p>The AI SDLC has a layered structure. At the foundation: the foundation models that generate code. Above that: the context and retrieval systems that shape what those models see. Above that: the agent runtime — Claude Code, Cursor, Copilot, or equivalent. Above that: the tooling and execution layer where the agent reads files, runs tests, calls APIs. Above that: the <strong>governance and architectural control layer</strong>. Above that: validation and evaluation. Above that: human oversight.</p>
+
+    <p>Governance sits at layer 5 — above agent execution, below human review. In practice, that means:</p>
+
+    <ul>
+      <li><strong>Pre-generation hooks:</strong> The governance system intercepts the agent's tool-use intent before execution. In Claude Code, this is the pre-tool-use hook. In Cursor, this is rules injection before generation. The hook surfaces the relevant decision records to the agent's context before it writes.</li>
+      <li><strong>CI gates:</strong> The governance system runs as a CI step, evaluating generated code against encoded constraints before merge. This is post-generation enforcement, but it is pre-production — a merge gate rather than a review proxy.</li>
+      <li><strong>Decision memory:</strong> The governance layer requires a persistent, structured record of architectural decisions — not documentation, not ADRs as prose, but machine-readable decision records that the retrieval system can score and inject. The memory is the source of truth for constraints.</li>
+    </ul>
+
+    <p>What governance does not do: it does not evaluate correctness, performance, or product logic. It evaluates architectural coherence — whether the code is consistent with the decisions the team has made. Correctness and logic remain in the review layer, where human judgment is appropriate and irreplaceable.</p>
+
+    <div class="callout">
+      <p><strong>The governance layer is what the agent queries before writing and what the CI gate checks before merge.</strong> It is not a wrapper around the agent, a prompt, or a linting rule. It is a structural layer with its own components, its own metrics, and its own failure modes — and it requires engineering investment proportional to the AI generation rate it governs.</p>
+    </div>
+
+    <p>Teams that invest in a governance layer before scaling AI-assisted development report two consistent outcomes: review queue depth decreases (fewer violations reaching review), and architectural coherence is maintained at generation volumes that would otherwise produce visible drift within weeks. Teams that skip the governance layer and rely on review consistently report the opposite: review becomes the bottleneck, reviewers flag the same classes of violations repeatedly, and architectural standards erode as the team prioritizes shipping over correction.</p>
+
+    <p>The investment in governance infrastructure pays off not as a process improvement but as a structural multiplier: it is what makes the rest of the AI-native SDLC tractable.</p>
+
+    <h2>Related concepts</h2>
+
+    <p>Architectural governance does not operate in isolation. Three concepts are structurally adjacent and together form the full picture of how governance works in an AI-native codebase:</p>
+
+    <ul>
+      <li><strong>Governance before generation</strong> — the principle that enforcement must happen upstream of the AI's output, not downstream. Governance before generation is the specific enforcement posture that makes architectural governance effective at AI generation speeds.</li>
+      <li><strong>Deterministic enforcement</strong> — the property that the same query against the same decision corpus always produces the same enforcement result. Without determinism, governance is probabilistic and therefore unauditable.</li>
+      <li><strong>Architectural drift</strong> — what happens in the absence of governance. Drift is compound degradation: violations that propagate and amplify across sessions, agents, and services. Governance prevents drift by enforcing constraints consistently before violations compound.</li>
+    </ul>
+
+  </div>
+
+  <section class="article-faq">
+    <h2>Frequently asked questions</h2>
+    <details>
+      <summary>What is architectural governance in AI coding?</summary>
+      <div class="faq-body">Architectural governance in AI coding is the system that encodes team architectural decisions as machine-evaluable constraints and enforces those constraints before or at the moment of AI code generation — not after. It is distinct from code review, documentation, and conventions. It is an enforcement layer: the system that evaluates what an AI agent is about to write against the decisions the team has already made, and either shapes the agent's output or blocks the violation before it reaches review.</div>
+    </details>
+    <details>
+      <summary>How is architectural governance different from code review?</summary>
+      <div class="faq-body">Code review is a sample of AI output after it has been written. Architectural governance is the constraint layer that shapes what the AI proposes before it writes. When teams conflate the two, code review becomes the enforcement layer — but it can't scale linearly with AI output volume. Governance upstream of generation means the review layer receives architecturally coherent code, not a stream of violations that must be caught and corrected one PR at a time.</div>
+    </details>
+    <details>
+      <summary>What does an architectural governance system enforce?</summary>
+      <div class="faq-body">An architectural governance system enforces machine-readable constraints derived from team decisions: which patterns are approved, which dependencies are permitted, which services can call which, which structural rules apply to which file paths. These constraints are encoded as decision records — not documentation, not style guides, but evaluable rules that a governance system can check against AI-generated code automatically and consistently across every agent and every session.</div>
+    </details>
+    <details>
+      <summary>Why can't prompt engineering substitute for architectural governance?</summary>
+      <div class="faq-body">Prompt engineering shapes a single generation context. Architectural governance enforces constraints across every generation, every agent, every session — consistently and without requiring the human to re-specify constraints each time. Prompts are ephemeral; governance is persistent. Prompts can be overridden, misunderstood, or forgotten as context windows grow; governance constraints are structural and evaluated independently of what the user wrote in the prompt. Prompt engineering is a tool for a single interaction; governance is an infrastructure layer for the codebase over time.</div>
+    </details>
+    <details>
+      <summary>Where does architectural governance sit in the AI SDLC?</summary>
+      <div class="faq-body">Architectural governance sits in the pre-generation layer — above the agent runtime (Claude Code, Cursor, Copilot) and below the human review layer. It is what the agent queries before writing, what the CI gate checks before merge, and what the hook fires before the agent's tool use completes. It is not part of the agent; it is the constraint layer the agent operates within. In practice, this means pre-tool-use hooks in the agent runtime, CI enforcement gates, and a persistent decision memory that the governance system queries to determine which constraints apply to the current file and task.</div>
+    </details>
+  </section>
+
+  <h2 id="related-reading">Related reading</h2>
+  <ul>
+    <li><a href="/concepts/governance-before-generation/">Governance Before Generation</a></li>
+    <li><a href="/concepts/deterministic-enforcement/">Deterministic Enforcement</a></li>
+    <li><a href="/insights/why-rag-fails-for-architectural-governance/">Why RAG Fails for Architectural Governance</a></li>
+  </ul>
+
+  <footer class="article-footer">
+    <a href="/concepts/" class="back-link">← Back to Concepts</a>
+
+    <div class="cta-block">
+      <h3>See governance enforcement in action</h3>
+      <p>The Mneme demo shows architectural governance running against live AI generation — hook interception, decision retrieval, and enforcement verdicts in real time.</p>
+      <a href="/demo/" class="btn-primary">View the demo →</a>
+    </div>
+  </footer>
+</article>
+</main>
+
+<footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+  <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/use-cases/">Use cases</a></li>
+        <li><a href="/works-with/">Works with</a></li>
+        <li><a href="/platforms/">Platforms</a></li>
+        <li><a href="/integrations/">Integrations</a></li>
+        <li><a href="/compare/">Compare</a></li>
+        <li><a href="/demo/">Demo</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/insights/">Insights</a></li>
+        <li><a href="/standards/">Standards</a></li>
+        <li><a href="/benchmark/">Benchmark</a></li>
+        <li><a href="/docs/">Docs</a></li>
+        <li><a href="/docs/cli/">CLI reference</a></li>
+        <li><a href="/docs/governance-violations/">Governance violations</a></li>
+        <li><a href="/supported-languages/">Supported languages</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/pilot/" style="color:var(--accent);">Request pilot</a></li>
+        <li><a href="/for/">For teams</a></li>
+        <li><a href="/founder/">Founder</a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/roadmap/">Roadmap</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Code</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="https://github.com/TheoV823/mneme">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="/privacy/">Privacy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
+    <span style="display:inline-flex;align-items:center;gap:0.75rem;"><a href="/" aria-label="Mneme HQ home" style="display:inline-flex;opacity:0.75;"><img src="/favicon.png" alt="Mneme HQ" height="22" style="display:block;"></a><span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span></span>
+    <nav aria-label="Social media" style="display: flex; align-items: center; gap: 1rem;">
+      <a href="https://github.com/TheoV823/mneme" target="_blank" rel="noopener" aria-label="GitHub" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.16c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.27-1.69-1.27-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.34.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18.92-.26 1.91-.39 2.89-.39.98 0 1.97.13 2.89.39 2.2-1.49 3.17-1.18 3.17-1.18.62 1.58.23 2.75.12 3.04.73.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.26 5.68.41.35.78 1.05.78 2.12v3.15c0 .31.21.67.8.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener" aria-label="LinkedIn" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/@MnemeHQ" target="_blank" rel="noopener" aria-label="YouTube" style="color: var(--muted); display: inline-flex;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.12C19.55 3.5 12 3.5 12 3.5s-7.55 0-9.4.58A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.12c1.85.58 9.4.58 9.4.58s7.55 0 9.4-.58a3 3 0 0 0 2.1-2.12A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8zM9.6 15.57V8.43L15.82 12 9.6 15.57z"/></svg>
+      </a>
+    </nav>
+    <span>&copy; 2026</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  function setOpen(open){
+    links.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('menu-open', open);
+  }
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    setOpen(!links.classList.contains('open'));
+  });
+  document.addEventListener('click', function(e){
+    if (!links.classList.contains('open')) return;
+    if (links.contains(e.target) || btn.contains(e.target)) return;
+    setOpen(false);
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false);
+  });
+  links.addEventListener('click', function(e){
+    if (e.target.tagName === 'A') setOpen(false);
+  });
+  window.addEventListener('resize', function(){
+    if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false);
+  });
+})();
+</script>
+</body>
+</html>

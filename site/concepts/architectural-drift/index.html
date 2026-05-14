@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Architectural Drift — Mneme HQ Concepts</title>
+  <meta name="description" content="Architectural drift is the compound degradation in codebase coherence caused by AI agents producing code inconsistent with established decisions, uncorrected across sessions and agents." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/concepts/architectural-drift/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Architectural Drift — Mneme HQ Concepts" />
+  <meta property="og:description" content="Architectural drift is the compound degradation in codebase coherence caused by AI agents producing code inconsistent with established decisions, uncorrected across sessions and agents." />
+  <meta property="og:url" content="https://mnemehq.com/concepts/architectural-drift/" />
+  <meta property="og:image" content="https://mnemehq.com/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Architectural Drift — Mneme HQ Concepts" />
+  <meta name="twitter:description" content="Architectural drift is the compound degradation in codebase coherence caused by AI agents producing code inconsistent with established decisions, uncorrected across sessions and agents." />
+  <meta name="twitter:image" content="https://mnemehq.com/og.png" />
+  <meta name="author" content="Theo Valmis" />
+  <meta property="article:published_time" content="2026-05-14T00:00:00Z" />
+  <meta property="article:author" content="https://mnemehq.com/founder/" />
+  <meta property="article:section" content="Concepts" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #88889a;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .article-wrap { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 7rem; }
+    .article-header { margin-bottom: 3.5rem; }
+    .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+
+    .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
+    .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .article-body h3 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--text); }
+    .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
+    .article-body p strong { color: var(--text); font-weight: 500; }
+    .article-body ul, .article-body ol { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body li { margin-bottom: 0.5rem; }
+    .article-body li strong { color: var(--text); font-weight: 500; }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout p strong { color: var(--accent); }
+
+    .callout-teal { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--teal); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout-teal p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout-teal p strong { color: var(--teal); }
+
+    .comparison-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.85rem; }
+    .comparison-table th { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border2); color: var(--muted); font-weight: 500; }
+    .comparison-table td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .comparison-table td:first-child { color: var(--muted); white-space: nowrap; }
+    .comparison-table td:nth-child(2) { color: var(--text); opacity: 0.5; }
+    .comparison-table td:nth-child(3) { color: var(--teal); }
+
+    .drift-timeline { display: flex; flex-direction: column; gap: 0; margin: 2.5rem 0; position: relative; }
+    .drift-timeline::before { content: ''; position: absolute; left: 2.25rem; top: 2rem; bottom: 2rem; width: 1px; background: var(--border2); }
+    .drift-day { display: flex; gap: 1.25rem; align-items: flex-start; padding: 1.25rem 0; }
+    .drift-day-marker { flex-shrink: 0; width: 4.5rem; display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
+    .drift-day-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--muted); letter-spacing: 0.06em; }
+    .drift-day-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border2); border: 2px solid var(--border2); flex-shrink: 0; }
+    .drift-day-dot.dot-warn { background: #e8a87c; border-color: #e8a87c; }
+    .drift-day-dot.dot-danger { background: #e87c7c; border-color: #e87c7c; }
+    .drift-day-dot.dot-critical { background: #c8505a; border-color: #c8505a; }
+    .drift-day-content { flex: 1; padding-top: 0.1rem; }
+    .drift-day-content strong { font-size: 0.85rem; color: var(--text); font-weight: 500; display: block; margin-bottom: 0.3rem; }
+    .drift-day-content span { font-size: 0.8rem; color: var(--muted); }
+
+    .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .article-faq { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .article-faq h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 1.5rem; color: var(--text); }
+    .article-faq details { margin: 0.75rem 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .article-faq summary { padding: 1rem 1.25rem; cursor: pointer; font-size: 0.88rem; color: var(--text); background: var(--surface); list-style: none; }
+    .article-faq summary::-webkit-details-marker { display: none; }
+    .article-faq summary::before { content: '+ '; color: var(--accent); }
+    .article-faq details[open] summary::before { content: '− '; }
+    .article-faq details[open] summary { border-bottom: 1px solid var(--border); }
+    .article-faq .faq-body { padding: 1.25rem; font-size: 0.86rem; color: var(--muted); line-height: 1.85; }
+    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .back-link:hover { color: var(--text); }
+    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2rem; }
+    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--accent-dim); }
+
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    .answer-capsule { max-width: 820px; margin: 0 auto; padding: 1.5rem 2rem; background: var(--surface); border-bottom: 1px solid rgba(200,240,96,0.18); font-size: 0.88rem; color: var(--muted); line-height: 1.8; }
+    .answer-capsule strong { color: var(--accent); }
+
+    footer { border-top: 1px solid var(--border); padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .breadcrumb-nav { max-width: 720px; margin: 0 auto; padding: 1.75rem 2rem 0.85rem; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.82rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .nav-hamburger {
+      display: none;
+      background: none;
+      border: 1px solid var(--border2);
+      color: var(--text);
+      width: 40px; height: 40px;
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 0;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 4px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span { display: block; width: 18px; height: 2px; background: currentColor; border-radius: 1px; transition: transform 0.25s ease, opacity 0.18s ease; transform-origin: center; }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    @media (max-width: 900px) {
+      html, body { overflow-x: hidden; }
+      body.menu-open { overflow: hidden; }
+      nav { position: relative; padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links {
+        display: flex !important;
+        flex-direction: column;
+        position: absolute;
+        top: 100%; left: 0; right: 0;
+        gap: 0;
+        background: rgba(12,12,13,0.98);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: 0 1.25rem;
+        z-index: 99;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        visibility: hidden;
+        transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s;
+      }
+      .nav-links.open {
+        max-height: 80vh;
+        opacity: 1;
+        visibility: visible;
+        padding: 0.5rem 1.25rem 1.25rem;
+        transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s;
+        overflow-y: auto;
+      }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.92rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+      .article-wrap { padding: 3rem 1.25rem 5rem; }
+    }
+
+    h2#related-reading { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 400; margin-top: 3.5rem; margin-bottom: 0.75rem; }
+    h2#related-reading + ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    h2#related-reading + ul li { margin: 0; }
+    h2#related-reading + ul li a { display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.1rem; background: var(--surface); color: var(--text); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.15s, color 0.15s; }
+    h2#related-reading + ul li a::after { content: '\2192'; opacity: 0.35; transition: opacity 0.15s, transform 0.15s; display: inline-block; margin-left: 0.5rem; }
+    h2#related-reading + ul li a:hover { background: var(--surface2); color: var(--accent); }
+    h2#related-reading + ul li a:hover::after { opacity: 1; transform: translateX(3px); }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Concepts", "item": "https://mnemehq.com/concepts/"},
+          {"@type": "ListItem", "position": 3, "name": "Architectural Drift", "item": "https://mnemehq.com/concepts/architectural-drift/"}
+        ]
+      },
+      {
+        "@type": "TechArticle",
+        "headline": "Architectural Drift — Mneme HQ Concepts",
+        "description": "Architectural drift is the compound degradation in codebase coherence caused by AI agents producing code inconsistent with established decisions, uncorrected across sessions and agents.",
+        "url": "https://mnemehq.com/concepts/architectural-drift/",
+        "datePublished": "2026-05-14",
+        "dateModified": "2026-05-14",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "image": "https://mnemehq.com/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/concepts/architectural-drift/",
+        "proficiencyLevel": "Expert",
+        "articleSection": "Concepts"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is architectural drift in AI-assisted development?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Architectural drift is the compound degradation in codebase coherence that results from AI agents producing code inconsistent with established architectural decisions, uncorrected across sessions, across agents, and across time. It is not the accumulation of individual violations — it is the structural divergence between what the codebase is doing and what architectural decisions say it should do, growing over time. Drift is a system-level property; violations are per-PR events. Drift is what happens when violations propagate uncorrected and become precedent for downstream generation."}
+          },
+          {
+            "@type": "Question",
+            "name": "Why is architectural drift a compound problem?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Architectural drift is compound because AI agents use the existing codebase as context for future generation. When a violation reaches the codebase uncorrected, downstream agents encounter it and may treat it as the established pattern — building on it rather than against it. The violation propagates and amplifies. Drift is not the sum of violations; it is the structural divergence that grows as violations become embedded in patterns that subsequent generations follow. Compounding is what makes drift categorically different from a per-PR problem."}
+          },
+          {
+            "@type": "Question",
+            "name": "How does AI coding accelerate architectural drift?",
+            "acceptedAnswer": {"@type": "Answer", "text": "AI agents generate code at rates that can outpace human review by orders of magnitude. An agent producing 10 PRs per day across 5 services can introduce drift that would take a team a week of focused review to identify — by which point downstream agents have already built on the drifted patterns. The acceleration is not just in violation introduction rate; it's in propagation speed. AI agents propagate drifted patterns faster than humans can identify and correct them, unless governance is enforced before generation."}
+          },
+          {
+            "@type": "Question",
+            "name": "What's the difference between a violation and drift?",
+            "acceptedAnswer": {"@type": "Answer", "text": "A violation is a per-PR event: one instance of code that doesn't conform to an architectural decision. Drift is a system-level property: the structural distance between what the codebase is and what architectural decisions say it should be, accumulating over time. A single violation caught in review is an incident. The same violation type appearing across 15 PRs over two weeks, propagating into downstream services because agents treated the first occurrence as precedent — that is drift. Individual incidents are manageable; drift requires architectural remediation."}
+          },
+          {
+            "@type": "Question",
+            "name": "How does governance before generation prevent architectural drift?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Governance before generation prevents architectural drift by addressing it at the source: the first violation never occurs. When architectural constraints are injected before the AI writes, the agent produces code consistent with decisions — the drifted pattern never enters the codebase, so downstream agents never encounter it as precedent. If a constraint is not injected and a violation does occur, CI enforcement catches it before merge — preventing propagation. Drift requires violations to propagate uncorrected; governance before generation breaks the propagation mechanism at both points."}
+          }
+        ]
+      },
+      {
+        "@type": "DefinedTerm",
+        "name": "Architectural Drift",
+        "description": "Compound degradation in codebase coherence caused by AI agents producing code inconsistent with established architectural decisions, propagating uncorrected across sessions and agents.",
+        "inDefinedTermSet": {"@type": "DefinedTermSet", "name": "Mneme HQ Concepts", "url": "https://mnemehq.com/concepts/"},
+        "url": "https://mnemehq.com/concepts/architectural-drift/"
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/benchmark/">Benchmark</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<div class="answer-capsule">
+  <strong>Architectural drift.</strong> The compound degradation in codebase coherence that results from AI agents producing code inconsistent with established decisions — uncorrected across sessions, across agents, across time. Drift is not a per-PR problem. It is a system-level property that compounds.
+</div>
+
+<nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/concepts/">Concepts</a></li>
+    <li aria-current="page">Architectural Drift</li>
+  </ol>
+</nav>
+
+<article class="article-wrap">
+  <header class="article-header">
+    <div class="article-eyebrow">
+      <span class="eyebrow-tag">Concepts</span>
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-meta">12 min read &nbsp;·&nbsp; May 2026</span>
+    </div>
+    <h1>Architectural Drift</h1>
+    <p class="article-lede">A single architectural violation in a PR is a mistake. The same violation in every PR across ten agents over two weeks is architectural drift. The distinction between incident and compound system failure is what separates individual code review from architectural governance.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-14">Published May 2026</time>
+    </p>
+  </header>
+
+  <div class="article-body">
+
+    <p>Software teams have always accumulated technical debt. Some of that debt is architectural — divergence between what the codebase is doing and what architectural decisions say it should do. In human-paced development, this divergence accumulates slowly enough that periodic architectural reviews, refactoring sprints, and team norms can keep it in check. It is a chronic problem, not an acute one.</p>
+
+    <p>AI agents changed the accumulation rate. What previously took months to drift now takes days. The mechanisms that kept drift in check at human generation speed are insufficient at AI generation speed. <strong>Architectural drift</strong> is the name for this compound failure mode: not individual violations, but the structural divergence that grows as violations propagate and become precedent for downstream generation.</p>
+
+    <h2>What architectural drift actually means</h2>
+
+    <p>Drift is compound, not additive. This distinction is the structural core of the concept and the reason it requires a different response than per-PR violation management.</p>
+
+    <p>When a violation is additive — a linting error, a style inconsistency — it exists in isolation. Fixing it closes the issue. The violation does not interact with other parts of the system. Additive violations are managed by review queues and linters; they don't compound.</p>
+
+    <p>When a violation is compound, it propagates. In an AI-assisted codebase, the propagation mechanism is the agent's context window. AI agents generate code based on what they see in the codebase: existing patterns, existing file structures, existing abstractions. When a violation enters the codebase and is not corrected, downstream agents encounter it as existing code. They learn from it as a pattern. They replicate it. They build on it. The violation becomes the new floor from which subsequent violations diverge further.</p>
+
+    <div class="callout">
+      <p><strong>Drift is the structural divergence between what the codebase is doing and what architectural decisions say it should do, growing over time.</strong> The accumulation of violations is the symptom. The underlying problem is that each uncorrected violation expands the space from which the next violation can emerge — compounding the distance between the actual codebase and the intended architecture.</p>
+    </div>
+
+    <p>A codebase that has drifted is not just a codebase with many violations. It is a codebase where the violations have become embedded in patterns, where those patterns have been treated as precedent, and where correcting the drift requires not just fixing individual violations but restoring the structural coherence that the violations eroded. That is categorically more expensive than catching the first violation.</p>
+
+    <h2>Why this problem exists in AI-native development</h2>
+
+    <p>Architectural drift has always existed. The AI-native dimension of the problem is the acceleration: violations are introduced faster, they propagate faster, and the detection lag between introduction and remediation widens at AI generation speeds.</p>
+
+    <p>Consider the timeline. A human developer introduces an architectural violation — uses a deprecated pattern, calls a service outside its permitted boundary, introduces an unapproved dependency. That violation reaches code review within hours or days. The reviewer catches it, or doesn't. If caught, it's corrected before merge. If missed, it reaches the codebase — but the next human developer who works in that area will encounter it at human speed: they might read the code carefully, notice the pattern, and question it in a future PR or design discussion.</p>
+
+    <p>An AI agent introduces the same violation. The agent produces 10 PRs per day. Some are reviewed carefully; under time pressure, others receive lighter scrutiny. The violation reaches the codebase. The next agent that works in that area encounters the pattern during its context window loading — not at human reading speed, but as part of its immediate generation context. It treats the pattern as established. It replicates it in the next file, the next service, the next PR. By the time a human notices the pattern, it has appeared in 15 PRs across 4 services over 10 days.</p>
+
+    <p>That is the acceleration. The introduction rate and propagation rate are both higher. The detection rate is not — it is bounded by human review capacity, which has not changed.</p>
+
+    <div class="drift-timeline">
+      <div class="drift-day">
+        <div class="drift-day-marker">
+          <div class="drift-day-label">Day 1</div>
+          <div class="drift-day-dot dot-warn"></div>
+        </div>
+        <div class="drift-day-content">
+          <strong>Violation introduced by agent A</strong>
+          <span>Agent A uses a deprecated service client in payments/handler.py. PR passes review under time pressure. Violation reaches production.</span>
+        </div>
+      </div>
+      <div class="drift-day">
+        <div class="drift-day-marker">
+          <div class="drift-day-label">Day 2</div>
+          <div class="drift-day-dot dot-warn"></div>
+        </div>
+        <div class="drift-day-content">
+          <strong>Agent B builds on the drifted pattern</strong>
+          <span>Agent B reads payments/handler.py as context for a new payments/refunds.py task. It uses the same deprecated client — treating it as the established pattern for this service.</span>
+        </div>
+      </div>
+      <div class="drift-day">
+        <div class="drift-day-marker">
+          <div class="drift-day-label">Day 5</div>
+          <div class="drift-day-dot dot-danger"></div>
+        </div>
+        <div class="drift-day-content">
+          <strong>Drift compounds across 3 services</strong>
+          <span>Agents C and D, working on subscriptions and invoicing services that integrate with payments, encounter the same deprecated client pattern in their context. Both replicate it. The pattern is now embedded in 3 services, 8 files.</span>
+        </div>
+      </div>
+      <div class="drift-day">
+        <div class="drift-day-marker">
+          <div class="drift-day-label">Day 10</div>
+          <div class="drift-day-dot dot-critical"></div>
+        </div>
+        <div class="drift-day-content">
+          <strong>Architectural coherence significantly degraded</strong>
+          <span>The deprecated client appears in 22 files across 5 services. The correct client is now the minority pattern. Remediation requires identifying all 22 occurrences, understanding their dependencies, coordinating updates across 5 services — all while AI agents continue to introduce new instances daily.</span>
+        </div>
+      </div>
+    </div>
+
+    <p>The timeline above is not a worst case. It is the expected outcome of AI-assisted development without pre-generation governance. The compounding is not exceptional behavior — it is the natural result of agents using existing code as context, applied at high generation velocity.</p>
+
+    <h2>The common misread: treating drift as a per-PR problem</h2>
+
+    <p>Teams that approach architectural drift with per-PR tooling — code review checklists, PR linting, violation count metrics — are measuring the wrong thing. They are measuring incidents when the problem is system-level degradation.</p>
+
+    <p>The misread is conceptually clear: if we catch every violation in review, drift cannot accumulate. Violations are the mechanism; if violations are caught, drift is prevented. The problem is that this logic assumes a 100% violation detection rate in review — which is not achievable at AI generation speeds, and which assumes the detection can happen before propagation, which requires catching the violation before the next generation cycle uses it as context.</p>
+
+    <div class="callout-teal">
+      <p><strong>Code review catches individual violations in specific PRs. It does not model the compound effect of uncorrected violations propagating across the codebase.</strong> Teams that track "violations per PR" are measuring incidents. Teams that govern architectural coherence are preventing drift. These are different problems that require different infrastructure.</p>
+    </div>
+
+    <p>A team tracking violation counts might celebrate a 10% reduction in violations per PR. But if those violations are being introduced faster (because AI generation volume increased), the absolute violation count is still growing. And if even a fraction of those violations reach the codebase before detection, the propagation mechanism amplifies them. Violation rate is an incident metric. Architectural coherence over time is the drift metric.</p>
+
+    <p>The practical implication: teams need to measure architectural coherence at the codebase level, not just at the PR level. This means tracking the distribution of architectural patterns across the codebase over time, not just whether each PR passed review. It means having machine-evaluable definitions of what architectural coherence looks like — which requires the same decision records that governance before generation uses.</p>
+
+    <h2>How this fits the AI SDLC</h2>
+
+    <p>Architectural drift is what happens in the absence of governance infrastructure. The relationship between drift prevention and governance has three components:</p>
+
+    <p><strong>Governance before generation prevents the first violation.</strong> If architectural constraints are injected before the agent writes, the agent produces code consistent with decisions. The first occurrence of the violation never enters the codebase. The propagation mechanism has no seed to amplify.</p>
+
+    <p><strong>Decision continuity prevents propagation.</strong> Even if a violation reaches the codebase (through a session where governance was not active, or through code written without the governance layer), decision continuity means subsequent agents are still constrained by the correct decisions — they don't inherit the drifted pattern as their constraint context. Governance is session-independent; the decisions are always present in the agent's context.</p>
+
+    <p><strong>Deterministic enforcement ensures consistency across agents and sessions.</strong> Drift compounds when different agents receive different governance signals — when agent A is constrained but agent B is not, or when the enforcement signal is inconsistent. Deterministic enforcement ensures every agent, every session, every generation receives the same constraint signal from the same decision corpus. The enforcement surface has no gaps through which drift can propagate.</p>
+
+    <div class="callout">
+      <p><strong>Drift is what fills governance gaps.</strong> Every gap in the governance layer — a session without hook interception, a service without decision coverage, a constraint that was encoded too vaguely to enforce — is a space where violations can be introduced and propagated. Governing comprehensively is not perfectionism; it is preventing the propagation mechanism from having gaps to amplify.</p>
+    </div>
+
+    <h2>Related concepts</h2>
+
+    <p>Architectural drift is the failure mode that governance infrastructure exists to prevent. The adjacent concepts describe the prevention mechanisms:</p>
+
+    <ul>
+      <li><strong>Decision continuity</strong> — the property that architectural decisions remain present and enforced across sessions, agents, and time. Decision continuity is the mechanism that prevents drifted patterns from becoming the new precedent: the correct decision is always present in the agent's context, regardless of what the surrounding code looks like.</li>
+      <li><strong>Governance before generation</strong> — the enforcement posture that prevents violations from entering the codebase in the first place. Drift requires violations to propagate; governance before generation prevents the first violation that would seed propagation.</li>
+      <li><strong>Demo: Architectural drift prevention</strong> — a live demonstration of how Mneme's governance layer intercepts the propagation mechanism, showing what happens with and without pre-generation enforcement over a simulated multi-agent generation session.</li>
+    </ul>
+
+  </div>
+
+  <section class="article-faq">
+    <h2>Frequently asked questions</h2>
+    <details>
+      <summary>What is architectural drift in AI-assisted development?</summary>
+      <div class="faq-body">Architectural drift is the compound degradation in codebase coherence that results from AI agents producing code inconsistent with established architectural decisions, uncorrected across sessions, across agents, and across time. It is not the accumulation of individual violations — it is the structural divergence between what the codebase is doing and what architectural decisions say it should do, growing over time. Drift is a system-level property; violations are per-PR events. Drift is what happens when violations propagate uncorrected and become precedent for downstream generation.</div>
+    </details>
+    <details>
+      <summary>Why is architectural drift a compound problem?</summary>
+      <div class="faq-body">Architectural drift is compound because AI agents use the existing codebase as context for future generation. When a violation reaches the codebase uncorrected, downstream agents encounter it and may treat it as the established pattern — building on it rather than against it. The violation propagates and amplifies. Drift is not the sum of violations; it is the structural divergence that grows as violations become embedded in patterns that subsequent generations follow. Compounding is what makes drift categorically different from a per-PR problem.</div>
+    </details>
+    <details>
+      <summary>How does AI coding accelerate architectural drift?</summary>
+      <div class="faq-body">AI agents generate code at rates that can outpace human review by orders of magnitude. An agent producing 10 PRs per day across 5 services can introduce drift that would take a team a week of focused review to identify — by which point downstream agents have already built on the drifted patterns. The acceleration is not just in violation introduction rate; it's in propagation speed. AI agents propagate drifted patterns faster than humans can identify and correct them, unless governance is enforced before generation.</div>
+    </details>
+    <details>
+      <summary>What's the difference between a violation and drift?</summary>
+      <div class="faq-body">A violation is a per-PR event: one instance of code that doesn't conform to an architectural decision. Drift is a system-level property: the structural distance between what the codebase is and what architectural decisions say it should be, accumulating over time. A single violation caught in review is an incident. The same violation type appearing across 15 PRs over two weeks, propagating into downstream services because agents treated the first occurrence as precedent — that is drift. Individual incidents are manageable; drift requires architectural remediation.</div>
+    </details>
+    <details>
+      <summary>How does governance before generation prevent architectural drift?</summary>
+      <div class="faq-body">Governance before generation prevents architectural drift by addressing it at the source: the first violation never occurs. When architectural constraints are injected before the AI writes, the agent produces code consistent with decisions — the drifted pattern never enters the codebase, so downstream agents never encounter it as precedent. If a constraint is not injected and a violation does occur, CI enforcement catches it before merge — preventing propagation. Drift requires violations to propagate uncorrected; governance before generation breaks the propagation mechanism at both points.</div>
+    </details>
+  </section>
+
+  <h2 id="related-reading">Related reading</h2>
+  <ul>
+    <li><a href="/concepts/decision-continuity/">Decision Continuity</a></li>
+    <li><a href="/concepts/governance-before-generation/">Governance Before Generation</a></li>
+    <li><a href="/demo/">Demo: Architectural Drift Prevention</a></li>
+  </ul>
+
+  <footer class="article-footer">
+    <a href="/concepts/" class="back-link">← Back to Concepts</a>
+
+    <div class="cta-block">
+      <h3>See drift prevention in the demo</h3>
+      <p>The Mneme demo shows the difference between a governed and ungoverned multi-agent session — tracking how violations propagate without governance and how pre-generation enforcement breaks the propagation mechanism.</p>
+      <a href="/demo/" class="btn-primary">View the demo →</a>
+    </div>
+  </footer>
+</article>
+</main>
+
+<footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+  <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/use-cases/">Use cases</a></li>
+        <li><a href="/works-with/">Works with</a></li>
+        <li><a href="/platforms/">Platforms</a></li>
+        <li><a href="/integrations/">Integrations</a></li>
+        <li><a href="/compare/">Compare</a></li>
+        <li><a href="/demo/">Demo</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/insights/">Insights</a></li>
+        <li><a href="/standards/">Standards</a></li>
+        <li><a href="/benchmark/">Benchmark</a></li>
+        <li><a href="/docs/">Docs</a></li>
+        <li><a href="/docs/cli/">CLI reference</a></li>
+        <li><a href="/docs/governance-violations/">Governance violations</a></li>
+        <li><a href="/supported-languages/">Supported languages</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/pilot/" style="color:var(--accent);">Request pilot</a></li>
+        <li><a href="/for/">For teams</a></li>
+        <li><a href="/founder/">Founder</a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/roadmap/">Roadmap</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Code</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="https://github.com/TheoV823/mneme">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="/privacy/">Privacy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
+    <span style="display:inline-flex;align-items:center;gap:0.75rem;"><a href="/" aria-label="Mneme HQ home" style="display:inline-flex;opacity:0.75;"><img src="/favicon.png" alt="Mneme HQ" height="22" style="display:block;"></a><span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span></span>
+    <nav aria-label="Social media" style="display: flex; align-items: center; gap: 1rem;">
+      <a href="https://github.com/TheoV823/mneme" target="_blank" rel="noopener" aria-label="GitHub" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.16c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.27-1.69-1.27-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.34.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18.92-.26 1.91-.39 2.89-.39.98 0 1.97.13 2.89.39 2.2-1.49 3.17-1.18 3.17-1.18.62 1.58.23 2.75.12 3.04.73.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.26 5.68.41.35.78 1.05.78 2.12v3.15c0 .31.21.67.8.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener" aria-label="LinkedIn" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/@MnemeHQ" target="_blank" rel="noopener" aria-label="YouTube" style="color: var(--muted); display: inline-flex;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.12C19.55 3.5 12 3.5 12 3.5s-7.55 0-9.4.58A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.12c1.85.58 9.4.58 9.4.58s7.55 0 9.4-.58a3 3 0 0 0 2.1-2.12A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8zM9.6 15.57V8.43L15.82 12 9.6 15.57z"/></svg>
+      </a>
+    </nav>
+    <span>&copy; 2026</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  function setOpen(open){
+    links.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('menu-open', open);
+  }
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    setOpen(!links.classList.contains('open'));
+  });
+  document.addEventListener('click', function(e){
+    if (!links.classList.contains('open')) return;
+    if (links.contains(e.target) || btn.contains(e.target)) return;
+    setOpen(false);
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false);
+  });
+  links.addEventListener('click', function(e){
+    if (e.target.tagName === 'A') setOpen(false);
+  });
+  window.addEventListener('resize', function(){
+    if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false);
+  });
+})();
+</script>
+</body>
+</html>
