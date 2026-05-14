@@ -46,8 +46,10 @@
         "hasPart": [
           {"@type": "WebPage", "name": "Claude Code", "url": "https://mnemehq.com/integrations/claude-code/"},
           {"@type": "WebPage", "name": "Cursor", "url": "https://mnemehq.com/integrations/cursor/"},
+          {"@type": "WebPage", "name": "VS Code", "url": "https://mnemehq.com/integrations/vscode/"},
           {"@type": "WebPage", "name": "GitHub Actions", "url": "https://mnemehq.com/integrations/github-actions/"},
           {"@type": "WebPage", "name": "ADR Import", "url": "https://mnemehq.com/integrations/adr-import/"},
+          {"@type": "WebPage", "name": "GitHub Copilot", "url": "https://mnemehq.com/integrations/copilot/"},
           {"@type": "WebPage", "name": "Perplexity Enterprise", "url": "https://mnemehq.com/integrations/perplexity/"}
         ]
       }
@@ -273,25 +275,25 @@
       </div>
     </div>
 
-    <div class="compare-card coming-soon">
+    <div class="compare-card">
       <div class="card-meta">
-        <span class="card-tag">Coming soon</span>
+        <span class="card-tag">Corpus + CI gate</span>
       </div>
-      <h3>Copilot</h3>
-      <p>Governance for GitHub Copilot suggestions in VS Code and JetBrains. Enforce architectural decisions at the suggestion layer.</p>
+      <h3>Mneme HQ + GitHub Copilot</h3>
+      <p>Copilot generates in VS Code and JetBrains. Mneme HQ is the constraint layer above it &mdash; one structured decision corpus, enforced at the CI gate and exportable as Cursor Rules.</p>
       <div class="card-footer">
-        <span class="soon-label">Coming soon</span>
+        <a href="/integrations/copilot/" class="read-link">Learn more &rarr;</a>
       </div>
     </div>
 
-    <div class="compare-card coming-soon">
+    <div class="compare-card">
       <div class="card-meta">
-        <span class="card-tag">Coming soon</span>
+        <span class="card-tag">Native integration</span>
       </div>
-      <h3>VS Code</h3>
-      <p>Mneme HQ inside VS Code — governing Claude Code and Copilot sessions from a unified decision corpus.</p>
+      <h3>Mneme HQ + VS Code</h3>
+      <p>VS Code is the host for Claude Code and Copilot. Mneme's PreToolUse hook governs every Edit, Write, and MultiEdit a Claude Code session attempts &mdash; no extension required.</p>
       <div class="card-footer">
-        <span class="soon-label">Coming soon</span>
+        <a href="/integrations/vscode/" class="read-link">Learn more →</a>
       </div>
     </div>
 
