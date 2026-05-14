@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Govern architectural constraints in Claude Agent SDK workflows — Mneme HQ</title>
+  <meta name="description" content="Claude Agent SDK handles execution and orchestration. Mneme handles architectural invariants and enforcement. Learn how to wire a deterministic governance policy layer around your agent workflows." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/integrations/claude-agent-sdk/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Govern architectural constraints in Claude Agent SDK workflows" />
+  <meta property="og:description" content="Claude Agent SDK handles execution and orchestration. Mneme handles architectural invariants and enforcement. A deterministic governance policy layer around your agent workflows." />
+  <meta property="og:url" content="https://mnemehq.com/integrations/claude-agent-sdk/" />
+  <meta property="og:image" content="https://mnemehq.com/integrations/claude-agent-sdk/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Govern architectural constraints in Claude Agent SDK workflows" />
+  <meta name="twitter:description" content="Claude Agent SDK handles execution and orchestration. Mneme handles architectural invariants and enforcement." />
+  <meta name="twitter:image" content="https://mnemehq.com/integrations/claude-agent-sdk/og.png" />
+  <meta name="author" content="Theo Valmis" />
+  <meta property="article:published_time" content="2026-05-14T00:00:00Z" />
+  <meta property="article:author" content="https://mnemehq.com/founder/" />
+  <meta property="article:section" content="Integration" />
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Integrations", "item": "https://mnemehq.com/integrations/"},
+          {"@type": "ListItem", "position": 3, "name": "Claude Agent SDK", "item": "https://mnemehq.com/integrations/claude-agent-sdk/"}
+        ]
+      },
+      {
+        "@type": "TechArticle",
+        "headline": "Govern architectural constraints in Claude Agent SDK workflows",
+        "description": "Claude Agent SDK handles execution and orchestration. Mneme handles architectural invariants and enforcement. A deterministic governance policy layer around your agent workflows.",
+        "url": "https://mnemehq.com/integrations/claude-agent-sdk/",
+        "datePublished": "2026-05-14",
+        "dateModified": "2026-05-14",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "image": "https://mnemehq.com/integrations/claude-agent-sdk/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/integrations/claude-agent-sdk/",
+        "proficiencyLevel": "Intermediate",
+        "dependencies": "Python 3.10+, anthropic SDK, mneme"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Is Mneme itself an agent inside the SDK?",
+            "acceptedAnswer": {"@type": "Answer", "text": "No. Mneme does not run as an agent, a tool, or a subagent inside your Claude Agent SDK workflow. It runs as a governance layer around the workflow: a Python function or subprocess you call before and after tool execution. It evaluates proposed file writes against your decision corpus and returns a structured verdict. The agents answer to it architecturally; it is not one of them."}
+          },
+          {
+            "@type": "Question",
+            "name": "Does the governance hook add meaningful latency to agent tool calls?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Mneme's retriever is deterministic keyword scoring with no embedding model and no vector store. For typical projects with a corpus under 200 decisions, per-check latency is in the low milliseconds. The check runs in-process with a subprocess call, not over a network. Retrieval is bounded by K=3 — the top three decisions by score are returned regardless of corpus size."}
+          },
+          {
+            "@type": "Question",
+            "name": "What if my agent uses non-file tools — API calls, shell commands?",
+            "acceptedAnswer": {"@type": "Answer", "text": "The pre-execution hook pattern applies to any tool call, not just file writes. You can intercept tool calls by name and run mneme check against the proposed operation text. The check is most precise when the proposed change involves identifiable architectural surface (file paths, dependency names, module patterns). For generic API calls, you can still inject relevant decisions as context so the agent reasons from the corpus rather than from training defaults."}
+          },
+          {
+            "@type": "Question",
+            "name": "Does Mneme support long-running or multi-turn agent sessions?",
+            "acceptedAnswer": {"@type": "Answer", "text": "The governance corpus is stateless and idempotent — each check is independent. For long-running sessions, the enforcement trace (PASS / WARN / FAIL records with decision IDs) is designed to be persisted alongside the agent's run log, giving you an auditable record of which decisions were evaluated at each tool call. Persistent trace support across workflow IDs is on the roadmap."}
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #88889a;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+      --pass: #c8f060; --warn: #f59e0b; --fail: #ef4444;
+      --term-bg: #0a0a0d;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; padding: 0; flex-shrink: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; transition: border-color 0.15s, background 0.15s; }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span { display: block; width: 18px; height: 2px; background: currentColor; border-radius: 1px; transition: transform 0.25s ease, opacity 0.18s ease; transform-origin: center; }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    .breadcrumb-nav { max-width: 720px; margin: 0 auto; padding: 1.75rem 2rem 0.85rem; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.82rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .article-wrap { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 7rem; }
+    .article-header { margin-bottom: 3.5rem; }
+    .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+    .article-lede strong { color: var(--text); font-weight: 500; }
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
+    .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .article-body h3 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--text); }
+    .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
+    .article-body p strong { color: var(--text); font-weight: 500; }
+    .article-body ul, .article-body ol { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body li { margin-bottom: 0.5rem; }
+    .article-body li strong { color: var(--text); font-weight: 500; }
+    .article-body pre {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: var(--teal);
+    }
+    .article-body pre code { font-size: 1em; color: var(--teal); background: none; border: none; padding: 0; }
+    .article-body code { font-family: 'DM Mono', monospace; font-size: 0.82em; color: var(--teal); background: none; }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout p strong { color: var(--accent); }
+    .callout.teal { border-left-color: var(--teal); }
+    .callout.teal p strong { color: var(--teal); }
+
+    .responsibility-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 2rem 0; }
+    @media (max-width: 580px) { .responsibility-grid { grid-template-columns: 1fr; } }
+    .responsibility-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.4rem 1.5rem; }
+    .responsibility-card .rc-label { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.75rem; }
+    .responsibility-card.sdk .rc-label { color: var(--teal); }
+    .responsibility-card.mneme .rc-label { color: var(--accent); }
+    .responsibility-card h3 { font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 0.6rem; }
+    .responsibility-card ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.45rem; }
+    .responsibility-card ul li { font-size: 0.82rem; color: var(--muted); padding-left: 1rem; position: relative; line-height: 1.55; }
+    .responsibility-card.sdk ul li::before { content: '\2192'; position: absolute; left: 0; color: var(--teal); opacity: 0.7; }
+    .responsibility-card.mneme ul li::before { content: '\2192'; position: absolute; left: 0; color: var(--accent); opacity: 0.7; }
+
+    .governance-trace { background: var(--term-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; font-family: 'DM Mono', monospace; font-size: 0.75rem; line-height: 1.9; margin: 1.25rem 0; overflow-x: auto; }
+    .governance-trace .gt-label { color: var(--teal); margin-right: 0.5rem; }
+    .governance-trace .gt-pass { color: var(--pass); font-weight: 500; }
+    .governance-trace .gt-warn { color: var(--warn); font-weight: 500; }
+    .governance-trace .gt-fail { color: var(--fail); font-weight: 500; }
+    .governance-trace .gt-info { color: var(--muted); }
+    .governance-trace strong { color: var(--text); font-weight: 500; }
+    .governance-trace .gt-comment { color: #4a4a5a; }
+
+    .verdict-bar { display: flex; align-items: center; gap: 0.6rem; margin: 1rem 0 0.25rem; font-family: 'DM Mono', monospace; font-size: 0.72rem; }
+    .verdict-pill { padding: 0.18rem 0.55rem; border-radius: 4px; letter-spacing: 0.06em; font-size: 0.65rem; font-weight: 500; }
+    .verdict-pill.pass { background: rgba(200,240,96,0.1); color: var(--pass); border: 1px solid rgba(200,240,96,0.25); }
+    .verdict-pill.warn { background: rgba(245,158,11,0.1); color: var(--warn); border: 1px solid rgba(245,158,11,0.25); }
+    .verdict-pill.fail { background: rgba(239,68,68,0.1); color: var(--fail); border: 1px solid rgba(239,68,68,0.25); }
+
+    .faq-list { margin-top: 1.5rem; }
+    .faq-item { border-top: 1px solid var(--border); padding: 1.05rem 0; }
+    .faq-item:last-child { border-bottom: 1px solid var(--border); }
+    .faq-item summary { cursor: pointer; font-size: 0.92rem; color: var(--text); font-weight: 500; list-style: none; position: relative; padding-right: 2rem; }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; font-family: 'DM Mono', monospace; color: var(--muted); font-size: 1.1rem; position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
+    .faq-item[open] summary::after { content: '\2212'; }
+    .faq-body { padding-top: 0.85rem; font-size: 0.85rem; color: var(--muted); line-height: 1.8; }
+    .faq-body a { color: var(--accent); text-decoration: none; }
+    .faq-body a:hover { color: var(--accent-dim); }
+    .faq-body code { font-family: 'DM Mono', monospace; font-size: 0.82em; color: var(--teal); }
+
+    .next-bar { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+    @media (max-width: 640px) { .next-bar { grid-template-columns: 1fr; } }
+    .next-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; text-decoration: none; color: inherit; transition: border-color 0.15s, transform 0.15s; display: block; }
+    .next-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+    .next-card .nc-label { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+    .next-card h4 { font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 0.4rem; line-height: 1.35; }
+    .next-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.6; margin-bottom: 0.5rem; }
+    .next-card .nc-arrow { color: var(--accent); font-family: 'DM Mono', monospace; font-size: 0.72rem; }
+
+    .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .back-link:hover { color: var(--text); }
+    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; }
+    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--accent-dim); }
+    .cta-secondary { display: block; margin-top: 0.75rem; font-size: 0.82rem; color: var(--muted); text-decoration: none; }
+    .cta-secondary:hover { color: var(--text); }
+
+    h2#related-reading { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 400; margin-top: 3.5rem; margin-bottom: 0.75rem; }
+    h2#related-reading + ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    h2#related-reading + ul li { margin: 0; }
+    h2#related-reading + ul li a { display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.1rem; background: var(--surface); color: var(--text); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.15s, color 0.15s; }
+    h2#related-reading + ul li a::after { content: '\2192'; opacity: 0.35; transition: opacity 0.15s, transform 0.15s; display: inline-block; margin-left: 0.5rem; }
+    h2#related-reading + ul li a:hover { background: var(--surface2); color: var(--accent); }
+    h2#related-reading + ul li a:hover::after { opacity: 1; transform: translateX(3px); }
+
+    @media (max-width: 900px) {
+      html, body { overflow-x: hidden; }
+      body.menu-open { overflow: hidden; }
+      nav { position: relative; padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 1.25rem; z-index: 99; max-height: 0; overflow: hidden; opacity: 0; visibility: hidden; transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s; }
+      .nav-links.open { max-height: 80vh; opacity: 1; visibility: visible; padding: 0.5rem 1.25rem 1.25rem; transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s; overflow-y: auto; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.92rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+      .article-wrap { padding: 3rem 1.25rem 5rem; }
+      .next-bar { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/benchmark/">Benchmark</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/integrations/">Integrations</a></li>
+    <li aria-current="page">Claude Agent SDK</li>
+  </ol>
+</nav>
+
+<article class="article-wrap">
+  <header class="article-header">
+    <div class="article-eyebrow">
+      <span class="eyebrow-tag">Integration &middot; Claude Agent SDK</span>
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-meta">8 min read &nbsp;&middot;&nbsp; May 2026</span>
+    </div>
+    <h1>Govern architectural constraints in Claude Agent SDK workflows</h1>
+    <p class="article-lede">The Claude Agent SDK gives you execution and orchestration. It does not give you architectural memory. <strong>Mneme is the enforcement layer that runs around your agent workflows</strong> &mdash; evaluating proposed changes against your decision corpus before they reach the codebase, and producing deterministic traces your CI can gate on.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-14">Published May 2026</time>
+    </p>
+  </header>
+
+  <div class="article-body">
+
+    <h2>The relationship</h2>
+
+    <p>Claude Agent SDK manages agent loops: tool selection, message passing, streaming, multi-turn context, subagent handoffs. These are execution concerns. Mneme does not touch any of them.</p>
+
+    <p>What Mneme does is sit at the boundary between your agent's intentions and your codebase. Before a file write lands, Mneme checks the proposed content against your recorded decisions. After a workflow completes, Mneme can verify the output against the full invariant set. The relationship is infrastructure-shaped: <strong>the SDK runs agents; Mneme is what the agents answer to architecturally.</strong></p>
+
+    <div class="responsibility-grid">
+      <div class="responsibility-card sdk">
+        <div class="rc-label">Claude Agent SDK</div>
+        <h3>Execution layer</h3>
+        <ul>
+          <li>Agent loop and tool dispatch</li>
+          <li>Multi-turn context and streaming</li>
+          <li>Subagent orchestration and handoffs</li>
+          <li>Tool schema definition and calling</li>
+          <li>Retry and error handling within the loop</li>
+          <li>Session lifecycle management</li>
+        </ul>
+      </div>
+      <div class="responsibility-card mneme">
+        <div class="rc-label">Mneme</div>
+        <h3>Enforcement layer</h3>
+        <ul>
+          <li>Architectural decision corpus (project_memory.json)</li>
+          <li>Pre-execution governance checks</li>
+          <li>Deterministic keyword retrieval (K=3, no embeddings)</li>
+          <li>Structured PASS / WARN / FAIL verdicts with decision IDs</li>
+          <li>Post-execution verification against invariant set</li>
+          <li>CI-gateable enforcement trace output</li>
+        </ul>
+      </div>
+    </div>
+
+    <p>Mneme is not "another agent." It does not call the model. It does not generate text. It scores proposed changes against a pre-registered decision corpus and returns a verdict. The agents answer to it; it does not answer to the agents.</p>
+
+    <h2>Pre-execution governance</h2>
+
+    <p>The most direct integration point is a governance hook you call before your agent writes any file. Wrap the SDK's tool execution callback to intercept file-write operations, run <code>mneme check</code> against the proposed content, and allow or abort based on the verdict.</p>
+
+    <p>Below is a complete Python hook that intercepts a <code>write_file</code> tool call before it executes:</p>
+
+    <pre><code>import subprocess, json, sys
+from anthropic import Anthropic
+
+client = Anthropic()
+
+def mneme_check(file_path: str, content: str) -> dict:
+    result = subprocess.run(
+        ["mneme", "check", "--file", file_path, "--mode", "warn"],
+        input=content,
+        capture_output=True,
+        text=True,
+        timeout=10,
+    )
+    try:
+        return json.loads(result.stdout)
+    except Exception:
+        return {"verdict": "PASS", "decisions": []}
+
+def governance_hook(tool_name: str, tool_input: dict) -> dict | None:
+    if tool_name != "write_file":
+        return None
+
+    path = tool_input.get("path", "")
+    content = tool_input.get("content", "")
+    verdict = mneme_check(path, content)
+
+    if verdict.get("verdict") == "FAIL":
+        decision_id = verdict.get("decisions", [{}])[0].get("id", "unknown")
+        return {
+            "type": "tool_result",
+            "is_error": True,
+            "content": (
+                f"[mneme] Governance violation: {decision_id}. "
+                f"Rationale: {verdict.get('decisions', [{}])[0].get('rationale', '')}. "
+                f"Revise the approach to comply with this decision."
+            ),
+        }
+    return None
+
+tools = [
+    {
+        "name": "write_file",
+        "description": "Write content to a file path.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "path": {"type": "string"},
+                "content": {"type": "string"},
+            },
+            "required": ["path", "content"],
+        },
+    }
+]
+
+messages = [{"role": "user", "content": "Implement the storage module."}]
+
+while True:
+    response = client.messages.create(
+        model="claude-opus-4-5",
+        max_tokens=4096,
+        tools=tools,
+        messages=messages,
+    )
+    messages.append({"role": "assistant", "content": response.content})
+
+    if response.stop_reason == "end_turn":
+        break
+
+    tool_results = []
+    for block in response.content:
+        if block.type != "tool_use":
+            continue
+        blocked = governance_hook(block.name, block.input)
+        if blocked:
+            tool_results.append({"type": "tool_result", "tool_use_id": block.id, **blocked})
+        else:
+            result_content = execute_tool(block.name, block.input)
+            tool_results.append({"type": "tool_result", "tool_use_id": block.id, "content": result_content})
+
+    messages.append({"role": "user", "content": tool_results})
+</code></pre>
+
+    <p>The hook intercepts at the <code>tool_use</code> block boundary, before <code>execute_tool</code> is called. A FAIL verdict returns an error tool result that re-enters the agent loop &mdash; the agent reads the decision id and rationale, revises its approach, and retries without human intervention. A PASS or WARN verdict allows execution to proceed normally.</p>
+
+    <div class="callout">
+      <p><strong>Fail-open by design.</strong> If <code>mneme</code> is not found on <code>$PATH</code>, if the JSON parse fails, or if the subprocess times out (10 s hard limit), the hook returns <code>None</code> and the tool call is allowed. A broken governance layer should not lock an agent workflow. Hard-blocking lives in CI.</p>
+    </div>
+
+    <p>A sample governance trace from the pre-execution check, printed to stderr alongside your agent log:</p>
+
+    <div class="governance-trace">
+      <div><span class="gt-label">mneme</span> <span class="gt-info">query &rarr; "write_file storage/db.py"</span></div>
+      <div><span class="gt-label">mneme</span> <span class="gt-info">retriever.score(query, corpus, K=3) &rarr; <strong>ADR-001 [0.84]</strong>, ADR-004 [0.61], ADR-003 [0.38]</span></div>
+      <div><span class="gt-label">mneme</span> <span class="gt-info">check ADR-001 &rarr; anti_pattern: "external database dependency"</span></div>
+      <div><span class="gt-label">mneme</span> <span class="gt-warn">FAIL</span> <span class="gt-info">content contains "import redis" &middot; violates ADR-001</span></div>
+      <div><span class="gt-label">mneme</span> <span class="gt-info">decision_id: ADR-001 &middot; rationale: "JSON storage only, no external db in v1"</span></div>
+      <div><span class="gt-label">mneme</span> <span class="gt-info">verdict returned to agent loop as tool_result error</span></div>
+    </div>
+
+    <div class="verdict-bar"><span class="verdict-pill fail">FAIL</span><span style="color:var(--muted);font-family:'DM Mono',monospace;font-size:0.72rem;">ADR-001 &middot; storage/db.py &middot; blocked before disk write</span></div>
+
+    <h2>Post-execution verification</h2>
+
+    <p>Pre-execution checks stop violations before they land. Post-execution verification catches what slipped through &mdash; partial matches, composite violations, or changes that look compliant per-file but drift when read as a whole. Run a verification pass after your agent workflow completes:</p>
+
+    <pre><code>import subprocess, json, pathlib
+
+def verify_outputs(changed_files: list[str]) -> list[dict]:
+    violations = []
+    for path in changed_files:
+        content = pathlib.Path(path).read_text()
+        result = subprocess.run(
+            ["mneme", "check", "--file", path, "--mode", "strict"],
+            input=content,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        try:
+            verdict = json.loads(result.stdout)
+            if verdict.get("verdict") in ("FAIL", "WARN"):
+                violations.append({"file": path, **verdict})
+        except Exception:
+            pass
+    return violations
+
+violations = verify_outputs(agent_output_files)
+if any(v["verdict"] == "FAIL" for v in violations):
+    print(json.dumps(violations, indent=2), file=sys.stderr)
+    sys.exit(1)
+</code></pre>
+
+    <p>The post-execution pass uses <code>--mode strict</code>, which treats WARN as FAIL. WARN in the pre-execution hook (to avoid blocking mid-loop on ambiguous signals) paired with strict post-execution verification gives you a two-stage gate: guide the agent while it works, then enforce cleanly when it finishes.</p>
+
+    <p>A post-execution enforcement trace:</p>
+
+    <div class="governance-trace">
+      <div><span class="gt-label">mneme</span> <span class="gt-info">post-execution verify &middot; 4 files changed</span></div>
+      <div><span class="gt-label">mneme</span> <span class="gt-info">check storage/db.py &rarr; retriever top: ADR-001 [0.84], ADR-004 [0.61]</span></div>
+      <div><span class="gt-label">mneme</span> <span class="gt-pass">PASS</span> <span class="gt-info">storage/db.py &middot; no anti-patterns matched</span></div>
+      <div><span class="gt-label">mneme</span> <span class="gt-info">check storage/session.py &rarr; retriever top: ADR-001 [0.71], ADR-003 [0.55]</span></div>
+      <div><span class="gt-label">mneme</span> <span class="gt-pass">PASS</span> <span class="gt-info">storage/session.py &middot; repository pattern intact</span></div>
+      <div><span class="gt-label">mneme</span> <span class="gt-info">check services/user.py &rarr; retriever top: ADR-004 [0.79]</span></div>
+      <div><span class="gt-label">mneme</span> <span class="gt-warn">WARN</span> <span class="gt-info">services/user.py &middot; direct storage import detected [ADR-004: repository abstraction required]</span></div>
+      <div><span class="gt-label">mneme</span> <span class="gt-info">check api/routes.py &rarr; no relevant decisions retrieved</span></div>
+      <div><span class="gt-label">mneme</span> <span class="gt-pass">PASS</span> <span class="gt-info">api/routes.py &middot; no corpus match</span></div>
+      <div><span class="gt-label">mneme</span> <span class="gt-info">summary: 3 PASS, 1 WARN &middot; mode=strict &rarr; exit 1</span></div>
+    </div>
+
+    <div class="verdict-bar">
+      <span class="verdict-pill pass">PASS</span>
+      <span style="color:var(--muted);font-family:'DM Mono',monospace;font-size:0.72rem;">storage/db.py</span>
+      <span class="verdict-pill pass">PASS</span>
+      <span style="color:var(--muted);font-family:'DM Mono',monospace;font-size:0.72rem;">storage/session.py</span>
+      <span class="verdict-pill warn">WARN</span>
+      <span style="color:var(--muted);font-family:'DM Mono',monospace;font-size:0.72rem;">services/user.py &middot; ADR-004</span>
+    </div>
+
+    <h2>Enforcement traces in long-running workflows</h2>
+
+    <p>For autonomous agent workflows that run unattended &mdash; scheduled coding tasks, remediation loops, multi-step refactors &mdash; the enforcement trace is your primary audit artifact. A governance check that returns PASS is not just a green light; it is a timestamped record that the proposed change was evaluated against the current corpus and found compliant. This matters in three contexts:</p>
+
+    <ul>
+      <li><strong>Audit trail.</strong> When a long-running workflow produces a diff, you need to know which decisions were in scope at the time the change was generated, not just whether the final output passes today's corpus. The structured trace output (JSON per check, with decision IDs and scores) gives you this.</li>
+      <li><strong>CI gates.</strong> A governance trace written to a file or stdout can be consumed by your CI pipeline. If any file in the agent's output has a FAIL verdict in the trace, the pipeline fails. This is not a soft advisory &mdash; it is a hard gate.</li>
+      <li><strong>Remediation loop signal.</strong> For autonomous loops where the agent is expected to self-correct, the decision id in a FAIL verdict is the signal. The agent reads which decision was violated, retrieves the rationale from the corpus, and reformulates the change. The loop terminates when the post-execution pass is clean, not when the agent decides it is done.</li>
+    </ul>
+
+    <div class="callout teal">
+      <p><strong>Deterministic retrieval matters here.</strong> Mneme uses keyword scoring, not embeddings. The same query against the same corpus returns the same top-K decisions every time. This means enforcement traces are reproducible: if you re-run a check against the same content and corpus, you get the same verdict. Embedding-based retrieval cannot make this guarantee.</p>
+    </div>
+
+    <h2>CI integration</h2>
+
+    <p>Add a governance gate step in your agent workflow's CI configuration. The step runs after your agent produces output and before the PR is opened or the deploy proceeds:</p>
+
+    <pre><code>name: agent-governance-gate
+on: [push, pull_request]
+
+jobs:
+  governance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Mneme
+        run: pip install mneme
+
+      - name: Run agent workflow
+        run: python scripts/agent_workflow.py
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Governance gate
+        run: |
+          mneme check \
+            --files-changed $(git diff --name-only HEAD~1) \
+            --mode strict \
+            --output-format json \
+            --trace-file governance-trace.json
+        shell: bash
+
+      - name: Upload governance trace
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: governance-trace
+          path: governance-trace.json
+</code></pre>
+
+    <p>The <code>--mode strict</code> flag means any WARN in the trace causes a non-zero exit and fails the step. The <code>--trace-file</code> flag writes the structured JSON trace as a CI artifact, giving you a per-run record of which decisions were evaluated and what the verdicts were. Use <code>--mode warn</code> during development iterations to surface signals without blocking merges.</p>
+
+    <p>For the GitHub Actions integration with finer-grained control over which file patterns trigger governance checks, see the <a href="/integrations/github-actions/" style="color:var(--accent);text-decoration:none;">GitHub Actions integration page</a>.</p>
+
+    <h2>FAQ</h2>
+
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Is Mneme itself an agent inside the SDK?</summary>
+        <div class="faq-body">No. Mneme does not run as an agent, a tool, or a subagent inside your Claude Agent SDK workflow. It runs as a governance layer around the workflow: a Python function or subprocess you call before and after tool execution. It evaluates proposed file writes against your decision corpus and returns a structured verdict. The agents answer to it architecturally; it is not one of them.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Does the governance hook add meaningful latency to agent tool calls?</summary>
+        <div class="faq-body">Mneme's retriever is deterministic keyword scoring with no embedding model and no vector store. For typical projects with a corpus under 200 decisions, per-check latency is in the low milliseconds. The check runs as a local subprocess call, not over a network. Retrieval is bounded by K=3 &mdash; the top three decisions by score are returned regardless of corpus size. The dominant cost in your agent loop remains model inference, not governance checks.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>What if my agent uses non-file tools &mdash; API calls, shell commands?</summary>
+        <div class="faq-body">The pre-execution hook pattern applies to any tool call, not just file writes. You can intercept tool calls by name and run <code>mneme check</code> against the proposed operation text. The check is most precise when the proposed change involves identifiable architectural surface (file paths, dependency names, module patterns). For generic API calls, you can still inject relevant decisions as context at the start of the agent loop so the agent reasons from the corpus rather than from training defaults. Use <code>mneme context --query "api call to external service"</code> to retrieve the relevant decisions for injection.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Does Mneme support long-running or multi-turn agent sessions?</summary>
+        <div class="faq-body">The governance corpus is stateless and idempotent &mdash; each check is independent. The same content checked twice against the same corpus returns the same verdict. For long-running sessions, the enforcement trace (PASS / WARN / FAIL records with decision IDs) is designed to be persisted alongside the agent's run log, giving you an auditable record of which decisions were evaluated at each tool call. Persistent cross-session trace aggregation and workflow-scoped audit views are on the <a href="/roadmap/">roadmap</a>.</div>
+      </details>
+    </div>
+
+    <h2 id="related-reading">Related reading</h2>
+    <ul>
+      <li><a href="/demo/multi-agent-governance/">Governance continuity across multiple actors</a></li>
+      <li><a href="/integrations/github-actions/">GitHub Actions enforcement gate</a></li>
+      <li><a href="/concepts/governance-before-generation/">Governance before generation</a></li>
+    </ul>
+
+  </div>
+
+  <div class="next-bar">
+    <a class="next-card" href="/demo/multi-agent-governance/">
+      <div class="nc-label">Demo</div>
+      <h4>Multi-agent governance</h4>
+      <p>Three actors, zero shared memory, one shared corpus. How invariants stay coherent across agent sessions.</p>
+      <span class="nc-arrow">Walk the demo &rarr;</span>
+    </a>
+    <a class="next-card" href="/integrations/github-actions/">
+      <div class="nc-label">Integration</div>
+      <h4>GitHub Actions gate</h4>
+      <p>Hard-block PRs that violate recorded decisions. The CI layer of the same enforcement pipeline.</p>
+      <span class="nc-arrow">See the gate &rarr;</span>
+    </a>
+    <a class="next-card" href="/concepts/governance-before-generation/">
+      <div class="nc-label">Concept</div>
+      <h4>Governance before generation</h4>
+      <p>Why the enforcement layer must evaluate constraints before the agent touches the codebase, not after.</p>
+      <span class="nc-arrow">Read the concept &rarr;</span>
+    </a>
+  </div>
+
+  <footer class="article-footer">
+    <a href="/integrations/" class="back-link">&#8592; All integrations</a>
+    <div class="cta-block">
+      <h3>Start enforcing architectural decisions in Agent SDK workflows</h3>
+      <p>Open source, self-hosted. The governance corpus is a JSON file in your repo. Install takes under five minutes.</p>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
+      <a href="/insights/prompt-engineering-is-not-governance/" class="cta-secondary">Read: Prompt Engineering Is Not Governance &rarr;</a>
+    </div>
+  </footer>
+</article>
+</main>
+
+<footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+  <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/use-cases/" style="color:var(--muted);text-decoration:none;">Use cases</a></li>
+        <li><a href="/integrations/" style="color:var(--muted);text-decoration:none;">Integrations</a></li>
+        <li><a href="/compare/" style="color:var(--muted);text-decoration:none;">Compare</a></li>
+        <li><a href="/demo/" style="color:var(--muted);text-decoration:none;">Demo</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/architecture/" style="color:var(--muted);text-decoration:none;">Architecture</a></li>
+        <li><a href="/insights/" style="color:var(--muted);text-decoration:none;">Insights</a></li>
+        <li><a href="/standards/" style="color:var(--muted);text-decoration:none;">Standards</a></li>
+        <li><a href="/benchmark/" style="color:var(--muted);text-decoration:none;">Benchmark</a></li>
+        <li><a href="/docs/" style="color:var(--muted);text-decoration:none;">Docs</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/pilot/" style="color:var(--accent);text-decoration:none;">Request pilot</a></li>
+        <li><a href="/founder/" style="color:var(--muted);text-decoration:none;">Founder</a></li>
+        <li><a href="/about/" style="color:var(--muted);text-decoration:none;">About</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Code</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="https://github.com/TheoV823/mneme" style="color:var(--muted);text-decoration:none;">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener" style="color:var(--muted);text-decoration:none;">LinkedIn</a></li>
+        <li><a href="https://dev.to/mnemehq" target="_blank" rel="noopener" style="color:var(--muted);text-decoration:none;">DEV.to</a></li>
+        <li><a href="/privacy/" style="color:var(--muted);text-decoration:none;">Privacy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
+    <span style="display:inline-flex;align-items:center;gap:0.75rem;"><a href="/" aria-label="Mneme HQ home" style="display:inline-flex;opacity:0.75;"><img src="/favicon.png" alt="Mneme HQ" height="22" style="display:block;"></a><span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span></span>
+    <nav aria-label="Social media" style="display: flex; align-items: center; gap: 1rem;">
+      <a href="https://github.com/TheoV823/mneme" target="_blank" rel="noopener" aria-label="GitHub" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.16c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.27-1.69-1.27-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.34.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18.92-.26 1.91-.39 2.89-.39.98 0 1.97.13 2.89.39 2.2-1.49 3.17-1.18 3.17-1.18.62 1.58.23 2.75.12 3.04.73.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.26 5.68.41.35.78 1.05.78 2.12v3.15c0 .31.21.67.8.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener" aria-label="LinkedIn" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 .06.77 0 1.72v20.56C.06 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/@MnemeHQ" target="_blank" rel="noopener" aria-label="YouTube" style="color: var(--muted); display: inline-flex;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.12C19.55 3.5 12 3.5 12 3.5s-7.55 0-9.4.58A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.12c1.85.58 9.4.58 9.4.58s7.55 0 9.4-.58a3 3 0 0 0 2.1-2.12A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8zM9.6 15.57V8.43L15.82 12 9.6 15.57z"/></svg>
+      </a>
+      <a href="https://dev.to/mnemehq" target="_blank" rel="noopener" aria-label="DEV.to" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true"><path d="M120.12 208.29c-3.88-2.9-7.77-4.35-11.65-4.35H91.03v104.47h17.45c3.88 0 7.77-1.45 11.65-4.35 3.88-2.9 5.82-7.25 5.82-13.06v-69.65c-.01-5.8-1.96-10.16-5.83-13.06zM404.1 32H43.9C19.7 32 .06 51.59 0 75.8v360.4C.06 460.41 19.7 480 43.9 480h360.2c24.21 0 43.84-19.59 43.9-43.8V75.8c-.06-24.21-19.7-43.8-43.9-43.8zM154.2 291.19c0 18.81-11.61 47.31-48.36 47.25h-46.4V172.98h47.38c35.44 0 47.36 28.46 47.36 47.28l.02 70.93zm100.68-88.66H201.6v38.42h32.57v29.57H201.6v38.41h53.29v29.57h-62.18c-11.16.29-20.44-8.53-20.72-19.69V193.7c-.27-11.15 8.56-20.41 19.71-20.69h63.19l-.01 29.52zm103.64 115.29c-13.2 30.75-36.85 24.63-47.44 0l-38.53-144.8h32.57l29.71 113.72 29.57-113.72h32.58l-38.46 144.8z"/></svg>
+      </a>
+    </nav>
+    <span>&copy; 2026</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  function setOpen(open){
+    links.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('menu-open', open);
+  }
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    setOpen(!links.classList.contains('open'));
+  });
+  document.addEventListener('click', function(e){
+    if (!links.classList.contains('open')) return;
+    if (links.contains(e.target) || btn.contains(e.target)) return;
+    setOpen(false);
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false);
+  });
+  links.addEventListener('click', function(e){
+    if (e.target.tagName === 'A') setOpen(false);
+  });
+  window.addEventListener('resize', function(){
+    if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false);
+  });
+})();
+</script>
+</body>
+</html>
