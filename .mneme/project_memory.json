@@ -197,6 +197,32 @@
       ],
       "created_at": "2026-05-08T10:47:42Z",
       "updated_at": "2026-05-08T10:47:42Z"
+    },
+    {
+      "id": "encoding_001",
+      "decision": "All automation that reads or writes text files must specify the encoding explicitly. UTF-8 for all site, doc, config, and source files in this repo.",
+      "rationale": "Default encodings are runtime- and platform-dependent. PowerShell 5.1 defaults to Windows-1252, not UTF-8. Silent re-encoding of UTF-8 files with non-ASCII characters produces invalid UTF-8 bytes with no error at write time — discovered only when a downstream tool opens the file. See Governance Incident 002 and ADR-009.",
+      "scope": [
+        "scripts",
+        "automation",
+        "ci",
+        "file-io",
+        "site"
+      ],
+      "constraints": [
+        "PowerShell: always pass -Encoding utf8 to Set-Content and Get-Content",
+        "Python: always pass encoding='utf-8' to open() for text files",
+        "Node.js: always pass 'utf8' as the encoding argument to readFileSync / writeFileSync / appendFileSync",
+        "Do not rely on OS or runtime default encoding for any file read or write in this repo"
+      ],
+      "anti_patterns": [
+        "Set-Content without -Encoding",
+        "open() without encoding= in Python",
+        "writeFileSync without encoding in Node.js",
+        "implicit encoding in any automation file write"
+      ],
+      "created_at": "2026-05-12T00:00:00Z",
+      "updated_at": "2026-05-12T00:00:00Z"
     }
   ]
 }
