@@ -158,6 +158,14 @@
     .callout.purple { background: rgba(167,139,250,0.05); border-color: rgba(167,139,250,0.2); border-left-color: var(--agent-a); }
     .callout.purple p strong { color: var(--agent-a); }
 
+    /* ── ADR PRIMER ── */
+    .adr-primer { background: rgba(167,139,250,0.05); border: 1px solid rgba(167,139,250,0.18); border-left: 3px solid #a78bfa; border-radius: 8px; padding: 0.85rem 1.15rem; margin: 0 0 1.5rem; }
+    .primer-key { display: block; font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: #a78bfa; margin-bottom: 0.6rem; }
+    .primer-rules { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.75rem; font-size: 0.86rem; color: var(--muted); }
+    .primer-rules code { font-family: 'DM Mono', monospace; font-size: 0.8rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 0.05rem 0.35rem; color: var(--text); }
+    .primer-what { font-size: 0.86rem; color: var(--muted); margin: 0; padding-top: 0.65rem; border-top: 1px dashed var(--border); line-height: 1.65; }
+    .primer-what strong { color: var(--text); font-weight: 500; }
+
     /* ── NEXT BAR ── */
     .next-bar { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     @media (max-width: 640px) { .next-bar { grid-template-columns: 1fr; } }
@@ -249,6 +257,16 @@
       <p>What this page <em>does</em> demonstrate is the shape of the problem those frameworks expose: <strong>once multiple actors touch the same codebase against shared architectural invariants, the governance layer becomes the coordination layer.</strong> If the invariants are encoded somewhere the actors can answer to, the system stays coherent. If they aren't, every actor reasons against its own context and drift becomes inevitable.</p>
 
       <h2>The invariants the actors share</h2>
+
+      <div class="adr-primer">
+        <span class="primer-key">The decisions at stake</span>
+        <div class="primer-rules">
+          <div>&rarr; <code>ADR-001</code> forbids external databases. Redis is forbidden.</div>
+          <div>&rarr; <code>ADR-003</code> forbids ORMs in v1.</div>
+          <div>&rarr; <code>ADR-004</code> enforces the Repository pattern for all persistence.</div>
+        </div>
+        <p class="primer-what">The demo shows how three independent actors stay aligned because they all evaluate against this same <strong>compiled corpus</strong> &mdash; not against each other.</p>
+      </div>
 
       <p>Three actors will touch the same Python service over the course of one workflow. They share exactly one thing: the compiled decision corpus emitted by the <a href="/demo/adr-compiler/">ADR compiler</a>.</p>
 
@@ -387,11 +405,11 @@ python run.py</code></pre>
       </ul>
 
       <div class="next-bar">
-        <a class="next-card" href="/demo/adr-compiler/">
+        <a class="next-card" href="/demo/governed-python-agent/">
           <div class="nc-label">Flagship 01 &middot; Centerpiece</div>
-          <h4>The ADR compiler</h4>
-          <p>The artifact that produces the corpus the actors here share. The upstream half of this loop.</p>
-          <span class="nc-arrow">Walk the compiler &rarr;</span>
+          <h4>Governed Python agent</h4>
+          <p>The full product loop: a Python agent proposes a violating import, Mneme blocks it, the agent retries with compliant output.</p>
+          <span class="nc-arrow">See the product demo &rarr;</span>
         </a>
         <a class="next-card" href="/demo/architectural-drift/">
           <div class="nc-label">Flagship 02</div>

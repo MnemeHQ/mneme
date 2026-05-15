@@ -143,6 +143,13 @@
     .callout p a { color: var(--teal); text-decoration: none; border-bottom: 1px dotted rgba(139,224,200,0.4); }
     .callout p a:hover { border-bottom-color: rgba(139,224,200,0.7); }
 
+    /* ── ADR PRIMER ── */
+    .adr-primer { background: rgba(167,139,250,0.05); border: 1px solid rgba(167,139,250,0.18); border-left: 3px solid #a78bfa; border-radius: 8px; padding: 0.8rem 1.1rem; margin: 1.1rem 0 1.25rem; font-size: 0.87rem; color: var(--muted); line-height: 1.7; }
+    .adr-primer code { font-family: 'DM Mono', monospace; font-size: 0.8rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 0.05rem 0.35rem; color: var(--text); }
+    .primer-key { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.07em; text-transform: uppercase; color: #a78bfa; font-weight: 500; margin-right: 0.25rem; }
+    .retry-note { font-size: 0.8rem; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 0.75rem; line-height: 1.65; }
+    .retry-note code { font-size: 0.78rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 0.05rem 0.35rem; color: var(--text); }
+
     /* ── CTA / NEXT ── */
     .next-bar { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     @media (max-width: 640px) { .next-bar { grid-template-columns: 1fr; } }
@@ -240,6 +247,8 @@
 
       <p>The animation below runs a real governance scenario: the agent writes an import that looks correct from its training data but violates ADR-005. Mneme catches it, surfaces the decision, and the agent retries with compliant code.</p>
 
+      <div class="adr-primer"><span class="primer-key">ADR-005</span> separates brand identity from package namespace. <code>MnemeHQ</code> is the GitHub org, the website, and the LinkedIn page &mdash; so an agent confidently writes <code>from MnemeHQ.memory_store import &hellip;</code>. The decision declares <code>MnemeHQ</code> a forbidden dependency; the installable package namespace is <code>mneme</code>.</div>
+
       <div class="demo-wrap">
         <div class="panel">
           <div class="panel-header bad">
@@ -270,6 +279,7 @@
         </div>
       </div>
       <button class="replay-btn" type="button" id="replay-btn" onclick="startDemo(true)">&larr; Replay</button>
+      <p class="retry-note">Retry context contains: ADR-005 decision ID &middot; forbidden token (<code>MnemeHQ</code>) &middot; compliant alternative (<code>mneme</code>) &middot; constraint rationale from the compiled corpus.</p>
 
       <h2>Why this matters</h2>
 

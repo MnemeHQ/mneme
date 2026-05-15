@@ -187,6 +187,12 @@
     .support-card p { font-size: 0.78rem; color: var(--muted); line-height: 1.6; margin: 0; }
     .support-card .sc-arrow { color: var(--accent); font-family: 'DM Mono', monospace; font-size: 0.74rem; margin-top: auto; }
 
+    /* ── DEMO PRIMER ── */
+    .demo-primer { background: rgba(167,139,250,0.05); border: 1px solid rgba(167,139,250,0.18); border-left: 3px solid #a78bfa; border-radius: 8px; padding: 1rem 1.4rem; margin: -3.5rem 0 5rem; max-width: 760px; }
+    .demo-primer-label { display: block; font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: #a78bfa; margin-bottom: 0.55rem; }
+    .demo-primer p { font-size: 0.9rem; color: var(--muted); line-height: 1.7; margin: 0; }
+    .demo-primer p strong { color: var(--text); font-weight: 500; }
+
     /* ── EVIDENCE BAR ── */
     .evidence-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
     .evidence-block { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.4rem; text-decoration: none; color: inherit; transition: border-color 0.15s; display: block; }
@@ -318,6 +324,11 @@
         </div>
       </div>
     </section>
+
+    <div class="demo-primer">
+      <span class="demo-primer-label">How Mneme works</span>
+      <p>Mneme compiles your <strong>Architectural Decision Records (ADRs)</strong> into an executable governance corpus. Every agent proposal is evaluated against this corpus before generation, ensuring architectural invariants hold across tools, sessions, and actors.</p>
+    </div>
 
     <!-- ───── 02 · FLAGSHIP DEMOS ───── -->
     <section class="section" id="flagships">
