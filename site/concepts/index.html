@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Concepts — Mneme HQ</title>
+  <title>AI Coding Concepts — Mneme HQ Knowledge Graph</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="The foundational concepts behind architectural governance for AI coding agents — defined by the engineering team building the governance infrastructure layer." />
+  <meta name="description" content="Foundational concepts behind architectural governance for AI coding agents — 15 definitions across primitives, properties, and outcomes, organized as a knowledge graph." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/concepts/" />
@@ -130,7 +130,7 @@
     .intro strong { color: var(--text); font-weight: 500; }
 
     /* Concepts grid */
-    .section-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin: 3rem 0 1.25rem; }
+    .section-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; font-weight: 400; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin: 3rem 0 1.25rem; }
     .concepts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1px; background: var(--border); border-radius: 12px; overflow: hidden; }
     .concept-card { background: var(--surface); padding: 1.5rem 1.75rem; text-decoration: none; transition: background 0.15s; display: flex; flex-direction: column; gap: 0.5rem; }
     .concept-card:hover { background: var(--surface2); }
@@ -264,7 +264,7 @@
   <div class="intro">
     <p>Most of the terms on this page don't have industry-standard definitions yet. <strong>Architectural governance</strong>, <strong>governance before generation</strong>, <strong>decision continuity</strong> — these are concepts that the AI coding ecosystem is actively working out. The definitions here are Mneme's positions, not neutral encyclopedia entries.</p>
     <p>Each concept page explains not just what the term means, but <strong>why the structural problem it names exists</strong> in AI-native software delivery — and why the solutions that feel intuitive (documentation, prompt engineering, code review) don't actually solve it.</p>
-    <p>If you're evaluating architectural governance tooling, these concepts are the vocabulary for comparing approaches. If you're building in this space, they're the framework for understanding where different systems sit in the stack.</p>
+    <p>If you're evaluating architectural governance tooling, these concepts are the vocabulary for comparing approaches. If you're building in this space, they're the framework for understanding where different systems sit in the stack. The applied arguments — where each concept's consequences play out in real engineering — live in <a href="/insights/" style="color:var(--accent);text-decoration:none;">insights</a>; the empirical proof points are in the <a href="/benchmark/" style="color:var(--accent);text-decoration:none;">benchmark</a>.</p>
   </div>
 
   <figure class="concept-map" aria-labelledby="cmap-title">
@@ -397,7 +397,7 @@
     <figcaption class="concept-map-caption"><strong>How the concepts compose.</strong> Three primitives — compiled records, verification contracts, precedence rules — produce five system properties, which together produce the two outcomes that distinguish governed AI-native development. Absent these layers, the failure rail accumulates: agent-side drift, codebase-side drift.</figcaption>
   </figure>
 
-  <div class="section-label">Core concepts</div>
+  <h2 class="section-label">Core concepts</h2>
 
   <div class="concepts-grid" role="list">
 
@@ -469,7 +469,7 @@
 
   </div>
 
-  <div class="section-label" style="margin-top:3.5rem;">Systems concepts</div>
+  <h2 class="section-label" style="margin-top:3.5rem;">Systems concepts</h2>
 
   <div class="concepts-grid" role="list">
 
@@ -530,7 +530,7 @@
 
   </div>
 
-  <div class="section-label" style="margin-top:3.5rem;">Adjacent concepts</div>
+  <h2 class="section-label" style="margin-top:3.5rem;">Adjacent concepts</h2>
 
   <div class="concepts-grid" role="list">
 
@@ -580,7 +580,7 @@
 
   </div>
 
-  <div class="section-label" style="margin-top:3.5rem;">Architecture deep dives</div>
+  <h2 class="section-label" style="margin-top:3.5rem;">Architecture deep dives</h2>
   <div class="arch-row">
     <a href="/architecture/how-retrieval-works/" class="arch-card">
       <div class="arch-card-label">Architecture</div>

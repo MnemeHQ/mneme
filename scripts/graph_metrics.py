@@ -41,6 +41,23 @@ SITE_ROOT = Path(__file__).resolve().parent.parent / "site"
 
 HREF_RE = re.compile(r'href="([^"]*)"')
 
+# Weights for the per-concept authority score. Higher weight = more semantic
+# authority a single inbound link carries. Benchmarks rank highest because a
+# benchmark citation grounds the concept empirically; demos and use-cases
+# rank next because they prove the concept exists in code; concept ↔ concept
+# links count as much as compare-page citations because they represent
+# semantic mesh density; insights count least because they are abundant.
+AUTHORITY_WEIGHTS = {
+    "benchmark": 5,
+    "demo": 3,
+    "use-case": 3,
+    "integration": 3,
+    "compare": 2,
+    "concept": 2,
+    "works-with": 2,
+    "insight": 1,
+}
+
 
 def find_html_files(root: Path) -> list[Path]:
     return sorted(root.rglob("index.html"))
@@ -147,8 +164,24 @@ def build_report(site_root: Path) -> dict:
         in_demo = inbound[c].get("demo", 0)
         in_compare = inbound[c].get("compare", 0)
         in_bench = inbound[c].get("benchmark", 0)
+        in_integration = inbound[c].get("integration", 0)
+        in_use_case = inbound[c].get("use-case", 0)
+        in_works_with = inbound[c].get("works-with", 0)
         in_impl = in_demo + in_compare + in_bench
         in_total = inbound[c].get("_total", 0)
+
+        # Weighted authority score: sums (count × weight) across categories.
+        # Weights live in AUTHORITY_WEIGHTS at the top of this file.
+        authority_score = (
+            in_concept * AUTHORITY_WEIGHTS["concept"]
+            + in_insight * AUTHORITY_WEIGHTS["insight"]
+            + in_demo * AUTHORITY_WEIGHTS["demo"]
+            + in_compare * AUTHORITY_WEIGHTS["compare"]
+            + in_bench * AUTHORITY_WEIGHTS["benchmark"]
+            + in_integration * AUTHORITY_WEIGHTS["integration"]
+            + in_use_case * AUTHORITY_WEIGHTS["use-case"]
+            + in_works_with * AUTHORITY_WEIGHTS["works-with"]
+        )
 
         concept_metrics[c] = {
             "inbound_total": in_total,
@@ -158,26 +191,47 @@ def build_report(site_root: Path) -> dict:
             "inbound_from_demos": in_demo,
             "inbound_from_compare": in_compare,
             "inbound_from_benchmark": in_bench,
+            "inbound_from_integrations": in_integration,
+            "inbound_from_use_cases": in_use_case,
+            "inbound_from_works_with": in_works_with,
             "outbound_to_concepts": out_concepts,
             "outbound_to_insights": out_insights,
             "outbound_to_demos": out_demos,
             "is_orphan": in_total == 0,
             "is_implementation_orphan": in_impl == 0,
             "concept_depth": depth.get(c),
+            "authority_score": authority_score,
         }
 
     orphans = [c for c in concepts if concept_metrics[c]["is_orphan"]]
     impl_orphans = [c for c in concepts if concept_metrics[c]["is_implementation_orphan"]]
 
+    # Authority ranking — highest score first
+    by_authority = sorted(
+        concepts,
+        key=lambda c: (-concept_metrics[c]["authority_score"], c),
+    )
+    top_5 = by_authority[:5]
+    bottom_5 = by_authority[-5:]
+
     return {
         "site_root": str(site_root),
         "total_pages": len(graph),
         "concept_count": len(concepts),
+        "authority_weights": AUTHORITY_WEIGHTS,
         "summary": {
             "orphan_count": len(orphans),
             "orphans": orphans,
             "implementation_orphan_count": len(impl_orphans),
             "implementation_orphans": impl_orphans,
+            "top_5_by_authority": [
+                {"concept": c, "authority_score": concept_metrics[c]["authority_score"]}
+                for c in top_5
+            ],
+            "bottom_5_by_authority": [
+                {"concept": c, "authority_score": concept_metrics[c]["authority_score"]}
+                for c in bottom_5
+            ],
         },
         "concepts": concept_metrics,
     }
@@ -210,23 +264,46 @@ def render_summary(report: dict) -> str:
         lines.append("  - _(none)_")
     lines.append("")
 
-    lines.append("## Per-concept link counts")
+    lines.append("## Authority ranking")
     lines.append("")
     lines.append(
-        "| Concept | In total | In concepts | In insights | In demos | "
-        "In compare | In bench | Out concepts | Out insights | Out demos | Depth |"
+        "_Weighted inbound score. Weights: benchmark=5, demo=3, use-case=3, "
+        "integration=3, compare=2, concept=2, works-with=2, insight=1._"
+    )
+    lines.append("")
+    lines.append("**Top 5 by authority (canonical hub candidates):**")
+    for entry in report["summary"]["top_5_by_authority"]:
+        slug = entry["concept"].rstrip("/").split("/")[-1]
+        lines.append(f"  - **{slug}** — {entry['authority_score']}")
+    lines.append("")
+    lines.append("**Bottom 5 by authority (under-grounded — Phase 2/4 targets):**")
+    for entry in report["summary"]["bottom_5_by_authority"]:
+        slug = entry["concept"].rstrip("/").split("/")[-1]
+        lines.append(f"  - {slug} — {entry['authority_score']}")
+    lines.append("")
+
+    lines.append("## Per-concept link counts and authority")
+    lines.append("")
+    lines.append(
+        "| Concept | Authority | In total | In concepts | In insights | In demos | "
+        "In compare | In bench | Out concepts | Out insights | Depth |"
     )
     lines.append(
         "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|"
     )
-    for c, m in sorted(report["concepts"].items()):
+    # Sort by authority descending for the table
+    ranked = sorted(
+        report["concepts"].items(),
+        key=lambda kv: (-kv[1]["authority_score"], kv[0]),
+    )
+    for c, m in ranked:
         slug = c.rstrip("/").split("/")[-1]
         lines.append(
-            f"| {slug} | {m['inbound_total']} | {m['inbound_from_concepts']} "
-            f"| {m['inbound_from_insights']} | {m['inbound_from_demos']} "
-            f"| {m['inbound_from_compare']} | {m['inbound_from_benchmark']} "
-            f"| {m['outbound_to_concepts']} | {m['outbound_to_insights']} "
-            f"| {m['outbound_to_demos']} | {m['concept_depth']} |"
+            f"| {slug} | **{m['authority_score']}** | {m['inbound_total']} "
+            f"| {m['inbound_from_concepts']} | {m['inbound_from_insights']} "
+            f"| {m['inbound_from_demos']} | {m['inbound_from_compare']} "
+            f"| {m['inbound_from_benchmark']} | {m['outbound_to_concepts']} "
+            f"| {m['outbound_to_insights']} | {m['concept_depth']} |"
         )
     return "\n".join(lines) + "\n"
 
