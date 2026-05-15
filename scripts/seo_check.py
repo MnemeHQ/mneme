@@ -65,8 +65,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
+import time
+import urllib.parse
+import urllib.request
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable
@@ -632,6 +636,51 @@ def _node_type(n: dict) -> str:
     return ""
 
 
+PSI_ENDPOINT = "https://www.googleapis.com/pagespeedonline/v5/runPagespeed"
+_PSI_CACHE: dict[str, dict[str, int | None]] = {}  # url -> {mobile, desktop}
+
+
+def _psi_scores(url: str, api_key: str) -> dict[str, int | None]:
+    if url in _PSI_CACHE:
+        return _PSI_CACHE[url]
+    scores: dict[str, int | None] = {}
+    for strategy in ("mobile", "desktop"):
+        try:
+            params = urllib.parse.urlencode({"url": url, "strategy": strategy, "key": api_key, "category": "performance"})
+            with urllib.request.urlopen(f"{PSI_ENDPOINT}?{params}", timeout=30) as r:
+                data = json.loads(r.read())
+            raw = data.get("lighthouseResult", {}).get("categories", {}).get("performance", {}).get("score")
+            scores[strategy] = round(raw * 100) if raw is not None else None
+        except Exception:
+            scores[strategy] = None
+        time.sleep(0.5)
+    _PSI_CACHE[url] = scores
+    return scores
+
+
+def rule_pagespeed(html: str, ctx: PageContext) -> RuleResult:
+    api_key = os.environ.get("PAGESPEED_API_KEY", "")
+    if not api_key:
+        return WARN, "PAGESPEED_API_KEY not set"
+    if not ctx.canonical:
+        return WARN, "no canonical URL to test"
+    scores = _psi_scores(ctx.canonical, api_key)
+    mobile, desktop = scores.get("mobile"), scores.get("desktop")
+    if mobile is None and desktop is None:
+        return WARN, "PSI fetch failed for both strategies"
+    parts: list[str] = []
+    worst = min(s for s in (mobile, desktop) if s is not None)
+    for label, score in (("mobile", mobile), ("desktop", desktop)):
+        tag = f"{label}={score}" if score is not None else f"{label}=err"
+        parts.append(tag)
+    summary = ", ".join(parts)
+    if worst < 50:
+        return FAIL, f"performance score too low — {summary}"
+    if worst < 70:
+        return WARN, f"performance score below 70 — {summary}"
+    return PASS, summary
+
+
 RULES: list[tuple[str, RuleFn]] = [
     ("head.title",          rule_title),
     ("head.description",    rule_description),
@@ -653,6 +702,7 @@ RULES: list[tuple[str, RuleFn]] = [
     ("authority.byline",    rule_byline),
     ("geo.llms",            rule_llms_entry),
     ("style.classes",       rule_css_class_hygiene),
+    # pagespeed is appended at runtime only when --pagespeed is passed
 ]
 
 
@@ -755,7 +805,12 @@ def main() -> int:
     ap.add_argument("--include-low", action="store_true",
                     help="also audit thin/legal pages (privacy, contact)")
     ap.add_argument("--no-color", action="store_true", help="disable ANSI color")
+    ap.add_argument("--pagespeed", action="store_true",
+                    help="fetch live PageSpeed Insights scores (requires PAGESPEED_API_KEY; slow)")
     args = ap.parse_args()
+
+    if args.pagespeed:
+        RULES.append(("perf.pagespeed", rule_pagespeed))
 
     pages = collect_pages(args.only or None, args.include_low)
     if not pages:
