@@ -159,6 +159,14 @@
     .callout p strong { color: var(--text); font-weight: 500; }
     .callout.teal p strong { color: var(--teal); }
 
+    /* ── ADR PRIMER ── */
+    .adr-primer { background: rgba(167,139,250,0.05); border: 1px solid rgba(167,139,250,0.18); border-left: 3px solid #a78bfa; border-radius: 8px; padding: 0.85rem 1.15rem; margin: 0 0 2.5rem; }
+    .primer-key { display: block; font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: #a78bfa; margin-bottom: 0.6rem; }
+    .primer-rules { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.75rem; font-size: 0.86rem; color: var(--muted); }
+    .primer-rules code { font-family: 'DM Mono', monospace; font-size: 0.8rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 0.05rem 0.35rem; color: var(--text); }
+    .primer-what { font-size: 0.86rem; color: var(--muted); margin: 0; padding-top: 0.65rem; border-top: 1px dashed var(--border); line-height: 1.65; }
+    .primer-what strong { color: var(--text); font-weight: 500; }
+
     /* ── NEXT BAR ── */
     .next-bar { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     @media (max-width: 640px) { .next-bar { grid-template-columns: 1fr; } }
@@ -241,6 +249,15 @@
     </header>
 
     <div class="body">
+
+      <div class="adr-primer">
+        <span class="primer-key">The decisions at stake</span>
+        <div class="primer-rules">
+          <div>&rarr; <code>ADR-001</code> prohibits external databases. Redis is forbidden.</div>
+          <div>&rarr; <code>ADR-004</code> requires all persistence to go through a Repository abstraction.</div>
+        </div>
+        <p class="primer-what">The demo shows how three agents accidentally violate these decisions over a week &mdash; and how <strong>Mneme blocks the first divergence</strong> before it propagates.</p>
+      </div>
 
       <h2>The scenario</h2>
 
@@ -428,11 +445,11 @@ python run.py</code></pre>
       <p>The drift demo is what happens when those three artifacts are missing. The convergent timeline is what happens when they are wired up.</p>
 
       <div class="next-bar">
-        <a class="next-card" href="/demo/adr-compiler/">
+        <a class="next-card" href="/demo/governed-python-agent/">
           <div class="nc-label">Flagship 01 &middot; Centerpiece</div>
-          <h4>The ADR compiler</h4>
-          <p>The artifact that produced the decision corpus the timeline reads against. Read this if you want the upstream half.</p>
-          <span class="nc-arrow">Walk the compiler &rarr;</span>
+          <h4>Governed Python agent</h4>
+          <p>The full product loop: a Python agent proposes a violating import, Mneme blocks it, the agent retries with compliant output.</p>
+          <span class="nc-arrow">See the product demo &rarr;</span>
         </a>
         <a class="next-card" href="/demo/multi-agent-governance/">
           <div class="nc-label">Flagship 03</div>
