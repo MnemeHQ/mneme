@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dependency Policy Enforcement — Demo Scenario | Mneme HQ</title>
-  <meta name="description" content="A walkthrough of how Mneme catches an unapproved dependency (Prisma) when an AI coding agent introduces it during a refactor. WARN verdict in mneme check, with the exact decision ID that flagged it." />
+  <meta name="description" content="A walkthrough of how Mneme catches an unapproved dependency (sqlalchemy) when an AI coding agent introduces it during a refactor. WARN verdict in mneme check, with the exact decision ID that flagged it." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/demo/dependency-policy/" />
@@ -12,12 +12,12 @@
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
   <meta property="og:title" content="Dependency Policy Enforcement — Demo Scenario" />
-  <meta property="og:description" content="How Mneme flags unapproved dependencies (Prisma) when an AI agent introduces them mid-refactor. WARN verdict with the originating decision ID." />
+  <meta property="og:description" content="How Mneme flags unapproved dependencies (sqlalchemy) when an AI agent introduces them mid-refactor. WARN verdict with the originating decision ID." />
   <meta property="og:url" content="https://mnemehq.com/demo/dependency-policy/" />
   <meta property="og:image" content="https://mnemehq.com/demo/dependency-policy/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Dependency Policy Enforcement — Demo Scenario" />
-  <meta name="twitter:description" content="How Mneme flags unapproved dependencies (Prisma) when an AI agent introduces them mid-refactor. WARN verdict with the originating decision ID." />
+  <meta name="twitter:description" content="How Mneme flags unapproved dependencies (sqlalchemy) when an AI agent introduces them mid-refactor. WARN verdict with the originating decision ID." />
   <meta name="twitter:image" content="https://mnemehq.com/demo/dependency-policy/og.png" />
   <meta name="author" content="Theo Valmis" />
   <meta property="article:published_time" content="2026-05-09T00:00:00Z" />
@@ -45,7 +45,7 @@
       {
         "@type": "Article",
         "headline": "Dependency Policy Enforcement — Demo Scenario",
-        "description": "How Mneme catches an unapproved dependency (Prisma) when an AI coding agent introduces it during a refactor. Structured WARN verdict with the originating decision ID.",
+        "description": "How Mneme catches an unapproved dependency (sqlalchemy) when an AI coding agent introduces it during a refactor. Structured WARN verdict with the originating decision ID.",
         "url": "https://mnemehq.com/demo/dependency-policy/",
         "datePublished": "2026-05-09",
         "dateModified": "2026-05-09",
@@ -293,7 +293,7 @@
       <span class="verdict-pill warn">WARN</span>
     </div>
     <h1>Dependency policy enforcement</h1>
-    <p class="lede">During a refactor, the AI agent reaches for <code>prisma</code> &mdash; a sensible choice in isolation, but not on the team's approved dependency list. Mneme catches it during <code>mneme check</code> and emits a structured WARN with the originating decision ID, so the diff is flagged for review without hard-blocking the work.</p>
+    <p class="lede">During a refactor, the AI agent reaches for <code>sqlalchemy</code> &mdash; a sensible choice in isolation, but not on the team's approved dependency list. Mneme catches it during <code>mneme check</code> and emits a structured WARN with the originating decision ID, so the diff is flagged for review without hard-blocking the work.</p>
     <p class="byline">
       By <a href="/founder/">Theo Valmis</a>
       <span class="sep">&middot;</span>
@@ -317,15 +317,15 @@
       </div>
       <div class="panel-body">
         <div class="diff-rem">import json</div>
-        <div class="diff-add">import prisma</div>
-        <div class="diff-add">from prisma import Client</div>
+        <div class="diff-add">import sqlalchemy</div>
+        <div class="diff-add">from sqlalchemy import create_engine</div>
       </div>
     </div>
 
-    <p>The change looks reasonable in the editor. <code>prisma</code> is a real, popular library. Without governance, it would land in the next PR.</p>
+    <p>The change looks reasonable in the editor. <code>sqlalchemy</code> is a real, popular library. Without governance, it would land in the next PR.</p>
 
     <h2>Without Mneme</h2>
-    <p>The model has no signal that <code>prisma</code> is restricted. It treats the import as routine. The PR opens. Reviewers, who themselves rarely maintain a perfect mental copy of the approved list, scan the diff and merge if the logic looks right. The dependency arrives quietly. Three weeks later, the security team notices in the dependency audit and files a ticket asking who introduced it and why.</p>
+    <p>The model has no signal that <code>sqlalchemy</code> is restricted. It treats the import as routine. The PR opens. Reviewers, who themselves rarely maintain a perfect mental copy of the approved list, scan the diff and merge if the logic looks right. The dependency arrives quietly. Three weeks later, the security team notices in the dependency audit and files a ticket asking who introduced it and why.</p>
     <p>This is the silent-introduction failure mode. It is not catastrophic on any single PR. It compounds across hundreds.</p>
 
     <h2>With Mneme</h2>
@@ -335,7 +335,7 @@
       <div class="cr-title">mneme check &middot; dependency row</div>
       <div class="check-row">
         <span class="verdict warn">WARN</span>
-        <div class="desc"><strong>New dependency introduced</strong> &mdash; <code>prisma</code> not in approved list.</div>
+        <div class="desc"><strong>New dependency introduced</strong> &mdash; <code>sqlalchemy</code> not in approved list.</div>
       </div>
     </div>
 

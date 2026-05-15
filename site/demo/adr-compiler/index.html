@@ -43,7 +43,7 @@
         "description": "Flagship walkthrough of Mneme's ADR compiler. Reads ADR files with optional Constraints sections and emits enforceable, precedence-aware decisions. Runnable against Mneme's own ADRs.",
         "url": "https://mnemehq.com/demo/adr-compiler/",
         "datePublished": "2026-05-13",
-        "dateModified": "2026-05-13",
+        "dateModified": "2026-05-15",
         "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
         "image": "https://mnemehq.com/demo/og.png",
@@ -80,7 +80,9 @@
     .breadcrumb a { color: var(--muted); text-decoration: none; }
     .breadcrumb a:hover { color: var(--text); }
 
-    main { max-width: 880px; margin: 0 auto; padding: 2.5rem 2rem 5rem; }
+    /* ── PROSE SECTIONS ── */
+    .prose-section { max-width: 880px; margin: 0 auto; padding: 2.5rem 2rem 3.5rem; }
+    .prose-section + .prose-section { padding-top: 0; }
 
     .article-eyebrow { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
     .eyebrow-tag { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
@@ -92,13 +94,14 @@
     h1 em { font-style: italic; color: var(--accent); }
     .lede { font-size: 1.05rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; margin-bottom: 1.25rem; }
     .lede strong { color: var(--text); font-weight: 500; }
-    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-bottom: 3rem; }
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-bottom: 2.5rem; }
     .byline a { color: var(--muted); text-decoration: none; }
     .byline a:hover { color: var(--text); }
     .byline .sep { color: var(--border2); margin: 0 0.5rem; }
 
     .body { font-size: 0.95rem; line-height: 1.85; color: var(--text); }
     .body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .body h2:first-child { margin-top: 0; }
     .body h3 { font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--text); }
     .body p { margin-bottom: 1.1rem; color: var(--muted); }
     .body p strong { color: var(--text); font-weight: 500; }
@@ -107,32 +110,6 @@
     .body a:hover { color: var(--accent-dim); border-bottom-color: rgba(200,240,96,0.7); }
     .body pre { background: var(--term-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; overflow-x: auto; margin: 1.25rem 0; }
     .body pre code { background: transparent; border: none; padding: 0; font-size: 0.78rem; line-height: 1.7; color: var(--text); }
-
-    /* ── INTERACTIVE PANELS ── */
-    .demo-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin: 1.5rem 0; }
-    @media (max-width: 680px) { .demo-wrap { grid-template-columns: 1fr; } }
-    .panel { background: var(--term-bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
-    .panel-header { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem; background: #0d0d10; border-bottom: 1px solid var(--border); font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; font-family: 'DM Mono', monospace; }
-    .panel-header.bad { color: var(--fail); }
-    .panel-header.good { color: var(--accent); }
-    .panel-header.neutral { color: var(--teal); }
-    .dot { width: 9px; height: 9px; border-radius: 50%; }
-    .d-r { background: #ff5f57; } .d-y { background: #febc2e; } .d-g { background: #28c840; }
-    .panel-body { padding: 1.1rem 1.4rem; font-family: 'DM Mono', monospace; font-size: 0.78rem; line-height: 1.9; min-height: 240px; }
-    .prompt-line { color: #a78bfa; }
-    .out-bad { color: var(--term-bad); }
-    .out-good { color: var(--accent); }
-    .out-muted { color: var(--muted); }
-    .check-panel { grid-column: 1 / -1; background: var(--term-bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
-    .label-badge { display: inline-block; font-size: 0.63rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.12rem 0.45rem; border-radius: 999px; margin-right: 0.4rem; font-family: 'DM Mono', monospace; }
-    .badge-pass { background: rgba(200,240,96,0.12); color: var(--accent); border: 1px solid rgba(200,240,96,0.25); }
-    .badge-warn { background: rgba(245,158,11,0.12); color: var(--warn); border: 1px solid rgba(245,158,11,0.25); }
-    .badge-fail { background: rgba(239,68,68,0.12); color: var(--fail); border: 1px solid rgba(239,68,68,0.25); }
-    .hidden { display: none; }
-    .fade-in { animation: fadeIn 0.35s ease forwards; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
-    .replay-btn { margin: 1rem 0 0; background: transparent; color: var(--muted); border: 1px solid var(--border2); padding: 0.5rem 1.2rem; border-radius: 6px; font-size: 0.78rem; font-family: 'DM Mono', monospace; cursor: pointer; display: none; transition: color 0.15s, border-color 0.15s; }
-    .replay-btn:hover { color: var(--text); border-color: var(--muted); }
 
     /* ── PIPELINE DIAGRAM ── */
     .pipeline { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem 1.75rem; margin: 1.75rem 0; }
@@ -148,10 +125,50 @@
     .callout p { color: var(--muted); font-size: 0.88rem; margin: 0; }
     .callout p strong { color: var(--teal); font-weight: 500; }
 
+    /* ── DEMO BAND ── */
+    .demo-band { background: var(--surface2); border-top: 1px solid var(--border2); border-bottom: 1px solid var(--border2); }
+    .demo-band-inner { max-width: 920px; margin: 0 auto; padding: 4rem 2rem; }
+    .demo-band-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.85rem; }
+    .demo-band h2 { font-family: 'Instrument Serif', serif; font-size: clamp(1.6rem, 3.5vw, 2.2rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 0.85rem; color: var(--text); }
+    .demo-band h2 em { font-style: italic; color: var(--accent); }
+    .demo-band .demo-intro { font-size: 0.95rem; color: var(--muted); line-height: 1.75; max-width: 680px; margin-bottom: 2.5rem; }
+    .demo-band .demo-intro strong { color: var(--text); font-weight: 500; }
+
+    /* ── INTERACTIVE PANELS ── */
+    .demo-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin: 0 0 0.75rem; }
+    @media (max-width: 680px) { .demo-wrap { grid-template-columns: 1fr; } }
+    .panel { background: var(--term-bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .panel-header { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem; background: #0d0d10; border-bottom: 1px solid var(--border); font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; font-family: 'DM Mono', monospace; }
+    .panel-header.bad { color: var(--fail); }
+    .panel-header.good { color: var(--accent); }
+    .panel-header.neutral { color: var(--teal); }
+    .dot { width: 9px; height: 9px; border-radius: 50%; }
+    .d-r { background: #ff5f57; } .d-y { background: #febc2e; } .d-g { background: #28c840; }
+    .panel-body { padding: 1.1rem 1.4rem; font-family: 'DM Mono', monospace; font-size: 0.78rem; line-height: 1.9; min-height: 260px; }
+    .prompt-line { color: #a78bfa; }
+    .out-bad { color: var(--term-bad); }
+    .out-good { color: var(--accent); }
+    .out-muted { color: var(--muted); }
+    .check-panel { grid-column: 1 / -1; background: var(--term-bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .label-badge { display: inline-block; font-size: 0.63rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.12rem 0.45rem; border-radius: 999px; margin-right: 0.4rem; font-family: 'DM Mono', monospace; }
+    .badge-pass { background: rgba(200,240,96,0.12); color: var(--accent); border: 1px solid rgba(200,240,96,0.25); }
+    .badge-warn { background: rgba(245,158,11,0.12); color: var(--warn); border: 1px solid rgba(245,158,11,0.25); }
+    .badge-fail { background: rgba(239,68,68,0.12); color: var(--fail); border: 1px solid rgba(239,68,68,0.25); }
+    .hidden { display: none; }
+    .fade-in { animation: fadeIn 0.35s ease forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+    .replay-btn { margin: 1rem 0 0; background: transparent; color: var(--muted); border: 1px solid var(--border2); padding: 0.5rem 1.2rem; border-radius: 6px; font-size: 0.78rem; font-family: 'DM Mono', monospace; cursor: pointer; display: none; transition: color 0.15s, border-color 0.15s; }
+    .replay-btn:hover { color: var(--text); border-color: var(--muted); }
+
+    /* ── CLOSING BAND ── */
+    .closing-band { background: var(--surface); border-top: 1px solid var(--border); }
+    .closing-band-inner { max-width: 880px; margin: 0 auto; padding: 3.5rem 2rem; }
+    .closing-band .body h2:first-child { margin-top: 0; }
+
     /* ── CTA / NEXT ── */
-    .next-bar { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .next-bar { margin-top: 3rem; padding-top: 2.5rem; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     @media (max-width: 640px) { .next-bar { grid-template-columns: 1fr; } }
-    .next-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; text-decoration: none; color: inherit; transition: border-color 0.15s, transform 0.15s; display: block; }
+    .next-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; text-decoration: none; color: inherit; transition: border-color 0.15s, transform 0.15s; display: block; }
     .next-card:hover { border-color: var(--border2); transform: translateY(-1px); }
     .next-card .nc-label { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
     .next-card h4 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 0.4rem; }
@@ -177,7 +194,9 @@
       .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.92rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
       .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
       .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
-      main { padding: 2rem 1.25rem 4rem; }
+      .prose-section { padding: 2rem 1.25rem 2.5rem; }
+      .demo-band-inner { padding: 3rem 1.25rem; }
+      .closing-band-inner { padding: 2.5rem 1.25rem; }
       .breadcrumb-nav { padding: 0 1.25rem; }
     }
   </style>
@@ -207,7 +226,8 @@
     </ol>
   </nav>
 
-  <main>
+  <!-- SECTION 1: Hero + intro + pipeline (bg = --bg) -->
+  <div class="prose-section">
     <header>
       <div class="article-eyebrow">
         <span class="eyebrow-tag">Flagship 01 &middot; Centerpiece</span>
@@ -261,9 +281,15 @@
 
       <p>Same query into the resolved corpus returns the same decision set every time. That property is non-negotiable: if retrieval is non-deterministic, the governance layer cannot block on it.</p>
 
-      <h2>See it live: same prompt, same model, different answer</h2>
+    </div>
+  </div>
 
-      <p>The animation below runs the same prompt &mdash; <em>"Refactor the storage backend for scalability"</em> &mdash; through the same model twice. The two outputs disagree because one of them is governed by <code>ADR-001</code> (JSON storage only), <code>ADR-003</code> (no ORM in v1), and <code>ADR-005</code> (extend before rebuild). The decisions reach the model through the compiler, not through a freeform prompt.</p>
+  <!-- SECTION 2: Live demo (bg = --surface2, full bleed) -->
+  <div class="demo-band" id="live-demo">
+    <div class="demo-band-inner">
+      <div class="demo-band-eyebrow">Live animation</div>
+      <h2>See it live: <em>ADRs as source, governance as output</em></h2>
+      <p class="demo-intro">The animation below runs the same task two ways: once as a plain agent reading ADRs as documentation, and once through the ADR compiler. <strong>The difference is not the model.</strong> The difference is that the compiler parses frontmatter, extracts constraints, resolves precedence, and emits a deterministic governance corpus that hooks and CI can enforce.</p>
 
       <div class="demo-wrap">
         <div class="panel">
@@ -294,9 +320,13 @@
           <div class="panel-body" id="check-body" style="min-height:auto;"></div>
         </div>
       </div>
-      <button class="replay-btn" type="button" id="replay-btn" onclick="startDemo(true)">&larr; Replay</button>
+      <button class="replay-btn" type="button" id="replay-btn" onclick="startDemo()">&larr; Replay</button>
+    </div>
+  </div>
 
-      <p>The model is the same. The prompt is the same. The decisions are the same on disk in both cases. The only difference is that one run uses the compiled corpus and the other does not.</p>
+  <!-- SECTION 3: ADR format + conflict resolution + run it (bg = --bg) -->
+  <div class="prose-section">
+    <div class="body">
 
       <h2>What an ADR looks like to the compiler</h2>
 
@@ -373,31 +403,40 @@ Result: WARN</code></pre>
         <li>&rarr; <a href="/integrations/github-actions/">GitHub Actions integration</a> &mdash; post-generation enforcement gate on PRs.</li>
       </ul>
 
-      <h2>Dogfooding</h2>
-
-      <p>Mneme HQ enforces its own ADRs through the compiler. The <code>docs/adr/</code> directory in this repo holds the team's architectural decisions; the compiler keeps <code>.mneme/project_memory.json</code> in sync. When an AI-assisted task in this codebase generates a brand/namespace conflation, <code>ADR-005</code> fires before the change reaches review. The walkthrough above is the same loop the maintainers use day-to-day.</p>
-
-      <h2>Why this is strategically the most important demo</h2>
-
-      <p>The drift demo shows the failure mode. The multi-agent demo shows where governance has to scale to. The compiler is the artifact that makes both of them tractable &mdash; <strong>it is the step that turns existing architectural documentation into the executable substrate the other two flagships rely on.</strong> Without a compiler, governance stays advisory. With one, it becomes infrastructure.</p>
-
-      <div class="next-bar">
-        <a class="next-card" href="/demo/architectural-drift/">
-          <div class="nc-label">Flagship 02</div>
-          <h4>Architectural drift prevention</h4>
-          <p>The failure mode this compiler exists to prevent. A six-step timeline of compounding divergence.</p>
-          <span class="nc-arrow">Walk the timeline &rarr;</span>
-        </a>
-        <a class="next-card" href="/demo/multi-agent-governance/">
-          <div class="nc-label">Flagship 03</div>
-          <h4>Governance continuity across actors</h4>
-          <p>Where the compiler has to scale to once AI execution becomes parallel and persistent.</p>
-          <span class="nc-arrow">See the trace &rarr;</span>
-        </a>
-      </div>
-
     </div>
-  </main>
+  </div>
+
+  <!-- SECTION 4: Dogfooding + strategic framing + next (bg = --surface) -->
+  <div class="closing-band">
+    <div class="closing-band-inner">
+      <div class="body">
+
+        <h2>Dogfooding</h2>
+
+        <p>Mneme HQ enforces its own ADRs through the compiler. The <code>docs/adr/</code> directory in this repo holds the team's architectural decisions; the compiler keeps <code>.mneme/project_memory.json</code> in sync. When an AI-assisted task in this codebase generates a brand/namespace conflation, <code>ADR-005</code> fires before the change reaches review. The walkthrough above is the same loop the maintainers use day-to-day.</p>
+
+        <h2>Why this is strategically the most important demo</h2>
+
+        <p>The drift demo shows the failure mode. The multi-agent demo shows where governance has to scale to. The compiler is the artifact that makes both of them tractable &mdash; <strong>it is the step that turns existing architectural documentation into the executable substrate the other two flagships rely on.</strong> Without a compiler, governance stays advisory. With one, it becomes infrastructure.</p>
+
+        <div class="next-bar">
+          <a class="next-card" href="/demo/architectural-drift/">
+            <div class="nc-label">Flagship 02</div>
+            <h4>Architectural drift prevention</h4>
+            <p>The failure mode this compiler exists to prevent. A six-step timeline of compounding divergence.</p>
+            <span class="nc-arrow">Walk the timeline &rarr;</span>
+          </a>
+          <a class="next-card" href="/demo/multi-agent-governance/">
+            <div class="nc-label">Flagship 03</div>
+            <h4>Governance continuity across actors</h4>
+            <p>Where the compiler has to scale to once AI execution becomes parallel and persistent.</p>
+            <span class="nc-arrow">See the trace &rarr;</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
 
   <footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
     <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
@@ -414,7 +453,7 @@ Result: WARN</code></pre>
         <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
         <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
           <li><a href="/architecture/" style="color:var(--muted);text-decoration:none;">Architecture</a></li>
-        <li><a href="/insights/" style="color:var(--muted);text-decoration:none;">Insights</a></li>
+          <li><a href="/insights/" style="color:var(--muted);text-decoration:none;">Insights</a></li>
           <li><a href="/standards/" style="color:var(--muted);text-decoration:none;">Standards</a></li>
           <li><a href="/benchmark/" style="color:var(--muted);text-decoration:none;">Benchmark</a></li>
           <li><a href="/docs/" style="color:var(--muted);text-decoration:none;">Docs</a></li>
@@ -443,35 +482,39 @@ Result: WARN</code></pre>
   </footer>
 
   <script>
-    const PROMPT = '> "Refactor the storage backend for scalability."';
+    const PROMPT = '> "Compile the repo ADRs into enforceable project memory."';
+
     const WITHOUT_LINES = [
-      { t: 800,  html: '<div class="out-muted">Thinking...</div>' },
-      { t: 1400, html: '<div class="out-bad">I recommend migrating to a distributed</div>' },
-      { t: 1800, html: '<div class="out-bad">database architecture. Consider replacing</div>' },
-      { t: 2200, html: '<div class="out-bad">JSON storage with PostgreSQL or Redis.</div>' },
-      { t: 2600, html: '<div class="out-bad">Add a migration layer and ORM for</div>' },
-      { t: 3000, html: '<div class="out-bad">long-term scalability.</div>' },
+      { t: 800,  html: '<div class="out-muted">Reading docs/adr/*.md as prose...</div>' },
+      { t: 1400, html: '<div class="out-bad">Found several architecture notes.</div>' },
+      { t: 1800, html: '<div class="out-bad">Summarizing decisions into guidance...</div>' },
+      { t: 2300, html: '<div class="out-bad">Brand: Mneme HQ. Package: maybe MnemeHQ.</div>' },
+      { t: 2800, html: '<div class="out-bad">No explicit enforcement artifact emitted.</div>' },
+      { t: 3300, html: '<div class="out-bad">No precedence or constraint validation.</div>' },
     ];
+
     const WITH_LINES = [
-      { t: 800,  html: '<div class="out-muted">Compiler emits decisions...</div>' },
-      { t: 1400, html: '<div class="out-muted" style="font-size:0.72rem;color:#3a3a4a;">&#8627; ADR-001: JSON storage only &mdash; no external DB<br>&#8627; ADR-003: No ORM in v1<br>&#8627; ADR-005: Extend before rebuild</div>' },
-      { t: 2000, html: '<br>' },
-      { t: 2100, html: '<div class="out-good">Storage decision enforced. Per ADR-001,</div>' },
-      { t: 2500, html: '<div class="out-good">JSON storage is locked &mdash; no Postgres,</div>' },
-      { t: 2900, html: '<div class="out-good">no Redis, no ORM in v1. Extend the</div>' },
-      { t: 3300, html: '<div class="out-good">current storage module instead.</div>' },
+      { t: 800,  html: '<div class="out-muted">Compiler parsing ADR frontmatter...</div>' },
+      { t: 1400, html: '<div class="out-muted" style="font-size:0.72rem;color:#3a3a4a;">&#8627; ADR-005: Brand vs Package Namespace Enforcement<br>&#8627; status: accepted<br>&#8627; priority: foundational<br>&#8627; scope: code</div>' },
+      { t: 2100, html: '<br>' },
+      { t: 2200, html: '<div class="out-good">Constraints extracted:</div>' },
+      { t: 2700, html: '<div class="out-good">FORBID_DEPENDENCY: MnemeHQ</div>' },
+      { t: 3100, html: '<div class="out-good">FORBID_PATH: site/use-cases/**/Mneme HQ*</div>' },
+      { t: 3500, html: '<div class="out-good">Emitting .mneme/project_memory.json</div>' },
     ];
+
     const CHECK_LINES = [
-      { t: 400,  html: '<div class="out-muted">Checking decisions against current context...</div><br>' },
-      { t: 900,  html: '<div><span class="label-badge badge-pass">PASS</span> <span style="color:var(--text)">Storage decision enforced</span> <span class="out-muted">&mdash; JSON only, no new DBs</span></div>' },
-      { t: 1300, html: '<div><span class="label-badge badge-pass">PASS</span> <span style="color:var(--text)">Auth pattern respected</span> <span class="out-muted">&mdash; JWT middleware unchanged</span></div>' },
-      { t: 1700, html: '<div><span class="label-badge badge-warn">WARN</span> <span style="color:var(--text)">New dependency introduced</span> <span class="out-muted">&mdash; prisma not in approved list</span></div>' },
-      { t: 2100, html: '<div><span class="label-badge badge-fail">FAIL</span> <span style="color:var(--text)">Violates ADR-004</span> <span class="out-muted">&mdash; Repository pattern bypassed in user.service.ts</span></div>' },
-      { t: 2600, html: '<br><div class="out-muted">2 passed &middot; 1 warning &middot; 1 failure</div>' },
+      { t: 400,  html: '<div class="out-muted">Checking compiled decisions against generated code...</div><br>' },
+      { t: 900,  html: '<div><span class="label-badge badge-pass">PASS</span> <span style="color:var(--text)">ADR metadata parsed</span> <span class="out-muted">&mdash; accepted / foundational / code</span></div>' },
+      { t: 1400, html: '<div><span class="label-badge badge-pass">PASS</span> <span style="color:var(--text)">Constraints emitted</span> <span class="out-muted">&mdash; dependency and path rules available</span></div>' },
+      { t: 1900, html: '<div><span class="label-badge badge-warn">WARN</span> <span style="color:var(--text)">Namespace trigger matched</span> <span class="out-muted">&mdash; MnemeHQ import detected</span></div>' },
+      { t: 2400, html: '<div><span class="label-badge badge-fail">FAIL</span> <span style="color:var(--text)">Violates ADR-005</span> <span class="out-muted">&mdash; from MnemeHQ.memory_store import MemoryStore</span></div>' },
+      { t: 3000, html: '<br><div class="out-muted">2 passed &middot; 1 warning &middot; 1 failure &middot; source: ADR-005</div>' },
     ];
 
     let timers = [];
     function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+
     function typeText(el, text, cb) {
       let i = 0; el.textContent = '';
       function next() {
@@ -480,6 +523,7 @@ Result: WARN</code></pre>
       }
       next();
     }
+
     function appendLines(containerId, lines, startDelay, onDone) {
       const el = document.getElementById(containerId);
       lines.forEach(({ t, html }) => {
@@ -491,7 +535,8 @@ Result: WARN</code></pre>
       });
       if (onDone) timers.push(setTimeout(onDone, startDelay + lines[lines.length - 1].t + 600));
     }
-    function startDemo(fromReplay) {
+
+    function startDemo() {
       clearTimers();
       document.getElementById('replay-btn').style.display = 'none';
       const wPrompt = document.getElementById('w-prompt');
@@ -504,15 +549,7 @@ Result: WARN</code></pre>
       wOut.innerHTML = ''; wOut.classList.add('hidden');
       mOut.innerHTML = ''; mOut.classList.add('hidden');
       checkPanel.classList.add('hidden'); checkBody.innerHTML = '';
-      if (fromReplay) {
-        // The check panel just collapsed, so the page is now shorter and the
-        // demo wrap would otherwise fall above the viewport. Scroll it back
-        // into view so the user actually sees the replay.
-        const wrap = document.querySelector('.demo-wrap');
-        if (wrap && wrap.scrollIntoView) {
-          wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }
+
       typeText(wPrompt, PROMPT, () => {
         wOut.classList.remove('hidden');
         appendLines('w-out', WITHOUT_LINES, 0);
@@ -531,6 +568,7 @@ Result: WARN</code></pre>
         });
       }, 150));
     }
+
     startDemo();
   </script>
   <script>
