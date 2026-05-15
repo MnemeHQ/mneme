@@ -5,8 +5,8 @@
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/favicon.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mneme HQ — Operational proof of architectural governance</title>
-  <meta name="description" content="Three flagship demos and a benchmark suite showing why governance becomes infrastructure once AI SDLCs scale. Architectural drift prevention, the ADR compiler, and governance continuity across multiple agents." />
+  <title>Mneme HQ — AI governance in action: governed agents, drift prevention, multi-actor continuity</title>
+  <meta name="description" content="Three flagship demos showing AI governance as infrastructure. A Python agent catches its own namespace violation. Architectural drift gets blocked upstream. Governance holds across multiple actors. Plus a runnable benchmark suite." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/demo/" />
@@ -14,14 +14,14 @@
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Mneme HQ — Operational proof of architectural governance" />
-  <meta property="og:description" content="Three flagship demos and a benchmark suite showing why governance becomes infrastructure once AI SDLCs scale." />
+  <meta property="og:title" content="Mneme HQ — AI governance in action: governed agents, drift prevention, multi-actor continuity" />
+  <meta property="og:description" content="Three flagship demos showing AI governance as infrastructure. A Python agent catches its own namespace violation. Architectural drift gets blocked upstream. Governance holds across multiple actors." />
   <meta property="og:url" content="https://mnemehq.com/demo/" />
   <meta property="og:image" content="https://mnemehq.com/demo/og.png" />
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Mneme HQ — Operational proof of architectural governance" />
-  <meta name="twitter:description" content="Three flagship demos and a benchmark suite showing why governance becomes infrastructure once AI SDLCs scale." />
+  <meta name="twitter:title" content="Mneme HQ — AI governance in action: governed agents, drift prevention, multi-actor continuity" />
+  <meta name="twitter:description" content="Three flagship demos showing AI governance as infrastructure. A Python agent catches its own namespace violation. Architectural drift gets blocked upstream. Governance holds across multiple actors." />
   <meta name="twitter:image" content="https://mnemehq.com/demo/og.png" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,7 +48,7 @@
         "description": "Three flagship demos and a benchmark suite showing why architectural governance becomes infrastructure once AI SDLCs scale. Architectural drift prevention, the ADR compiler, and governance continuity across multiple agents.",
         "url": "https://mnemehq.com/demo/",
         "datePublished": "2026-04-01",
-        "dateModified": "2026-05-13",
+        "dateModified": "2026-05-15",
         "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
         "primaryImageOfPage": "https://mnemehq.com/demo/og.png",
@@ -72,8 +72,8 @@
         "@type": "ItemList",
         "name": "Mneme HQ flagship demos",
         "itemListElement": [
-          {"@type": "ListItem", "position": 1, "name": "Architectural drift prevention", "url": "https://mnemehq.com/demo/architectural-drift/"},
-          {"@type": "ListItem", "position": 2, "name": "ADR compiler (governance-as-code)", "url": "https://mnemehq.com/demo/adr-compiler/"},
+          {"@type": "ListItem", "position": 1, "name": "Governed Python agent", "url": "https://mnemehq.com/demo/governed-python-agent/"},
+          {"@type": "ListItem", "position": 2, "name": "Architectural drift prevention", "url": "https://mnemehq.com/demo/architectural-drift/"},
           {"@type": "ListItem", "position": 3, "name": "Multi-agent governance continuity", "url": "https://mnemehq.com/demo/multi-agent-governance/"}
         ]
       },
@@ -221,6 +221,18 @@
     /* ── FOOTER ── */
     footer { border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left; }
 
+    /* ── INFRASTRUCTURE FEATURE CARDS ── */
+    .infra-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.85rem; }
+    .infra-card { background: var(--surface); border: 1px solid var(--border); border-left: 2px solid var(--teal); border-radius: 8px; padding: 1.25rem 1.5rem; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 0.55rem; transition: border-color 0.15s, transform 0.15s; }
+    .infra-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+    .infra-meta { display: flex; align-items: center; gap: 0.55rem; flex-wrap: wrap; }
+    .infra-tag { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal); }
+    .infra-tag-sep { color: var(--border2); font-family: 'DM Mono', monospace; font-size: 0.65rem; }
+    .infra-tag-sub { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+    .infra-card h3 { font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; color: var(--text); margin: 0; line-height: 1.35; }
+    .infra-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.65; margin: 0; }
+    .infra-card .ic-arrow { color: var(--accent); font-family: 'DM Mono', monospace; font-size: 0.74rem; margin-top: auto; }
+
     /* ── HAMBURGER ── */
     .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; padding: 0; flex-shrink: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; transition: border-color 0.15s, background 0.15s; }
     .nav-hamburger:hover { border-color: var(--accent); }
@@ -270,13 +282,13 @@
     <header class="hero">
       <div class="hero-eyebrow">Operational proof</div>
       <h1>Governance becomes <em>infrastructure</em><br>once AI SDLCs scale.</h1>
-      <p class="lede">Three flagship demos and a benchmark suite. Each one shows a different manifestation of the same structural problem: AI accelerates architectural entropy, review does not scale linearly with AI output, and local fixes compound into systemic drift. The remediation is a governance layer that lives outside any single coding tool.</p>
+      <p class="lede">Three flagship demos and a benchmark suite. Start with the product loop: a Python agent proposes violating code, Mneme catches it, the agent retries with compliant output. Then see how drift compounds without governance, and how invariants hold across multiple actors. The remediation is a governance layer that lives outside any single coding tool.</p>
       <p class="byline">
         By <a href="/founder/">Theo Valmis</a>
         <span class="sep">&middot;</span>
         <time datetime="2026-04-01">Published Apr 2026</time>
         <span class="sep">&middot;</span>
-        <time datetime="2026-05-13">Restructured May 2026</time>
+        <time datetime="2026-05-15">Restructured May 2026</time>
       </p>
     </header>
 
@@ -317,21 +329,21 @@
 
       <div class="flagship-grid">
 
-        <!-- Flagship 2: ADR Compiler (centerpiece, listed first) -->
-        <a class="flagship-card featured" href="/demo/adr-compiler/">
+        <!-- Flagship 1: Governed Python agent (centerpiece) -->
+        <a class="flagship-card featured" href="/demo/governed-python-agent/">
           <div class="flagship-meta">
             <span class="flagship-num">Flagship 01 &middot; Centerpiece</span>
             <span class="flagship-tag centerpiece">Runnable</span>
             <span class="flagship-tag runnable">Mneme dogfoods this</span>
           </div>
-          <h3>The ADR compiler &mdash; turn architectural decisions into infrastructure</h3>
-          <p class="fc-lede">Most teams already have ADRs. They sit in <code style="font-family:'DM Mono',monospace;font-size:0.85em;background:var(--surface2);border-radius:3px;padding:0.05em 0.35em;">docs/adr/</code>, get referenced in onboarding, and are quietly ignored by every AI coding agent that touches the codebase. The ADR compiler reads those same files, parses an optional <code style="font-family:'DM Mono',monospace;font-size:0.85em;background:var(--surface2);border-radius:3px;padding:0.05em 0.35em;">## Constraints</code> section, and emits enforceable, precedence-aware decisions that govern generation and CI. No rewrite. Same prompt, same model, different answer once the decisions are live.</p>
+          <h3>Governed Python agent &mdash; from bad code to compliant output</h3>
+          <p class="fc-lede">A Python coding agent proposes <code style="font-family:'DM Mono',monospace;font-size:0.85em;background:var(--surface2);border-radius:3px;padding:0.05em 0.35em;">from MnemeHQ.memory_store import MemoryStore</code>. Locally reasonable &mdash; MnemeHQ is the brand name the agent has seen everywhere. Architecturally invalid &mdash; it violates ADR-005 (Brand vs Package Namespace Enforcement). Mneme retrieves the compiled decision, blocks the violation, injects the context, and the agent retries with <code style="font-family:'DM Mono',monospace;font-size:0.85em;background:var(--surface2);border-radius:3px;padding:0.05em 0.35em;">from mneme.memory_store import MemoryStore</code>. This is the product loop in full.</p>
           <div class="fc-evidence">
-            <div class="fc-evidence-item"><strong>EVIDENCE</strong> Live walkthrough animation + scenario page</div>
+            <div class="fc-evidence-item"><strong>EVIDENCE</strong> Live animation + full enforcement trace</div>
             <div class="fc-evidence-item"><strong>RUNS</strong> <code style="font-family:'DM Mono',monospace;font-size:0.82em;">python examples/demo-adr-import.py</code></div>
-            <div class="fc-evidence-item"><strong>SOURCE</strong> Mneme's own ADRs in <code style="font-family:'DM Mono',monospace;font-size:0.82em;">docs/adr/</code></div>
+            <div class="fc-evidence-item"><strong>SHOWS</strong> Violation detection, retry context injection, compliant output</div>
           </div>
-          <span class="fc-cta">Walk through the compiler &rarr;</span>
+          <span class="fc-cta">Walk through the product loop &rarr;</span>
         </a>
 
         <!-- Flagship 1: Architectural drift -->
@@ -408,10 +420,32 @@
       </div>
     </section>
 
-    <!-- ───── 04 · OPERATIONAL EVIDENCE ───── -->
+    <!-- ───── 04 · INFRASTRUCTURE FEATURES ───── -->
+    <section class="section" id="infrastructure">
+      <div class="section-header">
+        <span class="section-num">04 &middot; Infrastructure features</span>
+        <h2>How the governance corpus is built</h2>
+      </div>
+      <p class="section-lede">The flagship demos work because ADR decisions are compiled into an executable corpus before generation happens. The feature below is the foundation layer &mdash; it turns existing architectural documentation into the structured decision store the demos run against.</p>
+
+      <div class="infra-grid">
+        <a class="infra-card" href="/demo/adr-compiler/">
+          <div class="infra-meta">
+            <span class="infra-tag">Infrastructure feature</span>
+            <span class="infra-tag-sep">&middot;</span>
+            <span class="infra-tag-sub">ADR compiler</span>
+          </div>
+          <h3>ADR compiler &mdash; turn architectural decisions into infrastructure</h3>
+          <p>The governed Python agent demo works because ADR-005 was compiled from <code style="font-family:'DM Mono',monospace;font-size:0.85em;background:var(--surface2);border-radius:3px;padding:0.05em 0.35em;">docs/adr/</code> into <code style="font-family:'DM Mono',monospace;font-size:0.85em;background:var(--surface2);border-radius:3px;padding:0.05em 0.35em;">project_memory.json</code>. This page explains the compiler step: parse, validate, resolve precedence, emit. No vector store. No ML. Deterministic every run.</p>
+          <span class="ic-arrow">See how ADRs become the governance corpus &rarr;</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ───── 05 · OPERATIONAL EVIDENCE ───── -->
     <section class="section" id="evidence">
       <div class="section-header">
-        <span class="section-num">04 · Operational evidence</span>
+        <span class="section-num">05 &middot; Operational evidence</span>
         <h2>The benchmark, the integrations, the trace format</h2>
       </div>
       <p class="section-lede">The flagships and supporting demos sit on top of three operational artifacts: a reproducible scenario benchmark, hook-level integrations with the tools teams already use, and a structured governance trace that drives the CI gate.</p>
@@ -457,7 +491,7 @@
       <div class="faq-list">
         <details class="faq-item">
           <summary>Why three flagship demos instead of a single feature tour?</summary>
-          <div class="faq-body">Each flagship demonstrates a different manifestation of the same structural problem: AI accelerates architectural entropy, review systems do not scale linearly with AI output, and local fixes accumulate into systemic drift. Architectural drift prevention shows the failure mode over time. The ADR compiler shows the remediation: turn existing decision records into executable constraints. Multi-agent governance shows that the constraints have to hold across actors, sessions, and retries. Together they sell the category, not a feature.</div>
+          <div class="faq-body">Each flagship demonstrates a different manifestation of the same structural problem. The governed Python agent demo shows the product outcome: AI proposes violating code, Mneme catches it, the agent retries with compliant output. Architectural drift prevention shows the failure mode over time. Multi-agent governance shows that constraints have to hold across actors, sessions, and retries. The ADR compiler is the infrastructure feature that makes all of them possible &mdash; it compiles existing ADRs into the executable corpus the flagships run against.</div>
         </details>
         <details class="faq-item">
           <summary>What is the difference between flagship and supporting demos?</summary>

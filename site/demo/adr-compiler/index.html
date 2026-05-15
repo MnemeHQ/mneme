@@ -233,7 +233,7 @@
   <div class="prose-section">
     <header>
       <div class="article-eyebrow">
-        <span class="eyebrow-tag">Flagship 01 &middot; Centerpiece</span>
+        <span class="eyebrow-tag" style="color: var(--teal);">Infrastructure feature &middot; ADR compiler</span>
         <span class="eyebrow-dot"></span>
         <span class="eyebrow-meta">7 min read</span>
         <span class="eyebrow-dot"></span>
@@ -241,6 +241,9 @@
       </div>
       <h1>The ADR compiler &mdash; turn architectural decisions into <em>infrastructure</em>.</h1>
       <p class="lede">Most teams have ADRs. They sit in <code>docs/adr/</code>, written in good faith, referenced in onboarding, and then quietly ignored by every AI coding agent that touches the codebase. The ADR compiler reads those same files, parses an optional <code>## Constraints</code> section, and emits enforceable, precedence-aware decisions that govern generation and CI. <strong>No rewrite. No new format. Decisions become infrastructure.</strong></p>
+      <div class="callout" style="margin: 0 0 1.5rem;">
+        <p>For the end-to-end product loop, see the <a href="/demo/governed-python-agent/">Governed Python agent demo</a>. This page explains the compiler step that turns ADRs into the governance corpus used by that demo.</p>
+      </div>
       <p class="byline">
         By <a href="/founder/">Theo Valmis</a>
         <span class="sep">&middot;</span>
@@ -252,7 +255,7 @@
 
     <div class="body">
 
-      <h2>Why this is the centerpiece</h2>
+      <h2>Why the compiler is the foundation</h2>
 
       <p>Every governance pitch eventually runs into the same objection: <em>we already document our architecture; the problem isn't documentation</em>. That objection is correct. The documentation is fine. What is missing is the compilation step that turns it into something an AI agent &mdash; or a CI gate &mdash; can actually answer to.</p>
 
@@ -418,16 +421,16 @@ Result: WARN</code></pre>
 
         <p>Mneme HQ enforces its own ADRs through the compiler. The <code>docs/adr/</code> directory in this repo holds the team's architectural decisions; the compiler keeps <code>.mneme/project_memory.json</code> in sync. When an AI-assisted task in this codebase generates a brand/namespace conflation, <code>ADR-005</code> fires before the change reaches review. The walkthrough above is the same loop the maintainers use day-to-day.</p>
 
-        <h2>Why this is strategically the most important demo</h2>
+        <h2>The compiler is the engine room</h2>
 
-        <p>The drift demo shows the failure mode. The multi-agent demo shows where governance has to scale to. The compiler is the artifact that makes both of them tractable &mdash; <strong>it is the step that turns existing architectural documentation into the executable substrate the other two flagships rely on.</strong> Without a compiler, governance stays advisory. With one, it becomes infrastructure.</p>
+        <p>The drift demo shows the failure mode. The multi-agent demo shows where governance has to scale to. The compiler is the artifact that makes both of them tractable &mdash; <strong>it is the step that turns existing architectural documentation into the executable substrate the other demos rely on.</strong> Without a compiler, governance stays advisory. With one, it becomes infrastructure. The product experience that demonstrates this end-to-end is the <a href="/demo/governed-python-agent/">Governed Python agent demo</a>.</p>
 
         <div class="next-bar">
-          <a class="next-card" href="/demo/architectural-drift/">
-            <div class="nc-label">Flagship 02</div>
-            <h4>Architectural drift prevention</h4>
-            <p>The failure mode this compiler exists to prevent. A six-step timeline of compounding divergence.</p>
-            <span class="nc-arrow">Walk the timeline &rarr;</span>
+          <a class="next-card" href="/demo/governed-python-agent/">
+            <div class="nc-label">Flagship 01 &middot; Product demo</div>
+            <h4>Governed Python agent</h4>
+            <p>See the full product loop: a Python agent proposes a violating import, Mneme blocks it using this compiled corpus, the agent retries with correct code.</p>
+            <span class="nc-arrow">See the product demo &rarr;</span>
           </a>
           <a class="next-card" href="/demo/multi-agent-governance/">
             <div class="nc-label">Flagship 03</div>

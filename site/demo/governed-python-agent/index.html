@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/favicon.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Governed Python agent — from bad code to compliant output | Mneme HQ</title>
+  <meta name="description" content="A Python coding agent proposes an architecturally invalid import. Mneme retrieves ADR-005, blocks the namespace violation, and the agent retries with compliant code. The full product loop in one demo." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/demo/governed-python-agent/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Governed Python agent — from bad code to compliant output | Mneme HQ" />
+  <meta property="og:description" content="A Python coding agent proposes an architecturally invalid import. Mneme retrieves ADR-005, blocks the namespace violation, and the agent retries with compliant code. The full product loop in one demo." />
+  <meta property="og:url" content="https://mnemehq.com/demo/governed-python-agent/" />
+  <meta property="og:image" content="https://mnemehq.com/demo/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Governed Python agent — from bad code to compliant output | Mneme HQ" />
+  <meta name="twitter:description" content="A Python coding agent proposes an architecturally invalid import. Mneme retrieves ADR-005, blocks the namespace violation, and the agent retries with compliant code. The full product loop in one demo." />
+  <meta name="twitter:image" content="https://mnemehq.com/demo/og.png" />
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Demo", "item": "https://mnemehq.com/demo/"},
+          {"@type": "ListItem", "position": 3, "name": "Governed Python agent", "item": "https://mnemehq.com/demo/governed-python-agent/"}
+        ]
+      },
+      {
+        "@type": "Article",
+        "headline": "Governed Python agent — from bad code to compliant output",
+        "description": "A Python coding agent proposes an architecturally invalid import. Mneme retrieves ADR-005, blocks the namespace violation, and the agent retries with compliant code.",
+        "url": "https://mnemehq.com/demo/governed-python-agent/",
+        "datePublished": "2026-05-15",
+        "dateModified": "2026-05-15",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "image": "https://mnemehq.com/demo/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/demo/governed-python-agent/"
+      }
+    ]
+  }
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #88889a;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+      --pass: #c8f060; --warn: #f59e0b; --fail: #ef4444;
+      --term-bad: #ff8585; --term-bg: #0a0a0d;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: #0c0c0d; backdrop-filter: blur(8px); z-index: 100; }
+    .logo { font-family: 'Instrument Serif', serif; font-size: 1.4rem; font-weight: 400; color: var(--text); text-decoration: none; letter-spacing: -0.01em; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--accent); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .breadcrumb-nav { max-width: 880px; margin: 1.5rem auto 0; padding: 0 2rem; }
+    .breadcrumb { display: flex; gap: 0.5rem; list-style: none; font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.04em; }
+    .breadcrumb li:not(:last-child)::after { content: ' / '; margin-left: 0.5rem; color: var(--border2); }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+
+    main { max-width: 880px; margin: 0 auto; padding: 2.5rem 2rem 5rem; }
+
+    .article-eyebrow { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .eyebrow-tag { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+    .eyebrow-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-family: 'DM Mono', monospace; font-size: 0.66rem; color: var(--muted); letter-spacing: 0.04em; }
+    .verdict-pill { font-family: 'DM Mono', monospace; font-size: 0.65rem; padding: 0.18rem 0.55rem; border-radius: 4px; letter-spacing: 0.06em; background: rgba(139,224,200,0.12); color: var(--teal); border: 1px solid rgba(139,224,200,0.3); }
+
+    h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.25rem; }
+    h1 em { font-style: italic; color: var(--accent); }
+    .lede { font-size: 1.05rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; margin-bottom: 1.25rem; }
+    .lede strong { color: var(--text); font-weight: 500; }
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-bottom: 3rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    .body { font-size: 0.95rem; line-height: 1.85; color: var(--text); }
+    .body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .body h3 { font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--text); }
+    .body p { margin-bottom: 1.1rem; color: var(--muted); }
+    .body p strong { color: var(--text); font-weight: 500; }
+    .body code { font-family: 'DM Mono', monospace; font-size: 0.82rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 0.05rem 0.4rem; color: var(--text); }
+    .body a { color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(200,240,96,0.4); }
+    .body a:hover { color: var(--accent-dim); border-bottom-color: rgba(200,240,96,0.7); }
+    .body pre { background: var(--term-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; overflow-x: auto; margin: 1.25rem 0; }
+    .body pre code { background: transparent; border: none; padding: 0; font-size: 0.78rem; line-height: 1.7; color: var(--text); }
+    .body ol { margin: 0.5rem 0 1.5rem 1.5rem; padding: 0; display: flex; flex-direction: column; gap: 0.45rem; color: var(--muted); font-size: 0.9rem; }
+    .body ol li { padding-left: 0.25rem; }
+
+    /* ── INTERACTIVE PANELS ── */
+    .demo-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin: 1.5rem 0; }
+    @media (max-width: 680px) { .demo-wrap { grid-template-columns: 1fr; } }
+    .panel { background: var(--term-bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .panel-header { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem; background: #0d0d10; border-bottom: 1px solid var(--border); font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; font-family: 'DM Mono', monospace; }
+    .panel-header.bad { color: var(--fail); }
+    .panel-header.good { color: var(--accent); }
+    .panel-header.neutral { color: var(--teal); }
+    .dot { width: 9px; height: 9px; border-radius: 50%; }
+    .d-r { background: #ff5f57; } .d-y { background: #febc2e; } .d-g { background: #28c840; }
+    .panel-body { padding: 1.1rem 1.4rem; font-family: 'DM Mono', monospace; font-size: 0.78rem; line-height: 1.9; min-height: 240px; }
+    .prompt-line { color: #a78bfa; }
+    .out-bad { color: var(--term-bad); }
+    .out-good { color: var(--accent); }
+    .out-muted { color: var(--muted); }
+    .correct-panel { grid-column: 1 / -1; background: var(--term-bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .label-badge { display: inline-block; font-size: 0.63rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.12rem 0.45rem; border-radius: 999px; margin-right: 0.4rem; font-family: 'DM Mono', monospace; }
+    .badge-pass { background: rgba(200,240,96,0.12); color: var(--accent); border: 1px solid rgba(200,240,96,0.25); }
+    .badge-warn { background: rgba(245,158,11,0.12); color: var(--warn); border: 1px solid rgba(245,158,11,0.25); }
+    .badge-fail { background: rgba(239,68,68,0.12); color: var(--fail); border: 1px solid rgba(239,68,68,0.25); }
+    .hidden { display: none; }
+    .fade-in { animation: fadeIn 0.35s ease forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+    .replay-btn { margin: 1rem 0 0; background: transparent; color: var(--muted); border: 1px solid var(--border2); padding: 0.5rem 1.2rem; border-radius: 6px; font-size: 0.78rem; font-family: 'DM Mono', monospace; cursor: pointer; display: none; transition: color 0.15s, border-color 0.15s; }
+    .replay-btn:hover { color: var(--text); border-color: var(--muted); }
+
+    /* ── CALLOUT ── */
+    .callout { background: rgba(139,224,200,0.05); border: 1px solid rgba(139,224,200,0.2); border-left: 3px solid var(--teal); border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; }
+    .callout p { color: var(--muted); font-size: 0.88rem; margin: 0; }
+    .callout p strong { color: var(--teal); font-weight: 500; }
+    .callout p a { color: var(--teal); text-decoration: none; border-bottom: 1px dotted rgba(139,224,200,0.4); }
+    .callout p a:hover { border-bottom-color: rgba(139,224,200,0.7); }
+
+    /* ── CTA / NEXT ── */
+    .next-bar { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 640px) { .next-bar { grid-template-columns: 1fr; } }
+    .next-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; text-decoration: none; color: inherit; transition: border-color 0.15s, transform 0.15s; display: block; }
+    .next-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+    .next-card .nc-label { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+    .next-card h4 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 0.4rem; }
+    .next-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.6; margin-bottom: 0.5rem; }
+    .next-card .nc-arrow { color: var(--accent); font-family: 'DM Mono', monospace; font-size: 0.72rem; }
+
+    footer { border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left; }
+
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; padding: 0; flex-shrink: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; transition: border-color 0.15s, background 0.15s; }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span { display: block; width: 18px; height: 2px; background: currentColor; border-radius: 1px; transition: transform 0.25s ease, opacity 0.18s ease; transform-origin: center; }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+    @media (max-width: 900px) {
+      html, body { overflow-x: hidden; }
+      body.menu-open { overflow: hidden; }
+      nav { position: relative; padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 1.25rem; z-index: 99; max-height: 0; overflow: hidden; opacity: 0; visibility: hidden; transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s; }
+      .nav-links.open { max-height: 80vh; opacity: 1; visibility: visible; padding: 0.5rem 1.25rem 1.25rem; transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s; overflow-y: auto; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.92rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+      main { padding: 2rem 1.25rem 4rem; }
+      .breadcrumb-nav { padding: 0 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <nav>
+    <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+    <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    <div class="nav-links">
+      <a href="/#how-it-works">How it works</a>
+      <a href="/use-cases/">Use cases</a>
+      <a href="/insights/">Insights</a>
+      <a href="/roadmap/">Roadmap</a>
+      <a href="/demo/">Demo</a>
+      <a href="/benchmark/">Benchmark</a>
+      <a href="https://github.com/TheoV823/mneme">GitHub</a>
+      <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+    </div>
+  </nav>
+
+  <nav aria-label="Breadcrumb" class="breadcrumb-nav">
+    <ol class="breadcrumb">
+      <li><a href="/">Home</a></li>
+      <li><a href="/demo/">Demo</a></li>
+      <li aria-current="page">Governed Python agent</li>
+    </ol>
+  </nav>
+
+  <main>
+    <header>
+      <div class="article-eyebrow">
+        <span class="eyebrow-tag">Flagship 01 &middot; Centerpiece</span>
+        <span class="eyebrow-dot"></span>
+        <span class="eyebrow-meta">5 min read</span>
+        <span class="eyebrow-dot"></span>
+        <span class="verdict-pill">RUNNABLE</span>
+      </div>
+      <h1>Governed Python agent &mdash; from bad code to <em>compliant</em> output.</h1>
+      <p class="lede">A Python coding agent proposes a locally reasonable but architecturally invalid import. Mneme retrieves the relevant ADR, blocks the violation, injects the decision context, and the agent retries with correct code. <strong>This is the product loop in full.</strong></p>
+      <p class="byline">
+        By <a href="/founder/">Theo Valmis</a>
+        <span class="sep">&middot;</span>
+        <time datetime="2026-05-15">Published May 2026</time>
+        <span class="sep">&middot;</span>
+        <a href="/demo/">All demos</a>
+      </p>
+    </header>
+
+    <div class="body">
+
+      <h2>The product loop</h2>
+
+      <p>Governance is only useful if it fires before bad code reaches review. The loop below is how Mneme closes that gap: the constraint lives in a compiled ADR, surfaces at generation time, and the agent corrects itself without human intervention.</p>
+
+      <ol>
+        <li>Agent proposes code</li>
+        <li>Mneme checks against compiled governance corpus</li>
+        <li>ADR-005 fires &mdash; decision ID and rationale surface</li>
+        <li>Retry context injected to agent</li>
+        <li>Agent retries &mdash; <code>mneme check --mode strict</code> passes</li>
+      </ol>
+
+      <h2>See it live &mdash; namespace violation caught and corrected</h2>
+
+      <p>The animation below runs a real governance scenario: the agent writes an import that looks correct from its training data but violates ADR-005. Mneme catches it, surfaces the decision, and the agent retries with compliant code.</p>
+
+      <div class="demo-wrap">
+        <div class="panel">
+          <div class="panel-header bad">
+            <span class="dot d-r"></span><span class="dot d-y"></span><span class="dot d-g"></span>
+            Agent proposes
+          </div>
+          <div class="panel-body" id="agent-body">
+            <div class="prompt-line" id="agent-prompt"></div>
+            <div id="agent-out" class="hidden"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header neutral">
+            <span class="dot d-r"></span><span class="dot d-y"></span><span class="dot d-g"></span>
+            mneme check --mode strict
+          </div>
+          <div class="panel-body" id="enforce-body">
+            <div class="prompt-line" id="enforce-prompt"></div>
+            <div id="enforce-out" class="hidden"></div>
+          </div>
+        </div>
+        <div class="correct-panel hidden" id="correct-panel">
+          <div class="panel-header good">
+            <span class="dot d-r"></span><span class="dot d-y"></span><span class="dot d-g"></span>
+            Corrected output &mdash; agent retry
+          </div>
+          <div class="panel-body" id="correct-out" style="min-height:auto;"></div>
+        </div>
+      </div>
+      <button class="replay-btn" type="button" id="replay-btn" onclick="startDemo(true)">&larr; Replay</button>
+
+      <h2>Why this matters</h2>
+
+      <p>AI agents infer from training data. <code>MnemeHQ</code> appears everywhere as the brand &mdash; the GitHub org, the website, the LinkedIn page. When asked to work with the Mneme library, an agent confidently writes <code>from MnemeHQ.memory_store import MemoryStore</code>. It is a locally reasonable guess. It is also architecturally invalid.</p>
+
+      <p>Mneme separates brand identity from package namespace through ADR-005: an enforceable architectural decision compiled into <code>project_memory.json</code>. The constraint is not a linting rule. It fires before the code reaches review, surfaces the decision ID and rationale, and the agent corrects itself. The result is governed output &mdash; not probabilistic compliance.</p>
+
+      <div class="callout">
+        <p><strong>The governance loop works because ADR-005 was compiled.</strong> The ADR compiler reads <code>docs/adr/</code>, parses the <code>## Constraints</code> section of ADR-005, and emits the <code>FORBID_DEPENDENCY: MnemeHQ</code> directive into <code>project_memory.json</code>. Without that step, the namespace constraint is documentation. With it, the constraint is infrastructure. <a href="/demo/adr-compiler/">See how ADRs become the governance corpus &rarr;</a></p>
+      </div>
+
+      <h2>Run it yourself</h2>
+
+      <pre><code>git clone https://github.com/TheoV823/mneme
+cd mneme/mneme-project-memory
+pip install -e .
+python examples/demo-adr-import.py</code></pre>
+
+      <h3>Expected output (abbreviated)</h3>
+
+      <pre><code>-- Step 4: Enforcement check (namespace violation)
+
+WARN  [ADR-005] constraint "no MnemeHQ" -- trigger: mnemehq
+      Brand vs Package Namespace Enforcement
+
+Result: WARN</code></pre>
+
+      <p>The walkthrough runs the ADR compiler, applies decisions to a fresh memory file, then enforces against a namespace violation so ADR-005 fires on the wrong import path.</p>
+
+      <div class="next-bar">
+        <a class="next-card" href="/demo/architectural-drift/">
+          <div class="nc-label">Flagship 02</div>
+          <h4>Architectural drift prevention</h4>
+          <p>The failure mode a governance layer exists to prevent. A six-step timeline of compounding divergence without enforcement.</p>
+          <span class="nc-arrow">Walk the timeline &rarr;</span>
+        </a>
+        <a class="next-card" href="/demo/multi-agent-governance/">
+          <div class="nc-label">Flagship 03</div>
+          <h4>Governance continuity across actors</h4>
+          <p>Where enforcement has to hold once AI execution becomes parallel and persistent. Invariants across actors, sessions, and retries.</p>
+          <span class="nc-arrow">See the trace &rarr;</span>
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+    <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+      <div>
+        <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div>
+        <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+          <li><a href="/use-cases/" style="color:var(--muted);text-decoration:none;">Use cases</a></li>
+          <li><a href="/integrations/" style="color:var(--muted);text-decoration:none;">Integrations</a></li>
+          <li><a href="/compare/" style="color:var(--muted);text-decoration:none;">Compare</a></li>
+          <li><a href="/demo/" style="color:var(--muted);text-decoration:none;">Demo</a></li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
+        <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+          <li><a href="/architecture/" style="color:var(--muted);text-decoration:none;">Architecture</a></li>
+          <li><a href="/insights/" style="color:var(--muted);text-decoration:none;">Insights</a></li>
+          <li><a href="/standards/" style="color:var(--muted);text-decoration:none;">Standards</a></li>
+          <li><a href="/benchmark/" style="color:var(--muted);text-decoration:none;">Benchmark</a></li>
+          <li><a href="/docs/" style="color:var(--muted);text-decoration:none;">Docs</a></li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
+        <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+          <li><a href="/pilot/" style="color:var(--accent);text-decoration:none;">Request pilot</a></li>
+          <li><a href="/founder/" style="color:var(--muted);text-decoration:none;">Founder</a></li>
+          <li><a href="/about/" style="color:var(--muted);text-decoration:none;">About</a></li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Code</div>
+        <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+          <li><a href="https://github.com/TheoV823/mneme" style="color:var(--muted);text-decoration:none;">GitHub</a></li>
+          <li><a href="/privacy/" style="color:var(--muted);text-decoration:none;">Privacy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
+      <span style="display:inline-flex;align-items:center;gap:0.75rem;"><a href="/" aria-label="Mneme HQ home" style="display:inline-flex;opacity:0.75;"><img src="/favicon.png" alt="Mneme HQ" height="22" style="display:block;"></a><span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span></span>
+      <span>&copy; 2026</span>
+    </div>
+  </footer>
+
+  <script>
+    const PROMPT = '> "Add a memory store for the governance layer."';
+
+    const AGENT_LINES = [
+      { t: 800,  html: '<div class="out-muted">Thinking...</div>' },
+      { t: 1400, html: '<div class="out-bad">from MnemeHQ.memory_store import MemoryStore</div>' },
+      { t: 1900, html: '<br>' },
+      { t: 2000, html: '<div class="out-bad">store = MemoryStore(".mneme/project_memory.json")</div>' },
+    ];
+
+    const ENFORCE_LINES = [
+      { t: 400,  html: '<div class="out-muted">Compiler emits decisions...</div>' },
+      { t: 900,  html: '<div class="out-muted" style="font-size:0.72rem;color:#3a3a4a;">&nbsp;&nbsp;&#8627; ADR-005: Brand vs Package Namespace Enforcement<br>&nbsp;&nbsp;&#8627; FORBID_DEPENDENCY: MnemeHQ</div>' },
+      { t: 1500, html: '<br>' },
+      { t: 1600, html: '<div><span class="label-badge badge-fail">FAIL</span> <span style="color:var(--fail)">[ADR-005] forbidden dependency: MnemeHQ</span></div>' },
+      { t: 2000, html: '<div class="out-muted" style="font-size:0.72rem;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Brand vs Package Namespace Enforcement<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Use package namespace: mneme</div>' },
+      { t: 2600, html: '<br><div class="out-muted">Retry context injected to agent...</div>' },
+    ];
+
+    const CORRECT_LINES = [
+      { t: 400,  html: '<div class="out-good">from mneme.memory_store import MemoryStore</div>' },
+      { t: 900,  html: '<br>' },
+      { t: 1000, html: '<div class="out-good">store = MemoryStore(".mneme/project_memory.json")</div>' },
+      { t: 1600, html: '<br>' },
+      { t: 1700, html: '<div><span class="label-badge badge-pass">PASS</span> <span style="color:var(--text)">[ADR-005] import compliant</span> <span class="out-muted">&mdash; mneme namespace confirmed</span></div>' },
+    ];
+
+    let timers = [];
+    function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+    function typeText(el, text, cb) {
+      let i = 0; el.textContent = '';
+      function next() {
+        if (i < text.length) { el.textContent += text[i++]; timers.push(setTimeout(next, 28)); }
+        else if (cb) cb();
+      }
+      next();
+    }
+    function appendLines(containerId, lines, startDelay, onDone) {
+      const el = document.getElementById(containerId);
+      lines.forEach(({ t, html }) => {
+        const timer = setTimeout(() => {
+          const div = document.createElement('div'); div.innerHTML = html;
+          div.classList.add('fade-in'); el.appendChild(div);
+        }, startDelay + t);
+        timers.push(timer);
+      });
+      if (onDone) timers.push(setTimeout(onDone, startDelay + lines[lines.length - 1].t + 600));
+    }
+    function startDemo(fromReplay) {
+      clearTimers();
+      document.getElementById('replay-btn').style.display = 'none';
+      const agentPrompt = document.getElementById('agent-prompt');
+      const enforcePrompt = document.getElementById('enforce-prompt');
+      const agentOut = document.getElementById('agent-out');
+      const enforceOut = document.getElementById('enforce-out');
+      const correctPanel = document.getElementById('correct-panel');
+      const correctOut = document.getElementById('correct-out');
+      agentPrompt.textContent = ''; enforcePrompt.textContent = '';
+      agentOut.innerHTML = ''; agentOut.classList.add('hidden');
+      enforceOut.innerHTML = ''; enforceOut.classList.add('hidden');
+      correctPanel.classList.add('hidden'); correctOut.innerHTML = '';
+      if (fromReplay) {
+        const wrap = document.querySelector('.demo-wrap');
+        if (wrap && wrap.scrollIntoView) {
+          wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+      typeText(agentPrompt, PROMPT, () => {
+        agentOut.classList.remove('hidden');
+        appendLines('agent-out', AGENT_LINES, 0);
+      });
+      timers.push(setTimeout(() => {
+        typeText(enforcePrompt, PROMPT, () => {
+          enforceOut.classList.remove('hidden');
+          appendLines('enforce-out', ENFORCE_LINES, 0, () => {
+            timers.push(setTimeout(() => {
+              correctPanel.classList.remove('hidden');
+              appendLines('correct-out', CORRECT_LINES, 0, () => {
+                document.getElementById('replay-btn').style.display = 'inline-block';
+              });
+            }, 600));
+          });
+        });
+      }, 150));
+    }
+    startDemo();
+  </script>
+  <script>
+    (function(){
+      var path = window.location.pathname;
+      document.querySelectorAll('.nav-links a').forEach(function(a){
+        var href = a.getAttribute('href');
+        if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) a.classList.add('active');
+      });
+    })();
+  </script>
+  <script>
+    (function(){
+      var btn = document.querySelector('.nav-hamburger');
+      var links = document.querySelector('.nav-links');
+      if (!btn || !links) return;
+      function setOpen(open){ links.classList.toggle('open', open); btn.setAttribute('aria-expanded', String(open)); document.body.classList.toggle('menu-open', open); }
+      btn.addEventListener('click', function(e){ e.stopPropagation(); setOpen(!links.classList.contains('open')); });
+      document.addEventListener('click', function(e){ if (!links.classList.contains('open')) return; if (links.contains(e.target) || btn.contains(e.target)) return; setOpen(false); });
+      document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false); });
+      links.addEventListener('click', function(e){ if (e.target.tagName === 'A') setOpen(false); });
+      window.addEventListener('resize', function(){ if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false); });
+    })();
+  </script>
+</body>
+</html>
