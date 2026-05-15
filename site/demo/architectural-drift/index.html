@@ -624,5 +624,117 @@ python run.py</code></pre>
   });
 })();
 </script>
+  <script>
+  (function(){
+    /* ── Terminal demo animation ── */
+    var CMD = 'claude "Simplify the check command by loading .mneme/project_memory.json directly inside check.py"';
+
+    var LINES = [
+      [600,  '',                                                          'term-blank'],
+      [0,    '↳ Mneme evaluating proposed change...',               'term-muted'],
+      [1100, '',                                                          'term-blank'],
+      [0,    '[MNEME] Architectural violation detected',                  'term-header'],
+      [500,  '',                                                          'term-blank'],
+      [0,    'Decision:  ADR-001 — Retrieval architecture',         'term-key'],
+      [500,  '',                                                          'term-blank'],
+      [0,    'Rule:',                                                     'term-key'],
+      [180,  '  CLI commands must use the MemoryStore',                  'term-value'],
+      [120,  '  and Retriever pipeline.',                                 'term-value'],
+      [500,  '',                                                          'term-blank'],
+      [0,    'Violation:',                                                'term-key'],
+      [180,  '  check.py would load governance decisions',               'term-value'],
+      [120,  '  directly from JSON.',                                     'term-value'],
+      [500,  '',                                                          'term-blank'],
+      [0,    'Action:',                                                   'term-key'],
+      [180,  '  BLOCKED',                                                 'term-blocked'],
+      [500,  '',                                                          'term-blank'],
+      [0,    'Reason:',                                                   'term-key'],
+      [180,  '  Direct file access breaks provenance,',                  'term-value'],
+      [120,  '  freshness checks, and centralized enforcement.',          'term-value'],
+      [700,  '',                                                          'term-blank'],
+      [0,    'No files changed.',                                         'term-end'],
+      [220,  'Agent halted before architectural drift.',                  'term-end']
+    ];
+
+    var cmdEl    = document.getElementById('term-cmd');
+    var cursor   = document.getElementById('term-cursor');
+    var output   = document.getElementById('term-output');
+    var pauseBtn = document.getElementById('term-pause-btn');
+    var replayBtn= document.getElementById('term-replay-btn');
+
+    if (!cmdEl || !output) return;
+
+    var timers   = [];
+    var paused   = false;
+    var done     = false;
+    var remaining = [];
+
+    function clearTimers() { timers.forEach(clearTimeout); timers = []; remaining = []; }
+
+    function schedule(fn, delay) { var id = setTimeout(fn, delay); timers.push(id); return id; }
+
+    function appendLine(text, cls) {
+      if (!text && cls === 'term-blank') {
+        var b = document.createElement('div'); b.className = 'term-blank'; output.appendChild(b); return;
+      }
+      var d = document.createElement('div');
+      d.className = 'term-output-line ' + (cls || '');
+      d.textContent = text;
+      output.appendChild(d);
+    }
+
+    function typeCmd(str, idx, cb) {
+      if (paused) { remaining.unshift({fn: function(){ typeCmd(str, idx, cb); }, delay: 0}); return; }
+      if (idx >= str.length) { cb(); return; }
+      cmdEl.textContent += str[idx];
+      schedule(function(){ typeCmd(str, idx + 1, cb); }, 28 + Math.random() * 22);
+    }
+
+    function runLines(index) {
+      if (index >= LINES.length) { done = true; cursor.classList.add('hidden'); return; }
+      var entry = LINES[index];
+      schedule(function(){
+        if (paused) { remaining.unshift({fn: function(){ runLines(index); }, delay: 0}); return; }
+        appendLine(entry[1], entry[2]);
+        runLines(index + 1);
+      }, entry[0]);
+    }
+
+    function start() {
+      clearTimers();
+      done = false; paused = false;
+      pauseBtn.setAttribute('aria-pressed', 'false');
+      pauseBtn.querySelector('.dtc-pause-icon').textContent = '⏸';
+      cmdEl.textContent = '';
+      cursor.classList.remove('hidden');
+      var promptLine = document.getElementById('term-prompt-line');
+      while (output.lastChild !== promptLine) output.removeChild(output.lastChild);
+      typeCmd(CMD, 0, function(){
+        cursor.classList.add('hidden');
+        runLines(0);
+      });
+    }
+
+    pauseBtn.addEventListener('click', function(){
+      if (done) return;
+      paused = !paused;
+      pauseBtn.setAttribute('aria-pressed', String(paused));
+      pauseBtn.querySelector('.dtc-pause-icon').textContent = paused ? '▶' : '⏸';
+      if (!paused && remaining.length) { var next = remaining.shift(); schedule(next.fn, next.delay); }
+    });
+
+    replayBtn.addEventListener('click', function(){ start(); });
+
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function(entries){
+        if (entries[0].isIntersecting) { io.disconnect(); start(); }
+      }, { threshold: 0.25 });
+      io.observe(document.getElementById('terminal-demo'));
+    } else {
+      start();
+    }
+  })();
+  </script>
+
 </body>
 </html>
