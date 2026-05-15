@@ -1,0 +1,50 @@
+name: PageSpeed → BigQuery
+
+# Runs every Monday at 07:00 UTC — after weekend traffic, before the work week.
+# Also triggerable manually for on-demand runs (e.g. post-deploy validation).
+
+on:
+  schedule:
+    - cron: '0 7 * * 1'
+  workflow_dispatch:
+    inputs:
+      url_prefix:
+        description: 'URL prefix filter (e.g. /insights/). Leave blank for all pages.'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  pagespeed:
+    name: Fetch PSI scores and write to BQ
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install google-cloud-bigquery google-auth
+
+      - name: Write BQ credentials
+        run: echo '${{ secrets.MNEME_HQ_BQ_CREDENTIALS }}' > /tmp/bq-credentials.json
+
+      - name: Run PageSpeed → BQ
+        env:
+          PAGESPEED_API_KEY: ${{ secrets.PAGESPEED_API_KEY }}
+          MNEME_BQ_PROJECT: mneme-hq-prod
+          MNEME_BQ_LOCATION: US
+          MNEME_GOOGLE_APPLICATION_CREDENTIALS: /tmp/bq-credentials.json
+        run: |
+          python scripts/pagespeed_to_bq.py \
+            ${{ github.event.inputs.url_prefix != '' && format('--url {0}', github.event.inputs.url_prefix) || '' }}
+
+      - name: Clean up credentials
+        if: always()
+        run: rm -f /tmp/bq-credentials.json

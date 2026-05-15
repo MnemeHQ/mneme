@@ -202,6 +202,8 @@
     }
   
     @media (max-width: 768px) { nav, .mobile-menu { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } }
+  
+    @media (max-width: 700px) { .demo-wrap { grid-template-columns: 1fr !important; } }
   </style>
 </head>
 <body>
@@ -303,7 +305,7 @@
             <span class="dot d-r"></span><span class="dot d-y"></span><span class="dot d-g"></span>
             Without the compiler
           </div>
-          <div class="panel-body" id="without-body">
+          <div class="panel-body" id="without-body" style="min-height:220px;">
             <div class="prompt-line" id="w-prompt"></div>
             <div id="w-out" class="hidden"></div>
           </div>
@@ -313,7 +315,7 @@
             <span class="dot d-r"></span><span class="dot d-y"></span><span class="dot d-g"></span>
             With the compiler
           </div>
-          <div class="panel-body" id="with-body">
+          <div class="panel-body" id="with-body" style="min-height:220px;">
             <div class="prompt-line" id="m-prompt"></div>
             <div id="m-out" class="hidden"></div>
           </div>
@@ -488,6 +490,8 @@ Result: WARN</code></pre>
   </footer>
 
   <script>
+  window.addEventListener('load', function() {
+
     const PROMPT = '> "Compile the repo ADRs into enforceable project memory."';
 
     const WITHOUT_LINES = [
@@ -576,7 +580,9 @@ Result: WARN</code></pre>
     }
 
     startDemo();
-  </script>
+  
+  });
+</script>
   <script>
     (function(){
       var path = window.location.pathname;

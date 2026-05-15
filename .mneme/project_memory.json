@@ -223,6 +223,34 @@
       ],
       "created_at": "2026-05-12T00:00:00Z",
       "updated_at": "2026-05-12T00:00:00Z"
+    },
+    {
+      "id": "site_perf_001",
+      "decision": "Site pages with inline JavaScript must defer animations and pre-size dynamic containers to prevent CLS and TBT regressions on mobile.",
+      "rationale": "Inline animation scripts running at parse time block the main thread and inflate TBT. Unsized dynamically-populated containers (e.g. demo panels) cause layout shifts that tank CLS and drop mobile Lighthouse scores 15-25 points. Discovered during May 2026 PSI audit: /demo/adr-compiler/ scored 49 mobile before fixes, 75+ after deferring the typewriter script and adding min-height to panels.",
+      "scope": [
+        "site",
+        "demo",
+        "performance",
+        "javascript",
+        "mobile"
+      ],
+      "constraints": [
+        "Wrap all inline animation/typewriter JS in window.addEventListener('load', function() { ... }) — never run at parse time",
+        "All dynamically populated containers must have an explicit min-height set before content loads to prevent CLS",
+        "Web fonts must use the async preload pattern (rel=preload + onload swap) — never synchronous <link rel=stylesheet>",
+        "No blocking scripts in <head> before preconnect hints",
+        "Mobile PSI score must stay ≥ 70 for all site pages — treat sub-70 as a deploy blocker"
+      ],
+      "anti_patterns": [
+        "inline <script> running animation or DOM-mutation logic at parse time",
+        "container divs with no height before JS populates them",
+        "synchronous Google Fonts CSS link in <head>",
+        "backdrop-filter on nav/menus applied unconditionally on mobile (GPU cost)",
+        "scripts before <link rel=preconnect> hints"
+      ],
+      "created_at": "2026-05-15T00:00:00Z",
+      "updated_at": "2026-05-15T00:00:00Z"
     }
   ]
 }
