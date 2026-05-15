@@ -92,7 +92,7 @@ ctx.check_hostname = False
 ctx.verify_mode = ssl.CERT_NONE
 
 BASE_REMOTE  = '/home/cadafdd1/mnemehq.com'
-BINARY_EXTS  = {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico', '.svg'}
+BINARY_EXTS  = {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico', '.svg', '.woff2', '.woff', '.ttf', '.otf'}
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 def mkdir(remote_path):
@@ -119,7 +119,14 @@ def upload(local_path, remote_subdir):
 
     filename     = os.path.basename(local_path)
     remote_dir   = BASE_REMOTE + ('/' + remote_subdir if remote_subdir else '')
-    content_type = 'image/png' if ext == '.png' else 'text/html'
+    if ext == '.png':
+        content_type = 'image/png'
+    elif ext == '.woff2':
+        content_type = 'font/woff2'
+    elif ext == '.css':
+        content_type = 'text/css'
+    else:
+        content_type = 'text/html'
     boundary     = '----MnemeDeploy2026'
     header = (
         f'--{boundary}\r\n'
