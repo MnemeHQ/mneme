@@ -529,9 +529,53 @@
     </table>
     </div>
 
+    <h2>Where this sits in the autonomous runtime stack</h2>
+
+    <p>The clearest way to position governance infrastructure is as a distinct layer in the runtime stack of an autonomous agent system. Models produce candidate output. Harnesses coordinate execution, retries, and tool use. Execution systems maintain long-running loops, sessions, and memory. Governance infrastructure defines and enforces the architectural constraints the output must satisfy. Verification confirms the resulting system still passes its objective checks. Each layer answers a question the layer above it cannot.</p>
+
+    <div class="layer-stack">
+      <div class="layer-row">
+        <div class="layer-num">5</div>
+        <div class="layer-content">
+          <strong>Verification &middot; enforcement</strong>
+          <span>Tests, builds, deploy-time checks, deterministic verdicts</span>
+        </div>
+      </div>
+      <div class="layer-row highlighted">
+        <div class="layer-num">4</div>
+        <div class="layer-content">
+          <strong>Governance infrastructure</strong>
+          <span>Decision graph, precedence, pre-generation enforcement, propagation across surfaces</span>
+        </div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-num">3</div>
+        <div class="layer-content">
+          <strong>Execution systems</strong>
+          <span>Long-running loops, sessions, memory, continuity infrastructure</span>
+        </div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-num">2</div>
+        <div class="layer-content">
+          <strong>Harnesses</strong>
+          <span>Tool orchestration, retries, planning loops, context lifecycle</span>
+        </div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-num">1</div>
+        <div class="layer-content">
+          <strong>Models</strong>
+          <span>Candidate output, generation, probability over tokens</span>
+        </div>
+      </div>
+    </div>
+
+    <p>This stack is the single most reusable abstraction for talking about where governance infrastructure belongs. Harnesses coordinate execution; governance defines constraints; verification enforces invariants. None of those layers can do the others' jobs &mdash; which is what makes governance infrastructure a category rather than a feature of any adjacent system. The companion essay <a href="/insights/harness-engineering-still-needs-governance/">Harness Engineering Still Needs Governance</a> walks through this argument in detail.</p>
+
     <h2>How this fits the AI SDLC</h2>
 
-    <p>Governance infrastructure occupies <strong>Layer 5</strong> of the generative AI software engineering stack — above agent runtimes (Layers 3–4), below human oversight (Layer 7). Its position is load-bearing: it is the layer that makes the rest of the stack architecturally coherent at scale.</p>
+    <p>The runtime stack above is one cut. The broader software development lifecycle is another: the same governance infrastructure occupies <strong>Layer 5</strong> of the generative AI software engineering stack — above agent runtimes (Layers 3–4), below human oversight (Layer 7). Its position is load-bearing: it is the layer that makes the rest of the stack architecturally coherent at scale.</p>
 
     <div class="layer-stack">
       <div class="layer-row">
