@@ -231,13 +231,13 @@
     .byline a:hover { color: var(--text); }
     .byline .sep { color: var(--border2); margin: 0 0.5rem; }
 
-    h2#related-reading { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 400; margin-top: 3.5rem; margin-bottom: 0.75rem; }
-    h2#related-reading + ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
-    h2#related-reading + ul li { margin: 0; }
-    h2#related-reading + ul li a { display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.1rem; background: var(--surface); color: var(--text); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.15s, color 0.15s; }
-    h2#related-reading + ul li a::after { content: '\2192'; opacity: 0.35; transition: opacity 0.15s, transform 0.15s; display: inline-block; margin-left: 0.5rem; }
-    h2#related-reading + ul li a:hover { background: var(--surface2); color: var(--accent); }
-    h2#related-reading + ul li a:hover::after { opacity: 1; transform: translateX(3px); }
+    h2#related-reading, h2#related-concepts { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 400; margin-top: 3.5rem; margin-bottom: 0.75rem; }
+    h2#related-reading + ul, h2#related-concepts + ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    h2#related-reading + ul li, h2#related-concepts + ul li { margin: 0; }
+    h2#related-reading + ul li a, h2#related-concepts + ul li a { display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.1rem; background: var(--surface); color: var(--text); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.15s, color 0.15s; }
+    h2#related-reading + ul li a::after, h2#related-concepts + ul li a::after { content: '\2192'; opacity: 0.35; transition: opacity 0.15s, transform 0.15s; display: inline-block; margin-left: 0.5rem; }
+    h2#related-reading + ul li a:hover, h2#related-concepts + ul li a:hover { background: var(--surface2); color: var(--accent); }
+    h2#related-reading + ul li a:hover::after, h2#related-concepts + ul li a:hover::after { opacity: 1; transform: translateX(3px); }
 
     .pull-quote { font-family: 'Instrument Serif', serif; font-size: 1.5rem; line-height: 1.45; color: var(--text); border-left: 2px solid var(--accent); padding: 0.25rem 0 0.25rem 1.25rem; margin: 2.5rem 0; font-style: italic; }
     .pull-quote em { font-style: normal; color: var(--accent); }
@@ -618,6 +618,17 @@ Verification     &mdash; tests, builds, deploy-time checks</code></pre>
     </div>
 
   </div>
+
+  <h2 id="related-concepts">Related concepts</h2>
+  <ul>
+    <li><a href="/concepts/governance-infrastructure/">Governance Infrastructure</a></li>
+    <li><a href="/concepts/architectural-governance/">Architectural Governance</a></li>
+    <li><a href="/concepts/governance-propagation/">Governance Propagation</a></li>
+    <li><a href="/concepts/verification-contracts/">Verification Contracts</a></li>
+    <li><a href="/concepts/governance-before-generation/">Governance Before Generation</a></li>
+    <li><a href="/concepts/architectural-drift/">Architectural Drift</a></li>
+    <li><a href="/concepts/agentic-development/">Agentic Development</a></li>
+  </ul>
 
   <h2 id="related-reading">Related reading</h2>
   <ul>
