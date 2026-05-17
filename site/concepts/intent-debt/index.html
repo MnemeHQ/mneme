@@ -269,7 +269,7 @@
       <span class="eyebrow-meta">7 min read &nbsp;·&nbsp; May 2026</span>
     </div>
     <h1>Intent Debt</h1>
-    <p class="article-lede">Every team carries some intent that was never made explicit, current, and enforceable. In human-paced delivery, that gap is manageable. When agents become the execution layer, the gap compounds with every session.</p>
+    <p class="article-lede">Most architectural intent inside a team is undocumented, stale, or unenforced. Human reviewers used to compensate for that by carrying intent in their heads and applying it during review. AI agents do not carry that intent and do not wait for review. The deficit was always there. Agents make it load-bearing.</p>
     <p class="byline">
       By <a href="/founder/">Theo Valmis</a>
       <span class="sep">&middot;</span>
@@ -283,19 +283,21 @@
 
     <p><strong>Intent debt is the gap between what a system is supposed to preserve and what its AI agents are actually constrained to follow.</strong></p>
 
-    <p>The debt accumulates whenever architectural decisions, operating constraints, or design rules exist in documents, wikis, or human memory but have not been compiled into a form that agents must query before generating code. The decisions are real. The enforcement is absent. That absence is the debt.</p>
+    <p>The debt accumulates whenever architectural decisions, operating constraints, or design rules exist in documents, wikis, or human memory but have not been compiled into a form that agents must query before generating code. The decisions exist. The enforcement does not.</p>
 
     <div class="callout">
-      <p><strong>The canonical form:</strong> Intent debt = what the system should preserve − what agents are actually constrained to follow. When that difference is nonzero, every agent session is a draw against the balance.</p>
+      <p><strong>Intent debt is structural, not behavioral.</strong> It is a missing layer between the decisions a team has made and the constraints its agents operate under — not a failure of any individual agent, ADR, or engineer.</p>
     </div>
 
     <h2>Why it emerges in AI-native engineering</h2>
 
-    <p>In human-paced software delivery, intent was transmitted through proximity. Decisions were made in meetings, recorded in ADRs, propagated through pair programming and code review, and maintained by engineers who shared context. The transmission was lossy, but the pace of delivery was low enough that the losses were manageable. A wrong pattern caught in review could be corrected before it spread.</p>
+    <p>Intent debt is not new. Every team has carried it. What changed is who was absorbing it.</p>
 
-    <p>AI agents break this equilibrium on two axes simultaneously. They generate code faster than human reviewers can inspect it — and they have no inherited memory of decisions made in prior sessions, by other agents, or by other developers. Each agent session begins from whatever it can observe in the workspace. If the workspace does not make decisions queryable, the agent infers. That inference is often plausible. It is rarely authoritative.</p>
+    <p>In human-paced delivery, senior engineers and reviewers carried the missing intent in their heads and applied it during pair programming, design discussions, and code review. The decisions did not need to be compiled into a queryable form because a human with context was already in the loop. The buffer hid the debt. From the outside, the system looked governed; from the inside, the governance lived in people's memories.</p>
 
-    <p>Intent debt is what accumulates when the inference rate exceeds the enforcement rate. With agents writing code at high velocity, the gap between what was decided and what was enforced widens faster than it can be closed by review.</p>
+    <p>AI agents change two things at once. They generate code faster than human reviewers can inspect — and they have no inherited memory of decisions made in prior sessions, by other agents, or by other developers. Each agent session begins from whatever it can observe in the workspace. If the workspace does not make decisions queryable, the agent infers. The inference is often plausible. It is rarely authoritative.</p>
+
+    <p>The human buffer that was silently doing enforcement does not scale with agent output. Intent debt is what accumulates when that buffer collapses and nothing structural takes its place.</p>
 
     <h2>How intent debt differs from technical debt and cognitive debt</h2>
 
@@ -328,22 +330,24 @@
     </table>
     </div>
 
-    <p>The distinctions matter for remediation. Technical debt is addressed by refactoring. Cognitive debt is addressed by documentation. Intent debt is not addressed by either — it requires compiling decisions into a form that closes the enforcement gap at the point of generation.</p>
+    <p>The distinctions matter for remediation. Technical debt is addressed by refactoring. Cognitive debt is addressed by documentation. Intent debt is addressed by neither — it requires compiling decisions into a form that closes the enforcement gap before the agent writes.</p>
 
-    <p>A team can write excellent documentation, clear ADRs, and thorough code comments, and still carry high intent debt. If those documents are not compiled into a queryable corpus that agents must consult before writing, the gap persists. Documentation serves the human knowledge transfer channel. It does not serve the machine enforcement channel. Intent debt lives in the machine enforcement channel.</p>
+    <p><strong>A team can have zero technical debt and still carry high intent debt</strong> — if its agents are writing clean, well-structured code that quietly violates the architectural decisions the team has made. Clean code is not governed code. The two questions answer different things.</p>
+
+    <p>This is also why excellent documentation does not retire intent debt. Documentation serves the human knowledge transfer channel; intent debt lives in the machine enforcement channel. ADRs read by a person at 2pm do not constrain an agent writing code at 2:03.</p>
 
     <h2>Why review, memory, and orchestration are insufficient</h2>
 
-    <p>Three approaches are commonly used to manage the problem that intent debt names. None of them close the gap at the point where it matters.</p>
+    <p>Three approaches are commonly proposed for the problem intent debt names. None of them close the gap at the point where it matters.</p>
 
-    <p><strong>Code review</strong> is reactive. It catches violations after code is written, not before. At human delivery pace, this is acceptable — the review cycle is fast relative to the generation cycle. At agent velocity, the generation cycle runs orders of magnitude faster than the review cycle. The review queue grows faster than it can be drained. Intent debt accumulates in the backlog.</p>
+    <p><strong>Code review</strong> is reactive. It catches violations after the code exists, not before. At human delivery pace this is acceptable — review keeps up with generation. At agent velocity the generation cycle runs orders of magnitude faster than the review cycle, and review becomes a queue that cannot be drained, not a control.</p>
 
-    <p><strong>Memory systems</strong> — RAG pipelines, vector stores, context injection — optimize for retrieval, not enforcement. They surface relevant content when queried. They do not guarantee that the right content is current, that it takes precedence over conflicting signals, or that it is deterministically enforced. A memory system that surfaces an ADR in context does not prevent the agent from ignoring it. Retrieval and constraint are different operations.</p>
+    <p><strong>Memory systems</strong> — RAG, vector stores, context injection — optimize for retrieval, not enforcement. They surface relevant content when queried. They do not guarantee that the surfaced content is current, that it takes precedence over conflicting signals, or that the agent is bound to follow it. Surfacing an ADR in context does not prevent an agent from ignoring it. Retrieval and constraint are different operations.</p>
 
-    <p><strong>Orchestration</strong> coordinates agent execution — sequencing, routing, tool access. It does not compile decisions into constraints. An orchestration layer can tell an agent when to run and what tools it can call. It cannot enforce that the agent's architectural choices comply with a decision made eighteen months ago that exists only in a Confluence page.</p>
+    <p><strong>Orchestration</strong> coordinates agent execution — sequencing, routing, tool access. It controls when an agent runs and what tools it can call, but it does not compile decisions into binding constraints. Orchestration governs the workflow around the agent; intent debt lives inside what the agent writes.</p>
 
     <div class="callout-teal">
-      <p><strong>Intent debt requires enforcement before generation.</strong> Review, memory, and orchestration are all post-generation or advisory. The gap closes when every agent session must query compiled decisions before writing code — and receives a deterministic answer.</p>
+      <p><strong>The common failure mode is to treat advisory mechanisms as if they were enforced.</strong> Review, memory, and orchestration are all post-generation or non-binding at the moment of writing. Closing the gap requires a mechanism that is queried before generation and returns a deterministic answer.</p>
     </div>
 
     <h2>How governance infrastructure reduces intent debt</h2>
@@ -358,11 +362,25 @@
 
     <p>When this loop is in place, intent debt cannot accumulate silently. The gap between what the system is supposed to preserve and what agents are constrained to follow is closed at the point of generation. Decisions that are compiled, current, and scoped are enforced in every session, by every agent, without depending on review to catch violations after the fact.</p>
 
-    <p>Intent debt is not eliminated permanently — new decisions create new opportunities for the gap to reopen if they are not compiled. Governance infrastructure is a practice, not a one-time fix. But it is the only mechanism that operates in the machine enforcement channel where intent debt actually lives.</p>
+    <p>Intent debt is not eliminated permanently. New decisions create new opportunities for the gap to reopen if they are not compiled. Governance infrastructure is a practice, not a one-time fix — but it is the only mechanism that operates in the machine enforcement channel where intent debt actually lives.</p>
+
+    <h2>How to know you have intent debt</h2>
+
+    <p>Intent debt is invisible until it is measured. Most teams discover they have it the same way they discover technical debt: through symptoms that compound until they cannot be ignored. The recognizable signs:</p>
+
+    <ul>
+      <li><strong>Reviewers keep correcting the same pattern.</strong> The decision exists, the agents do not know it, and review becomes the enforcement layer by default — a layer that does not scale.</li>
+      <li><strong>Two services solve the same problem differently.</strong> The team picked an approach; the agent in the second session never queried it.</li>
+      <li><strong>An ADR is "live" but nothing changes after it lands.</strong> Documents are written. The generation behavior does not move because nothing binds the agent to the document.</li>
+      <li><strong>New engineers re-derive decisions that already exist.</strong> The decisions live in heads, not in a queryable form — so the agent and the new engineer face the same gap.</li>
+      <li><strong>"AI velocity" feels indistinguishable from "AI churn."</strong> Throughput is high. Coherence is not. Output rate without an enforcement layer is the surface signature of intent debt.</li>
+    </ul>
+
+    <p>The diagnostic is simple: pick a recent architectural decision. Ask whether any agent on the team is bound to follow it, or whether a human has to catch the violation. If the answer is "a human catches it," that decision is denominated in intent debt.</p>
 
     <h2 id="further-reading">Further reading</h2>
     <ul>
-      <li><a href="/insights/ai-native-engineering-intent-debt/">AI-Native Engineering Has an Intent Debt Problem — the evidence-led argument</a></li>
+      <li><a href="/insights/ai-native-engineering-intent-debt/">AI-Native Engineering Has an Intent Debt Problem</a></li>
     </ul>
 
   </div>
@@ -396,8 +414,8 @@
     <ul class="related-list">
       <li><a href="/concepts/governance-infrastructure/"><div class="rel-title">Governance Infrastructure</div><p class="rel-desc">The platform layer that compiles decisions into enforced constraints — the mechanism that closes the intent debt gap.</p></a></li>
       <li><a href="/concepts/governance-before-generation/"><div class="rel-title">Governance Before Generation</div><p class="rel-desc">The enforcement posture that addresses intent debt at the point of intent rather than at the point of review.</p></a></li>
-      <li><a href="/concepts/ai-agent-drift/"><div class="rel-title">AI Agent Drift</div><p class="rel-desc">The agent-side phenomenon that intent debt enables — agents diverging from decisions they were never constrained to follow.</p></a></li>
-      <li><a href="/concepts/architectural-drift/"><div class="rel-title">Architectural Drift</div><p class="rel-desc">The codebase-side accumulation of intent debt across sessions and agents.</p></a></li>
+      <li><a href="/concepts/ai-agent-drift/"><div class="rel-title">AI Agent Drift</div><p class="rel-desc">The agent-side phenomenon — sessions diverging from decisions they were never bound to. Intent debt is the constraint gap; agent drift is what fills it.</p></a></li>
+      <li><a href="/concepts/architectural-drift/"><div class="rel-title">Architectural Drift</div><p class="rel-desc">The codebase-side residue left behind when intent debt is paid in agent output rather than enforcement.</p></a></li>
     </ul>
   </aside>
 
