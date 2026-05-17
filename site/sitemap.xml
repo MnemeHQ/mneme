@@ -141,6 +141,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://mnemehq.com/insights/ai-native-engineering-intent-debt/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://mnemehq.com/insights/rise-of-agentic-engineering-education/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
