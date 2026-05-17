@@ -26,6 +26,9 @@
   <meta name="twitter:description" content="Mneme HQ enforces your team's architectural decisions before AI-generated code reaches review. Prevent drift, enforce standards, and govern AI coding at the source." />
   <meta name="twitter:image" content="https://mnemehq.com/og.png" />
 
+    <!-- Consent defaults -->
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{'analytics_storage':'granted','ad_storage':'denied','ad_user_data':'denied','ad_personalization':'denied'});</script>
+
   <!-- Google Tag Manager -->
   <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
   <!-- End Google Tag Manager -->
@@ -1735,6 +1738,27 @@
         done();
       }
     });
+  });
+})();
+</script>
+<script>
+(function () {
+  window.gtag = window.gtag || function(){(window.dataLayer = window.dataLayer||[]).push(arguments);};
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('a[href], button');
+    if (!el) return;
+    var href = el.getAttribute('href') || '';
+    var text = (el.innerText || el.textContent || '').trim().slice(0, 60);
+    var isPrimary = el.classList.contains('btn-primary');
+    var isDemo = href.indexOf('/demo') !== -1;
+    var isPilot = href.indexOf('/pilot') !== -1;
+    if (isPrimary || isDemo || isPilot) {
+      window.gtag('event', 'cta_clicked', {
+        cta_text: text,
+        cta_href: href,
+        cta_type: isPilot ? 'pilot' : isDemo ? 'demo' : 'primary'
+      });
+    }
   });
 })();
 </script>
