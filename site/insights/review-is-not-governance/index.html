@@ -194,6 +194,19 @@
     h2#related-reading + ul li a::after { content: '\2192'; opacity: 0.35; transition: opacity 0.15s, transform 0.15s; display: inline-block; margin-left: 0.5rem; }
     h2#related-reading + ul li a:hover { background: var(--surface2); color: var(--accent); }
     h2#related-reading + ul li a:hover::after { opacity: 1; transform: translateX(3px); }
+    /* Cross-reference panel (Related operational essays / Related governance concepts) */
+    .related-panel { margin-top: 3.5rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .related-panel-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    .related-list li { margin: 0; }
+    .related-list a { display: block; padding: 1.15rem 1.35rem; background: var(--surface); text-decoration: none; transition: background 0.15s; }
+    .related-list a:hover { background: var(--surface2); }
+    .related-list .rel-title { color: var(--text); font-size: 0.92rem; font-weight: 600; margin-bottom: 0.35rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; letter-spacing: -0.005em; transition: color 0.15s; }
+    .related-list .rel-title::after { content: '\2192'; color: var(--accent); opacity: 0.4; transition: opacity 0.15s, transform 0.15s; flex-shrink: 0; }
+    .related-list a:hover .rel-title { color: var(--accent); }
+    .related-list a:hover .rel-title::after { opacity: 1; transform: translateX(3px); }
+    .related-list .rel-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.65; margin: 0; }
+
   
     @media (max-width: 768px) { nav, .mobile-menu { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } }
   </style>
@@ -323,12 +336,24 @@
   </div>
 
   
-    <h2 id="related-reading">Related reading</h2>
-    <ul>
-        <li><a href="/insights/why-code-review-cannot-scale-with-ai-output/">Why Code Review Cannot Scale With AI Output</a></li>
-        <li><a href="/insights/ai-code-review-does-not-scale-linearly/">AI Code Review Does Not Scale Linearly</a></li>
-        <li><a href="/insights/prompt-engineering-is-not-governance/">Prompt Engineering Is Not Governance</a></li>
+    <aside class="related-panel" aria-labelledby="related-panel-label">
+    <div class="related-panel-label" id="related-panel-label">Related governance concepts</div>
+    <ul class="related-list">
+      <li><a href="/concepts/governance-before-generation/"><div class="rel-title">Governance before generation</div><p class="rel-desc">Enforcement at the point of AI intent, not at the point of human review.</p></a></li>
+      <li><a href="/concepts/architectural-governance/"><div class="rel-title">Architectural governance</div><p class="rel-desc">The system that turns team decisions into machine-evaluable constraints enforced at generation time.</p></a></li>
+      <li><a href="/concepts/governance-infrastructure/"><div class="rel-title">Governance infrastructure</div><p class="rel-desc">The platform layer that encodes, distributes, versions, and enforces decisions across agents and CI.</p></a></li>
+      <li><a href="/concepts/verification-contracts/"><div class="rel-title">Verification contracts</div><p class="rel-desc">Pre-registered, machine-evaluable assertions that define what a governance check must prove.</p></a></li>
     </ul>
+  </aside>
+
+  <aside class="related-panel" aria-labelledby="related-essays-label" style="margin-top:1.5rem;padding-top:0;border-top:none;">
+    <div class="related-panel-label" id="related-essays-label">Related operational essays</div>
+    <ul class="related-list">
+      <li><a href="/insights/harness-engineering-still-needs-governance/"><div class="rel-title">Harness Engineering Still Needs Governance</div><p class="rel-desc">Review is the last gate. Governance is the first. Harnesses produce the volume that breaks the gate.</p></a></li>
+      <li><a href="/insights/why-observability-is-not-governance/"><div class="rel-title">Why Observability Is Not Governance</div><p class="rel-desc">Visibility explains drift after it occurs. Governance constrains drift before generation.</p></a></li>
+      <li><a href="/insights/memory-is-not-governance/"><div class="rel-title">Memory Is Not Governance</div><p class="rel-desc">Recall systems retrieve. Governance systems refuse. Two different infrastructures for two different problems.</p></a></li>
+    </ul>
+  </aside>
 
   <footer class="article-footer">
     <a href="/insights/" class="back-link">&larr; Back to Insights</a>

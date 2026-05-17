@@ -6,7 +6,7 @@
   <title>Governance Infrastructure — Mneme HQ Concepts</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="Governance infrastructure is the dedicated engineering platform layer that encodes, distributes, versions, and enforces architectural decisions across AI agents — a first-class reliability concern, not a process layer." />
+  <meta name="description" content="Governance infrastructure is the engineering platform layer that encodes, distributes, versions, and enforces architectural decisions across AI agents." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/concepts/governance-infrastructure/" />
@@ -14,12 +14,12 @@
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
   <meta property="og:title" content="Governance Infrastructure — Mneme HQ Concepts" />
-  <meta property="og:description" content="Governance infrastructure is the dedicated engineering platform layer that encodes, distributes, versions, and enforces architectural decisions across AI agents — a first-class reliability concern, not a process layer." />
+  <meta property="og:description" content="Governance infrastructure is the engineering platform layer that encodes, distributes, versions, and enforces architectural decisions across AI agents." />
   <meta property="og:url" content="https://mnemehq.com/concepts/governance-infrastructure/" />
   <meta property="og:image" content="https://mnemehq.com/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Governance Infrastructure — Mneme HQ Concepts" />
-  <meta name="twitter:description" content="Governance infrastructure is the dedicated engineering platform layer that encodes, distributes, versions, and enforces architectural decisions across AI agents — a first-class reliability concern, not a process layer." />
+  <meta name="twitter:description" content="Governance infrastructure is the engineering platform layer that encodes, distributes, versions, and enforces architectural decisions across AI agents." />
   <meta name="twitter:image" content="https://mnemehq.com/og.png" />
   <meta name="author" content="Theo Valmis" />
   <meta property="article:published_time" content="2026-05-14T00:00:00Z" />
@@ -201,7 +201,35 @@
     h2#related-reading + ul li a::after { content: '\2192'; opacity: 0.35; transition: opacity 0.15s, transform 0.15s; display: inline-block; margin-left: 0.5rem; }
     h2#related-reading + ul li a:hover { background: var(--surface2); color: var(--accent); }
     h2#related-reading + ul li a:hover::after { opacity: 1; transform: translateX(3px); }
-  
+    /* Cross-reference panel (Related operational essays / Related governance concepts) */
+    .related-panel { margin-top: 3.5rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .related-panel-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    .related-list li { margin: 0; }
+    .related-list a { display: block; padding: 1.15rem 1.35rem; background: var(--surface); text-decoration: none; transition: background 0.15s; }
+    .related-list a:hover { background: var(--surface2); }
+    .related-list .rel-title { color: var(--text); font-size: 0.92rem; font-weight: 600; margin-bottom: 0.35rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; letter-spacing: -0.005em; transition: color 0.15s; }
+    .related-list .rel-title::after { content: '\2192'; color: var(--accent); opacity: 0.4; transition: opacity 0.15s, transform 0.15s; flex-shrink: 0; }
+    .related-list a:hover .rel-title { color: var(--accent); }
+    .related-list a:hover .rel-title::after { opacity: 1; transform: translateX(3px); }
+    .related-list .rel-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.65; margin: 0; }
+
+
+    /* Diagrams */
+    .diagram-figure { margin: 2.25rem 0 2rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem 1.5rem 1.25rem; overflow: hidden; }
+    .diagram-figure svg { display: block; width: 100%; height: auto; max-width: 100%; }
+    .diagram-caption { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.06em; color: var(--muted); text-transform: uppercase; margin-top: 1rem; padding-top: 0.9rem; border-top: 1px solid var(--border); line-height: 1.7; }
+    .diagram-caption strong { color: var(--accent); font-weight: 500; }
+    .diag-box { fill: #141416; stroke: #2e2e34; }
+    .diag-box-active { fill: rgba(200,240,96,0.05); stroke: #c8f060; stroke-width: 1.5; }
+    .diag-box-teal { fill: rgba(139,224,200,0.05); stroke: #8be0c8; stroke-width: 1.2; }
+    .diag-text { fill: #e8e8ec; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; }
+    .diag-meta { fill: #88889a; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.05em; }
+    .diag-accent-text { fill: #c8f060; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; }
+    .diag-teal-text { fill: #8be0c8; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.05em; }
+    .diag-arrow { stroke: #2e2e34; stroke-width: 1; fill: none; }
+    .diag-arrow-active { stroke: #c8f060; stroke-width: 1.5; fill: none; }
+
     @media (max-width: 768px) { nav, .mobile-menu { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } }
   </style>
   <script type="application/ld+json">
@@ -219,7 +247,7 @@
       {
         "@type": "TechArticle",
         "headline": "Governance Infrastructure — Mneme HQ Concepts",
-        "description": "Governance infrastructure is the dedicated engineering platform layer that encodes, distributes, versions, and enforces architectural decisions across AI agents — a first-class reliability concern, not a process layer.",
+        "description": "Governance infrastructure is the engineering platform layer that encodes, distributes, versions, and enforces architectural decisions across AI agents.",
         "url": "https://mnemehq.com/concepts/governance-infrastructure/",
         "datePublished": "2026-05-14",
         "dateModified": "2026-05-14",
@@ -328,6 +356,81 @@
 
     <p>Governance infrastructure applies the same standard to architectural enforcement that teams already apply to observability, security, and testing: it must be first-class, automated, versioned, observable, and available. That application is the substance of the concept.</p>
 
+    <figure class="diagram-figure" aria-labelledby="gi-diag-title">
+      <svg viewBox="0 0 800 360" role="img" aria-labelledby="gi-diag-title gi-diag-desc" xmlns="http://www.w3.org/2000/svg">
+        <title id="gi-diag-title">The four planes of governance infrastructure</title>
+        <desc id="gi-diag-desc">A platform diagram showing the four planes — encoding, distribution, enforcement, observability — operating on a shared decision corpus, with AI agents and CI pipelines as the consumers.</desc>
+        <g>
+          <text x="40" y="28" class="diag-accent-text">GOVERNANCE INFRASTRUCTURE</text>
+          <text x="760" y="28" text-anchor="end" class="diag-meta">platform · not process</text>
+
+          <!-- Plane 1: Encoding -->
+          <rect x="40" y="50" width="170" height="92" rx="8" class="diag-box"/>
+          <text x="55" y="73" class="diag-accent-text">01 · ENCODING</text>
+          <text x="55" y="95" class="diag-text">Architectural</text>
+          <text x="55" y="111" class="diag-text">compiler</text>
+          <text x="55" y="131" class="diag-meta">ADR → JSON corpus</text>
+
+          <!-- Plane 2: Distribution -->
+          <rect x="220" y="50" width="170" height="92" rx="8" class="diag-box"/>
+          <text x="235" y="73" class="diag-accent-text">02 · DISTRIBUTION</text>
+          <text x="235" y="95" class="diag-text">Decision retriever</text>
+          <text x="235" y="111" class="diag-text">scope · precedence</text>
+          <text x="235" y="131" class="diag-meta">corpus → context</text>
+
+          <!-- Plane 3: Enforcement -->
+          <rect x="400" y="50" width="170" height="92" rx="8" class="diag-box-active"/>
+          <text x="415" y="73" class="diag-accent-text">03 · ENFORCEMENT</text>
+          <text x="415" y="95" class="diag-text">Pre-tool-use hook</text>
+          <text x="415" y="111" class="diag-text">CI gate</text>
+          <text x="415" y="131" class="diag-meta">verdict · block · pass</text>
+
+          <!-- Plane 4: Observability -->
+          <rect x="580" y="50" width="180" height="92" rx="8" class="diag-box"/>
+          <text x="595" y="73" class="diag-accent-text">04 · OBSERVABILITY</text>
+          <text x="595" y="95" class="diag-text">Provenance trail</text>
+          <text x="595" y="111" class="diag-text">violation log</text>
+          <text x="595" y="131" class="diag-meta">queryable · auditable</text>
+
+          <!-- Shared state: corpus -->
+          <rect x="40" y="170" width="720" height="60" rx="8" class="diag-box-teal"/>
+          <text x="55" y="194" class="diag-teal-text">SHARED STATE · DECISION CORPUS</text>
+          <text x="55" y="216" class="diag-text">project_memory.json · typed records · versioned · single source of truth</text>
+          <text x="745" y="216" text-anchor="end" class="diag-meta">read by every consumer</text>
+
+          <!-- Lines from planes to corpus -->
+          <line x1="125" y1="142" x2="125" y2="170" class="diag-arrow"/>
+          <line x1="305" y1="142" x2="305" y2="170" class="diag-arrow"/>
+          <line x1="485" y1="142" x2="485" y2="170" class="diag-arrow-active"/>
+          <line x1="670" y1="142" x2="670" y2="170" class="diag-arrow"/>
+
+          <!-- Consumers row -->
+          <text x="40" y="262" class="diag-accent-text">CONSUMERS</text>
+          <rect x="40" y="276" width="160" height="56" rx="6" class="diag-box"/>
+          <text x="120" y="298" text-anchor="middle" class="diag-text">Claude Code</text>
+          <text x="120" y="316" text-anchor="middle" class="diag-meta">pre-tool-use hook</text>
+
+          <rect x="216" y="276" width="160" height="56" rx="6" class="diag-box"/>
+          <text x="296" y="298" text-anchor="middle" class="diag-text">Cursor / Copilot</text>
+          <text x="296" y="316" text-anchor="middle" class="diag-meta">rules injection</text>
+
+          <rect x="392" y="276" width="160" height="56" rx="6" class="diag-box"/>
+          <text x="472" y="298" text-anchor="middle" class="diag-text">CI / merge gate</text>
+          <text x="472" y="316" text-anchor="middle" class="diag-meta">batch enforcement</text>
+
+          <rect x="568" y="276" width="192" height="56" rx="6" class="diag-box"/>
+          <text x="664" y="298" text-anchor="middle" class="diag-text">Dashboards / audit</text>
+          <text x="664" y="316" text-anchor="middle" class="diag-meta">drift telemetry</text>
+
+          <line x1="120" y1="230" x2="120" y2="276" class="diag-arrow"/>
+          <line x1="296" y1="230" x2="296" y2="276" class="diag-arrow"/>
+          <line x1="472" y1="230" x2="472" y2="276" class="diag-arrow"/>
+          <line x1="664" y1="230" x2="664" y2="276" class="diag-arrow"/>
+        </g>
+      </svg>
+      <figcaption class="diagram-caption"><strong>Four planes, one corpus.</strong> Encoding, distribution, enforcement, and observability operate as engineering planes on a shared decision corpus. Agents and CI are consumers — not the source of governance, never the governance itself.</figcaption>
+    </figure>
+
     <h2>What governance infrastructure provides that process cannot</h2>
 
     <p>Governance infrastructure provides four things that process-based governance structurally cannot deliver at agent output velocity:</p>
@@ -430,9 +533,53 @@
     </table>
     </div>
 
+    <h2>Where this sits in the autonomous runtime stack</h2>
+
+    <p>The clearest way to position governance infrastructure is as a distinct layer in the runtime stack of an autonomous agent system. Models produce candidate output. Harnesses coordinate execution, retries, and tool use. Execution systems maintain long-running loops, sessions, and memory. Governance infrastructure defines and enforces the architectural constraints the output must satisfy. Verification confirms the resulting system still passes its objective checks. Each layer answers a question the layer above it cannot.</p>
+
+    <div class="layer-stack">
+      <div class="layer-row">
+        <div class="layer-num">5</div>
+        <div class="layer-content">
+          <strong>Verification &middot; enforcement</strong>
+          <span>Tests, builds, deploy-time checks, deterministic verdicts</span>
+        </div>
+      </div>
+      <div class="layer-row highlighted">
+        <div class="layer-num">4</div>
+        <div class="layer-content">
+          <strong>Governance infrastructure</strong>
+          <span>Decision graph, precedence, pre-generation enforcement, propagation across surfaces</span>
+        </div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-num">3</div>
+        <div class="layer-content">
+          <strong>Execution systems</strong>
+          <span>Long-running loops, sessions, memory, continuity infrastructure</span>
+        </div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-num">2</div>
+        <div class="layer-content">
+          <strong>Harnesses</strong>
+          <span>Tool orchestration, retries, planning loops, context lifecycle</span>
+        </div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-num">1</div>
+        <div class="layer-content">
+          <strong>Models</strong>
+          <span>Candidate output, generation, probability over tokens</span>
+        </div>
+      </div>
+    </div>
+
+    <p>This stack is the single most reusable abstraction for talking about where governance infrastructure belongs. Harnesses coordinate execution; governance defines constraints; verification enforces invariants. None of those layers can do the others' jobs &mdash; which is what makes governance infrastructure a category rather than a feature of any adjacent system. The companion essay <a href="/insights/harness-engineering-still-needs-governance/">Harness Engineering Still Needs Governance</a> walks through this argument in detail.</p>
+
     <h2>How this fits the AI SDLC</h2>
 
-    <p>Governance infrastructure occupies <strong>Layer 5</strong> of the generative AI software engineering stack — above agent runtimes (Layers 3–4), below human oversight (Layer 7). Its position is load-bearing: it is the layer that makes the rest of the stack architecturally coherent at scale.</p>
+    <p>The runtime stack above is one cut. The broader software development lifecycle is another: the same governance infrastructure occupies <strong>Layer 5</strong> of the generative AI software engineering stack — above agent runtimes (Layers 3–4), below human oversight (Layer 7). Its position is load-bearing: it is the layer that makes the rest of the stack architecturally coherent at scale.</p>
 
     <div class="layer-stack">
       <div class="layer-row">
@@ -538,12 +685,16 @@
     </details>
   </section>
 
-  <h2 id="related-reading">Related reading</h2>
-  <ul>
-    <li><a href="/concepts/agentic-development/">Agentic Development</a></li>
-    <li><a href="/concepts/ai-native-sdlc/">AI-Native SDLC</a></li>
-    <li><a href="/insights/generative-ai-software-engineering-stack/">The Generative AI Software Engineering Stack</a></li>
-  </ul>
+  <aside class="related-panel" aria-labelledby="related-panel-label">
+    <div class="related-panel-label" id="related-panel-label">Related operational essays</div>
+    <ul class="related-list">
+      <li><a href="/insights/harness-engineering-still-needs-governance/"><div class="rel-title">Harness Engineering Still Needs Governance</div><p class="rel-desc">Harnesses coordinate execution. Governance enforces architectural intent. They are different layers of the agent stack.</p></a></li>
+      <li><a href="/insights/why-observability-is-not-governance/"><div class="rel-title">Why Observability Is Not Governance</div><p class="rel-desc">Visibility explains drift after it occurs. Governance constrains drift before generation.</p></a></li>
+      <li><a href="/insights/review-is-not-governance/"><div class="rel-title">Review Is Not Governance</div><p class="rel-desc">Human review systems do not scale linearly with AI output velocity. Review samples; governance shapes.</p></a></li>
+      <li><a href="/insights/memory-is-not-governance/"><div class="rel-title">Memory Is Not Governance</div><p class="rel-desc">Context persistence cannot enforce architectural invariants. Recall is not constraint.</p></a></li>
+      <li><a href="/insights/why-claude-md-stops-scaling/"><div class="rel-title">Why CLAUDE.md Stops Scaling</div><p class="rel-desc">Prompt files document standards but cannot deterministically enforce them across sessions and agents.</p></a></li>
+    </ul>
+  </aside>
 
   <footer class="article-footer">
     <a href="/concepts/" class="back-link">← Back to Concepts</a>

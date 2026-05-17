@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Governance Propagation — Mneme HQ Concepts</title>
+  <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/fonts.css">
+  <meta name="description" content="Governance propagation: a single compiled decision reaches every agent, every developer, every CI run with identical semantics, scope, and enforcement verdict." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/concepts/governance-propagation/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Governance Propagation — Mneme HQ Concepts" />
+  <meta property="og:description" content="Governance propagation is the property that a single compiled decision reaches every agent, every developer, every CI run — with the same semantics, the same scope, and the same enforcement verdict." />
+  <meta property="og:url" content="https://mnemehq.com/concepts/governance-propagation/" />
+  <meta property="og:image" content="https://mnemehq.com/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Governance Propagation — Mneme HQ Concepts" />
+  <meta name="twitter:description" content="A single compiled decision reaches every agent, every developer, every CI run — with the same enforcement verdict." />
+  <meta name="twitter:image" content="https://mnemehq.com/og.png" />
+  <meta name="author" content="Theo Valmis" />
+  <meta property="article:published_time" content="2026-05-15T00:00:00Z" />
+  <meta property="article:author" content="https://mnemehq.com/founder/" />
+  <meta property="article:section" content="Concepts" />
+
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d; --border: #222226; --border2: #2e2e34; --text: #e8e8ec; --muted: #88889a; --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .article-wrap { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 7rem; }
+    .article-header { margin-bottom: 3.5rem; }
+    .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+
+    .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
+    .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .article-body h3 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--text); }
+    .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
+    .article-body p strong { color: var(--text); font-weight: 500; }
+    .article-body ul, .article-body ol { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body li { margin-bottom: 0.5rem; }
+    .article-body li strong { color: var(--text); font-weight: 500; }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout p strong { color: var(--accent); }
+
+    .callout-teal { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--teal); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout-teal p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout-teal p strong { color: var(--teal); }
+
+    .comparison-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.85rem; }
+    .comparison-table th { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border2); color: var(--muted); font-weight: 500; }
+    .comparison-table td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .comparison-table td:first-child { color: var(--muted); white-space: nowrap; }
+    .comparison-table td:nth-child(2) { color: var(--text); opacity: 0.5; }
+    .comparison-table td:nth-child(3) { color: var(--teal); }
+
+    .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .article-faq { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .article-faq h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 1.5rem; color: var(--text); }
+    .article-faq details { margin: 0.75rem 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .article-faq summary { padding: 1rem 1.25rem; cursor: pointer; font-size: 0.88rem; color: var(--text); background: var(--surface); list-style: none; }
+    .article-faq summary::-webkit-details-marker { display: none; }
+    .article-faq summary::before { content: '+ '; color: var(--accent); }
+    .article-faq details[open] summary::before { content: '− '; }
+    .article-faq details[open] summary { border-bottom: 1px solid var(--border); }
+    .article-faq .faq-body { padding: 1.25rem; font-size: 0.86rem; color: var(--muted); line-height: 1.85; }
+    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .back-link:hover { color: var(--text); }
+    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2rem; }
+    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--accent-dim); }
+
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    .answer-capsule { max-width: 820px; margin: 0 auto; padding: 1.5rem 2rem; background: var(--surface); border-bottom: 1px solid rgba(200,240,96,0.18); font-size: 0.88rem; color: var(--muted); line-height: 1.8; }
+    .answer-capsule strong { color: var(--accent); }
+
+    footer { border-top: 1px solid var(--border); padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .breadcrumb-nav { max-width: 720px; margin: 0 auto; padding: 1.75rem 2rem 0.85rem; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.82rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; padding: 0; flex-shrink: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; transition: border-color 0.15s, background 0.15s; }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span { display: block; width: 18px; height: 2px; background: currentColor; border-radius: 1px; transition: transform 0.25s ease, opacity 0.18s ease; transform-origin: center; }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    @media (max-width: 900px) {
+      html, body { overflow-x: hidden; }
+      body.menu-open { overflow: hidden; }
+      nav { position: relative; padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 1.25rem; z-index: 99; max-height: 0; overflow: hidden; opacity: 0; visibility: hidden; transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s; }
+      .nav-links.open { max-height: 80vh; opacity: 1; visibility: visible; padding: 0.5rem 1.25rem 1.25rem; transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s; overflow-y: auto; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.92rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+      .article-wrap { padding: 3rem 1.25rem 5rem; }
+    }
+
+    h2#related-reading { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 400; margin-top: 3.5rem; margin-bottom: 0.75rem; }
+    h2#related-reading + ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    h2#related-reading + ul li { margin: 0; }
+    h2#related-reading + ul li a { display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.1rem; background: var(--surface); color: var(--text); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.15s, color 0.15s; }
+    h2#related-reading + ul li a::after { content: '\2192'; opacity: 0.35; transition: opacity 0.15s, transform 0.15s; display: inline-block; margin-left: 0.5rem; }
+    h2#related-reading + ul li a:hover { background: var(--surface2); color: var(--accent); }
+    h2#related-reading + ul li a:hover::after { opacity: 1; transform: translateX(3px); }
+    /* Cross-reference panel (Related operational essays / Related governance concepts) */
+    .related-panel { margin-top: 3.5rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .related-panel-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    .related-list li { margin: 0; }
+    .related-list a { display: block; padding: 1.15rem 1.35rem; background: var(--surface); text-decoration: none; transition: background 0.15s; }
+    .related-list a:hover { background: var(--surface2); }
+    .related-list .rel-title { color: var(--text); font-size: 0.92rem; font-weight: 600; margin-bottom: 0.35rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; letter-spacing: -0.005em; transition: color 0.15s; }
+    .related-list .rel-title::after { content: '\2192'; color: var(--accent); opacity: 0.4; transition: opacity 0.15s, transform 0.15s; flex-shrink: 0; }
+    .related-list a:hover .rel-title { color: var(--accent); }
+    .related-list a:hover .rel-title::after { opacity: 1; transform: translateX(3px); }
+    .related-list .rel-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.65; margin: 0; }
+
+
+    /* Diagrams */
+    .diagram-figure { margin: 2.25rem 0 2rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem 1.5rem 1.25rem; overflow: hidden; }
+    .diagram-figure svg { display: block; width: 100%; height: auto; max-width: 100%; }
+    .diagram-caption { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.06em; color: var(--muted); text-transform: uppercase; margin-top: 1rem; padding-top: 0.9rem; border-top: 1px solid var(--border); line-height: 1.7; }
+    .diagram-caption strong { color: var(--accent); font-weight: 500; }
+
+    @media (max-width: 768px) { nav, .mobile-menu { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Concepts", "item": "https://mnemehq.com/concepts/"},
+          {"@type": "ListItem", "position": 3, "name": "Governance Propagation", "item": "https://mnemehq.com/concepts/governance-propagation/"}
+        ]
+      },
+      {
+        "@type": "TechArticle",
+        "headline": "Governance Propagation — Mneme HQ Concepts",
+        "description": "Governance propagation is the property that a single compiled decision reaches every agent, every developer, every CI run with identical enforcement semantics.",
+        "url": "https://mnemehq.com/concepts/governance-propagation/",
+        "datePublished": "2026-05-15",
+        "dateModified": "2026-05-15",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "image": "https://mnemehq.com/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/concepts/governance-propagation/",
+        "articleSection": "Concepts"
+      },
+      {
+        "@type": "DefinedTerm",
+        "name": "Governance Propagation",
+        "description": "The property that a single compiled decision reaches every agent, every developer, every CI run, with identical scope and enforcement semantics.",
+        "inDefinedTermSet": {"@type": "DefinedTermSet", "name": "Mneme HQ Concepts", "url": "https://mnemehq.com/concepts/"},
+        "url": "https://mnemehq.com/concepts/governance-propagation/"
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/benchmark/">Benchmark</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<div class="answer-capsule">
+  <strong>Governance propagation.</strong> One decision · many consumers · identical semantics. A compiled constraint reaches every agent, every developer, every CI run with the same scope, the same precedence, and the same verdict — without per-agent reconfiguration. Without propagation, "governance" is per-tool, per-developer, per-session — and a decision is never really enforced.
+</div>
+
+<nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/concepts/">Concepts</a></li>
+    <li aria-current="page">Governance Propagation</li>
+  </ol>
+</nav>
+
+<article class="article-wrap">
+  <header class="article-header">
+    <div class="article-eyebrow">
+      <span class="eyebrow-tag">Concepts</span>
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-meta">9 min read &nbsp;·&nbsp; May 2026</span>
+    </div>
+    <h1>Governance Propagation</h1>
+    <p class="article-lede">An architectural decision that is enforced in one developer's Claude Code session but not in another developer's Cursor session is not a team decision — it is a personal preference. Governance propagation is the property that turns a single compiled decision into uniform enforcement across every surface the team uses.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-15">Published May 2026</time>
+    </p>
+  </header>
+
+  <div class="article-body">
+
+    <p>Most discussion of AI coding governance focuses on a single surface — usually a single agent in a single editor. The unspoken assumption is that if the constraint works in that one place, governance is solved. It is not. The hard problem in real teams is not enforcing a constraint in one session; it is making sure the same constraint, with the same meaning, is enforced in every session, by every agent, on every developer's machine, and in CI. That property has a name: <strong>governance propagation</strong>.</p>
+
+    <figure class="diagram-figure" aria-labelledby="gp-diag-title">
+      <svg viewBox="0 0 800 360" role="img" aria-labelledby="gp-diag-title gp-diag-desc" xmlns="http://www.w3.org/2000/svg">
+        <title id="gp-diag-title">A single compiled decision propagating to every consumer</title>
+        <desc id="gp-diag-desc">Central node 'ADR-0017' compiles into a decision corpus that fans out to multiple consumers — Claude Code, Cursor, Copilot, CI, JetBrains, code review bots — each receiving the identical constraint.</desc>
+        <g>
+          <text x="40" y="28" fill="#c8f060" font-family="DM Mono, monospace" font-size="10" letter-spacing="0.06em">ONE DECISION · IDENTICAL SEMANTICS · EVERY CONSUMER</text>
+
+          <!-- Source -->
+          <rect x="40" y="68" width="160" height="60" rx="8" fill="rgba(139,224,200,0.05)" stroke="#8be0c8" stroke-width="1.2"/>
+          <text x="120" y="92" text-anchor="middle" fill="#8be0c8" font-family="DM Mono, monospace" font-size="10">ADR-0017</text>
+          <text x="120" y="112" text-anchor="middle" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">use repository pattern</text>
+
+          <!-- Compiler -->
+          <rect x="240" y="68" width="140" height="60" rx="8" fill="rgba(200,240,96,0.05)" stroke="#c8f060" stroke-width="1.5"/>
+          <text x="310" y="92" text-anchor="middle" fill="#c8f060" font-family="DM Mono, monospace" font-size="10">COMPILER</text>
+          <text x="310" y="112" text-anchor="middle" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">parse · validate · emit</text>
+
+          <line x1="200" y1="98" x2="240" y2="98" stroke="#c8f060" stroke-width="1.5"/>
+
+          <!-- Corpus -->
+          <rect x="420" y="68" width="200" height="60" rx="8" fill="rgba(200,240,96,0.05)" stroke="#c8f060" stroke-width="1.5"/>
+          <text x="520" y="92" text-anchor="middle" fill="#c8f060" font-family="DM Mono, monospace" font-size="10">project_memory.json</text>
+          <text x="520" y="112" text-anchor="middle" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">single source of truth</text>
+
+          <line x1="380" y1="98" x2="420" y2="98" stroke="#c8f060" stroke-width="1.5"/>
+
+          <!-- Fanout point -->
+          <circle cx="520" cy="170" r="4" fill="#c8f060"/>
+          <line x1="520" y1="128" x2="520" y2="170" stroke="#c8f060" stroke-width="1.5"/>
+
+          <!-- Fanout lines -->
+          <line x1="520" y1="170" x2="100" y2="240" stroke="#c8f060" stroke-width="1.2"/>
+          <line x1="520" y1="170" x2="240" y2="240" stroke="#c8f060" stroke-width="1.2"/>
+          <line x1="520" y1="170" x2="380" y2="240" stroke="#c8f060" stroke-width="1.2"/>
+          <line x1="520" y1="170" x2="520" y2="240" stroke="#c8f060" stroke-width="1.2"/>
+          <line x1="520" y1="170" x2="660" y2="240" stroke="#c8f060" stroke-width="1.2"/>
+
+          <!-- Consumers -->
+          <rect x="40" y="240" width="120" height="56" rx="6" fill="#141416" stroke="#2e2e34"/>
+          <text x="100" y="262" text-anchor="middle" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">Claude Code</text>
+          <text x="100" y="280" text-anchor="middle" fill="#88889a" font-family="DM Mono, monospace" font-size="9">pre-tool-use hook</text>
+
+          <rect x="180" y="240" width="120" height="56" rx="6" fill="#141416" stroke="#2e2e34"/>
+          <text x="240" y="262" text-anchor="middle" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">Cursor</text>
+          <text x="240" y="280" text-anchor="middle" fill="#88889a" font-family="DM Mono, monospace" font-size="9">rules emission</text>
+
+          <rect x="320" y="240" width="120" height="56" rx="6" fill="#141416" stroke="#2e2e34"/>
+          <text x="380" y="262" text-anchor="middle" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">Copilot</text>
+          <text x="380" y="280" text-anchor="middle" fill="#88889a" font-family="DM Mono, monospace" font-size="9">instructions file</text>
+
+          <rect x="460" y="240" width="120" height="56" rx="6" fill="rgba(200,240,96,0.05)" stroke="#c8f060" stroke-width="1.5"/>
+          <text x="520" y="262" text-anchor="middle" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">CI gate</text>
+          <text x="520" y="280" text-anchor="middle" fill="#c8f060" font-family="DM Mono, monospace" font-size="9">merge enforcement</text>
+
+          <rect x="600" y="240" width="120" height="56" rx="6" fill="#141416" stroke="#2e2e34"/>
+          <text x="660" y="262" text-anchor="middle" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">JetBrains</text>
+          <text x="660" y="280" text-anchor="middle" fill="#88889a" font-family="DM Mono, monospace" font-size="9">plugin · inline</text>
+
+          <!-- Equivalence note -->
+          <text x="400" y="328" text-anchor="middle" fill="#c8f060" font-family="DM Mono, monospace" font-size="11">verdict(claude) ≡ verdict(cursor) ≡ verdict(copilot) ≡ verdict(ci)</text>
+          <text x="400" y="346" text-anchor="middle" fill="#88889a" font-family="DM Mono, monospace" font-size="10">same query · same corpus · same scope · same precedence · same answer</text>
+        </g>
+      </svg>
+      <figcaption class="diagram-caption"><strong>Propagation is a one-to-many invariant.</strong> A decision is compiled once. Every consumer reads the same corpus, applies the same scope and precedence rules, and produces the same verdict. There is no second copy of the truth to drift against.</figcaption>
+    </figure>
+
+    <h2>What governance propagation actually means</h2>
+
+    <p>Propagation has three operational components, each of which must hold for the property to be useful.</p>
+
+    <h3>1. Source identity</h3>
+
+    <p>Every consumer reads from <em>the same compiled corpus</em>. Not "a copy of the corpus that was up-to-date last Tuesday." Not "the Cursor-specific export." Not "the CLAUDE.md that the team manually keeps in sync with the wiki." A single artifact, versioned, durable, and addressable. Source identity is the prerequisite for everything else: if two consumers read from two different sources, they will reach different verdicts, and that divergence is the absence of propagation.</p>
+
+    <h3>2. Semantic equivalence</h3>
+
+    <p>Reading the same corpus is necessary but not sufficient. The consumers must <em>interpret</em> the corpus identically — the same scope syntax must select the same files; the same precedence rules must resolve conflicts the same way; the same predicate must produce the same verdict against the same input. Semantic equivalence is what governance propagation provides beyond simple replication. A YAML file shared between two tools that interpret it differently is two governance systems, not one.</p>
+
+    <h3>3. Update propagation</h3>
+
+    <p>When the source changes, every consumer must see the change. The propagation latency must be bounded — ideally near-zero, since every minute that one consumer has stale rules is a minute that team has multiple effective governance regimes. In practice, this means consumers query the live corpus at decision time (pull) or are notified of updates (push), and never operate on cached snapshots that can silently desync.</p>
+
+    <div class="callout">
+      <p><strong>The property is "no second copy of the truth."</strong> Every export, sync script, or per-tool mirror is a future divergence event waiting to happen. Propagation is what you get when the corpus is the source — not a thing you sync from.</p>
+    </div>
+
+    <h2>Why propagation is hard in practice</h2>
+
+    <p>The hardness is not in the concept. It is in the fact that the consumers of governance — AI coding agents — are heterogeneous and were not designed to share governance state.</p>
+
+    <ul>
+      <li><strong>Each agent has its own configuration surface.</strong> Claude Code reads CLAUDE.md and hook configs. Cursor reads .cursorrules. Copilot reads copilot-instructions.md. JetBrains AI reads project-level config. CI reads its own config files. These surfaces don't share a schema or a query API.</li>
+      <li><strong>Each surface has its own interpretation of "context."</strong> A scope rule of <code style="font-family:'DM Mono',monospace;color:var(--teal)">services/billing/**</code> might mean "include these files in the agent's context" in one tool and "apply this rule when modifying these files" in another. The semantics are not portable.</li>
+      <li><strong>Each tool has its own update model.</strong> Some watch files for changes; some load configs at session start and never reload; some require explicit reload. Without a unifying layer, the "same" rule can be live in one tool and stale in another at any moment.</li>
+    </ul>
+
+    <p>Propagation, in this environment, is not a configuration problem — it is an engineering one. It requires a layer that absorbs the heterogeneity of consumer surfaces and presents a uniform query API on top of a single corpus. That layer is the governance infrastructure. Without it, the team is running multiple parallel governance systems and calling them one.</p>
+
+    <h2>Execution surfaces governance must propagate across</h2>
+
+    <p>Most discussions of agent governance treat propagation as a property of the source tree: the code the agent writes must satisfy architectural constraints, and that is the whole problem. That is too narrow. Long-running, autonomous agents do not only write source code &mdash; they write everywhere the workflow touches. Each of the following is an execution surface where the same governance corpus must be evaluable, or the surface ungoverned by default.</p>
+
+    <ul>
+      <li><strong>Source code.</strong> The obvious surface: edits, additions, deletions across the working tree. Governance must evaluate diffs against the active decision graph and refuse changes that violate it.</li>
+      <li><strong>Branch names.</strong> Auto-generated by harnesses, often outside the team's branch taxonomy. Conventions that downstream tooling, release notes, and audit traceability depend on quietly stop working when ungoverned.</li>
+      <li><strong>Commit messages.</strong> Workflow-generated commits accumulate in history. Message conventions (conventional commits, sign-offs, scope prefixes) are part of the architecture of the repo and need the same enforcement.</li>
+      <li><strong>PR titles and descriptions.</strong> The squash-merge title is what lands on <code>main</code>. If the title taxonomy is the durable record of product decisions, it cannot be left to a model with no governance hook.</li>
+      <li><strong>Tags and releases.</strong> Tag policies built around durable milestones get diluted by operational commits and ephemeral checkpoints when tagging is delegated to automation without governance.</li>
+      <li><strong>CI workflow and pipeline config.</strong> Workflow files, runner definitions, secret references, and approval gates are written by agents the same way they write code &mdash; but their governance constraints (least privilege, allowlists) are stricter and less visible.</li>
+      <li><strong>Deployment artifacts.</strong> Manifests, container tags, infra-as-code, generated changelogs, and release announcements all carry organizational intent that ungoverned automation can silently violate.</li>
+      <li><strong>Generated configuration.</strong> Feature flags, routing rules, scaling policies, and integration configs are generated as code. They are rarely reviewed with the same rigor and almost never checked against architectural decisions.</li>
+      <li><strong>Agent-produced documentation.</strong> READMEs, ADR drafts, runbooks, inline comments. Drift in docs propagates faster than drift in code, because the next agent session reads docs as authoritative.</li>
+    </ul>
+
+    <p>A governance layer that enforces ADR compliance in <code>src/</code> but ignores the surrounding automation artifacts is governing a fraction of the agent's output. The interesting, expensive failures live exactly at the boundaries the agent crosses on its way to "shipping a change" &mdash; the branch, the title, the workflow file, the deployment manifest, the release note. The companion essay <a href="/insights/harness-engineering-still-needs-governance/">Harness Engineering Still Needs Governance</a> develops the execution-surfaces argument in full.</p>
+
+    <h2>The common misread: shared documents as propagation</h2>
+
+    <p>The most common shortcut is to keep a single CLAUDE.md or .cursorrules file and commit it to the repo, then assume every tool reads it consistently. This is shared <em>documentation</em>, not shared <em>governance</em>.</p>
+
+    <p>The problem is that each tool ingests the file differently. Claude Code may inject it into every prompt; Cursor may use it as a hint; Copilot may ignore it depending on file size; CI may not read it at all. Even if every tool theoretically reads the same file, the operational consequence of reading it is tool-specific. Decisions encoded in prose are interpreted by each consumer model — and interpretation varies across consumers, across runs, across context windows. That is not propagation; that is parallel interpretation of a shared hint.</p>
+
+    <div class="callout-teal">
+      <p><strong>Real propagation requires structured records and a query API, not a shared document.</strong> A predicate that can be evaluated identically by every consumer — not a paragraph that each consumer reads in its own way.</p>
+    </div>
+
+    <h2>What propagation enables</h2>
+
+    <p>When propagation holds, three downstream properties become possible — and none of them are achievable without it.</p>
+
+    <div style="overflow-x:auto;margin:2rem 0;">
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>Property</th>
+          <th>Without propagation</th>
+          <th>With propagation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Decision lifetime</td>
+          <td>Lives as long as the file is in sync</td>
+          <td>Enforced everywhere, immediately</td>
+        </tr>
+        <tr>
+          <td>Onboarding</td>
+          <td>Per-tool configuration, per-developer</td>
+          <td>One bootstrap; works in every agent</td>
+        </tr>
+        <tr>
+          <td>Auditability</td>
+          <td>Which file did this agent read?</td>
+          <td>Which compiled record applied? Same answer from every consumer</td>
+        </tr>
+        <tr>
+          <td>Drift</td>
+          <td>Inevitable — divergence is the default</td>
+          <td>Detectable — drift is a violation that surfaces</td>
+        </tr>
+        <tr>
+          <td>Multi-agent workflows</td>
+          <td>Each agent governed by its own subset</td>
+          <td>Workflow governed end-to-end by one corpus</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>The connective property here is that propagation is what makes governance composable. You can have a constraint that applies to a Claude Code session that hands off to a Cursor refactor that gets merged through CI — and the same architectural decision is enforced at every step, because every step queries the same corpus.</p>
+
+    <h2>Related concepts</h2>
+
+    <ul>
+      <li><strong>Multi-agent continuity</strong> — what propagation enables across time. Continuity is the temporal version of propagation; propagation is the spatial version of continuity.</li>
+      <li><strong>Precedence semantics</strong> — what every consumer must interpret identically for propagation to be meaningful. Without shared precedence rules, "the same corpus" produces different verdicts.</li>
+      <li><strong>Enforcement provenance</strong> — what propagation makes possible. When every consumer reports verdicts against the same corpus, you can trace any enforcement event back to a single, citable decision record.</li>
+    </ul>
+
+  </div>
+
+  <aside class="related-panel" aria-labelledby="related-panel-label">
+    <div class="related-panel-label" id="related-panel-label">Related operational essays</div>
+    <ul class="related-list">
+      <li><a href="/insights/harness-engineering-still-needs-governance/"><div class="rel-title">Harness Engineering Still Needs Governance</div><p class="rel-desc">Branch names, PR titles, CI config, deployment artifacts &mdash; governance must propagate across every surface the agent writes to, not just source code.</p></a></li>
+      <li><a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/"><div class="rel-title">Architectural Governance Across Heterogeneous AI Coding Agents</div><p class="rel-desc">Claude, Cursor, Copilot — each has its own surface. Governance must be portable across all of them.</p></a></li>
+      <li><a href="/insights/why-claude-md-stops-scaling/"><div class="rel-title">Why CLAUDE.md Stops Scaling</div><p class="rel-desc">Prompt files document standards but cannot deterministically enforce them across sessions and agents.</p></a></li>
+      <li><a href="/insights/mneme-vs-cursor-rules/"><div class="rel-title">Mneme vs Cursor Rules</div><p class="rel-desc">Cursor rules are per-tool prompt files. A governance corpus is a multi-tool decision substrate.</p></a></li>
+      <li><a href="/insights/memory-is-not-governance/"><div class="rel-title">Memory Is Not Governance</div><p class="rel-desc">Context persistence cannot enforce architectural invariants. Recall is not constraint.</p></a></li>
+    </ul>
+  </aside>
+
+  <footer class="article-footer">
+    <a href="/concepts/" class="back-link">← Back to Concepts</a>
+
+    <div class="cta-block">
+      <h3>Governance that propagates to every agent</h3>
+      <p>Mneme compiles your decisions into a single corpus that Claude Code, Cursor, Copilot, JetBrains, and CI all query directly. One source. Identical semantics. Every surface.</p>
+      <a href="/works-with/" class="btn-primary">See supported surfaces →</a>
+    </div>
+  </footer>
+</article>
+</main>
+
+<footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+  <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/use-cases/">Use cases</a></li>
+        <li><a href="/works-with/">Works with</a></li>
+        <li><a href="/platforms/">Platforms</a></li>
+        <li><a href="/integrations/">Integrations</a></li>
+        <li><a href="/compare/">Compare</a></li>
+        <li><a href="/demo/">Demo</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/concepts/" style="color:var(--accent);">Concepts</a></li>
+        <li><a href="/insights/">Insights</a></li>
+        <li><a href="/standards/">Standards</a></li>
+        <li><a href="/benchmark/">Benchmark</a></li>
+        <li><a href="/docs/">Docs</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/pilot/" style="color:var(--accent);">Request pilot</a></li>
+        <li><a href="/for/">For teams</a></li>
+        <li><a href="/founder/">Founder</a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/roadmap/">Roadmap</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Code</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="https://github.com/TheoV823/mneme">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="/privacy/">Privacy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
+    <span style="display:inline-flex;align-items:center;gap:0.75rem;"><a href="/" aria-label="Mneme HQ home" style="display:inline-flex;opacity:0.75;"><img src="/favicon.png" alt="Mneme HQ" height="22" style="display:block;"></a><span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span></span>
+    <span>&copy; 2026</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) { a.classList.add('active'); }
+  });
+})();
+</script>
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  function setOpen(open){ links.classList.toggle('open', open); btn.setAttribute('aria-expanded', String(open)); document.body.classList.toggle('menu-open', open); }
+  btn.addEventListener('click', function(e){ e.stopPropagation(); setOpen(!links.classList.contains('open')); });
+  document.addEventListener('click', function(e){ if (!links.classList.contains('open')) return; if (links.contains(e.target) || btn.contains(e.target)) return; setOpen(false); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false); });
+  links.addEventListener('click', function(e){ if (e.target.tagName === 'A') setOpen(false); });
+  window.addEventListener('resize', function(){ if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false); });
+})();
+</script>
+</body>
+</html>

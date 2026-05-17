@@ -237,6 +237,18 @@
     .term-transcript pre code { font-family: 'DM Mono', monospace; font-size: 0.76rem; line-height: 1.7; color: var(--muted); background: transparent; border: none; padding: 0; }
 
     .term-sim-note { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--muted); letter-spacing: 0.03em; margin: -1.5rem 0 2.5rem; opacity: 0.7; }
+    /* Cross-reference panel (Related governance concepts) */
+    .related-panel { margin-top: 3rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .related-panel-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    .related-list li { margin: 0; }
+    .related-list a { display: block; padding: 1.15rem 1.35rem; background: var(--surface); text-decoration: none; transition: background 0.15s; }
+    .related-list a:hover { background: var(--surface2); }
+    .related-list .rel-title { color: var(--text); font-size: 0.92rem; font-weight: 600; margin-bottom: 0.35rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; letter-spacing: -0.005em; transition: color 0.15s; }
+    .related-list .rel-title::after { content: '\2192'; color: var(--accent); opacity: 0.4; transition: opacity 0.15s, transform 0.15s; flex-shrink: 0; }
+    .related-list a:hover .rel-title { color: var(--accent); }
+    .related-list a:hover .rel-title::after { opacity: 1; transform: translateX(3px); }
+    .related-list .rel-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.65; margin: 0; }
   </style>
 </head>
 <body>
@@ -530,6 +542,16 @@ python run.py</code></pre>
       </ul>
 
       <p>The drift demo is what happens when those three artifacts are missing. The convergent timeline is what happens when they are wired up.</p>
+
+  <aside class="related-panel" aria-labelledby="related-panel-label">
+    <div class="related-panel-label" id="related-panel-label">Related governance concepts</div>
+    <ul class="related-list">
+      <li><a href="/concepts/ai-agent-drift/"><div class="rel-title">AI agent drift</div><p class="rel-desc">The agent-side phenomenon where coding agents diverge from intended architecture across sessions.</p></a></li>
+      <li><a href="/concepts/architectural-drift/"><div class="rel-title">Architectural drift</div><p class="rel-desc">The compound degradation in codebase coherence when AI generation outpaces governance.</p></a></li>
+      <li><a href="/concepts/governance-before-generation/"><div class="rel-title">Governance before generation</div><p class="rel-desc">Enforcement at the point of AI intent, not at the point of human review.</p></a></li>
+      <li><a href="/concepts/governance-infrastructure/"><div class="rel-title">Governance infrastructure</div><p class="rel-desc">The platform layer that encodes, distributes, versions, and enforces decisions across agents and CI.</p></a></li>
+    </ul>
+  </aside>
 
       <div class="next-bar">
         <a class="next-card" href="/demo/governed-python-agent/">

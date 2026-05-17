@@ -191,7 +191,36 @@
     h2#related-reading + ul li a::after { content: '\2192'; opacity: 0.35; transition: opacity 0.15s, transform 0.15s; display: inline-block; margin-left: 0.5rem; }
     h2#related-reading + ul li a:hover { background: var(--surface2); color: var(--accent); }
     h2#related-reading + ul li a:hover::after { opacity: 1; transform: translateX(3px); }
-  
+    /* Cross-reference panel (Related operational essays / Related governance concepts) */
+    .related-panel { margin-top: 3.5rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .related-panel-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    .related-list li { margin: 0; }
+    .related-list a { display: block; padding: 1.15rem 1.35rem; background: var(--surface); text-decoration: none; transition: background 0.15s; }
+    .related-list a:hover { background: var(--surface2); }
+    .related-list .rel-title { color: var(--text); font-size: 0.92rem; font-weight: 600; margin-bottom: 0.35rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; letter-spacing: -0.005em; transition: color 0.15s; }
+    .related-list .rel-title::after { content: '\2192'; color: var(--accent); opacity: 0.4; transition: opacity 0.15s, transform 0.15s; flex-shrink: 0; }
+    .related-list a:hover .rel-title { color: var(--accent); }
+    .related-list a:hover .rel-title::after { opacity: 1; transform: translateX(3px); }
+    .related-list .rel-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.65; margin: 0; }
+
+
+    /* Diagrams */
+    .diagram-figure { margin: 2.25rem 0 2rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem 1.5rem 1.25rem; overflow: hidden; }
+    .diagram-figure svg { display: block; width: 100%; height: auto; max-width: 100%; }
+    .diagram-caption { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.06em; color: var(--muted); text-transform: uppercase; margin-top: 1rem; padding-top: 0.9rem; border-top: 1px solid var(--border); line-height: 1.7; }
+    .diagram-caption strong { color: var(--accent); font-weight: 500; }
+    .diag-box { fill: #141416; stroke: #2e2e34; }
+    .diag-box-active { fill: rgba(200,240,96,0.05); stroke: #c8f060; stroke-width: 1.5; }
+    .diag-box-teal { fill: rgba(139,224,200,0.05); stroke: #8be0c8; stroke-width: 1.2; }
+    .diag-text { fill: #e8e8ec; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; }
+    .diag-meta { fill: #88889a; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.05em; }
+    .diag-mono { fill: #e8e8ec; font-family: 'DM Mono', monospace; font-size: 11px; }
+    .diag-accent-text { fill: #c8f060; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; }
+    .diag-teal-text { fill: #8be0c8; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.05em; }
+    .diag-arrow { stroke: #2e2e34; stroke-width: 1; fill: none; }
+    .diag-arrow-active { stroke: #c8f060; stroke-width: 1.5; fill: none; }
+
     @media (max-width: 768px) { nav, .mobile-menu { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } }
   </style>
   <script type="application/ld+json">
@@ -317,6 +346,66 @@
     <p>Governance systems are engineering systems. They have inputs (queries, file paths, task descriptions), processes (decision retrieval, context injection, evaluation), and outputs (verdicts, enforcement signals). And like any engineering system, their behavior must be testable — not by running them and hoping the result looks right, but by pre-registering what the result must be before the run, then evaluating whether the system produced it.</p>
 
     <p><strong>Verification contracts</strong> are that pre-registration mechanism. They are what make governance systems testable — and therefore improvable, auditable, and trustworthy.</p>
+
+    <figure class="diagram-figure" aria-labelledby="vc-diag-title">
+      <svg viewBox="0 0 800 320" role="img" aria-labelledby="vc-diag-title vc-diag-desc" xmlns="http://www.w3.org/2000/svg">
+        <title id="vc-diag-title">Anatomy of a verification contract</title>
+        <desc id="vc-diag-desc">A diagram showing the four components of a verification contract — scenario, claim, expected verdict, expected evidence — and how the governance run produces an observed verdict that is compared against the contract to yield a pass-or-fail result.</desc>
+        <g>
+          <text x="40" y="28" class="diag-accent-text">VERIFICATION CONTRACT · pre-registered, before any code generation</text>
+
+          <!-- Contract -->
+          <rect x="40" y="48" width="340" height="220" rx="10" class="diag-box-teal"/>
+          <text x="60" y="72" class="diag-teal-text">CONTRACT.YAML</text>
+
+          <rect x="60" y="86" width="300" height="36" rx="5" class="diag-box"/>
+          <text x="74" y="103" class="diag-meta">SCENARIO</text>
+          <text x="74" y="117" class="diag-mono">file=services/billing/checkout.py</text>
+
+          <rect x="60" y="130" width="300" height="36" rx="5" class="diag-box"/>
+          <text x="74" y="147" class="diag-meta">CLAIM</text>
+          <text x="74" y="161" class="diag-mono">no_direct_db_access ⇒ violation</text>
+
+          <rect x="60" y="174" width="300" height="36" rx="5" class="diag-box"/>
+          <text x="74" y="191" class="diag-meta">EXPECTED VERDICT</text>
+          <text x="74" y="205" class="diag-mono">block · severity=high</text>
+
+          <rect x="60" y="218" width="300" height="36" rx="5" class="diag-box"/>
+          <text x="74" y="235" class="diag-meta">EXPECTED EVIDENCE</text>
+          <text x="74" y="249" class="diag-mono">decision_id=ADR-0017 · top-K=3</text>
+
+          <!-- Governance run -->
+          <rect x="420" y="48" width="180" height="100" rx="10" class="diag-box"/>
+          <text x="438" y="72" class="diag-accent-text">GOVERNANCE RUN</text>
+          <text x="438" y="94" class="diag-text">retriever +</text>
+          <text x="438" y="112" class="diag-text">evaluator</text>
+          <text x="438" y="138" class="diag-meta">runs against the corpus</text>
+
+          <!-- Observed -->
+          <rect x="420" y="168" width="180" height="100" rx="10" class="diag-box"/>
+          <text x="438" y="192" class="diag-accent-text">OBSERVED</text>
+          <text x="438" y="214" class="diag-text">verdict + evidence</text>
+          <text x="438" y="232" class="diag-meta">decision_id, top-K, severity</text>
+          <text x="438" y="252" class="diag-meta">produced by the run</text>
+
+          <line x1="510" y1="148" x2="510" y2="168" class="diag-arrow"/>
+
+          <!-- Comparison -->
+          <rect x="640" y="108" width="120" height="100" rx="10" class="diag-box-active"/>
+          <text x="700" y="135" text-anchor="middle" class="diag-accent-text">COMPARE</text>
+          <text x="700" y="160" text-anchor="middle" class="diag-text">expected</text>
+          <text x="700" y="178" text-anchor="middle" class="diag-text">vs observed</text>
+          <text x="700" y="200" text-anchor="middle" class="diag-accent-text">PASS · FAIL</text>
+
+          <line x1="380" y1="158" x2="430" y2="98" class="diag-arrow-active"/>
+          <line x1="600" y1="98" x2="640" y2="148" class="diag-arrow-active"/>
+          <line x1="600" y1="218" x2="640" y2="168" class="diag-arrow-active"/>
+
+          <text x="40" y="295" class="diag-meta">CONTRACT IS THE GROUND TRUTH · governance system is the unit under test · result is a binary verdict, not a vibe</text>
+        </g>
+      </svg>
+      <figcaption class="diagram-caption"><strong>Pre-register the verdict.</strong> Scenario, claim, expected verdict, and expected evidence are committed before a run. The run produces what it produces; the contract decides whether that counts as governance working.</figcaption>
+    </figure>
 
     <h2>What verification contracts actually mean</h2>
 
@@ -465,12 +554,16 @@
     </details>
   </section>
 
-  <h2 id="related-reading">Related reading</h2>
-  <ul>
-    <li><a href="/concepts/deterministic-enforcement/">Deterministic Enforcement</a></li>
-    <li><a href="/benchmark/">Governance Benchmark v1.1 Methodology</a></li>
-    <li><a href="/architecture/how-retrieval-works/">How Retrieval Works</a></li>
-  </ul>
+  <aside class="related-panel" aria-labelledby="related-panel-label">
+    <div class="related-panel-label" id="related-panel-label">Related operational essays</div>
+    <ul class="related-list">
+      <li><a href="/insights/harness-engineering-still-needs-governance/"><div class="rel-title">Harness Engineering Still Needs Governance</div><p class="rel-desc">Harnesses coordinate execution. Verification contracts are how governance becomes enforceable instead of advisory.</p></a></li>
+      <li><a href="/insights/ai-coding-governance-should-be-reviewable/"><div class="rel-title">AI Coding Governance Should Be Reviewable</div><p class="rel-desc">Governance verdicts must be inspectable, citable, and disagreeable — or engineer trust collapses.</p></a></li>
+      <li><a href="/insights/why-observability-is-not-governance/"><div class="rel-title">Why Observability Is Not Governance</div><p class="rel-desc">Visibility explains drift after it occurs. Governance constrains drift before generation.</p></a></li>
+      <li><a href="/insights/why-architectural-governance-needs-precedence-semantics/"><div class="rel-title">Why Architectural Governance Needs Precedence Semantics</div><p class="rel-desc">When ADRs overlap, the system needs deterministic resolution — not best-effort guessing from a model.</p></a></li>
+      <li><a href="/insights/prompt-engineering-is-not-governance/"><div class="rel-title">Prompt Engineering Is Not Governance</div><p class="rel-desc">Prompt templates nudge output. They cannot enforce architectural invariants across sessions and agents.</p></a></li>
+    </ul>
+  </aside>
 
   <footer class="article-footer">
     <a href="/concepts/" class="back-link">← Back to Concepts</a>

@@ -45,6 +45,7 @@
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
         "hasPart": [
           {"@type": "Article", "name": "AI-Native Engineering Has an Intent Debt Problem", "url": "https://mnemehq.com/insights/ai-native-engineering-intent-debt/"},
+          {"@type": "Article", "name": "Harness Engineering Still Needs Governance", "url": "https://mnemehq.com/insights/harness-engineering-still-needs-governance/"},
           {"@type": "Article", "name": "Datadog's State of AI Engineering Report Quietly Confirms the Governance Crisis", "url": "https://mnemehq.com/insights/datadog-state-of-ai-engineering-governance-crisis/"},
           {"@type": "Article", "name": "Why CLAUDE.md Stops Scaling", "url": "https://mnemehq.com/insights/why-claude-md-stops-scaling/"},
           {"@type": "Article", "name": "What Is the AI SDLC?", "url": "https://mnemehq.com/insights/what-is-the-ai-sdlc/"},
@@ -57,6 +58,7 @@
           {"@type": "Article", "name": "AI Code Review Does Not Scale Linearly", "url": "https://mnemehq.com/insights/ai-code-review-does-not-scale-linearly/"},
           {"@type": "Article", "name": "Deployment Quality Will Define the AI Era", "url": "https://mnemehq.com/insights/deployment-quality-will-define-the-ai-era/"},
           {"@type": "Article", "name": "Review Is Not Governance", "url": "https://mnemehq.com/insights/review-is-not-governance/"},
+          {"@type": "Article", "name": "Why Observability Is Not Governance", "url": "https://mnemehq.com/insights/why-observability-is-not-governance/"},
           {"@type": "Article", "name": "Why Prompt Memory Fails at Scale", "url": "https://mnemehq.com/insights/why-prompt-memory-fails-at-scale/"},
           {"@type": "Article", "name": "Architectural Governance Across Heterogeneous AI Coding Agents", "url": "https://mnemehq.com/insights/architectural-governance-across-heterogeneous-ai-coding-agents/"},
           {"@type": "Article", "name": "Why AI Architectural Governance Needs Precedence Semantics", "url": "https://mnemehq.com/insights/why-architectural-governance-needs-precedence-semantics/"},
@@ -281,7 +283,7 @@
 
 <div class="cards-wrap">
   <h2 style="font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; color: var(--text); letter-spacing: -0.01em; margin: 0 auto 1rem; max-width: 660px;">Research, analysis, and implementation notes on architectural governance for AI-assisted software development.</h2>
-  <p class="hub-intro">These articles explore architectural drift, constraint enforcement, governance systems, and the operational realities of AI-assisted development.</p>
+  <p class="hub-intro">The agent stack is settling: models, harnesses, execution systems, governance, verification. These articles cover the layer that sits between execution and verification &mdash; what governance is, why long-running agents and harness-engineered workflows still need it, how it propagates across every surface autonomous workflows touch, and what deterministic enforcement looks like in practice.</p>
 
   <!-- Group 0: AI-native engineering cluster -->
   <div class="cards-section">
@@ -347,6 +349,19 @@
   <div class="cards-section">
     <div class="section-divider"><span class="section-label">The governance problem</span></div>
     <div class="cards-grid">
+
+      <div class="insight-card">
+        <div class="card-meta">
+          <span class="card-tag">Thought Leadership</span>
+          <span class="card-dot"></span>
+          <span class="card-read-time">11 min read</span>
+        </div>
+        <h3>Harness Engineering Still Needs Governance</h3>
+        <p>The industry moved from prompt engineering to harness engineering: execution systems that coordinate tools, memory, and retries. Harnesses solve how agents act. They do not enforce architectural intent &mdash; and that is the missing layer.</p>
+        <div class="card-footer">
+          <a href="/insights/harness-engineering-still-needs-governance/" class="read-link">Read &rarr;</a>
+        </div>
+      </div>
 
       <div class="insight-card">
         <div class="card-meta">
@@ -436,6 +451,19 @@
         <p>CodeRabbit helps review AI-generated code. Mneme helps govern what the AI generates in the first place. Two different layers of the same problem.</p>
         <div class="card-footer">
           <a href="/insights/review-is-not-governance/" class="read-link">Read →</a>
+        </div>
+      </div>
+
+      <div class="insight-card">
+        <div class="card-meta">
+          <span class="card-tag">Thought Leadership</span>
+          <span class="card-dot"></span>
+          <span class="card-read-time">7 min read</span>
+        </div>
+        <h3>Why Observability Is Not Governance</h3>
+        <p>Observability tells you the agent violated architecture. Governance helps prevent the violation from being proposed in the first place. Visibility is not control — and dashboards without enforcement are operational archaeology.</p>
+        <div class="card-footer">
+          <a href="/insights/why-observability-is-not-governance/" class="read-link">Read →</a>
         </div>
       </div>
 
