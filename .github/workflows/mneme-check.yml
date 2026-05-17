@@ -17,6 +17,15 @@ name: mneme self-check (warn mode)
 # with the `--query` arg, so we combine the PR title (intent) with the
 # changed file path (subsystem). PR title alone is too narrow to match
 # subsystem-specific rules like the no-vector-db / no-langchain anti-pattern.
+#
+# UNKNOWN verdicts mean `mneme check` did not emit a recognized
+# PASS/WARN/FAIL `Result:` line. Treat them as untrusted governance
+# output: count them, show raw CLI output in Details, and emit a
+# warning callout. UNKNOWN remains non-blocking in warn mode.
+#
+# Manual validation: stub `python -m mneme.cli` to emit output without
+# a `Result:` line, run this step locally, and inspect summary.md.
+#
 
 on:
   pull_request:
@@ -108,7 +117,7 @@ jobs:
             exit 0
           fi
 
-          pass=0; warn=0; fail=0
+          pass=0; warn=0; fail=0; unknown=0
           : > /tmp/mneme/rows.txt
           : > /tmp/mneme/details.txt
           while IFS= read -r f; do
@@ -122,13 +131,13 @@ jobs:
             verdict="$(printf '%s\n' "$out" | tr -d '\r' | awk -F': ' '/^Result:/ {print $2; exit}')"
             verdict="${verdict:-UNKNOWN}"
             case "$verdict" in
-              PASS) pass=$((pass+1)); icon=":white_check_mark:" ;;
-              WARN) warn=$((warn+1)); icon=":warning:" ;;
-              FAIL) fail=$((fail+1)); icon=":x:" ;;
-              *)    icon=":grey_question:" ;;
+              PASS) pass=$((pass+1));       icon=":white_check_mark:" ;;
+              WARN) warn=$((warn+1));       icon=":warning:" ;;
+              FAIL) fail=$((fail+1));       icon=":x:" ;;
+              *)    unknown=$((unknown+1)); icon=":grey_question:"; verdict="UNKNOWN" ;;
             esac
             printf '| %s %s | `%s` |\n' "$icon" "$verdict" "$f" >> /tmp/mneme/rows.txt
-            if [ "$verdict" = "FAIL" ] || [ "$verdict" = "WARN" ]; then
+            if [ "$verdict" = "FAIL" ] || [ "$verdict" = "WARN" ] || [ "$verdict" = "UNKNOWN" ]; then
               {
                 printf '\n<details><summary><code>%s</code> — %s</summary>\n\n' "$f" "$verdict"
                 printf '```\n%s\n```\n\n</details>\n' "$out"
@@ -137,8 +146,13 @@ jobs:
           done < /tmp/mneme/files.txt
 
           {
-            echo "**Summary:** ${pass} pass, ${warn} warn, ${fail} fail"
+            echo "**Summary:** ${pass} pass, ${warn} warn, ${fail} fail, ${unknown} unknown"
             echo ""
+            if [ "$unknown" -gt 0 ]; then
+              echo "> [!WARNING]"
+              echo "> Mneme returned one or more \`UNKNOWN\` verdicts. Governance output could not be trusted for those files. See the raw CLI output in the **Details** section below."
+              echo ""
+            fi
             echo "| verdict | file |"
             echo "| :--- | :--- |"
             cat /tmp/mneme/rows.txt
