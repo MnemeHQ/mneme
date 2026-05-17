@@ -401,6 +401,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://mnemehq.com/concepts/intent-debt/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://mnemehq.com/compare/claude-code-memory/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

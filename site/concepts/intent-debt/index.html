@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Intent Debt — Mneme HQ Concepts</title>
+  <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/fonts.css">
+  <meta name="description" content="Intent debt is the gap between what a system is supposed to preserve and what its AI agents are actually constrained to follow. When agents become the execution layer, intent debt becomes the primary bottleneck." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/concepts/intent-debt/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Intent Debt — Mneme HQ Concepts" />
+  <meta property="og:description" content="Intent debt is the gap between what a system is supposed to preserve and what its AI agents are actually constrained to follow." />
+  <meta property="og:url" content="https://mnemehq.com/concepts/intent-debt/" />
+  <meta property="og:image" content="https://mnemehq.com/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Intent Debt — Mneme HQ Concepts" />
+  <meta name="twitter:description" content="Intent debt is the gap between what a system is supposed to preserve and what its AI agents are actually constrained to follow." />
+  <meta name="twitter:image" content="https://mnemehq.com/og.png" />
+  <meta name="author" content="Theo Valmis" />
+  <meta property="article:published_time" content="2026-05-17T00:00:00Z" />
+  <meta property="article:author" content="https://mnemehq.com/founder/" />
+  <meta property="article:section" content="Concepts" />
+
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #88889a;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .article-wrap { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 7rem; }
+    .article-header { margin-bottom: 3.5rem; }
+    .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+
+    .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
+    .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .article-body h3 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--text); }
+    .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
+    .article-body p strong { color: var(--text); font-weight: 500; }
+    .article-body ul, .article-body ol { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body li { margin-bottom: 0.5rem; }
+    .article-body li strong { color: var(--text); font-weight: 500; }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout p strong { color: var(--accent); }
+
+    .callout-teal { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--teal); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout-teal p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout-teal p strong { color: var(--teal); }
+
+    .comparison-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.85rem; }
+    .comparison-table th { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border2); color: var(--muted); font-weight: 500; }
+    .comparison-table td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .comparison-table td:first-child { color: var(--muted); white-space: nowrap; }
+    .comparison-table td:nth-child(2) { color: var(--text); opacity: 0.55; }
+    .comparison-table td:nth-child(3) { color: var(--teal); }
+
+    .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .article-faq { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .article-faq h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 1.5rem; color: var(--text); }
+    .article-faq details { margin: 0.75rem 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .article-faq summary { padding: 1rem 1.25rem; cursor: pointer; font-size: 0.88rem; color: var(--text); background: var(--surface); list-style: none; }
+    .article-faq summary::-webkit-details-marker { display: none; }
+    .article-faq summary::before { content: '+ '; color: var(--accent); }
+    .article-faq details[open] summary::before { content: '− '; }
+    .article-faq details[open] summary { border-bottom: 1px solid var(--border); }
+    .article-faq .faq-body { padding: 1.25rem; font-size: 0.86rem; color: var(--muted); line-height: 1.85; }
+    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .back-link:hover { color: var(--text); }
+    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2rem; }
+    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--accent-dim); }
+
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    .answer-capsule { max-width: 820px; margin: 0 auto; padding: 1.5rem 2rem; background: var(--surface); border-bottom: 1px solid rgba(200,240,96,0.18); font-size: 0.88rem; color: var(--muted); line-height: 1.8; }
+    .answer-capsule strong { color: var(--accent); }
+
+    footer { border-top: 1px solid var(--border); padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .breadcrumb-nav { max-width: 720px; margin: 0 auto; padding: 1.75rem 2rem 0.85rem; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.82rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; padding: 0; flex-shrink: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; transition: border-color 0.15s, background 0.15s; }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span { display: block; width: 18px; height: 2px; background: currentColor; border-radius: 1px; transition: transform 0.25s ease, opacity 0.18s ease; transform-origin: center; }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    @media (max-width: 900px) {
+      html, body { overflow-x: hidden; }
+      body.menu-open { overflow: hidden; }
+      nav { position: relative; padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 1.25rem; z-index: 99; max-height: 0; overflow: hidden; opacity: 0; visibility: hidden; transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s; }
+      .nav-links.open { max-height: 80vh; opacity: 1; visibility: visible; padding: 0.5rem 1.25rem 1.25rem; transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s; overflow-y: auto; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.92rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+      .article-wrap { padding: 3rem 1.25rem 5rem; }
+    }
+
+    h2#further-reading { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 400; margin-top: 3.5rem; margin-bottom: 0.75rem; }
+    h2#further-reading + ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    h2#further-reading + ul li { margin: 0; }
+    h2#further-reading + ul li a { display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.1rem; background: var(--surface); color: var(--text); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.15s, color 0.15s; }
+    h2#further-reading + ul li a::after { content: '\2192'; opacity: 0.35; transition: opacity 0.15s, transform 0.15s; display: inline-block; margin-left: 0.5rem; }
+    h2#further-reading + ul li a:hover { background: var(--surface2); color: var(--accent); }
+    h2#further-reading + ul li a:hover::after { opacity: 1; transform: translateX(3px); }
+
+    .related-panel { margin-top: 3.5rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .related-panel-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    .related-list li { margin: 0; }
+    .related-list a { display: block; padding: 1.15rem 1.35rem; background: var(--surface); text-decoration: none; transition: background 0.15s; }
+    .related-list a:hover { background: var(--surface2); }
+    .related-list .rel-title { color: var(--text); font-size: 0.92rem; font-weight: 600; margin-bottom: 0.35rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; letter-spacing: -0.005em; transition: color 0.15s; }
+    .related-list .rel-title::after { content: '\2192'; color: var(--accent); opacity: 0.4; transition: opacity 0.15s, transform 0.15s; flex-shrink: 0; }
+    .related-list a:hover .rel-title { color: var(--accent); }
+    .related-list a:hover .rel-title::after { opacity: 1; transform: translateX(3px); }
+    .related-list .rel-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.65; margin: 0; }
+
+    @media (max-width: 768px) { nav, .mobile-menu { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Concepts", "item": "https://mnemehq.com/concepts/"},
+          {"@type": "ListItem", "position": 3, "name": "Intent Debt", "item": "https://mnemehq.com/concepts/intent-debt/"}
+        ]
+      },
+      {
+        "@type": "TechArticle",
+        "headline": "Intent Debt — Mneme HQ Concepts",
+        "description": "Intent debt is the gap between what a system is supposed to preserve and what its AI agents are actually constrained to follow. When agents become the execution layer, intent debt becomes the primary bottleneck.",
+        "url": "https://mnemehq.com/concepts/intent-debt/",
+        "datePublished": "2026-05-17",
+        "dateModified": "2026-05-17",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "image": "https://mnemehq.com/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/concepts/intent-debt/",
+        "proficiencyLevel": "Expert",
+        "articleSection": "Concepts"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is intent debt?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Intent debt is the gap between what a system is supposed to preserve and what its AI agents are actually constrained to follow. When architectural decisions, constraints, and operating rules exist in documents or human memory but are not compiled into a form agents must query before generating code, that gap is intent debt. It accumulates silently and compounds as agent velocity increases."}
+          },
+          {
+            "@type": "Question",
+            "name": "How is intent debt different from technical debt?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Technical debt describes implementation quality — shortcuts, workarounds, code that works but is hard to maintain. Intent debt describes a constraint gap — the difference between what the system is supposed to do and what its agents are actually enforced to do. You can have zero technical debt and high intent debt if your agents are writing clean, well-structured code that violates every architectural decision the team has ever made."}
+          },
+          {
+            "@type": "Question",
+            "name": "Why does intent debt accumulate faster with AI agents?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Because AI agents generate code at a rate human reviewers cannot match. In human-paced delivery, intent lived in engineers' heads and was transmitted through pair programming, code review, and conversation. At agent velocity, that transmission channel saturates. Agents write more code, faster, with less knowledge of prior decisions. Intent debt is the structural deficit that emerges when the delivery rate exceeds the rate at which intent is enforced."}
+          },
+          {
+            "@type": "Question",
+            "name": "Why don't code review, memory systems, or orchestration solve intent debt?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Code review is reactive — it catches violations after code is written, not before. At agent velocity, the review queue grows faster than reviewers can drain it. Memory systems (RAG, vector stores, context injection) optimize for retrieval, not enforcement — they surface relevant content but cannot deterministically block a violation. Orchestration systems coordinate agent execution but do not compile decisions into enforced constraints. All three are advisory at the point of generation; intent debt requires enforcement before generation."}
+          },
+          {
+            "@type": "Question",
+            "name": "How does governance infrastructure reduce intent debt?",
+            "acceptedAnswer": {"@type": "Answer", "text": "By compiling architectural decisions into a typed, scoped, precedence-aware corpus that every agent must query before generating code. Governance infrastructure closes the intent debt gap at the point of generation: the agent asks what constraints apply here, receives a deterministic answer, and writes code that satisfies them. The gap between what the system is supposed to preserve and what agents are constrained to follow approaches zero when the constraint is live, current, and enforced."}
+          }
+        ]
+      },
+      {
+        "@type": "DefinedTerm",
+        "name": "Intent Debt",
+        "description": "The gap between what a system is supposed to preserve and what its AI agents are actually constrained to follow.",
+        "inDefinedTermSet": {"@type": "DefinedTermSet", "name": "Mneme HQ Concepts", "url": "https://mnemehq.com/concepts/"},
+        "url": "https://mnemehq.com/concepts/intent-debt/"
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/benchmark/">Benchmark</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<div class="answer-capsule">
+  <strong>Intent debt.</strong> The gap between what a system is supposed to preserve and what its AI agents are actually constrained to follow. When agents become the execution layer, undocumented, stale, or unenforced architectural decisions do not just slow delivery — they actively accumulate as structural liability.
+</div>
+
+<nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/concepts/">Concepts</a></li>
+    <li aria-current="page">Intent Debt</li>
+  </ol>
+</nav>
+
+<article class="article-wrap">
+  <header class="article-header">
+    <div class="article-eyebrow">
+      <span class="eyebrow-tag">Concepts</span>
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-meta">7 min read &nbsp;·&nbsp; May 2026</span>
+    </div>
+    <h1>Intent Debt</h1>
+    <p class="article-lede">Every team carries some intent that was never made explicit, current, and enforceable. In human-paced delivery, that gap is manageable. When agents become the execution layer, the gap compounds with every session.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-17">Published May 2026</time>
+    </p>
+  </header>
+
+  <div class="article-body">
+
+    <h2>Definition</h2>
+
+    <p><strong>Intent debt is the gap between what a system is supposed to preserve and what its AI agents are actually constrained to follow.</strong></p>
+
+    <p>The debt accumulates whenever architectural decisions, operating constraints, or design rules exist in documents, wikis, or human memory but have not been compiled into a form that agents must query before generating code. The decisions are real. The enforcement is absent. That absence is the debt.</p>
+
+    <div class="callout">
+      <p><strong>The canonical form:</strong> Intent debt = what the system should preserve − what agents are actually constrained to follow. When that difference is nonzero, every agent session is a draw against the balance.</p>
+    </div>
+
+    <h2>Why it emerges in AI-native engineering</h2>
+
+    <p>In human-paced software delivery, intent was transmitted through proximity. Decisions were made in meetings, recorded in ADRs, propagated through pair programming and code review, and maintained by engineers who shared context. The transmission was lossy, but the pace of delivery was low enough that the losses were manageable. A wrong pattern caught in review could be corrected before it spread.</p>
+
+    <p>AI agents break this equilibrium on two axes simultaneously. They generate code faster than human reviewers can inspect it — and they have no inherited memory of decisions made in prior sessions, by other agents, or by other developers. Each agent session begins from whatever it can observe in the workspace. If the workspace does not make decisions queryable, the agent infers. That inference is often plausible. It is rarely authoritative.</p>
+
+    <p>Intent debt is what accumulates when the inference rate exceeds the enforcement rate. With agents writing code at high velocity, the gap between what was decided and what was enforced widens faster than it can be closed by review.</p>
+
+    <h2>How intent debt differs from technical debt and cognitive debt</h2>
+
+    <div style="overflow-x:auto;margin:2rem 0;">
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>Debt type</th>
+          <th>What it names</th>
+          <th>Primary consequence</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Technical debt</td>
+          <td>Implementation shortcuts that cost future maintainability</td>
+          <td>Code that works but is hard to change</td>
+        </tr>
+        <tr>
+          <td>Cognitive debt</td>
+          <td>Decisions not documented for human knowledge transfer</td>
+          <td>Engineering time lost to rediscovery</td>
+        </tr>
+        <tr>
+          <td>Intent debt</td>
+          <td>Constraints not compiled into machine-enforceable form</td>
+          <td>Agent-generated code that violates architectural decisions</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>The distinctions matter for remediation. Technical debt is addressed by refactoring. Cognitive debt is addressed by documentation. Intent debt is not addressed by either — it requires compiling decisions into a form that closes the enforcement gap at the point of generation.</p>
+
+    <p>A team can write excellent documentation, clear ADRs, and thorough code comments, and still carry high intent debt. If those documents are not compiled into a queryable corpus that agents must consult before writing, the gap persists. Documentation serves the human knowledge transfer channel. It does not serve the machine enforcement channel. Intent debt lives in the machine enforcement channel.</p>
+
+    <h2>Why review, memory, and orchestration are insufficient</h2>
+
+    <p>Three approaches are commonly used to manage the problem that intent debt names. None of them close the gap at the point where it matters.</p>
+
+    <p><strong>Code review</strong> is reactive. It catches violations after code is written, not before. At human delivery pace, this is acceptable — the review cycle is fast relative to the generation cycle. At agent velocity, the generation cycle runs orders of magnitude faster than the review cycle. The review queue grows faster than it can be drained. Intent debt accumulates in the backlog.</p>
+
+    <p><strong>Memory systems</strong> — RAG pipelines, vector stores, context injection — optimize for retrieval, not enforcement. They surface relevant content when queried. They do not guarantee that the right content is current, that it takes precedence over conflicting signals, or that it is deterministically enforced. A memory system that surfaces an ADR in context does not prevent the agent from ignoring it. Retrieval and constraint are different operations.</p>
+
+    <p><strong>Orchestration</strong> coordinates agent execution — sequencing, routing, tool access. It does not compile decisions into constraints. An orchestration layer can tell an agent when to run and what tools it can call. It cannot enforce that the agent's architectural choices comply with a decision made eighteen months ago that exists only in a Confluence page.</p>
+
+    <div class="callout-teal">
+      <p><strong>Intent debt requires enforcement before generation.</strong> Review, memory, and orchestration are all post-generation or advisory. The gap closes when every agent session must query compiled decisions before writing code — and receives a deterministic answer.</p>
+    </div>
+
+    <h2>How governance infrastructure reduces intent debt</h2>
+
+    <p>Governance infrastructure addresses intent debt by compiling architectural decisions into a typed, scoped, precedence-aware corpus — and by enforcing that corpus at the pre-generation hook. The mechanism is:</p>
+
+    <ol>
+      <li><strong>Compile.</strong> ADRs, operating constraints, and architectural rules are parsed into structured decisions with explicit scope, type, and precedence metadata.</li>
+      <li><strong>Retrieve.</strong> When an agent signals intent to write code, the governance layer retrieves the decisions that apply to the target file, package, or operation.</li>
+      <li><strong>Enforce.</strong> The decisions are presented as constraints the agent must satisfy, not suggestions it may consider. Violations are blocked or flagged with a citable verdict.</li>
+    </ol>
+
+    <p>When this loop is in place, intent debt cannot accumulate silently. The gap between what the system is supposed to preserve and what agents are constrained to follow is closed at the point of generation. Decisions that are compiled, current, and scoped are enforced in every session, by every agent, without depending on review to catch violations after the fact.</p>
+
+    <p>Intent debt is not eliminated permanently — new decisions create new opportunities for the gap to reopen if they are not compiled. Governance infrastructure is a practice, not a one-time fix. But it is the only mechanism that operates in the machine enforcement channel where intent debt actually lives.</p>
+
+    <h2 id="further-reading">Further reading</h2>
+    <ul>
+      <li><a href="/insights/ai-native-engineering-intent-debt/">AI-Native Engineering Has an Intent Debt Problem — the evidence-led argument</a></li>
+    </ul>
+
+  </div>
+
+  <section class="article-faq">
+    <h2>Frequently asked questions</h2>
+    <details>
+      <summary>What is intent debt?</summary>
+      <div class="faq-body">Intent debt is the gap between what a system is supposed to preserve and what its AI agents are actually constrained to follow. When architectural decisions, constraints, and operating rules exist in documents or human memory but are not compiled into a form agents must query before generating code, that gap is intent debt. It accumulates silently and compounds as agent velocity increases.</div>
+    </details>
+    <details>
+      <summary>How is intent debt different from technical debt?</summary>
+      <div class="faq-body">Technical debt describes implementation quality — shortcuts, workarounds, code that works but is hard to maintain. Intent debt describes a constraint gap — the difference between what the system is supposed to do and what its agents are actually enforced to do. You can have zero technical debt and high intent debt if your agents are writing clean, well-structured code that violates every architectural decision the team has ever made.</div>
+    </details>
+    <details>
+      <summary>Why does intent debt accumulate faster with AI agents?</summary>
+      <div class="faq-body">Because AI agents generate code at a rate human reviewers cannot match. In human-paced delivery, intent lived in engineers' heads and was transmitted through pair programming, code review, and conversation. At agent velocity, that transmission channel saturates. Agents write more code, faster, with less knowledge of prior decisions. Intent debt is the structural deficit that emerges when the delivery rate exceeds the rate at which intent is enforced.</div>
+    </details>
+    <details>
+      <summary>Why don't code review, memory systems, or orchestration solve intent debt?</summary>
+      <div class="faq-body">Code review is reactive — it catches violations after code is written, not before. At agent velocity, the review queue grows faster than reviewers can drain it. Memory systems (RAG, vector stores, context injection) optimize for retrieval, not enforcement — they surface relevant content but cannot deterministically block a violation. Orchestration systems coordinate agent execution but do not compile decisions into enforced constraints. All three are advisory at the point of generation; intent debt requires enforcement before generation.</div>
+    </details>
+    <details>
+      <summary>How does governance infrastructure reduce intent debt?</summary>
+      <div class="faq-body">By compiling architectural decisions into a typed, scoped, precedence-aware corpus that every agent must query before generating code. Governance infrastructure closes the intent debt gap at the point of generation: the agent asks what constraints apply here, receives a deterministic answer, and writes code that satisfies them. The gap between what the system is supposed to preserve and what agents are constrained to follow approaches zero when the constraint is live, current, and enforced.</div>
+    </details>
+  </section>
+
+  <aside class="related-panel" aria-labelledby="related-panel-label">
+    <div class="related-panel-label" id="related-panel-label">Related governance concepts</div>
+    <ul class="related-list">
+      <li><a href="/concepts/governance-infrastructure/"><div class="rel-title">Governance Infrastructure</div><p class="rel-desc">The platform layer that compiles decisions into enforced constraints — the mechanism that closes the intent debt gap.</p></a></li>
+      <li><a href="/concepts/governance-before-generation/"><div class="rel-title">Governance Before Generation</div><p class="rel-desc">The enforcement posture that addresses intent debt at the point of intent rather than at the point of review.</p></a></li>
+      <li><a href="/concepts/ai-agent-drift/"><div class="rel-title">AI Agent Drift</div><p class="rel-desc">The agent-side phenomenon that intent debt enables — agents diverging from decisions they were never constrained to follow.</p></a></li>
+      <li><a href="/concepts/architectural-drift/"><div class="rel-title">Architectural Drift</div><p class="rel-desc">The codebase-side accumulation of intent debt across sessions and agents.</p></a></li>
+    </ul>
+  </aside>
+
+  <footer class="article-footer">
+    <a href="/concepts/" class="back-link">← Back to Concepts</a>
+
+    <div class="cta-block">
+      <h3>See intent enforcement in action</h3>
+      <p>The Mneme demo shows how compiled decisions close the intent debt gap at the pre-generation hook — live, deterministic, citable.</p>
+      <a href="/demo/" class="btn-primary">View the demo →</a>
+    </div>
+  </footer>
+</article>
+</main>
+
+<footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+  <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/use-cases/">Use cases</a></li>
+        <li><a href="/works-with/">Works with</a></li>
+        <li><a href="/platforms/">Platforms</a></li>
+        <li><a href="/integrations/">Integrations</a></li>
+        <li><a href="/compare/">Compare</a></li>
+        <li><a href="/demo/">Demo</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/concepts/" style="color:var(--accent);">Concepts</a></li>
+        <li><a href="/insights/">Insights</a></li>
+        <li><a href="/standards/">Standards</a></li>
+        <li><a href="/benchmark/">Benchmark</a></li>
+        <li><a href="/docs/">Docs</a></li>
+        <li><a href="/docs/cli/">CLI reference</a></li>
+        <li><a href="/docs/governance-violations/">Governance violations</a></li>
+        <li><a href="/supported-languages/">Supported languages</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/pilot/" style="color:var(--accent);">Request pilot</a></li>
+        <li><a href="/for/">For teams</a></li>
+        <li><a href="/founder/">Founder</a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/roadmap/">Roadmap</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Code</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="https://github.com/TheoV823/mneme">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://dev.to/mnemehq" target="_blank" rel="noopener">DEV.to</a></li>
+        <li><a href="/privacy/">Privacy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
+    <span style="display:inline-flex;align-items:center;gap:0.75rem;"><a href="/" aria-label="Mneme HQ home" style="display:inline-flex;opacity:0.75;"><img src="/favicon.png" alt="Mneme HQ" height="22" style="display:block;"></a><span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span></span>
+    <span>&copy; 2026</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  function setOpen(open){
+    links.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('menu-open', open);
+  }
+  btn.addEventListener('click', function(e){ e.stopPropagation(); setOpen(!links.classList.contains('open')); });
+  document.addEventListener('click', function(e){
+    if (!links.classList.contains('open')) return;
+    if (links.contains(e.target) || btn.contains(e.target)) return;
+    setOpen(false);
+  });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false); });
+  links.addEventListener('click', function(e){ if (e.target.tagName === 'A') setOpen(false); });
+  window.addEventListener('resize', function(){ if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false); });
+})();
+</script>
+</body>
+</html>
