@@ -47,6 +47,8 @@ TEMPLATE_MAP = {
     "og-insights-heterogeneous-agents.html": "insights/architectural-governance-across-heterogeneous-ai-coding-agents/og.png",
     "og-insights-agentic-education.html": "insights/rise-of-agentic-engineering-education/og.png",
     "og-insights-openai-compatible-apis.html": "insights/openai-compatible-apis-are-commoditizing-models/og.png",
+    "og-insights-genai-stack.html": "insights/generative-ai-software-engineering-stack/og.png",
+    "og-insights-claude-md-stops.html": "insights/why-claude-md-stops-scaling/og.png",
     "og-standards.html": "standards/og.png",
     "og-for-cto.html": "for-cto/og.png",
     "og-for-platform.html": "for-platform/og.png",

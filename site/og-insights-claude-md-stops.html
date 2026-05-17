@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1200px;
+    height: 630px;
+    background: #0c0c0d;
+    font-family: 'DM Mono', monospace;
+    overflow: hidden;
+    position: relative;
+  }
+  .grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(200,240,96,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,240,96,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+  .glow {
+    position: absolute;
+    top: -80px;
+    right: -80px;
+    width: 560px;
+    height: 560px;
+    background: radial-gradient(circle at top right, rgba(200,240,96,0.07), transparent 65%);
+    pointer-events: none;
+  }
+  .container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    padding: 44px 52px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-family: 'Instrument Serif', serif;
+    font-size: 26px;
+    color: #e8e8ec;
+    letter-spacing: -0.3px;
+  }
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: #c8f060;
+    background: rgba(200,240,96,0.08);
+    border: 1px solid rgba(200,240,96,0.25);
+    border-radius: 100px;
+    padding: 5px 14px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .middle {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 860px;
+    padding-top: 8px;
+  }
+  .heading {
+    font-family: 'Instrument Serif', serif;
+    font-size: 60px;
+    line-height: 1.08;
+    color: #e8e8ec;
+    letter-spacing: -1px;
+    margin-bottom: 28px;
+  }
+  .heading em {
+    font-style: italic;
+    color: #c8f060;
+  }
+  .two-col {
+    display: flex;
+    gap: 32px;
+  }
+  .col {
+    flex: 1;
+  }
+  .col-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #55555f;
+    margin-bottom: 6px;
+  }
+  .col-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #88889a;
+    font-weight: 300;
+  }
+  .col-text strong {
+    color: #e8e8ec;
+    font-weight: 400;
+  }
+  .col-text em {
+    color: #c8f060;
+    font-style: normal;
+  }
+  .bottom {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+  .principle {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: #c8f060;
+    letter-spacing: 0.02em;
+    max-width: 640px;
+    line-height: 1.5;
+  }
+  .url {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: #55555f;
+    letter-spacing: 0.01em;
+  }
+</style>
+</head>
+<body>
+  <div class="grid"></div>
+  <div class="glow"></div>
+  <div class="container">
+    <div class="top">
+      <span class="logo">Mneme HQ</span>
+      <span class="tag">Insights</span>
+    </div>
+    <div class="middle">
+      <div class="heading">Why <em>CLAUDE.md</em><br>stops scaling</div>
+      <div class="two-col">
+        <div class="col">
+          <div class="col-label">What it is</div>
+          <div class="col-text"><strong>CLAUDE.md</strong> is an instruction surface. It tells the model what to do.</div>
+        </div>
+        <div class="col">
+          <div class="col-label">What it is not</div>
+          <div class="col-text">It is <em>not governance</em>. It does not verify that the model did it.</div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom">
+      <span class="principle">context injection is not enforcement &middot; instruction is not constraint</span>
+      <div class="url">mnemehq.com/insights/why-claude-md-stops-scaling</div>
+    </div>
+  </div>
+</body>
+</html>
