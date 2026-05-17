@@ -192,7 +192,37 @@
     h2#related-reading + ul li a::after { content: '\2192'; opacity: 0.35; transition: opacity 0.15s, transform 0.15s; display: inline-block; margin-left: 0.5rem; }
     h2#related-reading + ul li a:hover { background: var(--surface2); color: var(--accent); }
     h2#related-reading + ul li a:hover::after { opacity: 1; transform: translateX(3px); }
-  
+    /* Cross-reference panel (Related operational essays / Related governance concepts) */
+    .related-panel { margin-top: 3.5rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .related-panel-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    .related-list li { margin: 0; }
+    .related-list a { display: block; padding: 1.15rem 1.35rem; background: var(--surface); text-decoration: none; transition: background 0.15s; }
+    .related-list a:hover { background: var(--surface2); }
+    .related-list .rel-title { color: var(--text); font-size: 0.92rem; font-weight: 600; margin-bottom: 0.35rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; letter-spacing: -0.005em; transition: color 0.15s; }
+    .related-list .rel-title::after { content: '\2192'; color: var(--accent); opacity: 0.4; transition: opacity 0.15s, transform 0.15s; flex-shrink: 0; }
+    .related-list a:hover .rel-title { color: var(--accent); }
+    .related-list a:hover .rel-title::after { opacity: 1; transform: translateX(3px); }
+    .related-list .rel-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.65; margin: 0; }
+
+
+    /* Diagrams */
+    .diagram-figure { margin: 2.25rem 0 2rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem 1.5rem 1.25rem; overflow: hidden; }
+    .diagram-figure svg { display: block; width: 100%; height: auto; max-width: 100%; }
+    .diagram-caption { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.06em; color: var(--muted); text-transform: uppercase; margin-top: 1rem; padding-top: 0.9rem; border-top: 1px solid var(--border); line-height: 1.7; }
+    .diagram-caption strong { color: var(--accent); font-weight: 500; }
+    .diag-box { fill: #141416; stroke: #2e2e34; }
+    .diag-box-active { fill: rgba(200,240,96,0.05); stroke: #c8f060; stroke-width: 1.5; }
+    .diag-box-dim { fill: #141416; stroke: #2e2e34; stroke-dasharray: 3 3; opacity: 0.55; }
+    .diag-text { fill: #e8e8ec; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; }
+    .diag-text-dim { fill: #88889a; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; }
+    .diag-meta { fill: #88889a; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.05em; }
+    .diag-accent-text { fill: #c8f060; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; }
+    .diag-teal-text { fill: #8be0c8; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.05em; }
+    .diag-arrow { stroke: #2e2e34; stroke-width: 1; fill: none; }
+    .diag-arrow-active { stroke: #c8f060; stroke-width: 1.5; fill: none; }
+    .diag-bad { fill: #e87c7c; font-family: 'DM Mono', monospace; font-size: 10px; }
+
     @media (max-width: 768px) { nav, .mobile-menu { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } }
   </style>
   <script type="application/ld+json">
@@ -316,6 +346,88 @@
     <p>The phrase "governance before generation" describes a specific enforcement posture — a choice about <em>where</em> in the AI development pipeline architectural constraints are applied. It is not about whether governance happens. It is about the only enforcement point that can shape AI output rather than react to it.</p>
 
     <p>That distinction — shaping versus reacting — is the structural argument this page develops. The enforcement point is not a scheduling detail. It is the variable that determines whether governance is architectural infrastructure or expensive remediation.</p>
+
+    <figure class="diagram-figure" aria-labelledby="gbg-diag-title">
+      <svg viewBox="0 0 800 340" role="img" aria-labelledby="gbg-diag-title gbg-diag-desc" xmlns="http://www.w3.org/2000/svg">
+        <title id="gbg-diag-title">Two enforcement points on the same pipeline</title>
+        <desc id="gbg-diag-desc">Two parallel pipelines: the upper one places enforcement before generation and produces shaped output. The lower one places enforcement after generation as review and accumulates rework.</desc>
+        <g>
+          <!-- Top pipeline: BEFORE -->
+          <text x="40" y="32" class="diag-accent-text">▲ ENFORCEMENT BEFORE GENERATION · shapes output</text>
+
+          <rect x="40" y="48" width="110" height="54" rx="6" class="diag-box"/>
+          <text x="95" y="72" text-anchor="middle" class="diag-text">Intent</text>
+          <text x="95" y="89" text-anchor="middle" class="diag-meta">user prompt</text>
+
+          <rect x="170" y="48" width="130" height="54" rx="6" class="diag-box-active"/>
+          <text x="235" y="71" text-anchor="middle" class="diag-text">Governance</text>
+          <text x="235" y="88" text-anchor="middle" class="diag-accent-text">retrieve + inject</text>
+
+          <rect x="320" y="48" width="110" height="54" rx="6" class="diag-box"/>
+          <text x="375" y="72" text-anchor="middle" class="diag-text">Agent</text>
+          <text x="375" y="89" text-anchor="middle" class="diag-meta">shaped run</text>
+
+          <rect x="450" y="48" width="110" height="54" rx="6" class="diag-box"/>
+          <text x="505" y="72" text-anchor="middle" class="diag-text">Output</text>
+          <text x="505" y="89" text-anchor="middle" class="diag-meta">already coherent</text>
+
+          <rect x="580" y="48" width="100" height="54" rx="6" class="diag-box"/>
+          <text x="630" y="72" text-anchor="middle" class="diag-text">Review</text>
+          <text x="630" y="89" text-anchor="middle" class="diag-meta">judgment only</text>
+
+          <rect x="700" y="48" width="60" height="54" rx="6" class="diag-box"/>
+          <text x="730" y="72" text-anchor="middle" class="diag-text">Merge</text>
+
+          <line x1="150" y1="75" x2="170" y2="75" class="diag-arrow-active"/>
+          <line x1="300" y1="75" x2="320" y2="75" class="diag-arrow-active"/>
+          <line x1="430" y1="75" x2="450" y2="75" class="diag-arrow-active"/>
+          <line x1="560" y1="75" x2="580" y2="75" class="diag-arrow-active"/>
+          <line x1="680" y1="75" x2="700" y2="75" class="diag-arrow-active"/>
+
+          <!-- Divider -->
+          <line x1="40" y1="148" x2="760" y2="148" stroke="#222226"/>
+
+          <!-- Bottom pipeline: AFTER -->
+          <text x="40" y="178" class="diag-bad">▼ ENFORCEMENT AFTER GENERATION · reacts to output, accumulates rework</text>
+
+          <rect x="40" y="194" width="110" height="54" rx="6" class="diag-box"/>
+          <text x="95" y="218" text-anchor="middle" class="diag-text">Intent</text>
+          <text x="95" y="235" text-anchor="middle" class="diag-meta">user prompt</text>
+
+          <rect x="170" y="194" width="110" height="54" rx="6" class="diag-box-dim"/>
+          <text x="225" y="218" text-anchor="middle" class="diag-text-dim">(no gate)</text>
+          <text x="225" y="235" text-anchor="middle" class="diag-meta">unconstrained</text>
+
+          <rect x="300" y="194" width="110" height="54" rx="6" class="diag-box"/>
+          <text x="355" y="218" text-anchor="middle" class="diag-text">Agent</text>
+          <text x="355" y="235" text-anchor="middle" class="diag-meta">free run</text>
+
+          <rect x="430" y="194" width="110" height="54" rx="6" class="diag-box"/>
+          <text x="485" y="218" text-anchor="middle" class="diag-text">Output</text>
+          <text x="485" y="235" text-anchor="middle" class="diag-meta">may violate</text>
+
+          <rect x="560" y="194" width="130" height="54" rx="6" class="diag-box-active"/>
+          <text x="625" y="217" text-anchor="middle" class="diag-text">Governance =</text>
+          <text x="625" y="234" text-anchor="middle" class="diag-accent-text">review queue</text>
+
+          <rect x="710" y="194" width="50" height="54" rx="6" class="diag-box"/>
+          <text x="735" y="218" text-anchor="middle" class="diag-text">Merge</text>
+          <text x="735" y="235" text-anchor="middle" class="diag-meta">or block</text>
+
+          <line x1="150" y1="221" x2="170" y2="221" class="diag-arrow"/>
+          <line x1="280" y1="221" x2="300" y2="221" class="diag-arrow"/>
+          <line x1="410" y1="221" x2="430" y2="221" class="diag-arrow"/>
+          <line x1="540" y1="221" x2="560" y2="221" class="diag-arrow"/>
+          <line x1="690" y1="221" x2="710" y2="221" class="diag-arrow"/>
+
+          <!-- Rework loop -->
+          <path d="M 625 248 Q 625 290 485 290 Q 355 290 355 248" class="diag-arrow" stroke-dasharray="4 4"/>
+          <polygon points="350,245 360,245 355,252" fill="#88889a"/>
+          <text x="490" y="308" class="diag-meta">rework loop · violations regenerated · queue depth grows with output rate</text>
+        </g>
+      </svg>
+      <figcaption class="diagram-caption"><strong>The enforcement point is the strategic variable.</strong> Moved upstream of the agent, governance shapes a single proposal. Moved downstream, governance becomes the review queue — a rework loop that scales with AI generation rate, not with team size.</figcaption>
+    </figure>
 
     <h2>What governance before generation actually means</h2>
 
@@ -456,12 +568,16 @@
     </details>
   </section>
 
-  <h2 id="related-reading">Related reading</h2>
-  <ul>
-    <li><a href="/concepts/architectural-governance/">Architectural Governance</a></li>
-    <li><a href="/concepts/deterministic-enforcement/">Deterministic Enforcement</a></li>
-    <li><a href="/integrations/claude-code/">Claude Code Integration (hook-level enforcement)</a></li>
-  </ul>
+  <aside class="related-panel" aria-labelledby="related-panel-label">
+    <div class="related-panel-label" id="related-panel-label">Related operational essays</div>
+    <ul class="related-list">
+      <li><a href="/insights/harness-engineering-still-needs-governance/"><div class="rel-title">Harness Engineering Still Needs Governance</div><p class="rel-desc">Governance has to sit in front of the action it constrains. Pre-generation enforcement is what makes that possible across an agent loop.</p></a></li>
+      <li><a href="/insights/review-is-not-governance/"><div class="rel-title">Review Is Not Governance</div><p class="rel-desc">Human review systems do not scale linearly with AI output velocity. Review samples; governance shapes.</p></a></li>
+      <li><a href="/insights/why-observability-is-not-governance/"><div class="rel-title">Why Observability Is Not Governance</div><p class="rel-desc">Visibility explains drift after it occurs. Governance constrains drift before generation.</p></a></li>
+      <li><a href="/insights/ai-code-review-does-not-scale-linearly/"><div class="rel-title">AI Code Review Does Not Scale Linearly</div><p class="rel-desc">Adding reviewers cannot keep pace with agent-paced generation rates. The math is structural.</p></a></li>
+      <li><a href="/insights/prompt-engineering-is-not-governance/"><div class="rel-title">Prompt Engineering Is Not Governance</div><p class="rel-desc">Prompt templates nudge output. They cannot enforce architectural invariants across sessions and agents.</p></a></li>
+    </ul>
+  </aside>
 
   <footer class="article-footer">
     <a href="/concepts/" class="back-link">← Back to Concepts</a>

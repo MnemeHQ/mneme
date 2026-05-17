@@ -138,7 +138,24 @@
     .cta-text p { font-size: 0.84rem; color: var(--muted); line-height: 1.7; max-width: 400px; }
     .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; white-space: nowrap; }
     .btn-primary:hover { background: var(--accent-dim); }
-  
+
+    /* Runtime stack — mirrors site/concepts/governance-infrastructure/ */
+    .stack-section { margin: 3.5rem 0 0; }
+    .stack-section .stack-lede { font-size: 0.92rem; color: var(--muted); line-height: 1.85; max-width: 720px; margin: 0.5rem 0 1.5rem; }
+    .stack-section .stack-lede strong { color: var(--text); font-weight: 500; }
+    .layer-stack { display: flex; flex-direction: column; gap: 2px; margin: 1.5rem 0 1.25rem; border-radius: 10px; overflow: hidden; }
+    .layer-row { display: flex; align-items: stretch; min-height: 52px; }
+    .layer-num { width: 44px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted); background: var(--surface); border-right: 1px solid var(--border2); }
+    .layer-content { flex: 1; padding: 0.75rem 1rem; background: var(--surface); display: flex; flex-direction: column; justify-content: center; }
+    .layer-content strong { font-size: 0.82rem; color: var(--text); font-weight: 500; }
+    .layer-content span { font-size: 0.74rem; color: var(--muted); margin-top: 0.15rem; }
+    .layer-row.highlighted .layer-num { background: rgba(200,240,96,0.08); color: var(--accent); border-right-color: rgba(200,240,96,0.3); }
+    .layer-row.highlighted .layer-content { background: rgba(200,240,96,0.05); border-left: 2px solid var(--accent); }
+    .layer-row.highlighted .layer-content strong { color: var(--accent); }
+    .stack-xrefs { font-size: 0.82rem; color: var(--muted); line-height: 1.8; margin-top: 0.75rem; }
+    .stack-xrefs a { color: var(--teal); text-decoration: none; }
+    .stack-xrefs a:hover { color: var(--accent); }
+
     @media (max-width: 768px) { nav, .mobile-menu { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } }
   </style>
   <script type="application/ld+json">
@@ -212,10 +229,53 @@
     <p class="hero-desc">Technical deep dives into the pipeline — retrieval mechanics, scoring, decision memory, and the deliberate architectural choices behind deterministic governance. No embeddings, no ML, no approximations in the enforcement path.</p>
   </header>
 
-  <hr style="border:none;border-top:1px solid var(--border);">
+  <section class="stack-section" aria-labelledby="runtime-stack-heading">
+    <div class="section-label" id="runtime-stack-heading" style="margin-top:0;">Runtime stack &middot; where Mneme sits</div>
+    <p class="stack-lede">An autonomous agent system is not one layer. <strong>Models</strong> produce candidate output. <strong>Harnesses</strong> coordinate execution, retries, and tool use. <strong>Execution systems</strong> maintain long-running loops, sessions, and memory. <strong>Governance infrastructure</strong> defines and enforces the architectural constraints the output must satisfy. <strong>Verification</strong> confirms the resulting system still passes its objective checks. Mneme is the governance layer &mdash; a separate layer that runs side by side with harnesses and execution systems, not inside them.</p>
+    <div class="layer-stack">
+      <div class="layer-row">
+        <div class="layer-num">5</div>
+        <div class="layer-content">
+          <strong>Verification &middot; enforcement</strong>
+          <span>Tests, builds, deploy-time checks, deterministic verdicts</span>
+        </div>
+      </div>
+      <div class="layer-row highlighted">
+        <div class="layer-num">4</div>
+        <div class="layer-content">
+          <strong>Governance infrastructure</strong>
+          <span>Decision graph, precedence, pre-generation enforcement, propagation across surfaces &mdash; Mneme's layer</span>
+        </div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-num">3</div>
+        <div class="layer-content">
+          <strong>Execution systems</strong>
+          <span>Long-running loops, sessions, memory, continuity infrastructure</span>
+        </div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-num">2</div>
+        <div class="layer-content">
+          <strong>Harnesses</strong>
+          <span>Tool orchestration, retries, planning loops, context lifecycle</span>
+        </div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-num">1</div>
+        <div class="layer-content">
+          <strong>Models</strong>
+          <span>Candidate output, generation, probability over tokens</span>
+        </div>
+      </div>
+    </div>
+    <p class="stack-xrefs">Harnesses coordinate execution; governance defines constraints; verification enforces invariants. None of those layers can do the others' jobs. The argument in full: <a href="/insights/harness-engineering-still-needs-governance/">Harness Engineering Still Needs Governance</a>. The concept page that anchors this stack: <a href="/concepts/governance-infrastructure/">Governance Infrastructure</a>.</p>
+  </section>
+
+  <hr style="border:none;border-top:1px solid var(--border);margin-top:3rem;">
 
   <div class="pipeline-strip">
-    <div class="pipeline-strip-label">Five-stage pipeline</div>
+    <div class="pipeline-strip-label">Inside Layer 4 &middot; five-stage pipeline</div>
     <div class="pipeline-stages">
       <div class="pipeline-stage">
         <div class="stage-box">MemoryStore</div>

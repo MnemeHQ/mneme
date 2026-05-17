@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Concepts — Mneme HQ</title>
+  <title>AI Coding Concepts — Mneme HQ Knowledge Graph</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="The foundational concepts behind architectural governance for AI coding agents — defined by the engineering team building the governance infrastructure layer." />
+  <meta name="description" content="Foundational concepts behind architectural governance for AI coding agents — 15 definitions across primitives, properties, and outcomes, organized as a knowledge graph." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/concepts/" />
@@ -131,7 +131,7 @@
     .intro strong { color: var(--text); font-weight: 500; }
 
     /* Concepts grid */
-    .section-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin: 3rem 0 1.25rem; }
+    .section-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; font-weight: 400; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin: 3rem 0 1.25rem; }
     .concepts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1px; background: var(--border); border-radius: 12px; overflow: hidden; }
     .concept-card { background: var(--surface); padding: 1.5rem 1.75rem; text-decoration: none; transition: background 0.15s; display: flex; flex-direction: column; gap: 0.5rem; }
     .concept-card:hover { background: var(--surface2); }
@@ -149,6 +149,26 @@
     .arch-card-label { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal); margin-bottom: 0.4rem; }
     .arch-card-title { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 0.4rem; }
     .arch-card-desc { font-size: 0.79rem; color: var(--muted); line-height: 1.65; }
+
+    /* Concept-architecture diagram */
+    .concept-map { margin: 1.5rem 0 0.75rem; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.75rem 1.75rem 1.5rem; overflow: hidden; }
+    .concept-map svg { display: block; width: 100%; height: auto; max-width: 100%; }
+    .concept-map-caption { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.06em; color: var(--muted); text-transform: uppercase; margin-top: 1.1rem; padding-top: 0.9rem; border-top: 1px solid var(--border); line-height: 1.7; }
+    .concept-map-caption strong { color: var(--accent); font-weight: 500; }
+    .cmap-tier { fill: #88889a; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; }
+    .cmap-tier-meta { fill: #88889a; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.04em; }
+    .cmap-title { fill: #c8f060; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.06em; }
+    .cmap-card { fill: #141416; stroke: #2e2e34; transition: fill 0.15s, stroke 0.15s; }
+    .cmap-card-outcome { fill: rgba(200,240,96,0.05); stroke: #c8f060; stroke-width: 1.5; transition: fill 0.15s; }
+    .cmap-card-primitive { fill: rgba(139,224,200,0.05); stroke: #8be0c8; stroke-width: 1.2; transition: fill 0.15s; }
+    .cmap-card-fail { fill: #141416; stroke: #e87c7c; stroke-width: 1.2; stroke-dasharray: 4 3; opacity: 0.85; transition: opacity 0.15s; }
+    .cmap-label { fill: #e8e8ec; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: -0.005em; pointer-events: none; }
+    .cmap-link:hover .cmap-card { fill: #1a1a1d; stroke: #c8f060; }
+    .cmap-link:hover .cmap-card-outcome { fill: rgba(200,240,96,0.12); }
+    .cmap-link:hover .cmap-card-primitive { fill: rgba(139,224,200,0.12); }
+    .cmap-link:hover .cmap-card-fail { opacity: 1; }
+    .cmap-flow { stroke: #2e2e34; stroke-width: 1; fill: none; }
+    .cmap-divider { stroke: #222226; stroke-width: 1; }
 
     /* CTA block */
     .cta-block { margin-top: 4rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2.5rem 2.5rem; display: flex; justify-content: space-between; align-items: flex-end; gap: 2rem; flex-wrap: wrap; }
@@ -178,15 +198,20 @@
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/"},
         "hasPart": [
           {"@type": "DefinedTerm", "name": "Architectural Governance", "url": "https://mnemehq.com/concepts/architectural-governance/"},
+          {"@type": "DefinedTerm", "name": "Governance Infrastructure", "url": "https://mnemehq.com/concepts/governance-infrastructure/"},
+          {"@type": "DefinedTerm", "name": "AI Agent Drift", "url": "https://mnemehq.com/concepts/ai-agent-drift/"},
           {"@type": "DefinedTerm", "name": "Governance Before Generation", "url": "https://mnemehq.com/concepts/governance-before-generation/"},
+          {"@type": "DefinedTerm", "name": "Verification Contracts", "url": "https://mnemehq.com/concepts/verification-contracts/"},
+          {"@type": "DefinedTerm", "name": "Architectural Compiler", "url": "https://mnemehq.com/concepts/architectural-compiler/"},
+          {"@type": "DefinedTerm", "name": "Governance Propagation", "url": "https://mnemehq.com/concepts/governance-propagation/"},
+          {"@type": "DefinedTerm", "name": "Deterministic Enforcement", "url": "https://mnemehq.com/concepts/deterministic-enforcement/"},
+          {"@type": "DefinedTerm", "name": "Precedence Semantics", "url": "https://mnemehq.com/concepts/precedence-semantics/"},
+          {"@type": "DefinedTerm", "name": "Multi-Agent Continuity", "url": "https://mnemehq.com/concepts/multi-agent-continuity/"},
+          {"@type": "DefinedTerm", "name": "Enforcement Provenance", "url": "https://mnemehq.com/concepts/enforcement-provenance/"},
           {"@type": "DefinedTerm", "name": "AI-Native SDLC", "url": "https://mnemehq.com/concepts/ai-native-sdlc/"},
           {"@type": "DefinedTerm", "name": "Architectural Drift", "url": "https://mnemehq.com/concepts/architectural-drift/"},
-          {"@type": "DefinedTerm", "name": "Verification Contracts", "url": "https://mnemehq.com/concepts/verification-contracts/"},
           {"@type": "DefinedTerm", "name": "Decision Continuity", "url": "https://mnemehq.com/concepts/decision-continuity/"},
-          {"@type": "DefinedTerm", "name": "Architectural Compiler", "url": "https://mnemehq.com/concepts/architectural-compiler/"},
-          {"@type": "DefinedTerm", "name": "Deterministic Enforcement", "url": "https://mnemehq.com/concepts/deterministic-enforcement/"},
-          {"@type": "DefinedTerm", "name": "Agentic Development", "url": "https://mnemehq.com/concepts/agentic-development/"},
-          {"@type": "DefinedTerm", "name": "Governance Infrastructure", "url": "https://mnemehq.com/concepts/governance-infrastructure/"}
+          {"@type": "DefinedTerm", "name": "Agentic Development", "url": "https://mnemehq.com/concepts/agentic-development/"}
         ]
       },
       {
@@ -240,10 +265,140 @@
   <div class="intro">
     <p>Most of the terms on this page don't have industry-standard definitions yet. <strong>Architectural governance</strong>, <strong>governance before generation</strong>, <strong>decision continuity</strong> — these are concepts that the AI coding ecosystem is actively working out. The definitions here are Mneme's positions, not neutral encyclopedia entries.</p>
     <p>Each concept page explains not just what the term means, but <strong>why the structural problem it names exists</strong> in AI-native software delivery — and why the solutions that feel intuitive (documentation, prompt engineering, code review) don't actually solve it.</p>
-    <p>If you're evaluating architectural governance tooling, these concepts are the vocabulary for comparing approaches. If you're building in this space, they're the framework for understanding where different systems sit in the stack.</p>
+    <p>If you're evaluating architectural governance tooling, these concepts are the vocabulary for comparing approaches. If you're building in this space, they're the framework for understanding where different systems sit in the stack. The applied arguments — where each concept's consequences play out in real engineering — live in <a href="/insights/" style="color:var(--accent);text-decoration:none;">insights</a>; the empirical proof points are in the <a href="/benchmark/" style="color:var(--accent);text-decoration:none;">benchmark</a>.</p>
   </div>
 
-  <div class="section-label">Core concepts</div>
+  <figure class="concept-map" aria-labelledby="cmap-title">
+    <svg viewBox="0 0 1000 580" role="img" aria-labelledby="cmap-title cmap-desc" xmlns="http://www.w3.org/2000/svg">
+      <title id="cmap-title">Mneme HQ concept architecture</title>
+      <desc id="cmap-desc">A three-tier composition diagram. At the bottom, three primitives — architectural compiler, verification contracts, precedence semantics — compose into five system properties in the middle, which together produce two outcomes at the top: architectural governance and governance infrastructure. A failure-mode rail at the bottom shows what accumulates in the absence of these layers: AI agent drift and architectural drift.</desc>
+
+      <text x="20" y="26" class="cmap-title">CONCEPT ARCHITECTURE · primitives → properties → outcomes</text>
+      <text x="980" y="26" text-anchor="end" class="cmap-tier-meta">every node links to its definition</text>
+
+      <!-- TIER: Outcomes -->
+      <text x="20" y="80" class="cmap-tier">OUTCOMES</text>
+      <text x="20" y="95" class="cmap-tier-meta">what governance achieves</text>
+
+      <a href="/concepts/architectural-governance/" class="cmap-link" aria-label="Architectural Governance">
+        <rect x="240" y="62" width="240" height="56" rx="10" class="cmap-card-outcome"/>
+        <text x="360" y="84" text-anchor="middle" class="cmap-label">Architectural Governance</text>
+        <text x="360" y="104" text-anchor="middle" class="cmap-tier-meta">the discipline</text>
+      </a>
+
+      <a href="/concepts/governance-infrastructure/" class="cmap-link" aria-label="Governance Infrastructure">
+        <rect x="520" y="62" width="240" height="56" rx="10" class="cmap-card-outcome"/>
+        <text x="640" y="84" text-anchor="middle" class="cmap-label">Governance Infrastructure</text>
+        <text x="640" y="104" text-anchor="middle" class="cmap-tier-meta">the platform layer</text>
+      </a>
+
+      <!-- Flow lines from properties up to outcomes (subtle) -->
+      <line x1="125" y1="200" x2="360" y2="118" class="cmap-flow"/>
+      <line x1="320" y1="200" x2="360" y2="118" class="cmap-flow"/>
+      <line x1="510" y1="200" x2="500" y2="118" class="cmap-flow"/>
+      <line x1="700" y1="200" x2="640" y2="118" class="cmap-flow"/>
+      <line x1="890" y1="200" x2="640" y2="118" class="cmap-flow"/>
+
+      <!-- TIER: Properties -->
+      <text x="20" y="200" class="cmap-tier">PROPERTIES</text>
+      <text x="20" y="215" class="cmap-tier-meta">what governance does</text>
+
+      <a href="/concepts/governance-before-generation/" class="cmap-link" aria-label="Governance Before Generation">
+        <rect x="40" y="200" width="170" height="62" rx="10" class="cmap-card"/>
+        <text x="125" y="224" text-anchor="middle" class="cmap-label">Governance</text>
+        <text x="125" y="240" text-anchor="middle" class="cmap-label">Before Generation</text>
+        <text x="125" y="256" text-anchor="middle" class="cmap-tier-meta">pre-generation hook</text>
+      </a>
+
+      <a href="/concepts/deterministic-enforcement/" class="cmap-link" aria-label="Deterministic Enforcement">
+        <rect x="235" y="200" width="170" height="62" rx="10" class="cmap-card"/>
+        <text x="320" y="224" text-anchor="middle" class="cmap-label">Deterministic</text>
+        <text x="320" y="240" text-anchor="middle" class="cmap-label">Enforcement</text>
+        <text x="320" y="256" text-anchor="middle" class="cmap-tier-meta">same input · same verdict</text>
+      </a>
+
+      <a href="/concepts/governance-propagation/" class="cmap-link" aria-label="Governance Propagation">
+        <rect x="425" y="200" width="170" height="62" rx="10" class="cmap-card"/>
+        <text x="510" y="224" text-anchor="middle" class="cmap-label">Governance</text>
+        <text x="510" y="240" text-anchor="middle" class="cmap-label">Propagation</text>
+        <text x="510" y="256" text-anchor="middle" class="cmap-tier-meta">one corpus · every agent</text>
+      </a>
+
+      <a href="/concepts/multi-agent-continuity/" class="cmap-link" aria-label="Multi-Agent Continuity">
+        <rect x="615" y="200" width="170" height="62" rx="10" class="cmap-card"/>
+        <text x="700" y="224" text-anchor="middle" class="cmap-label">Multi-Agent</text>
+        <text x="700" y="240" text-anchor="middle" class="cmap-label">Continuity</text>
+        <text x="700" y="256" text-anchor="middle" class="cmap-tier-meta">across sessions · time</text>
+      </a>
+
+      <a href="/concepts/enforcement-provenance/" class="cmap-link" aria-label="Enforcement Provenance">
+        <rect x="805" y="200" width="170" height="62" rx="10" class="cmap-card"/>
+        <text x="890" y="224" text-anchor="middle" class="cmap-label">Enforcement</text>
+        <text x="890" y="240" text-anchor="middle" class="cmap-label">Provenance</text>
+        <text x="890" y="256" text-anchor="middle" class="cmap-tier-meta">citable verdicts</text>
+      </a>
+
+      <!-- Flow lines from primitives up to properties (subtle) -->
+      <line x1="240" y1="362" x2="125" y2="262" class="cmap-flow"/>
+      <line x1="240" y1="362" x2="320" y2="262" class="cmap-flow"/>
+      <line x1="500" y1="362" x2="320" y2="262" class="cmap-flow"/>
+      <line x1="500" y1="362" x2="510" y2="262" class="cmap-flow"/>
+      <line x1="500" y1="362" x2="890" y2="262" class="cmap-flow"/>
+      <line x1="760" y1="362" x2="510" y2="262" class="cmap-flow"/>
+      <line x1="760" y1="362" x2="700" y2="262" class="cmap-flow"/>
+
+      <!-- TIER: Primitives -->
+      <text x="20" y="362" class="cmap-tier">PRIMITIVES</text>
+      <text x="20" y="377" class="cmap-tier-meta">what it's built from</text>
+
+      <a href="/concepts/architectural-compiler/" class="cmap-link" aria-label="Architectural Compiler">
+        <rect x="120" y="362" width="240" height="56" rx="10" class="cmap-card-primitive"/>
+        <text x="240" y="385" text-anchor="middle" class="cmap-label">Architectural Compiler</text>
+        <text x="240" y="404" text-anchor="middle" class="cmap-tier-meta">ADR → typed corpus</text>
+      </a>
+
+      <a href="/concepts/verification-contracts/" class="cmap-link" aria-label="Verification Contracts">
+        <rect x="380" y="362" width="240" height="56" rx="10" class="cmap-card-primitive"/>
+        <text x="500" y="385" text-anchor="middle" class="cmap-label">Verification Contracts</text>
+        <text x="500" y="404" text-anchor="middle" class="cmap-tier-meta">pre-registered verdicts</text>
+      </a>
+
+      <a href="/concepts/precedence-semantics/" class="cmap-link" aria-label="Precedence Semantics">
+        <rect x="640" y="362" width="240" height="56" rx="10" class="cmap-card-primitive"/>
+        <text x="760" y="385" text-anchor="middle" class="cmap-label">Precedence Semantics</text>
+        <text x="760" y="404" text-anchor="middle" class="cmap-tier-meta">supersession · scope · time</text>
+
+      </a>
+
+      <!-- Divider before failure rail -->
+      <line x1="20" y1="455" x2="980" y2="455" class="cmap-divider"/>
+
+      <!-- Failure rail -->
+      <text x="20" y="485" fill="#e87c7c" font-family="DM Mono, monospace" font-size="11" letter-spacing="0.06em">WITHOUT THIS LAYER</text>
+      <text x="20" y="500" class="cmap-tier-meta">what accumulates</text>
+
+      <a href="/concepts/ai-agent-drift/" class="cmap-link" aria-label="AI Agent Drift">
+        <rect x="240" y="478" width="240" height="56" rx="10" class="cmap-card-fail"/>
+        <text x="360" y="500" text-anchor="middle" class="cmap-label">AI Agent Drift</text>
+        <text x="360" y="520" text-anchor="middle" class="cmap-tier-meta">the agent-side phenomenon</text>
+      </a>
+
+      <a href="/concepts/architectural-drift/" class="cmap-link" aria-label="Architectural Drift">
+        <rect x="520" y="478" width="240" height="56" rx="10" class="cmap-card-fail"/>
+        <text x="640" y="500" text-anchor="middle" class="cmap-label">Architectural Drift</text>
+        <text x="640" y="520" text-anchor="middle" class="cmap-tier-meta">the codebase-side consequence</text>
+      </a>
+
+      <text x="980" y="500" text-anchor="end" fill="#e87c7c" font-family="DM Mono, monospace" font-size="10" letter-spacing="0.04em">↑ what governance prevents</text>
+
+      <!-- Right edge: flow direction annotation -->
+      <text x="980" y="265" text-anchor="end" class="cmap-tier-meta">↑ properties produce outcomes</text>
+      <text x="980" y="425" text-anchor="end" class="cmap-tier-meta">↑ primitives compose into properties</text>
+    </svg>
+    <figcaption class="concept-map-caption"><strong>How the concepts compose.</strong> Three primitives — compiled records, verification contracts, precedence rules — produce five system properties, which together produce the two outcomes that distinguish governed AI-native development. Absent these layers, the failure rail accumulates: agent-side drift, codebase-side drift.</figcaption>
+  </figure>
+
+  <h2 class="section-label">Core concepts</h2>
 
   <div class="concepts-grid" role="list">
 
@@ -258,36 +413,36 @@
       <span class="card-arrow">→</span>
     </a>
 
-    <a href="/concepts/governance-before-generation/" class="concept-card" role="listitem">
+    <a href="/concepts/governance-infrastructure/" class="concept-card" role="listitem">
       <div class="card-top">
         <span class="card-num">02</span>
+        <div>
+          <div class="card-title">Governance Infrastructure</div>
+        </div>
+      </div>
+      <p class="card-desc">The dedicated engineering platform layer that encodes, distributes, versions, and enforces architectural decisions across AI agents. Infrastructure — not process, not convention, not tooling bolt-on.</p>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="/concepts/ai-agent-drift/" class="concept-card" role="listitem">
+      <div class="card-top">
+        <span class="card-num">03</span>
+        <div>
+          <div class="card-title">AI Agent Drift</div>
+        </div>
+      </div>
+      <p class="card-desc">The agent-side phenomenon — coding agents, across sessions and providers, producing code that progressively diverges from the team's intended architecture when no shared decision substrate exists.</p>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="/concepts/governance-before-generation/" class="concept-card" role="listitem">
+      <div class="card-top">
+        <span class="card-num">04</span>
         <div>
           <div class="card-title">Governance Before Generation</div>
         </div>
       </div>
       <p class="card-desc">The principle that architectural constraints must be evaluated before the AI writes code. The enforcement point is the strategic variable — and moving it upstream changes everything.</p>
-      <span class="card-arrow">→</span>
-    </a>
-
-    <a href="/concepts/ai-native-sdlc/" class="concept-card" role="listitem">
-      <div class="card-top">
-        <span class="card-num">03</span>
-        <div>
-          <div class="card-title">AI-Native SDLC</div>
-        </div>
-      </div>
-      <p class="card-desc">A software delivery lifecycle designed from first principles for AI agents as primary code generators. The rate-limiting step has flipped — generation is no longer the bottleneck.</p>
-      <span class="card-arrow">→</span>
-    </a>
-
-    <a href="/concepts/architectural-drift/" class="concept-card" role="listitem">
-      <div class="card-top">
-        <span class="card-num">04</span>
-        <div>
-          <div class="card-title">Architectural Drift</div>
-        </div>
-      </div>
-      <p class="card-desc">The compound degradation in codebase coherence caused by AI agents producing code inconsistent with established decisions — uncorrected across sessions, agents, and time.</p>
       <span class="card-arrow">→</span>
     </a>
 
@@ -302,25 +457,31 @@
       <span class="card-arrow">→</span>
     </a>
 
-    <a href="/concepts/decision-continuity/" class="concept-card" role="listitem">
-      <div class="card-top">
-        <span class="card-num">06</span>
-        <div>
-          <div class="card-title">Decision Continuity</div>
-        </div>
-      </div>
-      <p class="card-desc">The property that architectural decisions remain enforced across agents, sessions, and time — regardless of which agent acts or what context it inherited. Prompt memory cannot provide it.</p>
-      <span class="card-arrow">→</span>
-    </a>
-
     <a href="/concepts/architectural-compiler/" class="concept-card" role="listitem">
       <div class="card-top">
-        <span class="card-num">07</span>
+        <span class="card-num">06</span>
         <div>
           <div class="card-title">Architectural Compiler</div>
         </div>
       </div>
-      <p class="card-desc">The pipeline that converts documentation-form decisions into machine-evaluable constraint records. Parse → validate → resolve → emit → enforce. Compilation is the step that closes the documentation-to-enforcement gap.</p>
+      <p class="card-desc">The pipeline that converts documentation-form decisions into machine-evaluable constraint records. Parse → validate → resolve → emit → enforce. Compilation closes the documentation-to-enforcement gap.</p>
+      <span class="card-arrow">→</span>
+    </a>
+
+  </div>
+
+  <h2 class="section-label" style="margin-top:3.5rem;">Systems concepts</h2>
+
+  <div class="concepts-grid" role="list">
+
+    <a href="/concepts/governance-propagation/" class="concept-card" role="listitem">
+      <div class="card-top">
+        <span class="card-num">07</span>
+        <div>
+          <div class="card-title">Governance Propagation</div>
+        </div>
+      </div>
+      <p class="card-desc">One compiled decision reaches every agent, every developer, every CI run with identical scope and verdict. The spatial property that turns "the same rule" into "the same enforcement."</p>
       <span class="card-arrow">→</span>
     </a>
 
@@ -335,31 +496,114 @@
       <span class="card-arrow">→</span>
     </a>
 
-    <a href="/concepts/agentic-development/" class="concept-card" role="listitem">
+    <a href="/concepts/precedence-semantics/" class="concept-card" role="listitem">
       <div class="card-top">
         <span class="card-num">09</span>
         <div>
-          <div class="card-title">Agentic Development</div>
+          <div class="card-title">Precedence Semantics</div>
         </div>
       </div>
-      <p class="card-desc">A software development paradigm where AI agents are the primary code generators. When agents are first-class actors, architectural control stops being a cultural norm and becomes an operational engineering problem.</p>
+      <p class="card-desc">The ordered rules that resolve overlapping decisions deterministically. Supersession → scope specificity → recency → severity. Conflicts that can't resolve are compile-time errors, not runtime ambiguity.</p>
       <span class="card-arrow">→</span>
     </a>
 
-    <a href="/concepts/governance-infrastructure/" class="concept-card" role="listitem">
+    <a href="/concepts/multi-agent-continuity/" class="concept-card" role="listitem">
       <div class="card-top">
         <span class="card-num">10</span>
         <div>
-          <div class="card-title">Governance Infrastructure</div>
+          <div class="card-title">Multi-Agent Continuity</div>
         </div>
       </div>
-      <p class="card-desc">The dedicated engineering platform layer that encodes, distributes, versions, and enforces architectural decisions across AI agents. Infrastructure — not process, not convention, not tooling bolt-on.</p>
+      <p class="card-desc">Decisions persist across agents, sessions, and time without re-derivation. The temporal counterpart to propagation — decision-side memory rather than agent-side memory.</p>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="/concepts/enforcement-provenance/" class="concept-card" role="listitem">
+      <div class="card-top">
+        <span class="card-num">11</span>
+        <div>
+          <div class="card-title">Enforcement Provenance</div>
+        </div>
+      </div>
+      <p class="card-desc">Every verdict is a citable chain — back through the precedence rule, the compiled record, and the authoring ADR. Opaque enforcement is theater; provenance is what makes governance trustable.</p>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="/insights/ai-native-engineering-intent-debt/" class="concept-card" role="listitem">
+      <div class="card-top">
+        <span class="card-num">11</span>
+        <div>
+          <div class="card-title">Intent Debt</div>
+        </div>
+      </div>
+      <p class="card-desc">The gap between what a system is supposed to preserve and what its AI agents are actually constrained to follow. When agents become the execution layer, intent debt becomes the primary bottleneck.</p>
       <span class="card-arrow">→</span>
     </a>
 
   </div>
 
-  <div class="section-label" style="margin-top:3.5rem;">Architecture deep dives</div>
+  <h2 class="section-label" style="margin-top:3.5rem;">Adjacent concepts</h2>
+
+  <div class="concepts-grid" role="list">
+
+    <a href="/concepts/ai-native-sdlc/" class="concept-card" role="listitem">
+      <div class="card-top">
+        <span class="card-num">12</span>
+        <div>
+          <div class="card-title">AI-Native SDLC</div>
+        </div>
+      </div>
+      <p class="card-desc">A software delivery lifecycle designed from first principles for AI agents as primary code generators. The rate-limiting step has flipped — generation is no longer the bottleneck.</p>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="/concepts/architectural-drift/" class="concept-card" role="listitem">
+      <div class="card-top">
+        <span class="card-num">13</span>
+        <div>
+          <div class="card-title">Architectural Drift</div>
+        </div>
+      </div>
+      <p class="card-desc">The codebase-side compound degradation that AI agent drift produces. What "drift" looks like once it has settled into the repository's structure.</p>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="/concepts/decision-continuity/" class="concept-card" role="listitem">
+      <div class="card-top">
+        <span class="card-num">14</span>
+        <div>
+          <div class="card-title">Decision Continuity</div>
+        </div>
+      </div>
+      <p class="card-desc">The property that architectural decisions remain enforced across agents, sessions, and time — regardless of which agent acts or what context it inherited.</p>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="/concepts/agentic-development/" class="concept-card" role="listitem">
+      <div class="card-top">
+        <span class="card-num">15</span>
+        <div>
+          <div class="card-title">Agentic Development</div>
+        </div>
+      </div>
+      <p class="card-desc">The development paradigm where AI agents are first-class code generators. Architectural control stops being a cultural norm and becomes an operational engineering problem.</p>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="/insights/ai-native-engineering-intent-debt/" class="concept-card" role="listitem">
+      <div class="card-top">
+        <span class="card-num">16</span>
+        <div>
+          <div class="card-title">Intent Debt</div>
+        </div>
+      </div>
+      <p class="card-desc">The gap between what a system is supposed to preserve and what its AI agents are actually constrained to follow. When agents become the execution layer, intent debt becomes the primary bottleneck.</p>
+      <span class="card-arrow">→</span>
+    </a>
+
+  </div>
+
+  <h2 class="section-label" style="margin-top:3.5rem;">Architecture deep dives</h2>
   <div class="arch-row">
     <a href="/architecture/how-retrieval-works/" class="arch-card">
       <div class="arch-card-label">Architecture</div>

@@ -311,6 +311,7 @@
     </div>
     <h1>Governing Claude Code Workflows</h1>
     <p class="article-lede">Mneme HQ registers a PreToolUse hook with Claude Code. Every Edit, Write, and MultiEdit is intercepted before it reaches disk &mdash; violations surface the decision id as feedback and exit 2 (block). Claude Code adjusts its approach without manual intervention.</p>
+    <p style="font-size:0.92rem;color:var(--muted);line-height:1.85;margin-top:1rem;max-width:680px;">Claude Code is a harness &mdash; it coordinates execution, tool use, and the agent loop. Mneme is the governance layer that runs alongside it, enforcing the architectural intent the harness has no opinion about. They are different layers of the runtime stack, and they run side by side. The argument in full: <a href="/insights/harness-engineering-still-needs-governance/" style="color:var(--teal);">Harness Engineering Still Needs Governance</a>.</p>
     <p class="byline">
       By <a href="/founder/">Theo Valmis</a>
       <span class="sep">&middot;</span>

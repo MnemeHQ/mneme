@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Harness Engineering Still Needs Governance — Mneme HQ</title>
+  <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/fonts.css">
+  <meta name="description" content="Harness engineering solves execution, orchestration, retries, and tool use. It does not enforce architectural intent. Governance is the missing layer in long-running agent systems." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/insights/harness-engineering-still-needs-governance/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Harness Engineering Still Needs Governance" />
+  <meta property="og:description" content="Harnesses help agents act. Governance ensures they act within architectural boundaries. The next layer of the agent stack is governance infrastructure." />
+  <meta property="og:url" content="https://mnemehq.com/insights/harness-engineering-still-needs-governance/" />
+  <meta property="og:image" content="https://mnemehq.com/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Harness Engineering Still Needs Governance" />
+  <meta name="twitter:description" content="Harnesses help agents act. Governance ensures they act within architectural boundaries. The next layer of the agent stack is governance infrastructure." />
+  <meta name="twitter:image" content="https://mnemehq.com/og.png" />
+  <meta name="author" content="Theo Valmis" />
+  <meta property="article:published_time" content="2026-05-16T00:00:00Z" />
+  <meta property="article:author" content="https://mnemehq.com/founder/" />
+  <meta property="article:section" content="Engineering" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #88889a;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .article-wrap { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 7rem; }
+    .article-header { margin-bottom: 3.5rem; }
+    .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+
+    .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
+    .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
+    .article-body p strong { color: var(--text); font-weight: 500; }
+    .article-body ul { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body ul li { margin-bottom: 0.5rem; line-height: 1.8; }
+    .article-body ul li strong { color: var(--text); font-weight: 500; }
+    .article-body ol { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body ol li { margin-bottom: 0.5rem; line-height: 1.8; }
+    .article-body ol li strong { color: var(--text); font-weight: 500; }
+    .article-body code { font-family: 'DM Mono', monospace; font-size: 0.82rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 0.05rem 0.4rem; color: var(--text); }
+    .article-body pre { font-family: 'DM Mono', monospace; font-size: 0.8rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; color: var(--text); overflow-x: auto; margin: 1.5rem 0 1.75rem; line-height: 1.7; }
+    .article-body pre code { background: none; border: none; padding: 0; font-size: inherit; }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout p strong { color: var(--accent); }
+
+    .failure-stack { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2rem; margin: 2.5rem 0; }
+    .failure-stack .stack-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
+    .stack-row { display: flex; align-items: flex-start; gap: 1rem; padding: 0.9rem 0; border-bottom: 1px solid var(--border); }
+    .stack-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .stack-row:first-of-type { padding-top: 0; }
+    .stack-num { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--border2); flex-shrink: 0; padding-top: 0.1rem; min-width: 1.5rem; }
+    .stack-content { flex: 1; }
+    .stack-label { font-size: 0.82rem; font-weight: 600; color: var(--text); margin-bottom: 0.25rem; }
+    .stack-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.7; }
+
+    .contrast-block { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border-radius: 12px; overflow: hidden; margin: 2.5rem 0; }
+    .contrast-cell { background: var(--surface); padding: 1.75rem; }
+    .contrast-cell .label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem; }
+    .contrast-cell .tool { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem; }
+    .contrast-cell .desc { font-size: 0.82rem; color: var(--muted); line-height: 1.65; }
+    .contrast-cell.accent-left { border-left: 3px solid var(--border2); }
+    .contrast-cell.accent-right { border-left: 3px solid var(--accent); }
+    @media (max-width: 540px) { .contrast-block { grid-template-columns: 1fr; } }
+
+    .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .back-link:hover { color: var(--text); }
+    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2rem; }
+    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--accent-dim); }
+
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .breadcrumb-nav { max-width: 720px; margin: 0 auto; padding: 1.75rem 2rem 0.85rem; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.82rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin: 0 0 3rem; }
+    .toc .toc-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.9rem; }
+    .toc ol { list-style: none; counter-reset: toc; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 0.45rem; }
+    .toc ol li { counter-increment: toc; font-size: 0.85rem; padding-left: 2.2rem; position: relative; line-height: 1.5; }
+    .toc ol li::before { content: counter(toc, decimal-leading-zero); position: absolute; left: 0; top: 0.05rem; font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--border2); letter-spacing: 0.05em; }
+    .toc a { color: var(--muted); text-decoration: none; transition: color 0.15s; }
+    .toc a:hover { color: var(--accent); }
+    @media (min-width: 720px) { .toc ol { grid-template-columns: 1fr 1fr; gap: 0.55rem 1.5rem; } }
+
+    .figure { margin: 2.5rem 0; }
+    .figure svg { display: block; width: 100%; height: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+    .figure figcaption { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-top: 0.75rem; padding-left: 0.25rem; }
+
+    .axis-table { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin: 2.5rem 0; overflow-x: auto; }
+    .axis-table .ax-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+    .axis-table table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .axis-table th, .axis-table td { text-align: left; padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; }
+    .axis-table th { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+    .axis-table td:first-child { color: var(--text); font-weight: 500; min-width: 8rem; }
+    .axis-table tr:last-child td { border-bottom: none; }
+    .axis-table tr.accent-row td { color: var(--accent); }
+    .axis-table tr.accent-row td:first-child { color: var(--accent); }
+
+    .faq-list { margin: 2rem 0 0; }
+    .faq-item { border-top: 1px solid var(--border); padding: 1.1rem 0; }
+    .faq-item:last-child { border-bottom: 1px solid var(--border); }
+    .faq-item summary { cursor: pointer; font-size: 0.92rem; color: var(--text); font-weight: 500; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; font-family: 'DM Mono', monospace; color: var(--muted); font-size: 1.1rem; transition: transform 0.15s; }
+    .faq-item[open] summary::after { content: '\2212'; }
+    .faq-body { padding-top: 0.9rem; font-size: 0.85rem; color: var(--muted); line-height: 1.8; }
+    .faq-body a { color: var(--accent); text-decoration: none; }
+    .faq-body a:hover { color: var(--accent-dim); }
+
+    .article-body a.ext { color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(200,240,96,0.4); }
+    .article-body a.ext:hover { color: var(--accent-dim); border-bottom-color: rgba(200,240,96,0.7); }
+
+    .nav-hamburger {
+      display: none;
+      background: none;
+      border: 1px solid var(--border2);
+      color: var(--text);
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 0;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 4px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span {
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: currentColor;
+      border-radius: 1px;
+      transition: transform 0.25s ease, opacity 0.18s ease;
+      transform-origin: center;
+    }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    @media (max-width: 900px) {
+      html, body { overflow-x: hidden; }
+      body.menu-open { overflow: hidden; }
+      nav, nav.site-nav { position: relative; padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links {
+        display: flex !important;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        gap: 0;
+        background: rgba(12,12,13,0.98);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: 0 1.25rem;
+        z-index: 99;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        visibility: hidden;
+        transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s;
+      }
+      .nav-links.open {
+        max-height: 80vh;
+        opacity: 1;
+        visibility: visible;
+        padding: 0.5rem 1.25rem 1.25rem;
+        transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s;
+        overflow-y: auto;
+      }
+      .nav-links a:not(.btn-nav-cta) {
+        display: block;
+        color: var(--text);
+        font-size: 0.92rem;
+        padding: 0.85rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+      .article-wrap { padding: 3rem 1.25rem 5rem; }
+    }
+
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    h2#related-reading, h2#related-concepts { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 400; margin-top: 3.5rem; margin-bottom: 0.75rem; }
+    h2#related-reading + ul, h2#related-concepts + ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    h2#related-reading + ul li, h2#related-concepts + ul li { margin: 0; }
+    h2#related-reading + ul li a, h2#related-concepts + ul li a { display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.1rem; background: var(--surface); color: var(--text); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.15s, color 0.15s; }
+    h2#related-reading + ul li a::after, h2#related-concepts + ul li a::after { content: '\2192'; opacity: 0.35; transition: opacity 0.15s, transform 0.15s; display: inline-block; margin-left: 0.5rem; }
+    h2#related-reading + ul li a:hover, h2#related-concepts + ul li a:hover { background: var(--surface2); color: var(--accent); }
+    h2#related-reading + ul li a:hover::after, h2#related-concepts + ul li a:hover::after { opacity: 1; transform: translateX(3px); }
+
+    .pull-quote { font-family: 'Instrument Serif', serif; font-size: 1.5rem; line-height: 1.45; color: var(--text); border-left: 2px solid var(--accent); padding: 0.25rem 0 0.25rem 1.25rem; margin: 2.5rem 0; font-style: italic; }
+    .pull-quote em { font-style: normal; color: var(--accent); }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Insights", "item": "https://mnemehq.com/insights/"},
+          {"@type": "ListItem", "position": 3, "name": "Harness Engineering Still Needs Governance", "item": "https://mnemehq.com/insights/harness-engineering-still-needs-governance/"}
+        ]
+      },
+      {
+        "@type": "Article",
+        "headline": "Harness Engineering Still Needs Governance",
+        "description": "Harness engineering solves execution, orchestration, retries, and tool use. It does not enforce architectural intent. Governance is the missing layer in long-running agent systems.",
+        "url": "https://mnemehq.com/insights/harness-engineering-still-needs-governance/",
+        "datePublished": "2026-05-16",
+        "dateModified": "2026-05-16",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "image": "https://mnemehq.com/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/insights/harness-engineering-still-needs-governance/"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {"@type": "Question", "name": "Is harness engineering bad or unnecessary?", "acceptedAnswer": {"@type": "Answer", "text": "No. Harness engineering is a major architectural advancement over prompt engineering. Harnesses solve real, hard problems: context lifecycle management, retries, tool orchestration, planning and execution loops, memory injection, and observability. Long-running agent systems are not viable without them. The point of this article is that harnesses are necessary but not sufficient. They make agents act effectively; they do not make agents act within architectural boundaries."}},
+          {"@type": "Question", "name": "Isn't observability enough? If you can see what the agent did, you can correct it.", "acceptedAnswer": {"@type": "Answer", "text": "Observability tells you what happened. Governance defines what should have been allowed. Logs are not policy. Traces are not invariants. Visibility is not enforcement. A trace can show that an agent introduced a forbidden dependency; only governance can stop the change from being proposed, written, committed, or merged in the first place. Observability is the audit log of a system. Governance is the constraint that the system must satisfy."}},
+          {"@type": "Question", "name": "What is 'governance propagation across execution surfaces'?", "acceptedAnswer": {"@type": "Answer", "text": "Long-running agents do not just touch code. They touch PR titles, branch names, commit messages, CI metadata, deployment artifacts, generated config, release notes, and agent-produced documentation. Architectural intent must hold across all of those surfaces, not just the source tree. A governance layer that enforces invariants in code but ignores the surrounding automation artifacts leaves most of the agent's output ungoverned. Governance must propagate to every surface the agent writes to."}},
+          {"@type": "Question", "name": "Where does Mneme fit relative to a harness?", "acceptedAnswer": {"@type": "Answer", "text": "Mneme runs beside the harness, not instead of it. The harness coordinates execution; Mneme enforces architectural decisions. At session start, mneme check --mode warn loads active ADRs and surfaces existing violations. Before commit or PR, mneme check --mode strict blocks output that violates the active decision graph. In CI, the same check is the team-level backstop. Mneme does not replace tool use, retries, or memory; it enforces the constraints those layers cannot enforce."}},
+          {"@type": "Question", "name": "Why is this a 'category' rather than a feature?", "acceptedAnswer": {"@type": "Answer", "text": "Because the problem governance infrastructure solves is not solvable inside a model, a harness, or a memory system. Models produce text. Harnesses coordinate execution. Memory recalls context. None of those layers can deterministically resolve which architectural decision applies to a given change, or block output that violates it. That requires a separate layer with its own data model, its own resolver, and its own enforcement hooks. When a layer cannot be folded into any adjacent layer, it is a category."}}
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/benchmark/">Benchmark</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/insights/">Insights</a></li>
+    <li aria-current="page">Harness Engineering Still Needs Governance</li>
+  </ol>
+</nav>
+<article class="article-wrap">
+  <header class="article-header">
+    <div class="article-eyebrow">
+      <span class="eyebrow-tag">Thought Leadership</span>
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-meta">11 min read &nbsp;&middot;&nbsp; May 2026</span>
+    </div>
+    <h1>Harness engineering still needs governance</h1>
+    <p class="article-lede">The industry has moved from prompt engineering to harness engineering: execution systems that coordinate models, tools, memory, and retries across long-running agent loops. Harnesses solve how agents act. They do not solve <em>whether the actions stay within architectural boundaries</em>. As autonomous workflows scale, the missing layer is governance infrastructure.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-16">Published May 2026</time>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-16">Updated May 2026</time>
+    </p>
+  </header>
+
+  <div class="article-body">
+
+    <nav class="toc" aria-label="Table of contents">
+      <div class="toc-title">In this article</div>
+      <ol>
+        <li><a href="#shift">The shift: prompts, harnesses, execution systems</a></li>
+        <li><a href="#solved">What harness engineering solves</a></li>
+        <li><a href="#gap">The governance gap</a></li>
+        <li><a href="#observability">Why observability is insufficient</a></li>
+        <li><a href="#propagation">Governance propagation across execution surfaces</a></li>
+        <li><a href="#next-layer">The next layer: governance infrastructure</a></li>
+        <li><a href="#mneme">Where Mneme fits</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="shift">The shift: prompts, harnesses, execution systems</h2>
+
+    <p>Three years ago, the prevailing question was how to phrase a prompt. The model was the product, and prompt engineering was the surface where teams competed.</p>
+
+    <p>That framing no longer matches what is being built. OpenAI's recent <a href="https://openai.com/index/harness-engineering/" class="ext" target="_blank" rel="noopener">harness work on Codex</a>, Anthropic's pattern for <a href="https://www.anthropic.com/engineering/managed-agents" class="ext" target="_blank" rel="noopener">long-running managed agents</a>, Cursor's background-agent runtime, Claude Code's session-aware workflow, and the open-source frameworks &mdash; LangGraph, CrewAI, AutoGen &mdash; all converge on the same architectural move: the model is wrapped inside an execution system that handles tools, memory, retries, planning, and continuity.</p>
+
+    <p>Single calls have given way to execution loops. Assistants have given way to autonomous workflows. The model is no longer the product boundary. The execution environment is.</p>
+
+    <p>That is the right move. Anyone building agentic systems in 2026 needs a harness. But it is also incomplete. As soon as agents are doing real work across many sessions, on real codebases, the harness reveals what it does not cover: <em>architectural intent</em>.</p>
+
+    <h2 id="solved">What harness engineering solves</h2>
+
+    <p>It is worth being precise about what the current generation of harnesses solves, because the answer is genuinely impressive. These are the problems prompt engineering could never address and that single-call APIs treated as out of scope.</p>
+
+    <div class="failure-stack">
+      <div class="stack-title">Problems harness engineering handles well</div>
+
+      <div class="stack-row">
+        <div class="stack-num">01</div>
+        <div class="stack-content">
+          <div class="stack-label">Context lifecycle management</div>
+          <div class="stack-desc">Loading the right context at session start, evicting stale context, summarizing history, and injecting the working set the agent needs for the next step. Without this, every long conversation degenerates into context pressure.</div>
+        </div>
+      </div>
+
+      <div class="stack-row">
+        <div class="stack-num">02</div>
+        <div class="stack-content">
+          <div class="stack-label">Tool orchestration</div>
+          <div class="stack-desc">Tool selection, schema validation, parallel calls where safe, sequencing where required, and recovery when a tool fails or returns unexpected output. The harness is what makes tool use composable rather than fragile.</div>
+        </div>
+      </div>
+
+      <div class="stack-row">
+        <div class="stack-num">03</div>
+        <div class="stack-content">
+          <div class="stack-label">Retries and error recovery</div>
+          <div class="stack-desc">Idempotent retries on transient failures, backoff on rate limits, recovery from partial tool failures, and the bookkeeping required to avoid double-applying side effects. Robust autonomous workflows are mostly retry logic in disguise.</div>
+        </div>
+      </div>
+
+      <div class="stack-row">
+        <div class="stack-num">04</div>
+        <div class="stack-content">
+          <div class="stack-label">Planning and execution loops</div>
+          <div class="stack-desc">Decomposing a goal into steps, running steps, checking results, and replanning when the plan no longer fits reality. The harness encodes the agentic loop and gives it durable state across iterations.</div>
+        </div>
+      </div>
+
+      <div class="stack-row">
+        <div class="stack-num">05</div>
+        <div class="stack-content">
+          <div class="stack-label">Memory injection and continuity</div>
+          <div class="stack-desc">Persistent notes, feature lists, progress logs, and session handoffs that let the next agent pick up where the last one stopped. This is the relay-team infrastructure that makes long-running work possible.</div>
+        </div>
+      </div>
+
+      <div class="stack-row">
+        <div class="stack-num">06</div>
+        <div class="stack-content">
+          <div class="stack-label">Observability and execution coordination</div>
+          <div class="stack-desc">Tracing what the agent did, when, with which tools, on which inputs. This is what makes the workflow auditable after the fact and operable at scale.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <pre><code>Model
+  &darr;
+Harness
+  &darr;
+Tools / Memory / Execution / Retries</code></pre>
+
+    <p>This is a major architectural advancement over prompt engineering. Treating the execution environment as the product boundary lets autonomous workflows survive contact with real systems: rate limits, partial failures, long horizons, multi-tool coordination, and cross-session continuity.</p>
+
+    <p>None of what follows is an argument against any of that. The argument is that this layer alone is not enough.</p>
+
+    <h2 id="gap">The governance gap</h2>
+
+    <p>A harness can make an agent faster, more persistent, more autonomous, and more capable. It cannot, by construction, make the agent <em>architecturally aligned</em>. Continuity is not constraint. Orchestration is not enforcement. Memory of past decisions is not authority to refuse a future one.</p>
+
+    <p>The failures look like this:</p>
+
+    <ul>
+      <li><strong>An ADR is bypassed.</strong> The repo has a recorded decision &mdash; "do not introduce a runtime ORM" &mdash; that the agent does not read at session start, because the harness does not treat ADRs as first-class inputs. The agent introduces an ORM because it solves the immediate ticket.</li>
+      <li><strong>A forbidden dependency reappears.</strong> A package was removed for a documented reason. A later session reintroduces it because the prohibition lives only in a stale doc, not in an enforcement hook.</li>
+      <li><strong>A governed system is rewritten.</strong> The agent refactors a module that had a specific layering contract. The new version is functionally equivalent and passes tests, but violates the layering rule that was the entire point of the original design.</li>
+      <li><strong>Layering boundaries are crossed.</strong> A controller starts calling into a data layer that the architecture forbids it from touching directly. The change is locally sensible, globally corrosive.</li>
+      <li><strong>Naming conventions drift.</strong> Each session is internally consistent. Across sessions, the naming gradually changes, and the next agent infers the new pattern from recent files.</li>
+      <li><strong>Infrastructure patterns mutate.</strong> A standard for how services are exposed, configured, or deployed is silently replaced by a sensible-looking alternative that the rest of the system does not expect.</li>
+      <li><strong>Automation artifacts become inconsistent.</strong> Branch names, commit messages, PR titles, and CI configs all drift away from team conventions because no layer is enforcing them.</li>
+    </ul>
+
+    <p>None of these failures are caused by the harness being bad. They are caused by the harness being the wrong place to enforce architectural decisions. The harness's job is to keep work moving. Its incentives are continuity and throughput, not refusal.</p>
+
+    <p class="pull-quote"><em>Harnesses preserve execution continuity.</em> They do not preserve architectural intent.</p>
+
+    <p>That distinction matters because architectural intent is exactly what a long-running, autonomous workflow erodes by default. Each session makes locally plausible choices. The cumulative effect is drift &mdash; and no progress log, retry policy, or tool router catches drift, because none of them know what the architecture was supposed to be.</p>
+
+    <h2 id="observability">Why observability is insufficient</h2>
+
+    <p>The most common response to the governance gap is to lean harder on observability. Trace every tool call. Log every diff. Pipe agent activity into a dashboard. If we can see what the agent did, we can correct it.</p>
+
+    <p>That argument confuses two different questions.</p>
+
+    <div class="axis-table">
+      <div class="ax-title">Observability vs governance &middot; what each layer answers</div>
+      <table>
+        <thead>
+          <tr><th>Layer</th><th>Question it answers</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Traces</td><td>Which steps ran?</td></tr>
+          <tr><td>Logs</td><td>What was emitted?</td></tr>
+          <tr><td>Metrics</td><td>How often, how fast, how reliably?</td></tr>
+          <tr><td>Dashboards</td><td>Is the system healthy?</td></tr>
+          <tr class="accent-row"><td>Governance</td><td>Was the action allowed?</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Observability answers <em>what happened</em>. Governance answers <em>what should have been allowed</em>. These are not the same problem, and tools built for the first are structurally unable to solve the second.</p>
+
+    <ul>
+      <li><strong>Logs are not policy.</strong> A log records that a forbidden dependency was added. It does not refuse the add.</li>
+      <li><strong>Traces are not invariants.</strong> A trace shows the call graph. It does not declare which call graphs are valid.</li>
+      <li><strong>Visibility is not enforcement.</strong> A dashboard surfaces drift after it occurs. It does not block the change that produced the drift.</li>
+    </ul>
+
+    <p>Observability is necessary &mdash; you cannot govern what you cannot see &mdash; but it sits on the wrong side of the action. By the time the trace reaches the dashboard, the commit has already happened, the PR may already be merged, the artifact may already be deployed. Governance has to sit <em>in front of</em> the action it constrains, with a deterministic rule about whether to allow it.</p>
+
+    <p>The next layer is not better dashboards. It is enforceable contracts.</p>
+
+    <h2 id="propagation">Governance propagation across execution surfaces</h2>
+
+    <p>Here is where most discussions of agent governance fall short. They treat governance as a property of the source tree: the code the agent writes must satisfy certain architectural constraints, and that is the whole problem.</p>
+
+    <p>That is too narrow. Long-running, autonomous agents do not only write source code. They write everywhere the workflow touches:</p>
+
+    <div class="failure-stack">
+      <div class="stack-title">Execution surfaces produced by autonomous workflows</div>
+
+      <div class="stack-row">
+        <div class="stack-num">01</div>
+        <div class="stack-content">
+          <div class="stack-label">Branch names and PR titles</div>
+          <div class="stack-desc">Auto-generated by the harness, often outside the team's branch and title taxonomy. Conventions that exist for a reason &mdash; downstream tooling, release notes, audit traceability &mdash; quietly stop working.</div>
+        </div>
+      </div>
+
+      <div class="stack-row">
+        <div class="stack-num">02</div>
+        <div class="stack-content">
+          <div class="stack-label">Commit messages and tags</div>
+          <div class="stack-desc">Workflow-generated commits accumulate in history. Tag policies built around durable milestones get diluted by operational commits and ephemeral checkpoints.</div>
+        </div>
+      </div>
+
+      <div class="stack-row">
+        <div class="stack-num">03</div>
+        <div class="stack-content">
+          <div class="stack-label">CI metadata and pipeline config</div>
+          <div class="stack-desc">Workflow files, environment definitions, secret references, and runner configurations are written by agents the same way they write code &mdash; but their governance constraints (least privilege, approval gates, allowlists) are stricter and less visible.</div>
+        </div>
+      </div>
+
+      <div class="stack-row">
+        <div class="stack-num">04</div>
+        <div class="stack-content">
+          <div class="stack-label">Deployment artifacts and release notes</div>
+          <div class="stack-desc">Manifests, container tags, generated changelogs, and release announcements all carry organizational intent that ungoverned automation can silently violate.</div>
+        </div>
+      </div>
+
+      <div class="stack-row">
+        <div class="stack-num">05</div>
+        <div class="stack-content">
+          <div class="stack-label">Generated configuration</div>
+          <div class="stack-desc">Feature flags, routing rules, scaling policies, and integration configs are generated as code. They are rarely reviewed with the same rigor and almost never checked against architectural decisions.</div>
+        </div>
+      </div>
+
+      <div class="stack-row">
+        <div class="stack-num">06</div>
+        <div class="stack-content">
+          <div class="stack-label">Agent-produced documentation</div>
+          <div class="stack-desc">READMEs, ADR drafts, runbooks, and inline comments authored by the agent become the next agent's training context. Drift in docs propagates faster than drift in code, because the next session reads docs as authoritative.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <p>Governance must propagate across every surface touched by autonomous execution.</p>
+
+    <p>This is the part of the problem the industry is barely talking about. A governance layer that enforces ADR compliance in <code>src/</code> but ignores commit messages, PR titles, CI config, and generated docs is governing a fraction of the agent's output. The interesting, expensive failures live exactly at the boundaries the agent crosses on its way to "shipping a change": the branch, the title, the workflow file, the deployment manifest, the release note.</p>
+
+    <p>Repository policies like the one in this codebase &mdash; conventional branch prefixes, squash-merge with curated titles, durable-milestone-only tag policy &mdash; exist precisely because automation artifacts left ungoverned will rot the operational story of the repo. Encoding those policies as ADRs and propagating them into the agent's pre-commit, pre-PR, and CI checks is the only way they survive automation.</p>
+
+    <h2 id="next-layer">The next layer: governance infrastructure</h2>
+
+    <p>The clean way to think about the emerging stack is to stop treating it as a model-plus-tooling problem and start treating it as a layered system.</p>
+
+    <pre><code>Models           &mdash; produce candidate output
+  &darr;
+Harnesses        &mdash; coordinate execution, retries, tools
+  &darr;
+Execution        &mdash; long-running loops, sessions, memory
+  &darr;
+Governance       &mdash; defines and enforces architectural constraints
+  &darr;
+Verification     &mdash; tests, builds, deploy-time checks</code></pre>
+
+    <p>Each layer answers a question the layer above it cannot:</p>
+
+    <ul>
+      <li><strong>Harnesses</strong> answer <em>how does the agent act?</em></li>
+      <li><strong>Execution systems</strong> answer <em>how does the agent keep working across time?</em></li>
+      <li><strong>Governance</strong> answers <em>which actions are allowed, and according to which decisions?</em></li>
+      <li><strong>Verification</strong> answers <em>did the resulting system still pass its objective checks?</em></li>
+    </ul>
+
+    <p>Governance is its own layer because the problem it solves is not solvable inside any of the others. Models produce text. Harnesses coordinate. Memory recalls. None of them can deterministically resolve which ADR governs a given change, or block output that violates the active decision graph. That requires a layer with its own data model (decisions, supersedes relationships, scopes), its own resolver (precedence semantics), and its own enforcement hooks (session start, pre-tool, pre-commit, pre-PR, CI).</p>
+
+    <p>This is what makes governance infrastructure a category, not a feature. It cannot be folded into the harness without giving the harness an enforcement responsibility that conflicts with its continuity responsibility. It cannot be folded into observability without losing its blocking authority. It cannot be folded into the model, because the model has no source of truth about the repository's decisions.</p>
+
+    <p>Harnesses coordinate execution. Governance defines constraints. Verification enforces invariants. Each layer has a job; none can do the others' jobs well.</p>
+
+    <h2 id="mneme">Where Mneme fits</h2>
+
+    <p>Mneme is a deliberately narrow layer in this stack. It does not orchestrate tools. It does not retry calls. It does not manage memory or context. It does one thing: it compiles the repository's ADR corpus into a deterministic decision graph and enforces it at the boundaries where agents make consequential changes.</p>
+
+    <ul>
+      <li><strong>Repo-native.</strong> ADRs live in the repository. The decision graph is rebuilt from them on every check. There is no separate hosted policy store to drift out of sync.</li>
+      <li><strong>Deterministic enforcement.</strong> Given the same decision graph and the same change, the result is the same every time. No probabilistic recall, no model in the loop at the enforcement boundary.</li>
+      <li><strong>Architectural decision verification.</strong> Status, supersedes, and scope are first-class fields. Conflicts between active decisions are resolved by declared precedence, not by ordering accidents.</li>
+      <li><strong>Governance before generation.</strong> <code>mneme check --mode warn</code> at session start tells the agent which decisions are active before it writes anything. <code>mneme check --mode strict</code> at pre-commit and CI is the enforcement gate.</li>
+    </ul>
+
+    <p>The framing matters: Mneme is complementary to harness engineering, not competitive with it. A team running Codex, Claude Code, Cursor background agents, or any of the open-source agent frameworks should still run a harness. They should also run a governance layer beside it.</p>
+
+    <div class="callout">
+      <p><strong>Harnesses help agents act.</strong> Governance ensures they act within architectural boundaries. Verification confirms the result. All three layers are infrastructure. None of them substitute for the others.</p>
+    </div>
+
+    <p>Long-running agents need more than memory and orchestration. They need enforceable architectural boundaries. The next phase of agent infrastructure is the layer that provides them.</p>
+
+    <h2 id="faq">FAQ</h2>
+
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Is harness engineering bad or unnecessary?</summary>
+        <div class="faq-body">No. Harness engineering is a major architectural advancement over prompt engineering. Harnesses solve real, hard problems: context lifecycle management, retries, tool orchestration, planning and execution loops, memory injection, and observability. Long-running agent systems are not viable without them. The point of this article is that harnesses are necessary but not sufficient. They make agents act effectively; they do not make agents act within architectural boundaries.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Isn't observability enough? If you can see what the agent did, you can correct it.</summary>
+        <div class="faq-body">Observability tells you what happened. Governance defines what should have been allowed. Logs are not policy. Traces are not invariants. Visibility is not enforcement. A trace can show that an agent introduced a forbidden dependency; only governance can stop the change from being proposed, written, committed, or merged in the first place. Observability is the audit log of a system. Governance is the constraint that the system must satisfy. See <a href="/insights/why-observability-is-not-governance/">Why Observability Is Not Governance</a> for the long version.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>What is "governance propagation across execution surfaces"?</summary>
+        <div class="faq-body">Long-running agents do not just touch code. They touch PR titles, branch names, commit messages, CI metadata, deployment artifacts, generated config, release notes, and agent-produced documentation. Architectural intent must hold across all of those surfaces, not just the source tree. A governance layer that enforces invariants in code but ignores the surrounding automation artifacts leaves most of the agent's output ungoverned. Governance must propagate to every surface the agent writes to.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Where does Mneme fit relative to a harness?</summary>
+        <div class="faq-body">Mneme runs beside the harness, not instead of it. The harness coordinates execution; Mneme enforces architectural decisions. At session start, <code>mneme check --mode warn</code> loads active ADRs and surfaces existing violations. Before commit or PR, <code>mneme check --mode strict</code> blocks output that violates the active decision graph. In CI, the same check is the team-level backstop. Mneme does not replace tool use, retries, or memory; it enforces the constraints those layers cannot enforce. See the <a href="https://github.com/TheoV823/mneme" target="_blank" rel="noopener">open-source repository</a> for setup details.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Why is this a "category" rather than a feature?</summary>
+        <div class="faq-body">Because the problem governance infrastructure solves is not solvable inside a model, a harness, or a memory system. Models produce text. Harnesses coordinate execution. Memory recalls context. None of those layers can deterministically resolve which architectural decision applies to a given change, or block output that violates it. That requires a separate layer with its own data model, its own resolver, and its own enforcement hooks. When a layer cannot be folded into any adjacent layer, it is a category.</div>
+      </details>
+    </div>
+
+  </div>
+
+  <h2 id="related-concepts">Related concepts</h2>
+  <ul>
+    <li><a href="/concepts/governance-infrastructure/">Governance Infrastructure</a></li>
+    <li><a href="/concepts/architectural-governance/">Architectural Governance</a></li>
+    <li><a href="/concepts/governance-propagation/">Governance Propagation</a></li>
+    <li><a href="/concepts/verification-contracts/">Verification Contracts</a></li>
+    <li><a href="/concepts/governance-before-generation/">Governance Before Generation</a></li>
+    <li><a href="/concepts/architectural-drift/">Architectural Drift</a></li>
+    <li><a href="/concepts/agentic-development/">Agentic Development</a></li>
+  </ul>
+
+  <h2 id="related-reading">Related reading</h2>
+  <ul>
+    <li><a href="/insights/long-running-agents-need-governance/">Long-Running Agents Need More Than Memory</a></li>
+    <li><a href="/insights/why-observability-is-not-governance/">Why Observability Is Not Governance</a></li>
+    <li><a href="/insights/why-architectural-governance-needs-precedence-semantics/">Why AI Architectural Governance Needs Precedence Semantics</a></li>
+    <li><a href="/insights/generative-ai-software-engineering-stack/">The Generative AI Software Engineering Stack</a></li>
+    <li><a href="/insights/memory-is-not-governance/">Memory Is Not Governance</a></li>
+  </ul>
+
+  <footer class="article-footer">
+    <a href="/insights/" class="back-link">&larr; Back to Insights</a>
+
+    <div class="cta-block">
+      <h3>The governance layer your agent harness is missing.</h3>
+      <p>Mneme HQ is the deterministic precedence engine and enforcement hook that runs beside your agent workflow. Harnesses keep agents acting. Mneme keeps them inside their architectural boundaries. Open source, MIT licensed.</p>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
+    </div>
+  </footer>
+</article>
+</main>
+
+<footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+  <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/use-cases/">Use cases</a></li>
+        <li><a href="/works-with/">Works with</a></li>
+        <li><a href="/platforms/">Platforms</a></li>
+        <li><a href="/integrations/">Integrations</a></li>
+        <li><a href="/compare/">Compare</a></li>
+        <li><a href="/demo/">Demo</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/concepts/">Concepts</a></li>
+        <li><a href="/architecture/">Architecture</a></li>
+        <li><a href="/insights/">Insights</a></li>
+        <li><a href="/standards/">Standards</a></li>
+        <li><a href="/benchmark/">Benchmark</a></li>
+        <li><a href="/docs/">Docs</a></li>
+        <li><a href="/docs/cli/">CLI reference</a></li>
+        <li><a href="/docs/governance-violations/">Governance violations</a></li>
+        <li><a href="/supported-languages/">Supported languages</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/pilot/" style="color:var(--accent);">Request pilot</a></li>
+        <li><a href="/for/">For teams</a></li>
+        <li><a href="/founder/">Founder</a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/roadmap/">Roadmap</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Code</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="https://github.com/TheoV823/mneme">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://dev.to/mnemehq" target="_blank" rel="noopener">DEV.to</a></li>
+        <li><a href="/privacy/">Privacy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
+    <span style="display:inline-flex;align-items:center;gap:0.75rem;"><a href="/" aria-label="Mneme HQ home" style="display:inline-flex;opacity:0.75;"><img src="/favicon.png" alt="Mneme HQ" height="22" style="display:block;"></a><span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span></span>
+    <nav aria-label="Social media" style="display: flex; align-items: center; gap: 1rem;">
+      <a href="https://github.com/TheoV823/mneme" target="_blank" rel="noopener" aria-label="GitHub" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.16c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.27-1.69-1.27-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.34.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18.92-.26 1.91-.39 2.89-.39.98 0 1.97.13 2.89.39 2.2-1.49 3.17-1.18 3.17-1.18.62 1.58.23 2.75.12 3.04.73.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.26 5.68.41.35.78 1.05.78 2.12v3.15c0 .31.21.67.8.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener" aria-label="LinkedIn" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/@MnemeHQ" target="_blank" rel="noopener" aria-label="YouTube" style="color: var(--muted); display: inline-flex;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.12C19.55 3.5 12 3.5 12 3.5s-7.55 0-9.4.58A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.12c1.85.58 9.4.58 9.4.58s7.55 0 9.4-.58a3 3 0 0 0 2.1-2.12A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8zM9.6 15.57V8.43L15.82 12 9.6 15.57z"/></svg>
+      </a>
+      <a href="https://dev.to/mnemehq" target="_blank" rel="noopener" aria-label="DEV.to" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true"><path d="M120.12 208.29c-3.88-2.9-7.77-4.35-11.65-4.35H91.03v104.47h17.45c3.88 0 7.77-1.45 11.65-4.35 3.88-2.9 5.82-7.25 5.82-13.06v-69.65c-.01-5.8-1.96-10.16-5.83-13.06zM404.1 32H43.9C19.7 32 .06 51.59 0 75.8v360.4C.06 460.41 19.7 480 43.9 480h360.2c24.21 0 43.84-19.59 43.9-43.8V75.8c-.06-24.21-19.7-43.8-43.9-43.8zM154.2 291.19c0 18.81-11.61 47.31-48.36 47.25h-46.4V172.98h47.38c35.44 0 47.36 28.46 47.36 47.28l.02 70.93zm100.68-88.66H201.6v38.42h32.57v29.57H201.6v38.41h53.29v29.57h-62.18c-11.16.29-20.44-8.53-20.72-19.69V193.7c-.27-11.15 8.56-20.41 19.71-20.69h63.19l-.01 29.52zm103.64 115.29c-13.2 30.75-36.85 24.63-47.44 0l-38.53-144.8h32.57l29.71 113.72 29.57-113.72h32.58l-38.46 144.8z"/></svg>
+      </a>
+    </nav>
+    <span>&copy; 2026</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  function setOpen(open){
+    links.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('menu-open', open);
+  }
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    setOpen(!links.classList.contains('open'));
+  });
+  document.addEventListener('click', function(e){
+    if (!links.classList.contains('open')) return;
+    if (links.contains(e.target) || btn.contains(e.target)) return;
+    setOpen(false);
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false);
+  });
+  links.addEventListener('click', function(e){
+    if (e.target.tagName === 'A') setOpen(false);
+  });
+  window.addEventListener('resize', function(){
+    if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false);
+  });
+})();
+</script>
+<script>
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
+</body>
+</html>
