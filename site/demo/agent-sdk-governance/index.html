@@ -1,27 +1,27 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/favicon.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Governance gates in Claude Agent SDK workflows — Mneme HQ</title>
+  <title>Governance gates in Claude Agent SDK workflows â€” Mneme HQ</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="A Claude Agent SDK workflow where Mneme acts as the governance layer. An autonomous agent tasked with caching introduces Redis — violating ADR-001. Mneme's pre-execution hook catches the violation before the file write executes and reroutes the agent to the compliant primitive." />
+  <meta name="description" content="A Claude Agent SDK workflow where Mneme acts as the governance layer. An autonomous agent tasked with caching introduces Redis â€” violating ADR-001. Mneme's pre-execution hook catches the violation before the file write executes and reroutes the agent to the compliant primitive." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/demo/agent-sdk-governance/" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
   <meta property="og:title" content="Governance gates in Claude Agent SDK workflows" />
-  <meta property="og:description" content="An autonomous agent tasked with caching introduces Redis — violating ADR-001. Mneme's pre-execution hook catches the violation before the file write executes and reroutes the agent to the compliant primitive." />
+  <meta property="og:description" content="An autonomous agent tasked with caching introduces Redis â€” violating ADR-001. Mneme's pre-execution hook catches the violation before the file write executes and reroutes the agent to the compliant primitive." />
   <meta property="og:url" content="https://mnemehq.com/demo/agent-sdk-governance/" />
   <meta property="og:image" content="https://mnemehq.com/demo/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Governance gates in Claude Agent SDK workflows" />
-  <meta name="twitter:description" content="An autonomous agent tasked with caching introduces Redis — violating ADR-001. Mneme catches the violation before the file write executes." />
+  <meta name="twitter:description" content="An autonomous agent tasked with caching introduces Redis â€” violating ADR-001. Mneme catches the violation before the file write executes." />
   <meta name="twitter:image" content="https://mnemehq.com/demo/og.png" />
   <!-- Consent defaults -->
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{'analytics_storage':'granted','ad_storage':'denied','ad_user_data':'denied','ad_personalization':'denied'});</script>
@@ -42,7 +42,7 @@
       {
         "@type": "Article",
         "headline": "Governance gates in Claude Agent SDK workflows",
-        "description": "A Claude Agent SDK workflow where Mneme acts as the governance/runtime policy layer. An autonomous agent tasked with caching introduces Redis — violating ADR-001. Mneme's pre-execution hook catches the violation before the file write executes and reroutes the agent to the compliant primitive.",
+        "description": "A Claude Agent SDK workflow where Mneme acts as the governance/runtime policy layer. An autonomous agent tasked with caching introduces Redis â€” violating ADR-001. Mneme's pre-execution hook catches the violation before the file write executes and reroutes the agent to the compliant primitive.",
         "url": "https://mnemehq.com/demo/agent-sdk-governance/",
         "datePublished": "2026-05-14",
         "dateModified": "2026-05-14",
@@ -59,7 +59,7 @@
     :root {
       --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
       --border: #222226; --border2: #2e2e34;
-      --text: #e8e8ec; --muted: #88889a;
+      --text: #e8e8ec; --muted: #a8a8b8;
       --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
       --pass: #c8f060; --warn: #f59e0b; --fail: #ef4444;
       --agent-a: #a78bfa; --agent-b: #f59e0b; --agent-c: #8be0c8;
@@ -112,7 +112,7 @@
     .body pre { background: var(--term-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; overflow-x: auto; margin: 1.25rem 0; }
     .body pre code { background: transparent; border: none; padding: 0; font-size: 0.78rem; line-height: 1.7; color: var(--text); }
 
-    /* ── INVARIANT LEDGER ── */
+    /* â”€â”€ INVARIANT LEDGER â”€â”€ */
     .invariants { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; margin: 1.75rem 0; }
     .invariants .inv-title { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.85rem; }
     .invariants ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.55rem; }
@@ -121,7 +121,7 @@
     .invariants li .inv-id { font-family: 'DM Mono', monospace; font-size: 0.74rem; color: var(--text); letter-spacing: 0.04em; }
     .invariants li .inv-text strong { color: var(--text); font-weight: 500; }
 
-    /* ── AGENT TRANSCRIPT ── */
+    /* â”€â”€ AGENT TRANSCRIPT â”€â”€ */
     .actor-step { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin: 1.5rem 0; overflow: hidden; }
     .actor-header { padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap; }
     .actor-header.a { background: rgba(167,139,250,0.06); }
@@ -145,7 +145,7 @@
     .governance-trace .gt-info { color: var(--muted); }
     .governance-trace strong { color: var(--text); font-weight: 500; }
 
-    /* ── COMPARE BAR ── */
+    /* â”€â”€ COMPARE BAR â”€â”€ */
     .compare-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 2rem 0; }
     @media (max-width: 720px) { .compare-bar { grid-template-columns: 1fr; } }
     .compare-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.4rem; }
@@ -154,14 +154,14 @@
     .compare-card h4 { font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 0.55rem; }
     .compare-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.65; }
 
-    /* ── CALLOUT ── */
+    /* â”€â”€ CALLOUT â”€â”€ */
     .callout { background: rgba(139,224,200,0.05); border: 1px solid rgba(139,224,200,0.2); border-left: 3px solid var(--teal); border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; }
     .callout p { color: var(--muted); font-size: 0.88rem; margin: 0; }
     .callout p strong { color: var(--text); font-weight: 500; }
     .callout.purple { background: rgba(167,139,250,0.05); border-color: rgba(167,139,250,0.2); border-left-color: var(--agent-a); }
     .callout.purple p strong { color: var(--agent-a); }
 
-    /* ── NEXT BAR ── */
+    /* â”€â”€ NEXT BAR â”€â”€ */
     .next-bar { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     @media (max-width: 640px) { .next-bar { grid-template-columns: 1fr; } }
     .next-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; text-decoration: none; color: inherit; transition: border-color 0.15s, transform 0.15s; display: block; }
@@ -195,14 +195,14 @@
       .invariants li { grid-template-columns: 1fr; gap: 0.2rem; }
     }
 
-    /* ── CODE BLOCK WITH HEADER ── */
+    /* â”€â”€ CODE BLOCK WITH HEADER â”€â”€ */
     .code-block { margin: 1.25rem 0; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
     .code-block-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.5rem 1rem; display: flex; align-items: center; justify-content: space-between; }
     .code-block-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.07em; color: var(--muted); text-transform: uppercase; }
     .code-block-lang { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--teal); letter-spacing: 0.05em; }
     .code-block pre { border-radius: 0; border: none; margin: 0; }
 
-    /* ── TRACE LOOP DIAGRAM ── */
+    /* â”€â”€ TRACE LOOP DIAGRAM â”€â”€ */
     .trace-loop { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; margin: 1.75rem 0; }
     .trace-loop .tl-title { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal); margin-bottom: 1rem; }
     .trace-loop ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0; }

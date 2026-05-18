@@ -75,7 +75,7 @@
     :root {
       --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
       --border: #222226; --border2: #2e2e34;
-      --text: #e8e8ec; --muted: #88889a;
+      --text: #e8e8ec; --muted: #a8a8b8;
       --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
     }
     html { scroll-behavior: smooth; }
@@ -112,14 +112,14 @@
     .article-body a.ext { color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(200,240,96,0.4); }
     .article-body a.ext:hover { color: var(--accent-dim); border-bottom-color: rgba(200,240,96,0.7); }
 
-    .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin: 0 0 3rem; }
-    .toc .toc-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.9rem; }
-    .toc ol { list-style: none; counter-reset: toc; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 0.45rem; }
-    .toc ol li { counter-increment: toc; font-size: 0.85rem; padding-left: 2.2rem; position: relative; line-height: 1.5; }
-    .toc ol li::before { content: counter(toc, decimal-leading-zero); position: absolute; left: 0; top: 0.05rem; font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--border2); letter-spacing: 0.05em; }
-    .toc a { color: var(--muted); text-decoration: none; transition: color 0.15s; }
+    .toc { position: static; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 0.9rem 1.25rem; margin: 0 0 2rem; }
+    .toc .toc-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.55rem; }
+    .toc ol { list-style: none; counter-reset: toc; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 0.25rem; }
+    .toc ol li { counter-increment: toc; font-size: 0.78rem; padding-left: 1.9rem; position: relative; line-height: 1.5; }
+    .toc ol li::before { content: counter(toc, decimal-leading-zero); position: absolute; left: 0; top: 0.05rem; font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.05em; }
+    .toc a { color: var(--text); text-decoration: none; transition: color 0.15s; }
     .toc a:hover { color: var(--accent); }
-    @media (min-width: 720px) { .toc ol { grid-template-columns: 1fr 1fr; gap: 0.55rem 1.5rem; } }
+    @media (min-width: 720px) { .toc ol { grid-template-columns: 1fr 1fr; gap: 0.3rem 1.25rem; } }
 
     .answer-capsule { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 0 0 2.5rem; }
     .answer-capsule p { margin: 0; font-size: 0.92rem; color: var(--muted); line-height: 1.8; }

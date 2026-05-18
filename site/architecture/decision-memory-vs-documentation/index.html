@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Decision Memory vs. Documentation — Architecture Deep Dive</title>
+  <title>Decision Memory vs. Documentation â€” Architecture Deep Dive</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
@@ -14,12 +14,12 @@
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Decision Memory vs. Documentation — Architecture Deep Dive" />
+  <meta property="og:title" content="Decision Memory vs. Documentation â€” Architecture Deep Dive" />
   <meta property="og:description" content="Decision memory and documentation look similar but solve different problems. Documentation surfaces information. Decision memory enforces constraints. The distinction determines whether your governance system actually works." />
   <meta property="og:url" content="https://mnemehq.com/architecture/decision-memory-vs-documentation/" />
   <meta property="og:image" content="https://mnemehq.com/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Decision Memory vs. Documentation — Architecture Deep Dive" />
+  <meta name="twitter:title" content="Decision Memory vs. Documentation â€” Architecture Deep Dive" />
   <meta name="twitter:description" content="Decision memory and documentation look similar but solve different problems. Documentation surfaces information. Decision memory enforces constraints. The distinction determines whether your governance system actually works." />
   <meta name="twitter:image" content="https://mnemehq.com/og.png" />
   <meta name="author" content="Theo Valmis" />
@@ -39,7 +39,7 @@
     :root {
       --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
       --border: #222226; --border2: #2e2e34;
-      --text: #e8e8ec; --muted: #88889a;
+      --text: #e8e8ec; --muted: #a8a8b8;
       --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
     }
     html { scroll-behavior: smooth; }
@@ -101,7 +101,7 @@
     .article-faq summary { padding: 1rem 1.25rem; cursor: pointer; font-size: 0.88rem; color: var(--text); background: var(--surface); list-style: none; }
     .article-faq summary::-webkit-details-marker { display: none; }
     .article-faq summary::before { content: '+ '; color: var(--accent); }
-    .article-faq details[open] summary::before { content: '− '; }
+    .article-faq details[open] summary::before { content: 'âˆ’ '; }
     .article-faq details[open] summary { border-bottom: 1px solid var(--border); }
     .article-faq .faq-body { padding: 1.25rem; font-size: 0.86rem; color: var(--muted); line-height: 1.85; }
     .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
@@ -224,7 +224,7 @@
       },
       {
         "@type": "TechArticle",
-        "headline": "Decision Memory vs. Documentation — Architecture Deep Dive",
+        "headline": "Decision Memory vs. Documentation â€” Architecture Deep Dive",
         "description": "Decision memory and documentation look similar but solve different problems. Documentation surfaces information. Decision memory enforces constraints. The distinction determines whether your governance system actually works.",
         "url": "https://mnemehq.com/architecture/decision-memory-vs-documentation/",
         "datePublished": "2026-05-14",
@@ -242,27 +242,27 @@
           {
             "@type": "Question",
             "name": "What is the difference between decision memory and documentation?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Documentation surfaces information — it is read by humans (or retrieved for AI context). Decision memory enforces constraints — it is a structured corpus of authoritative decisions that a governance system evaluates generated code against. Documentation answers 'what does our system do?'. Decision memory answers 'what must every AI coding agent comply with?' The distinction matters because you cannot build enforcement on top of documentation retrieval."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Documentation surfaces information â€” it is read by humans (or retrieved for AI context). Decision memory enforces constraints â€” it is a structured corpus of authoritative decisions that a governance system evaluates generated code against. Documentation answers 'what does our system do?'. Decision memory answers 'what must every AI coding agent comply with?' The distinction matters because you cannot build enforcement on top of documentation retrieval."}
           },
           {
             "@type": "Question",
             "name": "Can you use documentation (wiki, ADR files) as a governance corpus?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Not directly. Raw documentation lacks the structural fields required for governance: scope patterns (which files does this apply to?), status (is this decision still active?), supersedes (which older decision does this replace?), priority (what wins when two decisions conflict?), and constraint text (what exactly must the AI comply with?). Mneme's ADR import integration reads existing ADR files and extracts a Constraints section into structured decision records — converting documentation into decision memory without rewriting the ADRs."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Not directly. Raw documentation lacks the structural fields required for governance: scope patterns (which files does this apply to?), status (is this decision still active?), supersedes (which older decision does this replace?), priority (what wins when two decisions conflict?), and constraint text (what exactly must the AI comply with?). Mneme's ADR import integration reads existing ADR files and extracts a Constraints section into structured decision records â€” converting documentation into decision memory without rewriting the ADRs."}
           },
           {
             "@type": "Question",
             "name": "What makes a decision record different from a documentation page?",
-            "acceptedAnswer": {"@type": "Answer", "text": "A decision record is a typed, schema-validated object with fields for: id (unique identifier), type (decision/rule/anti_pattern), title, status (active/superseded/deprecated), scope (glob pattern for applicable file paths), supersedes (IDs this record replaces), priority (org/project/feature), tags (explicit retrieval signals), content (rationale prose), and constraint (the enforced rule text). A documentation page has none of this structure — it is free-form prose that can be retrieved but not evaluated against."}
+            "acceptedAnswer": {"@type": "Answer", "text": "A decision record is a typed, schema-validated object with fields for: id (unique identifier), type (decision/rule/anti_pattern), title, status (active/superseded/deprecated), scope (glob pattern for applicable file paths), supersedes (IDs this record replaces), priority (org/project/feature), tags (explicit retrieval signals), content (rationale prose), and constraint (the enforced rule text). A documentation page has none of this structure â€” it is free-form prose that can be retrieved but not evaluated against."}
           },
           {
             "@type": "Question",
             "name": "What is precedence resolution and why does it require decision memory?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Precedence resolution is the process of determining which decision wins when two decisions conflict. For example: an org-level decision says 'use PostgreSQL,' a project-level decision says 'this service uses SQLite — approved exception.' The governance system must determine which applies for a given file. This requires explicit precedence fields (org vs. project vs. feature), status checking (is the org rule still active?), and supersedes relationships. Documentation has none of these fields; precedence resolution over free-form text is undefined."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Precedence resolution is the process of determining which decision wins when two decisions conflict. For example: an org-level decision says 'use PostgreSQL,' a project-level decision says 'this service uses SQLite â€” approved exception.' The governance system must determine which applies for a given file. This requires explicit precedence fields (org vs. project vs. feature), status checking (is the org rule still active?), and supersedes relationships. Documentation has none of these fields; precedence resolution over free-form text is undefined."}
           },
           {
             "@type": "Question",
             "name": "How does Mneme turn existing ADRs into decision memory?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Mneme's ADR import integration reads any ADR file that contains a ## Constraints section. Each constraint line becomes a structured decision record in project_memory.json. The rest of the ADR — context, rationale, consequences — is preserved as documentation and is not imported. The result: engineers keep writing ADRs in their existing format, and Mneme extracts only the enforceable constraint layer into the governance corpus."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Mneme's ADR import integration reads any ADR file that contains a ## Constraints section. Each constraint line becomes a structured decision record in project_memory.json. The rest of the ADR â€” context, rationale, consequences â€” is preserved as documentation and is not imported. The result: engineers keep writing ADRs in their existing format, and Mneme extracts only the enforceable constraint layer into the governance corpus."}
           }
         ]
       }
@@ -292,7 +292,7 @@
 
 <main>
 <div class="answer-capsule">
-  <strong>Decision memory vs. documentation.</strong> Documentation is information you can retrieve. Decision memory is constraints you can enforce. An ADR wiki page is documentation. The same ADR compiled into a structured corpus with scope patterns, precedence fields, and status tracking is decision memory. The governance gap between the two is where AI coding agents produce architectural drift — because suggestion is not enforcement.
+  <strong>Decision memory vs. documentation.</strong> Documentation is information you can retrieve. Decision memory is constraints you can enforce. An ADR wiki page is documentation. The same ADR compiled into a structured corpus with scope patterns, precedence fields, and status tracking is decision memory. The governance gap between the two is where AI coding agents produce architectural drift â€” because suggestion is not enforcement.
 </div>
 
 <nav aria-label="Breadcrumb" class="breadcrumb-nav">
@@ -308,7 +308,7 @@
     <div class="article-eyebrow">
       <span class="eyebrow-tag">Architecture</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">10 min read &nbsp;·&nbsp; May 2026</span>
+      <span class="eyebrow-meta">10 min read &nbsp;Â·&nbsp; May 2026</span>
     </div>
     <h1>Decision Memory vs. Documentation</h1>
     <p class="article-lede">Most teams write architecture decisions as documentation. That is necessary but not sufficient for governing AI coding agents. Documentation surfaces information. Decision memory enforces constraints. The gap between the two is exactly where architectural drift enters AI-assisted codebases.</p>
@@ -321,9 +321,9 @@
 
   <div class="article-body">
 
-    <p>When a team ships their first ADR process, the instinct is to put the ADRs in a wiki or a <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">docs/adr/</code> folder and call it governance. In the human-only workflow, this works well enough — engineers read the ADRs, internalize the decisions, and apply them in code review.</p>
+    <p>When a team ships their first ADR process, the instinct is to put the ADRs in a wiki or a <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">docs/adr/</code> folder and call it governance. In the human-only workflow, this works well enough â€” engineers read the ADRs, internalize the decisions, and apply them in code review.</p>
 
-    <p>In the AI-assisted workflow, this breaks down immediately. AI coding agents don't read ADRs. They generate code from prompts. If you want an agent to respect a decision, the decision needs to be in the prompt — injected as structured context before generation, not sitting in a wiki hoping the agent will find it.</p>
+    <p>In the AI-assisted workflow, this breaks down immediately. AI coding agents don't read ADRs. They generate code from prompts. If you want an agent to respect a decision, the decision needs to be in the prompt â€” injected as structured context before generation, not sitting in a wiki hoping the agent will find it.</p>
 
     <p>But even prompt injection isn't governance. It's suggestion. The distinction between documentation, suggestion, and enforcement is the architecture of the governance problem.</p>
 
@@ -332,9 +332,9 @@
     <p>There are three tiers of architectural knowledge in an AI coding workflow, each with a different relationship to enforcement:</p>
 
     <ol>
-      <li><strong>Documentation</strong> — prose that explains context, rationale, and history. Wikis, ADR bodies, design docs. Read by humans. Retrieved (imprecisely) by RAG. No enforcement capability.</li>
-      <li><strong>Prompt memory</strong> — constraints injected into the model context. CLAUDE.md files, rules files, retrieved RAG passages. The model may or may not follow them. No structural enforcement.</li>
-      <li><strong>Decision memory</strong> — structured, schema-validated constraint records evaluated deterministically against model output. Authoritative, precedence-aware, scope-scoped. Enforcement-capable.</li>
+      <li><strong>Documentation</strong> â€” prose that explains context, rationale, and history. Wikis, ADR bodies, design docs. Read by humans. Retrieved (imprecisely) by RAG. No enforcement capability.</li>
+      <li><strong>Prompt memory</strong> â€” constraints injected into the model context. CLAUDE.md files, rules files, retrieved RAG passages. The model may or may not follow them. No structural enforcement.</li>
+      <li><strong>Decision memory</strong> â€” structured, schema-validated constraint records evaluated deterministically against model output. Authoritative, precedence-aware, scope-scoped. Enforcement-capable.</li>
     </ol>
 
     <p>Most teams operating at Tier 1 believe they're at Tier 3. The most common mistake in AI coding governance is mistaking documentation retrieval for enforcement.</p>
@@ -365,7 +365,7 @@
 
         <rect x="30" y="104" width="220" height="40" rx="8" fill="#141416" stroke="#2e2e34" stroke-width="1.5"/>
         <text x="140" y="126" font-family="Inter,sans-serif" font-size="10" fill="#e8e8ec" text-anchor="middle" font-weight="600">RAG / embedding retrieval</text>
-        <text x="140" y="139" font-family="DM Mono,monospace" font-size="8.5" fill="#88889a" text-anchor="middle">semantic similarity → k passages</text>
+        <text x="140" y="139" font-family="DM Mono,monospace" font-size="8.5" fill="#88889a" text-anchor="middle">semantic similarity â†’ k passages</text>
 
         <line x1="140" y1="144" x2="140" y2="174" stroke="#2e2e34" stroke-width="1.5" marker-end="url(#arr2-muted)"/>
 
@@ -393,7 +393,7 @@
 
         <rect x="360" y="104" width="220" height="40" rx="8" fill="#141416" stroke="#c8f060" stroke-width="1.5"/>
         <text x="470" y="126" font-family="Inter,sans-serif" font-size="10" fill="#c8f060" text-anchor="middle" font-weight="600">Deterministic keyword scorer</text>
-        <text x="470" y="139" font-family="DM Mono,monospace" font-size="8.5" fill="#88889a" text-anchor="middle">field weights + tag boost → top-K=3</text>
+        <text x="470" y="139" font-family="DM Mono,monospace" font-size="8.5" fill="#88889a" text-anchor="middle">field weights + tag boost â†’ top-K=3</text>
 
         <line x1="470" y1="144" x2="470" y2="174" stroke="#c8f060" stroke-width="1.5" marker-end="url(#arr2-accent)"/>
 
@@ -407,7 +407,7 @@
         <text x="470" y="268" font-family="Inter,sans-serif" font-size="10" fill="#8be0c8" text-anchor="middle" font-weight="600">Evaluator: PASS / FAIL / WEAK</text>
         <text x="470" y="282" font-family="DM Mono,monospace" font-size="8.5" fill="#88889a" text-anchor="middle">enforced, auditable, blockable</text>
       </svg>
-      <figcaption>Fig. 1 — Documentation path ends in suggestion. Decision memory path ends in enforcement. Same ADR source, different architectural handling.</figcaption>
+      <figcaption>Fig. 1 â€” Documentation path ends in suggestion. Decision memory path ends in enforcement. Same ADR source, different architectural handling.</figcaption>
     </figure>
 
     <h2>What documentation is and what it isn't</h2>
@@ -482,12 +482,12 @@
 
     <h2>Why precedence resolution requires decision memory</h2>
 
-    <p>The hardest governance problem isn't enforcing a single decision — it's resolving conflicts between multiple applicable decisions. Conflicts happen constantly in real codebases:</p>
+    <p>The hardest governance problem isn't enforcing a single decision â€” it's resolving conflicts between multiple applicable decisions. Conflicts happen constantly in real codebases:</p>
 
     <ul>
       <li>An org-level rule says "no direct database calls from HTTP handlers."</li>
-      <li>A project-level decision says "this service's admin handler is an approved exception — approved by platform team on 2024-11-10."</li>
-      <li>A feature-level decision says "the new bulk-import handler needs direct connection for performance — feature flag: bulk-import-v2."</li>
+      <li>A project-level decision says "this service's admin handler is an approved exception â€” approved by platform team on 2024-11-10."</li>
+      <li>A feature-level decision says "the new bulk-import handler needs direct connection for performance â€” feature flag: bulk-import-v2."</li>
     </ul>
 
     <p>When an AI agent edits <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">services/payments/bulk_import.py</code>, all three decisions are potentially applicable. Which wins?</p>
@@ -495,7 +495,7 @@
     <p>The answer requires a precedence engine that evaluates: status (is each decision active?), scope specificity (the feature-level decision is most specific), supersedes relationships (does any decision explicitly supersede another?), and priority tier (feature &gt; project &gt; org for exceptions). A governance system that lacks structured fields for any of these dimensions cannot compute the answer deterministically.</p>
 
     <div class="callout">
-      <p><strong>Documentation retrieval leaves conflict resolution to the model.</strong> When RAG surfaces three conflicting passages, the model picks whichever it finds most persuasive in context — which is probabilistic and ungovernable. Decision memory carries the fields that make conflict resolution computable.</p>
+      <p><strong>Documentation retrieval leaves conflict resolution to the model.</strong> When RAG surfaces three conflicting passages, the model picks whichever it finds most persuasive in context â€” which is probabilistic and ungovernable. Decision memory carries the fields that make conflict resolution computable.</p>
     </div>
 
     <h2>The enforcement gap</h2>
@@ -505,8 +505,8 @@
     <p>Enforcement requires two things the documentation path cannot provide:</p>
 
     <ol>
-      <li><strong>A structured constraint to evaluate against.</strong> "Use PostgreSQL with SQLAlchemy ORM" is a constraint. Three paragraphs about why PostgreSQL was chosen are not. Evaluation requires a precise, machine-testable assertion — what import is forbidden, what pattern must appear, what must not appear.</li>
-      <li><strong>A layer that inspects output after generation.</strong> The governance system must see what the AI actually wrote, compare it against the applicable constraints, and emit a verdict before the code reaches review. This is the Evaluator layer in Mneme — separate from retrieval, separate from the LLM, architecturally downstream of both.</li>
+      <li><strong>A structured constraint to evaluate against.</strong> "Use PostgreSQL with SQLAlchemy ORM" is a constraint. Three paragraphs about why PostgreSQL was chosen are not. Evaluation requires a precise, machine-testable assertion â€” what import is forbidden, what pattern must appear, what must not appear.</li>
+      <li><strong>A layer that inspects output after generation.</strong> The governance system must see what the AI actually wrote, compare it against the applicable constraints, and emit a verdict before the code reaches review. This is the Evaluator layer in Mneme â€” separate from retrieval, separate from the LLM, architecturally downstream of both.</li>
     </ol>
 
     <p>Documentation retrieval injects context before generation. Decision memory enforcement checks output after generation. Both are necessary for a governance system that catches violations reliably.</p>
@@ -533,7 +533,7 @@
         <!-- Context injection block -->
         <rect x="20" y="60" width="160" height="36" rx="8" fill="#141416" stroke="#c8f060" stroke-width="1.5"/>
         <text x="100" y="80" font-family="Inter,sans-serif" font-size="9.5" fill="#c8f060" text-anchor="middle" font-weight="600">Context injection</text>
-        <text x="100" y="92" font-family="DM Mono,monospace" font-size="8" fill="#88889a" text-anchor="middle">decisions → prompt</text>
+        <text x="100" y="92" font-family="DM Mono,monospace" font-size="8" fill="#88889a" text-anchor="middle">decisions â†’ prompt</text>
 
         <line x1="180" y1="78" x2="216" y2="78" stroke="#2e2e34" stroke-width="1.5" marker-end="url(#arr3)"/>
 
@@ -547,7 +547,7 @@
         <!-- Evaluator block -->
         <rect x="416" y="60" width="184" height="36" rx="8" fill="#141416" stroke="#8be0c8" stroke-width="1.5"/>
         <text x="508" y="80" font-family="Inter,sans-serif" font-size="9.5" fill="#8be0c8" text-anchor="middle" font-weight="600">Evaluator</text>
-        <text x="508" y="92" font-family="DM Mono,monospace" font-size="8" fill="#88889a" text-anchor="middle">output vs. constraints → verdict</text>
+        <text x="508" y="92" font-family="DM Mono,monospace" font-size="8" fill="#88889a" text-anchor="middle">output vs. constraints â†’ verdict</text>
 
         <!-- Documentation-only zone label -->
         <rect x="20" y="140" width="160" height="22" rx="4" fill="rgba(200,240,96,0.06)" stroke="rgba(200,240,96,0.18)" stroke-width="1"/>
@@ -557,14 +557,14 @@
         <rect x="20" y="166" width="578" height="22" rx="4" fill="rgba(139,224,200,0.05)" stroke="rgba(139,224,200,0.18)" stroke-width="1"/>
         <text x="309" y="181" font-family="DM Mono,monospace" font-size="8" fill="#8be0c8" text-anchor="middle" letter-spacing="0.06em">decision memory covers the full pipeline</text>
       </svg>
-      <figcaption>Fig. 2 — Documentation retrieval reaches the pre-generation injection point only. Decision memory spans the full pipeline, including the post-generation enforcement check.</figcaption>
+      <figcaption>Fig. 2 â€” Documentation retrieval reaches the pre-generation injection point only. Decision memory spans the full pipeline, including the post-generation enforcement check.</figcaption>
     </figure>
 
     <h2>Converting documentation to decision memory</h2>
 
     <p>The path from documentation to decision memory doesn't require rewriting your ADRs. Mneme's ADR import integration reads existing ADR files and extracts a <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">## Constraints</code> section that engineers add alongside (not replacing) the existing ADR structure.</p>
 
-    <p>Each constraint line in the Constraints section is compiled into a structured decision record in <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">project_memory.json</code>. The ADR body — context, rationale, consequences — remains documentation and is not imported into the enforcement corpus. The two layers coexist: documentation for human understanding, decision memory for machine enforcement.</p>
+    <p>Each constraint line in the Constraints section is compiled into a structured decision record in <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">project_memory.json</code>. The ADR body â€” context, rationale, consequences â€” remains documentation and is not imported into the enforcement corpus. The two layers coexist: documentation for human understanding, decision memory for machine enforcement.</p>
 
     <div class="callout-teal">
       <p><strong>The ADR import workflow:</strong> Add a Constraints section to any existing ADR. Run <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">mneme import-adr --preview</code> to see what records would be created. Run without <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">--preview</code> to apply. Your ADRs gain enforcement capability without losing their documentation function.</p>
@@ -585,7 +585,7 @@
         <tr>
           <td>Format</td>
           <td>Free-form prose</td>
-          <td>Typed schema (id, scope, status, constraint…)</td>
+          <td>Typed schema (id, scope, status, constraintâ€¦)</td>
         </tr>
         <tr>
           <td>Primary consumer</td>
@@ -599,7 +599,7 @@
         </tr>
         <tr>
           <td>Scope handling</td>
-          <td>None — applies conceptually</td>
+          <td>None â€” applies conceptually</td>
           <td>Explicit glob patterns per record</td>
         </tr>
         <tr>
@@ -614,7 +614,7 @@
         </tr>
         <tr>
           <td>Audit trail</td>
-          <td>None — no per-decision trace</td>
+          <td>None â€” no per-decision trace</td>
           <td>Decision ID, field match, verdict per check</td>
         </tr>
         <tr>
@@ -625,7 +625,7 @@
         <tr>
           <td>Supersession</td>
           <td>Noted in prose only</td>
-          <td>Machine-readable supersedes field — old record deactivated</td>
+          <td>Machine-readable supersedes field â€” old record deactivated</td>
         </tr>
       </tbody>
     </table>
@@ -637,7 +637,7 @@
 
     <p>The argument is narrower: <strong>documentation is not a governance system, and treating it as one creates a false sense of safety.</strong> When a team believes their ADR wiki is enforcing architectural decisions in the AI coding workflow, they are not protected against the violations they think they are.</p>
 
-    <p>The right stack is both: documentation for human understanding and institutional memory, decision memory for machine-readable constraint enforcement. The two are complementary, not competing. Mneme is designed to sit alongside your documentation — it enforces the enforceable subset of your architectural decisions without asking you to stop writing ADRs.</p>
+    <p>The right stack is both: documentation for human understanding and institutional memory, decision memory for machine-readable constraint enforcement. The two are complementary, not competing. Mneme is designed to sit alongside your documentation â€” it enforces the enforceable subset of your architectural decisions without asking you to stop writing ADRs.</p>
 
   </div>
 
@@ -645,41 +645,41 @@
     <h2>Frequently asked questions</h2>
     <details>
       <summary>What is the difference between decision memory and documentation?</summary>
-      <div class="faq-body">Documentation surfaces information — it is read by humans (or retrieved for AI context). Decision memory enforces constraints — it is a structured corpus of authoritative decisions that a governance system evaluates generated code against. Documentation answers "what does our system do?" Decision memory answers "what must every AI coding agent comply with?" The distinction matters because you cannot build enforcement on top of documentation retrieval.</div>
+      <div class="faq-body">Documentation surfaces information â€” it is read by humans (or retrieved for AI context). Decision memory enforces constraints â€” it is a structured corpus of authoritative decisions that a governance system evaluates generated code against. Documentation answers "what does our system do?" Decision memory answers "what must every AI coding agent comply with?" The distinction matters because you cannot build enforcement on top of documentation retrieval.</div>
     </details>
     <details>
       <summary>Can you use wiki pages or ADR files directly as a governance corpus?</summary>
-      <div class="faq-body">Not directly. Raw documentation lacks the structural fields required for governance: scope patterns (which files does this apply to?), status (is this decision still active?), supersedes (which older decision does this replace?), priority tier (what wins when two decisions conflict?), and constraint text (what exactly must the AI comply with?). Mneme's ADR import integration reads existing ADR files and extracts a Constraints section into structured decision records — converting documentation into decision memory without rewriting the ADRs.</div>
+      <div class="faq-body">Not directly. Raw documentation lacks the structural fields required for governance: scope patterns (which files does this apply to?), status (is this decision still active?), supersedes (which older decision does this replace?), priority tier (what wins when two decisions conflict?), and constraint text (what exactly must the AI comply with?). Mneme's ADR import integration reads existing ADR files and extracts a Constraints section into structured decision records â€” converting documentation into decision memory without rewriting the ADRs.</div>
     </details>
     <details>
       <summary>What makes a decision record different from a documentation page?</summary>
-      <div class="faq-body">A decision record is a typed, schema-validated object with fields for: id (unique identifier), type (decision/rule/anti_pattern), title, status (active/superseded/deprecated), scope (glob pattern for applicable file paths), supersedes (IDs this record replaces), priority tier (org/project/feature), tags (explicit retrieval signals), content (rationale prose), and constraint (the enforced rule text). A documentation page has none of this structure — it is free-form prose that can be retrieved but not evaluated against.</div>
+      <div class="faq-body">A decision record is a typed, schema-validated object with fields for: id (unique identifier), type (decision/rule/anti_pattern), title, status (active/superseded/deprecated), scope (glob pattern for applicable file paths), supersedes (IDs this record replaces), priority tier (org/project/feature), tags (explicit retrieval signals), content (rationale prose), and constraint (the enforced rule text). A documentation page has none of this structure â€” it is free-form prose that can be retrieved but not evaluated against.</div>
     </details>
     <details>
       <summary>What is precedence resolution and why does it require decision memory?</summary>
-      <div class="faq-body">Precedence resolution is the process of determining which decision wins when two decisions conflict — for example, an org-level "use PostgreSQL" rule versus a project-level "approved SQLite exception." The governance system must determine which applies for a given file. This requires explicit precedence fields (org vs. project vs. feature), status checking, and supersedes relationships. Documentation has none of these fields; precedence resolution over free-form prose is undefined and left to the model's discretion.</div>
+      <div class="faq-body">Precedence resolution is the process of determining which decision wins when two decisions conflict â€” for example, an org-level "use PostgreSQL" rule versus a project-level "approved SQLite exception." The governance system must determine which applies for a given file. This requires explicit precedence fields (org vs. project vs. feature), status checking, and supersedes relationships. Documentation has none of these fields; precedence resolution over free-form prose is undefined and left to the model's discretion.</div>
     </details>
     <details>
       <summary>How does Mneme turn existing ADRs into decision memory?</summary>
-      <div class="faq-body">Mneme's ADR import integration reads any ADR file that contains a ## Constraints section. Each constraint line becomes a structured decision record in project_memory.json with the relevant scope, tags, priority, and constraint text. The rest of the ADR — context, rationale, consequences — is preserved as documentation and is not imported into the enforcement corpus. Engineers keep writing ADRs in their existing format; Mneme extracts only the enforceable constraint layer into the governance corpus.</div>
+      <div class="faq-body">Mneme's ADR import integration reads any ADR file that contains a ## Constraints section. Each constraint line becomes a structured decision record in project_memory.json with the relevant scope, tags, priority, and constraint text. The rest of the ADR â€” context, rationale, consequences â€” is preserved as documentation and is not imported into the enforcement corpus. Engineers keep writing ADRs in their existing format; Mneme extracts only the enforceable constraint layer into the governance corpus.</div>
     </details>
   </section>
 
   <h2 id="related-reading">Related reading</h2>
   <ul>
-    <li><a href="/architecture/how-retrieval-works/">How Retrieval Works in Mneme — Pipeline Deep Dive</a></li>
+    <li><a href="/architecture/how-retrieval-works/">How Retrieval Works in Mneme â€” Pipeline Deep Dive</a></li>
     <li><a href="/insights/memory-is-not-governance/">Memory Is Not Governance</a></li>
     <li><a href="/insights/why-rag-fails-for-architectural-governance/">Why RAG Fails for Architectural Governance</a></li>
     <li><a href="/integrations/adr-import/">ADR Import Integration</a></li>
   </ul>
 
   <footer class="article-footer">
-    <a href="/docs/" class="back-link">← Back to Docs</a>
+    <a href="/docs/" class="back-link">â† Back to Docs</a>
 
     <div class="cta-block">
       <h3>Add enforcement to the ADRs you already have</h3>
       <p>The ADR import integration adds a Constraints section to your existing ADRs and compiles them into the Mneme enforcement corpus. No rewrite, no new format.</p>
-      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub →</a>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub â†’</a>
     </div>
   </footer>
 </article>

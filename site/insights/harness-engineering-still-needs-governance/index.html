@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Harness Engineering Still Needs Governance — Mneme HQ</title>
+  <title>Harness Engineering Still Needs Governance â€” Mneme HQ</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
   <meta name="description" content="Harness engineering solves execution, orchestration, retries, and tool use. It does not enforce architectural intent. Governance is the missing layer in long-running agent systems." />
@@ -34,7 +34,7 @@
     :root {
       --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
       --border: #222226; --border2: #2e2e34;
-      --text: #e8e8ec; --muted: #88889a;
+      --text: #e8e8ec; --muted: #a8a8b8;
       --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
     }
     html { scroll-behavior: smooth; }
@@ -113,14 +113,14 @@
     .breadcrumb a:hover { color: var(--text); }
     .breadcrumb [aria-current="page"] { color: var(--text); }
 
-    .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin: 0 0 3rem; }
-    .toc .toc-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.9rem; }
-    .toc ol { list-style: none; counter-reset: toc; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 0.45rem; }
-    .toc ol li { counter-increment: toc; font-size: 0.85rem; padding-left: 2.2rem; position: relative; line-height: 1.5; }
-    .toc ol li::before { content: counter(toc, decimal-leading-zero); position: absolute; left: 0; top: 0.05rem; font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--border2); letter-spacing: 0.05em; }
-    .toc a { color: var(--muted); text-decoration: none; transition: color 0.15s; }
+    .toc { position: static; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 0.9rem 1.25rem; margin: 0 0 2rem; }
+    .toc .toc-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.55rem; }
+    .toc ol { list-style: none; counter-reset: toc; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 0.25rem; }
+    .toc ol li { counter-increment: toc; font-size: 0.78rem; padding-left: 1.9rem; position: relative; line-height: 1.5; }
+    .toc ol li::before { content: counter(toc, decimal-leading-zero); position: absolute; left: 0; top: 0.05rem; font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.05em; }
+    .toc a { color: var(--text); text-decoration: none; transition: color 0.15s; }
     .toc a:hover { color: var(--accent); }
-    @media (min-width: 720px) { .toc ol { grid-template-columns: 1fr 1fr; gap: 0.55rem 1.5rem; } }
+    @media (min-width: 720px) { .toc ol { grid-template-columns: 1fr 1fr; gap: 0.3rem 1.25rem; } }
 
     .figure { margin: 2.5rem 0; }
     .figure svg { display: block; width: 100%; height: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }

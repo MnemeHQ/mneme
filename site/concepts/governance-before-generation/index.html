@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Governance Before Generation — Mneme HQ Concepts</title>
+  <title>Governance Before Generation â€” Mneme HQ Concepts</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
@@ -14,12 +14,12 @@
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Governance Before Generation — Mneme HQ Concepts" />
+  <meta property="og:title" content="Governance Before Generation â€” Mneme HQ Concepts" />
   <meta property="og:description" content="Governance before generation means enforcing architectural constraints before the AI writes code, not after it reaches review. The enforcement point is the strategic variable." />
   <meta property="og:url" content="https://mnemehq.com/concepts/governance-before-generation/" />
   <meta property="og:image" content="https://mnemehq.com/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Governance Before Generation — Mneme HQ Concepts" />
+  <meta name="twitter:title" content="Governance Before Generation â€” Mneme HQ Concepts" />
   <meta name="twitter:description" content="Governance before generation means enforcing architectural constraints before the AI writes code, not after it reaches review. The enforcement point is the strategic variable." />
   <meta name="twitter:image" content="https://mnemehq.com/og.png" />
   <meta name="author" content="Theo Valmis" />
@@ -39,7 +39,7 @@
     :root {
       --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
       --border: #222226; --border2: #2e2e34;
-      --text: #e8e8ec; --muted: #88889a;
+      --text: #e8e8ec; --muted: #a8a8b8;
       --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
     }
     html { scroll-behavior: smooth; }
@@ -99,7 +99,7 @@
     .article-faq summary { padding: 1rem 1.25rem; cursor: pointer; font-size: 0.88rem; color: var(--text); background: var(--surface); list-style: none; }
     .article-faq summary::-webkit-details-marker { display: none; }
     .article-faq summary::before { content: '+ '; color: var(--accent); }
-    .article-faq details[open] summary::before { content: '− '; }
+    .article-faq details[open] summary::before { content: 'âˆ’ '; }
     .article-faq details[open] summary { border-bottom: 1px solid var(--border); }
     .article-faq .faq-body { padding: 1.25rem; font-size: 0.86rem; color: var(--muted); line-height: 1.85; }
     .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
@@ -242,7 +242,7 @@
       },
       {
         "@type": "TechArticle",
-        "headline": "Governance Before Generation — Mneme HQ Concepts",
+        "headline": "Governance Before Generation â€” Mneme HQ Concepts",
         "description": "Governance before generation means enforcing architectural constraints before the AI writes code, not after it reaches review. The enforcement point is the strategic variable.",
         "url": "https://mnemehq.com/concepts/governance-before-generation/",
         "datePublished": "2026-05-14",
@@ -260,17 +260,17 @@
           {
             "@type": "Question",
             "name": "What does 'governance before generation' mean?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Governance before generation means that architectural constraints are evaluated and injected into the AI agent's context before it writes a single line of code — not caught in CI, not flagged in PR review, not corrected after the fact. The enforcement point is the moment of AI intent, before output. This is structurally different from post-generation enforcement: the constraint shapes what the AI proposes rather than rejecting what it already produced."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Governance before generation means that architectural constraints are evaluated and injected into the AI agent's context before it writes a single line of code â€” not caught in CI, not flagged in PR review, not corrected after the fact. The enforcement point is the moment of AI intent, before output. This is structurally different from post-generation enforcement: the constraint shapes what the AI proposes rather than rejecting what it already produced."}
           },
           {
             "@type": "Question",
             "name": "Why does the enforcement point matter?",
-            "acceptedAnswer": {"@type": "Answer", "text": "The enforcement point determines whether governance is a shaping force or a reactive gate. Pre-generation enforcement changes what the AI proposes — the agent receives the constraint before writing and produces code shaped by it. Post-generation enforcement (CI, review) catches violations after the AI has already committed to architectural choices: which patterns to use, which dependencies to introduce, which services to call. Reversing those choices after the fact is always more costly than not making them in the first place."}
+            "acceptedAnswer": {"@type": "Answer", "text": "The enforcement point determines whether governance is a shaping force or a reactive gate. Pre-generation enforcement changes what the AI proposes â€” the agent receives the constraint before writing and produces code shaped by it. Post-generation enforcement (CI, review) catches violations after the AI has already committed to architectural choices: which patterns to use, which dependencies to introduce, which services to call. Reversing those choices after the fact is always more costly than not making them in the first place."}
           },
           {
             "@type": "Question",
             "name": "Isn't CI/CD enforcement equivalent to pre-generation governance?",
-            "acceptedAnswer": {"@type": "Answer", "text": "No. CI/CD enforcement is post-generation: it evaluates code after the AI wrote it, after the developer staged it, after the PR was opened. The constraint fires too late to shape the output. Pre-generation governance fires at the moment of AI intent — before the tool writes to disk. The difference is not just timing; it's outcome. Post-generation enforcement means the AI still writes the wrong thing, developers still spend time on the violation, and the review or CI step still consumes capacity. Pre-generation enforcement prevents the violation from existing."}
+            "acceptedAnswer": {"@type": "Answer", "text": "No. CI/CD enforcement is post-generation: it evaluates code after the AI wrote it, after the developer staged it, after the PR was opened. The constraint fires too late to shape the output. Pre-generation governance fires at the moment of AI intent â€” before the tool writes to disk. The difference is not just timing; it's outcome. Post-generation enforcement means the AI still writes the wrong thing, developers still spend time on the violation, and the review or CI step still consumes capacity. Pre-generation enforcement prevents the violation from existing."}
           },
           {
             "@type": "Question",
@@ -280,7 +280,7 @@
           {
             "@type": "Question",
             "name": "What happens without governance before generation?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Without governance before generation, the enforcement burden falls entirely on post-generation processes: code review, CI linting, and PR checklists. At human generation speeds, this is manageable — the violation rate is low enough that review can catch most issues. At AI generation speeds, it fails: the volume of output overwhelms review capacity, violations slip through, and those that are caught still consumed reviewer attention that could have been directed at logic and product decisions. The codebase drifts architecturally, and the drift compounds as downstream agents build on drifted patterns."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Without governance before generation, the enforcement burden falls entirely on post-generation processes: code review, CI linting, and PR checklists. At human generation speeds, this is manageable â€” the violation rate is low enough that review can catch most issues. At AI generation speeds, it fails: the volume of output overwhelms review capacity, violations slip through, and those that are caught still consumed reviewer attention that could have been directed at logic and product decisions. The codebase drifts architecturally, and the drift compounds as downstream agents build on drifted patterns."}
           }
         ]
       },
@@ -317,7 +317,7 @@
 
 <main>
 <div class="answer-capsule">
-  <strong>Governance before generation.</strong> Architectural constraints evaluated and injected before the AI agent writes a single line — not caught in CI, not flagged in PR review. The enforcement point is the strategic variable. Move it upstream of generation and the entire output changes.
+  <strong>Governance before generation.</strong> Architectural constraints evaluated and injected before the AI agent writes a single line â€” not caught in CI, not flagged in PR review. The enforcement point is the strategic variable. Move it upstream of generation and the entire output changes.
 </div>
 
 <nav aria-label="Breadcrumb" class="breadcrumb-nav">
@@ -333,7 +333,7 @@
     <div class="article-eyebrow">
       <span class="eyebrow-tag">Concepts</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">11 min read &nbsp;·&nbsp; May 2026</span>
+      <span class="eyebrow-meta">11 min read &nbsp;Â·&nbsp; May 2026</span>
     </div>
     <h1>Governance Before Generation</h1>
     <p class="article-lede">Where in the development pipeline you enforce architectural constraints determines whether governance is a bottleneck or a multiplier. Governance before generation means enforcement happens at the moment of AI intent, not at the moment of human review.</p>
@@ -346,9 +346,9 @@
 
   <div class="article-body">
 
-    <p>The phrase "governance before generation" describes a specific enforcement posture — a choice about <em>where</em> in the AI development pipeline architectural constraints are applied. It is not about whether governance happens. It is about the only enforcement point that can shape AI output rather than react to it.</p>
+    <p>The phrase "governance before generation" describes a specific enforcement posture â€” a choice about <em>where</em> in the AI development pipeline architectural constraints are applied. It is not about whether governance happens. It is about the only enforcement point that can shape AI output rather than react to it.</p>
 
-    <p>That distinction — shaping versus reacting — is the structural argument this page develops. The enforcement point is not a scheduling detail. It is the variable that determines whether governance is architectural infrastructure or expensive remediation.</p>
+    <p>That distinction â€” shaping versus reacting â€” is the structural argument this page develops. The enforcement point is not a scheduling detail. It is the variable that determines whether governance is architectural infrastructure or expensive remediation.</p>
 
     <figure class="diagram-figure" aria-labelledby="gbg-diag-title">
       <svg viewBox="0 0 800 340" role="img" aria-labelledby="gbg-diag-title gbg-diag-desc" xmlns="http://www.w3.org/2000/svg">
@@ -356,7 +356,7 @@
         <desc id="gbg-diag-desc">Two parallel pipelines: the upper one places enforcement before generation and produces shaped output. The lower one places enforcement after generation as review and accumulates rework.</desc>
         <g>
           <!-- Top pipeline: BEFORE -->
-          <text x="40" y="32" class="diag-accent-text">▲ ENFORCEMENT BEFORE GENERATION · shapes output</text>
+          <text x="40" y="32" class="diag-accent-text">â–² ENFORCEMENT BEFORE GENERATION Â· shapes output</text>
 
           <rect x="40" y="48" width="110" height="54" rx="6" class="diag-box"/>
           <text x="95" y="72" text-anchor="middle" class="diag-text">Intent</text>
@@ -391,7 +391,7 @@
           <line x1="40" y1="148" x2="760" y2="148" stroke="#222226"/>
 
           <!-- Bottom pipeline: AFTER -->
-          <text x="40" y="178" class="diag-bad">▼ ENFORCEMENT AFTER GENERATION · reacts to output, accumulates rework</text>
+          <text x="40" y="178" class="diag-bad">â–¼ ENFORCEMENT AFTER GENERATION Â· reacts to output, accumulates rework</text>
 
           <rect x="40" y="194" width="110" height="54" rx="6" class="diag-box"/>
           <text x="95" y="218" text-anchor="middle" class="diag-text">Intent</text>
@@ -426,10 +426,10 @@
           <!-- Rework loop -->
           <path d="M 625 248 Q 625 290 485 290 Q 355 290 355 248" class="diag-arrow" stroke-dasharray="4 4"/>
           <polygon points="350,245 360,245 355,252" fill="#88889a"/>
-          <text x="490" y="308" class="diag-meta">rework loop · violations regenerated · queue depth grows with output rate</text>
+          <text x="490" y="308" class="diag-meta">rework loop Â· violations regenerated Â· queue depth grows with output rate</text>
         </g>
       </svg>
-      <figcaption class="diagram-caption"><strong>The enforcement point is the strategic variable.</strong> Moved upstream of the agent, governance shapes a single proposal. Moved downstream, governance becomes the review queue — a rework loop that scales with AI generation rate, not with team size.</figcaption>
+      <figcaption class="diagram-caption"><strong>The enforcement point is the strategic variable.</strong> Moved upstream of the agent, governance shapes a single proposal. Moved downstream, governance becomes the review queue â€” a rework loop that scales with AI generation rate, not with team size.</figcaption>
     </figure>
 
     <h2>What governance before generation actually means</h2>
@@ -438,19 +438,19 @@
 
     <p><strong>Pre-generation enforcement</strong> means the governance system fires before the agent writes. The sequence becomes: intent forms, governance evaluates and injects constraints, agent runs with those constraints in context, output is produced already shaped by the constraint. The constraint influenced the proposal; it did not just evaluate it.</p>
 
-    <p><strong>Post-generation enforcement</strong> — CI linting, PR review, audit tooling — means the governance system fires after the agent has already written. The sequence becomes: intent forms, agent runs (without constraint context), output is produced, governance evaluates the output, violations are flagged or blocked. The constraint evaluated the proposal; it did not shape it.</p>
+    <p><strong>Post-generation enforcement</strong> â€” CI linting, PR review, audit tooling â€” means the governance system fires after the agent has already written. The sequence becomes: intent forms, agent runs (without constraint context), output is produced, governance evaluates the output, violations are flagged or blocked. The constraint evaluated the proposal; it did not shape it.</p>
 
-    <p>These produce structurally different outcomes. Pre-generation enforcement reduces violations at source. Post-generation enforcement catches violations after they exist. At human generation speeds, this difference is manageable — the volume of violations is low enough that post-generation catching is workable. At AI generation speeds, the difference compounds.</p>
+    <p>These produce structurally different outcomes. Pre-generation enforcement reduces violations at source. Post-generation enforcement catches violations after they exist. At human generation speeds, this difference is manageable â€” the volume of violations is low enough that post-generation catching is workable. At AI generation speeds, the difference compounds.</p>
 
     <div class="callout">
-      <p><strong>The enforcement point is the strategic variable.</strong> Everything else — the quality of your decision records, the precision of your retrieval, the coverage of your constraints — is multiplied or divided by where enforcement fires. Pre-generation enforcement multiplies; post-generation enforcement divides attention.</p>
+      <p><strong>The enforcement point is the strategic variable.</strong> Everything else â€” the quality of your decision records, the precision of your retrieval, the coverage of your constraints â€” is multiplied or divided by where enforcement fires. Pre-generation enforcement multiplies; post-generation enforcement divides attention.</p>
     </div>
 
     <h2>Why this problem exists in AI-native development</h2>
 
     <p>The enforcement-point problem is not new to software teams. Static analysis, linting, and pre-commit hooks all represent an understanding that catching violations earlier is cheaper than catching them later. The question has always been: how early can you push the enforcement point?</p>
 
-    <p>For human developers, the answer was: pre-commit, at most. Human developers can internalize constraints, read documentation, and apply architectural knowledge as they write. Pre-generation enforcement — injecting constraints before the developer types — was not meaningfully possible because the developer was already doing it mentally.</p>
+    <p>For human developers, the answer was: pre-commit, at most. Human developers can internalize constraints, read documentation, and apply architectural knowledge as they write. Pre-generation enforcement â€” injecting constraints before the developer types â€” was not meaningfully possible because the developer was already doing it mentally.</p>
 
     <p>AI agents do not internalize constraints. They generate code based on training distribution, task prompt, and whatever context is present in the active window at generation time. If the constraint is not in that context, the agent does not apply it. It is not failure to comply; it is absence of information. The agent literally does not know the constraint exists unless it is injected.</p>
 
@@ -474,17 +474,17 @@
         <tr>
           <td>Pre-commit / CI lint</td>
           <td>Whether code is staged or merged</td>
-          <td>Violations written, then caught — costs reviewer time</td>
+          <td>Violations written, then caught â€” costs reviewer time</td>
         </tr>
         <tr>
           <td>PR review</td>
           <td>Whether code is merged</td>
-          <td>Violations written, reviewed, disputed, revised — highest cost</td>
+          <td>Violations written, reviewed, disputed, revised â€” highest cost</td>
         </tr>
         <tr>
           <td>Post-merge audit</td>
           <td>Codebase at rest</td>
-          <td>Violations already in production — remediation required</td>
+          <td>Violations already in production â€” remediation required</td>
         </tr>
       </tbody>
     </table>
@@ -494,17 +494,17 @@
 
     <h2>The common misread: treating post-generation enforcement as equivalent</h2>
 
-    <p>Teams that have invested in strong CI pipelines and thorough code review often argue that their post-generation enforcement is functionally equivalent to pre-generation governance. The reasoning: if the CI gate catches every violation and blocks every non-compliant merge, then no violations reach production — which is the goal.</p>
+    <p>Teams that have invested in strong CI pipelines and thorough code review often argue that their post-generation enforcement is functionally equivalent to pre-generation governance. The reasoning: if the CI gate catches every violation and blocks every non-compliant merge, then no violations reach production â€” which is the goal.</p>
 
     <p>This argument holds for violation prevention at the codebase level. It does not hold at the level of review cost, developer feedback loops, or architectural drift velocity.</p>
 
-    <p>When the CI gate blocks a violation, someone wrote it, staged it, opened a PR, waited for CI, read the failure, understood the violation, revised the code, and re-submitted. That sequence consumed time at every step. At human generation speeds, that sequence is occasional — most PRs pass, and the violations that fail are edge cases. At AI generation speeds, that sequence fires far more frequently. The AI writes more, it writes faster, and each generation is a fresh draw from a distribution that does not know your architectural constraints unless you inject them.</p>
+    <p>When the CI gate blocks a violation, someone wrote it, staged it, opened a PR, waited for CI, read the failure, understood the violation, revised the code, and re-submitted. That sequence consumed time at every step. At human generation speeds, that sequence is occasional â€” most PRs pass, and the violations that fail are edge cases. At AI generation speeds, that sequence fires far more frequently. The AI writes more, it writes faster, and each generation is a fresh draw from a distribution that does not know your architectural constraints unless you inject them.</p>
 
     <div class="callout-teal">
       <p><strong>Post-generation enforcement catches violations after they are written. Pre-generation enforcement prevents them from being written.</strong> The CI gate is a necessary fallback. It is not a substitute for pre-generation governance. Teams that treat CI as their primary enforcement layer will find it increasingly expensive as AI generation volume grows.</p>
     </div>
 
-    <p>The second failure mode of post-generation-only enforcement is architectural drift velocity. When violations are caught post-generation, the agent's context does not update. The next generation starts from the same constraint-free state. The agent will produce similar violations again — not because it "learned" the wrong thing, but because its context for the next task does not include the lesson from the previous failure. Pre-generation enforcement injects that lesson into every generation. Post-generation enforcement has to reteach it through CI failures every time.</p>
+    <p>The second failure mode of post-generation-only enforcement is architectural drift velocity. When violations are caught post-generation, the agent's context does not update. The next generation starts from the same constraint-free state. The agent will produce similar violations again â€” not because it "learned" the wrong thing, but because its context for the next task does not include the lesson from the previous failure. Pre-generation enforcement injects that lesson into every generation. Post-generation enforcement has to reteach it through CI failures every time.</p>
 
     <h2>How this fits the AI SDLC</h2>
 
@@ -529,20 +529,20 @@
 }
 </div>
 
-    <p>The hook is not a wrapper around the agent. It is a pre-flight interception that surfaces context the agent did not have before the write intent was declared. The sequence: agent declares intent to write → hook fires → Mneme retrieves relevant decisions → decisions are injected → agent writes with constraint context in scope.</p>
+    <p>The hook is not a wrapper around the agent. It is a pre-flight interception that surfaces context the agent did not have before the write intent was declared. The sequence: agent declares intent to write â†’ hook fires â†’ Mneme retrieves relevant decisions â†’ decisions are injected â†’ agent writes with constraint context in scope.</p>
 
-    <p>For teams using CI as a secondary enforcement layer, Mneme also provides a CI mode that evaluates generated code against the full decision corpus after generation — a confirmation that what reached CI is consistent with what the hook injected before generation. The CI gate is not the primary governance enforcement; it is the audit trail that confirms the pre-generation layer worked.</p>
+    <p>For teams using CI as a secondary enforcement layer, Mneme also provides a CI mode that evaluates generated code against the full decision corpus after generation â€” a confirmation that what reached CI is consistent with what the hook injected before generation. The CI gate is not the primary governance enforcement; it is the audit trail that confirms the pre-generation layer worked.</p>
 
-    <p>This two-layer architecture — pre-generation injection as the shaping layer, CI evaluation as the audit layer — is the full implementation of governance before generation. Neither layer alone is sufficient at scale. Together, they create an enforcement surface that operates at both the moment of AI intent and the moment of merge readiness.</p>
+    <p>This two-layer architecture â€” pre-generation injection as the shaping layer, CI evaluation as the audit layer â€” is the full implementation of governance before generation. Neither layer alone is sufficient at scale. Together, they create an enforcement surface that operates at both the moment of AI intent and the moment of merge readiness.</p>
 
     <h2>Related concepts</h2>
 
     <p>Governance before generation is the enforcement posture. Three adjacent concepts describe the components that make it work:</p>
 
     <ul>
-      <li><strong>Architectural governance</strong> — the system that governance before generation implements. Governance before generation is not a product; it is a design principle about where enforcement lives. Architectural governance is the full system: decision records, retrieval, injection, and verification.</li>
-      <li><strong>Deterministic enforcement</strong> — the property that pre-generation enforcement must have to be auditable. If the same query against the same decision corpus can produce different constraint injections on different runs, governance is probabilistic and unauditable. Deterministic enforcement ensures the injection is consistent.</li>
-      <li><strong>Claude Code integration</strong> — the specific runtime surface where pre-tool-use hooks implement governance before generation for Claude Code users. The integration is the engineering realization of the concept.</li>
+      <li><strong>Architectural governance</strong> â€” the system that governance before generation implements. Governance before generation is not a product; it is a design principle about where enforcement lives. Architectural governance is the full system: decision records, retrieval, injection, and verification.</li>
+      <li><strong>Deterministic enforcement</strong> â€” the property that pre-generation enforcement must have to be auditable. If the same query against the same decision corpus can produce different constraint injections on different runs, governance is probabilistic and unauditable. Deterministic enforcement ensures the injection is consistent.</li>
+      <li><strong>Claude Code integration</strong> â€” the specific runtime surface where pre-tool-use hooks implement governance before generation for Claude Code users. The integration is the engineering realization of the concept.</li>
     </ul>
 
   </div>
@@ -551,23 +551,23 @@
     <h2>Frequently asked questions</h2>
     <details>
       <summary>What does 'governance before generation' mean?</summary>
-      <div class="faq-body">Governance before generation means that architectural constraints are evaluated and injected into the AI agent's context before it writes a single line of code — not caught in CI, not flagged in PR review, not corrected after the fact. The enforcement point is the moment of AI intent, before output. This is structurally different from post-generation enforcement: the constraint shapes what the AI proposes rather than rejecting what it already produced.</div>
+      <div class="faq-body">Governance before generation means that architectural constraints are evaluated and injected into the AI agent's context before it writes a single line of code â€” not caught in CI, not flagged in PR review, not corrected after the fact. The enforcement point is the moment of AI intent, before output. This is structurally different from post-generation enforcement: the constraint shapes what the AI proposes rather than rejecting what it already produced.</div>
     </details>
     <details>
       <summary>Why does the enforcement point matter?</summary>
-      <div class="faq-body">The enforcement point determines whether governance is a shaping force or a reactive gate. Pre-generation enforcement changes what the AI proposes — the agent receives the constraint before writing and produces code shaped by it. Post-generation enforcement (CI, review) catches violations after the AI has already committed to architectural choices: which patterns to use, which dependencies to introduce, which services to call. Reversing those choices after the fact is always more costly than not making them in the first place. At AI generation speeds, that cost difference compounds into a significant engineering drag.</div>
+      <div class="faq-body">The enforcement point determines whether governance is a shaping force or a reactive gate. Pre-generation enforcement changes what the AI proposes â€” the agent receives the constraint before writing and produces code shaped by it. Post-generation enforcement (CI, review) catches violations after the AI has already committed to architectural choices: which patterns to use, which dependencies to introduce, which services to call. Reversing those choices after the fact is always more costly than not making them in the first place. At AI generation speeds, that cost difference compounds into a significant engineering drag.</div>
     </details>
     <details>
       <summary>Isn't CI/CD enforcement equivalent to pre-generation governance?</summary>
-      <div class="faq-body">No. CI/CD enforcement is post-generation: it evaluates code after the AI wrote it, after the developer staged it, after the PR was opened. The constraint fires too late to shape the output. Pre-generation governance fires at the moment of AI intent — before the tool writes to disk. The difference is not just timing; it's outcome. Post-generation enforcement means the AI still writes the wrong thing, developers still spend time on the violation, and the review or CI step still consumes capacity. Pre-generation enforcement prevents the violation from existing.</div>
+      <div class="faq-body">No. CI/CD enforcement is post-generation: it evaluates code after the AI wrote it, after the developer staged it, after the PR was opened. The constraint fires too late to shape the output. Pre-generation governance fires at the moment of AI intent â€” before the tool writes to disk. The difference is not just timing; it's outcome. Post-generation enforcement means the AI still writes the wrong thing, developers still spend time on the violation, and the review or CI step still consumes capacity. Pre-generation enforcement prevents the violation from existing.</div>
     </details>
     <details>
       <summary>How does Mneme implement governance before generation?</summary>
-      <div class="faq-body">Mneme implements governance before generation through hook interception at the agent runtime layer. In Claude Code, this is the pre-tool-use hook: before the agent writes a file, the hook fires, Mneme retrieves the relevant decisions for the file path and task, and injects them into the agent's context. The agent then generates code with the constraint in context. Mneme also provides CI gates for post-generation enforcement as a secondary layer, but the primary enforcement point is pre-tool-use — the moment before the write.</div>
+      <div class="faq-body">Mneme implements governance before generation through hook interception at the agent runtime layer. In Claude Code, this is the pre-tool-use hook: before the agent writes a file, the hook fires, Mneme retrieves the relevant decisions for the file path and task, and injects them into the agent's context. The agent then generates code with the constraint in context. Mneme also provides CI gates for post-generation enforcement as a secondary layer, but the primary enforcement point is pre-tool-use â€” the moment before the write.</div>
     </details>
     <details>
       <summary>What happens without governance before generation?</summary>
-      <div class="faq-body">Without governance before generation, the enforcement burden falls entirely on post-generation processes: code review, CI linting, and PR checklists. At human generation speeds, this is manageable — the violation rate is low enough that review can catch most issues. At AI generation speeds, it fails: the volume of output overwhelms review capacity, violations slip through, and those that are caught still consumed reviewer attention that could have been directed at logic and product decisions. The codebase drifts architecturally, and the drift compounds as downstream agents build on drifted patterns.</div>
+      <div class="faq-body">Without governance before generation, the enforcement burden falls entirely on post-generation processes: code review, CI linting, and PR checklists. At human generation speeds, this is manageable â€” the violation rate is low enough that review can catch most issues. At AI generation speeds, it fails: the volume of output overwhelms review capacity, violations slip through, and those that are caught still consumed reviewer attention that could have been directed at logic and product decisions. The codebase drifts architecturally, and the drift compounds as downstream agents build on drifted patterns.</div>
     </details>
   </section>
 
@@ -583,12 +583,12 @@
   </aside>
 
   <footer class="article-footer">
-    <a href="/concepts/" class="back-link">← Back to Concepts</a>
+    <a href="/concepts/" class="back-link">â† Back to Concepts</a>
 
     <div class="cta-block">
       <h3>See pre-generation enforcement running live</h3>
-      <p>The Mneme demo shows the pre-tool-use hook intercepting Claude Code, retrieving decisions, and shaping generation — before a single line is written.</p>
-      <a href="/demo/" class="btn-primary">View the demo →</a>
+      <p>The Mneme demo shows the pre-tool-use hook intercepting Claude Code, retrieving decisions, and shaping generation â€” before a single line is written.</p>
+      <a href="/demo/" class="btn-primary">View the demo â†’</a>
     </div>
   </footer>
 </article>

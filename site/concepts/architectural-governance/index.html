@@ -1,26 +1,26 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Architectural Governance — Mneme HQ Concepts</title>
+  <title>Architectural Governance â€” Mneme HQ Concepts</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="Architectural governance is the system that encodes team decisions as machine-evaluable constraints enforced at the point of AI code generation — before review, before drift compounds." />
+  <meta name="description" content="Architectural governance is the system that encodes team decisions as machine-evaluable constraints enforced at the point of AI code generation â€” before review, before drift compounds." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/concepts/architectural-governance/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Architectural Governance — Mneme HQ Concepts" />
-  <meta property="og:description" content="Architectural governance is the system that encodes team decisions as machine-evaluable constraints enforced at the point of AI code generation — before review, before drift compounds." />
+  <meta property="og:title" content="Architectural Governance â€” Mneme HQ Concepts" />
+  <meta property="og:description" content="Architectural governance is the system that encodes team decisions as machine-evaluable constraints enforced at the point of AI code generation â€” before review, before drift compounds." />
   <meta property="og:url" content="https://mnemehq.com/concepts/architectural-governance/" />
   <meta property="og:image" content="https://mnemehq.com/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Architectural Governance — Mneme HQ Concepts" />
-  <meta name="twitter:description" content="Architectural governance is the system that encodes team decisions as machine-evaluable constraints enforced at the point of AI code generation — before review, before drift compounds." />
+  <meta name="twitter:title" content="Architectural Governance â€” Mneme HQ Concepts" />
+  <meta name="twitter:description" content="Architectural governance is the system that encodes team decisions as machine-evaluable constraints enforced at the point of AI code generation â€” before review, before drift compounds." />
   <meta name="twitter:image" content="https://mnemehq.com/og.png" />
   <meta name="author" content="Theo Valmis" />
   <meta property="article:published_time" content="2026-05-14T00:00:00Z" />
@@ -39,7 +39,7 @@
     :root {
       --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
       --border: #222226; --border2: #2e2e34;
-      --text: #e8e8ec; --muted: #88889a;
+      --text: #e8e8ec; --muted: #a8a8b8;
       --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
     }
     html { scroll-behavior: smooth; }
@@ -99,7 +99,7 @@
     .article-faq summary { padding: 1rem 1.25rem; cursor: pointer; font-size: 0.88rem; color: var(--text); background: var(--surface); list-style: none; }
     .article-faq summary::-webkit-details-marker { display: none; }
     .article-faq summary::before { content: '+ '; color: var(--accent); }
-    .article-faq details[open] summary::before { content: '− '; }
+    .article-faq details[open] summary::before { content: 'âˆ’ '; }
     .article-faq details[open] summary { border-bottom: 1px solid var(--border); }
     .article-faq .faq-body { padding: 1.25rem; font-size: 0.86rem; color: var(--muted); line-height: 1.85; }
     .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
@@ -239,8 +239,8 @@
       },
       {
         "@type": "TechArticle",
-        "headline": "Architectural Governance — Mneme HQ Concepts",
-        "description": "Architectural governance is the system that encodes team decisions as machine-evaluable constraints enforced at the point of AI code generation — before review, before drift compounds.",
+        "headline": "Architectural Governance â€” Mneme HQ Concepts",
+        "description": "Architectural governance is the system that encodes team decisions as machine-evaluable constraints enforced at the point of AI code generation â€” before review, before drift compounds.",
         "url": "https://mnemehq.com/concepts/architectural-governance/",
         "datePublished": "2026-05-14",
         "dateModified": "2026-05-14",
@@ -257,27 +257,27 @@
           {
             "@type": "Question",
             "name": "What is architectural governance in AI coding?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Architectural governance in AI coding is the system that encodes team architectural decisions as machine-evaluable constraints and enforces those constraints before or at the moment of AI code generation — not after. It is distinct from code review, documentation, and conventions. It is an enforcement layer: the system that evaluates what an AI agent is about to write against the decisions the team has already made, and either shapes the agent's output or blocks the violation before it reaches review."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Architectural governance in AI coding is the system that encodes team architectural decisions as machine-evaluable constraints and enforces those constraints before or at the moment of AI code generation â€” not after. It is distinct from code review, documentation, and conventions. It is an enforcement layer: the system that evaluates what an AI agent is about to write against the decisions the team has already made, and either shapes the agent's output or blocks the violation before it reaches review."}
           },
           {
             "@type": "Question",
             "name": "How is architectural governance different from code review?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Code review is a sample of AI output after it has been written. Architectural governance is the constraint layer that shapes what the AI proposes before it writes. When teams conflate the two, code review becomes the enforcement layer — but it can't scale linearly with AI output volume. Governance upstream of generation means the review layer receives architecturally coherent code, not a stream of violations that must be caught and corrected one PR at a time."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Code review is a sample of AI output after it has been written. Architectural governance is the constraint layer that shapes what the AI proposes before it writes. When teams conflate the two, code review becomes the enforcement layer â€” but it can't scale linearly with AI output volume. Governance upstream of generation means the review layer receives architecturally coherent code, not a stream of violations that must be caught and corrected one PR at a time."}
           },
           {
             "@type": "Question",
             "name": "What does an architectural governance system enforce?",
-            "acceptedAnswer": {"@type": "Answer", "text": "An architectural governance system enforces machine-readable constraints derived from team decisions: which patterns are approved, which dependencies are permitted, which services can call which, which structural rules apply to which file paths. These constraints are encoded as decision records — not documentation, not style guides, but evaluable rules that a governance system can check against AI-generated code automatically."}
+            "acceptedAnswer": {"@type": "Answer", "text": "An architectural governance system enforces machine-readable constraints derived from team decisions: which patterns are approved, which dependencies are permitted, which services can call which, which structural rules apply to which file paths. These constraints are encoded as decision records â€” not documentation, not style guides, but evaluable rules that a governance system can check against AI-generated code automatically."}
           },
           {
             "@type": "Question",
             "name": "Why can't prompt engineering substitute for architectural governance?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Prompt engineering shapes a single generation context. Architectural governance enforces constraints across every generation, every agent, every session — consistently and without requiring the human to re-specify constraints each time. Prompts are ephemeral; governance is persistent. Prompts can be overridden, misunderstood, or forgotten as context windows grow; governance constraints are structural and evaluated independently of what the user wrote in the prompt."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Prompt engineering shapes a single generation context. Architectural governance enforces constraints across every generation, every agent, every session â€” consistently and without requiring the human to re-specify constraints each time. Prompts are ephemeral; governance is persistent. Prompts can be overridden, misunderstood, or forgotten as context windows grow; governance constraints are structural and evaluated independently of what the user wrote in the prompt."}
           },
           {
             "@type": "Question",
             "name": "Where does architectural governance sit in the AI SDLC?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Architectural governance sits in the pre-generation layer — above the agent runtime (Claude Code, Cursor, Copilot) and below the human review layer. It is what the agent queries before writing, what the CI gate checks before merge, and what the hook fires before the agent's tool use completes. It is not part of the agent; it is the constraint layer the agent operates within."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Architectural governance sits in the pre-generation layer â€” above the agent runtime (Claude Code, Cursor, Copilot) and below the human review layer. It is what the agent queries before writing, what the CI gate checks before merge, and what the hook fires before the agent's tool use completes. It is not part of the agent; it is the constraint layer the agent operates within."}
           }
         ]
       },
@@ -314,7 +314,7 @@
 
 <main>
 <div class="answer-capsule">
-  <strong>Architectural governance for AI coding.</strong> The system that turns team decisions into machine-evaluable constraints, enforced before AI agents generate code — not reviewed after. Code review is a governance signal; architectural governance is the enforcement layer that makes code review tractable.
+  <strong>Architectural governance for AI coding.</strong> The system that turns team decisions into machine-evaluable constraints, enforced before AI agents generate code â€” not reviewed after. Code review is a governance signal; architectural governance is the enforcement layer that makes code review tractable.
 </div>
 
 <nav aria-label="Breadcrumb" class="breadcrumb-nav">
@@ -330,10 +330,10 @@
     <div class="article-eyebrow">
       <span class="eyebrow-tag">Concepts</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">12 min read &nbsp;·&nbsp; May 2026</span>
+      <span class="eyebrow-meta">12 min read &nbsp;Â·&nbsp; May 2026</span>
     </div>
     <h1>Architectural Governance</h1>
-    <p class="article-lede">AI coding agents generate code faster than human review can keep pace with. Architectural governance is the structural answer to that mismatch — not a process improvement, not a cultural norm, but an enforcement layer that sits above the agent and below the reviewer.</p>
+    <p class="article-lede">AI coding agents generate code faster than human review can keep pace with. Architectural governance is the structural answer to that mismatch â€” not a process improvement, not a cultural norm, but an enforcement layer that sits above the agent and below the reviewer.</p>
     <p class="byline">
       By <a href="/founder/">Theo Valmis</a>
       <span class="sep">&middot;</span>
@@ -343,9 +343,9 @@
 
   <div class="article-body">
 
-    <p>The term gets borrowed from traditional software engineering, where it tends to mean committees, documentation, and periodic architectural reviews. That meaning is not what matters here. In the context of AI-native development, <strong>architectural governance</strong> names a structural problem: how do you ensure that code generated by AI agents at high velocity remains consistent with the decisions your team has made — without building a review process that collapses under its own weight?</p>
+    <p>The term gets borrowed from traditional software engineering, where it tends to mean committees, documentation, and periodic architectural reviews. That meaning is not what matters here. In the context of AI-native development, <strong>architectural governance</strong> names a structural problem: how do you ensure that code generated by AI agents at high velocity remains consistent with the decisions your team has made â€” without building a review process that collapses under its own weight?</p>
 
-    <p>That is the problem this page is about. Not the term — the problem it names.</p>
+    <p>That is the problem this page is about. Not the term â€” the problem it names.</p>
 
     <figure class="diagram-figure" aria-labelledby="ag-diag-title">
       <svg viewBox="0 0 800 360" role="img" aria-labelledby="ag-diag-title ag-diag-desc" xmlns="http://www.w3.org/2000/svg">
@@ -353,54 +353,54 @@
         <desc id="ag-diag-desc">A vertical stack of seven layers, from foundation models at the bottom up through human review at the top. The governance and architectural control layer is highlighted in the middle, between agent execution and validation.</desc>
         <g font-family="Inter, sans-serif">
           <text x="40" y="28" class="diag-accent-text">AI SDLC LAYERS</text>
-          <text x="760" y="28" text-anchor="end" class="diag-meta">below the human · above the agent</text>
+          <text x="760" y="28" text-anchor="end" class="diag-meta">below the human Â· above the agent</text>
 
           <rect x="40" y="50" width="720" height="34" rx="6" class="diag-layer"/>
-          <text x="60" y="72" class="diag-text">07 — Human review &amp; product judgment</text>
-          <text x="740" y="72" text-anchor="end" class="diag-meta">cognitive · slow · scarce</text>
+          <text x="60" y="72" class="diag-text">07 â€” Human review &amp; product judgment</text>
+          <text x="740" y="72" text-anchor="end" class="diag-meta">cognitive Â· slow Â· scarce</text>
 
           <rect x="40" y="92" width="720" height="34" rx="6" class="diag-layer"/>
-          <text x="60" y="114" class="diag-text">06 — Validation, tests, CI gates</text>
+          <text x="60" y="114" class="diag-text">06 â€” Validation, tests, CI gates</text>
           <text x="740" y="114" text-anchor="end" class="diag-meta">post-generation</text>
 
           <rect x="40" y="134" width="720" height="44" rx="6" class="diag-layer-active"/>
-          <text x="60" y="151" class="diag-text">05 — Governance &amp; architectural control</text>
-          <text x="60" y="168" class="diag-accent-text">decision corpus · pre-tool-use hooks · CI gates · verification contracts</text>
-          <text x="740" y="160" text-anchor="end" class="diag-accent-text">▲ enforcement layer</text>
+          <text x="60" y="151" class="diag-text">05 â€” Governance &amp; architectural control</text>
+          <text x="60" y="168" class="diag-accent-text">decision corpus Â· pre-tool-use hooks Â· CI gates Â· verification contracts</text>
+          <text x="740" y="160" text-anchor="end" class="diag-accent-text">â–² enforcement layer</text>
 
           <rect x="40" y="186" width="720" height="34" rx="6" class="diag-layer"/>
-          <text x="60" y="208" class="diag-text">04 — Tooling &amp; execution (read, write, run)</text>
+          <text x="60" y="208" class="diag-text">04 â€” Tooling &amp; execution (read, write, run)</text>
           <text x="740" y="208" text-anchor="end" class="diag-meta">tool calls</text>
 
           <rect x="40" y="228" width="720" height="34" rx="6" class="diag-layer"/>
-          <text x="60" y="250" class="diag-text">03 — Agent runtime (Claude Code, Cursor, Copilot)</text>
+          <text x="60" y="250" class="diag-text">03 â€” Agent runtime (Claude Code, Cursor, Copilot)</text>
           <text x="740" y="250" text-anchor="end" class="diag-meta">orchestration</text>
 
           <rect x="40" y="270" width="720" height="34" rx="6" class="diag-layer"/>
-          <text x="60" y="292" class="diag-text">02 — Context &amp; retrieval</text>
-          <text x="740" y="292" text-anchor="end" class="diag-meta">RAG · prompts</text>
+          <text x="60" y="292" class="diag-text">02 â€” Context &amp; retrieval</text>
+          <text x="740" y="292" text-anchor="end" class="diag-meta">RAG Â· prompts</text>
 
           <rect x="40" y="312" width="720" height="34" rx="6" class="diag-layer"/>
-          <text x="60" y="334" class="diag-text">01 — Foundation models</text>
-          <text x="740" y="334" text-anchor="end" class="diag-meta">probabilistic · non-deterministic</text>
+          <text x="60" y="334" class="diag-text">01 â€” Foundation models</text>
+          <text x="740" y="334" text-anchor="end" class="diag-meta">probabilistic Â· non-deterministic</text>
         </g>
       </svg>
-      <figcaption class="diagram-caption"><strong>Governance is layer 5.</strong> Above the agent's runtime and tool execution, below validation and human review. It is the constraint layer the agent operates within — not part of the agent, not part of the review.</figcaption>
+      <figcaption class="diagram-caption"><strong>Governance is layer 5.</strong> Above the agent's runtime and tool execution, below validation and human review. It is the constraint layer the agent operates within â€” not part of the agent, not part of the review.</figcaption>
     </figure>
 
     <h2>What architectural governance actually means</h2>
 
-    <p>Governance is not review. It is not documentation. It is not a set of conventions your team maintains in a Confluence page or a style guide. These are all proxies for governance — they encode intent, but they don't enforce it.</p>
+    <p>Governance is not review. It is not documentation. It is not a set of conventions your team maintains in a Confluence page or a style guide. These are all proxies for governance â€” they encode intent, but they don't enforce it.</p>
 
     <p><strong>Architectural governance, properly construed, is the system that evaluates AI-generated code against machine-readable constraints before that code reaches human review.</strong> The key word is "before." Enforcement before generation changes what gets written. Enforcement after generation (code review, CI linting, PR checklists) catches what was already written. These produce fundamentally different outcomes at scale.</p>
 
-    <p>The distinction matters structurally, not just philosophically. When you enforce architectural constraints before code is generated, the AI agent receives the constraint as context and produces code shaped by it. When you enforce after generation, the AI agent produces code based on its training, the prompt, and whatever context it was given — and a human then reviews whether the result is acceptable. The review is a gate. The pre-generation enforcement is a shaping force.</p>
+    <p>The distinction matters structurally, not just philosophically. When you enforce architectural constraints before code is generated, the AI agent receives the constraint as context and produces code shaped by it. When you enforce after generation, the AI agent produces code based on its training, the prompt, and whatever context it was given â€” and a human then reviews whether the result is acceptable. The review is a gate. The pre-generation enforcement is a shaping force.</p>
 
     <div class="callout">
-      <p><strong>Governance is the enforcement layer, not the enforcement event.</strong> A single code review is an enforcement event. A governance system is the layer that determines what code reaches review in the first place — and what constraints were already applied before it got there.</p>
+      <p><strong>Governance is the enforcement layer, not the enforcement event.</strong> A single code review is an enforcement event. A governance system is the layer that determines what code reaches review in the first place â€” and what constraints were already applied before it got there.</p>
     </div>
 
-    <p>A governance system in this sense has specific components: decision records (the encoded constraints), a retrieval mechanism (which decisions apply to the current code context), an injection layer (delivering those decisions to the agent before generation), and a verification layer (checking that the output respects the injected constraints). These are not metaphors — they are engineering components with specific responsibilities.</p>
+    <p>A governance system in this sense has specific components: decision records (the encoded constraints), a retrieval mechanism (which decisions apply to the current code context), an injection layer (delivering those decisions to the agent before generation), and a verification layer (checking that the output respects the injected constraints). These are not metaphors â€” they are engineering components with specific responsibilities.</p>
 
     <h2>Why this problem exists in AI-native development</h2>
 
@@ -423,7 +423,7 @@
         <tr>
           <td>Generation rate</td>
           <td>Linear with team size</td>
-          <td>10–100x per engineer</td>
+          <td>10â€“100x per engineer</td>
         </tr>
         <tr>
           <td>Review capacity</td>
@@ -437,8 +437,8 @@
         </tr>
         <tr>
           <td>Drift risk</td>
-          <td>Low — violations are infrequent</td>
-          <td>High — violations compound faster than review catches</td>
+          <td>Low â€” violations are infrequent</td>
+          <td>High â€” violations compound faster than review catches</td>
         </tr>
         <tr>
           <td>Governance approach</td>
@@ -449,7 +449,7 @@
     </table>
     </div>
 
-    <p>When generation rate exceeds review capacity by an order of magnitude, governance-by-review fails. The review queue becomes the bottleneck, but — more importantly — it becomes a sampling mechanism, not a comprehensive gate. Reviewers see a fraction of AI output. Violations that slip through are not anomalies; they are expected outcomes of any process that relies on human review to catch machine-speed output.</p>
+    <p>When generation rate exceeds review capacity by an order of magnitude, governance-by-review fails. The review queue becomes the bottleneck, but â€” more importantly â€” it becomes a sampling mechanism, not a comprehensive gate. Reviewers see a fraction of AI output. Violations that slip through are not anomalies; they are expected outcomes of any process that relies on human review to catch machine-speed output.</p>
 
     <p>Architectural governance is the structural answer to this. Not a faster review process. Not a larger review team. A constraint layer that operates at generation speed, shapes what the agent proposes, and makes the review layer tractable by reducing the violation rate before review occurs.</p>
 
@@ -457,9 +457,9 @@
 
     <p>The most common failure mode teams fall into without a clear understanding of architectural governance is treating code review as the governance layer. The reasoning is intuitive: code review catches violations, code review is mandatory, therefore code review is governance. This is the misread.</p>
 
-    <p>Code review is a <em>sample</em> of AI output. Even a 100% PR-review policy means every PR is reviewed — it does not mean every architectural decision the AI made within that PR was evaluated against the team's constraints. A PR can pass code review and still contain architectural violations that reviewers didn't catch, didn't know to look for, or deprioritized under time pressure.</p>
+    <p>Code review is a <em>sample</em> of AI output. Even a 100% PR-review policy means every PR is reviewed â€” it does not mean every architectural decision the AI made within that PR was evaluated against the team's constraints. A PR can pass code review and still contain architectural violations that reviewers didn't catch, didn't know to look for, or deprioritized under time pressure.</p>
 
-    <p>More fundamentally: code review happens after the AI has already made architectural choices. Which patterns to use. Which services to call. Which dependencies to introduce. Which abstractions to build on. By the time the PR is open, those choices are already committed — and reversing them is costly. Review can block the merge, but it cannot undo the architectural commitments already embedded in the diff.</p>
+    <p>More fundamentally: code review happens after the AI has already made architectural choices. Which patterns to use. Which services to call. Which dependencies to introduce. Which abstractions to build on. By the time the PR is open, those choices are already committed â€” and reversing them is costly. Review can block the merge, but it cannot undo the architectural commitments already embedded in the diff.</p>
 
     <div class="callout-teal">
       <p><strong>When teams conflate code review with architectural governance,</strong> the review queue fills with architectural violations that should never have been generated. Reviewers spend their attention on structural problems the AI created, rather than on the logic and product decisions that require human judgment. The cognitive load of governance crowds out the cognitive load of review.</p>
@@ -469,22 +469,22 @@
 
     <h2>How this fits the AI SDLC</h2>
 
-    <p>Architectural governance sits at a specific layer in the AI software development lifecycle. Understanding where it lives — and what it does not do — is necessary for implementing it correctly.</p>
+    <p>Architectural governance sits at a specific layer in the AI software development lifecycle. Understanding where it lives â€” and what it does not do â€” is necessary for implementing it correctly.</p>
 
-    <p>The AI SDLC has a layered structure. At the foundation: the foundation models that generate code. Above that: the context and retrieval systems that shape what those models see. Above that: the agent runtime — Claude Code, Cursor, Copilot, or equivalent. Above that: the tooling and execution layer where the agent reads files, runs tests, calls APIs. Above that: the <strong>governance and architectural control layer</strong>. Above that: validation and evaluation. Above that: human oversight.</p>
+    <p>The AI SDLC has a layered structure. At the foundation: the foundation models that generate code. Above that: the context and retrieval systems that shape what those models see. Above that: the agent runtime â€” Claude Code, Cursor, Copilot, or equivalent. Above that: the tooling and execution layer where the agent reads files, runs tests, calls APIs. Above that: the <strong>governance and architectural control layer</strong>. Above that: validation and evaluation. Above that: human oversight.</p>
 
-    <p>Governance sits at layer 5 — above agent execution, below human review. In practice, that means:</p>
+    <p>Governance sits at layer 5 â€” above agent execution, below human review. In practice, that means:</p>
 
     <ul>
       <li><strong>Pre-generation hooks:</strong> The governance system intercepts the agent's tool-use intent before execution. In Claude Code, this is the pre-tool-use hook. In Cursor, this is rules injection before generation. The hook surfaces the relevant decision records to the agent's context before it writes.</li>
-      <li><strong>CI gates:</strong> The governance system runs as a CI step, evaluating generated code against encoded constraints before merge. This is post-generation enforcement, but it is pre-production — a merge gate rather than a review proxy.</li>
-      <li><strong>Decision memory:</strong> The governance layer requires a persistent, structured record of architectural decisions — not documentation, not ADRs as prose, but machine-readable decision records that the retrieval system can score and inject. The memory is the source of truth for constraints.</li>
+      <li><strong>CI gates:</strong> The governance system runs as a CI step, evaluating generated code against encoded constraints before merge. This is post-generation enforcement, but it is pre-production â€” a merge gate rather than a review proxy.</li>
+      <li><strong>Decision memory:</strong> The governance layer requires a persistent, structured record of architectural decisions â€” not documentation, not ADRs as prose, but machine-readable decision records that the retrieval system can score and inject. The memory is the source of truth for constraints.</li>
     </ul>
 
-    <p>What governance does not do: it does not evaluate correctness, performance, or product logic. It evaluates architectural coherence — whether the code is consistent with the decisions the team has made. Correctness and logic remain in the review layer, where human judgment is appropriate and irreplaceable.</p>
+    <p>What governance does not do: it does not evaluate correctness, performance, or product logic. It evaluates architectural coherence â€” whether the code is consistent with the decisions the team has made. Correctness and logic remain in the review layer, where human judgment is appropriate and irreplaceable.</p>
 
     <div class="callout">
-      <p><strong>The governance layer is what the agent queries before writing and what the CI gate checks before merge.</strong> It is not a wrapper around the agent, a prompt, or a linting rule. It is a structural layer with its own components, its own metrics, and its own failure modes — and it requires engineering investment proportional to the AI generation rate it governs.</p>
+      <p><strong>The governance layer is what the agent queries before writing and what the CI gate checks before merge.</strong> It is not a wrapper around the agent, a prompt, or a linting rule. It is a structural layer with its own components, its own metrics, and its own failure modes â€” and it requires engineering investment proportional to the AI generation rate it governs.</p>
     </div>
 
     <p>Teams that invest in a governance layer before scaling AI-assisted development report two consistent outcomes: review queue depth decreases (fewer violations reaching review), and architectural coherence is maintained at generation volumes that would otherwise produce visible drift within weeks. Teams that skip the governance layer and rely on review consistently report the opposite: review becomes the bottleneck, reviewers flag the same classes of violations repeatedly, and architectural standards erode as the team prioritizes shipping over correction.</p>
@@ -496,9 +496,9 @@
     <p>Architectural governance does not operate in isolation. Three concepts are structurally adjacent and together form the full picture of how governance works in an AI-native codebase:</p>
 
     <ul>
-      <li><strong>Governance before generation</strong> — the principle that enforcement must happen upstream of the AI's output, not downstream. Governance before generation is the specific enforcement posture that makes architectural governance effective at AI generation speeds.</li>
-      <li><strong>Deterministic enforcement</strong> — the property that the same query against the same decision corpus always produces the same enforcement result. Without determinism, governance is probabilistic and therefore unauditable.</li>
-      <li><strong>Architectural drift</strong> — what happens in the absence of governance. Drift is compound degradation: violations that propagate and amplify across sessions, agents, and services. Governance prevents drift by enforcing constraints consistently before violations compound.</li>
+      <li><strong>Governance before generation</strong> â€” the principle that enforcement must happen upstream of the AI's output, not downstream. Governance before generation is the specific enforcement posture that makes architectural governance effective at AI generation speeds.</li>
+      <li><strong>Deterministic enforcement</strong> â€” the property that the same query against the same decision corpus always produces the same enforcement result. Without determinism, governance is probabilistic and therefore unauditable.</li>
+      <li><strong>Architectural drift</strong> â€” what happens in the absence of governance. Drift is compound degradation: violations that propagate and amplify across sessions, agents, and services. Governance prevents drift by enforcing constraints consistently before violations compound.</li>
     </ul>
 
   </div>
@@ -507,23 +507,23 @@
     <h2>Frequently asked questions</h2>
     <details>
       <summary>What is architectural governance in AI coding?</summary>
-      <div class="faq-body">Architectural governance in AI coding is the system that encodes team architectural decisions as machine-evaluable constraints and enforces those constraints before or at the moment of AI code generation — not after. It is distinct from code review, documentation, and conventions. It is an enforcement layer: the system that evaluates what an AI agent is about to write against the decisions the team has already made, and either shapes the agent's output or blocks the violation before it reaches review.</div>
+      <div class="faq-body">Architectural governance in AI coding is the system that encodes team architectural decisions as machine-evaluable constraints and enforces those constraints before or at the moment of AI code generation â€” not after. It is distinct from code review, documentation, and conventions. It is an enforcement layer: the system that evaluates what an AI agent is about to write against the decisions the team has already made, and either shapes the agent's output or blocks the violation before it reaches review.</div>
     </details>
     <details>
       <summary>How is architectural governance different from code review?</summary>
-      <div class="faq-body">Code review is a sample of AI output after it has been written. Architectural governance is the constraint layer that shapes what the AI proposes before it writes. When teams conflate the two, code review becomes the enforcement layer — but it can't scale linearly with AI output volume. Governance upstream of generation means the review layer receives architecturally coherent code, not a stream of violations that must be caught and corrected one PR at a time.</div>
+      <div class="faq-body">Code review is a sample of AI output after it has been written. Architectural governance is the constraint layer that shapes what the AI proposes before it writes. When teams conflate the two, code review becomes the enforcement layer â€” but it can't scale linearly with AI output volume. Governance upstream of generation means the review layer receives architecturally coherent code, not a stream of violations that must be caught and corrected one PR at a time.</div>
     </details>
     <details>
       <summary>What does an architectural governance system enforce?</summary>
-      <div class="faq-body">An architectural governance system enforces machine-readable constraints derived from team decisions: which patterns are approved, which dependencies are permitted, which services can call which, which structural rules apply to which file paths. These constraints are encoded as decision records — not documentation, not style guides, but evaluable rules that a governance system can check against AI-generated code automatically and consistently across every agent and every session.</div>
+      <div class="faq-body">An architectural governance system enforces machine-readable constraints derived from team decisions: which patterns are approved, which dependencies are permitted, which services can call which, which structural rules apply to which file paths. These constraints are encoded as decision records â€” not documentation, not style guides, but evaluable rules that a governance system can check against AI-generated code automatically and consistently across every agent and every session.</div>
     </details>
     <details>
       <summary>Why can't prompt engineering substitute for architectural governance?</summary>
-      <div class="faq-body">Prompt engineering shapes a single generation context. Architectural governance enforces constraints across every generation, every agent, every session — consistently and without requiring the human to re-specify constraints each time. Prompts are ephemeral; governance is persistent. Prompts can be overridden, misunderstood, or forgotten as context windows grow; governance constraints are structural and evaluated independently of what the user wrote in the prompt. Prompt engineering is a tool for a single interaction; governance is an infrastructure layer for the codebase over time.</div>
+      <div class="faq-body">Prompt engineering shapes a single generation context. Architectural governance enforces constraints across every generation, every agent, every session â€” consistently and without requiring the human to re-specify constraints each time. Prompts are ephemeral; governance is persistent. Prompts can be overridden, misunderstood, or forgotten as context windows grow; governance constraints are structural and evaluated independently of what the user wrote in the prompt. Prompt engineering is a tool for a single interaction; governance is an infrastructure layer for the codebase over time.</div>
     </details>
     <details>
       <summary>Where does architectural governance sit in the AI SDLC?</summary>
-      <div class="faq-body">Architectural governance sits in the pre-generation layer — above the agent runtime (Claude Code, Cursor, Copilot) and below the human review layer. It is what the agent queries before writing, what the CI gate checks before merge, and what the hook fires before the agent's tool use completes. It is not part of the agent; it is the constraint layer the agent operates within. In practice, this means pre-tool-use hooks in the agent runtime, CI enforcement gates, and a persistent decision memory that the governance system queries to determine which constraints apply to the current file and task.</div>
+      <div class="faq-body">Architectural governance sits in the pre-generation layer â€” above the agent runtime (Claude Code, Cursor, Copilot) and below the human review layer. It is what the agent queries before writing, what the CI gate checks before merge, and what the hook fires before the agent's tool use completes. It is not part of the agent; it is the constraint layer the agent operates within. In practice, this means pre-tool-use hooks in the agent runtime, CI enforcement gates, and a persistent decision memory that the governance system queries to determine which constraints apply to the current file and task.</div>
     </details>
   </section>
 
@@ -539,12 +539,12 @@
   </aside>
 
   <footer class="article-footer">
-    <a href="/concepts/" class="back-link">← Back to Concepts</a>
+    <a href="/concepts/" class="back-link">â† Back to Concepts</a>
 
     <div class="cta-block">
       <h3>See governance enforcement in action</h3>
-      <p>The Mneme demo shows architectural governance running against live AI generation — hook interception, decision retrieval, and enforcement verdicts in real time.</p>
-      <a href="/demo/" class="btn-primary">View the demo →</a>
+      <p>The Mneme demo shows architectural governance running against live AI generation â€” hook interception, decision retrieval, and enforcement verdicts in real time.</p>
+      <a href="/demo/" class="btn-primary">View the demo â†’</a>
     </div>
   </footer>
 </article>

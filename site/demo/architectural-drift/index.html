@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/favicon.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Architectural drift prevention — the AI SDLC entropy demo | Mneme HQ</title>
+  <title>Architectural drift prevention â€” the AI SDLC entropy demo | Mneme HQ</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
@@ -15,12 +15,12 @@
   <link rel="canonical" href="https://mnemehq.com/demo/architectural-drift/" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Architectural drift prevention — the AI SDLC entropy demo" />
+  <meta property="og:title" content="Architectural drift prevention â€” the AI SDLC entropy demo" />
   <meta property="og:description" content="A six-step timeline. An agent proposes reasonable-looking code that violates an ADR. Downstream changes amplify the divergence. A reviewer would plausibly miss it. Mneme blocks the first divergence upstream and the system converges." />
   <meta property="og:url" content="https://mnemehq.com/demo/architectural-drift/" />
   <meta property="og:image" content="https://mnemehq.com/demo/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Architectural drift prevention — the AI SDLC entropy demo" />
+  <meta name="twitter:title" content="Architectural drift prevention â€” the AI SDLC entropy demo" />
   <meta name="twitter:description" content="A six-step timeline showing how drift compounds without a governance layer, and how Mneme blocks the first divergence upstream." />
   <meta name="twitter:image" content="https://mnemehq.com/demo/og.png" />
   <!-- Consent defaults -->
@@ -41,7 +41,7 @@
       },
       {
         "@type": "Article",
-        "headline": "Architectural drift prevention — the AI SDLC entropy demo",
+        "headline": "Architectural drift prevention â€” the AI SDLC entropy demo",
         "description": "Six-step timeline showing how drift compounds without a governance layer, and how Mneme blocks the first divergence upstream so the system converges.",
         "url": "https://mnemehq.com/demo/architectural-drift/",
         "datePublished": "2026-05-13",
@@ -59,7 +59,7 @@
     :root {
       --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
       --border: #222226; --border2: #2e2e34;
-      --text: #e8e8ec; --muted: #88889a;
+      --text: #e8e8ec; --muted: #a8a8b8;
       --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
       --pass: #c8f060; --warn: #f59e0b; --fail: #ef4444;
       --term-bad: #ff8585; --term-bg: #0a0a0d;
@@ -110,7 +110,7 @@
     .body pre { background: var(--term-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; overflow-x: auto; margin: 1.25rem 0; }
     .body pre code { background: transparent; border: none; padding: 0; font-size: 0.78rem; line-height: 1.7; color: var(--text); }
 
-    /* ── TIMELINE ── */
+    /* â”€â”€ TIMELINE â”€â”€ */
     .timeline { margin: 2rem 0 1rem; position: relative; }
     .timeline::before { content: ''; position: absolute; left: 1.05rem; top: 0.5rem; bottom: 0.5rem; width: 1px; background: var(--border2); }
     .timeline-step { display: grid; grid-template-columns: 2.5rem 1fr; gap: 0.75rem; margin-bottom: 0.65rem; position: relative; }
@@ -138,7 +138,7 @@
     .timeline-divider .td-line { flex: 1; height: 1px; background: var(--border2); }
     .timeline-divider .td-label { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
 
-    /* ── COMPARE TWO PATHS ── */
+    /* â”€â”€ COMPARE TWO PATHS â”€â”€ */
     .paths { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
     @media (max-width: 720px) { .paths { grid-template-columns: 1fr; } }
     .path-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.4rem; }
@@ -154,14 +154,14 @@
     .path-card.bad ul li::before { color: var(--fail); }
     .path-card.good ul li::before { color: var(--accent); }
 
-    /* ── CALLOUT ── */
+    /* â”€â”€ CALLOUT â”€â”€ */
     .callout { background: rgba(239,68,68,0.04); border: 1px solid rgba(239,68,68,0.2); border-left: 3px solid var(--fail); border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; }
     .callout.teal { background: rgba(139,224,200,0.05); border-color: rgba(139,224,200,0.2); border-left-color: var(--teal); }
     .callout p { color: var(--muted); font-size: 0.88rem; margin: 0; }
     .callout p strong { color: var(--text); font-weight: 500; }
     .callout.teal p strong { color: var(--teal); }
 
-    /* ── ADR PRIMER ── */
+    /* â”€â”€ ADR PRIMER â”€â”€ */
     .adr-primer { background: rgba(167,139,250,0.05); border: 1px solid rgba(167,139,250,0.18); border-left: 3px solid #a78bfa; border-radius: 8px; padding: 0.85rem 1.15rem; margin: 0 0 2.5rem; }
     .primer-key { display: block; font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: #a78bfa; margin-bottom: 0.6rem; }
     .primer-rules { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.75rem; font-size: 0.86rem; color: var(--muted); }
@@ -169,7 +169,7 @@
     .primer-what { font-size: 0.86rem; color: var(--muted); margin: 0; padding-top: 0.65rem; border-top: 1px dashed var(--border); line-height: 1.65; }
     .primer-what strong { color: var(--text); font-weight: 500; }
 
-    /* ── NEXT BAR ── */
+    /* â”€â”€ NEXT BAR â”€â”€ */
     .next-bar { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     @media (max-width: 640px) { .next-bar { grid-template-columns: 1fr; } }
     .next-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; text-decoration: none; color: inherit; transition: border-color 0.15s, transform 0.15s; display: block; }
@@ -204,7 +204,7 @@
 
     @media (max-width: 768px) { nav, .mobile-menu { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } }
 
-    /* ── TERMINAL DEMO ── */
+    /* â”€â”€ TERMINAL DEMO â”€â”€ */
     .demo-terminal-wrapper { margin: 0 0 3rem; border: 1px solid var(--border2); border-radius: 10px; overflow: hidden; background: var(--term-bg); }
     .demo-terminal-chrome { display: flex; align-items: center; gap: 0.5rem; padding: 0.65rem 1rem; background: #1a1a1e; border-bottom: 1px solid var(--border2); }
     .dtc-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
@@ -311,19 +311,19 @@
         <p class="primer-what">The demo shows how three agents accidentally violate these decisions over a week &mdash; and how <strong>Mneme blocks the first divergence</strong> before it propagates.</p>
       </div>
 
-      <!-- ── TERMINAL DEMO ── swap .demo-terminal-sim for <video> when VHS recording is ready -->
+      <!-- â”€â”€ TERMINAL DEMO â”€â”€ swap .demo-terminal-sim for <video> when VHS recording is ready -->
       <div class="demo-terminal-wrapper" id="terminal-demo" aria-label="Live terminal demo">
         <div class="demo-terminal-chrome">
           <span class="dtc-dot dtc-red"></span>
           <span class="dtc-dot dtc-yellow"></span>
           <span class="dtc-dot dtc-green"></span>
-          <span class="dtc-title">mneme-demo — bash</span>
+          <span class="dtc-title">mneme-demo â€” bash</span>
           <div class="dtc-controls">
             <button class="dtc-btn" id="term-pause-btn" aria-label="Pause animation" aria-pressed="false">
-              <span class="dtc-pause-icon" aria-hidden="true">⏸</span>
+              <span class="dtc-pause-icon" aria-hidden="true">â¸</span>
             </button>
             <button class="dtc-btn" id="term-replay-btn" aria-label="Replay animation">
-              <span aria-hidden="true">↺</span> Replay
+              <span aria-hidden="true">â†º</span> Replay
             </button>
           </div>
         </div>
@@ -338,11 +338,11 @@
         <summary>Full terminal transcript</summary>
         <pre aria-label="Terminal transcript"><code>$ claude "Simplify the check command by loading .mneme/project_memory.json directly inside check.py"
 
-↳ Mneme evaluating proposed change...
+â†³ Mneme evaluating proposed change...
 
 [MNEME] Architectural violation detected
 
-Decision:  ADR-001 — Retrieval architecture
+Decision:  ADR-001 â€” Retrieval architecture
 
 Rule:
   CLI commands must use the MemoryStore and Retriever pipeline.
@@ -652,16 +652,16 @@ python run.py</code></pre>
 </script>
   <script>
   (function(){
-    /* ── Terminal demo animation ── */
+    /* â”€â”€ Terminal demo animation â”€â”€ */
     var CMD = 'claude "Simplify the check command by loading .mneme/project_memory.json directly inside check.py"';
 
     var LINES = [
       [600,  '',                                                          'term-blank'],
-      [0,    '↳ Mneme evaluating proposed change...',               'term-muted'],
+      [0,    'â†³ Mneme evaluating proposed change...',               'term-muted'],
       [1100, '',                                                          'term-blank'],
       [0,    '[MNEME] Architectural violation detected',                  'term-header'],
       [500,  '',                                                          'term-blank'],
-      [0,    'Decision:  ADR-001 — Retrieval architecture',         'term-key'],
+      [0,    'Decision:  ADR-001 â€” Retrieval architecture',         'term-key'],
       [500,  '',                                                          'term-blank'],
       [0,    'Rule:',                                                     'term-key'],
       [180,  '  CLI commands must use the MemoryStore',                  'term-value'],
@@ -730,7 +730,7 @@ python run.py</code></pre>
       clearTimers();
       done = false; paused = false;
       pauseBtn.setAttribute('aria-pressed', 'false');
-      pauseBtn.querySelector('.dtc-pause-icon').textContent = '⏸';
+      pauseBtn.querySelector('.dtc-pause-icon').textContent = 'â¸';
       cmdEl.textContent = '';
       cursor.classList.remove('hidden');
       var promptLine = document.getElementById('term-prompt-line');
@@ -745,7 +745,7 @@ python run.py</code></pre>
       if (done) return;
       paused = !paused;
       pauseBtn.setAttribute('aria-pressed', String(paused));
-      pauseBtn.querySelector('.dtc-pause-icon').textContent = paused ? '▶' : '⏸';
+      pauseBtn.querySelector('.dtc-pause-icon').textContent = paused ? 'â–¶' : 'â¸';
       if (!paused && remaining.length) { var next = remaining.shift(); schedule(next.fn, next.delay); }
     });
 

@@ -32,7 +32,7 @@
     :root {
       --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
       --border: #222226; --border2: #2e2e34;
-      --text: #e8e8ec; --muted: #88889a;
+      --text: #e8e8ec; --muted: #a8a8b8;
       --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
     }
     html { scroll-behavior: smooth; }
@@ -69,13 +69,13 @@
     .panel-label.good { color: var(--accent); }
     .panel-body { padding: 1.25rem; font-size: 0.78rem; line-height: 1.8; color: var(--muted); }
     .panel-body.good-response { color: var(--text); }
-    .panel-prompt { color: var(--border2); margin-bottom: 0.75rem; font-size: 0.72rem; font-style: italic; }
+    .panel-prompt { color: var(--muted); margin-bottom: 0.75rem; font-size: 0.72rem; font-style: italic; }
     .rag-table-wrap { overflow-x: auto; margin: 2rem 0; }
     .rag-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
     .rag-table th { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border2); color: var(--muted); font-weight: 500; }
     .rag-table td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
     .rag-table td:first-child { color: var(--muted); }
-    .rag-table td:nth-child(2) { color: var(--text); opacity: 0.55; }
+    .rag-table td:nth-child(2) { color: var(--text); }
     .rag-table td:nth-child(3) { color: var(--teal); }
     .rag-table tr:last-child td { border-bottom: none; }
     .steps { display: flex; flex-direction: column; gap: 1.5rem; margin: 2rem 0; }

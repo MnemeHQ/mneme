@@ -60,7 +60,7 @@
     :root {
       --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
       --border: #222226; --border2: #2e2e34;
-      --text: #e8e8ec; --muted: #88889a;
+      --text: #e8e8ec; --muted: #a8a8b8;
       --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
       --warn: #ff9d6e;
     }
@@ -92,15 +92,15 @@
 
     .wrap { max-width: 880px; margin: 0 auto; padding: 3rem 2rem 4rem; font-size: 0.92rem; line-height: 1.85; }
 
-    .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin-bottom: 3rem; }
+    .toc { position: static; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 0.9rem 1.25rem; margin-bottom: 3rem; }
     .toc-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.9rem; }
     .toc ol { list-style: none; counter-reset: toc; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 0.4rem; }
-    .toc ol li { counter-increment: toc; font-size: 0.86rem; padding-left: 2.2rem; position: relative; line-height: 1.5; }
-    .toc ol li::before { content: counter(toc, decimal-leading-zero); position: absolute; left: 0; top: 0.05rem; font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--border2); letter-spacing: 0.05em; }
+    .toc ol li { counter-increment: toc; font-size: 0.86rem; padding-left: 1.9rem; position: relative; line-height: 1.5; }
+    .toc ol li::before { content: counter(toc, decimal-leading-zero); position: absolute; left: 0; top: 0.05rem; font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.05em; }
     .toc ol li.cat { padding-left: 0; font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-top: 0.65rem; }
     .toc ol li.cat:first-child { margin-top: 0; }
     .toc ol li.cat::before { content: ''; }
-    .toc a { color: var(--muted); text-decoration: none; transition: color 0.15s; }
+    .toc a { color: var(--text); text-decoration: none; transition: color 0.15s; }
     .toc a:hover { color: var(--accent); }
     @media (min-width: 720px) { .toc ol { grid-template-columns: 1fr 1fr; gap: 0.5rem 1.5rem; } }
 

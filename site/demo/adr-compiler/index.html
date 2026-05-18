@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/favicon.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The ADR compiler — turn architectural decisions into infrastructure | Mneme HQ</title>
+  <title>The ADR compiler â€” turn architectural decisions into infrastructure | Mneme HQ</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
@@ -16,12 +16,12 @@
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="The ADR compiler — turn architectural decisions into infrastructure" />
+  <meta property="og:title" content="The ADR compiler â€” turn architectural decisions into infrastructure" />
   <meta property="og:description" content="Most teams already have ADRs. They sit in docs/adr/ and are quietly ignored by every AI coding agent. The ADR compiler reads those same files and emits enforceable, precedence-aware decisions." />
   <meta property="og:url" content="https://mnemehq.com/demo/adr-compiler/" />
   <meta property="og:image" content="https://mnemehq.com/demo/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="The ADR compiler — turn architectural decisions into infrastructure" />
+  <meta name="twitter:title" content="The ADR compiler â€” turn architectural decisions into infrastructure" />
   <meta name="twitter:description" content="Most teams already have ADRs. They sit in docs/adr/ and are quietly ignored by every AI coding agent. The ADR compiler reads those same files and emits enforceable, precedence-aware decisions." />
   <meta name="twitter:image" content="https://mnemehq.com/demo/og.png" />
   <!-- Consent defaults -->
@@ -42,7 +42,7 @@
       },
       {
         "@type": "Article",
-        "headline": "The ADR compiler — turn architectural decisions into infrastructure",
+        "headline": "The ADR compiler â€” turn architectural decisions into infrastructure",
         "description": "Flagship walkthrough of Mneme's ADR compiler. Reads ADR files with optional Constraints sections and emits enforceable, precedence-aware decisions. Runnable against Mneme's own ADRs.",
         "url": "https://mnemehq.com/demo/adr-compiler/",
         "datePublished": "2026-05-13",
@@ -60,7 +60,7 @@
     :root {
       --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
       --border: #222226; --border2: #2e2e34;
-      --text: #e8e8ec; --muted: #88889a;
+      --text: #e8e8ec; --muted: #a8a8b8;
       --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
       --pass: #c8f060; --warn: #f59e0b; --fail: #ef4444;
       --term-bad: #ff8585; --term-bg: #0a0a0d;
@@ -83,7 +83,7 @@
     .breadcrumb a { color: var(--muted); text-decoration: none; }
     .breadcrumb a:hover { color: var(--text); }
 
-    /* ── PROSE SECTIONS ── */
+    /* â”€â”€ PROSE SECTIONS â”€â”€ */
     .prose-section { max-width: 880px; margin: 0 auto; padding: 2.5rem 2rem 3.5rem; }
     .prose-section + .prose-section { padding-top: 0; }
 
@@ -114,7 +114,7 @@
     .body pre { background: var(--term-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; overflow-x: auto; margin: 1.25rem 0; }
     .body pre code { background: transparent; border: none; padding: 0; font-size: 0.78rem; line-height: 1.7; color: var(--text); }
 
-    /* ── PIPELINE DIAGRAM ── */
+    /* â”€â”€ PIPELINE DIAGRAM â”€â”€ */
     .pipeline { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem 1.75rem; margin: 1.75rem 0; }
     .pipeline-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.5rem; align-items: center; font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted); }
     .pipeline-step { background: var(--term-bg); border: 1px solid var(--border); border-radius: 6px; padding: 0.65rem 0.85rem; text-align: center; }
@@ -123,12 +123,12 @@
     .pipeline-arrow { color: var(--border2); font-size: 1rem; text-align: center; }
     @media (max-width: 640px) { .pipeline-arrow { display: none; } }
 
-    /* ── CALLOUT ── */
+    /* â”€â”€ CALLOUT â”€â”€ */
     .callout { background: rgba(139,224,200,0.05); border: 1px solid rgba(139,224,200,0.2); border-left: 3px solid var(--teal); border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; }
     .callout p { color: var(--muted); font-size: 0.88rem; margin: 0; }
     .callout p strong { color: var(--teal); font-weight: 500; }
 
-    /* ── DEMO BAND ── */
+    /* â”€â”€ DEMO BAND â”€â”€ */
     .demo-band { background: var(--surface2); border-top: 1px solid var(--border2); border-bottom: 1px solid var(--border2); }
     .demo-band-inner { max-width: 920px; margin: 0 auto; padding: 4rem 2rem; }
     .demo-band-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.85rem; }
@@ -137,7 +137,7 @@
     .demo-band .demo-intro { font-size: 0.95rem; color: var(--muted); line-height: 1.75; max-width: 680px; margin-bottom: 2.5rem; }
     .demo-band .demo-intro strong { color: var(--text); font-weight: 500; }
 
-    /* ── INTERACTIVE PANELS ── */
+    /* â”€â”€ INTERACTIVE PANELS â”€â”€ */
     .demo-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin: 0 0 0.75rem; }
     @media (max-width: 680px) { .demo-wrap { grid-template-columns: 1fr; } }
     .panel { background: var(--term-bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
@@ -163,12 +163,12 @@
     .replay-btn { margin: 1rem 0 0; background: transparent; color: var(--muted); border: 1px solid var(--border2); padding: 0.5rem 1.2rem; border-radius: 6px; font-size: 0.78rem; font-family: 'DM Mono', monospace; cursor: pointer; display: none; transition: color 0.15s, border-color 0.15s; }
     .replay-btn:hover { color: var(--text); border-color: var(--muted); }
 
-    /* ── CLOSING BAND ── */
+    /* â”€â”€ CLOSING BAND â”€â”€ */
     .closing-band { background: var(--surface); border-top: 1px solid var(--border); }
     .closing-band-inner { max-width: 880px; margin: 0 auto; padding: 3.5rem 2rem; }
     .closing-band .body h2:first-child { margin-top: 0; }
 
-    /* ── CTA / NEXT ── */
+    /* â”€â”€ CTA / NEXT â”€â”€ */
     .next-bar { margin-top: 3rem; padding-top: 2.5rem; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     @media (max-width: 640px) { .next-bar { grid-template-columns: 1fr; } }
     .next-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; text-decoration: none; color: inherit; transition: border-color 0.15s, transform 0.15s; display: block; }
@@ -445,7 +445,7 @@ Result: WARN</code></pre>
     <div class="related-panel-label" id="related-panel-label">Related governance concepts</div>
     <ul class="related-list">
       <li><a href="/concepts/architectural-compiler/"><div class="rel-title">Architectural compiler</div><p class="rel-desc">The pipeline that converts documentation-form decisions into machine-evaluable constraint records.</p></a></li>
-      <li><a href="/concepts/precedence-semantics/"><div class="rel-title">Precedence semantics</div><p class="rel-desc">Ordered rules that resolve overlapping decisions deterministically — supersession, scope, recency.</p></a></li>
+      <li><a href="/concepts/precedence-semantics/"><div class="rel-title">Precedence semantics</div><p class="rel-desc">Ordered rules that resolve overlapping decisions deterministically â€” supersession, scope, recency.</p></a></li>
       <li><a href="/concepts/governance-infrastructure/"><div class="rel-title">Governance infrastructure</div><p class="rel-desc">The platform layer that encodes, distributes, versions, and enforces decisions across agents and CI.</p></a></li>
       <li><a href="/concepts/verification-contracts/"><div class="rel-title">Verification contracts</div><p class="rel-desc">Pre-registered, machine-evaluable assertions that define what a governance check must prove.</p></a></li>
     </ul>

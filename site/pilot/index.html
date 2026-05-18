@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -64,7 +64,7 @@
       --border: #222226;
       --border2: #2e2e34;
       --text: #e8e8ec;
-      --muted: #88889a;
+      --muted: #a8a8b8;
       --accent: #c8f060;
       --accent-dim: #a8d040;
       --teal: #8be0c8;
@@ -80,7 +80,7 @@
       min-height: 100vh;
     }
 
-    /* ── NAV ── */
+    /* â”€â”€ NAV â”€â”€ */
     nav {
       display: flex;
       justify-content: space-between;
@@ -116,14 +116,14 @@
     }
     .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
 
-    /* ── LAYOUT ── */
+    /* â”€â”€ LAYOUT â”€â”€ */
     .page-wrap {
       max-width: 680px;
       margin: 0 auto;
       padding: 5rem 2rem 7rem;
     }
 
-    /* ── BREADCRUMB ── */
+    /* â”€â”€ BREADCRUMB â”€â”€ */
     .breadcrumb {
       font-size: 0.75rem;
       color: var(--muted);
@@ -136,7 +136,7 @@
     .breadcrumb a:hover { color: var(--text); }
     .breadcrumb .sep { color: var(--border2); }
 
-    /* ── HEADER ── */
+    /* â”€â”€ HEADER â”€â”€ */
     .page-tag {
       display: inline-block;
       background: rgba(200,240,96,0.07);
@@ -165,7 +165,7 @@
       max-width: 540px;
     }
 
-    /* ── FIT LIST ── */
+    /* â”€â”€ FIT LIST â”€â”€ */
     .fit-section {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -202,7 +202,7 @@
       color: var(--accent);
     }
 
-    /* ── FORM ── */
+    /* â”€â”€ FORM â”€â”€ */
     .pilot-form-wrap {
       border-top: 1px solid var(--border);
       padding-top: 2.5rem;
@@ -295,7 +295,7 @@
       line-height: 1.5;
     }
 
-    /* ── FOOTER ── */
+    /* â”€â”€ FOOTER â”€â”€ */
     footer {
       text-align: center;
       padding: 2rem;
@@ -307,7 +307,7 @@
     footer a { color: var(--muted); text-decoration: none; }
     footer a:hover { color: var(--text); }
 
-    /* ── NAV HAMBURGER ── */
+    /* â”€â”€ NAV HAMBURGER â”€â”€ */
     .nav-hamburger {
       display: none;
       background: none;
@@ -459,7 +459,7 @@
         <div class="field">
           <label for="pilot-team-type">Team type</label>
           <select id="pilot-team-type" name="team_type" required>
-            <option value="" disabled selected>Select…</option>
+            <option value="" disabled selected>Selectâ€¦</option>
             <option value="platform">Platform engineering / IDP</option>
             <option value="data">Backend / data platform / infrastructure</option>
             <option value="ai-native">AI-native product engineering</option>
@@ -471,25 +471,25 @@
 
       <div class="field">
         <label for="pilot-tools">AI coding tools your team uses</label>
-        <input type="text" id="pilot-tools" name="tools" placeholder="e.g. Cursor, Claude Code, Copilot, custom agents…" />
+        <input type="text" id="pilot-tools" name="tools" placeholder="e.g. Cursor, Claude Code, Copilot, custom agentsâ€¦" />
       </div>
 
       <div class="field">
         <label for="pilot-challenge">What governance challenge are you trying to solve?</label>
-        <textarea id="pilot-challenge" name="challenge" placeholder="Describe the architectural drift, review bottleneck, or consistency problem you're dealing with…"></textarea>
-        <span class="field-hint">No minimum length — a sentence is fine.</span>
+        <textarea id="pilot-challenge" name="challenge" placeholder="Describe the architectural drift, review bottleneck, or consistency problem you're dealing withâ€¦"></textarea>
+        <span class="field-hint">No minimum length â€” a sentence is fine.</span>
       </div>
 
       <div class="submit-row">
         <button type="submit" class="btn-submit" id="pilot-submit">Submit pilot request</button>
-        <span class="submit-note">We respond within 1–2 business days.<br>Not sure if you fit? <a href="/for/" style="color: var(--muted); text-decoration: underline; text-decoration-color: var(--border2);">See who Mneme is for →</a></span>
+        <span class="submit-note">We respond within 1â€“2 business days.<br>Not sure if you fit? <a href="/for/" style="color: var(--muted); text-decoration: underline; text-decoration-color: var(--border2);">See who Mneme is for â†’</a></span>
       </div>
 
     </form>
 
     <div id="pilot-success" style="display:none;margin-top:1.5rem;padding:1.25rem 1.5rem;background:rgba(200,240,96,0.06);border:1px solid rgba(200,240,96,0.25);border-radius:10px;">
       <div style="font-family:'DM Mono',monospace;font-size:0.82rem;color:var(--accent);margin-bottom:0.4rem;">Request received</div>
-      <p style="font-size:0.88rem;color:var(--muted);margin:0;line-height:1.6;">We'll review your application and respond within 1–2 business days.</p>
+      <p style="font-size:0.88rem;color:var(--muted);margin:0;line-height:1.6;">We'll review your application and respond within 1â€“2 business days.</p>
     </div>
     <div id="pilot-error" style="display:none;margin-top:1.5rem;padding:1.25rem 1.5rem;background:rgba(255,112,112,0.06);border:1px solid rgba(255,112,112,0.25);border-radius:10px;">
       <div style="font-family:'DM Mono',monospace;font-size:0.82rem;color:#ff7070;margin-bottom:0.4rem;">Submission failed</div>
@@ -619,7 +619,7 @@
   form.addEventListener('submit', function(e){
     e.preventDefault();
     btn.disabled = true;
-    btn.textContent = 'Submitting…';
+    btn.textContent = 'Submittingâ€¦';
     error.style.display = 'none';
     fetch(form.action, {
       method: 'POST',

@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/favicon.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mneme HQ — AI governance in action: governed agents, drift prevention, multi-actor continuity</title>
+  <title>Mneme HQ â€” AI governance in action: governed agents, drift prevention, multi-actor continuity</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
@@ -17,13 +17,13 @@
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Mneme HQ — AI governance in action: governed agents, drift prevention, multi-actor continuity" />
+  <meta property="og:title" content="Mneme HQ â€” AI governance in action: governed agents, drift prevention, multi-actor continuity" />
   <meta property="og:description" content="Three flagship demos showing AI governance as infrastructure. A Python agent catches its own namespace violation. Architectural drift gets blocked upstream. Governance holds across multiple actors." />
   <meta property="og:url" content="https://mnemehq.com/demo/" />
   <meta property="og:image" content="https://mnemehq.com/demo/og.png" />
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Mneme HQ — AI governance in action: governed agents, drift prevention, multi-actor continuity" />
+  <meta name="twitter:title" content="Mneme HQ â€” AI governance in action: governed agents, drift prevention, multi-actor continuity" />
   <meta name="twitter:description" content="Three flagship demos showing AI governance as infrastructure. A Python agent catches its own namespace violation. Architectural drift gets blocked upstream. Governance holds across multiple actors." />
   <meta name="twitter:image" content="https://mnemehq.com/demo/og.png" />
 
@@ -46,7 +46,7 @@
       },
       {
         "@type": "WebPage",
-        "name": "Mneme HQ — Operational proof of architectural governance",
+        "name": "Mneme HQ â€” Operational proof of architectural governance",
         "description": "Three flagship demos and a benchmark suite showing why architectural governance becomes infrastructure once AI SDLCs scale. Architectural drift prevention, the ADR compiler, and governance continuity across multiple agents.",
         "url": "https://mnemehq.com/demo/",
         "datePublished": "2026-04-01",
@@ -83,8 +83,8 @@
         "@type": "FAQPage",
         "mainEntity": [
           {"@type": "Question", "name": "Why three flagship demos instead of a single feature tour?", "acceptedAnswer": {"@type": "Answer", "text": "Each flagship demonstrates a different manifestation of the same structural problem: AI accelerates architectural entropy, review systems do not scale linearly with AI output, and local fixes accumulate into systemic drift. Architectural drift prevention shows the failure mode over time. The ADR compiler shows the remediation: turn existing decision records into executable constraints. Multi-agent governance shows that the constraints have to hold across actors, sessions, and retries. Together they sell the category, not a feature."}},
-          {"@type": "Question", "name": "What is the difference between flagship and supporting demos?", "acceptedAnswer": {"@type": "Answer", "text": "Flagship demos answer 'why does this category exist?' Supporting demos answer 'is the enforcement real?' The supporting demos — storage decision, dependency policy, repository pattern — are short, deterministic enforcement examples a senior engineer can verify in 30 seconds. The flagships are systemic narratives showing where one-off enforcement compounds into infrastructure."}},
-          {"@type": "Question", "name": "Are the runnable examples real or scripted?", "acceptedAnswer": {"@type": "Answer", "text": "The supporting demos are deterministic — same input, same Mneme verdict, every run. The ADR compiler flagship runs against Mneme's own ADRs and ships a Python walkthrough that imports, applies, and enforces. The drift and multi-agent governance flagships ship lightweight reproducible scripts that simulate the orchestration; the enforcement and conflict-detection steps are the real Mneme pipeline. The point is to demonstrate governance coherence, not to claim a multi-agent runtime."}},
+          {"@type": "Question", "name": "What is the difference between flagship and supporting demos?", "acceptedAnswer": {"@type": "Answer", "text": "Flagship demos answer 'why does this category exist?' Supporting demos answer 'is the enforcement real?' The supporting demos â€” storage decision, dependency policy, repository pattern â€” are short, deterministic enforcement examples a senior engineer can verify in 30 seconds. The flagships are systemic narratives showing where one-off enforcement compounds into infrastructure."}},
+          {"@type": "Question", "name": "Are the runnable examples real or scripted?", "acceptedAnswer": {"@type": "Answer", "text": "The supporting demos are deterministic â€” same input, same Mneme verdict, every run. The ADR compiler flagship runs against Mneme's own ADRs and ships a Python walkthrough that imports, applies, and enforces. The drift and multi-agent governance flagships ship lightweight reproducible scripts that simulate the orchestration; the enforcement and conflict-detection steps are the real Mneme pipeline. The point is to demonstrate governance coherence, not to claim a multi-agent runtime."}},
           {"@type": "Question", "name": "Where does the benchmark fit?", "acceptedAnswer": {"@type": "Answer", "text": "The benchmark is the evidence layer underneath the flagships. The flagships show why a governance layer is structurally necessary; the benchmark proves the enforcement is deterministic and reproducible across scenarios. See /benchmark/ for the methodology and the v1.1 scenario suite."}}
         ]
       }
@@ -101,7 +101,7 @@
       --border: #222226;
       --border2: #2e2e34;
       --text: #e8e8ec;
-      --muted: #88889a;
+      --muted: #a8a8b8;
       --accent: #c8f060;
       --accent-dim: #a8d040;
       --teal: #8be0c8;
@@ -115,7 +115,7 @@
     html { scroll-behavior: smooth; }
     body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
 
-    /* ── NAV ── */
+    /* â”€â”€ NAV â”€â”€ */
     nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: #0c0c0d; backdrop-filter: blur(8px); z-index: 100; }
     .logo { font-family: 'Instrument Serif', serif; font-size: 1.4rem; font-weight: 400; color: var(--text); text-decoration: none; letter-spacing: -0.01em; }
     .nav-links { display: flex; gap: 1.5rem; align-items: center; }
@@ -125,7 +125,7 @@
     .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
     .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
 
-    /* ── LAYOUT ── */
+    /* â”€â”€ LAYOUT â”€â”€ */
     main { max-width: 1080px; margin: 0 auto; padding: 4.5rem 2rem 6rem; }
 
     .hero { text-align: center; margin-bottom: 5rem; }
@@ -138,7 +138,7 @@
     .hero .byline a:hover { color: var(--text); }
     .hero .byline .sep { color: var(--border2); margin: 0 0.5rem; }
 
-    /* ── SECTION HEADER ── */
+    /* â”€â”€ SECTION HEADER â”€â”€ */
     .section { margin-bottom: 5rem; }
     .section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1.75rem; flex-wrap: wrap; }
     .section-num { font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; color: var(--accent); text-transform: uppercase; }
@@ -146,14 +146,14 @@
     .section-lede { color: var(--muted); font-size: 0.95rem; max-width: 760px; margin-bottom: 2rem; line-height: 1.75; }
     .section-lede strong { color: var(--text); font-weight: 500; }
 
-    /* ── PROBLEM CARDS ── */
+    /* â”€â”€ PROBLEM CARDS â”€â”€ */
     .problem-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
     .problem-card { background: var(--surface); border: 1px solid var(--border); border-left: 2px solid var(--fail); border-radius: 8px; padding: 1.25rem 1.4rem; }
     .problem-card .pc-label { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fail); margin-bottom: 0.65rem; }
     .problem-card h3 { font-family: 'Inter', sans-serif; font-size: 0.98rem; font-weight: 600; color: var(--text); margin: 0 0 0.55rem; line-height: 1.35; }
     .problem-card p { font-size: 0.83rem; color: var(--muted); line-height: 1.65; }
 
-    /* ── FLAGSHIP CARDS ── */
+    /* â”€â”€ FLAGSHIP CARDS â”€â”€ */
     .flagship-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
     .flagship-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem 1.85rem; text-decoration: none; color: inherit; display: block; transition: border-color 0.15s, transform 0.15s, background 0.2s; position: relative; overflow: hidden; }
     .flagship-card:hover { border-color: var(--border2); transform: translateY(-1px); background: #16161a; }
@@ -175,7 +175,7 @@
     .flagship-card .fc-cta { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--accent); font-family: 'DM Mono', monospace; font-size: 0.78rem; }
     .flagship-card:hover .fc-cta { color: var(--accent-dim); }
 
-    /* ── SUPPORTING DEMOS ── */
+    /* â”€â”€ SUPPORTING DEMOS â”€â”€ */
     .supporting-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.85rem; }
     .support-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.1rem 1.25rem; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 0.55rem; transition: border-color 0.15s, transform 0.15s; }
     .support-card:hover { border-color: var(--border2); transform: translateY(-1px); }
@@ -189,13 +189,13 @@
     .support-card p { font-size: 0.78rem; color: var(--muted); line-height: 1.6; margin: 0; }
     .support-card .sc-arrow { color: var(--accent); font-family: 'DM Mono', monospace; font-size: 0.74rem; margin-top: auto; }
 
-    /* ── DEMO PRIMER ── */
+    /* â”€â”€ DEMO PRIMER â”€â”€ */
     .demo-primer { background: rgba(167,139,250,0.05); border: 1px solid rgba(167,139,250,0.18); border-left: 3px solid #a78bfa; border-radius: 8px; padding: 1rem 1.4rem; margin: -3.5rem 0 5rem; max-width: 760px; }
     .demo-primer-label { display: block; font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: #a78bfa; margin-bottom: 0.55rem; }
     .demo-primer p { font-size: 0.9rem; color: var(--muted); line-height: 1.7; margin: 0; }
     .demo-primer p strong { color: var(--text); font-weight: 500; }
 
-    /* ── EVIDENCE BAR ── */
+    /* â”€â”€ EVIDENCE BAR â”€â”€ */
     .evidence-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
     .evidence-block { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.4rem; text-decoration: none; color: inherit; transition: border-color 0.15s; display: block; }
     .evidence-block:hover { border-color: var(--border2); }
@@ -204,7 +204,7 @@
     .evidence-block p { font-size: 0.8rem; color: var(--muted); line-height: 1.65; margin-bottom: 0.5rem; }
     .evidence-block .eb-arrow { color: var(--accent); font-family: 'DM Mono', monospace; font-size: 0.72rem; }
 
-    /* ── CTA SNIPPET ── */
+    /* â”€â”€ CTA SNIPPET â”€â”€ */
     .cta-snippet { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem 1.75rem; margin-top: 4rem; text-align: center; }
     .cta-snippet h3 { font-family: 'Instrument Serif', serif; font-size: 1.3rem; font-weight: 400; color: var(--text); margin-bottom: 0.5rem; }
     .cta-snippet p { color: var(--muted); font-size: 0.88rem; margin-bottom: 1.25rem; }
@@ -213,7 +213,7 @@
     .copy-btn:hover { color: var(--accent); border-color: var(--accent); }
     .copy-btn.copied { color: var(--teal); border-color: var(--teal); }
 
-    /* ── FAQ ── */
+    /* â”€â”€ FAQ â”€â”€ */
     .faq-list { margin-top: 1.5rem; max-width: 760px; }
     .faq-item { border-top: 1px solid var(--border); padding: 1.05rem 0; }
     .faq-item:last-child { border-bottom: 1px solid var(--border); }
@@ -226,10 +226,10 @@
     .faq-body a:hover { color: var(--accent-dim); }
     .faq-body code { font-family: 'DM Mono', monospace; font-size: 0.78rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 0.05rem 0.4rem; color: var(--text); }
 
-    /* ── FOOTER ── */
+    /* â”€â”€ FOOTER â”€â”€ */
     footer { border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left; }
 
-    /* ── INFRASTRUCTURE FEATURE CARDS ── */
+    /* â”€â”€ INFRASTRUCTURE FEATURE CARDS â”€â”€ */
     .infra-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.85rem; }
     .infra-card { background: var(--surface); border: 1px solid var(--border); border-left: 2px solid var(--teal); border-radius: 8px; padding: 1.25rem 1.5rem; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 0.55rem; transition: border-color 0.15s, transform 0.15s; }
     .infra-card:hover { border-color: var(--border2); transform: translateY(-1px); }
@@ -241,7 +241,7 @@
     .infra-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.65; margin: 0; }
     .infra-card .ic-arrow { color: var(--accent); font-family: 'DM Mono', monospace; font-size: 0.74rem; margin-top: auto; }
 
-    /* ── HAMBURGER ── */
+    /* â”€â”€ HAMBURGER â”€â”€ */
     .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; padding: 0; flex-shrink: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; transition: border-color 0.15s, background 0.15s; }
     .nav-hamburger:hover { border-color: var(--accent); }
     .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -300,10 +300,10 @@
       </p>
     </header>
 
-    <!-- ───── 01 · THE PROBLEM ───── -->
+    <!-- â”€â”€â”€â”€â”€ 01 Â· THE PROBLEM â”€â”€â”€â”€â”€ -->
     <section class="section" id="problem">
       <div class="section-header">
-        <span class="section-num">01 · The problem</span>
+        <span class="section-num">01 Â· The problem</span>
         <h2>What review-based governance can no longer absorb</h2>
       </div>
       <p class="section-lede">The same three pathologies show up everywhere AI assistance is taken seriously: reasonable-looking code that quietly violates architecture, reviewers who cannot keep pace with parallel agents, and drift that propagates faster than humans can detect it. The flagship demos below each isolate one of these and show what changes when a governance layer sits upstream of generation.</p>
@@ -332,10 +332,10 @@
       <p>Mneme compiles your <strong>Architectural Decision Records (ADRs)</strong> into an executable governance corpus. Every agent proposal is evaluated against this corpus before generation, ensuring architectural invariants hold across tools, sessions, and actors.</p>
     </div>
 
-    <!-- ───── 02 · FLAGSHIP DEMOS ───── -->
+    <!-- â”€â”€â”€â”€â”€ 02 Â· FLAGSHIP DEMOS â”€â”€â”€â”€â”€ -->
     <section class="section" id="flagships">
       <div class="section-header">
-        <span class="section-num">02 · Flagship demos</span>
+        <span class="section-num">02 Â· Flagship demos</span>
         <h2>Three manifestations of the same governance problem</h2>
       </div>
       <p class="section-lede">Each flagship is a category-level narrative: <strong>what fails without a governance layer, what holds with one, and where the evidence lives.</strong> They are designed to be cited, demoed, and walked through end-to-end &mdash; not skimmed.</p>
@@ -394,10 +394,10 @@
       </div>
     </section>
 
-    <!-- ───── 03 · SUPPORTING ENFORCEMENT EXAMPLES ───── -->
+    <!-- â”€â”€â”€â”€â”€ 03 Â· SUPPORTING ENFORCEMENT EXAMPLES â”€â”€â”€â”€â”€ -->
     <section class="section" id="supporting">
       <div class="section-header">
-        <span class="section-num">03 · Supporting enforcement examples</span>
+        <span class="section-num">03 Â· Supporting enforcement examples</span>
         <h2>Is the enforcement real? Yes, here are the deterministic verdicts</h2>
       </div>
       <p class="section-lede">If the flagships answer <em>why does this category exist</em>, the supporting examples answer <em>is the enforcement actually deterministic</em>. Each one is a single-violation walkthrough: a concrete ADR, the diff an agent would generate, and the exact <code style="font-family:'DM Mono',monospace;font-size:0.85em;background:var(--surface2);border-radius:3px;padding:0.05em 0.35em;">mneme check</code> verdict.</p>
@@ -433,7 +433,7 @@
       </div>
     </section>
 
-    <!-- ───── 04 · INFRASTRUCTURE FEATURES ───── -->
+    <!-- â”€â”€â”€â”€â”€ 04 Â· INFRASTRUCTURE FEATURES â”€â”€â”€â”€â”€ -->
     <section class="section" id="infrastructure">
       <div class="section-header">
         <span class="section-num">04 &middot; Infrastructure features</span>
@@ -455,7 +455,7 @@
       </div>
     </section>
 
-    <!-- ───── 05 · OPERATIONAL EVIDENCE ───── -->
+    <!-- â”€â”€â”€â”€â”€ 05 Â· OPERATIONAL EVIDENCE â”€â”€â”€â”€â”€ -->
     <section class="section" id="evidence">
       <div class="section-header">
         <span class="section-num">05 &middot; Operational evidence</span>
@@ -485,7 +485,7 @@
       </div>
     </section>
 
-    <!-- ───── 05 · CTA ───── -->
+    <!-- â”€â”€â”€â”€â”€ 05 Â· CTA â”€â”€â”€â”€â”€ -->
     <div class="cta-snippet">
       <h3>Three lines to wire this up on your own repo</h3>
       <p>Open source, MIT. Same decision corpus drives the editor hook, the CI gate, and the ADR compiler.</p>
@@ -495,7 +495,7 @@
       </div>
     </div>
 
-    <!-- ───── FAQ ───── -->
+    <!-- â”€â”€â”€â”€â”€ FAQ â”€â”€â”€â”€â”€ -->
     <section class="section" id="faq" style="margin-top: 5rem;">
       <div class="section-header">
         <span class="section-num">FAQ</span>

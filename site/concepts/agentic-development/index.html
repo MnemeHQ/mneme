@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Agentic Development — Mneme HQ Concepts</title>
+  <title>Agentic Development â€” Mneme HQ Concepts</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
@@ -14,12 +14,12 @@
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Agentic Development — Mneme HQ Concepts" />
+  <meta property="og:title" content="Agentic Development â€” Mneme HQ Concepts" />
   <meta property="og:description" content="Agentic development: a software paradigm where AI agents are the primary code generators. Architectural control becomes operational engineering, not a cultural norm." />
   <meta property="og:url" content="https://mnemehq.com/concepts/agentic-development/" />
   <meta property="og:image" content="https://mnemehq.com/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Agentic Development — Mneme HQ Concepts" />
+  <meta name="twitter:title" content="Agentic Development â€” Mneme HQ Concepts" />
   <meta name="twitter:description" content="Agentic development: a software paradigm where AI agents are the primary code generators. Architectural control becomes operational engineering, not a cultural norm." />
   <meta name="twitter:image" content="https://mnemehq.com/og.png" />
   <meta name="author" content="Theo Valmis" />
@@ -39,7 +39,7 @@
     :root {
       --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
       --border: #222226; --border2: #2e2e34;
-      --text: #e8e8ec; --muted: #88889a;
+      --text: #e8e8ec; --muted: #a8a8b8;
       --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
     }
     html { scroll-behavior: smooth; }
@@ -99,7 +99,7 @@
     .article-faq summary { padding: 1rem 1.25rem; cursor: pointer; font-size: 0.88rem; color: var(--text); background: var(--surface); list-style: none; }
     .article-faq summary::-webkit-details-marker { display: none; }
     .article-faq summary::before { content: '+ '; color: var(--accent); }
-    .article-faq details[open] summary::before { content: '− '; }
+    .article-faq details[open] summary::before { content: 'âˆ’ '; }
     .article-faq details[open] summary { border-bottom: 1px solid var(--border); }
     .article-faq .faq-body { padding: 1.25rem; font-size: 0.86rem; color: var(--muted); line-height: 1.85; }
     .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
@@ -212,7 +212,7 @@
       },
       {
         "@type": "TechArticle",
-        "headline": "Agentic Development — Mneme HQ Concepts",
+        "headline": "Agentic Development â€” Mneme HQ Concepts",
         "description": "Agentic development: a software paradigm where AI agents are the primary code generators. Architectural control becomes operational engineering, not a cultural norm.",
         "url": "https://mnemehq.com/concepts/agentic-development/",
         "datePublished": "2026-05-14",
@@ -230,7 +230,7 @@
           {
             "@type": "Question",
             "name": "What is agentic development?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Agentic development is a software development paradigm where AI agents — not human engineers — are the primary code generators, operating autonomously across files, services, and architectural boundaries. Agents read codebases, make architectural choices, write entire features, and commit changes without human permission at each step. The human role shifts from generator to architect and reviewer. When agents are first-class actors, architectural control stops being a cultural norm and becomes an operational engineering problem."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Agentic development is a software development paradigm where AI agents â€” not human engineers â€” are the primary code generators, operating autonomously across files, services, and architectural boundaries. Agents read codebases, make architectural choices, write entire features, and commit changes without human permission at each step. The human role shifts from generator to architect and reviewer. When agents are first-class actors, architectural control stops being a cultural norm and becomes an operational engineering problem."}
           },
           {
             "@type": "Question",
@@ -240,24 +240,24 @@
           {
             "@type": "Question",
             "name": "Why does agentic development require different governance?",
-            "acceptedAnswer": {"@type": "Answer", "text": "In human-only development, cultural norms and PR review are sufficient governance because humans are the bottleneck. Reviewers have time to apply architectural knowledge at each review step. In agentic development, agents generate at 10-100x human speed, saturating the review model. Governance must move upstream — from review to pre-generation enforcement. Architectural decisions must be encoded, distributed, and enforced mechanically, because there is no human in the generation loop to apply cultural norms."}
+            "acceptedAnswer": {"@type": "Answer", "text": "In human-only development, cultural norms and PR review are sufficient governance because humans are the bottleneck. Reviewers have time to apply architectural knowledge at each review step. In agentic development, agents generate at 10-100x human speed, saturating the review model. Governance must move upstream â€” from review to pre-generation enforcement. Architectural decisions must be encoded, distributed, and enforced mechanically, because there is no human in the generation loop to apply cultural norms."}
           },
           {
             "@type": "Question",
             "name": "What risks does agentic development introduce?",
-            "acceptedAnswer": {"@type": "Answer", "text": "The primary risks are architectural drift at scale and invisible constraint violations. Agents make architectural choices autonomously — database selections, API patterns, error handling strategies — without the architectural context that a senior engineer would apply. At agent speed, violations compound faster than human review can catch them. Without pre-generation enforcement, teams discover architectural problems in production rather than at generation time."}
+            "acceptedAnswer": {"@type": "Answer", "text": "The primary risks are architectural drift at scale and invisible constraint violations. Agents make architectural choices autonomously â€” database selections, API patterns, error handling strategies â€” without the architectural context that a senior engineer would apply. At agent speed, violations compound faster than human review can catch them. Without pre-generation enforcement, teams discover architectural problems in production rather than at generation time."}
           },
           {
             "@type": "Question",
             "name": "What does architectural governance look like in an agentic development workflow?",
-            "acceptedAnswer": {"@type": "Answer", "text": "In an agentic workflow, governance shifts from PR checklists and review norms to pre-generation constraint enforcement. Architectural decisions are encoded in a governance corpus (project_memory.json), distributed to all agents via a deterministic retrieval layer, and enforced before code generation completes. Each agent — planner, coder, reviewer, CI — queries the same corpus and receives the same constraints. The governance system is infrastructure, not process."}
+            "acceptedAnswer": {"@type": "Answer", "text": "In an agentic workflow, governance shifts from PR checklists and review norms to pre-generation constraint enforcement. Architectural decisions are encoded in a governance corpus (project_memory.json), distributed to all agents via a deterministic retrieval layer, and enforced before code generation completes. Each agent â€” planner, coder, reviewer, CI â€” queries the same corpus and receives the same constraints. The governance system is infrastructure, not process."}
           }
         ]
       },
       {
         "@type": "DefinedTerm",
         "name": "Agentic Development",
-        "description": "A software development paradigm where AI agents — not human engineers — are the primary code generators, operating autonomously across files, services, and architectural boundaries.",
+        "description": "A software development paradigm where AI agents â€” not human engineers â€” are the primary code generators, operating autonomously across files, services, and architectural boundaries.",
         "inDefinedTermSet": {"@type": "DefinedTermSet", "name": "Mneme HQ Concepts", "url": "https://mnemehq.com/concepts/"},
         "url": "https://mnemehq.com/concepts/agentic-development/"
       }
@@ -287,7 +287,7 @@
 
 <main>
 <div class="answer-capsule">
-  <strong>Agentic development.</strong> A software development paradigm where AI agents — not human engineers — are the primary code generators, operating autonomously across files, services, and architectural boundaries. When agents are first-class actors, architectural control stops being a cultural norm and becomes an operational engineering problem.
+  <strong>Agentic development.</strong> A software development paradigm where AI agents â€” not human engineers â€” are the primary code generators, operating autonomously across files, services, and architectural boundaries. When agents are first-class actors, architectural control stops being a cultural norm and becomes an operational engineering problem.
 </div>
 
 <nav aria-label="Breadcrumb" class="breadcrumb-nav">
@@ -303,10 +303,10 @@
     <div class="article-eyebrow">
       <span class="eyebrow-tag">Concepts</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">13 min read &nbsp;·&nbsp; May 2026</span>
+      <span class="eyebrow-meta">13 min read &nbsp;Â·&nbsp; May 2026</span>
     </div>
     <h1>Agentic Development</h1>
-    <p class="article-lede">The shift from AI as assistant to AI as primary actor changes what software engineering infrastructure has to provide. Agentic development is that shift made explicit — and it reframes architectural governance from a team practice into a runtime requirement.</p>
+    <p class="article-lede">The shift from AI as assistant to AI as primary actor changes what software engineering infrastructure has to provide. Agentic development is that shift made explicit â€” and it reframes architectural governance from a team practice into a runtime requirement.</p>
     <p class="byline">
       By <a href="/founder/">Theo Valmis</a>
       <span class="sep">&middot;</span>
@@ -316,44 +316,44 @@
 
   <div class="article-body">
 
-    <p>The phrase "AI-assisted development" has a precise implication embedded in it: human development assisted by AI. The human is the actor; the AI is the tool. The human proposes; the AI helps implement. The human reviews; the AI explains. This is a valuable paradigm — it makes human developers faster — but it is not the paradigm that is collapsing the existing model of software engineering governance.</p>
+    <p>The phrase "AI-assisted development" has a precise implication embedded in it: human development assisted by AI. The human is the actor; the AI is the tool. The human proposes; the AI helps implement. The human reviews; the AI explains. This is a valuable paradigm â€” it makes human developers faster â€” but it is not the paradigm that is collapsing the existing model of software engineering governance.</p>
 
-    <p>Agentic development is. It is the paradigm where the AI is the actor: proposing, implementing, committing — with the human designing constraints and reviewing outcomes rather than generating at each step. That inversion is not a marginal change. It makes the entire architecture of existing governance systems structurally inadequate.</p>
+    <p>Agentic development is. It is the paradigm where the AI is the actor: proposing, implementing, committing â€” with the human designing constraints and reviewing outcomes rather than generating at each step. That inversion is not a marginal change. It makes the entire architecture of existing governance systems structurally inadequate.</p>
 
     <h2>What agentic development actually means</h2>
 
-    <p>The operational definition: <strong>AI agents operate autonomously across files, services, and architectural boundaries without asking permission at each step.</strong> An agentic coder doesn't suggest a function and wait for approval — it reads the codebase, understands the context, writes the feature, updates the tests, and commits the changes. The human's involvement is bounded: they specify requirements at the start and review outcomes at the end.</p>
+    <p>The operational definition: <strong>AI agents operate autonomously across files, services, and architectural boundaries without asking permission at each step.</strong> An agentic coder doesn't suggest a function and wait for approval â€” it reads the codebase, understands the context, writes the feature, updates the tests, and commits the changes. The human's involvement is bounded: they specify requirements at the start and review outcomes at the end.</p>
 
     <p>This autonomy across architectural boundaries is the critical element. An agent writing a feature might:</p>
 
     <ul>
-      <li>Choose which database driver to use based on what it sees in existing code — right or wrong.</li>
+      <li>Choose which database driver to use based on what it sees in existing code â€” right or wrong.</li>
       <li>Select an error handling pattern from the codebase without knowing which patterns are deprecated.</li>
       <li>Import a library that has been organizationally banned because of a security decision made six months ago.</li>
-      <li>Structure a new service in a way that violates an ADR about service boundaries — an ADR the agent was never told about.</li>
+      <li>Structure a new service in a way that violates an ADR about service boundaries â€” an ADR the agent was never told about.</li>
     </ul>
 
-    <p>Each of these choices is locally plausible — the agent is making reasonable inferences from what it sees. Each is potentially a serious architectural violation — made by an actor that has no intrinsic knowledge of the decisions that humans made and documented.</p>
+    <p>Each of these choices is locally plausible â€” the agent is making reasonable inferences from what it sees. Each is potentially a serious architectural violation â€” made by an actor that has no intrinsic knowledge of the decisions that humans made and documented.</p>
 
     <div class="callout">
-      <p><strong>Agentic development is not "better autocomplete."</strong> Autocomplete suggests tokens; the human decides. Agentic development makes architectural choices; the human reviews after the fact. The governance model must shift accordingly — from human-in-the-loop to governance-in-the-generation.</p>
+      <p><strong>Agentic development is not "better autocomplete."</strong> Autocomplete suggests tokens; the human decides. Agentic development makes architectural choices; the human reviews after the fact. The governance model must shift accordingly â€” from human-in-the-loop to governance-in-the-generation.</p>
     </div>
 
     <h2>Why this problem exists structurally</h2>
 
     <p>The structural problem is that <strong>human oversight models don't scale to agent output velocity</strong>. This is the central incompatibility between agentic development and existing engineering governance.</p>
 
-    <p>In human-only software development, the oversight model is: (1) human proposes, (2) PR review approves or rejects. This model works because human proposal speed is the bottleneck — there are roughly as many proposals as reviewers can meaningfully evaluate. The oversight cost is proportional to the generation cost.</p>
+    <p>In human-only software development, the oversight model is: (1) human proposes, (2) PR review approves or rejects. This model works because human proposal speed is the bottleneck â€” there are roughly as many proposals as reviewers can meaningfully evaluate. The oversight cost is proportional to the generation cost.</p>
 
-    <p>In agentic development, the proposal speed increases by 10–100x. The review model doesn't scale: reviewers have the same bandwidth they always had, but are now receiving 10–100x the throughput. One of three things happens:</p>
+    <p>In agentic development, the proposal speed increases by 10â€“100x. The review model doesn't scale: reviewers have the same bandwidth they always had, but are now receiving 10â€“100x the throughput. One of three things happens:</p>
 
     <ol>
-      <li><strong>Review quality degrades.</strong> Reviewers rubber-stamp to keep pace. Governance becomes nominal — the process exists but the enforcement doesn't.</li>
+      <li><strong>Review quality degrades.</strong> Reviewers rubber-stamp to keep pace. Governance becomes nominal â€” the process exists but the enforcement doesn't.</li>
       <li><strong>Throughput throttles.</strong> The team constrains agent velocity to match review capacity, losing the productivity gain. Governance survives at the cost of the benefit.</li>
-      <li><strong>Governance moves upstream.</strong> Architectural decisions are encoded, distributed, and enforced before generation completes — eliminating violations rather than reviewing them after the fact.</li>
+      <li><strong>Governance moves upstream.</strong> Architectural decisions are encoded, distributed, and enforced before generation completes â€” eliminating violations rather than reviewing them after the fact.</li>
     </ol>
 
-    <p>Agentic development names the paradigm that makes option (3) necessary. Teams that adopt agentic workflows without moving governance upstream discover options (1) and (2) empirically — usually through accumulated architectural violations that surface months later.</p>
+    <p>Agentic development names the paradigm that makes option (3) necessary. Teams that adopt agentic workflows without moving governance upstream discover options (1) and (2) empirically â€” usually through accumulated architectural violations that surface months later.</p>
 
     <div class="callout-teal">
       <p><strong>The leverage point shifts from review to governance.</strong> In human-only development, investment in code review process compounds. In agentic development, investment in pre-generation governance infrastructure compounds. These are different leverage points, and optimizing for the wrong one produces the wrong outcomes.</p>
@@ -361,15 +361,15 @@
 
     <h2>The common misread: AI as productivity tool</h2>
 
-    <p>The most widespread failure mode is <strong>treating AI coding agents as productivity tools for human developers and applying the same governance model</strong>. This misread is understandable — for the first generation of AI coding tools, it was accurate. GitHub Copilot, early Claude Code, early Cursor — these were genuinely AI-assisted development: humans still drove the generation loop, and existing governance models applied with minor adjustments.</p>
+    <p>The most widespread failure mode is <strong>treating AI coding agents as productivity tools for human developers and applying the same governance model</strong>. This misread is understandable â€” for the first generation of AI coding tools, it was accurate. GitHub Copilot, early Claude Code, early Cursor â€” these were genuinely AI-assisted development: humans still drove the generation loop, and existing governance models applied with minor adjustments.</p>
 
-    <p>The misread becomes structural when teams adopt agentic workflows — autonomous agents operating without human proposal at each step — but don't redesign the governance model. The symptoms:</p>
+    <p>The misread becomes structural when teams adopt agentic workflows â€” autonomous agents operating without human proposal at each step â€” but don't redesign the governance model. The symptoms:</p>
 
     <ul>
       <li>PR review volume increases without a corresponding increase in review depth. Reviewers approve faster, not better.</li>
-      <li>Architectural violations accumulate in merged code — each locally plausible, collectively incoherent.</li>
-      <li>Teams invest in better CLAUDE.md files, longer context windows, more comprehensive prompt engineering — improvements that help within a session but don't address the cross-session, cross-agent governance problem.</li>
-      <li>Senior engineers spend increasing time on architectural debt remediation rather than new development — the opposite of the productivity promise.</li>
+      <li>Architectural violations accumulate in merged code â€” each locally plausible, collectively incoherent.</li>
+      <li>Teams invest in better CLAUDE.md files, longer context windows, more comprehensive prompt engineering â€” improvements that help within a session but don't address the cross-session, cross-agent governance problem.</li>
+      <li>Senior engineers spend increasing time on architectural debt remediation rather than new development â€” the opposite of the productivity promise.</li>
     </ul>
 
     <p>The diagnosis is that the governance model was designed for human-speed development and has been applied unchanged to agent-speed development. It was designed for a different bottleneck.</p>
@@ -420,9 +420,9 @@
 
     <h2>How this fits the AI SDLC</h2>
 
-    <p>Agentic development is the paradigm that makes architectural governance infrastructure <strong>necessary rather than optional</strong>. In human-only development, cultural norms and code review are sufficient governance. In AI-assisted development, they are still mostly sufficient — the human is still in the generation loop. In agentic development, they are structurally insufficient — there is no human in the generation loop to apply cultural norms.</p>
+    <p>Agentic development is the paradigm that makes architectural governance infrastructure <strong>necessary rather than optional</strong>. In human-only development, cultural norms and code review are sufficient governance. In AI-assisted development, they are still mostly sufficient â€” the human is still in the generation loop. In agentic development, they are structurally insufficient â€” there is no human in the generation loop to apply cultural norms.</p>
 
-    <p>The consequence: <strong>architectural decisions must be encoded, distributed, and enforced mechanically</strong>. "Encoded" means the decision lives in a version-controlled, machine-readable corpus — not only in a document or a team wiki. "Distributed" means every agent that operates on the codebase receives the relevant decisions at generation time — not just the agents whose users remembered to configure governance. "Enforced" means the governance system produces a binary verdict before generation completes — not a suggestion, not a style warning, but a blocking check.</p>
+    <p>The consequence: <strong>architectural decisions must be encoded, distributed, and enforced mechanically</strong>. "Encoded" means the decision lives in a version-controlled, machine-readable corpus â€” not only in a document or a team wiki. "Distributed" means every agent that operates on the codebase receives the relevant decisions at generation time â€” not just the agents whose users remembered to configure governance. "Enforced" means the governance system produces a binary verdict before generation completes â€” not a suggestion, not a style warning, but a blocking check.</p>
 
     <p>This is the transition from governance as a team practice to governance as engineering infrastructure. It is the same transition that happened with security (from "developers should write secure code" to "security testing in CI"), with reliability (from "developers should handle errors" to "error handling linting"), and with performance (from "developers should profile their code" to "performance benchmarks in CI"). Each time, a practice that worked at human scale became infrastructure at machine scale.</p>
 
@@ -430,12 +430,12 @@
 
     <p>Agentic development frequently involves not one autonomous agent but <strong>multiple agents acting on the same codebase</strong> in a coordinated pipeline: a planner agent that decomposes requirements, a coder agent that implements features, a reviewer agent that checks for obvious issues, a CI agent that runs governance gates. Each agent has its own LLM instance, its own context window, its own session lifecycle, its own failure modes.</p>
 
-    <p>The multi-agent context is where existing governance models fail most visibly. A CLAUDE.md file configured for the coder agent doesn't automatically propagate to the reviewer agent. A governance configuration set up for one engineer's Claude Code session doesn't apply to another engineer's Cursor session operating on the same codebase. Each agent is an independent actor with independent context — and without shared governance infrastructure, they receive inconsistent architectural constraints.</p>
+    <p>The multi-agent context is where existing governance models fail most visibly. A CLAUDE.md file configured for the coder agent doesn't automatically propagate to the reviewer agent. A governance configuration set up for one engineer's Claude Code session doesn't apply to another engineer's Cursor session operating on the same codebase. Each agent is an independent actor with independent context â€” and without shared governance infrastructure, they receive inconsistent architectural constraints.</p>
 
-    <p>Consistent governance across heterogeneous agents requires the governance to live in a shared external corpus, not in any agent's configuration. Every agent queries the same corpus; every agent receives the same constraints. The architectural decisions are not owned by any single agent's session — they are owned by the corpus, which is the shared architectural authority for the entire codebase regardless of who or what is operating on it.</p>
+    <p>Consistent governance across heterogeneous agents requires the governance to live in a shared external corpus, not in any agent's configuration. Every agent queries the same corpus; every agent receives the same constraints. The architectural decisions are not owned by any single agent's session â€” they are owned by the corpus, which is the shared architectural authority for the entire codebase regardless of who or what is operating on it.</p>
 
     <div class="callout">
-      <p><strong>In multi-agent agentic development, governance is the only architectural authority that all agents share.</strong> The governance corpus is not one agent's memory. It is the architectural constitution of the codebase — consulted by every agent, enforced at every generation step, versioned alongside the code it governs.</p>
+      <p><strong>In multi-agent agentic development, governance is the only architectural authority that all agents share.</strong> The governance corpus is not one agent's memory. It is the architectural constitution of the codebase â€” consulted by every agent, enforced at every generation step, versioned alongside the code it governs.</p>
     </div>
 
   </div>
@@ -444,7 +444,7 @@
     <h2>Frequently asked questions</h2>
     <details>
       <summary>What is agentic development?</summary>
-      <div class="faq-body">Agentic development is a software development paradigm where AI agents — not human engineers — are the primary code generators, operating autonomously across files, services, and architectural boundaries. Agents read codebases, make architectural choices, write entire features, and commit changes without human permission at each step. The human role shifts from generator to architect and reviewer.</div>
+      <div class="faq-body">Agentic development is a software development paradigm where AI agents â€” not human engineers â€” are the primary code generators, operating autonomously across files, services, and architectural boundaries. Agents read codebases, make architectural choices, write entire features, and commit changes without human permission at each step. The human role shifts from generator to architect and reviewer.</div>
     </details>
     <details>
       <summary>How is agentic development different from AI-assisted development?</summary>
@@ -452,15 +452,15 @@
     </details>
     <details>
       <summary>Why does agentic development require different governance?</summary>
-      <div class="faq-body">In human-only development, cultural norms and PR review are sufficient governance because humans are the bottleneck — reviewers can keep pace with generators. In agentic development, agents generate at 10-100x human speed, saturating the review model. Governance must move upstream — from review to pre-generation enforcement. Architectural decisions must be encoded, distributed, and enforced mechanically, because there is no human in the generation loop to apply cultural norms at each step.</div>
+      <div class="faq-body">In human-only development, cultural norms and PR review are sufficient governance because humans are the bottleneck â€” reviewers can keep pace with generators. In agentic development, agents generate at 10-100x human speed, saturating the review model. Governance must move upstream â€” from review to pre-generation enforcement. Architectural decisions must be encoded, distributed, and enforced mechanically, because there is no human in the generation loop to apply cultural norms at each step.</div>
     </details>
     <details>
       <summary>What risks does agentic development introduce?</summary>
-      <div class="faq-body">The primary risks are architectural drift at scale and invisible constraint violations. Agents make architectural choices autonomously — database selections, API patterns, service boundaries, library choices — without the architectural context that a senior engineer would apply. At agent speed, violations compound faster than human review can catch them. Without pre-generation enforcement, teams discover architectural problems after they have accumulated across many merged PRs, at which point remediation is expensive.</div>
+      <div class="faq-body">The primary risks are architectural drift at scale and invisible constraint violations. Agents make architectural choices autonomously â€” database selections, API patterns, service boundaries, library choices â€” without the architectural context that a senior engineer would apply. At agent speed, violations compound faster than human review can catch them. Without pre-generation enforcement, teams discover architectural problems after they have accumulated across many merged PRs, at which point remediation is expensive.</div>
     </details>
     <details>
       <summary>What does architectural governance look like in an agentic development workflow?</summary>
-      <div class="faq-body">In an agentic workflow, governance shifts from PR checklists and review norms to pre-generation constraint enforcement. Architectural decisions are encoded in a governance corpus, distributed to all agents via a deterministic retrieval layer, and enforced before code generation completes. Each agent — planner, coder, reviewer, CI — queries the same corpus and receives the same constraints. The governance is infrastructure: available, versioned, observable, and consistent across all agents regardless of which engineer's session triggered them.</div>
+      <div class="faq-body">In an agentic workflow, governance shifts from PR checklists and review norms to pre-generation constraint enforcement. Architectural decisions are encoded in a governance corpus, distributed to all agents via a deterministic retrieval layer, and enforced before code generation completes. Each agent â€” planner, coder, reviewer, CI â€” queries the same corpus and receives the same constraints. The governance is infrastructure: available, versioned, observable, and consistent across all agents regardless of which engineer's session triggered them.</div>
     </details>
   </section>
 
@@ -473,12 +473,12 @@
   </ul>
 
   <footer class="article-footer">
-    <a href="/concepts/" class="back-link">← Back to Concepts</a>
+    <a href="/concepts/" class="back-link">â† Back to Concepts</a>
 
     <div class="cta-block">
       <h3>Govern your agentic workflow</h3>
-      <p>Mneme provides the pre-generation enforcement infrastructure that agentic development requires — across agents, sessions, and tools, from a single version-controlled corpus.</p>
-      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub →</a>
+      <p>Mneme provides the pre-generation enforcement infrastructure that agentic development requires â€” across agents, sessions, and tools, from a single version-controlled corpus.</p>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub â†’</a>
     </div>
   </footer>
 </article>

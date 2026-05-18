@@ -1,12 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Why Observability Is Not Governance — Mneme HQ</title>
+  <title>Why Observability Is Not Governance â€” Mneme HQ</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="Observability tells you the agent violated architecture. Governance helps prevent the violation from being proposed in the first place. Visibility is not control — and observability without enforcement is operational archaeology." />
+  <meta name="description" content="Observability tells you the agent violated architecture. Governance helps prevent the violation from being proposed in the first place. Visibility is not control â€” and observability without enforcement is operational archaeology." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/insights/why-observability-is-not-governance/" />
@@ -35,7 +35,7 @@
     :root {
       --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
       --border: #222226; --border2: #2e2e34;
-      --text: #e8e8ec; --muted: #88889a;
+      --text: #e8e8ec; --muted: #a8a8b8;
       --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
     }
     html { scroll-behavior: smooth; }
@@ -103,7 +103,7 @@
     .article-faq summary { padding: 1rem 1.25rem; cursor: pointer; font-size: 0.88rem; color: var(--text); background: var(--surface); list-style: none; }
     .article-faq summary::-webkit-details-marker { display: none; }
     .article-faq summary::before { content: '+ '; color: var(--accent); }
-    .article-faq details[open] summary::before { content: '− '; }
+    .article-faq details[open] summary::before { content: 'âˆ’ '; }
     .article-faq details[open] summary { border-bottom: 1px solid var(--border); }
     .article-faq .faq-body { padding: 1.25rem; font-size: 0.86rem; color: var(--muted); line-height: 1.85; }
     .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
@@ -193,7 +193,7 @@
       {
         "@type": "Article",
         "headline": "Why Observability Is Not Governance",
-        "description": "Observability tells you the agent violated architecture. Governance helps prevent the violation from being proposed in the first place. Visibility is not control — and observability without enforcement is operational archaeology.",
+        "description": "Observability tells you the agent violated architecture. Governance helps prevent the violation from being proposed in the first place. Visibility is not control â€” and observability without enforcement is operational archaeology.",
         "url": "https://mnemehq.com/insights/why-observability-is-not-governance/",
         "datePublished": "2026-05-15",
         "dateModified": "2026-05-15",
@@ -208,27 +208,27 @@
           {
             "@type": "Question",
             "name": "What is the difference between observability and governance for AI coding agents?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Observability detects and explains violations after they have already been proposed or merged — it produces traces, dashboards, drift logs, and evaluations of agent behavior. Governance prevents or constrains those violations before code is generated, by enforcing machine-evaluable architectural decisions at the agent's pre-tool-use hook and at the CI merge gate. Observability is downstream of governance. Visibility tells you what happened; control determines what happens."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Observability detects and explains violations after they have already been proposed or merged â€” it produces traces, dashboards, drift logs, and evaluations of agent behavior. Governance prevents or constrains those violations before code is generated, by enforcing machine-evaluable architectural decisions at the agent's pre-tool-use hook and at the CI merge gate. Observability is downstream of governance. Visibility tells you what happened; control determines what happens."}
           },
           {
             "@type": "Question",
             "name": "Why isn't AI agent telemetry sufficient on its own?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Telemetry is reactive by design. It begins after the behavior has already occurred. At agentic scale — where a single team generates 10–100x the code of human-paced development — telemetry that surfaces violations after generation accumulates a review backlog that grows faster than the team can clear it. Observability without an enforcement layer in front of it converts every violation into rework, not prevention."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Telemetry is reactive by design. It begins after the behavior has already occurred. At agentic scale â€” where a single team generates 10â€“100x the code of human-paced development â€” telemetry that surfaces violations after generation accumulates a review backlog that grows faster than the team can clear it. Observability without an enforcement layer in front of it converts every violation into rework, not prevention."}
           },
           {
             "@type": "Question",
             "name": "Does this mean observability tools are useless?",
-            "acceptedAnswer": {"@type": "Answer", "text": "No. Observability is essential — it is how teams measure drift, audit enforcement, and improve governance over time. But it is operational memory, not operational control. Observability records what the system did; governance shapes what the system is allowed to do. The argument here is not that observability is wrong. It is that observability without an upstream enforcement layer is operational archaeology — you can perfectly observe drift and continuously ship drift at the same time."}
+            "acceptedAnswer": {"@type": "Answer", "text": "No. Observability is essential â€” it is how teams measure drift, audit enforcement, and improve governance over time. But it is operational memory, not operational control. Observability records what the system did; governance shapes what the system is allowed to do. The argument here is not that observability is wrong. It is that observability without an upstream enforcement layer is operational archaeology â€” you can perfectly observe drift and continuously ship drift at the same time."}
           },
           {
             "@type": "Question",
             "name": "How do governance and observability fit together in the AI coding stack?",
-            "acceptedAnswer": {"@type": "Answer", "text": "They sit at different layers of the same pipeline. Generation produces code. Governance constrains what the agent is allowed to produce. Verification confirms invariants hold. Observability explains outcomes after the fact. Review escalates edge cases that none of the prior layers resolved. Each layer has a distinct job — and conflating them is what produces the current pattern of teams investing in dashboards while still shipping architectural drift at AI velocity."}
+            "acceptedAnswer": {"@type": "Answer", "text": "They sit at different layers of the same pipeline. Generation produces code. Governance constrains what the agent is allowed to produce. Verification confirms invariants hold. Observability explains outcomes after the fact. Review escalates edge cases that none of the prior layers resolved. Each layer has a distinct job â€” and conflating them is what produces the current pattern of teams investing in dashboards while still shipping architectural drift at AI velocity."}
           },
           {
             "@type": "Question",
             "name": "How does this relate to LangSmith, Braintrust, Arize, and similar tools?",
-            "acceptedAnswer": {"@type": "Answer", "text": "AI observability tools — LangSmith, Braintrust, Arize, Phoenix, agent tracing platforms — sit at the observability layer of the stack. They are valuable for measuring agent behavior, identifying regressions, and improving prompts. They are not architectural enforcement layers. They become most useful when paired with a governance layer that prevents the violations they would otherwise have to surface — making the observability signal less noisy and more focused on the edge cases that genuinely need human attention."}
+            "acceptedAnswer": {"@type": "Answer", "text": "AI observability tools â€” LangSmith, Braintrust, Arize, Phoenix, agent tracing platforms â€” sit at the observability layer of the stack. They are valuable for measuring agent behavior, identifying regressions, and improving prompts. They are not architectural enforcement layers. They become most useful when paired with a governance layer that prevents the violations they would otherwise have to surface â€” making the observability signal less noisy and more focused on the edge cases that genuinely need human attention."}
           }
         ]
       },
@@ -308,7 +308,7 @@
       </div>
     </div>
 
-    <p>The AI tooling market currently has a strong gravitational pull toward observability. Traces. Dashboards. Drift surfaces. Evaluation pipelines. Agent behavior analytics. Each layer is independently useful — and the ecosystem has moved there first because instrumentation is easier to build than enforcement, and easier to sell than restraint.</p>
+    <p>The AI tooling market currently has a strong gravitational pull toward observability. Traces. Dashboards. Drift surfaces. Evaluation pipelines. Agent behavior analytics. Each layer is independently useful â€” and the ecosystem has moved there first because instrumentation is easier to build than enforcement, and easier to sell than restraint.</p>
 
     <p>But the move has produced a quiet category error. Teams investing heavily in agent observability are interpreting that investment as governance. It is not. Visibility into agent behavior is necessary, but it is not the layer that determines what the agent is allowed to do. <strong>Observability is downstream of governance.</strong></p>
 
@@ -316,41 +316,41 @@
 
     <p>The reason the observability layer matured first is structural, not strategic. When AI coding agents began producing meaningful code volume, the immediate need was to understand what they were doing. Traces became the unit of debugging. Token streams became the unit of cost accounting. Drift dashboards became the unit of quality reporting. Evaluation harnesses became the unit of model selection.</p>
 
-    <p>This made sense. You cannot improve what you cannot see. Observability tooling — LangSmith, Braintrust, Arize, Phoenix, agent tracing platforms — gave teams a way to inspect the previously opaque behavior of LLM-based agents. The investment was justified, and the category will continue to grow.</p>
+    <p>This made sense. You cannot improve what you cannot see. Observability tooling â€” LangSmith, Braintrust, Arize, Phoenix, agent tracing platforms â€” gave teams a way to inspect the previously opaque behavior of LLM-based agents. The investment was justified, and the category will continue to grow.</p>
 
-    <p>What did not happen, in most teams, is the parallel investment in the layer that decides what the agent is allowed to produce in the first place. The result is a stack with a strong observation layer and a missing constraint layer — a microscope without a gate.</p>
+    <p>What did not happen, in most teams, is the parallel investment in the layer that decides what the agent is allowed to produce in the first place. The result is a stack with a strong observation layer and a missing constraint layer â€” a microscope without a gate.</p>
 
     <h2>Observability is reactive by design</h2>
 
     <p>This is the structural argument the rest of the post rests on.</p>
 
-    <p class="pull-quote">Observability begins after the behavior already occurred.<span class="attrib">— the core property</span></p>
+    <p class="pull-quote">Observability begins after the behavior already occurred.<span class="attrib">â€” the core property</span></p>
 
-    <p>That is not a flaw of observability. It is the definition. To <em>observe</em> a system is to record what it did. The observation comes after the action; that ordering is irreducible. A telemetry pipeline can be fast, low-latency, real-time — none of those properties change the temporal ordering. The behavior happened, then it was observed.</p>
+    <p>That is not a flaw of observability. It is the definition. To <em>observe</em> a system is to record what it did. The observation comes after the action; that ordering is irreducible. A telemetry pipeline can be fast, low-latency, real-time â€” none of those properties change the temporal ordering. The behavior happened, then it was observed.</p>
 
     <p>For systems where the throughput is human-paced, that ordering is fine. The behavior happens slowly enough that the observation produces signal in time to act. A human engineer writes a function; review observes it; the team makes a decision. The loop closes within hours.</p>
 
     <p>For systems where the throughput is agent-paced, the same ordering fails. An agent writes thousands of lines while the observation pipeline is still processing the first batch. The signal is real; the latency between signal and action is what changes. By the time the team has surfaced a pattern of violations from the dashboard, the codebase has accumulated dozens of additional instances of the same pattern.</p>
 
     <div class="callout">
-      <p><strong>Observability does not introduce reactivity. It exposes it.</strong> The reactivity was already there — observability is just what makes it legible. The question that follows is whether the layer in front of observability can act before the behavior occurs.</p>
+      <p><strong>Observability does not introduce reactivity. It exposes it.</strong> The reactivity was already there â€” observability is just what makes it legible. The question that follows is whether the layer in front of observability can act before the behavior occurs.</p>
     </div>
 
     <h2>The scaling problem</h2>
 
-    <p>The reactive ordering is tolerable when the violation rate is low. It is not tolerable when the violation rate is high — and that is exactly the regime agentic development creates.</p>
+    <p>The reactive ordering is tolerable when the violation rate is low. It is not tolerable when the violation rate is high â€” and that is exactly the regime agentic development creates.</p>
 
     <p>Three forces compound:</p>
 
     <ul>
-      <li><strong>Generation rate</strong> — one engineer with an AI agent produces 10–100x the code of a non-AI baseline. Drift accumulates at the same multiplier.</li>
-      <li><strong>Session multiplicity</strong> — each cold-started session, each agent runtime, each developer's local workflow produces independent drift. The aggregate drift rate scales with the team's effective parallelism.</li>
-      <li><strong>Review capacity</strong> — the human layer that observability ultimately feeds remains linear with team size. It does not scale with the agent layer.</li>
+      <li><strong>Generation rate</strong> â€” one engineer with an AI agent produces 10â€“100x the code of a non-AI baseline. Drift accumulates at the same multiplier.</li>
+      <li><strong>Session multiplicity</strong> â€” each cold-started session, each agent runtime, each developer's local workflow produces independent drift. The aggregate drift rate scales with the team's effective parallelism.</li>
+      <li><strong>Review capacity</strong> â€” the human layer that observability ultimately feeds remains linear with team size. It does not scale with the agent layer.</li>
     </ul>
 
     <p>When all three operate at once, the observability dashboard becomes a backlog generator. Each row on the drift surface represents a violation that has already been proposed, possibly merged, and is now waiting for someone to act on it. The dashboard grows faster than it shrinks. It becomes evidence of the problem rather than a tool for resolving it.</p>
 
-    <p>This is not a tooling failure. It is an architectural one. You cannot fix a queue-depth problem by improving the visualization of the queue. You fix it by reducing the rate at which the queue fills — which means acting upstream of the observation point.</p>
+    <p>This is not a tooling failure. It is an architectural one. You cannot fix a queue-depth problem by improving the visualization of the queue. You fix it by reducing the rate at which the queue fills â€” which means acting upstream of the observation point.</p>
 
     <h2>Visibility without enforcement</h2>
 
@@ -358,29 +358,29 @@
 
     <p>This team has, by hypothesis, complete visibility into agent behavior. Every tool call is traced. Every diff is scored against architectural rules. Every drift event surfaces on a dashboard within seconds. The team can name, count, and graph every category of violation in their codebase. They can correlate violations with agents, with sessions, with file paths, with developers. The observability stack is maximal.</p>
 
-    <p>That team can still ship architectural drift continuously. The agent proposes the violation; the observability layer records the violation; the violation merges or is reverted; the next session proposes the same violation again. The dashboard reports a stable drift rate — not because nothing is being done about it, but because the only thing being done is observing.</p>
+    <p>That team can still ship architectural drift continuously. The agent proposes the violation; the observability layer records the violation; the violation merges or is reverted; the next session proposes the same violation again. The dashboard reports a stable drift rate â€” not because nothing is being done about it, but because the only thing being done is observing.</p>
 
-    <p class="pull-quote">You can perfectly observe drift, and continuously ship drift, at the same time.<span class="attrib">— the failure mode</span></p>
+    <p class="pull-quote">You can perfectly observe drift, and continuously ship drift, at the same time.<span class="attrib">â€” the failure mode</span></p>
 
-    <p>This is the failure mode that observability-as-governance produces. The team feels in control because they can see everything. The codebase, meanwhile, accumulates exactly the violations the dashboard is reporting. Visibility is not control. <strong>Observability without enforcement becomes operational archaeology</strong> — a precise catalog of what already happened, with no mechanism to change what happens next.</p>
+    <p>This is the failure mode that observability-as-governance produces. The team feels in control because they can see everything. The codebase, meanwhile, accumulates exactly the violations the dashboard is reporting. Visibility is not control. <strong>Observability without enforcement becomes operational archaeology</strong> â€” a precise catalog of what already happened, with no mechanism to change what happens next.</p>
 
     <h2>Governance before generation</h2>
 
-    <p>The corrective layer sits in front of the agent, not behind it. Architectural decisions, compiled into a typed corpus, are queried by the agent — or imposed on the agent's tool use — at the moment it is about to write code. The agent's proposal is shaped by the constraint before it becomes output that observability would have to surface.</p>
+    <p>The corrective layer sits in front of the agent, not behind it. Architectural decisions, compiled into a typed corpus, are queried by the agent â€” or imposed on the agent's tool use â€” at the moment it is about to write code. The agent's proposal is shaped by the constraint before it becomes output that observability would have to surface.</p>
 
     <p>This layer has specific properties that distinguish it from telemetry:</p>
 
     <ul>
-      <li><strong>Pre-generation</strong> — it fires at the agent's pre-tool-use hook or in the IDE rules layer, not at the merge gate or after.</li>
-      <li><strong>Deterministic</strong> — the same query against the same corpus returns the same verdict. The constraint is not a probabilistic suggestion that the agent may or may not follow.</li>
-      <li><strong>Propagated</strong> — every agent the team uses queries the same compiled corpus. Claude Code, Cursor, Copilot, and CI all reach the same verdict against the same decision.</li>
-      <li><strong>Citable</strong> — every enforcement event traces back to the authoring ADR. Engineers see <em>which</em> decision blocked them, written by <em>whom</em>, on <em>which</em> date.</li>
+      <li><strong>Pre-generation</strong> â€” it fires at the agent's pre-tool-use hook or in the IDE rules layer, not at the merge gate or after.</li>
+      <li><strong>Deterministic</strong> â€” the same query against the same corpus returns the same verdict. The constraint is not a probabilistic suggestion that the agent may or may not follow.</li>
+      <li><strong>Propagated</strong> â€” every agent the team uses queries the same compiled corpus. Claude Code, Cursor, Copilot, and CI all reach the same verdict against the same decision.</li>
+      <li><strong>Citable</strong> â€” every enforcement event traces back to the authoring ADR. Engineers see <em>which</em> decision blocked them, written by <em>whom</em>, on <em>which</em> date.</li>
     </ul>
 
-    <p>Done correctly, the governance layer reduces the rate at which the observability layer has to surface violations. Drift telemetry becomes meaningful again — it surfaces the edge cases that the constraint layer did not catch, rather than reporting an endless stream of preventable proposals. The two layers work in series, not in substitution.</p>
+    <p>Done correctly, the governance layer reduces the rate at which the observability layer has to surface violations. Drift telemetry becomes meaningful again â€” it surfaces the edge cases that the constraint layer did not catch, rather than reporting an endless stream of preventable proposals. The two layers work in series, not in substitution.</p>
 
     <div class="callout-teal">
-      <p><strong>Observability is operational memory. Governance is operational control.</strong> A team with both has a feedback loop. A team with only observability has a record. A team with only governance has a gate but no learning. The point is not to choose — it is to put them in the right order.</p>
+      <p><strong>Observability is operational memory. Governance is operational control.</strong> A team with both has a feedback loop. A team with only observability has a record. A team with only governance has a gate but no learning. The point is not to choose â€” it is to put them in the right order.</p>
     </div>
 
     <h2>The four layers of the AI coding stack</h2>
@@ -414,25 +414,25 @@
       <tbody>
         <tr><td>Generation</td><td>Produce code (Claude Code, Cursor, Copilot, JetBrains AI)</td></tr>
         <tr class="row-accent"><td>Governance</td><td>Constrain behavior at the moment of intent (Mneme)</td></tr>
-        <tr><td>Observability</td><td>Explain outcomes — traces, drift, evaluations (LangSmith, Braintrust, Arize)</td></tr>
+        <tr><td>Observability</td><td>Explain outcomes â€” traces, drift, evaluations (LangSmith, Braintrust, Arize)</td></tr>
         <tr><td>Review</td><td>Escalate edge cases (CodeRabbit, human reviewers)</td></tr>
       </tbody>
     </table>
 
-    <p>The teams currently building the observability layer are doing important work. The category is real. The argument is not that observability tools are unnecessary — it is that they are most valuable when paired with a governance layer that prevents the noise they would otherwise have to surface. The observability signal becomes sharper when most of the routine violations have already been suppressed upstream. The drift dashboard becomes a list of the genuinely interesting cases, not a backlog of preventable patterns.</p>
+    <p>The teams currently building the observability layer are doing important work. The category is real. The argument is not that observability tools are unnecessary â€” it is that they are most valuable when paired with a governance layer that prevents the noise they would otherwise have to surface. The observability signal becomes sharper when most of the routine violations have already been suppressed upstream. The drift dashboard becomes a list of the genuinely interesting cases, not a backlog of preventable patterns.</p>
 
     <h2>The complete worldview</h2>
 
     <p>Mneme's position is that AI coding requires a governance layer with the same engineering rigor that observability already has. The conceptual framework that follows is consistent:</p>
 
     <ul>
-      <li><strong>Memory is not governance</strong> — recall is not constraint. Remembering a decision does not enforce it.</li>
-      <li><strong>Prompt engineering is not governance</strong> — nudging the agent is not constraining the agent. Prompts shape one generation; governance shapes every generation.</li>
-      <li><strong>Review is not governance</strong> — catching the violation is not preventing it. Review samples output; governance shapes input.</li>
-      <li><strong>Observability is not governance</strong> — seeing the violation is not stopping it. Visibility is downstream of control.</li>
+      <li><strong>Memory is not governance</strong> â€” recall is not constraint. Remembering a decision does not enforce it.</li>
+      <li><strong>Prompt engineering is not governance</strong> â€” nudging the agent is not constraining the agent. Prompts shape one generation; governance shapes every generation.</li>
+      <li><strong>Review is not governance</strong> â€” catching the violation is not preventing it. Review samples output; governance shapes input.</li>
+      <li><strong>Observability is not governance</strong> â€” seeing the violation is not stopping it. Visibility is downstream of control.</li>
     </ul>
 
-    <p>Each is a category boundary the ecosystem will eventually settle. The team that wires all four layers in the right order — generation, governance, observability, review — runs a stack where each layer does exactly the work it is suited for and nothing else. That is the configuration that scales.</p>
+    <p>Each is a category boundary the ecosystem will eventually settle. The team that wires all four layers in the right order â€” generation, governance, observability, review â€” runs a stack where each layer does exactly the work it is suited for and nothing else. That is the configuration that scales.</p>
 
     <p>Everything else is, in the long run, operational archaeology.</p>
 
@@ -442,23 +442,23 @@
     <h2>Frequently asked questions</h2>
     <details>
       <summary>What is the difference between observability and governance for AI coding agents?</summary>
-      <div class="faq-body">Observability detects and explains violations after they have already been proposed or merged — it produces traces, dashboards, drift logs, and evaluations of agent behavior. Governance prevents or constrains those violations before code is generated, by enforcing machine-evaluable architectural decisions at the agent's pre-tool-use hook and at the CI merge gate. Observability is downstream of governance. Visibility tells you what happened; control determines what happens.</div>
+      <div class="faq-body">Observability detects and explains violations after they have already been proposed or merged â€” it produces traces, dashboards, drift logs, and evaluations of agent behavior. Governance prevents or constrains those violations before code is generated, by enforcing machine-evaluable architectural decisions at the agent's pre-tool-use hook and at the CI merge gate. Observability is downstream of governance. Visibility tells you what happened; control determines what happens.</div>
     </details>
     <details>
       <summary>Why isn't AI agent telemetry sufficient on its own?</summary>
-      <div class="faq-body">Telemetry is reactive by design. It begins after the behavior has already occurred. At agentic scale — where a single team generates 10–100x the code of human-paced development — telemetry that surfaces violations after generation accumulates a review backlog that grows faster than the team can clear it. Observability without an enforcement layer in front of it converts every violation into rework, not prevention.</div>
+      <div class="faq-body">Telemetry is reactive by design. It begins after the behavior has already occurred. At agentic scale â€” where a single team generates 10â€“100x the code of human-paced development â€” telemetry that surfaces violations after generation accumulates a review backlog that grows faster than the team can clear it. Observability without an enforcement layer in front of it converts every violation into rework, not prevention.</div>
     </details>
     <details>
       <summary>Does this mean observability tools are useless?</summary>
-      <div class="faq-body">No. Observability is essential — it is how teams measure drift, audit enforcement, and improve governance over time. But it is operational memory, not operational control. Observability records what the system did; governance shapes what the system is allowed to do. The argument here is not that observability is wrong. It is that observability without an upstream enforcement layer is operational archaeology — you can perfectly observe drift and continuously ship drift at the same time.</div>
+      <div class="faq-body">No. Observability is essential â€” it is how teams measure drift, audit enforcement, and improve governance over time. But it is operational memory, not operational control. Observability records what the system did; governance shapes what the system is allowed to do. The argument here is not that observability is wrong. It is that observability without an upstream enforcement layer is operational archaeology â€” you can perfectly observe drift and continuously ship drift at the same time.</div>
     </details>
     <details>
       <summary>How do governance and observability fit together in the AI coding stack?</summary>
-      <div class="faq-body">They sit at different layers of the same pipeline. Generation produces code. Governance constrains what the agent is allowed to produce. Verification confirms invariants hold. Observability explains outcomes after the fact. Review escalates edge cases that none of the prior layers resolved. Each layer has a distinct job — and conflating them is what produces the current pattern of teams investing in dashboards while still shipping architectural drift at AI velocity.</div>
+      <div class="faq-body">They sit at different layers of the same pipeline. Generation produces code. Governance constrains what the agent is allowed to produce. Verification confirms invariants hold. Observability explains outcomes after the fact. Review escalates edge cases that none of the prior layers resolved. Each layer has a distinct job â€” and conflating them is what produces the current pattern of teams investing in dashboards while still shipping architectural drift at AI velocity.</div>
     </details>
     <details>
       <summary>How does this relate to LangSmith, Braintrust, Arize, and similar tools?</summary>
-      <div class="faq-body">AI observability tools — LangSmith, Braintrust, Arize, Phoenix, agent tracing platforms — sit at the observability layer of the stack. They are valuable for measuring agent behavior, identifying regressions, and improving prompts. They are not architectural enforcement layers. They become most useful when paired with a governance layer that prevents the violations they would otherwise have to surface — making the observability signal less noisy and more focused on the edge cases that genuinely need human attention.</div>
+      <div class="faq-body">AI observability tools â€” LangSmith, Braintrust, Arize, Phoenix, agent tracing platforms â€” sit at the observability layer of the stack. They are valuable for measuring agent behavior, identifying regressions, and improving prompts. They are not architectural enforcement layers. They become most useful when paired with a governance layer that prevents the violations they would otherwise have to surface â€” making the observability signal less noisy and more focused on the edge cases that genuinely need human attention.</div>
     </details>
   </section>
 
@@ -469,7 +469,7 @@
       <li><a href="/concepts/verification-contracts/"><div class="rel-title">Verification contracts</div><p class="rel-desc">Pre-registered, machine-evaluable assertions that define what a governance check must prove.</p></a></li>
       <li><a href="/concepts/governance-before-generation/"><div class="rel-title">Governance before generation</div><p class="rel-desc">Enforcement at the point of AI intent, not at the point of human review.</p></a></li>
       <li><a href="/concepts/architectural-drift/"><div class="rel-title">Architectural drift</div><p class="rel-desc">The compound degradation in codebase coherence when AI generation outpaces governance.</p></a></li>
-      <li><a href="/concepts/deterministic-enforcement/"><div class="rel-title">Deterministic enforcement</div><p class="rel-desc">Same input, same verdict — every run, every agent, every consumer. The precondition for auditability.</p></a></li>
+      <li><a href="/concepts/deterministic-enforcement/"><div class="rel-title">Deterministic enforcement</div><p class="rel-desc">Same input, same verdict â€” every run, every agent, every consumer. The precondition for auditability.</p></a></li>
     </ul>
   </aside>
 
@@ -487,7 +487,7 @@
 
     <div class="cta-block">
       <h3>Put governance upstream of your dashboards</h3>
-      <p>Mneme HQ enforces your architectural decisions at generation time — pre-tool-use hook in the agent, gate in CI. The drift you can finally stop measuring is the drift you stopped shipping.</p>
+      <p>Mneme HQ enforces your architectural decisions at generation time â€” pre-tool-use hook in the agent, gate in CI. The drift you can finally stop measuring is the drift you stopped shipping.</p>
       <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
     </div>
   </footer>
