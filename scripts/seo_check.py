@@ -432,6 +432,44 @@ def rule_linking_pattern(html: str, ctx: PageContext) -> RuleResult:
     return PASS, ""
 
 
+def rule_breadcrumb_html(html: str, ctx: PageContext) -> RuleResult:
+    """The visible <ol class="breadcrumb"> parent links must match the page's URL hierarchy.
+
+    For a page at /section/slug/, the parent hrefs must be exactly ["/" , "/section/"].
+    Catches stray intermediate items (e.g. /concepts/ or /architecture/ inside an
+    /insights/ article breadcrumb).
+
+    Pages that don't use the ol.breadcrumb pattern are skipped — this rule only
+    fires when the markup is present.
+    """
+    rel = ctx.rel_path
+    parts = rel.split("/")
+
+    # Home page or single-segment paths: no breadcrumb constraint
+    if len(parts) <= 1:
+        return PASS, ""
+
+    # Build the expected parent hrefs list based on depth:
+    #   section hub  (e.g. insights/index.html)         → ["/"]
+    #   sub-page     (e.g. insights/foo/index.html)      → ["/", "/section/"]
+    if len(parts) == 2:
+        expected = ["/"]
+    else:
+        section = parts[0]
+        expected = ["/", f"/{section}/"]
+
+    m = re.search(r'<ol\s+class=["\']breadcrumb["\']>(.*?)</ol>', html, flags=re.S | re.I)
+    if not m:
+        return PASS, ""  # no ol.breadcrumb present; skip
+
+    block = re.sub(r'<li[^>]*\baria-current\b[^>]*>.*?</li>', '', m.group(1), flags=re.S | re.I)
+    actual = re.findall(r'<a\b[^>]*\bhref\s*=\s*["\']([^"\']*)["\']', block, flags=re.I)
+
+    if actual != expected:
+        return FAIL, f"breadcrumb parents {actual} != expected {expected}"
+    return PASS, ""
+
+
 def rule_jsonld_breadcrumb(html: str, ctx: PageContext) -> RuleResult:
     # Skip the home page — it doesn't need a breadcrumb.
     if ctx.rel_path == "index.html":
@@ -694,6 +732,7 @@ RULES: list[tuple[str, RuleFn]] = [
     ("structure.links",     rule_internal_links),
     ("links.targets",       rule_link_targets),
     ("links.pattern",       rule_linking_pattern),
+    ("nav.breadcrumb",      rule_breadcrumb_html),
     ("jsonld.breadcrumb",   rule_jsonld_breadcrumb),
     ("jsonld.main",         rule_jsonld_main),
     ("jsonld.author",       rule_jsonld_author),
