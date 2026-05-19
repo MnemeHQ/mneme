@@ -298,7 +298,21 @@
         <span class="sep">&middot;</span>
         <time datetime="2026-05-15">Restructured May 2026</time>
       </p>
+      <p style="margin-top:0.9rem;font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--muted);letter-spacing:0.04em;">
+        Open source &middot; Mneme dogfoods this on its own repo &middot; 117 passing benchmark scenarios
+      </p>
     </header>
+
+    <!-- HERO VIDEO -->
+    <div style="max-width:880px;margin:0 auto 5rem;aspect-ratio:16/9;position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--border2);box-shadow:0 0 0 1px rgba(200,240,96,0.06), 0 20px 60px rgba(0,0,0,0.4);">
+      <iframe
+        src="https://www.youtube-nocookie.com/embed/4Yg43V9amao"
+        title="Mneme HQ â€” Governed Python Agent Demo"
+        loading="lazy"
+        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen
+        style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe>
+    </div>
 
     <!-- â”€â”€â”€â”€â”€ 01 Â· THE PROBLEM â”€â”€â”€â”€â”€ -->
     <section class="section" id="problem">
@@ -358,6 +372,13 @@
           </div>
           <span class="fc-cta">Walk through the product loop &rarr;</span>
         </a>
+
+        <!-- Mid-page install + pilot -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+          <span style="font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--muted);">Try it on your own repo:</span>
+          <code style="font-family:'DM Mono',monospace;font-size:0.82rem;color:var(--text);background:var(--term-bg);border:1px solid var(--border);border-radius:6px;padding:0.4rem 0.75rem;">pip install mneme &amp;&amp; mneme init &amp;&amp; mneme check</code>
+          <a href="/pilot/" style="font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--accent);text-decoration:none;white-space:nowrap;">or request a pilot &rarr;</a>
+        </div>
 
         <!-- Flagship 1: Architectural drift -->
         <a class="flagship-card" href="/demo/architectural-drift/">
@@ -493,6 +514,7 @@
         <code id="snippet-text">pip install mneme &amp;&amp; mneme init &amp;&amp; mneme check</code>
         <button class="copy-btn" id="copy-btn" onclick="copySnippet()">Copy</button>
       </div>
+      <p style="margin-top:1.25rem;margin-bottom:0;font-size:0.82rem;color:var(--muted);">Want help wiring it up? <a href="/pilot/" style="color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(200,240,96,0.3);">Request a pilot</a> &mdash; we'll compile your ADRs and walk the enforcement trace on your own repo.</p>
     </div>
 
     <!-- â”€â”€â”€â”€â”€ FAQ â”€â”€â”€â”€â”€ -->

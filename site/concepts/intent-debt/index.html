@@ -360,13 +360,13 @@
       <li><strong>Enforce.</strong> The decisions are presented as constraints the agent must satisfy, not suggestions it may consider. Violations are blocked or flagged with a citable verdict.</li>
     </ol>
 
-    <p>When this loop is in place, intent debt cannot accumulate silently. The gap between what the system is supposed to preserve and what agents are constrained to follow is closed at the point of generation. Decisions that are compiled, current, and scoped are enforced in every session, by every agent, without depending on review to catch violations after the fact.</p>
+    <p>When this loop is in place, intent debt cannot accumulate silently. The gap between what the system is supposed to preserve and what agents are constrained to follow is closed at the point of generation. <a href="/demo/" style="color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(200,240,96,0.3);">The demo walks through this loop end-to-end</a> â€” the agent proposes a violation, the corpus blocks it, the retry comes back compliant. Decisions that are compiled, current, and scoped are enforced in every session, by every agent, without depending on review to catch violations after the fact.</p>
 
     <p>Intent debt is not eliminated permanently. New decisions create new opportunities for the gap to reopen if they are not compiled. Governance infrastructure is a practice, not a one-time fix â€” but it is the only mechanism that operates in the machine enforcement channel where intent debt actually lives.</p>
 
     <h2>How to know you have intent debt</h2>
 
-    <p>Intent debt is invisible until it is measured. Most teams discover they have it the same way they discover technical debt: through symptoms that compound until they cannot be ignored. The recognizable signs:</p>
+    <p>Intent debt is invisible until it is measured. Most teams discover they have it the same way they discover technical debt: through symptoms that compound until they cannot be ignored. These patterns recur across <a href="/use-cases/" style="color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(200,240,96,0.3);">the use cases where teams adopt Mneme</a> â€” recognizable signs include:</p>
 
     <ul>
       <li><strong>Reviewers keep correcting the same pattern.</strong> The decision exists, the agents do not know it, and review becomes the enforcement layer by default â€” a layer that does not scale.</li>
@@ -376,7 +376,7 @@
       <li><strong>"AI velocity" feels indistinguishable from "AI churn."</strong> Throughput is high. Coherence is not. Output rate without an enforcement layer is the surface signature of intent debt.</li>
     </ul>
 
-    <p>The diagnostic is simple: pick a recent architectural decision. Ask whether any agent on the team is bound to follow it, or whether a human has to catch the violation. If the answer is "a human catches it," that decision is denominated in intent debt.</p>
+    <p>The diagnostic is simple: pick a recent architectural decision. Ask whether any agent on the team is bound to follow it, or whether a human has to catch the violation. If the answer is "a human catches it," that decision is denominated in intent debt. <a href="/pilot/" style="color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(200,240,96,0.3);">A pilot</a> compiles your existing ADRs into the enforcement layer and measures the gap directly.</p>
 
     <h2 id="further-reading">Further reading</h2>
     <ul>
@@ -426,6 +426,7 @@
       <h3>See intent enforcement in action</h3>
       <p>The Mneme demo shows how compiled decisions close the intent debt gap at the pre-generation hook â€” live, deterministic, citable.</p>
       <a href="/demo/" class="btn-primary">View the demo â†’</a>
+      <a href="/pilot/" style="display:inline-block;margin-left:0.75rem;padding:0.65rem 1.25rem;border:1px solid var(--border2);border-radius:8px;font-size:0.85rem;font-weight:500;font-family:'DM Mono',monospace;color:var(--muted);text-decoration:none;transition:color 0.15s, border-color 0.15s;" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--accent)';" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border2)';">Or request a pilot â†’</a>
     </div>
   </footer>
 </article>
