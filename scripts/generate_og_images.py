@@ -104,6 +104,7 @@ TEMPLATE_MAP = {
     "og-concepts-agent-verification.html": "concepts/agent-verification/og.png",
     "og-concepts-governance-provenance.html": "concepts/governance-provenance/og.png",
     "og-concepts-execution-surfaces.html": "concepts/execution-surfaces/og.png",
+    "og-concepts-reliable-delegation.html": "concepts/reliable-delegation/og.png",
     # Docs
     "og-docs.html": "docs/og.png",
     # Architecture

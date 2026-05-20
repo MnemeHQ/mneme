@@ -333,6 +333,7 @@
         <li><a href="#observability">Why observability is not governance</a></li>
         <li><a href="#memory">Why memory is not governance</a></li>
         <li><a href="#missing">The missing layer: executable architectural intent</a></li>
+        <li><a href="#reliable-delegation">From capable agents to reliable delegation</a></li>
         <li><a href="#closing">The new reliability question</a></li>
         <li><a href="#signals">Market signals</a></li>
         <li><a href="#faq">FAQ</a></li>
@@ -511,6 +512,18 @@
       <p><strong>The layer test.</strong> A capability is its own layer when it cannot be folded into any adjacent layer without breaking that layer's contract. Memory cannot refuse changes without becoming a policy engine. Observability cannot block actions without becoming an enforcement gate. Orchestration cannot resolve decision precedence without becoming a governance system. The layer is what is left when each adjacent tool finishes doing its actual job.</p>
     </div>
 
+    <h2 id="reliable-delegation">From capable agents to reliable delegation</h2>
+
+    <p>As AI systems become more agentic, the enterprise question changes. The issue is not only whether a model can complete a task, but whether it can complete delegated work consistently, safely, and within known constraints.</p>
+
+    <p>For software teams, this is the <a href="/concepts/reliable-delegation/">reliable delegation</a> problem. An agent that can refactor code, generate migrations, or modify infrastructure is only useful if the team can trust the boundaries around that work. Those boundaries include architectural decisions, approved dependencies, security rules, platform conventions, and the expected shape of the system.</p>
+
+    <p>Memory helps an agent remember context. Orchestration helps it coordinate tasks. Governance defines what it is allowed to do. Verification proves whether it did what was expected. All four layers are necessary; none can do the others&rsquo; jobs.</p>
+
+    <p class="pull-quote"><em>Capability gets agents into the workflow.</em> Reliable delegation keeps them usable in production.</p>
+
+    <p>The shift is from asking <em>can this agent complete the task?</em> to <em>can we verify it completed the task inside our constraints?</em> That second question is what the governance and verification layers exist to answer.</p>
+
     <h2 id="closing">The new reliability question</h2>
 
     <p>The first wave of the agent market was a capability competition: which model can reason further, which harness can keep the loop going longer, which retrieval system can find the right snippet. Those questions are not finished, but they are no longer the bottleneck for production deployment.</p>
@@ -574,6 +587,7 @@
     <li><a href="/concepts/verification-contracts/">Verification Contracts</a></li>
     <li><a href="/concepts/enforcement-provenance/">Enforcement Provenance</a></li>
     <li><a href="/concepts/intent-debt/">Intent Debt</a></li>
+    <li><a href="/concepts/reliable-delegation/">Reliable Delegation</a></li>
   </ul>
 
   <h2 id="related-reading">Related reading</h2>
