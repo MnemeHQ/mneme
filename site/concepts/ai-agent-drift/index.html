@@ -167,6 +167,28 @@
     .diagram-caption strong { color: var(--accent); font-weight: 500; }
 
     @media (max-width: 768px) { nav, .mobile-menu { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } }
+  
+    /* Phase 2 — multi-category metadata block; mirrors .related-panel card styling onto .concept-metadata-list
+       so .rel-title / .rel-desc carry the same treatment when used here. */
+    .concept-metadata { margin-top: 3.5rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .concept-metadata-group { margin-bottom: 2rem; }
+    .concept-metadata-group:last-child { margin-bottom: 0; }
+    .concept-metadata-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
+    .concept-metadata-label.tint-accent { color: var(--accent); }
+    .concept-metadata-label.tint-teal { color: var(--teal); }
+    .concept-metadata-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    .concept-metadata-list.is-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; }
+    .concept-metadata-list li { margin: 0; }
+    .concept-metadata-list a { display: block; padding: 1.15rem 1.35rem; background: var(--surface); text-decoration: none; transition: background 0.15s; }
+    .concept-metadata-list a:hover { background: var(--surface2); }
+    .concept-metadata-list .rel-title { color: var(--text); font-size: 0.92rem; font-weight: 600; margin-bottom: 0.35rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; letter-spacing: -0.005em; transition: color 0.15s; }
+    .concept-metadata-list .rel-title::after { content: '\2192'; color: var(--accent); opacity: 0.4; transition: opacity 0.15s, transform 0.15s; flex-shrink: 0; }
+    .concept-metadata-list a:hover .rel-title { color: var(--accent); }
+    .concept-metadata-list a:hover .rel-title::after { opacity: 1; transform: translateX(3px); }
+    .concept-metadata-list .rel-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.65; margin: 0; }
+    @media (max-width: 640px) {
+      .concept-metadata-list.is-grid { grid-template-columns: 1fr; }
+    }
   </style>
   <script type="application/ld+json">
   {
@@ -505,15 +527,41 @@
     </details>
   </section>
 
-  <aside class="related-panel" aria-labelledby="related-panel-label">
-    <div class="related-panel-label" id="related-panel-label">Related operational essays</div>
-    <ul class="related-list">
+  <aside class="concept-metadata" aria-label="Concept metadata">
+    <div class="concept-metadata-group">
+      <div class="concept-metadata-label tint-accent">Operational implications</div>
+      <ul class="concept-metadata-list is-grid">
       <li><a href="/insights/memory-is-not-governance/"><div class="rel-title">Memory Is Not Governance</div><p class="rel-desc">Context persistence cannot enforce architectural invariants. Recall is not constraint.</p></a></li>
-      <li><a href="/insights/why-prompt-memory-fails-at-scale/"><div class="rel-title">Why Prompt Memory Fails at Scale</div><p class="rel-desc">Context injection has a ceiling â€” no precedence, no enforcement, no persistence across sessions.</p></a></li>
+      <li><a href="/insights/why-prompt-memory-fails-at-scale/"><div class="rel-title">Why Prompt Memory Fails at Scale</div><p class="rel-desc">Context injection has a ceiling — no precedence, no enforcement, no persistence across sessions.</p></a></li>
       <li><a href="/insights/why-claude-md-stops-scaling/"><div class="rel-title">Why CLAUDE.md Stops Scaling</div><p class="rel-desc">Prompt files document standards but cannot deterministically enforce them across sessions and agents.</p></a></li>
       <li><a href="/insights/agents-of-chaos-and-the-governance-gap/"><div class="rel-title">Agents of Chaos and the Governance Gap</div><p class="rel-desc">AI agents acting at high throughput surface the governance layer most teams quietly skipped.</p></a></li>
-    </ul>
+      </ul>
+    </div>
+    <div class="concept-metadata-group">
+      <div class="concept-metadata-label tint-teal">Enforcement surfaces</div>
+      <ul class="concept-metadata-list">
+      <li><a href="/integrations/claude-code/"><div class="rel-title">Claude Code</div><p class="rel-desc">PreToolUse hook enforces governance constraints before every file write.</p></a></li>
+      <li><a href="/integrations/cursor/"><div class="rel-title">Cursor</div><p class="rel-desc">CLAUDE.md-equivalent governance surface for Cursor-based development.</p></a></li>
+      <li><a href="/integrations/copilot/"><div class="rel-title">GitHub Copilot</div><p class="rel-desc">Governance layer applied to Copilot-assisted generation via shared constraint records.</p></a></li>
+      </ul>
+    </div>
+    <div class="concept-metadata-group">
+      <div class="concept-metadata-label tint-teal">Related demos</div>
+      <ul class="concept-metadata-list">
+      <li><a href="/demo/architectural-drift/"><div class="rel-title">Architectural Drift Demo</div><p class="rel-desc">Before/after trace of drift accumulation and governance interception.</p></a></li>
+      </ul>
+    </div>
+    <div class="concept-metadata-group">
+      <div class="concept-metadata-label">Related concepts</div>
+      <ul class="concept-metadata-list is-grid">
+      <li><a href="/concepts/architectural-drift/"><div class="rel-title">Architectural Drift</div><p class="rel-desc">The codebase-side residue of ungoverned generation — invariants quietly eroded across sessions.</p></a></li>
+      <li><a href="/concepts/multi-agent-continuity/"><div class="rel-title">Multi-Agent Continuity</div><p class="rel-desc">Decisions persist across sessions, agents, and tools so the architectural worldview survives the next run.</p></a></li>
+      <li><a href="/concepts/governance-before-generation/"><div class="rel-title">Governance Before Generation</div><p class="rel-desc">Governance posture that intercepts agent output at the point of intent rather than at the point of review.</p></a></li>
+      <li><a href="/concepts/governance-infrastructure/"><div class="rel-title">Governance Infrastructure</div><p class="rel-desc">The engineering platform layer that encodes, distributes, versions, and enforces architectural decisions across agents and CI.</p></a></li>
+      </ul>
+    </div>
   </aside>
+
 
   <footer class="article-footer">
     <a href="/concepts/" class="back-link">â† Back to Concepts</a>
