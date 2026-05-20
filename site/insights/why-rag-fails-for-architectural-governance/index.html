@@ -74,6 +74,23 @@
     .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
     .callout p strong { color: var(--accent); }
 
+    .flow-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border-radius: 12px; overflow: hidden; margin: 2.5rem 0; }
+    .flow-col { background: var(--surface); padding: 1.5rem 1.5rem 1.75rem; }
+    .flow-col.gov { background: linear-gradient(180deg, rgba(200,240,96,0.04), var(--surface) 70%); }
+    .flow-col .fc-label { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+    .flow-col.gov .fc-label { color: var(--accent); }
+    .flow-col .fc-name { font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 1.1rem; }
+    .flow-step { display: flex; align-items: flex-start; gap: 0.7rem; padding: 0.55rem 0; }
+    .flow-step .fs-num { font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--border2); padding-top: 0.2rem; min-width: 1.25rem; flex-shrink: 0; }
+    .flow-col.gov .flow-step .fs-num { color: rgba(200,240,96,0.55); }
+    .flow-step .fs-text { font-size: 0.83rem; color: var(--muted); line-height: 1.55; }
+    .flow-step .fs-text strong { color: var(--text); font-weight: 500; }
+    .flow-col.gov .flow-step .fs-text strong { color: var(--accent); }
+    .flow-arrow { font-family: 'DM Mono', monospace; font-size: 0.66rem; color: var(--border2); padding-left: 1.95rem; line-height: 1; }
+    .flow-out { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted); margin-top: 1rem; padding-top: 0.85rem; border-top: 1px dashed var(--border2); }
+    .flow-col.gov .flow-out { color: var(--accent); }
+    @media (max-width: 600px) { .flow-compare { grid-template-columns: 1fr; } }
+
     .comparison-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.85rem; }
     .comparison-table th { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border2); color: var(--muted); font-weight: 500; }
     .comparison-table td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
@@ -354,7 +371,36 @@
       <li><strong>Structurally validated</strong> — decisions need a schema, not just free-form text, so violations can be detected consistently.</li>
     </ol>
 
-    <p>RAG addresses exactly none of these requirements natively. Let's go through each failure mode.</p>
+    <p>RAG addresses exactly none of these requirements natively. The shapes of the two flows make the mismatch clear:</p>
+
+    <div class="flow-compare" aria-label="RAG flow vs governance flow">
+      <div class="flow-col">
+        <div class="fc-label">RAG flow</div>
+        <div class="fc-name">Retrieve &rarr; suggest &rarr; generate</div>
+        <div class="flow-step"><div class="fs-num">01</div><div class="fs-text"><strong>Embed query</strong> &mdash; turn the agent's prompt into a vector</div></div>
+        <div class="flow-arrow">&darr;</div>
+        <div class="flow-step"><div class="fs-num">02</div><div class="fs-text"><strong>Nearest-neighbor search</strong> &mdash; rank docs by cosine similarity</div></div>
+        <div class="flow-arrow">&darr;</div>
+        <div class="flow-step"><div class="fs-num">03</div><div class="fs-text"><strong>Inject top-k</strong> &mdash; concatenate retrieved passages into context</div></div>
+        <div class="flow-arrow">&darr;</div>
+        <div class="flow-step"><div class="fs-num">04</div><div class="fs-text"><strong>Model generates</strong> &mdash; with retrieved context as suggestion</div></div>
+        <div class="flow-out">Output: probabilistic. Model may follow or ignore retrieved context.</div>
+      </div>
+      <div class="flow-col gov">
+        <div class="fc-label">Governance flow</div>
+        <div class="fc-name">Resolve &rarr; compile &rarr; enforce</div>
+        <div class="flow-step"><div class="fs-num">01</div><div class="fs-text"><strong>Scope match</strong> &mdash; structured matching by path, service, module</div></div>
+        <div class="flow-arrow">&darr;</div>
+        <div class="flow-step"><div class="fs-num">02</div><div class="fs-text"><strong>Precedence resolve</strong> &mdash; status, supersedes, priority, recency</div></div>
+        <div class="flow-arrow">&darr;</div>
+        <div class="flow-step"><div class="fs-num">03</div><div class="fs-text"><strong>Compile constraints</strong> &mdash; emit machine-checkable rules for the seam</div></div>
+        <div class="flow-arrow">&darr;</div>
+        <div class="flow-step"><div class="fs-num">04</div><div class="fs-text"><strong>Enforce at hook</strong> &mdash; block or flag violating output before commit</div></div>
+        <div class="flow-out">Output: deterministic. Same decision graph + same change &rarr; same verdict.</div>
+      </div>
+    </div>
+
+    <p>RAG ranks by similarity and ends in a suggestion. Governance ranks by authority and ends in a verdict. Let's go through each failure mode.</p>
 
     <h2>Failure mode 1: Semantic similarity ≠ decision authority</h2>
 

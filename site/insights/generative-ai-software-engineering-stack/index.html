@@ -130,6 +130,20 @@
     .callout p { margin: 0; color: var(--muted); font-size: 0.9rem; }
     .callout p strong { color: var(--accent); }
 
+    .layer-stack { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin: 1.5rem 0 2.5rem; }
+    .layer-stack .ls-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding: 0.85rem 1.1rem; border-bottom: 1px solid var(--border); background: var(--surface2); }
+    .layer-row { display: flex; align-items: stretch; min-height: 52px; border-bottom: 1px solid var(--border); }
+    .layer-row:last-child { border-bottom: none; }
+    .layer-num-mini { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted); width: 64px; padding: 0.85rem; background: var(--surface2); border-right: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .layer-content-mini { flex: 1; padding: 0.85rem 1.1rem; display: flex; flex-direction: column; justify-content: center; }
+    .layer-content-mini strong { color: var(--text); font-weight: 600; font-size: 0.88rem; }
+    .layer-content-mini span { color: var(--muted); font-size: 0.78rem; line-height: 1.55; margin-top: 0.15rem; }
+    .layer-row.highlighted .layer-num-mini { background: rgba(200,240,96,0.08); color: var(--accent); border-right-color: rgba(200,240,96,0.3); }
+    .layer-row.highlighted .layer-content-mini { background: rgba(200,240,96,0.05); border-left: 2px solid var(--accent); }
+    .layer-row.highlighted .layer-content-mini strong { color: var(--accent); }
+    .layer-row.dim .layer-content-mini { opacity: 0.72; }
+    .layer-caption { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.06em; color: var(--muted); margin: -1.5rem 0 2.5rem; padding-left: 0.25rem; }
+
     .stack-grid { display: grid; grid-template-columns: 1fr; gap: 0.75rem; margin: 1.5rem 0 0.5rem; }
     .layer { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.3rem; position: relative; }
     .layer.layer-mneme { border-color: rgba(200,240,96,0.45); background: linear-gradient(180deg, rgba(200,240,96,0.05), var(--surface) 60%); }
@@ -141,6 +155,24 @@
     .layer .layer-purpose strong { color: var(--text); font-weight: 500; }
     .layer ul.layer-bullets { margin: 0.4rem 0 0 1.25rem; color: var(--muted); }
     .layer ul.layer-bullets li { font-size: 0.85rem; margin-bottom: 0.25rem; line-height: 1.65; }
+
+    .asymmetry { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin: 2rem 0 2.5rem; }
+    .asymmetry .as-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.1rem; }
+    .as-band { display: grid; grid-template-columns: 130px 1fr; align-items: center; gap: 0.85rem; padding: 0.6rem 0; }
+    .as-label { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; line-height: 1.4; }
+    .as-bar { height: 14px; border-radius: 3px; flex-shrink: 0; }
+    .as-bar.throughput { background: linear-gradient(90deg, rgba(200,240,96,0.7), rgba(200,240,96,0.35)); }
+    .as-bar.control-pre { background: rgba(200,240,96,0.4); border: 1px dashed rgba(200,240,96,0.7); box-sizing: border-box; }
+    .as-bar.control-post { background: rgba(168,168,184,0.22); border: 1px solid rgba(168,168,184,0.4); box-sizing: border-box; }
+    .as-bar.control-human { background: rgba(168,168,184,0.12); border: 1px solid rgba(168,168,184,0.3); box-sizing: border-box; }
+    .as-cap { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--muted); margin-left: 0.7rem; line-height: 1.4; white-space: nowrap; }
+    .as-row { display: flex; align-items: center; height: 22px; }
+    .as-axis { font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--border2); display: flex; justify-content: space-between; padding-top: 0.65rem; margin-top: 0.4rem; border-top: 1px solid var(--border); margin-left: 130px; }
+    @media (max-width: 540px) {
+      .as-band { grid-template-columns: 90px 1fr; gap: 0.5rem; }
+      .as-axis { margin-left: 90px; }
+      .as-cap { font-size: 0.62rem; white-space: normal; }
+    }
 
     .compare-stack { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem; margin: 2rem 0; }
     .compare-stack .cs-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.1rem; }
@@ -345,6 +377,60 @@
 
     <h2 id="stack">The seven layers</h2>
 
+    <div class="layer-stack" aria-label="Generative AI software engineering stack overview">
+      <div class="ls-title">Stack at a glance &middot; Layer 5 is the strategically scarce layer</div>
+      <div class="layer-row dim">
+        <div class="layer-num-mini">L7</div>
+        <div class="layer-content-mini">
+          <strong>Human oversight</strong>
+          <span>Code review, architecture review, approvals &middot; linear in headcount</span>
+        </div>
+      </div>
+      <div class="layer-row dim">
+        <div class="layer-num-mini">L6</div>
+        <div class="layer-content-mini">
+          <strong>Validation &amp; evaluation</strong>
+          <span>Benchmarks, eval harnesses, observability, regression tests</span>
+        </div>
+      </div>
+      <div class="layer-row highlighted">
+        <div class="layer-num-mini">L5</div>
+        <div class="layer-content-mini">
+          <strong>Governance &amp; architectural control</strong>
+          <span>Decision corpus, precedence, pre-generation enforcement &middot; Mneme</span>
+        </div>
+      </div>
+      <div class="layer-row dim">
+        <div class="layer-num-mini">L4</div>
+        <div class="layer-content-mini">
+          <strong>Tooling &amp; execution</strong>
+          <span>MCP, APIs, shells, browsers, CI/CD &middot; consolidating around an open standard</span>
+        </div>
+      </div>
+      <div class="layer-row dim">
+        <div class="layer-num-mini">L3</div>
+        <div class="layer-content-mini">
+          <strong>Agent runtime / orchestration</strong>
+          <span>Claude Code, Cursor, Copilot, LangGraph, CrewAI, AutoGen</span>
+        </div>
+      </div>
+      <div class="layer-row dim">
+        <div class="layer-num-mini">L2</div>
+        <div class="layer-content-mini">
+          <strong>Context &amp; retrieval</strong>
+          <span>RAG, vector DBs, embeddings, semantic search, memory systems</span>
+        </div>
+      </div>
+      <div class="layer-row dim">
+        <div class="layer-num-mini">L1</div>
+        <div class="layer-content-mini">
+          <strong>Foundation models</strong>
+          <span>OpenAI, Anthropic, Google, Meta, DeepSeek, Mistral, xAI</span>
+        </div>
+      </div>
+    </div>
+    <p class="layer-caption">Layers 1&ndash;3 are crowded. Layer 4 is settling on MCP. Layers 6&ndash;7 have established practices. Layer 5 is the gap.</p>
+
     <div class="stack-grid">
 
       <div class="layer">
@@ -410,6 +496,27 @@
     <h2 id="throughput-gap">The throughput vs. governance gap</h2>
 
     <p>The cleanest framing for the entire stack is one sentence: <strong>AI coding increased generation throughput. Governance and review did not scale at the same rate.</strong> Layers 1&ndash;4 are throughput layers &mdash; they make more code happen, faster. Layer 7 is a human layer that scales linearly with people. Layers 5 and 6 are the only places where the asymmetry can be closed, and only one of them &mdash; layer 6 &mdash; is well-resourced.</p>
+
+    <div class="asymmetry" aria-label="Throughput vs control capacity, relative">
+      <div class="as-title">Capacity, relative &middot; throughput far outpaces control</div>
+      <div class="as-band">
+        <div class="as-label">L1&ndash;4<br>throughput</div>
+        <div class="as-row"><div class="as-bar throughput" style="width: 100%;"></div></div>
+      </div>
+      <div class="as-band">
+        <div class="as-label">L5 pre-gen</div>
+        <div class="as-row"><div class="as-bar control-pre" style="width: 32%;"></div><span class="as-cap">Pre-generation enforcement &mdash; underbuilt</span></div>
+      </div>
+      <div class="as-band">
+        <div class="as-label">L6 post-gen</div>
+        <div class="as-row"><div class="as-bar control-post" style="width: 58%;"></div><span class="as-cap">Eval + observability &mdash; retrospective</span></div>
+      </div>
+      <div class="as-band">
+        <div class="as-label">L7 human</div>
+        <div class="as-row"><div class="as-bar control-human" style="width: 22%;"></div><span class="as-cap">Reviewers &mdash; headcount-bound</span></div>
+      </div>
+      <div class="as-axis"><span>zero</span><span>frontier-model output rate &rarr;</span></div>
+    </div>
 
     <div class="compare-stack">
       <div class="cs-title">Throughput vs. control, by layer</div>

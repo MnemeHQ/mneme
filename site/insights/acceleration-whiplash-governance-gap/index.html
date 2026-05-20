@@ -89,6 +89,16 @@
     .source-note a { color: var(--border2); text-decoration: none; }
     .source-note a:hover { color: var(--muted); }
 
+    .gap-chart { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.5rem 1.25rem; margin: 2.5rem 0; }
+    .gap-chart .gc-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.85rem; }
+    .gap-chart svg { display: block; width: 100%; height: auto; }
+    .gap-chart .gc-legend { display: flex; gap: 1.5rem; margin-top: 0.85rem; font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted); flex-wrap: wrap; }
+    .gap-chart .gc-legend span { display: inline-flex; align-items: center; gap: 0.45rem; }
+    .gap-chart .gc-legend .swatch { width: 18px; height: 2px; border-radius: 1px; flex-shrink: 0; }
+    .gap-chart .gc-legend .swatch.t { background: #c8f060; }
+    .gap-chart .gc-legend .swatch.c { background: #a8a8b8; }
+    .gap-chart .gc-caption { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.04em; color: var(--muted); margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border); line-height: 1.55; }
+
     .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
     .article-faq { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
     .article-faq h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 1.5rem; color: var(--text); }
@@ -285,7 +295,66 @@
     </div>
     <p class="source-note">Source: <a href="https://www.faros.ai/blog/ai-acceleration-whiplash-takeaways" target="_blank" rel="noopener">Faros AI Engineering Report 2026: The Acceleration Whiplash</a>. Telemetry from 22,000 developers across 4,000+ teams. Figures represent metric change from lowest to highest AI adoption periods within each organization.</p>
 
-    <p>Both sets of numbers are true simultaneously. That is the whiplash. Throughput accelerated. The downstream systems built to validate that throughput did not.</p>
+    <p>Both sets of numbers are true simultaneously. That is the whiplash. Throughput accelerated. The downstream systems built to validate that throughput did not. Plotted together, the gap is the entire story:</p>
+
+    <div class="gap-chart" aria-label="Divergence between AI generation throughput and control capacity over time">
+      <div class="gc-title">The whiplash &middot; throughput up, control flat &mdash; the gap is the governance debt</div>
+      <svg viewBox="0 0 720 320" role="img" aria-label="Two diverging curves: AI generation throughput rises steeply while control capacity stays nearly flat. The shaded region between them is the governance gap.">
+        <defs>
+          <linearGradient id="gapFill" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stop-color="#c8f060" stop-opacity="0.18"/>
+            <stop offset="100%" stop-color="#c8f060" stop-opacity="0.02"/>
+          </linearGradient>
+          <pattern id="gapHatch" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
+            <line x1="0" y1="0" x2="0" y2="8" stroke="#c8f060" stroke-opacity="0.12" stroke-width="1.4"/>
+          </pattern>
+        </defs>
+        <!-- Plot area: x 60..680, y 30..270 -->
+        <!-- y-axis -->
+        <line x1="60" y1="30" x2="60" y2="270" stroke="#222226" stroke-width="1"/>
+        <!-- x-axis -->
+        <line x1="60" y1="270" x2="680" y2="270" stroke="#222226" stroke-width="1"/>
+        <!-- gridlines -->
+        <line x1="60" y1="90" x2="680" y2="90" stroke="#1a1a1d" stroke-width="1" stroke-dasharray="2 4"/>
+        <line x1="60" y1="150" x2="680" y2="150" stroke="#1a1a1d" stroke-width="1" stroke-dasharray="2 4"/>
+        <line x1="60" y1="210" x2="680" y2="210" stroke="#1a1a1d" stroke-width="1" stroke-dasharray="2 4"/>
+        <!-- y-axis labels -->
+        <text x="50" y="34" text-anchor="end" font-family="DM Mono, monospace" font-size="10" fill="#55555f">100%</text>
+        <text x="50" y="94" text-anchor="end" font-family="DM Mono, monospace" font-size="10" fill="#55555f">75%</text>
+        <text x="50" y="154" text-anchor="end" font-family="DM Mono, monospace" font-size="10" fill="#55555f">50%</text>
+        <text x="50" y="214" text-anchor="end" font-family="DM Mono, monospace" font-size="10" fill="#55555f">25%</text>
+        <text x="50" y="274" text-anchor="end" font-family="DM Mono, monospace" font-size="10" fill="#55555f">0</text>
+        <!-- x-axis labels -->
+        <text x="80" y="290" font-family="DM Mono, monospace" font-size="10" fill="#55555f">low AI adoption</text>
+        <text x="650" y="290" text-anchor="end" font-family="DM Mono, monospace" font-size="10" fill="#55555f">high AI adoption &rarr;</text>
+        <!-- y-axis title -->
+        <text x="20" y="150" font-family="DM Mono, monospace" font-size="10" fill="#88889a" transform="rotate(-90, 20, 150)" text-anchor="middle">capacity / output (relative)</text>
+
+        <!-- gap fill between curves -->
+        <path d="M 80 250 L 200 235 L 340 215 L 480 188 L 620 158 L 620 50 L 480 60 L 340 80 L 200 110 L 80 160 Z" fill="url(#gapHatch)"/>
+
+        <!-- Throughput curve (steep up) -->
+        <path d="M 80 160 L 200 110 L 340 80 L 480 60 L 620 50" fill="none" stroke="#c8f060" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Throughput data points -->
+        <circle cx="80" cy="160" r="3" fill="#c8f060"/>
+        <circle cx="620" cy="50" r="3" fill="#c8f060"/>
+
+        <!-- Control capacity curve (flat-ish) -->
+        <path d="M 80 250 L 200 235 L 340 215 L 480 188 L 620 158" fill="none" stroke="#a8a8b8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 3"/>
+        <circle cx="80" cy="250" r="3" fill="#a8a8b8"/>
+        <circle cx="620" cy="158" r="3" fill="#a8a8b8"/>
+
+        <!-- Annotations -->
+        <text x="612" y="38" text-anchor="end" font-family="DM Mono, monospace" font-size="11" fill="#c8f060">Generation throughput</text>
+        <text x="612" y="148" text-anchor="end" font-family="DM Mono, monospace" font-size="11" fill="#a8a8b8">Control capacity</text>
+        <text x="350" y="135" font-family="DM Mono, monospace" font-size="11" fill="#c8f060" font-style="italic" text-anchor="middle" opacity="0.85">the governance gap</text>
+      </svg>
+      <div class="gc-legend">
+        <span><span class="swatch t"></span>Generation throughput &middot; epics +66%, tasks +34%, PRs +16%</span>
+        <span><span class="swatch c"></span>Control capacity &middot; review time +442%, no-review merges 31%, incidents +243%</span>
+      </div>
+      <div class="gc-caption">Each axis position represents a band of AI adoption within the Faros telemetry, lowest to highest. The shaded region between the curves is the governance gap &mdash; the structural argument the rest of this article makes.</div>
+    </div>
 
     <h2>Why the systems did not scale</h2>
 

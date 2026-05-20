@@ -524,12 +524,13 @@
 
     <h2>Related concepts</h2>
 
-    <p>Verification contracts are the testing layer for the governance layer. Three adjacent concepts describe what they test:</p>
+    <p>Verification contracts are the testing layer for the governance layer. Four adjacent concepts describe what they test and what consumes them:</p>
 
     <ul>
-      <li><strong>Deterministic enforcement</strong> â€” the property that the same query against the same decision corpus always produces the same enforcement result. Without determinism, verification contracts cannot be reliable: a contract might pass on one run and fail on another for the same scenario, making the contract itself untrustworthy. Determinism is the prerequisite for contracts being meaningful.</li>
-      <li><strong>Governance benchmark v1.1 methodology</strong> â€” the full specification of how verification contracts are used in Mneme's benchmark suite: scenario structure, metric definitions (recall@K, pass_rate, WEAK_RETRIEVAL count), baseline confirmation methodology, and merge gate requirements. The benchmark is the operationalization of verification contracts at suite scale.</li>
-      <li><strong>How retrieval works</strong> â€” the retrieval layer that verification contracts test at Layer 1. recall@K as a contract metric only makes sense in the context of how retrieval decisions are scored and ranked. Understanding the retrieval pipeline is the prerequisite for understanding why retrieval-layer contracts are necessary.</li>
+      <li><strong><a href="/concepts/agent-verification/">Agent verification</a></strong> &mdash; the discipline that uses verification contracts as its substrate. Contracts are the data; agent verification is the act of evaluating an autonomous run against them.</li>
+      <li><strong><a href="/concepts/deterministic-enforcement/">Deterministic enforcement</a></strong> &mdash; the property that the same query against the same decision corpus always produces the same enforcement result. Without determinism, verification contracts cannot be reliable: a contract might pass on one run and fail on another for the same scenario, making the contract itself untrustworthy. Determinism is the prerequisite for contracts being meaningful.</li>
+      <li><strong>Governance benchmark v1.1 methodology</strong> &mdash; the full specification of how verification contracts are used in Mneme's benchmark suite: scenario structure, metric definitions (recall@K, pass_rate, WEAK_RETRIEVAL count), baseline confirmation methodology, and merge gate requirements. The benchmark is the operationalization of verification contracts at suite scale.</li>
+      <li><strong>How retrieval works</strong> &mdash; the retrieval layer that verification contracts test at Layer 1. recall@K as a contract metric only makes sense in the context of how retrieval decisions are scored and ranked. Understanding the retrieval pipeline is the prerequisite for understanding why retrieval-layer contracts are necessary.</li>
     </ul>
 
   </div>

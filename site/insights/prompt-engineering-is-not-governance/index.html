@@ -74,6 +74,15 @@
     .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
     .callout p strong { color: var(--accent); }
 
+    .axis-table { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin: 2.5rem 0; overflow-x: auto; }
+    .axis-table .ax-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+    .axis-table table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .axis-table th, .axis-table td { text-align: left; padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; }
+    .axis-table th { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+    .axis-table td:first-child { color: var(--text); font-weight: 500; min-width: 7rem; }
+    .axis-table tr:last-child td { border-bottom: none; }
+    .axis-table .gov-col { color: var(--accent) !important; }
+
     .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
     .article-faq { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
     .article-faq h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 1.5rem; color: var(--text); }
@@ -402,6 +411,24 @@
     <p>The pattern that fails is using prompt engineering to handle the second category. Teams do this because it is easier than building the enforcement infrastructure — until the first significant violation, at which point the cost of the gap becomes clear.</p>
 
     <h2>What governance actually requires</h2>
+
+    <div class="axis-table" aria-label="Prompt engineering vs governance, by axis">
+      <div class="ax-title">Prompt engineering vs governance, by axis</div>
+      <table>
+        <thead>
+          <tr><th>Axis</th><th>Prompt engineering</th><th class="gov-col">Governance</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Output shape</td><td>Tokens shaped probabilistically</td><td class="gov-col">Verdict: allowed / blocked / flagged</td></tr>
+          <tr><td>Determinism</td><td>Sampled; varies per call</td><td class="gov-col">Same inputs &rarr; same result</td></tr>
+          <tr><td>Conflict resolution</td><td>Model picks &mdash; usually most recent / most specific token</td><td class="gov-col">Explicit precedence over status, supersedes, scope, priority</td></tr>
+          <tr><td>Scope</td><td>Whole session; truncates under pressure</td><td class="gov-col">Per-file, per-module, per-service; structurally matched</td></tr>
+          <tr><td>Persistence</td><td>Session-bound; dies at /clear</td><td class="gov-col">Repo-native; survives sessions, tools, engineers</td></tr>
+          <tr><td>Enforcement point</td><td>None &mdash; suggestion only</td><td class="gov-col">Session start, pre-tool, pre-commit, pre-PR, CI</td></tr>
+          <tr><td>Auditability</td><td>Prompt + sample log</td><td class="gov-col">Which decisions applied, why, with provenance</td></tr>
+        </tbody>
+      </table>
+    </div>
 
     <p>Effective governance requires four things that prompt engineering cannot provide: a structured decision schema (typed fields for scope, status, rationale, and the constraint itself), a precedence engine (deterministic conflict resolution when rules overlap), scope-aware retrieval (the right rules fire for the right files, not the most semantically similar ones), and hook-level enforcement (violations blocked before the file is written — not after the PR is opened).</p>
 

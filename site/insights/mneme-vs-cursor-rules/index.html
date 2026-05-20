@@ -74,6 +74,21 @@
     .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
     .callout p strong { color: var(--accent); }
 
+    .contrast-block { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border-radius: 12px; overflow: hidden; margin: 2.5rem 0; }
+    .contrast-cell { background: var(--surface); padding: 1.6rem 1.6rem 1.75rem; }
+    .contrast-cell.gov { background: linear-gradient(180deg, rgba(200,240,96,0.05), var(--surface) 70%); }
+    .contrast-cell .cb-label { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.55rem; }
+    .contrast-cell.gov .cb-label { color: var(--accent); }
+    .contrast-cell .cb-name { font-family: 'Instrument Serif', serif; font-size: 1.5rem; line-height: 1.15; color: var(--text); margin-bottom: 0.6rem; letter-spacing: -0.01em; }
+    .contrast-cell.gov .cb-name { color: var(--accent); }
+    .contrast-cell .cb-tag { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--muted); margin-bottom: 1rem; letter-spacing: 0.03em; }
+    .contrast-cell ul.cb-list { margin: 0; padding: 0; list-style: none; }
+    .contrast-cell ul.cb-list li { font-size: 0.83rem; color: var(--muted); padding: 0.4rem 0; border-top: 1px solid var(--border); line-height: 1.5; display: flex; gap: 0.55rem; }
+    .contrast-cell ul.cb-list li:first-child { border-top: none; }
+    .contrast-cell ul.cb-list li::before { content: '\2014'; color: var(--border2); flex-shrink: 0; }
+    .contrast-cell.gov ul.cb-list li::before { color: rgba(200,240,96,0.55); }
+    @media (max-width: 600px) { .contrast-block { grid-template-columns: 1fr; } }
+
     .comparison-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.85rem; }
     .comparison-table th { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border2); color: var(--muted); font-weight: 500; }
     .comparison-table td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
@@ -318,6 +333,33 @@
   </header>
 
   <div class="article-body">
+
+    <div class="contrast-block" aria-label="Cursor Rules vs Mneme HQ at a glance">
+      <div class="contrast-cell">
+        <div class="cb-label">Cursor Rules</div>
+        <div class="cb-name">Configuration</div>
+        <div class="cb-tag">Per-repo text &middot; suggestion only</div>
+        <ul class="cb-list">
+          <li>Flat <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.cursorrules</code> file</li>
+          <li>Whole-repo scope, no per-file matching</li>
+          <li>No conflict resolution between overlapping rules</li>
+          <li>Injected as prompt preamble &mdash; model may ignore</li>
+          <li>One file per repo &middot; not multi-agent shared</li>
+        </ul>
+      </div>
+      <div class="contrast-cell gov">
+        <div class="cb-label">Mneme HQ</div>
+        <div class="cb-name">Enforcement</div>
+        <div class="cb-tag">Repo-native decisions &middot; deterministic verdict</div>
+        <ul class="cb-list">
+          <li>Structured records: id, scope, status, supersedes</li>
+          <li>Per-file pattern matching (<code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">services/payments/**</code>)</li>
+          <li>Precedence engine resolves conflicts deterministically</li>
+          <li>Hook-level blocking at Edit/Write &middot; CI gate</li>
+          <li>Shared corpus queryable by every agent on the codebase</li>
+        </ul>
+      </div>
+    </div>
 
     <h2>What Cursor Rules are</h2>
 

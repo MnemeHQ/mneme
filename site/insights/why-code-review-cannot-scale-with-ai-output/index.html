@@ -74,6 +74,33 @@
     .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
     .callout p strong { color: var(--accent); }
 
+    .pipeline { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.5rem 1.25rem; margin: 2.5rem 0; }
+    .pipeline .pl-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.1rem; }
+    .pl-stages { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; position: relative; }
+    .pl-stage { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 0.75rem 0.5rem 0.65rem; text-align: center; }
+    .pl-stage.early { border-color: rgba(200,240,96,0.4); background: linear-gradient(180deg, rgba(200,240,96,0.06), var(--surface2) 70%); }
+    .pl-stage.late { border-color: rgba(220,90,90,0.3); }
+    .pl-stage .ps-name { font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 600; color: var(--text); margin-bottom: 0.25rem; }
+    .pl-stage .ps-cost { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--muted); letter-spacing: 0.03em; }
+    .pl-stage.early .ps-cost { color: var(--accent); }
+    .pl-stage.late .ps-cost { color: #e05a5a; }
+    .pl-cost-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 8px; }
+    .pl-cost-cell { height: 6px; border-radius: 2px; background: linear-gradient(90deg, rgba(200,240,96,0.65), rgba(220,90,90,0.65)); position: relative; }
+    .pl-cost-cell::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; background: var(--border); border-radius: 2px; }
+    .pl-cost-cell.c1::before { width: 4%; background: rgba(200,240,96,0.7); }
+    .pl-cost-cell.c2::before { width: 18%; background: rgba(200,240,96,0.6); }
+    .pl-cost-cell.c3::before { width: 38%; background: rgba(168,168,184,0.5); }
+    .pl-cost-cell.c4::before { width: 70%; background: rgba(220,90,90,0.5); }
+    .pl-cost-cell.c5::before { width: 100%; background: rgba(220,90,90,0.7); }
+    .pl-axis { display: flex; justify-content: space-between; font-family: 'DM Mono', monospace; font-size: 0.66rem; color: var(--muted); margin-top: 0.85rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
+    .pl-axis span:last-child { color: #e05a5a; }
+    @media (max-width: 720px) {
+      .pl-stages, .pl-cost-bar { grid-template-columns: repeat(5, 1fr); }
+      .pl-stage { padding: 0.55rem 0.3rem; }
+      .pl-stage .ps-name { font-size: 0.7rem; }
+      .pl-stage .ps-cost { font-size: 0.6rem; }
+    }
+
     .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 2.5rem 0; }
     @media (max-width: 580px) { .stat-row { grid-template-columns: 1fr; } }
     .stat-block { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.25rem; }
@@ -381,6 +408,43 @@
     </div>
 
     <p>Teams that try to solve this with review tooling — AI-assisted code review, static analysis, architecture rule checkers — observe partial improvement. These tools can catch mechanical violations: undefined variables, type errors, obvious anti-patterns. They cannot catch violations that require understanding your team's specific architectural decisions. That context isn't in the training data and can't be injected efficiently at review time.</p>
+
+    <div class="pipeline" aria-label="Where violations are caught along the pipeline, and at what cost">
+      <div class="pl-title">Where violations get caught &middot; cost rises sharply the later it happens</div>
+      <div class="pl-stages">
+        <div class="pl-stage early">
+          <div class="ps-name">Pre-generation</div>
+          <div class="ps-cost">governance hook</div>
+        </div>
+        <div class="pl-stage early">
+          <div class="ps-name">Pre-commit</div>
+          <div class="ps-cost">local hook</div>
+        </div>
+        <div class="pl-stage">
+          <div class="ps-name">CI / tests</div>
+          <div class="ps-cost">pipeline check</div>
+        </div>
+        <div class="pl-stage late">
+          <div class="ps-name">Code review</div>
+          <div class="ps-cost">reviewer attention</div>
+        </div>
+        <div class="pl-stage late">
+          <div class="ps-name">Post-merge</div>
+          <div class="ps-cost">incident response</div>
+        </div>
+      </div>
+      <div class="pl-cost-bar" aria-hidden="true">
+        <div class="pl-cost-cell c1"></div>
+        <div class="pl-cost-cell c2"></div>
+        <div class="pl-cost-cell c3"></div>
+        <div class="pl-cost-cell c4"></div>
+        <div class="pl-cost-cell c5"></div>
+      </div>
+      <div class="pl-axis">
+        <span>cheap to fix &middot; before code exists</span>
+        <span>expensive &middot; after merge, after deploy &rarr;</span>
+      </div>
+    </div>
 
     <h2>The shift-left argument</h2>
 

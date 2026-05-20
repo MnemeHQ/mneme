@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Governance Provenance &mdash; Mneme HQ Concepts</title>
+  <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/fonts.css">
+  <meta name="description" content="Per-rule lineage: tracing every active governance rule back to the ADR, supersession chain, and originating discussion or incident that authored it." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/concepts/governance-provenance/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Governance Provenance &mdash; Mneme HQ Concepts" />
+  <meta property="og:description" content="Every rule has a lineage. Governance provenance is the structural property that traces an active rule back to the ADR, commit, and discussion that authored it." />
+  <meta property="og:url" content="https://mnemehq.com/concepts/governance-provenance/" />
+  <meta property="og:image" content="https://mnemehq.com/concepts/governance-provenance/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Governance Provenance &mdash; Mneme HQ Concepts" />
+  <meta name="twitter:description" content="Every rule has a lineage. Provenance is what makes it citable." />
+  <meta name="twitter:image" content="https://mnemehq.com/concepts/governance-provenance/og.png" />
+  <meta name="author" content="Theo Valmis" />
+  <meta property="article:published_time" content="2026-05-20T00:00:00Z" />
+  <meta property="article:author" content="https://mnemehq.com/founder/" />
+  <meta property="article:section" content="Concepts" />
+
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d; --border: #222226; --border2: #2e2e34; --text: #e8e8ec; --muted: #a8a8b8; --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .article-wrap { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 7rem; }
+    .article-header { margin-bottom: 3.5rem; }
+    .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+
+    .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
+    .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .article-body h3 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--text); }
+    .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
+    .article-body p strong { color: var(--text); font-weight: 500; }
+    .article-body ul, .article-body ol { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body li { margin-bottom: 0.5rem; }
+    .article-body li strong { color: var(--text); font-weight: 500; }
+    .article-body code { font-family: 'DM Mono', monospace; font-size: 0.82rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 0.05rem 0.4rem; color: var(--text); }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout p strong { color: var(--accent); }
+
+    .callout-teal { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--teal); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout-teal p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout-teal p strong { color: var(--teal); }
+
+    .comparison-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.85rem; }
+    .comparison-table th { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border2); color: var(--muted); font-weight: 500; }
+    .comparison-table td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .comparison-table td:first-child { color: var(--muted); white-space: nowrap; }
+    .comparison-table td:nth-child(2) { color: var(--text); opacity: 0.55; }
+    .comparison-table td:nth-child(3) { color: var(--accent); }
+
+    .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .back-link:hover { color: var(--text); }
+    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2rem; }
+    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--accent-dim); }
+
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    .answer-capsule { max-width: 820px; margin: 0 auto; padding: 1.5rem 2rem; background: var(--surface); border-bottom: 1px solid rgba(200,240,96,0.18); font-size: 0.88rem; color: var(--muted); line-height: 1.8; }
+    .answer-capsule strong { color: var(--accent); }
+
+    footer { border-top: 1px solid var(--border); padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .breadcrumb-nav { max-width: 720px; margin: 0 auto; padding: 1.75rem 2rem 0.85rem; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.82rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; padding: 0; flex-shrink: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; transition: border-color 0.15s, background 0.15s; }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span { display: block; width: 18px; height: 2px; background: currentColor; border-radius: 1px; transition: transform 0.25s ease, opacity 0.18s ease; transform-origin: center; }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    @media (max-width: 900px) {
+      html, body { overflow-x: hidden; }
+      body.menu-open { overflow: hidden; }
+      nav { position: relative; padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 1.25rem; z-index: 99; max-height: 0; overflow: hidden; opacity: 0; visibility: hidden; transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s; }
+      .nav-links.open { max-height: 80vh; opacity: 1; visibility: visible; padding: 0.5rem 1.25rem 1.25rem; transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s; overflow-y: auto; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.92rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+      .article-wrap { padding: 3rem 1.25rem 5rem; }
+    }
+
+    .related-panel { margin-top: 3.5rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .related-panel-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    .related-list li { margin: 0; }
+    .related-list a { display: block; padding: 1.15rem 1.35rem; background: var(--surface); text-decoration: none; transition: background 0.15s; }
+    .related-list a:hover { background: var(--surface2); }
+    .related-list .rel-title { color: var(--text); font-size: 0.92rem; font-weight: 600; margin-bottom: 0.35rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; letter-spacing: -0.005em; transition: color 0.15s; }
+    .related-list .rel-title::after { content: '\2192'; color: var(--accent); opacity: 0.4; transition: opacity 0.15s, transform 0.15s; flex-shrink: 0; }
+    .related-list a:hover .rel-title { color: var(--accent); }
+    .related-list a:hover .rel-title::after { opacity: 1; transform: translateX(3px); }
+    .related-list .rel-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.65; margin: 0; }
+
+    .diagram-figure { margin: 2.25rem 0 2rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem 1.5rem 1.25rem; overflow: hidden; }
+    .diagram-figure svg { display: block; width: 100%; height: auto; max-width: 100%; }
+    .diagram-caption { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.06em; color: var(--muted); text-transform: uppercase; margin-top: 1rem; padding-top: 0.9rem; border-top: 1px solid var(--border); line-height: 1.7; }
+    .diagram-caption strong { color: var(--accent); font-weight: 500; }
+
+    .article-faq { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .article-faq h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 1.5rem; color: var(--text); }
+    .article-faq details { margin: 0.75rem 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .article-faq summary { padding: 1rem 1.25rem; cursor: pointer; font-size: 0.88rem; color: var(--text); background: var(--surface); list-style: none; }
+    .article-faq summary::-webkit-details-marker { display: none; }
+    .article-faq summary::before { content: '+ '; color: var(--accent); }
+    .article-faq details[open] summary::before { content: '\2212 '; }
+    .article-faq details[open] summary { border-bottom: 1px solid var(--border); }
+    .article-faq .faq-body { padding: 1.25rem; font-size: 0.86rem; color: var(--muted); line-height: 1.85; }
+    .article-faq .faq-body a { color: var(--accent); text-decoration: none; }
+
+    @media (max-width: 768px) { nav { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Concepts", "item": "https://mnemehq.com/concepts/"},
+          {"@type": "ListItem", "position": 3, "name": "Governance Provenance", "item": "https://mnemehq.com/concepts/governance-provenance/"}
+        ]
+      },
+      {
+        "@type": "TechArticle",
+        "headline": "Governance Provenance &mdash; Mneme HQ Concepts",
+        "description": "Tracing every active rule back to the ADR, commit, discussion, or incident that authored it &mdash; the lineage of the rules themselves, distinct from per-verdict enforcement provenance.",
+        "url": "https://mnemehq.com/concepts/governance-provenance/",
+        "datePublished": "2026-05-20",
+        "dateModified": "2026-05-20",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "image": "https://mnemehq.com/concepts/governance-provenance/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/concepts/governance-provenance/",
+        "articleSection": "Concepts"
+      },
+      {
+        "@type": "DefinedTerm",
+        "name": "Governance Provenance",
+        "description": "The lineage of every active governance rule: which ADR authored it, which discussion or incident motivated it, which decisions it supersedes, and where it propagates. Distinct from enforcement provenance (which traces a single verdict to its decision); governance provenance traces a decision to its origin.",
+        "inDefinedTermSet": {"@type": "DefinedTermSet", "name": "Mneme HQ Concepts", "url": "https://mnemehq.com/concepts/"},
+        "url": "https://mnemehq.com/concepts/governance-provenance/"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {"@type": "Question", "name": "How is governance provenance different from enforcement provenance?", "acceptedAnswer": {"@type": "Answer", "text": "Enforcement provenance traces a single verdict back to the decision that produced it (verdict #9341 cited rule R, which was resolved from candidates X, Y, Z). Governance provenance traces a rule back to its own origin (rule R was authored by ADR-0017, on date D, by author A, supersedes ADRs P and Q, was motivated by incident I). Enforcement provenance is per-event. Governance provenance is per-rule."}},
+          {"@type": "Question", "name": "What does governance provenance actually contain?", "acceptedAnswer": {"@type": "Answer", "text": "For every active rule: the source ADR (file, sha, author, date), the supersession chain (which rules it replaces and why), the propagation history (which surfaces and scopes it has been applied to), and the originating context (the discussion, issue, RFC, or incident that motivated the decision). Together these form a queryable lineage for every constraint in the corpus."}},
+          {"@type": "Question", "name": "Why does governance provenance matter operationally?", "acceptedAnswer": {"@type": "Answer", "text": "It is the substrate for trust, change-impact analysis, audit, and security review. An engineer can ask 'why does this rule exist?' and get a citable answer. A security review can show that every governance rule traces to an approved decision. A refactor of the ADR corpus can identify which rules are at risk of regression. None of these capabilities exist if the rules are anonymous or freeform."}},
+          {"@type": "Question", "name": "How does governance provenance relate to the compiler analogy?", "acceptedAnswer": {"@type": "Answer", "text": "Compilers emit source-location diagnostics for every error: 'this variable was declared at line 42 of file X, used at line 73 of file Y, and its type is wrong here.' Governance provenance is the same property applied to rules: every active rule carries source-location metadata back to its authoring ADR, and the compiler-style trace is what makes rule changes inspectable rather than mysterious."}}
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/benchmark/">Benchmark</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<div class="answer-capsule">
+  <strong>Governance provenance.</strong> A rule fires. An engineer asks "why does this rule exist?" Governance provenance answers that question with a citable lineage &mdash; the ADR that authored it, the discussion or incident that motivated it, the rules it superseded, the surfaces it propagates to. Enforcement provenance traces a verdict to a decision; governance provenance traces a decision to its origin.
+</div>
+
+<nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/concepts/">Concepts</a></li>
+    <li aria-current="page">Governance Provenance</li>
+  </ol>
+</nav>
+
+<article class="article-wrap">
+  <header class="article-header">
+    <div class="article-eyebrow">
+      <span class="eyebrow-tag">Concepts</span>
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-meta">9 min read &nbsp;&middot;&nbsp; May 2026</span>
+    </div>
+    <h1>Governance provenance</h1>
+    <p class="article-lede">A governance rule blocks a PR. The engineer's first question is not "what did I do wrong?" &mdash; it is "why does this rule exist?" Governance provenance is the structural property that gives that question a single, citable answer: this ADR, this author, this discussion, this supersession history. Rules without provenance are folklore; rules with it are engineering.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-20">Published May 2026</time>
+    </p>
+  </header>
+
+  <div class="article-body">
+
+    <p>Every active governance rule in a serious codebase exists for a reason. Sometimes the reason is an architectural decision captured in an ADR. Sometimes it is a security incident from two years ago. Sometimes it is a compliance requirement that arrived from outside the engineering org. The reason matters, because rules without traceable origins eventually get challenged, weakened, or routed around by engineers who cannot tell the difference between a load-bearing constraint and ancient cargo.</p>
+
+    <p>Governance provenance is the engineering property that makes the origin of every rule queryable. It is the substrate that turns "the bot says no" into "ADR-0017 says no &mdash; here is the file, the author, the discussion that produced it, and the rules it superseded."</p>
+
+    <figure class="diagram-figure" aria-labelledby="gp-diag-title">
+      <svg viewBox="0 0 760 360" role="img" aria-labelledby="gp-diag-title gp-diag-desc" xmlns="http://www.w3.org/2000/svg">
+        <title id="gp-diag-title">The two provenance questions</title>
+        <desc id="gp-diag-desc">Two parallel chains: enforcement provenance traces a single verdict back to the decision that produced it; governance provenance traces a decision back to its authoring ADR, supersession history, and originating context.</desc>
+        <g>
+          <text x="30" y="28" fill="#c8f060" font-family="DM Mono, monospace" font-size="10" letter-spacing="0.06em">TWO PROVENANCE QUESTIONS &middot; DIFFERENT GRAINS</text>
+
+          <!-- Enforcement provenance row -->
+          <text x="30" y="60" fill="#8be0c8" font-family="DM Mono, monospace" font-size="10" letter-spacing="0.04em">ENFORCEMENT &middot; verdict &rarr; decision</text>
+
+          <rect x="30" y="74" width="140" height="56" rx="7" fill="rgba(139,224,200,0.04)" stroke="#2e2e34"/>
+          <text x="45" y="94" fill="#8be0c8" font-family="DM Mono, monospace" font-size="9">VERDICT</text>
+          <text x="45" y="112" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">verdict #9341</text>
+          <text x="45" y="124" fill="#88889a" font-family="DM Mono, monospace" font-size="9">BLOCK</text>
+
+          <line x1="170" y1="102" x2="200" y2="102" stroke="#8be0c8" stroke-width="1.5"/>
+
+          <rect x="200" y="74" width="140" height="56" rx="7" fill="rgba(139,224,200,0.04)" stroke="#2e2e34"/>
+          <text x="215" y="94" fill="#8be0c8" font-family="DM Mono, monospace" font-size="9">PRECEDENCE</text>
+          <text x="215" y="112" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">selected: d-17</text>
+          <text x="215" y="124" fill="#88889a" font-family="DM Mono, monospace" font-size="9">rule wins by scope</text>
+
+          <line x1="340" y1="102" x2="370" y2="102" stroke="#8be0c8" stroke-width="1.5"/>
+
+          <rect x="370" y="74" width="140" height="56" rx="7" fill="rgba(139,224,200,0.04)" stroke="#2e2e34"/>
+          <text x="385" y="94" fill="#8be0c8" font-family="DM Mono, monospace" font-size="9">DECISION RECORD</text>
+          <text x="385" y="112" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">d-17 &middot; active</text>
+          <text x="385" y="124" fill="#88889a" font-family="DM Mono, monospace" font-size="9">compiled from ADR</text>
+
+          <!-- Down arrow connecting the two rows -->
+          <line x1="440" y1="138" x2="440" y2="180" stroke="#a8a8b8" stroke-width="1.2" stroke-dasharray="3 3"/>
+          <polygon points="436,176 444,176 440,184" fill="#a8a8b8"/>
+
+          <!-- Governance provenance row -->
+          <text x="30" y="208" fill="#c8f060" font-family="DM Mono, monospace" font-size="10" letter-spacing="0.04em">GOVERNANCE &middot; decision &rarr; origin</text>
+
+          <rect x="370" y="222" width="140" height="56" rx="7" fill="rgba(200,240,96,0.05)" stroke="#c8f060" stroke-width="1.5"/>
+          <text x="385" y="242" fill="#c8f060" font-family="DM Mono, monospace" font-size="9">DECISION RECORD</text>
+          <text x="385" y="260" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">d-17 &middot; active</text>
+          <text x="385" y="272" fill="#88889a" font-family="DM Mono, monospace" font-size="9">compiled from ADR</text>
+
+          <line x1="370" y1="250" x2="340" y2="250" stroke="#c8f060" stroke-width="1.5"/>
+          <polygon points="346,246 346,254 338,250" fill="#c8f060"/>
+
+          <rect x="200" y="222" width="140" height="56" rx="7" fill="rgba(200,240,96,0.04)" stroke="#2e2e34"/>
+          <text x="215" y="242" fill="#c8f060" font-family="DM Mono, monospace" font-size="9">AUTHORING ADR</text>
+          <text x="215" y="260" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">ADR-0017.md</text>
+          <text x="215" y="272" fill="#88889a" font-family="DM Mono, monospace" font-size="9">sha &middot; author &middot; date</text>
+
+          <line x1="200" y1="250" x2="170" y2="250" stroke="#c8f060" stroke-width="1.5"/>
+          <polygon points="176,246 176,254 168,250" fill="#c8f060"/>
+
+          <rect x="30" y="222" width="140" height="56" rx="7" fill="rgba(200,240,96,0.04)" stroke="#2e2e34"/>
+          <text x="45" y="242" fill="#c8f060" font-family="DM Mono, monospace" font-size="9">ORIGIN</text>
+          <text x="45" y="260" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">incident I-44</text>
+          <text x="45" y="272" fill="#88889a" font-family="DM Mono, monospace" font-size="9">RFC &middot; discussion</text>
+
+          <!-- Supersession note -->
+          <rect x="540" y="222" width="190" height="56" rx="7" fill="rgba(200,240,96,0.04)" stroke="#2e2e34"/>
+          <text x="555" y="242" fill="#c8f060" font-family="DM Mono, monospace" font-size="9">SUPERSESSION</text>
+          <text x="555" y="260" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">replaces ADRs P, Q</text>
+          <text x="555" y="272" fill="#88889a" font-family="DM Mono, monospace" font-size="9">with rationale &amp; date</text>
+
+          <line x1="510" y1="250" x2="540" y2="250" stroke="#c8f060" stroke-width="1.5"/>
+
+          <!-- Bottom note -->
+          <rect x="30" y="300" width="700" height="44" rx="10" fill="rgba(200,240,96,0.04)" stroke="#c8f060" stroke-width="1" stroke-dasharray="4 3"/>
+          <text x="50" y="328" fill="#e8e8ec" font-family="DM Mono, monospace" font-size="11">Both chains are queryable. Enforcement asks "why this verdict?" Governance asks "why this rule?"</text>
+        </g>
+      </svg>
+      <figcaption class="diagram-caption"><strong>Two grains of provenance.</strong> Enforcement is per-verdict; governance is per-rule. The same decision record sits at both endpoints &mdash; one chain runs forward to the verdict, the other runs backward to the rule's origin.</figcaption>
+    </figure>
+
+    <h2>The two provenance questions</h2>
+
+    <p>There are two related but distinct questions a serious governance system has to answer for any active rule. They live at different grains and serve different audiences.</p>
+
+    <h3>Enforcement provenance: "why this verdict?"</h3>
+
+    <p><a href="/concepts/enforcement-provenance/">Enforcement provenance</a> is per-event. It traces a single verdict back to the precedence rule that selected the decision, back to the compiled record, back to the authoring ADR. Its primary audience is the engineer holding the blocked PR. Its primary question is operational: "what specifically caused this block, and where can I read the rationale?"</p>
+
+    <h3>Governance provenance: "why this rule?"</h3>
+
+    <p>Governance provenance is per-rule. It traces an active decision back to its authoring ADR, the supersession chain that led to it, the discussion or incident that motivated it, and the surfaces it currently propagates to. Its primary audiences are the architect reviewing the corpus, the security reviewer running an audit, the engineer about to challenge a rule's relevance, and the agent reasoning about which rule applies. Its primary question is structural: "what is the lineage of this constraint?"</p>
+
+    <p>Both questions need the same substrate &mdash; structured records, stable IDs, link integrity &mdash; but they query that substrate in opposite directions. Enforcement provenance runs forward from a verdict; governance provenance runs backward from a rule.</p>
+
+    <h2>What governance provenance actually contains</h2>
+
+    <p>For every active rule in the decision corpus, governance provenance maintains four classes of metadata.</p>
+
+    <h3>1. Authoring ADR</h3>
+
+    <p>The source document that produced the rule. Not just a filename &mdash; a stable reference: the file path, the git SHA at which the ADR was committed, the author identity, and the authoring date. If the ADR is renamed or moved, the link still resolves. If the ADR is edited, the rule references the specific revision that produced it.</p>
+
+    <h3>2. Supersession chain</h3>
+
+    <p>The ordered history of ADRs this rule replaced. Supersession is not a delete &mdash; it is a structured transition, with both the prior decision and the rationale for replacing it preserved. A rule's supersession chain is the history of its category: "this is the third iteration of the dependency policy; iterations one and two are recorded with their motivating context."</p>
+
+    <h3>3. Propagation history</h3>
+
+    <p>The surfaces the rule has been applied to and the scope at which it operates. A single architectural decision may propagate into pre-commit hooks, CI gates, agent context injection, and the policy catalog &mdash; each with its own scope. Governance provenance records where the rule has been applied, when, and at what scope, so changes to one surface do not silently leave others stale.</p>
+
+    <h3>4. Originating context</h3>
+
+    <p>The discussion, RFC, issue, or incident that motivated the decision. ADRs do not appear from nowhere; they answer a question someone asked. The originating context preserves that question. When the rule is later challenged, the original framing is available: "this rule exists because incident I-44 cost us 6 hours of downtime, and the postmortem recommended this constraint."</p>
+
+    <div class="callout">
+      <p><strong>Provenance is not a metadata afterthought.</strong> It is the structural property that determines whether a rule survives organizational turnover. A rule without origin metadata becomes folklore the moment its author leaves.</p>
+    </div>
+
+    <h2>The compiler-diagnostics analogy</h2>
+
+    <p>The most useful mental model for governance provenance is the compiler diagnostic. A C++ compiler that emits "error: type mismatch" without source location is unusable; the same compiler emitting "error at file.cpp:73:11, declared at file.h:42:5, expected <code>int</code> got <code>float</code>" is a tool you can debug with. The location chain is what turns the error from a verdict into a diagnostic.</p>
+
+    <p>Governance provenance plays the same role for architectural rules. A governance system that blocks a PR without provenance emits "error: violation"; the same system with provenance emits "violation: ADR-0017.md @ sha 9f3a, authored 2026-01-14 by Theo, motivated by incident I-44, supersedes ADRs P and Q." The chain converts a refusal into an artifact you can act on.</p>
+
+    <p>This analogy matters because compilers earned engineer trust over decades by producing diagnostics, not just verdicts. Governance systems are at the same inflection point. The difference between a governance layer engineers route around and one they actually trust is whether its outputs look like diagnostics or look like a black box saying no.</p>
+
+    <h2>How governance provenance differs from enforcement provenance</h2>
+
+    <div style="overflow-x:auto;margin:2rem 0;">
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>Axis</th>
+          <th>Enforcement provenance</th>
+          <th>Governance provenance</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Grain</td>
+          <td>Per-event (one verdict)</td>
+          <td>Per-rule (one decision)</td>
+        </tr>
+        <tr>
+          <td>Direction</td>
+          <td>Verdict &rarr; decision</td>
+          <td>Decision &rarr; origin</td>
+        </tr>
+        <tr>
+          <td>Primary audience</td>
+          <td>Engineer holding the blocked PR</td>
+          <td>Architect, security reviewer, agent</td>
+        </tr>
+        <tr>
+          <td>Primary question</td>
+          <td>"Why did this block?"</td>
+          <td>"Why does this rule exist?"</td>
+        </tr>
+        <tr>
+          <td>Stored as</td>
+          <td>Audit event log</td>
+          <td>Rule metadata in the corpus</td>
+        </tr>
+        <tr>
+          <td>Lifetime</td>
+          <td>As long as the audit log retains</td>
+          <td>As long as the rule is active</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>The two are complementary, not competing. A complete governance system maintains both. Enforcement provenance without governance provenance produces verdicts you can trace but rules you cannot interrogate. Governance provenance without enforcement provenance produces rules you can read but verdicts you cannot debug.</p>
+
+    <h2>What governance provenance enables</h2>
+
+    <p>Several capabilities exist only when governance provenance is in place. None are achievable from freeform documentation.</p>
+
+    <ul>
+      <li><strong>Trust through interrogation.</strong> Engineers can challenge a rule by reading its origin. Productive disagreement requires citable history.</li>
+      <li><strong>Audit and security review.</strong> "Show me every active rule and its authoring ADR" is one query. The auditor's job becomes verification, not investigation.</li>
+      <li><strong>Change-impact analysis.</strong> When an ADR is updated or superseded, the governance layer can identify every rule downstream of it and flag the surfaces that need to be re-evaluated.</li>
+      <li><strong>Drift detection in the corpus.</strong> Rules whose authoring ADRs have been deleted, rules whose supersession chains break, rules whose originating contexts no longer apply &mdash; all surface as actionable signals.</li>
+      <li><strong>Cross-rule reasoning by agents.</strong> An agent that sees both the active rule and its origin can answer "is this rule still relevant?" with more than pattern-matching; it can read the original motivation and reason about whether it still holds.</li>
+      <li><strong>Organizational continuity.</strong> When the architect who authored the rule leaves, the rule remains intelligible. Folklore does not survive turnover; provenance does.</li>
+    </ul>
+
+    <div class="callout-teal">
+      <p><strong>Without governance provenance, a rule's authority decays to whoever last touched it.</strong> With it, authority traces to the decision that produced it &mdash; and the rule's relevance is testable, not inherited.</p>
+    </div>
+
+    <h2>Why narrative documentation is not provenance</h2>
+
+    <p>The common shortcut is to attach a freeform "rationale" field to each rule. This is narrative documentation, and it has the same failure modes as narrative provenance at the enforcement layer:</p>
+
+    <ul>
+      <li>It cannot be queried at the structural level &mdash; "list rules motivated by incidents" requires natural-language parsing.</li>
+      <li>It drifts as the original context fades &mdash; the prose stays the same while the system around it changes.</li>
+      <li>It cannot be aggregated &mdash; you cannot ask "how many rules in this category trace to which authoring authority?"</li>
+      <li>It is generated, not stored as relationships &mdash; the supersession chain is a graph, not a paragraph.</li>
+    </ul>
+
+    <p>Structural provenance &mdash; IDs, links, dated relationships &mdash; is the substrate underneath narrative. Any narrative can be rendered on top of structural provenance at any time. The reverse is not true.</p>
+
+    <h2>Where governance provenance sits in the layer model</h2>
+
+    <p>Governance provenance is a property of the governance infrastructure layer, not a separate layer of its own. It is what every step of the corpus pipeline produces as metadata when the pipeline is built right: the compiler records source links, the supersession resolver records the chain, the propagation system records each application surface, and the corpus query layer can return all of it.</p>
+
+    <p>The relationship to adjacent concepts:</p>
+
+    <ul>
+      <li><strong>Compiles with <a href="/concepts/architectural-compiler/">architectural compiler</a></strong> &mdash; the compiler is what emits the source-link metadata that provenance relies on.</li>
+      <li><strong>Resolves through <a href="/concepts/precedence-semantics/">precedence semantics</a></strong> &mdash; supersession is a precedence relationship; provenance preserves the resolved chain.</li>
+      <li><strong>Stored beside <a href="/concepts/enforcement-provenance/">enforcement provenance</a></strong> &mdash; same substrate, different grain. The two together form the full provenance surface.</li>
+      <li><strong>Read by <a href="/concepts/architectural-governance/">architectural governance</a></strong> &mdash; the discipline that requires citable rules to operate at scale.</li>
+    </ul>
+
+    <h2>Related concepts</h2>
+
+    <ul>
+      <li><strong><a href="/concepts/enforcement-provenance/">Enforcement provenance</a></strong> &mdash; per-verdict chain. Same substrate, opposite direction.</li>
+      <li><strong><a href="/concepts/architectural-compiler/">Architectural compiler</a></strong> &mdash; emits the source-location metadata governance provenance relies on.</li>
+      <li><strong><a href="/concepts/precedence-semantics/">Precedence semantics</a></strong> &mdash; the rule set that supersession provenance records the resolution of.</li>
+      <li><strong><a href="/concepts/governance-infrastructure/">Governance infrastructure</a></strong> &mdash; the layer in which provenance is a structural property, not an add-on.</li>
+      <li><strong><a href="/concepts/architectural-governance/">Architectural governance</a></strong> &mdash; the discipline that depends on citable rules to operate at scale.</li>
+    </ul>
+
+  </div>
+
+  <section class="article-faq">
+    <h2>Frequently asked questions</h2>
+    <details>
+      <summary>How is governance provenance different from enforcement provenance?</summary>
+      <div class="faq-body">Enforcement provenance traces a single verdict back to the decision that produced it (verdict #9341 cited rule R, which was resolved from candidates X, Y, Z). Governance provenance traces a rule back to its own origin (rule R was authored by ADR-0017, on date D, by author A, supersedes ADRs P and Q, was motivated by incident I). Enforcement provenance is per-event; governance provenance is per-rule. See <a href="/concepts/enforcement-provenance/">enforcement provenance</a> for the per-verdict view.</div>
+    </details>
+    <details>
+      <summary>What does governance provenance actually contain?</summary>
+      <div class="faq-body">For every active rule: the source ADR (file, sha, author, date), the supersession chain (which rules it replaces and why), the propagation history (which surfaces and scopes it has been applied to), and the originating context (the discussion, issue, RFC, or incident that motivated the decision). Together these form a queryable lineage for every constraint in the corpus.</div>
+    </details>
+    <details>
+      <summary>Why does governance provenance matter operationally?</summary>
+      <div class="faq-body">It is the substrate for trust, change-impact analysis, audit, and security review. An engineer can ask "why does this rule exist?" and get a citable answer. A security review can show that every governance rule traces to an approved decision. A refactor of the ADR corpus can identify which rules are at risk of regression. None of these capabilities exist if the rules are anonymous or freeform.</div>
+    </details>
+    <details>
+      <summary>How does governance provenance relate to the compiler analogy?</summary>
+      <div class="faq-body">Compilers emit source-location diagnostics for every error: "this variable was declared at line 42 of file X, used at line 73 of file Y, and its type is wrong here." Governance provenance is the same property applied to rules: every active rule carries source-location metadata back to its authoring ADR, and the compiler-style trace is what makes rule changes inspectable rather than mysterious.</div>
+    </details>
+    <details>
+      <summary>Is narrative documentation enough?</summary>
+      <div class="faq-body">No. A freeform "rationale" field cannot be queried structurally, cannot be aggregated, drifts as context fades, and stores chains as paragraphs instead of relationships. Narrative can always be rendered on top of structural provenance, but structural provenance cannot be reconstructed from narrative after the fact.</div>
+    </details>
+  </section>
+
+  <aside class="related-panel" aria-labelledby="related-panel-label">
+    <div class="related-panel-label" id="related-panel-label">Related operational essays</div>
+    <ul class="related-list">
+      <li><a href="/insights/emerging-ai-agent-infrastructure-stack/"><div class="rel-title">The Emerging AI Agent Infrastructure Stack</div><p class="rel-desc">Provenance is its own layer in the agent infrastructure stack &mdash; the one that answers why a decision exists.</p></a></li>
+      <li><a href="/insights/ai-coding-governance-should-be-reviewable/"><div class="rel-title">AI Coding Governance Should Be Reviewable</div><p class="rel-desc">Governance verdicts must be inspectable, citable, and disagreeable &mdash; provenance is what makes that possible.</p></a></li>
+      <li><a href="/insights/why-architectural-governance-needs-precedence-semantics/"><div class="rel-title">Why Architectural Governance Needs Precedence Semantics</div><p class="rel-desc">Supersession is a precedence relationship; provenance preserves the resolved chain across iterations.</p></a></li>
+      <li><a href="/insights/why-claude-md-stops-scaling/"><div class="rel-title">Why CLAUDE.md Stops Scaling</div><p class="rel-desc">Free-form rule files have no structural provenance &mdash; which is why they degrade as the team grows.</p></a></li>
+    </ul>
+  </aside>
+
+  <footer class="article-footer">
+    <a href="/concepts/" class="back-link">&larr; Back to Concepts</a>
+
+    <div class="cta-block">
+      <h3>Rules with citable lineage</h3>
+      <p>Mneme compiles your ADRs into a decision corpus where every rule carries its authoring ADR, supersession chain, propagation history, and originating context &mdash; queryable from CI, the dashboard, and the agent's verdict output.</p>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
+    </div>
+  </footer>
+</article>
+</main>
+
+<footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+  <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/use-cases/">Use cases</a></li>
+        <li><a href="/works-with/">Works with</a></li>
+        <li><a href="/demo/">Demo</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/concepts/" style="color:var(--accent);">Concepts</a></li>
+        <li><a href="/insights/">Insights</a></li>
+        <li><a href="/standards/">Standards</a></li>
+        <li><a href="/benchmark/">Benchmark</a></li>
+        <li><a href="/docs/">Docs</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/pilot/" style="color:var(--accent);">Request pilot</a></li>
+        <li><a href="/founder/">Founder</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Code</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="https://github.com/TheoV823/mneme">GitHub</a></li>
+        <li><a href="/privacy/">Privacy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
+    <span style="display:inline-flex;align-items:center;gap:0.75rem;"><a href="/" aria-label="Mneme HQ home" style="display:inline-flex;opacity:0.75;"><img src="/favicon.png" alt="Mneme HQ" height="22" style="display:block;"></a><span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span></span>
+    <span>&copy; 2026</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) { a.classList.add('active'); }
+  });
+})();
+</script>
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  function setOpen(open){ links.classList.toggle('open', open); btn.setAttribute('aria-expanded', String(open)); document.body.classList.toggle('menu-open', open); }
+  btn.addEventListener('click', function(e){ e.stopPropagation(); setOpen(!links.classList.contains('open')); });
+  document.addEventListener('click', function(e){ if (!links.classList.contains('open')) return; if (links.contains(e.target) || btn.contains(e.target)) return; setOpen(false); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false); });
+  links.addEventListener('click', function(e){ if (e.target.tagName === 'A') setOpen(false); });
+  window.addEventListener('resize', function(){ if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false); });
+})();
+</script>
+</body>
+</html>

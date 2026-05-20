@@ -74,6 +74,26 @@
     .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
     .callout p strong { color: var(--accent); }
 
+    .quad { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.5rem 1.25rem; margin: 2.5rem 0; }
+    .quad .qd-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.1rem; }
+    .quad-grid { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 1.5rem 1rem 1rem 3rem; }
+    .quad-cell { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 1.1rem 1.2rem; min-height: 122px; display: flex; flex-direction: column; justify-content: flex-start; }
+    .quad-cell.winner { border-color: rgba(200,240,96,0.45); background: linear-gradient(180deg, rgba(200,240,96,0.06), var(--surface2) 70%); }
+    .quad-cell.trap { border-color: rgba(220,90,90,0.3); }
+    .quad-cell .qc-label { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
+    .quad-cell.winner .qc-label { color: var(--accent); }
+    .quad-cell.trap .qc-label { color: #e05a5a; }
+    .quad-cell .qc-name { font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem; line-height: 1.3; }
+    .quad-cell .qc-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.55; }
+    .quad-yaxis { position: absolute; left: 0; top: 1.5rem; bottom: 1rem; width: 2.5rem; display: flex; align-items: center; justify-content: center; }
+    .quad-yaxis span { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; writing-mode: vertical-rl; transform: rotate(180deg); }
+    .quad-yaxis::after { content: ''; position: absolute; left: 50%; top: 4px; bottom: 4px; width: 1px; background: var(--border); }
+    .quad-xaxis { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; text-align: center; margin-top: 0.5rem; padding-top: 0.65rem; border-top: 1px solid var(--border); }
+    @media (max-width: 540px) {
+      .quad-grid { grid-template-columns: 1fr; padding-left: 1rem; }
+      .quad-yaxis { display: none; }
+    }
+
     .pullquote { margin: 2.5rem 0; padding: 1.75rem 2rem; background: var(--surface); border-radius: 12px; border: 1px solid var(--border2); }
     .pullquote blockquote { font-family: 'Instrument Serif', serif; font-size: 1.2rem; line-height: 1.6; color: var(--text); font-style: italic; margin-bottom: 0.85rem; }
     .pullquote cite { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.03em; font-style: normal; }
@@ -299,7 +319,37 @@
 
     <p>Deployment quality. Not speed of adoption. Not model selection. Not prompt sophistication. The differentiator in the next phase is whether organizations can execute AI-assisted work at scale without quality degrading as output volume grows.</p>
 
-    <p>That framing matters beyond CX strategy. It is precisely the problem facing AI-assisted engineering teams right now.</p>
+    <p>That framing matters beyond CX strategy. It is precisely the problem facing AI-assisted engineering teams right now. The first AI era rewarded one axis: speed of adoption. The next era rewards two:</p>
+
+    <div class="quad" aria-label="Speed of AI adoption versus deployment quality, by quadrant">
+      <div class="qd-title">Speed &times; deployment quality &middot; the next era's winners are top-right</div>
+      <div class="quad-grid">
+        <div class="quad-yaxis"><span>deployment quality &rarr;</span></div>
+        <!-- Top row: high quality -->
+        <div class="quad-cell">
+          <div class="qc-label">low speed &middot; high quality</div>
+          <div class="qc-name">Cautious holdout</div>
+          <div class="qc-desc">Strong engineering discipline; under-adopted AI. Loses on throughput. Outcompeted on delivery rate by teams that close the gap on quality.</div>
+        </div>
+        <div class="quad-cell winner">
+          <div class="qc-label">high speed &middot; high quality</div>
+          <div class="qc-name">Operationalized</div>
+          <div class="qc-desc">AI throughput plus governance infrastructure that scales with it. Speed without drift. The next era's differentiator.</div>
+        </div>
+        <!-- Bottom row: low quality -->
+        <div class="quad-cell">
+          <div class="qc-label">low speed &middot; low quality</div>
+          <div class="qc-name">Laggard</div>
+          <div class="qc-desc">No AI advantage and no quality moat. Structurally disadvantaged in both axes; the smallest cohort going forward.</div>
+        </div>
+        <div class="quad-cell trap">
+          <div class="qc-label">high speed &middot; low quality</div>
+          <div class="qc-name">Whiplash trap</div>
+          <div class="qc-desc">Fast adoption, no governance. Throughput rises, incidents rise faster, review queues collapse. The default outcome without an enforcement layer.</div>
+        </div>
+      </div>
+      <div class="quad-xaxis">speed of AI adoption &rarr;</div>
+    </div>
 
     <h2>Phase 1: Adoption advantage</h2>
 

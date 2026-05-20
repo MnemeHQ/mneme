@@ -83,6 +83,22 @@
     .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; line-height: 1.75; }
     .callout p strong { color: var(--accent); }
 
+    .lifecycle { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.5rem 1.25rem; margin: 2.5rem 0; }
+    .lifecycle .lc-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.1rem; }
+    .lc-flow { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+    .lc-phase { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 0.7rem 0.55rem; text-align: center; }
+    .lc-phase .lp-name { font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 0.25rem; }
+    .lc-phase .lp-ai { font-family: 'DM Mono', monospace; font-size: 0.66rem; color: var(--muted); letter-spacing: 0.04em; line-height: 1.35; }
+    .lc-overlay { margin-top: 10px; background: linear-gradient(90deg, rgba(200,240,96,0.1), rgba(200,240,96,0.18), rgba(200,240,96,0.1)); border: 1px solid rgba(200,240,96,0.35); border-radius: 6px; padding: 0.7rem 1rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .lc-overlay .lo-label { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--accent); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+    .lc-overlay .lo-text { font-size: 0.78rem; color: var(--text); line-height: 1.5; text-align: right; }
+    .lc-caption { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.04em; color: var(--muted); margin-top: 0.85rem; padding-top: 0.75rem; border-top: 1px solid var(--border); line-height: 1.55; }
+    @media (max-width: 720px) {
+      .lc-flow { grid-template-columns: repeat(3, 1fr); }
+      .lc-overlay { flex-direction: column; align-items: flex-start; gap: 0.4rem; }
+      .lc-overlay .lo-text { text-align: left; }
+    }
+
     .governance-list { display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 12px; overflow: hidden; margin: 1.75rem 0; }
     .gov-row { background: var(--surface); padding: 1rem 1.25rem; display: flex; gap: 1rem; align-items: flex-start; }
     .gov-bullet { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; flex-shrink: 0; margin-top: 0.5rem; }
@@ -262,7 +278,24 @@
         </div>
       </div>
 
-      <p>The lifecycle remains familiar. What changes is the speed, scale, and autonomy of code generation.</p>
+      <p>The lifecycle remains familiar. What changes is the speed, scale, and autonomy of code generation &mdash; and the constraint surface that has to span all six phases instead of living in the review step.</p>
+
+      <div class="lifecycle" aria-label="AI SDLC lifecycle with governance overlay">
+        <div class="lc-title">The AI SDLC &middot; six phases with an AI participant &middot; governance spans all of them</div>
+        <div class="lc-flow">
+          <div class="lc-phase"><div class="lp-name">Plan</div><div class="lp-ai">specs, breakdown</div></div>
+          <div class="lc-phase"><div class="lp-name">Design</div><div class="lp-ai">architectures, scaffolds</div></div>
+          <div class="lc-phase"><div class="lp-name">Implement</div><div class="lp-ai">generation at velocity</div></div>
+          <div class="lc-phase"><div class="lp-name">Test</div><div class="lp-ai">cases, fuzzing</div></div>
+          <div class="lc-phase"><div class="lp-name">Review</div><div class="lp-ai">diffs, patterns</div></div>
+          <div class="lc-phase"><div class="lp-name">Maintain</div><div class="lp-ai">migrations, docs</div></div>
+        </div>
+        <div class="lc-overlay">
+          <span class="lo-label">Governance layer</span>
+          <span class="lo-text">Architectural decisions, scope, precedence, pre-generation enforcement &mdash; applied across every phase, not just at review</span>
+        </div>
+        <div class="lc-caption">Each phase keeps its traditional name. Each phase now has an AI participant. The governance bar across the bottom is the new layer the lifecycle requires to remain coherent at AI velocity.</div>
+      </div>
 
       <h2 id="why-the-term-exists">Why the term exists</h2>
 

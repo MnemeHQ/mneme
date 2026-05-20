@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 1200px; height: 630px; background: #0c0c0d; font-family: 'DM Mono', monospace; overflow: hidden; position: relative; }
+  .grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(200,240,96,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(200,240,96,0.04) 1px, transparent 1px); background-size: 60px 60px; pointer-events: none; }
+  .glow { position: absolute; top: -120px; left: -120px; width: 600px; height: 600px; background: radial-gradient(circle at top left, rgba(200,240,96,0.08), transparent 70%); pointer-events: none; }
+  .container { position: relative; z-index: 1; width: 100%; height: 100%; padding: 44px 52px; display: flex; flex-direction: column; justify-content: space-between; }
+  .top { display: flex; align-items: center; justify-content: space-between; }
+  .logo { font-family: 'Instrument Serif', serif; font-size: 26px; color: #e8e8ec; letter-spacing: -0.3px; }
+  .tag { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; color: #c8f060; background: rgba(200,240,96,0.08); border: 1px solid rgba(200,240,96,0.25); border-radius: 100px; padding: 5px 14px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .middle { flex: 1; display: flex; gap: 44px; align-items: center; padding-top: 8px; }
+  .copy { flex: 1; max-width: 600px; }
+  .heading { font-family: 'Instrument Serif', serif; line-height: 1.05; color: #e8e8ec; letter-spacing: -1px; margin-bottom: 20px; font-size: 60px; }
+  .heading em { font-style: italic; color: #c8f060; }
+  .subtitle { font-family: 'DM Mono', monospace; font-size: 14px; line-height: 1.7; color: #88889a; font-weight: 300; }
+  .surfaces { flex-shrink: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 380px; }
+  .s { font-family: 'DM Mono', monospace; font-size: 11px; padding: 9px 12px; border-radius: 6px; letter-spacing: 0.04em; text-transform: uppercase; border: 1px solid rgba(168,168,184,0.18); background: rgba(168,168,184,0.04); color: #a8a8b8; text-align: center; }
+  .s.accent { border-color: rgba(200,240,96,0.35); background: rgba(200,240,96,0.06); color: #c8f060; }
+  .bottom { display: flex; align-items: flex-end; justify-content: flex-end; }
+  .url { font-family: 'DM Mono', monospace; font-size: 12px; color: #55555f; letter-spacing: 0.01em; white-space: nowrap; }
+</style>
+</head>
+<body>
+  <div class="grid"></div>
+  <div class="glow"></div>
+  <div class="container">
+    <div class="top">
+      <span class="logo">Mneme HQ</span>
+      <span class="tag">Concept</span>
+    </div>
+    <div class="middle">
+      <div class="copy">
+        <div class="heading">Execution <em>surfaces</em>.</div>
+        <div class="subtitle">Agents do not only write code. They write commits, branches, PRs, CI configs, manifests, runbooks, docs. Each is a surface governance has to propagate to.</div>
+      </div>
+      <div class="surfaces">
+        <div class="s accent">source code</div>
+        <div class="s">branches</div>
+        <div class="s">commits</div>
+        <div class="s">PR titles</div>
+        <div class="s">CI config</div>
+        <div class="s">manifests</div>
+        <div class="s">runbooks</div>
+        <div class="s">gen docs</div>
+        <div class="s">agent plans</div>
+        <div class="s">tool traces</div>
+      </div>
+    </div>
+    <div class="bottom">
+      <div class="url">mnemehq.com/concepts/execution-surfaces</div>
+    </div>
+  </div>
+</body>
+</html>

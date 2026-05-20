@@ -75,6 +75,17 @@
     .contrast-cell.accent-right { border-left: 3px solid var(--accent); }
     @media (max-width: 540px) { .contrast-block { grid-template-columns: 1fr; } }
 
+    .layer-stack { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin: 2rem 0 1rem; }
+    .layer-row { display: flex; align-items: stretch; min-height: 56px; border-bottom: 1px solid var(--border); }
+    .layer-row:last-child { border-bottom: none; }
+    .layer-num { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted); width: 64px; padding: 0.85rem; background: var(--surface2); border-right: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .layer-content { flex: 1; padding: 0.85rem 1.1rem; display: flex; flex-direction: column; justify-content: center; }
+    .layer-content strong { color: var(--text); font-weight: 600; font-size: 0.9rem; }
+    .layer-content span { color: var(--muted); font-size: 0.8rem; line-height: 1.55; margin-top: 0.2rem; }
+    .layer-row.highlighted .layer-num { background: rgba(200,240,96,0.08); color: var(--accent); border-right-color: rgba(200,240,96,0.3); }
+    .layer-row.highlighted .layer-content { background: rgba(200,240,96,0.05); border-left: 2px solid var(--accent); }
+    .layer-row.highlighted .layer-content strong { color: var(--accent); }
+
     .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
     .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
     .callout p strong { color: var(--accent); }
@@ -315,13 +326,31 @@
 
     <h2>Two layers, one stack</h2>
 
-    <p>The AI coding stack is evolving into distinct layers:</p>
+    <p>The AI coding stack is evolving into three distinct layers, only one of which most teams have built deliberately:</p>
 
-    <p><strong>Generation runtimes</strong> like Cursor and Claude Code accelerate output. They are the engine.</p>
-
-    <p><strong>Review platforms</strong> like CodeRabbit inspect what surfaces in pull requests. They are the quality gate.</p>
-
-    <p><strong>Governance systems</strong> enforce architectural constraints before code is generated. They are the upstream layer that most teams are only beginning to build.</p>
+    <div class="layer-stack" aria-label="Three layers of the AI coding stack: generation, review, governance">
+      <div class="layer-row highlighted">
+        <div class="layer-num">L3</div>
+        <div class="layer-content">
+          <strong>Governance &middot; before generation</strong>
+          <span>Decision corpus, scope, precedence, pre-tool-use hook. The upstream layer most teams are only beginning to build.</span>
+        </div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-num">L2</div>
+        <div class="layer-content">
+          <strong>Review &middot; after generation</strong>
+          <span>CodeRabbit, PR bots, AI-assisted linters. Inspects what surfaces in a pull request. The quality gate.</span>
+        </div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-num">L1</div>
+        <div class="layer-content">
+          <strong>Generation &middot; the runtime</strong>
+          <span>Cursor, Claude Code, Copilot. Produces output at AI velocity. The engine.</span>
+        </div>
+      </div>
+    </div>
 
     <p>These layers are complementary. A team with strong generation tooling and strong review tooling but no governance layer will ship fast and review often — and still accumulate architectural drift at AI velocity. A team that adds the governance layer stops correcting and starts directing.</p>
 
