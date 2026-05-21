@@ -6,7 +6,7 @@ Mneme HQ is the architectural governance layer for AI-assisted development.
 
 [![Mneme HQ — Governed Python Agent Demo](https://img.youtube.com/vi/4Yg43V9amao/maxresdefault.jpg)](https://www.youtube.com/watch?v=4Yg43V9amao)
 
-**▶ [Watch the demo](https://www.youtube.com/watch?v=4Yg43V9amao)** · [Walk all three flagship demos →](https://mnemehq.com/demo/) · [**Request a pilot →**](https://mnemehq.com/pilot/)
+**▶ [Governed Python Agent Demo](https://www.youtube.com/watch?v=4Yg43V9amao)** · [ADR Import Demo →](https://mnemehq.com/demo/adr-compiler/) · [**Request a pilot →**](https://mnemehq.com/pilot/)
 
 > **Current phase: Layer 1 — validation.** Mechanism is frozen at commit [`e73ff7d`](https://github.com/TheoV823/mneme/commit/e73ff7d). Local-repo, single-developer, project-scoped governance. Layer 2 (multi-repo, team sync, org policy distribution) is intentionally deferred. See [docs/architecture/current-phase.md](docs/architecture/current-phase.md) and [docs/architecture/layer1-freeze-e73ff7d.md](docs/architecture/layer1-freeze-e73ff7d.md).
 
@@ -52,6 +52,8 @@ The freeze is governed by three load-bearing principles. Every feature is judged
 - **Auditable > autonomous.** Every block records which decision matched, which rule triggered, which term in the input fired it. A human can reconstruct any verdict from the artifacts.
 - **Prevention before review.** Mneme runs *before* the LLM generates output, not after. The intervention point is the prompt boundary.
 
+Mneme is built around a broader architectural governance model for AI-assisted development. See the [concepts hub](https://mnemehq.com/concepts/) for definitions including governance before generation, verification contracts, architectural drift, and governance infrastructure.
+
 ## Benchmark Philosophy
 
 The benchmark is a **regression and integrity instrument**, not a generalization claim. Its job is to make every change to retrieval or enforcement visible and reproducible — so a regression cannot land silently, a PASS cannot be coincidence, and external numbers cannot drift away from what the code does.
@@ -69,17 +71,25 @@ Contributor guidance: changes to `decision_retriever.py`, `enforcer.py`, `benchm
 
 ---
 
-## Demo
+## Demo videos
 
-**[▶ See the demo: same prompt, two outcomes](https://mnemehq.com/demo/)**
+Watch short demos of Mneme running in realistic AI-assisted development workflows:
 
-*Same prompt. Same model. Different answer — because it has your project's decisions.*
+- [Governed Python Agent Demo](https://www.youtube.com/watch?v=4Yg43V9amao) — the core product loop: violation caught, context injected, agent retries compliant
+- [ADR Import Demo](https://www.youtube.com/watch?v=lMkq-RoKeD4) — compile ADRs into an executable governance corpus
+- [Architectural Drift Demo](https://www.youtube.com/watch?v=xkXJqSnXBJ8) — drift at AI speed, caught before it compounds
+- [GitHub Actions Governance Demo](https://www.youtube.com/watch?v=LaJqeJrKkgg) — enforce architecture in CI from ADR to gate
+- [Dependency Policy Demo](https://www.youtube.com/watch?v=pBJSpN8d9FU) — project memory as enforcement policy
+
+For the full demo library, see [mnemehq.com/demo](https://mnemehq.com/demo/) or the [YouTube channel](https://www.youtube.com/@MnemeHQ).
 
 ---
 
 ## The problem
 
 LLMs start every call from zero. They forget prior architecture choices, reintroduce rejected technologies, and suggest changes that contradict decisions your team already made. This happens whether you are using a direct API completion, an IDE coding assistant, an agent framework, or a managed agent platform.
+
+Mneme helps teams prevent [architectural drift](https://mnemehq.com/concepts/architectural-drift/) by enforcing [governance before generation](https://mnemehq.com/concepts/governance-before-generation/).
 
 Mneme HQ turns those decisions into structured, retrievable constraints that can be injected into LLM calls and checked against generated output.
 
