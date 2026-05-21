@@ -88,6 +88,7 @@ TEMPLATE_MAP = {
     "og-insights-goal-driven-agents.html": "insights/goal-driven-agents-architectural-governance/og.png",
     "og-insights-llm-wiki.html": "insights/llm-wiki-library-not-law/og.png",
     "og-insights-ai-operating-layer.html": "insights/ai-is-becoming-the-operating-layer-for-software-execution/og.png",
+    "og-insights-models-are-temporary.html": "insights/models-are-temporary-architectural-intent-is-not/og.png",
     # Concepts
     "og-concepts-index.html": "concepts/og.png",
     "og-concepts-agentic-development.html": "concepts/agentic-development/og.png",
@@ -113,6 +114,7 @@ TEMPLATE_MAP = {
     "og-concepts-objective-driven-development.html": "concepts/objective-driven-development/og.png",
     "og-concepts-executable-architectural-intent.html": "concepts/executable-architectural-intent/og.png",
     "og-concepts-ai-operating-layer.html": "concepts/ai-operating-layer/og.png",
+    "og-concepts-model-independent-governance.html": "concepts/model-independent-governance/og.png",
     # Docs
     "og-docs.html": "docs/og.png",
     # Architecture
