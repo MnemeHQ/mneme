@@ -1,18 +1,17 @@
 # Mneme HQ — Diagram Conventions
 
-Internal reference for the canonical diagram primitives used across `/concepts/`,
+Contributor reference for the canonical diagram primitives used across `/concepts/`,
 `/insights/`, `/demo/`, and `/compare/`. New diagrams must follow these
 conventions; bespoke per-page SVGs are no longer how we add visual
 infrastructure.
 
-The four canonical primitives live in `site/assets/css/diagrams.css`:
+The four canonical primitives live in `site/assets/css/diagrams.css`, each
+embedded on its canonical concept-page home:
 
-- `.mneme-diagram--propagation` — fan-out from a compiled corpus to consumers
-- `.mneme-diagram--checkpoints` — lifecycle enforcement checkpoints
-- `.mneme-diagram--chain` — backward citation chain (verdict → ADR)
-- `.mneme-diagram--cascade` — compounding drift over sessions
-
-Canonical homes are documented in the Phase 3 design doc (private repo).
+- `.mneme-diagram--propagation` — fan-out from a compiled corpus to consumers — `/concepts/governance-propagation/`
+- `.mneme-diagram--checkpoints` — lifecycle enforcement checkpoints — `/concepts/governance-before-generation/`
+- `.mneme-diagram--chain` — backward citation chain (verdict → ADR) — `/concepts/enforcement-provenance/`
+- `.mneme-diagram--cascade` — compounding drift over sessions — `/concepts/architectural-drift/`
 
 ---
 
