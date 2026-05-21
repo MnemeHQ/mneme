@@ -40,28 +40,25 @@ def extract_card_slugs(html: str) -> set:
 
 
 def extract_jsonld_slugs(html: str) -> set:
-    """Return slugs from every hasPart entry in the CollectionPage JSON-LD block."""
+    """Return slugs from every hasPart entry in any CollectionPage JSON-LD block."""
     slugs = set()
-    ld_m = re.search(
+    for ld_m in re.finditer(
         r'<script\s+type="application/ld\+json">(.*?)</script>',
         html,
         re.DOTALL,
-    )
-    if not ld_m:
-        return slugs
-    try:
-        data = json.loads(ld_m.group(1))
-    except json.JSONDecodeError as exc:
-        print(f"  ERROR  JSON-LD parse failed: {exc}", file=sys.stderr)
-        return slugs
-    graph = data.get("@graph", [data])
-    for node in graph:
-        if node.get("@type") == "CollectionPage":
-            for part in node.get("hasPart", []):
-                url = part.get("url", "")
-                m = re.match(r'https://mnemehq\.com/concepts/([^/]+)/', url)
-                if m:
-                    slugs.add(m.group(1))
+    ):
+        try:
+            data = json.loads(ld_m.group(1))
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"JSON-LD parse failed: {exc}") from exc
+        graph = data.get("@graph", [data])
+        for node in graph:
+            if node.get("@type") == "CollectionPage":
+                for part in node.get("hasPart", []):
+                    url = part.get("url", "")
+                    m = re.match(r'https://mnemehq\.com/concepts/([^/]+)/', url)
+                    if m:
+                        slugs.add(m.group(1))
     return slugs
 
 
@@ -69,7 +66,7 @@ def extract_svg_slugs(html: str) -> set:
     """Return slugs for every concept linked from an SVG cmap-link node."""
     slugs = set()
     fig_m = re.search(
-        r'<figure\s+class="concept-map"[^>]*>(.*?)</figure>',
+        r'<figure\b[^>]*\bclass="[^"]*concept-map[^"]*"[^>]*>(.*?)</figure>',
         html,
         re.DOTALL,
     )
@@ -114,7 +111,11 @@ def main() -> int:
     hub_html = load_html(HUB)
     pages = page_slugs()
     cards = extract_card_slugs(hub_html)
-    jsonld = extract_jsonld_slugs(hub_html)
+    try:
+        jsonld = extract_jsonld_slugs(hub_html)
+    except ValueError as exc:
+        print(f"ERROR  {exc}", file=sys.stderr)
+        return 1
     svg = extract_svg_slugs(hub_html)
     omitted = svg_omitted()
 
