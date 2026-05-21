@@ -7,6 +7,7 @@
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
+  <link rel="stylesheet" href="/assets/css/diagrams.css">
   <meta name="description" content="Governance before generation means enforcing architectural constraints before the AI writes code, not after it reaches review. The enforcement point is the strategic variable." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
@@ -372,7 +373,7 @@
 
     <p>That distinction â€” shaping versus reacting â€” is the structural argument this page develops. The enforcement point is not a scheduling detail. It is the variable that determines whether governance is architectural infrastructure or expensive remediation.</p>
 
-    <figure class="diagram-figure" aria-labelledby="gbg-diag-title">
+    <figure class="diagram-figure">
       <svg viewBox="0 0 800 340" role="img" aria-labelledby="gbg-diag-title gbg-diag-desc" xmlns="http://www.w3.org/2000/svg">
         <title id="gbg-diag-title">Two enforcement points on the same pipeline</title>
         <desc id="gbg-diag-desc">Two parallel pipelines: the upper one places enforcement before generation and produces shaped output. The lower one places enforcement after generation as review and accumulates rework.</desc>
@@ -467,6 +468,45 @@
     <div class="callout">
       <p><strong>The enforcement point is the strategic variable.</strong> Everything else â€” the quality of your decision records, the precision of your retrieval, the coverage of your constraints â€” is multiplied or divided by where enforcement fires. Pre-generation enforcement multiplies; post-generation enforcement divides attention.</p>
     </div>
+
+    <p>The five concrete checkpoints across the AI development lifecycle make this choice visible. Each is a place where governance can fire &mdash; but only the first two fire before generation. The rest react to output that already exists.</p>
+
+    <figure class="diagram-figure">
+      <div class="mneme-diagram mneme-diagram--checkpoints" role="img"
+           aria-labelledby="ec-diag-title ec-diag-desc">
+        <p id="ec-diag-title" class="mneme-diagram__title">Five enforcement checkpoints &middot; two fire before generation</p>
+        <p id="ec-diag-desc" class="mneme-diagram__sr-desc">Five lifecycle checkpoints. Pre-generation governance: IDE corpus as context, and pre-tool-use hook that blocks before the agent writes. Post-generation checks: CI check (the hard gate that blocks before merge), Merge gated on the verdict, and post-hoc Audit review.</p>
+
+        <div class="brackets">
+          <div class="bracket-label pre">Pre-generation governance</div>
+          <div class="bracket-label post">Post-generation checks</div>
+        </div>
+
+        <div class="row">
+          <div class="step step--active">
+            <div class="s-title">IDE</div>
+            <div class="s-sub">corpus as context</div>
+          </div>
+          <div class="step step--active">
+            <div class="s-title">Pre-tool hook</div>
+            <div class="s-sub">block before generation</div>
+          </div>
+          <div class="step step--gate">
+            <div class="s-title">CI check</div>
+            <div class="s-sub">block before merge</div>
+          </div>
+          <div class="step">
+            <div class="s-title">Merge</div>
+            <div class="s-sub">gated on verdict</div>
+          </div>
+          <div class="step step--muted">
+            <div class="s-title">Audit</div>
+            <div class="s-sub">post-hoc review</div>
+          </div>
+        </div>
+      </div>
+      <figcaption class="diagram-caption"><strong>Five checkpoints, one strategic split.</strong> Pre-generation governance shapes a single proposal before the agent writes. Post-generation checks react to output that already exists; the CI gate is the only one that can still block.</figcaption>
+    </figure>
 
     <h2>Why this problem exists in AI-native development</h2>
 

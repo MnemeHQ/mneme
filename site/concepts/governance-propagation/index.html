@@ -6,6 +6,7 @@
   <title>Governance Propagation â€” Mneme HQ Concepts</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
+  <link rel="stylesheet" href="/assets/css/diagrams.css">
   <meta name="description" content="Governance propagation: a single compiled decision reaches every agent, every developer, every CI run with identical semantics, scope, and enforcement verdict." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
@@ -272,69 +273,59 @@
 
     <p>Most discussion of AI coding governance focuses on a single surface â€” usually a single agent in a single editor. The unspoken assumption is that if the constraint works in that one place, governance is solved. It is not. The hard problem in real teams is not enforcing a constraint in one session; it is making sure the same constraint, with the same meaning, is enforced in every session, by every agent, on every developer's machine, and in CI. That property has a name: <strong>governance propagation</strong>.</p>
 
-    <figure class="diagram-figure" aria-labelledby="gp-diag-title">
-      <svg viewBox="0 0 800 360" role="img" aria-labelledby="gp-diag-title gp-diag-desc" xmlns="http://www.w3.org/2000/svg">
-        <title id="gp-diag-title">A single compiled decision propagating to every consumer</title>
-        <desc id="gp-diag-desc">Central node 'ADR-0017' compiles into a decision corpus that fans out to multiple consumers â€” Claude Code, Cursor, Copilot, CI, JetBrains, code review bots â€” each receiving the identical constraint.</desc>
-        <g>
-          <text x="40" y="28" fill="#c8f060" font-family="DM Mono, monospace" font-size="10" letter-spacing="0.06em">ONE DECISION Â· IDENTICAL SEMANTICS Â· EVERY CONSUMER</text>
+    <figure class="diagram-figure">
+      <div class="mneme-diagram mneme-diagram--propagation" role="img"
+           aria-labelledby="gp-diag-title gp-diag-desc">
+        <p id="gp-diag-title" class="mneme-diagram__title">One decision · identical semantics · every consumer</p>
+        <p id="gp-diag-desc" class="mneme-diagram__sr-desc">A single compiled decision propagates from a source decision through a compiler into a corpus, then fans out to five consumers (Claude Code, Cursor, Copilot, CI merge gate, JetBrains) which each produce the same verdict.</p>
 
-          <!-- Source -->
-          <rect x="40" y="68" width="160" height="60" rx="8" fill="rgba(139,224,200,0.05)" stroke="#8be0c8" stroke-width="1.2"/>
-          <text x="120" y="92" text-anchor="middle" fill="#8be0c8" font-family="DM Mono, monospace" font-size="10">ADR-0017</text>
-          <text x="120" y="112" text-anchor="middle" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">use repository pattern</text>
+        <div class="pipeline">
+          <div class="node node--source">
+            <div class="n-eyebrow">ADR</div>
+            <div class="n-title">Source decision</div>
+            <div class="n-sub">authored once</div>
+          </div>
+          <div class="node node--active">
+            <div class="n-eyebrow">COMPILER</div>
+            <div class="n-title">parse · validate · emit</div>
+          </div>
+          <div class="node node--active">
+            <div class="n-eyebrow">CORPUS</div>
+            <div class="n-title">project_memory.json</div>
+            <div class="n-sub">single source of truth</div>
+          </div>
+        </div>
 
-          <!-- Compiler -->
-          <rect x="240" y="68" width="140" height="60" rx="8" fill="rgba(200,240,96,0.05)" stroke="#c8f060" stroke-width="1.5"/>
-          <text x="310" y="92" text-anchor="middle" fill="#c8f060" font-family="DM Mono, monospace" font-size="10">COMPILER</text>
-          <text x="310" y="112" text-anchor="middle" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">parse Â· validate Â· emit</text>
+        <div class="bus" aria-hidden="true"></div>
 
-          <line x1="200" y1="98" x2="240" y2="98" stroke="#c8f060" stroke-width="1.5"/>
+        <div class="consumers">
+          <div class="consumer node">
+            <div class="n-title">Claude Code</div>
+            <div class="n-sub">pre-tool-use hook</div>
+          </div>
+          <div class="consumer node">
+            <div class="n-title">Cursor</div>
+            <div class="n-sub">rules emission</div>
+          </div>
+          <div class="consumer node">
+            <div class="n-title">Copilot</div>
+            <div class="n-sub">instructions file</div>
+          </div>
+          <div class="consumer consumer--gate node node--gate">
+            <div class="n-title">CI gate</div>
+            <div class="n-sub">merge enforcement</div>
+          </div>
+          <div class="consumer node">
+            <div class="n-title">JetBrains</div>
+            <div class="n-sub">corpus context</div>
+          </div>
+        </div>
 
-          <!-- Corpus -->
-          <rect x="420" y="68" width="200" height="60" rx="8" fill="rgba(200,240,96,0.05)" stroke="#c8f060" stroke-width="1.5"/>
-          <text x="520" y="92" text-anchor="middle" fill="#c8f060" font-family="DM Mono, monospace" font-size="10">project_memory.json</text>
-          <text x="520" y="112" text-anchor="middle" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">single source of truth</text>
-
-          <line x1="380" y1="98" x2="420" y2="98" stroke="#c8f060" stroke-width="1.5"/>
-
-          <!-- Fanout point -->
-          <circle cx="520" cy="170" r="4" fill="#c8f060"/>
-          <line x1="520" y1="128" x2="520" y2="170" stroke="#c8f060" stroke-width="1.5"/>
-
-          <!-- Fanout lines -->
-          <line x1="520" y1="170" x2="100" y2="240" stroke="#c8f060" stroke-width="1.2"/>
-          <line x1="520" y1="170" x2="240" y2="240" stroke="#c8f060" stroke-width="1.2"/>
-          <line x1="520" y1="170" x2="380" y2="240" stroke="#c8f060" stroke-width="1.2"/>
-          <line x1="520" y1="170" x2="520" y2="240" stroke="#c8f060" stroke-width="1.2"/>
-          <line x1="520" y1="170" x2="660" y2="240" stroke="#c8f060" stroke-width="1.2"/>
-
-          <!-- Consumers -->
-          <rect x="40" y="240" width="120" height="56" rx="6" fill="#141416" stroke="#2e2e34"/>
-          <text x="100" y="262" text-anchor="middle" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">Claude Code</text>
-          <text x="100" y="280" text-anchor="middle" fill="#88889a" font-family="DM Mono, monospace" font-size="9">pre-tool-use hook</text>
-
-          <rect x="180" y="240" width="120" height="56" rx="6" fill="#141416" stroke="#2e2e34"/>
-          <text x="240" y="262" text-anchor="middle" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">Cursor</text>
-          <text x="240" y="280" text-anchor="middle" fill="#88889a" font-family="DM Mono, monospace" font-size="9">rules emission</text>
-
-          <rect x="320" y="240" width="120" height="56" rx="6" fill="#141416" stroke="#2e2e34"/>
-          <text x="380" y="262" text-anchor="middle" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">Copilot</text>
-          <text x="380" y="280" text-anchor="middle" fill="#88889a" font-family="DM Mono, monospace" font-size="9">instructions file</text>
-
-          <rect x="460" y="240" width="120" height="56" rx="6" fill="rgba(200,240,96,0.05)" stroke="#c8f060" stroke-width="1.5"/>
-          <text x="520" y="262" text-anchor="middle" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">CI gate</text>
-          <text x="520" y="280" text-anchor="middle" fill="#c8f060" font-family="DM Mono, monospace" font-size="9">merge enforcement</text>
-
-          <rect x="600" y="240" width="120" height="56" rx="6" fill="#141416" stroke="#2e2e34"/>
-          <text x="660" y="262" text-anchor="middle" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">JetBrains</text>
-          <text x="660" y="280" text-anchor="middle" fill="#88889a" font-family="DM Mono, monospace" font-size="9">plugin Â· inline</text>
-
-          <!-- Equivalence note -->
-          <text x="400" y="328" text-anchor="middle" fill="#c8f060" font-family="DM Mono, monospace" font-size="11">verdict(claude) â‰¡ verdict(cursor) â‰¡ verdict(copilot) â‰¡ verdict(ci)</text>
-          <text x="400" y="346" text-anchor="middle" fill="#88889a" font-family="DM Mono, monospace" font-size="10">same query Â· same corpus Â· same scope Â· same precedence Â· same answer</text>
-        </g>
-      </svg>
+        <div class="equiv">
+          verdict(claude) ≡ verdict(cursor) ≡ verdict(copilot) ≡ verdict(ci)
+          <small>same query · same corpus · same scope · same precedence · same answer</small>
+        </div>
+      </div>
       <figcaption class="diagram-caption"><strong>Propagation is a one-to-many invariant.</strong> A decision is compiled once. Every consumer reads the same corpus, applies the same scope and precedence rules, and produces the same verdict. There is no second copy of the truth to drift against.</figcaption>
     </figure>
 

@@ -1,0 +1,569 @@
+/*
+ * Mneme HQ — Canonical Diagram Primitives
+ *
+ * Four self-contained HTML+CSS diagram primitives, all scoped under
+ * .mneme-diagram. See docs/contributing/diagram-conventions.md for the visual
+ * language spec and the no-invented-capabilities rule.
+ *
+ * Theme tokens (--accent, --teal, --surface, etc.) are defined in each
+ * page's inline <style> block. This file relies on them but does not
+ * redefine them.
+ */
+
+/* ============================================================
+ * Base wrapper
+ * ============================================================ */
+
+.mneme-diagram {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  color: var(--text);
+  position: relative;
+}
+
+.mneme-diagram__title {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 400;
+  margin: 0 0 1.1rem 0;
+}
+
+.mneme-diagram__sr-desc {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ============================================================
+ * Primitive 1: Governance propagation
+ * Three-row layout: pipeline → bus → consumers, with equivalence line
+ * ============================================================ */
+
+.mneme-diagram--propagation {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+}
+
+.mneme-diagram--propagation .pipeline {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.mneme-diagram--propagation .node {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 0.7rem 0.55rem;
+  text-align: center;
+}
+
+.mneme-diagram--propagation .node--source {
+  background: rgba(139, 224, 200, 0.05);
+  border-color: var(--teal);
+}
+
+.mneme-diagram--propagation .node--active {
+  background: rgba(200, 240, 96, 0.05);
+  border-color: var(--accent);
+  border-width: 1.5px;
+}
+
+.mneme-diagram--propagation .node--gate {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.mneme-diagram--propagation .node--gate .n-title,
+.mneme-diagram--propagation .node--gate .n-sub {
+  color: #0c0c0d;
+}
+
+.mneme-diagram--propagation .n-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.25rem;
+}
+
+.mneme-diagram--propagation .node--source .n-eyebrow { color: var(--teal); }
+.mneme-diagram--propagation .node--active .n-eyebrow { color: var(--accent); }
+
+.mneme-diagram--propagation .n-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.2rem;
+}
+
+.mneme-diagram--propagation .n-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.66rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.mneme-diagram--propagation .bus {
+  position: relative;
+  height: 36px;
+}
+
+.mneme-diagram--propagation .bus::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1.5px;
+  background: var(--accent);
+  transform: translateX(-50%);
+}
+
+.mneme-diagram--propagation .consumers {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  position: relative;
+  padding-top: 10px;
+}
+
+.mneme-diagram--propagation .consumers::before {
+  content: '';
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 0;
+  height: 1.5px;
+  background: var(--accent);
+}
+
+.mneme-diagram--propagation .consumer {
+  position: relative;
+  padding-top: 8px;
+}
+
+.mneme-diagram--propagation .consumer::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 1.5px;
+  height: 8px;
+  background: var(--accent);
+  transform: translateX(-50%);
+}
+
+.mneme-diagram--propagation .equiv {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--accent);
+  text-align: center;
+  margin-top: 1.1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border);
+  line-height: 1.6;
+}
+
+.mneme-diagram--propagation .equiv small {
+  display: block;
+  font-size: 0.66rem;
+  color: var(--muted);
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 640px) {
+  /* Pipeline collapses to a single vertical stack. */
+  .mneme-diagram--propagation .pipeline {
+    grid-template-columns: 1fr;
+  }
+  /* Consumers also collapse to a single vertical stack. The 2-column
+   * layout with a span-2 gate cell left empty grid slots and orphaned
+   * connector stubs whose horizontal bar lived only above row 1. The
+   * fan-out argument is communicated by the figcaption and structural
+   * flow (3 pipeline cells -> bus -> 5 consumer cells stacked); the
+   * horizontal bar and per-cell stubs are decorative and hidden. */
+  .mneme-diagram--propagation .consumers {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding-top: 0;
+  }
+  .mneme-diagram--propagation .consumers::before,
+  .mneme-diagram--propagation .consumer::before {
+    display: none;
+  }
+  .mneme-diagram--propagation .consumer {
+    padding-top: 0;
+  }
+}
+
+/* ============================================================
+ * Primitive 2: Enforcement checkpoints
+ * Five lifecycle checkpoints, bracketed into pre- and post-generation,
+ * with the strategic hard gate (CI check) visually marked.
+ * ============================================================ */
+
+.mneme-diagram--checkpoints {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+}
+
+.mneme-diagram--checkpoints .brackets {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: 12px;
+  margin-bottom: 0.5rem;
+}
+
+.mneme-diagram--checkpoints .bracket-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border2);
+}
+
+.mneme-diagram--checkpoints .bracket-label.pre {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.mneme-diagram--checkpoints .bracket-label.post {
+  color: var(--muted);
+}
+
+.mneme-diagram--checkpoints .row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  align-items: stretch;
+  position: relative;
+}
+
+.mneme-diagram--checkpoints .step {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 0.7rem 0.55rem;
+  text-align: center;
+  position: relative;
+}
+
+.mneme-diagram--checkpoints .step--active {
+  background: rgba(200, 240, 96, 0.05);
+  border-color: var(--accent);
+  border-width: 1.5px;
+}
+
+.mneme-diagram--checkpoints .step--gate {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.mneme-diagram--checkpoints .step--gate .s-title,
+.mneme-diagram--checkpoints .step--gate .s-sub {
+  color: #0c0c0d;
+}
+
+.mneme-diagram--checkpoints .step--muted {
+  border-style: dashed;
+  border-color: var(--border);
+  background: var(--surface);
+}
+
+.mneme-diagram--checkpoints .s-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+.mneme-diagram--checkpoints .s-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.66rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.mneme-diagram--checkpoints .step + .step::before {
+  content: '\2192';
+  position: absolute;
+  left: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+@media (max-width: 640px) {
+  .mneme-diagram--checkpoints .brackets {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .mneme-diagram--checkpoints .row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .mneme-diagram--checkpoints .step + .step::before {
+    content: '\2193';
+    left: 50%;
+    top: -10px;
+    transform: translateX(-50%);
+  }
+}
+
+/* ============================================================
+ * Primitive 3: Provenance chain
+ * Six numbered links from authoring ADR to enforcement event,
+ * plus a citable-chain summary trailer.
+ * ============================================================ */
+
+.mneme-diagram--chain {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+}
+
+.mneme-diagram--chain .chain {
+  display: grid;
+  /* minmax(0, 1fr) so long content (l-id strings like
+   * "predicate(decision, diff) -> block") wraps within its cell
+   * rather than forcing its column wider than its siblings. */
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mneme-diagram--chain .link {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 0.7rem 0.55rem;
+  position: relative;
+}
+
+.mneme-diagram--chain .link--source {
+  background: rgba(139, 224, 200, 0.05);
+  border-color: var(--teal);
+}
+
+.mneme-diagram--chain .link--active {
+  background: rgba(200, 240, 96, 0.05);
+  border-color: var(--accent);
+  border-width: 1.5px;
+}
+
+.mneme-diagram--chain .link + .link::before {
+  content: '\2192';
+  position: absolute;
+  left: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--accent);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.mneme-diagram--chain .l-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 0.2rem;
+}
+
+.mneme-diagram--chain .l-type {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.3rem;
+  line-height: 1.3;
+}
+
+.mneme-diagram--chain .link--source .l-type {
+  color: var(--teal);
+}
+
+.mneme-diagram--chain .l-id {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.3rem;
+  line-height: 1.35;
+  /* Some l-id values contain long un-breakable tokens such as
+   * "predicate(decision," that would otherwise force the cell wider
+   * than its siblings. anywhere lets the browser break mid-token. */
+  overflow-wrap: anywhere;
+}
+
+.mneme-diagram--chain .l-meta {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.mneme-diagram--chain .citation {
+  margin-top: 1.1rem;
+  padding: 0.85rem 1rem;
+  background: rgba(139, 224, 200, 0.05);
+  border: 1px solid var(--teal);
+  border-radius: 6px;
+}
+
+.mneme-diagram--chain .citation-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 0.5rem;
+}
+
+.mneme-diagram--chain .citation-line {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--text);
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.mneme-diagram--chain .citation-summary {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--muted);
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border);
+  line-height: 1.55;
+}
+
+@media (max-width: 640px) {
+  .mneme-diagram--chain .chain {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .mneme-diagram--chain .link + .link::before {
+    content: '\2193';
+    left: 50%;
+    top: -10px;
+    transform: translateX(-50%);
+  }
+  .mneme-diagram--chain .citation-line {
+    font-size: 0.66rem;
+  }
+}
+
+/* ============================================================
+ * Primitive 4: Architectural drift cascade
+ * Five schematic tier rows showing compounding drift across
+ * sessions. Bar widths are illustrative (20/40/60/80/100%); no
+ * specific violation counts or benchmark figures appear in the
+ * markup. See /benchmark/ for measured rates.
+ *
+ * Note on rgba values: the rgba(168, 168, 184, X) tier shades
+ * derive from #a8a8b8, the --muted token. CSS does not natively
+ * interpolate var() into rgba() without color-mix(), and we are
+ * not pinning evergreen-only browser support yet. These rgba
+ * literals are intentional theme-token derivatives, not stray hex.
+ * ============================================================ */
+
+.mneme-diagram--cascade {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+}
+
+.mneme-diagram--cascade .tier {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.mneme-diagram--cascade .tier:last-child {
+  margin-bottom: 0;
+}
+
+.mneme-diagram--cascade .t-session {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+
+.mneme-diagram--cascade .t-body {
+  position: relative;
+  height: 44px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.mneme-diagram--cascade .t-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(168, 168, 184, 0.1);
+  border-right: 1px solid var(--border2);
+}
+
+/* Schematic widths increase across tiers; no measured units. */
+.mneme-diagram--cascade .t-bar--w1 { width: 20%; }
+.mneme-diagram--cascade .t-bar--w2 { width: 40%; background: rgba(168, 168, 184, 0.15); }
+.mneme-diagram--cascade .t-bar--w3 { width: 60%; background: rgba(168, 168, 184, 0.2); }
+.mneme-diagram--cascade .t-bar--w4 { width: 80%; background: rgba(168, 168, 184, 0.25); border-right-style: dashed; }
+.mneme-diagram--cascade .t-bar--w5 { width: 100%; background: rgba(168, 168, 184, 0.3); border-right-style: dashed; }
+
+.mneme-diagram--cascade .t-label {
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text);
+  z-index: 1;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .mneme-diagram--cascade .tier {
+    grid-template-columns: 44px 1fr;
+    gap: 8px;
+  }
+  .mneme-diagram--cascade .t-label {
+    font-size: 0.74rem;
+  }
+}

@@ -6,6 +6,7 @@
   <title>Enforcement Provenance â€” Mneme HQ Concepts</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
+  <link rel="stylesheet" href="/assets/css/diagrams.css">
   <meta name="description" content="Enforcement provenance: every governance verdict traces back to a specific decision record, the precedence rule that selected it, and the source ADR â€” a citable chain." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
@@ -269,71 +270,59 @@
 
     <p>A governance system that blocks a merge but cannot explain why is indistinguishable from a flaky test. The block becomes noise to be worked around â€” disabled in CI, ignored in review, treated as a hostile gate rather than an architectural signal. Provenance is the property that converts an enforcement event from "the system said no" into "this specific team decision, written on this date, by this person, applies because of this precedence rule, and the rationale is at this URL."</p>
 
-    <figure class="diagram-figure" aria-labelledby="ep-diag-title">
-      <svg viewBox="0 0 800 380" role="img" aria-labelledby="ep-diag-title ep-diag-desc" xmlns="http://www.w3.org/2000/svg">
-        <title id="ep-diag-title">The provenance chain of an enforcement verdict</title>
-        <desc id="ep-diag-desc">A six-link chain from authoring ADR through compilation, retrieval, precedence resolution, evaluation, and enforcement output â€” each link annotated with its citable identifier.</desc>
-        <g>
-          <text x="40" y="28" fill="#c8f060" font-family="DM Mono, monospace" font-size="10" letter-spacing="0.06em">PROVENANCE CHAIN Â· enforcement verdict â†’ authoring intent</text>
+    <figure class="diagram-figure">
+      <div class="mneme-diagram mneme-diagram--chain" role="img"
+           aria-labelledby="ep-diag-title ep-diag-desc">
+        <p id="ep-diag-title" class="mneme-diagram__title">Provenance chain &middot; enforcement verdict cites authoring intent</p>
+        <p id="ep-diag-desc" class="mneme-diagram__sr-desc">Six-link chain from authoring ADR through compilation, retrieval, precedence resolution, evaluation, and enforcement event. Link 1 (authoring) is the source decision; link 6 (enforcement event) is the verdict. Each link cites the previous, making the chain the audit record. A citable-chain summary block follows the six links.</p>
 
-          <!-- Link 1: ADR -->
-          <rect x="40" y="56" width="170" height="70" rx="8" fill="rgba(139,224,200,0.05)" stroke="#8be0c8" stroke-width="1.2"/>
-          <text x="55" y="78" fill="#8be0c8" font-family="DM Mono, monospace" font-size="10">01 Â· AUTHORING</text>
-          <text x="55" y="98" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">ADR-0017.md</text>
-          <text x="55" y="116" fill="#88889a" font-family="DM Mono, monospace" font-size="10">git sha Â· author Â· date</text>
+        <ol class="chain">
+          <li class="link link--source">
+            <div class="l-num">01</div>
+            <div class="l-type">Authoring</div>
+            <div class="l-id">Source decision</div>
+            <div class="l-meta">git sha &middot; author &middot; date</div>
+          </li>
+          <li class="link">
+            <div class="l-num">02</div>
+            <div class="l-type">Compiled record</div>
+            <div class="l-id">decision_id</div>
+            <div class="l-meta">corpus version &middot; schema</div>
+          </li>
+          <li class="link">
+            <div class="l-num">03</div>
+            <div class="l-type">Retrieval</div>
+            <div class="l-id">scope match &middot; top-K</div>
+            <div class="l-meta">query &middot; rank &middot; candidates</div>
+          </li>
+          <li class="link">
+            <div class="l-num">04</div>
+            <div class="l-type">Precedence</div>
+            <div class="l-id">rule &middot; winner</div>
+            <div class="l-meta">supersession &middot; scope</div>
+          </li>
+          <li class="link">
+            <div class="l-num">05</div>
+            <div class="l-type">Evaluation</div>
+            <div class="l-id">predicate(decision, diff) &rarr; block</div>
+            <div class="l-meta">tool &middot; agent &middot; timestamp</div>
+          </li>
+          <li class="link link--active">
+            <div class="l-num">06</div>
+            <div class="l-type">Enforcement event</div>
+            <div class="l-id">verdict &middot; severity</div>
+            <div class="l-meta">queryable from CI, dashboard, IDE</div>
+          </li>
+        </ol>
 
-          <!-- Link 2: Compile -->
-          <rect x="240" y="56" width="170" height="70" rx="8" fill="#141416" stroke="#2e2e34"/>
-          <text x="255" y="78" fill="#c8f060" font-family="DM Mono, monospace" font-size="10">02 Â· COMPILED RECORD</text>
-          <text x="255" y="98" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">decision_id = d-17</text>
-          <text x="255" y="116" fill="#88889a" font-family="DM Mono, monospace" font-size="10">corpus version Â· schema</text>
-
-          <!-- Link 3: Retrieve -->
-          <rect x="440" y="56" width="170" height="70" rx="8" fill="#141416" stroke="#2e2e34"/>
-          <text x="455" y="78" fill="#c8f060" font-family="DM Mono, monospace" font-size="10">03 Â· RETRIEVAL</text>
-          <text x="455" y="98" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">scope match Â· top-K</text>
-          <text x="455" y="116" fill="#88889a" font-family="DM Mono, monospace" font-size="10">query Â· rank Â· candidates</text>
-
-          <!-- Link 4: Precedence -->
-          <rect x="640" y="56" width="120" height="70" rx="8" fill="#141416" stroke="#2e2e34"/>
-          <text x="650" y="78" fill="#c8f060" font-family="DM Mono, monospace" font-size="10">04 Â· PRECEDENCE</text>
-          <text x="650" y="98" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">rule Â· winner</text>
-          <text x="650" y="116" fill="#88889a" font-family="DM Mono, monospace" font-size="10">supersession Â· scope</text>
-
-          <!-- Arrows top row -->
-          <line x1="210" y1="91" x2="240" y2="91" stroke="#c8f060" stroke-width="1.5"/>
-          <line x1="410" y1="91" x2="440" y2="91" stroke="#c8f060" stroke-width="1.5"/>
-          <line x1="610" y1="91" x2="640" y2="91" stroke="#c8f060" stroke-width="1.5"/>
-
-          <!-- Down arrow -->
-          <line x1="700" y1="126" x2="700" y2="146" stroke="#c8f060" stroke-width="1.5"/>
-          <polygon points="695,142 705,142 700,150" fill="#c8f060"/>
-
-          <!-- Link 5: Evaluate -->
-          <rect x="440" y="156" width="320" height="70" rx="8" fill="#141416" stroke="#2e2e34"/>
-          <text x="455" y="178" fill="#c8f060" font-family="DM Mono, monospace" font-size="10">05 Â· EVALUATION</text>
-          <text x="455" y="198" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">predicate(d-17, diff) â†’ block</text>
-          <text x="455" y="216" fill="#88889a" font-family="DM Mono, monospace" font-size="10">tool Â· agent Â· timestamp Â· pre-tool-use hook</text>
-
-          <line x1="440" y1="191" x2="410" y2="191" stroke="#c8f060" stroke-width="1.5"/>
-          <polygon points="414,186 414,196 406,191" fill="#c8f060"/>
-
-          <!-- Link 6: Verdict -->
-          <rect x="40" y="156" width="370" height="70" rx="8" fill="rgba(200,240,96,0.05)" stroke="#c8f060" stroke-width="1.5"/>
-          <text x="55" y="178" fill="#c8f060" font-family="DM Mono, monospace" font-size="10">06 Â· ENFORCEMENT EVENT Â· stored, queryable</text>
-          <text x="55" y="198" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">verdict = BLOCK Â· severity = high</text>
-          <text x="55" y="216" fill="#88889a" font-family="DM Mono, monospace" font-size="10">links: 01 Â· 02 Â· 03 Â· 04 Â· 05 Â· queryable from CI, dashboard, IDE</text>
-
-          <!-- Chain summary -->
-          <rect x="40" y="252" width="720" height="100" rx="10" fill="rgba(139,224,200,0.05)" stroke="#8be0c8" stroke-width="1.2"/>
-          <text x="55" y="276" fill="#8be0c8" font-family="DM Mono, monospace" font-size="10">CITABLE CHAIN</text>
-
-          <text x="55" y="298" fill="#e8e8ec" font-family="DM Mono, monospace" font-size="11">verdict#9341 â† evaluator(d-17 @ corpus v.42) â† precedence(supersession) â† retrieval(query qâ‚)</text>
-          <text x="55" y="316" fill="#e8e8ec" font-family="DM Mono, monospace" font-size="11">          â† d-17 â† compile(ADR-0017.md @ sha 9f3a) â† author: Theo Â· 2026-01-14</text>
-          <text x="55" y="340" fill="#88889a" font-family="DM Mono, monospace" font-size="10">Every step is a link Â· every link is queryable Â· the chain is the audit record</text>
-        </g>
-      </svg>
-      <figcaption class="diagram-caption"><strong>The chain is the audit record.</strong> Verdict â†’ evaluator â†’ precedence rule â†’ retrieval â†’ compiled record â†’ authoring ADR. Each link cites the next. "Why did this fail?" resolves to a single chain, not a guess.</figcaption>
+        <div class="citation">
+          <div class="citation-label">Citable chain</div>
+          <div class="citation-line">verdict#NNNN &larr; evaluator(decision @ corpus v.N) &larr; precedence(supersession) &larr; retrieval(query q)</div>
+          <div class="citation-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &larr; decision &larr; compile(source @ sha) &larr; author</div>
+          <div class="citation-summary">Every step is a link &middot; every link is queryable &middot; the chain is the audit record.</div>
+        </div>
+      </div>
+      <figcaption class="diagram-caption"><strong>The chain is the audit record.</strong> Verdict &rarr; evaluator &rarr; precedence rule &rarr; retrieval &rarr; compiled record &rarr; authoring ADR. Each link cites the next. "Why did this fail?" resolves to a single chain, not a guess.</figcaption>
     </figure>
 
     <h2>What enforcement provenance actually means</h2>

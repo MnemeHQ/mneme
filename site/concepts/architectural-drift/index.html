@@ -7,6 +7,7 @@
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
+  <link rel="stylesheet" href="/assets/css/diagrams.css">
   <meta name="description" content="Architectural drift is the compound degradation in codebase coherence caused by AI agents producing code inconsistent with established decisions, uncorrected across sessions and agents." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
@@ -337,6 +338,51 @@
     <div class="callout">
       <p><strong>Drift is the structural divergence between what the codebase is doing and what architectural decisions say it should do, growing over time.</strong> The accumulation of violations is the symptom. The underlying problem is that each uncorrected violation expands the space from which the next violation can emerge â€” compounding the distance between the actual codebase and the intended architecture.</p>
     </div>
+
+    <figure class="diagram-figure">
+      <div class="mneme-diagram mneme-diagram--cascade" role="img"
+           aria-labelledby="dc-diag-title dc-diag-desc">
+        <p id="dc-diag-title" class="mneme-diagram__title">Schematic &middot; drift compounds across sessions</p>
+        <p id="dc-diag-desc" class="mneme-diagram__sr-desc">Five schematic tiers of accumulating architectural drift across sessions. S1 new drift; S2 compounded; S3 deeply compounded; S4 architecturally divergent (dashed boundary signals ungoverned territory); S5 governance reset required. Bar widths are illustrative of compounding shape, not measured rates.</p>
+
+        <div class="tier">
+          <div class="t-session">S1</div>
+          <div class="t-body">
+            <div class="t-bar t-bar--w1"></div>
+            <div class="t-label">new drift</div>
+          </div>
+        </div>
+        <div class="tier">
+          <div class="t-session">S2</div>
+          <div class="t-body">
+            <div class="t-bar t-bar--w2"></div>
+            <div class="t-label">compounded</div>
+          </div>
+        </div>
+        <div class="tier">
+          <div class="t-session">S3</div>
+          <div class="t-body">
+            <div class="t-bar t-bar--w3"></div>
+            <div class="t-label">deeply compounded</div>
+          </div>
+        </div>
+        <div class="tier">
+          <div class="t-session">S4</div>
+          <div class="t-body">
+            <div class="t-bar t-bar--w4"></div>
+            <div class="t-label">architecturally divergent</div>
+          </div>
+        </div>
+        <div class="tier">
+          <div class="t-session">S5</div>
+          <div class="t-body">
+            <div class="t-bar t-bar--w5"></div>
+            <div class="t-label">governance reset required</div>
+          </div>
+        </div>
+      </div>
+      <figcaption class="diagram-caption"><strong>Drift is compound, not additive.</strong> Each session inherits the previous session's drift as precedent and adds to it. Schematic; see <a href="/benchmark/">/benchmark/</a> for measured drift rate.</figcaption>
+    </figure>
 
     <p>A codebase that has drifted is not just a codebase with many violations. It is a codebase where the violations have become embedded in patterns, where those patterns have been treated as precedent, and where correcting the drift requires not just fixing individual violations but restoring the structural coherence that the violations eroded. That is categorically more expensive than catching the first violation.</p>
 
