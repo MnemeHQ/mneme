@@ -7,7 +7,7 @@
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="RAG retrieves relevant context. Mneme HQ enforces architectural constraints. Retrieval and enforcement are different layers â€” and confusing them is the most common governance mistake in AI engineering." />
+  <meta name="description" content="RAG retrieves relevant context. Mneme HQ enforces architectural constraints. Retrieval and enforcement are different layers — and confusing them is the most common governance mistake in AI engineering." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/compare/rag-vs-governance/" />
@@ -15,7 +15,7 @@
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
   <meta property="og:title" content="Mneme HQ vs RAG-based Governance" />
-  <meta property="og:description" content="RAG retrieves relevant context. Mneme HQ enforces architectural constraints. Retrieval and enforcement are different layers â€” and confusing them is the most common governance mistake in AI engineering." />
+  <meta property="og:description" content="RAG retrieves relevant context. Mneme HQ enforces architectural constraints. Retrieval and enforcement are different layers — and confusing them is the most common governance mistake in AI engineering." />
   <meta property="og:url" content="https://mnemehq.com/compare/rag-vs-governance/" />
   <meta property="og:image" content="https://mnemehq.com/compare/rag-vs-governance/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -187,7 +187,7 @@
       {
         "@type": "Article",
         "headline": "Mneme HQ vs RAG-based Governance",
-        "description": "RAG retrieves relevant context. Mneme HQ enforces architectural constraints. Retrieval and enforcement are different layers â€” and confusing them is the most common governance mistake in AI engineering.",
+        "description": "RAG retrieves relevant context. Mneme HQ enforces architectural constraints. Retrieval and enforcement are different layers — and confusing them is the most common governance mistake in AI engineering.",
         "url": "https://mnemehq.com/compare/rag-vs-governance/",
         "datePublished": "2026-05-14",
         "dateModified": "2026-05-14",
@@ -202,12 +202,12 @@
           {
             "@type": "Question",
             "name": "Can RAG enforce architectural constraints?",
-            "acceptedAnswer": {"@type": "Answer", "text": "RAG can surface relevant constraints as context for the model to consider. It cannot prevent the model from violating those constraints. A model given a RAG-retrieved rule can still generate code that breaks it â€” especially under task completion pressure or when the rule competes with other signals in a long context window. Enforcement requires a blocking layer, not a retrieval layer."}
+            "acceptedAnswer": {"@type": "Answer", "text": "RAG can surface relevant constraints as context for the model to consider. It cannot prevent the model from violating those constraints. A model given a RAG-retrieved rule can still generate code that breaks it — especially under task completion pressure or when the rule competes with other signals in a long context window. Enforcement requires a blocking layer, not a retrieval layer."}
           },
           {
             "@type": "Question",
             "name": "Does Mneme HQ use RAG internally?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Mneme uses deterministic retrieval: given a file path or edit operation, it looks up which architectural decisions apply based on scope rules and precedence semantics. This is not probabilistic embedding search â€” it is structured lookup against a typed decision corpus. The retrieval is exact and reproducible, not approximate."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Mneme uses deterministic retrieval: given a file path or edit operation, it looks up which architectural decisions apply based on scope rules and precedence semantics. This is not probabilistic embedding search — it is structured lookup against a typed decision corpus. The retrieval is exact and reproducible, not approximate."}
           },
           {
             "@type": "Question",
@@ -217,7 +217,7 @@
           {
             "@type": "Question",
             "name": "Why does retrieval quality matter less than enforcement for governance?",
-            "acceptedAnswer": {"@type": "Answer", "text": "A governance system must be correct every time, not most of the time. RAG retrieval is probabilistic: the right rule may not be in the top-k results, and even when it is, the model may not apply it under competing task signals. Governance infrastructure must be deterministic â€” the violation either happens or it does not. That property requires enforcement, not retrieval."}
+            "acceptedAnswer": {"@type": "Answer", "text": "A governance system must be correct every time, not most of the time. RAG retrieval is probabilistic: the right rule may not be in the top-k results, and even when it is, the model may not apply it under competing task signals. Governance infrastructure must be deterministic — the violation either happens or it does not. That property requires enforcement, not retrieval."}
           }
         ]
       }
@@ -430,8 +430,8 @@
     <div class="related-panel-label" id="related-panel-label">Related governance concepts</div>
     <ul class="related-list">
       <li><a href="/concepts/architectural-compiler/"><div class="rel-title">Architectural compiler</div><p class="rel-desc">The pipeline that converts documentation-form decisions into machine-evaluable constraint records.</p></a></li>
-      <li><a href="/concepts/precedence-semantics/"><div class="rel-title">Precedence semantics</div><p class="rel-desc">Ordered rules that resolve overlapping decisions deterministically â€” supersession, scope, recency.</p></a></li>
-      <li><a href="/concepts/deterministic-enforcement/"><div class="rel-title">Deterministic enforcement</div><p class="rel-desc">Same input, same verdict â€” every run, every agent, every consumer. The precondition for auditability.</p></a></li>
+      <li><a href="/concepts/precedence-semantics/"><div class="rel-title">Precedence semantics</div><p class="rel-desc">Ordered rules that resolve overlapping decisions deterministically — supersession, scope, recency.</p></a></li>
+      <li><a href="/concepts/deterministic-enforcement/"><div class="rel-title">Deterministic enforcement</div><p class="rel-desc">Same input, same verdict — every run, every agent, every consumer. The precondition for auditability.</p></a></li>
       <li><a href="/concepts/governance-infrastructure/"><div class="rel-title">Governance infrastructure</div><p class="rel-desc">The platform layer that encodes, distributes, versions, and enforces decisions across agents and CI.</p></a></li>
     </ul>
   </aside>

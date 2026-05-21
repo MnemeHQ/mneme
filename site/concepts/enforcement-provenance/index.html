@@ -3,23 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Enforcement Provenance â€” Mneme HQ Concepts</title>
+  <title>Enforcement Provenance — Mneme HQ Concepts</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
   <link rel="stylesheet" href="/assets/css/diagrams.css">
-  <meta name="description" content="Enforcement provenance: every governance verdict traces back to a specific decision record, the precedence rule that selected it, and the source ADR â€” a citable chain." />
+  <meta name="description" content="Enforcement provenance: every governance verdict traces back to a specific decision record, the precedence rule that selected it, and the source ADR — a citable chain." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/concepts/enforcement-provenance/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Enforcement Provenance â€” Mneme HQ Concepts" />
-  <meta property="og:description" content="Every governance verdict is traceable to a specific decision record, the precedence rule that selected it, and the source ADR â€” a citable chain from outcome to authoring intent." />
+  <meta property="og:title" content="Enforcement Provenance — Mneme HQ Concepts" />
+  <meta property="og:description" content="Every governance verdict is traceable to a specific decision record, the precedence rule that selected it, and the source ADR — a citable chain from outcome to authoring intent." />
   <meta property="og:url" content="https://mnemehq.com/concepts/enforcement-provenance/" />
   <meta property="og:image" content="https://mnemehq.com/concepts/enforcement-provenance/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Enforcement Provenance â€” Mneme HQ Concepts" />
+  <meta name="twitter:title" content="Enforcement Provenance — Mneme HQ Concepts" />
   <meta name="twitter:description" content="A citable chain from enforcement verdict back to the authoring ADR." />
   <meta name="twitter:image" content="https://mnemehq.com/concepts/enforcement-provenance/og.png" />
   <meta name="author" content="Theo Valmis" />
@@ -197,8 +197,8 @@
       },
       {
         "@type": "TechArticle",
-        "headline": "Enforcement Provenance â€” Mneme HQ Concepts",
-        "description": "Every governance verdict is traceable to a specific decision record, the precedence rule that selected it, and the source ADR â€” a citable chain from outcome to authoring intent.",
+        "headline": "Enforcement Provenance — Mneme HQ Concepts",
+        "description": "Every governance verdict is traceable to a specific decision record, the precedence rule that selected it, and the source ADR — a citable chain from outcome to authoring intent.",
         "url": "https://mnemehq.com/concepts/enforcement-provenance/",
         "datePublished": "2026-05-15",
         "dateModified": "2026-05-15",
@@ -239,7 +239,7 @@
 
 <main>
 <div class="answer-capsule">
-  <strong>Enforcement provenance.</strong> Every governance verdict is a record with a chain â€” back through the precedence rule that selected the decision, back through the compiled record, back to the authoring ADR. "Why did this PR get blocked?" has a single, citable answer: the chain itself. Without provenance, governance is opaque enforcement; with it, governance is auditable engineering.
+  <strong>Enforcement provenance.</strong> Every governance verdict is a record with a chain — back through the precedence rule that selected the decision, back through the compiled record, back to the authoring ADR. "Why did this PR get blocked?" has a single, citable answer: the chain itself. Without provenance, governance is opaque enforcement; with it, governance is auditable engineering.
 </div>
 
 <nav aria-label="Breadcrumb" class="breadcrumb-nav">
@@ -255,10 +255,10 @@
     <div class="article-eyebrow">
       <span class="eyebrow-tag">Concepts</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">9 min read &nbsp;Â·&nbsp; May 2026</span>
+      <span class="eyebrow-meta">9 min read &nbsp;·&nbsp; May 2026</span>
     </div>
     <h1>Enforcement Provenance</h1>
-    <p class="article-lede">An engineer pushes a PR. CI blocks the merge with a governance violation. The engineer's first question is: which decision blocked this, and where can I read the rationale? Enforcement provenance is the engineering property that makes the answer one click away â€” not a guessing game.</p>
+    <p class="article-lede">An engineer pushes a PR. CI blocks the merge with a governance violation. The engineer's first question is: which decision blocked this, and where can I read the rationale? Enforcement provenance is the engineering property that makes the answer one click away — not a guessing game.</p>
     <p class="byline">
       By <a href="/founder/">Theo Valmis</a>
       <span class="sep">&middot;</span>
@@ -268,7 +268,7 @@
 
   <div class="article-body">
 
-    <p>A governance system that blocks a merge but cannot explain why is indistinguishable from a flaky test. The block becomes noise to be worked around â€” disabled in CI, ignored in review, treated as a hostile gate rather than an architectural signal. Provenance is the property that converts an enforcement event from "the system said no" into "this specific team decision, written on this date, by this person, applies because of this precedence rule, and the rationale is at this URL."</p>
+    <p>A governance system that blocks a merge but cannot explain why is indistinguishable from a flaky test. The block becomes noise to be worked around — disabled in CI, ignored in review, treated as a hostile gate rather than an architectural signal. Provenance is the property that converts an enforcement event from "the system said no" into "this specific team decision, written on this date, by this person, applies because of this precedence rule, and the rationale is at this URL."</p>
 
     <figure class="diagram-figure">
       <div class="mneme-diagram mneme-diagram--chain" role="img"
@@ -331,7 +331,7 @@
 
     <h3>1. Decision identity</h3>
 
-    <p>Every compiled decision has a stable identifier â€” not just a filename. The ID survives ADR renames, supersessions, and refactors of the source documentation. When a verdict cites <code style="font-family:'DM Mono',monospace;color:var(--teal)">d-17</code>, that identifier resolves to a specific record in the corpus regardless of how the underlying ADR file has moved or been edited.</p>
+    <p>Every compiled decision has a stable identifier — not just a filename. The ID survives ADR renames, supersessions, and refactors of the source documentation. When a verdict cites <code style="font-family:'DM Mono',monospace;color:var(--teal)">d-17</code>, that identifier resolves to a specific record in the corpus regardless of how the underlying ADR file has moved or been edited.</p>
 
     <h3>2. Compilation traceability</h3>
 
@@ -339,7 +339,7 @@
 
     <h3>3. Retrieval explanation</h3>
 
-    <p>When the governance retriever returns a set of candidate decisions for a query, it records the query, the scope match, the rank, and the candidates. The set of decisions that <em>could</em> have applied is itself a queryable record â€” not just the one that did apply.</p>
+    <p>When the governance retriever returns a set of candidate decisions for a query, it records the query, the scope match, the rank, and the candidates. The set of decisions that <em>could</em> have applied is itself a queryable record — not just the one that did apply.</p>
 
     <h3>4. Precedence citation</h3>
 
@@ -355,14 +355,14 @@
 
     <h2>Why provenance has to be structural, not narrative</h2>
 
-    <p>A common shortcut is to attach a freeform message to each block: "Blocked because of the repository pattern rule." This is narrative provenance â€” a human-readable explanation generated by the system at the time of the block. It is useful for humans, but it is not enough.</p>
+    <p>A common shortcut is to attach a freeform message to each block: "Blocked because of the repository pattern rule." This is narrative provenance — a human-readable explanation generated by the system at the time of the block. It is useful for humans, but it is not enough.</p>
 
     <p>Narrative provenance fails in three ways: it cannot be programmatically queried (so you cannot ask "how often does this decision block PRs?"); it cannot be aggregated (so you cannot graph drift by decision); and it is generated, not stored (so the rationale text might change run-to-run as templates evolve, breaking auditability over time).</p>
 
-    <p>Structural provenance â€” IDs, links, timestamps, versions â€” is the substrate underneath narrative. The system can render any narrative on top of structural provenance at any time; the system cannot derive structural provenance from narrative after the fact.</p>
+    <p>Structural provenance — IDs, links, timestamps, versions — is the substrate underneath narrative. The system can render any narrative on top of structural provenance at any time; the system cannot derive structural provenance from narrative after the fact.</p>
 
     <div class="callout">
-      <p><strong>If the verdict cannot be programmatically traced to a specific record, the enforcement is opaque.</strong> Opaque enforcement is what turns governance into noise â€” engineers stop trusting it because they cannot interrogate it.</p>
+      <p><strong>If the verdict cannot be programmatically traced to a specific record, the enforcement is opaque.</strong> Opaque enforcement is what turns governance into noise — engineers stop trusting it because they cannot interrogate it.</p>
     </div>
 
     <h2>What provenance enables</h2>
@@ -387,11 +387,11 @@
         <tr>
           <td>Drift telemetry</td>
           <td>Aggregate text matches</td>
-          <td>Aggregate by decision_id Â· per-agent Â· per-path</td>
+          <td>Aggregate by decision_id · per-agent · per-path</td>
         </tr>
         <tr>
           <td>Decision impact analysis</td>
-          <td>None â€” guesses based on tickets</td>
+          <td>None — guesses based on tickets</td>
           <td>"This ADR blocked 14 PRs this quarter"</td>
         </tr>
         <tr>
@@ -422,9 +422,9 @@
     <p>Real provenance has three properties that logs alone do not:</p>
 
     <ul>
-      <li><strong>Stable references</strong> â€” the decision ID in the verdict still resolves to a record six months later, even if the ADR was renamed.</li>
-      <li><strong>Versioned context</strong> â€” the corpus version at the time of the verdict is part of the record. Reproducing the verdict means knowing which corpus state produced it.</li>
-      <li><strong>Bidirectional links</strong> â€” given a decision, you can list the verdicts that cited it. Given a verdict, you can list the decisions it cited. Logs are one-directional and unindexed.</li>
+      <li><strong>Stable references</strong> — the decision ID in the verdict still resolves to a record six months later, even if the ADR was renamed.</li>
+      <li><strong>Versioned context</strong> — the corpus version at the time of the verdict is part of the record. Reproducing the verdict means knowing which corpus state produced it.</li>
+      <li><strong>Bidirectional links</strong> — given a decision, you can list the verdicts that cited it. Given a verdict, you can list the decisions it cited. Logs are one-directional and unindexed.</li>
     </ul>
 
     <div class="callout-teal">
@@ -433,7 +433,7 @@
 
     <h2>Provenance as the foundation of trust</h2>
 
-    <p>Governance systems live or die on engineer trust. An engineer who has been blocked once by an opaque rule will, the next time, look for a way around the gate. A governance system that gets routed around does not have governance â€” it has theater. Provenance is the mechanism by which engineers can interrogate the system, disagree with it productively, and either update the decision or accept the block on its merits.</p>
+    <p>Governance systems live or die on engineer trust. An engineer who has been blocked once by an opaque rule will, the next time, look for a way around the gate. A governance system that gets routed around does not have governance — it has theater. Provenance is the mechanism by which engineers can interrogate the system, disagree with it productively, and either update the decision or accept the block on its merits.</p>
 
     <p>This is why provenance is not a "nice to have" property attached to a working governance system. It is a precondition for governance being adopted at all. Without it, the system is a black box that says no. With it, the system is a colleague that cites its sources.</p>
 
@@ -492,12 +492,12 @@
 
 
   <footer class="article-footer">
-    <a href="/concepts/" class="back-link">â† Back to Concepts</a>
+    <a href="/concepts/" class="back-link">← Back to Concepts</a>
 
     <div class="cta-block">
       <h3>Provenance you can click through to</h3>
-      <p>Mneme stores every enforcement event with a full chain back to the authoring ADR â€” queryable from CI logs, the dashboard, and the agent's verdict output. "Why did this block?" has one answer.</p>
-      <a href="/architecture/" class="btn-primary">See the architecture â†’</a>
+      <p>Mneme stores every enforcement event with a full chain back to the authoring ADR — queryable from CI logs, the dashboard, and the agent's verdict output. "Why did this block?" has one answer.</p>
+      <a href="/architecture/" class="btn-primary">See the architecture →</a>
     </div>
   </footer>
 </article>

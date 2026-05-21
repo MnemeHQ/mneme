@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Govern architectural constraints in Claude Agent SDK workflows â€” Mneme HQ</title>
+  <title>Govern architectural constraints in Claude Agent SDK workflows — Mneme HQ</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
@@ -68,17 +68,17 @@
           {
             "@type": "Question",
             "name": "Does the governance hook add meaningful latency to agent tool calls?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Mneme's retriever is deterministic keyword scoring with no embedding model and no vector store. For typical projects with a corpus under 200 decisions, per-check latency is in the low milliseconds. The check runs in-process with a subprocess call, not over a network. Retrieval is bounded by K=3 â€” the top three decisions by score are returned regardless of corpus size."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Mneme's retriever is deterministic keyword scoring with no embedding model and no vector store. For typical projects with a corpus under 200 decisions, per-check latency is in the low milliseconds. The check runs in-process with a subprocess call, not over a network. Retrieval is bounded by K=3 — the top three decisions by score are returned regardless of corpus size."}
           },
           {
             "@type": "Question",
-            "name": "What if my agent uses non-file tools â€” API calls, shell commands?",
+            "name": "What if my agent uses non-file tools — API calls, shell commands?",
             "acceptedAnswer": {"@type": "Answer", "text": "The pre-execution hook pattern applies to any tool call, not just file writes. You can intercept tool calls by name and run mneme check against the proposed operation text. The check is most precise when the proposed change involves identifiable architectural surface (file paths, dependency names, module patterns). For generic API calls, you can still inject relevant decisions as context so the agent reasons from the corpus rather than from training defaults."}
           },
           {
             "@type": "Question",
             "name": "Does Mneme support long-running or multi-turn agent sessions?",
-            "acceptedAnswer": {"@type": "Answer", "text": "The governance corpus is stateless and idempotent â€” each check is independent. For long-running sessions, the enforcement trace (PASS / WARN / FAIL records with decision IDs) is designed to be persisted alongside the agent's run log, giving you an auditable record of which decisions were evaluated at each tool call. Persistent trace support across workflow IDs is on the roadmap."}
+            "acceptedAnswer": {"@type": "Answer", "text": "The governance corpus is stateless and idempotent — each check is independent. For long-running sessions, the enforcement trace (PASS / WARN / FAIL records with decision IDs) is designed to be persisted alongside the agent's run log, giving you an auditable record of which decisions were evaluated at each tool call. Persistent trace support across workflow IDs is on the roadmap."}
           }
         ]
       }

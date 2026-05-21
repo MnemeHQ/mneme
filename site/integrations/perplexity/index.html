@@ -14,12 +14,12 @@
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Perplexity &amp; Mneme HQ â€” Research Rationale Meets Architectural Enforcement" />
+  <meta property="og:title" content="Perplexity &amp; Mneme HQ — Research Rationale Meets Architectural Enforcement" />
   <meta property="og:description" content="Perplexity helps teams understand why. Mneme helps teams preserve what must remain true. Research-to-enforcement workflow for architectural decision-making." />
   <meta property="og:url" content="https://mnemehq.com/integrations/perplexity/" />
   <meta property="og:image" content="https://mnemehq.com/integrations/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Perplexity &amp; Mneme HQ â€” Research Rationale Meets Architectural Enforcement" />
+  <meta name="twitter:title" content="Perplexity &amp; Mneme HQ — Research Rationale Meets Architectural Enforcement" />
   <meta name="twitter:description" content="Perplexity helps teams understand why. Mneme helps teams preserve what must remain true. Research-to-enforcement workflow for architectural decision-making." />
   <meta name="twitter:image" content="https://mnemehq.com/integrations/og.png" />
 
@@ -44,7 +44,7 @@
       },
       {
         "@type": "TechArticle",
-        "headline": "Perplexity & Mneme HQ â€” Research Rationale Meets Architectural Enforcement",
+        "headline": "Perplexity & Mneme HQ — Research Rationale Meets Architectural Enforcement",
         "description": "Perplexity helps teams understand why. Mneme helps teams preserve what must remain true.",
         "url": "https://mnemehq.com/integrations/perplexity/",
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}}
@@ -204,7 +204,7 @@
       <span class="eyebrow-meta">Works alongside</span>
     </div>
     <h1>Perplexity helps teams understand&nbsp;why.<br>Mneme helps teams preserve what must remain&nbsp;true.</h1>
-    <p class="article-lede">Perplexity Enterprise gives engineering teams cited, up-to-date answers about technology choices. Mneme takes those choices and makes them enforceable â€” turning research rationale into governance constraints every AI coding agent respects.</p>
+    <p class="article-lede">Perplexity Enterprise gives engineering teams cited, up-to-date answers about technology choices. Mneme takes those choices and makes them enforceable — turning research rationale into governance constraints every AI coding agent respects.</p>
   </header>
 
   <div class="article-body">
@@ -230,13 +230,13 @@
       </div>
     </div>
 
-    <p>The gap between them is where architectural drift lives. A team researches "should we use Redis or a JSON store?" in Perplexity, lands on an answer, and then that answer exists only in a Slack thread, a brain, or an ADR that no agent ever reads. The next time an agent touches the storage layer, it reaches its own conclusion â€” often the wrong one.</p>
+    <p>The gap between them is where architectural drift lives. A team researches "should we use Redis or a JSON store?" in Perplexity, lands on an answer, and then that answer exists only in a Slack thread, a brain, or an ADR that no agent ever reads. The next time an agent touches the storage layer, it reaches its own conclusion — often the wrong one.</p>
 
     <p>Mneme is the mechanism that closes that gap: take the decision the team arrived at after the research, record it as a structured constraint, and from that point forward every AI coding agent is bound by it.</p>
 
     <h2>The research-to-enforcement workflow</h2>
 
-    <p>This is the practical sequence. No API required â€” just a disciplined hand-off between the research stage and the governance stage.</p>
+    <p>This is the practical sequence. No API required — just a disciplined hand-off between the research stage and the governance stage.</p>
 
     <div class="flow-diagram">
       <div class="flow-step">
@@ -257,25 +257,25 @@
         <div class="flow-step-num">03</div>
         <div class="flow-step-body">
           <div class="flow-step-tool mneme">Mneme HQ &mdash; Pre-generation hook</div>
-          <div class="flow-step-desc">Every subsequent AI-generated diff touching the storage layer is evaluated against the recorded decision. Redis gets blocked. The JSON store approach gets through. The team's research becomes structural â€” not a suggestion the agent can ignore.</div>
+          <div class="flow-step-desc">Every subsequent AI-generated diff touching the storage layer is evaluated against the recorded decision. Redis gets blocked. The JSON store approach gets through. The team's research becomes structural — not a suggestion the agent can ignore.</div>
         </div>
       </div>
       <div class="flow-step">
         <div class="flow-step-num">04</div>
         <div class="flow-step-body">
-          <div class="flow-step-tool agent">Claude Code Â· Cursor Â· GitHub Actions CI</div>
-          <div class="flow-step-desc">Any agent on any tool operates within the constraint. The decision made via Perplexity research is now equally visible to a Claude Code hook at the editor layer and a GitHub Actions gate in CI â€” without being pasted into both.</div>
+          <div class="flow-step-tool agent">Claude Code · Cursor · GitHub Actions CI</div>
+          <div class="flow-step-desc">Any agent on any tool operates within the constraint. The decision made via Perplexity research is now equally visible to a Claude Code hook at the editor layer and a GitHub Actions gate in CI — without being pasted into both.</div>
         </div>
       </div>
     </div>
 
     <h2>Why this pattern matters for AI-assisted teams</h2>
 
-    <p>Teams using Perplexity Enterprise for architectural research are usually doing so because they have high AI coding adoption. They're generating code faster than they're reviewing it. Research quality improves the initial decision â€” but it doesn't govern the downstream agents that implement it.</p>
+    <p>Teams using Perplexity Enterprise for architectural research are usually doing so because they have high AI coding adoption. They're generating code faster than they're reviewing it. Research quality improves the initial decision — but it doesn't govern the downstream agents that implement it.</p>
 
-    <p><strong>The structural problem:</strong> a Perplexity answer is high-quality input to a human decision. But once the human moves on, the decision has no enforcement surface. The next agent â€” or the next human â€” has no deterministic way to know that the question was already answered and the answer is binding.</p>
+    <p><strong>The structural problem:</strong> a Perplexity answer is high-quality input to a human decision. But once the human moves on, the decision has no enforcement surface. The next agent — or the next human — has no deterministic way to know that the question was already answered and the answer is binding.</p>
 
-    <p>Mneme provides that enforcement surface. Once a decision is recorded in <code>project_memory.json</code>, every invocation of <code>mneme check</code> â€” whether from a Claude Code PreToolUse hook, a Cursor session, or a GitHub Actions gate â€” evaluates new code against it. The research rationale becomes architecture enforcement. Same input, structural output.</p>
+    <p>Mneme provides that enforcement surface. Once a decision is recorded in <code>project_memory.json</code>, every invocation of <code>mneme check</code> — whether from a Claude Code PreToolUse hook, a Cursor session, or a GitHub Actions gate — evaluates new code against it. The research rationale becomes architecture enforcement. Same input, structural output.</p>
 
     <div class="callout teal">
       <p><strong>Scope note:</strong> This is a workflow pattern, not a native API integration. Mneme does not call Perplexity and Perplexity does not call Mneme. The integration is the discipline: research in Perplexity, record in Mneme, enforce everywhere. That handoff is where most teams currently lose their decisions.</p>
@@ -288,13 +288,13 @@
     <ul>
       <li>Mneme does not tell you which storage technology is better. It enforces the decision your team made after figuring that out.</li>
       <li>Perplexity does not enforce decisions. It surfaces rationale. You still have to record and govern the decision.</li>
-      <li>Mneme's retrieval is deterministic keyword scoring â€” no fuzzy recall, no hallucination. What goes in comes back exactly as recorded.</li>
-      <li>Perplexity's output is stochastic by design â€” that's what makes it useful for open research questions. It's the wrong tool for constraint enforcement.</li>
+      <li>Mneme's retrieval is deterministic keyword scoring — no fuzzy recall, no hallucination. What goes in comes back exactly as recorded.</li>
+      <li>Perplexity's output is stochastic by design — that's what makes it useful for open research questions. It's the wrong tool for constraint enforcement.</li>
     </ul>
 
     <h2>Where Perplexity Enterprise fits in the AI coding stack</h2>
 
-    <p>Research assistants like Perplexity Enterprise are increasingly part of engineering workflows â€” used to evaluate libraries, explore security postures, assess migration paths, and audit emerging dependencies. As these tools become more capable, the decisions they inform multiply. Each one is a potential constraint that needs to be recorded and enforced.</p>
+    <p>Research assistants like Perplexity Enterprise are increasingly part of engineering workflows — used to evaluate libraries, explore security postures, assess migration paths, and audit emerging dependencies. As these tools become more capable, the decisions they inform multiply. Each one is a potential constraint that needs to be recorded and enforced.</p>
 
     <p>Mneme sits one layer below: it doesn't help you research; it helps you make research decisions durable. For teams serious about AI-assisted engineering at scale, both are necessary. Research without enforcement creates well-informed drift. Enforcement without research creates brittle rules with no grounding.</p>
 
@@ -303,13 +303,13 @@
   </div>
 
   <div class="article-footer">
-    <a href="/integrations/" class="back-link">â† Back to integrations</a>
+    <a href="/integrations/" class="back-link">← Back to integrations</a>
 
     <div class="cta-block">
       <h3>Record your next architectural decision</h3>
       <p>The fastest way to move from research to enforcement: run <code>mneme init</code>, add your first decision with <code>mneme add_decision</code>, and wire a hook. The research rationale lives in the corpus; the constraint is live from the first <code>mneme check</code>.</p>
       <a href="https://github.com/TheoV823/mneme" class="btn-primary">Get started on GitHub</a>
-      <a href="/demo/adr-compiler/" class="cta-secondary">See the ADR compiler â€” how existing docs become live enforcement â†’</a>
+      <a href="/demo/adr-compiler/" class="cta-secondary">See the ADR compiler — how existing docs become live enforcement →</a>
     </div>
   </div>
 </div>

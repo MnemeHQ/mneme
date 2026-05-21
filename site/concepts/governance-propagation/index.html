@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Governance Propagation â€” Mneme HQ Concepts</title>
+  <title>Governance Propagation — Mneme HQ Concepts</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
   <link rel="stylesheet" href="/assets/css/diagrams.css">
@@ -14,13 +14,13 @@
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Governance Propagation â€” Mneme HQ Concepts" />
-  <meta property="og:description" content="Governance propagation is the property that a single compiled decision reaches every agent, every developer, every CI run â€” with the same semantics, the same scope, and the same enforcement verdict." />
+  <meta property="og:title" content="Governance Propagation — Mneme HQ Concepts" />
+  <meta property="og:description" content="Governance propagation is the property that a single compiled decision reaches every agent, every developer, every CI run — with the same semantics, the same scope, and the same enforcement verdict." />
   <meta property="og:url" content="https://mnemehq.com/concepts/governance-propagation/" />
   <meta property="og:image" content="https://mnemehq.com/concepts/governance-propagation/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Governance Propagation â€” Mneme HQ Concepts" />
-  <meta name="twitter:description" content="A single compiled decision reaches every agent, every developer, every CI run â€” with the same enforcement verdict." />
+  <meta name="twitter:title" content="Governance Propagation — Mneme HQ Concepts" />
+  <meta name="twitter:description" content="A single compiled decision reaches every agent, every developer, every CI run — with the same enforcement verdict." />
   <meta name="twitter:image" content="https://mnemehq.com/concepts/governance-propagation/og.png" />
   <meta name="author" content="Theo Valmis" />
   <meta property="article:published_time" content="2026-05-15T00:00:00Z" />
@@ -200,7 +200,7 @@
       },
       {
         "@type": "TechArticle",
-        "headline": "Governance Propagation â€” Mneme HQ Concepts",
+        "headline": "Governance Propagation — Mneme HQ Concepts",
         "description": "Governance propagation is the property that a single compiled decision reaches every agent, every developer, every CI run with identical enforcement semantics.",
         "url": "https://mnemehq.com/concepts/governance-propagation/",
         "datePublished": "2026-05-15",
@@ -242,7 +242,7 @@
 
 <main>
 <div class="answer-capsule">
-  <strong>Governance propagation.</strong> One decision Â· many consumers Â· identical semantics. A compiled constraint reaches every agent, every developer, every CI run with the same scope, the same precedence, and the same verdict â€” without per-agent reconfiguration. Without propagation, "governance" is per-tool, per-developer, per-session â€” and a decision is never really enforced.
+  <strong>Governance propagation.</strong> One decision · many consumers · identical semantics. A compiled constraint reaches every agent, every developer, every CI run with the same scope, the same precedence, and the same verdict — without per-agent reconfiguration. Without propagation, "governance" is per-tool, per-developer, per-session — and a decision is never really enforced.
 </div>
 
 <nav aria-label="Breadcrumb" class="breadcrumb-nav">
@@ -258,10 +258,10 @@
     <div class="article-eyebrow">
       <span class="eyebrow-tag">Concepts</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">9 min read &nbsp;Â·&nbsp; May 2026</span>
+      <span class="eyebrow-meta">9 min read &nbsp;·&nbsp; May 2026</span>
     </div>
     <h1>Governance Propagation</h1>
-    <p class="article-lede">An architectural decision that is enforced in one developer's Claude Code session but not in another developer's Cursor session is not a team decision â€” it is a personal preference. Governance propagation is the property that turns a single compiled decision into uniform enforcement across every surface the team uses.</p>
+    <p class="article-lede">An architectural decision that is enforced in one developer's Claude Code session but not in another developer's Cursor session is not a team decision — it is a personal preference. Governance propagation is the property that turns a single compiled decision into uniform enforcement across every surface the team uses.</p>
     <p class="byline">
       By <a href="/founder/">Theo Valmis</a>
       <span class="sep">&middot;</span>
@@ -271,7 +271,7 @@
 
   <div class="article-body">
 
-    <p>Most discussion of AI coding governance focuses on a single surface â€” usually a single agent in a single editor. The unspoken assumption is that if the constraint works in that one place, governance is solved. It is not. The hard problem in real teams is not enforcing a constraint in one session; it is making sure the same constraint, with the same meaning, is enforced in every session, by every agent, on every developer's machine, and in CI. That property has a name: <strong>governance propagation</strong>.</p>
+    <p>Most discussion of AI coding governance focuses on a single surface — usually a single agent in a single editor. The unspoken assumption is that if the constraint works in that one place, governance is solved. It is not. The hard problem in real teams is not enforcing a constraint in one session; it is making sure the same constraint, with the same meaning, is enforced in every session, by every agent, on every developer's machine, and in CI. That property has a name: <strong>governance propagation</strong>.</p>
 
     <figure class="diagram-figure">
       <div class="mneme-diagram mneme-diagram--propagation" role="img"
@@ -339,19 +339,19 @@
 
     <h3>2. Semantic equivalence</h3>
 
-    <p>Reading the same corpus is necessary but not sufficient. The consumers must <em>interpret</em> the corpus identically â€” the same scope syntax must select the same files; the same precedence rules must resolve conflicts the same way; the same predicate must produce the same verdict against the same input. Semantic equivalence is what governance propagation provides beyond simple replication. A YAML file shared between two tools that interpret it differently is two governance systems, not one.</p>
+    <p>Reading the same corpus is necessary but not sufficient. The consumers must <em>interpret</em> the corpus identically — the same scope syntax must select the same files; the same precedence rules must resolve conflicts the same way; the same predicate must produce the same verdict against the same input. Semantic equivalence is what governance propagation provides beyond simple replication. A YAML file shared between two tools that interpret it differently is two governance systems, not one.</p>
 
     <h3>3. Update propagation</h3>
 
-    <p>When the source changes, every consumer must see the change. The propagation latency must be bounded â€” ideally near-zero, since every minute that one consumer has stale rules is a minute that team has multiple effective governance regimes. In practice, this means consumers query the live corpus at decision time (pull) or are notified of updates (push), and never operate on cached snapshots that can silently desync.</p>
+    <p>When the source changes, every consumer must see the change. The propagation latency must be bounded — ideally near-zero, since every minute that one consumer has stale rules is a minute that team has multiple effective governance regimes. In practice, this means consumers query the live corpus at decision time (pull) or are notified of updates (push), and never operate on cached snapshots that can silently desync.</p>
 
     <div class="callout">
-      <p><strong>The property is "no second copy of the truth."</strong> Every export, sync script, or per-tool mirror is a future divergence event waiting to happen. Propagation is what you get when the corpus is the source â€” not a thing you sync from.</p>
+      <p><strong>The property is "no second copy of the truth."</strong> Every export, sync script, or per-tool mirror is a future divergence event waiting to happen. Propagation is what you get when the corpus is the source — not a thing you sync from.</p>
     </div>
 
     <h2>Why propagation is hard in practice</h2>
 
-    <p>The hardness is not in the concept. It is in the fact that the consumers of governance â€” AI coding agents â€” are heterogeneous and were not designed to share governance state.</p>
+    <p>The hardness is not in the concept. It is in the fact that the consumers of governance — AI coding agents — are heterogeneous and were not designed to share governance state.</p>
 
     <ul>
       <li><strong>Each agent has its own configuration surface.</strong> Claude Code reads CLAUDE.md and hook configs. Cursor reads .cursorrules. Copilot reads copilot-instructions.md. JetBrains AI reads project-level config. CI reads its own config files. These surfaces don't share a schema or a query API.</li>
@@ -359,7 +359,7 @@
       <li><strong>Each tool has its own update model.</strong> Some watch files for changes; some load configs at session start and never reload; some require explicit reload. Without a unifying layer, the "same" rule can be live in one tool and stale in another at any moment.</li>
     </ul>
 
-    <p>Propagation, in this environment, is not a configuration problem â€” it is an engineering one. It requires a layer that absorbs the heterogeneity of consumer surfaces and presents a uniform query API on top of a single corpus. That layer is the governance infrastructure. Without it, the team is running multiple parallel governance systems and calling them one.</p>
+    <p>Propagation, in this environment, is not a configuration problem — it is an engineering one. It requires a layer that absorbs the heterogeneity of consumer surfaces and presents a uniform query API on top of a single corpus. That layer is the governance infrastructure. Without it, the team is running multiple parallel governance systems and calling them one.</p>
 
     <h2>Execution surfaces governance must propagate across</h2>
 
@@ -383,15 +383,15 @@
 
     <p>The most common shortcut is to keep a single CLAUDE.md or .cursorrules file and commit it to the repo, then assume every tool reads it consistently. This is shared <em>documentation</em>, not shared <em>governance</em>.</p>
 
-    <p>The problem is that each tool ingests the file differently. Claude Code may inject it into every prompt; Cursor may use it as a hint; Copilot may ignore it depending on file size; CI may not read it at all. Even if every tool theoretically reads the same file, the operational consequence of reading it is tool-specific. Decisions encoded in prose are interpreted by each consumer model â€” and interpretation varies across consumers, across runs, across context windows. That is not propagation; that is parallel interpretation of a shared hint.</p>
+    <p>The problem is that each tool ingests the file differently. Claude Code may inject it into every prompt; Cursor may use it as a hint; Copilot may ignore it depending on file size; CI may not read it at all. Even if every tool theoretically reads the same file, the operational consequence of reading it is tool-specific. Decisions encoded in prose are interpreted by each consumer model — and interpretation varies across consumers, across runs, across context windows. That is not propagation; that is parallel interpretation of a shared hint.</p>
 
     <div class="callout-teal">
-      <p><strong>Real propagation requires structured records and a query API, not a shared document.</strong> A predicate that can be evaluated identically by every consumer â€” not a paragraph that each consumer reads in its own way.</p>
+      <p><strong>Real propagation requires structured records and a query API, not a shared document.</strong> A predicate that can be evaluated identically by every consumer — not a paragraph that each consumer reads in its own way.</p>
     </div>
 
     <h2>What propagation enables</h2>
 
-    <p>When propagation holds, three downstream properties become possible â€” and none of them are achievable without it.</p>
+    <p>When propagation holds, three downstream properties become possible — and none of them are achievable without it.</p>
 
     <div style="overflow-x:auto;margin:2rem 0;">
     <table class="comparison-table">
@@ -420,8 +420,8 @@
         </tr>
         <tr>
           <td>Drift</td>
-          <td>Inevitable â€” divergence is the default</td>
-          <td>Detectable â€” drift is a violation that surfaces</td>
+          <td>Inevitable — divergence is the default</td>
+          <td>Detectable — drift is a violation that surfaces</td>
         </tr>
         <tr>
           <td>Multi-agent workflows</td>
@@ -432,7 +432,7 @@
     </table>
     </div>
 
-    <p>The connective property here is that propagation is what makes governance composable. You can have a constraint that applies to a Claude Code session that hands off to a Cursor refactor that gets merged through CI â€” and the same architectural decision is enforced at every step, because every step queries the same corpus.</p>
+    <p>The connective property here is that propagation is what makes governance composable. You can have a constraint that applies to a Claude Code session that hands off to a Cursor refactor that gets merged through CI — and the same architectural decision is enforced at every step, because every step queries the same corpus.</p>
 
     <h2>Related concepts</h2>
 
@@ -487,12 +487,12 @@
 
 
   <footer class="article-footer">
-    <a href="/concepts/" class="back-link">â† Back to Concepts</a>
+    <a href="/concepts/" class="back-link">← Back to Concepts</a>
 
     <div class="cta-block">
       <h3>Governance that propagates to every agent</h3>
       <p>Mneme compiles your decisions into a single corpus that Claude Code, Cursor, Copilot, JetBrains, and CI all query directly. One source. Identical semantics. Every surface.</p>
-      <a href="/works-with/" class="btn-primary">See supported surfaces â†’</a>
+      <a href="/works-with/" class="btn-primary">See supported surfaces →</a>
     </div>
   </footer>
 </article>

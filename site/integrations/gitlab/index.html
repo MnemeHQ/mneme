@@ -7,7 +7,7 @@
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="Run Mneme HQ's checks in your GitLab CI pipeline. Block merge requests that violate architectural decisions before they merge â€” enforcement after generation." />
+  <meta name="description" content="Run Mneme HQ's checks in your GitLab CI pipeline. Block merge requests that violate architectural decisions before they merge — enforcement after generation." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/integrations/gitlab/" />
@@ -15,12 +15,12 @@
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
   <meta property="og:title" content="Architectural Governance in GitLab CI" />
-  <meta property="og:description" content="Run Mneme HQ's checks in your GitLab CI pipeline. Block merge requests that violate architectural decisions before they merge â€” enforcement after generation." />
+  <meta property="og:description" content="Run Mneme HQ's checks in your GitLab CI pipeline. Block merge requests that violate architectural decisions before they merge — enforcement after generation." />
   <meta property="og:url" content="https://mnemehq.com/integrations/gitlab/" />
   <meta property="og:image" content="https://mnemehq.com/integrations/gitlab/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Architectural Governance in GitLab CI" />
-  <meta name="twitter:description" content="Run Mneme HQ's checks in your GitLab CI pipeline. Block merge requests that violate architectural decisions before they merge â€” enforcement after generation." />
+  <meta name="twitter:description" content="Run Mneme HQ's checks in your GitLab CI pipeline. Block merge requests that violate architectural decisions before they merge — enforcement after generation." />
   <meta name="twitter:image" content="https://mnemehq.com/integrations/gitlab/og.png" />
   <meta name="author" content="Theo Valmis" />
   <meta property="article:published_time" content="2026-05-14T00:00:00Z" />
@@ -232,7 +232,7 @@
       {
         "@type": "Article",
         "headline": "Architectural Governance in GitLab CI",
-        "description": "Run Mneme HQ's checks in your GitLab CI pipeline. Block merge requests that violate architectural decisions before they merge â€” enforcement after generation.",
+        "description": "Run Mneme HQ's checks in your GitLab CI pipeline. Block merge requests that violate architectural decisions before they merge — enforcement after generation.",
         "url": "https://mnemehq.com/integrations/gitlab/",
         "datePublished": "2026-05-14",
         "dateModified": "2026-05-14",
@@ -244,9 +244,9 @@
       {
         "@type": "FAQPage",
         "mainEntity": [
-          {"@type": "Question", "name": "Should we run this on every merge request or only on the default branch?", "acceptedAnswer": {"@type": "Answer", "text": "Every merge request. The point of CI enforcement is to surface violations at MR time when the cost of fixing is lowest. Running only on the default branch means failures land after merge, which defeats the gating purpose. The check is fast â€” deterministic keyword scoring, no embedding model â€” so per-pipeline cost is negligible."}},
-          {"@type": "Question", "name": "What if a merge request needs to override a decision intentionally?", "acceptedAnswer": {"@type": "Answer", "text": "Add an override record to project_memory.json as part of the same MR â€” with rationale, scope, and expiry. The check picks it up automatically. The override is reviewable in the MR diff like any other change, so weakening a constraint is a visible decision rather than a silent merge."}},
-          {"@type": "Question", "name": "How does this compare to running other linters or scanners in GitLab CI?", "acceptedAnswer": {"@type": "Answer", "text": "Different layers. Linters check syntax and style; SAST scanners check for security issues; Mneme enforces architectural decisions against the project's own decision corpus. They compose: typical pipeline sequence is lint â†’ mneme check â†’ tests â†’ SAST."}}
+          {"@type": "Question", "name": "Should we run this on every merge request or only on the default branch?", "acceptedAnswer": {"@type": "Answer", "text": "Every merge request. The point of CI enforcement is to surface violations at MR time when the cost of fixing is lowest. Running only on the default branch means failures land after merge, which defeats the gating purpose. The check is fast — deterministic keyword scoring, no embedding model — so per-pipeline cost is negligible."}},
+          {"@type": "Question", "name": "What if a merge request needs to override a decision intentionally?", "acceptedAnswer": {"@type": "Answer", "text": "Add an override record to project_memory.json as part of the same MR — with rationale, scope, and expiry. The check picks it up automatically. The override is reviewable in the MR diff like any other change, so weakening a constraint is a visible decision rather than a silent merge."}},
+          {"@type": "Question", "name": "How does this compare to running other linters or scanners in GitLab CI?", "acceptedAnswer": {"@type": "Answer", "text": "Different layers. Linters check syntax and style; SAST scanners check for security issues; Mneme enforces architectural decisions against the project's own decision corpus. They compose: typical pipeline sequence is lint → mneme check → tests → SAST."}}
         ]
       }
     ]

@@ -257,9 +257,9 @@
         "@type": "FAQPage",
         "mainEntity": [
           {"@type": "Question", "name": "Does Mneme HQ govern Copilot suggestions in VS Code today?", "acceptedAnswer": {"@type": "Answer", "text": "Not yet. Copilot inline suggestions land in the editor through a different surface than Claude Code's tool calls, so the PreToolUse hook does not intercept them. Mneme catches Copilot-generated code at the next layer: the GitHub Actions enforcement gate on every PR diff. A native Copilot integration is on the roadmap; until then, CI is the enforcement point for Copilot output."}},
-          {"@type": "Question", "name": "Do I install a VS Code extension to enable Mneme?", "acceptedAnswer": {"@type": "Answer", "text": "No. Mneme runs as a Claude Code PreToolUse hook configured in .claude/settings.json â€” the hook fires regardless of whether Claude Code is launched from the VS Code integrated terminal, the standalone terminal, or any other host. There is no Mneme VS Code extension to install."}},
+          {"@type": "Question", "name": "Do I install a VS Code extension to enable Mneme?", "acceptedAnswer": {"@type": "Answer", "text": "No. Mneme runs as a Claude Code PreToolUse hook configured in .claude/settings.json — the hook fires regardless of whether Claude Code is launched from the VS Code integrated terminal, the standalone terminal, or any other host. There is no Mneme VS Code extension to install."}},
           {"@type": "Question", "name": "Does the hook work in WSL or remote VS Code sessions?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The hook runs wherever Claude Code runs. In WSL or a VS Code Remote-SSH session, install mneme inside the remote environment (the same one Claude Code is invoked from) and the hook works identically. The .mneme/project_memory.json file lives in the repo, so it travels with the project."}},
-          {"@type": "Question", "name": "Why route enforcement through Claude Code instead of VS Code directly?", "acceptedAnswer": {"@type": "Answer", "text": "VS Code does not generate code on its own â€” humans and AI agents do. Mneme governs the agent. Claude Code exposes a PreToolUse hook that intercepts every Edit, Write, and MultiEdit before disk; that is the deterministic enforcement point. A VS Code-level extension would only see what the user types directly, missing the bulk of AI-generated change."}}
+          {"@type": "Question", "name": "Why route enforcement through Claude Code instead of VS Code directly?", "acceptedAnswer": {"@type": "Answer", "text": "VS Code does not generate code on its own — humans and AI agents do. Mneme governs the agent. Claude Code exposes a PreToolUse hook that intercepts every Edit, Write, and MultiEdit before disk; that is the deterministic enforcement point. A VS Code-level extension would only see what the user types directly, missing the bulk of AI-generated change."}}
         ]
       }
     ]
@@ -299,7 +299,7 @@
     <div class="article-eyebrow">
       <span class="eyebrow-tag">Integration &middot; VS Code</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">5 min read &nbsp;Â·&nbsp; May 2026</span>
+      <span class="eyebrow-meta">5 min read &nbsp;·&nbsp; May 2026</span>
     </div>
     <h1>Mneme HQ + VS Code</h1>
     <p class="article-lede">VS Code is where most engineering teams already write code &mdash; and where Claude Code and Copilot now write code too. Mneme HQ governs the AI agent running inside the editor, not the editor itself. Every Edit, Write, and MultiEdit a Claude Code session attempts inside VS Code passes through the same PreToolUse hook before it reaches disk.</p>

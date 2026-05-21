@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI-Native Engineering Has an Intent Debt Problem â€” Mneme HQ</title>
+  <title>AI-Native Engineering Has an Intent Debt Problem — Mneme HQ</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
   <meta name="description" content="As agents write more code, the real risk is not just technical debt. It is stale, implicit, unenforced intent. The next bottleneck in AI-native engineering is intent enforcement." />
@@ -281,9 +281,9 @@
 
     <p>AI-native engineering is not failing because agents cannot write code. It is straining because agents can write code faster than organizations can preserve, update, and enforce intent.</p>
 
-    <p>Industry signals are starting to name the pattern. Augment's <a class="ext" href="https://www.augmentcode.com/lp/state-of-ai-native-engineering-2026-report" target="_blank" rel="noopener">State of AI-Native Engineering 2026</a> reports that nearly half of new code is now AI-generated, while confidence, comprehension, role definitions, onboarding, and process changes lag behind. The framing has shifted from "can AI write code" to "what is happening to the work around the code." The survey separates the strain into compounding debt layers â€” and the layer that matters most is also the least named.</p>
+    <p>Industry signals are starting to name the pattern. Augment's <a class="ext" href="https://www.augmentcode.com/lp/state-of-ai-native-engineering-2026-report" target="_blank" rel="noopener">State of AI-Native Engineering 2026</a> reports that nearly half of new code is now AI-generated, while confidence, comprehension, role definitions, onboarding, and process changes lag behind. The framing has shifted from "can AI write code" to "what is happening to the work around the code." The survey separates the strain into compounding debt layers — and the layer that matters most is also the least named.</p>
 
-    <p>The problem is not only technical debt. It is not only cognitive debt. It is <strong>intent debt</strong> â€” and naming it is the precondition for fixing it.</p>
+    <p>The problem is not only technical debt. It is not only cognitive debt. It is <strong>intent debt</strong> — and naming it is the precondition for fixing it.</p>
 
     <h2>What is intent debt?</h2>
 
@@ -314,7 +314,7 @@
 
     <p>Human execution masked weak intent infrastructure. When humans were writing most of the code, they carried context into implementation. The intent lived in their heads, and their hands obeyed it.</p>
 
-    <p>Agents do not carry that context. They execute on whatever is in the prompt window â€” and the things humans used to fill in silently are now load-bearing absences.</p>
+    <p>Agents do not carry that context. They execute on whatever is in the prompt window — and the things humans used to fill in silently are now load-bearing absences.</p>
 
     <h2>Why agents make intent debt visible</h2>
 
@@ -323,7 +323,7 @@
     <p>The same patterns show up across teams:</p>
 
     <ul>
-      <li>An agent chooses a new dependency because it solves the immediate task â€” and nobody told it the team already standardized on a different one.</li>
+      <li>An agent chooses a new dependency because it solves the immediate task — and nobody told it the team already standardized on a different one.</li>
       <li>An agent rewrites a subsystem instead of extending an approved abstraction, because the abstraction was never made discoverable.</li>
       <li>An agent bypasses an ADR because the ADR was not in its context window.</li>
       <li>An agent creates a parallel pattern next to an existing one because the existing convention was undocumented.</li>
@@ -358,7 +358,7 @@
 
     <p>The other instinct is to throw more context at the agent. Add a memory layer. Add retrieval. Add an orchestrator that routes tasks across tools. All of these are real, useful capabilities. None of them are governance.</p>
 
-    <p>Memory preserves context. Orchestration coordinates work. Observability shows what happened. Review inspects the result. Governance is the layer that constrains what is <em>allowed</em> before and during execution â€” and that property does not emerge automatically from any of the others.</p>
+    <p>Memory preserves context. Orchestration coordinates work. Observability shows what happened. Review inspects the result. Governance is the layer that constrains what is <em>allowed</em> before and during execution — and that property does not emerge automatically from any of the others.</p>
 
     <p>Memory can retrieve stale or conflicting information. Orchestration can route a task to the wrong tool with full fidelity. Observability tells you the violation happened. Review catches a fraction of what surfaces. The missing layer is not more context. It is <strong>enforceable context</strong>.</p>
 
@@ -373,7 +373,7 @@
       <li><strong>Versioned.</strong> Intent changes are tracked the same way code changes are.</li>
       <li><strong>Repo-native.</strong> It lives next to the code it governs, not in a separate wiki nobody reads.</li>
       <li><strong>Scoped.</strong> A rule that applies to one subsystem does not pollute another.</li>
-      <li><strong>Enforceable.</strong> Violations are surfaced â€” or blocked â€” at generation time.</li>
+      <li><strong>Enforceable.</strong> Violations are surfaced — or blocked — at generation time.</li>
       <li><strong>Auditable.</strong> Every enforcement decision has a trace.</li>
       <li><strong>Available before generation.</strong> Not just at review.</li>
     </ul>
@@ -393,20 +393,20 @@
 
     <h2>What intent governance looks like in practice</h2>
 
-    <p><strong>Dependency governance.</strong> Intent: "Do not introduce a second auth library." Without governance, an agent adds one because it solves the immediate task; the violation is caught in review, if it is caught at all. With governance, the constraint is surfaced before the agent writes the import, and the alternative path â€” the approved library â€” is part of the context the agent generates against.</p>
+    <p><strong>Dependency governance.</strong> Intent: "Do not introduce a second auth library." Without governance, an agent adds one because it solves the immediate task; the violation is caught in review, if it is caught at all. With governance, the constraint is surfaced before the agent writes the import, and the alternative path — the approved library — is part of the context the agent generates against.</p>
 
     <p><strong>Architectural migration.</strong> Intent: "Extend the current retrieval layer; do not rebuild with a new vector database." Without governance, an agent proposes a rewrite because rewrites are often the locally cleanest answer to a complex change. With governance, the agent sees the active architectural decision and works inside the approved path.</p>
 
-    <p><strong>Generated artifact drift.</strong> Intent: "All public artifacts follow naming and provenance conventions." Without governance, automation emits branches, PR titles, release notes, and generated docs outside repo standards â€” because each of those surfaces is treated as cosmetic. With governance, those surfaces are treated as first-class governance targets: the same constraints that gate code apply to everything an agent emits on the way to shipping it.</p>
+    <p><strong>Generated artifact drift.</strong> Intent: "All public artifacts follow naming and provenance conventions." Without governance, automation emits branches, PR titles, release notes, and generated docs outside repo standards — because each of those surfaces is treated as cosmetic. With governance, those surfaces are treated as first-class governance targets: the same constraints that gate code apply to everything an agent emits on the way to shipping it.</p>
 
     <h2>What engineering leaders should do now</h2>
 
     <ol class="" style="margin: 0 0 1.5rem 1.5rem; color: var(--muted); font-size: 0.92rem; line-height: 1.85;">
-      <li style="margin-bottom: 0.4rem;"><strong style="color: var(--text); font-weight: 500;">Inventory</strong> where architectural intent currently lives â€” ADRs, wikis, Slack threads, individual heads.</li>
+      <li style="margin-bottom: 0.4rem;"><strong style="color: var(--text); font-weight: 500;">Inventory</strong> where architectural intent currently lives — ADRs, wikis, Slack threads, individual heads.</li>
       <li style="margin-bottom: 0.4rem;"><strong style="color: var(--text); font-weight: 500;">Triage</strong> which decisions are still active, which are stale, and which have been silently superseded.</li>
       <li style="margin-bottom: 0.4rem;"><strong style="color: var(--text); font-weight: 500;">Convert</strong> high-risk decisions into explicit, repo-native constraints.</li>
       <li style="margin-bottom: 0.4rem;"><strong style="color: var(--text); font-weight: 500;">Apply</strong> those constraints before generation, not only during review.</li>
-      <li style="margin-bottom: 0.4rem;"><strong style="color: var(--text); font-weight: 500;">Treat</strong> agent workflows, CI pipelines, PRs, docs, and generated artifacts as governance surfaces â€” not just the code in <code style="font-family: 'DM Mono', monospace; font-size: 0.82rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 0.05rem 0.4rem; color: var(--text);">src/</code>.</li>
+      <li style="margin-bottom: 0.4rem;"><strong style="color: var(--text); font-weight: 500;">Treat</strong> agent workflows, CI pipelines, PRs, docs, and generated artifacts as governance surfaces — not just the code in <code style="font-family: 'DM Mono', monospace; font-size: 0.82rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 0.05rem 0.4rem; color: var(--text);">src/</code>.</li>
     </ol>
 
     <div class="callout">
@@ -443,7 +443,7 @@
 
     <div class="cta-block">
       <h3>Govern what the AI generates</h3>
-      <p>Mneme is an open-source architectural governance layer for AI-assisted development. It turns architectural decisions into enforceable constraints before agents generate code â€” via Claude Code's PreToolUse hook and other generation-time surfaces.</p>
+      <p>Mneme is an open-source architectural governance layer for AI-assisted development. It turns architectural decisions into enforceable constraints before agents generate code — via Claude Code's PreToolUse hook and other generation-time surfaces.</p>
       <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
     </div>
   </footer>

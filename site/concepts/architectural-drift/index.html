@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Architectural Drift â€” Mneme HQ Concepts</title>
+  <title>Architectural Drift — Mneme HQ Concepts</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
@@ -15,12 +15,12 @@
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Architectural Drift â€” Mneme HQ Concepts" />
+  <meta property="og:title" content="Architectural Drift — Mneme HQ Concepts" />
   <meta property="og:description" content="Architectural drift is the compound degradation in codebase coherence caused by AI agents producing code inconsistent with established decisions, uncorrected across sessions and agents." />
   <meta property="og:url" content="https://mnemehq.com/concepts/architectural-drift/" />
   <meta property="og:image" content="https://mnemehq.com/concepts/architectural-drift/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Architectural Drift â€” Mneme HQ Concepts" />
+  <meta name="twitter:title" content="Architectural Drift — Mneme HQ Concepts" />
   <meta name="twitter:description" content="Architectural drift is the compound degradation in codebase coherence caused by AI agents producing code inconsistent with established decisions, uncorrected across sessions and agents." />
   <meta name="twitter:image" content="https://mnemehq.com/concepts/architectural-drift/og.png" />
   <meta name="author" content="Theo Valmis" />
@@ -219,7 +219,7 @@
       },
       {
         "@type": "TechArticle",
-        "headline": "Architectural Drift â€” Mneme HQ Concepts",
+        "headline": "Architectural Drift — Mneme HQ Concepts",
         "description": "Architectural drift is the compound degradation in codebase coherence caused by AI agents producing code inconsistent with established decisions, uncorrected across sessions and agents.",
         "url": "https://mnemehq.com/concepts/architectural-drift/",
         "datePublished": "2026-05-14",
@@ -237,27 +237,27 @@
           {
             "@type": "Question",
             "name": "What is architectural drift in AI-assisted development?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Architectural drift is the compound degradation in codebase coherence that results from AI agents producing code inconsistent with established architectural decisions, uncorrected across sessions, across agents, and across time. It is not the accumulation of individual violations â€” it is the structural divergence between what the codebase is doing and what architectural decisions say it should do, growing over time. Drift is a system-level property; violations are per-PR events. Drift is what happens when violations propagate uncorrected and become precedent for downstream generation."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Architectural drift is the compound degradation in codebase coherence that results from AI agents producing code inconsistent with established architectural decisions, uncorrected across sessions, across agents, and across time. It is not the accumulation of individual violations — it is the structural divergence between what the codebase is doing and what architectural decisions say it should do, growing over time. Drift is a system-level property; violations are per-PR events. Drift is what happens when violations propagate uncorrected and become precedent for downstream generation."}
           },
           {
             "@type": "Question",
             "name": "Why is architectural drift a compound problem?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Architectural drift is compound because AI agents use the existing codebase as context for future generation. When a violation reaches the codebase uncorrected, downstream agents encounter it and may treat it as the established pattern â€” building on it rather than against it. The violation propagates and amplifies. Drift is not the sum of violations; it is the structural divergence that grows as violations become embedded in patterns that subsequent generations follow. Compounding is what makes drift categorically different from a per-PR problem."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Architectural drift is compound because AI agents use the existing codebase as context for future generation. When a violation reaches the codebase uncorrected, downstream agents encounter it and may treat it as the established pattern — building on it rather than against it. The violation propagates and amplifies. Drift is not the sum of violations; it is the structural divergence that grows as violations become embedded in patterns that subsequent generations follow. Compounding is what makes drift categorically different from a per-PR problem."}
           },
           {
             "@type": "Question",
             "name": "How does AI coding accelerate architectural drift?",
-            "acceptedAnswer": {"@type": "Answer", "text": "AI agents generate code at rates that can outpace human review by orders of magnitude. An agent producing 10 PRs per day across 5 services can introduce drift that would take a team a week of focused review to identify â€” by which point downstream agents have already built on the drifted patterns. The acceleration is not just in violation introduction rate; it's in propagation speed. AI agents propagate drifted patterns faster than humans can identify and correct them, unless governance is enforced before generation."}
+            "acceptedAnswer": {"@type": "Answer", "text": "AI agents generate code at rates that can outpace human review by orders of magnitude. An agent producing 10 PRs per day across 5 services can introduce drift that would take a team a week of focused review to identify — by which point downstream agents have already built on the drifted patterns. The acceleration is not just in violation introduction rate; it's in propagation speed. AI agents propagate drifted patterns faster than humans can identify and correct them, unless governance is enforced before generation."}
           },
           {
             "@type": "Question",
             "name": "What's the difference between a violation and drift?",
-            "acceptedAnswer": {"@type": "Answer", "text": "A violation is a per-PR event: one instance of code that doesn't conform to an architectural decision. Drift is a system-level property: the structural distance between what the codebase is and what architectural decisions say it should be, accumulating over time. A single violation caught in review is an incident. The same violation type appearing across 15 PRs over two weeks, propagating into downstream services because agents treated the first occurrence as precedent â€” that is drift. Individual incidents are manageable; drift requires architectural remediation."}
+            "acceptedAnswer": {"@type": "Answer", "text": "A violation is a per-PR event: one instance of code that doesn't conform to an architectural decision. Drift is a system-level property: the structural distance between what the codebase is and what architectural decisions say it should be, accumulating over time. A single violation caught in review is an incident. The same violation type appearing across 15 PRs over two weeks, propagating into downstream services because agents treated the first occurrence as precedent — that is drift. Individual incidents are manageable; drift requires architectural remediation."}
           },
           {
             "@type": "Question",
             "name": "How does governance before generation prevent architectural drift?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Governance before generation prevents architectural drift by addressing it at the source: the first violation never occurs. When architectural constraints are injected before the AI writes, the agent produces code consistent with decisions â€” the drifted pattern never enters the codebase, so downstream agents never encounter it as precedent. If a constraint is not injected and a violation does occur, CI enforcement catches it before merge â€” preventing propagation. Drift requires violations to propagate uncorrected; governance before generation breaks the propagation mechanism at both points."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Governance before generation prevents architectural drift by addressing it at the source: the first violation never occurs. When architectural constraints are injected before the AI writes, the agent produces code consistent with decisions — the drifted pattern never enters the codebase, so downstream agents never encounter it as precedent. If a constraint is not injected and a violation does occur, CI enforcement catches it before merge — preventing propagation. Drift requires violations to propagate uncorrected; governance before generation breaks the propagation mechanism at both points."}
           }
         ]
       },
@@ -294,7 +294,7 @@
 
 <main>
 <div class="answer-capsule">
-  <strong>Architectural drift.</strong> The compound degradation in codebase coherence that results from AI agents producing code inconsistent with established decisions â€” uncorrected across sessions, across agents, across time. Drift is not a per-PR problem. It is a system-level property that compounds.
+  <strong>Architectural drift.</strong> The compound degradation in codebase coherence that results from AI agents producing code inconsistent with established decisions — uncorrected across sessions, across agents, across time. Drift is not a per-PR problem. It is a system-level property that compounds.
 </div>
 
 <nav aria-label="Breadcrumb" class="breadcrumb-nav">
@@ -310,7 +310,7 @@
     <div class="article-eyebrow">
       <span class="eyebrow-tag">Concepts</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">12 min read &nbsp;Â·&nbsp; May 2026</span>
+      <span class="eyebrow-meta">12 min read &nbsp;·&nbsp; May 2026</span>
     </div>
     <h1>Architectural Drift</h1>
     <p class="article-lede">A single architectural violation in a PR is a mistake. The same violation in every PR across ten agents over two weeks is architectural drift. The distinction between incident and compound system failure is what separates individual code review from architectural governance.</p>
@@ -323,7 +323,7 @@
 
   <div class="article-body">
 
-    <p>Software teams have always accumulated technical debt. Some of that debt is architectural â€” divergence between what the codebase is doing and what architectural decisions say it should do. In human-paced development, this divergence accumulates slowly enough that periodic architectural reviews, refactoring sprints, and team norms can keep it in check. It is a chronic problem, not an acute one.</p>
+    <p>Software teams have always accumulated technical debt. Some of that debt is architectural — divergence between what the codebase is doing and what architectural decisions say it should do. In human-paced development, this divergence accumulates slowly enough that periodic architectural reviews, refactoring sprints, and team norms can keep it in check. It is a chronic problem, not an acute one.</p>
 
     <p>AI agents changed the accumulation rate. What previously took months to drift now takes days. The mechanisms that kept drift in check at human generation speed are insufficient at AI generation speed. <strong>Architectural drift</strong> is the name for this compound failure mode: not individual violations, but the structural divergence that grows as violations propagate and become precedent for downstream generation.</p>
 
@@ -331,12 +331,12 @@
 
     <p>Drift is compound, not additive. This distinction is the structural core of the concept and the reason it requires a different response than per-PR violation management.</p>
 
-    <p>When a violation is additive â€” a linting error, a style inconsistency â€” it exists in isolation. Fixing it closes the issue. The violation does not interact with other parts of the system. Additive violations are managed by review queues and linters; they don't compound.</p>
+    <p>When a violation is additive — a linting error, a style inconsistency — it exists in isolation. Fixing it closes the issue. The violation does not interact with other parts of the system. Additive violations are managed by review queues and linters; they don't compound.</p>
 
     <p>When a violation is compound, it propagates. In an AI-assisted codebase, the propagation mechanism is the agent's context window. AI agents generate code based on what they see in the codebase: existing patterns, existing file structures, existing abstractions. When a violation enters the codebase and is not corrected, downstream agents encounter it as existing code. They learn from it as a pattern. They replicate it. They build on it. The violation becomes the new floor from which subsequent violations diverge further.</p>
 
     <div class="callout">
-      <p><strong>Drift is the structural divergence between what the codebase is doing and what architectural decisions say it should do, growing over time.</strong> The accumulation of violations is the symptom. The underlying problem is that each uncorrected violation expands the space from which the next violation can emerge â€” compounding the distance between the actual codebase and the intended architecture.</p>
+      <p><strong>Drift is the structural divergence between what the codebase is doing and what architectural decisions say it should do, growing over time.</strong> The accumulation of violations is the symptom. The underlying problem is that each uncorrected violation expands the space from which the next violation can emerge — compounding the distance between the actual codebase and the intended architecture.</p>
     </div>
 
     <figure class="diagram-figure">
@@ -390,11 +390,11 @@
 
     <p>Architectural drift has always existed. The AI-native dimension of the problem is the acceleration: violations are introduced faster, they propagate faster, and the detection lag between introduction and remediation widens at AI generation speeds.</p>
 
-    <p>Consider the timeline. A human developer introduces an architectural violation â€” uses a deprecated pattern, calls a service outside its permitted boundary, introduces an unapproved dependency. That violation reaches code review within hours or days. The reviewer catches it, or doesn't. If caught, it's corrected before merge. If missed, it reaches the codebase â€” but the next human developer who works in that area will encounter it at human speed: they might read the code carefully, notice the pattern, and question it in a future PR or design discussion.</p>
+    <p>Consider the timeline. A human developer introduces an architectural violation — uses a deprecated pattern, calls a service outside its permitted boundary, introduces an unapproved dependency. That violation reaches code review within hours or days. The reviewer catches it, or doesn't. If caught, it's corrected before merge. If missed, it reaches the codebase — but the next human developer who works in that area will encounter it at human speed: they might read the code carefully, notice the pattern, and question it in a future PR or design discussion.</p>
 
-    <p>An AI agent introduces the same violation. The agent produces 10 PRs per day. Some are reviewed carefully; under time pressure, others receive lighter scrutiny. The violation reaches the codebase. The next agent that works in that area encounters the pattern during its context window loading â€” not at human reading speed, but as part of its immediate generation context. It treats the pattern as established. It replicates it in the next file, the next service, the next PR. By the time a human notices the pattern, it has appeared in 15 PRs across 4 services over 10 days.</p>
+    <p>An AI agent introduces the same violation. The agent produces 10 PRs per day. Some are reviewed carefully; under time pressure, others receive lighter scrutiny. The violation reaches the codebase. The next agent that works in that area encounters the pattern during its context window loading — not at human reading speed, but as part of its immediate generation context. It treats the pattern as established. It replicates it in the next file, the next service, the next PR. By the time a human notices the pattern, it has appeared in 15 PRs across 4 services over 10 days.</p>
 
-    <p>That is the acceleration. The introduction rate and propagation rate are both higher. The detection rate is not â€” it is bounded by human review capacity, which has not changed.</p>
+    <p>That is the acceleration. The introduction rate and propagation rate are both higher. The detection rate is not — it is bounded by human review capacity, which has not changed.</p>
 
     <div class="drift-timeline">
       <div class="drift-day">
@@ -414,7 +414,7 @@
         </div>
         <div class="drift-day-content">
           <strong>Agent B builds on the drifted pattern</strong>
-          <span>Agent B reads payments/handler.py as context for a new payments/refunds.py task. It uses the same deprecated client â€” treating it as the established pattern for this service.</span>
+          <span>Agent B reads payments/handler.py as context for a new payments/refunds.py task. It uses the same deprecated client — treating it as the established pattern for this service.</span>
         </div>
       </div>
       <div class="drift-day">
@@ -434,18 +434,18 @@
         </div>
         <div class="drift-day-content">
           <strong>Architectural coherence significantly degraded</strong>
-          <span>The deprecated client appears in 22 files across 5 services. The correct client is now the minority pattern. Remediation requires identifying all 22 occurrences, understanding their dependencies, coordinating updates across 5 services â€” all while AI agents continue to introduce new instances daily.</span>
+          <span>The deprecated client appears in 22 files across 5 services. The correct client is now the minority pattern. Remediation requires identifying all 22 occurrences, understanding their dependencies, coordinating updates across 5 services — all while AI agents continue to introduce new instances daily.</span>
         </div>
       </div>
     </div>
 
-    <p>The timeline above is not a worst case. It is the expected outcome of AI-assisted development without pre-generation governance. The compounding is not exceptional behavior â€” it is the natural result of agents using existing code as context, applied at high generation velocity.</p>
+    <p>The timeline above is not a worst case. It is the expected outcome of AI-assisted development without pre-generation governance. The compounding is not exceptional behavior — it is the natural result of agents using existing code as context, applied at high generation velocity.</p>
 
     <h2>The common misread: treating drift as a per-PR problem</h2>
 
-    <p>Teams that approach architectural drift with per-PR tooling â€” code review checklists, PR linting, violation count metrics â€” are measuring the wrong thing. They are measuring incidents when the problem is system-level degradation.</p>
+    <p>Teams that approach architectural drift with per-PR tooling — code review checklists, PR linting, violation count metrics — are measuring the wrong thing. They are measuring incidents when the problem is system-level degradation.</p>
 
-    <p>The misread is conceptually clear: if we catch every violation in review, drift cannot accumulate. Violations are the mechanism; if violations are caught, drift is prevented. The problem is that this logic assumes a 100% violation detection rate in review â€” which is not achievable at AI generation speeds, and which assumes the detection can happen before propagation, which requires catching the violation before the next generation cycle uses it as context.</p>
+    <p>The misread is conceptually clear: if we catch every violation in review, drift cannot accumulate. Violations are the mechanism; if violations are caught, drift is prevented. The problem is that this logic assumes a 100% violation detection rate in review — which is not achievable at AI generation speeds, and which assumes the detection can happen before propagation, which requires catching the violation before the next generation cycle uses it as context.</p>
 
     <div class="callout-teal">
       <p><strong>Code review catches individual violations in specific PRs. It does not model the compound effect of uncorrected violations propagating across the codebase.</strong> Teams that track "violations per PR" are measuring incidents. Teams that govern architectural coherence are preventing drift. These are different problems that require different infrastructure.</p>
@@ -453,7 +453,7 @@
 
     <p>A team tracking violation counts might celebrate a 10% reduction in violations per PR. But if those violations are being introduced faster (because AI generation volume increased), the absolute violation count is still growing. And if even a fraction of those violations reach the codebase before detection, the propagation mechanism amplifies them. Violation rate is an incident metric. Architectural coherence over time is the drift metric.</p>
 
-    <p>The practical implication: teams need to measure architectural coherence at the codebase level, not just at the PR level. This means tracking the distribution of architectural patterns across the codebase over time, not just whether each PR passed review. It means having machine-evaluable definitions of what architectural coherence looks like â€” which requires the same decision records that governance before generation uses.</p>
+    <p>The practical implication: teams need to measure architectural coherence at the codebase level, not just at the PR level. This means tracking the distribution of architectural patterns across the codebase over time, not just whether each PR passed review. It means having machine-evaluable definitions of what architectural coherence looks like — which requires the same decision records that governance before generation uses.</p>
 
     <h2>How this fits the AI SDLC</h2>
 
@@ -461,12 +461,12 @@
 
     <p><strong>Governance before generation prevents the first violation.</strong> If architectural constraints are injected before the agent writes, the agent produces code consistent with decisions. The first occurrence of the violation never enters the codebase. The propagation mechanism has no seed to amplify.</p>
 
-    <p><strong>Decision continuity prevents propagation.</strong> Even if a violation reaches the codebase (through a session where governance was not active, or through code written without the governance layer), decision continuity means subsequent agents are still constrained by the correct decisions â€” they don't inherit the drifted pattern as their constraint context. Governance is session-independent; the decisions are always present in the agent's context.</p>
+    <p><strong>Decision continuity prevents propagation.</strong> Even if a violation reaches the codebase (through a session where governance was not active, or through code written without the governance layer), decision continuity means subsequent agents are still constrained by the correct decisions — they don't inherit the drifted pattern as their constraint context. Governance is session-independent; the decisions are always present in the agent's context.</p>
 
-    <p><strong>Deterministic enforcement ensures consistency across agents and sessions.</strong> Drift compounds when different agents receive different governance signals â€” when agent A is constrained but agent B is not, or when the enforcement signal is inconsistent. Deterministic enforcement ensures every agent, every session, every generation receives the same constraint signal from the same decision corpus. The enforcement surface has no gaps through which drift can propagate.</p>
+    <p><strong>Deterministic enforcement ensures consistency across agents and sessions.</strong> Drift compounds when different agents receive different governance signals — when agent A is constrained but agent B is not, or when the enforcement signal is inconsistent. Deterministic enforcement ensures every agent, every session, every generation receives the same constraint signal from the same decision corpus. The enforcement surface has no gaps through which drift can propagate.</p>
 
     <div class="callout">
-      <p><strong>Drift is what fills governance gaps.</strong> Every gap in the governance layer â€” a session without hook interception, a service without decision coverage, a constraint that was encoded too vaguely to enforce â€” is a space where violations can be introduced and propagated. Governing comprehensively is not perfectionism; it is preventing the propagation mechanism from having gaps to amplify.</p>
+      <p><strong>Drift is what fills governance gaps.</strong> Every gap in the governance layer — a session without hook interception, a service without decision coverage, a constraint that was encoded too vaguely to enforce — is a space where violations can be introduced and propagated. Governing comprehensively is not perfectionism; it is preventing the propagation mechanism from having gaps to amplify.</p>
     </div>
 
     <h2>Related concepts</h2>
@@ -474,9 +474,9 @@
     <p>Architectural drift is the failure mode that governance infrastructure exists to prevent. The adjacent concepts describe the prevention mechanisms:</p>
 
     <ul>
-      <li><strong>Decision continuity</strong> â€” the property that architectural decisions remain present and enforced across sessions, agents, and time. Decision continuity is the mechanism that prevents drifted patterns from becoming the new precedent: the correct decision is always present in the agent's context, regardless of what the surrounding code looks like.</li>
-      <li><strong>Governance before generation</strong> â€” the enforcement posture that prevents violations from entering the codebase in the first place. Drift requires violations to propagate; governance before generation prevents the first violation that would seed propagation.</li>
-      <li><strong>Demo: Architectural drift prevention</strong> â€” a live demonstration of how Mneme's governance layer intercepts the propagation mechanism, showing what happens with and without pre-generation enforcement over a simulated multi-agent generation session.</li>
+      <li><strong>Decision continuity</strong> — the property that architectural decisions remain present and enforced across sessions, agents, and time. Decision continuity is the mechanism that prevents drifted patterns from becoming the new precedent: the correct decision is always present in the agent's context, regardless of what the surrounding code looks like.</li>
+      <li><strong>Governance before generation</strong> — the enforcement posture that prevents violations from entering the codebase in the first place. Drift requires violations to propagate; governance before generation prevents the first violation that would seed propagation.</li>
+      <li><strong>Demo: Architectural drift prevention</strong> — a live demonstration of how Mneme's governance layer intercepts the propagation mechanism, showing what happens with and without pre-generation enforcement over a simulated multi-agent generation session.</li>
     </ul>
 
   </div>
@@ -485,23 +485,23 @@
     <h2>Frequently asked questions</h2>
     <details>
       <summary>What is architectural drift in AI-assisted development?</summary>
-      <div class="faq-body">Architectural drift is the compound degradation in codebase coherence that results from AI agents producing code inconsistent with established architectural decisions, uncorrected across sessions, across agents, and across time. It is not the accumulation of individual violations â€” it is the structural divergence between what the codebase is doing and what architectural decisions say it should do, growing over time. Drift is a system-level property; violations are per-PR events. Drift is what happens when violations propagate uncorrected and become precedent for downstream generation.</div>
+      <div class="faq-body">Architectural drift is the compound degradation in codebase coherence that results from AI agents producing code inconsistent with established architectural decisions, uncorrected across sessions, across agents, and across time. It is not the accumulation of individual violations — it is the structural divergence between what the codebase is doing and what architectural decisions say it should do, growing over time. Drift is a system-level property; violations are per-PR events. Drift is what happens when violations propagate uncorrected and become precedent for downstream generation.</div>
     </details>
     <details>
       <summary>Why is architectural drift a compound problem?</summary>
-      <div class="faq-body">Architectural drift is compound because AI agents use the existing codebase as context for future generation. When a violation reaches the codebase uncorrected, downstream agents encounter it and may treat it as the established pattern â€” building on it rather than against it. The violation propagates and amplifies. Drift is not the sum of violations; it is the structural divergence that grows as violations become embedded in patterns that subsequent generations follow. Compounding is what makes drift categorically different from a per-PR problem.</div>
+      <div class="faq-body">Architectural drift is compound because AI agents use the existing codebase as context for future generation. When a violation reaches the codebase uncorrected, downstream agents encounter it and may treat it as the established pattern — building on it rather than against it. The violation propagates and amplifies. Drift is not the sum of violations; it is the structural divergence that grows as violations become embedded in patterns that subsequent generations follow. Compounding is what makes drift categorically different from a per-PR problem.</div>
     </details>
     <details>
       <summary>How does AI coding accelerate architectural drift?</summary>
-      <div class="faq-body">AI agents generate code at rates that can outpace human review by orders of magnitude. An agent producing 10 PRs per day across 5 services can introduce drift that would take a team a week of focused review to identify â€” by which point downstream agents have already built on the drifted patterns. The acceleration is not just in violation introduction rate; it's in propagation speed. AI agents propagate drifted patterns faster than humans can identify and correct them, unless governance is enforced before generation.</div>
+      <div class="faq-body">AI agents generate code at rates that can outpace human review by orders of magnitude. An agent producing 10 PRs per day across 5 services can introduce drift that would take a team a week of focused review to identify — by which point downstream agents have already built on the drifted patterns. The acceleration is not just in violation introduction rate; it's in propagation speed. AI agents propagate drifted patterns faster than humans can identify and correct them, unless governance is enforced before generation.</div>
     </details>
     <details>
       <summary>What's the difference between a violation and drift?</summary>
-      <div class="faq-body">A violation is a per-PR event: one instance of code that doesn't conform to an architectural decision. Drift is a system-level property: the structural distance between what the codebase is and what architectural decisions say it should be, accumulating over time. A single violation caught in review is an incident. The same violation type appearing across 15 PRs over two weeks, propagating into downstream services because agents treated the first occurrence as precedent â€” that is drift. Individual incidents are manageable; drift requires architectural remediation.</div>
+      <div class="faq-body">A violation is a per-PR event: one instance of code that doesn't conform to an architectural decision. Drift is a system-level property: the structural distance between what the codebase is and what architectural decisions say it should be, accumulating over time. A single violation caught in review is an incident. The same violation type appearing across 15 PRs over two weeks, propagating into downstream services because agents treated the first occurrence as precedent — that is drift. Individual incidents are manageable; drift requires architectural remediation.</div>
     </details>
     <details>
       <summary>How does governance before generation prevent architectural drift?</summary>
-      <div class="faq-body">Governance before generation prevents architectural drift by addressing it at the source: the first violation never occurs. When architectural constraints are injected before the AI writes, the agent produces code consistent with decisions â€” the drifted pattern never enters the codebase, so downstream agents never encounter it as precedent. If a constraint is not injected and a violation does occur, CI enforcement catches it before merge â€” preventing propagation. Drift requires violations to propagate uncorrected; governance before generation breaks the propagation mechanism at both points.</div>
+      <div class="faq-body">Governance before generation prevents architectural drift by addressing it at the source: the first violation never occurs. When architectural constraints are injected before the AI writes, the agent produces code consistent with decisions — the drifted pattern never enters the codebase, so downstream agents never encounter it as precedent. If a constraint is not injected and a violation does occur, CI enforcement catches it before merge — preventing propagation. Drift requires violations to propagate uncorrected; governance before generation breaks the propagation mechanism at both points.</div>
     </details>
   </section>
 
@@ -514,12 +514,12 @@
   </ul>
 
   <footer class="article-footer">
-    <a href="/concepts/" class="back-link">â† Back to Concepts</a>
+    <a href="/concepts/" class="back-link">← Back to Concepts</a>
 
     <div class="cta-block">
       <h3>See drift prevention in the demo</h3>
-      <p>The Mneme demo shows the difference between a governed and ungoverned multi-agent session â€” tracking how violations propagate without governance and how pre-generation enforcement breaks the propagation mechanism.</p>
-      <a href="/demo/" class="btn-primary">View the demo â†’</a>
+      <p>The Mneme demo shows the difference between a governed and ungoverned multi-agent session — tracking how violations propagate without governance and how pre-generation enforcement breaks the propagation mechanism.</p>
+      <a href="/demo/" class="btn-primary">View the demo →</a>
     </div>
   </footer>
 </article>

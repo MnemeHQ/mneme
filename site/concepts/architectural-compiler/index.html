@@ -3,24 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Architectural Compiler â€” Mneme HQ Concepts</title>
+  <title>Architectural Compiler — Mneme HQ Concepts</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="The architectural compiler is the pipeline that converts documentation-form decisions (ADRs) into machine-evaluable constraint records â€” parse, validate, resolve, emit, enforce." />
+  <meta name="description" content="The architectural compiler is the pipeline that converts documentation-form decisions (ADRs) into machine-evaluable constraint records — parse, validate, resolve, emit, enforce." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/concepts/architectural-compiler/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Architectural Compiler â€” Mneme HQ Concepts" />
-  <meta property="og:description" content="The architectural compiler is the pipeline that converts documentation-form decisions (ADRs) into machine-evaluable constraint records â€” parse, validate, resolve, emit, enforce." />
+  <meta property="og:title" content="Architectural Compiler — Mneme HQ Concepts" />
+  <meta property="og:description" content="The architectural compiler is the pipeline that converts documentation-form decisions (ADRs) into machine-evaluable constraint records — parse, validate, resolve, emit, enforce." />
   <meta property="og:url" content="https://mnemehq.com/concepts/architectural-compiler/" />
   <meta property="og:image" content="https://mnemehq.com/concepts/architectural-compiler/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Architectural Compiler â€” Mneme HQ Concepts" />
-  <meta name="twitter:description" content="The architectural compiler is the pipeline that converts documentation-form decisions (ADRs) into machine-evaluable constraint records â€” parse, validate, resolve, emit, enforce." />
+  <meta name="twitter:title" content="Architectural Compiler — Mneme HQ Concepts" />
+  <meta name="twitter:description" content="The architectural compiler is the pipeline that converts documentation-form decisions (ADRs) into machine-evaluable constraint records — parse, validate, resolve, emit, enforce." />
   <meta name="twitter:image" content="https://mnemehq.com/concepts/architectural-compiler/og.png" />
   <meta name="author" content="Theo Valmis" />
   <meta property="article:published_time" content="2026-05-14T00:00:00Z" />
@@ -269,8 +269,8 @@
       },
       {
         "@type": "TechArticle",
-        "headline": "Architectural Compiler â€” Mneme HQ Concepts",
-        "description": "The architectural compiler is the pipeline that converts documentation-form decisions (ADRs) into machine-evaluable constraint records â€” parse, validate, resolve, emit, enforce.",
+        "headline": "Architectural Compiler — Mneme HQ Concepts",
+        "description": "The architectural compiler is the pipeline that converts documentation-form decisions (ADRs) into machine-evaluable constraint records — parse, validate, resolve, emit, enforce.",
         "url": "https://mnemehq.com/concepts/architectural-compiler/",
         "datePublished": "2026-05-14",
         "dateModified": "2026-05-14",
@@ -287,34 +287,34 @@
           {
             "@type": "Question",
             "name": "What is an architectural compiler?",
-            "acceptedAnswer": {"@type": "Answer", "text": "An architectural compiler is the pipeline that transforms documentation-form decisions â€” ADRs, design docs, style guides â€” into machine-evaluable constraint records. It performs five stages: parse (extract decision records from source files), validate (check schema and required fields), resolve (compute precedence and detect conflicts), emit (write validated records to the governance corpus), and enforce (the compiled corpus is queried at generation time). Compilation is the discrete, auditable step that closes the gap between what teams document and what AI agents are governed by."}
+            "acceptedAnswer": {"@type": "Answer", "text": "An architectural compiler is the pipeline that transforms documentation-form decisions — ADRs, design docs, style guides — into machine-evaluable constraint records. It performs five stages: parse (extract decision records from source files), validate (check schema and required fields), resolve (compute precedence and detect conflicts), emit (write validated records to the governance corpus), and enforce (the compiled corpus is queried at generation time). Compilation is the discrete, auditable step that closes the gap between what teams document and what AI agents are governed by."}
           },
           {
             "@type": "Question",
             "name": "What does the architectural compiler do with existing ADRs?",
-            "acceptedAnswer": {"@type": "Answer", "text": "The compiler reads ADR files that contain a structured Constraints section, extracts each constraint as a typed decision record, validates it against the governance schema, resolves any precedence or supersession relationships with existing records, and emits the validated records to project_memory.json. The ADR itself remains unchanged â€” the compiler produces a separate compiled artifact that the governance runtime uses for enforcement."}
+            "acceptedAnswer": {"@type": "Answer", "text": "The compiler reads ADR files that contain a structured Constraints section, extracts each constraint as a typed decision record, validates it against the governance schema, resolves any precedence or supersession relationships with existing records, and emits the validated records to project_memory.json. The ADR itself remains unchanged — the compiler produces a separate compiled artifact that the governance runtime uses for enforcement."}
           },
           {
             "@type": "Question",
-            "name": "Why is compilation necessary â€” why not just use documentation directly?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Documentation and enforcement are different artifacts. An ADR explaining why PostgreSQL was chosen is documentation â€” it describes a decision and its rationale. A constraint record that says 'services/payments/** must not use SQLite' is enforcement â€” it is a machine-evaluable rule with scope, precedence, and a structured field for evaluation. Documentation cannot be evaluated against code output without first being compiled into constraint records. Retrieving ADR prose and injecting it into a prompt is not compilation â€” it is context retrieval, which doesn't provide the scope assignment, precedence resolution, or schema validation that enforcement requires."}
+            "name": "Why is compilation necessary — why not just use documentation directly?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Documentation and enforcement are different artifacts. An ADR explaining why PostgreSQL was chosen is documentation — it describes a decision and its rationale. A constraint record that says 'services/payments/** must not use SQLite' is enforcement — it is a machine-evaluable rule with scope, precedence, and a structured field for evaluation. Documentation cannot be evaluated against code output without first being compiled into constraint records. Retrieving ADR prose and injecting it into a prompt is not compilation — it is context retrieval, which doesn't provide the scope assignment, precedence resolution, or schema validation that enforcement requires."}
           },
           {
             "@type": "Question",
             "name": "What are the five stages of architectural compilation?",
-            "acceptedAnswer": {"@type": "Answer", "text": "The five stages are: (1) Parse â€” extract decision records from source files (ADRs with a Constraints section, governance config, manual records); (2) Validate â€” check schema compliance, required fields, and scope syntax; (3) Resolve â€” compute precedence, apply supersession relationships, and detect conflicts between decisions; (4) Emit â€” write validated, resolved records to project_memory.json as the compiled governance corpus; (5) Enforce â€” the compiled corpus is queried at code generation time by the governance system's retrieval layer."}
+            "acceptedAnswer": {"@type": "Answer", "text": "The five stages are: (1) Parse — extract decision records from source files (ADRs with a Constraints section, governance config, manual records); (2) Validate — check schema compliance, required fields, and scope syntax; (3) Resolve — compute precedence, apply supersession relationships, and detect conflicts between decisions; (4) Emit — write validated, resolved records to project_memory.json as the compiled governance corpus; (5) Enforce — the compiled corpus is queried at code generation time by the governance system's retrieval layer."}
           },
           {
             "@type": "Question",
             "name": "How is the architectural compiler different from RAG over documentation?",
-            "acceptedAnswer": {"@type": "Answer", "text": "RAG over documentation retrieves prose passages that describe decisions. The architectural compiler produces structured constraint records that enforce them. These are different outputs with different properties: RAG retrieval is probabilistic and produces natural language context; the compiled corpus is deterministic and produces machine-evaluable constraints. A model receiving RAG context about a decision can still choose to violate it â€” the decision is advice, not a constraint. A model evaluated against a compiled constraint record produces a binary verdict: the constraint was respected or it was not."}
+            "acceptedAnswer": {"@type": "Answer", "text": "RAG over documentation retrieves prose passages that describe decisions. The architectural compiler produces structured constraint records that enforce them. These are different outputs with different properties: RAG retrieval is probabilistic and produces natural language context; the compiled corpus is deterministic and produces machine-evaluable constraints. A model receiving RAG context about a decision can still choose to violate it — the decision is advice, not a constraint. A model evaluated against a compiled constraint record produces a binary verdict: the constraint was respected or it was not."}
           }
         ]
       },
       {
         "@type": "DefinedTerm",
         "name": "Architectural Compiler",
-        "description": "The pipeline that converts documentation-form decisions â€” ADRs, design docs, style guides â€” into machine-evaluable constraint records through parsing, validation, conflict resolution, and scope assignment.",
+        "description": "The pipeline that converts documentation-form decisions — ADRs, design docs, style guides — into machine-evaluable constraint records through parsing, validation, conflict resolution, and scope assignment.",
         "inDefinedTermSet": {"@type": "DefinedTermSet", "name": "Mneme HQ Concepts", "url": "https://mnemehq.com/concepts/"},
         "url": "https://mnemehq.com/concepts/architectural-compiler/"
       }
@@ -344,7 +344,7 @@
 
 <main>
 <div class="answer-capsule">
-  <strong>The architectural compiler.</strong> The pipeline that converts documentation-form decisions â€” ADRs, design docs, style guides â€” into machine-evaluable constraint records. Parse &rarr; validate &rarr; resolve &rarr; emit &rarr; enforce. Compilation is the discrete, auditable step that closes the gap between what teams document and what AI agents are governed by.
+  <strong>The architectural compiler.</strong> The pipeline that converts documentation-form decisions — ADRs, design docs, style guides — into machine-evaluable constraint records. Parse &rarr; validate &rarr; resolve &rarr; emit &rarr; enforce. Compilation is the discrete, auditable step that closes the gap between what teams document and what AI agents are governed by.
 </div>
 
 <nav aria-label="Breadcrumb" class="breadcrumb-nav">
@@ -360,7 +360,7 @@
     <div class="article-eyebrow">
       <span class="eyebrow-tag">Concepts</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">12 min read &nbsp;Â·&nbsp; May 2026</span>
+      <span class="eyebrow-meta">12 min read &nbsp;·&nbsp; May 2026</span>
     </div>
     <h1>Architectural Compiler</h1>
     <p class="article-lede">There is a gap between what engineering teams document and what AI coding agents are governed by. Documentation describes decisions in prose. Governance requires decisions in structured, scope-assigned, precedence-aware constraint records. The architectural compiler is the pipeline that crosses that gap.</p>
@@ -373,16 +373,16 @@
 
   <div class="article-body">
 
-    <p>Every software engineering team that adopts AI coding agents eventually confronts the same asymmetry: the team's architectural knowledge lives in ADRs, design documents, style guides, and team wikis â€” written for humans, describing decisions in narrative form. AI agents don't consume narratives as governance. They need constraint records: scoped, typed, precedence-resolved, machine-evaluable rules that can be checked against code output with a binary verdict.</p>
+    <p>Every software engineering team that adopts AI coding agents eventually confronts the same asymmetry: the team's architectural knowledge lives in ADRs, design documents, style guides, and team wikis — written for humans, describing decisions in narrative form. AI agents don't consume narratives as governance. They need constraint records: scoped, typed, precedence-resolved, machine-evaluable rules that can be checked against code output with a binary verdict.</p>
 
-    <p>The architectural compiler is the name for the transformation pipeline that converts the former into the latter. It is a deliberate, auditable compilation step â€” not an implicit, best-effort retrieval. The same way a code compiler converts source files into executables, the architectural compiler converts decision documentation into enforcement artifacts.</p>
+    <p>The architectural compiler is the name for the transformation pipeline that converts the former into the latter. It is a deliberate, auditable compilation step — not an implicit, best-effort retrieval. The same way a code compiler converts source files into executables, the architectural compiler converts decision documentation into enforcement artifacts.</p>
 
     <figure class="diagram-figure" aria-labelledby="ac-diag-title">
       <svg viewBox="0 0 800 300" role="img" aria-labelledby="ac-diag-title ac-diag-desc" xmlns="http://www.w3.org/2000/svg">
         <title id="ac-diag-title">The five-stage architectural compiler pipeline</title>
-        <desc id="ac-diag-desc">Pipeline diagram showing ADR sources on the left flowing through five stages â€” parse, validate, resolve, emit, enforce â€” into the decision corpus on the right, with violations branching off at validate and resolve.</desc>
+        <desc id="ac-diag-desc">Pipeline diagram showing ADR sources on the left flowing through five stages — parse, validate, resolve, emit, enforce — into the decision corpus on the right, with violations branching off at validate and resolve.</desc>
         <g>
-          <text x="40" y="28" class="diag-accent-text">SOURCE â†’ COMPILED ARTIFACT â†’ ENFORCEMENT</text>
+          <text x="40" y="28" class="diag-accent-text">SOURCE → COMPILED ARTIFACT → ENFORCEMENT</text>
 
           <!-- Sources -->
           <rect x="40" y="100" width="100" height="80" rx="8" class="diag-box-teal"/>
@@ -393,31 +393,31 @@
 
           <!-- Stage 1 Parse -->
           <rect x="170" y="100" width="100" height="80" rx="8" class="diag-box"/>
-          <text x="220" y="125" text-anchor="middle" class="diag-accent-text">01 Â· PARSE</text>
+          <text x="220" y="125" text-anchor="middle" class="diag-accent-text">01 · PARSE</text>
           <text x="220" y="148" text-anchor="middle" class="diag-text">extract</text>
           <text x="220" y="164" text-anchor="middle" class="diag-text">records</text>
 
           <!-- Stage 2 Validate -->
           <rect x="290" y="100" width="100" height="80" rx="8" class="diag-box"/>
-          <text x="340" y="125" text-anchor="middle" class="diag-accent-text">02 Â· VALIDATE</text>
+          <text x="340" y="125" text-anchor="middle" class="diag-accent-text">02 · VALIDATE</text>
           <text x="340" y="148" text-anchor="middle" class="diag-text">schema</text>
           <text x="340" y="164" text-anchor="middle" class="diag-text">required fields</text>
 
           <!-- Stage 3 Resolve -->
           <rect x="410" y="100" width="100" height="80" rx="8" class="diag-box"/>
-          <text x="460" y="125" text-anchor="middle" class="diag-accent-text">03 Â· RESOLVE</text>
+          <text x="460" y="125" text-anchor="middle" class="diag-accent-text">03 · RESOLVE</text>
           <text x="460" y="148" text-anchor="middle" class="diag-text">precedence</text>
           <text x="460" y="164" text-anchor="middle" class="diag-text">supersession</text>
 
           <!-- Stage 4 Emit -->
           <rect x="530" y="100" width="100" height="80" rx="8" class="diag-box"/>
-          <text x="580" y="125" text-anchor="middle" class="diag-accent-text">04 Â· EMIT</text>
+          <text x="580" y="125" text-anchor="middle" class="diag-accent-text">04 · EMIT</text>
           <text x="580" y="148" text-anchor="middle" class="diag-text">write</text>
           <text x="580" y="164" text-anchor="middle" class="diag-text">corpus</text>
 
           <!-- Stage 5 Enforce -->
           <rect x="650" y="100" width="110" height="80" rx="8" class="diag-box-active"/>
-          <text x="705" y="125" text-anchor="middle" class="diag-accent-text">05 Â· ENFORCE</text>
+          <text x="705" y="125" text-anchor="middle" class="diag-accent-text">05 · ENFORCE</text>
           <text x="705" y="148" text-anchor="middle" class="diag-text">runtime query</text>
           <text x="705" y="164" text-anchor="middle" class="diag-text">at generation</text>
 
@@ -432,33 +432,33 @@
           <line x1="340" y1="180" x2="340" y2="220" class="diag-arrow" stroke-dasharray="3 3"/>
           <line x1="460" y1="180" x2="460" y2="220" class="diag-arrow" stroke-dasharray="3 3"/>
           <rect x="270" y="220" width="240" height="40" rx="6" class="diag-box"/>
-          <text x="390" y="244" text-anchor="middle" class="diag-meta">COMPILE-TIME ERRORS Â· schema Â· conflicts Â· missing scope</text>
+          <text x="390" y="244" text-anchor="middle" class="diag-meta">COMPILE-TIME ERRORS · schema · conflicts · missing scope</text>
 
           <!-- Corpus output -->
           <text x="705" y="220" text-anchor="middle" class="diag-meta">project_memory.json</text>
-          <text x="705" y="235" text-anchor="middle" class="diag-meta">versioned Â· typed</text>
+          <text x="705" y="235" text-anchor="middle" class="diag-meta">versioned · typed</text>
           <text x="705" y="250" text-anchor="middle" class="diag-meta">queried by agents + CI</text>
 
-          <text x="40" y="64" class="diag-meta">Same source files â†’ same compiled corpus. The compilation step is what makes governance auditable.</text>
+          <text x="40" y="64" class="diag-meta">Same source files → same compiled corpus. The compilation step is what makes governance auditable.</text>
         </g>
       </svg>
-      <figcaption class="diagram-caption"><strong>Compilation is a transformation with guarantees.</strong> Five sequential stages turn documentation into a typed, versioned, scope-aware decision corpus. Schema and conflict errors fail at compile time â€” not at enforcement time, not in production.</figcaption>
+      <figcaption class="diagram-caption"><strong>Compilation is a transformation with guarantees.</strong> Five sequential stages turn documentation into a typed, versioned, scope-aware decision corpus. Schema and conflict errors fail at compile time — not at enforcement time, not in production.</figcaption>
     </figure>
 
     <h2>What compilation actually means in this context</h2>
 
     <p>Compilation in software engineering is a <strong>transformation with guarantees</strong>: same source, same output; type errors surface at compile time, not runtime; the compiled artifact is a first-class product that can be versioned, distributed, and deployed. The architectural compiler applies all three guarantees to governance decisions.</p>
 
-    <p>The transformation starts with source files â€” ADRs that include a structured <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">## Constraints</code> section, governance configuration files, or manually authored decision records. It ends with a compiled governance corpus: <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">project_memory.json</code>. The corpus is not the documentation. It is the enforcement artifact â€” a separate, schema-validated, scope-assigned, precedence-resolved file that the governance runtime queries at code generation time.</p>
+    <p>The transformation starts with source files — ADRs that include a structured <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">## Constraints</code> section, governance configuration files, or manually authored decision records. It ends with a compiled governance corpus: <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">project_memory.json</code>. The corpus is not the documentation. It is the enforcement artifact — a separate, schema-validated, scope-assigned, precedence-resolved file that the governance runtime queries at code generation time.</p>
 
     <p>The five stages of the compilation pipeline are sequential and each has a distinct purpose:</p>
 
     <ol>
-      <li><strong>Parse</strong> â€” extract decision records from source files</li>
-      <li><strong>Validate</strong> â€” check schema compliance, required fields, scope syntax</li>
-      <li><strong>Resolve</strong> â€” compute precedence, apply supersession, detect conflicts</li>
-      <li><strong>Emit</strong> â€” write validated, resolved records to the governance corpus</li>
-      <li><strong>Enforce</strong> â€” the compiled corpus is queried at generation time by the governance system</li>
+      <li><strong>Parse</strong> — extract decision records from source files</li>
+      <li><strong>Validate</strong> — check schema compliance, required fields, scope syntax</li>
+      <li><strong>Resolve</strong> — compute precedence, apply supersession, detect conflicts</li>
+      <li><strong>Emit</strong> — write validated, resolved records to the governance corpus</li>
+      <li><strong>Enforce</strong> — the compiled corpus is queried at generation time by the governance system</li>
     </ol>
 
     <div class="callout">
@@ -469,12 +469,12 @@
 
     <p>The gap between documentation and enforcement is not new. In human-only development teams, that gap is bridged by people: engineers who read ADRs, internalize the decisions, and apply them in code review. The gap is tolerable because human review speed is the bottleneck. Reviewers have time to consult documentation, check precedent, and catch violations before they merge.</p>
 
-    <p>In AI-native development, the bottleneck shifts. <strong>AI agents generate code at 10â€“100x human pace.</strong> The review model that worked for human-speed development saturates immediately. Engineers cannot read every ADR before reviewing every AI-generated PR. The gap between documentation and enforcement â€” previously bridged by human expertise â€” becomes a structural liability: agents generate code freely because there is no mechanical mechanism to enforce the decisions that humans have documented.</p>
+    <p>In AI-native development, the bottleneck shifts. <strong>AI agents generate code at 10–100x human pace.</strong> The review model that worked for human-speed development saturates immediately. Engineers cannot read every ADR before reviewing every AI-generated PR. The gap between documentation and enforcement — previously bridged by human expertise — becomes a structural liability: agents generate code freely because there is no mechanical mechanism to enforce the decisions that humans have documented.</p>
 
     <p>The architectural compiler closes that gap mechanically. It doesn't require engineers to remember which ADRs apply to which codebase regions. It doesn't require reviewers to cross-reference documentation before approving. The compilation step converts the documentation into enforcement artifacts that the governance system applies automatically, at generation time, before code is ever committed.</p>
 
     <div class="callout-teal">
-      <p><strong>Documentation describes decisions. Compilation enforces them.</strong> The distance between the two is where architectural drift lives. Every codebase with thorough ADRs and inconsistent AI-generated code has that distance â€” the documentation was never compiled into enforcement.</p>
+      <p><strong>Documentation describes decisions. Compilation enforces them.</strong> The distance between the two is where architectural drift lives. Every codebase with thorough ADRs and inconsistent AI-generated code has that distance — the documentation was never compiled into enforcement.</p>
     </div>
 
     <h2>The common misread: retrieval as a substitute for compilation</h2>
@@ -515,7 +515,7 @@
         </tr>
         <tr>
           <td>Conflict resolution</td>
-          <td>None â€” model decides</td>
+          <td>None — model decides</td>
           <td>Precedence rules; compile-time error</td>
         </tr>
         <tr>
@@ -527,33 +527,33 @@
     </table>
     </div>
 
-    <p>A model receiving RAG context about a PostgreSQL decision can still choose to write SQLite code. The decision is context, not enforcement. A model evaluated against a compiled constraint record that says <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">services/payments/** must not use SQLite</code> produces a binary verdict: the constraint was respected or violated. The compiled record is not advice â€” it is enforcement.</p>
+    <p>A model receiving RAG context about a PostgreSQL decision can still choose to write SQLite code. The decision is context, not enforcement. A model evaluated against a compiled constraint record that says <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">services/payments/** must not use SQLite</code> produces a binary verdict: the constraint was respected or violated. The compiled record is not advice — it is enforcement.</p>
 
     <h2>The five stages in detail</h2>
 
     <h3>Stage 1: Parse</h3>
 
-    <p>The parser reads source files and extracts structured decision records. For ADR files, extraction targets the <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">## Constraints</code> section â€” a structured addition to the standard ADR format that lists machine-extractable enforcement rules. Each constraint becomes a candidate decision record with fields populated from the ADR metadata: title, status, date, tags derived from context.</p>
+    <p>The parser reads source files and extracts structured decision records. For ADR files, extraction targets the <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">## Constraints</code> section — a structured addition to the standard ADR format that lists machine-extractable enforcement rules. Each constraint becomes a candidate decision record with fields populated from the ADR metadata: title, status, date, tags derived from context.</p>
 
     <p>The parser is format-aware. It handles Markdown ADRs, YAML governance config, and directly-authored JSON records. Source format is an input concern; the output is always a normalized record structure before it enters validation.</p>
 
     <h3>Stage 2: Validate</h3>
 
-    <p>The validator checks each parsed record against the governance schema. Required fields (<code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">id</code>, <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">title</code>, <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">constraint</code>, <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">type</code>) must be present. Scope patterns, if provided, must be valid glob syntax. Tags must match the allowed taxonomy. Records that fail validation are rejected at compile time â€” they never enter the corpus.</p>
+    <p>The validator checks each parsed record against the governance schema. Required fields (<code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">id</code>, <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">title</code>, <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">constraint</code>, <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">type</code>) must be present. Scope patterns, if provided, must be valid glob syntax. Tags must match the allowed taxonomy. Records that fail validation are rejected at compile time — they never enter the corpus.</p>
 
     <p>This is the compile-time error mechanism. Problems in governance sources surface here, before they can produce undefined runtime behavior.</p>
 
     <h3>Stage 3: Resolve</h3>
 
-    <p>The resolver handles precedence and supersession. When a new ADR supersedes an older decision, the resolver updates the older record's status to <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">superseded</code> and links it to the superseding record. When two decisions conflict â€” when they would produce contradictory verdicts for the same file and query â€” the resolver surfaces the conflict as a compile-time error rather than allowing the ambiguity to reach the enforcement runtime.</p>
+    <p>The resolver handles precedence and supersession. When a new ADR supersedes an older decision, the resolver updates the older record's status to <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">superseded</code> and links it to the superseding record. When two decisions conflict — when they would produce contradictory verdicts for the same file and query — the resolver surfaces the conflict as a compile-time error rather than allowing the ambiguity to reach the enforcement runtime.</p>
 
     <h3>Stage 4: Emit</h3>
 
-    <p>The emitter writes validated, resolved records to <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">project_memory.json</code>. The emit step is deterministic: same validated records, same JSON output, same file state. The emitted corpus is the governance artifact â€” it is version-controlled alongside the codebase and constitutes the auditable record of what is currently enforced.</p>
+    <p>The emitter writes validated, resolved records to <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">project_memory.json</code>. The emit step is deterministic: same validated records, same JSON output, same file state. The emitted corpus is the governance artifact — it is version-controlled alongside the codebase and constitutes the auditable record of what is currently enforced.</p>
 
     <h3>Stage 5: Enforce</h3>
 
-    <p>Enforcement is not strictly a stage of the compilation pipeline â€” it is what happens when the compiled corpus is queried. The governance runtime's retrieval layer reads the corpus, selects the relevant constraint records for a given query, and injects them as authoritative constraints. The evaluator checks the model's output against those constraints and emits a verdict. The compiler's work is done; enforcement is downstream.</p>
+    <p>Enforcement is not strictly a stage of the compilation pipeline — it is what happens when the compiled corpus is queried. The governance runtime's retrieval layer reads the corpus, selects the relevant constraint records for a given query, and injects them as authoritative constraints. The evaluator checks the model's output against those constraints and emits a verdict. The compiler's work is done; enforcement is downstream.</p>
 
     <h2>A concrete before/after example</h2>
 
@@ -601,16 +601,16 @@ PostgreSQL only.</span>
     <p>The ADR prose explains the rationale. The compiled record is the enforcement artifact: it has a stable ID for tracking, a scope pattern for file-level targeting, a severity for verdict weighting, and a structured constraint field that the evaluator checks against. The rationale is preserved in the ADR source; the compiled record carries only what enforcement needs.</p>
 
     <div class="callout">
-      <p><strong>The ADR is the source file. The project_memory.json record is the compiled output.</strong> Modifying the ADR without recompiling doesn't change enforcement. The corpus is the authority â€” the source files are inputs to the compiler, not the governance artifact itself.</p>
+      <p><strong>The ADR is the source file. The project_memory.json record is the compiled output.</strong> Modifying the ADR without recompiling doesn't change enforcement. The corpus is the authority — the source files are inputs to the compiler, not the governance artifact itself.</p>
     </div>
 
     <h2>How this fits the AI SDLC</h2>
 
     <p>The architectural compiler runs as a developer operation or CI step. In practice: <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">mneme import-adr docs/adr/</code> triggers a compile pass over all ADR files in the target directory, updates the corpus, and reports any validation or conflict errors. The compiled corpus is then committed to version control alongside the code changes that the ADRs govern.</p>
 
-    <p>The compilation step belongs in CI: when an ADR is merged, the CI pipeline runs the compiler, validates the output, and commits the updated corpus. This ensures the corpus is always current with the latest decision sources and that no unresolved conflicts enter the enforcement runtime. Compilation failures block the merge â€” the same way a build failure blocks a code merge.</p>
+    <p>The compilation step belongs in CI: when an ADR is merged, the CI pipeline runs the compiler, validates the output, and commits the updated corpus. This ensures the corpus is always current with the latest decision sources and that no unresolved conflicts enter the enforcement runtime. Compilation failures block the merge — the same way a build failure blocks a code merge.</p>
 
-    <p>This is what makes architectural governance tractable at scale. The enforcement corpus doesn't require human maintenance to stay current â€” it is produced mechanically from the source of truth (the ADRs) by a deterministic, auditable compilation step. The same guarantees that make code compilation reliable apply to governance compilation: same inputs, same output, errors surface early, the artifact is versioned and deployable.</p>
+    <p>This is what makes architectural governance tractable at scale. The enforcement corpus doesn't require human maintenance to stay current — it is produced mechanically from the source of truth (the ADRs) by a deterministic, auditable compilation step. The same guarantees that make code compilation reliable apply to governance compilation: same inputs, same output, errors surface early, the artifact is versioned and deployable.</p>
 
   </div>
 
@@ -618,23 +618,23 @@ PostgreSQL only.</span>
     <h2>Frequently asked questions</h2>
     <details>
       <summary>What is an architectural compiler?</summary>
-      <div class="faq-body">An architectural compiler is the pipeline that transforms documentation-form decisions â€” ADRs, design docs, style guides â€” into machine-evaluable constraint records. It performs five stages: parse (extract decision records from source files), validate (check schema and required fields), resolve (compute precedence and detect conflicts), emit (write validated records to the governance corpus), and enforce (the compiled corpus is queried at generation time). Compilation is the discrete, auditable step that closes the gap between what teams document and what AI agents are governed by.</div>
+      <div class="faq-body">An architectural compiler is the pipeline that transforms documentation-form decisions — ADRs, design docs, style guides — into machine-evaluable constraint records. It performs five stages: parse (extract decision records from source files), validate (check schema and required fields), resolve (compute precedence and detect conflicts), emit (write validated records to the governance corpus), and enforce (the compiled corpus is queried at generation time). Compilation is the discrete, auditable step that closes the gap between what teams document and what AI agents are governed by.</div>
     </details>
     <details>
       <summary>What does the architectural compiler do with existing ADRs?</summary>
-      <div class="faq-body">The compiler reads ADR files that contain a structured Constraints section, extracts each constraint as a typed decision record, validates it against the governance schema, resolves any precedence or supersession relationships with existing records, and emits the validated records to project_memory.json. The ADR itself remains unchanged â€” the compiler produces a separate compiled artifact that the governance runtime uses for enforcement.</div>
+      <div class="faq-body">The compiler reads ADR files that contain a structured Constraints section, extracts each constraint as a typed decision record, validates it against the governance schema, resolves any precedence or supersession relationships with existing records, and emits the validated records to project_memory.json. The ADR itself remains unchanged — the compiler produces a separate compiled artifact that the governance runtime uses for enforcement.</div>
     </details>
     <details>
-      <summary>Why is compilation necessary â€” why not just use documentation directly?</summary>
-      <div class="faq-body">Documentation and enforcement are different artifacts. An ADR explaining why PostgreSQL was chosen is documentation â€” it describes a decision and its rationale. A constraint record that says "services/payments/** must not use SQLite" is enforcement â€” it is a machine-evaluable rule with scope, precedence, and a structured field for evaluation. Documentation cannot be evaluated against code output without first being compiled into constraint records. Retrieving ADR prose and injecting it into a prompt is context retrieval, not compilation â€” and it doesn't provide the scope assignment, precedence resolution, or schema validation that enforcement requires.</div>
+      <summary>Why is compilation necessary — why not just use documentation directly?</summary>
+      <div class="faq-body">Documentation and enforcement are different artifacts. An ADR explaining why PostgreSQL was chosen is documentation — it describes a decision and its rationale. A constraint record that says "services/payments/** must not use SQLite" is enforcement — it is a machine-evaluable rule with scope, precedence, and a structured field for evaluation. Documentation cannot be evaluated against code output without first being compiled into constraint records. Retrieving ADR prose and injecting it into a prompt is context retrieval, not compilation — and it doesn't provide the scope assignment, precedence resolution, or schema validation that enforcement requires.</div>
     </details>
     <details>
       <summary>What are the five stages of architectural compilation?</summary>
-      <div class="faq-body">The five stages are: (1) Parse â€” extract decision records from source files such as ADRs with a Constraints section; (2) Validate â€” check schema compliance, required fields, and scope syntax; (3) Resolve â€” compute precedence, apply supersession relationships, and detect conflicts between decisions; (4) Emit â€” write validated, resolved records to project_memory.json as the compiled governance corpus; (5) Enforce â€” the compiled corpus is queried at code generation time by the governance system's retrieval layer.</div>
+      <div class="faq-body">The five stages are: (1) Parse — extract decision records from source files such as ADRs with a Constraints section; (2) Validate — check schema compliance, required fields, and scope syntax; (3) Resolve — compute precedence, apply supersession relationships, and detect conflicts between decisions; (4) Emit — write validated, resolved records to project_memory.json as the compiled governance corpus; (5) Enforce — the compiled corpus is queried at code generation time by the governance system's retrieval layer.</div>
     </details>
     <details>
       <summary>How is the architectural compiler different from RAG over documentation?</summary>
-      <div class="faq-body">RAG over documentation retrieves prose passages that describe decisions. The architectural compiler produces structured constraint records that enforce them. RAG retrieval is probabilistic and outputs natural language context; the compiled corpus is deterministic and outputs machine-evaluable constraints. A model receiving RAG context about a decision can still choose to violate it â€” the decision is advice, not enforcement. A model evaluated against a compiled constraint record produces a binary verdict: the constraint was respected or it was not.</div>
+      <div class="faq-body">RAG over documentation retrieves prose passages that describe decisions. The architectural compiler produces structured constraint records that enforce them. RAG retrieval is probabilistic and outputs natural language context; the compiled corpus is deterministic and outputs machine-evaluable constraints. A model receiving RAG context about a decision can still choose to violate it — the decision is advice, not enforcement. A model evaluated against a compiled constraint record produces a binary verdict: the constraint was respected or it was not.</div>
     </details>
   </section>
 
@@ -672,12 +672,12 @@ PostgreSQL only.</span>
 
 
   <footer class="article-footer">
-    <a href="/concepts/" class="back-link">â† Back to Concepts</a>
+    <a href="/concepts/" class="back-link">← Back to Concepts</a>
 
     <div class="cta-block">
       <h3>Try the ADR compiler</h3>
-      <p>Run <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">mneme import-adr</code> against your existing ADR directory and see what compiles â€” and what surfaces as a validation error.</p>
-      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub â†’</a>
+      <p>Run <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">mneme import-adr</code> against your existing ADR directory and see what compiles — and what surfaces as a validation error.</p>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub →</a>
     </div>
   </footer>
 </article>

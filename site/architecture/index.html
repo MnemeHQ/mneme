@@ -3,24 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Architecture â€” Mneme HQ</title>
+  <title>Architecture — Mneme HQ</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="Technical deep dives into how Mneme works â€” the retrieval pipeline, decision memory, scoring mechanics, and the architectural choices behind deterministic governance." />
+  <meta name="description" content="Technical deep dives into how Mneme works — the retrieval pipeline, decision memory, scoring mechanics, and the architectural choices behind deterministic governance." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/architecture/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Architecture â€” Mneme HQ" />
-  <meta property="og:description" content="Technical deep dives into how Mneme works â€” the retrieval pipeline, decision memory, scoring mechanics, and the architectural choices behind deterministic governance." />
+  <meta property="og:title" content="Architecture — Mneme HQ" />
+  <meta property="og:description" content="Technical deep dives into how Mneme works — the retrieval pipeline, decision memory, scoring mechanics, and the architectural choices behind deterministic governance." />
   <meta property="og:url" content="https://mnemehq.com/architecture/" />
   <meta property="og:image" content="https://mnemehq.com/architecture/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Architecture â€” Mneme HQ" />
-  <meta name="twitter:description" content="Technical deep dives into how Mneme works â€” the retrieval pipeline, decision memory, and the architectural choices behind deterministic governance." />
+  <meta name="twitter:title" content="Architecture — Mneme HQ" />
+  <meta name="twitter:description" content="Technical deep dives into how Mneme works — the retrieval pipeline, decision memory, and the architectural choices behind deterministic governance." />
   <meta name="twitter:image" content="https://mnemehq.com/architecture/og.png" />
 
     <!-- Consent defaults -->
@@ -142,7 +142,7 @@
     .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; white-space: nowrap; }
     .btn-primary:hover { background: var(--accent-dim); }
 
-    /* Runtime stack â€” mirrors site/concepts/governance-infrastructure/ */
+    /* Runtime stack — mirrors site/concepts/governance-infrastructure/ */
     .stack-section { margin: 3.5rem 0 0; }
     .stack-section .stack-lede { font-size: 0.92rem; color: var(--muted); line-height: 1.85; max-width: 720px; margin: 0.5rem 0 1.5rem; }
     .stack-section .stack-lede strong { color: var(--text); font-weight: 500; }
@@ -175,7 +175,7 @@
       {
         "@type": "CollectionPage",
         "name": "Mneme HQ Architecture",
-        "description": "Technical deep dives into how Mneme works â€” the retrieval pipeline, decision memory, scoring mechanics, and the architectural choices behind deterministic governance.",
+        "description": "Technical deep dives into how Mneme works — the retrieval pipeline, decision memory, scoring mechanics, and the architectural choices behind deterministic governance.",
         "url": "https://mnemehq.com/architecture/",
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/"},
         "hasPart": [
@@ -183,7 +183,7 @@
             "@type": "TechArticle",
             "name": "How Retrieval Works",
             "url": "https://mnemehq.com/architecture/how-retrieval-works/",
-            "description": "Five-stage pipeline deep dive â€” MemoryStore, DecisionRetriever, ContextBuilder, LLMAdapter, Evaluator. Deterministic keyword scoring with field weights, tag boost, top-K=3, and no embeddings."
+            "description": "Five-stage pipeline deep dive — MemoryStore, DecisionRetriever, ContextBuilder, LLMAdapter, Evaluator. Deterministic keyword scoring with field weights, tag boost, top-K=3, and no embeddings."
           },
           {
             "@type": "TechArticle",
@@ -229,7 +229,7 @@
   <header class="hero">
     <div class="hero-eyebrow">Architecture</div>
     <h1>How Mneme works, precisely</h1>
-    <p class="hero-desc">Technical deep dives into the pipeline â€” retrieval mechanics, scoring, decision memory, and the deliberate architectural choices behind deterministic governance. No embeddings, no ML, no approximations in the enforcement path.</p>
+    <p class="hero-desc">Technical deep dives into the pipeline — retrieval mechanics, scoring, decision memory, and the deliberate architectural choices behind deterministic governance. No embeddings, no ML, no approximations in the enforcement path.</p>
   </header>
 
   <section class="stack-section" aria-labelledby="runtime-stack-heading">
@@ -282,34 +282,34 @@
     <div class="pipeline-stages">
       <div class="pipeline-stage">
         <div class="stage-box">MemoryStore</div>
-        <span class="stage-arrow">â†’</span>
+        <span class="stage-arrow">→</span>
       </div>
       <div class="pipeline-stage">
         <div class="stage-box highlight">DecisionRetriever</div>
-        <span class="stage-arrow">â†’</span>
+        <span class="stage-arrow">→</span>
       </div>
       <div class="pipeline-stage">
         <div class="stage-box">ContextBuilder</div>
-        <span class="stage-arrow">â†’</span>
+        <span class="stage-arrow">→</span>
       </div>
       <div class="pipeline-stage">
         <div class="stage-box">LLMAdapter</div>
-        <span class="stage-arrow">â†’</span>
+        <span class="stage-arrow">→</span>
       </div>
       <div class="pipeline-stage">
         <div class="stage-box highlight">Evaluator</div>
       </div>
     </div>
-    <p class="pipeline-note">Loads <strong>project_memory.json</strong> â†’ scores decisions by field weights â†’ injects top-K=3 into prompt â†’ checks model output â†’ emits <strong>PASS / FAIL / WEAK_RETRIEVAL</strong>. Same query, same corpus, same result every time.</p>
+    <p class="pipeline-note">Loads <strong>project_memory.json</strong> → scores decisions by field weights → injects top-K=3 into prompt → checks model output → emits <strong>PASS / FAIL / WEAK_RETRIEVAL</strong>. Same query, same corpus, same result every time.</p>
   </div>
 
   <div class="section-label">Deep dives</div>
 
   <div class="arch-grid">
     <a href="/architecture/how-retrieval-works/" class="arch-card">
-      <div class="card-eyebrow">Architecture Â· 12 min</div>
+      <div class="card-eyebrow">Architecture · 12 min</div>
       <div class="card-title">How Retrieval Works</div>
-      <p class="card-desc">The full DecisionRetriever walkthrough â€” tokenization, field weights (titleÃ—3.0, tagsÃ—2.5, constraintÃ—1.5, contentÃ—1.0), tag boosting, top-K=3 selection, tie-break determinism, and why there are no embeddings. Includes Layer 1 vs. Layer 2 metric distinctions and WEAK_RETRIEVAL semantics.</p>
+      <p class="card-desc">The full DecisionRetriever walkthrough — tokenization, field weights (titleÃ—3.0, tagsÃ—2.5, constraintÃ—1.5, contentÃ—1.0), tag boosting, top-K=3 selection, tie-break determinism, and why there are no embeddings. Includes Layer 1 vs. Layer 2 metric distinctions and WEAK_RETRIEVAL semantics.</p>
       <div class="card-tags">
         <span class="card-tag">retrieval</span>
         <span class="card-tag">scoring</span>
@@ -317,13 +317,13 @@
         <span class="card-tag">WEAK_RETRIEVAL</span>
         <span class="card-tag">no embeddings</span>
       </div>
-      <span class="card-arrow">â†’</span>
+      <span class="card-arrow">→</span>
     </a>
 
     <a href="/architecture/decision-memory-vs-documentation/" class="arch-card">
-      <div class="card-eyebrow">Architecture Â· 10 min</div>
+      <div class="card-eyebrow">Architecture · 10 min</div>
       <div class="card-title">Decision Memory vs. Documentation</div>
-      <p class="card-desc">The three-tier model â€” documentation (prose, wikis, ADR bodies), prompt memory (CLAUDE.md, rules files, RAG injection), and decision memory (typed schema with scope, status, precedence, constraint fields). Why documentation retrieval ends in suggestion. Why decision memory enables enforcement.</p>
+      <p class="card-desc">The three-tier model — documentation (prose, wikis, ADR bodies), prompt memory (CLAUDE.md, rules files, RAG injection), and decision memory (typed schema with scope, status, precedence, constraint fields). Why documentation retrieval ends in suggestion. Why decision memory enables enforcement.</p>
       <div class="card-tags">
         <span class="card-tag">decision memory</span>
         <span class="card-tag">schema</span>
@@ -331,17 +331,17 @@
         <span class="card-tag">ADR import</span>
         <span class="card-tag">enforcement gap</span>
       </div>
-      <span class="card-arrow">â†’</span>
+      <span class="card-arrow">→</span>
     </a>
   </div>
 
   <a href="/concepts/" class="concepts-link">
     <div class="concepts-link-text">
       <div class="concepts-link-eyebrow">Related</div>
-      <div class="concepts-link-title">Concepts â€” the terminology behind these architectural choices</div>
+      <div class="concepts-link-title">Concepts — the terminology behind these architectural choices</div>
       <p class="concepts-link-desc">Architectural Governance, Deterministic Enforcement, Architectural Compiler, Decision Continuity, and seven more. Systems-level explanations of why each concept exists in AI-native software delivery.</p>
     </div>
-    <span class="concepts-link-arrow">â†’</span>
+    <span class="concepts-link-arrow">→</span>
   </a>
 
   <div class="cta-block">
@@ -349,7 +349,7 @@
       <h2>Read the source</h2>
       <p>DecisionRetriever, MemoryStore, ContextBuilder, and the benchmark harness are all open source under MIT.</p>
     </div>
-    <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub â†’</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub →</a>
   </div>
 </div>
 </main>

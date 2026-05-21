@@ -3,24 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Verification Contracts â€” Mneme HQ Concepts</title>
+  <title>Verification Contracts — Mneme HQ Concepts</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="Verification contracts are pre-registered, machine-evaluable assertions about what a governance check must prove â€” the structural difference between measurable governance and subjective review." />
+  <meta name="description" content="Verification contracts are pre-registered, machine-evaluable assertions about what a governance check must prove — the structural difference between measurable governance and subjective review." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/concepts/verification-contracts/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Verification Contracts â€” Mneme HQ Concepts" />
-  <meta property="og:description" content="Verification contracts are pre-registered, machine-evaluable assertions about what a governance check must prove â€” the structural difference between measurable governance and subjective review." />
+  <meta property="og:title" content="Verification Contracts — Mneme HQ Concepts" />
+  <meta property="og:description" content="Verification contracts are pre-registered, machine-evaluable assertions about what a governance check must prove — the structural difference between measurable governance and subjective review." />
   <meta property="og:url" content="https://mnemehq.com/concepts/verification-contracts/" />
   <meta property="og:image" content="https://mnemehq.com/concepts/verification-contracts/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Verification Contracts â€” Mneme HQ Concepts" />
-  <meta name="twitter:description" content="Verification contracts are pre-registered, machine-evaluable assertions about what a governance check must prove â€” the structural difference between measurable governance and subjective review." />
+  <meta name="twitter:title" content="Verification Contracts — Mneme HQ Concepts" />
+  <meta name="twitter:description" content="Verification contracts are pre-registered, machine-evaluable assertions about what a governance check must prove — the structural difference between measurable governance and subjective review." />
   <meta name="twitter:image" content="https://mnemehq.com/concepts/verification-contracts/og.png" />
   <meta name="author" content="Theo Valmis" />
   <meta property="article:published_time" content="2026-05-14T00:00:00Z" />
@@ -263,8 +263,8 @@
       },
       {
         "@type": "TechArticle",
-        "headline": "Verification Contracts â€” Mneme HQ Concepts",
-        "description": "Verification contracts are pre-registered, machine-evaluable assertions about what a governance check must prove â€” the structural difference between measurable governance and subjective review.",
+        "headline": "Verification Contracts — Mneme HQ Concepts",
+        "description": "Verification contracts are pre-registered, machine-evaluable assertions about what a governance check must prove — the structural difference between measurable governance and subjective review.",
         "url": "https://mnemehq.com/concepts/verification-contracts/",
         "datePublished": "2026-05-14",
         "dateModified": "2026-05-14",
@@ -281,17 +281,17 @@
           {
             "@type": "Question",
             "name": "What is a verification contract in AI governance?",
-            "acceptedAnswer": {"@type": "Answer", "text": "A verification contract is a pre-registered, machine-evaluable assertion that specifies what a governance check must prove before any code is generated. It defines: the query or scenario, the expected decision IDs that must be retrieved, the expected verdict (PASS/FAIL/WEAK), and the specific failure terms that must appear if the model without governance produces a violation. The contract is the expected behavior written before the test runs â€” which makes it a pre-registration rather than a post-hoc evaluation."}
+            "acceptedAnswer": {"@type": "Answer", "text": "A verification contract is a pre-registered, machine-evaluable assertion that specifies what a governance check must prove before any code is generated. It defines: the query or scenario, the expected decision IDs that must be retrieved, the expected verdict (PASS/FAIL/WEAK), and the specific failure terms that must appear if the model without governance produces a violation. The contract is the expected behavior written before the test runs — which makes it a pre-registration rather than a post-hoc evaluation."}
           },
           {
             "@type": "Question",
             "name": "How is a verification contract different from a unit test?",
-            "acceptedAnswer": {"@type": "Answer", "text": "A unit test specifies expected behavior for application code â€” given input X, expect output Y. A verification contract specifies expected behavior for the governance system itself â€” given scenario S, expect the governance system to retrieve decisions D, produce verdict V, and detect failure terms T. Verification contracts are tests for the testing layer: they are the mechanism by which you govern your governance system. Without them, you have an ungoverned governance layer â€” which is the same structural problem as ungoverned application code."}
+            "acceptedAnswer": {"@type": "Answer", "text": "A unit test specifies expected behavior for application code — given input X, expect output Y. A verification contract specifies expected behavior for the governance system itself — given scenario S, expect the governance system to retrieve decisions D, produce verdict V, and detect failure terms T. Verification contracts are tests for the testing layer: they are the mechanism by which you govern your governance system. Without them, you have an ungoverned governance layer — which is the same structural problem as ungoverned application code."}
           },
           {
             "@type": "Question",
             "name": "Why do governance systems need verification contracts?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Without pre-registered expected behavior, governance evaluation is post-hoc and subjective. A team can run a governance check, see a verdict, and ask 'was that the right verdict?' â€” but without a contract to compare against, there's no objective answer. Governance becomes unmeasurable and therefore unimprovable. Verification contracts provide the comparison baseline: the expected behavior is written before the test runs, so the evaluation is objective and the results are comparable across governance system versions."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Without pre-registered expected behavior, governance evaluation is post-hoc and subjective. A team can run a governance check, see a verdict, and ask 'was that the right verdict?' — but without a contract to compare against, there's no objective answer. Governance becomes unmeasurable and therefore unimprovable. Verification contracts provide the comparison baseline: the expected behavior is written before the test runs, so the evaluation is objective and the results are comparable across governance system versions."}
           },
           {
             "@type": "Question",
@@ -301,14 +301,14 @@
           {
             "@type": "Question",
             "name": "How does pre-registration prevent governance gaming?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Pre-registration means the expected behavior is committed before the test runs â€” it cannot be adjusted after seeing the result. Post-hoc evaluation allows a team to see a verdict and retroactively decide that verdict was correct. Pre-registration removes that flexibility: the contract is the specification, and the governance system either satisfies it or doesn't. This is particularly important for governance quality benchmarking: without pre-registration, benchmark results can be made to look good by choosing scenarios the governance system already handles well, rather than scenarios that stress-test it."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Pre-registration means the expected behavior is committed before the test runs — it cannot be adjusted after seeing the result. Post-hoc evaluation allows a team to see a verdict and retroactively decide that verdict was correct. Pre-registration removes that flexibility: the contract is the specification, and the governance system either satisfies it or doesn't. This is particularly important for governance quality benchmarking: without pre-registration, benchmark results can be made to look good by choosing scenarios the governance system already handles well, rather than scenarios that stress-test it."}
           }
         ]
       },
       {
         "@type": "DefinedTerm",
         "name": "Verification Contracts",
-        "description": "Pre-registered, machine-evaluable assertions that specify what a governance check must prove â€” defined before any code is generated, enabling objective governance quality measurement.",
+        "description": "Pre-registered, machine-evaluable assertions that specify what a governance check must prove — defined before any code is generated, enabling objective governance quality measurement.",
         "inDefinedTermSet": {"@type": "DefinedTermSet", "name": "Mneme HQ Concepts", "url": "https://mnemehq.com/concepts/"},
         "url": "https://mnemehq.com/concepts/verification-contracts/"
       }
@@ -338,7 +338,7 @@
 
 <main>
 <div class="answer-capsule">
-  <strong>Verification contracts.</strong> Pre-registered, machine-evaluable assertions that define what a governance check must prove â€” specified before any code is generated. The structural difference between governance you can measure and governance you can only hope for.
+  <strong>Verification contracts.</strong> Pre-registered, machine-evaluable assertions that define what a governance check must prove — specified before any code is generated. The structural difference between governance you can measure and governance you can only hope for.
 </div>
 
 <nav aria-label="Breadcrumb" class="breadcrumb-nav">
@@ -354,10 +354,10 @@
     <div class="article-eyebrow">
       <span class="eyebrow-tag">Concepts</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">11 min read &nbsp;Â·&nbsp; May 2026</span>
+      <span class="eyebrow-meta">11 min read &nbsp;·&nbsp; May 2026</span>
     </div>
     <h1>Verification Contracts</h1>
-    <p class="article-lede">If you can't pre-register what a governance check must prove, you can't know whether your governance system worked. Verification contracts are the precondition for governance quality measurement â€” and governance quality measurement is the precondition for governance improvement.</p>
+    <p class="article-lede">If you can't pre-register what a governance check must prove, you can't know whether your governance system worked. Verification contracts are the precondition for governance quality measurement — and governance quality measurement is the precondition for governance improvement.</p>
     <p class="byline">
       By <a href="/founder/">Theo Valmis</a>
       <span class="sep">&middot;</span>
@@ -367,18 +367,18 @@
 
   <div class="article-body">
 
-    <p>Every engineering system that matters is tested. Application code has unit tests. APIs have integration tests. Infrastructure has smoke tests. These are not optional practices â€” they are the mechanism by which you know whether the system works. Remove the tests, and you don't have a tested system; you have an untested one that may or may not behave as intended.</p>
+    <p>Every engineering system that matters is tested. Application code has unit tests. APIs have integration tests. Infrastructure has smoke tests. These are not optional practices — they are the mechanism by which you know whether the system works. Remove the tests, and you don't have a tested system; you have an untested one that may or may not behave as intended.</p>
 
-    <p>Governance systems are engineering systems. They have inputs (queries, file paths, task descriptions), processes (decision retrieval, context injection, evaluation), and outputs (verdicts, enforcement signals). And like any engineering system, their behavior must be testable â€” not by running them and hoping the result looks right, but by pre-registering what the result must be before the run, then evaluating whether the system produced it.</p>
+    <p>Governance systems are engineering systems. They have inputs (queries, file paths, task descriptions), processes (decision retrieval, context injection, evaluation), and outputs (verdicts, enforcement signals). And like any engineering system, their behavior must be testable — not by running them and hoping the result looks right, but by pre-registering what the result must be before the run, then evaluating whether the system produced it.</p>
 
-    <p><strong>Verification contracts</strong> are that pre-registration mechanism. They are what make governance systems testable â€” and therefore improvable, auditable, and trustworthy.</p>
+    <p><strong>Verification contracts</strong> are that pre-registration mechanism. They are what make governance systems testable — and therefore improvable, auditable, and trustworthy.</p>
 
     <figure class="diagram-figure" aria-labelledby="vc-diag-title">
       <svg viewBox="0 0 800 320" role="img" aria-labelledby="vc-diag-title vc-diag-desc" xmlns="http://www.w3.org/2000/svg">
         <title id="vc-diag-title">Anatomy of a verification contract</title>
-        <desc id="vc-diag-desc">A diagram showing the four components of a verification contract â€” scenario, claim, expected verdict, expected evidence â€” and how the governance run produces an observed verdict that is compared against the contract to yield a pass-or-fail result.</desc>
+        <desc id="vc-diag-desc">A diagram showing the four components of a verification contract — scenario, claim, expected verdict, expected evidence — and how the governance run produces an observed verdict that is compared against the contract to yield a pass-or-fail result.</desc>
         <g>
-          <text x="40" y="28" class="diag-accent-text">VERIFICATION CONTRACT Â· pre-registered, before any code generation</text>
+          <text x="40" y="28" class="diag-accent-text">VERIFICATION CONTRACT · pre-registered, before any code generation</text>
 
           <!-- Contract -->
           <rect x="40" y="48" width="340" height="220" rx="10" class="diag-box-teal"/>
@@ -394,11 +394,11 @@
 
           <rect x="60" y="174" width="300" height="36" rx="5" class="diag-box"/>
           <text x="74" y="191" class="diag-meta">EXPECTED VERDICT</text>
-          <text x="74" y="205" class="diag-mono">block Â· severity=high</text>
+          <text x="74" y="205" class="diag-mono">block · severity=high</text>
 
           <rect x="60" y="218" width="300" height="36" rx="5" class="diag-box"/>
           <text x="74" y="235" class="diag-meta">EXPECTED EVIDENCE</text>
-          <text x="74" y="249" class="diag-mono">decision_id=ADR-0017 Â· top-K=3</text>
+          <text x="74" y="249" class="diag-mono">decision_id=ADR-0017 · top-K=3</text>
 
           <!-- Governance run -->
           <rect x="420" y="48" width="180" height="100" rx="10" class="diag-box"/>
@@ -421,13 +421,13 @@
           <text x="700" y="135" text-anchor="middle" class="diag-accent-text">COMPARE</text>
           <text x="700" y="160" text-anchor="middle" class="diag-text">expected</text>
           <text x="700" y="178" text-anchor="middle" class="diag-text">vs observed</text>
-          <text x="700" y="200" text-anchor="middle" class="diag-accent-text">PASS Â· FAIL</text>
+          <text x="700" y="200" text-anchor="middle" class="diag-accent-text">PASS · FAIL</text>
 
           <line x1="380" y1="158" x2="430" y2="98" class="diag-arrow-active"/>
           <line x1="600" y1="98" x2="640" y2="148" class="diag-arrow-active"/>
           <line x1="600" y1="218" x2="640" y2="168" class="diag-arrow-active"/>
 
-          <text x="40" y="295" class="diag-meta">CONTRACT IS THE GROUND TRUTH Â· governance system is the unit under test Â· result is a binary verdict, not a vibe</text>
+          <text x="40" y="295" class="diag-meta">CONTRACT IS THE GROUND TRUTH · governance system is the unit under test · result is a binary verdict, not a vibe</text>
         </g>
       </svg>
       <figcaption class="diagram-caption"><strong>Pre-register the verdict.</strong> Scenario, claim, expected verdict, and expected evidence are committed before a run. The run produces what it produces; the contract decides whether that counts as governance working.</figcaption>
@@ -438,25 +438,25 @@
     <p>A verification contract specifies, before any code is generated, the complete expected behavior of a governance check against a specific scenario. The contract has four components:</p>
 
     <ol>
-      <li><strong>The query or scenario:</strong> The file path and task description that will be submitted to the governance system. This is the input â€” the thing the agent is about to do.</li>
+      <li><strong>The query or scenario:</strong> The file path and task description that will be submitted to the governance system. This is the input — the thing the agent is about to do.</li>
       <li><strong>The expected decision IDs:</strong> The specific decision records that must be retrieved from the decision corpus for this query. This specifies what Layer 1 (retrieval) must produce. If these decisions are not retrieved, the governance chain would have failed even if the enforcement layer didn't notice.</li>
       <li><strong>The expected verdict:</strong> Whether the governance system should produce PASS or FAIL (or WEAK) for this scenario. This specifies what Layer 2 (enforcement) must produce.</li>
-      <li><strong>The expected failure terms:</strong> The specific strings that must appear in the model's output when governance is absent â€” confirming that the scenario genuinely tests a governed constraint, not a constraint the model would follow anyway. This is the baseline against which governance is measured.</li>
+      <li><strong>The expected failure terms:</strong> The specific strings that must appear in the model's output when governance is absent — confirming that the scenario genuinely tests a governed constraint, not a constraint the model would follow anyway. This is the baseline against which governance is measured.</li>
     </ol>
 
     <p>All four components are written before the scenario runs. This is the pre-registration property: the contract specifies expected behavior before observation. After the scenario runs, the system's actual behavior is compared to the contract. Match on all four components: the governance system is working correctly for this scenario. Any mismatch: a specific, actionable failure signal.</p>
 
     <div class="callout">
-      <p><strong>A verification contract is not a test case that checks whether code is correct. It is a test case that checks whether the governance system is correct.</strong> The subject of the test is the governance layer itself â€” its retrieval behavior, its enforcement accuracy, and its ability to detect violations that the model would produce without constraints.</p>
+      <p><strong>A verification contract is not a test case that checks whether code is correct. It is a test case that checks whether the governance system is correct.</strong> The subject of the test is the governance layer itself — its retrieval behavior, its enforcement accuracy, and its ability to detect violations that the model would produce without constraints.</p>
     </div>
 
     <h2>Why this problem exists in AI-native development</h2>
 
-    <p>Governance systems for AI coding face a measurement problem that does not exist for simpler enforcement layers. A linter can be tested by running it against known-bad code and verifying it flags the right lines. The expected behavior is obvious. A governance system that uses LLM-based evaluation is more complex: the behavior depends on what decisions were retrieved, how they were formatted, what the model saw, and how it interpreted the constraints. The failure modes are not obvious â€” a governance system can appear to work while silently failing on specific scenario classes.</p>
+    <p>Governance systems for AI coding face a measurement problem that does not exist for simpler enforcement layers. A linter can be tested by running it against known-bad code and verifying it flags the right lines. The expected behavior is obvious. A governance system that uses LLM-based evaluation is more complex: the behavior depends on what decisions were retrieved, how they were formatted, what the model saw, and how it interpreted the constraints. The failure modes are not obvious — a governance system can appear to work while silently failing on specific scenario classes.</p>
 
-    <p>Without verification contracts, governance quality assessment is forced into post-hoc subjectivity. A team runs the governance system, looks at the verdicts, and asks: "Do these look right?" If they look right, the system is declared to be working. If they don't, the team investigates. But "looks right" is not a specification â€” it is a human judgment that varies between reviewers, changes as context changes, and cannot be automated.</p>
+    <p>Without verification contracts, governance quality assessment is forced into post-hoc subjectivity. A team runs the governance system, looks at the verdicts, and asks: "Do these look right?" If they look right, the system is declared to be working. If they don't, the team investigates. But "looks right" is not a specification — it is a human judgment that varies between reviewers, changes as context changes, and cannot be automated.</p>
 
-    <p>The deeper problem: without pre-registration, the evaluation can be gamed â€” even unintentionally. A team evaluating their governance system's quality will naturally gravitate toward scenarios where the system works well. They run the scenarios, see good results, and report high quality. The scenarios that stress-test the system â€” edge cases, ambiguous queries, borderline constraint matches â€” are the ones that get excluded because they're hard to evaluate post-hoc. The result is a governance system with measured high quality that has never been tested on its most important failure modes.</p>
+    <p>The deeper problem: without pre-registration, the evaluation can be gamed — even unintentionally. A team evaluating their governance system's quality will naturally gravitate toward scenarios where the system works well. They run the scenarios, see good results, and report high quality. The scenarios that stress-test the system — edge cases, ambiguous queries, borderline constraint matches — are the ones that get excluded because they're hard to evaluate post-hoc. The result is a governance system with measured high quality that has never been tested on its most important failure modes.</p>
 
     <div class="callout-teal">
       <p><strong>Pre-registration prevents governance gaming by committing the expected behavior before the result is seen.</strong> You cannot adjust the expected verdict after seeing that the system produced FAIL instead of PASS. The contract is the specification; the system either satisfies it or doesn't. This is the same integrity property that makes pre-registration valuable in scientific studies: it prevents the specification from being adjusted to match the observed results.</p>
@@ -468,9 +468,9 @@
 
     <p><strong>"LGTM" review:</strong> Human reviewers look at governance verdicts and approve them. This is subjective, inconsistent across reviewers, and cannot be automated. It also produces no baseline: there is no specification against which the verdicts are measured, so there is no objective definition of what "working" means.</p>
 
-    <p><strong>Ad-hoc testing:</strong> The governance system is run against some scenarios and the results are inspected. Without pre-registration, the selection of scenarios is influenced by knowledge of which scenarios the system handles well. The coverage is unknown. Regressions are invisible â€” if the system previously handled a scenario correctly and now handles it incorrectly, there is no contract to compare against, so the regression goes undetected.</p>
+    <p><strong>Ad-hoc testing:</strong> The governance system is run against some scenarios and the results are inspected. Without pre-registration, the selection of scenarios is influenced by knowledge of which scenarios the system handles well. The coverage is unknown. Regressions are invisible — if the system previously handled a scenario correctly and now handles it incorrectly, there is no contract to compare against, so the regression goes undetected.</p>
 
-    <p><strong>Post-hoc audit:</strong> The governance system's verdicts are audited periodically. This catches large failures but misses small regressions, boundary condition failures, and retrieval-layer failures that produce correct-looking verdicts through incorrect mechanisms. A system that produces PASS by failing to retrieve the relevant decision (and therefore never enforcing it) looks identical to a system that produces PASS by correctly enforcing the decision â€” unless you have a contract specifying which decisions must be retrieved.</p>
+    <p><strong>Post-hoc audit:</strong> The governance system's verdicts are audited periodically. This catches large failures but misses small regressions, boundary condition failures, and retrieval-layer failures that produce correct-looking verdicts through incorrect mechanisms. A system that produces PASS by failing to retrieve the relevant decision (and therefore never enforcing it) looks identical to a system that produces PASS by correctly enforcing the decision — unless you have a contract specifying which decisions must be retrieved.</p>
 
     <div style="overflow-x:auto;margin:2rem 0;">
     <table class="comparison-table">
@@ -500,7 +500,7 @@
         <tr>
           <td>Verification contracts</td>
           <td>Full behavioral specification</td>
-          <td>Nothing within contract scope â€” gaps are known and explicit</td>
+          <td>Nothing within contract scope — gaps are known and explicit</td>
         </tr>
       </tbody>
     </table>
@@ -510,38 +510,38 @@
 
     <h2>How this fits the AI SDLC</h2>
 
-    <p>Verification contracts sit at the validation layer of the AI SDLC â€” layer 6, above governance and architectural control, below human oversight. They are the testing infrastructure for the governance layer itself. And like any testing infrastructure, they require deliberate investment.</p>
+    <p>Verification contracts sit at the validation layer of the AI SDLC — layer 6, above governance and architectural control, below human oversight. They are the testing infrastructure for the governance layer itself. And like any testing infrastructure, they require deliberate investment.</p>
 
     <p>In Mneme's benchmark methodology, verification contracts are implemented as scenario objects in the benchmark fixture. Each scenario is a complete contract:</p>
 
     <div class="code-block">
-<span class="comment"># Mneme benchmark scenario â€” a complete verification contract</span>
+<span class="comment"># Mneme benchmark scenario — a complete verification contract</span>
 {
   <span class="key">"id"</span>: <span class="str">"scen-payments-deprecated-client"</span>,
   <span class="key">"description"</span>: <span class="str">"Agent attempts to use deprecated PaymentsV1 client"</span>,
-  <span class="key">"query"</span>: <span class="str">"services/payments/handler.py â€” add charge endpoint"</span>,
+  <span class="key">"query"</span>: <span class="str">"services/payments/handler.py — add charge endpoint"</span>,
   <span class="key">"expected_protected_decision_ids"</span>: [<span class="str">"dec-payments-client-v2-only"</span>],
   <span class="key">"expected_verdict"</span>: <span class="str">"FAIL"</span>,
   <span class="key">"expected_failure_terms"</span>: [<span class="str">"PaymentsV1"</span>, <span class="str">"payments_v1_client"</span>]
 }
 </div>
 
-    <p>This contract specifies: for the query "services/payments/handler.py â€” add charge endpoint", the governance system must (1) retrieve decision ID "dec-payments-client-v2-only", (2) produce a FAIL verdict, and (3) the model without governance must produce output containing "PaymentsV1" or "payments_v1_client" (confirming the constraint is genuine, not hypothetical).</p>
+    <p>This contract specifies: for the query "services/payments/handler.py — add charge endpoint", the governance system must (1) retrieve decision ID "dec-payments-client-v2-only", (2) produce a FAIL verdict, and (3) the model without governance must produce output containing "PaymentsV1" or "payments_v1_client" (confirming the constraint is genuine, not hypothetical).</p>
 
     <p>When the benchmark runs against this contract:</p>
 
     <ul>
       <li><strong>recall@K:</strong> Was "dec-payments-client-v2-only" in the top-K retrieved decisions? If not, the governance chain would have failed regardless of the enforcement layer's behavior.</li>
       <li><strong>pass_rate:</strong> Did the enforcement verdict match the expected verdict? If the governance system produced PASS where FAIL was expected, the constraint was not enforced.</li>
-      <li><strong>Baseline confirmation:</strong> Did the model without governance produce the expected failure terms? If not, the scenario is not a genuine test of the governance constraint â€” it's testing behavior the model would exhibit anyway.</li>
+      <li><strong>Baseline confirmation:</strong> Did the model without governance produce the expected failure terms? If not, the scenario is not a genuine test of the governance constraint — it's testing behavior the model would exhibit anyway.</li>
     </ul>
 
     <p>Each metric corresponds to a specific component of the governance system. recall@K measures the retrieval layer. pass_rate measures the enforcement layer. Baseline confirmation validates the scenario specification itself. The verification contract makes all three measurable, comparable across governance system versions, and automatable in CI.</p>
 
-    <p>The practical implication for governance system development: every change to the retrieval system, the decision corpus, or the enforcement logic must be validated against the full set of verification contracts before merge. A change that improves behavior on some scenarios while regressing on others is visible â€” the regressions show up as contract failures. Without contracts, that regression is invisible until a human happens to evaluate the affected scenario.</p>
+    <p>The practical implication for governance system development: every change to the retrieval system, the decision corpus, or the enforcement logic must be validated against the full set of verification contracts before merge. A change that improves behavior on some scenarios while regressing on others is visible — the regressions show up as contract failures. Without contracts, that regression is invisible until a human happens to evaluate the affected scenario.</p>
 
     <div class="callout">
-      <p><strong>Verification contracts make governance systems improvable.</strong> Without them, you can observe that governance seems to be working â€” but you can't measure by how much, can't detect regressions, and can't compare governance system versions objectively. With contracts, every change to the governance system produces a measurable effect on contract satisfaction. The governance system becomes an engineered system with a test suite, not a black box with a hope attached.</p>
+      <p><strong>Verification contracts make governance systems improvable.</strong> Without them, you can observe that governance seems to be working — but you can't measure by how much, can't detect regressions, and can't compare governance system versions objectively. With contracts, every change to the governance system produces a measurable effect on contract satisfaction. The governance system becomes an engineered system with a test suite, not a black box with a hope attached.</p>
     </div>
 
     <h2>Related concepts</h2>
@@ -561,23 +561,23 @@
     <h2>Frequently asked questions</h2>
     <details>
       <summary>What is a verification contract in AI governance?</summary>
-      <div class="faq-body">A verification contract is a pre-registered, machine-evaluable assertion that specifies what a governance check must prove before any code is generated. It defines: the query or scenario, the expected decision IDs that must be retrieved, the expected verdict (PASS/FAIL/WEAK), and the specific failure terms that must appear if the model without governance produces a violation. The contract is the expected behavior written before the test runs â€” which makes it a pre-registration rather than a post-hoc evaluation.</div>
+      <div class="faq-body">A verification contract is a pre-registered, machine-evaluable assertion that specifies what a governance check must prove before any code is generated. It defines: the query or scenario, the expected decision IDs that must be retrieved, the expected verdict (PASS/FAIL/WEAK), and the specific failure terms that must appear if the model without governance produces a violation. The contract is the expected behavior written before the test runs — which makes it a pre-registration rather than a post-hoc evaluation.</div>
     </details>
     <details>
       <summary>How is a verification contract different from a unit test?</summary>
-      <div class="faq-body">A unit test specifies expected behavior for application code â€” given input X, expect output Y. A verification contract specifies expected behavior for the governance system itself â€” given scenario S, expect the governance system to retrieve decisions D, produce verdict V, and detect failure terms T. Verification contracts are tests for the testing layer: they are the mechanism by which you govern your governance system. Without them, you have an ungoverned governance layer â€” which is the same structural problem as ungoverned application code.</div>
+      <div class="faq-body">A unit test specifies expected behavior for application code — given input X, expect output Y. A verification contract specifies expected behavior for the governance system itself — given scenario S, expect the governance system to retrieve decisions D, produce verdict V, and detect failure terms T. Verification contracts are tests for the testing layer: they are the mechanism by which you govern your governance system. Without them, you have an ungoverned governance layer — which is the same structural problem as ungoverned application code.</div>
     </details>
     <details>
       <summary>Why do governance systems need verification contracts?</summary>
-      <div class="faq-body">Without pre-registered expected behavior, governance evaluation is post-hoc and subjective. A team can run a governance check, see a verdict, and ask "was that the right verdict?" â€” but without a contract to compare against, there's no objective answer. Governance becomes unmeasurable and therefore unimprovable. Verification contracts provide the comparison baseline: the expected behavior is written before the test runs, so the evaluation is objective and the results are comparable across governance system versions.</div>
+      <div class="faq-body">Without pre-registered expected behavior, governance evaluation is post-hoc and subjective. A team can run a governance check, see a verdict, and ask "was that the right verdict?" — but without a contract to compare against, there's no objective answer. Governance becomes unmeasurable and therefore unimprovable. Verification contracts provide the comparison baseline: the expected behavior is written before the test runs, so the evaluation is objective and the results are comparable across governance system versions.</div>
     </details>
     <details>
       <summary>What does a verification contract look like in practice?</summary>
-      <div class="faq-body">In Mneme's benchmark methodology, a verification contract is a scenario object with: id (unique identifier), description (the scenario), query (the file path and task), expected_protected_decision_ids (the decision IDs that must be retrieved), expected_verdict (PASS or FAIL), and expected_failure_terms (the specific strings that must appear in model output without governance to confirm the scenario is genuinely governed). All fields are pre-registered before the scenario runs. The run then measures whether each field was satisfied â€” producing recall@K at Layer 1 and pass_rate at Layer 2.</div>
+      <div class="faq-body">In Mneme's benchmark methodology, a verification contract is a scenario object with: id (unique identifier), description (the scenario), query (the file path and task), expected_protected_decision_ids (the decision IDs that must be retrieved), expected_verdict (PASS or FAIL), and expected_failure_terms (the specific strings that must appear in model output without governance to confirm the scenario is genuinely governed). All fields are pre-registered before the scenario runs. The run then measures whether each field was satisfied — producing recall@K at Layer 1 and pass_rate at Layer 2.</div>
     </details>
     <details>
       <summary>How does pre-registration prevent governance gaming?</summary>
-      <div class="faq-body">Pre-registration means the expected behavior is committed before the test runs â€” it cannot be adjusted after seeing the result. Post-hoc evaluation allows a team to see a verdict and retroactively decide that verdict was correct. Pre-registration removes that flexibility: the contract is the specification, and the governance system either satisfies it or doesn't. This is particularly important for governance quality benchmarking: without pre-registration, benchmark results can be made to look good by choosing scenarios the governance system already handles well, rather than scenarios that stress-test it.</div>
+      <div class="faq-body">Pre-registration means the expected behavior is committed before the test runs — it cannot be adjusted after seeing the result. Post-hoc evaluation allows a team to see a verdict and retroactively decide that verdict was correct. Pre-registration removes that flexibility: the contract is the specification, and the governance system either satisfies it or doesn't. This is particularly important for governance quality benchmarking: without pre-registration, benchmark results can be made to look good by choosing scenarios the governance system already handles well, rather than scenarios that stress-test it.</div>
     </details>
   </section>
 
@@ -628,12 +628,12 @@
 
 
   <footer class="article-footer">
-    <a href="/concepts/" class="back-link">â† Back to Concepts</a>
+    <a href="/concepts/" class="back-link">← Back to Concepts</a>
 
     <div class="cta-block">
       <h3>Read the benchmark methodology</h3>
       <p>Mneme's governance benchmark is built on verification contracts: pre-registered scenarios with expected decision IDs, verdicts, and failure terms. The methodology is fully public.</p>
-      <a href="/benchmark/" class="btn-primary">View the benchmark â†’</a>
+      <a href="/benchmark/" class="btn-primary">View the benchmark →</a>
     </div>
   </footer>
 </article>

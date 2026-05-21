@@ -5,7 +5,7 @@
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/favicon.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mneme HQ â€” AI governance in action: governed agents, drift prevention, multi-actor continuity</title>
+  <title>Mneme HQ — AI governance in action: governed agents, drift prevention, multi-actor continuity</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
@@ -17,13 +17,13 @@
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Mneme HQ â€” AI governance in action: governed agents, drift prevention, multi-actor continuity" />
+  <meta property="og:title" content="Mneme HQ — AI governance in action: governed agents, drift prevention, multi-actor continuity" />
   <meta property="og:description" content="Three flagship demos showing AI governance as infrastructure. A Python agent catches its own namespace violation. Architectural drift gets blocked upstream. Governance holds across multiple actors." />
   <meta property="og:url" content="https://mnemehq.com/demo/" />
   <meta property="og:image" content="https://mnemehq.com/demo/og.png" />
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Mneme HQ â€” AI governance in action: governed agents, drift prevention, multi-actor continuity" />
+  <meta name="twitter:title" content="Mneme HQ — AI governance in action: governed agents, drift prevention, multi-actor continuity" />
   <meta name="twitter:description" content="Three flagship demos showing AI governance as infrastructure. A Python agent catches its own namespace violation. Architectural drift gets blocked upstream. Governance holds across multiple actors." />
   <meta name="twitter:image" content="https://mnemehq.com/demo/og.png" />
 
@@ -46,7 +46,7 @@
       },
       {
         "@type": "WebPage",
-        "name": "Mneme HQ â€” Operational proof of architectural governance",
+        "name": "Mneme HQ — Operational proof of architectural governance",
         "description": "Three flagship demos and a benchmark suite showing why architectural governance becomes infrastructure once AI SDLCs scale. Architectural drift prevention, the ADR compiler, and governance continuity across multiple agents.",
         "url": "https://mnemehq.com/demo/",
         "datePublished": "2026-04-01",
@@ -83,8 +83,8 @@
         "@type": "FAQPage",
         "mainEntity": [
           {"@type": "Question", "name": "Why three flagship demos instead of a single feature tour?", "acceptedAnswer": {"@type": "Answer", "text": "Each flagship demonstrates a different manifestation of the same structural problem: AI accelerates architectural entropy, review systems do not scale linearly with AI output, and local fixes accumulate into systemic drift. Architectural drift prevention shows the failure mode over time. The ADR compiler shows the remediation: turn existing decision records into executable constraints. Multi-agent governance shows that the constraints have to hold across actors, sessions, and retries. Together they sell the category, not a feature."}},
-          {"@type": "Question", "name": "What is the difference between flagship and supporting demos?", "acceptedAnswer": {"@type": "Answer", "text": "Flagship demos answer 'why does this category exist?' Supporting demos answer 'is the enforcement real?' The supporting demos â€” storage decision, dependency policy, repository pattern â€” are short, deterministic enforcement examples a senior engineer can verify in 30 seconds. The flagships are systemic narratives showing where one-off enforcement compounds into infrastructure."}},
-          {"@type": "Question", "name": "Are the runnable examples real or scripted?", "acceptedAnswer": {"@type": "Answer", "text": "The supporting demos are deterministic â€” same input, same Mneme verdict, every run. The ADR compiler flagship runs against Mneme's own ADRs and ships a Python walkthrough that imports, applies, and enforces. The drift and multi-agent governance flagships ship lightweight reproducible scripts that simulate the orchestration; the enforcement and conflict-detection steps are the real Mneme pipeline. The point is to demonstrate governance coherence, not to claim a multi-agent runtime."}},
+          {"@type": "Question", "name": "What is the difference between flagship and supporting demos?", "acceptedAnswer": {"@type": "Answer", "text": "Flagship demos answer 'why does this category exist?' Supporting demos answer 'is the enforcement real?' The supporting demos — storage decision, dependency policy, repository pattern — are short, deterministic enforcement examples a senior engineer can verify in 30 seconds. The flagships are systemic narratives showing where one-off enforcement compounds into infrastructure."}},
+          {"@type": "Question", "name": "Are the runnable examples real or scripted?", "acceptedAnswer": {"@type": "Answer", "text": "The supporting demos are deterministic — same input, same Mneme verdict, every run. The ADR compiler flagship runs against Mneme's own ADRs and ships a Python walkthrough that imports, applies, and enforces. The drift and multi-agent governance flagships ship lightweight reproducible scripts that simulate the orchestration; the enforcement and conflict-detection steps are the real Mneme pipeline. The point is to demonstrate governance coherence, not to claim a multi-agent runtime."}},
           {"@type": "Question", "name": "Where does the benchmark fit?", "acceptedAnswer": {"@type": "Answer", "text": "The benchmark is the evidence layer underneath the flagships. The flagships show why a governance layer is structurally necessary; the benchmark proves the enforcement is deterministic and reproducible across scenarios. See /benchmark/ for the methodology and the v1.1 scenario suite."}}
         ]
       }
@@ -307,17 +307,17 @@
     <div style="max-width:880px;margin:0 auto 5rem;aspect-ratio:16/9;position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--border2);box-shadow:0 0 0 1px rgba(200,240,96,0.06), 0 20px 60px rgba(0,0,0,0.4);">
       <iframe
         src="https://www.youtube-nocookie.com/embed/4Yg43V9amao"
-        title="Mneme HQ â€” Governed Python Agent Demo"
+        title="Mneme HQ — Governed Python Agent Demo"
         loading="lazy"
         allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         allowfullscreen
         style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe>
     </div>
 
-    <!-- â”€â”€â”€â”€â”€ 01 Â· THE PROBLEM â”€â”€â”€â”€â”€ -->
+    <!-- â”€â”€â”€â”€â”€ 01 · THE PROBLEM â”€â”€â”€â”€â”€ -->
     <section class="section" id="problem">
       <div class="section-header">
-        <span class="section-num">01 Â· The problem</span>
+        <span class="section-num">01 · The problem</span>
         <h2>What review-based governance can no longer absorb</h2>
       </div>
       <p class="section-lede">The same three pathologies show up everywhere AI assistance is taken seriously: reasonable-looking code that quietly violates architecture, reviewers who cannot keep pace with parallel agents, and drift that propagates faster than humans can detect it. The flagship demos below each isolate one of these and show what changes when a governance layer sits upstream of generation.</p>
@@ -346,10 +346,10 @@
       <p>Mneme compiles your <strong>Architectural Decision Records (ADRs)</strong> into an executable governance corpus. Every agent proposal is evaluated against this corpus before generation, ensuring architectural invariants hold across tools, sessions, and actors.</p>
     </div>
 
-    <!-- â”€â”€â”€â”€â”€ 02 Â· FLAGSHIP DEMOS â”€â”€â”€â”€â”€ -->
+    <!-- â”€â”€â”€â”€â”€ 02 · FLAGSHIP DEMOS â”€â”€â”€â”€â”€ -->
     <section class="section" id="flagships">
       <div class="section-header">
-        <span class="section-num">02 Â· Flagship demos</span>
+        <span class="section-num">02 · Flagship demos</span>
         <h2>Three manifestations of the same governance problem</h2>
       </div>
       <p class="section-lede">Each flagship is a category-level narrative: <strong>what fails without a governance layer, what holds with one, and where the evidence lives.</strong> They are designed to be cited, demoed, and walked through end-to-end &mdash; not skimmed.</p>
@@ -415,10 +415,10 @@
       </div>
     </section>
 
-    <!-- â”€â”€â”€â”€â”€ 03 Â· SUPPORTING ENFORCEMENT EXAMPLES â”€â”€â”€â”€â”€ -->
+    <!-- â”€â”€â”€â”€â”€ 03 · SUPPORTING ENFORCEMENT EXAMPLES â”€â”€â”€â”€â”€ -->
     <section class="section" id="supporting">
       <div class="section-header">
-        <span class="section-num">03 Â· Supporting enforcement examples</span>
+        <span class="section-num">03 · Supporting enforcement examples</span>
         <h2>Is the enforcement real? Yes, here are the deterministic verdicts</h2>
       </div>
       <p class="section-lede">If the flagships answer <em>why does this category exist</em>, the supporting examples answer <em>is the enforcement actually deterministic</em>. Each one is a single-violation walkthrough: a concrete ADR, the diff an agent would generate, and the exact <code style="font-family:'DM Mono',monospace;font-size:0.85em;background:var(--surface2);border-radius:3px;padding:0.05em 0.35em;">mneme check</code> verdict.</p>
@@ -454,7 +454,7 @@
       </div>
     </section>
 
-    <!-- â”€â”€â”€â”€â”€ 04 Â· INFRASTRUCTURE FEATURES â”€â”€â”€â”€â”€ -->
+    <!-- â”€â”€â”€â”€â”€ 04 · INFRASTRUCTURE FEATURES â”€â”€â”€â”€â”€ -->
     <section class="section" id="infrastructure">
       <div class="section-header">
         <span class="section-num">04 &middot; Infrastructure features</span>
@@ -476,7 +476,7 @@
       </div>
     </section>
 
-    <!-- â”€â”€â”€â”€â”€ 05 Â· OPERATIONAL EVIDENCE â”€â”€â”€â”€â”€ -->
+    <!-- â”€â”€â”€â”€â”€ 05 · OPERATIONAL EVIDENCE â”€â”€â”€â”€â”€ -->
     <section class="section" id="evidence">
       <div class="section-header">
         <span class="section-num">05 &middot; Operational evidence</span>
@@ -506,7 +506,7 @@
       </div>
     </section>
 
-    <!-- â”€â”€â”€â”€â”€ 05 Â· CTA â”€â”€â”€â”€â”€ -->
+    <!-- â”€â”€â”€â”€â”€ 05 · CTA â”€â”€â”€â”€â”€ -->
     <div class="cta-snippet">
       <h3>Three lines to wire this up on your own repo</h3>
       <p>Open source, MIT. Same decision corpus drives the editor hook, the CI gate, and the ADR compiler.</p>
