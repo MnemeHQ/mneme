@@ -1,0 +1,13 @@
+# Concepts intentionally absent from the SVG knowledge graph.
+# These are contextual or adjacent concepts that do not occupy a structural
+# position in the primitives -> properties -> outcomes architecture.
+# Add a slug here (one per line, no trailing slash) whenever a concept is
+# published without an SVG node.
+agent-verification
+agentic-development
+ai-native-sdlc
+decision-continuity
+execution-surfaces
+governance-provenance
+intent-debt
+reliable-delegation
