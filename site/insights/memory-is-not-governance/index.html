@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Memory Is Not Governance â€” Mneme HQ</title>
+  <title>Memory Is Not Governance — Mneme HQ</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
@@ -296,10 +296,10 @@
       {
         "@type": "FAQPage",
         "mainEntity": [
-          {"@type": "Question", "name": "Isn't this just semantics?", "acceptedAnswer": {"@type": "Answer", "text": "Words shape what gets built. As long as the category calls governance 'memory', vendors keep shipping recall systems and labeling them governance systems. Buyers keep evaluating recall metrics and assuming they measure enforcement. The conflation is not academic â€” it determines which problem the next year of engineering hours gets spent on."}},
-          {"@type": "Question", "name": "Don't memory systems include some governance features?", "acceptedAnswer": {"@type": "Answer", "text": "Some do. A memory system with structured fields and a retrieval policy is closer to governance than an opaque embedding store. But 'closer' is the wrong frame. Governance requires deterministic resolution between conflicting constraints. A memory system that adds tagging is still optimizing recall â€” it just adds metadata to the recall query. Until the system can answer 'which constraint applies here, deterministically,' it has not changed categories."}},
-          {"@type": "Question", "name": "What about Letta, Mem0, OpenAI memory, Claude projects?", "acceptedAnswer": {"@type": "Answer", "text": "These are real, useful memory systems for the problems they were built to solve â€” durable user context, session continuity, personalization. They are not governance systems and were never meant to be. The category error is not that these products exist; it is that the AI coding conversation has been borrowing their primitives and pretending the architectural-constraint problem is solved when it is not."}},
-          {"@type": "Question", "name": "So what is memory in a governance system?", "acceptedAnswer": {"@type": "Answer", "text": "An input. A governance system queries memory to discover which decisions exist, which ones touch the current scope, and what their declared properties are. That query is exactly the kind of thing memory systems are good at. What governance adds on top is the resolution layer â€” given the candidate decisions, compute the single one that applies, deterministically. Memory feeds the resolver. It is not the resolver."}},
+          {"@type": "Question", "name": "Isn't this just semantics?", "acceptedAnswer": {"@type": "Answer", "text": "Words shape what gets built. As long as the category calls governance 'memory', vendors keep shipping recall systems and labeling them governance systems. Buyers keep evaluating recall metrics and assuming they measure enforcement. The conflation is not academic — it determines which problem the next year of engineering hours gets spent on."}},
+          {"@type": "Question", "name": "Don't memory systems include some governance features?", "acceptedAnswer": {"@type": "Answer", "text": "Some do. A memory system with structured fields and a retrieval policy is closer to governance than an opaque embedding store. But 'closer' is the wrong frame. Governance requires deterministic resolution between conflicting constraints. A memory system that adds tagging is still optimizing recall — it just adds metadata to the recall query. Until the system can answer 'which constraint applies here, deterministically,' it has not changed categories."}},
+          {"@type": "Question", "name": "What about Letta, Mem0, OpenAI memory, Claude projects?", "acceptedAnswer": {"@type": "Answer", "text": "These are real, useful memory systems for the problems they were built to solve — durable user context, session continuity, personalization. They are not governance systems and were never meant to be. The category error is not that these products exist; it is that the AI coding conversation has been borrowing their primitives and pretending the architectural-constraint problem is solved when it is not."}},
+          {"@type": "Question", "name": "So what is memory in a governance system?", "acceptedAnswer": {"@type": "Answer", "text": "An input. A governance system queries memory to discover which decisions exist, which ones touch the current scope, and what their declared properties are. That query is exactly the kind of thing memory systems are good at. What governance adds on top is the resolution layer — given the candidate decisions, compute the single one that applies, deterministically. Memory feeds the resolver. It is not the resolver."}},
           {"@type": "Question", "name": "Does this mean retrieval is also not governance?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Retrieval is one mechanism a memory system uses to do recall well. It inherits all of memory's properties: optimizes for relevance, tolerates fuzziness, has no opinion on conflict. RAG over an ADR folder is a retrieval system pointed at architectural content, not a governance system. The article 'Why RAG Fails for Architectural Governance' covers the same point from the retrieval angle."}}
         ]
       }
@@ -719,7 +719,7 @@
       <li><a href="/concepts/governance-infrastructure/"><div class="rel-title">Governance infrastructure</div><p class="rel-desc">The platform layer that encodes, distributes, versions, and enforces decisions across agents and CI.</p></a></li>
       <li><a href="/concepts/multi-agent-continuity/"><div class="rel-title">Multi-agent continuity</div><p class="rel-desc">Decisions persist across agents, sessions, and time. Decision-side memory, not agent-side memory.</p></a></li>
       <li><a href="/concepts/ai-agent-drift/"><div class="rel-title">AI agent drift</div><p class="rel-desc">The agent-side phenomenon where coding agents diverge from intended architecture across sessions.</p></a></li>
-      <li><a href="/concepts/deterministic-enforcement/"><div class="rel-title">Deterministic enforcement</div><p class="rel-desc">Same input, same verdict â€” every run, every agent, every consumer. The precondition for auditability.</p></a></li>
+      <li><a href="/concepts/deterministic-enforcement/"><div class="rel-title">Deterministic enforcement</div><p class="rel-desc">Same input, same verdict — every run, every agent, every consumer. The precondition for auditability.</p></a></li>
     </ul>
   </aside>
 

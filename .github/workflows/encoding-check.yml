@@ -1,0 +1,34 @@
+name: encoding check
+
+# Catches the cp1252-as-UTF-8 corruption + UTF-8 BOM signature that
+# commit 999f531 introduced to 50 site files in May 2026. Both signals
+# are produced when an ad-hoc script reads UTF-8 with the wrong codec
+# (typically open(path,'r') without encoding= on Windows, or PowerShell
+# Get-Content without -Encoding UTF8) and writes the result back as UTF-8.
+#
+# Runs on every PR to main and on direct pushes to main as a safety net
+# in case anything bypasses PR review.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check-encoding:
+    name: Scan site/docs/scripts for mojibake + BOM
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run encoding check
+        run: python scripts/check_encoding.py

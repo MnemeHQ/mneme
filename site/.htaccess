@@ -8,6 +8,10 @@ RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 # URL hygiene: /demo.html (legacy) -> /demo/ (canonical)
 RewriteRule ^demo\.html$ /demo/ [R=301,L]
 
+# Legacy /insights/ slug retirements -> current canonical articles
+RewriteRule ^insights/ai-code-review/?$ /insights/ai-code-review-does-not-scale-linearly/ [R=301,L]
+RewriteRule ^insights/cursor-rules-for-teams/?$ /insights/mneme-vs-cursor-rules/ [R=301,L]
+
 # Branded 404 page
 ErrorDocument 404 /404.html
 

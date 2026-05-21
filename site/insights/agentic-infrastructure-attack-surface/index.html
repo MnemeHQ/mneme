@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The New Attack Surface Is Agentic Infrastructure — Mneme HQ</title>
+  <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/fonts.css">
+  <meta name="description" content="AI tooling has stopped being productivity software and become execution infrastructure. The recent npm and developer-tooling compromises persisted by embedding into Claude Code hooks, VS Code tasks, and CI automation. The attack surface is no longer just code — it is the execution fabric surrounding autonomous agents." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/insights/agentic-infrastructure-attack-surface/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="The New Attack Surface Is Agentic Infrastructure" />
+  <meta property="og:description" content="The execution fabric around AI agents — hooks, task runners, CI workflows, orchestration graphs — is now infrastructure. Security tooling asks if something is malicious. Governance asks whether an execution path should exist at all." />
+  <meta property="og:url" content="https://mnemehq.com/insights/agentic-infrastructure-attack-surface/" />
+  <meta property="og:image" content="https://mnemehq.com/insights/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="The New Attack Surface Is Agentic Infrastructure" />
+  <meta name="twitter:description" content="The execution fabric around AI agents — hooks, task runners, CI workflows, orchestration graphs — is now infrastructure. Security tooling asks if something is malicious. Governance asks whether an execution path should exist at all." />
+  <meta name="twitter:image" content="https://mnemehq.com/insights/og.png" />
+  <meta name="author" content="Theo Valmis" />
+  <meta property="article:published_time" content="2026-05-21T00:00:00Z" />
+  <meta property="article:author" content="https://mnemehq.com/founder/" />
+  <meta property="article:section" content="Engineering" />
+    <!-- Consent defaults -->
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{'analytics_storage':'granted','ad_storage':'denied','ad_user_data':'denied','ad_personalization':'denied'});</script>
+
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #a8a8b8;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .article-wrap { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 7rem; }
+    .article-header { margin-bottom: 3.5rem; }
+    .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+
+    .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
+    .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
+    .article-body p strong { color: var(--text); font-weight: 500; }
+    .article-body ul { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body ul li { margin-bottom: 0.5rem; line-height: 1.8; }
+    .article-body ul li strong { color: var(--text); font-weight: 500; }
+    .article-body ol { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body ol li { margin-bottom: 0.5rem; line-height: 1.8; }
+    .article-body ol li strong { color: var(--text); font-weight: 500; }
+    .article-body code { font-family: 'DM Mono', monospace; font-size: 0.82rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 0.05rem 0.4rem; color: var(--text); }
+    .article-body pre { font-family: 'DM Mono', monospace; font-size: 0.8rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; color: var(--text); overflow-x: auto; margin: 1.5rem 0 1.75rem; line-height: 1.7; }
+    .article-body pre code { background: none; border: none; padding: 0; font-size: inherit; }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout p strong { color: var(--accent); }
+
+    .failure-stack { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2rem; margin: 2.5rem 0; }
+    .failure-stack .stack-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
+    .stack-row { display: flex; align-items: flex-start; gap: 1rem; padding: 0.9rem 0; border-bottom: 1px solid var(--border); }
+    .stack-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .stack-row:first-of-type { padding-top: 0; }
+    .stack-num { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--border2); flex-shrink: 0; padding-top: 0.1rem; min-width: 1.5rem; }
+    .stack-content { flex: 1; }
+    .stack-label { font-size: 0.82rem; font-weight: 600; color: var(--text); margin-bottom: 0.25rem; }
+    .stack-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.7; }
+
+    .contrast-block { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border-radius: 12px; overflow: hidden; margin: 2.5rem 0; }
+    .contrast-cell { background: var(--surface); padding: 1.75rem; }
+    .contrast-cell .label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem; }
+    .contrast-cell .tool { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem; }
+    .contrast-cell .desc { font-size: 0.82rem; color: var(--muted); line-height: 1.65; }
+    .contrast-cell.accent-left { border-left: 3px solid var(--border2); }
+    .contrast-cell.accent-right { border-left: 3px solid var(--accent); }
+    @media (max-width: 540px) { .contrast-block { grid-template-columns: 1fr; } }
+
+    .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .back-link:hover { color: var(--text); }
+    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2rem; }
+    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--accent-dim); }
+
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .breadcrumb-nav { max-width: 720px; margin: 0 auto; padding: 1.75rem 2rem 0.85rem; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.82rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .toc { position: static; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 0.9rem 1.25rem; margin: 0 0 2rem; }
+    .toc .toc-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.55rem; }
+    .toc ol { list-style: none; counter-reset: toc; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 0.25rem; }
+    .toc ol li { counter-increment: toc; font-size: 0.78rem; padding-left: 1.9rem; position: relative; line-height: 1.5; }
+    .toc ol li::before { content: counter(toc, decimal-leading-zero); position: absolute; left: 0; top: 0.05rem; font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.05em; }
+    .toc a { color: var(--text); text-decoration: none; transition: color 0.15s; }
+    .toc a:hover { color: var(--accent); }
+    @media (min-width: 720px) { .toc ol { grid-template-columns: 1fr 1fr; gap: 0.3rem 1.25rem; } }
+
+    .axis-table { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin: 2.5rem 0; overflow-x: auto; }
+    .axis-table .ax-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+    .axis-table table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .axis-table th, .axis-table td { text-align: left; padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; }
+    .axis-table th { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+    .axis-table td:first-child { color: var(--text); font-weight: 500; min-width: 8rem; }
+    .axis-table tr:last-child td { border-bottom: none; }
+    .axis-table tr.accent-row td { color: var(--accent); }
+    .axis-table tr.accent-row td:first-child { color: var(--accent); }
+
+    .faq-list { margin: 2rem 0 0; }
+    .faq-item { border-top: 1px solid var(--border); padding: 1.1rem 0; }
+    .faq-item:last-child { border-bottom: 1px solid var(--border); }
+    .faq-item summary { cursor: pointer; font-size: 0.92rem; color: var(--text); font-weight: 500; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; font-family: 'DM Mono', monospace; color: var(--muted); font-size: 1.1rem; transition: transform 0.15s; }
+    .faq-item[open] summary::after { content: '\2212'; }
+    .faq-body { padding-top: 0.9rem; font-size: 0.85rem; color: var(--muted); line-height: 1.8; }
+    .faq-body a { color: var(--accent); text-decoration: none; }
+    .faq-body a:hover { color: var(--accent-dim); }
+
+    .article-body a.ext { color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(200,240,96,0.4); }
+    .article-body a.ext:hover { color: var(--accent-dim); border-bottom-color: rgba(200,240,96,0.7); }
+
+    .nav-hamburger {
+      display: none;
+      background: none;
+      border: 1px solid var(--border2);
+      color: var(--text);
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 0;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 4px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span {
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: currentColor;
+      border-radius: 1px;
+      transition: transform 0.25s ease, opacity 0.18s ease;
+      transform-origin: center;
+    }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    @media (max-width: 900px) {
+      html, body { overflow-x: hidden; }
+      body.menu-open { overflow: hidden; }
+      nav, nav.site-nav { position: relative; padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links {
+        display: flex !important;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        gap: 0;
+        background: rgba(12,12,13,0.98);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: 0 1.25rem;
+        z-index: 99;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        visibility: hidden;
+        transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s;
+      }
+      .nav-links.open {
+        max-height: 80vh;
+        opacity: 1;
+        visibility: visible;
+        padding: 0.5rem 1.25rem 1.25rem;
+        transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s;
+        overflow-y: auto;
+      }
+      .nav-links a:not(.btn-nav-cta) {
+        display: block;
+        color: var(--text);
+        font-size: 0.92rem;
+        padding: 0.85rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+      .article-wrap { padding: 3rem 1.25rem 5rem; }
+    }
+
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    h2#related-reading { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 400; margin-top: 3.5rem; margin-bottom: 0.75rem; }
+    h2#related-reading + ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    h2#related-reading + ul li { margin: 0; }
+    h2#related-reading + ul li a { display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.1rem; background: var(--surface); color: var(--text); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.15s, color 0.15s; }
+    h2#related-reading + ul li a::after { content: '\2192'; opacity: 0.35; transition: opacity 0.15s, transform 0.15s; display: inline-block; margin-left: 0.5rem; }
+    h2#related-reading + ul li a:hover { background: var(--surface2); color: var(--accent); }
+    h2#related-reading + ul li a:hover::after { opacity: 1; transform: translateX(3px); }
+
+    .pull-quote { font-family: 'Instrument Serif', serif; font-size: 1.5rem; line-height: 1.45; color: var(--text); border-left: 2px solid var(--accent); padding: 0.25rem 0 0.25rem 1.25rem; margin: 2.5rem 0; font-style: italic; }
+    .pull-quote em { font-style: normal; color: var(--accent); }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Insights", "item": "https://mnemehq.com/insights/"},
+          {"@type": "ListItem", "position": 3, "name": "The New Attack Surface Is Agentic Infrastructure", "item": "https://mnemehq.com/insights/agentic-infrastructure-attack-surface/"}
+        ]
+      },
+      {
+        "@type": "Article",
+        "headline": "The New Attack Surface Is Agentic Infrastructure",
+        "description": "AI tooling has stopped being productivity software and become execution infrastructure. The recent npm and developer-tooling compromises persisted by embedding into Claude Code hooks, VS Code tasks, and CI automation. The attack surface is no longer just code — it is the execution fabric surrounding autonomous agents.",
+        "url": "https://mnemehq.com/insights/agentic-infrastructure-attack-surface/",
+        "datePublished": "2026-05-21",
+        "dateModified": "2026-05-21",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "image": "https://mnemehq.com/insights/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/insights/agentic-infrastructure-attack-surface/"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {"@type": "Question", "name": "Is this article about a specific malware incident?", "acceptedAnswer": {"@type": "Answer", "text": "No. The recent compromises that persisted through Claude Code hooks, VS Code tasks, and CI automation are the surface symptom. The article's argument is about the underlying infrastructure transition that made those persistence paths exist. The incident is treated as evidence, not as the story."}},
+          {"@type": "Question", "name": "How is execution governance different from security?", "acceptedAnswer": {"@type": "Answer", "text": "Security answers whether something is malicious, vulnerable, or compromised. Governance answers whether an execution path should exist at all, whether an agent has authority to perform an action, and whether automation is operating within approved architectural boundaries. The two questions overlap in places but are not substitutes — a non-malicious agent action can still violate architectural intent."}},
+          {"@type": "Question", "name": "What counts as agentic infrastructure?", "acceptedAnswer": {"@type": "Answer", "text": "Anything that gives an AI system the ability to execute work without an explicit per-action human trigger: Claude Code hooks, agent skills, VS Code task runners, GitHub Actions workflows that invoke models, MCP servers, autonomous remediation loops, scheduled agent runs, and multi-agent orchestration graphs. The defining property is delegated authority — the agent is allowed to act, and the act has effects on shared systems."}},
+          {"@type": "Question", "name": "Why does this matter for governance specifically?", "acceptedAnswer": {"@type": "Answer", "text": "Because the security model for agentic infrastructure still assumes a human in the loop, but the execution model increasingly does not. Once an agent can write code, modify configuration, trigger workflows, and persist state, the question of which decisions govern those actions stops being a documentation problem and becomes an enforcement problem. Governance is the layer that turns architectural intent into a deterministic check that runs before execution, not after."}},
+          {"@type": "Question", "name": "Doesn't supply-chain security already cover this?", "acceptedAnswer": {"@type": "Answer", "text": "Supply-chain security frameworks like SLSA, Sigstore, and OpenSSF address provenance and integrity of code artifacts — they answer 'is this build what its source says it is?' That is necessary but not sufficient. They do not address whether the now-trusted artifact should have authority to run a hook on developer machines, modify CI configuration, or invoke another agent. That additional question is what execution governance covers."}}
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/benchmark/">Benchmark</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/insights/">Insights</a></li>
+    <li aria-current="page">The New Attack Surface Is Agentic Infrastructure</li>
+  </ol>
+</nav>
+<article class="article-wrap">
+  <header class="article-header">
+    <div class="article-eyebrow">
+      <span class="eyebrow-tag">Thought Leadership</span>
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-meta">10 min read &nbsp;&middot;&nbsp; May 2026</span>
+    </div>
+    <h1>The new attack surface is agentic infrastructure</h1>
+    <p class="article-lede">GitHub Actions, Claude Code hooks, VS Code task runners, autonomous terminal agents &mdash; these are no longer developer tools. They are execution infrastructure. And execution infrastructure creates new attack surfaces. The recent compromises in the npm and developer-tooling ecosystem are not the story; they are evidence of a deeper shift the security and governance model has not caught up to.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-21">Published May 2026</time>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-21">Updated May 2026</time>
+    </p>
+  </header>
+
+  <div class="article-body">
+
+    <nav class="toc" aria-label="Table of contents">
+      <div class="toc-title">In this article</div>
+      <ol>
+        <li><a href="#old-model">The old model: tools assisted humans</a></li>
+        <li><a href="#new-model">The new model: tools execute autonomously</a></li>
+        <li><a href="#why-attacks-matter">Why the recent attacks matter</a></li>
+        <li><a href="#hidden-paths">Agentic infrastructure creates hidden execution paths</a></li>
+        <li><a href="#gap">The governance gap</a></li>
+        <li><a href="#security-vs-governance">Security is not enough</a></li>
+        <li><a href="#operational">AI infrastructure is becoming operational infrastructure</a></li>
+        <li><a href="#conclusion">Conclusion</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ol>
+    </nav>
+
+    <p>We are entering a new infrastructure era in which AI systems are no longer passive assistants generating text or code on request. They execute tools. They trigger workflows. They modify repositories, run terminal commands, persist configuration, invoke CI/CD systems, orchestrate other agents, and maintain long-running operational state. The shift is not a productivity story. It is an infrastructure story.</p>
+
+    <p>The result is that the attack surface is no longer just software. The attack surface is now the execution layer surrounding AI agents &mdash; the hooks, task runners, automation pipelines, orchestration graphs, and persistence mechanisms that let agents act between human turns.</p>
+
+    <p>This changes the security and governance model entirely. The recent malware campaigns that propagated through npm and persisted by writing themselves into Claude Code hooks, VS Code task configurations, and downstream automation paths are the surface symptom. The underlying condition is that AI tooling has crossed from productivity software into executable infrastructure, and the controls that govern executable infrastructure have not crossed with it.</p>
+
+    <h2 id="old-model">The old model: tools assisted humans</h2>
+
+    <p>For most of the modern engineering era, developer tooling was deterministic, human-triggered, and reasonably isolated. Editors edited files when a human typed. Linters ran when a human invoked them or when a CI pipeline triggered. Package managers installed dependencies on explicit command. CI systems ran when a human pushed a commit or merged a pull request.</p>
+
+    <p>The compromise scope of any single tool was narrow because:</p>
+
+    <ul>
+      <li><strong>Humans initiated execution.</strong> Most actions traced back to a deliberate keystroke, command, or merge.</li>
+      <li><strong>Workflows were explicit.</strong> Build steps, deploy steps, and test runs were described in version-controlled files that a human had reviewed.</li>
+      <li><strong>Persistence mechanisms were known.</strong> The set of places code could install itself was small and inspectable: PATH, shell rc files, system services, CI configurations, package registries.</li>
+      <li><strong>Observability matched execution.</strong> If something ran, it ran because a human or a known pipeline scheduled it.</li>
+    </ul>
+
+    <p>Supply-chain attacks existed in this world, but the threat model assumed a human or a deterministic pipeline as the trigger. The defensive posture matched: sign artifacts, verify checksums, restrict registry sources, harden CI runners. The trust boundary was clear because the execution boundary was clear.</p>
+
+    <h2 id="new-model">The new model: tools execute autonomously</h2>
+
+    <p>Modern AI-assisted development changes the execution model in ways that are easy to underestimate from inside it. Claude Code hooks fire on tool calls and prompt submissions. GitHub Actions workflows invoke models. Cursor and Windsurf agents drive multi-step edits without per-action human approval. Terminal copilots execute shell commands as a default behavior. Autonomous remediation loops attempt fixes, run tests, and retry. Multi-agent orchestration graphs chain decisions across systems.</p>
+
+    <p>The system evolves from <em>human using tool</em> to <em>infrastructure invoking infrastructure</em>. That is the paradigm shift.</p>
+
+    <p>Execution under this model has new properties:</p>
+
+    <ul>
+      <li><strong>Delegated.</strong> A human authorized the agent once. The agent now decides which actions to perform within that authorization window.</li>
+      <li><strong>Persistent.</strong> Hooks, settings files, MCP server configurations, and agent skill definitions remain active across sessions and survive the original prompt that created them.</li>
+      <li><strong>Chained.</strong> One agent invokes another. One tool call triggers another. One workflow emits an event that wakes another workflow.</li>
+      <li><strong>Partially opaque.</strong> The exact sequence of actions an agent will take is not fully knowable in advance and is sometimes not fully knowable in retrospect either.</li>
+      <li><strong>Continuously running.</strong> Long-running agents, scheduled runs, and event-driven loops mean execution is no longer a discrete event keyed to a human action.</li>
+    </ul>
+
+    <p>None of these properties make the tooling worse; they are exactly what makes agentic development valuable. But they break every assumption the old model relied on for narrow compromise scope.</p>
+
+    <h2 id="why-attacks-matter">Why the recent attacks matter</h2>
+
+    <p>The recent compromises through the npm ecosystem and developer-tooling supply chain are important not because the malware was novel, but because of where it chose to persist. The infected packages did not stop at executing code at install time. They wrote themselves into the execution surfaces surrounding AI agents and editors: Claude Code settings, VS Code task definitions, automation paths invoked by extensions, and downstream package-manager hooks.</p>
+
+    <p>Reporting and post-incident writeups across the ecosystem &mdash; including GitHub's own security advisory infrastructure, <a href="https://securitylab.github.com/" class="ext" target="_blank" rel="noopener">GitHub Security Lab</a> coverage of supply-chain campaigns, and OpenSSF's tracking of malicious packages &mdash; describe a consistent pattern. The compromise targeted the orchestration layer itself, not just the application code that depended on it.</p>
+
+    <p>That is the critical conceptual jump. The persistence layer of choice was no longer the binary or the package; it was the developer's execution fabric. Once installed, the malware did not need a fresh invocation to act &mdash; it inherited the agent's authority and ran whenever the agent ran.</p>
+
+    <p>That is what makes this incident class structurally different from the npm and PyPI compromises of the prior decade. The attack used the agent's execution surface as both the host and the trigger. The agent was not malicious. The agent was the multiplier.</p>
+
+    <div class="callout">
+      <p><strong>The conceptual shift:</strong> Traditional supply-chain attacks compromise an artifact. Agentic supply-chain attacks compromise the execution fabric that artifacts authorize. The blast radius scales with the agent's authority, not with the package's footprint.</p>
+    </div>
+
+    <h2 id="hidden-paths">Agentic infrastructure creates hidden execution paths</h2>
+
+    <p>The deeper problem the attacks expose is that agentic infrastructure creates execution paths that no inventory tool, security scanner, or code review process is currently designed to enumerate.</p>
+
+    <p>A modern repository is no longer just code plus CI. It is a layered system whose components touch and authorize each other in ways that are increasingly hard to draw on a single diagram.</p>
+
+    <div class="failure-stack">
+      <div class="stack-title">What a modern agentic repository actually contains</div>
+
+      <div class="stack-row">
+        <div class="stack-num">01</div>
+        <div class="stack-content">
+          <div class="stack-label">Application code</div>
+          <div class="stack-desc">The shipped product. Reviewed in pull requests, scanned by SAST tools, covered by tests. This is the part the old security model was designed to protect.</div>
+        </div>
+      </div>
+
+      <div class="stack-row">
+        <div class="stack-num">02</div>
+        <div class="stack-content">
+          <div class="stack-label">Prompts and instructions</div>
+          <div class="stack-desc">CLAUDE.md, AGENTS.md, repo-local system prompts, skill definitions. These shape what agents do but are rarely reviewed as security artifacts. A modified instruction file can redirect agent behavior without changing any application code.</div>
+        </div>
+      </div>
+
+      <div class="stack-row">
+        <div class="stack-num">03</div>
+        <div class="stack-content">
+          <div class="stack-label">Hooks and task runners</div>
+          <div class="stack-desc">Claude Code hooks, VS Code tasks, editor extensions with execute permissions, pre-commit and post-merge scripts. These fire automatically on developer actions and inherit the developer's authority.</div>
+        </div>
+      </div>
+
+      <div class="stack-row">
+        <div class="stack-num">04</div>
+        <div class="stack-content">
+          <div class="stack-label">Agent memory and persistent state</div>
+          <div class="stack-desc">Long-term memory stores, vector databases, progress files, agent checkpoints. They carry information forward across sessions and across agents. They are also writable persistence surfaces.</div>
+        </div>
+      </div>
+
+      <div class="stack-row">
+        <div class="stack-num">05</div>
+        <div class="stack-content">
+          <div class="stack-label">Execution policies</div>
+          <div class="stack-desc">Tool-use allowlists, MCP server configurations, automated approval rules, network policies, sandbox toggles. These define what an agent is allowed to invoke; they are the closest existing analog to a governance layer.</div>
+        </div>
+      </div>
+
+      <div class="stack-row">
+        <div class="stack-num">06</div>
+        <div class="stack-content">
+          <div class="stack-label">Orchestration graphs</div>
+          <div class="stack-desc">Multi-agent workflows, sub-agent invocation patterns, scheduled automation, event-driven loops. The graph itself is infrastructure: which agent can call which, under what condition, with what authority.</div>
+        </div>
+      </div>
+
+      <div class="stack-row">
+        <div class="stack-num">07</div>
+        <div class="stack-content">
+          <div class="stack-label">Automation metadata</div>
+          <div class="stack-desc">CI workflows that invoke models, deployment pipelines that include agent steps, webhook integrations that trigger autonomous responses. These were once "just CI" but increasingly contain execution authority delegated to non-deterministic systems.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <p>Every one of these surfaces is an execution path. Every one of them can persist. Most of them sit outside the review processes that govern application code. And every one of them is a place that a compromise &mdash; or simply an unintended agent action &mdash; can land.</p>
+
+    <p>This massively expands operational complexity. It also shifts where the boundary of "the system" sits. The boundary used to be the deployed binary. It now extends backward into the development fabric itself.</p>
+
+    <h2 id="gap">The governance gap</h2>
+
+    <p>Current AI discourse focuses heavily on models, prompts, benchmarks, hallucinations, and memory. Those are real concerns. But for teams operating agentic infrastructure, the real operational problem is execution governance &mdash; and very little of the AI conversation is about that.</p>
+
+    <p>Execution governance asks a set of questions the productivity-tooling era never had to answer:</p>
+
+    <ul>
+      <li><strong>What is allowed to execute?</strong> Which tools, which hooks, which sub-agents can run, and from which contexts?</li>
+      <li><strong>Under which invariants?</strong> What architectural rules and security boundaries must any execution respect?</li>
+      <li><strong>Which decisions propagate downstream?</strong> When an agent makes a choice in one place, where else does that choice now apply?</li>
+      <li><strong>What persists after generation?</strong> Which artifacts &mdash; hooks, skills, memories, settings &mdash; survive the agent session and act as new execution surfaces?</li>
+      <li><strong>Which automation inherits governance?</strong> When agent A invokes agent B, do the constraints on A bind B as well? If not, why not?</li>
+      <li><strong>Which actions require deterministic verification?</strong> Where is it acceptable for an LLM to be the only check, and where does a downstream operation require a constraint resolver that does not run on a probability distribution?</li>
+    </ul>
+
+    <p>None of these questions are answered by model quality or prompt engineering. They are infrastructure questions, and they require infrastructure-level answers.</p>
+
+    <p class="pull-quote"><em>Governance answers the question security cannot:</em> should this execution path exist at all?</p>
+
+    <h2 id="security-vs-governance">Security is not enough</h2>
+
+    <p>The distinction between security and governance is important enough to make explicit, because they are often used as if they were the same thing. They are not.</p>
+
+    <div class="contrast-block">
+      <div class="contrast-cell accent-left">
+        <div class="label">Security asks</div>
+        <div class="tool">Is this malicious or vulnerable?</div>
+        <div class="desc">Is this package compromised? Has this artifact been tampered with? Does this binary match its source? Does this CI runner have the minimum required privileges? Security is fundamentally a verification problem about properties of artifacts and processes.</div>
+      </div>
+      <div class="contrast-cell accent-right">
+        <div class="label">Governance asks</div>
+        <div class="tool">Should this execution path exist at all?</div>
+        <div class="desc">Should this agent have authority to perform this action? Does this automation violate an architectural invariant? Does the chain of delegations through which this command arrived match what was actually approved? Governance is a constraint problem about authority and intent.</div>
+      </div>
+    </div>
+
+    <p>A non-malicious agent can violate architectural intent. A signed, attested, fully provenance-tracked package can still be wired into a hook that should not exist. A correctly configured CI runner can execute a workflow whose authority chain was never approved. None of these failures are security failures in the traditional sense. All of them are governance failures.</p>
+
+    <p>Supply-chain security frameworks &mdash; <a href="https://slsa.dev/" class="ext" target="_blank" rel="noopener">SLSA</a>, <a href="https://www.sigstore.dev/" class="ext" target="_blank" rel="noopener">Sigstore</a>, <a href="https://openssf.org/" class="ext" target="_blank" rel="noopener">OpenSSF</a> &mdash; do important work at the artifact level. They answer "is this build what its source claims to be?" That work is necessary; it is also not sufficient for the agentic era. A verified artifact installed into a hook that should not exist is still a governance failure, even when every signature checks out.</p>
+
+    <p>The relationship between security and governance is not adversarial; the two layers compose. Security narrows the set of artifacts you can trust. Governance narrows the set of actions trusted artifacts are allowed to perform.</p>
+
+    <h2 id="operational">AI infrastructure is becoming operational infrastructure</h2>
+
+    <p>The industry still talks about AI tooling as if it were productivity software. The actual deployed pattern looks more like operational infrastructure: orchestration systems, distributed runtimes, policy execution layers, and CI/CD-adjacent automation that happens to have a model in the loop.</p>
+
+    <p>This is not a metaphor. GitHub itself increasingly frames CI/CD and workflow execution as security-critical infrastructure rather than developer convenience. Its <a href="https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions" class="ext" target="_blank" rel="noopener">guidance on hardening GitHub Actions</a> reads less like advice for an automation tool and more like advice for a runtime: principle of least privilege, scoped secrets, restricted token permissions, controlled use of untrusted input, careful handling of external references. The transition has already happened; the vocabulary is catching up.</p>
+
+    <p>The consequence is that failures in this layer stop being coding mistakes and start being architectural, operational, and organizational failures. A misconfigured workflow that grants write access to the repository where it should have had read-only is no longer a developer bug. It is an authority assignment error in a runtime. The framing matters because it determines who is responsible for the fix, where the control plane lives, and what kind of check is supposed to catch the misconfiguration before it ships.</p>
+
+    <p>Three shifts follow from taking the framing seriously:</p>
+
+    <ol>
+      <li><strong>Governance stops being optional.</strong> When AI systems execute infrastructure, the cost of "we will review this later" rises with every additional agent and every additional persistent execution surface.</li>
+      <li><strong>Architectural intent becomes operational.</strong> The rules that used to live in ADRs and tribal knowledge now need to be machine-checkable, because the actors most likely to violate them are not humans who can be reasoned with.</li>
+      <li><strong>Verification becomes infrastructure-native.</strong> Constraint checks belong in the same layer as the execution they govern, not in a documentation folder that the next agent will not read.</li>
+    </ol>
+
+    <p>This is also where Mneme's category becomes legible. The work we do &mdash; precedence-aware decision resolution, deterministic enforcement, governance propagation across execution surfaces &mdash; is one specific instance of the broader need for verifiable execution governance around autonomous systems. The category is not "tool for AI coding teams"; the category is "execution governance for agentic infrastructure." Mneme is one implementation. The need will produce many.</p>
+
+    <h2 id="conclusion">Conclusion</h2>
+
+    <p>The npm and developer-tooling compromises are not the story. They are the visible edge of a larger transition. AI systems have moved from generating output that a human then deploys to operating execution infrastructure directly. The hooks they install, the workflows they trigger, the configurations they persist, and the agents they invoke are all part of a fabric that did not exist in the productivity-tooling era and that current security models were not designed for.</p>
+
+    <p>The right response is not better antivirus for developer machines or stricter package allowlists, though both have their place. The right response is to treat the execution fabric as the runtime it has become: define which paths are allowed to exist, attach architectural invariants to them, propagate constraints across delegations, and put a deterministic check between intent and execution.</p>
+
+    <p>The future AI stack will not just need better models. It will need verifiable execution infrastructure.</p>
+
+    <h2 id="faq">FAQ</h2>
+
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Is this article about a specific malware incident?</summary>
+        <div class="faq-body">No. The recent compromises that persisted through Claude Code hooks, VS Code tasks, and CI automation are the surface symptom. The article's argument is about the underlying infrastructure transition that made those persistence paths exist. The incident is treated as evidence, not as the story.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>How is execution governance different from security?</summary>
+        <div class="faq-body">Security answers whether something is malicious, vulnerable, or compromised. Governance answers whether an execution path should exist at all, whether an agent has authority to perform an action, and whether automation is operating within approved architectural boundaries. The two questions overlap in places but are not substitutes &mdash; a non-malicious agent action can still violate architectural intent.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>What counts as agentic infrastructure?</summary>
+        <div class="faq-body">Anything that gives an AI system the ability to execute work without an explicit per-action human trigger: Claude Code hooks, agent skills, VS Code task runners, GitHub Actions workflows that invoke models, MCP servers, autonomous remediation loops, scheduled agent runs, and multi-agent orchestration graphs. The defining property is delegated authority &mdash; the agent is allowed to act, and the act has effects on shared systems.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Why does this matter for governance specifically?</summary>
+        <div class="faq-body">Because the security model for agentic infrastructure still assumes a human in the loop, but the execution model increasingly does not. Once an agent can write code, modify configuration, trigger workflows, and persist state, the question of which decisions govern those actions stops being a documentation problem and becomes an enforcement problem. Governance is the layer that turns architectural intent into a deterministic check that runs before execution, not after.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Doesn't supply-chain security already cover this?</summary>
+        <div class="faq-body">Supply-chain security frameworks like <a href="https://slsa.dev/" target="_blank" rel="noopener">SLSA</a>, <a href="https://www.sigstore.dev/" target="_blank" rel="noopener">Sigstore</a>, and <a href="https://openssf.org/" target="_blank" rel="noopener">OpenSSF</a> address provenance and integrity of code artifacts &mdash; they answer "is this build what its source says it is?" That is necessary but not sufficient. They do not address whether the now-trusted artifact should have authority to run a hook on developer machines, modify CI configuration, or invoke another agent. That additional question is what execution governance covers.</div>
+      </details>
+    </div>
+
+    <h2 id="related-reading">Related reading</h2>
+    <ul>
+      <li><a href="/insights/autonomous-code-remediation-requires-architectural-governance/">Autonomous Code Remediation Requires Architectural Governance</a></li>
+      <li><a href="/insights/long-running-agents-need-governance/">Long-Running Agents Need More Than Memory</a></li>
+      <li><a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/">Architectural Governance Across Heterogeneous AI Coding Agents</a></li>
+      <li><a href="/insights/why-architectural-governance-needs-precedence-semantics/">Why AI Architectural Governance Needs Precedence Semantics</a></li>
+      <li><a href="/concepts/governance-infrastructure/">Concept: Governance Infrastructure</a></li>
+      <li><a href="/concepts/enforcement-provenance/">Concept: Enforcement Provenance</a></li>
+    </ul>
+
+    <div class="cta-block">
+      <h3>See execution governance running</h3>
+      <p>The Mneme demo shows a deterministic governance layer intercepting agent tool calls, resolving the applicable decision, and enforcing it before any change lands &mdash; the same enforcement pattern this article argues belongs in every agentic execution surface.</p>
+      <a href="/demo/" class="btn-primary">View the demo &rarr;</a>
+    </div>
+
+    <div class="article-footer">
+      <a href="/insights/" class="back-link">&larr; Back to Insights</a>
+    </div>
+
+  </div>
+</article>
+</main>
+
+<footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+  <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/use-cases/" style="color: var(--muted); text-decoration: none;">Use cases</a></li>
+        <li><a href="/#how-it-works" style="color: var(--muted); text-decoration: none;">How it works</a></li>
+        <li><a href="/demo/" style="color: var(--muted); text-decoration: none;">Demo</a></li>
+        <li><a href="/benchmark/" style="color: var(--muted); text-decoration: none;">Benchmark</a></li>
+        <li><a href="/roadmap/" style="color: var(--muted); text-decoration: none;">Roadmap</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Resources</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/insights/" style="color: var(--muted); text-decoration: none;">Insights</a></li>
+        <li><a href="/concepts/" style="color: var(--muted); text-decoration: none;">Concepts</a></li>
+        <li><a href="/architecture/" style="color: var(--muted); text-decoration: none;">Architecture</a></li>
+        <li><a href="/integrations/" style="color: var(--muted); text-decoration: none;">Integrations</a></li>
+        <li><a href="/standards/" style="color: var(--muted); text-decoration: none;">Standards</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/founder/" style="color: var(--muted); text-decoration: none;">Founder</a></li>
+        <li><a href="https://github.com/TheoV823/mneme" style="color: var(--muted); text-decoration: none;">GitHub</a></li>
+        <li><a href="mailto:hi@theovalmis.com" style="color: var(--muted); text-decoration: none;">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="max-width: 1080px; margin: 2.5rem auto 0; display: flex; justify-content: space-between; align-items: center; padding-top: 1.5rem; border-top: 1px solid var(--border); font-size: 0.72rem; color: var(--muted);">
+    <span>&copy; 2026 Mneme HQ</span>
+  </div>
+</footer>
+
+<script><!-- nav-active -->
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  function setOpen(open){
+    links.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('menu-open', open);
+  }
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    setOpen(!links.classList.contains('open'));
+  });
+  document.addEventListener('click', function(e){
+    if (!links.classList.contains('open')) return;
+    if (links.contains(e.target) || btn.contains(e.target)) return;
+    setOpen(false);
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false);
+  });
+  links.addEventListener('click', function(e){
+    if (e.target.tagName === 'A') setOpen(false);
+  });
+  window.addEventListener('resize', function(){
+    if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false);
+  });
+})();
+</script>
+</body>
+</html>

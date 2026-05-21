@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAG Is Not Memory — Mneme HQ</title>
+  <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/fonts.css">
+  <meta name="description" content="RAG retrieves similar text. Memory preserves durable identity. Most products labelled 'AI memory' are actually retrieval over a session transcript — and the conflation produces failure modes that look like memory bugs but are retrieval bugs." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/insights/rag-is-not-memory/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="RAG Is Not Memory" />
+  <meta property="og:description" content="RAG retrieves similar text. Memory preserves durable identity. The category has been conflating them, and the failure modes are showing up in production." />
+  <meta property="og:url" content="https://mnemehq.com/insights/rag-is-not-memory/" />
+  <meta property="og:image" content="https://mnemehq.com/insights/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="RAG Is Not Memory" />
+  <meta name="twitter:description" content="RAG retrieves similar text. Memory preserves durable identity. The category has been conflating them, and the failure modes are showing up in production." />
+  <meta name="twitter:image" content="https://mnemehq.com/insights/og.png" />
+  <meta name="author" content="Theo Valmis" />
+  <meta property="article:published_time" content="2026-05-21T00:00:00Z" />
+  <meta property="article:author" content="https://mnemehq.com/founder/" />
+  <meta property="article:section" content="Engineering" />
+    <!-- Consent defaults -->
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{'analytics_storage':'granted','ad_storage':'denied','ad_user_data':'denied','ad_personalization':'denied'});</script>
+
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #a8a8b8;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .article-wrap { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 7rem; }
+    .article-header { margin-bottom: 3.5rem; }
+    .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+
+    .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
+    .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
+    .article-body p strong { color: var(--text); font-weight: 500; }
+    .article-body ul { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body ul li { margin-bottom: 0.5rem; line-height: 1.8; }
+    .article-body ul li strong { color: var(--text); font-weight: 500; }
+    .article-body ol { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body ol li { margin-bottom: 0.5rem; line-height: 1.8; }
+    .article-body ol li strong { color: var(--text); font-weight: 500; }
+    .article-body code { font-family: 'DM Mono', monospace; font-size: 0.82rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 0.05rem 0.4rem; color: var(--text); }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout p strong { color: var(--accent); }
+
+    .contrast-block { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border-radius: 12px; overflow: hidden; margin: 2.5rem 0; }
+    .contrast-cell { background: var(--surface); padding: 1.75rem; }
+    .contrast-cell .label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem; }
+    .contrast-cell .tool { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem; }
+    .contrast-cell .desc { font-size: 0.82rem; color: var(--muted); line-height: 1.65; }
+    .contrast-cell.accent-left { border-left: 3px solid var(--border2); }
+    .contrast-cell.accent-right { border-left: 3px solid var(--accent); }
+    @media (max-width: 540px) { .contrast-block { grid-template-columns: 1fr; } }
+
+    .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .back-link:hover { color: var(--text); }
+    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2rem; }
+    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--accent-dim); }
+
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .breadcrumb-nav { max-width: 720px; margin: 0 auto; padding: 1.75rem 2rem 0.85rem; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.82rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .toc { position: static; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 0.9rem 1.25rem; margin: 0 0 2rem; }
+    .toc .toc-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.55rem; }
+    .toc ol { list-style: none; counter-reset: toc; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 0.25rem; }
+    .toc ol li { counter-increment: toc; font-size: 0.78rem; padding-left: 1.9rem; position: relative; line-height: 1.5; }
+    .toc ol li::before { content: counter(toc, decimal-leading-zero); position: absolute; left: 0; top: 0.05rem; font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.05em; }
+    .toc a { color: var(--text); text-decoration: none; transition: color 0.15s; }
+    .toc a:hover { color: var(--accent); }
+    @media (min-width: 720px) { .toc ol { grid-template-columns: 1fr 1fr; gap: 0.3rem 1.25rem; } }
+
+    .axis-table { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin: 2.5rem 0; overflow-x: auto; }
+    .axis-table .ax-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+    .axis-table table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .axis-table th, .axis-table td { text-align: left; padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; }
+    .axis-table th { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+    .axis-table td:first-child { color: var(--text); font-weight: 500; min-width: 8rem; }
+    .axis-table tr:last-child td { border-bottom: none; }
+    .axis-table tr.accent-row td { color: var(--accent); }
+    .axis-table tr.accent-row td:first-child { color: var(--accent); }
+
+    .faq-list { margin: 2rem 0 0; }
+    .faq-item { border-top: 1px solid var(--border); padding: 1.1rem 0; }
+    .faq-item:last-child { border-bottom: 1px solid var(--border); }
+    .faq-item summary { cursor: pointer; font-size: 0.92rem; color: var(--text); font-weight: 500; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; font-family: 'DM Mono', monospace; color: var(--muted); font-size: 1.1rem; transition: transform 0.15s; }
+    .faq-item[open] summary::after { content: '\2212'; }
+    .faq-body { padding-top: 0.9rem; font-size: 0.85rem; color: var(--muted); line-height: 1.8; }
+    .faq-body a { color: var(--accent); text-decoration: none; }
+    .faq-body a:hover { color: var(--accent-dim); }
+
+    .article-body a.ext { color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(200,240,96,0.4); }
+    .article-body a.ext:hover { color: var(--accent-dim); border-bottom-color: rgba(200,240,96,0.7); }
+
+    .nav-hamburger {
+      display: none;
+      background: none;
+      border: 1px solid var(--border2);
+      color: var(--text);
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 0;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 4px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span {
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: currentColor;
+      border-radius: 1px;
+      transition: transform 0.25s ease, opacity 0.18s ease;
+      transform-origin: center;
+    }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    @media (max-width: 900px) {
+      html, body { overflow-x: hidden; }
+      body.menu-open { overflow: hidden; }
+      nav, nav.site-nav { position: relative; padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links {
+        display: flex !important;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        gap: 0;
+        background: rgba(12,12,13,0.98);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: 0 1.25rem;
+        z-index: 99;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        visibility: hidden;
+        transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s;
+      }
+      .nav-links.open {
+        max-height: 80vh;
+        opacity: 1;
+        visibility: visible;
+        padding: 0.5rem 1.25rem 1.25rem;
+        transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s;
+        overflow-y: auto;
+      }
+      .nav-links a:not(.btn-nav-cta) {
+        display: block;
+        color: var(--text);
+        font-size: 0.92rem;
+        padding: 0.85rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+      .article-wrap { padding: 3rem 1.25rem 5rem; }
+    }
+
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    h2#related-reading { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 400; margin-top: 3.5rem; margin-bottom: 0.75rem; }
+    h2#related-reading + ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    h2#related-reading + ul li { margin: 0; }
+    h2#related-reading + ul li a { display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.1rem; background: var(--surface); color: var(--text); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.15s, color 0.15s; }
+    h2#related-reading + ul li a::after { content: '\2192'; opacity: 0.35; transition: opacity 0.15s, transform 0.15s; display: inline-block; margin-left: 0.5rem; }
+    h2#related-reading + ul li a:hover { background: var(--surface2); color: var(--accent); }
+    h2#related-reading + ul li a:hover::after { opacity: 1; transform: translateX(3px); }
+
+    .pull-quote { font-family: 'Instrument Serif', serif; font-size: 1.5rem; line-height: 1.45; color: var(--text); border-left: 2px solid var(--accent); padding: 0.25rem 0 0.25rem 1.25rem; margin: 2.5rem 0; font-style: italic; }
+    .pull-quote em { font-style: normal; color: var(--accent); }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Insights", "item": "https://mnemehq.com/insights/"},
+          {"@type": "ListItem", "position": 3, "name": "RAG Is Not Memory", "item": "https://mnemehq.com/insights/rag-is-not-memory/"}
+        ]
+      },
+      {
+        "@type": "Article",
+        "headline": "RAG Is Not Memory",
+        "description": "RAG retrieves similar text. Memory preserves durable identity. Most products labelled 'AI memory' are actually retrieval over a session transcript — and the conflation produces failure modes that look like memory bugs but are retrieval bugs.",
+        "url": "https://mnemehq.com/insights/rag-is-not-memory/",
+        "datePublished": "2026-05-21",
+        "dateModified": "2026-05-21",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "image": "https://mnemehq.com/insights/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/insights/rag-is-not-memory/"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {"@type": "Question", "name": "Isn't RAG just a way of giving an LLM memory?", "acceptedAnswer": {"@type": "Answer", "text": "RAG gives an LLM access to a similarity-ranked subset of prior text at inference time. That is useful, but it is not memory in the engineering sense. Memory implies a durable, identity-stable store where 'what is true about X' has a single answer at any given time. RAG returns the k most similar passages to a query embedding — a probability distribution, not an identity record. Treating the first as the second produces the most common AI memory failures in production."}},
+          {"@type": "Question", "name": "What is an example of a failure caused by this conflation?", "acceptedAnswer": {"@type": "Answer", "text": "A user tells the assistant their database is now PostgreSQL, having previously been MySQL. A memory system updates the canonical fact 'database = PostgreSQL' and the old fact is no longer authoritative. A RAG-as-memory system stores both statements as separate documents. On the next query, the similarity ranker may return either, depending on phrasing. The assistant confidently says 'your database is MySQL' three turns later because that passage scored higher on the new query embedding. This is not a memory bug; it is RAG behaving exactly as designed."}},
+          {"@type": "Question", "name": "Does this mean RAG is bad?", "acceptedAnswer": {"@type": "Answer", "text": "No. RAG is excellent at what it actually does: retrieving relevant text passages from a large corpus to inform a generation step. That is a real and valuable capability. The issue is naming. When a product is sold as 'AI memory' but implemented as RAG, users expect identity-stable behavior and get similarity-ranked behavior. The category produces both bad UX and unsafe operational decisions in agent systems that rely on persistent state."}},
+          {"@type": "Question", "name": "What does a real memory layer look like?", "acceptedAnswer": {"@type": "Answer", "text": "A real memory layer has: stable identity (each fact is keyed, not just embedded); time-aware truth (the latest assertion about a key supersedes earlier ones); deterministic resolution (a query for 'database' returns one answer, not a distribution); replacement and deletion semantics; and an audit trail of when each fact was set, by whom, and what it superseded. None of these are properties of vector similarity retrieval. All of them are required if you want the system to act as if it remembers."}},
+          {"@type": "Question", "name": "How does this relate to architectural governance?", "acceptedAnswer": {"@type": "Answer", "text": "Architectural governance has the same identity-stability requirement as memory, and the same incompatibility with RAG. An ADR that supersedes an older one must win every retrieval, not just the ones where its embedding happens to rank higher. Mneme treats decisions as identity-keyed memory entries with explicit supersedes relationships and a deterministic precedence resolver — which is why a vector store under it would defeat the point."}}
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/benchmark/">Benchmark</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/insights/">Insights</a></li>
+    <li aria-current="page">RAG Is Not Memory</li>
+  </ol>
+</nav>
+<article class="article-wrap">
+  <header class="article-header">
+    <div class="article-eyebrow">
+      <span class="eyebrow-tag">Category Education</span>
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-meta">7 min read &nbsp;&middot;&nbsp; May 2026</span>
+    </div>
+    <h1>RAG is not memory</h1>
+    <p class="article-lede">A retrieval system answers <em>which passages are most similar to this query?</em> A memory system answers <em>what is true about this thing right now?</em> Most products labelled "AI memory" implement the first and are sold as if they implemented the second. The conflation produces a class of failures that look like memory bugs but are retrieval behaving exactly as designed.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-21">Published May 2026</time>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-21">Updated May 2026</time>
+    </p>
+  </header>
+
+  <div class="article-body">
+
+    <nav class="toc" aria-label="Table of contents">
+      <div class="toc-title">In this article</div>
+      <ol>
+        <li><a href="#two-questions">Two different questions</a></li>
+        <li><a href="#what-rag-does">What RAG actually does</a></li>
+        <li><a href="#what-memory-needs">What memory actually needs</a></li>
+        <li><a href="#failure-modes">The failure modes the conflation produces</a></li>
+        <li><a href="#why-it-spreads">Why the conflation keeps spreading</a></li>
+        <li><a href="#triangle">The conceptual triangle: memory, RAG, governance</a></li>
+        <li><a href="#conclusion">Conclusion</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ol>
+    </nav>
+
+    <p>The AI tooling category has settled on "memory" as a name for a feature most products implement as retrieval. The two words sound interchangeable in marketing copy. They are not interchangeable in engineering. When a user says "the assistant should remember that my database is PostgreSQL now," they are describing a memory operation &mdash; replace the prior fact with the new one, and never produce the old one again. When a vector store answers a similarity query about databases, it returns the top-k most embedding-similar passages from the corpus, including both the current and the prior assertion.</p>
+
+    <p>Those are not two implementations of the same thing. They are two different operations with two different correctness criteria. Conflating them is the most expensive recurring mistake in current "AI memory" products.</p>
+
+    <h2 id="two-questions">Two different questions</h2>
+
+    <p>The cleanest way to see the distinction is to write down the question each system is built to answer.</p>
+
+    <div class="contrast-block">
+      <div class="contrast-cell accent-left">
+        <div class="label">RAG answers</div>
+        <div class="tool">Which passages are most similar to this query?</div>
+        <div class="desc">Input is a query embedding. Output is a ranked list of stored passages by cosine similarity (or another distance metric). The result is a probability distribution over the corpus, conditioned on the query. There is no single correct answer; there is a most-relevant one.</div>
+      </div>
+      <div class="contrast-cell accent-right">
+        <div class="label">Memory answers</div>
+        <div class="tool">What is true about this entity right now?</div>
+        <div class="desc">Input is an identity key (a user, a project, a setting). Output is the current value, ideally with the time it was set and what it superseded. There is a single correct answer at any moment; previous answers are history, not candidates.</div>
+      </div>
+    </div>
+
+    <p>The shape of the operation is different. RAG is a ranking function over a corpus. Memory is a lookup against an identity. They can be composed &mdash; you can use RAG to retrieve memory entries &mdash; but RAG <em>alone</em> cannot perform a memory operation, because RAG has no concept of identity, replacement, or "the latest one wins."</p>
+
+    <h2 id="what-rag-does">What RAG actually does</h2>
+
+    <p>Retrieval-augmented generation, in the standard implementation, looks like this:</p>
+
+    <ol>
+      <li><strong>Chunk and embed.</strong> Documents are split into chunks and each chunk is embedded into a vector space. The chunks live in a vector store, possibly with metadata.</li>
+      <li><strong>Embed the query.</strong> At inference time, the user query (or some derived form of it) is embedded into the same vector space.</li>
+      <li><strong>Retrieve top-k.</strong> A similarity search returns the k nearest chunks, ranked by distance.</li>
+      <li><strong>Inject and generate.</strong> The retrieved chunks are inserted into the LLM context and the model generates an answer.</li>
+    </ol>
+
+    <p>This pattern is excellent at what it was designed for: surfacing relevant passages from a large corpus that an LLM might not otherwise have in context. It works well for documentation lookup, knowledge-base assistants, semantic search, and a wide class of question-answering tasks where the right answer is plausibly contained in one or more passages somewhere in the corpus.</p>
+
+    <p>What RAG does not do, by construction:</p>
+
+    <ul>
+      <li><strong>It does not know which passage is current.</strong> Two passages that contradict each other both live in the store. Both can be returned. The newer one does not automatically win.</li>
+      <li><strong>It does not have identity.</strong> The store does not have a concept of "the user's database setting." It has chunks that mention databases.</li>
+      <li><strong>It cannot replace.</strong> Adding a new passage does not invalidate the old one. Both will continue to be retrievable.</li>
+      <li><strong>It is non-deterministic at the boundary.</strong> A different phrasing of the same question can change which passages rank highest. The system's output depends on the exact query embedding, not on the underlying fact.</li>
+    </ul>
+
+    <p>None of these are bugs. They are properties. RAG is a similarity search; similarity search behaves like this.</p>
+
+    <h2 id="what-memory-needs">What memory actually needs</h2>
+
+    <p>A system that genuinely behaves as memory has a different set of properties, each of which a vector store does not provide on its own.</p>
+
+    <div class="axis-table">
+      <div class="ax-title">Properties of a real memory layer</div>
+      <table>
+        <thead>
+          <tr><th>Property</th><th>What it means</th><th>Has RAG?</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Stable identity</td><td>Each fact is keyed to a thing &mdash; a user, a project, a setting &mdash; not just embedded as text.</td><td>No</td></tr>
+          <tr><td>Time-aware truth</td><td>The latest assertion about a key is authoritative. Earlier values become history.</td><td>No</td></tr>
+          <tr><td>Deterministic resolution</td><td>A query for the value of a key returns exactly one answer, not a distribution.</td><td>No</td></tr>
+          <tr><td>Replacement semantics</td><td>Writing a new value invalidates the old one. The old value is not returned by future reads of the same key.</td><td>No</td></tr>
+          <tr><td>Deletion semantics</td><td>A fact can be explicitly removed. Future reads return "no value," not a stale match.</td><td>No</td></tr>
+          <tr><td>Audit trail</td><td>When each fact was set, by whom, and what it superseded, is recoverable after the fact.</td><td>No</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>You can build a system with these properties on top of a vector store, but the vector store is no longer doing the memory work &mdash; an identity-keyed metadata layer on top of it is. The relevant part of the design is the layer that knows about identity, time, and supersession. The embedding is incidental.</p>
+
+    <h2 id="failure-modes">The failure modes the conflation produces</h2>
+
+    <p>When a product treats RAG as memory, a recognizable set of failures appears in production:</p>
+
+    <ul>
+      <li><strong>Stale facts resurface.</strong> The assistant tells the user something they corrected three weeks ago, because a phrasing of the new query happens to retrieve the old passage with higher similarity.</li>
+      <li><strong>Contradictions in adjacent turns.</strong> The model says one thing in turn 4 and the opposite in turn 7. Both came from the corpus. Neither was wrong to retrieve. The system has no concept of which is true.</li>
+      <li><strong>Identity confusion.</strong> The assistant mixes facts from two users whose memories happen to embed near each other in vector space, especially in multi-tenant systems where identity scoping is implicit rather than enforced.</li>
+      <li><strong>Drift that looks like model regression.</strong> As the corpus grows, the distribution of retrieved passages shifts. The same query starts returning different results. The model appears to "forget" without anything having changed in the model itself.</li>
+      <li><strong>Silent data sprawl.</strong> Because nothing is ever replaced, the store accumulates duplicates and near-duplicates. Operations and quality teams interpret this as a data hygiene problem; it is a missing semantics problem.</li>
+    </ul>
+
+    <p class="pull-quote"><em>The failures are not memory bugs.</em> They are retrieval behaving exactly as designed.</p>
+
+    <h2 id="why-it-spreads">Why the conflation keeps spreading</h2>
+
+    <p>The naming is sticky for three reasons.</p>
+
+    <p>First, RAG is comparatively easy to build. There are mature open-source embedding libraries, mature vector stores, and well-understood patterns. Identity-keyed memory with replacement semantics is harder to build correctly &mdash; you need schema, write paths, conflict resolution, deletion, and audit. A team shipping fast picks the easier infrastructure and labels it with the more attractive word.</p>
+
+    <p>Second, retrieval systems demo well. In a single short conversation, recalling a relevant prior message looks like memory. The failure modes &mdash; staleness, contradiction, identity confusion &mdash; appear over longer interactions, larger corpora, and multi-tenant deployments. A demo at launch is unlikely to surface them. A production deployment six months later will.</p>
+
+    <p>Third, the category has not yet developed clear vocabulary. "Memory" is the available word for "the system remembers things across sessions." Until the category separates retrieval and memory at the level of how products describe themselves, the naming will keep doing the work that a clear specification should be doing.</p>
+
+    <h2 id="triangle">The conceptual triangle: memory, RAG, governance</h2>
+
+    <p>This article sits next to two others on the site that argue adjacent points. The three together form a triangle of "X is not Y" arguments that share a structural feature: each pair gets conflated in marketing and produces specific failure modes in engineering.</p>
+
+    <ul>
+      <li><strong><a href="/insights/memory-is-not-governance/">Memory is not governance.</a></strong> Memory optimizes recall. Governance optimizes constraint enforcement. Even a perfect memory layer does not enforce architectural rules; it only remembers them.</li>
+      <li><strong><a href="/insights/why-rag-fails-for-architectural-governance/">Why RAG fails for architectural governance.</a></strong> RAG retrieves similar text. Governance requires authoritative, precedence-aware constraint resolution. Even when "the right ADR" exists in the corpus, RAG will not reliably surface it against an older one with higher similarity.</li>
+      <li><strong>RAG is not memory.</strong> The third edge. Even before governance enters the picture, the two infrastructure primitives most often confused with each other &mdash; the retrieval layer and the memory layer &mdash; are different operations with different correctness criteria.</li>
+    </ul>
+
+    <p>The three pieces compose. Once memory is correctly separated from retrieval, and governance is correctly separated from memory, what remains is a clearer view of which infrastructure piece is responsible for which property. Identity-keyed truth lives in memory. Similarity-ranked context lives in RAG. Deterministic constraint enforcement lives in governance. Mneme is one specific implementation of the third, and one of the reasons it works is that it does not pretend to be the other two.</p>
+
+    <h2 id="conclusion">Conclusion</h2>
+
+    <p>The names matter because the contracts matter. A user who is told a system has memory expects identity-keyed, time-aware, replacement-respecting behavior. A system built on RAG provides similarity-ranked retrieval over a corpus. The two are useful for different things. Selling one as the other produces a recognizable set of failures that no amount of model improvement can fix, because the gap is not in the model &mdash; it is in the data layer the model is asked to trust.</p>
+
+    <p>Build retrieval where retrieval is the right tool. Build memory where memory is the right tool. And if a product is offering you "AI memory," it is worth asking, before you trust it with anything authoritative, which of the two it actually is underneath.</p>
+
+    <h2 id="faq">FAQ</h2>
+
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Isn't RAG just a way of giving an LLM memory?</summary>
+        <div class="faq-body">RAG gives an LLM access to a similarity-ranked subset of prior text at inference time. That is useful, but it is not memory in the engineering sense. Memory implies a durable, identity-stable store where "what is true about X" has a single answer at any given time. RAG returns the k most similar passages to a query embedding &mdash; a probability distribution, not an identity record. Treating the first as the second produces the most common AI memory failures in production.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>What is an example of a failure caused by this conflation?</summary>
+        <div class="faq-body">A user tells the assistant their database is now PostgreSQL, having previously been MySQL. A memory system updates the canonical fact "database = PostgreSQL" and the old fact is no longer authoritative. A RAG-as-memory system stores both statements as separate documents. On the next query, the similarity ranker may return either, depending on phrasing. The assistant confidently says "your database is MySQL" three turns later because that passage scored higher on the new query embedding. This is not a memory bug; it is RAG behaving exactly as designed.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Does this mean RAG is bad?</summary>
+        <div class="faq-body">No. RAG is excellent at what it actually does: retrieving relevant text passages from a large corpus to inform a generation step. That is a real and valuable capability. The issue is naming. When a product is sold as "AI memory" but implemented as RAG, users expect identity-stable behavior and get similarity-ranked behavior. The category produces both bad UX and unsafe operational decisions in agent systems that rely on persistent state.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>What does a real memory layer look like?</summary>
+        <div class="faq-body">A real memory layer has: stable identity (each fact is keyed, not just embedded); time-aware truth (the latest assertion about a key supersedes earlier ones); deterministic resolution (a query for "database" returns one answer, not a distribution); replacement and deletion semantics; and an audit trail of when each fact was set, by whom, and what it superseded. None of these are properties of vector similarity retrieval. All of them are required if you want the system to act as if it remembers.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>How does this relate to architectural governance?</summary>
+        <div class="faq-body">Architectural governance has the same identity-stability requirement as memory, and the same incompatibility with RAG. An ADR that supersedes an older one must win every retrieval, not just the ones where its embedding happens to rank higher. Mneme treats decisions as identity-keyed memory entries with explicit supersedes relationships and a deterministic precedence resolver &mdash; which is why a vector store under it would defeat the point.</div>
+      </details>
+    </div>
+
+    <h2 id="related-reading">Related reading</h2>
+    <ul>
+      <li><a href="/insights/memory-is-not-governance/">Memory Is Not Governance</a></li>
+      <li><a href="/insights/why-rag-fails-for-architectural-governance/">Why RAG Fails for Architectural Governance</a></li>
+      <li><a href="/insights/why-prompt-memory-fails-at-scale/">Why Prompt Memory Fails at Scale</a></li>
+      <li><a href="/insights/why-architectural-governance-needs-precedence-semantics/">Why AI Architectural Governance Needs Precedence Semantics</a></li>
+      <li><a href="/concepts/decision-continuity/">Concept: Decision Continuity</a></li>
+    </ul>
+
+    <div class="cta-block">
+      <h3>See identity-keyed governance running</h3>
+      <p>The Mneme demo shows decisions resolved by identity and precedence, not by similarity &mdash; the property this article argues a memory layer needs and a retrieval layer cannot provide.</p>
+      <a href="/demo/" class="btn-primary">View the demo &rarr;</a>
+    </div>
+
+    <div class="article-footer">
+      <a href="/insights/" class="back-link">&larr; Back to Insights</a>
+    </div>
+
+  </div>
+</article>
+</main>
+
+<footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+  <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/use-cases/" style="color: var(--muted); text-decoration: none;">Use cases</a></li>
+        <li><a href="/#how-it-works" style="color: var(--muted); text-decoration: none;">How it works</a></li>
+        <li><a href="/demo/" style="color: var(--muted); text-decoration: none;">Demo</a></li>
+        <li><a href="/benchmark/" style="color: var(--muted); text-decoration: none;">Benchmark</a></li>
+        <li><a href="/roadmap/" style="color: var(--muted); text-decoration: none;">Roadmap</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Resources</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/insights/" style="color: var(--muted); text-decoration: none;">Insights</a></li>
+        <li><a href="/concepts/" style="color: var(--muted); text-decoration: none;">Concepts</a></li>
+        <li><a href="/architecture/" style="color: var(--muted); text-decoration: none;">Architecture</a></li>
+        <li><a href="/integrations/" style="color: var(--muted); text-decoration: none;">Integrations</a></li>
+        <li><a href="/standards/" style="color: var(--muted); text-decoration: none;">Standards</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/founder/" style="color: var(--muted); text-decoration: none;">Founder</a></li>
+        <li><a href="https://github.com/TheoV823/mneme" style="color: var(--muted); text-decoration: none;">GitHub</a></li>
+        <li><a href="mailto:hi@theovalmis.com" style="color: var(--muted); text-decoration: none;">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="max-width: 1080px; margin: 2.5rem auto 0; display: flex; justify-content: space-between; align-items: center; padding-top: 1.5rem; border-top: 1px solid var(--border); font-size: 0.72rem; color: var(--muted);">
+    <span>&copy; 2026 Mneme HQ</span>
+  </div>
+</footer>
+
+<script><!-- nav-active -->
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  function setOpen(open){
+    links.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('menu-open', open);
+  }
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    setOpen(!links.classList.contains('open'));
+  });
+  document.addEventListener('click', function(e){
+    if (!links.classList.contains('open')) return;
+    if (links.contains(e.target) || btn.contains(e.target)) return;
+    setOpen(false);
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false);
+  });
+  links.addEventListener('click', function(e){
+    if (e.target.tagName === 'A') setOpen(false);
+  });
+  window.addEventListener('resize', function(){
+    if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false);
+  });
+})();
+</script>
+</body>
+</html>

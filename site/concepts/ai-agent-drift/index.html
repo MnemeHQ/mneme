@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Agent Drift â€” Mneme HQ Concepts</title>
+  <title>AI Agent Drift — Mneme HQ Concepts</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
   <meta name="description" content="AI agent drift is the agent-side phenomenon where coding agents progressively diverge from the team's intended architecture across sessions, providers, and context resets." />
@@ -13,12 +13,12 @@
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="AI Agent Drift â€” Mneme HQ Concepts" />
+  <meta property="og:title" content="AI Agent Drift — Mneme HQ Concepts" />
   <meta property="og:description" content="AI agent drift is the agent-side phenomenon where coding agents progressively diverge from the team's intended architecture across sessions, providers, and context resets." />
   <meta property="og:url" content="https://mnemehq.com/concepts/ai-agent-drift/" />
   <meta property="og:image" content="https://mnemehq.com/concepts/ai-agent-drift/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="AI Agent Drift â€” Mneme HQ Concepts" />
+  <meta name="twitter:title" content="AI Agent Drift — Mneme HQ Concepts" />
   <meta name="twitter:description" content="AI agent drift is the agent-side phenomenon where coding agents produce code that progressively diverges from team architecture." />
   <meta name="twitter:image" content="https://mnemehq.com/concepts/ai-agent-drift/og.png" />
   <meta name="author" content="Theo Valmis" />
@@ -204,7 +204,7 @@
       },
       {
         "@type": "TechArticle",
-        "headline": "AI Agent Drift â€” Mneme HQ Concepts",
+        "headline": "AI Agent Drift — Mneme HQ Concepts",
         "description": "AI agent drift is the agent-side phenomenon where coding agents produce code that progressively diverges from team architecture across sessions, providers, and context resets.",
         "url": "https://mnemehq.com/concepts/ai-agent-drift/",
         "datePublished": "2026-05-15",
@@ -222,27 +222,27 @@
           {
             "@type": "Question",
             "name": "What is AI agent drift?",
-            "acceptedAnswer": {"@type": "Answer", "text": "AI agent drift is the agent-side phenomenon where coding agents produce code that diverges from the team's intended architecture â€” not because of a single bad answer, but because no two sessions share the same memory of prior architectural decisions. Each session starts cold, infers conventions from whatever it sees, and writes code that subtly shifts the codebase's patterns. The result, across hundreds of sessions and multiple agents, is compound divergence: architectural drift in the codebase."}
+            "acceptedAnswer": {"@type": "Answer", "text": "AI agent drift is the agent-side phenomenon where coding agents produce code that diverges from the team's intended architecture — not because of a single bad answer, but because no two sessions share the same memory of prior architectural decisions. Each session starts cold, infers conventions from whatever it sees, and writes code that subtly shifts the codebase's patterns. The result, across hundreds of sessions and multiple agents, is compound divergence: architectural drift in the codebase."}
           },
           {
             "@type": "Question",
             "name": "How is AI agent drift different from architectural drift?",
-            "acceptedAnswer": {"@type": "Answer", "text": "AI agent drift is the cause; architectural drift is the effect. The agent-side phenomenon is loss of context and divergence in proposals. The codebase-side phenomenon is the accumulated incoherence that follows. Both terms describe the same problem from opposite ends â€” one looks at the agent, the other looks at the codebase. Governance infrastructure addresses both: it constrains agent behavior so that the codebase doesn't drift."}
+            "acceptedAnswer": {"@type": "Answer", "text": "AI agent drift is the cause; architectural drift is the effect. The agent-side phenomenon is loss of context and divergence in proposals. The codebase-side phenomenon is the accumulated incoherence that follows. Both terms describe the same problem from opposite ends — one looks at the agent, the other looks at the codebase. Governance infrastructure addresses both: it constrains agent behavior so that the codebase doesn't drift."}
           },
           {
             "@type": "Question",
             "name": "Why does AI agent drift happen even with CLAUDE.md and prompt memory?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Because CLAUDE.md and prompt memory are advisory, not enforced. They live in the agent's context window â€” vulnerable to truncation, compaction, and being overridden by stronger signals elsewhere in the prompt. They are also per-agent: a CLAUDE.md file does not constrain Cursor, Copilot, or a teammate's session. Agent drift is structural; advisory memory cannot prevent it."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Because CLAUDE.md and prompt memory are advisory, not enforced. They live in the agent's context window — vulnerable to truncation, compaction, and being overridden by stronger signals elsewhere in the prompt. They are also per-agent: a CLAUDE.md file does not constrain Cursor, Copilot, or a teammate's session. Agent drift is structural; advisory memory cannot prevent it."}
           },
           {
             "@type": "Question",
             "name": "Can you measure AI agent drift?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Yes â€” and you should. Drift is measurable as the rate at which an agent's proposals deviate from compiled decision constraints, observed at the pre-tool-use hook. A drift-aware governance system logs each violation by agent, by session, by file. Aggregated, this produces a drift telemetry surface that tells you which decisions are being violated most often and which agents need constraint reinforcement."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Yes — and you should. Drift is measurable as the rate at which an agent's proposals deviate from compiled decision constraints, observed at the pre-tool-use hook. A drift-aware governance system logs each violation by agent, by session, by file. Aggregated, this produces a drift telemetry surface that tells you which decisions are being violated most often and which agents need constraint reinforcement."}
           },
           {
             "@type": "Question",
             "name": "What stops AI agent drift?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Pre-generation enforcement against a shared, compiled decision corpus. Every session â€” every agent â€” queries the same decisions before writing. Drift cannot accumulate when each proposal is checked against the same source of truth at the moment of intent. Documentation cannot do this; prompt memory cannot do this; only governance infrastructure can."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Pre-generation enforcement against a shared, compiled decision corpus. Every session — every agent — queries the same decisions before writing. Drift cannot accumulate when each proposal is checked against the same source of truth at the moment of intent. Documentation cannot do this; prompt memory cannot do this; only governance infrastructure can."}
           }
         ]
       },
@@ -279,7 +279,7 @@
 
 <main>
 <div class="answer-capsule">
-  <strong>AI agent drift.</strong> The agent-side phenomenon â€” coding agents, across sessions and providers, producing code that progressively diverges from the team's intended architecture. Architectural drift is what shows up in the codebase; AI agent drift is the upstream cause. The fix is not better prompts. It is governance the agent must query before writing.
+  <strong>AI agent drift.</strong> The agent-side phenomenon — coding agents, across sessions and providers, producing code that progressively diverges from the team's intended architecture. Architectural drift is what shows up in the codebase; AI agent drift is the upstream cause. The fix is not better prompts. It is governance the agent must query before writing.
 </div>
 
 <nav aria-label="Breadcrumb" class="breadcrumb-nav">
@@ -295,10 +295,10 @@
     <div class="article-eyebrow">
       <span class="eyebrow-tag">Concepts</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">10 min read &nbsp;Â·&nbsp; May 2026</span>
+      <span class="eyebrow-meta">10 min read &nbsp;·&nbsp; May 2026</span>
     </div>
     <h1>AI Agent Drift</h1>
-    <p class="article-lede">A single AI session has no way to know what was decided in a session three months ago â€” by a different agent, in a different chat, on a different developer's machine. Every cold start is a fresh interpretation of the codebase. AI agent drift is what accumulates when those interpretations are never reconciled against a source of truth.</p>
+    <p class="article-lede">A single AI session has no way to know what was decided in a session three months ago — by a different agent, in a different chat, on a different developer's machine. Every cold start is a fresh interpretation of the codebase. AI agent drift is what accumulates when those interpretations are never reconciled against a source of truth.</p>
     <p class="byline">
       By <a href="/founder/">Theo Valmis</a>
       <span class="sep">&middot;</span>
@@ -308,7 +308,7 @@
 
   <div class="article-body">
 
-    <p>"Drift" gets used loosely in AI coding discussions â€” sometimes to mean model degradation, sometimes to mean prompt forgetting, sometimes to mean code quality regression. None of those are what this page is about. AI agent drift names a specific, structural failure mode: <strong>the gap between the architectural decisions a team has made and the architectural choices an agent makes in any given session, when those decisions were never made queryable.</strong></p>
+    <p>"Drift" gets used loosely in AI coding discussions — sometimes to mean model degradation, sometimes to mean prompt forgetting, sometimes to mean code quality regression. None of those are what this page is about. AI agent drift names a specific, structural failure mode: <strong>the gap between the architectural decisions a team has made and the architectural choices an agent makes in any given session, when those decisions were never made queryable.</strong></p>
 
     <p>It is not a model failure. It is not an agent failure. It is a missing layer.</p>
 
@@ -323,7 +323,7 @@
           </linearGradient>
         </defs>
         <g>
-          <text x="40" y="28" fill="#c8f060" font-family="DM Mono, monospace" font-size="10" letter-spacing="0.06em">DRIFT TELEMETRY Â· sessions over time Â· no shared memory</text>
+          <text x="40" y="28" fill="#c8f060" font-family="DM Mono, monospace" font-size="10" letter-spacing="0.06em">DRIFT TELEMETRY · sessions over time · no shared memory</text>
 
           <!-- Axes -->
           <line x1="60" y1="180" x2="760" y2="180" stroke="#2e2e34" stroke-width="1"/>
@@ -374,7 +374,7 @@
           <text x="720" y="230" fill="#88889a" font-family="DM Mono, monospace" font-size="9" text-anchor="middle">tâ‚‡</text>
 
           <!-- Annotations -->
-          <text x="270" y="100" fill="#88889a" font-family="DM Mono, monospace" font-size="10">each session: cold start Â· no inherited decisions Â· pattern inferred from sample</text>
+          <text x="270" y="100" fill="#88889a" font-family="DM Mono, monospace" font-size="10">each session: cold start · no inherited decisions · pattern inferred from sample</text>
           <text x="270" y="115" fill="#88889a" font-family="DM Mono, monospace" font-size="10">small per-session deviations compound across the team's full output</text>
 
           <!-- Drift label -->
@@ -382,7 +382,7 @@
           <text x="710" y="158" fill="#e87c7c" font-family="DM Mono, monospace" font-size="10" text-anchor="end">drift = Î”</text>
 
           <!-- X axis label -->
-          <text x="400" y="270" fill="#88889a" font-family="DM Mono, monospace" font-size="10" text-anchor="middle">SESSIONS / TIME â†’</text>
+          <text x="400" y="270" fill="#88889a" font-family="DM Mono, monospace" font-size="10" text-anchor="middle">SESSIONS / TIME →</text>
           <text x="400" y="290" fill="#88889a" font-family="DM Mono, monospace" font-size="10" text-anchor="middle">each agent has no memory of what the others decided</text>
         </g>
       </svg>
@@ -391,11 +391,11 @@
 
     <h2>What AI agent drift actually means</h2>
 
-    <p>An agent starts a session. Its context is whatever the user supplies plus whatever the agent retrieves from the workspace. It has no inherited memory of decisions made in previous sessions, by previous agents, by other developers on the team. If the codebase contains the repository pattern in one service and a direct-DAO pattern in another, the agent has no way to know which one the team has decided to standardize on â€” unless that decision is encoded somewhere the agent will query, in a form the agent can use.</p>
+    <p>An agent starts a session. Its context is whatever the user supplies plus whatever the agent retrieves from the workspace. It has no inherited memory of decisions made in previous sessions, by previous agents, by other developers on the team. If the codebase contains the repository pattern in one service and a direct-DAO pattern in another, the agent has no way to know which one the team has decided to standardize on — unless that decision is encoded somewhere the agent will query, in a form the agent can use.</p>
 
-    <p>So the agent infers. It looks at what's around, picks a pattern, and proposes code consistent with what it sees. If it sees both patterns, it picks one â€” sometimes the right one, sometimes the wrong one. Across hundreds of sessions, that inference produces a probability distribution of pattern choices. The expected value of that distribution is not the team's decision. It is the agent's best guess given local samples.</p>
+    <p>So the agent infers. It looks at what's around, picks a pattern, and proposes code consistent with what it sees. If it sees both patterns, it picks one — sometimes the right one, sometimes the wrong one. Across hundreds of sessions, that inference produces a probability distribution of pattern choices. The expected value of that distribution is not the team's decision. It is the agent's best guess given local samples.</p>
 
-    <p><strong>AI agent drift is the divergence between what the team has decided and what the agent â€” left to its own inference â€” actually produces.</strong> It is not a moral failure of the agent. The agent is doing exactly what it is designed to do: write code that fits the context it sees. The structural problem is that "the context it sees" is not the same thing as "the decisions the team has made."</p>
+    <p><strong>AI agent drift is the divergence between what the team has decided and what the agent — left to its own inference — actually produces.</strong> It is not a moral failure of the agent. The agent is doing exactly what it is designed to do: write code that fits the context it sees. The structural problem is that "the context it sees" is not the same thing as "the decisions the team has made."</p>
 
     <div class="callout">
       <p><strong>No single agent action is drift.</strong> Drift is the statistical signature of many agent actions taken without a shared source of truth. It is what you observe in aggregate, not in any individual PR.</p>
@@ -407,11 +407,11 @@
 
     <ul>
       <li><strong>Better-trained agents</strong> can encode general best practices but cannot know <em>your team's</em> architectural decisions. A model that scores higher on every coding benchmark still has no awareness of your team's ADR-0017 on retry budgets.</li>
-      <li><strong>Longer context windows</strong> let agents read more â€” but reading is not the same as querying authoritative decisions. The agent still has to infer which of the patterns it read is the canonical one. A 1M-token window does not include the team's decision register unless that register exists and is structured.</li>
+      <li><strong>Longer context windows</strong> let agents read more — but reading is not the same as querying authoritative decisions. The agent still has to infer which of the patterns it read is the canonical one. A 1M-token window does not include the team's decision register unless that register exists and is structured.</li>
       <li><strong>Better CLAUDE.md files</strong> document decisions to humans and to the agent's reading layer, but they are advisory: a wall of prose competing with the rest of the context window for the model's attention. They are read; they are not enforced.</li>
     </ul>
 
-    <p>The structural cause of agent drift is that <strong>architectural decisions are not currently a queryable substrate</strong>. There is no schema, no API, no scope-aware retrieval, no precedence model. The agent has no way to ask "what decision applies to this file?" and receive a deterministic answer. The decisions exist â€” in heads, in wikis, in old ADRs â€” but they are not in a form that closes the inference gap. As long as the gap is open, drift will accumulate at the rate the team generates code.</p>
+    <p>The structural cause of agent drift is that <strong>architectural decisions are not currently a queryable substrate</strong>. There is no schema, no API, no scope-aware retrieval, no precedence model. The agent has no way to ask "what decision applies to this file?" and receive a deterministic answer. The decisions exist — in heads, in wikis, in old ADRs — but they are not in a form that closes the inference gap. As long as the gap is open, drift will accumulate at the rate the team generates code.</p>
 
     <h2>Drift across agents, sessions, and providers</h2>
 
@@ -445,7 +445,7 @@
         <tr>
           <td>Developers</td>
           <td>Each developer's local AI workflow</td>
-          <td>No shared substrate â€” each session is private</td>
+          <td>No shared substrate — each session is private</td>
         </tr>
         <tr>
           <td>Time</td>
@@ -456,27 +456,27 @@
     </table>
     </div>
 
-    <p>The takeaway: drift is not a bug in any one of these axes. It is the predictable outcome when none of them share state. The cure is shared state â€” externally compiled, externally enforced, available to all agents on all axes.</p>
+    <p>The takeaway: drift is not a bug in any one of these axes. It is the predictable outcome when none of them share state. The cure is shared state — externally compiled, externally enforced, available to all agents on all axes.</p>
 
     <h2>The common misread: confusing drift with hallucination</h2>
 
     <p>Engineers new to the problem sometimes describe agent drift as "the agent hallucinating an architecture." That framing is wrong in a way that matters. The agent is not hallucinating. It is faithfully producing code that fits the context it can see. The architecture it produces is a plausible inference from a partial sample.</p>
 
-    <p>Hallucination is a model failing to be grounded in its inputs. Drift is a model being perfectly grounded â€” in the wrong substrate. The substrate is the codebase plus the prompt; the decisions live elsewhere, often nowhere queryable. Treating drift as hallucination leads teams to invest in groundedness improvements (better RAG, more documentation in prompts) that don't address the missing decision layer.</p>
+    <p>Hallucination is a model failing to be grounded in its inputs. Drift is a model being perfectly grounded — in the wrong substrate. The substrate is the codebase plus the prompt; the decisions live elsewhere, often nowhere queryable. Treating drift as hallucination leads teams to invest in groundedness improvements (better RAG, more documentation in prompts) that don't address the missing decision layer.</p>
 
     <div class="callout-teal">
-      <p><strong>The fix for drift is not making the agent better.</strong> It is giving the agent something to query â€” a compiled, deterministic, scope-aware decision corpus that any agent, in any session, with any context window, can consult before generating code.</p>
+      <p><strong>The fix for drift is not making the agent better.</strong> It is giving the agent something to query — a compiled, deterministic, scope-aware decision corpus that any agent, in any session, with any context window, can consult before generating code.</p>
     </div>
 
     <h2>Drift as a measurable signal</h2>
 
-    <p>Drift is not just a narrative â€” it is observable. A governance system that intercepts agent tool use at the pre-generation hook can record, for every proposal, which decisions applied, which were respected, and which were violated. Aggregated, these records form a drift telemetry surface:</p>
+    <p>Drift is not just a narrative — it is observable. A governance system that intercepts agent tool use at the pre-generation hook can record, for every proposal, which decisions applied, which were respected, and which were violated. Aggregated, these records form a drift telemetry surface:</p>
 
     <ul>
-      <li><strong>Drift rate per decision</strong> â€” which decisions are violated most often? This is a signal that the decision is unclear, too narrow, or has a missing scope.</li>
-      <li><strong>Drift rate per agent</strong> â€” does one agent runtime systematically miss certain constraint types? Useful for tuning each agent's integration.</li>
-      <li><strong>Drift rate per region of the codebase</strong> â€” are violations clustering in legacy code, in new services, in specific paths? Helps target where the governance scope needs to be tightened.</li>
-      <li><strong>Drift over time</strong> â€” is the rate trending up or down after a new ADR is compiled? The first quantitative measure of whether a decision is taking effect.</li>
+      <li><strong>Drift rate per decision</strong> — which decisions are violated most often? This is a signal that the decision is unclear, too narrow, or has a missing scope.</li>
+      <li><strong>Drift rate per agent</strong> — does one agent runtime systematically miss certain constraint types? Useful for tuning each agent's integration.</li>
+      <li><strong>Drift rate per region of the codebase</strong> — are violations clustering in legacy code, in new services, in specific paths? Helps target where the governance scope needs to be tightened.</li>
+      <li><strong>Drift over time</strong> — is the rate trending up or down after a new ADR is compiled? The first quantitative measure of whether a decision is taking effect.</li>
     </ul>
 
     <p>None of this telemetry is available when governance is process-based. You cannot graph the rate at which reviewers caught a violation that should have been caught by a constraint, because the constraint doesn't exist in a measurable form. Encoding decisions for governance is the precondition for measuring drift. Measuring drift is the precondition for closing the loop on it.</p>
@@ -486,19 +486,19 @@
     <p>Three properties of the governance layer, taken together, are what stop drift:</p>
 
     <ul>
-      <li><strong>Externalized decisions</strong> â€” the decisions live outside any single agent's context, in a compiled corpus that every agent reads from. No agent has to remember; every agent has to look.</li>
-      <li><strong>Pre-generation enforcement</strong> â€” the decisions are consulted before the agent writes, not after. Drift is prevented at the point of intent, not corrected in review.</li>
-      <li><strong>Deterministic answers</strong> â€” the same query against the same corpus returns the same constraint, every time, for every agent. The governance answer is not a guess and is not session-dependent.</li>
+      <li><strong>Externalized decisions</strong> — the decisions live outside any single agent's context, in a compiled corpus that every agent reads from. No agent has to remember; every agent has to look.</li>
+      <li><strong>Pre-generation enforcement</strong> — the decisions are consulted before the agent writes, not after. Drift is prevented at the point of intent, not corrected in review.</li>
+      <li><strong>Deterministic answers</strong> — the same query against the same corpus returns the same constraint, every time, for every agent. The governance answer is not a guess and is not session-dependent.</li>
     </ul>
 
-    <p>This is the precise role of governance infrastructure: to be the substrate that makes "what does the team decide here?" a queryable question. Once the question is queryable, drift is no longer the default behavior â€” it is the exception, surfaced and measurable.</p>
+    <p>This is the precise role of governance infrastructure: to be the substrate that makes "what does the team decide here?" a queryable question. Once the question is queryable, drift is no longer the default behavior — it is the exception, surfaced and measurable.</p>
 
     <h2>Related concepts</h2>
 
     <ul>
-      <li><strong>Architectural drift</strong> â€” the codebase-side effect that AI agent drift produces. One looks at the agent; the other looks at the code.</li>
-      <li><strong>Multi-agent continuity</strong> â€” the property that decisions persist across agents. Continuity is what stops drift at the boundary between sessions and providers.</li>
-      <li><strong>Governance before generation</strong> â€” the enforcement posture that addresses drift at the point of intent rather than at the point of review.</li>
+      <li><strong>Architectural drift</strong> — the codebase-side effect that AI agent drift produces. One looks at the agent; the other looks at the code.</li>
+      <li><strong>Multi-agent continuity</strong> — the property that decisions persist across agents. Continuity is what stops drift at the boundary between sessions and providers.</li>
+      <li><strong>Governance before generation</strong> — the enforcement posture that addresses drift at the point of intent rather than at the point of review.</li>
     </ul>
 
   </div>
@@ -507,23 +507,23 @@
     <h2>Frequently asked questions</h2>
     <details>
       <summary>What is AI agent drift?</summary>
-      <div class="faq-body">AI agent drift is the agent-side phenomenon where coding agents produce code that diverges from the team's intended architecture â€” not because of a single bad answer, but because no two sessions share the same memory of prior architectural decisions. Each session starts cold, infers conventions from whatever it sees, and writes code that subtly shifts the codebase's patterns. The result, across hundreds of sessions and multiple agents, is compound divergence: architectural drift in the codebase.</div>
+      <div class="faq-body">AI agent drift is the agent-side phenomenon where coding agents produce code that diverges from the team's intended architecture — not because of a single bad answer, but because no two sessions share the same memory of prior architectural decisions. Each session starts cold, infers conventions from whatever it sees, and writes code that subtly shifts the codebase's patterns. The result, across hundreds of sessions and multiple agents, is compound divergence: architectural drift in the codebase.</div>
     </details>
     <details>
       <summary>How is AI agent drift different from architectural drift?</summary>
-      <div class="faq-body">AI agent drift is the cause; architectural drift is the effect. The agent-side phenomenon is loss of context and divergence in proposals. The codebase-side phenomenon is the accumulated incoherence that follows. Both terms describe the same problem from opposite ends â€” one looks at the agent, the other looks at the codebase. Governance infrastructure addresses both: it constrains agent behavior so that the codebase doesn't drift.</div>
+      <div class="faq-body">AI agent drift is the cause; architectural drift is the effect. The agent-side phenomenon is loss of context and divergence in proposals. The codebase-side phenomenon is the accumulated incoherence that follows. Both terms describe the same problem from opposite ends — one looks at the agent, the other looks at the codebase. Governance infrastructure addresses both: it constrains agent behavior so that the codebase doesn't drift.</div>
     </details>
     <details>
       <summary>Why does AI agent drift happen even with CLAUDE.md and prompt memory?</summary>
-      <div class="faq-body">Because CLAUDE.md and prompt memory are advisory, not enforced. They live in the agent's context window â€” vulnerable to truncation, compaction, and being overridden by stronger signals elsewhere in the prompt. They are also per-agent: a CLAUDE.md file does not constrain Cursor, Copilot, or a teammate's session. Agent drift is structural; advisory memory cannot prevent it.</div>
+      <div class="faq-body">Because CLAUDE.md and prompt memory are advisory, not enforced. They live in the agent's context window — vulnerable to truncation, compaction, and being overridden by stronger signals elsewhere in the prompt. They are also per-agent: a CLAUDE.md file does not constrain Cursor, Copilot, or a teammate's session. Agent drift is structural; advisory memory cannot prevent it.</div>
     </details>
     <details>
       <summary>Can you measure AI agent drift?</summary>
-      <div class="faq-body">Yes â€” and you should. Drift is measurable as the rate at which an agent's proposals deviate from compiled decision constraints, observed at the pre-tool-use hook. A drift-aware governance system logs each violation by agent, by session, by file. Aggregated, this produces a drift telemetry surface that tells you which decisions are being violated most often and which agents need constraint reinforcement.</div>
+      <div class="faq-body">Yes — and you should. Drift is measurable as the rate at which an agent's proposals deviate from compiled decision constraints, observed at the pre-tool-use hook. A drift-aware governance system logs each violation by agent, by session, by file. Aggregated, this produces a drift telemetry surface that tells you which decisions are being violated most often and which agents need constraint reinforcement.</div>
     </details>
     <details>
       <summary>What stops AI agent drift?</summary>
-      <div class="faq-body">Pre-generation enforcement against a shared, compiled decision corpus. Every session â€” every agent â€” queries the same decisions before writing. Drift cannot accumulate when each proposal is checked against the same source of truth at the moment of intent. Documentation cannot do this; prompt memory cannot do this; only governance infrastructure can.</div>
+      <div class="faq-body">Pre-generation enforcement against a shared, compiled decision corpus. Every session — every agent — queries the same decisions before writing. Drift cannot accumulate when each proposal is checked against the same source of truth at the moment of intent. Documentation cannot do this; prompt memory cannot do this; only governance infrastructure can.</div>
     </details>
   </section>
 
@@ -564,12 +564,12 @@
 
 
   <footer class="article-footer">
-    <a href="/concepts/" class="back-link">â† Back to Concepts</a>
+    <a href="/concepts/" class="back-link">← Back to Concepts</a>
 
     <div class="cta-block">
       <h3>See drift telemetry in action</h3>
-      <p>The Mneme demo records every agent proposal against the compiled corpus â€” and surfaces drift by decision, by agent, by file. Run it locally against your own codebase.</p>
-      <a href="/demo/" class="btn-primary">View the demo â†’</a>
+      <p>The Mneme demo records every agent proposal against the compiled corpus — and surfaces drift by decision, by agent, by file. Run it locally against your own codebase.</p>
+      <a href="/demo/" class="btn-primary">View the demo →</a>
     </div>
   </footer>
 </article>

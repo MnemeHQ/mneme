@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -7,7 +7,7 @@
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="GitHub Copilot generates code in VS Code and JetBrains. Mneme HQ is the architectural constraint layer above it â€” a structured decision corpus for AI tools." />
+  <meta name="description" content="GitHub Copilot generates code in VS Code and JetBrains. Mneme HQ is the architectural constraint layer above it — a structured decision corpus for AI tools." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/integrations/copilot/" />
@@ -15,12 +15,12 @@
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
   <meta property="og:title" content="Mneme HQ + GitHub Copilot" />
-  <meta property="og:description" content="GitHub Copilot generates code in VS Code and JetBrains. Mneme HQ is the architectural constraint layer above it â€” a structured decision corpus for AI tools." />
+  <meta property="og:description" content="GitHub Copilot generates code in VS Code and JetBrains. Mneme HQ is the architectural constraint layer above it — a structured decision corpus for AI tools." />
   <meta property="og:url" content="https://mnemehq.com/integrations/copilot/" />
   <meta property="og:image" content="https://mnemehq.com/integrations/copilot/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Mneme HQ + GitHub Copilot" />
-  <meta name="twitter:description" content="GitHub Copilot generates code in VS Code and JetBrains. Mneme HQ is the architectural constraint layer above it â€” a structured decision corpus for AI tools." />
+  <meta name="twitter:description" content="GitHub Copilot generates code in VS Code and JetBrains. Mneme HQ is the architectural constraint layer above it — a structured decision corpus for AI tools." />
   <meta name="twitter:image" content="https://mnemehq.com/integrations/copilot/og.png" />
   <meta name="author" content="Theo Valmis" />
   <meta property="article:published_time" content="2026-05-14T00:00:00Z" />
@@ -232,7 +232,7 @@
       {
         "@type": "Article",
         "headline": "Mneme HQ + GitHub Copilot",
-        "description": "GitHub Copilot generates code in VS Code and JetBrains. Mneme HQ is the architectural constraint layer above it â€” a structured decision corpus for AI tools.",
+        "description": "GitHub Copilot generates code in VS Code and JetBrains. Mneme HQ is the architectural constraint layer above it — a structured decision corpus for AI tools.",
         "url": "https://mnemehq.com/integrations/copilot/",
         "datePublished": "2026-05-14",
         "dateModified": "2026-05-14",
@@ -245,8 +245,8 @@
         "@type": "FAQPage",
         "mainEntity": [
           {"@type": "Question", "name": "Does Mneme HQ hook directly into Copilot's suggestions in VS Code or JetBrains?", "acceptedAnswer": {"@type": "Answer", "text": "No. GitHub Copilot does not expose a PreToolUse-style API for third-party governance to gate generation in-flight. Mneme positions one layer above Copilot: it holds the architectural decision corpus that defines what your AI tools should and shouldn't do, and enforces those decisions wherever hook-level coverage exists (Claude Code today) and at the CI gate."}},
-          {"@type": "Question", "name": "Then what's the practical integration between Mneme and Copilot?", "acceptedAnswer": {"@type": "Answer", "text": "Three points of contact. First, the same decision corpus that drives Claude Code hook enforcement can be exported as Cursor Rules and adapted as context Copilot can see (custom instructions, repo-level guidance files). Second, the mneme check CI gate runs against every PR diff regardless of which tool produced the code â€” so Copilot-authored changes that violate a recorded decision get blocked in GitHub Actions. Third, the corpus itself is the single source of truth: when a decision changes, every downstream surface updates from one file."}},
-          {"@type": "Question", "name": "Why use Mneme HQ if our team is on Copilot rather than Claude Code?", "acceptedAnswer": {"@type": "Answer", "text": "Because the corpus, not the editor, is what survives. Engineers swap tools; teams add and drop AI assistants. The architectural decisions â€” what database we use, which dependencies are allowed, what patterns we accept â€” should not be locked inside any one vendor's prompt-engineering surface. Mneme HQ gives you a versioned, structured decision corpus that any current or future tool can read, with CI enforcement as the backstop. Copilot is one consumer; tomorrow's tool will be another."}}
+          {"@type": "Question", "name": "Then what's the practical integration between Mneme and Copilot?", "acceptedAnswer": {"@type": "Answer", "text": "Three points of contact. First, the same decision corpus that drives Claude Code hook enforcement can be exported as Cursor Rules and adapted as context Copilot can see (custom instructions, repo-level guidance files). Second, the mneme check CI gate runs against every PR diff regardless of which tool produced the code — so Copilot-authored changes that violate a recorded decision get blocked in GitHub Actions. Third, the corpus itself is the single source of truth: when a decision changes, every downstream surface updates from one file."}},
+          {"@type": "Question", "name": "Why use Mneme HQ if our team is on Copilot rather than Claude Code?", "acceptedAnswer": {"@type": "Answer", "text": "Because the corpus, not the editor, is what survives. Engineers swap tools; teams add and drop AI assistants. The architectural decisions — what database we use, which dependencies are allowed, what patterns we accept — should not be locked inside any one vendor's prompt-engineering surface. Mneme HQ gives you a versioned, structured decision corpus that any current or future tool can read, with CI enforcement as the backstop. Copilot is one consumer; tomorrow's tool will be another."}}
         ]
       }
     ]

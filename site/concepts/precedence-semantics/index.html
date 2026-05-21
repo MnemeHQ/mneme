@@ -1,24 +1,24 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Precedence Semantics â€” Mneme HQ Concepts</title>
+  <title>Precedence Semantics — Mneme HQ Concepts</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="Precedence semantics define how a governance system resolves conflicts when two decisions both apply to a file. Without precedence rules, the system has no governance â€” it has overlapping suggestions." />
+  <meta name="description" content="Precedence semantics define how a governance system resolves conflicts when two decisions both apply to a file. Without precedence rules, the system has no governance — it has overlapping suggestions." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/concepts/precedence-semantics/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Precedence Semantics â€” Mneme HQ Concepts" />
+  <meta property="og:title" content="Precedence Semantics — Mneme HQ Concepts" />
   <meta property="og:description" content="The rules that determine which of two conflicting decisions wins. Without precedence semantics, governance is a collection of overlapping suggestions, not a system." />
   <meta property="og:url" content="https://mnemehq.com/concepts/precedence-semantics/" />
   <meta property="og:image" content="https://mnemehq.com/concepts/precedence-semantics/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Precedence Semantics â€” Mneme HQ Concepts" />
+  <meta name="twitter:title" content="Precedence Semantics — Mneme HQ Concepts" />
   <meta name="twitter:description" content="Rules that determine which of two conflicting decisions wins, deterministically." />
   <meta name="twitter:image" content="https://mnemehq.com/concepts/precedence-semantics/og.png" />
   <meta name="author" content="Theo Valmis" />
@@ -197,7 +197,7 @@
       },
       {
         "@type": "TechArticle",
-        "headline": "Precedence Semantics â€” Mneme HQ Concepts",
+        "headline": "Precedence Semantics — Mneme HQ Concepts",
         "description": "Precedence semantics define how a governance system resolves conflicts when two decisions both apply to a file. Without precedence rules, the system has no governance.",
         "url": "https://mnemehq.com/concepts/precedence-semantics/",
         "datePublished": "2026-05-15",
@@ -239,7 +239,7 @@
 
 <main>
 <div class="answer-capsule">
-  <strong>Precedence semantics.</strong> The rules that decide which of two overlapping decisions wins. Glob specificity beats glob generality. Explicit decisions beat inherited ones. Newer supersessions beat older originals. Compile-time conflict errors beat runtime ambiguity. Without precedence semantics, governance is a stack of suggestions â€” and which one applies depends on the run.
+  <strong>Precedence semantics.</strong> The rules that decide which of two overlapping decisions wins. Glob specificity beats glob generality. Explicit decisions beat inherited ones. Newer supersessions beat older originals. Compile-time conflict errors beat runtime ambiguity. Without precedence semantics, governance is a stack of suggestions — and which one applies depends on the run.
 </div>
 
 <nav aria-label="Breadcrumb" class="breadcrumb-nav">
@@ -255,10 +255,10 @@
     <div class="article-eyebrow">
       <span class="eyebrow-tag">Concepts</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">9 min read &nbsp;Â·&nbsp; May 2026</span>
+      <span class="eyebrow-meta">9 min read &nbsp;·&nbsp; May 2026</span>
     </div>
     <h1>Precedence Semantics</h1>
-    <p class="article-lede">Every real-world team has overlapping rules. The repository pattern applies to all services â€” except the legacy billing service, which has its own explicit exemption. A governance system that cannot resolve that overlap deterministically is not enforcing decisions; it is offering opinions that occasionally agree with one another.</p>
+    <p class="article-lede">Every real-world team has overlapping rules. The repository pattern applies to all services — except the legacy billing service, which has its own explicit exemption. A governance system that cannot resolve that overlap deterministically is not enforcing decisions; it is offering opinions that occasionally agree with one another.</p>
     <p class="byline">
       By <a href="/founder/">Theo Valmis</a>
       <span class="sep">&middot;</span>
@@ -268,62 +268,62 @@
 
   <div class="article-body">
 
-    <p>Architectural decisions overlap. That is not a flaw â€” it is how engineering teams accumulate knowledge. A broad standard ("services use the repository pattern") gets carved by a narrower exception ("legacy billing keeps direct DAO access until migrated"). A newer ADR supersedes an older one. A team-wide convention has a service-specific override. The shape of real-world governance is layered, not flat.</p>
+    <p>Architectural decisions overlap. That is not a flaw — it is how engineering teams accumulate knowledge. A broad standard ("services use the repository pattern") gets carved by a narrower exception ("legacy billing keeps direct DAO access until migrated"). A newer ADR supersedes an older one. A team-wide convention has a service-specific override. The shape of real-world governance is layered, not flat.</p>
 
     <p>The question is not whether overlaps will exist. They will. The question is: when two decisions both apply to the file the agent is about to write, <strong>which one wins, and is that answer the same on every run, on every machine, from every consumer?</strong> The rules that determine the answer are the precedence semantics.</p>
 
     <figure class="diagram-figure" aria-labelledby="ps-diag-title">
       <svg viewBox="0 0 800 380" role="img" aria-labelledby="ps-diag-title ps-diag-desc" xmlns="http://www.w3.org/2000/svg">
         <title id="ps-diag-title">Precedence resolution for overlapping decisions</title>
-        <desc id="ps-diag-desc">Two overlapping decisions match the same file path. The precedence ladder applies four rules in order â€” supersession, specificity, recency, severity â€” to select the winning record.</desc>
+        <desc id="ps-diag-desc">Two overlapping decisions match the same file path. The precedence ladder applies four rules in order — supersession, specificity, recency, severity — to select the winning record.</desc>
         <g>
-          <text x="40" y="28" fill="#c8f060" font-family="DM Mono, monospace" font-size="10" letter-spacing="0.06em">QUERY Â· which decision applies to services/billing/legacy/dao.py?</text>
+          <text x="40" y="28" fill="#c8f060" font-family="DM Mono, monospace" font-size="10" letter-spacing="0.06em">QUERY · which decision applies to services/billing/legacy/dao.py?</text>
 
           <!-- Decision A -->
           <rect x="40" y="56" width="340" height="90" rx="8" fill="#141416" stroke="#2e2e34"/>
-          <text x="60" y="78" fill="#8be0c8" font-family="DM Mono, monospace" font-size="10">DECISION A Â· ADR-0017</text>
+          <text x="60" y="78" fill="#8be0c8" font-family="DM Mono, monospace" font-size="10">DECISION A · ADR-0017</text>
           <text x="60" y="98" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">Use repository pattern</text>
           <text x="60" y="118" fill="#88889a" font-family="DM Mono, monospace" font-size="10">scope: services/**</text>
-          <text x="60" y="134" fill="#88889a" font-family="DM Mono, monospace" font-size="10">created: 2026-01 Â· severity: high</text>
+          <text x="60" y="134" fill="#88889a" font-family="DM Mono, monospace" font-size="10">created: 2026-01 · severity: high</text>
 
           <!-- Decision B -->
           <rect x="420" y="56" width="340" height="90" rx="8" fill="#141416" stroke="#2e2e34"/>
-          <text x="440" y="78" fill="#8be0c8" font-family="DM Mono, monospace" font-size="10">DECISION B Â· ADR-0042</text>
+          <text x="440" y="78" fill="#8be0c8" font-family="DM Mono, monospace" font-size="10">DECISION B · ADR-0042</text>
           <text x="440" y="98" fill="#e8e8ec" font-family="Inter, sans-serif" font-size="12" font-weight="500">Legacy billing keeps DAO</text>
           <text x="440" y="118" fill="#88889a" font-family="DM Mono, monospace" font-size="10">scope: services/billing/legacy/**</text>
-          <text x="440" y="134" fill="#88889a" font-family="DM Mono, monospace" font-size="10">created: 2026-04 Â· severity: high Â· supersedes: ADR-0017 (in scope)</text>
+          <text x="440" y="134" fill="#88889a" font-family="DM Mono, monospace" font-size="10">created: 2026-04 · severity: high · supersedes: ADR-0017 (in scope)</text>
 
           <!-- Conflict arrow down -->
           <path d="M 400 146 L 400 175" stroke="#c8f060" stroke-width="1.5" fill="none"/>
           <polygon points="395,170 405,170 400,178" fill="#c8f060"/>
 
-          <text x="400" y="170" text-anchor="middle" fill="#c8f060" font-family="DM Mono, monospace" font-size="10">BOTH MATCH Â· resolve precedence</text>
+          <text x="400" y="170" text-anchor="middle" fill="#c8f060" font-family="DM Mono, monospace" font-size="10">BOTH MATCH · resolve precedence</text>
 
           <!-- Precedence ladder -->
           <rect x="40" y="186" width="720" height="142" rx="10" fill="rgba(200,240,96,0.05)" stroke="#c8f060" stroke-width="1.5"/>
-          <text x="60" y="208" fill="#c8f060" font-family="DM Mono, monospace" font-size="10" letter-spacing="0.06em">PRECEDENCE LADDER Â· evaluated top to bottom</text>
+          <text x="60" y="208" fill="#c8f060" font-family="DM Mono, monospace" font-size="10" letter-spacing="0.06em">PRECEDENCE LADDER · evaluated top to bottom</text>
 
           <line x1="60" y1="218" x2="740" y2="218" stroke="#2e2e34"/>
 
-          <text x="60" y="242" fill="#e8e8ec" font-family="DM Mono, monospace" font-size="11">1 Â· SUPERSESSION</text>
+          <text x="60" y="242" fill="#e8e8ec" font-family="DM Mono, monospace" font-size="11">1 · SUPERSESSION</text>
           <text x="280" y="242" fill="#88889a" font-family="DM Mono, monospace" font-size="11">explicit supersedes-link wins</text>
-          <text x="740" y="242" text-anchor="end" fill="#c8f060" font-family="DM Mono, monospace" font-size="11">â†’ B supersedes A in this scope</text>
+          <text x="740" y="242" text-anchor="end" fill="#c8f060" font-family="DM Mono, monospace" font-size="11">→ B supersedes A in this scope</text>
 
-          <text x="60" y="266" fill="#88889a" font-family="DM Mono, monospace" font-size="11">2 Â· SCOPE SPECIFICITY</text>
+          <text x="60" y="266" fill="#88889a" font-family="DM Mono, monospace" font-size="11">2 · SCOPE SPECIFICITY</text>
           <text x="280" y="266" fill="#88889a" font-family="DM Mono, monospace" font-size="11">deeper glob wins</text>
           <text x="740" y="266" text-anchor="end" fill="#88889a" font-family="DM Mono, monospace" font-size="11">/billing/legacy/ &gt; /**</text>
 
-          <text x="60" y="290" fill="#88889a" font-family="DM Mono, monospace" font-size="11">3 Â· RECENCY</text>
+          <text x="60" y="290" fill="#88889a" font-family="DM Mono, monospace" font-size="11">3 · RECENCY</text>
           <text x="280" y="290" fill="#88889a" font-family="DM Mono, monospace" font-size="11">newer record wins ties</text>
           <text x="740" y="290" text-anchor="end" fill="#88889a" font-family="DM Mono, monospace" font-size="11">2026-04 &gt; 2026-01</text>
 
-          <text x="60" y="314" fill="#88889a" font-family="DM Mono, monospace" font-size="11">4 Â· SEVERITY</text>
+          <text x="60" y="314" fill="#88889a" font-family="DM Mono, monospace" font-size="11">4 · SEVERITY</text>
           <text x="280" y="314" fill="#88889a" font-family="DM Mono, monospace" font-size="11">higher severity escalates</text>
           <text x="740" y="314" text-anchor="end" fill="#88889a" font-family="DM Mono, monospace" font-size="11">tiebreak only</text>
 
           <!-- Verdict -->
           <rect x="220" y="346" width="360" height="28" rx="6" fill="rgba(200,240,96,0.05)" stroke="#c8f060" stroke-width="1.5"/>
-          <text x="400" y="364" text-anchor="middle" fill="#c8f060" font-family="DM Mono, monospace" font-size="11">VERDICT Â· apply ADR-0042 Â· skip ADR-0017</text>
+          <text x="400" y="364" text-anchor="middle" fill="#c8f060" font-family="DM Mono, monospace" font-size="11">VERDICT · apply ADR-0042 · skip ADR-0017</text>
         </g>
       </svg>
       <figcaption class="diagram-caption"><strong>Ordered rules, deterministic outcome.</strong> Every overlap resolves the same way, every time, from every consumer. The ladder runs top-to-bottom; the first rule that produces a winner stops the descent. No tiebreaker is ever "the model decided."</figcaption>
@@ -331,14 +331,14 @@
 
     <h2>What precedence semantics actually mean</h2>
 
-    <p>A precedence semantics is a function from a set of matching decisions to a single winning decision. Given two or more records whose scope patterns both match the same query, the semantics deterministically selects one â€” and the selection is auditable. Every overlap maps to a single answer, and every answer cites the rule that produced it.</p>
+    <p>A precedence semantics is a function from a set of matching decisions to a single winning decision. Given two or more records whose scope patterns both match the same query, the semantics deterministically selects one — and the selection is auditable. Every overlap maps to a single answer, and every answer cites the rule that produced it.</p>
 
     <p>The semantics has three structural properties that distinguish it from ad-hoc conflict handling:</p>
 
     <ul>
-      <li><strong>Total</strong> â€” every conflict resolves to a winner. There is no "tie" that defers to user judgment or model guessing.</li>
-      <li><strong>Deterministic</strong> â€” the same set of records always produces the same winner, regardless of which order they were loaded, retrieved, or evaluated.</li>
-      <li><strong>Citable</strong> â€” the winner is accompanied by the precedence rule that selected it. "ADR-0042 won by supersession" is a usable audit record; "ADR-0042 was chosen" is not.</li>
+      <li><strong>Total</strong> — every conflict resolves to a winner. There is no "tie" that defers to user judgment or model guessing.</li>
+      <li><strong>Deterministic</strong> — the same set of records always produces the same winner, regardless of which order they were loaded, retrieved, or evaluated.</li>
+      <li><strong>Citable</strong> — the winner is accompanied by the precedence rule that selected it. "ADR-0042 won by supersession" is a usable audit record; "ADR-0042 was chosen" is not.</li>
     </ul>
 
     <h2>The standard precedence ladder</h2>
@@ -347,34 +347,34 @@
 
     <h3>1. Supersession</h3>
 
-    <p>If one decision explicitly supersedes another within the overlapping scope, supersession wins. Supersession is an authored relationship: the newer decision declares <code>supersedes: ADR-0017</code> in its metadata. This is the strongest precedence rule because it represents an explicit team statement that decision A is replaced â€” not just refined â€” by decision B.</p>
+    <p>If one decision explicitly supersedes another within the overlapping scope, supersession wins. Supersession is an authored relationship: the newer decision declares <code>supersedes: ADR-0017</code> in its metadata. This is the strongest precedence rule because it represents an explicit team statement that decision A is replaced — not just refined — by decision B.</p>
 
     <h3>2. Scope specificity</h3>
 
-    <p>If no supersession applies, the more specific scope wins. <code>services/billing/legacy/**</code> beats <code>services/**</code> because the legacy scope explicitly addresses a narrower region. Specificity is computed structurally on the glob: depth, literal segments, and explicit anchors. The rule is mechanical, not semantic â€” there is no model judgment of "which feels more specific."</p>
+    <p>If no supersession applies, the more specific scope wins. <code>services/billing/legacy/**</code> beats <code>services/**</code> because the legacy scope explicitly addresses a narrower region. Specificity is computed structurally on the glob: depth, literal segments, and explicit anchors. The rule is mechanical, not semantic — there is no model judgment of "which feels more specific."</p>
 
     <h3>3. Recency</h3>
 
-    <p>If scopes are equally specific, the more recently created decision wins. This rule encodes a soft preference for newer team thinking, but it is intentionally below specificity â€” a broad new decision should not silently override an older narrow exception. Recency breaks ties, not standards.</p>
+    <p>If scopes are equally specific, the more recently created decision wins. This rule encodes a soft preference for newer team thinking, but it is intentionally below specificity — a broad new decision should not silently override an older narrow exception. Recency breaks ties, not standards.</p>
 
     <h3>4. Severity escalation</h3>
 
-    <p>If recency ties, the higher-severity decision wins as a final tiebreaker. This rule almost never fires in practice â€” its existence is mostly to ensure the function is total: every conflict has a defined answer, even pathological ones.</p>
+    <p>If recency ties, the higher-severity decision wins as a final tiebreaker. This rule almost never fires in practice — its existence is mostly to ensure the function is total: every conflict has a defined answer, even pathological ones.</p>
 
     <div class="callout">
-      <p><strong>Conflict cases that the ladder cannot resolve are compile-time errors.</strong> Two decisions with identical scope, identical severity, identical timestamps, and no supersession link â€” the compiler refuses to emit the corpus until the team resolves the ambiguity. The runtime never sees an unresolved conflict.</p>
+      <p><strong>Conflict cases that the ladder cannot resolve are compile-time errors.</strong> Two decisions with identical scope, identical severity, identical timestamps, and no supersession link — the compiler refuses to emit the corpus until the team resolves the ambiguity. The runtime never sees an unresolved conflict.</p>
     </div>
 
     <h2>Why precedence has to be at compile time, not runtime</h2>
 
-    <p>It is tempting to imagine precedence as a runtime concern â€” let the governance system look at each matching decision and pick one when the query arrives. That model fails for the same reason ambiguous runtime behavior fails generally: it is unauditable and untestable.</p>
+    <p>It is tempting to imagine precedence as a runtime concern — let the governance system look at each matching decision and pick one when the query arrives. That model fails for the same reason ambiguous runtime behavior fails generally: it is unauditable and untestable.</p>
 
     <p>Compile-time precedence has three properties runtime precedence cannot match:</p>
 
     <ul>
       <li><strong>Conflicts surface during build, not during enforcement.</strong> If two decisions cannot be reconciled, the compilation step fails. Engineers see the conflict in their PR or in CI, not in production after a violation slipped through.</li>
       <li><strong>The resolved corpus is reviewable.</strong> Teams can inspect which decision applies to which scope before any agent queries the corpus. The resolved precedence is itself a versioned artifact.</li>
-      <li><strong>Resolution is identical across all consumers.</strong> Because precedence resolves at compile time, every consumer reads an already-resolved corpus. No consumer has to re-implement the precedence rules â€” and therefore no consumer can drift from them.</li>
+      <li><strong>Resolution is identical across all consumers.</strong> Because precedence resolves at compile time, every consumer reads an already-resolved corpus. No consumer has to re-implement the precedence rules — and therefore no consumer can drift from them.</li>
     </ul>
 
     <p>Runtime precedence, by contrast, leaves each consumer to implement its own resolution. Two consumers can disagree about the winner, and the disagreement is invisible until both produce different verdicts. This is one of the most common failure modes in ad-hoc governance setups: every tool reads the same rules and quietly applies them differently.</p>
@@ -396,7 +396,7 @@
         <tr>
           <td>First-match-wins</td>
           <td>Many config systems, .gitignore-style</td>
-          <td>Ordering becomes load-order-dependent â€” non-deterministic across consumers</td>
+          <td>Ordering becomes load-order-dependent — non-deterministic across consumers</td>
         </tr>
         <tr>
           <td>Longest-rule-wins</td>
@@ -406,7 +406,7 @@
         <tr>
           <td>Most-specific-wins (alone)</td>
           <td>CSS, some policy engines</td>
-          <td>Cannot model "this decision replaces that one" â€” supersession needs explicit precedence</td>
+          <td>Cannot model "this decision replaces that one" — supersession needs explicit precedence</td>
         </tr>
         <tr>
           <td>Newest-wins (alone)</td>
@@ -424,18 +424,18 @@
     <p>Precedence semantics are the prerequisite for several other governance properties:</p>
 
     <ul>
-      <li><strong>Deterministic enforcement</strong> â€” without a deterministic conflict-resolution rule, the same query can produce different verdicts. Determinism downstream depends on precedence determinism upstream.</li>
-      <li><strong>Auditability</strong> â€” every enforcement event cites both the winning decision and the precedence rule that selected it. "Blocked by ADR-0042, winner by supersession over ADR-0017" is a complete audit record.</li>
-      <li><strong>Safe evolution</strong> â€” teams can supersede, narrow, or refine decisions without fearing silent regressions. The compiler surfaces every overlap; the ladder handles every resolution.</li>
-      <li><strong>Cross-consumer agreement</strong> â€” Claude Code, Cursor, Copilot, and CI all reach the same verdict because they all read an already-resolved corpus. Propagation depends on precedence resolution happening upstream of distribution.</li>
+      <li><strong>Deterministic enforcement</strong> — without a deterministic conflict-resolution rule, the same query can produce different verdicts. Determinism downstream depends on precedence determinism upstream.</li>
+      <li><strong>Auditability</strong> — every enforcement event cites both the winning decision and the precedence rule that selected it. "Blocked by ADR-0042, winner by supersession over ADR-0017" is a complete audit record.</li>
+      <li><strong>Safe evolution</strong> — teams can supersede, narrow, or refine decisions without fearing silent regressions. The compiler surfaces every overlap; the ladder handles every resolution.</li>
+      <li><strong>Cross-consumer agreement</strong> — Claude Code, Cursor, Copilot, and CI all reach the same verdict because they all read an already-resolved corpus. Propagation depends on precedence resolution happening upstream of distribution.</li>
     </ul>
 
     <h2>Related concepts</h2>
 
     <ul>
-      <li><strong>Architectural compiler</strong> â€” the pipeline in which precedence resolution happens. The "resolve" stage is precedence semantics applied to the candidate record set.</li>
-      <li><strong>Deterministic enforcement</strong> â€” the property that depends on precedence resolution producing the same answer every time.</li>
-      <li><strong>Governance propagation</strong> â€” the property that becomes meaningful when every consumer reads an already-resolved corpus. Without precedence, propagation distributes ambiguity.</li>
+      <li><strong>Architectural compiler</strong> — the pipeline in which precedence resolution happens. The "resolve" stage is precedence semantics applied to the candidate record set.</li>
+      <li><strong>Deterministic enforcement</strong> — the property that depends on precedence resolution producing the same answer every time.</li>
+      <li><strong>Governance propagation</strong> — the property that becomes meaningful when every consumer reads an already-resolved corpus. Without precedence, propagation distributes ambiguity.</li>
     </ul>
 
   </div>
@@ -475,12 +475,12 @@
 
 
   <footer class="article-footer">
-    <a href="/concepts/" class="back-link">â† Back to Concepts</a>
+    <a href="/concepts/" class="back-link">← Back to Concepts</a>
 
     <div class="cta-block">
       <h3>Precedence as a compile-time guarantee</h3>
       <p>Mneme's compiler resolves every decision overlap before the corpus is emitted. Conflicts are build errors, not runtime surprises. Every verdict cites the rule that selected it.</p>
-      <a href="/architecture/" class="btn-primary">See the architecture â†’</a>
+      <a href="/architecture/" class="btn-primary">See the architecture →</a>
     </div>
   </footer>
 </article>

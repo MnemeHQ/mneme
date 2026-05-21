@@ -1,26 +1,26 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Decision Continuity â€” Mneme HQ Concepts</title>
+  <title>Decision Continuity — Mneme HQ Concepts</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="Decision continuity is the property that architectural decisions remain enforced across agents, sessions, and time â€” regardless of which agent acts or what context it inherited." />
+  <meta name="description" content="Decision continuity is the property that architectural decisions remain enforced across agents, sessions, and time — regardless of which agent acts or what context it inherited." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/concepts/decision-continuity/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Decision Continuity â€” Mneme HQ Concepts" />
-  <meta property="og:description" content="Decision continuity is the property that architectural decisions remain enforced across agents, sessions, and time â€” regardless of which agent acts or what context it inherited." />
+  <meta property="og:title" content="Decision Continuity — Mneme HQ Concepts" />
+  <meta property="og:description" content="Decision continuity is the property that architectural decisions remain enforced across agents, sessions, and time — regardless of which agent acts or what context it inherited." />
   <meta property="og:url" content="https://mnemehq.com/concepts/decision-continuity/" />
   <meta property="og:image" content="https://mnemehq.com/concepts/decision-continuity/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Decision Continuity â€” Mneme HQ Concepts" />
-  <meta name="twitter:description" content="Decision continuity is the property that architectural decisions remain enforced across agents, sessions, and time â€” regardless of which agent acts or what context it inherited." />
+  <meta name="twitter:title" content="Decision Continuity — Mneme HQ Concepts" />
+  <meta name="twitter:description" content="Decision continuity is the property that architectural decisions remain enforced across agents, sessions, and time — regardless of which agent acts or what context it inherited." />
   <meta name="twitter:image" content="https://mnemehq.com/concepts/decision-continuity/og.png" />
   <meta name="author" content="Theo Valmis" />
   <meta property="article:published_time" content="2026-05-14T00:00:00Z" />
@@ -212,8 +212,8 @@
       },
       {
         "@type": "TechArticle",
-        "headline": "Decision Continuity â€” Mneme HQ Concepts",
-        "description": "Decision continuity is the property that architectural decisions remain enforced across agents, sessions, and time â€” regardless of which agent acts or what context it inherited.",
+        "headline": "Decision Continuity — Mneme HQ Concepts",
+        "description": "Decision continuity is the property that architectural decisions remain enforced across agents, sessions, and time — regardless of which agent acts or what context it inherited.",
         "url": "https://mnemehq.com/concepts/decision-continuity/",
         "datePublished": "2026-05-14",
         "dateModified": "2026-05-14",
@@ -230,17 +230,17 @@
           {
             "@type": "Question",
             "name": "What is decision continuity in AI coding governance?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Decision continuity is the system property that architectural decisions remain enforced identically across agents, sessions, and time â€” regardless of which agent is acting, which context it inherited, or how many context windows have reset since the decision was made. It is a property of the governance system, not of any individual agent or session."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Decision continuity is the system property that architectural decisions remain enforced identically across agents, sessions, and time — regardless of which agent is acting, which context it inherited, or how many context windows have reset since the decision was made. It is a property of the governance system, not of any individual agent or session."}
           },
           {
             "@type": "Question",
             "name": "Why can't prompt memory provide decision continuity?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Prompt memory â€” CLAUDE.md files, injected rules, per-session context â€” is session-scoped. It provides continuity within a single agent session, but ceases to exist when the session ends. A new agent starting a new session has no memory of what the previous agent enforced, decided, or was told. Continuity requires the decision to live in an external, version-controlled corpus that every session queries identically."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Prompt memory — CLAUDE.md files, injected rules, per-session context — is session-scoped. It provides continuity within a single agent session, but ceases to exist when the session ends. A new agent starting a new session has no memory of what the previous agent enforced, decided, or was told. Continuity requires the decision to live in an external, version-controlled corpus that every session queries identically."}
           },
           {
             "@type": "Question",
             "name": "How does decision continuity work across multiple agents?",
-            "acceptedAnswer": {"@type": "Answer", "text": "In a multi-agent pipeline â€” planner, coder, reviewer â€” each agent queries the same governance corpus (project_memory.json). The decisions don't need to be re-injected at each handoff because they aren't stored in any agent's memory. They live in the corpus, and each agent retrieves what it needs at query time. The corpus is the shared memory that all agents inherit."}
+            "acceptedAnswer": {"@type": "Answer", "text": "In a multi-agent pipeline — planner, coder, reviewer — each agent queries the same governance corpus (project_memory.json). The decisions don't need to be re-injected at each handoff because they aren't stored in any agent's memory. They live in the corpus, and each agent retrieves what it needs at query time. The corpus is the shared memory that all agents inherit."}
           },
           {
             "@type": "Question",
@@ -250,14 +250,14 @@
           {
             "@type": "Question",
             "name": "How does Mneme maintain decision continuity across agent sessions?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Mneme stores architectural decisions in project_memory.json â€” a version-controlled, externally-queryable corpus that lives outside any agent. Every agent session queries the same corpus at generation time. The decisions are not injected by a human or a previous agent; they are retrieved deterministically by the governance system. Session boundaries don't affect the corpus, so continuity is structural, not session-dependent."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Mneme stores architectural decisions in project_memory.json — a version-controlled, externally-queryable corpus that lives outside any agent. Every agent session queries the same corpus at generation time. The decisions are not injected by a human or a previous agent; they are retrieved deterministically by the governance system. Session boundaries don't affect the corpus, so continuity is structural, not session-dependent."}
           }
         ]
       },
       {
         "@type": "DefinedTerm",
         "name": "Decision Continuity",
-        "description": "The property that architectural decisions remain enforced across agents, sessions, and time â€” regardless of which agent is acting, which context it inherited, or how many context windows have reset since the decision was made.",
+        "description": "The property that architectural decisions remain enforced across agents, sessions, and time — regardless of which agent is acting, which context it inherited, or how many context windows have reset since the decision was made.",
         "inDefinedTermSet": {"@type": "DefinedTermSet", "name": "Mneme HQ Concepts", "url": "https://mnemehq.com/concepts/"},
         "url": "https://mnemehq.com/concepts/decision-continuity/"
       }
@@ -287,7 +287,7 @@
 
 <main>
 <div class="answer-capsule">
-  <strong>Decision continuity.</strong> The property that architectural decisions remain enforced across agents, sessions, and time â€” regardless of which agent is acting, which context it inherited, or how many context windows have reset since the decision was made. Prompt memory provides per-session continuity. Decision memory provides structural continuity.
+  <strong>Decision continuity.</strong> The property that architectural decisions remain enforced across agents, sessions, and time — regardless of which agent is acting, which context it inherited, or how many context windows have reset since the decision was made. Prompt memory provides per-session continuity. Decision memory provides structural continuity.
 </div>
 
 <nav aria-label="Breadcrumb" class="breadcrumb-nav">
@@ -303,10 +303,10 @@
     <div class="article-eyebrow">
       <span class="eyebrow-tag">Concepts</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">11 min read &nbsp;Â·&nbsp; May 2026</span>
+      <span class="eyebrow-meta">11 min read &nbsp;·&nbsp; May 2026</span>
     </div>
     <h1>Decision Continuity</h1>
-    <p class="article-lede">Context windows reset. Agents don't share memory. A decision injected into one session doesn't survive into the next. Decision continuity is the structural answer to this problem â€” not a better memory system, but a governance corpus that lives outside any agent.</p>
+    <p class="article-lede">Context windows reset. Agents don't share memory. A decision injected into one session doesn't survive into the next. Decision continuity is the structural answer to this problem — not a better memory system, but a governance corpus that lives outside any agent.</p>
     <p class="byline">
       By <a href="/founder/">Theo Valmis</a>
       <span class="sep">&middot;</span>
@@ -316,7 +316,7 @@
 
   <div class="article-body">
 
-    <p>There is a difference between a system that remembers a decision and a system that enforces it. Most teams who adopt AI coding agents invest in the former â€” better prompts, longer context, richer CLAUDE.md files â€” without recognizing that this only solves continuity within a session. The problem is structural: session memory and architectural governance are different things, and conflating them is the primary reason architectural drift compounds across agent workflows.</p>
+    <p>There is a difference between a system that remembers a decision and a system that enforces it. Most teams who adopt AI coding agents invest in the former — better prompts, longer context, richer CLAUDE.md files — without recognizing that this only solves continuity within a session. The problem is structural: session memory and architectural governance are different things, and conflating them is the primary reason architectural drift compounds across agent workflows.</p>
 
     <p>Decision continuity names that structural property precisely. Not "does the agent know about the decision this session?" but "will the decision be enforced identically regardless of which session is running, which agent is involved, and whether any previous agent ever saw the decision at all?"</p>
 
@@ -328,33 +328,33 @@
 
     <ol>
       <li><strong>Agent-independent.</strong> The decision is enforced by Agent A in the same way it would be enforced by Agent B, even if Agent B has never been told about the decision before.</li>
-      <li><strong>Session-independent.</strong> The decision is enforced in Session 47 the same way it was in Session 1, even if no agent in Sessions 2â€“46 ever encountered it.</li>
+      <li><strong>Session-independent.</strong> The decision is enforced in Session 47 the same way it was in Session 1, even if no agent in Sessions 2–46 ever encountered it.</li>
       <li><strong>History-independent.</strong> An agent enforcing the decision doesn't require knowledge of how previous agents handled it. It queries the corpus; the corpus carries the authority.</li>
     </ol>
 
-    <p>Achieving all three requires the decision to live in a <strong>version-controlled, externally-queryable corpus</strong> â€” not inside any agent's context window, not in a file that must be manually included, and not in a system prompt that requires human maintenance across tool upgrades.</p>
+    <p>Achieving all three requires the decision to live in a <strong>version-controlled, externally-queryable corpus</strong> — not inside any agent's context window, not in a file that must be manually included, and not in a system prompt that requires human maintenance across tool upgrades.</p>
 
     <div class="callout">
-      <p><strong>Continuity is not about memory quality.</strong> A longer context window doesn't provide decision continuity. A more comprehensive CLAUDE.md doesn't provide it. These improve per-session recall, which is valuable â€” but they fail at the boundary: when a session ends, the improvement ends with it.</p>
+      <p><strong>Continuity is not about memory quality.</strong> A longer context window doesn't provide decision continuity. A more comprehensive CLAUDE.md doesn't provide it. These improve per-session recall, which is valuable — but they fail at the boundary: when a session ends, the improvement ends with it.</p>
     </div>
 
     <h2>Why this problem exists in AI-native development</h2>
 
-    <p>The structural problem is that <strong>AI coding agents operate in stateless sessions</strong>. Each new session starts without memory of previous sessions. This is not a bug or a limitation that will eventually be solved â€” it is a fundamental property of how current LLMs work. Context windows are bounded, sessions are ephemeral, and there is no persistent shared memory across agent invocations unless something external provides it.</p>
+    <p>The structural problem is that <strong>AI coding agents operate in stateless sessions</strong>. Each new session starts without memory of previous sessions. This is not a bug or a limitation that will eventually be solved — it is a fundamental property of how current LLMs work. Context windows are bounded, sessions are ephemeral, and there is no persistent shared memory across agent invocations unless something external provides it.</p>
 
     <p>In human software development, this isn't a problem because humans carry architectural knowledge across time. A developer who made a decision in a code review three months ago still knows about it today. They apply that knowledge when they review new code, answer questions from colleagues, or catch a PR that violates the pattern. The knowledge is persistent because the person is persistent.</p>
 
-    <p>In AI-native development, that persistence doesn't exist by default. An agent starting a session to implement a new feature has no knowledge of the architectural decisions made in previous sessions â€” unless those decisions are explicitly provided. The burden of maintaining that continuity falls on whoever designs the governance system.</p>
+    <p>In AI-native development, that persistence doesn't exist by default. An agent starting a session to implement a new feature has no knowledge of the architectural decisions made in previous sessions — unless those decisions are explicitly provided. The burden of maintaining that continuity falls on whoever designs the governance system.</p>
 
-    <p>If the governance system is session-scoped â€” decisions living in CLAUDE.md files, injected RAG passages, or tool configurations â€” then architectural knowledge expires at every session boundary. The compounding effect is severe: each new session is essentially starting from scratch on governance, relying on whatever context was injected that time. <strong>Drift compounds across handoffs</strong> because no single agent ever has a complete picture of all decisions in effect.</p>
+    <p>If the governance system is session-scoped — decisions living in CLAUDE.md files, injected RAG passages, or tool configurations — then architectural knowledge expires at every session boundary. The compounding effect is severe: each new session is essentially starting from scratch on governance, relying on whatever context was injected that time. <strong>Drift compounds across handoffs</strong> because no single agent ever has a complete picture of all decisions in effect.</p>
 
     <div class="callout-teal">
-      <p><strong>The session boundary is the governance failure point.</strong> Every time a context window resets, session-scoped governance resets with it. In a development workflow with dozens of agent sessions per day across multiple engineers and tools, those failures accumulate silently â€” each agent unaware that it's operating on incomplete architectural context.</p>
+      <p><strong>The session boundary is the governance failure point.</strong> Every time a context window resets, session-scoped governance resets with it. In a development workflow with dozens of agent sessions per day across multiple engineers and tools, those failures accumulate silently — each agent unaware that it's operating on incomplete architectural context.</p>
     </div>
 
     <h2>The common misread: treating prompt memory as governance</h2>
 
-    <p>The most widespread failure mode is treating <strong>CLAUDE.md files, per-session context injection, and prompt memory</strong> as a governance system. This is the misread that decision continuity names. These mechanisms are valuable â€” they improve agent behavior within a session â€” but they provide continuity within a session, not across sessions, agents, or retries.</p>
+    <p>The most widespread failure mode is treating <strong>CLAUDE.md files, per-session context injection, and prompt memory</strong> as a governance system. This is the misread that decision continuity names. These mechanisms are valuable — they improve agent behavior within a session — but they provide continuity within a session, not across sessions, agents, or retries.</p>
 
     <p>Consider what happens in a typical multi-session workflow:</p>
 
@@ -362,7 +362,7 @@
       <li>A team documents their architectural decisions in a CLAUDE.md file and injects it at session start.</li>
       <li>An agent in Session 1 respects those decisions and generates compliant code.</li>
       <li>Session 2 starts with a new agent, different tool, different engineer. The CLAUDE.md file may or may not be included. If included, it may have been updated. The agent has no way to verify whether it matches what Session 1 used.</li>
-      <li>A decision conflict arises â€” Session 2's context is subtly different from Session 1's. The agent follows what it was told. No one notices.</li>
+      <li>A decision conflict arises — Session 2's context is subtly different from Session 1's. The agent follows what it was told. No one notices.</li>
       <li>Session 10, Session 20, Session 47: drift has accumulated. The codebase reflects multiple contradictory governance contexts, each one locally coherent but globally inconsistent.</li>
     </ol>
 
@@ -400,8 +400,8 @@
         </tr>
         <tr>
           <td>Agent-independence</td>
-          <td>No â€” depends on config</td>
-          <td>Yes â€” corpus is the authority</td>
+          <td>No — depends on config</td>
+          <td>Yes — corpus is the authority</td>
         </tr>
       </tbody>
     </table>
@@ -409,15 +409,15 @@
 
     <h2>How this fits the AI SDLC</h2>
 
-    <p>Decision continuity is enabled by the <strong>governance infrastructure layer</strong> â€” specifically by storing decisions in a version-controlled corpus that every agent queries identically. In the Mneme architecture, that corpus is <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">project_memory.json</code>. The corpus lives outside any agent's context. It is not injected by a human. It is queried by the governance system at generation time, using deterministic retrieval.</p>
+    <p>Decision continuity is enabled by the <strong>governance infrastructure layer</strong> — specifically by storing decisions in a version-controlled corpus that every agent queries identically. In the Mneme architecture, that corpus is <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">project_memory.json</code>. The corpus lives outside any agent's context. It is not injected by a human. It is queried by the governance system at generation time, using deterministic retrieval.</p>
 
     <p>The key architectural consequence: <strong>the decision is the continuous element, not the agent's memory of the decision.</strong> A new agent starting a fresh session doesn't need to be told about previous decisions. It queries the corpus. The corpus tells it what is in effect. The corpus is always current because it is version-controlled. The agent enforces whatever the corpus says, regardless of what any previous agent knew.</p>
 
-    <p>This is the same pattern that makes database-backed applications resilient: the database is the source of truth, not the application's in-memory state. An application server that crashes and restarts doesn't need to rebuild its knowledge from previous sessions â€” it reads from the database. Decision continuity applies the same principle to governance: the corpus is the source of truth, not any agent's context.</p>
+    <p>This is the same pattern that makes database-backed applications resilient: the database is the source of truth, not the application's in-memory state. An application server that crashes and restarts doesn't need to rebuild its knowledge from previous sessions — it reads from the database. Decision continuity applies the same principle to governance: the corpus is the source of truth, not any agent's context.</p>
 
     <h3>Decision continuity in multi-agent pipelines</h3>
 
-    <p>The benefits compound in multi-agent workflows. In an agentic pipeline â€” planner agent, coder agent, reviewer agent, CI agent â€” each agent has its own LLM, its own context window, its own session lifecycle. Without a shared external corpus, governance would require explicit handoffs: the planner passes decisions to the coder, the coder passes them to the reviewer, and so on. Any broken link in the handoff chain means a downstream agent operates without the full governance context.</p>
+    <p>The benefits compound in multi-agent workflows. In an agentic pipeline — planner agent, coder agent, reviewer agent, CI agent — each agent has its own LLM, its own context window, its own session lifecycle. Without a shared external corpus, governance would require explicit handoffs: the planner passes decisions to the coder, the coder passes them to the reviewer, and so on. Any broken link in the handoff chain means a downstream agent operates without the full governance context.</p>
 
     <p>With a shared decision corpus, <strong>handoffs don't carry governance burden</strong>. Each agent queries the corpus independently at query time. The planner doesn't need to package its governance context and pass it to the coder. The coder doesn't need to understand what the planner decided. Both query the corpus; the corpus provides the same authoritative decisions to both. The pipeline is architecturally coherent without requiring explicit governance coordination at each step.</p>
 
@@ -432,11 +432,11 @@
     <ol>
       <li><strong>External storage.</strong> Decisions must live outside any agent's context window. A file that is read by the governance system, not injected into the agent prompt by a human.</li>
       <li><strong>Version control.</strong> The decision corpus must be version-controlled so that its history is auditable. When did a decision change? Who changed it? What did it say before? These questions must have answers.</li>
-      <li><strong>Deterministic retrieval.</strong> The same query against the same corpus must return the same decisions. If retrieval is probabilistic, continuity is probabilistic â€” which means it isn't continuity at all.</li>
+      <li><strong>Deterministic retrieval.</strong> The same query against the same corpus must return the same decisions. If retrieval is probabilistic, continuity is probabilistic — which means it isn't continuity at all.</li>
       <li><strong>Session-agnostic access.</strong> Any agent, in any session, using any tool, must be able to query the corpus and receive the same result. The corpus access cannot depend on session state or prior context.</li>
     </ol>
 
-    <p>Prompt memory satisfies none of these. A version-controlled decision corpus satisfies all four. That gap is precisely why decision continuity is a distinct concept â€” and why solving the memory problem doesn't solve the governance problem.</p>
+    <p>Prompt memory satisfies none of these. A version-controlled decision corpus satisfies all four. That gap is precisely why decision continuity is a distinct concept — and why solving the memory problem doesn't solve the governance problem.</p>
 
   </div>
 
@@ -444,23 +444,23 @@
     <h2>Frequently asked questions</h2>
     <details>
       <summary>What is decision continuity in AI coding governance?</summary>
-      <div class="faq-body">Decision continuity is the system property that architectural decisions remain enforced identically across agents, sessions, and time â€” regardless of which agent is acting, which context it inherited, or how many context windows have reset since the decision was made. It is a property of the governance system, not of any individual agent or session.</div>
+      <div class="faq-body">Decision continuity is the system property that architectural decisions remain enforced identically across agents, sessions, and time — regardless of which agent is acting, which context it inherited, or how many context windows have reset since the decision was made. It is a property of the governance system, not of any individual agent or session.</div>
     </details>
     <details>
       <summary>Why can't prompt memory provide decision continuity?</summary>
-      <div class="faq-body">Prompt memory â€” CLAUDE.md files, injected rules, per-session context â€” is session-scoped. It provides continuity within a single agent session, but ceases to exist when the session ends. A new agent starting a new session has no memory of what the previous agent enforced, decided, or was told. Continuity requires the decision to live in an external, version-controlled corpus that every session queries identically â€” not a file that must be re-injected at each session start.</div>
+      <div class="faq-body">Prompt memory — CLAUDE.md files, injected rules, per-session context — is session-scoped. It provides continuity within a single agent session, but ceases to exist when the session ends. A new agent starting a new session has no memory of what the previous agent enforced, decided, or was told. Continuity requires the decision to live in an external, version-controlled corpus that every session queries identically — not a file that must be re-injected at each session start.</div>
     </details>
     <details>
       <summary>How does decision continuity work across multiple agents?</summary>
-      <div class="faq-body">In a multi-agent pipeline â€” planner, coder, reviewer â€” each agent queries the same governance corpus independently. The decisions don't need to be re-injected at each handoff because they aren't stored in any agent's memory. They live in the corpus, and each agent retrieves what it needs at query time. The corpus is the shared memory that all agents inherit, without requiring explicit governance handoffs between them.</div>
+      <div class="faq-body">In a multi-agent pipeline — planner, coder, reviewer — each agent queries the same governance corpus independently. The decisions don't need to be re-injected at each handoff because they aren't stored in any agent's memory. They live in the corpus, and each agent retrieves what it needs at query time. The corpus is the shared memory that all agents inherit, without requiring explicit governance handoffs between them.</div>
     </details>
     <details>
       <summary>What breaks without decision continuity?</summary>
-      <div class="faq-body">Without decision continuity, architectural drift compounds across agent handoffs. Each new session starts without knowledge of previous decisions. An agent that contradicts an earlier architectural choice has no mechanism to know it has done so. Over time, the codebase accumulates violations that were never surfaced because no agent ever had full context of the decisions in play. The violations are silent â€” locally coherent in each session, globally inconsistent across the project.</div>
+      <div class="faq-body">Without decision continuity, architectural drift compounds across agent handoffs. Each new session starts without knowledge of previous decisions. An agent that contradicts an earlier architectural choice has no mechanism to know it has done so. Over time, the codebase accumulates violations that were never surfaced because no agent ever had full context of the decisions in play. The violations are silent — locally coherent in each session, globally inconsistent across the project.</div>
     </details>
     <details>
       <summary>How does Mneme maintain decision continuity across agent sessions?</summary>
-      <div class="faq-body">Mneme stores architectural decisions in project_memory.json â€” a version-controlled, externally-queryable corpus that lives outside any agent. Every agent session queries the same corpus at generation time using deterministic keyword scoring. The decisions are not injected by a human or passed between agents; they are retrieved by the governance system. Session boundaries don't affect the corpus, so continuity is structural, not session-dependent.</div>
+      <div class="faq-body">Mneme stores architectural decisions in project_memory.json — a version-controlled, externally-queryable corpus that lives outside any agent. Every agent session queries the same corpus at generation time using deterministic keyword scoring. The decisions are not injected by a human or passed between agents; they are retrieved by the governance system. Session boundaries don't affect the corpus, so continuity is structural, not session-dependent.</div>
     </details>
   </section>
 
@@ -472,12 +472,12 @@
   </ul>
 
   <footer class="article-footer">
-    <a href="/concepts/" class="back-link">â† Back to Concepts</a>
+    <a href="/concepts/" class="back-link">← Back to Concepts</a>
 
     <div class="cta-block">
       <h3>See decision continuity in action</h3>
-      <p>Mneme's governance corpus provides structural continuity across every agent session â€” without CLAUDE.md maintenance or per-session context injection.</p>
-      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub â†’</a>
+      <p>Mneme's governance corpus provides structural continuity across every agent session — without CLAUDE.md maintenance or per-session context injection.</p>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub →</a>
     </div>
   </footer>
 </article>

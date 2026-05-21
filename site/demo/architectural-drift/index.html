@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/favicon.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Architectural drift prevention â€” the AI SDLC entropy demo | Mneme HQ</title>
+  <title>Architectural drift prevention — the AI SDLC entropy demo | Mneme HQ</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
@@ -15,12 +15,12 @@
   <link rel="canonical" href="https://mnemehq.com/demo/architectural-drift/" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Architectural drift prevention â€” the AI SDLC entropy demo" />
+  <meta property="og:title" content="Architectural drift prevention — the AI SDLC entropy demo" />
   <meta property="og:description" content="A six-step timeline. An agent proposes reasonable-looking code that violates an ADR. Downstream changes amplify the divergence. A reviewer would plausibly miss it. Mneme blocks the first divergence upstream and the system converges." />
   <meta property="og:url" content="https://mnemehq.com/demo/architectural-drift/" />
   <meta property="og:image" content="https://mnemehq.com/demo/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Architectural drift prevention â€” the AI SDLC entropy demo" />
+  <meta name="twitter:title" content="Architectural drift prevention — the AI SDLC entropy demo" />
   <meta name="twitter:description" content="A six-step timeline showing how drift compounds without a governance layer, and how Mneme blocks the first divergence upstream." />
   <meta name="twitter:image" content="https://mnemehq.com/demo/og.png" />
   <!-- Consent defaults -->
@@ -41,7 +41,7 @@
       },
       {
         "@type": "Article",
-        "headline": "Architectural drift prevention â€” the AI SDLC entropy demo",
+        "headline": "Architectural drift prevention — the AI SDLC entropy demo",
         "description": "Six-step timeline showing how drift compounds without a governance layer, and how Mneme blocks the first divergence upstream so the system converges.",
         "url": "https://mnemehq.com/demo/architectural-drift/",
         "datePublished": "2026-05-13",
@@ -317,13 +317,13 @@
           <span class="dtc-dot dtc-red"></span>
           <span class="dtc-dot dtc-yellow"></span>
           <span class="dtc-dot dtc-green"></span>
-          <span class="dtc-title">mneme-demo â€” bash</span>
+          <span class="dtc-title">mneme-demo — bash</span>
           <div class="dtc-controls">
             <button class="dtc-btn" id="term-pause-btn" aria-label="Pause animation" aria-pressed="false">
               <span class="dtc-pause-icon" aria-hidden="true">â¸</span>
             </button>
             <button class="dtc-btn" id="term-replay-btn" aria-label="Replay animation">
-              <span aria-hidden="true">â†º</span> Replay
+              <span aria-hidden="true">↺</span> Replay
             </button>
           </div>
         </div>
@@ -338,11 +338,11 @@
         <summary>Full terminal transcript</summary>
         <pre aria-label="Terminal transcript"><code>$ claude "Simplify the check command by loading .mneme/project_memory.json directly inside check.py"
 
-â†³ Mneme evaluating proposed change...
+↳ Mneme evaluating proposed change...
 
 [MNEME] Architectural violation detected
 
-Decision:  ADR-001 â€” Retrieval architecture
+Decision:  ADR-001 — Retrieval architecture
 
 Rule:
   CLI commands must use the MemoryStore and Retriever pipeline.
@@ -669,11 +669,11 @@ python run.py</code></pre>
 
     var LINES = [
       [600,  '',                                                          'term-blank'],
-      [0,    'â†³ Mneme evaluating proposed change...',               'term-muted'],
+      [0,    '↳ Mneme evaluating proposed change...',               'term-muted'],
       [1100, '',                                                          'term-blank'],
       [0,    '[MNEME] Architectural violation detected',                  'term-header'],
       [500,  '',                                                          'term-blank'],
-      [0,    'Decision:  ADR-001 â€” Retrieval architecture',         'term-key'],
+      [0,    'Decision:  ADR-001 — Retrieval architecture',         'term-key'],
       [500,  '',                                                          'term-blank'],
       [0,    'Rule:',                                                     'term-key'],
       [180,  '  CLI commands must use the MemoryStore',                  'term-value'],

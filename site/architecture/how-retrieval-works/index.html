@@ -1,26 +1,26 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>How Retrieval Works in Mneme â€” Architecture Deep Dive</title>
+  <title>How Retrieval Works in Mneme — Architecture Deep Dive</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="Mneme's retrieval is deterministic keyword scoring over structured decision records â€” no vector store, no ML. Scope filter â†’ weighted scorer â†’ top-K selection â†’ context injection â†’ enforcement." />
+  <meta name="description" content="Mneme's retrieval is deterministic keyword scoring over structured decision records — no vector store, no ML. Scope filter → weighted scorer → top-K selection → context injection → enforcement." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/architecture/how-retrieval-works/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="How Retrieval Works in Mneme â€” Architecture Deep Dive" />
-  <meta property="og:description" content="Mneme's retrieval is deterministic keyword scoring over structured decision records â€” no vector store, no ML. Scope filter â†’ weighted scorer â†’ top-K selection â†’ context injection â†’ enforcement." />
+  <meta property="og:title" content="How Retrieval Works in Mneme — Architecture Deep Dive" />
+  <meta property="og:description" content="Mneme's retrieval is deterministic keyword scoring over structured decision records — no vector store, no ML. Scope filter → weighted scorer → top-K selection → context injection → enforcement." />
   <meta property="og:url" content="https://mnemehq.com/architecture/how-retrieval-works/" />
   <meta property="og:image" content="https://mnemehq.com/architecture/how-retrieval-works/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="How Retrieval Works in Mneme â€” Architecture Deep Dive" />
-  <meta name="twitter:description" content="Mneme's retrieval is deterministic keyword scoring over structured decision records â€” no vector store, no ML. Scope filter â†’ weighted scorer â†’ top-K selection â†’ context injection â†’ enforcement." />
+  <meta name="twitter:title" content="How Retrieval Works in Mneme — Architecture Deep Dive" />
+  <meta name="twitter:description" content="Mneme's retrieval is deterministic keyword scoring over structured decision records — no vector store, no ML. Scope filter → weighted scorer → top-K selection → context injection → enforcement." />
   <meta name="twitter:image" content="https://mnemehq.com/architecture/how-retrieval-works/og.png" />
   <meta name="author" content="Theo Valmis" />
   <meta property="article:published_time" content="2026-05-14T00:00:00Z" />
@@ -220,8 +220,8 @@
       },
       {
         "@type": "TechArticle",
-        "headline": "How Retrieval Works in Mneme â€” Architecture Deep Dive",
-        "description": "Mneme's retrieval is deterministic keyword scoring over structured decision records â€” no vector store, no ML. Scope filter â†’ weighted scorer â†’ top-K selection â†’ context injection â†’ enforcement.",
+        "headline": "How Retrieval Works in Mneme — Architecture Deep Dive",
+        "description": "Mneme's retrieval is deterministic keyword scoring over structured decision records — no vector store, no ML. Scope filter → weighted scorer → top-K selection → context injection → enforcement.",
         "url": "https://mnemehq.com/architecture/how-retrieval-works/",
         "datePublished": "2026-05-14",
         "dateModified": "2026-05-14",
@@ -238,12 +238,12 @@
           {
             "@type": "Question",
             "name": "How does Mneme retrieve decisions for a query?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Mneme uses deterministic keyword scoring over structured decision records. The query is tokenized, then scored against each decision's fields (title, tags, content, constraint) using a fixed weight table. Tag matches receive an additive boost. The top-K decisions by score are selected â€” K defaults to 3. Same query, same memory file, same ranked result every time. There is no vector store, no embedding model, and no ML in the retrieval path."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Mneme uses deterministic keyword scoring over structured decision records. The query is tokenized, then scored against each decision's fields (title, tags, content, constraint) using a fixed weight table. Tag matches receive an additive boost. The top-K decisions by score are selected — K defaults to 3. Same query, same memory file, same ranked result every time. There is no vector store, no embedding model, and no ML in the retrieval path."}
           },
           {
             "@type": "Question",
             "name": "What is the default K value in Mneme's retrieval?",
-            "acceptedAnswer": {"@type": "Answer", "text": "K equals 3. This is the DEFAULT_MAX_DECISIONS constant that governs both the runtime retrieval and the benchmark harness. Changing K requires a methodology ADR â€” it is not a tuning parameter."}
+            "acceptedAnswer": {"@type": "Answer", "text": "K equals 3. This is the DEFAULT_MAX_DECISIONS constant that governs both the runtime retrieval and the benchmark harness. Changing K requires a methodology ADR — it is not a tuning parameter."}
           },
           {
             "@type": "Question",
@@ -258,7 +258,7 @@
           {
             "@type": "Question",
             "name": "What are the five stages of Mneme's pipeline?",
-            "acceptedAnswer": {"@type": "Answer", "text": "The five stages are: (1) MemoryStore â€” loads and parses project_memory.json into typed Decision records; (2) DecisionRetriever â€” scores and ranks decisions against the query using deterministic keyword scoring; (3) ContextBuilder â€” formats the top-K decisions for injection; (4) LLMAdapter â€” injects context into the model prompt; (5) Evaluator â€” checks the model's output against the injected decisions and emits a PASS, FAIL, WEAK, WEAK_RETRIEVAL, or MALFORMED verdict."}
+            "acceptedAnswer": {"@type": "Answer", "text": "The five stages are: (1) MemoryStore — loads and parses project_memory.json into typed Decision records; (2) DecisionRetriever — scores and ranks decisions against the query using deterministic keyword scoring; (3) ContextBuilder — formats the top-K decisions for injection; (4) LLMAdapter — injects context into the model prompt; (5) Evaluator — checks the model's output against the injected decisions and emits a PASS, FAIL, WEAK, WEAK_RETRIEVAL, or MALFORMED verdict."}
           }
         ]
       }
@@ -288,7 +288,7 @@
 
 <main>
 <div class="answer-capsule">
-  <strong>How Mneme retrieval works.</strong> Deterministic keyword scoring over structured decision records â€” no embedding model, no vector store, no ML in the path. The query is tokenized, scored against every field in every Decision record using fixed weights, and the top-K results are returned in rank order. Same query, same memory file, same result. That determinism is what makes governance auditable.
+  <strong>How Mneme retrieval works.</strong> Deterministic keyword scoring over structured decision records — no embedding model, no vector store, no ML in the path. The query is tokenized, scored against every field in every Decision record using fixed weights, and the top-K results are returned in rank order. Same query, same memory file, same result. That determinism is what makes governance auditable.
 </div>
 
 <nav aria-label="Breadcrumb" class="breadcrumb-nav">
@@ -304,10 +304,10 @@
     <div class="article-eyebrow">
       <span class="eyebrow-tag">Architecture</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">12 min read &nbsp;Â·&nbsp; May 2026</span>
+      <span class="eyebrow-meta">12 min read &nbsp;·&nbsp; May 2026</span>
     </div>
     <h1>How Retrieval Works in Mneme</h1>
-    <p class="article-lede">Mneme's retrieval pipeline is five stages, fully deterministic, and entirely free of embedding models. This page walks through each stage â€” from the memory store through the evaluator â€” and explains why each design choice exists.</p>
+    <p class="article-lede">Mneme's retrieval pipeline is five stages, fully deterministic, and entirely free of embedding models. This page walks through each stage — from the memory store through the evaluator — and explains why each design choice exists.</p>
     <p class="byline">
       By <a href="/founder/">Theo Valmis</a>
       <span class="sep">&middot;</span>
@@ -317,7 +317,7 @@
 
   <div class="article-body">
 
-    <p>Architectural governance for AI coding agents has a retrieval problem at its core: when an AI agent is about to generate code, the governance system needs to surface the correct decisions from a potentially large corpus in real time, before generation completes. That retrieval must be fast, correct, and â€” critically â€” reproducible.</p>
+    <p>Architectural governance for AI coding agents has a retrieval problem at its core: when an AI agent is about to generate code, the governance system needs to surface the correct decisions from a potentially large corpus in real time, before generation completes. That retrieval must be fast, correct, and — critically — reproducible.</p>
 
     <p>Mneme solves this with a deterministic keyword scorer over structured decision records. No probability, no approximation, no model inference in the retrieval path. The same query against the same memory file always returns the same ranked list.</p>
 
@@ -326,7 +326,7 @@
     <p>Every governance check in Mneme runs through five sequential stages. Understanding these stages is the prerequisite for understanding both the retrieval mechanics and the evaluation layer that uses the retrieved results.</p>
 
     <figure class="diagram-wrap" aria-label="Mneme five-stage pipeline diagram">
-      <svg viewBox="0 0 660 340" width="100%" style="max-width:640px;display:block;margin:0 auto;" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pipeline: MemoryStore â†’ DecisionRetriever â†’ ContextBuilder â†’ LLMAdapter â†’ Evaluator">
+      <svg viewBox="0 0 660 340" width="100%" style="max-width:640px;display:block;margin:0 auto;" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pipeline: MemoryStore → DecisionRetriever → ContextBuilder → LLMAdapter → Evaluator">
         <!-- Background boxes for stages -->
         <!-- Stage 1: MemoryStore -->
         <rect x="8" y="100" width="106" height="60" rx="8" fill="#141416" stroke="#2e2e34" stroke-width="1.5"/>
@@ -342,7 +342,7 @@
         <text x="194" y="124" font-family="Inter,sans-serif" font-size="10" fill="#c8f060" text-anchor="middle" font-weight="600">DecisionRetriever</text>
         <text x="194" y="139" font-family="DM Mono,monospace" font-size="8.5" fill="#88889a" text-anchor="middle">keyword score</text>
         <text x="194" y="151" font-family="DM Mono,monospace" font-size="8.5" fill="#88889a" text-anchor="middle">+ tag boost</text>
-        <text x="194" y="163" font-family="DM Mono,monospace" font-size="8.5" fill="#88889a" text-anchor="middle">â†’ top-K=3</text>
+        <text x="194" y="163" font-family="DM Mono,monospace" font-size="8.5" fill="#88889a" text-anchor="middle">→ top-K=3</text>
 
         <!-- Arrow 2 -->
         <line x1="252" y1="130" x2="272" y2="130" stroke="#2e2e34" stroke-width="1.5" marker-end="url(#arr)"/>
@@ -382,10 +382,10 @@
 
         <!-- Layer labels -->
         <rect x="126" y="230" width="136" height="22" rx="4" fill="rgba(200,240,96,0.07)" stroke="rgba(200,240,96,0.2)" stroke-width="1"/>
-        <text x="194" y="245" font-family="DM Mono,monospace" font-size="8.5" fill="#c8f060" text-anchor="middle" letter-spacing="0.06em">LAYER 1 â€” RETRIEVAL</text>
+        <text x="194" y="245" font-family="DM Mono,monospace" font-size="8.5" fill="#c8f060" text-anchor="middle" letter-spacing="0.06em">LAYER 1 — RETRIEVAL</text>
 
         <rect x="520" y="230" width="136" height="22" rx="4" fill="rgba(139,224,200,0.07)" stroke="rgba(139,224,200,0.2)" stroke-width="1"/>
-        <text x="588" y="245" font-family="DM Mono,monospace" font-size="8.5" fill="#8be0c8" text-anchor="middle" letter-spacing="0.06em">LAYER 2 â€” VERDICT</text>
+        <text x="588" y="245" font-family="DM Mono,monospace" font-size="8.5" fill="#8be0c8" text-anchor="middle" letter-spacing="0.06em">LAYER 2 — VERDICT</text>
 
         <!-- Memory file label on left -->
         <text x="61" y="90" font-family="DM Mono,monospace" font-size="8.5" fill="#88889a" text-anchor="middle">project_memory.json</text>
@@ -407,18 +407,18 @@
           </marker>
         </defs>
       </svg>
-      <figcaption>Fig. 1 â€” Mneme's five-stage governance pipeline. Layer 1 (retrieval) and Layer 2 (verdict) are distinct evaluation surfaces with separate metrics.</figcaption>
+      <figcaption>Fig. 1 — Mneme's five-stage governance pipeline. Layer 1 (retrieval) and Layer 2 (verdict) are distinct evaluation surfaces with separate metrics.</figcaption>
     </figure>
 
-    <h2>Stage 1: MemoryStore â€” loading the decision corpus</h2>
+    <h2>Stage 1: MemoryStore — loading the decision corpus</h2>
 
-    <p>Every Mneme run begins by loading <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">project_memory.json</code> into a <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">MemoryStore</code>. The store deserializes the JSON into typed records. The retrieval-eligible pool is the subset of records whose type is <strong>Decision</strong> â€” which includes native <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">decision</code> items and any items migrated to decision type (typically <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">rule</code> and <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">anti_pattern</code> records).</p>
+    <p>Every Mneme run begins by loading <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">project_memory.json</code> into a <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">MemoryStore</code>. The store deserializes the JSON into typed records. The retrieval-eligible pool is the subset of records whose type is <strong>Decision</strong> — which includes native <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">decision</code> items and any items migrated to decision type (typically <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">rule</code> and <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">anti_pattern</code> records).</p>
 
-    <p>Items of type <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">preference</code>, <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">fact</code>, and <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">example</code> are not eligible for retrieval without an explicit migration step â€” this is intentional. Retrieval pool composition is a methodology decision, not a tuning parameter.</p>
+    <p>Items of type <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">preference</code>, <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">fact</code>, and <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">example</code> are not eligible for retrieval without an explicit migration step — this is intentional. Retrieval pool composition is a methodology decision, not a tuning parameter.</p>
 
     <p>The store also enforces ID uniqueness at load time: if two records share an ID, the first-seen record wins and the duplicate is discarded. This determinism property is tested and enforced.</p>
 
-    <h2>Stage 2: DecisionRetriever â€” scoring and ranking</h2>
+    <h2>Stage 2: DecisionRetriever — scoring and ranking</h2>
 
     <p>The retriever is the core of Mneme's approach. It answers one question: <em>given this query string, which decisions are most relevant?</em> It answers that question deterministically, using a weighted keyword scorer.</p>
 
@@ -431,21 +431,21 @@
     <p>Each decision record has several scored fields. Token overlap between the query tokens and each field's token set is computed, then multiplied by that field's weight:</p>
 
     <div class="code-block">
-<span class="comment"># _WEIGHTS â€” per-field scoring coefficients</span>
-<span class="key">title</span>:      <span class="num">3.0</span>   <span class="comment"># highest â€” title is the authoritative description</span>
-<span class="key">tags</span>:       <span class="num">2.5</span>   <span class="comment"># high â€” curated signals, explicit match intent</span>
-<span class="key">constraint</span>: <span class="num">1.5</span>   <span class="comment"># medium â€” the enforced rule text</span>
-<span class="key">content</span>:    <span class="num">1.0</span>   <span class="comment"># baseline â€” rationale / context prose</span>
+<span class="comment"># _WEIGHTS — per-field scoring coefficients</span>
+<span class="key">title</span>:      <span class="num">3.0</span>   <span class="comment"># highest — title is the authoritative description</span>
+<span class="key">tags</span>:       <span class="num">2.5</span>   <span class="comment"># high — curated signals, explicit match intent</span>
+<span class="key">constraint</span>: <span class="num">1.5</span>   <span class="comment"># medium — the enforced rule text</span>
+<span class="key">content</span>:    <span class="num">1.0</span>   <span class="comment"># baseline — rationale / context prose</span>
 </div>
 
     <p>A record's raw score is the sum of weighted overlap across all fields. Tag matching also receives an additive flat boost per matching tag (on top of the weight-scaled overlap), which rewards decisions that were explicitly curated for a domain.</p>
 
     <h3>Top-K selection</h3>
 
-    <p>After all candidate decisions are scored, the results are sorted descending by score. The top <strong>K=3</strong> are returned as the retrieval output. If two records have identical scores, tie-breaking is deterministic â€” same order in the memory file, same tie-break result.</p>
+    <p>After all candidate decisions are scored, the results are sorted descending by score. The top <strong>K=3</strong> are returned as the retrieval output. If two records have identical scores, tie-breaking is deterministic — same order in the memory file, same tie-break result.</p>
 
     <div class="callout">
-      <p><strong>Why K=3?</strong> Three decisions fit within a model's active attention without crowding the task prompt. Benchmarking showed that recall@3 covers all five governed scenarios at 100% with the current decision pool. K is pinned â€” changing it requires a methodology ADR because it affects benchmark comparability.</p>
+      <p><strong>Why K=3?</strong> Three decisions fit within a model's active attention without crowding the task prompt. Benchmarking showed that recall@3 covers all five governed scenarios at 100% with the current decision pool. K is pinned — changing it requires a methodology ADR because it affects benchmark comparability.</p>
     </div>
 
     <p>The retrieval output is a ranked list of decision records with their scores and field-level match evidence. This output feeds directly into the ContextBuilder.</p>
@@ -455,7 +455,7 @@
 
         <!-- Query box -->
         <rect x="230" y="8" width="160" height="36" rx="8" fill="#141416" stroke="#c8f060" stroke-width="1.5"/>
-        <text x="310" y="30" font-family="DM Mono,monospace" font-size="9.5" fill="#c8f060" text-anchor="middle">query â†’ token set</text>
+        <text x="310" y="30" font-family="DM Mono,monospace" font-size="9.5" fill="#c8f060" text-anchor="middle">query → token set</text>
 
         <!-- Arrows down to fields -->
         <line x1="255" y1="44" x2="75" y2="88" stroke="#2e2e34" stroke-width="1" stroke-dasharray="3 2"/>
@@ -493,27 +493,27 @@
         <!-- Sum box -->
         <rect x="236" y="180" width="148" height="38" rx="8" fill="#141416" stroke="#8be0c8" stroke-width="1.5"/>
         <text x="310" y="201" font-family="Inter,sans-serif" font-size="9.5" fill="#8be0c8" text-anchor="middle" font-weight="600">raw score per record</text>
-        <text x="310" y="214" font-family="DM Mono,monospace" font-size="8.5" fill="#88889a" text-anchor="middle">sort â†“ â†’ top K=3</text>
+        <text x="310" y="214" font-family="DM Mono,monospace" font-size="8.5" fill="#88889a" text-anchor="middle">sort ↓ → top K=3</text>
 
       </svg>
-      <figcaption>Fig. 2 â€” DecisionRetriever scoring: token overlap against each field, weighted, summed to a raw score, then top-K selection.</figcaption>
+      <figcaption>Fig. 2 — DecisionRetriever scoring: token overlap against each field, weighted, summed to a raw score, then top-K selection.</figcaption>
     </figure>
 
-    <h2>Stage 3: ContextBuilder â€” formatting for injection</h2>
+    <h2>Stage 3: ContextBuilder — formatting for injection</h2>
 
-    <p>The ContextBuilder takes the ranked list from the retriever and converts it into a prompt-ready string. Each retrieved decision is serialized with its ID, title, constraint text, and tags. The formatting is consistent and schema-governed â€” the LLM sees the same structure for every governance check, which improves constraint adherence.</p>
+    <p>The ContextBuilder takes the ranked list from the retriever and converts it into a prompt-ready string. Each retrieved decision is serialized with its ID, title, constraint text, and tags. The formatting is consistent and schema-governed — the LLM sees the same structure for every governance check, which improves constraint adherence.</p>
 
     <p>The ContextBuilder does not filter or re-rank the decisions it receives. Retrieval ordering is preserved. Any post-retrieval modification would introduce non-determinism into the injection path, which is explicitly not allowed.</p>
 
-    <h2>Stage 4: LLMAdapter â€” context injection</h2>
+    <h2>Stage 4: LLMAdapter — context injection</h2>
 
-    <p>The LLMAdapter wraps the underlying model call. It takes the formatted context from the ContextBuilder, combines it with the original task prompt, and calls the configured LLM. The governance context is injected as system-level instruction â€” before the task description, with explicit language identifying the decisions as authoritative constraints.</p>
+    <p>The LLMAdapter wraps the underlying model call. It takes the formatted context from the ContextBuilder, combines it with the original task prompt, and calls the configured LLM. The governance context is injected as system-level instruction — before the task description, with explicit language identifying the decisions as authoritative constraints.</p>
 
     <p>The adapter is model-agnostic. Any model behind an OpenAI-compatible endpoint works without changes to the retrieval or evaluation stages.</p>
 
-    <h2>Stage 5: Evaluator â€” the verdict layer</h2>
+    <h2>Stage 5: Evaluator — the verdict layer</h2>
 
-    <p>The Evaluator inspects the model's output against the injected decisions and emits a structured verdict. This is Layer 2 evaluation â€” separate from the retrieval metrics computed at Layer 1. The five possible verdicts are:</p>
+    <p>The Evaluator inspects the model's output against the injected decisions and emits a structured verdict. This is Layer 2 evaluation — separate from the retrieval metrics computed at Layer 1. The five possible verdicts are:</p>
 
     <div class="metric-row">
       <div class="metric-card">
@@ -530,7 +530,7 @@
       </div>
       <div class="metric-card">
         <div class="metric-val" style="color:var(--muted)">WEAK_RETR.</div>
-        <div class="metric-label">Expected decision not in top-K â€” Layer 1 failure</div>
+        <div class="metric-label">Expected decision not in top-K — Layer 1 failure</div>
       </div>
       <div class="metric-card">
         <div class="metric-val" style="color:var(--muted)">MALFORMED</div>
@@ -538,10 +538,10 @@
       </div>
     </div>
 
-    <p><strong>WEAK_RETRIEVAL</strong> is the critical verdict for understanding retrieval quality. It fires when the evaluator expected a specific decision ID to be present in the injected context, but that ID was not in the top-K retrieved results. This means the model was never given the constraint it was supposed to enforce â€” a retrieval failure that causes an enforcement gap.</p>
+    <p><strong>WEAK_RETRIEVAL</strong> is the critical verdict for understanding retrieval quality. It fires when the evaluator expected a specific decision ID to be present in the injected context, but that ID was not in the top-K retrieved results. This means the model was never given the constraint it was supposed to enforce — a retrieval failure that causes an enforcement gap.</p>
 
     <div class="callout-teal">
-      <p><strong>WEAK_RETRIEVAL is a Layer 1 failure surfaced at Layer 2.</strong> The evaluator sees that recall dropped â€” the expected decision ID wasn't retrieved â€” and downgrades the scenario from PASS. A zero WEAK_RETRIEVAL count across the benchmark suite is a merge-gate requirement.</p>
+      <p><strong>WEAK_RETRIEVAL is a Layer 1 failure surfaced at Layer 2.</strong> The evaluator sees that recall dropped — the expected decision ID wasn't retrieved — and downgrades the scenario from PASS. A zero WEAK_RETRIEVAL count across the benchmark suite is a merge-gate requirement.</p>
     </div>
 
     <h2>Layer 1 and Layer 2 metrics</h2>
@@ -561,62 +561,62 @@
         <tr>
           <td>recall@K per scenario</td>
           <td>Layer 1</td>
-          <td>Regression guard â€” drop below 1.0 blocks merge</td>
+          <td>Regression guard — drop below 1.0 blocks merge</td>
         </tr>
         <tr>
           <td>recall@1 per scenario</td>
           <td>Layer 1</td>
-          <td>Sharpest tuning signal â€” rank-1 precision</td>
+          <td>Sharpest tuning signal — rank-1 precision</td>
         </tr>
         <tr>
           <td>precision@K (suite mean)</td>
           <td>Layer 1</td>
-          <td>Advisory â€” fixture-shape constrained at K=3</td>
+          <td>Advisory — fixture-shape constrained at K=3</td>
         </tr>
         <tr>
           <td>irrelevant_injection_rate</td>
           <td>Layer 1</td>
-          <td>Advisory â€” mechanically 1.0 given current fixture shape</td>
+          <td>Advisory — mechanically 1.0 given current fixture shape</td>
         </tr>
         <tr>
           <td>pass_rate</td>
           <td>Layer 2</td>
-          <td>Authoritative merge gate â€” must remain 1.00</td>
+          <td>Authoritative merge gate — must remain 1.00</td>
         </tr>
         <tr>
           <td>WEAK_RETRIEVAL count</td>
           <td>Layer 2</td>
-          <td>Authoritative â€” must remain 0</td>
+          <td>Authoritative — must remain 0</td>
         </tr>
       </tbody>
     </table>
     </div>
 
-    <p>Recall@K is the primary regression guard because it directly measures whether the expected decision survived the K=3 cutoff. At the current benchmark suite shape (one expected ID per governed scenario), recall@K can only be 0.0 or 1.0 â€” it has no headroom upward and can only regress. That makes it an ideal invariant.</p>
+    <p>Recall@K is the primary regression guard because it directly measures whether the expected decision survived the K=3 cutoff. At the current benchmark suite shape (one expected ID per governed scenario), recall@K can only be 0.0 or 1.0 — it has no headroom upward and can only regress. That makes it an ideal invariant.</p>
 
     <h2>Why no embeddings?</h2>
 
     <p>The decision to use deterministic keyword scoring instead of embedding-based retrieval is architectural, not just pragmatic. Governance enforcement requires three properties that embedding models cannot provide:</p>
 
     <ol>
-      <li><strong>Reproducibility.</strong> Governance audits require that the same query against the same corpus returns the same decisions. Embedding models are updated, fine-tuned, and replaced â€” any change silently changes retrieval behavior.</li>
+      <li><strong>Reproducibility.</strong> Governance audits require that the same query against the same corpus returns the same decisions. Embedding models are updated, fine-tuned, and replaced — any change silently changes retrieval behavior.</li>
       <li><strong>Explainability.</strong> When a decision is retrieved, an engineer must be able to understand why. Keyword overlap is transparent: the title matched two of the query tokens at weight 3.0, and the tags matched one at weight 2.5. Cosine similarity in a 1536-dimensional space is not.</li>
       <li><strong>No runtime dependencies.</strong> A governance system that requires an embedding API call in the critical path adds latency, failure modes, and cost to every AI-assisted edit. Mneme's retrieval is pure Python, runs locally, and has no network dependencies.</li>
     </ol>
 
     <div class="callout">
-      <p><strong>RAG retrieves knowledge. Mneme operationalizes decisions.</strong> Embedding-based retrieval is optimized for semantic relevance â€” finding passages that are topically close to a query. Governance retrieval needs to find the <em>authoritative</em> decision that applies to the current file and task, not the most semantically similar passage. These are different optimization targets.</p>
+      <p><strong>RAG retrieves knowledge. Mneme operationalizes decisions.</strong> Embedding-based retrieval is optimized for semantic relevance — finding passages that are topically close to a query. Governance retrieval needs to find the <em>authoritative</em> decision that applies to the current file and task, not the most semantically similar passage. These are different optimization targets.</p>
     </div>
 
     <h2>Scope-aware retrieval</h2>
 
-    <p>Each decision record can carry a <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">scope</code> field â€” a glob pattern that restricts which file paths the decision applies to. When a query is associated with a specific file path (e.g. a Claude Code hook fires when editing <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">services/payments/handler.py</code>), the retriever applies scope patterns as a pre-filter before scoring.</p>
+    <p>Each decision record can carry a <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">scope</code> field — a glob pattern that restricts which file paths the decision applies to. When a query is associated with a specific file path (e.g. a Claude Code hook fires when editing <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">services/payments/handler.py</code>), the retriever applies scope patterns as a pre-filter before scoring.</p>
 
     <p>This scope matching is structural, not semantic. A decision scoped to <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">services/payments/**</code> fires only for files matching that pattern, regardless of whether the query text is semantically related to payments. This is the correct behavior: a payments-specific constraint should not fire when the model is editing an analytics pipeline, even if the query text happens to overlap.</p>
 
     <h2>Determinism guarantee</h2>
 
-    <p>Determinism is a non-negotiable invariant: same query, same memory file, same ranked result. It is tested at the unit level (token scorer), the integration level (full pipeline), and the suite level (benchmark scenarios). Any change to tie-breaking behavior requires a pinned test before the change ships â€” the test documents the new contract and prevents silent drift.</p>
+    <p>Determinism is a non-negotiable invariant: same query, same memory file, same ranked result. It is tested at the unit level (token scorer), the integration level (full pipeline), and the suite level (benchmark scenarios). Any change to tie-breaking behavior requires a pinned test before the change ships — the test documents the new contract and prevents silent drift.</p>
 
     <p>This determinism is what makes Mneme's governance auditable. Every CI gate, every hook block, every FAIL verdict traces back to a specific decision record with a specific field match. The trace is reproducible.</p>
 
@@ -626,15 +626,15 @@
     <h2>Frequently asked questions</h2>
     <details>
       <summary>How does Mneme retrieve decisions for a query?</summary>
-      <div class="faq-body">Mneme uses deterministic keyword scoring over structured decision records. The query is tokenized, then scored against each decision's fields (title, tags, content, constraint) using a fixed weight table. Tag matches receive an additive boost. The top-K decisions by score are selected â€” K defaults to 3. Same query, same memory file, same ranked result every time. There is no vector store, no embedding model, and no ML in the retrieval path.</div>
+      <div class="faq-body">Mneme uses deterministic keyword scoring over structured decision records. The query is tokenized, then scored against each decision's fields (title, tags, content, constraint) using a fixed weight table. Tag matches receive an additive boost. The top-K decisions by score are selected — K defaults to 3. Same query, same memory file, same ranked result every time. There is no vector store, no embedding model, and no ML in the retrieval path.</div>
     </details>
     <details>
       <summary>What is the default K value and can it be changed?</summary>
-      <div class="faq-body">K equals 3. This is the DEFAULT_MAX_DECISIONS constant that governs both the runtime retrieval and the benchmark harness. Runtime and benchmark must agree on K â€” if they diverge, benchmark results no longer reflect runtime behavior. Changing K requires a methodology ADR because it affects benchmark comparability across versions. It is not a tuning parameter.</div>
+      <div class="faq-body">K equals 3. This is the DEFAULT_MAX_DECISIONS constant that governs both the runtime retrieval and the benchmark harness. Runtime and benchmark must agree on K — if they diverge, benchmark results no longer reflect runtime behavior. Changing K requires a methodology ADR because it affects benchmark comparability across versions. It is not a tuning parameter.</div>
     </details>
     <details>
       <summary>What is WEAK_RETRIEVAL and when does it fire?</summary>
-      <div class="faq-body">WEAK_RETRIEVAL is a scenario verdict emitted when an expected decision ID was not found in the top-K retrieved results. It means the enforcement chain would have failed on that query â€” the model was never given the constraint it was supposed to enforce. WEAK_RETRIEVAL count must remain at zero across the benchmark suite; any non-zero count is a merge-blocking regression.</div>
+      <div class="faq-body">WEAK_RETRIEVAL is a scenario verdict emitted when an expected decision ID was not found in the top-K retrieved results. It means the enforcement chain would have failed on that query — the model was never given the constraint it was supposed to enforce. WEAK_RETRIEVAL count must remain at zero across the benchmark suite; any non-zero count is a merge-blocking regression.</div>
     </details>
     <details>
       <summary>Does Mneme use embeddings or vector similarity?</summary>
@@ -642,25 +642,25 @@
     </details>
     <details>
       <summary>What are recall@K and recall@1, and why do they differ?</summary>
-      <div class="faq-body">recall@K measures whether the expected decision ID appears anywhere in the top-K results. recall@1 measures whether it appears at rank 1 specifically. recall@K is the regression guard (cannot regress without blocking merge). recall@1 is the tuning signal â€” it has headroom to improve from the current baseline and is the sharpest evidence that retrieval selectivity improved. Both are computed per scenario, not just as a suite mean.</div>
+      <div class="faq-body">recall@K measures whether the expected decision ID appears anywhere in the top-K results. recall@1 measures whether it appears at rank 1 specifically. recall@K is the regression guard (cannot regress without blocking merge). recall@1 is the tuning signal — it has headroom to improve from the current baseline and is the sharpest evidence that retrieval selectivity improved. Both are computed per scenario, not just as a suite mean.</div>
     </details>
   </section>
 
   <h2 id="related-reading">Related reading</h2>
   <ul>
-    <li><a href="/architecture/decision-memory-vs-documentation/">Decision Memory vs. Documentation â€” What Makes Them Different</a></li>
+    <li><a href="/architecture/decision-memory-vs-documentation/">Decision Memory vs. Documentation — What Makes Them Different</a></li>
     <li><a href="/insights/why-rag-fails-for-architectural-governance/">Why RAG Fails for Architectural Governance</a></li>
     <li><a href="/benchmark/">Governance Benchmark v1.1 Methodology</a></li>
     <li><a href="/docs/governance-violations/">Governance Violations Reference</a></li>
   </ul>
 
   <footer class="article-footer">
-    <a href="/docs/" class="back-link">â† Back to Docs</a>
+    <a href="/docs/" class="back-link">← Back to Docs</a>
 
     <div class="cta-block">
       <h3>Inspect the retriever source</h3>
       <p>DecisionRetriever, MemoryStore, ContextBuilder, and the full evaluation harness are open source under MIT license.</p>
-      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub â†’</a>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub →</a>
     </div>
   </footer>
 </article>

@@ -1,13 +1,13 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Why AI Architectural Governance Needs Precedence Semantics â€” Mneme HQ</title>
+  <title>Why AI Architectural Governance Needs Precedence Semantics — Mneme HQ</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="When two architectural decisions overlap, prompt rules, RAG, and PR review all resolve the conflict non-deterministically. Precedence semantics â€” specificity, supersedes, priority, status, temporal resolution â€” is the missing layer that makes AI governance deterministic." />
+  <meta name="description" content="When two architectural decisions overlap, prompt rules, RAG, and PR review all resolve the conflict non-deterministically. Precedence semantics — specificity, supersedes, priority, status, temporal resolution — is the missing layer that makes AI governance deterministic." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/insights/why-architectural-governance-needs-precedence-semantics/" />
@@ -268,7 +268,7 @@
       {
         "@type": "Article",
         "headline": "Why AI Architectural Governance Needs Precedence Semantics",
-        "description": "When two architectural decisions overlap, prompt rules, RAG, and PR review all resolve the conflict non-deterministically. Precedence semantics â€” specificity, supersedes, priority, status, temporal resolution â€” is the missing layer that makes AI governance deterministic.",
+        "description": "When two architectural decisions overlap, prompt rules, RAG, and PR review all resolve the conflict non-deterministically. Precedence semantics — specificity, supersedes, priority, status, temporal resolution — is the missing layer that makes AI governance deterministic.",
         "url": "https://mnemehq.com/insights/why-architectural-governance-needs-precedence-semantics/",
         "datePublished": "2026-05-13",
         "dateModified": "2026-05-13",
@@ -280,11 +280,11 @@
       {
         "@type": "FAQPage",
         "mainEntity": [
-          {"@type": "Question", "name": "Isn't precedence just rule ordering?", "acceptedAnswer": {"@type": "Answer", "text": "No. Rule ordering is a single axis â€” the rule that comes last wins. Precedence semantics is multi-dimensional: scope specificity, supersedes relationships, explicit priority, decision status, and temporal resolution all interact. A more recent decision can be overridden by an older one with narrower scope. A higher-priority decision can be retired by status. Ordering cannot express any of that."}},
+          {"@type": "Question", "name": "Isn't precedence just rule ordering?", "acceptedAnswer": {"@type": "Answer", "text": "No. Rule ordering is a single axis — the rule that comes last wins. Precedence semantics is multi-dimensional: scope specificity, supersedes relationships, explicit priority, decision status, and temporal resolution all interact. A more recent decision can be overridden by an older one with narrower scope. A higher-priority decision can be retired by status. Ordering cannot express any of that."}},
           {"@type": "Question", "name": "Why can't an LLM just resolve the conflict at generation time?", "acceptedAnswer": {"@type": "Answer", "text": "An LLM resolving a conflict is, by definition, non-deterministic. The same conflict with the same inputs can resolve differently on different runs, in different agents, at different temperatures. Architectural decisions need a single answer that every agent and every reviewer can reproduce. That requires the resolution to happen before the model sees the constraints, not inside the model's reasoning."}},
-          {"@type": "Question", "name": "How is this different from policy-as-code?", "acceptedAnswer": {"@type": "Answer", "text": "Policy-as-code (OPA, Conftest, similar) is a downstream evaluator: given a policy and an artifact, return allow or deny. Precedence semantics sits upstream â€” it answers which policy actually applies when several overlap, before evaluation runs. The two compose. Precedence resolution decides what the rule is; policy-as-code decides whether the artifact obeys it."}},
+          {"@type": "Question", "name": "How is this different from policy-as-code?", "acceptedAnswer": {"@type": "Answer", "text": "Policy-as-code (OPA, Conftest, similar) is a downstream evaluator: given a policy and an artifact, return allow or deny. Precedence semantics sits upstream — it answers which policy actually applies when several overlap, before evaluation runs. The two compose. Precedence resolution decides what the rule is; policy-as-code decides whether the artifact obeys it."}},
           {"@type": "Question", "name": "What does this require from how we write ADRs?", "acceptedAnswer": {"@type": "Answer", "text": "Less than it sounds. ADRs continue to be written as decisions with rationale. What changes is that they declare three additional facts in structured form: their scope (paths, services, layers), their relationship to prior decisions (supersedes, refines, exception-to), and their status (proposed, accepted, deprecated). Those three facts are what a precedence engine resolves over."}},
-          {"@type": "Question", "name": "Does this only matter for large codebases?", "acceptedAnswer": {"@type": "Answer", "text": "It matters as soon as you have two decisions whose scopes overlap. That happens earlier than most teams expect â€” usually around the time the first cross-service exception is granted. Small teams feel it as 'we keep relitigating this in code review.' Large teams feel it as silent drift between services."}}
+          {"@type": "Question", "name": "Does this only matter for large codebases?", "acceptedAnswer": {"@type": "Answer", "text": "It matters as soon as you have two decisions whose scopes overlap. That happens earlier than most teams expect — usually around the time the first cross-service exception is granted. Small teams feel it as 'we keep relitigating this in code review.' Large teams feel it as silent drift between services."}}
         ]
       }
     ]

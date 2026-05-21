@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Deterministic Enforcement â€” Mneme HQ Concepts</title>
+  <title>Deterministic Enforcement — Mneme HQ Concepts</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
@@ -14,12 +14,12 @@
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Deterministic Enforcement â€” Mneme HQ Concepts" />
+  <meta property="og:title" content="Deterministic Enforcement — Mneme HQ Concepts" />
   <meta property="og:description" content="Deterministic enforcement means a governance check produces the same verdict for the same inputs, always. The precondition for governance auditability and improvement." />
   <meta property="og:url" content="https://mnemehq.com/concepts/deterministic-enforcement/" />
   <meta property="og:image" content="https://mnemehq.com/concepts/deterministic-enforcement/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Deterministic Enforcement â€” Mneme HQ Concepts" />
+  <meta name="twitter:title" content="Deterministic Enforcement — Mneme HQ Concepts" />
   <meta name="twitter:description" content="Deterministic enforcement means a governance check produces the same verdict for the same inputs, always. The precondition for governance auditability and improvement." />
   <meta name="twitter:image" content="https://mnemehq.com/concepts/deterministic-enforcement/og.png" />
   <meta name="author" content="Theo Valmis" />
@@ -264,7 +264,7 @@
       },
       {
         "@type": "TechArticle",
-        "headline": "Deterministic Enforcement â€” Mneme HQ Concepts",
+        "headline": "Deterministic Enforcement — Mneme HQ Concepts",
         "description": "Deterministic enforcement means a governance check produces the same verdict for the same inputs, always. The precondition for governance auditability and improvement.",
         "url": "https://mnemehq.com/concepts/deterministic-enforcement/",
         "datePublished": "2026-05-14",
@@ -282,34 +282,34 @@
           {
             "@type": "Question",
             "name": "What is deterministic enforcement in governance?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Deterministic enforcement means that a governance check produces the same verdict for the same code, the same decision corpus, and the same context â€” every time, independent of model state, retrieval variance, or runtime conditions. Same inputs, same verdict. It is the property that makes governance results auditable and comparable across versions and runs."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Deterministic enforcement means that a governance check produces the same verdict for the same code, the same decision corpus, and the same context — every time, independent of model state, retrieval variance, or runtime conditions. Same inputs, same verdict. It is the property that makes governance results auditable and comparable across versions and runs."}
           },
           {
             "@type": "Question",
             "name": "Why is determinism important for governance auditability?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Governance audits require reproducibility: the same query against the same corpus must produce the same result. If a governance check can produce different verdicts for the same input on different runs, then a CI gate that passed last Tuesday might fail today without any code change â€” and there's no meaningful way to compare governance history across versions. Determinism is the structural precondition for meaningful audit trails."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Governance audits require reproducibility: the same query against the same corpus must produce the same result. If a governance check can produce different verdicts for the same input on different runs, then a CI gate that passed last Tuesday might fail today without any code change — and there's no meaningful way to compare governance history across versions. Determinism is the structural precondition for meaningful audit trails."}
           },
           {
             "@type": "Question",
             "name": "Is all of Mneme's pipeline deterministic?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Retrieval and evaluation are deterministic. The LLM inference step is non-deterministic (models have temperature). Mneme addresses this by moving enforcement to the evaluation layer, which inspects structured output assertions against structured constraint records â€” not natural language compliance. The evaluator's verdict is a function of structured inputs, not model behavior, so determinism is preserved at the enforcement layer even though the model itself is non-deterministic."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Retrieval and evaluation are deterministic. The LLM inference step is non-deterministic (models have temperature). Mneme addresses this by moving enforcement to the evaluation layer, which inspects structured output assertions against structured constraint records — not natural language compliance. The evaluator's verdict is a function of structured inputs, not model behavior, so determinism is preserved at the enforcement layer even though the model itself is non-deterministic."}
           },
           {
             "@type": "Question",
             "name": "How does non-deterministic retrieval undermine governance?",
-            "acceptedAnswer": {"@type": "Answer", "text": "If retrieval is probabilistic â€” as with embedding-based RAG â€” the same query might retrieve different decisions on different runs because embedding models are updated, similarity scores drift, and passage selection varies. This means the constraints injected into a governance check vary across runs. A developer who passes a governance check on Monday might fail on Tuesday without changing any code. The governance signal becomes unreliable and impossible to audit meaningfully."}
+            "acceptedAnswer": {"@type": "Answer", "text": "If retrieval is probabilistic — as with embedding-based RAG — the same query might retrieve different decisions on different runs because embedding models are updated, similarity scores drift, and passage selection varies. This means the constraints injected into a governance check vary across runs. A developer who passes a governance check on Monday might fail on Tuesday without changing any code. The governance signal becomes unreliable and impossible to audit meaningfully."}
           },
           {
             "@type": "Question",
             "name": "Can you have deterministic enforcement with a non-deterministic LLM?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Yes, if enforcement happens at the evaluation layer, not inside the LLM. Mneme requires the model to produce structured assertions â€” specific claims about which constraints it followed or violated. The evaluator then checks those assertions against the constraint records deterministically. The model's temperature affects the phrasing of the assertion, but the evaluation logic checks structured fields, not natural language. The verdict is determined by the evaluation function, which is fully deterministic."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Yes, if enforcement happens at the evaluation layer, not inside the LLM. Mneme requires the model to produce structured assertions — specific claims about which constraints it followed or violated. The evaluator then checks those assertions against the constraint records deterministically. The model's temperature affects the phrasing of the assertion, but the evaluation logic checks structured fields, not natural language. The verdict is determined by the evaluation function, which is fully deterministic."}
           }
         ]
       },
       {
         "@type": "DefinedTerm",
         "name": "Deterministic Enforcement",
-        "description": "A governance check that produces the same verdict for the same code, the same decision corpus, and the same context â€” every time, independent of model state, retrieval variance, or runtime conditions.",
+        "description": "A governance check that produces the same verdict for the same code, the same decision corpus, and the same context — every time, independent of model state, retrieval variance, or runtime conditions.",
         "inDefinedTermSet": {"@type": "DefinedTermSet", "name": "Mneme HQ Concepts", "url": "https://mnemehq.com/concepts/"},
         "url": "https://mnemehq.com/concepts/deterministic-enforcement/"
       }
@@ -339,7 +339,7 @@
 
 <main>
 <div class="answer-capsule">
-  <strong>Deterministic enforcement.</strong> A governance check that produces the same verdict for the same code, the same decision corpus, and the same context â€” every time, independent of model state, retrieval variance, or runtime conditions. Determinism is not a performance property. It is the precondition for governance auditability.
+  <strong>Deterministic enforcement.</strong> A governance check that produces the same verdict for the same code, the same decision corpus, and the same context — every time, independent of model state, retrieval variance, or runtime conditions. Determinism is not a performance property. It is the precondition for governance auditability.
 </div>
 
 <nav aria-label="Breadcrumb" class="breadcrumb-nav">
@@ -355,10 +355,10 @@
     <div class="article-eyebrow">
       <span class="eyebrow-tag">Concepts</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">11 min read &nbsp;Â·&nbsp; May 2026</span>
+      <span class="eyebrow-meta">11 min read &nbsp;·&nbsp; May 2026</span>
     </div>
     <h1>Deterministic Enforcement</h1>
-    <p class="article-lede">A governance system that produces different verdicts for the same input on different runs cannot be audited, cannot be compared across versions, and cannot be trusted. Deterministic enforcement is not an optimization â€” it is the structural property that makes governance meaningful.</p>
+    <p class="article-lede">A governance system that produces different verdicts for the same input on different runs cannot be audited, cannot be compared across versions, and cannot be trusted. Deterministic enforcement is not an optimization — it is the structural property that makes governance meaningful.</p>
     <p class="byline">
       By <a href="/founder/">Theo Valmis</a>
       <span class="sep">&middot;</span>
@@ -368,9 +368,9 @@
 
   <div class="article-body">
 
-    <p>When an engineer asks "did the governance check pass?" they implicitly assume the question has a stable answer. Pass means pass â€” the same code, the same rules, the same result. That assumption is the foundation of every useful governance system, from unit tests to CI gates to security scanners. Without it, the question doesn't have a meaningful answer. It has a distribution of possible answers, varying by run conditions.</p>
+    <p>When an engineer asks "did the governance check pass?" they implicitly assume the question has a stable answer. Pass means pass — the same code, the same rules, the same result. That assumption is the foundation of every useful governance system, from unit tests to CI gates to security scanners. Without it, the question doesn't have a meaningful answer. It has a distribution of possible answers, varying by run conditions.</p>
 
-    <p>Deterministic enforcement is the name for the property that makes governance questions have stable answers. It is not a feature or an optimization goal. It is a structural requirement â€” the minimum bar below which "governance" is better described as "probabilistic suggestion."</p>
+    <p>Deterministic enforcement is the name for the property that makes governance questions have stable answers. It is not a feature or an optimization goal. It is a structural requirement — the minimum bar below which "governance" is better described as "probabilistic suggestion."</p>
 
     <figure class="diagram-figure" aria-labelledby="de-diag-title">
       <svg viewBox="0 0 800 340" role="img" aria-labelledby="de-diag-title de-diag-desc" xmlns="http://www.w3.org/2000/svg">
@@ -379,7 +379,7 @@
         <g>
           <!-- Deterministic column -->
           <text x="40" y="32" class="diag-accent-text">â–² DETERMINISTIC ENFORCEMENT</text>
-          <text x="40" y="50" class="diag-meta">same input Â· same corpus Â· same verdict Â· every run</text>
+          <text x="40" y="50" class="diag-meta">same input · same corpus · same verdict · every run</text>
 
           <rect x="40" y="64" width="120" height="38" rx="6" class="diag-box-active"/>
           <text x="100" y="88" text-anchor="middle" class="diag-mono">query = qâ‚</text>
@@ -389,15 +389,15 @@
           <line x1="160" y1="83" x2="200" y2="187" class="diag-arrow-active"/>
 
           <rect x="200" y="64" width="160" height="38" rx="6" class="diag-box"/>
-          <text x="280" y="80" text-anchor="middle" class="diag-meta">RUN 1 Â· t=09:00</text>
+          <text x="280" y="80" text-anchor="middle" class="diag-meta">RUN 1 · t=09:00</text>
           <text x="280" y="95" text-anchor="middle" class="diag-mono">retriever + evaluator</text>
 
           <rect x="200" y="116" width="160" height="38" rx="6" class="diag-box"/>
-          <text x="280" y="132" text-anchor="middle" class="diag-meta">RUN 2 Â· t=12:30</text>
+          <text x="280" y="132" text-anchor="middle" class="diag-meta">RUN 2 · t=12:30</text>
           <text x="280" y="147" text-anchor="middle" class="diag-mono">retriever + evaluator</text>
 
           <rect x="200" y="168" width="160" height="38" rx="6" class="diag-box"/>
-          <text x="280" y="184" text-anchor="middle" class="diag-meta">RUN 3 Â· t=17:45</text>
+          <text x="280" y="184" text-anchor="middle" class="diag-meta">RUN 3 · t=17:45</text>
           <text x="280" y="199" text-anchor="middle" class="diag-mono">retriever + evaluator</text>
 
           <line x1="360" y1="83" x2="380" y2="83" class="diag-arrow-active"/>
@@ -410,13 +410,13 @@
           <path d="M 360 83 Q 370 83 380 116" class="diag-arrow-active"/>
           <path d="M 360 187 Q 370 187 380 154" class="diag-arrow-active"/>
 
-          <text x="510" y="140" class="diag-accent-text">â‰¡ same record Â· auditable</text>
+          <text x="510" y="140" class="diag-accent-text">â‰¡ same record · auditable</text>
 
           <!-- Divider -->
           <line x1="40" y1="232" x2="760" y2="232" stroke="#222226"/>
 
           <!-- Probabilistic column -->
-          <text x="40" y="258" class="diag-bad-text">â–¼ PROBABILISTIC SUGGESTION Â· embedding retrieval, LLM-judge</text>
+          <text x="40" y="258" class="diag-bad-text">â–¼ PROBABILISTIC SUGGESTION · embedding retrieval, LLM-judge</text>
 
           <rect x="40" y="270" width="120" height="38" rx="6" class="diag-box"/>
           <text x="100" y="294" text-anchor="middle" class="diag-mono">query = qâ‚</text>
@@ -438,7 +438,7 @@
           <text x="660" y="294" class="diag-bad-text">unauditable</text>
         </g>
       </svg>
-      <figcaption class="diagram-caption"><strong>Same input Â· same verdict.</strong> Determinism is the minimum bar. A governance check that drifts across runs cannot be regression-tested, cannot be audited, and cannot underpin a merge gate â€” it produces noise that looks like enforcement.</figcaption>
+      <figcaption class="diagram-caption"><strong>Same input · same verdict.</strong> Determinism is the minimum bar. A governance check that drifts across runs cannot be regression-tested, cannot be audited, and cannot underpin a merge gate — it produces noise that looks like enforcement.</figcaption>
     </figure>
 
     <h2>What deterministic enforcement actually means</h2>
@@ -447,7 +447,7 @@
 
     <h3>Retrieval determinism</h3>
 
-    <p>Same query + same corpus = same ranked decisions. The retrieval layer must return the identical set of constraint records for the identical query, regardless of when the query is made, what model is deployed, or what other queries have been run recently. Retrieval determinism is the precondition for everything downstream â€” if the retrieval layer varies, all subsequent enforcement varies with it.</p>
+    <p>Same query + same corpus = same ranked decisions. The retrieval layer must return the identical set of constraint records for the identical query, regardless of when the query is made, what model is deployed, or what other queries have been run recently. Retrieval determinism is the precondition for everything downstream — if the retrieval layer varies, all subsequent enforcement varies with it.</p>
 
     <h3>Context determinism</h3>
 
@@ -455,7 +455,7 @@
 
     <h3>Evaluation determinism</h3>
 
-    <p>Same model output + same constraints = same verdict. The evaluator must produce the identical verdict for identical inputs â€” regardless of when the evaluation runs, which evaluator instance processes it, or what the evaluator's internal state is. Evaluation determinism means the verdict is a pure function of (output, constraint_records) with no hidden state.</p>
+    <p>Same model output + same constraints = same verdict. The evaluator must produce the identical verdict for identical inputs — regardless of when the evaluation runs, which evaluator instance processes it, or what the evaluator's internal state is. Evaluation determinism means the verdict is a pure function of (output, constraint_records) with no hidden state.</p>
 
     <div class="callout">
       <p><strong>Determinism must hold at every layer.</strong> A system that achieves retrieval determinism but not evaluation determinism still produces unpredictable verdicts. A system that achieves context determinism but not retrieval determinism is building deterministic context on top of an unstable retrieval foundation. All three components must be deterministic for the governance system to be auditable.</p>
@@ -465,35 +465,35 @@
 
     <p>The problem is structural: <strong>the most natural approaches to AI-native governance introduce non-determinism at exactly the points where determinism is required.</strong></p>
 
-    <p>Consider how most teams approach governance retrieval: they embed decision documentation in a vector store and retrieve semantically relevant passages at query time. Embedding-based retrieval is designed to be approximate â€” it finds passages that are semantically close to the query, using cosine similarity in high-dimensional space. That approximation is the feature. But approximation is another word for non-determinism at the retrieval layer.</p>
+    <p>Consider how most teams approach governance retrieval: they embed decision documentation in a vector store and retrieve semantically relevant passages at query time. Embedding-based retrieval is designed to be approximate — it finds passages that are semantically close to the query, using cosine similarity in high-dimensional space. That approximation is the feature. But approximation is another word for non-determinism at the retrieval layer.</p>
 
     <p>The non-determinism compounds across time:</p>
 
     <ol>
       <li>Embedding models are updated and replaced. The same text produces different embeddings after a model update, changing similarity scores and passage rankings silently.</li>
-      <li>Vector indexes are rebuilt. Index structure affects nearest-neighbor results at the margin â€” the same query might find a slightly different set of passages depending on when the index was built.</li>
+      <li>Vector indexes are rebuilt. Index structure affects nearest-neighbor results at the margin — the same query might find a slightly different set of passages depending on when the index was built.</li>
       <li>New documents are added to the corpus. Adding a new ADR can change the relative similarity scores of existing documents, causing previously-retrieved passages to drop out of the top-K results.</li>
     </ol>
 
     <p>None of these changes require any modification to the code being governed or the rules being enforced. They are infrastructure events. But they change the governance verdict, silently, for code that hasn't changed. A developer who passed governance check on Monday might fail on Tuesday not because their code violated a rule, but because the embedding model was updated and a relevant passage dropped below the retrieval threshold.</p>
 
     <div class="callout-teal">
-      <p><strong>A governance failure that wasn't caused by a code change cannot be meaningfully acted on.</strong> It is noise in the governance signal â€” indistinguishable from a real violation, but caused by retrieval drift. Teams that rely on probabilistic retrieval cannot distinguish genuine violations from retrieval variance in their governance history.</p>
+      <p><strong>A governance failure that wasn't caused by a code change cannot be meaningfully acted on.</strong> It is noise in the governance signal — indistinguishable from a real violation, but caused by retrieval drift. Teams that rely on probabilistic retrieval cannot distinguish genuine violations from retrieval variance in their governance history.</p>
     </div>
 
     <h2>The common misread: confusing compliance with determinism</h2>
 
-    <p>The most pervasive anti-pattern is building governance systems that rely on <strong>model-dependent compliance</strong> â€” where the governance check passes because the model "chose to follow" the injected constraints, not because the system enforced them.</p>
+    <p>The most pervasive anti-pattern is building governance systems that rely on <strong>model-dependent compliance</strong> — where the governance check passes because the model "chose to follow" the injected constraints, not because the system enforced them.</p>
 
     <p>Model-dependent compliance has three failure modes:</p>
 
     <ol>
-      <li><strong>RAG retrieval (probabilistic).</strong> Constraints reach the model through probabilistic retrieval. If the relevant constraint isn't retrieved, the model is never told about it and cannot comply. The governance check passes by default â€” a false pass, not a meaningful pass.</li>
+      <li><strong>RAG retrieval (probabilistic).</strong> Constraints reach the model through probabilistic retrieval. If the relevant constraint isn't retrieved, the model is never told about it and cannot comply. The governance check passes by default — a false pass, not a meaningful pass.</li>
       <li><strong>Model-dependent evaluation.</strong> The evaluator asks the model whether the generated code complied. The model might say yes when it actually violated a constraint, or say no when it didn't. The verdict is a model inference, not a structural check.</li>
-      <li><strong>Prompt engineering as enforcement.</strong> The governance system nudges the model toward compliance through prompt language ("always use PostgreSQL") rather than checking structured output against structured constraints. Nudges are probabilistic â€” they work most of the time, fail at the margin, and fail silently.</li>
+      <li><strong>Prompt engineering as enforcement.</strong> The governance system nudges the model toward compliance through prompt language ("always use PostgreSQL") rather than checking structured output against structured constraints. Nudges are probabilistic — they work most of the time, fail at the margin, and fail silently.</li>
     </ol>
 
-    <p>All three approaches introduce non-determinism at critical points in the governance chain. A team that relies on any of them cannot audit their governance history meaningfully â€” they cannot distinguish "passed because code was compliant" from "passed because the model got lucky."</p>
+    <p>All three approaches introduce non-determinism at critical points in the governance chain. A team that relies on any of them cannot audit their governance history meaningfully — they cannot distinguish "passed because code was compliant" from "passed because the model got lucky."</p>
 
     <div style="overflow-x:auto;margin:2rem 0;">
     <table class="comparison-table">
@@ -535,25 +535,25 @@
 
     <h3>Layer 1: Retrieval</h3>
 
-    <p>At the retrieval layer, determinism means the <strong>DecisionRetriever uses fixed-weight keyword scoring</strong> over structured decision records â€” no embedding model, no vector store, no ML in the path. The same query tokenizes to the same token set, scores against the same fields with the same weights, and returns the same ranked decisions. The retrieval is a pure function of (query, corpus). Same inputs, same result, every time.</p>
+    <p>At the retrieval layer, determinism means the <strong>DecisionRetriever uses fixed-weight keyword scoring</strong> over structured decision records — no embedding model, no vector store, no ML in the path. The same query tokenizes to the same token set, scores against the same fields with the same weights, and returns the same ranked decisions. The retrieval is a pure function of (query, corpus). Same inputs, same result, every time.</p>
 
     <p>This is the architectural choice that makes Layer 2 meaningful. If Layer 1 varies, the constraints injected at Layer 2 vary, and the verdict at Layer 2 varies. Determinism at Layer 1 is the foundation.</p>
 
     <h3>Layer 2: Evaluation</h3>
 
-    <p>At the evaluation layer, determinism means the <strong>Evaluator checks structured output against structured constraints</strong> â€” not natural language compliance, not model self-assessment. The model is required to produce structured assertions about which constraints it followed. The evaluator checks each assertion against the corresponding constraint record using exact matching on the structured fields. The verdict is a function of (assertions, constraint_records). Same inputs, same verdict.</p>
+    <p>At the evaluation layer, determinism means the <strong>Evaluator checks structured output against structured constraints</strong> — not natural language compliance, not model self-assessment. The model is required to produce structured assertions about which constraints it followed. The evaluator checks each assertion against the corresponding constraint record using exact matching on the structured fields. The verdict is a function of (assertions, constraint_records). Same inputs, same verdict.</p>
 
     <p>The model's temperature affects how the assertions are phrased, but the evaluator doesn't check phrasing. It checks the structured fields. A model that writes compliant code but phrases its assertion awkwardly still passes. A model that writes non-compliant code but phrases its assertion confidently still fails. The evaluation is structural, not linguistic.</p>
 
     <div class="callout">
-      <p><strong>The non-deterministic LLM is sandwiched between two deterministic layers.</strong> Layer 1 deterministically retrieves constraints. Layer 2 deterministically evaluates outputs against them. The model's non-determinism is bounded â€” it affects what code is generated, not whether the generated code is evaluated correctly.</p>
+      <p><strong>The non-deterministic LLM is sandwiched between two deterministic layers.</strong> Layer 1 deterministically retrieves constraints. Layer 2 deterministically evaluates outputs against them. The model's non-determinism is bounded — it affects what code is generated, not whether the generated code is evaluated correctly.</p>
     </div>
 
     <h2>The benchmark consequence</h2>
 
     <p>Deterministic enforcement has a concrete consequence for governance benchmarking: <strong>benchmark results are only comparable across versions if enforcement is deterministic.</strong></p>
 
-    <p>If a benchmark run shows that pass_rate improved from 0.85 to 1.00 between versions, that improvement must mean the governance system improved â€” more scenarios where code was generated compliantly. It cannot mean the retrieval layer happened to return better decisions by chance, or that the model happened to be more compliant on this particular run due to temperature variance.</p>
+    <p>If a benchmark run shows that pass_rate improved from 0.85 to 1.00 between versions, that improvement must mean the governance system improved — more scenarios where code was generated compliantly. It cannot mean the retrieval layer happened to return better decisions by chance, or that the model happened to be more compliant on this particular run due to temperature variance.</p>
 
     <p>Non-deterministic governance systems cannot produce comparable benchmarks. Every run is a sample from a distribution, and comparing two samples from potentially different distributions doesn't tell you whether the governance system improved. Deterministic governance systems produce comparable benchmarks because the same scenarios, same corpus, and same evaluation logic guarantee that differences in outcomes reflect genuine differences in governance quality.</p>
 
@@ -565,23 +565,23 @@
     <h2>Frequently asked questions</h2>
     <details>
       <summary>What is deterministic enforcement in governance?</summary>
-      <div class="faq-body">Deterministic enforcement means that a governance check produces the same verdict for the same code, the same decision corpus, and the same context â€” every time, independent of model state, retrieval variance, or runtime conditions. Same inputs, same verdict. It is the property that makes governance results auditable and comparable across versions and runs.</div>
+      <div class="faq-body">Deterministic enforcement means that a governance check produces the same verdict for the same code, the same decision corpus, and the same context — every time, independent of model state, retrieval variance, or runtime conditions. Same inputs, same verdict. It is the property that makes governance results auditable and comparable across versions and runs.</div>
     </details>
     <details>
       <summary>Why is determinism important for governance auditability?</summary>
-      <div class="faq-body">Governance audits require reproducibility: if a CI gate failed, the failure must be traceable to a specific constraint violation â€” not to retrieval variance or model sampling. If a governance check can produce different verdicts for the same input on different runs, then audit trails are meaningless: you cannot distinguish a genuine violation from a false positive caused by system non-determinism. Determinism is the structural precondition for meaningful audit trails.</div>
+      <div class="faq-body">Governance audits require reproducibility: if a CI gate failed, the failure must be traceable to a specific constraint violation — not to retrieval variance or model sampling. If a governance check can produce different verdicts for the same input on different runs, then audit trails are meaningless: you cannot distinguish a genuine violation from a false positive caused by system non-determinism. Determinism is the structural precondition for meaningful audit trails.</div>
     </details>
     <details>
       <summary>Is all of Mneme's pipeline deterministic?</summary>
-      <div class="faq-body">Retrieval and evaluation are deterministic. The LLM inference step is non-deterministic (models have temperature). Mneme addresses this by moving enforcement to the evaluation layer, which inspects structured output assertions against structured constraint records â€” not natural language compliance. The evaluator's verdict is a function of structured inputs, not model behavior. The model's non-determinism is bounded: it affects what code is generated, not whether the generated code is evaluated correctly.</div>
+      <div class="faq-body">Retrieval and evaluation are deterministic. The LLM inference step is non-deterministic (models have temperature). Mneme addresses this by moving enforcement to the evaluation layer, which inspects structured output assertions against structured constraint records — not natural language compliance. The evaluator's verdict is a function of structured inputs, not model behavior. The model's non-determinism is bounded: it affects what code is generated, not whether the generated code is evaluated correctly.</div>
     </details>
     <details>
       <summary>How does non-deterministic retrieval undermine governance?</summary>
-      <div class="faq-body">If retrieval is probabilistic â€” as with embedding-based RAG â€” the same query might retrieve different decisions on different runs. This means the constraints injected into a governance check vary across runs: different constraints retrieved, different context injected, different verdict produced. A developer who passes a governance check on Monday might fail on Tuesday without changing any code â€” because the embedding model was updated, the index was rebuilt, or a new document changed relative similarity scores. The governance signal becomes unreliable and impossible to audit.</div>
+      <div class="faq-body">If retrieval is probabilistic — as with embedding-based RAG — the same query might retrieve different decisions on different runs. This means the constraints injected into a governance check vary across runs: different constraints retrieved, different context injected, different verdict produced. A developer who passes a governance check on Monday might fail on Tuesday without changing any code — because the embedding model was updated, the index was rebuilt, or a new document changed relative similarity scores. The governance signal becomes unreliable and impossible to audit.</div>
     </details>
     <details>
       <summary>Can you have deterministic enforcement with a non-deterministic LLM?</summary>
-      <div class="faq-body">Yes, if enforcement happens at the evaluation layer rather than inside the LLM. Mneme requires the model to produce structured assertions about constraint compliance. The evaluator then checks those assertions against the constraint records using deterministic field matching â€” not natural language interpretation. The model's temperature affects the phrasing of the assertion, but the evaluation checks structured fields, not phrasing. The verdict is determined by the evaluation function, which is fully deterministic regardless of model temperature.</div>
+      <div class="faq-body">Yes, if enforcement happens at the evaluation layer rather than inside the LLM. Mneme requires the model to produce structured assertions about constraint compliance. The evaluator then checks those assertions against the constraint records using deterministic field matching — not natural language interpretation. The model's temperature affects the phrasing of the assertion, but the evaluation checks structured fields, not phrasing. The verdict is determined by the evaluation function, which is fully deterministic regardless of model temperature.</div>
     </details>
   </section>
 
@@ -630,12 +630,12 @@
 
 
   <footer class="article-footer">
-    <a href="/concepts/" class="back-link">â† Back to Concepts</a>
+    <a href="/concepts/" class="back-link">← Back to Concepts</a>
 
     <div class="cta-block">
       <h3>Inspect the deterministic evaluator</h3>
-      <p>Mneme's evaluation layer â€” structured output checking against structured constraint records â€” is open source. Read the evaluator source to see how determinism is maintained across non-deterministic model inference.</p>
-      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub â†’</a>
+      <p>Mneme's evaluation layer — structured output checking against structured constraint records — is open source. Read the evaluator source to see how determinism is maintained across non-deterministic model inference.</p>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub →</a>
     </div>
   </footer>
 </article>

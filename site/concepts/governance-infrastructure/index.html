@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Governance Infrastructure â€” Mneme HQ Concepts</title>
+  <title>Governance Infrastructure — Mneme HQ Concepts</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
@@ -14,12 +14,12 @@
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Governance Infrastructure â€” Mneme HQ Concepts" />
+  <meta property="og:title" content="Governance Infrastructure — Mneme HQ Concepts" />
   <meta property="og:description" content="Governance infrastructure is the engineering platform layer that encodes, distributes, versions, and enforces architectural decisions across AI agents." />
   <meta property="og:url" content="https://mnemehq.com/concepts/governance-infrastructure/" />
   <meta property="og:image" content="https://mnemehq.com/concepts/governance-infrastructure/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Governance Infrastructure â€” Mneme HQ Concepts" />
+  <meta name="twitter:title" content="Governance Infrastructure — Mneme HQ Concepts" />
   <meta name="twitter:description" content="Governance infrastructure is the engineering platform layer that encodes, distributes, versions, and enforces architectural decisions across AI agents." />
   <meta name="twitter:image" content="https://mnemehq.com/concepts/governance-infrastructure/og.png" />
   <meta name="author" content="Theo Valmis" />
@@ -272,7 +272,7 @@
       },
       {
         "@type": "TechArticle",
-        "headline": "Governance Infrastructure â€” Mneme HQ Concepts",
+        "headline": "Governance Infrastructure — Mneme HQ Concepts",
         "description": "Governance infrastructure is the engineering platform layer that encodes, distributes, versions, and enforces architectural decisions across AI agents.",
         "url": "https://mnemehq.com/concepts/governance-infrastructure/",
         "datePublished": "2026-05-14",
@@ -290,34 +290,34 @@
           {
             "@type": "Question",
             "name": "What is governance infrastructure?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Governance infrastructure is the dedicated engineering platform layer responsible for encoding, distributing, versioning, and enforcing architectural decisions across AI agents at scale. It is not a process layer, not a documentation system, and not a set of team conventions. It is infrastructure â€” with the reliability, observability, versioning, and availability requirements that word implies in engineering contexts."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Governance infrastructure is the dedicated engineering platform layer responsible for encoding, distributing, versioning, and enforcing architectural decisions across AI agents at scale. It is not a process layer, not a documentation system, and not a set of team conventions. It is infrastructure — with the reliability, observability, versioning, and availability requirements that word implies in engineering contexts."}
           },
           {
             "@type": "Question",
             "name": "How is governance infrastructure different from governance as a process?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Process-based governance (PR checklists, review norms, team conventions) requires humans to apply it at each step. Infrastructure applies itself. Process scales with human headcount; infrastructure scales with agent output velocity. In agentic development, where agents generate at 10-100x human speed, process-based governance saturates immediately â€” reviewers cannot keep pace. Infrastructure-grade governance enforces constraints before generation completes, without requiring human intervention at each step."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Process-based governance (PR checklists, review norms, team conventions) requires humans to apply it at each step. Infrastructure applies itself. Process scales with human headcount; infrastructure scales with agent output velocity. In agentic development, where agents generate at 10-100x human speed, process-based governance saturates immediately — reviewers cannot keep pace. Infrastructure-grade governance enforces constraints before generation completes, without requiring human intervention at each step."}
           },
           {
             "@type": "Question",
             "name": "What does it mean for governance to be 'infrastructure-grade'?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Infrastructure-grade governance must meet the same operational standards as any critical engineering infrastructure: availability (the governance system must be available when agents query it), determinism (same query, same corpus, same result â€” always), versioning (decisions have a commit log, a supersession history, a recoverable state), observability (enforcement signals are visible and queryable), and enforcement (decisions produce binary verdicts, not suggestions). Any governance system that fails these properties is not infrastructure â€” it is a well-intentioned process dressed up as one."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Infrastructure-grade governance must meet the same operational standards as any critical engineering infrastructure: availability (the governance system must be available when agents query it), determinism (same query, same corpus, same result — always), versioning (decisions have a commit log, a supersession history, a recoverable state), observability (enforcement signals are visible and queryable), and enforcement (decisions produce binary verdicts, not suggestions). Any governance system that fails these properties is not infrastructure — it is a well-intentioned process dressed up as one."}
           },
           {
             "@type": "Question",
             "name": "Which layer of the AI engineering stack is governance infrastructure?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Governance infrastructure is Layer 5 in the generative AI software engineering stack â€” above agent runtimes (Layers 3-4) and below human oversight (Layer 7). It is the layer that makes the rest of the stack architecturally coherent at scale. Without it, Layers 1-4 accelerate entropy â€” agents generate faster without architectural discipline. With it, they accelerate delivery â€” agents generate faster within architectural constraints that are enforced mechanically."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Governance infrastructure is Layer 5 in the generative AI software engineering stack — above agent runtimes (Layers 3-4) and below human oversight (Layer 7). It is the layer that makes the rest of the stack architecturally coherent at scale. Without it, Layers 1-4 accelerate entropy — agents generate faster without architectural discipline. With it, they accelerate delivery — agents generate faster within architectural constraints that are enforced mechanically."}
           },
           {
             "@type": "Question",
             "name": "How does governance infrastructure relate to observability tools like Datadog?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Observability infrastructure tells you what happened. Governance infrastructure prevents specific categories of violation from happening in the first place. They are complementary: observability shows you which agents are generating code and what errors occur at runtime; governance prevents architectural violations from reaching runtime in the first place. Post-hoc observability and pre-generation governance are different layers with different authority â€” one is retrospective, one is preventive."}
+            "acceptedAnswer": {"@type": "Answer", "text": "Observability infrastructure tells you what happened. Governance infrastructure prevents specific categories of violation from happening in the first place. They are complementary: observability shows you which agents are generating code and what errors occur at runtime; governance prevents architectural violations from reaching runtime in the first place. Post-hoc observability and pre-generation governance are different layers with different authority — one is retrospective, one is preventive."}
           }
         ]
       },
       {
         "@type": "DefinedTerm",
         "name": "Governance Infrastructure",
-        "description": "The dedicated engineering platform layer responsible for encoding, distributing, versioning, and enforcing architectural decisions across AI agents at scale â€” not a process layer, but infrastructure with the reliability, observability, and versioning requirements that word implies.",
+        "description": "The dedicated engineering platform layer responsible for encoding, distributing, versioning, and enforcing architectural decisions across AI agents at scale — not a process layer, but infrastructure with the reliability, observability, and versioning requirements that word implies.",
         "inDefinedTermSet": {"@type": "DefinedTermSet", "name": "Mneme HQ Concepts", "url": "https://mnemehq.com/concepts/"},
         "url": "https://mnemehq.com/concepts/governance-infrastructure/"
       }
@@ -347,7 +347,7 @@
 
 <main>
 <div class="answer-capsule">
-  <strong>Governance infrastructure.</strong> The dedicated engineering platform layer responsible for encoding, distributing, versioning, and enforcing architectural decisions across AI agents at scale. Not a process layer. Not a documentation system. Infrastructure â€” with the reliability, observability, and versioning requirements that word implies.
+  <strong>Governance infrastructure.</strong> The dedicated engineering platform layer responsible for encoding, distributing, versioning, and enforcing architectural decisions across AI agents at scale. Not a process layer. Not a documentation system. Infrastructure — with the reliability, observability, and versioning requirements that word implies.
 </div>
 
 <nav aria-label="Breadcrumb" class="breadcrumb-nav">
@@ -363,10 +363,10 @@
     <div class="article-eyebrow">
       <span class="eyebrow-tag">Concepts</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">13 min read &nbsp;Â·&nbsp; May 2026</span>
+      <span class="eyebrow-meta">13 min read &nbsp;·&nbsp; May 2026</span>
     </div>
     <h1>Governance Infrastructure</h1>
-    <p class="article-lede">Infrastructure is a loaded word in engineering: it implies things are first-class, reliable, versioned, observable, and operated. Governance infrastructure applies that standard to architectural enforcement â€” and that application is what distinguishes serious AI coding governance from a set of conventions.</p>
+    <p class="article-lede">Infrastructure is a loaded word in engineering: it implies things are first-class, reliable, versioned, observable, and operated. Governance infrastructure applies that standard to architectural enforcement — and that application is what distinguishes serious AI coding governance from a set of conventions.</p>
     <p class="byline">
       By <a href="/founder/">Theo Valmis</a>
       <span class="sep">&middot;</span>
@@ -378,50 +378,50 @@
 
     <p>Consider what the word "infrastructure" implies in engineering. A database is infrastructure: it is always available, its state is durable and recoverable, its behavior is deterministic, its access is consistent regardless of who is querying. A logging system is infrastructure: it captures every event, makes them queryable, provides a history. A CI pipeline is infrastructure: it runs on every merge, produces the same result for the same inputs, blocks merges that fail.</p>
 
-    <p>Now consider what most teams call "governance." A CLAUDE.md file checked into the repo. A PR checklist that reviewers might complete. A team convention documented in a wiki. Team standards that senior engineers enforce in code review. These are practices, not infrastructure. They work at human scale. They fail at agent scale â€” not because the practices are bad, but because the word "infrastructure" implies properties that practices structurally cannot provide.</p>
+    <p>Now consider what most teams call "governance." A CLAUDE.md file checked into the repo. A PR checklist that reviewers might complete. A team convention documented in a wiki. Team standards that senior engineers enforce in code review. These are practices, not infrastructure. They work at human scale. They fail at agent scale — not because the practices are bad, but because the word "infrastructure" implies properties that practices structurally cannot provide.</p>
 
     <p>Governance infrastructure applies the same standard to architectural enforcement that teams already apply to observability, security, and testing: it must be first-class, automated, versioned, observable, and available. That application is the substance of the concept.</p>
 
     <figure class="diagram-figure" aria-labelledby="gi-diag-title">
       <svg viewBox="0 0 800 360" role="img" aria-labelledby="gi-diag-title gi-diag-desc" xmlns="http://www.w3.org/2000/svg">
         <title id="gi-diag-title">The four planes of governance infrastructure</title>
-        <desc id="gi-diag-desc">A platform diagram showing the four planes â€” encoding, distribution, enforcement, observability â€” operating on a shared decision corpus, with AI agents and CI pipelines as the consumers.</desc>
+        <desc id="gi-diag-desc">A platform diagram showing the four planes — encoding, distribution, enforcement, observability — operating on a shared decision corpus, with AI agents and CI pipelines as the consumers.</desc>
         <g>
           <text x="40" y="28" class="diag-accent-text">GOVERNANCE INFRASTRUCTURE</text>
-          <text x="760" y="28" text-anchor="end" class="diag-meta">platform Â· not process</text>
+          <text x="760" y="28" text-anchor="end" class="diag-meta">platform · not process</text>
 
           <!-- Plane 1: Encoding -->
           <rect x="40" y="50" width="170" height="92" rx="8" class="diag-box"/>
-          <text x="55" y="73" class="diag-accent-text">01 Â· ENCODING</text>
+          <text x="55" y="73" class="diag-accent-text">01 · ENCODING</text>
           <text x="55" y="95" class="diag-text">Architectural</text>
           <text x="55" y="111" class="diag-text">compiler</text>
-          <text x="55" y="131" class="diag-meta">ADR â†’ JSON corpus</text>
+          <text x="55" y="131" class="diag-meta">ADR → JSON corpus</text>
 
           <!-- Plane 2: Distribution -->
           <rect x="220" y="50" width="170" height="92" rx="8" class="diag-box"/>
-          <text x="235" y="73" class="diag-accent-text">02 Â· DISTRIBUTION</text>
+          <text x="235" y="73" class="diag-accent-text">02 · DISTRIBUTION</text>
           <text x="235" y="95" class="diag-text">Decision retriever</text>
-          <text x="235" y="111" class="diag-text">scope Â· precedence</text>
-          <text x="235" y="131" class="diag-meta">corpus â†’ context</text>
+          <text x="235" y="111" class="diag-text">scope · precedence</text>
+          <text x="235" y="131" class="diag-meta">corpus → context</text>
 
           <!-- Plane 3: Enforcement -->
           <rect x="400" y="50" width="170" height="92" rx="8" class="diag-box-active"/>
-          <text x="415" y="73" class="diag-accent-text">03 Â· ENFORCEMENT</text>
+          <text x="415" y="73" class="diag-accent-text">03 · ENFORCEMENT</text>
           <text x="415" y="95" class="diag-text">Pre-tool-use hook</text>
           <text x="415" y="111" class="diag-text">CI gate</text>
-          <text x="415" y="131" class="diag-meta">verdict Â· block Â· pass</text>
+          <text x="415" y="131" class="diag-meta">verdict · block · pass</text>
 
           <!-- Plane 4: Observability -->
           <rect x="580" y="50" width="180" height="92" rx="8" class="diag-box"/>
-          <text x="595" y="73" class="diag-accent-text">04 Â· OBSERVABILITY</text>
+          <text x="595" y="73" class="diag-accent-text">04 · OBSERVABILITY</text>
           <text x="595" y="95" class="diag-text">Provenance trail</text>
           <text x="595" y="111" class="diag-text">violation log</text>
-          <text x="595" y="131" class="diag-meta">queryable Â· auditable</text>
+          <text x="595" y="131" class="diag-meta">queryable · auditable</text>
 
           <!-- Shared state: corpus -->
           <rect x="40" y="170" width="720" height="60" rx="8" class="diag-box-teal"/>
-          <text x="55" y="194" class="diag-teal-text">SHARED STATE Â· DECISION CORPUS</text>
-          <text x="55" y="216" class="diag-text">project_memory.json Â· typed records Â· versioned Â· single source of truth</text>
+          <text x="55" y="194" class="diag-teal-text">SHARED STATE · DECISION CORPUS</text>
+          <text x="55" y="216" class="diag-text">project_memory.json · typed records · versioned · single source of truth</text>
           <text x="745" y="216" text-anchor="end" class="diag-meta">read by every consumer</text>
 
           <!-- Lines from planes to corpus -->
@@ -454,7 +454,7 @@
           <line x1="664" y1="230" x2="664" y2="276" class="diag-arrow"/>
         </g>
       </svg>
-      <figcaption class="diagram-caption"><strong>Four planes, one corpus.</strong> Encoding, distribution, enforcement, and observability operate as engineering planes on a shared decision corpus. Agents and CI are consumers â€” not the source of governance, never the governance itself.</figcaption>
+      <figcaption class="diagram-caption"><strong>Four planes, one corpus.</strong> Encoding, distribution, enforcement, and observability operate as engineering planes on a shared decision corpus. Agents and CI are consumers — not the source of governance, never the governance itself.</figcaption>
     </figure>
 
     <h2>What governance infrastructure provides that process cannot</h2>
@@ -463,27 +463,27 @@
 
     <h3>1. Encoding</h3>
 
-    <p>Process-based governance stores decisions in human-readable, human-interpretable form â€” ADRs, wikis, review comments. Humans can read these and apply them. Agents cannot evaluate code against prose â€” they can receive prose as context, but evaluating compliance requires machine-readable, schema-validated constraint records.</p>
+    <p>Process-based governance stores decisions in human-readable, human-interpretable form — ADRs, wikis, review comments. Humans can read these and apply them. Agents cannot evaluate code against prose — they can receive prose as context, but evaluating compliance requires machine-readable, schema-validated constraint records.</p>
 
     <p><strong>Infrastructure-grade governance encodes decisions</strong> in typed, validated constraint records with stable IDs, scope patterns, severity levels, and precedence relationships. Encoding is the prerequisite for everything downstream. An unencoded decision is a governance intention, not a governance constraint.</p>
 
     <h3>2. Distribution</h3>
 
-    <p>Process-based governance distributes decisions through people: a senior engineer tells the team about a new constraint, it goes into the CLAUDE.md file, it gets mentioned in the next sprint planning. This works when the team is small and stable. It fails when agents are the actors â€” agents don't attend sprint planning, don't inherit institutional knowledge, and don't carry decisions from previous sessions.</p>
+    <p>Process-based governance distributes decisions through people: a senior engineer tells the team about a new constraint, it goes into the CLAUDE.md file, it gets mentioned in the next sprint planning. This works when the team is small and stable. It fails when agents are the actors — agents don't attend sprint planning, don't inherit institutional knowledge, and don't carry decisions from previous sessions.</p>
 
-    <p><strong>Infrastructure-grade governance distributes decisions</strong> to every agent that operates on the codebase, automatically, at query time. No human maintenance required. No session configuration required. The agent queries the corpus; the corpus returns the relevant decisions. Distribution is not a communication problem â€” it is an infrastructure problem that the corpus solves mechanically.</p>
+    <p><strong>Infrastructure-grade governance distributes decisions</strong> to every agent that operates on the codebase, automatically, at query time. No human maintenance required. No session configuration required. The agent queries the corpus; the corpus returns the relevant decisions. Distribution is not a communication problem — it is an infrastructure problem that the corpus solves mechanically.</p>
 
     <h3>3. Versioning</h3>
 
-    <p>Process-based governance has no version history. A convention that changed six months ago is gone from team memory â€” or persists incorrectly in the minds of engineers who haven't been updated. There is no commit log for "we decided to stop using this pattern on 2026-03-14."</p>
+    <p>Process-based governance has no version history. A convention that changed six months ago is gone from team memory — or persists incorrectly in the minds of engineers who haven't been updated. There is no commit log for "we decided to stop using this pattern on 2026-03-14."</p>
 
     <p><strong>Infrastructure-grade governance versions decisions</strong> in the same repository as the code they govern. Every decision has a creation date, a modification history, a supersession record. "What constraints were active when this PR was merged?" has a definitive answer: read the corpus at that commit. The audit trail is structural, not reconstructed from memory.</p>
 
     <h3>4. Enforcement</h3>
 
-    <p>Process-based governance surfaces decisions for human consideration â€” they are evaluated by reviewers, applied in code review, surfaced in linting output. This is enforcement at human speed. It saturates when agents generate at 10â€“100x that speed.</p>
+    <p>Process-based governance surfaces decisions for human consideration — they are evaluated by reviewers, applied in code review, surfaced in linting output. This is enforcement at human speed. It saturates when agents generate at 10–100x that speed.</p>
 
-    <p><strong>Infrastructure-grade governance enforces decisions</strong> against AI output before it is committed â€” producing a binary verdict that blocks violations rather than reporting them after the fact. Enforcement is pre-generation, not post-generation. The violation is prevented, not discovered.</p>
+    <p><strong>Infrastructure-grade governance enforces decisions</strong> against AI output before it is committed — producing a binary verdict that blocks violations rather than reporting them after the fact. Enforcement is pre-generation, not post-generation. The violation is prevented, not discovered.</p>
 
     <div class="callout">
       <p><strong>The multiplier effect of infrastructure is what makes governance tractable at agent velocity.</strong> Process requires humans to apply it at each step. Infrastructure applies itself. In a workflow where agents generate 100 PRs per day, process-based governance requires 100 human governance applications per day. Infrastructure-grade governance applies at generation time, automatically, without human intervention.</p>
@@ -492,14 +492,14 @@
     <h2>Why this problem exists in AI-native development</h2>
 
     <div class="callout-teal">
-      <p><strong>Intent debt is why governance infrastructure becomes necessary.</strong> As AI agents become part of the execution layer, teams accumulate <a href="/insights/ai-native-engineering-intent-debt/" style="color:var(--teal);text-decoration:none;border-bottom:1px dotted rgba(139,224,200,0.4);">intent debt</a>: architectural decisions, constraints, and operating rules that exist in docs or human memory but are not enforced during generation. Governance infrastructure exists to close that gap â€” to make intent explicit, versioned, and enforceable at the moment agents produce code.</p>
+      <p><strong>Intent debt is why governance infrastructure becomes necessary.</strong> As AI agents become part of the execution layer, teams accumulate <a href="/insights/ai-native-engineering-intent-debt/" style="color:var(--teal);text-decoration:none;border-bottom:1px dotted rgba(139,224,200,0.4);">intent debt</a>: architectural decisions, constraints, and operating rules that exist in docs or human memory but are not enforced during generation. Governance infrastructure exists to close that gap — to make intent explicit, versioned, and enforceable at the moment agents produce code.</p>
     </div>
 
-    <p>The problem is not that teams lack governance intentions. Most teams that have adopted AI coding agents have written ADRs, updated CLAUDE.md files, discussed constraints in team meetings, and built PR review checklists. They have governance intentions. What they are missing is <strong>governance infrastructure</strong> â€” the engineering layer that converts those intentions into mechanical enforcement.</p>
+    <p>The problem is not that teams lack governance intentions. Most teams that have adopted AI coding agents have written ADRs, updated CLAUDE.md files, discussed constraints in team meetings, and built PR review checklists. They have governance intentions. What they are missing is <strong>governance infrastructure</strong> — the engineering layer that converts those intentions into mechanical enforcement.</p>
 
-    <p>The structural gap: <strong>process-based governance was designed for human-speed development</strong>. At human speed, the review model is the enforcement mechanism â€” reviewers catch violations before they merge, apply institutional knowledge, and enforce team conventions. The process works because the rate of generation matches the rate of review.</p>
+    <p>The structural gap: <strong>process-based governance was designed for human-speed development</strong>. At human speed, the review model is the enforcement mechanism — reviewers catch violations before they merge, apply institutional knowledge, and enforce team conventions. The process works because the rate of generation matches the rate of review.</p>
 
-    <p>Agentic development breaks that rate relationship. Agents generate at 10â€“100x human speed. The review model doesn't scale. The options are: accept that governance degrades with throughput, throttle agent velocity to match review capacity, or invest in governance infrastructure that enforces at generation time.</p>
+    <p>Agentic development breaks that rate relationship. Agents generate at 10–100x human speed. The review model doesn't scale. The options are: accept that governance degrades with throughput, throttle agent velocity to match review capacity, or invest in governance infrastructure that enforces at generation time.</p>
 
     <p>Teams that don't invest in governance infrastructure discover this empirically: accumulated architectural violations that surface months after they were introduced, an architectural debt remediation burden that grows with agent adoption, a senior engineering bandwidth bottleneck that appears as AI usage scales up. The debt is the missing governance layer, not the AI agents themselves.</p>
 
@@ -509,11 +509,11 @@
 
     <h2>The common misread: bolt-on tooling as infrastructure</h2>
 
-    <p>The most common failure mode is investing in <strong>governance as bolt-on tooling</strong> rather than governance as infrastructure. Bolt-on tooling includes style linters, import checkers, naming convention enforces â€” tools that catch specific patterns after code is written. These are valuable; they are not governance infrastructure.</p>
+    <p>The most common failure mode is investing in <strong>governance as bolt-on tooling</strong> rather than governance as infrastructure. Bolt-on tooling includes style linters, import checkers, naming convention enforces — tools that catch specific patterns after code is written. These are valuable; they are not governance infrastructure.</p>
 
-    <p>The distinction: bolt-on tooling enforces style, not architecture. A linter can catch that a variable name doesn't follow the naming convention. It cannot enforce that a new service follows the service boundary architecture defined in ADR-012. Architecture-level enforcement requires scope-aware, precedence-resolved constraint records that encode the architectural decision â€” not just the surface manifestation of the decision.</p>
+    <p>The distinction: bolt-on tooling enforces style, not architecture. A linter can catch that a variable name doesn't follow the naming convention. It cannot enforce that a new service follows the service boundary architecture defined in ADR-012. Architecture-level enforcement requires scope-aware, precedence-resolved constraint records that encode the architectural decision — not just the surface manifestation of the decision.</p>
 
-    <p>Similarly, a code review checklist is not governance infrastructure. It is a human reminder â€” a process aid that improves the probability a reviewer will check a specific thing. It does not enforce; it reminds. The reliability difference matters: a 90% adherence rate to a checklist item means 10% of PRs bypass that governance. At 100 PRs per day, that is 10 unreviewed violations per day. Infrastructure that enforces at generation time has a 0% bypass rate â€” the violation doesn't reach the PR.</p>
+    <p>Similarly, a code review checklist is not governance infrastructure. It is a human reminder — a process aid that improves the probability a reviewer will check a specific thing. It does not enforce; it reminds. The reliability difference matters: a 90% adherence rate to a checklist item means 10% of PRs bypass that governance. At 100 PRs per day, that is 10 unreviewed violations per day. Infrastructure that enforces at generation time has a 0% bypass rate — the violation doesn't reach the PR.</p>
 
     <div style="overflow-x:auto;margin:2rem 0;">
     <table class="comparison-table">
@@ -605,7 +605,7 @@
 
     <h2>How this fits the AI SDLC</h2>
 
-    <p>The runtime stack above is one cut. The broader software development lifecycle is another: the same governance infrastructure occupies <strong>Layer 5</strong> of the generative AI software engineering stack â€” above agent runtimes (Layers 3â€“4), below human oversight (Layer 7). Its position is load-bearing: it is the layer that makes the rest of the stack architecturally coherent at scale.</p>
+    <p>The runtime stack above is one cut. The broader software development lifecycle is another: the same governance infrastructure occupies <strong>Layer 5</strong> of the generative AI software engineering stack — above agent runtimes (Layers 3–4), below human oversight (Layer 7). Its position is load-bearing: it is the layer that makes the rest of the stack architecturally coherent at scale.</p>
 
     <div class="layer-stack">
       <div class="layer-row">
@@ -659,23 +659,23 @@
       </div>
     </div>
 
-    <p>Without Layer 5, Layers 1â€“4 accelerate entropy: agent runtimes produce code faster, but without architectural discipline, the codebase accumulates violations at agent velocity. With Layer 5, Layers 1â€“4 accelerate delivery: agent runtimes produce architecturally coherent code faster, because governance infrastructure enforces the architectural constraints that the human team has defined.</p>
+    <p>Without Layer 5, Layers 1–4 accelerate entropy: agent runtimes produce code faster, but without architectural discipline, the codebase accumulates violations at agent velocity. With Layer 5, Layers 1–4 accelerate delivery: agent runtimes produce architecturally coherent code faster, because governance infrastructure enforces the architectural constraints that the human team has defined.</p>
 
     <h2>Governance infrastructure and observability: complementary layers</h2>
 
-    <p>Governance infrastructure is frequently compared to observability infrastructure â€” tools like Datadog, Sentry, or OpenTelemetry. The comparison is instructive because it clarifies what governance infrastructure is not.</p>
+    <p>Governance infrastructure is frequently compared to observability infrastructure — tools like Datadog, Sentry, or OpenTelemetry. The comparison is instructive because it clarifies what governance infrastructure is not.</p>
 
     <p><strong>Observability infrastructure tells you what happened.</strong> It captures events, aggregates metrics, surfaces anomalies, and enables post-hoc diagnosis. When an agent generates code that causes a production error, observability tells you which agent, which session, which code path. It is retrospective and diagnostic.</p>
 
-    <p><strong>Governance infrastructure prevents specific categories of violation from happening.</strong> It is prospective and preventive. When an agent is about to generate code that violates an architectural constraint, governance infrastructure surfaces the constraint at generation time and blocks the violation. It is not a diagnostic tool â€” it is an enforcement tool.</p>
+    <p><strong>Governance infrastructure prevents specific categories of violation from happening.</strong> It is prospective and preventive. When an agent is about to generate code that violates an architectural constraint, governance infrastructure surfaces the constraint at generation time and blocks the violation. It is not a diagnostic tool — it is an enforcement tool.</p>
 
-    <p>Both layers are necessary in an AI-native engineering stack. Observability tells you what happened; governance prevents what shouldn't happen. They are complementary infrastructure concerns, not competitors. A team with strong observability but no governance will discover architectural violations clearly â€” after they have accumulated. A team with strong governance but no observability will prevent violations but lack the visibility to understand agent behavior at scale. The mature AI engineering stack requires both.</p>
+    <p>Both layers are necessary in an AI-native engineering stack. Observability tells you what happened; governance prevents what shouldn't happen. They are complementary infrastructure concerns, not competitors. A team with strong observability but no governance will discover architectural violations clearly — after they have accumulated. A team with strong governance but no observability will prevent violations but lack the visibility to understand agent behavior at scale. The mature AI engineering stack requires both.</p>
 
     <h2>The reliability angle: operating governance infrastructure</h2>
 
-    <p>Governance infrastructure requires the same operational properties as any other infrastructure: it must be available when agents query it, its results must be deterministic, the corpus must be versioned and recoverable, and enforcement signals must be observable. These are not aspirational properties â€” they are minimum requirements for governance to be meaningful.</p>
+    <p>Governance infrastructure requires the same operational properties as any other infrastructure: it must be available when agents query it, its results must be deterministic, the corpus must be versioned and recoverable, and enforcement signals must be observable. These are not aspirational properties — they are minimum requirements for governance to be meaningful.</p>
 
-    <p>An available governance system fails when it becomes a bottleneck: if the governance layer adds 10 seconds to every code generation cycle, agents route around it. The governance corpus must be queryable in milliseconds, locally, without network dependencies. Mneme's corpus is a local file queried by a pure-Python scorer â€” no API call, no vector service, no ML inference in the critical path.</p>
+    <p>An available governance system fails when it becomes a bottleneck: if the governance layer adds 10 seconds to every code generation cycle, agents route around it. The governance corpus must be queryable in milliseconds, locally, without network dependencies. Mneme's corpus is a local file queried by a pure-Python scorer — no API call, no vector service, no ML inference in the critical path.</p>
 
     <p>A deterministic governance system fails when results vary across runs. An enforcement signal that fires on Monday and doesn't fire on Tuesday for the same code is noise, not governance. Determinism at the retrieval layer (same query, same decisions) and at the evaluation layer (same code, same constraint, same verdict) is what makes enforcement trustworthy.</p>
 
@@ -691,23 +691,23 @@
     <h2>Frequently asked questions</h2>
     <details>
       <summary>What is governance infrastructure?</summary>
-      <div class="faq-body">Governance infrastructure is the dedicated engineering platform layer responsible for encoding, distributing, versioning, and enforcing architectural decisions across AI agents at scale. It is not a process layer, not a documentation system, and not a set of team conventions. It is infrastructure â€” with the availability, determinism, versioning, observability, and enforcement requirements that word implies in engineering contexts.</div>
+      <div class="faq-body">Governance infrastructure is the dedicated engineering platform layer responsible for encoding, distributing, versioning, and enforcing architectural decisions across AI agents at scale. It is not a process layer, not a documentation system, and not a set of team conventions. It is infrastructure — with the availability, determinism, versioning, observability, and enforcement requirements that word implies in engineering contexts.</div>
     </details>
     <details>
       <summary>How is governance infrastructure different from governance as a process?</summary>
-      <div class="faq-body">Process-based governance â€” PR checklists, review norms, team conventions â€” requires humans to apply it at each step. Infrastructure applies itself. Process scales with human headcount; infrastructure scales with agent output velocity. In agentic development, where agents generate at 10-100x human speed, process-based governance saturates immediately. Infrastructure-grade governance enforces constraints before generation completes, without requiring human intervention at each step, with a 0% bypass rate rather than a non-zero human-error rate.</div>
+      <div class="faq-body">Process-based governance — PR checklists, review norms, team conventions — requires humans to apply it at each step. Infrastructure applies itself. Process scales with human headcount; infrastructure scales with agent output velocity. In agentic development, where agents generate at 10-100x human speed, process-based governance saturates immediately. Infrastructure-grade governance enforces constraints before generation completes, without requiring human intervention at each step, with a 0% bypass rate rather than a non-zero human-error rate.</div>
     </details>
     <details>
       <summary>What does it mean for governance to be 'infrastructure-grade'?</summary>
-      <div class="faq-body">Infrastructure-grade governance must meet the same operational standards as any critical engineering infrastructure: availability (queryable when agents need it, without network dependencies), determinism (same query, same corpus, same result â€” always), versioning (decisions have a commit log, a supersession history, a recoverable state), observability (enforcement signals are visible and queryable), and enforcement (decisions produce binary blocking verdicts, not suggestions or warnings). Any governance system that fails these properties is not infrastructure â€” it is a well-intentioned process.</div>
+      <div class="faq-body">Infrastructure-grade governance must meet the same operational standards as any critical engineering infrastructure: availability (queryable when agents need it, without network dependencies), determinism (same query, same corpus, same result — always), versioning (decisions have a commit log, a supersession history, a recoverable state), observability (enforcement signals are visible and queryable), and enforcement (decisions produce binary blocking verdicts, not suggestions or warnings). Any governance system that fails these properties is not infrastructure — it is a well-intentioned process.</div>
     </details>
     <details>
       <summary>Which layer of the AI engineering stack is governance infrastructure?</summary>
-      <div class="faq-body">Governance infrastructure is Layer 5 in the generative AI software engineering stack â€” above agent runtimes (Layers 3-4) and below human oversight (Layer 7). It is the load-bearing layer that makes the rest of the stack architecturally coherent at scale. Without it, Layers 1-4 accelerate entropy â€” agents generate faster without architectural discipline. With it, they accelerate delivery â€” agents generate faster within architectural constraints that are enforced mechanically.</div>
+      <div class="faq-body">Governance infrastructure is Layer 5 in the generative AI software engineering stack — above agent runtimes (Layers 3-4) and below human oversight (Layer 7). It is the load-bearing layer that makes the rest of the stack architecturally coherent at scale. Without it, Layers 1-4 accelerate entropy — agents generate faster without architectural discipline. With it, they accelerate delivery — agents generate faster within architectural constraints that are enforced mechanically.</div>
     </details>
     <details>
       <summary>How does governance infrastructure relate to observability tools like Datadog?</summary>
-      <div class="faq-body">Observability infrastructure tells you what happened â€” it captures events, surfaces anomalies, and enables post-hoc diagnosis. Governance infrastructure prevents specific categories of violation from happening in the first place. They are complementary layers: observability is retrospective and diagnostic; governance is prospective and preventive. A mature AI engineering stack requires both â€” observability to understand agent behavior, governance to enforce architectural constraints before violations reach production.</div>
+      <div class="faq-body">Observability infrastructure tells you what happened — it captures events, surfaces anomalies, and enables post-hoc diagnosis. Governance infrastructure prevents specific categories of violation from happening in the first place. They are complementary layers: observability is retrospective and diagnostic; governance is prospective and preventive. A mature AI engineering stack requires both — observability to understand agent behavior, governance to enforce architectural constraints before violations reach production.</div>
     </details>
   </section>
 
@@ -764,12 +764,12 @@
 
 
   <footer class="article-footer">
-    <a href="/concepts/" class="back-link">â† Back to Concepts</a>
+    <a href="/concepts/" class="back-link">← Back to Concepts</a>
 
     <div class="cta-block">
       <h3>Deploy governance infrastructure</h3>
-      <p>Mneme is the governance infrastructure layer for AI-native software teams â€” encoding, distributing, versioning, and enforcing architectural decisions across every agent that touches your codebase.</p>
-      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub â†’</a>
+      <p>Mneme is the governance infrastructure layer for AI-native software teams — encoding, distributing, versioning, and enforcing architectural decisions across every agent that touches your codebase.</p>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub →</a>
     </div>
   </footer>
 </article>
