@@ -76,10 +76,10 @@ Contributor guidance: changes to `decision_retriever.py`, `enforcer.py`, `benchm
 Watch short demos of Mneme running in realistic AI-assisted development workflows:
 
 - [Governed Python Agent Demo](https://www.youtube.com/watch?v=4Yg43V9amao) — the core product loop: violation caught, context injected, agent retries compliant
-- [ADR Import Demo](https://mnemehq.com/demo/adr-compiler/) — compile ADRs into an executable governance corpus
-- [Dependency Policy Demo](https://mnemehq.com/demo/dependency-policy/) — enforce dependency constraints before generation
-- [Claude Code Hooks Demo](https://mnemehq.com/demo/agent-sdk-governance/) — governance gates in Claude Code and Agent SDK workflows
-- [GitHub Actions Governance Demo](https://mnemehq.com/demo/multi-agent-governance/) — continuity across multiple actors and CI runs
+- [ADR Import Demo](https://www.youtube.com/watch?v=lMkq-RoKeD4) — compile ADRs into an executable governance corpus
+- [Architectural Drift Demo](https://www.youtube.com/watch?v=xkXJqSnXBJ8) — drift at AI speed, caught before it compounds
+- [GitHub Actions Governance Demo](https://www.youtube.com/watch?v=LaJqeJrKkgg) — enforce architecture in CI from ADR to gate
+- [Dependency Policy Demo](https://www.youtube.com/watch?v=pBJSpN8d9FU) — project memory as enforcement policy
 
 For the full demo library, see [mnemehq.com/demo](https://mnemehq.com/demo/) or the [YouTube channel](https://www.youtube.com/@MnemeHQ).
 
