@@ -346,7 +346,10 @@
 
 .mneme-diagram--chain .chain {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  /* minmax(0, 1fr) so long content (l-id strings like
+   * "predicate(decision, diff) -> block") wraps within its cell
+   * rather than forcing its column wider than its siblings. */
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 6px;
   list-style: none;
   margin: 0;
@@ -413,6 +416,10 @@
   color: var(--text);
   margin-bottom: 0.3rem;
   line-height: 1.35;
+  /* Some l-id values contain long un-breakable tokens such as
+   * "predicate(decision," that would otherwise force the cell wider
+   * than its siblings. anywhere lets the browser break mid-token. */
+  overflow-wrap: anywhere;
 }
 
 .mneme-diagram--chain .l-meta {
