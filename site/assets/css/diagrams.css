@@ -211,8 +211,125 @@
 
 /* ============================================================
  * Primitive 2: Enforcement checkpoints
- * (filled in Task 18)
+ * Five lifecycle checkpoints, bracketed into pre- and post-generation,
+ * with the strategic hard gate (CI check) visually marked.
  * ============================================================ */
+
+.mneme-diagram--checkpoints {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+}
+
+.mneme-diagram--checkpoints .brackets {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: 12px;
+  margin-bottom: 0.5rem;
+}
+
+.mneme-diagram--checkpoints .bracket-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border2);
+}
+
+.mneme-diagram--checkpoints .bracket-label.pre {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.mneme-diagram--checkpoints .bracket-label.post {
+  color: var(--muted);
+}
+
+.mneme-diagram--checkpoints .row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  align-items: stretch;
+  position: relative;
+}
+
+.mneme-diagram--checkpoints .step {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 0.7rem 0.55rem;
+  text-align: center;
+  position: relative;
+}
+
+.mneme-diagram--checkpoints .step--active {
+  background: rgba(200, 240, 96, 0.05);
+  border-color: var(--accent);
+  border-width: 1.5px;
+}
+
+.mneme-diagram--checkpoints .step--gate {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.mneme-diagram--checkpoints .step--gate .s-title,
+.mneme-diagram--checkpoints .step--gate .s-sub {
+  color: #0c0c0d;
+}
+
+.mneme-diagram--checkpoints .step--muted {
+  border-style: dashed;
+  border-color: var(--border);
+  background: var(--surface);
+}
+
+.mneme-diagram--checkpoints .s-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+.mneme-diagram--checkpoints .s-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.66rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.mneme-diagram--checkpoints .step + .step::before {
+  content: '\2192';
+  position: absolute;
+  left: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+@media (max-width: 640px) {
+  .mneme-diagram--checkpoints .brackets {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .mneme-diagram--checkpoints .row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .mneme-diagram--checkpoints .step + .step::before {
+    content: '\2193';
+    left: 50%;
+    top: -10px;
+    transform: translateX(-50%);
+  }
+}
 
 /* ============================================================
  * Primitive 3: Provenance chain
