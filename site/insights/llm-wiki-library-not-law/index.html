@@ -3,27 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Agent Skills vs Architectural Governance &mdash; Mneme HQ</title>
+  <title>Your LLM Wiki Is a Library, Not a Law &mdash; Mneme HQ</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="Agent skills teach agents how to perform tasks. Architectural governance constrains what agents are allowed to do. These are different layers, and conflating them leaves system integrity unaddressed." />
+  <meta name="description" content="LLM wikis help agents read project knowledge, but they do not enforce architectural decisions. Documentation is context. Governance is constraint." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
-  <link rel="canonical" href="https://mnemehq.com/insights/agent-skills-vs-architectural-governance/" />
+  <link rel="canonical" href="https://mnemehq.com/insights/llm-wiki-library-not-law/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Agent Skills vs Architectural Governance" />
-  <meta property="og:description" content="Agent skills teach agents how to perform tasks. Architectural governance constrains what agents are allowed to do. These are different layers." />
-  <meta property="og:url" content="https://mnemehq.com/insights/agent-skills-vs-architectural-governance/" />
-  <meta property="og:image" content="https://mnemehq.com/insights/agent-skills-vs-architectural-governance/og.png" />
+  <meta property="og:title" content="Your LLM Wiki Is a Library, Not a Law" />
+  <meta property="og:description" content="LLM wikis help agents read project knowledge, but they do not enforce architectural decisions. Documentation is context. Governance is constraint." />
+  <meta property="og:url" content="https://mnemehq.com/insights/llm-wiki-library-not-law/" />
+  <meta property="og:image" content="https://mnemehq.com/insights/llm-wiki-library-not-law/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Agent Skills vs Architectural Governance" />
-  <meta name="twitter:description" content="Agent skills teach agents how to perform tasks. Architectural governance constrains what agents are allowed to do. These are different layers." />
-  <meta name="twitter:image" content="https://mnemehq.com/insights/agent-skills-vs-architectural-governance/og.png" />
+  <meta name="twitter:title" content="Your LLM Wiki Is a Library, Not a Law" />
+  <meta name="twitter:description" content="LLM wikis help agents read project knowledge, but they do not enforce architectural decisions." />
+  <meta name="twitter:image" content="https://mnemehq.com/insights/llm-wiki-library-not-law/og.png" />
   <meta name="author" content="Theo Valmis" />
-  <meta property="article:published_time" content="2026-05-20T00:00:00Z" />
+  <meta property="article:published_time" content="2026-05-21T00:00:00Z" />
   <meta property="article:author" content="https://mnemehq.com/founder/" />
   <meta property="article:section" content="Engineering" />
 
@@ -69,10 +69,14 @@
     .article-body ul, .article-body ol { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
     .article-body li { margin-bottom: 0.5rem; }
     .article-body li strong { color: var(--text); font-weight: 500; }
+    .article-body a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(200,240,96,0.3); transition: border-color 0.15s; }
+    .article-body a:hover { border-color: var(--accent); }
 
     .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
     .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
     .callout p strong { color: var(--accent); }
+
+    .pull-quote { font-family: 'Instrument Serif', serif; font-size: 1.55rem; line-height: 1.35; color: var(--text); margin: 2.5rem 0; padding: 1rem 0 1rem 1.5rem; border-left: 3px solid var(--accent); letter-spacing: -0.01em; }
 
     .contrast-block { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border-radius: 12px; overflow: hidden; margin: 2.5rem 0; }
     .contrast-cell { background: var(--surface); padding: 1.6rem 1.6rem 1.75rem; }
@@ -89,21 +93,20 @@
     .contrast-cell.gov ul.cb-list li::before { color: rgba(200,240,96,0.55); }
     @media (max-width: 600px) { .contrast-block { grid-template-columns: 1fr; } }
 
-    .comparison-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.85rem; }
-    .comparison-table th { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border2); color: var(--muted); font-weight: 500; }
-    .comparison-table td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
-    .comparison-table td:first-child { color: var(--muted); }
-    .comparison-table td:nth-child(2) { color: var(--text); }
-
     .layer-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.85rem; }
     .layer-table th { background: var(--surface); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border2); }
     .layer-table td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; }
     .layer-table tr:last-child td { border-bottom: none; }
-    .layer-table td:first-child { color: var(--text); font-weight: 500; }
+    .layer-table td:first-child { color: var(--text); font-weight: 500; font-family: 'DM Mono', monospace; font-size: 0.78rem; }
     .layer-table tr.gov-row td { color: var(--accent); }
     .layer-table tr.gov-row td:first-child { color: var(--accent); }
-    .layer-table tr.verify-row td { color: var(--accent); opacity: 0.75; }
-    .layer-table tr.verify-row td:first-child { color: var(--accent); opacity: 0.75; }
+
+    .criteria-list { list-style: none; margin: 1.5rem 0 2rem; padding: 0; counter-reset: crit; }
+    .criteria-list li { counter-increment: crit; display: flex; gap: 1rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+    .criteria-list li:last-child { border-bottom: none; }
+    .criteria-list li::before { content: counter(crit, decimal-leading-zero); font-family: 'DM Mono', monospace; color: var(--accent); font-size: 0.75rem; letter-spacing: 0.05em; flex-shrink: 0; padding-top: 0.15rem; min-width: 1.8rem; }
+    .criteria-list li strong { color: var(--text); font-weight: 500; }
+    .criteria-list li span { color: var(--muted); display: block; font-size: 0.82rem; line-height: 1.65; margin-top: 0.15rem; }
 
     .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
     .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
@@ -125,21 +128,46 @@
     .breadcrumb a:hover { color: var(--text); }
     .breadcrumb [aria-current="page"] { color: var(--text); }
 
-    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 36px; height: 36px; border-radius: 6px; cursor: pointer; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; }
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; padding: 0; flex-shrink: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; transition: border-color 0.15s, background 0.15s; }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span { display: block; width: 18px; height: 2px; background: currentColor; border-radius: 1px; transition: transform 0.25s ease, opacity 0.18s ease; transform-origin: center; }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
-    .layer-stack { display: flex; flex-direction: column; gap: 0.75rem; margin: 2rem 0; }
-    .layer-item { display: flex; align-items: center; gap: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.25rem; }
-    .layer-num { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--accent); background: rgba(200,240,96,0.08); width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .layer-text { font-size: 0.85rem; color: var(--muted); }
-    .layer-text strong { color: var(--text); font-weight: 500; }
-
-    @media (max-width: 640px) {
-      nav { padding: 1rem 1.25rem; position: relative; }
-      .article-wrap { padding: 3rem 1.25rem 5rem; }
+    @media (max-width: 900px) {
+      html, body { overflow-x: hidden; }
+      body.menu-open { overflow: hidden; }
+      nav, nav.site-nav { position: relative; padding: 1rem 1.25rem; }
       .nav-hamburger { display: flex; }
-      .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0.5rem 1.25rem 1.25rem; z-index: 99; }
-      .nav-links.open { display: flex; }
-      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.88rem; padding: 0.7rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links {
+        display: flex !important;
+        flex-direction: column;
+        position: absolute;
+        top: 100%; left: 0; right: 0;
+        gap: 0;
+        background: rgba(12,12,13,0.98);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: 0 1.25rem;
+        z-index: 99;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        visibility: hidden;
+        transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s;
+      }
+      .nav-links.open {
+        max-height: 80vh;
+        opacity: 1;
+        visibility: visible;
+        padding: 0.5rem 1.25rem 1.25rem;
+        transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s;
+        overflow-y: auto;
+      }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.92rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
       .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
     }
 
@@ -148,88 +176,11 @@
     .byline a:hover { color: var(--text); }
     .byline .sep { color: var(--border2); margin: 0 0.5rem; }
 
-/* === Nav upgrade (injected, overrides existing) === */
-.nav-hamburger {
-  display: none;
-  background: none;
-  border: 1px solid var(--border2);
-  color: var(--text);
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  cursor: pointer;
-  padding: 0;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 4px;
-  transition: border-color 0.15s, background 0.15s;
-}
-.nav-hamburger:hover { border-color: var(--accent); }
-.nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.nav-hamburger span {
-  display: block;
-  width: 18px;
-  height: 2px;
-  background: currentColor;
-  border-radius: 1px;
-  transition: transform 0.25s ease, opacity 0.18s ease;
-  transform-origin: center;
-}
-.nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
-.nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
-.nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
-
-@media (max-width: 900px) {
-  html, body { overflow-x: hidden; }
-  body.menu-open { overflow: hidden; }
-  nav, nav.site-nav { position: relative; padding: 1rem 1.25rem; }
-  .nav-hamburger { display: flex; }
-  .nav-links {
-    display: flex !important;
-    flex-direction: column;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    gap: 0;
-    background: rgba(12,12,13,0.98);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-    padding: 0 1.25rem;
-    z-index: 99;
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-    visibility: hidden;
-    transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s;
-  }
-  .nav-links.open {
-    max-height: 80vh;
-    opacity: 1;
-    visibility: visible;
-    padding: 0.5rem 1.25rem 1.25rem;
-    transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s;
-    overflow-y: auto;
-  }
-  .nav-links a:not(.btn-nav-cta) {
-    display: block;
-    color: var(--text);
-    font-size: 0.92rem;
-    padding: 0.85rem 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
-  .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
-}
-
-    /* === Related reading === */
     .related-panel { margin-top: 3.5rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
     .related-panel-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
     .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
     .related-list li { margin: 0; }
-    .related-list a { display: block; padding: 1.15rem 1.35rem; background: var(--surface); text-decoration: none; transition: background 0.15s; }
+    .related-list a { display: block; padding: 1.15rem 1.35rem; background: var(--surface); text-decoration: none; transition: background 0.15s; border-bottom: none; }
     .related-list a:hover { background: var(--surface2); }
     .related-list .rel-title { color: var(--text); font-size: 0.92rem; font-weight: 600; margin-bottom: 0.35rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; letter-spacing: -0.005em; transition: color 0.15s; }
     .related-list .rel-title::after { content: '\2192'; color: var(--accent); opacity: 0.4; transition: opacity 0.15s, transform 0.15s; flex-shrink: 0; }
@@ -248,15 +199,15 @@
         "itemListElement": [
           {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
           {"@type": "ListItem", "position": 2, "name": "Insights", "item": "https://mnemehq.com/insights/"},
-          {"@type": "ListItem", "position": 3, "name": "Agent Skills vs Architectural Governance", "item": "https://mnemehq.com/insights/agent-skills-vs-architectural-governance/"}
+          {"@type": "ListItem", "position": 3, "name": "Your LLM Wiki Is a Library, Not a Law", "item": "https://mnemehq.com/insights/llm-wiki-library-not-law/"}
         ]
       },
       {
         "@type": "TechArticle",
-        "headline": "Agent Skills vs Architectural Governance",
-        "description": "Agent skills teach agents how to perform tasks. Architectural governance constrains what agents are allowed to do. These are different layers, and conflating them leaves system integrity unaddressed.",
-        "url": "https://mnemehq.com/insights/agent-skills-vs-architectural-governance/",
-        "datePublished": "2026-05-20",
+        "headline": "Your LLM Wiki Is a Library, Not a Law",
+        "description": "LLM wikis help agents read project knowledge, but they do not enforce architectural decisions. Documentation is context. Governance is constraint.",
+        "url": "https://mnemehq.com/insights/llm-wiki-library-not-law/",
+        "datePublished": "2026-05-21",
         "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/"}
       }
@@ -289,149 +240,161 @@
   <ol class="breadcrumb">
     <li><a href="/">Home</a></li>
     <li><a href="/insights/">Insights</a></li>
-    <li aria-current="page">Agent Skills vs Architectural Governance</li>
+    <li aria-current="page">Your LLM Wiki Is a Library, Not a Law</li>
   </ol>
 </nav>
 <article class="article-wrap">
   <header class="article-header">
     <div class="article-eyebrow">
-      <span class="eyebrow-tag">Comparison</span>
+      <span class="eyebrow-tag">Category Distinction</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">9 min read</span>
+      <span class="eyebrow-meta">8 min read</span>
     </div>
-    <h1>Agent Skills vs Architectural Governance</h1>
-    <p class="article-lede">Agent skills are genuinely useful. They package reusable capability, reduce repeated instruction, and make AI agents more consistent at the task level. But skills teach agents how to act. They do not govern what those actions are allowed to do to the system. That is a different problem, and it needs a different layer.</p>
-    <p class="byline">By <a href="/founder/">Theo Valmis</a><span class="sep">&middot;</span><time datetime="2026-05-20">May 2026</time></p>
+    <h1>Your LLM Wiki Is a Library, Not a Law</h1>
+    <p class="article-lede">Teams are doing real work organizing project knowledge so coding agents can read it. ADRs, PRDs, CLAUDE.md, AGENTS.md, NotebookLM, internal wikis, Cursor rules. This is a good step. It is not the final layer. A wiki helps the agent know. Governance makes the agent comply.</p>
+    <p class="byline">By <a href="/founder/">Theo Valmis</a><span class="sep">&middot;</span><time datetime="2026-05-21">May 2026</time></p>
   </header>
 
   <div class="article-body">
 
-    <div class="contrast-block" aria-label="Agent Skills vs Architectural Governance at a glance">
+    <h2>The rise of the LLM-readable project wiki</h2>
+    <p>The pattern is now widespread. Teams are restructuring docs, ADRs, PRDs, design notes, research folders, and live planning files so AI coding agents can understand the system faster. NotebookLM-style project knowledge bases, AGENTS.md / CLAUDE.md / PLANS.md conventions, Cursor rules, and repo-native wikis are all examples of the same move.</p>
+    <p>It is a useful move. An agent given a curated, retrievable library of project knowledge has a better starting point than one piecing things together from scattered chat history, tribal knowledge, or whatever happens to be open in a buffer.</p>
+    <p>The result is a generation of teams who have invested in making project knowledge legible to LLMs. The question this article is about is what that legibility actually buys you, and what it does not.</p>
+
+    <h2>A library improves recall. It does not create authority.</h2>
+    <p>A wiki can tell the agent what the architecture is. It cannot guarantee the agent treats that information as a constraint.</p>
+    <p>In practice, agents working against an LLM-readable wiki can still:</p>
+    <ul>
+      <li>retrieve the wrong document for the task at hand</li>
+      <li>miss the relevant ADR entirely</li>
+      <li>treat a binding rule as ambient background context</li>
+      <li>follow a rule in one session and forget it in the next</li>
+      <li>generate code that looks locally correct but violates a system boundary the wiki described</li>
+    </ul>
+    <p>These are not failures of the documentation. The decision is written down. The architecture is on the page. The wiki found it. The agent read it. And then the agent shipped code that contradicted it.</p>
+
+    <p class="pull-quote">The problem is not that the agent cannot read the rule. The problem is that reading is not the same as obeying.</p>
+
+    <h2>The failure mode: the rule was documented, but not enforced</h2>
+    <p>The most painful cases in real codebases are rarely caused by missing documentation. The decision usually exists. The architecture is written down. The PRD is clear. The ADR explains the constraint.</p>
+    <p>The failure is that none of it is <em>active at the moment code is generated</em>. The agent has access to the text. The agent may even cite it. But the text has no enforcement surface, so there is nothing in the loop that can block a generation that disagrees with it.</p>
+    <p>This is the structural reason that "we wrote it down, so the agent will follow it" keeps disappointing teams. Writing it down is necessary. It is not sufficient.</p>
+
+    <h2>Documentation is context. Governance is constraint.</h2>
+    <p>This is the category distinction worth keeping straight.</p>
+
+    <div class="contrast-block" aria-label="LLM wiki vs architectural governance at a glance">
       <div class="contrast-cell">
-        <div class="cb-label">Agent Skills</div>
-        <div class="cb-name">Capability layer</div>
-        <div class="cb-tag">Procedures &middot; task acceleration</div>
+        <div class="cb-label">LLM Wiki</div>
+        <div class="cb-name">Knowledge surface</div>
+        <div class="cb-tag">Reference &middot; recall &middot; context</div>
         <ul class="cb-list">
-          <li>Teach agents how to perform tasks</li>
-          <li>Encode reusable procedures and workflows</li>
-          <li>Reduce repeated instruction across sessions</li>
-          <li>Task-level consistency &mdash; not system-level</li>
-          <li>Can be ignored, overridden, or diluted</li>
+          <li>Answers: what should the agent know?</li>
+          <li>Organizes docs, ADRs, PRDs, plans</li>
+          <li>Improves retrieval and grounding</li>
+          <li>Passive: read only at request time</li>
+          <li>Can be ignored, missed, or paraphrased away</li>
         </ul>
       </div>
       <div class="contrast-cell gov">
         <div class="cb-label">Architectural Governance</div>
-        <div class="cb-name">Constraint layer</div>
-        <div class="cb-tag">Invariants &middot; deterministic enforcement</div>
+        <div class="cb-name">Control surface</div>
+        <div class="cb-tag">Invariants &middot; enforcement &middot; audit</div>
         <ul class="cb-list">
-          <li>Constrain behavior to architectural intent</li>
-          <li>Encode invariants and system constraints</li>
-          <li>Propagate across agents, tools, and CI</li>
-          <li>System-level integrity &mdash; not task-level</li>
-          <li>Deterministic verdicts &mdash; not suggestions</li>
+          <li>Answers: what must the agent not violate?</li>
+          <li>Encodes binding architectural constraints</li>
+          <li>Injected before generation, checked at CI</li>
+          <li>Active: enters the loop, not just the context</li>
+          <li>Deterministic verdicts with provenance</li>
         </ul>
       </div>
     </div>
 
-    <h2>What agent skills solve</h2>
-    <p>Agent skills are the execution acceleration layer. They package reusable capability so agents can perform tasks consistently without requiring the same detailed instruction every session. The umbrella term covers Claude Code skills, Cursor rules, workflow packs, tool-use recipes, prompt libraries, and skill libraries of all kinds.</p>
-    <p>What they share: they encode <em>how to do something</em>. A skill for writing tests describes the test pattern. A skill for API integration describes the integration procedure. A workflow pack for code review describes the review steps.</p>
-    <div class="callout"><p><strong>Reusable skills are genuinely useful.</strong> They are the execution acceleration layer &mdash; and acceleration at the task level is a real and valuable improvement.</p></div>
-    <p>Skills reduce local hallucinations, improve session consistency, and make agents faster at their jobs. These are the right problems to solve if capability consistency is your bottleneck.</p>
+    <p>A wiki is a knowledge surface. Governance is a control surface. They are not competing layers; they sit on top of each other. The mistake is treating the knowledge surface as if it were already a control surface.</p>
 
-    <h2>Why reusable skills still drift</h2>
-    <p>Skills give agents better procedures. They do not give systems better constraints. When a skilled agent encounters a tradeoff between task completion and architectural consistency, the skill has no mechanism to resolve it &mdash; it encodes the procedure, not the invariant.</p>
-    <div class="callout"><p><strong>A skill can tell an agent how to work; it cannot decide whether the work still fits the system.</strong></p></div>
-    <p>Session boundaries reset skills. Orchestration handoffs lose them. Multi-agent systems where one agent plans and another implements have no mechanism for skill-based constraints to propagate as architectural requirements rather than as suggestions.</p>
-    <p>And even a perfectly-followed skill can violate an architectural constraint &mdash; because skills are written for tasks, not for the system boundaries the task is operating inside.</p>
+    <h2>What turns project knowledge into governance?</h2>
+    <p>Most project knowledge stays in the wiki and should stay there. Reference material, design context, history, and rationale do not need to be enforced; they need to be findable. Only a subset of project knowledge is binding, and that subset has to clear a higher bar to become governance.</p>
 
-    <h2>Skills are procedural. Governance is constraint-based.</h2>
-    <p>The distinction is not capability vs. quality. It is procedure vs. constraint. These are different types of encoded knowledge, and they fail in different ways.</p>
+    <p>Useful project knowledge becomes governance only when it is:</p>
 
-    <div style="overflow-x:auto;margin:2rem 0;">
-    <table class="comparison-table">
-      <thead><tr><th>Agent Skills</th><th>Architectural Governance</th></tr></thead>
-      <tbody>
-        <tr><td>&ldquo;How to do X&rdquo;</td><td>&ldquo;What must never be violated&rdquo;</td></tr>
-        <tr><td>Procedural guidance</td><td>System constraints</td></tr>
-        <tr><td>Task acceleration</td><td>Architectural integrity</td></tr>
-        <tr><td>Capability reuse</td><td>Invariant preservation</td></tr>
-        <tr><td>Prompt / runtime behavior</td><td>Enforcement semantics</td></tr>
-        <tr><td>Often optional</td><td>Often mandatory</td></tr>
-      </tbody>
-    </table>
-    </div>
+    <ol class="criteria-list">
+      <li><strong>Explicit.</strong><span>Stated as a checkable rule, not implied across paragraphs of prose.</span></li>
+      <li><strong>Scoped.</strong><span>Tied to the part of the system it actually governs, so it is retrieved when it is relevant and not when it is not.</span></li>
+      <li><strong>Retrievable at the right moment.</strong><span>Surfaced into the loop before the agent commits to a candidate change, not buried in a doc that may or may not be fetched.</span></li>
+      <li><strong>Enforceable before code lands.</strong><span>Evaluable by a hook or CI gate that can return a deterministic verdict against the resulting artifact.</span></li>
+      <li><strong>Auditable back to the source decision.</strong><span>Every verdict can be traced to the ADR, PRD, or policy it derives from, so enforcement is reviewable rather than opaque.</span></li>
+    </ol>
 
-    <p>These layers are not competing for the same role. They address different failure modes and they should be deployed together.</p>
+    <p>Knowledge that meets all five criteria is doing a different job than knowledge that sits in a wiki. It has stopped being reference material and become an <a href="/concepts/executable-architectural-intent/">executable architectural constraint</a>.</p>
+
+    <h2>The Mneme comparison frame</h2>
+    <p>It helps to name each layer by what it actually does, rather than treating them as interchangeable.</p>
 
     <div style="overflow-x:auto;margin:2rem 0;">
     <table class="layer-table">
-      <thead><tr><th>Layer</th><th>Purpose</th></tr></thead>
+      <thead><tr><th>Layer</th><th>What it does</th></tr></thead>
       <tbody>
-        <tr><td>Agent skills</td><td>Teach agents how to perform tasks</td></tr>
-        <tr><td>Context engineering</td><td>Help agents retain and retrieve information</td></tr>
-        <tr class="gov-row"><td>Governance</td><td>Constrain behavior to architectural intent</td></tr>
-        <tr class="verify-row"><td>Verification</td><td>Deterministically validate outputs</td></tr>
+        <tr><td>LLM wiki</td><td>Organizes project knowledge so agents can read it</td></tr>
+        <tr><td>Prompt files</td><td>Remind the agent what generally matters in this repo</td></tr>
+        <tr><td>ADRs &amp; PRDs</td><td>Record architectural and product decisions for humans</td></tr>
+        <tr class="gov-row"><td>Mneme</td><td>Turns selected decisions into enforceable constraints in the agent loop</td></tr>
       </tbody>
     </table>
     </div>
 
-    <h2>Why orchestration amplifies inconsistency</h2>
-    <p>Skills were designed for single-agent, session-bounded use. As systems grow toward multi-agent coordination, the skill model creates a new gap: capability propagates across the workflow, but architectural constraints do not.</p>
-    <p>One agent can follow the right procedure, pass the work to the next agent, and that agent can also follow the right procedure &mdash; while the system as a whole drifts from its architectural intent. The procedures were correct. The constraints were never enforced.</p>
-    <p>Orchestration amplifies the gap because every handoff is a point where governance needs to travel with the work. Skills do not include governance as a component. They solve a different problem.</p>
+    <p>None of the upper layers go away. A team that adopts governance still needs ADRs and a project wiki, just like a team that adopts CI still needs a README. What changes is that the binding parts of the knowledge stop relying on the agent&rsquo;s discretion to be honored.</p>
 
-    <h2>The emerging AI development stack</h2>
-    <p>Context engineering, agent skills, orchestration, governance, and verification are not competing approaches. They are different layers of the same stack, each solving a different reliability problem.</p>
+    <h2>Where Mneme fits</h2>
+    <p>Mneme does not replace docs, ADRs, AGENTS.md files, or project wikis. It sits after them. It takes architectural intent from repo-native sources and makes it available as enforceable constraints for AI-assisted development &mdash; retrieved before generation, enforced at the hook and CI layers, and provenanced back to the source decision.</p>
 
-    <div class="layer-stack" style="margin:2rem 0;">
-      <div class="layer-item"><div class="layer-num">06</div><div class="layer-text"><strong>Verification</strong> &mdash; deterministically validate that outputs match architectural intent</div></div>
-      <div class="layer-item" style="border-color:var(--accent);background:rgba(200,240,96,0.03);"><div class="layer-num" style="color:var(--accent);background:rgba(200,240,96,0.08);">05</div><div class="layer-text"><strong style="color:var(--text);">Governance</strong> &mdash; constrain behavior to architectural intent across every execution surface</div></div>
-      <div class="layer-item"><div class="layer-num">04</div><div class="layer-text"><strong>Orchestration</strong> &mdash; coordinate agents, tools, and multi-step workflows</div></div>
-      <div class="layer-item"><div class="layer-num">03</div><div class="layer-text"><strong>Context engineering</strong> &mdash; help agents retain and retrieve information across sessions</div></div>
-      <div class="layer-item"><div class="layer-num">02</div><div class="layer-text"><strong>Memory</strong> &mdash; persist session state, decisions, and historical context</div></div>
-      <div class="layer-item"><div class="layer-num">01</div><div class="layer-text"><strong>Agent skills</strong> &mdash; teach agents how to perform tasks consistently</div></div>
+    <p>The wiki remains the library. Mneme becomes the law.</p>
+
+    <div class="callout">
+      <p><strong>An LLM wiki helps agents understand the system. Architectural governance determines which parts of that understanding are binding.</strong></p>
     </div>
 
-    <p>Governance is the layer between orchestration and verification &mdash; the point where architectural intent becomes enforceable rather than aspirational.</p>
-    <div class="callout"><p><strong>Skills help agents act consistently. Governance helps systems remain consistent.</strong> Reusable capabilities are not the same thing as enforceable architectural intent.</p></div>
-    <p>Mneme treats architectural decisions as enforceable project memory, so governance can travel with the agent workflow instead of living only in review.</p>
+    <h2>Closing</h2>
+    <p>If your team already has ADRs, design notes, or project rules, the next step is not another wiki. It is deciding which parts of that knowledge should become enforceable architectural constraints &mdash; and what enforcement surface they belong on.</p>
+
+    <p>The library is good work. It is not the last layer.</p>
 
     <section class="article-faq" aria-labelledby="faq-heading" style="margin-top:3rem;">
       <h2 id="faq-heading" style="margin-bottom:1.5rem;">Frequently asked questions</h2>
       <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-        <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Are agent skills bad or insufficient?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-        <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">No. Agent skills are a genuine and useful layer. They reduce repeated instruction, improve task-level consistency, and accelerate agent execution. The argument here is not that skills are insufficient in some absolute sense &mdash; it is that skills were never designed to solve the constraint enforcement problem. They solve the capability consistency problem. Both are worth solving, and they require different infrastructure.</div>
+        <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Is an LLM wiki bad or insufficient?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+        <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">No. An LLM-readable project wiki is genuinely useful. It improves agent grounding, reduces repeated explanation, and gives onboarding teams a real artifact. The argument here is not that wikis are insufficient in some absolute sense &mdash; it is that wikis are knowledge surfaces. They were not designed to enforce architectural constraints, and using them as if they were leads to the failure mode where the rule is documented but ignored at generation time.</div>
       </details>
       <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-        <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Can I use both agent skills and governance?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-        <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Yes &mdash; and in most production systems, you need both. Skills handle the how: consistent procedures, reusable workflows, task acceleration. Governance handles the what-must-not: architectural invariants, policy constraints, deterministic enforcement. They operate at different points in the stack and address different failure modes. A system with great skills but no governance will still drift. A system with strong governance but no skills will still be slow and inconsistent at the task level.</div>
+        <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Can I use both an LLM wiki and Mneme?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+        <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Yes &mdash; and in most teams that is the right combination. The wiki organizes the full body of project knowledge: rationale, history, design discussion, reference material. Mneme governs the subset of that knowledge that has to bind agent behavior: ADR rules, dependency policies, scope boundaries, security invariants. The wiki tells the agent what the system is. Mneme makes sure the binding parts of that description are honored at generation time and verified at CI.</div>
       </details>
       <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-        <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Is Mneme just a skill library for governance?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-        <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">No. Mneme is a governance infrastructure layer: it encodes architectural decisions as machine-evaluable constraints, enforces them at the hook level, and propagates them across every agent and CI surface that touches your codebase. A skill library packages reusable procedures. Mneme packages reusable architectural constraints with deterministic enforcement semantics &mdash; same constraint, same codebase state, same verdict, every run.</div>
+        <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Doesn&rsquo;t putting rules in CLAUDE.md or AGENTS.md count as governance?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+        <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Prompt files like CLAUDE.md and AGENTS.md are useful as reminders. They are still knowledge surfaces, not control surfaces: the model decides how to weight them, they apply only within sessions that load them, and they have no deterministic enforcement at the hook or CI layer. They reduce friction. They do not produce a verdict. Treating them as if they were policy is the version of this failure mode that lives one layer above the wiki.</div>
       </details>
       <details style="border:1px solid var(--border);border-radius:8px;overflow:hidden;">
-        <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">At what point does the governance gap appear?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-        <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">The governance gap typically becomes visible at the point where agent output is fast enough that human review is no longer the primary quality gate. In single-agent, human-reviewed workflows, the reviewer catches drift before it compounds. As agent velocity increases, review queues grow faster than they can be processed, and drift accumulates between review cycles. Governance infrastructure closes this gap by enforcing constraints at the point of generation rather than at the point of review.</div>
+        <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">How do I decide what to promote from wiki to governance?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+        <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Two practical questions: would you reject a PR that violated this rule, and can the rule be stated as a check the agent must not fail? If both answers are yes, the knowledge is doing governance work and should be encoded as an enforceable constraint &mdash; explicit, scoped, retrievable at generation time, enforceable before merge, and traceable back to the source decision. If either answer is no, the knowledge belongs in the wiki and not in the governance layer.</div>
       </details>
     </section>
 
-    <aside class="related-panel" aria-labelledby="related-concepts-label" style="margin-top:3rem;">
+    <aside class="related-panel" aria-labelledby="related-concepts-label">
       <div class="related-panel-label" id="related-concepts-label">Related governance concepts</div>
       <ul class="related-list">
-        <li><a href="/concepts/governance-infrastructure/"><div class="rel-title">Governance Infrastructure</div><p class="rel-desc">The platform layer that encodes, distributes, versions, and enforces architectural decisions across agents and CI.</p></a></li>
+        <li><a href="/concepts/executable-architectural-intent/"><div class="rel-title">Executable Architectural Intent</div><p class="rel-desc">The slice of project knowledge that has been promoted from documentation into machine-evaluable, enforceable constraints.</p></a></li>
+        <li><a href="/concepts/architectural-governance/"><div class="rel-title">Architectural Governance</div><p class="rel-desc">The discipline of constraining what AI agents are allowed to do, not just describing what they should know.</p></a></li>
+        <li><a href="/concepts/governance-before-generation/"><div class="rel-title">Governance Before Generation</div><p class="rel-desc">Architectural constraints retrieved and applied before the agent commits to a candidate change.</p></a></li>
         <li><a href="/concepts/verification-contracts/"><div class="rel-title">Verification Contracts</div><p class="rel-desc">Predefined checks that prove architectural intent survived the agent run.</p></a></li>
-        <li><a href="/concepts/governance-propagation/"><div class="rel-title">Governance Propagation</div><p class="rel-desc">Identical compiled constraints fan out to every agent, IDE, hook, and CI surface.</p></a></li>
       </ul>
     </aside>
 
     <aside class="related-panel" aria-labelledby="related-essays-label" style="margin-top:1.5rem;padding-top:0;border-top:none;">
       <div class="related-panel-label" id="related-essays-label">Related operational essays</div>
       <ul class="related-list">
-        <li><a href="/insights/goal-driven-agents-architectural-governance/"><div class="rel-title">Goal-Driven Agents Need Architectural Governance</div><p class="rel-desc">Claude /goal, AutoResearch, and Shopify&rsquo;s metric-driven loops point to a shift from prompt-based coding to objective-driven development. Tests verify outcomes. Governance preserves intent.</p></a></li>
-        <li><a href="/insights/llm-wiki-library-not-law/"><div class="rel-title">Your LLM Wiki Is a Library, Not a Law</div><p class="rel-desc">LLM wikis help agents read project knowledge. They do not enforce architectural decisions. Documentation is context. Governance is constraint.</p></a></li>
-        <li><a href="/insights/why-context-alone-doesnt-prevent-architectural-drift/"><div class="rel-title">Why Context Alone Doesn&rsquo;t Prevent Architectural Drift</div><p class="rel-desc">Context engineering and governance solve different problems. The missing layer between orchestration and verification is enforcement.</p></a></li>
+        <li><a href="/insights/agent-skills-vs-architectural-governance/"><div class="rel-title">Agent Skills vs Architectural Governance</div><p class="rel-desc">Skills teach agents how to act. Governance constrains what those actions can do to the system.</p></a></li>
+        <li><a href="/insights/goal-driven-agents-architectural-governance/"><div class="rel-title">Goal-Driven Agents Need Architectural Governance</div><p class="rel-desc">Tests verify outcomes. Governance preserves architectural intent while the loop runs.</p></a></li>
+        <li><a href="/insights/why-claude-md-stops-scaling/"><div class="rel-title">Why CLAUDE.md Stops Scaling</div><p class="rel-desc">An instruction surface is not a governance layer.</p></a></li>
         <li><a href="/insights/memory-is-not-governance/"><div class="rel-title">Memory Is Not Governance</div><p class="rel-desc">Context persistence cannot enforce architectural invariants. Recall is not constraint.</p></a></li>
       </ul>
     </aside>
@@ -440,8 +403,8 @@
   <footer class="article-footer">
     <a href="/insights/" class="back-link">&larr; Back to Insights</a>
     <div class="cta-block">
-      <h3>Add governance to your agent stack</h3>
-      <p>Mneme encodes architectural decisions as machine-evaluable constraints and enforces them at the hook level &mdash; so governance travels with the workflow instead of living only in review. Open source.</p>
+      <h3>Promote your binding decisions out of the wiki</h3>
+      <p>Mneme takes the subset of your architectural intent that has to bind agent behavior and makes it explicit, retrievable, enforceable, and auditable &mdash; on top of the docs and ADRs you already have. Open source.</p>
       <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
     </div>
   </footer>
@@ -516,7 +479,7 @@
   </div>
 </footer>
 
-<script><!-- nav-active -->
+<script>
 (function(){
   var path = window.location.pathname;
   document.querySelectorAll('.nav-links a').forEach(function(a){

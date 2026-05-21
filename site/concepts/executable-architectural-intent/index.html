@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Executable Architectural Intent &mdash; Mneme HQ Concepts</title>
+  <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/fonts.css">
+  <meta name="description" content="Executable architectural intent: the slice of project knowledge that has been promoted from documentation into machine-evaluable, enforceable constraints that bind AI agent behavior at generation time." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/concepts/executable-architectural-intent/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Executable Architectural Intent &mdash; Mneme HQ Concepts" />
+  <meta property="og:description" content="The slice of project knowledge that has been promoted from documentation into machine-evaluable, enforceable constraints that bind AI agent behavior at generation time." />
+  <meta property="og:url" content="https://mnemehq.com/concepts/executable-architectural-intent/" />
+  <meta property="og:image" content="https://mnemehq.com/concepts/executable-architectural-intent/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Executable Architectural Intent &mdash; Mneme HQ Concepts" />
+  <meta name="twitter:description" content="Project knowledge promoted from documentation into enforceable constraints that bind AI agent behavior." />
+  <meta name="twitter:image" content="https://mnemehq.com/concepts/executable-architectural-intent/og.png" />
+  <meta name="author" content="Theo Valmis" />
+  <meta property="article:published_time" content="2026-05-21T00:00:00Z" />
+  <meta property="article:author" content="https://mnemehq.com/founder/" />
+  <meta property="article:section" content="Concepts" />
+
+  <!-- Consent defaults -->
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{'analytics_storage':'granted','ad_storage':'denied','ad_user_data':'denied','ad_personalization':'denied'});</script>
+
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #a8a8b8;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .article-wrap { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 7rem; }
+    .article-header { margin-bottom: 3.5rem; }
+    .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+
+    .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
+    .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .article-body h3 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--text); }
+    .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
+    .article-body p strong { color: var(--text); font-weight: 500; }
+    .article-body ul, .article-body ol { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body li { margin-bottom: 0.5rem; }
+    .article-body li strong { color: var(--text); font-weight: 500; }
+    .article-body a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(200,240,96,0.3); transition: border-color 0.15s; }
+    .article-body a:hover { border-color: var(--accent); }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout p strong { color: var(--accent); }
+
+    .callout-teal { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--teal); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout-teal p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout-teal p strong { color: var(--teal); }
+
+    .comparison-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.85rem; }
+    .comparison-table th { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border2); color: var(--muted); font-weight: 500; }
+    .comparison-table td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .comparison-table td:first-child { color: var(--muted); white-space: nowrap; }
+    .comparison-table td:nth-child(2) { color: var(--text); opacity: 0.6; }
+    .comparison-table td:nth-child(3) { color: var(--accent); }
+
+    .promote-flow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border-radius: 12px; overflow: hidden; margin: 2.5rem 0; }
+    .promote-cell { background: var(--surface); padding: 1.4rem 1.4rem 1.6rem; position: relative; }
+    .promote-cell.final { background: linear-gradient(180deg, rgba(200,240,96,0.05), var(--surface) 70%); }
+    .promote-cell .pc-label { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+    .promote-cell.final .pc-label { color: var(--accent); }
+    .promote-cell .pc-name { font-family: 'Instrument Serif', serif; font-size: 1.2rem; line-height: 1.2; color: var(--text); margin-bottom: 0.55rem; letter-spacing: -0.005em; }
+    .promote-cell.final .pc-name { color: var(--accent); }
+    .promote-cell .pc-desc { font-size: 0.78rem; line-height: 1.65; color: var(--muted); }
+    @media (max-width: 600px) { .promote-flow { grid-template-columns: 1fr; } }
+
+    .criteria-list { list-style: none; margin: 1.5rem 0 2rem; padding: 0; counter-reset: crit; }
+    .criteria-list li { counter-increment: crit; display: flex; gap: 1rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+    .criteria-list li:last-child { border-bottom: none; }
+    .criteria-list li::before { content: counter(crit, decimal-leading-zero); font-family: 'DM Mono', monospace; color: var(--accent); font-size: 0.75rem; letter-spacing: 0.05em; flex-shrink: 0; padding-top: 0.15rem; min-width: 1.8rem; }
+    .criteria-list li strong { color: var(--text); font-weight: 500; }
+    .criteria-list li span { color: var(--muted); display: block; font-size: 0.82rem; line-height: 1.65; margin-top: 0.15rem; }
+
+    .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .article-faq { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .article-faq h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 1.5rem; color: var(--text); }
+    .article-faq details { margin: 0.75rem 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .article-faq summary { padding: 1rem 1.25rem; cursor: pointer; font-size: 0.88rem; color: var(--text); background: var(--surface); list-style: none; }
+    .article-faq summary::-webkit-details-marker { display: none; }
+    .article-faq summary::before { content: '+ '; color: var(--accent); }
+    .article-faq details[open] summary::before { content: '\2212 '; }
+    .article-faq details[open] summary { border-bottom: 1px solid var(--border); }
+    .article-faq .faq-body { padding: 1.25rem; font-size: 0.86rem; color: var(--muted); line-height: 1.85; }
+    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .back-link:hover { color: var(--text); }
+    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2rem; }
+    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--accent-dim); }
+
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    .answer-capsule { max-width: 820px; margin: 0 auto; padding: 1.5rem 2rem; background: var(--surface); border-bottom: 1px solid rgba(200,240,96,0.18); font-size: 0.88rem; color: var(--muted); line-height: 1.8; }
+    .answer-capsule strong { color: var(--accent); }
+
+    footer { border-top: 1px solid var(--border); padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .breadcrumb-nav { max-width: 720px; margin: 0 auto; padding: 1.75rem 2rem 0.85rem; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.82rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; padding: 0; flex-shrink: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; transition: border-color 0.15s, background 0.15s; }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span { display: block; width: 18px; height: 2px; background: currentColor; border-radius: 1px; transition: transform 0.25s ease, opacity 0.18s ease; transform-origin: center; }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    @media (max-width: 900px) {
+      html, body { overflow-x: hidden; }
+      body.menu-open { overflow: hidden; }
+      nav { position: relative; padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 1.25rem; z-index: 99; max-height: 0; overflow: hidden; opacity: 0; visibility: hidden; transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s; }
+      .nav-links.open { max-height: 80vh; opacity: 1; visibility: visible; padding: 0.5rem 1.25rem 1.25rem; transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s; overflow-y: auto; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.92rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+      .article-wrap { padding: 3rem 1.25rem 5rem; }
+    }
+
+    h2#related-reading { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 400; margin-top: 3.5rem; margin-bottom: 0.75rem; }
+    h2#related-reading + ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    h2#related-reading + ul li { margin: 0; }
+    h2#related-reading + ul li a { display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.1rem; background: var(--surface); color: var(--text); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.15s, color 0.15s; border-bottom: none; }
+    h2#related-reading + ul li a::after { content: '\2192'; opacity: 0.35; transition: opacity 0.15s, transform 0.15s; display: inline-block; margin-left: 0.5rem; }
+    h2#related-reading + ul li a:hover { background: var(--surface2); color: var(--accent); }
+    h2#related-reading + ul li a:hover::after { opacity: 1; transform: translateX(3px); }
+
+    @media (max-width: 768px) { nav, .mobile-menu { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Concepts", "item": "https://mnemehq.com/concepts/"},
+          {"@type": "ListItem", "position": 3, "name": "Executable Architectural Intent", "item": "https://mnemehq.com/concepts/executable-architectural-intent/"}
+        ]
+      },
+      {
+        "@type": "TechArticle",
+        "headline": "Executable Architectural Intent",
+        "description": "The slice of project knowledge that has been promoted from documentation into machine-evaluable, enforceable constraints that bind AI agent behavior at generation time.",
+        "url": "https://mnemehq.com/concepts/executable-architectural-intent/",
+        "datePublished": "2026-05-21",
+        "dateModified": "2026-05-21",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "image": "https://mnemehq.com/concepts/executable-architectural-intent/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/concepts/executable-architectural-intent/",
+        "proficiencyLevel": "Expert",
+        "articleSection": "Concepts"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is executable architectural intent?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Executable architectural intent is the slice of project knowledge that has been promoted from documentation into machine-evaluable, enforceable constraints that bind AI agent behavior at generation time. It is the difference between an ADR an agent can read and a constraint the agent cannot violate."}
+          },
+          {
+            "@type": "Question",
+            "name": "How is executable architectural intent different from an LLM wiki?",
+            "acceptedAnswer": {"@type": "Answer", "text": "An LLM wiki is a knowledge surface — it organizes project documentation so AI agents can read it. Executable architectural intent is a control surface — the subset of that knowledge that has been encoded so it can be retrieved before generation, checked deterministically before merge, and traced back to its source decision. The wiki helps agents understand. Executable intent decides which parts of that understanding are binding."}
+          },
+          {
+            "@type": "Question",
+            "name": "What criteria turn project knowledge into executable architectural intent?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Five criteria: the knowledge must be explicit (stated as a checkable rule), scoped (tied to the part of the system it governs), retrievable at the right moment (surfaced before the agent generates), enforceable before code lands (a deterministic hook or CI verdict), and auditable back to the source decision (traceable to the ADR or PRD it derives from)."}
+          },
+          {
+            "@type": "Question",
+            "name": "Does every architectural decision need to become executable?",
+            "acceptedAnswer": {"@type": "Answer", "text": "No. Most project knowledge belongs in the wiki and should stay there. Reference material, design history, and rationale need to be findable, not enforceable. Only the subset of architectural intent that has to bind agent behavior — and that you would reject a PR for violating — should be promoted into the governance layer. Promotion is a deliberate decision, not an automatic one."}
+          },
+          {
+            "@type": "Question",
+            "name": "How does Mneme implement executable architectural intent?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Mneme treats architectural decisions as machine-evaluable constraints stored in a version-controlled corpus, retrieves them through a deterministic scoping layer before agents generate, and validates them at the hook and CI levels after generation. Each verdict carries provenance back to the source decision so enforcement is auditable, not opaque."}
+          }
+        ]
+      },
+      {
+        "@type": "DefinedTerm",
+        "name": "Executable Architectural Intent",
+        "description": "The slice of project knowledge that has been promoted from documentation into machine-evaluable, enforceable constraints that bind AI agent behavior at generation time.",
+        "inDefinedTermSet": {"@type": "DefinedTermSet", "name": "Mneme HQ Concepts", "url": "https://mnemehq.com/concepts/"},
+        "url": "https://mnemehq.com/concepts/executable-architectural-intent/"
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/benchmark/">Benchmark</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<div class="answer-capsule">
+  <strong>Executable architectural intent.</strong> The slice of project knowledge that has been promoted from documentation into machine-evaluable, enforceable constraints that bind AI agent behavior at generation time &mdash; not just read, but obeyed.
+</div>
+
+<nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/concepts/">Concepts</a></li>
+    <li aria-current="page">Executable Architectural Intent</li>
+  </ol>
+</nav>
+
+<article class="article-wrap">
+  <header class="article-header">
+    <div class="article-eyebrow">
+      <span class="eyebrow-tag">Concepts</span>
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-meta">9 min read &nbsp;&middot;&nbsp; May 2026</span>
+    </div>
+    <h1>Executable Architectural Intent</h1>
+    <p class="article-lede">Most project knowledge wants to be findable. A smaller, more important subset has to be binding. Executable architectural intent is the name for that subset &mdash; the slice of architectural knowledge that has been promoted out of documentation and into the layer where it can actually constrain what an AI agent does.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-21">Published May 2026</time>
+    </p>
+  </header>
+
+  <div class="article-body">
+
+    <p>Teams writing for AI coding agents accumulate project knowledge fast: ADRs, PRDs, design notes, AGENTS.md files, NotebookLM corpora, Cursor rules, repo-native wikis. Almost all of it is useful, and almost all of it is reference material. It tells the agent what the system is.</p>
+    <p>A different question sits behind that body of work: which parts of this knowledge are not optional? Which decisions, if the agent ignored them, would make the result wrong even if it ran, passed tests, and looked locally plausible?</p>
+    <p>That subset has to live somewhere else. It is no longer documentation. It is <strong>executable architectural intent</strong>.</p>
+
+    <h2>The operational definition</h2>
+    <p><strong>Executable architectural intent is the slice of project knowledge that has been promoted from documentation into machine-evaluable, enforceable constraints that bind AI agent behavior at generation time.</strong></p>
+    <p>Three properties distinguish it from ordinary project knowledge:</p>
+
+    <ul>
+      <li><strong>It is binding, not informational.</strong> The agent does not have discretion to weigh it against task pressure. A run that violates it is a failed run, regardless of whether the rest of the output looks right.</li>
+      <li><strong>It is machine-evaluable.</strong> A hook or a CI gate can produce a deterministic verdict against the resulting artifact. The constraint is not a sentence in a doc; it is something a check can answer with pass or fail.</li>
+      <li><strong>It is traceable.</strong> Every verdict can be linked back to the source decision &mdash; the ADR, PRD, or policy it derives from &mdash; so enforcement is auditable rather than opaque.</li>
+    </ul>
+
+    <div class="callout">
+      <p><strong>Reference knowledge tells the agent what the system is.</strong> Executable architectural intent tells the agent what it is not allowed to change about that system while doing the task.</p>
+    </div>
+
+    <h2>Promotion: from documentation to constraint</h2>
+    <p>Executable architectural intent does not appear by default. It exists because a team explicitly promoted a piece of knowledge from the wiki layer into the governance layer. The shape of that promotion:</p>
+
+    <div class="promote-flow">
+      <div class="promote-cell">
+        <div class="pc-label">Stage 01</div>
+        <div class="pc-name">Decision</div>
+        <p class="pc-desc">An architectural choice is made &mdash; usually in an ADR, PRD, design doc, or policy note.</p>
+      </div>
+      <div class="promote-cell">
+        <div class="pc-label">Stage 02</div>
+        <div class="pc-name">Reference</div>
+        <p class="pc-desc">The decision lives in the project wiki or LLM-readable corpus. Agents can read it. Compliance is left to discretion.</p>
+      </div>
+      <div class="promote-cell final">
+        <div class="pc-label">Stage 03</div>
+        <div class="pc-name">Executable intent</div>
+        <p class="pc-desc">The decision is encoded as a scoped, retrievable, enforceable constraint that enters the agent loop and produces deterministic verdicts.</p>
+      </div>
+    </div>
+
+    <p>Most architectural knowledge stops at stage two and should. Promotion to stage three is a deliberate act, applied selectively to the rules that genuinely have to bind agent behavior.</p>
+
+    <h2>The five-criteria bar</h2>
+    <p>The signal that a piece of project knowledge is ready to be promoted is that it meets all five of the following criteria.</p>
+
+    <ol class="criteria-list">
+      <li><strong>Explicit.</strong><span>Stated as a checkable rule, not implied across paragraphs of rationale.</span></li>
+      <li><strong>Scoped.</strong><span>Tied to the part of the system it actually governs, so it is retrieved when relevant and silent when not.</span></li>
+      <li><strong>Retrievable at the right moment.</strong><span>Surfaced into the agent&rsquo;s context before it commits to a candidate change, not after.</span></li>
+      <li><strong>Enforceable before code lands.</strong><span>Evaluable by a hook or CI gate that returns a deterministic verdict against the resulting artifact.</span></li>
+      <li><strong>Auditable back to the source decision.</strong><span>Every verdict can be traced to the ADR, PRD, or policy it derives from, so enforcement is reviewable rather than opaque.</span></li>
+    </ol>
+
+    <p>If any one of these is missing, the rule is still doing useful work in the wiki, but it is not yet executable intent. It is documentation that has aspirations.</p>
+
+    <h2>Why this category exists</h2>
+    <p>Without an explicit name for this layer, teams end up putting binding rules into surfaces that were never designed to enforce them: long CLAUDE.md files, system prompts, prose in ADRs, PR review checklists. Each of those is a useful surface for its own purpose. None of them produces a deterministic verdict at the moment of generation.</p>
+    <p>The result is a familiar failure mode: the rule was documented, the agent read it, the agent generated code that contradicted it, and the violation was caught (or missed) only in review. The cause was not missing knowledge. It was the absence of an enforcement surface for the knowledge that was already there.</p>
+
+    <p class="byline" style="margin-top:1.5rem;">See: <a href="/insights/llm-wiki-library-not-law/">Your LLM Wiki Is a Library, Not a Law</a> for the trend-capture version of this argument.</p>
+
+    <h2>How it differs from adjacent concepts</h2>
+
+    <div style="overflow-x:auto;margin:2rem 0;">
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>Layer</th>
+          <th>What it does</th>
+          <th>What it does not do</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>LLM wiki / NotebookLM</td><td>Organizes project knowledge for agent retrieval</td><td>Cannot return a deterministic verdict at generation time</td></tr>
+        <tr><td>Prompt files (CLAUDE.md, AGENTS.md)</td><td>Reminds the agent what generally matters in the repo</td><td>Cannot prevent a session from ignoring or paraphrasing the rule</td></tr>
+        <tr><td>ADRs &amp; PRDs</td><td>Records architectural and product decisions for humans</td><td>Cannot, on their own, enforce themselves on a generated artifact</td></tr>
+        <tr><td>Executable architectural intent</td><td>Binds agent behavior at generation and at merge</td><td>Does not replace any of the layers above &mdash; it sits on top of them</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="callout-teal">
+      <p><strong>Executable architectural intent is the layer that turns selected pieces of project knowledge into rules the agent cannot route around.</strong> It is not a replacement for the wiki or for ADRs. It is the promotion path that some of their contents need to take.</p>
+    </div>
+
+    <h2>How Mneme implements it</h2>
+    <p>Mneme is the infrastructure layer for executable architectural intent. Architectural decisions are encoded in a version-controlled corpus, retrieved through a deterministic scoping layer before agents generate, and validated at the hook and CI levels after generation. Each verdict carries <a href="/concepts/enforcement-provenance/">provenance</a> back to the source decision, so enforcement is reviewable rather than opaque.</p>
+    <p>The wiki keeps doing its job. ADRs keep doing theirs. Mneme handles the promoted slice: the constraints whose violation would make the run wrong.</p>
+
+  </div>
+
+  <section class="article-faq">
+    <h2>Frequently asked questions</h2>
+    <details>
+      <summary>What is executable architectural intent?</summary>
+      <div class="faq-body">Executable architectural intent is the slice of project knowledge that has been promoted from documentation into machine-evaluable, enforceable constraints that bind AI agent behavior at generation time. It is the difference between an ADR an agent can read and a constraint the agent cannot violate.</div>
+    </details>
+    <details>
+      <summary>How is executable architectural intent different from an LLM wiki?</summary>
+      <div class="faq-body">An LLM wiki is a knowledge surface &mdash; it organizes project documentation so AI agents can read it. Executable architectural intent is a control surface &mdash; the subset of that knowledge encoded so it can be retrieved before generation, checked deterministically before merge, and traced back to its source decision. The wiki helps agents understand. Executable intent decides which parts of that understanding are binding.</div>
+    </details>
+    <details>
+      <summary>What criteria turn project knowledge into executable architectural intent?</summary>
+      <div class="faq-body">Five criteria: the knowledge must be explicit (stated as a checkable rule), scoped (tied to the part of the system it governs), retrievable at the right moment (surfaced before the agent generates), enforceable before code lands (a deterministic hook or CI verdict), and auditable back to the source decision (traceable to the ADR or PRD it derives from).</div>
+    </details>
+    <details>
+      <summary>Does every architectural decision need to become executable?</summary>
+      <div class="faq-body">No. Most project knowledge belongs in the wiki and should stay there. Reference material, design history, and rationale need to be findable, not enforceable. Only the subset of architectural intent that has to bind agent behavior &mdash; and that you would reject a PR for violating &mdash; should be promoted into the governance layer. Promotion is a deliberate decision, not an automatic one.</div>
+    </details>
+    <details>
+      <summary>How does Mneme implement executable architectural intent?</summary>
+      <div class="faq-body">Mneme treats architectural decisions as machine-evaluable constraints stored in a version-controlled corpus, retrieves them through a deterministic scoping layer before agents generate, and validates them at the hook and CI levels after generation. Each verdict carries provenance back to the source decision so enforcement is auditable, not opaque.</div>
+    </details>
+  </section>
+
+  <h2 id="related-reading">Related reading</h2>
+  <ul>
+    <li><a href="/concepts/architectural-governance/">Architectural Governance</a></li>
+    <li><a href="/concepts/governance-before-generation/">Governance Before Generation</a></li>
+    <li><a href="/concepts/verification-contracts/">Verification Contracts</a></li>
+    <li><a href="/concepts/deterministic-enforcement/">Deterministic Enforcement</a></li>
+    <li><a href="/concepts/enforcement-provenance/">Enforcement Provenance</a></li>
+    <li><a href="/insights/llm-wiki-library-not-law/">Your LLM Wiki Is a Library, Not a Law</a></li>
+  </ul>
+
+  <footer class="article-footer">
+    <a href="/concepts/" class="back-link">&larr; Back to Concepts</a>
+
+    <div class="cta-block">
+      <h3>Promote the binding slice of your architecture</h3>
+      <p>Mneme is the infrastructure layer for executable architectural intent: machine-evaluable constraints retrieved before agents generate, enforced at CI, traceable back to the source decision.</p>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
+    </div>
+  </footer>
+</article>
+</main>
+
+<footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+  <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/use-cases/">Use cases</a></li>
+        <li><a href="/works-with/">Works with</a></li>
+        <li><a href="/platforms/">Platforms</a></li>
+        <li><a href="/integrations/">Integrations</a></li>
+        <li><a href="/compare/">Compare</a></li>
+        <li><a href="/demo/">Demo</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/insights/">Insights</a></li>
+        <li><a href="/standards/">Standards</a></li>
+        <li><a href="/benchmark/">Benchmark</a></li>
+        <li><a href="/docs/">Docs</a></li>
+        <li><a href="/docs/cli/">CLI reference</a></li>
+        <li><a href="/docs/governance-violations/">Governance violations</a></li>
+        <li><a href="/supported-languages/">Supported languages</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/pilot/" style="color:var(--accent);">Request pilot</a></li>
+        <li><a href="/for/">For teams</a></li>
+        <li><a href="/founder/">Founder</a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/roadmap/">Roadmap</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Code</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="https://github.com/TheoV823/mneme">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://dev.to/mnemehq" target="_blank" rel="noopener">DEV.to</a></li>
+        <li><a href="/privacy/">Privacy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
+    <span style="display:inline-flex;align-items:center;gap:0.75rem;"><a href="/" aria-label="Mneme HQ home" style="display:inline-flex;opacity:0.75;"><img src="/favicon.png" alt="Mneme HQ" height="22" style="display:block;"></a><span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span></span>
+    <nav aria-label="Social media" style="display: flex; align-items: center; gap: 1rem;">
+      <a href="https://github.com/TheoV823/mneme" target="_blank" rel="noopener" aria-label="GitHub" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.16c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.27-1.69-1.27-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.34.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18.92-.26 1.91-.39 2.89-.39.98 0 1.97.13 2.89.39 2.2-1.49 3.17-1.18 3.17-1.18.62 1.58.23 2.75.12 3.04.73.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.26 5.68.41.35.78 1.05.78 2.12v3.15c0 .31.21.67.8.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener" aria-label="LinkedIn" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 .06.77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/@MnemeHQ" target="_blank" rel="noopener" aria-label="YouTube" style="color: var(--muted); display: inline-flex;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.12C19.55 3.5 12 3.5 12 3.5s-7.55 0-9.4.58A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.12c1.85.58 9.4.58 9.4.58s7.55 0 9.4-.58a3 3 0 0 0 2.1-2.12A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8zM9.6 15.57V8.43L15.82 12 9.6 15.57z"/></svg>
+      </a>
+      <a href="https://dev.to/mnemehq" target="_blank" rel="noopener" aria-label="DEV.to" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true"><path d="M120.12 208.29c-3.88-2.9-7.77-4.35-11.65-4.35H91.03v104.47h17.45c3.88 0 7.77-1.45 11.65-4.35 3.88-2.9 5.82-7.25 5.82-13.06v-69.65c-.01-5.8-1.96-10.16-5.83-13.06zM404.1 32H43.9C19.7 32 .06 51.59 0 75.8v360.4C.06 460.41 19.7 480 43.9 480h360.2c24.21 0 43.84-19.59 43.9-43.8V75.8c-.06-24.21-19.7-43.8-43.9-43.8zM154.2 291.19c0 18.81-11.61 47.31-48.36 47.25h-46.4V172.98h47.38c35.44 0 47.36 28.46 47.36 47.28l.02 70.93zm100.68-88.66H201.6v38.42h32.57v29.57H201.6v38.41h53.29v29.57h-62.18c-11.16.29-20.44-8.53-20.72-19.69V193.7c-.27-11.15 8.56-20.41 19.71-20.69h63.19l-.01 29.52zm103.64 115.29c-13.2 30.75-36.85 24.63-47.44 0l-38.53-144.8h32.57l29.71 113.72 29.57-113.72h32.58l-38.46 144.8z"/></svg>
+      </a>
+    </nav>
+    <span>&copy; 2026</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  function setOpen(open){
+    links.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('menu-open', open);
+  }
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    setOpen(!links.classList.contains('open'));
+  });
+  document.addEventListener('click', function(e){
+    if (!links.classList.contains('open')) return;
+    if (links.contains(e.target) || btn.contains(e.target)) return;
+    setOpen(false);
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false);
+  });
+  links.addEventListener('click', function(e){
+    if (e.target.tagName === 'A') setOpen(false);
+  });
+  window.addEventListener('resize', function(){
+    if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false);
+  });
+})();
+</script>
+</body>
+</html>
