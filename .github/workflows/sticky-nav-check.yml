@@ -1,0 +1,33 @@
+name: sticky-nav check
+
+# Catches the mobile-sticky-nav CSS bug that demotes the main top nav
+# from sticky on viewports under 900px. The bug has been fixed three
+# times (e5970e2, a9d27a3, PR #125) but kept reappearing as new pages
+# were scaffolded from older buggy ones. This lint exists to catch the
+# fourth reintroduction at PR time, not on the live site.
+#
+# See scripts/check_sticky_nav.py for the exact patterns and rationale.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check-sticky-nav:
+    name: Scan site/ for the mobile-sticky-nav regression
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run sticky-nav check
+        run: python scripts/check_sticky_nav.py

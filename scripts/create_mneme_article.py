@@ -36,8 +36,16 @@ def cpanel_put(path, content):
         d = json.loads(r.read().decode())
         return d.get('status') == 1
 
-# Fetch index to extract nav HTML (reuse structure)
-index = cpanel_get('index.html')
+# Source the template structure from the local repo (NOT live cPanel).
+#
+# Why: when this script fetched `index.html` over the cPanel API, every new
+# article inherited whatever HTML was live on the production server at the
+# moment of generation. That created a propagation path for any CSS bug
+# present on production — including the mobile-sticky-nav bug that took three
+# fix attempts to land (commits e5970e2, a9d27a3, and PR #125). After this
+# change, the template structure is bound to the repo's reviewed state.
+_repo_index = Path(__file__).parent.parent / 'site' / 'index.html'
+index = _repo_index.read_text(encoding='utf-8')
 
 # Extract nav block
 nav_start = index.find('<nav ')
