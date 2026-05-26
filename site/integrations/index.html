@@ -93,7 +93,7 @@
     .hub-intro { font-size: 0.88rem; color: var(--muted); line-height: 1.8; max-width: 660px; margin: 0 auto 3rem; }
     .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
 
-    .compare-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 1.75rem; display: flex; flex-direction: column; gap: 0.65rem; transition: border-color 0.15s; }
+    .compare-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 1.75rem; display: flex; flex-direction: column; gap: 0.65rem; transition: border-color 0.15s, transform 0.15s, background 0.15s; }
     .compare-card:hover { border-color: var(--border2); }
     .compare-card.coming-soon { opacity: 0.55; }
     .card-meta { display: flex; align-items: center; gap: 0.6rem; }
@@ -105,6 +105,13 @@
     .read-link { color: var(--accent); font-size: 0.82rem; text-decoration: none; }
     .read-link:hover { color: var(--accent-dim); }
     .soon-label { color: var(--muted); font-size: 0.78rem; font-family: 'DM Mono', monospace; }
+
+    /* Whole-card clickable wrapper (mirrors insights .insight-card-link pattern) */
+    .compare-card-link { display: block; text-decoration: none; color: inherit; border-radius: 12px; }
+    .compare-card-link:hover .compare-card { border-color: var(--border2); transform: translateY(-2px); background: rgba(200,240,96,0.025); }
+    .compare-card-link:hover .read-link { color: var(--accent-dim); }
+    .compare-card-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .compare-card-link:focus-visible .compare-card { border-color: var(--accent); }
 
     footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
     footer a { color: var(--muted); text-decoration: none; }
@@ -242,104 +249,122 @@
 
   <div class="cards-grid">
 
-    <div class="compare-card">
-      <div class="card-meta">
-        <span class="card-tag">Native integration</span>
+    <a href="/integrations/claude-code/" class="compare-card-link">
+      <div class="compare-card">
+        <div class="card-meta">
+          <span class="card-tag">Native integration</span>
+        </div>
+        <h3>Governing Claude Code Workflows</h3>
+        <p>Hook-level enforcement for every Edit, Write, and MultiEdit Claude Code attempts. Violations block before they reach disk — no PR required.</p>
+        <div class="card-footer">
+          <span class="read-link">Learn more →</span>
+        </div>
       </div>
-      <h3>Governing Claude Code Workflows</h3>
-      <p>Hook-level enforcement for every Edit, Write, and MultiEdit Claude Code attempts. Violations block before they reach disk — no PR required.</p>
-      <div class="card-footer">
-        <a href="/integrations/claude-code/" class="read-link">Learn more →</a>
-      </div>
-    </div>
+    </a>
 
-    <div class="compare-card">
-      <div class="card-meta">
-        <span class="card-tag">Rules export</span>
+    <a href="/integrations/cursor/" class="compare-card-link">
+      <div class="compare-card">
+        <div class="card-meta">
+          <span class="card-tag">Rules export</span>
+        </div>
+        <h3>Mneme HQ + Cursor</h3>
+        <p>Keep architectural decisions in Mneme's structured corpus. Export to Cursor Rules for every session — one authoritative source, two surfaces.</p>
+        <div class="card-footer">
+          <span class="read-link">Learn more →</span>
+        </div>
       </div>
-      <h3>Mneme HQ + Cursor</h3>
-      <p>Keep architectural decisions in Mneme's structured corpus. Export to Cursor Rules for every session — one authoritative source, two surfaces.</p>
-      <div class="card-footer">
-        <a href="/integrations/cursor/" class="read-link">Learn more →</a>
-      </div>
-    </div>
+    </a>
 
-    <div class="compare-card">
-      <div class="card-meta">
-        <span class="card-tag">CI enforcement</span>
+    <a href="/integrations/github-actions/" class="compare-card-link">
+      <div class="compare-card">
+        <div class="card-meta">
+          <span class="card-tag">CI enforcement</span>
+        </div>
+        <h3>Architectural Governance in GitHub Actions</h3>
+        <p>Run Mneme's enforcement checks against every PR diff. Block merges that violate architectural decisions — a second enforcement layer after generation.</p>
+        <div class="card-footer">
+          <span class="read-link">Learn more →</span>
+        </div>
       </div>
-      <h3>Architectural Governance in GitHub Actions</h3>
-      <p>Run Mneme's enforcement checks against every PR diff. Block merges that violate architectural decisions — a second enforcement layer after generation.</p>
-      <div class="card-footer">
-        <a href="/integrations/github-actions/" class="read-link">Learn more →</a>
-      </div>
-    </div>
+    </a>
 
-    <div class="compare-card">
-      <div class="card-meta">
-        <span class="card-tag">Corpus import</span>
+    <a href="/integrations/adr-import/" class="compare-card-link">
+      <div class="compare-card">
+        <div class="card-meta">
+          <span class="card-tag">Corpus import</span>
+        </div>
+        <h3>Import Existing ADRs</h3>
+        <p>Bring your existing ADR corpus into Mneme's enforcement pipeline. Import, parse, and activate decisions in one command — no manual rewriting.</p>
+        <div class="card-footer">
+          <span class="read-link">Learn more →</span>
+        </div>
       </div>
-      <h3>Import Existing ADRs</h3>
-      <p>Bring your existing ADR corpus into Mneme's enforcement pipeline. Import, parse, and activate decisions in one command — no manual rewriting.</p>
-      <div class="card-footer">
-        <a href="/integrations/adr-import/" class="read-link">Learn more →</a>
-      </div>
-    </div>
+    </a>
 
-    <div class="compare-card">
-      <div class="card-meta">
-        <span class="card-tag">Corpus + CI gate</span>
+    <a href="/integrations/copilot/" class="compare-card-link">
+      <div class="compare-card">
+        <div class="card-meta">
+          <span class="card-tag">Corpus + CI gate</span>
+        </div>
+        <h3>Mneme HQ + GitHub Copilot</h3>
+        <p>Copilot generates in VS Code and JetBrains. Mneme HQ is the constraint layer above it &mdash; one structured decision corpus, enforced at the CI gate and exportable as Cursor Rules.</p>
+        <div class="card-footer">
+          <span class="read-link">Learn more &rarr;</span>
+        </div>
       </div>
-      <h3>Mneme HQ + GitHub Copilot</h3>
-      <p>Copilot generates in VS Code and JetBrains. Mneme HQ is the constraint layer above it &mdash; one structured decision corpus, enforced at the CI gate and exportable as Cursor Rules.</p>
-      <div class="card-footer">
-        <a href="/integrations/copilot/" class="read-link">Learn more &rarr;</a>
-      </div>
-    </div>
+    </a>
 
-    <div class="compare-card">
-      <div class="card-meta">
-        <span class="card-tag">Native integration</span>
+    <a href="/integrations/vscode/" class="compare-card-link">
+      <div class="compare-card">
+        <div class="card-meta">
+          <span class="card-tag">Native integration</span>
+        </div>
+        <h3>Mneme HQ + VS Code</h3>
+        <p>VS Code is the host for Claude Code and Copilot. Mneme's PreToolUse hook governs every Edit, Write, and MultiEdit a Claude Code session attempts &mdash; no extension required.</p>
+        <div class="card-footer">
+          <span class="read-link">Learn more →</span>
+        </div>
       </div>
-      <h3>Mneme HQ + VS Code</h3>
-      <p>VS Code is the host for Claude Code and Copilot. Mneme's PreToolUse hook governs every Edit, Write, and MultiEdit a Claude Code session attempts &mdash; no extension required.</p>
-      <div class="card-footer">
-        <a href="/integrations/vscode/" class="read-link">Learn more →</a>
-      </div>
-    </div>
+    </a>
 
-    <div class="compare-card">
-      <div class="card-meta">
-        <span class="card-tag">CI enforcement</span>
+    <a href="/integrations/gitlab/" class="compare-card-link">
+      <div class="compare-card">
+        <div class="card-meta">
+          <span class="card-tag">CI enforcement</span>
+        </div>
+        <h3>Architectural Governance in GitLab CI</h3>
+        <p>Run Mneme's enforcement checks against every merge request diff. Block pipelines that violate architectural decisions — the same CI gate pattern as GitHub Actions, native to GitLab.</p>
+        <div class="card-footer">
+          <span class="read-link">Learn more &rarr;</span>
+        </div>
       </div>
-      <h3>Architectural Governance in GitLab CI</h3>
-      <p>Run Mneme's enforcement checks against every merge request diff. Block pipelines that violate architectural decisions — the same CI gate pattern as GitHub Actions, native to GitLab.</p>
-      <div class="card-footer">
-        <a href="/integrations/gitlab/" class="read-link">Learn more &rarr;</a>
-      </div>
-    </div>
+    </a>
 
-    <div class="compare-card">
-      <div class="card-meta">
-        <span class="card-tag">Corpus + CI gate</span>
+    <a href="/integrations/jetbrains/" class="compare-card-link">
+      <div class="compare-card">
+        <div class="card-meta">
+          <span class="card-tag">Corpus + CI gate</span>
+        </div>
+        <h3>Mneme HQ + JetBrains IDEs</h3>
+        <p>JetBrains AI Assistant runs across IntelliJ, PyCharm, WebStorm, and the rest of the family. Mneme HQ's decision corpus is the constraint layer those sessions read &mdash; enforced via <code style="font-family:'DM Mono',monospace;font-size:0.82em;">mneme check</code> in CI regardless of the IDE.</p>
+        <div class="card-footer">
+          <span class="read-link">Learn more &rarr;</span>
+        </div>
       </div>
-      <h3>Mneme HQ + JetBrains IDEs</h3>
-      <p>JetBrains AI Assistant runs across IntelliJ, PyCharm, WebStorm, and the rest of the family. Mneme HQ's decision corpus is the constraint layer those sessions read &mdash; enforced via <code style="font-family:'DM Mono',monospace;font-size:0.82em;">mneme check</code> in CI regardless of the IDE.</p>
-      <div class="card-footer">
-        <a href="/integrations/jetbrains/" class="read-link">Learn more &rarr;</a>
-      </div>
-    </div>
+    </a>
 
-    <div class="compare-card">
-      <div class="card-meta">
-        <span class="card-tag">Works alongside</span>
+    <a href="/integrations/warp/" class="compare-card-link">
+      <div class="compare-card">
+        <div class="card-meta">
+          <span class="card-tag">Works alongside</span>
+        </div>
+        <h3>Warp AI Terminal Governance</h3>
+        <p>Warp orchestrates Agent Mode and autonomous execution. Mneme HQ preserves the architectural invariants underneath those loops &mdash; enforced at the file-write boundary regardless of which agent Warp spawns.</p>
+        <div class="card-footer">
+          <span class="read-link">Learn more &rarr;</span>
+        </div>
       </div>
-      <h3>Warp AI Terminal Governance</h3>
-      <p>Warp orchestrates Agent Mode and autonomous execution. Mneme HQ preserves the architectural invariants underneath those loops &mdash; enforced at the file-write boundary regardless of which agent Warp spawns.</p>
-      <div class="card-footer">
-        <a href="/integrations/warp/" class="read-link">Learn more &rarr;</a>
-      </div>
-    </div>
+    </a>
 
     <div class="compare-card coming-soon">
       <div class="card-meta">
@@ -359,16 +384,18 @@
 
   <div class="cards-grid" style="max-width: 900px; margin: 0 auto;">
 
-    <div class="compare-card">
-      <div class="card-meta">
-        <span class="card-tag">Works alongside</span>
+    <a href="/integrations/perplexity/" class="compare-card-link">
+      <div class="compare-card">
+        <div class="card-meta">
+          <span class="card-tag">Works alongside</span>
+        </div>
+        <h3>Perplexity Enterprise</h3>
+        <p>Perplexity gives teams cited, up-to-date answers about technology choices. Mneme takes those choices and makes them enforceable — closing the gap between research rationale and governance constraint.</p>
+        <div class="card-footer">
+          <span class="read-link">Learn more →</span>
+        </div>
       </div>
-      <h3>Perplexity Enterprise</h3>
-      <p>Perplexity gives teams cited, up-to-date answers about technology choices. Mneme takes those choices and makes them enforceable — closing the gap between research rationale and governance constraint.</p>
-      <div class="card-footer">
-        <a href="/integrations/perplexity/" class="read-link">Learn more →</a>
-      </div>
-    </div>
+    </a>
 
   </div>
 
