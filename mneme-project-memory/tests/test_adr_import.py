@@ -187,6 +187,38 @@ def test_apply_import_appends_decisions_to_target_memory(tmp_path):
     assert "no mongodb" in by_id["ADR-101"]["constraints"]
 
 
+def test_apply_import_writes_source_provenance_block(tmp_path):
+    """Each imported decision must carry a `source` block with type/path/sha256
+    so `mneme.adr_freshness.check_freshness` can detect drift later.
+    """
+    import hashlib
+    from mneme.adr_import import apply_import, compile_for_import
+
+    target = tmp_path / "project_memory.json"
+    target.write_text(json.dumps({
+        "meta": {"name": "test", "description": "test"},
+        "items": [], "examples": [], "decisions": [],
+    }), encoding="utf-8")
+
+    report = compile_for_import(FIXTURES / "adrs_import_basic")
+    apply_import(report, target_path=target, allow_update=False)
+
+    persisted = json.loads(target.read_text(encoding="utf-8"))
+    by_id = {d["id"]: d for d in persisted["decisions"]}
+
+    for adr_id in ("ADR-101", "ADR-102"):
+        source = by_id[adr_id].get("source")
+        assert source is not None, f"{adr_id} missing source block"
+        assert source["type"] == "adr"
+        assert source["path"].endswith(".md")
+        assert len(source["sha256"]) == 64  # SHA-256 hex digest
+
+        # Hash must match the bytes the importer actually read from disk.
+        resolved = (target.parent / source["path"]).resolve()
+        expected = hashlib.sha256(resolved.read_bytes()).hexdigest()
+        assert source["sha256"] == expected
+
+
 def test_apply_import_refuses_overwrite_without_allow_update(tmp_path):
     """Same-id collision must block apply unless allow_update=True."""
     from mneme.adr_import import apply_import, compile_for_import

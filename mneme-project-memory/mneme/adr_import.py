@@ -31,6 +31,10 @@ from mneme.adr_compiler import (
 from mneme.adr_parser import parse_adr_directory
 from mneme.schemas import Decision
 
+# Note: mneme.adr_freshness is imported lazily inside ``apply_import`` to
+# avoid a module-init cycle (adr_freshness needs project_decision_graph
+# from this module).
+
 
 GraphStatus = Literal["active", "superseded", "deprecated", "inactive"]
 
@@ -108,12 +112,19 @@ class ImportDiagnostic:
 
 @dataclass(frozen=True)
 class ImportReport:
-    """Output of `compile_for_import`."""
+    """Output of `compile_for_import`.
+
+    ``adr_sources_by_id`` carries the on-disk path of each active ADR so
+    ``apply_import`` can persist a provenance block (path + sha256) on
+    each written decision. Decisions that lack a matching entry get no
+    ``source`` block (e.g. legacy callers constructing reports by hand).
+    """
 
     active_nodes: list[DecisionNode]
     all_nodes: list[DecisionNode]
     decisions: list[Decision]
     diagnostics: list[ImportDiagnostic]
+    adr_sources_by_id: dict[str, str] = field(default_factory=dict)
 
 
 def compile_for_import(adr_dir: str | Path) -> ImportReport:
@@ -151,12 +162,14 @@ def compile_for_import(adr_dir: str | Path) -> ImportReport:
     active_ids = {a.id for a in active_adrs}
     active_nodes = [n for n in all_nodes if n.id in active_ids]
     decisions = adrs_to_decisions(active_adrs)
+    adr_sources_by_id = {a.id: a.source_path for a in active_adrs if a.source_path}
 
     return ImportReport(
         active_nodes=active_nodes,
         all_nodes=all_nodes,
         decisions=decisions,
         diagnostics=diagnostics,
+        adr_sources_by_id=adr_sources_by_id,
     )
 
 
@@ -296,6 +309,8 @@ def apply_import(
 
     Returns the list of ids actually written, in input order.
     """
+    from mneme.adr_freshness import compute_source_hash, relative_source_path
+
     target_path = Path(target_path)
 
     has_active_active = any(
@@ -324,6 +339,13 @@ def apply_import(
             "created_at": decision.created_at,
             "updated_at": decision.updated_at,
         }
+        source_path = report.adr_sources_by_id.get(decision.id)
+        if source_path:
+            entry["source"] = {
+                "type": "adr",
+                "path": relative_source_path(source_path, target_path),
+                "sha256": compute_source_hash(source_path),
+            }
         if decision.id in existing_idx:
             if not allow_update:
                 raise RuntimeError(

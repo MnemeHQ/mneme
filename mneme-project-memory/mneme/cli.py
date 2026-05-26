@@ -30,6 +30,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
+from mneme.adr_freshness import FreshnessIssue, check_freshness
 from mneme.adr_import import (
     apply_import,
     compile_for_import,
@@ -144,8 +145,29 @@ def _cmd_check(args: argparse.Namespace) -> int:
             print(f"      {v.decision_text}")
         print()
 
+    # ADR freshness diagnostics are warn-only: they print to stdout but
+    # never influence the exit code. Skipped silently when adr_dir is
+    # absent so existing CLI output is unchanged for projects that do
+    # not use ADRs.
+    freshness = check_freshness(memory_path=args.memory, adr_dir=args.adr_dir)
+    if freshness:
+        for issue in freshness:
+            _print_freshness_issue(issue)
+        print()
+
     print(f"Result: {result.verdict.value}")
     return _EXIT_CODES_BY_MODE[args.mode][result.verdict]
+
+
+def _print_freshness_issue(issue: FreshnessIssue) -> None:
+    """Render one freshness diagnostic with a distinct ``ADR_*`` token.
+
+    Format is intentionally different from enforcement violations so
+    operators can grep ``mneme check`` output without ambiguity.
+    """
+    print(f"WARN  {issue.code:15}  [{issue.adr_id}] {issue.message}")
+    if issue.path:
+        print(f"      source: {issue.path}")
 
 
 # ── Subcommand: cursor generate ──────────────────────────────────────────────
@@ -297,6 +319,14 @@ def _build_parser() -> argparse.ArgumentParser:
     p_check.add_argument(
         "--mode", choices=["warn", "strict"], default="strict",
         help="warn: all verdicts exit 0; strict (default): WARN->1, FAIL->2",
+    )
+    p_check.add_argument(
+        "--adr-dir", dest="adr_dir", default="docs/adr",
+        help=(
+            "Directory containing ADR markdown files to check for freshness "
+            "drift (warn-only; never affects exit code). "
+            "Defaults to docs/adr; freshness is skipped silently if absent."
+        ),
     )
     p_check.set_defaults(func=_cmd_check)
 
