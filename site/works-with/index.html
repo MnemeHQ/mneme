@@ -86,7 +86,7 @@
     .group-lede { font-size: 0.86rem; color: var(--muted); line-height: 1.8; max-width: 660px; margin: 0 0 1.5rem; }
     .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
 
-    .compare-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 1.75rem; display: flex; flex-direction: column; gap: 0.65rem; transition: border-color 0.15s; }
+    .compare-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 1.75rem; display: flex; flex-direction: column; gap: 0.65rem; transition: border-color 0.15s, transform 0.15s, background 0.15s; }
     .compare-card:hover { border-color: var(--border2); }
     .compare-card .card-meta { display: flex; align-items: center; gap: 0.6rem; }
     .compare-card .card-tag { font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-family: 'DM Mono', monospace; }
@@ -97,6 +97,13 @@
     .compare-card .card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 0.25rem; }
     .compare-card .read-link { color: var(--accent); font-size: 0.82rem; text-decoration: none; }
     .compare-card .read-link:hover { color: var(--accent-dim); }
+
+    /* Whole-card clickable wrapper (mirrors insights .insight-card-link pattern) */
+    .compare-card-link { display: block; text-decoration: none; color: inherit; border-radius: 12px; }
+    .compare-card-link:hover .compare-card { border-color: var(--border2); transform: translateY(-2px); background: rgba(200,240,96,0.025); }
+    .compare-card-link:hover .read-link { color: var(--accent-dim); }
+    .compare-card-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .compare-card-link:focus-visible .compare-card { border-color: var(--accent); }
 
     .messaging-block { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.2rem 1.5rem; margin: 2rem 0 0; font-size: 0.88rem; color: var(--muted); line-height: 1.75; max-width: 900px; }
     .messaging-block strong { color: var(--accent); }
@@ -333,6 +340,14 @@
       <p>Llama-class models served via vLLM, Ollama, Together, Groq, and similar runtimes.</p>
     </div>
 
+    <div class="compare-card">
+      <div class="card-meta">
+        <span class="card-tag">Open weight &middot; designed to support</span>
+      </div>
+      <h3>Nous Hermes</h3>
+      <p>Nous Research's open-weight Hermes models accessed via hosted or self-hosted inference. Mneme is model-agnostic; the decision corpus is injected at the runtime seam regardless of which Hermes variant the agent is running.</p>
+    </div>
+
   </div>
 
   <div class="messaging-block">
@@ -344,27 +359,31 @@
 
   <div class="cards-grid">
 
-    <div class="compare-card native">
-      <div class="card-meta">
-        <span class="card-tag">Native integration</span>
+    <a href="/integrations/claude-code/" class="compare-card-link">
+      <div class="compare-card native">
+        <div class="card-meta">
+          <span class="card-tag">Native integration</span>
+        </div>
+        <h3>Claude Code</h3>
+        <p>Hook-level enforcement via SessionStart, PreToolUse, and PostToolUse. One of the three documented native integrations.</p>
+        <div class="card-footer">
+          <span class="read-link">Integration page &rarr;</span>
+        </div>
       </div>
-      <h3>Claude Code</h3>
-      <p>Hook-level enforcement via SessionStart, PreToolUse, and PostToolUse. One of the three documented native integrations.</p>
-      <div class="card-footer">
-        <a href="/integrations/claude-code/" class="read-link">Integration page &rarr;</a>
-      </div>
-    </div>
+    </a>
 
-    <div class="compare-card native">
-      <div class="card-meta">
-        <span class="card-tag">Native integration</span>
+    <a href="/integrations/cursor/" class="compare-card-link">
+      <div class="compare-card native">
+        <div class="card-meta">
+          <span class="card-tag">Native integration</span>
+        </div>
+        <h3>Cursor</h3>
+        <p>Rules export from the Mneme decision corpus into Cursor's rules system. One of the three documented native integrations.</p>
+        <div class="card-footer">
+          <span class="read-link">Integration page &rarr;</span>
+        </div>
       </div>
-      <h3>Cursor</h3>
-      <p>Rules export from the Mneme decision corpus into Cursor's rules system. One of the three documented native integrations.</p>
-      <div class="card-footer">
-        <a href="/integrations/cursor/" class="read-link">Integration page &rarr;</a>
-      </div>
-    </div>
+    </a>
 
     <div class="compare-card">
       <div class="card-meta">
@@ -404,6 +423,14 @@
       </div>
       <h3>Roo Code</h3>
       <p>Works alongside Roo Code's agent surface for governance across its editing and execution paths.</p>
+    </div>
+
+    <div class="compare-card">
+      <div class="card-meta">
+        <span class="card-tag">CLI agent &middot; designed to support</span>
+      </div>
+      <h3>Grok Build CLI</h3>
+      <p>xAI's CLI coding agent. No documented native integration today; designed to be governable at the file-write boundary like other CLI agents &mdash; the architectural corpus stays enforceable at the CI gate regardless of which agent produced the diff.</p>
     </div>
 
   </div>
@@ -487,16 +514,18 @@
       <p>Runs alongside the developer's editor and CLI agents; governance enforced before the file is written.</p>
     </div>
 
-    <div class="compare-card">
-      <div class="card-meta">
-        <span class="card-tag">AI-native terminal &middot; works alongside</span>
+    <a href="/integrations/warp/" class="compare-card-link">
+      <div class="compare-card">
+        <div class="card-meta">
+          <span class="card-tag">AI-native terminal &middot; works alongside</span>
+        </div>
+        <h3>Warp</h3>
+        <p>Works alongside Warp&rsquo;s AI-native terminal and autonomous execution workflows. Warp accelerates how teams run agents and orchestrate tasks; Mneme preserves the architectural invariants underneath those execution loops.</p>
+        <div class="card-footer">
+          <span class="read-link">Integration page &rarr;</span>
+        </div>
       </div>
-      <h3>Warp</h3>
-      <p>Works alongside Warp&rsquo;s AI-native terminal and autonomous execution workflows. Warp accelerates how teams run agents and orchestrate tasks; Mneme preserves the architectural invariants underneath those execution loops.</p>
-      <div class="card-footer">
-        <a href="/integrations/warp/" class="read-link">Integration page &rarr;</a>
-      </div>
-    </div>
+    </a>
 
     <div class="compare-card">
       <div class="card-meta">
@@ -506,16 +535,18 @@
       <p>Compatible with standard CI runners as a pre-merge governance check on AI-generated diffs.</p>
     </div>
 
-    <div class="compare-card native">
-      <div class="card-meta">
-        <span class="card-tag">Native integration</span>
+    <a href="/integrations/github-actions/" class="compare-card-link">
+      <div class="compare-card native">
+        <div class="card-meta">
+          <span class="card-tag">Native integration</span>
+        </div>
+        <h3>GitHub Actions</h3>
+        <p><code style="font-family:'DM Mono',monospace;font-size:0.82em;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:0.05rem 0.4rem;color:var(--text);">mneme check</code> on every PR diff. One of the three documented native integrations.</p>
+        <div class="card-footer">
+          <span class="read-link">Integration page &rarr;</span>
+        </div>
       </div>
-      <h3>GitHub Actions</h3>
-      <p><code style="font-family:'DM Mono',monospace;font-size:0.82em;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:0.05rem 0.4rem;color:var(--text);">mneme check</code> on every PR diff. One of the three documented native integrations.</p>
-      <div class="card-footer">
-        <a href="/integrations/github-actions/" class="read-link">Integration page &rarr;</a>
-      </div>
-    </div>
+    </a>
 
     <div class="compare-card">
       <div class="card-meta">
