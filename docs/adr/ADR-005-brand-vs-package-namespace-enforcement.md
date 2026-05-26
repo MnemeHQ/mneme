@@ -1,3 +1,12 @@
+---
+id: ADR-005
+title: "Brand vs Package Namespace Enforcement"
+status: accepted
+priority: normal
+date: 2026-05-04
+scope: brand.namespace
+---
+
 # ADR-005: Brand vs Package Namespace Enforcement
 
 **Status:** Accepted

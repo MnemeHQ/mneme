@@ -1,3 +1,12 @@
+---
+id: ADR-012
+title: "Conceptual-authority discipline for /concepts/, /insights/, and recurring frames"
+status: accepted
+priority: normal
+date: 2026-05-15
+scope: site.conceptual_authority
+---
+
 # ADR-012: Conceptual-authority discipline for /concepts/, /insights/, and recurring frames
 
 **Status:** Accepted

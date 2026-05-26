@@ -1,3 +1,12 @@
+---
+id: ADR-004
+title: "Brand Rename — Mneme to Mneme HQ"
+status: accepted
+priority: normal
+date: 2026-05-03
+scope: brand.naming
+---
+
 # ADR-004: Brand Rename — Mneme to Mneme HQ
 
 ## Status

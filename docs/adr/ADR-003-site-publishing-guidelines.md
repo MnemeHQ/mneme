@@ -1,3 +1,12 @@
+---
+id: ADR-003
+title: "Site Publishing Guidelines"
+status: accepted
+priority: normal
+date: 2026-05-01
+scope: site.publishing
+---
+
 # ADR-003: Site Publishing Guidelines
 
 **Status:** Accepted  

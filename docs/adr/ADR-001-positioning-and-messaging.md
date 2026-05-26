@@ -1,3 +1,12 @@
+---
+id: ADR-001
+title: "Mneme HQ Positioning and Messaging Rules"
+status: accepted
+priority: normal
+date: 2026-05-03
+scope: positioning
+---
+
 # ADR-001: Mneme HQ Positioning and Messaging Rules
 
 ## Status

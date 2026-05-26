@@ -1,3 +1,12 @@
+---
+id: ADR-010
+title: "Automation-generated artifacts must inherit repository governance conventions"
+status: accepted
+priority: normal
+date: 2026-05-14
+scope: automation.governance
+---
+
 # ADR-010: Automation-generated artifacts must inherit repository governance conventions
 
 **Status:** Accepted  

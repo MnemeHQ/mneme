@@ -1,3 +1,12 @@
+---
+id: ADR-007
+title: "OG Image Generation for Social Sharing"
+status: accepted
+priority: normal
+date: 2026-05-06
+scope: site.og_images
+---
+
 # ADR-007: OG Image Generation for Social Sharing
 
 **Status:** Accepted  

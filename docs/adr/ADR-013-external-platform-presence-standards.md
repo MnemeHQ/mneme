@@ -1,4 +1,19 @@
-# ADR-010: External Platform Presence Standards
+---
+id: ADR-013
+title: "External Platform Presence Standards"
+status: accepted
+priority: normal
+date: 2026-05-14
+scope: distribution.external_platforms
+---
+
+# ADR-013: External Platform Presence Standards
+
+> Note: this ADR was originally numbered ADR-010 and was renumbered to ADR-013
+> during the 2026-05-26 legacy-ADR normalization pass (see PR following
+> [issue #139](https://github.com/TheoV823/mneme/issues/139)). The original
+> ADR-010 number now belongs to "Automation-generated artifacts must inherit
+> repository governance conventions"; this ADR's content is unchanged.
 
 **Status:** Accepted  
 **Date:** 2026-05-14  

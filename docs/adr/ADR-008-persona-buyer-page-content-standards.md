@@ -1,3 +1,12 @@
+---
+id: ADR-008
+title: "Persona / Buyer-Page Content Standards"
+status: accepted
+priority: normal
+date: 2026-05-10
+scope: site.persona_pages
+---
+
 # ADR-008: Persona / Buyer-Page Content Standards
 
 **Status:** Accepted

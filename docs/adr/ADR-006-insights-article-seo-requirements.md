@@ -1,3 +1,12 @@
+---
+id: ADR-006
+title: "Insights Article SEO and Schema Requirements"
+status: accepted
+priority: normal
+date: 2026-05-06
+scope: site.insights_seo
+---
+
 # ADR-006: Insights Article SEO and Schema Requirements
 
 **Status:** Accepted  

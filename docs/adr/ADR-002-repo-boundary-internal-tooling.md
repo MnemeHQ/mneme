@@ -1,3 +1,12 @@
+---
+id: ADR-002
+title: "Repository Boundary for Internal Operational Tooling"
+status: accepted
+priority: normal
+date: 2026-05-01
+scope: repo.boundary
+---
+
 # ADR-002: Repository Boundary for Internal Operational Tooling
 
 **Status:** Accepted  

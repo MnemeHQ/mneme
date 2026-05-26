@@ -1,3 +1,12 @@
+---
+id: ADR-009
+title: "Automation file writes must specify explicit text encodings"
+status: accepted
+priority: normal
+date: 2026-05-12
+scope: automation.encoding
+---
+
 # ADR-009: Automation file writes must specify explicit text encodings
 
 **Status:** Accepted  

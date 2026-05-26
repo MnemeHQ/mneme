@@ -1,4 +1,20 @@
-# ADR-011: Harness-Complementary Positioning Vocabulary
+---
+id: ADR-014
+title: "Harness-Complementary Positioning Vocabulary"
+status: accepted
+priority: normal
+date: 2026-05-16
+scope: positioning.harness_vocab
+---
+
+# ADR-014: Harness-Complementary Positioning Vocabulary
+
+> Note: this ADR was originally numbered ADR-011 and was renumbered to ADR-014
+> during the 2026-05-26 legacy-ADR normalization pass (see PR following
+> [issue #139](https://github.com/TheoV823/mneme/issues/139)). The original
+> ADR-011 number now belongs to "Knowledge-graph content architecture";
+> this ADR's content is unchanged except for cross-references to the renumbered
+> external-platform-presence ADR (now ADR-013).
 
 **Status:** Accepted
 **Date:** 2026-05-16
@@ -111,9 +127,9 @@ the canonical references. When in doubt, copy phrasing from there.
   than as part of this decision.
 - The `/architecture/` and `/works-with/` surfaces, refreshed in Wave 2,
   are bound by this ADR as soon as it lands.
-- Awesome-list and directory submissions (ADR-010, external platform
+- Awesome-list and directory submissions (ADR-013, external platform
   presence) inherit the prohibitions in §3 implicitly — the existing copy
-  variants in ADR-010 already conform, but future variants must.
+  variants in ADR-013 already conform, but future variants must.
 
 ---
 
@@ -126,7 +142,7 @@ the canonical references. When in doubt, copy phrasing from there.
   this ADR governs how the product is *positioned*, not what it is *called*.
 - **ADR-006** — Insights Article SEO Requirements. New insights articles
   must satisfy ADR-006 *and* this ADR. The two are independent gates.
-- **ADR-010 (external platform presence)** — locks external copy variants.
+- **ADR-013 (external platform presence)** — locks external copy variants.
   New variants must conform to the prohibitions in §3 above.
 - `docs/plans/2026-05-16-wave-2-ontology-followups.md` — the Wave 2 plan
   this ADR completes.

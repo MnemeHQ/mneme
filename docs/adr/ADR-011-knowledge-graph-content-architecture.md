@@ -1,3 +1,12 @@
+---
+id: ADR-011
+title: "Knowledge-graph content architecture for /concepts/ and /insights/"
+status: accepted
+priority: normal
+date: 2026-05-15
+scope: site.knowledge_graph
+---
+
 # ADR-011: Knowledge-graph content architecture for /concepts/ and /insights/
 
 **Status:** Accepted
