@@ -156,3 +156,58 @@ def test_check_without_adr_dir_default_missing_is_silent(tmp_path, capsys):
     assert "ADR_UNIMPORTED" not in out
     assert "ADR_CHANGED" not in out
     assert "ADR_MISSING" not in out
+    assert "ADR_UNPARSEABLE" not in out
+
+
+def test_check_emits_unparseable_diagnostic(tmp_path, capsys):
+    """An ADR-shaped file without valid frontmatter surfaces as
+    ADR_UNPARSEABLE in mneme check output (warn-only)."""
+    adr_dir = tmp_path / "docs" / "adr"
+    adr_dir.mkdir(parents=True)
+    (adr_dir / "ADR-777-broken.md").write_text(
+        "# ADR-777: legacy header only\n\nno yaml here\n",
+        encoding="utf-8",
+    )
+
+    mem = _memory(tmp_path)
+    inp = _input(tmp_path)
+
+    code = main([
+        "check",
+        "--memory", str(mem),
+        "--input", str(inp),
+        "--query", "storage",
+        "--mode", "warn",
+        "--adr-dir", str(adr_dir),
+    ])
+
+    out = capsys.readouterr().out
+    assert "ADR_UNPARSEABLE" in out
+    assert "ADR-777" in out
+    # Warn-only: exit code follows enforcer verdict, not freshness.
+    assert code == 0
+
+
+def test_check_ignores_non_adr_markdown_in_adr_dir(tmp_path, capsys):
+    """README.md / notes.md in --adr-dir must not produce any ADR_*
+    warnings (not UNPARSEABLE, not UNIMPORTED, not anything)."""
+    adr_dir = tmp_path / "docs" / "adr"
+    adr_dir.mkdir(parents=True)
+    (adr_dir / "README.md").write_text("# Index of ADRs\n", encoding="utf-8")
+    (adr_dir / "notes.md").write_text("scratch\n", encoding="utf-8")
+
+    mem = _memory(tmp_path)
+    inp = _input(tmp_path)
+
+    main([
+        "check",
+        "--memory", str(mem),
+        "--input", str(inp),
+        "--query", "storage",
+        "--mode", "warn",
+        "--adr-dir", str(adr_dir),
+    ])
+
+    out = capsys.readouterr().out
+    for code in ("ADR_UNIMPORTED", "ADR_CHANGED", "ADR_MISSING", "ADR_UNPARSEABLE"):
+        assert code not in out

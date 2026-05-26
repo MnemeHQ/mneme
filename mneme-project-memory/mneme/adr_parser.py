@@ -45,7 +45,12 @@ def parse_adr_file(path: str | Path) -> ADR:
 
 
 def parse_adr_directory(directory: str | Path) -> list[ADR]:
-    """Parse every ``.md`` file in ``directory`` and return a sorted list.
+    """Parse every ``ADR-*.md`` file in ``directory`` and return a sorted list.
+
+    The glob is restricted to ``ADR-*.md`` so that incidental markdown in
+    the ADR directory (a ``README.md`` index, scratch ``notes.md``, work-
+    in-progress ``draft.md``) does not crash the strict ADR parser. Files
+    that do not match the ``ADR-`` filename prefix are ignored entirely.
 
     Files are sorted by ADR id for deterministic output regardless of
     filesystem ordering.
@@ -57,7 +62,7 @@ def parse_adr_directory(directory: str | Path) -> list[ADR]:
         A list of ``ADR`` records, sorted by ``id``.
     """
     directory = Path(directory)
-    adrs = [parse_adr_file(p) for p in sorted(directory.glob("*.md"))]
+    adrs = [parse_adr_file(p) for p in sorted(directory.glob("ADR-*.md"))]
     return sorted(adrs, key=lambda a: a.id)
 
 

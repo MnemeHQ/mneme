@@ -52,3 +52,19 @@ def test_malformed_yaml_raises_parse_error():
 def test_parse_adr_file_missing_file_raises():
     with pytest.raises(FileNotFoundError):
         parse_adr_file(VALID_DIR / "does-not-exist.md")
+
+
+def test_parse_directory_ignores_non_adr_markdown(tmp_path):
+    """parse_adr_directory must restrict itself to ADR-*.md files so that
+    incidental markdown (README, scratch notes) in the ADR directory does
+    not crash the strict parser."""
+    (tmp_path / "ADR-001-real.md").write_text(
+        "---\nid: ADR-001\ntitle: real\nstatus: accepted\npriority: normal\n"
+        "date: 2026-01-01\nscope: test\n---\n\nbody\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "README.md").write_text("# Index\n", encoding="utf-8")
+    (tmp_path / "notes.md").write_text("scratch\n", encoding="utf-8")
+
+    adrs = parse_adr_directory(tmp_path)
+    assert [a.id for a in adrs] == ["ADR-001"]

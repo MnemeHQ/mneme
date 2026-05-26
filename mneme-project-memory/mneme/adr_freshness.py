@@ -47,19 +47,23 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 from mneme.adr_import import project_decision_graph
-from mneme.adr_parser import parse_adr_directory
+from mneme.adr_parser import parse_adr_file
 
 
 ADR_UNIMPORTED = "ADR_UNIMPORTED"
 ADR_CHANGED = "ADR_CHANGED"
 ADR_MISSING = "ADR_MISSING"
+ADR_UNPARSEABLE = "ADR_UNPARSEABLE"
 
 _SOURCE_TYPE_ADR = "adr"
+_ADR_GLOB = "ADR-*.md"
+_ADR_ID_FROM_NAME = re.compile(r"^(ADR-\d+)")
 
 
 @dataclass(frozen=True)
@@ -132,11 +136,26 @@ def check_freshness(
     raw_decisions = _load_raw_decisions(memory_path)
     decisions_by_id: dict[str, dict] = {d["id"]: d for d in raw_decisions if "id" in d}
 
-    active_adr_ids, adrs_by_id = _active_adrs(adr_dir)
+    active_adr_ids, adrs_by_id, parse_errors = _scan_adr_directory(adr_dir)
 
+    unparseable: list[FreshnessIssue] = []
     unimported: list[FreshnessIssue] = []
     changed: list[FreshnessIssue] = []
     missing: list[FreshnessIssue] = []
+
+    # ADR_UNPARSEABLE: surface per-file parse failures so a single bad
+    # ADR does not silently zero out the rest of the scan.
+    for path, message in parse_errors:
+        unparseable.append(FreshnessIssue(
+            code=ADR_UNPARSEABLE,
+            adr_id=_id_from_filename(path),
+            path=str(path),
+            message=(
+                f"{path.name} could not be parsed as an ADR: {message}. "
+                f"Fix the frontmatter or rename the file out of the "
+                f"ADR-*.md pattern."
+            ),
+        ))
 
     # ADR_UNIMPORTED + ADR_CHANGED: scan the on-disk active corpus.
     for adr_id in sorted(active_adr_ids):
@@ -200,7 +219,7 @@ def check_freshness(
                 ),
             ))
 
-    return unimported + changed + missing
+    return unparseable + unimported + changed + missing
 
 
 # ── internals ─────────────────────────────────────────────────────────────────
@@ -222,26 +241,49 @@ def _load_raw_decisions(memory_path: Path) -> list[dict]:
     return [d for d in raw if isinstance(d, dict)]
 
 
-def _active_adrs(adr_dir: Path):
-    """Parse the ADR directory and return (active_id_set, adr_id_to_ADR_map).
+def _scan_adr_directory(adr_dir: Path):
+    """Scan ADR-*.md files individually, separating parsed from failed.
+
+    Returns ``(active_id_set, adr_id_to_ADR_map, parse_errors)`` where
+    parse_errors is a list of ``(path, message)`` tuples for files whose
+    name matches ``ADR-*.md`` but whose contents could not be parsed.
 
     "Active" mirrors the import contract: ``project_decision_graph`` marks
     accepted-and-not-superseded ADRs as ``status == "active"``. Proposed,
     deprecated, and superseded ADRs are not expected in memory and do not
     trigger UNIMPORTED.
 
-    Parse errors are swallowed -- the freshness checker is warn-only and
-    must not crash an unrelated ``mneme check`` invocation.
-    """
-    try:
-        adrs = parse_adr_directory(adr_dir)
-    except Exception:
-        return set(), {}
+    Non-ADR markdown files (``README.md``, ``notes.md``, ``draft.md``,
+    anything else) are ignored entirely by virtue of the ``ADR-*.md``
+    glob -- they are neither parsed nor reported as errors.
 
-    nodes = project_decision_graph(adrs)
+    Per-file errors are captured rather than raised: one bad ADR must
+    not silently zero out the rest of the scan (the prior behavior),
+    and the checker is warn-only so it must never crash an unrelated
+    ``mneme check`` invocation.
+    """
+    parsed: list = []
+    parse_errors: list[tuple[Path, str]] = []
+    for path in sorted(adr_dir.glob(_ADR_GLOB)):
+        try:
+            parsed.append(parse_adr_file(path))
+        except Exception as exc:
+            parse_errors.append((path, str(exc)))
+
+    nodes = project_decision_graph(parsed)
     active_ids = {n.id for n in nodes if n.status == "active"}
-    by_id = {a.id: a for a in adrs}
-    return active_ids, by_id
+    by_id = {a.id: a for a in parsed}
+    return active_ids, by_id, parse_errors
+
+
+def _id_from_filename(path: Path) -> str:
+    """Extract the ``ADR-NNN`` prefix from a filename, else use the stem.
+
+    Used to label ADR_UNPARSEABLE diagnostics when the file's body cannot
+    be parsed and the declared frontmatter id is therefore unknown.
+    """
+    m = _ADR_ID_FROM_NAME.match(path.name)
+    return m.group(1) if m else path.stem
 
 
 def _coerce_source(value: Any) -> dict | None:
@@ -255,6 +297,7 @@ __all__ = [
     "ADR_UNIMPORTED",
     "ADR_CHANGED",
     "ADR_MISSING",
+    "ADR_UNPARSEABLE",
     "FreshnessIssue",
     "check_freshness",
     "compute_source_hash",

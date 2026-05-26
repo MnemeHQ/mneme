@@ -20,6 +20,7 @@ from mneme.adr_freshness import (
     ADR_CHANGED,
     ADR_MISSING,
     ADR_UNIMPORTED,
+    ADR_UNPARSEABLE,
     FreshnessIssue,
     check_freshness,
 )
@@ -234,3 +235,76 @@ def test_issue_carries_path_and_message(tmp_path):
     assert i.adr_id == "ADR-006"
     assert "ADR-006-shape.md" in i.path
     assert i.message  # non-empty
+
+
+# ── ADR_UNPARSEABLE ───────────────────────────────────────────────────────────
+
+
+def test_unparseable_adr_produces_warning(tmp_path):
+    """An ADR-shaped filename whose contents lack required frontmatter
+    surfaces as ADR_UNPARSEABLE -- silently swallowing it would let real
+    governance content drop out of the active set without explanation.
+    """
+    memory, adr_dir = _layout(tmp_path)
+    bad = adr_dir / "ADR-998-bad.md"
+    bad.write_text("# ADR-998: Legacy heading\n\nNo frontmatter here.\n",
+                   encoding="utf-8")
+    _write_memory(memory, decisions=[])
+
+    issues = check_freshness(memory_path=memory, adr_dir=adr_dir)
+    unparseable = [i for i in issues if i.code == ADR_UNPARSEABLE]
+    assert len(unparseable) == 1
+    issue = unparseable[0]
+    assert issue.adr_id == "ADR-998"
+    assert "ADR-998-bad.md" in issue.path
+    assert issue.message  # non-empty
+    # An unparseable file must NOT also be reported as UNIMPORTED -- we
+    # don't know its declared status, so we can't claim it should be in
+    # memory.
+    assert [i for i in issues if i.code == ADR_UNIMPORTED] == []
+
+
+def test_unparseable_adr_does_not_block_parseable_neighbors(tmp_path):
+    """One bad ADR must not silence diagnostics for other ADRs in the
+    same directory. Prior to this issue, a single parse error swallowed
+    the entire scan and produced zero diagnostics."""
+    memory, adr_dir = _layout(tmp_path)
+    _write_adr(adr_dir / "ADR-100-good.md", "ADR-100")
+    (adr_dir / "ADR-101-bad.md").write_text("no frontmatter\n", encoding="utf-8")
+    _write_memory(memory, decisions=[])
+
+    issues = check_freshness(memory_path=memory, adr_dir=adr_dir)
+    codes_by_id = {(i.adr_id, i.code) for i in issues}
+    assert ("ADR-100", ADR_UNIMPORTED) in codes_by_id
+    assert ("ADR-101", ADR_UNPARSEABLE) in codes_by_id
+
+
+# ── non-ADR markdown ignored ──────────────────────────────────────────────────
+
+
+def test_non_adr_markdown_in_adr_dir_is_ignored(tmp_path):
+    """README.md / NOTES.md / draft.md in docs/adr/ are not ADRs.
+    Freshness scanning must ignore them so a stray notes file does not
+    produce noise (and does not produce a false ADR_UNPARSEABLE either).
+    """
+    memory, adr_dir = _layout(tmp_path)
+    (adr_dir / "README.md").write_text("# Index of ADRs\n", encoding="utf-8")
+    (adr_dir / "notes.md").write_text("scratchpad\n", encoding="utf-8")
+    (adr_dir / "draft.md").write_text("---\nfoo: bar\n---\n", encoding="utf-8")
+    _write_memory(memory, decisions=[])
+
+    issues = check_freshness(memory_path=memory, adr_dir=adr_dir)
+    assert issues == []
+
+
+def test_non_adr_markdown_ignored_alongside_real_adrs(tmp_path):
+    """Mix of valid ADR-*.md plus stray markdown -> only the ADR matters."""
+    memory, adr_dir = _layout(tmp_path)
+    _write_adr(adr_dir / "ADR-200-real.md", "ADR-200")
+    (adr_dir / "README.md").write_text("not an ADR\n", encoding="utf-8")
+    _write_memory(memory, decisions=[])
+
+    issues = check_freshness(memory_path=memory, adr_dir=adr_dir)
+    assert len(issues) == 1
+    assert issues[0].code == ADR_UNIMPORTED
+    assert issues[0].adr_id == "ADR-200"
