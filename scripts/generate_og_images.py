@@ -135,6 +135,14 @@ TEMPLATE_MAP = {
     "og-privacy.html": "privacy/og.png",
     "og-works-with.html": "works-with/og.png",
     "og-integration-claude-agent-sdk.html": "integrations/claude-agent-sdk/og.png",
+
+    # Insights — new
+    "og-insights-governance-perimeter-endpoint.html": "insights/governance-perimeter-is-moving-to-the-endpoint/og.png",
+    "og-insights-html-not-the-point.html": "insights/html-is-not-the-point-structure-is/og.png",
+    "og-insights-runtime-vs-architectural.html": "insights/runtime-verification-is-not-architectural-verification/og.png",
+    "og-insights-ai-roi-systems.html": "insights/ai-roi-problem-is-about-systems-not-models/og.png",
+    "og-insights-anthropic-coordination.html": "insights/anthropic-research-system-coordination-infrastructure/og.png",
+    "og-insights-pr-review-incident.html": "insights/pr-review-is-becoming-incident-response/og.png",
 }
 
 PORT = 8765
