@@ -6,11 +6,26 @@ Adding a new article under `site/insights/<slug>/index.html` is **not enough on 
 
 For every `site/insights/<slug>/index.html`, the following must all be true:
 
+**Registration**
+
 1. **Sitemap entry** — a `<url><loc>https://mnemehq.com/insights/<slug>/</loc>...</url>` block in [`site/sitemap.xml`](../../site/sitemap.xml).
-2. **Insights hub card** — an `<a href="/insights/<slug>/" class="insight-card-link">...</a>` card on [`site/insights/index.html`](../../site/insights/index.html) (and a matching entry in the page's `schema.org` `hasPart` JSON-LD array).
+2. **Insights hub card** — an `<a href="/insights/<slug>/" class="insight-card-link">...</a>` card on [`site/insights/index.html`](../../site/insights/index.html).
 3. **Local OG image** — `og.png` co-located in the article directory: `site/insights/<slug>/og.png`.
 4. **OG meta tags resolve** — both `<meta property="og:image">` and `<meta name="twitter:image">` in the article must point to a PNG file that actually exists under `site/`.
 5. **At least one incoming internal link** — at least one other HTML file under `site/` must link to `/insights/<slug>/`. The hub card from check (2) satisfies this; reciprocal links from related articles are recommended for SEO depth.
+
+**Breadcrumb**
+
+6. **Visible breadcrumb nav** — `<nav class="breadcrumb-nav">` block with exactly three `<li>` items: `Home` linking to `/`, `Insights` linking to `/insights/`, and the current page (no `<a>` or `aria-current="page"`).
+7. **BreadcrumbList JSON-LD** — a `schema.org` `BreadcrumbList` entry whose `itemListElement` has 3 items at positions 1, 2, 3 with `item` URLs matching `https://mnemehq.com/`, `https://mnemehq.com/insights/`, and `https://mnemehq.com/insights/<slug>/`.
+
+**Article schema**
+
+8. **TechArticle/Article JSON-LD** — exactly one `schema.org` `TechArticle` (or `Article`) entry with `url` matching `https://mnemehq.com/insights/<slug>/` and a non-empty `headline`.
+
+**Hub schema**
+
+9. **CollectionPage hasPart entry** — the slug must appear in the `hasPart` array of the `CollectionPage` JSON-LD on the hub. The visible card (check 2) and the hub `hasPart` entry can drift independently and are both consumed by search engines; both must be present.
 
 ## How to register a new insight
 
@@ -45,11 +60,27 @@ Append a `<url>` block to `site/sitemap.xml`:
 </url>
 ```
 
-### 3. Insights hub card
+### 3. Insights hub card and `hasPart`
 
-Add a card to `site/insights/index.html` in the most thematically appropriate `cards-section` (e.g. `governance-problem`, `ai-native`, `market-context`). Mirror the structure of neighboring cards: eyebrow tag, read time, `<h3>` title, summary `<p>`, and the `read-pill` footer. Also append a matching `{"@type": "Article", "name": "...", "url": "..."}` entry to the `hasPart` array in the `CollectionPage` JSON-LD block at the top of the file.
+Add a card to `site/insights/index.html` in the most thematically appropriate `cards-section` (e.g. `governance-problem`, `ai-native`, `market-context`). Mirror the structure of neighboring cards: eyebrow tag, read time, `<h3>` title, summary `<p>`, and the `read-pill` footer.
 
-### 4. Internal links
+**Also append a matching entry to the `hasPart` array** in the `CollectionPage` JSON-LD block at the top of the file. The visible card and the `hasPart` entry are checked independently — both are required.
+
+```json
+{"@type": "Article", "name": "Your Title", "url": "https://mnemehq.com/insights/<slug>/"}
+```
+
+### 4. Breadcrumb and article schema
+
+Every article must include:
+
+- A visible `<nav class="breadcrumb-nav">` block with three items: `Home -> Insights -> article`.
+- A `BreadcrumbList` JSON-LD entry in `<head>` whose `itemListElement` mirrors the visible breadcrumb.
+- A `TechArticle` (or `Article`) JSON-LD entry in `<head>` with `url` matching the article's canonical URL and a non-empty `headline`.
+
+The existing article template under any recent `site/insights/<slug>/index.html` (for example, [`why-context-alone-doesnt-prevent-architectural-drift`](../../site/insights/why-context-alone-doesnt-prevent-architectural-drift/index.html)) is the canonical reference — copy its `<head>` JSON-LD and breadcrumb-nav block and substitute slug + title + headline.
+
+### 5. Internal links
 
 The hub card from step 3 already satisfies the "at least one incoming internal link" requirement. For SEO depth, also add reciprocal cross-links from thematically related insights (the article's own `related-essays` panel links outward; the reciprocal inward links are the high-value pairing).
 
@@ -65,6 +96,10 @@ Exit code is `0` if every article is fully registered, `1` if any check fails. E
   my-new-article/
     - Missing sitemap entry for site/insights/my-new-article/
     - Missing og.png for site/insights/my-new-article/
+    - Missing breadcrumb nav block in my-new-article: expected <nav class="breadcrumb-nav"> with Home -> Insights -> article
+    - BreadcrumbList JSON-LD missing from my-new-article
+    - TechArticle/Article JSON-LD missing from my-new-article: add a schema.org TechArticle entry with url and headline
+    - Missing hub CollectionPage hasPart entry for my-new-article: add {"@type": "Article", "name": "<title>", "url": "https://mnemehq.com/insights/my-new-article/"} to the hasPart array in site/insights/index.html
     - No incoming internal links found for my-new-article
 ```
 
