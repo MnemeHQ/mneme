@@ -143,6 +143,12 @@ TEMPLATE_MAP = {
     "og-insights-ai-roi-systems.html": "insights/ai-roi-problem-is-about-systems-not-models/og.png",
     "og-insights-anthropic-coordination.html": "insights/anthropic-research-system-coordination-infrastructure/og.png",
     "og-insights-pr-review-incident.html": "insights/pr-review-is-becoming-incident-response/og.png",
+    # Backfill — pre-existing templates missing from TEMPLATE_MAP, plus a new
+    # template for agentic-infrastructure-attack-surface (PNG rendered for
+    # the validator's og.png check)
+    "og-insights-rag.html": "insights/rag-is-not-memory/og.png",
+    "og-insights-ai-operating-layer.html": "insights/ai-is-becoming-the-operating-layer-for-software-execution/og.png",
+    "og-insights-agentic-attack-surface.html": "insights/agentic-infrastructure-attack-surface/og.png",
 }
 
 PORT = 8765
