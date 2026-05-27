@@ -624,8 +624,22 @@ python demo.py --dry-run
 ## Quickstart
 
 ```bash
-git clone https://github.com/mneme-project/mneme-project-memory
-cd mneme-project-memory
+pip install mneme-hq
+mneme --help
+```
+
+```bash
+# Check a prompt against project decisions
+mneme check --memory .mneme/project_memory.json --input prompt.txt --query "storage backend"
+```
+
+### Development install
+
+To run the demo or contribute:
+
+```bash
+git clone https://github.com/TheoV823/mneme
+cd mneme/mneme-project-memory
 
 # Core only
 pip install -e .
@@ -659,8 +673,7 @@ python demo.py --context-only
 - Python 3.11+
 - `anthropic` >= 0.25.0
 - `python-dotenv` >= 1.0.0
-
-That is the entire dependency list.
+- `PyYAML` >= 6.0
 
 ## Example: project_memory.json
 
