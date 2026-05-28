@@ -1,0 +1,47 @@
+name: check compare hub invariants
+
+# Validates that every site/compare/<slug>/index.html is fully registered:
+# hub card link, sitemap entry, hub CollectionPage.hasPart entry, hub ItemList
+# entry with matching numberOfItems, byline counter, OG template, and OG
+# generator TEMPLATE_MAP entry.
+#
+# Validator: scripts/check_compare.py
+#
+# Path filter: only runs on PRs that touch the surfaces where registration
+# can drift out of sync — comparison pages, the hub, the sitemap, the OG
+# templates, and the publishing scripts.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'site/compare/**'
+      - 'site/og-compare-*.html'
+      - 'site/sitemap.xml'
+      - 'scripts/**'
+  push:
+    branches: [main]
+    paths:
+      - 'site/compare/**'
+      - 'site/og-compare-*.html'
+      - 'site/sitemap.xml'
+      - 'scripts/**'
+
+permissions:
+  contents: read
+
+jobs:
+  check-compare:
+    name: check_compare.py
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run compare hub validator
+        run: python scripts/check_compare.py
