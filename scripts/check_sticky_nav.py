@@ -30,11 +30,18 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_ROOTS = ["site"]
 
-# Pattern A: any of the three selector variants paired with
-# `position: relative; padding: 1rem 1.25rem;` (the combined form that
-# tends to appear inside @media (max-width: 900px)).
+# Pattern A (original order): any of the three selector variants paired with
+# `position: relative; padding: 1rem 1.25rem;` inside @media (max-width: 900px).
 PATTERN_A = re.compile(
     r'\b(?:nav|nav, nav\.site-nav|nav\.site) \{ position: relative; padding: 1rem 1\.25rem; \}'
+)
+
+# Pattern A2 (reverse order): same selectors paired with `padding` first then
+# `position: relative;`. CSS-equivalent to Pattern A — order of declarations
+# inside a rule does not affect computed style — but earlier regex missed it
+# and 46 site files shipped with the bug undetected until 2026-05-28.
+PATTERN_A2 = re.compile(
+    r'\b(?:nav|nav, nav\.site-nav|nav\.site) \{ padding: 1rem 1\.25rem; position: relative; \}'
 )
 
 # Pattern B: orphan `nav { position: relative; }` line on its own,
@@ -50,7 +57,11 @@ def scan(roots: list[str]) -> list[tuple[Path, str, int]]:
             continue
         for path in root.rglob("*.html"):
             text = path.read_text(encoding="utf-8", errors="replace")
-            for label, pat in (("combined", PATTERN_A), ("orphan", PATTERN_B)):
+            for label, pat in (
+                ("combined", PATTERN_A),
+                ("combined-reverse", PATTERN_A2),
+                ("orphan", PATTERN_B),
+            ):
                 for m in pat.finditer(text):
                     line = text.count("\n", 0, m.start()) + 1
                     findings.append((path.relative_to(REPO_ROOT), label, line))
