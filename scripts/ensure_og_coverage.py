@@ -586,6 +586,44 @@ TEMPLATES = [
         "Claude Agent SDK handles execution. Mneme handles architectural constraints.",
         "integrations/claude-agent-sdk",
     ),
+    # === BATCH: Market context + research + Antigravity cluster (May 2026) ===
+    ("og-insights-ms-agentic-playbook.html", "Insights", "Microsoft's Agentic Transformation Playbook", "46px", "Why enterprise AI agents need governance infrastructure, not just better models.", "insights/microsoft-agentic-transformation-playbook-ai-agent-governance"),
+    ("og-insights-constraint-decay.html", "Insights", "Constraint Decay in Coding Agents", "52px", "Agents satisfy loose specs but lose structural fidelity as constraints accumulate.", "insights/constraint-decay-coding-agents-architectural-governance"),
+    ("og-insights-ai-peer-review.html", "Insights", "AI Peer Review and Context Loss", "52px", "GPT-5.2 outperformed top human reviewers — and still missed context already in the source.", "insights/ai-peer-review-context-loss-governance"),
+    ("og-insights-ms-agent-forge.html", "Insights", "Microsoft Agent Forge and the Next AI Infrastructure Layer", "42px", "Once orchestration commoditizes, governance becomes the differentiator.", "insights/microsoft-agent-forge-enterprise-ai-infrastructure"),
+    ("og-insights-machine-readable-prs.html", "Insights", "Machine-Readable Pull Requests", "52px", "Human-readable PRs explain. Machine-readable PRs allow verification.", "insights/machine-readable-pull-requests-agentic-development"),
+    ("og-insights-long-context-governance.html", "Insights", "Long Context Does Not Eliminate Governance", "46px", "The reranker became optional. Retrieval did not. Governance is the missing layer.", "insights/long-context-windows-governance-infrastructure"),
+    ("og-insights-agent-runtime-governance.html", "Insights", "Agent Runtime Governance", "52px", "What Google Managed Agents signals about the next AI infrastructure layer.", "insights/agent-runtime-governance"),
+    ("og-insights-mistral-vibe.html", "Insights", "Mistral Vibe and AI Coding Infrastructure", "46px", "Coding agents are becoming multi-surface execution systems.", "insights/mistral-vibe-ai-coding-enterprise-infrastructure"),
+    ("og-insights-coordination-governance.html", "Insights", "The Next AI Infrastructure Layer Is Coordination Governance", "40px", "Subagents parallelize execution. They also parallelize inconsistency.", "insights/coordination-governance-multi-agent-systems"),
+    ("og-insights-determinism-probabilistic.html", "Insights", "Rebuilding Determinism Around Probabilistic Models", "42px", "The AI stack is reintroducing the layers software engineering already developed.", "insights/ai-stack-determinism-probabilistic-models"),
+    ("og-insights-snowflake-report.html", "Insights", "Snowflake's AI Data Engineering Report", "46px", "Data engineering is evolving into governance engineering.", "insights/snowflake-ai-data-engineering-governance-infrastructure"),
+    ("og-insights-claude-marketplace.html", "Insights", "The Emerging AI Engineering Control Plane", "46px", "What Anthropic's Claude Marketplace reveals about the post-Copilot stack.", "insights/anthropic-claude-marketplace-ai-engineering-control-plane"),
+    ("og-insights-devin-governance.html", "Insights", "Devin and the Next Layer of AI Infrastructure", "46px", "Autonomous software engineers make the governance gap visible.", "insights/devin-ai-software-engineer-governance"),
+    ("og-insights-antigravity-coordination.html", "Insights", "Antigravity Solves Coordination, Not Governance", "44px", "Antigravity makes agent work visible. The next layer has to make it governable.", "insights/antigravity-solves-coordination-not-governance"),
+    ("og-insights-artifacts-not-governance.html", "Insights", "Artifacts Are Not Governance", "60px", "A screenshot can prove the browser opened. It cannot prove the architecture held.", "insights/artifacts-are-not-governance"),
+    ("og-insights-agent-manager-control.html", "Insights", "The Agent Manager Is the New Control Plane", "46px", "Manager views without policy are dashboards. Add policy and they become control planes.", "insights/agent-manager-control-plane-governance"),
+    ("og-insights-agent-first-ides.html", "Insights", "Why Agent-First IDEs Need Architectural Invariants", "42px", "Delegated tasks need shared constraints, encoded and enforced.", "insights/agent-first-ides-need-architectural-invariants"),
+    ("og-insights-governance-category.html", "Insights", "The Next AI Infrastructure Category Is Governance", "42px", "Every infrastructure wave creates a governance layer. AI coding is next.", "insights/ai-infrastructure-governance-category"),
+    ("og-insights-liskov-python.html", "Insights", "Liskov's Python Critique Predicts the Governance Problem", "40px", "Encapsulation that's advisory holds at human pace. It does not survive agent velocity.", "insights/barbara-liskov-python-encapsulation-ai-governance"),
+    # === BATCH: New concepts ===
+    ("og-concepts-runtime-governance.html", "Concept", "Runtime Governance", "62px", "Enforcement across long-running autonomous execution environments.", "concepts/runtime-governance"),
+    ("og-concepts-autonomous-se-governance.html", "Concept", "Autonomous Software Engineering Governance", "44px", "The enforcement layer for AI-driven software execution systems.", "concepts/autonomous-software-engineering-governance"),
+    ("og-concepts-agentic-ide-governance.html", "Concept", "Agentic IDE Governance", "62px", "The control layer for autonomous agents inside development environments.", "concepts/agentic-ide-governance"),
+    ("og-concepts-multi-agent-drift.html", "Concept", "Multi-Agent Architectural Drift", "52px", "When parallel agents each make plausible changes without a shared enforcement layer.", "concepts/multi-agent-architectural-drift"),
+    ("og-concepts-artifact-provenance.html", "Concept", "Artifact Provenance", "62px", "Provenance explains what happened. Governance constrains what is allowed.", "concepts/artifact-provenance"),
+    ("og-concepts-antigravity-governance.html", "Concept", "Antigravity Governance", "62px", "Architectural control for agent-first IDEs.", "concepts/antigravity-governance"),
+    ("og-concepts-ai-governance-infrastructure.html", "Concept", "AI Governance Infrastructure", "52px", "The deterministic enforcement layer for AI-assisted software development.", "concepts/ai-governance-infrastructure"),
+    # === BATCH: New integrations ===
+    ("og-integration-ms-agent-forge.html", "Integration", "Architectural Governance for Microsoft Agent Forge", "40px", "Mneme adds deterministic governance on top of Agent Forge's execution substrate.", "integrations/microsoft-agent-forge"),
+    ("og-integration-antigravity.html", "Integration", "Architectural Governance for Google Antigravity", "42px", "Repo-native governance alongside Antigravity's editor, terminal, and browser surfaces.", "integrations/antigravity"),
+    # === BATCH: New works-with sub-pages ===
+    ("og-works-with-claude-marketplace.html", "Works With", "Mneme Works Alongside the Claude Marketplace", "42px", "The architectural governance layer above generation, memory, orchestration, and review.", "works-with/claude-marketplace"),
+    ("og-works-with-devin.html", "Works With", "Mneme Works Alongside Devin", "52px", "Devin executes. Mneme preserves architectural intent across that execution.", "works-with/devin"),
+    ("og-works-with-antigravity.html", "Works With", "Mneme Works Alongside Google Antigravity", "44px", "Architectural governance alongside agent-first development environments.", "works-with/antigravity"),
+    # === BATCH: New compare pages ===
+    ("og-compare-devin-vs-governance.html", "Compare", "Devin vs Architectural Governance", "52px", "Why autonomous coding agents still need deterministic enforcement.", "compare/devin-vs-architectural-governance"),
+    ("og-compare-antigravity-vs-mneme.html", "Compare", "Google Antigravity vs Mneme", "52px", "Agentic IDEs vs architectural governance. Different layers; they compose.", "compare/google-antigravity-vs-mneme"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -655,6 +693,44 @@ NEW_MAP_ENTRIES = {
     "og-privacy.html": "privacy/og.png",
     "og-works-with.html": "works-with/og.png",
     "og-integration-claude-agent-sdk.html": "integrations/claude-agent-sdk/og.png",
+    # Batch May 2026: insights
+    "og-insights-ms-agentic-playbook.html": "insights/microsoft-agentic-transformation-playbook-ai-agent-governance/og.png",
+    "og-insights-constraint-decay.html": "insights/constraint-decay-coding-agents-architectural-governance/og.png",
+    "og-insights-ai-peer-review.html": "insights/ai-peer-review-context-loss-governance/og.png",
+    "og-insights-ms-agent-forge.html": "insights/microsoft-agent-forge-enterprise-ai-infrastructure/og.png",
+    "og-insights-machine-readable-prs.html": "insights/machine-readable-pull-requests-agentic-development/og.png",
+    "og-insights-long-context-governance.html": "insights/long-context-windows-governance-infrastructure/og.png",
+    "og-insights-agent-runtime-governance.html": "insights/agent-runtime-governance/og.png",
+    "og-insights-mistral-vibe.html": "insights/mistral-vibe-ai-coding-enterprise-infrastructure/og.png",
+    "og-insights-coordination-governance.html": "insights/coordination-governance-multi-agent-systems/og.png",
+    "og-insights-determinism-probabilistic.html": "insights/ai-stack-determinism-probabilistic-models/og.png",
+    "og-insights-snowflake-report.html": "insights/snowflake-ai-data-engineering-governance-infrastructure/og.png",
+    "og-insights-claude-marketplace.html": "insights/anthropic-claude-marketplace-ai-engineering-control-plane/og.png",
+    "og-insights-devin-governance.html": "insights/devin-ai-software-engineer-governance/og.png",
+    "og-insights-antigravity-coordination.html": "insights/antigravity-solves-coordination-not-governance/og.png",
+    "og-insights-artifacts-not-governance.html": "insights/artifacts-are-not-governance/og.png",
+    "og-insights-agent-manager-control.html": "insights/agent-manager-control-plane-governance/og.png",
+    "og-insights-agent-first-ides.html": "insights/agent-first-ides-need-architectural-invariants/og.png",
+    "og-insights-governance-category.html": "insights/ai-infrastructure-governance-category/og.png",
+    "og-insights-liskov-python.html": "insights/barbara-liskov-python-encapsulation-ai-governance/og.png",
+    # Batch May 2026: concepts
+    "og-concepts-runtime-governance.html": "concepts/runtime-governance/og.png",
+    "og-concepts-autonomous-se-governance.html": "concepts/autonomous-software-engineering-governance/og.png",
+    "og-concepts-agentic-ide-governance.html": "concepts/agentic-ide-governance/og.png",
+    "og-concepts-multi-agent-drift.html": "concepts/multi-agent-architectural-drift/og.png",
+    "og-concepts-artifact-provenance.html": "concepts/artifact-provenance/og.png",
+    "og-concepts-antigravity-governance.html": "concepts/antigravity-governance/og.png",
+    "og-concepts-ai-governance-infrastructure.html": "concepts/ai-governance-infrastructure/og.png",
+    # Batch May 2026: integrations
+    "og-integration-ms-agent-forge.html": "integrations/microsoft-agent-forge/og.png",
+    "og-integration-antigravity.html": "integrations/antigravity/og.png",
+    # Batch May 2026: works-with sub-pages
+    "og-works-with-claude-marketplace.html": "works-with/claude-marketplace/og.png",
+    "og-works-with-devin.html": "works-with/devin/og.png",
+    "og-works-with-antigravity.html": "works-with/antigravity/og.png",
+    # Batch May 2026: compare
+    "og-compare-devin-vs-governance.html": "compare/devin-vs-architectural-governance/og.png",
+    "og-compare-antigravity-vs-mneme.html": "compare/google-antigravity-vs-mneme/og.png",
 }
 
 # ---------------------------------------------------------------------------

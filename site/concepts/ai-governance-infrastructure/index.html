@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Governance Infrastructure &mdash; Mneme HQ Concepts</title>
+  <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/fonts.css">
+  <meta name="description" content="AI governance infrastructure is the deterministic enforcement layer that preserves architectural intent across AI-assisted software development. It is the inevitable next category in the AI engineering stack — the same shape every previous infrastructure wave produced once it became autonomous enough to need it." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/concepts/ai-governance-infrastructure/" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="AI Governance Infrastructure" />
+  <meta property="og:description" content="The deterministic enforcement layer that preserves architectural intent across AI-assisted software development." />
+  <meta property="og:url" content="https://mnemehq.com/concepts/ai-governance-infrastructure/" />
+  <meta property="og:image" content="https://mnemehq.com/concepts/ai-governance-infrastructure/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="AI Governance Infrastructure" />
+  <meta name="twitter:description" content="The deterministic enforcement layer that preserves architectural intent across AI-assisted software development." />
+  <meta name="twitter:image" content="https://mnemehq.com/concepts/ai-governance-infrastructure/og.png" />
+  <meta name="author" content="Theo Valmis" />
+  <meta property="article:published_time" content="2026-05-28T00:00:00Z" />
+  <meta property="article:author" content="https://mnemehq.com/founder/" />
+  <meta property="article:section" content="Concepts" />
+
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{'analytics_storage':'granted','ad_storage':'denied','ad_user_data':'denied','ad_personalization':'denied'});</script>
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <link rel="icon" href="/favicon.png" type="image/png">
+
+  <script type="application/ld+json">
+  {"@context": "https://schema.org", "@graph": [
+    {"@type": "BreadcrumbList", "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+      {"@type": "ListItem", "position": 2, "name": "Concepts", "item": "https://mnemehq.com/concepts/"},
+      {"@type": "ListItem", "position": 3, "name": "AI Governance Infrastructure", "item": "https://mnemehq.com/concepts/ai-governance-infrastructure/"}
+    ]},
+    {"@type": "DefinedTerm", "name": "AI Governance Infrastructure", "description": "The deterministic enforcement layer that preserves architectural intent across AI-assisted software development. The category that emerges once AI coding agents reach the velocity and autonomy at which human review can no longer carry the governance load alone.", "url": "https://mnemehq.com/concepts/ai-governance-infrastructure/", "inDefinedTermSet": "https://mnemehq.com/concepts/"},
+    {"@type": "TechArticle", "headline": "AI Governance Infrastructure", "url": "https://mnemehq.com/concepts/ai-governance-infrastructure/", "datePublished": "2026-05-28", "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"}, "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/"}}
+  ]}
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d; --border: #222226; --border2: #2e2e34; --text: #e8e8ec; --muted: #a8a8b8; --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+    .article-wrap { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 7rem; }
+    .article-header { margin-bottom: 3.5rem; }
+    .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+    .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
+    .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
+    .article-body p strong { color: var(--text); font-weight: 500; }
+    .article-body ul { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body li { margin-bottom: 0.5rem; }
+    .article-body li strong { color: var(--text); font-weight: 500; }
+    .article-body a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(200,240,96,0.3); }
+    .article-body a:hover { border-bottom-color: var(--accent); }
+    .definition-card { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.5rem 1.75rem; margin: 0 0 2.5rem; }
+    .definition-card .def-label { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.6rem; }
+    .definition-card p { margin: 0; color: var(--text); font-size: 0.98rem; line-height: 1.75; }
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout p strong { color: var(--accent); }
+    .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .back-link:hover { color: var(--text); }
+    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2rem; }
+    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--accent-dim); }
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+    .breadcrumb-nav { max-width: 720px; margin: 0 auto; padding: 1.75rem 2rem 0.85rem; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.82rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; padding: 0; flex-shrink: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; transition: border-color 0.15s, background 0.15s; }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span { display: block; width: 18px; height: 2px; background: currentColor; border-radius: 1px; transition: transform 0.25s ease, opacity 0.18s ease; transform-origin: center; }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+    @media (max-width: 900px) {
+      html, body { overflow-x: clip; }
+      body.menu-open { overflow: hidden; }
+      nav, nav.site-nav { padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 1.25rem; z-index: 99; max-height: 0; overflow: hidden; opacity: 0; visibility: hidden; transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s; }
+      .nav-links.open { max-height: 80vh; opacity: 1; visibility: visible; padding: 0.5rem 1.25rem 1.25rem; transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s; overflow-y: auto; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.92rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+      .article-wrap { padding: 3rem 1.25rem 5rem; }
+    }
+    @media (max-width: 768px) { nav, .mobile-menu { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } }
+  </style>
+</head>
+<body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/concepts/" class="active">Concepts</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/benchmark/">Benchmark</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<nav class="breadcrumb-nav" aria-label="Breadcrumb">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/concepts/">Concepts</a></li>
+    <li aria-current="page">AI Governance Infrastructure</li>
+  </ol>
+</nav>
+
+<article class="article-wrap">
+  <header class="article-header">
+    <div class="article-eyebrow"><span class="eyebrow-tag">Concept</span><span class="eyebrow-dot"></span><span class="eyebrow-meta">8 min read</span></div>
+    <h1>AI Governance Infrastructure</h1>
+    <p class="article-lede">The infrastructure category that emerges once AI coding agents reach the velocity and autonomy at which human review can no longer carry the governance load alone.</p>
+    <p class="byline">By <a href="/founder/">Theo Valmis</a><span class="sep">&middot;</span><time datetime="2026-05-28">May 2026</time></p>
+  </header>
+
+  <div class="article-body">
+
+    <div class="definition-card">
+      <div class="def-label">Definition</div>
+      <p><strong>AI governance infrastructure</strong> is the deterministic enforcement layer that preserves architectural intent across AI-assisted software development. It compiles architectural decisions into machine-evaluable constraints, applies them at every execution surface an AI agent touches, and produces structured verdicts that travel with the codebase regardless of which agent or tool produced the change.</p>
+    </div>
+
+    <h2>Why the category emerges</h2>
+    <p>Every previous infrastructure wave produced a governance layer once the underlying capability became autonomous enough to outpace manual oversight. Cloud computing produced security and compliance infrastructure. CI/CD produced observability. Data platforms produced lineage and data governance. The pattern is consistent: when the capability layer scales past human-paced review, a specialized governance layer arrives to carry the load.</p>
+    <p>AI coding agents have crossed that threshold. The dominant failure mode is no longer the model writing something wrong; it is the system as a whole drifting from its intended architecture as agent velocity rises. That is the operational regime where governance categories emerge.</p>
+    <div class="callout"><p><strong>Infrastructure categories emerge when scale creates operational failure modes humans can no longer manage manually.</strong> AI coding is now in that regime.</p></div>
+
+    <h2>What it is not</h2>
+    <p>To anchor the boundary precisely:</p>
+    <ul>
+      <li><strong>Not memory or retrieval</strong> &mdash; recall is a probabilistic input. Governance is a deterministic gate.</li>
+      <li><strong>Not prompting</strong> &mdash; prompts are suggestions; governance is a contract.</li>
+      <li><strong>Not orchestration</strong> &mdash; orchestration coordinates execution; governance constrains it.</li>
+      <li><strong>Not observability</strong> &mdash; observability explains drift; governance prevents it.</li>
+      <li><strong>Not policy paperwork</strong> &mdash; AI governance infrastructure is technical infrastructure, evaluated at execution boundaries, not documents reviewed quarterly.</li>
+    </ul>
+
+    <h2>Core capabilities</h2>
+    <p>The shape the category is settling into &mdash; capabilities that show up across the products and platforms now addressing this layer:</p>
+    <ul>
+      <li><strong>ADR enforcement</strong> &mdash; architectural decisions compiled into machine-evaluable constraints</li>
+      <li><strong>Architectural policy engines</strong> &mdash; deterministic checks against the constraint set</li>
+      <li><strong>Governance propagation</strong> &mdash; the same compiled rules reach every agent, tool, and CI surface</li>
+      <li><strong>Deterministic retrieval</strong> &mdash; same task, same state, same surfaced decisions</li>
+      <li><strong>Policy compilation</strong> &mdash; turning rules into binary verdicts at every execution boundary</li>
+      <li><strong>Execution-surface verification</strong> &mdash; hook, commit, PR, CI &mdash; not just one of them</li>
+      <li><strong>Provenance-aware enforcement</strong> &mdash; every verdict traceable to the originating decision</li>
+      <li><strong>Machine-readable architectural constraints</strong> &mdash; rules carried as structured artifacts, not paragraphs</li>
+    </ul>
+
+    <h2>Relationship to existing concepts</h2>
+    <p>AI governance infrastructure is the umbrella category. Concepts already in this ontology specialize it for specific surfaces and disciplines:</p>
+    <ul>
+      <li><a href="/concepts/governance-infrastructure/">Governance Infrastructure</a> &mdash; the platform layer that encodes, distributes, versions, and enforces decisions</li>
+      <li><a href="/concepts/architectural-governance/">Architectural Governance</a> &mdash; architecture made executable; the discipline at the core of the category</li>
+      <li><a href="/concepts/runtime-governance/">Runtime Governance</a> &mdash; enforcement across long-running autonomous execution</li>
+      <li><a href="/concepts/agentic-ide-governance/">Agentic IDE Governance</a> &mdash; the IDE-surface specialization</li>
+      <li><a href="/concepts/autonomous-software-engineering-governance/">Autonomous Software Engineering Governance</a> &mdash; the agent-era discipline</li>
+      <li><a href="/concepts/governance-before-generation/">Governance Before Generation</a> &mdash; the timing principle</li>
+      <li><a href="/concepts/governance-propagation/">Governance Propagation</a> &mdash; the mechanism that makes rules reach every surface</li>
+      <li><a href="/concepts/verification-contracts/">Verification Contracts</a> &mdash; the predefined-check primitive</li>
+      <li><a href="/concepts/architectural-drift/">Architectural Drift</a> &mdash; the failure mode this category prevents</li>
+    </ul>
+
+    <h2>The long-term claim</h2>
+    <p>The shift the category sits inside:</p>
+    <div class="callout"><p><strong>From:</strong> human-authored systems with AI assistance.<br><strong>To:</strong> AI-generated systems with human governance.</p></div>
+    <p>That transition does not remove the need for engineering judgment. It moves it up a layer &mdash; from per-line authorship to defining the constraints the system writes lines under. AI governance infrastructure is the technical substrate that makes that move survivable.</p>
+
+  </div>
+
+  <footer class="article-footer">
+    <a href="/concepts/" class="back-link">&larr; Back to Concepts</a>
+    <div class="cta-block">
+      <h3>AI governance infrastructure, open source</h3>
+      <p>Mneme compiles ADRs into deterministic verdicts that travel with the repo and reach every agent, tool, and CI surface &mdash; the open-source layer for this category.</p>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
+    </div>
+  </footer>
+</article>
+</main>
+
+<footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+  <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+    <div><div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div><ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;"><li><a href="/use-cases/">Use cases</a></li><li><a href="/works-with/">Works with</a></li><li><a href="/platforms/">Platforms</a></li><li><a href="/integrations/">Integrations</a></li><li><a href="/compare/">Compare</a></li><li><a href="/demo/">Demo</a></li></ul></div>
+    <div><div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div><ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;"><li><a href="/concepts/">Concepts</a></li><li><a href="/architecture/">Architecture</a></li><li><a href="/insights/">Insights</a></li><li><a href="/qa-glossary/">Q&amp;A and Glossary</a></li><li><a href="/standards/">Standards</a></li><li><a href="/benchmark/">Benchmark</a></li><li><a href="/docs/">Docs</a></li></ul></div>
+    <div><div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div><ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;"><li><a href="/pilot/" style="color:var(--accent);">Request pilot</a></li><li><a href="/for/">For teams</a></li><li><a href="/founder/">Founder</a></li><li><a href="/about/">About</a></li><li><a href="/roadmap/">Roadmap</a></li><li><a href="/contact/">Contact</a></li></ul></div>
+    <div><div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Code</div><ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;"><li><a href="https://github.com/TheoV823/mneme">GitHub</a></li><li><a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a></li><li><a href="https://dev.to/mnemehq" target="_blank" rel="noopener">DEV.to</a></li><li><a href="/privacy/">Privacy</a></li></ul></div>
+  </div>
+  <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
+    <span style="display:inline-flex;align-items:center;gap:0.75rem;"><a href="/" aria-label="Mneme HQ home" style="display:inline-flex;opacity:0.75;"><img src="/favicon.png" alt="Mneme HQ" height="22" style="display:block;"></a><span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span></span>
+    <span>&copy; 2026</span>
+  </div>
+</footer>
+
+<script>(function(){var path=window.location.pathname;document.querySelectorAll('.nav-links a').forEach(function(a){var href=a.getAttribute('href');if(href&&href.startsWith('/')&&href!=='/'&&path.startsWith(href)){a.classList.add('active');}});})();</script>
+<script>(function(){var btn=document.querySelector('.nav-hamburger');var links=document.querySelector('.nav-links');if(!btn||!links)return;function setOpen(open){links.classList.toggle('open',open);btn.setAttribute('aria-expanded',String(open));document.body.classList.toggle('menu-open',open);}btn.addEventListener('click',function(e){e.stopPropagation();setOpen(!links.classList.contains('open'));});document.addEventListener('click',function(e){if(!links.classList.contains('open'))return;if(links.contains(e.target)||btn.contains(e.target))return;setOpen(false);});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&links.classList.contains('open'))setOpen(false);});links.addEventListener('click',function(e){if(e.target.tagName==='A')setOpen(false);});window.addEventListener('resize',function(){if(window.innerWidth>900&&links.classList.contains('open'))setOpen(false);});})();</script>
+</body>
+</html>
