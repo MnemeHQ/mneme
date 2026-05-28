@@ -135,8 +135,10 @@
     .hub-intro { font-size: 0.88rem; color: var(--muted); line-height: 1.8; max-width: 660px; margin: 0 auto 3rem; }
     .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
 
-    .compare-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 1.75rem; display: flex; flex-direction: column; gap: 0.65rem; transition: border-color 0.15s; }
-    .compare-card:hover { border-color: var(--border2); }
+    .compare-card-link { display: block; text-decoration: none; color: inherit; }
+    .compare-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 1.75rem; display: flex; flex-direction: column; gap: 0.65rem; transition: border-color 0.15s, transform 0.18s ease, background 0.15s; height: 100%; }
+    .compare-card-link:hover .compare-card { border-color: var(--border2); transform: translateY(-2px); background: rgba(200,240,96,0.025); }
+    .compare-card-link:hover .read-link { color: var(--accent-dim); }
     .compare-card.coming-soon { opacity: 0.55; }
     .card-meta { display: flex; align-items: center; gap: 0.6rem; }
     .card-tag { font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-family: 'DM Mono', monospace; }
@@ -323,70 +325,80 @@
 
   <div class="cards-grid">
 
-    <div class="compare-card">
-      <div class="card-meta">
-        <span class="card-tag">AI Code Review</span>
-        <span class="card-dot"></span>
-        <span class="card-tag">6 min read</span>
+    <a href="/compare/coderabbit/" class="compare-card-link">
+      <div class="compare-card">
+        <div class="card-meta">
+          <span class="card-tag">AI Code Review</span>
+          <span class="card-dot"></span>
+          <span class="card-tag">6 min read</span>
+        </div>
+        <h3>Mneme HQ vs CodeRabbit</h3>
+        <p>CodeRabbit reviews code after it's written. Mneme HQ enforces architectural constraints before generation. They operate at different stages of the same problem — and they're not mutually exclusive.</p>
+        <div class="card-footer">
+          <span class="read-link">Compare &rarr;</span>
+        </div>
       </div>
-      <h3>Mneme HQ vs CodeRabbit</h3>
-      <p>CodeRabbit reviews code after it's written. Mneme HQ enforces architectural constraints before generation. They operate at different stages of the same problem — and they're not mutually exclusive.</p>
-      <div class="card-footer">
-        <a href="/compare/coderabbit/" class="read-link">Compare →</a>
-      </div>
-    </div>
+    </a>
 
-    <div class="compare-card">
-      <div class="card-meta">
-        <span class="card-tag">Rules Files</span>
-        <span class="card-dot"></span>
-        <span class="card-tag">5 min read</span>
+    <a href="/compare/cursor-rules/" class="compare-card-link">
+      <div class="compare-card">
+        <div class="card-meta">
+          <span class="card-tag">Rules Files</span>
+          <span class="card-dot"></span>
+          <span class="card-tag">5 min read</span>
+        </div>
+        <h3>Mneme HQ vs Cursor Rules</h3>
+        <p>Cursor Rules are plain text injected into Cursor sessions. Mneme HQ is structured enforcement with a precedence engine and hook-level blocking. One is configuration. The other is enforcement.</p>
+        <div class="card-footer">
+          <span class="read-link">Compare &rarr;</span>
+        </div>
       </div>
-      <h3>Mneme HQ vs Cursor Rules</h3>
-      <p>Cursor Rules are plain text injected into Cursor sessions. Mneme HQ is structured enforcement with a precedence engine and hook-level blocking. One is configuration. The other is enforcement.</p>
-      <div class="card-footer">
-        <a href="/compare/cursor-rules/" class="read-link">Compare →</a>
-      </div>
-    </div>
+    </a>
 
-    <div class="compare-card">
-      <div class="card-meta">
-        <span class="card-tag">Built-in Memory</span>
-        <span class="card-dot"></span>
-        <span class="card-tag">5 min read</span>
+    <a href="/compare/claude-code-memory/" class="compare-card-link">
+      <div class="compare-card">
+        <div class="card-meta">
+          <span class="card-tag">Built-in Memory</span>
+          <span class="card-dot"></span>
+          <span class="card-tag">5 min read</span>
+        </div>
+        <h3>Mneme HQ vs Claude Code Memory</h3>
+        <p>Claude Code&rsquo;s CLAUDE.md provides instructions the model may follow. Mneme HQ hooks into Claude Code&rsquo;s edit operations and blocks violations before they happen. Instructions vs enforcement.</p>
+        <div class="card-footer">
+          <span class="read-link">Compare &rarr;</span>
+        </div>
       </div>
-      <h3>Mneme HQ vs Claude Code Memory</h3>
-      <p>Claude Code&rsquo;s CLAUDE.md provides instructions the model may follow. Mneme HQ hooks into Claude Code&rsquo;s edit operations and blocks violations before they happen. Instructions vs enforcement.</p>
-      <div class="card-footer">
-        <a href="/compare/claude-code-memory/" class="read-link">Compare &rarr;</a>
-      </div>
-    </div>
+    </a>
 
-    <div class="compare-card">
-      <div class="card-meta">
-        <span class="card-tag">Coding Memory</span>
-        <span class="card-dot"></span>
-        <span class="card-tag">6 min read</span>
+    <a href="/compare/rag-coding-memory/" class="compare-card-link">
+      <div class="compare-card">
+        <div class="card-meta">
+          <span class="card-tag">Coding Memory</span>
+          <span class="card-dot"></span>
+          <span class="card-tag">6 min read</span>
+        </div>
+        <h3>RAG Coding Memory vs Mneme</h3>
+        <p>RAG is useful for contextual memory. It is weak as decision memory. When an AI coding agent has to recall architectural decisions across sessions, retrieval ranking, embedding decay, and scope collisions all surface.</p>
+        <div class="card-footer">
+          <span class="read-link">Compare &rarr;</span>
+        </div>
       </div>
-      <h3>RAG Coding Memory vs Mneme</h3>
-      <p>RAG is useful for contextual memory. It is weak as decision memory. When an AI coding agent has to recall architectural decisions across sessions, retrieval ranking, embedding decay, and scope collisions all surface.</p>
-      <div class="card-footer">
-        <a href="/compare/rag-coding-memory/" class="read-link">Compare &rarr;</a>
-      </div>
-    </div>
+    </a>
 
-    <div class="compare-card">
-      <div class="card-meta">
-        <span class="card-tag">Architecture</span>
-        <span class="card-dot"></span>
-        <span class="card-tag">5 min read</span>
+    <a href="/compare/rag-vs-governance/" class="compare-card-link">
+      <div class="compare-card">
+        <div class="card-meta">
+          <span class="card-tag">Architecture</span>
+          <span class="card-dot"></span>
+          <span class="card-tag">5 min read</span>
+        </div>
+        <h3>RAG vs Governance</h3>
+        <p>Retrieval-augmented generation can surface relevant context. It cannot enforce it. Governance enforces architectural constraints before generation &mdash; deterministically, without retrieval drift.</p>
+        <div class="card-footer">
+          <span class="read-link">Compare &rarr;</span>
+        </div>
       </div>
-      <h3>RAG vs Governance</h3>
-      <p>Retrieval-augmented generation can surface relevant context. It cannot enforce it. Governance enforces architectural constraints before generation &mdash; deterministically, without retrieval drift.</p>
-      <div class="card-footer">
-        <a href="/compare/rag-vs-governance/" class="read-link">Compare &rarr;</a>
-      </div>
-    </div>
+    </a>
 
   </div>
 
