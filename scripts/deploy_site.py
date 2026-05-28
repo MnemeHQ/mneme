@@ -310,3 +310,33 @@ if verify_failures:
     raise SystemExit(1)
 
 print(f"\n[OK] All {len(sitemap_urls)} sitemap URLs verified - deploy complete")
+
+
+# -- IndexNow: notify search engines of updated pages --
+def submit_indexnow(urls):
+    key = os.environ.get('INDEXNOW_KEY', '')
+    if not key:
+        print('[SKIP] IndexNow -- INDEXNOW_KEY not set')
+        return
+    payload = json.dumps({
+        'host': 'mnemehq.com',
+        'key': key,
+        'keyLocation': f'https://mnemehq.com/{key}.txt',
+        'urlList': urls,
+    }).encode()
+    req = urllib.request.Request(
+        'https://api.indexnow.org/indexnow',
+        data=payload,
+        headers={'Content-Type': 'application/json; charset=utf-8'},
+        method='POST',
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=20) as r:
+            print(f'[OK] IndexNow -- {len(urls)} URL(s) submitted (HTTP {r.status})')
+    except urllib.error.HTTPError as e:
+        print(f'[WARN] IndexNow -- HTTP {e.code}: {e.read().decode()[:200]}')
+
+print('
+-- IndexNow submission --')
+submit_indexnow(purge_urls if not full_deploy else sitemap_urls)
+
