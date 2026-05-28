@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -7,7 +7,7 @@
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="Mneme HQ's decision corpus is the constraint layer for JetBrains AI Assistant across IntelliJ, PyCharm, and WebStorm â€” enforced via mneme check in CI." />
+  <meta name="description" content="Mneme HQ's decision corpus is the constraint layer for JetBrains AI Assistant across IntelliJ, PyCharm, and WebStorm — enforced via mneme check in CI." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/integrations/jetbrains/" />
@@ -15,12 +15,12 @@
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
   <meta property="og:title" content="Mneme HQ + JetBrains IDEs" />
-  <meta property="og:description" content="Mneme HQ's decision corpus is the constraint layer for JetBrains AI Assistant across IntelliJ, PyCharm, and WebStorm â€” enforced via mneme check in CI." />
+  <meta property="og:description" content="Mneme HQ's decision corpus is the constraint layer for JetBrains AI Assistant across IntelliJ, PyCharm, and WebStorm — enforced via mneme check in CI." />
   <meta property="og:url" content="https://mnemehq.com/integrations/jetbrains/" />
   <meta property="og:image" content="https://mnemehq.com/integrations/jetbrains/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Mneme HQ + JetBrains IDEs" />
-  <meta name="twitter:description" content="Mneme HQ's decision corpus is the constraint layer for JetBrains AI Assistant across IntelliJ, PyCharm, and WebStorm â€” enforced via mneme check in CI." />
+  <meta name="twitter:description" content="Mneme HQ's decision corpus is the constraint layer for JetBrains AI Assistant across IntelliJ, PyCharm, and WebStorm — enforced via mneme check in CI." />
   <meta name="twitter:image" content="https://mnemehq.com/integrations/jetbrains/og.png" />
   <meta name="author" content="Theo Valmis" />
   <meta property="article:published_time" content="2026-05-14T00:00:00Z" />
@@ -179,7 +179,7 @@
 @media (max-width: 900px) {
   html, body { overflow-x: hidden; }
   body.menu-open { overflow: hidden; }
-  nav, nav.site-nav { position: relative; padding: 1rem 1.25rem; }
+  nav, nav.site-nav { padding: 1rem 1.25rem; }
   .nav-hamburger { display: flex; }
   .nav-links {
     display: flex !important;
@@ -244,7 +244,7 @@
       {
         "@type": "Article",
         "headline": "Mneme HQ + JetBrains IDEs",
-        "description": "Mneme HQ's decision corpus is the constraint layer for JetBrains AI Assistant across IntelliJ, PyCharm, and WebStorm â€” enforced via mneme check in CI.",
+        "description": "Mneme HQ's decision corpus is the constraint layer for JetBrains AI Assistant across IntelliJ, PyCharm, and WebStorm — enforced via mneme check in CI.",
         "url": "https://mnemehq.com/integrations/jetbrains/",
         "datePublished": "2026-05-14",
         "dateModified": "2026-05-14",
@@ -258,8 +258,8 @@
         "mainEntity": [
           {"@type": "Question", "name": "Is there a Mneme HQ plugin for IntelliJ today?", "acceptedAnswer": {"@type": "Answer", "text": "Not yet. A native JetBrains plugin is on the roadmap. Today, teams use a corpus-first pattern: project_memory.json is the authoritative source of architectural decisions, the same corpus that feeds Claude Code hooks and the CI gate. JetBrains AI Assistant reads it as shared context, and mneme check enforces the corpus on every PR regardless of which tool produced the diff."}},
           {"@type": "Question", "name": "How does this differ from a JetBrains AI Assistant rules file?", "acceptedAnswer": {"@type": "Answer", "text": "A rules file is per-IDE configuration; the Mneme corpus is tool-agnostic. The same project_memory.json that informs JetBrains AI Assistant is also what Claude Code's PreToolUse hook checks, what the GitHub Actions gate enforces, and what future surfaces will read. You write the decision once. Every surface enforces it."}},
-          {"@type": "Question", "name": "What if the model ignores the corpus context in JetBrains AI Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "That is the central reason CI enforcement matters. Context injection is advisory â€” models attend to it imperfectly, especially under long context. mneme check in CI is the deterministic backstop: any diff that violates a recorded decision fails the build, no matter which IDE or model produced it. Editor-time context speeds the inner loop; CI enforcement guarantees correctness at the merge boundary."}},
-          {"@type": "Question", "name": "Which JetBrains IDEs does this pattern work with?", "acceptedAnswer": {"@type": "Answer", "text": "Any IDE in the JetBrains family â€” IntelliJ IDEA, PyCharm, WebStorm, GoLand, RubyMine, PhpStorm, Rider, CLion, DataGrip. The corpus is plain JSON at the repo root, so it does not depend on any IDE-specific feature. JetBrains AI Assistant ships across these IDEs uniformly; the same context-sharing pattern applies to all of them."}}
+          {"@type": "Question", "name": "What if the model ignores the corpus context in JetBrains AI Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "That is the central reason CI enforcement matters. Context injection is advisory — models attend to it imperfectly, especially under long context. mneme check in CI is the deterministic backstop: any diff that violates a recorded decision fails the build, no matter which IDE or model produced it. Editor-time context speeds the inner loop; CI enforcement guarantees correctness at the merge boundary."}},
+          {"@type": "Question", "name": "Which JetBrains IDEs does this pattern work with?", "acceptedAnswer": {"@type": "Answer", "text": "Any IDE in the JetBrains family — IntelliJ IDEA, PyCharm, WebStorm, GoLand, RubyMine, PhpStorm, Rider, CLion, DataGrip. The corpus is plain JSON at the repo root, so it does not depend on any IDE-specific feature. JetBrains AI Assistant ships across these IDEs uniformly; the same context-sharing pattern applies to all of them."}}
         ]
       },
       {
@@ -268,9 +268,9 @@
         "description": "Install Mneme HQ, attach the decision corpus as shared context in JetBrains AI Assistant, and run mneme check in CI to enforce constraints at the merge boundary.",
         "step": [
           {"@type": "HowToStep", "name": "Install", "text": "pip install mneme-hq and scaffold .mneme/project_memory.json at the repo root using examples/project_memory.json as a template."},
-          {"@type": "HowToStep", "name": "Populate the corpus", "text": "Record real architectural decisions in project_memory.json â€” each with scope (file globs), status, and rationale. Commit the file to the repo so every IDE on every machine reads the same corpus."},
+          {"@type": "HowToStep", "name": "Populate the corpus", "text": "Record real architectural decisions in project_memory.json — each with scope (file globs), status, and rationale. Commit the file to the repo so every IDE on every machine reads the same corpus."},
           {"@type": "HowToStep", "name": "Attach to JetBrains AI Assistant", "text": "In JetBrains AI Assistant settings, add .mneme/project_memory.json to the AI context (project context or pinned files). The model now treats recorded decisions as authoritative when generating code."},
-          {"@type": "HowToStep", "name": "Enforce in CI", "text": "Add mneme check --mode strict to your GitHub Actions or other CI workflow. Any PR diff that violates a recorded decision fails the build â€” regardless of which IDE or model produced it."}
+          {"@type": "HowToStep", "name": "Enforce in CI", "text": "Add mneme check --mode strict to your GitHub Actions or other CI workflow. Any PR diff that violates a recorded decision fails the build — regardless of which IDE or model produced it."}
         ]
       }
     ]
@@ -310,7 +310,7 @@
     <div class="article-eyebrow">
       <span class="eyebrow-tag">Integration &middot; JetBrains</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">5 min read &nbsp;Â·&nbsp; May 2026</span>
+      <span class="eyebrow-meta">5 min read &nbsp;·&nbsp; May 2026</span>
     </div>
     <h1>Mneme HQ + JetBrains IDEs</h1>
     <p class="article-lede">JetBrains AI Assistant ships across IntelliJ, PyCharm, WebStorm, and the rest of the family &mdash; it is the harness that coordinates generation inside the IDE. Mneme HQ runs alongside it as a separate governance layer: one decision corpus, every IDE, enforced in CI regardless of the generation tool.</p>
