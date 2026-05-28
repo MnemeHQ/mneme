@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mneme HQ vs Continue.dev &mdash; Rules vs Architectural Governance</title>
+  <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/fonts.css">
+  <meta name="description" content="Continue.dev is an open-source AI code assistant with a rules file. Mneme HQ is a governance layer with a precedence engine. Compare how each handles architectural decisions across IDEs and agents." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/compare/continue-dev/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Mneme HQ vs Continue.dev" />
+  <meta property="og:description" content="Continue.dev rules are configuration the model interprets. Mneme HQ is enforcement the system resolves &mdash; typed decisions with a precedence engine." />
+  <meta property="og:url" content="https://mnemehq.com/compare/continue-dev/" />
+  <meta property="og:image" content="https://mnemehq.com/compare/continue-dev/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Mneme HQ vs Continue.dev" />
+  <meta name="twitter:description" content="Continue.dev rules steer the model. Mneme HQ enforces architectural decisions at the Edit/Write boundary, with a precedence engine for overlaps." />
+  <meta name="twitter:image" content="https://mnemehq.com/compare/continue-dev/og.png" />
+  <meta name="author" content="Theo Valmis" />
+  <meta property="article:published_time" content="2026-05-28T00:00:00Z" />
+  <meta property="article:author" content="https://mnemehq.com/founder/" />
+  <meta property="article:section" content="Engineering" />
+
+    <!-- Consent defaults -->
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{'analytics_storage':'granted','ad_storage':'denied','ad_user_data':'denied','ad_personalization':'denied'});</script>
+
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #a8a8b8;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .article-wrap { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 7rem; }
+    .article-header { margin-bottom: 3.5rem; }
+    .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    .faq-list { margin-top: 1.5rem; }
+    .faq-item { border-top: 1px solid var(--border); padding: 1.05rem 0; }
+    .faq-item:last-child { border-bottom: 1px solid var(--border); }
+    .faq-item summary { cursor: pointer; font-size: 0.92rem; color: var(--text); font-weight: 500; list-style: none; position: relative; padding-right: 2rem; }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; font-family: 'DM Mono', monospace; color: var(--muted); font-size: 1.1rem; position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
+    .faq-item[open] summary::after { content: '\2212'; }
+    .faq-body { padding-top: 0.85rem; font-size: 0.85rem; color: var(--muted); line-height: 1.8; }
+    .faq-body a { color: var(--accent); text-decoration: none; }
+    .faq-body a:hover { color: var(--accent-dim); }
+
+    .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
+    .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .article-body h3 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--text); }
+    .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
+    .article-body p strong { color: var(--text); font-weight: 500; }
+    .article-body ul, .article-body ol { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body li { margin-bottom: 0.5rem; }
+    .article-body li strong { color: var(--text); font-weight: 500; }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout p strong { color: var(--accent); }
+
+    .comparison-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.85rem; }
+    .comparison-table th { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border2); color: var(--muted); font-weight: 500; }
+    .comparison-table td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .comparison-table td:first-child { color: var(--muted); white-space: nowrap; }
+    .comparison-table td:nth-child(2) { color: var(--text); opacity: 0.55; }
+    .comparison-table td:nth-child(3) { color: var(--teal); }
+
+    .memory-split { margin: 2.5rem 0; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .memory-card { padding: 1.25rem 1.4rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+    .memory-card--contextual { border-left: 3px solid var(--teal); }
+    .memory-card--decision { border-left: 3px solid var(--accent); }
+    .memory-card-label { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+    .memory-card--contextual .memory-card-label { color: var(--teal); }
+    .memory-card--decision .memory-card-label { color: var(--accent); }
+    .memory-card-title { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 0.55rem; letter-spacing: -0.005em; }
+    .memory-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.75; margin: 0; }
+    @media (max-width: 640px) { .memory-split { grid-template-columns: 1fr; } }
+
+    .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .back-link:hover { color: var(--text); }
+    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; }
+    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--accent-dim); }
+    .cta-secondary { display: block; margin-top: 0.75rem; font-size: 0.82rem; color: var(--muted); text-decoration: none; }
+    .cta-secondary:hover { color: var(--text); }
+
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .breadcrumb-nav { max-width: 720px; margin: 0 auto; padding: 1.75rem 2rem 0.85rem; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.82rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    h2#related-reading { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 400; margin-top: 3.5rem; margin-bottom: 0.75rem; }
+    h2#related-reading + ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    h2#related-reading + ul li { margin: 0; }
+    h2#related-reading + ul li a { display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.1rem; background: var(--surface); color: var(--text); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.15s, color 0.15s; }
+    h2#related-reading + ul li a::after { content: '\2192'; opacity: 0.35; transition: opacity 0.15s, transform 0.15s; display: inline-block; margin-left: 0.5rem; }
+    h2#related-reading + ul li a:hover { background: var(--surface2); color: var(--accent); }
+    h2#related-reading + ul li a:hover::after { opacity: 1; transform: translateX(3px); }
+
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; padding: 0; flex-shrink: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; transition: border-color 0.15s, background 0.15s; }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span { display: block; width: 18px; height: 2px; background: currentColor; border-radius: 1px; transition: transform 0.25s ease, opacity 0.18s ease; transform-origin: center; }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    @media (max-width: 900px) {
+      html, body { overflow-x: hidden; }
+      body.menu-open { overflow: hidden; }
+      nav { padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 1.25rem; z-index: 99; max-height: 0; overflow: hidden; opacity: 0; visibility: hidden; transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s; }
+      .nav-links.open { max-height: 80vh; opacity: 1; visibility: visible; padding: 0.5rem 1.25rem 1.25rem; transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s; overflow-y: auto; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.92rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+    }
+    @media (max-width: 640px) { .article-wrap { padding: 3rem 1.25rem 5rem; } }
+
+    @media (max-width: 768px) { nav, .mobile-menu { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } }
+    /* Cross-reference panel (Related governance concepts) */
+    .related-panel { margin-top: 3rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .related-panel-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    .related-list li { margin: 0; }
+    .related-list a { display: block; padding: 1.15rem 1.35rem; background: var(--surface); text-decoration: none; transition: background 0.15s; }
+    .related-list a:hover { background: var(--surface2); }
+    .related-list .rel-title { color: var(--text); font-size: 0.92rem; font-weight: 600; margin-bottom: 0.35rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; letter-spacing: -0.005em; transition: color 0.15s; }
+    .related-list .rel-title::after { content: '\2192'; color: var(--accent); opacity: 0.4; transition: opacity 0.15s, transform 0.15s; flex-shrink: 0; }
+    .related-list a:hover .rel-title { color: var(--accent); }
+    .related-list a:hover .rel-title::after { opacity: 1; transform: translateX(3px); }
+    .related-list .rel-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.65; margin: 0; }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Compare", "item": "https://mnemehq.com/compare/"},
+          {"@type": "ListItem", "position": 3, "name": "Mneme HQ vs Continue.dev", "item": "https://mnemehq.com/compare/continue-dev/"}
+        ]
+      },
+      {
+        "@type": "Article",
+        "headline": "Mneme HQ vs Continue.dev",
+        "description": "Continue.dev is an open-source AI code assistant with a rules file. Mneme HQ is a governance layer with a precedence engine. Compare how each handles architectural decisions across IDEs and agents.",
+        "url": "https://mnemehq.com/compare/continue-dev/",
+        "datePublished": "2026-05-28",
+        "dateModified": "2026-05-28",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "image": "https://mnemehq.com/compare/continue-dev/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/compare/continue-dev/"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Is Mneme HQ a Continue.dev alternative?",
+            "acceptedAnswer": {"@type": "Answer", "text": "No. Continue.dev is an open-source AI code assistant that runs inside VS Code and JetBrains. It supports custom rules, context providers, and a configurable model backend. Mneme HQ is not a coding assistant; it is the governance layer that runs at the Edit/Write boundary, enforcing typed architectural decisions regardless of which agent (Continue included) proposed the edit. The two solve adjacent but structurally different problems."}
+          },
+          {
+            "@type": "Question",
+            "name": "Can Continue rules enforce architectural decisions?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Continue rules are prose strings in config.yaml that Continue injects into the model's context. The model still decides how to apply them. That works for tone, library preferences, and average-case quality. It is weaker for architectural decisions that must apply every time with explicit scope, because Continue has no precedence engine and no per-edit enforcement step. Mneme stores the same intent as typed decisions evaluated against every edit, deterministically."}
+          },
+          {
+            "@type": "Question",
+            "name": "How does Mneme's precedence engine compare to rule ordering?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Continue rules are evaluated in the order they appear in config.yaml. There is no native concept of supersession, scope precedence, or override-as-record. Mneme's precedence engine explicitly resolves overlapping decisions: which scope is narrower, which decision supersedes which, which override applies and why. When two decisions conflict on an edit, the engine picks the right one deterministically, with the reasoning auditable per event."}
+          },
+          {
+            "@type": "Question",
+            "name": "Should I use Continue and Mneme together?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Yes, at different layers. Continue gives engineers an open-source, IDE-embedded coding assistant with flexible rules and context providers. Mneme gives the team a typed enforcement layer that runs at the Edit/Write hook. Continue rules continue to steer generation; Mneme blocks violations of architectural decisions that the rules cannot deterministically enforce on their own."}
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/benchmark/">Benchmark</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/compare/">Compare</a></li>
+    <li aria-current="page">Mneme HQ vs Continue.dev</li>
+  </ol>
+</nav>
+<article class="article-wrap">
+  <header class="article-header">
+    <div class="article-eyebrow">
+      <span class="eyebrow-tag">Comparative</span>
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-meta">5 min read &nbsp;&middot;&nbsp; May 2026</span>
+    </div>
+    <h1>Mneme HQ vs Continue.dev</h1>
+    <p class="article-lede">Continue.dev is the open-source IDE coding assistant of choice for teams that want self-hosted AI without vendor lock-in. Its rules and context providers are great for steering the model. Mneme HQ is what runs underneath &mdash; the precedence-aware enforcement layer that makes architectural decisions deterministic across editors, agents, and CI.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-28">Published May 2026</time>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-28">Updated May 2026</time>
+    </p>
+  </header>
+
+  <div class="article-body">
+    <h2>What Continue.dev brings to the IDE</h2>
+
+    <p>Continue.dev is the closest open-source sibling to Cursor and the commercial AI coding assistants. It runs inside VS Code and JetBrains, supports a configurable model backend (Anthropic, OpenAI, local Ollama, others), and exposes two of the surfaces most relevant to a governance comparison: <strong>rules</strong> defined in <code style="font-family:'DM Mono',monospace;font-size:0.88em;color:var(--text);">config.yaml</code>, and <strong>context providers</strong> that pull project information into each session.</p>
+
+    <p>For engineering teams that want the productivity of a modern IDE coding assistant without locking into a closed-source vendor, Continue is the strongest current option. Its rules and context providers cover most of what a team would otherwise put in a prose conventions file, with the bonus of being model-agnostic and self-hostable.</p>
+
+    <ul>
+      <li>Open-source AI code assistant for VS Code and JetBrains</li>
+      <li>Configurable model backend &mdash; Anthropic, OpenAI, local, others</li>
+      <li>Rules in <code style="font-family:'DM Mono',monospace;font-size:0.88em;color:var(--text);">config.yaml</code> for project-level steering</li>
+      <li>Context providers for grounding the model in the repo</li>
+      <li>Self-hostable; no vendor lock-in on the model</li>
+    </ul>
+
+    <p>Mneme HQ does not compete with the IDE coding-assistant category. It is the governance layer that enforces architectural decisions on the edits any coding assistant &mdash; Continue, Cursor, Copilot &mdash; proposes. The structural difference is the same one that appears in every comparison on this hub: prose rules steer the model; typed decisions are evaluated by the system.</p>
+
+    <div class="memory-split">
+      <div class="memory-card memory-card--contextual">
+        <div class="memory-card-label">Continue rules</div>
+        <div class="memory-card-title">Prose in config.yaml</div>
+        <p>Loaded into Continue&rsquo;s session context. The model reads them and decides how to apply them on each turn. Strong for tone, conventions, and average-case quality. Suggestion-shaped: there is no enforcement step.</p>
+      </div>
+      <div class="memory-card memory-card--decision">
+        <div class="memory-card-label">Mneme HQ enforcement</div>
+        <div class="memory-card-title">Typed corpus with precedence engine</div>
+        <p>Evaluated against every Edit/Write. The system matches scope, resolves precedence, and either allows or blocks with the specific decision that fired. Blocking-shaped: violations never reach the codebase.</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <p><strong>The framing:</strong> Continue rules are configuration the model interprets. Mneme is enforcement the system resolves. Both are useful; they answer different questions.</p>
+    </div>
+
+    <h2>Where they differ as layers in the stack</h2>
+
+    <div style="overflow-x:auto;margin:2rem 0;">
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>Dimension</th>
+          <th>Continue.dev</th>
+          <th>Mneme HQ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Architecture</td>
+          <td>IDE coding assistant plus rules</td>
+          <td>Governance layer at Edit/Write</td>
+        </tr>
+        <tr>
+          <td>Rule format</td>
+          <td>Prose strings in <code style="font-family:'DM Mono',monospace;font-size:0.88em;">config.yaml</code></td>
+          <td>Typed decision records with predicates</td>
+        </tr>
+        <tr>
+          <td>Scope model</td>
+          <td>Implicit, or glob in config</td>
+          <td>Explicit per-decision scope</td>
+        </tr>
+        <tr>
+          <td>Precedence</td>
+          <td>None &mdash; order-dependent in the file</td>
+          <td>Precedence engine resolves overlaps</td>
+        </tr>
+        <tr>
+          <td>Cross-IDE behavior</td>
+          <td>Continue-installed editors (VS Code, JetBrains)</td>
+          <td>Any agent or CI step that triggers Edit/Write</td>
+        </tr>
+        <tr>
+          <td>Enforcement</td>
+          <td>Suggestion to the model</td>
+          <td>Hook-level block on the proposed edit</td>
+        </tr>
+        <tr>
+          <td>Audit</td>
+          <td>No native per-event log</td>
+          <td>Every enforcement event is traceable per decision</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h2>Three failure modes for prose rules</h2>
+
+    <p>Continue&rsquo;s rules are competently designed for what they are. These failure modes are general to any prose-as-rules surface and are the reason teams reach for a typed governance layer once enforcement (not just steering) becomes the requirement.</p>
+
+    <h3>1. Rule ordering as accidental precedence</h3>
+
+    <p>Two rules in <code style="font-family:'DM Mono',monospace;font-size:0.88em;color:var(--text);">config.yaml</code> overlap. One says &ldquo;prefer functional style.&rdquo; The other says &ldquo;in the orchestration layer, use classes with explicit lifecycle.&rdquo; Whichever appears later in the file wins by accident of ordering. There is no &ldquo;narrower scope wins&rdquo; semantics, no supersession record, no override-as-decision. Mneme&rsquo;s precedence engine resolves the same overlap explicitly and traceably.</p>
+
+    <h3>2. Scope drift between editor and CI</h3>
+
+    <p>A team adds a rule that depends on file path. Continue applies it correctly inside VS Code where the rule is loaded. The same code path runs on a CI script that uses a different agent &mdash; Continue&rsquo;s rules don&rsquo;t apply there. The architectural decision is enforced in one place and not the other. Mneme runs at the Edit/Write hook regardless of which surface triggered it, so a CI-time edit and an in-editor edit go through the same enforcement.</p>
+
+    <h3>3. The rule is right but the model didn&rsquo;t use it</h3>
+
+    <p>A rule is in config.yaml. Continue injects it into context. The model is solving a multi-step task and is several turns deep. The rule is in context but not in the model&rsquo;s attention for the violating turn. The rule exists; it did not fire. Mneme&rsquo;s enforcement runs on the edit itself, not in the model&rsquo;s context window, so the verdict does not depend on whether the model was paying attention.</p>
+
+    <h2>Why a precedence engine matters</h2>
+
+    <p>Once a team has more than a handful of architectural decisions, overlap is inevitable. A repo-wide rule conflicts with a service-specific rule. A new ADR supersedes an older one. An override carves out a specific directory from a general policy. These cases need explicit resolution semantics, not file-order accidents.</p>
+
+    <p>Mneme&rsquo;s precedence engine treats this as a first-class concern: each decision has explicit scope, a position in the precedence graph, and a record of what (if anything) it supersedes. When two decisions could apply to the same edit, the engine picks one deterministically and produces an audit record of why. The same edit produces the same verdict every run.</p>
+
+    <p>This is the property a prose <code style="font-family:'DM Mono',monospace;font-size:0.88em;color:var(--text);">config.yaml</code> cannot provide, even with the most disciplined ordering convention. Ordering is a workaround; precedence is the model.</p>
+
+    <h2>Using Continue and Mneme together</h2>
+
+    <p>Continue stays the IDE coding assistant. Mneme stays the enforcement layer underneath. The two compose cleanly because they answer different questions.</p>
+
+    <ol>
+      <li><strong>Keep Continue for IDE coding.</strong> Rules, context providers, model choice &mdash; all of the productivity surface stays exactly where it is.</li>
+      <li><strong>Move enforceable decisions to Mneme.</strong> Anything where the answer must be the same every time, regardless of which model or which editor is running.</li>
+      <li><strong>Use Continue rules for steering.</strong> Tone, library preferences, &ldquo;here is how we write code&rdquo; &mdash; things the model can act on at generation time.</li>
+      <li><strong>Hook Mneme into Edit/Write.</strong> When Continue proposes an edit, Mneme matches the scope, resolves precedence, and blocks violations before they land.</li>
+      <li><strong>Encode supersessions and overrides as decisions, not config ordering.</strong> Reading <code style="font-family:'DM Mono',monospace;font-size:0.88em;color:var(--text);">config.yaml</code> top-to-bottom should not be how a team learns which rule wins.</li>
+    </ol>
+
+    <p>In this architecture, Continue is the engineer&rsquo;s coding surface; Mneme is the team&rsquo;s enforcement layer. The two compose without overlap, and the failure modes of prose-as-rules disappear because prose is no longer being asked to do the work of typed precedence.</p>
+
+    <section class="faq-list" aria-labelledby="faq-heading">
+      <h2 id="faq-heading" style="font-family:'Inter',sans-serif;font-size:1.25rem;font-weight:600;letter-spacing:-0.015em;margin-bottom:1.25rem;">Frequently asked questions</h2>
+      <details class="faq-item">
+        <summary>Is Mneme HQ a Continue.dev alternative?</summary>
+        <div class="faq-body">No. Continue.dev is an open-source AI code assistant that runs inside VS Code and JetBrains. It supports custom rules, context providers, and a configurable model backend. Mneme HQ is not a coding assistant; it is the governance layer that runs at the Edit/Write boundary, enforcing typed architectural decisions regardless of which agent (Continue included) proposed the edit. The two solve adjacent but structurally different problems.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Can Continue rules enforce architectural decisions?</summary>
+        <div class="faq-body">Continue rules are prose strings in config.yaml that Continue injects into the model's context. The model still decides how to apply them. That works for tone, library preferences, and average-case quality. It is weaker for architectural decisions that must apply every time with explicit scope, because Continue has no precedence engine and no per-edit enforcement step. Mneme stores the same intent as typed decisions evaluated against every edit, deterministically.</div>
+      </details>
+      <details class="faq-item">
+        <summary>How does Mneme's precedence engine compare to rule ordering?</summary>
+        <div class="faq-body">Continue rules are evaluated in the order they appear in config.yaml. There is no native concept of supersession, scope precedence, or override-as-record. Mneme's precedence engine explicitly resolves overlapping decisions: which scope is narrower, which decision supersedes which, which override applies and why. When two decisions conflict on an edit, the engine picks the right one deterministically, with the reasoning auditable per event.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Should I use Continue and Mneme together?</summary>
+        <div class="faq-body">Yes, at different layers. Continue gives engineers an open-source, IDE-embedded coding assistant with flexible rules and context providers. Mneme gives the team a typed enforcement layer that runs at the Edit/Write hook. Continue rules continue to steer generation; Mneme blocks violations of architectural decisions that the rules cannot deterministically enforce on their own.</div>
+      </details>
+    </section>
+
+  <aside class="related-panel" aria-labelledby="related-panel-label">
+    <div class="related-panel-label" id="related-panel-label">Related governance concepts</div>
+    <ul class="related-list">
+      <li><a href="/concepts/precedence-semantics/"><div class="rel-title">Precedence semantics</div><p class="rel-desc">The model behind explicit override and supersession &mdash; what file ordering cannot give you.</p></a></li>
+      <li><a href="/concepts/governance-infrastructure/"><div class="rel-title">Governance infrastructure</div><p class="rel-desc">Why enforcement belongs in a layer, not inside one editor&rsquo;s config.yaml.</p></a></li>
+      <li><a href="/concepts/deterministic-enforcement/"><div class="rel-title">Deterministic enforcement</div><p class="rel-desc">Same edit, same verdict, every time &mdash; independent of model attention or rule ordering.</p></a></li>
+      <li><a href="/concepts/architectural-compiler/"><div class="rel-title">Architectural compiler</div><p class="rel-desc">Compiling architectural intent into machine-evaluable predicates that any agent resolves against.</p></a></li>
+    </ul>
+  
+  </aside>
+
+  </div>
+
+  <footer class="article-footer">
+    <a href="/compare/" class="back-link">&larr; Back to Compare</a>
+    <div class="cta-block">
+      <h3>Precedence-aware governance underneath every coding agent</h3>
+      <p>Mneme HQ enforces architectural decisions with explicit scope and a precedence engine. It runs at the Edit/Write hook for Continue, Cursor, Claude Code, Copilot, and any other AI coding agent. Open source, self-hosted, model-agnostic.</p>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
+      <a href="/insights/why-architectural-governance-needs-precedence-semantics/" class="cta-secondary">Read: Why architectural governance needs precedence semantics &rarr;</a>
+    </div>
+  </footer>
+</article>
+</main>
+
+<footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+  <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/use-cases/">Use cases</a></li>
+        <li><a href="/works-with/">Works with</a></li>
+        <li><a href="/platforms/">Platforms</a></li>
+        <li><a href="/integrations/">Integrations</a></li>
+        <li><a href="/compare/">Compare</a></li>
+        <li><a href="/demo/">Demo</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/concepts/">Concepts</a></li>
+        <li><a href="/architecture/">Architecture</a></li>
+        <li><a href="/insights/">Insights</a></li>
+        <li><a href="/standards/">Standards</a></li>
+        <li><a href="/benchmark/">Benchmark</a></li>
+        <li><a href="/docs/">Docs</a></li>
+        <li><a href="/docs/cli/">CLI reference</a></li>
+        <li><a href="/docs/governance-violations/">Governance violations</a></li>
+        <li><a href="/supported-languages/">Supported languages</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/pilot/" style="color:var(--accent);">Request pilot</a></li>
+        <li><a href="/for/">For teams</a></li>
+        <li><a href="/founder/">Founder</a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/roadmap/">Roadmap</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Code</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="https://github.com/TheoV823/mneme">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://dev.to/mnemehq" target="_blank" rel="noopener">DEV.to</a></li>
+        <li><a href="/privacy/">Privacy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
+    <span style="display:inline-flex;align-items:center;gap:0.75rem;"><a href="/" aria-label="Mneme HQ home" style="display:inline-flex;opacity:0.75;"><img src="/favicon.png" alt="Mneme HQ" height="22" style="display:block;"></a><span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span></span>
+    <nav aria-label="Social media" style="display: flex; align-items: center; gap: 1rem;">
+      <a href="https://github.com/TheoV823/mneme" target="_blank" rel="noopener" aria-label="GitHub" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.16c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.27-1.69-1.27-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.34.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18.92-.26 1.91-.39 2.89-.39.98 0 1.97.13 2.89.39 2.2-1.49 3.17-1.18 3.17-1.18.62 1.58.23 2.75.12 3.04.73.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.26 5.68.41.35.78 1.05.78 2.12v3.15c0 .31.21.67.8.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener" aria-label="LinkedIn" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 .06.77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/@MnemeHQ" target="_blank" rel="noopener" aria-label="YouTube" style="color: var(--muted); display: inline-flex;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.12C19.55 3.5 12 3.5 12 3.5s-7.55 0-9.4.58A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.12c1.85.58 9.4.58 9.4.58s7.55 0 9.4-.58a3 3 0 0 0 2.1-2.12A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8zM9.6 15.57V8.43L15.82 12 9.6 15.57z"/></svg>
+      </a>
+      <a href="https://dev.to/mnemehq" target="_blank" rel="noopener" aria-label="DEV.to" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true"><path d="M120.12 208.29c-3.88-2.9-7.77-4.35-11.65-4.35H91.03v104.47h17.45c3.88 0 7.77-1.45 11.65-4.35 3.88-2.9 5.82-7.25 5.82-13.06v-69.65c-.01-5.8-1.96-10.16-5.83-13.06zM404.1 32H43.9C19.7 32 .06 51.59 0 75.8v360.4C.06 460.41 19.7 480 43.9 480h360.2c24.21 0 43.84-19.59 43.9-43.8V75.8c-.06-24.21-19.7-43.8-43.9-43.8zM154.2 291.19c0 18.81-11.61 47.31-48.36 47.25h-46.4V172.98h47.38c35.44 0 47.36 28.46 47.36 47.28l.02 70.93zm100.68-88.66H201.6v38.42h32.57v29.57H201.6v38.41h53.29v29.57h-62.18c-11.16.29-20.44-8.53-20.72-19.69V193.7c-.27-11.15 8.56-20.41 19.71-20.69h63.19l-.01 29.52zm103.64 115.29c-13.2 30.75-36.85 24.63-47.44 0l-38.53-144.8h32.57l29.71 113.72 29.57-113.72h32.58l-38.46 144.8z"/></svg>
+      </a>
+    </nav>
+    <span>&copy; 2026</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  function setOpen(open){
+    links.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('menu-open', open);
+  }
+  btn.addEventListener('click', function(e){ e.stopPropagation(); setOpen(!links.classList.contains('open')); });
+  document.addEventListener('click', function(e){ if (!links.classList.contains('open')) return; if (links.contains(e.target) || btn.contains(e.target)) return; setOpen(false); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false); });
+  links.addEventListener('click', function(e){ if (e.target.tagName === 'A') setOpen(false); });
+  window.addEventListener('resize', function(){ if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false); });
+})();
+</script>
+</body>
+</html>

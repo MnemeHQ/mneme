@@ -59,6 +59,7 @@ TEMPLATE_MAP = {
     "og-compare-rag-coding-memory.html": "compare/rag-coding-memory/og.png",
     "og-compare-github-copilot.html": "compare/github-copilot/og.png",
     "og-compare-aider.html": "compare/aider/og.png",
+    "og-compare-continue-dev.html": "compare/continue-dev/og.png",
     "og-integration-index.html": "integrations/og.png",
     "og-integration-claude-code.html": "integrations/claude-code/og.png",
     "og-integration-cursor.html": "integrations/cursor/og.png",
