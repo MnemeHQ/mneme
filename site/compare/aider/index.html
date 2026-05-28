@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mneme HQ vs Aider &mdash; Terminal AI Coding with Architectural Governance</title>
+  <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/fonts.css">
+  <meta name="description" content="Aider is a terminal-based AI pair programmer. Mneme HQ is the governance layer that runs alongside any AI coding agent. Compare how Aider handles repo conventions versus deterministic enforcement of architectural decisions." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/compare/aider/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Mneme HQ vs Aider" />
+  <meta property="og:description" content="Aider is an open-source terminal AI pair programmer. Mneme HQ is the governance layer underneath any coding agent &mdash; enforcing architectural decisions deterministically." />
+  <meta property="og:url" content="https://mnemehq.com/compare/aider/" />
+  <meta property="og:image" content="https://mnemehq.com/compare/aider/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Mneme HQ vs Aider" />
+  <meta name="twitter:description" content="Aider's conventions file is great context for the model. It is not enforcement. Mneme is the typed-decision layer underneath any coding agent." />
+  <meta name="twitter:image" content="https://mnemehq.com/compare/aider/og.png" />
+  <meta name="author" content="Theo Valmis" />
+  <meta property="article:published_time" content="2026-05-28T00:00:00Z" />
+  <meta property="article:author" content="https://mnemehq.com/founder/" />
+  <meta property="article:section" content="Engineering" />
+
+    <!-- Consent defaults -->
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{'analytics_storage':'granted','ad_storage':'denied','ad_user_data':'denied','ad_personalization':'denied'});</script>
+
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #a8a8b8;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .article-wrap { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 7rem; }
+    .article-header { margin-bottom: 3.5rem; }
+    .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    .faq-list { margin-top: 1.5rem; }
+    .faq-item { border-top: 1px solid var(--border); padding: 1.05rem 0; }
+    .faq-item:last-child { border-bottom: 1px solid var(--border); }
+    .faq-item summary { cursor: pointer; font-size: 0.92rem; color: var(--text); font-weight: 500; list-style: none; position: relative; padding-right: 2rem; }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; font-family: 'DM Mono', monospace; color: var(--muted); font-size: 1.1rem; position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
+    .faq-item[open] summary::after { content: '\2212'; }
+    .faq-body { padding-top: 0.85rem; font-size: 0.85rem; color: var(--muted); line-height: 1.8; }
+    .faq-body a { color: var(--accent); text-decoration: none; }
+    .faq-body a:hover { color: var(--accent-dim); }
+
+    .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
+    .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .article-body h3 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--text); }
+    .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
+    .article-body p strong { color: var(--text); font-weight: 500; }
+    .article-body ul, .article-body ol { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body li { margin-bottom: 0.5rem; }
+    .article-body li strong { color: var(--text); font-weight: 500; }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout p strong { color: var(--accent); }
+
+    .comparison-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.85rem; }
+    .comparison-table th { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border2); color: var(--muted); font-weight: 500; }
+    .comparison-table td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .comparison-table td:first-child { color: var(--muted); white-space: nowrap; }
+    .comparison-table td:nth-child(2) { color: var(--text); opacity: 0.55; }
+    .comparison-table td:nth-child(3) { color: var(--teal); }
+
+    .memory-split { margin: 2.5rem 0; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .memory-card { padding: 1.25rem 1.4rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+    .memory-card--contextual { border-left: 3px solid var(--teal); }
+    .memory-card--decision { border-left: 3px solid var(--accent); }
+    .memory-card-label { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+    .memory-card--contextual .memory-card-label { color: var(--teal); }
+    .memory-card--decision .memory-card-label { color: var(--accent); }
+    .memory-card-title { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 0.55rem; letter-spacing: -0.005em; }
+    .memory-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.75; margin: 0; }
+    @media (max-width: 640px) { .memory-split { grid-template-columns: 1fr; } }
+
+    .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .back-link:hover { color: var(--text); }
+    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; }
+    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--accent-dim); }
+    .cta-secondary { display: block; margin-top: 0.75rem; font-size: 0.82rem; color: var(--muted); text-decoration: none; }
+    .cta-secondary:hover { color: var(--text); }
+
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .breadcrumb-nav { max-width: 720px; margin: 0 auto; padding: 1.75rem 2rem 0.85rem; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.82rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    h2#related-reading { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 400; margin-top: 3.5rem; margin-bottom: 0.75rem; }
+    h2#related-reading + ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    h2#related-reading + ul li { margin: 0; }
+    h2#related-reading + ul li a { display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.1rem; background: var(--surface); color: var(--text); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.15s, color 0.15s; }
+    h2#related-reading + ul li a::after { content: '\2192'; opacity: 0.35; transition: opacity 0.15s, transform 0.15s; display: inline-block; margin-left: 0.5rem; }
+    h2#related-reading + ul li a:hover { background: var(--surface2); color: var(--accent); }
+    h2#related-reading + ul li a:hover::after { opacity: 1; transform: translateX(3px); }
+
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; padding: 0; flex-shrink: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; transition: border-color 0.15s, background 0.15s; }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span { display: block; width: 18px; height: 2px; background: currentColor; border-radius: 1px; transition: transform 0.25s ease, opacity 0.18s ease; transform-origin: center; }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    @media (max-width: 900px) {
+      html, body { overflow-x: hidden; }
+      body.menu-open { overflow: hidden; }
+      nav { padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 1.25rem; z-index: 99; max-height: 0; overflow: hidden; opacity: 0; visibility: hidden; transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s; }
+      .nav-links.open { max-height: 80vh; opacity: 1; visibility: visible; padding: 0.5rem 1.25rem 1.25rem; transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s; overflow-y: auto; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.92rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+    }
+    @media (max-width: 640px) { .article-wrap { padding: 3rem 1.25rem 5rem; } }
+
+    @media (max-width: 768px) { nav, .mobile-menu { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } }
+    /* Cross-reference panel (Related governance concepts) */
+    .related-panel { margin-top: 3rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .related-panel-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    .related-list li { margin: 0; }
+    .related-list a { display: block; padding: 1.15rem 1.35rem; background: var(--surface); text-decoration: none; transition: background 0.15s; }
+    .related-list a:hover { background: var(--surface2); }
+    .related-list .rel-title { color: var(--text); font-size: 0.92rem; font-weight: 600; margin-bottom: 0.35rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; letter-spacing: -0.005em; transition: color 0.15s; }
+    .related-list .rel-title::after { content: '\2192'; color: var(--accent); opacity: 0.4; transition: opacity 0.15s, transform 0.15s; flex-shrink: 0; }
+    .related-list a:hover .rel-title { color: var(--accent); }
+    .related-list a:hover .rel-title::after { opacity: 1; transform: translateX(3px); }
+    .related-list .rel-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.65; margin: 0; }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Compare", "item": "https://mnemehq.com/compare/"},
+          {"@type": "ListItem", "position": 3, "name": "Mneme HQ vs Aider", "item": "https://mnemehq.com/compare/aider/"}
+        ]
+      },
+      {
+        "@type": "Article",
+        "headline": "Mneme HQ vs Aider",
+        "description": "Aider is a terminal-based AI pair programmer. Mneme HQ is the governance layer that runs alongside any AI coding agent. Compare how Aider handles repo conventions versus deterministic enforcement of architectural decisions.",
+        "url": "https://mnemehq.com/compare/aider/",
+        "datePublished": "2026-05-28",
+        "dateModified": "2026-05-28",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "image": "https://mnemehq.com/compare/aider/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/compare/aider/"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Is Mneme HQ an alternative to Aider?",
+            "acceptedAnswer": {"@type": "Answer", "text": "No. Aider is an open-source terminal AI pair programmer that edits files in your repo from a chat-style interface. Mneme HQ does not generate code; it is the governance layer that enforces architectural decisions on whatever edits an AI coding agent proposes. Aider's audience and Mneme's audience overlap heavily because both are aimed at engineers who already trust an AI agent to touch their codebase. The two tools sit at different layers of that workflow."}
+          },
+          {
+            "@type": "Question",
+            "name": "Does Aider's conventions file enforce architectural decisions?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Not in the enforcement sense. Aider's conventions file (and repo map) is high-quality context for the model: it tells Aider what to keep in mind while editing. The model still decides how to apply that context on each turn. Where the conventions file is prose the model interprets, Mneme stores the same intent as typed decisions that fire deterministically when Aider proposes an Edit or Write. The conventions file remains the human-readable source; Mneme is the machine-evaluable enforcement layer."}
+          },
+          {
+            "@type": "Question",
+            "name": "Can I use Mneme HQ with Aider?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Yes. Mneme operates at the Edit/Write hook boundary, so it does not care which agent generated the proposed change. An Aider session that edits files goes through the same enforcement path as Cursor, Claude Code, or Copilot. The result is identical compliance against the same typed decision corpus, regardless of which terminal or IDE the engineer is using that day."}
+          },
+          {
+            "@type": "Question",
+            "name": "Why would I add governance on top of Aider?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Aider gives one engineer a fast, well-grounded coding loop. Governance gives a team a shared boundary for architectural decisions. As soon as more than one engineer (or more than one tool) starts editing a repo, the conventions file alone cannot guarantee that every edit respects the same architectural decisions. Mneme is the layer that makes that guarantee deterministic across agents, sessions, and team members."}
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/benchmark/">Benchmark</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<nav aria-label="Breadcrumb" class="breadcrumb-nav">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/compare/">Compare</a></li>
+    <li aria-current="page">Mneme HQ vs Aider</li>
+  </ol>
+</nav>
+<article class="article-wrap">
+  <header class="article-header">
+    <div class="article-eyebrow">
+      <span class="eyebrow-tag">Comparative</span>
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-meta">5 min read &nbsp;&middot;&nbsp; May 2026</span>
+    </div>
+    <h1>Mneme HQ vs Aider</h1>
+    <p class="article-lede">Aider is one of the best open-source terminal AI coding tools. Its repo map and conventions file give the model strong project context. Mneme HQ does not compete with that &mdash; it sits underneath Aider (and every other agent) and enforces architectural decisions at the Edit and Write boundary.</p>
+    <p class="byline">
+      By <a href="/founder/">Theo Valmis</a>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-28">Published May 2026</time>
+      <span class="sep">&middot;</span>
+      <time datetime="2026-05-28">Updated May 2026</time>
+    </p>
+  </header>
+
+  <div class="article-body">
+    <h2>What teams use Aider for</h2>
+
+    <p>Aider is one of the most established open-source AI coding tools. It runs in the terminal, reads your repo with a repo-map and a conventions file, and edits files directly from a chat-style interface. For engineers who prefer staying in the shell, Aider is fast, scriptable, and grounded in the actual repo.</p>
+
+    <p>The conventions file is the part most relevant to a governance comparison. It is a markdown file (typically at the repo root) that gives the model project-level context: preferred libraries, style choices, architectural notes. Combined with Aider&rsquo;s repo map, it is one of the strongest prose-driven steering surfaces in the open-source coding-agent ecosystem.</p>
+
+    <ul>
+      <li>Open-source, terminal-first AI pair programming</li>
+      <li>Repo map gives the model grounded structural context</li>
+      <li>Conventions file for prose-driven project steering</li>
+      <li>Direct Edit operations on files in the working tree</li>
+      <li>Model-agnostic (Anthropic, OpenAI, local, others)</li>
+    </ul>
+
+    <p>Mneme HQ is not in the same category. It does not generate code, and it does not run in the shell as a primary surface. It sits underneath any coding agent &mdash; Aider, Cursor, Claude Code, Copilot &mdash; and enforces architectural decisions on the edits the agent proposes. The two tools occupy different layers of the same workflow.</p>
+
+    <div class="memory-split">
+      <div class="memory-card memory-card--contextual">
+        <div class="memory-card-label">Aider conventions file</div>
+        <div class="memory-card-title">Prose context for the model</div>
+        <p>Read by Aider at session start, kept in context, interpreted by the model on each turn. Best for tone, preferred libraries, style. Suggestion-shaped: the model decides how to apply it.</p>
+      </div>
+      <div class="memory-card memory-card--decision">
+        <div class="memory-card-label">Mneme HQ enforcement</div>
+        <div class="memory-card-title">Typed corpus, hook-level block</div>
+        <p>Evaluated on every Edit/Write that any agent proposes. Best for architectural decisions, scope rules, dependency policies. Blocking-shaped: violations are stopped before they land.</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <p><strong>The framing:</strong> Aider is one of the best open-source pair programmers. Mneme is not a competitor &mdash; it is the layer that makes whatever Aider produces compliant with your architectural decisions, regardless of how the conventions file was phrased.</p>
+    </div>
+
+    <h2>Where they differ as layers in the stack</h2>
+
+    <div style="overflow-x:auto;margin:2rem 0;">
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>Dimension</th>
+          <th>Aider</th>
+          <th>Mneme HQ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Layer in the stack</td>
+          <td>Coding agent (terminal pair programmer)</td>
+          <td>Governance enforcement at Edit/Write</td>
+        </tr>
+        <tr>
+          <td>Context mechanism</td>
+          <td>Repo map plus conventions file</td>
+          <td>Typed decision corpus with scope and precedence</td>
+        </tr>
+        <tr>
+          <td>Compliance model</td>
+          <td>Prose-driven, model decides per turn</td>
+          <td>Scope-matched, system decides per edit</td>
+        </tr>
+        <tr>
+          <td>Multi-agent portability</td>
+          <td>Aider-specific conventions</td>
+          <td>Any agent that triggers Edit or Write</td>
+        </tr>
+        <tr>
+          <td>Override semantics</td>
+          <td>No native concept</td>
+          <td>First-class decision records with rationale</td>
+        </tr>
+        <tr>
+          <td>Operating point</td>
+          <td>Per chat turn, in context</td>
+          <td>Per Edit/Write hook, out of band</td>
+        </tr>
+        <tr>
+          <td>Cross-session continuity</td>
+          <td>Reloaded each session, model interprets</td>
+          <td>Deterministic recall every session, every agent</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h2>Three failure modes for the conventions file</h2>
+
+    <p>The conventions file is well-designed for what it is. These failure modes are not Aider bugs &mdash; they are the cost of using a single prose document as the only enforcement surface for decisions that must hold every time.</p>
+
+    <h3>1. The convention is in the file but not on this turn</h3>
+
+    <p>A team adds an architectural convention to <code style="font-family:'DM Mono',monospace;font-size:0.88em;color:var(--text);">CONVENTIONS.md</code>. Aider loads it. In a long session that touches many files, the convention is in context but the model&rsquo;s attention is on the immediate task. The relevant constraint never fires for the edit that violates it. Mneme&rsquo;s scope match runs on the edit, not in the context window, so the constraint fires whether the model was paying attention or not.</p>
+
+    <h3>2. The convention is ambiguous about scope</h3>
+
+    <p>A conventions file says &ldquo;use SQLAlchemy 2.x typed queries.&rdquo; The repo has a legacy admin tool in <code style="font-family:'DM Mono',monospace;font-size:0.88em;color:var(--text);">tools/admin/</code> that intentionally still uses raw SQL. The prose doesn&rsquo;t encode this exception. Aider, doing its job, applies the convention everywhere &mdash; including the directory where it shouldn&rsquo;t. A typed decision with explicit scope and an override record for <code style="font-family:'DM Mono',monospace;font-size:0.88em;color:var(--text);">tools/admin/**</code> would have resolved this deterministically.</p>
+
+    <h3>3. The team uses more than one tool</h3>
+
+    <p>One engineer uses Aider in the terminal. Another uses Cursor. CI runs Claude Code for autonomous remediation. The conventions file is Aider-specific; Cursor reads <code style="font-family:'DM Mono',monospace;font-size:0.88em;color:var(--text);">.cursor/rules</code>; Claude Code reads <code style="font-family:'DM Mono',monospace;font-size:0.88em;color:var(--text);">CLAUDE.md</code>. Keeping three prose surfaces in sync is a permanent maintenance task, and any drift between them is a drift in actual architectural compliance. Mneme&rsquo;s typed decisions are the single source of truth that all three agents resolve against.</p>
+
+    <h2>Why governance is a different primitive from pair programming</h2>
+
+    <p>Aider is a great pair programmer. Its core job is to help one engineer move quickly and stay grounded in the repo. The conventions file exists because that pair-programming loop benefits from project-level prose context. It works well at that job.</p>
+
+    <p>Architectural governance is a different job. The question is no longer &ldquo;what is the best edit for this turn?&rdquo; but &ldquo;is this edit allowed by the decisions this codebase has already made?&rdquo; The answer can&rsquo;t depend on which file the model happens to have in its context window or how the conventions file was phrased on Tuesday.</p>
+
+    <p>Mneme answers the governance question with typed decisions: explicit scope, machine-evaluable predicates, precedence ordering. When any agent (Aider included) proposes an Edit or Write, Mneme matches the scope, resolves precedence, and either lets the edit through or blocks it with the specific decision that fired. Same edit, same verdict, every session, every agent.</p>
+
+    <p>This is not a richer conventions file. It is a different primitive: structured enforcement, designed for the property prose cannot offer &mdash; deterministic recall of decisions that must hold every time.</p>
+
+    <h2>Using Aider and Mneme together</h2>
+
+    <p>The two tools compose cleanly. Aider stays the productive surface for engineers who like the terminal; Mneme stays the enforcement layer that catches violations regardless of which agent is editing.</p>
+
+    <ol>
+      <li><strong>Keep Aider for the in-flow coding loop.</strong> Repo map, conventions file, fast feedback &mdash; all of it. Aider is one of the best terminal pair programmers; Mneme has no quarrel with it.</li>
+      <li><strong>Move enforceable decisions into Mneme.</strong> Architectural rules, dependency policies, scope-bound conventions. Anything that must hold every time, regardless of which agent or session.</li>
+      <li><strong>Keep <code style="font-family:'DM Mono',monospace;font-size:0.88em;color:var(--text);">CONVENTIONS.md</code> for prose-shaped guidance.</strong> Tone, examples, things that improve average-case quality but aren&rsquo;t literal blocking criteria.</li>
+      <li><strong>Hook Mneme at the Edit/Write boundary.</strong> When Aider proposes an edit, Mneme matches by file scope and either allows it or blocks with the specific decision that fired.</li>
+      <li><strong>Encode exceptions as decisions, not as prose carve-outs.</strong> The <code style="font-family:'DM Mono',monospace;font-size:0.88em;color:var(--text);">tools/admin/</code> case above belongs in a typed decision record, not a paragraph in a conventions file.</li>
+    </ol>
+
+    <p>In this architecture, Aider is the memory of <em>how this engineer likes to work</em>. Mneme is the memory of <em>what this team has decided</em>. Workflows that use both are faster than Aider alone and have harder compliance guarantees than the conventions file can provide on its own.</p>
+
+    <section class="faq-list" aria-labelledby="faq-heading">
+      <h2 id="faq-heading" style="font-family:'Inter',sans-serif;font-size:1.25rem;font-weight:600;letter-spacing:-0.015em;margin-bottom:1.25rem;">Frequently asked questions</h2>
+      <details class="faq-item">
+        <summary>Is Mneme HQ an alternative to Aider?</summary>
+        <div class="faq-body">No. Aider is an open-source terminal AI pair programmer that edits files in your repo from a chat-style interface. Mneme HQ does not generate code; it is the governance layer that enforces architectural decisions on whatever edits an AI coding agent proposes. Aider's audience and Mneme's audience overlap heavily because both are aimed at engineers who already trust an AI agent to touch their codebase. The two tools sit at different layers of that workflow.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Does Aider's conventions file enforce architectural decisions?</summary>
+        <div class="faq-body">Not in the enforcement sense. Aider's conventions file (and repo map) is high-quality context for the model: it tells Aider what to keep in mind while editing. The model still decides how to apply that context on each turn. Where the conventions file is prose the model interprets, Mneme stores the same intent as typed decisions that fire deterministically when Aider proposes an Edit or Write. The conventions file remains the human-readable source; Mneme is the machine-evaluable enforcement layer.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Can I use Mneme HQ with Aider?</summary>
+        <div class="faq-body">Yes. Mneme operates at the Edit/Write hook boundary, so it does not care which agent generated the proposed change. An Aider session that edits files goes through the same enforcement path as Cursor, Claude Code, or Copilot. The result is identical compliance against the same typed decision corpus, regardless of which terminal or IDE the engineer is using that day.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Why would I add governance on top of Aider?</summary>
+        <div class="faq-body">Aider gives one engineer a fast, well-grounded coding loop. Governance gives a team a shared boundary for architectural decisions. As soon as more than one engineer (or more than one tool) starts editing a repo, the conventions file alone cannot guarantee that every edit respects the same architectural decisions. Mneme is the layer that makes that guarantee deterministic across agents, sessions, and team members.</div>
+      </details>
+    </section>
+
+  <aside class="related-panel" aria-labelledby="related-panel-label">
+    <div class="related-panel-label" id="related-panel-label">Related governance concepts</div>
+    <ul class="related-list">
+      <li><a href="/concepts/governance-infrastructure/"><div class="rel-title">Governance infrastructure</div><p class="rel-desc">Why governance has to be a layer, not a configuration file inside one tool &mdash; especially when teams use more than one coding agent.</p></a></li>
+      <li><a href="/concepts/deterministic-enforcement/"><div class="rel-title">Deterministic enforcement</div><p class="rel-desc">Same input, same verdict &mdash; every run, every agent. The property a prose conventions file cannot guarantee.</p></a></li>
+      <li><a href="/concepts/precedence-semantics/"><div class="rel-title">Precedence semantics</div><p class="rel-desc">Ordered rules that resolve overlapping decisions deterministically &mdash; supersession, scope, recency.</p></a></li>
+      <li><a href="/concepts/architectural-governance/"><div class="rel-title">Architectural governance</div><p class="rel-desc">The category Mneme operates in &mdash; orthogonal to the coding-agent layer that Aider, Cursor, and Claude Code share.</p></a></li>
+    </ul>
+  
+  </aside>
+
+  </div>
+
+  <footer class="article-footer">
+    <a href="/compare/" class="back-link">&larr; Back to Compare</a>
+    <div class="cta-block">
+      <h3>Architectural enforcement underneath every coding agent</h3>
+      <p>Mneme HQ hooks into Aider, Cursor, Claude Code, Copilot, and other AI coding agents at the Edit and Write boundary, matches your typed architectural decisions by scope, and blocks violations deterministically. Open source, self-hosted, model-agnostic.</p>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
+      <a href="/insights/architectural-governance-across-heterogeneous-ai-coding-agents/" class="cta-secondary">Read: Architectural governance across heterogeneous AI coding agents &rarr;</a>
+    </div>
+  </footer>
+</article>
+</main>
+
+<footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+  <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/use-cases/">Use cases</a></li>
+        <li><a href="/works-with/">Works with</a></li>
+        <li><a href="/platforms/">Platforms</a></li>
+        <li><a href="/integrations/">Integrations</a></li>
+        <li><a href="/compare/">Compare</a></li>
+        <li><a href="/demo/">Demo</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/concepts/">Concepts</a></li>
+        <li><a href="/architecture/">Architecture</a></li>
+        <li><a href="/insights/">Insights</a></li>
+        <li><a href="/standards/">Standards</a></li>
+        <li><a href="/benchmark/">Benchmark</a></li>
+        <li><a href="/docs/">Docs</a></li>
+        <li><a href="/docs/cli/">CLI reference</a></li>
+        <li><a href="/docs/governance-violations/">Governance violations</a></li>
+        <li><a href="/supported-languages/">Supported languages</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/pilot/" style="color:var(--accent);">Request pilot</a></li>
+        <li><a href="/for/">For teams</a></li>
+        <li><a href="/founder/">Founder</a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/roadmap/">Roadmap</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Code</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="https://github.com/TheoV823/mneme">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://dev.to/mnemehq" target="_blank" rel="noopener">DEV.to</a></li>
+        <li><a href="/privacy/">Privacy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
+    <span style="display:inline-flex;align-items:center;gap:0.75rem;"><a href="/" aria-label="Mneme HQ home" style="display:inline-flex;opacity:0.75;"><img src="/favicon.png" alt="Mneme HQ" height="22" style="display:block;"></a><span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span></span>
+    <nav aria-label="Social media" style="display: flex; align-items: center; gap: 1rem;">
+      <a href="https://github.com/TheoV823/mneme" target="_blank" rel="noopener" aria-label="GitHub" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.16c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.27-1.69-1.27-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.34.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18.92-.26 1.91-.39 2.89-.39.98 0 1.97.13 2.89.39 2.2-1.49 3.17-1.18 3.17-1.18.62 1.58.23 2.75.12 3.04.73.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.26 5.68.41.35.78 1.05.78 2.12v3.15c0 .31.21.67.8.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener" aria-label="LinkedIn" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 .06.77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/@MnemeHQ" target="_blank" rel="noopener" aria-label="YouTube" style="color: var(--muted); display: inline-flex;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.12C19.55 3.5 12 3.5 12 3.5s-7.55 0-9.4.58A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.12c1.85.58 9.4.58 9.4.58s7.55 0 9.4-.58a3 3 0 0 0 2.1-2.12A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8zM9.6 15.57V8.43L15.82 12 9.6 15.57z"/></svg>
+      </a>
+      <a href="https://dev.to/mnemehq" target="_blank" rel="noopener" aria-label="DEV.to" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true"><path d="M120.12 208.29c-3.88-2.9-7.77-4.35-11.65-4.35H91.03v104.47h17.45c3.88 0 7.77-1.45 11.65-4.35 3.88-2.9 5.82-7.25 5.82-13.06v-69.65c-.01-5.8-1.96-10.16-5.83-13.06zM404.1 32H43.9C19.7 32 .06 51.59 0 75.8v360.4C.06 460.41 19.7 480 43.9 480h360.2c24.21 0 43.84-19.59 43.9-43.8V75.8c-.06-24.21-19.7-43.8-43.9-43.8zM154.2 291.19c0 18.81-11.61 47.31-48.36 47.25h-46.4V172.98h47.38c35.44 0 47.36 28.46 47.36 47.28l.02 70.93zm100.68-88.66H201.6v38.42h32.57v29.57H201.6v38.41h53.29v29.57h-62.18c-11.16.29-20.44-8.53-20.72-19.69V193.7c-.27-11.15 8.56-20.41 19.71-20.69h63.19l-.01 29.52zm103.64 115.29c-13.2 30.75-36.85 24.63-47.44 0l-38.53-144.8h32.57l29.71 113.72 29.57-113.72h32.58l-38.46 144.8z"/></svg>
+      </a>
+    </nav>
+    <span>&copy; 2026</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  function setOpen(open){
+    links.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('menu-open', open);
+  }
+  btn.addEventListener('click', function(e){ e.stopPropagation(); setOpen(!links.classList.contains('open')); });
+  document.addEventListener('click', function(e){ if (!links.classList.contains('open')) return; if (links.contains(e.target) || btn.contains(e.target)) return; setOpen(false); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false); });
+  links.addEventListener('click', function(e){ if (e.target.tagName === 'A') setOpen(false); });
+  window.addEventListener('resize', function(){ if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false); });
+})();
+</script>
+</body>
+</html>
