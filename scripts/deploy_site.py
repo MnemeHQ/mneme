@@ -336,7 +336,6 @@ def submit_indexnow(urls):
     except urllib.error.HTTPError as e:
         print(f'[WARN] IndexNow -- HTTP {e.code}: {e.read().decode()[:200]}')
 
-print('
--- IndexNow submission --')
+print('\n-- IndexNow submission --')
 submit_indexnow(purge_urls if not full_deploy else sitemap_urls)
 
