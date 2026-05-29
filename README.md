@@ -4,9 +4,23 @@
 
 Mneme HQ is the architectural governance layer for AI-assisted development.
 
-[![Mneme HQ — Governed Python Agent Demo](https://img.youtube.com/vi/4Yg43V9amao/maxresdefault.jpg)](https://www.youtube.com/watch?v=4Yg43V9amao)
+<a href="https://www.youtube.com/watch?v=LaJqeJrKkgg" target="_blank">
+  <img 
+    src="https://i.ytimg.com/vi/LaJqeJrKkgg/maxresdefault.jpg" 
+    alt="From ADR to CI: Enforcing Architecture in GitHub Actions" 
+    width="100%"
+    style="border-radius: 8px;"
+  />
+</a>
 
-**▶ [Governed Python Agent Demo](https://www.youtube.com/watch?v=4Yg43V9amao)** · [ADR Import Demo →](https://mnemehq.com/demo/adr-compiler/) · [**Request a pilot →**](https://mnemehq.com/pilot/)
+<p align="center">
+  ▶ <a href="https://www.youtube.com/watch?v=4Yg43V9amao" target="_blank"><b>Governed Python Agent Demo</b></a>
+  &nbsp;·&nbsp;
+  <a href="https://mnemehq.com/demo/adr-compiler/" target="_blank">ADR Import Demo →</a>
+  &nbsp;·&nbsp;
+  <a href="https://mnemehq.com/pilot/" target="_blank"><b>Request a pilot →</b></a>
+</p>
+
 
 > **Current phase: Layer 1 — validation.** Mechanism is frozen at commit [`e73ff7d`](https://github.com/TheoV823/mneme/commit/e73ff7d). Local-repo, single-developer, project-scoped governance. Layer 2 (multi-repo, team sync, org policy distribution) is intentionally deferred. See [docs/architecture/current-phase.md](docs/architecture/current-phase.md) and [docs/architecture/layer1-freeze-e73ff7d.md](docs/architecture/layer1-freeze-e73ff7d.md).
 
