@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Agent Manager Is the New Control Plane for Software Development &mdash; Mneme HQ</title>
+  <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/fonts.css">
+  <meta name="description" content="As tools like Google Antigravity introduce manager views for supervising many agents across workspaces, the agent manager becomes a control plane for software development. But a control plane without policy enforcement is only visibility." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/insights/agent-manager-control-plane-governance/" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="The Agent Manager Is the New Control Plane for Software Development" />
+  <meta property="og:description" content="As manager views for supervising many agents become standard, the agent manager becomes a control plane. But a control plane without policy enforcement is only visibility." />
+  <meta property="og:url" content="https://mnemehq.com/insights/agent-manager-control-plane-governance/" />
+  <meta property="og:image" content="https://mnemehq.com/insights/agent-manager-control-plane-governance/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="The Agent Manager Is the New Control Plane" />
+  <meta name="twitter:description" content="A control plane without policy enforcement is only visibility. Multi-agent work needs policy, not just visibility." />
+  <meta name="twitter:image" content="https://mnemehq.com/insights/agent-manager-control-plane-governance/og.png" />
+  <meta name="author" content="Theo Valmis" />
+  <meta property="article:published_time" content="2026-05-28T00:00:00Z" />
+  <meta property="article:author" content="https://mnemehq.com/founder/" />
+  <meta property="article:section" content="Market Context" />
+
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{'analytics_storage':'granted','ad_storage':'denied','ad_user_data':'denied','ad_personalization':'denied'});</script>
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <link rel="icon" href="/favicon.png" type="image/png">
+
+  <script type="application/ld+json">
+  {"@context": "https://schema.org", "@graph": [
+    {"@type": "BreadcrumbList", "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+      {"@type": "ListItem", "position": 2, "name": "Insights", "item": "https://mnemehq.com/insights/"},
+      {"@type": "ListItem", "position": 3, "name": "The Agent Manager Is the New Control Plane for Software Development", "item": "https://mnemehq.com/insights/agent-manager-control-plane-governance/"}
+    ]},
+    {"@type": "TechArticle", "headline": "The Agent Manager Is the New Control Plane for Software Development", "url": "https://mnemehq.com/insights/agent-manager-control-plane-governance/", "datePublished": "2026-05-28", "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"}, "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/"}, "about": [{"@type": "Thing", "name": "Agent Manager"}, {"@type": "Thing", "name": "Google Antigravity"}, {"@type": "Thing", "name": "Multi-agent orchestration"}, {"@type": "Thing", "name": "Agentic IDE governance"}, {"@type": "Thing", "name": "Architectural governance"}]}
+  ]}
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d; --border: #222226; --border2: #2e2e34; --text: #e8e8ec; --muted: #a8a8b8; --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+    .article-wrap { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 7rem; }
+    .article-header { margin-bottom: 3.5rem; }
+    .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+    .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
+    .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
+    .article-body p strong { color: var(--text); font-weight: 500; }
+    .article-body ul { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body li { margin-bottom: 0.5rem; }
+    .article-body li strong { color: var(--text); font-weight: 500; }
+    .article-body a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(200,240,96,0.3); }
+    .article-body a:hover { border-bottom-color: var(--accent); }
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout p strong { color: var(--accent); }
+    .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .back-link:hover { color: var(--text); }
+    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2rem; }
+    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--accent-dim); }
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+    .breadcrumb-nav { max-width: 720px; margin: 0 auto; padding: 1.75rem 2rem 0.85rem; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.82rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; padding: 0; flex-shrink: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; transition: border-color 0.15s, background 0.15s; }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span { display: block; width: 18px; height: 2px; background: currentColor; border-radius: 1px; transition: transform 0.25s ease, opacity 0.18s ease; transform-origin: center; }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+    @media (max-width: 900px) {
+      html, body { overflow-x: clip; }
+      body.menu-open { overflow: hidden; }
+      nav, nav.site-nav { padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 1.25rem; z-index: 99; max-height: 0; overflow: hidden; opacity: 0; visibility: hidden; transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s; }
+      .nav-links.open { max-height: 80vh; opacity: 1; visibility: visible; padding: 0.5rem 1.25rem 1.25rem; transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s; overflow-y: auto; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.92rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+      .article-wrap { padding: 3rem 1.25rem 5rem; }
+    }
+    @media (max-width: 768px) { nav, .mobile-menu { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } }
+  </style>
+</head>
+<body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/concepts/">Concepts</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/" class="active">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/benchmark/">Benchmark</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<nav class="breadcrumb-nav" aria-label="Breadcrumb">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/insights/">Insights</a></li>
+    <li aria-current="page">The Agent Manager Is the New Control Plane</li>
+  </ol>
+</nav>
+
+<article class="article-wrap">
+  <header class="article-header">
+    <div class="article-eyebrow"><span class="eyebrow-tag">Market Context</span><span class="eyebrow-dot"></span><span class="eyebrow-meta">8 min read</span></div>
+    <h1>The Agent Manager Is the New Control Plane</h1>
+    <p class="article-lede">As tools like Google Antigravity introduce manager views for supervising many agents across workspaces, the agent manager becomes a control plane for software development. But a control plane without policy enforcement is only visibility.</p>
+    <p class="byline">By <a href="/founder/">Theo Valmis</a><span class="sep">&middot;</span><time datetime="2026-05-28">May 2026</time></p>
+  </header>
+
+  <div class="article-body">
+
+    <h2>Developer tools are becoming orchestration systems</h2>
+    <p>For most of software engineering history, the developer tool was a text editor with helpers around it &mdash; intellisense, debuggers, linters, source control. The unit of attention was the line, the file, the buffer.</p>
+    <p>Agent-first IDEs change that. Antigravity&rsquo;s Agent Manager / Mission Control puts the developer one level up: looking at a roster of agents, each working on its own task in its own workspace, each producing its own plan and artifact trail. The unit of attention is the agent, not the file.</p>
+    <p>That is an orchestration system. The label has not caught up, but the shape has.</p>
+
+    <h2>Manager views create a new operating model</h2>
+    <p>When the dashboard shows ten agents working on five tasks in four workspaces, the developer&rsquo;s job is closer to a team lead than to a typist. Decisions look like: which agent to escalate, which artifact to inspect, which task to redirect, which workspace to merge.</p>
+    <p>That is genuinely useful. It is also new infrastructure that has not yet absorbed the lessons of every other operations dashboard humanity has built &mdash; namely, that visibility without policy is incomplete.</p>
+
+    <h2>Multi-agent work needs policy, not just visibility</h2>
+    <p>A control plane that only shows what is happening is observability. A control plane that constrains what is allowed to happen is policy. The two are not the same thing.</p>
+    <ul>
+      <li><strong>Observability</strong> &mdash; you can see Agent #3 is about to merge a change that introduces a forbidden dependency.</li>
+      <li><strong>Policy</strong> &mdash; the merge does not happen, regardless of who is watching.</li>
+    </ul>
+    <p>Both are valuable. Only one is sufficient for autonomous execution at scale.</p>
+    <div class="callout"><p><strong>A control plane without policy is a dashboard.</strong> A dashboard can show you a problem. It cannot prevent the problem.</p></div>
+
+    <h2>Governance must travel across workspaces</h2>
+    <p>The manager view in Antigravity shows agents working across multiple workspaces. That distribution is the point &mdash; parallelism. But it is also the failure mode: each workspace is a potential surface where an architectural decision in one place is not enforced in another.</p>
+    <p>The governance layer underneath the manager view has to be the same across all of them. <a href="/concepts/governance-propagation/">Governance propagation</a> is what makes that possible &mdash; the same compiled constraints fan out to every agent in every workspace, so the manager view is showing work that was already evaluated against the same rule set.</p>
+
+    <h2>Architectural decisions need to become executable controls</h2>
+    <p>The Agent Manager surfaces what agents are doing. The governance layer underneath should surface, alongside each task, the architectural decisions that apply &mdash; and the verdict from checking the agent&rsquo;s work against them.</p>
+    <p>That turns the manager view into a real control plane: not just &ldquo;here is what the agents did,&rdquo; but &ldquo;here is what they did, and here is whether the system approves of what they did.&rdquo;</p>
+
+    <h2>Mneme framing</h2>
+    <p>Mneme is not trying to be the agent manager. It is the governance layer that agent managers should call before and during execution. The Agent Manager orchestrates; Mneme constrains; together they form a control plane that does both jobs.</p>
+    <div class="callout"><p><strong>Manager views without policy are dashboards.</strong> Manager views with policy are control planes. The shift from one to the other is where the next generation of developer tools wins.</p></div>
+
+  </div>
+
+  <footer class="article-footer">
+    <a href="/insights/" class="back-link">&larr; Back to Insights</a>
+    <div class="cta-block">
+      <h3>Add policy to your agent control plane</h3>
+      <p>Mneme is the open-source governance layer for multi-agent coding workflows &mdash; deterministic verdicts that travel alongside the manager view.</p>
+      <a href="/integrations/antigravity/" class="btn-primary" style="margin-right:0.5rem;">Works with Antigravity &rarr;</a>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary" style="background:transparent;border:1px solid var(--accent);color:var(--accent);">GitHub</a>
+    </div>
+  </footer>
+</article>
+</main>
+
+<footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+  <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+    <div><div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div><ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;"><li><a href="/use-cases/">Use cases</a></li><li><a href="/works-with/">Works with</a></li><li><a href="/platforms/">Platforms</a></li><li><a href="/integrations/">Integrations</a></li><li><a href="/compare/">Compare</a></li><li><a href="/demo/">Demo</a></li></ul></div>
+    <div><div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div><ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;"><li><a href="/concepts/">Concepts</a></li><li><a href="/architecture/">Architecture</a></li><li><a href="/insights/">Insights</a></li><li><a href="/qa-glossary/">Q&amp;A and Glossary</a></li><li><a href="/standards/">Standards</a></li><li><a href="/benchmark/">Benchmark</a></li><li><a href="/docs/">Docs</a></li></ul></div>
+    <div><div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div><ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;"><li><a href="/pilot/" style="color:var(--accent);">Request pilot</a></li><li><a href="/for/">For teams</a></li><li><a href="/founder/">Founder</a></li><li><a href="/about/">About</a></li><li><a href="/roadmap/">Roadmap</a></li><li><a href="/contact/">Contact</a></li></ul></div>
+    <div><div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Code</div><ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;"><li><a href="https://github.com/TheoV823/mneme">GitHub</a></li><li><a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a></li><li><a href="https://dev.to/mnemehq" target="_blank" rel="noopener">DEV.to</a></li><li><a href="/privacy/">Privacy</a></li></ul></div>
+  </div>
+  <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
+    <span style="display:inline-flex;align-items:center;gap:0.75rem;"><a href="/" aria-label="Mneme HQ home" style="display:inline-flex;opacity:0.75;"><img src="/favicon.png" alt="Mneme HQ" height="22" style="display:block;"></a><span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span></span>
+    <span>&copy; 2026</span>
+  </div>
+</footer>
+
+<script>(function(){var path=window.location.pathname;document.querySelectorAll('.nav-links a').forEach(function(a){var href=a.getAttribute('href');if(href&&href.startsWith('/')&&href!=='/'&&path.startsWith(href)){a.classList.add('active');}});})();</script>
+<script>(function(){var btn=document.querySelector('.nav-hamburger');var links=document.querySelector('.nav-links');if(!btn||!links)return;function setOpen(open){links.classList.toggle('open',open);btn.setAttribute('aria-expanded',String(open));document.body.classList.toggle('menu-open',open);}btn.addEventListener('click',function(e){e.stopPropagation();setOpen(!links.classList.contains('open'));});document.addEventListener('click',function(e){if(!links.classList.contains('open'))return;if(links.contains(e.target)||btn.contains(e.target))return;setOpen(false);});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&links.classList.contains('open'))setOpen(false);});links.addEventListener('click',function(e){if(e.target.tagName==='A')setOpen(false);});window.addEventListener('resize',function(){if(window.innerWidth>900&&links.classList.contains('open'))setOpen(false);});})();</script>
+</body>
+</html>
