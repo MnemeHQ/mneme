@@ -622,8 +622,8 @@ TEMPLATES = [
     ("og-works-with-devin.html", "Works With", "Mneme Works Alongside Devin", "52px", "Devin executes. Mneme preserves architectural intent across that execution.", "works-with/devin"),
     ("og-works-with-antigravity.html", "Works With", "Mneme Works Alongside Google Antigravity", "44px", "Architectural governance alongside agent-first development environments.", "works-with/antigravity"),
     # === BATCH: New compare pages ===
-    ("og-compare-devin-vs-governance.html", "Compare", "Devin vs Architectural Governance", "52px", "Why autonomous coding agents still need deterministic enforcement.", "compare/devin-vs-architectural-governance"),
-    ("og-compare-antigravity-vs-mneme.html", "Compare", "Google Antigravity vs Mneme", "52px", "Agentic IDEs vs architectural governance. Different layers; they compose.", "compare/google-antigravity-vs-mneme"),
+    ("og-compare-devin-vs-architectural-governance.html", "Compare", "Devin vs Architectural Governance", "52px", "Why autonomous coding agents still need deterministic enforcement.", "compare/devin-vs-architectural-governance"),
+    ("og-compare-google-antigravity-vs-mneme.html", "Compare", "Google Antigravity vs Mneme", "52px", "Agentic IDEs vs architectural governance. Different layers; they compose.", "compare/google-antigravity-vs-mneme"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -729,8 +729,8 @@ NEW_MAP_ENTRIES = {
     "og-works-with-devin.html": "works-with/devin/og.png",
     "og-works-with-antigravity.html": "works-with/antigravity/og.png",
     # Batch May 2026: compare
-    "og-compare-devin-vs-governance.html": "compare/devin-vs-architectural-governance/og.png",
-    "og-compare-antigravity-vs-mneme.html": "compare/google-antigravity-vs-mneme/og.png",
+    "og-compare-devin-vs-architectural-governance.html": "compare/devin-vs-architectural-governance/og.png",
+    "og-compare-google-antigravity-vs-mneme.html": "compare/google-antigravity-vs-mneme/og.png",
 }
 
 # ---------------------------------------------------------------------------

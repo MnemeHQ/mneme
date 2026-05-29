@@ -38,9 +38,7 @@ TEMPLATE_MAP = {
     "og-roadmap.html": "roadmap/og.png",
     "og-insights.html": "insights/og.png",
     "og-insights-prompt-engineering.html": "insights/prompt-engineering-is-not-governance/og.png",
-    "og-insights-code-review.html": "insights/ai-code-review/og.png",
     "og-insights-rag.html": "insights/rag-is-not-memory/og.png",
-    "og-insights-cursor.html": "insights/cursor-rules-for-teams/og.png",
     "og-insights-nonlinear-review.html": "insights/ai-code-review-does-not-scale-linearly/og.png",
     "og-insights-review-not-governance.html": "insights/review-is-not-governance/og.png",
     "og-insights-prompt-memory-fails.html": "insights/why-prompt-memory-fails-at-scale/og.png",
@@ -192,8 +190,8 @@ TEMPLATE_MAP = {
     "og-works-with-claude-marketplace.html": "works-with/claude-marketplace/og.png",
     "og-works-with-devin.html": "works-with/devin/og.png",
     "og-works-with-antigravity.html": "works-with/antigravity/og.png",
-    "og-compare-devin-vs-governance.html": "compare/devin-vs-architectural-governance/og.png",
-    "og-compare-antigravity-vs-mneme.html": "compare/google-antigravity-vs-mneme/og.png",
+    "og-compare-devin-vs-architectural-governance.html": "compare/devin-vs-architectural-governance/og.png",
+    "og-compare-google-antigravity-vs-mneme.html": "compare/google-antigravity-vs-mneme/og.png",
 }
 
 PORT = 8765
