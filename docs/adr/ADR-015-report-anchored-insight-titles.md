@@ -4,7 +4,7 @@ title: "Report-Anchored Insight Titles and Entity Front-Loading"
 status: accepted
 priority: normal
 date: 2026-05-30
-scope: site.insights_seo
+scope: site.insights_seo.report_titles
 ---
 
 # ADR-015: Report-Anchored Insight Titles and Entity Front-Loading
