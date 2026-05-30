@@ -86,6 +86,7 @@ TEMPLATE_MAP = {
     "og-insights-claude-md-scaling.html": "insights/why-claude-md-stops-scaling/og.png",
     "og-insights-reviewable-governance.html": "insights/ai-coding-governance-should-be-reviewable/og.png",
     "og-insights-copilot-space.html": "insights/github-copilot-space-framework/og.png",
+    "og-insights-productivity-paradox.html": "insights/productivity-paradox-perception-vs-measurement/og.png",
     "og-insights-harness-governance.html": "insights/harness-engineering-still-needs-governance/og.png",
     "og-insights-observability-governance.html": "insights/why-observability-is-not-governance/og.png",
     "og-insights-agent-infrastructure-stack.html": "insights/emerging-ai-agent-infrastructure-stack/og.png",
