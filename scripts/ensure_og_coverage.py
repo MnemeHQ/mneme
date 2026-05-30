@@ -606,6 +606,8 @@ TEMPLATES = [
     ("og-insights-agent-first-ides.html", "Insights", "Why Agent-First IDEs Need Architectural Invariants", "42px", "Delegated tasks need shared constraints, encoded and enforced.", "insights/agent-first-ides-need-architectural-invariants"),
     ("og-insights-governance-category.html", "Insights", "The Next AI Infrastructure Category Is Governance", "42px", "Every infrastructure wave creates a governance layer. AI coding is next.", "insights/ai-infrastructure-governance-category"),
     ("og-insights-liskov-python.html", "Insights", "Liskov's Python Critique Predicts the Governance Problem", "40px", "Encapsulation that's advisory holds at human pace. It does not survive agent velocity.", "insights/barbara-liskov-python-encapsulation-ai-governance"),
+    # === BATCH: Cursor Developer Habits Report (May 2026) ===
+    ("og-insights-cursor-habits.html", "Insights", "The Cursor Developer Habits Report", "52px", "Why AI coding now needs governance infrastructure.", "insights/cursor-developer-habits-report-governance-infrastructure"),
     # === BATCH: New concepts ===
     ("og-concepts-runtime-governance.html", "Concept", "Runtime Governance", "62px", "Enforcement across long-running autonomous execution environments.", "concepts/runtime-governance"),
     ("og-concepts-autonomous-se-governance.html", "Concept", "Autonomous Software Engineering Governance", "44px", "The enforcement layer for AI-driven software execution systems.", "concepts/autonomous-software-engineering-governance"),
@@ -713,6 +715,7 @@ NEW_MAP_ENTRIES = {
     "og-insights-agent-first-ides.html": "insights/agent-first-ides-need-architectural-invariants/og.png",
     "og-insights-governance-category.html": "insights/ai-infrastructure-governance-category/og.png",
     "og-insights-liskov-python.html": "insights/barbara-liskov-python-encapsulation-ai-governance/og.png",
+    "og-insights-cursor-habits.html": "insights/cursor-developer-habits-report-governance-infrastructure/og.png",
     # Batch May 2026: concepts
     "og-concepts-runtime-governance.html": "concepts/runtime-governance/og.png",
     "og-concepts-autonomous-se-governance.html": "concepts/autonomous-software-engineering-governance/og.png",

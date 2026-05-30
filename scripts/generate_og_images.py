@@ -177,6 +177,7 @@ TEMPLATE_MAP = {
     "og-insights-agent-first-ides.html": "insights/agent-first-ides-need-architectural-invariants/og.png",
     "og-insights-governance-category.html": "insights/ai-infrastructure-governance-category/og.png",
     "og-insights-liskov-python.html": "insights/barbara-liskov-python-encapsulation-ai-governance/og.png",
+    "og-insights-cursor-habits.html": "insights/cursor-developer-habits-report-governance-infrastructure/og.png",
     # Concepts
     "og-concepts-runtime-governance.html": "concepts/runtime-governance/og.png",
     "og-concepts-autonomous-se-governance.html": "concepts/autonomous-software-engineering-governance/og.png",
