@@ -1,0 +1,46 @@
+name: nav/footer check
+
+# Enforces that every applicable site/ page keeps the global header nav and
+# site footer in sync with the canonical partials site/_snippets/nav.html and
+# site/_snippets/footer.html.
+#
+# The site inlines a copy of the nav and footer into each of ~181 static pages.
+# A one-time normalization (PR: site/nav-footer-normalization) aligned them all;
+# this lint stops the drift from recurring as new pages are scaffolded from
+# older ones — the same failure mode that produced 3 header variants and 17
+# footer variants before normalization.
+#
+# Validator: scripts/check_nav_footer.py (derives the canonical markup from the
+# snippets at runtime, so the snippets remain the single source of truth).
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'site/**/*.html'
+      - 'scripts/check_nav_footer.py'
+      - '.github/workflows/nav-footer-check.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'site/**/*.html'
+      - 'scripts/check_nav_footer.py'
+      - '.github/workflows/nav-footer-check.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  check-nav-footer:
+    name: Verify nav/footer match site/_snippets/
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run nav/footer canonical check
+        run: python scripts/check_nav_footer.py
