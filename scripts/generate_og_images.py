@@ -193,6 +193,11 @@ TEMPLATE_MAP = {
     "og-works-with-antigravity.html": "works-with/antigravity/og.png",
     "og-compare-devin-vs-architectural-governance.html": "compare/devin-vs-architectural-governance/og.png",
     "og-compare-google-antigravity-vs-mneme.html": "compare/google-antigravity-vs-mneme/og.png",
+
+    # Insights — new
+    "og-insights-spec-driven-dev.html": "insights/spec-driven-development-still-needs-governance/og.png",
+    # Concepts
+    "og-concepts-spec-driven-development.html": "concepts/spec-driven-development/og.png",
 }
 
 PORT = 8765

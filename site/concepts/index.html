@@ -230,7 +230,8 @@
           {"@type": "DefinedTerm", "name": "Multi-Agent Architectural Drift", "url": "https://mnemehq.com/concepts/multi-agent-architectural-drift/"},
           {"@type": "DefinedTerm", "name": "Artifact Provenance", "url": "https://mnemehq.com/concepts/artifact-provenance/"},
           {"@type": "DefinedTerm", "name": "Antigravity Governance", "url": "https://mnemehq.com/concepts/antigravity-governance/"},
-          {"@type": "DefinedTerm", "name": "AI Governance Infrastructure", "url": "https://mnemehq.com/concepts/ai-governance-infrastructure/"}
+          {"@type": "DefinedTerm", "name": "AI Governance Infrastructure", "url": "https://mnemehq.com/concepts/ai-governance-infrastructure/"},
+          {"@type": "DefinedTerm", "name": "Spec-Driven Development", "url": "https://mnemehq.com/concepts/spec-driven-development/"}
         ]
       },
       {
@@ -493,25 +494,25 @@
       <span class="card-arrow">→</span>
     </a>
 
-    <a href="/concepts/governance-before-generation/" class="concept-card" role="listitem">
+    <a href="/concepts/architectural-drift/" class="concept-card" role="listitem">
       <div class="card-top">
         <span class="card-num">04</span>
+        <div>
+          <div class="card-title">Architectural Drift</div>
+        </div>
+      </div>
+      <p class="card-desc">The codebase-side compound degradation that AI agent drift produces. What "drift" looks like once it has settled into the repository's structure.</p>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="/concepts/governance-before-generation/" class="concept-card" role="listitem">
+      <div class="card-top">
+        <span class="card-num">05</span>
         <div>
           <div class="card-title">Governance Before Generation</div>
         </div>
       </div>
       <p class="card-desc">The principle that architectural constraints must be evaluated before the AI writes code. The enforcement point is the strategic variable — and moving it upstream changes everything.</p>
-      <span class="card-arrow">→</span>
-    </a>
-
-    <a href="/concepts/verification-contracts/" class="concept-card" role="listitem">
-      <div class="card-top">
-        <span class="card-num">05</span>
-        <div>
-          <div class="card-title">Verification Contracts</div>
-        </div>
-      </div>
-      <p class="card-desc">Pre-registered, machine-evaluable assertions that define what a governance check must prove. The structural difference between measurable governance and governance you can only hope for.</p>
       <span class="card-arrow">→</span>
     </a>
 
@@ -526,15 +527,37 @@
       <span class="card-arrow">→</span>
     </a>
 
+    <a href="/concepts/executable-architectural-intent/" class="concept-card" role="listitem">
+      <div class="card-top">
+        <span class="card-num">07</span>
+        <div>
+          <div class="card-title">Executable Architectural Intent</div>
+        </div>
+      </div>
+      <p class="card-desc">The slice of project knowledge that has been promoted from documentation into machine-evaluable, enforceable constraints that bind AI agent behavior at generation time &mdash; not just read, but obeyed.</p>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="/concepts/verification-contracts/" class="concept-card" role="listitem">
+      <div class="card-top">
+        <span class="card-num">08</span>
+        <div>
+          <div class="card-title">Verification Contracts</div>
+        </div>
+      </div>
+      <p class="card-desc">Pre-registered, machine-evaluable assertions that define what a governance check must prove. The structural difference between measurable governance and governance you can only hope for.</p>
+      <span class="card-arrow">→</span>
+    </a>
+
   </div>
 
-  <h2 class="section-label" style="margin-top:3.5rem;">Systems concepts</h2>
+  <h2 class="section-label" style="margin-top:3.5rem;">System properties</h2>
 
   <div class="concepts-grid" role="list">
 
     <a href="/concepts/governance-propagation/" class="concept-card" role="listitem">
       <div class="card-top">
-        <span class="card-num">07</span>
+        <span class="card-num">09</span>
         <div>
           <div class="card-title">Governance Propagation</div>
         </div>
@@ -545,7 +568,7 @@
 
     <a href="/concepts/deterministic-enforcement/" class="concept-card" role="listitem">
       <div class="card-top">
-        <span class="card-num">08</span>
+        <span class="card-num">10</span>
         <div>
           <div class="card-title">Deterministic Enforcement</div>
         </div>
@@ -556,7 +579,7 @@
 
     <a href="/concepts/precedence-semantics/" class="concept-card" role="listitem">
       <div class="card-top">
-        <span class="card-num">09</span>
+        <span class="card-num">11</span>
         <div>
           <div class="card-title">Precedence Semantics</div>
         </div>
@@ -567,7 +590,7 @@
 
     <a href="/concepts/multi-agent-continuity/" class="concept-card" role="listitem">
       <div class="card-top">
-        <span class="card-num">10</span>
+        <span class="card-num">12</span>
         <div>
           <div class="card-title">Multi-Agent Continuity</div>
         </div>
@@ -576,81 +599,9 @@
       <span class="card-arrow">→</span>
     </a>
 
-    <a href="/concepts/enforcement-provenance/" class="concept-card" role="listitem">
-      <div class="card-top">
-        <span class="card-num">11</span>
-        <div>
-          <div class="card-title">Enforcement Provenance</div>
-        </div>
-      </div>
-      <p class="card-desc">Every verdict is a citable chain &mdash; back through the precedence rule, the compiled record, and the authoring ADR. Opaque enforcement is theater; provenance is what makes governance trustable.</p>
-      <span class="card-arrow">&rarr;</span>
-    </a>
-
-    <a href="/concepts/governance-provenance/" class="concept-card" role="listitem">
-      <div class="card-top">
-        <span class="card-num">12</span>
-        <div>
-          <div class="card-title">Governance Provenance</div>
-        </div>
-      </div>
-      <p class="card-desc">Every rule has a lineage &mdash; the authoring ADR, the supersession chain, the originating discussion or incident. Per-rule, not per-verdict; the substrate that turns governance into engineering.</p>
-      <span class="card-arrow">&rarr;</span>
-    </a>
-
-    <a href="/concepts/agent-verification/" class="concept-card" role="listitem">
-      <div class="card-top">
-        <span class="card-num">13</span>
-        <div>
-          <div class="card-title">Agent Verification</div>
-        </div>
-      </div>
-      <p class="card-desc">Proving that an autonomous run preserved architectural intent, operational constraints, and invariants &mdash; not just that execution completed. Execution success is not architectural correctness.</p>
-      <span class="card-arrow">&rarr;</span>
-    </a>
-
-    <a href="/concepts/execution-surfaces/" class="concept-card" role="listitem">
-      <div class="card-top">
-        <span class="card-num">14</span>
-        <div>
-          <div class="card-title">Execution Surfaces</div>
-        </div>
-      </div>
-      <p class="card-desc">The inventory of places agents leave artifacts &mdash; code, commits, branches, PRs, CI configs, manifests, runbooks, docs. Governance limited to source code leaves most agent output ungoverned.</p>
-      <span class="card-arrow">&rarr;</span>
-    </a>
-
-  </div>
-
-  <h2 class="section-label" style="margin-top:3.5rem;">Adjacent concepts</h2>
-
-  <div class="concepts-grid" role="list">
-
-    <a href="/concepts/ai-native-sdlc/" class="concept-card" role="listitem">
-      <div class="card-top">
-        <span class="card-num">12</span>
-        <div>
-          <div class="card-title">AI-Native SDLC</div>
-        </div>
-      </div>
-      <p class="card-desc">A software delivery lifecycle designed from first principles for AI agents as primary code generators. The rate-limiting step has flipped — generation is no longer the bottleneck.</p>
-      <span class="card-arrow">→</span>
-    </a>
-
-    <a href="/concepts/architectural-drift/" class="concept-card" role="listitem">
-      <div class="card-top">
-        <span class="card-num">13</span>
-        <div>
-          <div class="card-title">Architectural Drift</div>
-        </div>
-      </div>
-      <p class="card-desc">The codebase-side compound degradation that AI agent drift produces. What "drift" looks like once it has settled into the repository's structure.</p>
-      <span class="card-arrow">→</span>
-    </a>
-
     <a href="/concepts/decision-continuity/" class="concept-card" role="listitem">
       <div class="card-top">
-        <span class="card-num">14</span>
+        <span class="card-num">13</span>
         <div>
           <div class="card-title">Decision Continuity</div>
         </div>
@@ -659,9 +610,81 @@
       <span class="card-arrow">→</span>
     </a>
 
-    <a href="/concepts/agentic-development/" class="concept-card" role="listitem">
+    <a href="/concepts/enforcement-provenance/" class="concept-card" role="listitem">
+      <div class="card-top">
+        <span class="card-num">14</span>
+        <div>
+          <div class="card-title">Enforcement Provenance</div>
+        </div>
+      </div>
+      <p class="card-desc">Every verdict is a citable chain &mdash; back through the precedence rule, the compiled record, and the authoring ADR. Opaque enforcement is theater; provenance is what makes governance trustable.</p>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="/concepts/governance-provenance/" class="concept-card" role="listitem">
       <div class="card-top">
         <span class="card-num">15</span>
+        <div>
+          <div class="card-title">Governance Provenance</div>
+        </div>
+      </div>
+      <p class="card-desc">Every rule has a lineage &mdash; the authoring ADR, the supersession chain, the originating discussion or incident. Per-rule, not per-verdict; the substrate that turns governance into engineering.</p>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="/concepts/model-independent-governance/" class="concept-card" role="listitem">
+      <div class="card-top">
+        <span class="card-num">16</span>
+        <div>
+          <div class="card-title">Model-Independent Governance</div>
+        </div>
+      </div>
+      <p class="card-desc">Architectural rules that live outside any one model, prompt, IDE, or agent runtime. The same engine consulting the same corpus returns the same verdict at every enforcement surface &mdash; so governance outlives the next model migration.</p>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="/concepts/agent-verification/" class="concept-card" role="listitem">
+      <div class="card-top">
+        <span class="card-num">17</span>
+        <div>
+          <div class="card-title">Agent Verification</div>
+        </div>
+      </div>
+      <p class="card-desc">Proving that an autonomous run preserved architectural intent, operational constraints, and invariants &mdash; not just that execution completed. Execution success is not architectural correctness.</p>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="/concepts/execution-surfaces/" class="concept-card" role="listitem">
+      <div class="card-top">
+        <span class="card-num">18</span>
+        <div>
+          <div class="card-title">Execution Surfaces</div>
+        </div>
+      </div>
+      <p class="card-desc">The inventory of places agents leave artifacts &mdash; code, commits, branches, PRs, CI configs, manifests, runbooks, docs. Governance limited to source code leaves most agent output ungoverned.</p>
+      <span class="card-arrow">→</span>
+    </a>
+
+  </div>
+
+  <h2 class="section-label" style="margin-top:3.5rem;">Paradigm &amp; context</h2>
+
+  <div class="concepts-grid" role="list">
+
+    <a href="/concepts/ai-native-sdlc/" class="concept-card" role="listitem">
+      <div class="card-top">
+        <span class="card-num">19</span>
+        <div>
+          <div class="card-title">AI-Native SDLC</div>
+        </div>
+      </div>
+      <p class="card-desc">A software delivery lifecycle designed from first principles for AI agents as primary code generators. The rate-limiting step has flipped — generation is no longer the bottleneck.</p>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="/concepts/agentic-development/" class="concept-card" role="listitem">
+      <div class="card-top">
+        <span class="card-num">20</span>
         <div>
           <div class="card-title">Agentic Development</div>
         </div>
@@ -670,9 +693,42 @@
       <span class="card-arrow">→</span>
     </a>
 
+    <a href="/concepts/objective-driven-development/" class="concept-card" role="listitem">
+      <div class="card-top">
+        <span class="card-num">21</span>
+        <div>
+          <div class="card-title">Objective-Driven Development</div>
+        </div>
+      </div>
+      <p class="card-desc">A programming model where developers define a desired outcome and an AI agent iteratively changes code until the condition is met. The unit of work shifts from the prompt to the objective &mdash; and the agent becomes an optimizer that needs constraints.</p>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="/concepts/ai-operating-layer/" class="concept-card" role="listitem">
+      <div class="card-top">
+        <span class="card-num">22</span>
+        <div>
+          <div class="card-title">AI Operating Layer</div>
+        </div>
+      </div>
+      <p class="card-desc">The coordination layer that translates human intent into multi-system execution across tools, agents, memory, and infrastructure. The new operating system is an execution system &mdash; and every execution system eventually becomes a governance system.</p>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="/concepts/reliable-delegation/" class="concept-card" role="listitem">
+      <div class="card-top">
+        <span class="card-num">23</span>
+        <div>
+          <div class="card-title">Reliable Delegation</div>
+        </div>
+      </div>
+      <p class="card-desc">The operating model for AI agents in production: teams can assign work to agents only when the system can verify that the work stayed inside known architectural, security, and operational constraints.</p>
+      <span class="card-arrow">→</span>
+    </a>
+
     <a href="/concepts/intent-debt/" class="concept-card" role="listitem">
       <div class="card-top">
-        <span class="card-num">16</span>
+        <span class="card-num">24</span>
         <div>
           <div class="card-title">Intent Debt</div>
         </div>
@@ -680,97 +736,99 @@
       <p class="card-desc">The gap between what a system is supposed to preserve and what its AI agents are actually constrained to follow. When agents become the execution layer, intent debt becomes the primary bottleneck.</p>
       <span class="card-arrow">→</span>
     </a>
-    <a href="/concepts/reliable-delegation/" class="concept-card" role="listitem">
+
+    <a href="/concepts/spec-driven-development/" class="concept-card" role="listitem">
       <div class="card-top">
-        <span class="card-num">17</span>
+        <span class="card-num">25</span>
         <div>
-          <div class="card-title">Reliable Delegation</div>
+          <div class="card-title">Spec-Driven Development</div>
         </div>
       </div>
-      <p class="card-desc">The operating model for AI agents in production: teams can assign work to agents only when the system can verify that the work stayed inside known architectural, security, and operational constraints.</p>
-      <span class="card-arrow">&rarr;</span>
+      <p class="card-desc">An AI-assisted workflow where a structured spec is the source of truth for what an agent builds. It defines what to build &mdash; governance defines what must stay true while building it.</p>
+      <span class="card-arrow">→</span>
     </a>
-    <a href="/concepts/objective-driven-development/" class="concept-card" role="listitem">
-      <div class="card-top">
-        <span class="card-num">18</span>
-        <div>
-          <div class="card-title">Objective-Driven Development</div>
-        </div>
-      </div>
-      <p class="card-desc">A programming model where developers define a desired outcome and an AI agent iteratively changes code until the condition is met. The unit of work shifts from the prompt to the objective &mdash; and the agent becomes an optimizer that needs constraints.</p>
-      <span class="card-arrow">&rarr;</span>
-    </a>
-    <a href="/concepts/executable-architectural-intent/" class="concept-card" role="listitem">
-      <div class="card-top">
-        <span class="card-num">19</span>
-        <div>
-          <div class="card-title">Executable Architectural Intent</div>
-        </div>
-      </div>
-      <p class="card-desc">The slice of project knowledge that has been promoted from documentation into machine-evaluable, enforceable constraints that bind AI agent behavior at generation time &mdash; not just read, but obeyed.</p>
-      <span class="card-arrow">&rarr;</span>
-    </a>
-    <a href="/concepts/ai-operating-layer/" class="concept-card" role="listitem">
-      <div class="card-top">
-        <span class="card-num">20</span>
-        <div>
-          <div class="card-title">AI Operating Layer</div>
-        </div>
-      </div>
-      <p class="card-desc">The coordination layer that translates human intent into multi-system execution across tools, agents, memory, and infrastructure. The new operating system is an execution system &mdash; and every execution system eventually becomes a governance system.</p>
-      <span class="card-arrow">&rarr;</span>
-    </a>
-    <a href="/concepts/model-independent-governance/" class="concept-card" role="listitem">
-      <div class="card-top">
-        <span class="card-num">21</span>
-        <div>
-          <div class="card-title">Model-Independent Governance</div>
-        </div>
-      </div>
-      <p class="card-desc">Architectural rules that live outside any one model, prompt, IDE, or agent runtime. The same engine consulting the same corpus returns the same verdict at every enforcement surface &mdash; so governance outlives the next model migration.</p>
-      <span class="card-arrow">&rarr;</span>
-    </a>
+
+  </div>
+
+  <h2 class="section-label" style="margin-top:3.5rem;">Applied governance surfaces</h2>
+
+  <div class="concepts-grid" role="list">
 
     <a href="/concepts/ai-governance-infrastructure/" class="concept-card" role="listitem">
-      <div class="card-top"><span class="card-num">22</span><div><div class="card-title">AI Governance Infrastructure</div></div></div>
+      <div class="card-top">
+        <span class="card-num">26</span>
+        <div>
+          <div class="card-title">AI Governance Infrastructure</div>
+        </div>
+      </div>
       <p class="card-desc">The deterministic enforcement layer that preserves architectural intent across AI-assisted software development &mdash; the inevitable next category in the AI engineering stack.</p>
-      <span class="card-arrow">&rarr;</span>
-    </a>
-
-    <a href="/concepts/runtime-governance/" class="concept-card" role="listitem">
-      <div class="card-top"><span class="card-num">23</span><div><div class="card-title">Runtime Governance</div></div></div>
-      <p class="card-desc">Enforcement of architectural, operational, and policy constraints across long-running autonomous execution environments &mdash; the runtime-time discipline.</p>
-      <span class="card-arrow">&rarr;</span>
+      <span class="card-arrow">→</span>
     </a>
 
     <a href="/concepts/autonomous-software-engineering-governance/" class="concept-card" role="listitem">
-      <div class="card-top"><span class="card-num">24</span><div><div class="card-title">Autonomous Software Engineering Governance</div></div></div>
+      <div class="card-top">
+        <span class="card-num">27</span>
+        <div>
+          <div class="card-title">Autonomous Software Engineering Governance</div>
+        </div>
+      </div>
       <p class="card-desc">The enforcement layer that preserves architectural, operational, and organizational constraints across AI-driven software execution systems.</p>
-      <span class="card-arrow">&rarr;</span>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="/concepts/runtime-governance/" class="concept-card" role="listitem">
+      <div class="card-top">
+        <span class="card-num">28</span>
+        <div>
+          <div class="card-title">Runtime Governance</div>
+        </div>
+      </div>
+      <p class="card-desc">Enforcement of architectural, operational, and policy constraints across long-running autonomous execution environments &mdash; the runtime-time discipline.</p>
+      <span class="card-arrow">→</span>
     </a>
 
     <a href="/concepts/agentic-ide-governance/" class="concept-card" role="listitem">
-      <div class="card-top"><span class="card-num">25</span><div><div class="card-title">Agentic IDE Governance</div></div></div>
+      <div class="card-top">
+        <span class="card-num">29</span>
+        <div>
+          <div class="card-title">Agentic IDE Governance</div>
+        </div>
+      </div>
       <p class="card-desc">The control layer that keeps autonomous coding agents aligned with architectural decisions while they operate inside agent-first IDEs &mdash; Antigravity, Cursor, Claude Code.</p>
-      <span class="card-arrow">&rarr;</span>
-    </a>
-
-    <a href="/concepts/multi-agent-architectural-drift/" class="concept-card" role="listitem">
-      <div class="card-top"><span class="card-num">26</span><div><div class="card-title">Multi-Agent Architectural Drift</div></div></div>
-      <p class="card-desc">What happens when multiple autonomous agents each make locally reasonable changes that compound into system-wide architectural deviation.</p>
-      <span class="card-arrow">&rarr;</span>
-    </a>
-
-    <a href="/concepts/artifact-provenance/" class="concept-card" role="listitem">
-      <div class="card-top"><span class="card-num">27</span><div><div class="card-title">Artifact Provenance</div></div></div>
-      <p class="card-desc">The record of plans, diffs, screenshots, browser recordings, and verification evidence produced by autonomous agents. Provenance explains; governance constrains.</p>
-      <span class="card-arrow">&rarr;</span>
+      <span class="card-arrow">→</span>
     </a>
 
     <a href="/concepts/antigravity-governance/" class="concept-card" role="listitem">
-      <div class="card-top"><span class="card-num">28</span><div><div class="card-title">Antigravity Governance</div></div></div>
+      <div class="card-top">
+        <span class="card-num">30</span>
+        <div>
+          <div class="card-title">Antigravity Governance</div>
+        </div>
+      </div>
       <p class="card-desc">The practice of applying architectural constraints, decision provenance, and verification checks to agent-first workflows running across editor, terminal, and browser.</p>
-      <span class="card-arrow">&rarr;</span>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="/concepts/multi-agent-architectural-drift/" class="concept-card" role="listitem">
+      <div class="card-top">
+        <span class="card-num">31</span>
+        <div>
+          <div class="card-title">Multi-Agent Architectural Drift</div>
+        </div>
+      </div>
+      <p class="card-desc">What happens when multiple autonomous agents each make locally reasonable changes that compound into system-wide architectural deviation.</p>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="/concepts/artifact-provenance/" class="concept-card" role="listitem">
+      <div class="card-top">
+        <span class="card-num">32</span>
+        <div>
+          <div class="card-title">Artifact Provenance</div>
+        </div>
+      </div>
+      <p class="card-desc">The record of plans, diffs, screenshots, browser recordings, and verification evidence produced by autonomous agents. Provenance explains; governance constrains.</p>
+      <span class="card-arrow">→</span>
     </a>
 
   </div>
