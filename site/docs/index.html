@@ -45,6 +45,7 @@
         "url": "https://mnemehq.com/docs/",
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
         "hasPart": [
+          {"@type": "WebPage", "name": "How enforcement works", "url": "https://mnemehq.com/docs/how-enforcement-works/"},
           {"@type": "WebPage", "name": "CLI reference", "url": "https://mnemehq.com/docs/cli/"},
           {"@type": "WebPage", "name": "Governance violations", "url": "https://mnemehq.com/docs/governance-violations/"},
           {"@type": "WebPage", "name": "Supported languages", "url": "https://mnemehq.com/docs/supported-languages/"},
@@ -154,6 +155,11 @@
   <p style="font-size:0.92rem;color:var(--muted);line-height:1.75;max-width:780px;margin:0 0 2rem;">Mneme HQ's documentation is intentionally narrow. We document the surfaces that engineers actually need to operate the governance layer: the CLI you run, the violations Mneme catches, the languages Mneme governs today, and the methodology behind the benchmark. Everything else lives in the source repository.</p>
 
   <div class="doc-grid">
+    <a class="doc-card" href="/docs/how-enforcement-works/">
+      <div class="dh"><span class="dname">How enforcement works</span><span class="dtag">Explainer</span></div>
+      <p>How Mneme turns human-authored architectural decisions into deterministic enforcement rules checked before AI generation. ADR authoring, structured governance, explainable verdicts.</p>
+      <span class="read">How enforcement works &rarr;</span>
+    </a>
     <a class="doc-card" href="/docs/cli/">
       <div class="dh"><span class="dname">CLI reference</span><span class="dtag">Reference</span></div>
       <p>Commands, flags, and exit codes for <code>mneme</code>: <code>list_decisions</code>, <code>add_decision</code>, <code>test_query</code>, <code>check</code>, <code>cursor generate</code>, and <code>benchmark</code>. GitHub Actions and pre-commit CI patterns.</p>
