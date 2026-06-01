@@ -144,6 +144,10 @@ Only a real verdict returned by `mneme check` can cause a block.
 - Review the triggered anti-patterns with `/mneme-context` to see if they're too broad.
 
 **`mneme check` is slow**
-- The hook has a 10 s timeout and fails open on expiry. If it's consistently slow,
-  check LLM API latency — `mneme check` calls the Anthropic API for embedding-assisted
-  retrieval on larger memory files.
+- The hook has a 10 s timeout and fails open on expiry. Retrieval is fully local and
+  deterministic — keyword-overlap scoring over your decisions, with no network calls,
+  no embeddings, and no Anthropic API round-trip — so any slowness is local work, not
+  API latency. If it's consistently slow, the usual causes are a very large
+  `.mneme/project_memory.json` (every decision is parsed and scored on each check) or
+  CLI process startup overhead. Trimming or splitting an oversized memory file and
+  pruning stale decisions are the effective fixes.

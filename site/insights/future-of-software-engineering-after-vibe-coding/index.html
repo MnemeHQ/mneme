@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Future of Software Engineering After Vibe Coding &mdash; Mneme HQ</title>
+  <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/fonts.css">
+  <meta name="description" content="Vibe coding changed how software gets built. But production engineering still requires judgment, governance, architectural constraints, and accountability in an AI-agent world." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/insights/future-of-software-engineering-after-vibe-coding/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="The Future of Software Engineering After Vibe Coding" />
+  <meta property="og:description" content="Vibe coding discovers what could exist. Engineering decides what is allowed to persist. As agents absorb the writing of code, engineering becomes the governing of systems that write code." />
+  <meta property="og:url" content="https://mnemehq.com/insights/future-of-software-engineering-after-vibe-coding/" />
+  <meta property="og:image" content="https://mnemehq.com/insights/future-of-software-engineering-after-vibe-coding/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="The Future of Software Engineering After Vibe Coding" />
+  <meta name="twitter:description" content="Vibe coding discovers what could exist. Engineering decides what is allowed to persist. As agents absorb the writing of code, engineering becomes the governing of systems that write code." />
+  <meta name="twitter:image" content="https://mnemehq.com/insights/future-of-software-engineering-after-vibe-coding/og.png" />
+  <meta name="author" content="Theo Valmis" />
+  <meta property="article:published_time" content="2026-06-01T00:00:00Z" />
+  <meta property="article:author" content="https://mnemehq.com/founder/" />
+  <meta property="article:section" content="Engineering" />
+
+  <!-- Consent defaults -->
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{'analytics_storage':'granted','ad_storage':'denied','ad_user_data':'denied','ad_personalization':'denied'});</script>
+
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="icon" href="/favicon.png" type="image/png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Insights", "item": "https://mnemehq.com/insights/"},
+          {"@type": "ListItem", "position": 3, "name": "The Future of Software Engineering After Vibe Coding", "item": "https://mnemehq.com/insights/future-of-software-engineering-after-vibe-coding/"}
+        ]
+      },
+      {
+        "@type": "TechArticle",
+        "headline": "The Future of Software Engineering After Vibe Coding",
+        "description": "Vibe coding changed how software gets built. But production engineering still requires judgment, governance, architectural constraints, and accountability in an AI-agent world.",
+        "url": "https://mnemehq.com/insights/future-of-software-engineering-after-vibe-coding/",
+        "datePublished": "2026-06-01",
+        "dateModified": "2026-06-01",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "image": "https://mnemehq.com/insights/future-of-software-engineering-after-vibe-coding/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/insights/future-of-software-engineering-after-vibe-coding/",
+        "about": ["vibe coding", "future of software engineering", "agentic engineering", "AI-assisted software development", "AI coding governance", "architectural governance", "software engineering judgment", "apprenticeship"]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is vibe coding?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Vibe coding is a term coined by Andrej Karpathy in February 2025 for a mode of building software where you prompt an AI, accept what it produces, and largely stop reading the code itself — you 'give in to the vibes.' He framed it as fine for throwaway weekend projects. It is not a synonym for all AI-assisted or agentic engineering; the defining feature is the absence of review. The distinction between exploratory vibe coding and accountable, reviewed engineering is the whole subject of the post-vibe-coding conversation."}
+          },
+          {
+            "@type": "Question",
+            "name": "Does vibe coding replace software engineers?",
+            "acceptedAnswer": {"@type": "Answer", "text": "No. It changes what engineering is. As AI agents absorb the writing of code, the engineer's unit of work shifts from authoring the diff to specifying and enforcing the constraint envelope the diff is generated inside. Coding becomes partially automated; accountability for reliability, security, and architectural integrity does not. Engineering moves from primarily producing code to governing the autonomous systems that produce it — which, as autonomy rises, requires more judgment and governance, not less."}
+          },
+          {
+            "@type": "Question",
+            "name": "Why is the decline of junior-engineer roles a governance risk?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Apprenticeship was never only training. The junior-to-senior pipeline was the mechanism by which a team's architectural intent got re-articulated, contested, and refreshed each generation — seniors had to make tacit decisions explicit in order to teach them. When agents absorb the entry-level work and juniors ship without metabolizing those decisions, that intent-renewal loop shuts down. The result is not just a skills gap; it is the loss of the process that kept architectural intent current. Intent debt that apprenticeship used to pay down silently now compounds with no human sink."}
+          },
+          {
+            "@type": "Question",
+            "name": "What replaces apprenticeship as the way architectural intent is preserved?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Governance as infrastructure. If the mentorship loop that used to transmit 'what is allowed to persist' is being decommissioned, the decisions it carried have to live somewhere a machine can read and enforce them: architectural intent compiled into explicit, versioned, machine-evaluable constraints that are applied before generation and at every gate, independent of which agent or which engineer produced the change. The governing layer now has to do the intent-renewal work the human loop used to do, because that loop is going away, not merely being under-taught."}
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #a8a8b8;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .article-wrap { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 7rem; }
+    .article-header { margin-bottom: 3.5rem; }
+    .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+
+    .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
+    .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .article-body h3 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--text); }
+    .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
+    .article-body p strong { color: var(--text); font-weight: 500; }
+    .article-body ul, .article-body ol { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body li { margin-bottom: 0.5rem; }
+    .article-body li strong { color: var(--text); font-weight: 500; }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout p strong { color: var(--accent); }
+
+    .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .back-link:hover { color: var(--text); }
+    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2rem; }
+    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--accent-dim); }
+
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .breadcrumb-nav { max-width: 720px; margin: 0 auto; padding: 1.75rem 2rem 0.85rem; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.82rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 36px; height: 36px; border-radius: 6px; cursor: pointer; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; }
+
+    @media (max-width: 640px) {
+      nav { padding: 1rem 1.25rem; }
+      .article-wrap { padding: 3rem 1.25rem 5rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0.5rem 1.25rem 1.25rem; z-index: 99; }
+      .nav-links.open { display: flex; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.88rem; padding: 0.7rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+    }
+
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    /* === Nav upgrade === */
+    .nav-hamburger {
+      display: none;
+      background: none;
+      border: 1px solid var(--border2);
+      color: var(--text);
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 0;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 4px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span {
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: currentColor;
+      border-radius: 1px;
+      transition: transform 0.25s ease, opacity 0.18s ease;
+      transform-origin: center;
+    }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    @media (max-width: 900px) {
+      html, body { overflow-x: clip; }
+      body.menu-open { overflow: hidden; }
+      nav, nav.site-nav { padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links {
+        display: flex !important;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        gap: 0;
+        background: rgba(12,12,13,0.98);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: 0 1.25rem;
+        z-index: 99;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        visibility: hidden;
+        transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s;
+      }
+      .nav-links.open {
+        max-height: 80vh;
+        opacity: 1;
+        visibility: visible;
+        padding: 0.5rem 1.25rem 1.25rem;
+        transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s;
+        overflow-y: auto;
+      }
+      .nav-links a:not(.btn-nav-cta) {
+        display: block;
+        color: var(--text);
+        font-size: 0.92rem;
+        padding: 0.85rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+    }
+
+    /* === Related reading === */
+    .related-panel { margin-top: 3.5rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .related-panel-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    .related-list li { margin: 0; }
+    .related-list a { display: block; padding: 1.15rem 1.35rem; background: var(--surface); text-decoration: none; transition: background 0.15s; }
+    .related-list a:hover { background: var(--surface2); }
+    .related-list .rel-title { color: var(--text); font-size: 0.92rem; font-weight: 600; margin-bottom: 0.35rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; letter-spacing: -0.005em; transition: color 0.15s; }
+    .related-list .rel-title::after { content: '\2192'; color: var(--accent); opacity: 0.4; transition: opacity 0.15s, transform 0.15s; flex-shrink: 0; }
+    .related-list a:hover .rel-title { color: var(--accent); }
+    .related-list a:hover .rel-title::after { opacity: 1; transform: translateX(3px); }
+    .related-list .rel-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.65; margin: 0; }
+
+    @media (max-width: 768px) { nav, .mobile-menu { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } }
+  </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/concepts/">Concepts</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/" class="active">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/benchmark/">Benchmark</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<nav class="breadcrumb-nav" aria-label="Breadcrumb">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/insights/">Insights</a></li>
+    <li aria-current="page">The Future of Software Engineering After Vibe Coding</li>
+  </ol>
+</nav>
+
+<article class="article-wrap">
+  <header class="article-header">
+    <div class="article-eyebrow">
+      <span class="eyebrow-tag">Thought Leadership</span>
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-meta">11 min read</span>
+    </div>
+    <h1>The Future of Software Engineering After Vibe Coding</h1>
+    <p class="article-lede">The debate everyone is having &mdash; do AI agents replace engineers? &mdash; is the wrong one. The real shift is not human-written code versus AI-written code. It is exploratory generation versus accountable production. Vibe coding discovers what could exist. Engineering decides what is allowed to persist. And the work of deciding is about to become the whole job.</p>
+    <p class="byline">By <a href="/founder/">Theo Valmis</a><span class="sep">&middot;</span><time datetime="2026-06-01">June 2026</time></p>
+  </header>
+
+  <div class="article-body">
+
+<p>In May 2026, Bloomberg ran a segment titled <a href="https://www.bloomberg.com/news/videos/2026-05-02/why-vibe-coding-isn-t-the-end-of-the-software-engineer-video" rel="noopener">&ldquo;Why Vibe Coding Isn&rsquo;t the End of the Software Engineer.&rdquo;</a> It follows a warehouse owner who rebuilt his shipping software by prompting an AI, and a designer who shipped her first app with no technical background &mdash; and then a Google Cloud AI director making the case that none of this means the end of serious engineering. In passing, it notes something sharper than its own headline: junior-developer hiring is falling fast, and researchers warn that companies are making a dangerous short-term bet.</p>
+<p>That tension is the whole story, and the usual framing misses it. The question is not whether AI writes code instead of humans. It is whether the thing being produced is an <em>exploration</em> or a <em>system someone is accountable for</em>. Those are different activities with different success criteria, and conflating them is how teams get hurt.</p>
+<p><strong>Vibe coding</strong> &mdash; a term Andrej Karpathy coined in February 2025 &mdash; names one end of that spectrum precisely. In his original sense it means giving in to the vibes: you prompt, you run, you copy-paste, and you largely stop reading the code. He framed it as fine for throwaway weekend projects. It is not a synonym for all AI-assisted or agentic engineering, and the difference is the entire subject of this essay. Vibe coding is what happens when generation is unaccountable on purpose. Engineering is what happens when it cannot be.</p>
+
+<h2>Vibe coding is a discovery primitive</h2>
+<p>Start by giving vibe coding its due, because the reflex to dismiss it is as wrong as the reflex to worship it. Vibe coding is a genuine advance in one specific thing: <strong>compressing the distance between an idea and a working artifact.</strong> It removes friction from experimentation. It lets a non-engineer turn a hunch into something runnable. It pulls engineering earlier into discovery, where the cost of trying an idea used to be the thing that killed it. As a way to find out what <em>could</em> exist, it is the best tool the industry has ever had.</p>
+<p>What it is not is a way to decide what <em>should</em> exist, or what is allowed to stay. A prototype is not an operational system. Generated code inherits no accountability for the system it lands in. An agent optimizing for completing the task in front of it is not optimizing for the maintainability of the codebase around it &mdash; and the very speed that makes vibe coding feel magical is what hides the architectural drift it produces. The output looks finished, which is exactly the problem: nothing about looking finished tells you whether it belongs.</p>
+<div class="callout"><p><strong>Vibe coding discovers what could exist. Engineering decides what is allowed to persist.</strong> The first is a generation problem and AI has largely solved it. The second is a judgment problem, and it is the part that does not automate.</p></div>
+<p>So the interesting question is not whether vibe coding is good. It is good, at the thing it is for. The interesting question is what happens at the boundary &mdash; the moment an explored artifact tries to graduate into a system people depend on. That boundary is where engineering now lives.</p>
+
+<h2>The unit of engineering work inverts</h2>
+<p>Here is the shift the &ldquo;replacement&rdquo; debate cannot see. When agents absorb the writing of code, the engineer&rsquo;s unit of work does not disappear. It inverts. The job stops being <em>author the diff</em> and becomes <em>specify and enforce the envelope the diff is generated inside.</em> The agent authors the content. The engineer authors the boundary.</p>
+<p>This is what &ldquo;software engineering moves from producing code to governing systems that produce code&rdquo; actually means in practice. It is not a slogan about engineers becoming editors. It is a concrete relocation of where the human adds value: from the implementation, which is now cheap and fast, to the constraints the implementation must satisfy, which are now the scarce and load-bearing thing. The decisions &mdash; which dependencies are allowed, which boundaries are inviolable, which patterns are standard, which older choices have been superseded &mdash; are the work. Writing them down in a form a system can apply <a href="/concepts/governance-before-generation/">before generation</a> is the work. Making them <a href="/concepts/verification-contracts/">machine-evaluable</a> so they hold across every agent and every run is the work.</p>
+<p>The industry has done this before, every time it added an abstraction layer. Cloud raised leverage and created a whole security-and-compliance discipline around it. Continuous delivery raised velocity and pulled observability and SRE into existence. Platform engineering productized the boundary so product teams could move inside it safely. Each layer increased what a team could do <em>and</em> increased what had to be governed for that power to be survivable. AI coding is the same pattern at a higher altitude: the leverage is enormous, and the governance requirement scales with it, not against it. This is the through-line in <a href="/insights/what-is-the-ai-sdlc/">the AI SDLC</a> and in why <a href="/insights/ai-is-becoming-the-operating-layer-for-software-execution/">AI is becoming the operating layer for software execution</a> &mdash; delegation, not interaction, is the new default, and delegation only works inside <a href="/concepts/reliable-delegation/">a boundary the delegator defined</a>.</p>
+
+<h2>What governing the systems actually requires</h2>
+<p>If engineering becomes governing, it is worth being precise about what that demands &mdash; and three of its hard parts already have their own treatments, so this is the short version with the pointers.</p>
+<p><strong>You supervise fleets, not files.</strong> Engineers increasingly oversee many agents working in parallel, and a console that shows you what they are doing is not the same as a layer that constrains what they are allowed to do. A control plane without policy is just visibility, the distinction drawn in <a href="/insights/agent-manager-control-plane-governance/">the agent manager as the new control plane</a>.</p>
+<p><strong>Tests and evals are necessary and not sufficient.</strong> Linting, benchmarks, security scans, and behavioral evals all matter, and none of them defines correctness. A run can be graded as having behaved acceptably and still merge a diff that contradicts a decision the team ratified &mdash; the gap examined in <a href="/insights/github-ai-agent-validation-trust-layer/">GitHub&rsquo;s Trust Layer validates behavior, not architectural conformance</a>. A system can pass every check and still be locally correct and globally destructive.</p>
+<p><strong>Visibility shrinks as autonomy grows.</strong> The more the system does, the less of its actual reasoning a human sees &mdash; you review summaries, plans, and diffs, not the full cognitive process. Monitoring records the drift; it does not prevent it, which is why <a href="/insights/why-observability-is-not-governance/">observability is not governance</a>. As execution surface expands, visibility contracts, and the blind spot is where failure accumulates quietly.</p>
+<p>None of these is the headline of this essay, because each is already its own argument. Together they describe the shape of the new job: the engineer is accountable for systems they did not directly author, and the only way to be accountable for what you did not write is to govern the conditions under which it gets written.</p>
+
+<h2>The apprenticeship was the governance</h2>
+<p>Which brings us to the thing the Bloomberg segment mentioned almost in passing, and the part of this shift that is genuinely under-discussed. The risk to engineers is not replacement. It is the quiet collapse of how engineering judgment was ever made in the first place.</p>
+<p>There is hard data underneath the anxiety. Stanford&rsquo;s <a href="https://digitaleconomy.stanford.edu/publication/canaries-in-the-coal-mine-six-facts-about-the-recent-employment-effects-of-artificial-intelligence/" rel="noopener">&ldquo;Canaries in the Coal Mine&rdquo;</a> study, built on ADP payroll records, found that since generative AI spread, workers aged 22&ndash;25 in the most AI-exposed occupations &mdash; software development among them &mdash; saw roughly a 13% <em>relative</em> employment decline (revised to about 16% in late 2025), while older and less-exposed workers held flat or grew. That is a relative shift controlling for firm-level shocks, not an absolute collapse in headcount &mdash; but the direction is unambiguous, and it points at the entry level. Meanwhile <a href="https://survey.stackoverflow.co/2025/ai" rel="noopener">Stack Overflow&rsquo;s 2025 survey</a> found 84% of developers use or plan to use AI tools while only 3.1% say they &ldquo;highly trust&rdquo; their output. Adoption is near-total; trust is near-zero. That is the signature of a tool doing the work without anyone learning from it.</p>
+<p>Now look at what apprenticeship actually was. Juniors learned by debugging, by taking incremental ownership, by being exposed to architecture, by failing and repeating. But the loop ran in both directions, and the upward direction is the one nobody counts. <strong>Mentoring forced seniors to make tacit architectural intent explicit.</strong> To teach a decision, you have to articulate it, defend it, and watch a junior stress-test it with a naive question that exposes the part you had stopped examining. Apprenticeship was not only how juniors absorbed intent. It was how the organization <em>re-encoded and refreshed</em> its intent, generation after generation.</p>
+<p>Vibe coding collapses that loop from both ends. Juniors ship through agents without ever metabolizing the decisions, so intent never gets absorbed. And seniors stop teaching, because the agent &ldquo;already knows&rdquo; &mdash; so intent never gets re-articulated. The mechanism that kept architectural intent current, contested, and alive simply stops running.</p>
+<div class="callout"><p><strong>Apprenticeship was the org&rsquo;s intent-renewal mechanism, not just its training program.</strong> &ldquo;<a href="/insights/ai-native-engineering-intent-debt/">Intent debt</a>&rdquo; used to be paid down silently by mentorship &mdash; every time a decision was taught, it was refreshed. Remove the loop and intent debt compounds with no human sink. This is a different problem from the curriculum gap in <a href="/insights/rise-of-agentic-engineering-education/">agentic engineering education</a>: that is about what we teach; this is about the renewal process disappearing entirely.</p></div>
+<p>The cost of a lost architectural decision used to be bounded by review latency &mdash; someone, eventually, in a code review or a mentorship moment, would re-encounter the decision and either restate it or knowingly retire it. Under vibe coding that bound is gone, because the human who would have re-encoded it never enters the loop. A decision that is never taught and never enforced does not get retired. It gets forgotten while the code that depended on it keeps shipping.</p>
+
+<h2>Governance has to do the work the loop used to</h2>
+<p>This reframes what governance-as-infrastructure is for. The homepage version of the argument is that AI writes more code, so you need a layer that enforces architectural decisions. True, but too small. The deeper claim is this: <strong>governance tooling now has to do the intent-renewal work that apprenticeship used to do, because apprenticeship is being decommissioned, not merely under-taught.</strong></p>
+<p>If the human institution that kept architectural intent current is going away, the intent has to live somewhere a machine can hold it, apply it, and surface it &mdash; compiled into explicit, versioned, machine-evaluable constraints, enforced <a href="/concepts/governance-before-generation/">before generation</a> and at every gate, <a href="/concepts/governance-propagation/">propagated</a> to every agent and surface regardless of who or what produced the change. Not a wiki a junior was supposed to read. Not a senior&rsquo;s memory that retires when they do. A governing layer that re-applies the decision every single time, which is the only form of &ldquo;mentorship&rdquo; that scales to a fleet of agents that never sat through a code review.</p>
+<p>This does not bring apprenticeship back, and it should not pretend to &mdash; the human formation of judgment is a real loss the industry will have to reckon with separately, including by deliberately preserving the parts of the loop that make senior engineers. But it does keep the <em>output</em> of that judgment &mdash; the decisions themselves &mdash; alive and enforced after the process that used to carry them has thinned out.</p>
+
+<h2>What the future engineer actually does</h2>
+<p>The future engineer is not replaced by agents. The future engineer governs increasingly autonomous execution. Coding becomes partially automated; accountability does not, and accountability is the part that was always the job. The engineers who thrive in this era are the ones who can define what quality means in their context, preserve architectural integrity as the system rewrites itself, encode organizational memory into something enforceable, set the governance boundaries agents operate inside, and &mdash; the rarest skill &mdash; know when not to ship.</p>
+<p>Vibe coding earned its place by making discovery almost free. That is a real gift, and it is not going away. But free discovery raises the value of everything downstream of it: the judgment about what graduates into production, the constraints that judgment compiles into, and the layer that holds those constraints when the humans who would have carried them are no longer in the loop.</p>
+<div class="callout"><p><strong>In the post-vibe-coding era, engineering stops being only about writing systems. It becomes about governing systems that can now write themselves</strong> &mdash; and about keeping the decisions those systems must respect alive after the apprenticeship that used to renew them is gone.</p></div>
+
+  </div><!-- /.article-body -->
+
+  <section class="article-faq" aria-labelledby="faq-heading" style="margin-top:3rem;">
+    <h2 id="faq-heading" style="margin-bottom:1.5rem;">Frequently asked questions</h2>
+    <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">What is vibe coding?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Vibe coding is a term coined by Andrej Karpathy in February 2025 for a mode of building software where you prompt an AI, accept what it produces, and largely stop reading the code itself. He framed it as fine for throwaway weekend projects. It is not a synonym for all AI-assisted or agentic engineering; the defining feature is the absence of review. The distinction between exploratory vibe coding and accountable, reviewed engineering is the whole subject of the post-vibe-coding conversation.</div>
+    </details>
+    <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Does vibe coding replace software engineers?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">No. It changes what engineering is. As AI agents absorb the writing of code, the engineer&rsquo;s unit of work shifts from authoring the diff to specifying and enforcing the constraint envelope the diff is generated inside. Coding becomes partially automated; accountability for reliability, security, and architectural integrity does not. Engineering moves from primarily producing code to governing the autonomous systems that produce it &mdash; which, as autonomy rises, requires more judgment and governance, not less.</div>
+    </details>
+    <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Why is the decline of junior-engineer roles a governance risk?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Apprenticeship was never only training. The junior-to-senior pipeline was the mechanism by which a team&rsquo;s architectural intent got re-articulated, contested, and refreshed each generation &mdash; seniors had to make tacit decisions explicit in order to teach them. When agents absorb the entry-level work and juniors ship without metabolizing those decisions, that intent-renewal loop shuts down. The result is not just a skills gap; it is the loss of the process that kept architectural intent current. Intent debt that apprenticeship used to pay down silently now compounds with no human sink.</div>
+    </details>
+    <details style="border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">What replaces apprenticeship as the way architectural intent is preserved?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Governance as infrastructure. If the mentorship loop that used to transmit &ldquo;what is allowed to persist&rdquo; is being decommissioned, the decisions it carried have to live somewhere a machine can read and enforce them: architectural intent compiled into explicit, versioned, machine-evaluable constraints that are applied before generation and at every gate, independent of which agent or which engineer produced the change. The governing layer now has to do the intent-renewal work the human loop used to do, because that loop is going away, not merely being under-taught.</div>
+    </details>
+  </section>
+
+  <aside class="related-panel" aria-labelledby="related-essays-label" style="margin-top:3rem;">
+    <div class="related-panel-label" id="related-essays-label">Related essays</div>
+    <ul class="related-list">
+      <li><a href="/insights/ai-native-engineering-intent-debt/"><div class="rel-title">AI-Native Engineering Has an Intent Debt Problem</div><p class="rel-desc">The debt apprenticeship used to pay down silently, now compounding with no human sink.</p></a></li>
+      <li><a href="/insights/rise-of-agentic-engineering-education/"><div class="rel-title">The Rise of Agentic Engineering Education</div><p class="rel-desc">The curriculum companion: what the new discipline has to teach.</p></a></li>
+      <li><a href="/insights/github-ai-agent-validation-trust-layer/"><div class="rel-title">GitHub's Trust Layer Validates Behavior, Not Architecture</div><p class="rel-desc">Why tests and evals are necessary and not sufficient for correctness.</p></a></li>
+      <li><a href="/insights/agent-manager-control-plane-governance/"><div class="rel-title">The Agent Manager Is the New Control Plane</div><p class="rel-desc">Supervising fleets of agents is not the same as constraining them.</p></a></li>
+    </ul>
+  </aside>
+
+  <aside class="related-panel" aria-labelledby="related-concepts-label" style="margin-top:1.5rem;padding-top:0;border-top:none;">
+    <div class="related-panel-label" id="related-concepts-label">Related governance concepts</div>
+    <ul class="related-list">
+      <li><a href="/concepts/governance-before-generation/"><div class="rel-title">Governance Before Generation</div><p class="rel-desc">Applying the team's decisions as constraints the agent meets before it writes.</p></a></li>
+      <li><a href="/concepts/reliable-delegation/"><div class="rel-title">Reliable Delegation</div><p class="rel-desc">Delegation only works inside a boundary the delegator actually defined.</p></a></li>
+      <li><a href="/concepts/governance-propagation/"><div class="rel-title">Governance Propagation</div><p class="rel-desc">The same constraints reaching every agent and surface, regardless of who produced the change.</p></a></li>
+    </ul>
+  </aside>
+
+  <footer class="article-footer">
+    <a href="/insights/" class="back-link">&larr; Back to Insights</a>
+    <div class="cta-block">
+      <h3>Keep your architectural decisions alive after the loop thins out</h3>
+      <p>Mneme is the open-source layer that compiles your architectural decisions and project rules into deterministic, machine-evaluable constraints and enforces them at hooks and in CI &mdash; the same verdict on every change, no matter which agent or engineer produced it. It is the governing layer for a world where coding is automated and accountability is not.</p>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
+    </div>
+  </footer>
+</article>
+</main>
+
+<footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+  <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/use-cases/">Use cases</a></li>
+        <li><a href="/works-with/">Works with</a></li>
+        <li><a href="/platforms/">Platforms</a></li>
+        <li><a href="/integrations/">Integrations</a></li>
+        <li><a href="/compare/">Compare</a></li>
+        <li><a href="/demo/">Demo</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/concepts/">Concepts</a></li>
+        <li><a href="/architecture/">Architecture</a></li>
+        <li><a href="/insights/">Insights</a></li>
+        <li><a href="/qa-glossary/">Q&amp;A and Glossary</a></li>
+        <li><a href="/standards/">Standards</a></li>
+        <li><a href="/benchmark/">Benchmark</a></li>
+        <li><a href="/docs/">Docs</a></li>
+        <li><a href="/docs/cli/">CLI reference</a></li>
+        <li><a href="/docs/governance-violations/">Governance violations</a></li>
+        <li><a href="/supported-languages/">Supported languages</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/pilot/" style="color:var(--accent);">Request pilot</a></li>
+        <li><a href="/for/">For teams</a></li>
+        <li><a href="/founder/">Founder</a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/roadmap/">Roadmap</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Code</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="https://github.com/TheoV823/mneme">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://dev.to/mnemehq" target="_blank" rel="noopener">DEV.to</a></li>
+        <li><a href="/privacy/">Privacy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
+    <span style="display:inline-flex;align-items:center;gap:0.75rem;"><a href="/" aria-label="Mneme HQ home" style="display:inline-flex;opacity:0.75;"><img src="/favicon.png" alt="Mneme HQ" height="22" style="display:block;"></a><span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span></span>
+    <nav aria-label="Social media" style="display: flex; align-items: center; gap: 1rem;">
+      <a href="https://github.com/TheoV823/mneme" target="_blank" rel="noopener" aria-label="GitHub" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.16c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.27-1.69-1.27-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.34.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18.92-.26 1.91-.39 2.89-.39.98 0 1.97.13 2.89.39 2.2-1.49 3.17-1.18 3.17-1.18.62 1.58.23 2.75.12 3.04.73.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.26 5.68.41.35.78 1.05.78 2.12v3.15c0 .31.21.67.8.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener" aria-label="LinkedIn" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 .06.77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/@MnemeHQ" target="_blank" rel="noopener" aria-label="YouTube" style="color: var(--muted); display: inline-flex;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.12C19.55 3.5 12 3.5 12 3.5s-7.55 0-9.4.58A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.12c1.85.58 9.4.58 9.4.58s7.55 0 9.4-.58a3 3 0 0 0 2.1-2.12A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8zM9.6 15.57V8.43L15.82 12 9.6 15.57z"/></svg>
+      </a>
+      <a href="https://dev.to/mnemehq" target="_blank" rel="noopener" aria-label="DEV.to" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true"><path d="M120.12 208.29c-3.88-2.9-7.77-4.35-11.65-4.35H91.03v104.47h17.45c3.88 0 7.77-1.45 11.65-4.35 3.88-2.9 5.82-7.25 5.82-13.06v-69.65c-.01-5.8-1.96-10.16-5.83-13.06zM404.1 32H43.9C19.7 32 .06 51.59 0 75.8v360.4C.06 460.41 19.7 480 43.9 480h360.2c24.21 0 43.84-19.59 43.9-43.8V75.8c-.06-24.21-19.7-43.8-43.9-43.8zM154.2 291.19c0 18.81-11.61 47.31-48.36 47.25h-46.4V172.98h47.38c35.44 0 47.36 28.46 47.36 47.28l.02 70.93zm100.68-88.66H201.6v38.42h32.57v29.57H201.6v38.41h53.29v29.57h-62.18c-11.16.29-20.44-8.53-20.72-19.69V193.7c-.27-11.15 8.56-20.41 19.71-20.69h63.19l-.01 29.52zm103.64 115.29c-13.2 30.75-36.85 24.63-47.44 0l-38.53-144.8h32.57l29.71 113.72 29.57-113.72h32.58l-38.46 144.8z"/></svg>
+      </a>
+    </nav>
+    <span>&copy; 2026</span>
+  </div>
+</footer>
+
+<script><!-- nav-active -->
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  function setOpen(open){
+    links.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('menu-open', open);
+  }
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    setOpen(!links.classList.contains('open'));
+  });
+  document.addEventListener('click', function(e){
+    if (!links.classList.contains('open')) return;
+    if (links.contains(e.target) || btn.contains(e.target)) return;
+    setOpen(false);
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false);
+  });
+  links.addEventListener('click', function(e){
+    if (e.target.tagName === 'A') setOpen(false);
+  });
+  window.addEventListener('resize', function(){
+    if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Google Cloud Agent Registry Governs Which Agents Run, Not Whether Their Output Stays Aligned &mdash; Mneme HQ</title>
+  <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/fonts.css">
+  <meta name="description" content="Google Cloud Agent Registry governs which agents run, not whether their output stays aligned with your architecture. Why agent fleet governance still leaves a gap." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0c0c0d" />
+  <link rel="canonical" href="https://mnemehq.com/insights/google-cloud-agent-registry-agent-fleet-governance/" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Mneme HQ" />
+  <meta property="og:title" content="Google Cloud Agent Registry Governs Which Agents Run, Not Whether Their Output Stays Aligned" />
+  <meta property="og:description" content="A registry draws a perimeter around the agent. It says nothing about whether the diff that agent produced still matches your architecture." />
+  <meta property="og:url" content="https://mnemehq.com/insights/google-cloud-agent-registry-agent-fleet-governance/" />
+  <meta property="og:image" content="https://mnemehq.com/insights/google-cloud-agent-registry-agent-fleet-governance/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Google Cloud Agent Registry Governs Which Agents Run, Not Whether Their Output Stays Aligned" />
+  <meta name="twitter:description" content="A registry draws a perimeter around the agent. It says nothing about whether the diff that agent produced still matches your architecture." />
+  <meta name="twitter:image" content="https://mnemehq.com/insights/google-cloud-agent-registry-agent-fleet-governance/og.png" />
+  <meta name="author" content="Theo Valmis" />
+  <meta property="article:published_time" content="2026-06-01T00:00:00Z" />
+  <meta property="article:author" content="https://mnemehq.com/founder/" />
+  <meta property="article:section" content="Engineering" />
+
+  <!-- Consent defaults -->
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{'analytics_storage':'granted','ad_storage':'denied','ad_user_data':'denied','ad_personalization':'denied'});</script>
+
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="icon" href="/favicon.png" type="image/png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
+          {"@type": "ListItem", "position": 2, "name": "Insights", "item": "https://mnemehq.com/insights/"},
+          {"@type": "ListItem", "position": 3, "name": "Google Cloud Agent Registry Governs Which Agents Run, Not Whether Their Output Stays Aligned", "item": "https://mnemehq.com/insights/google-cloud-agent-registry-agent-fleet-governance/"}
+        ]
+      },
+      {
+        "@type": "TechArticle",
+        "headline": "Google Cloud Agent Registry Governs Which Agents Run, Not Whether Their Output Stays Aligned",
+        "description": "Google Cloud Agent Registry governs which agents run, not whether their output stays aligned with your architecture. Why agent fleet governance still leaves a gap.",
+        "url": "https://mnemehq.com/insights/google-cloud-agent-registry-agent-fleet-governance/",
+        "datePublished": "2026-06-01",
+        "dateModified": "2026-06-01",
+        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "image": "https://mnemehq.com/insights/google-cloud-agent-registry-agent-fleet-governance/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/insights/google-cloud-agent-registry-agent-fleet-governance/",
+        "isBasedOn": {"@type": "WebPage", "name": "Gemini Enterprise Agent Platform", "publisher": {"@type": "Organization", "name": "Google"}, "url": "https://blog.google/innovation-and-ai/infrastructure-and-cloud/google-cloud/gemini-enterprise-agent-platform/"},
+        "about": ["Google Cloud Agent Registry", "AI agent governance", "agent fleet management", "MCP server registry", "architectural governance", "agent identity", "AI governance infrastructure", "Gemini Enterprise Agent Platform"]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the Google Cloud Agent Registry?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Google Cloud Agent Registry is a centralized catalog that lets organizations store, discover, and govern AI agents, tools, and Model Context Protocol (MCP) servers within Google Cloud. It is the governance pillar and unified inventory of the Gemini Enterprise Agent Platform (formerly Vertex AI), sitting alongside Agent Identity and Agent Gateway. Its job is fleet inventory and access: knowing which agents exist, who owns them, which tools and MCP servers are approved, and which are authorized to run."}
+          },
+          {
+            "@type": "Question",
+            "name": "Does an agent registry provide architectural governance?",
+            "acceptedAnswer": {"@type": "Answer", "text": "No. A registry governs the actor, not the artifact. It can certify that an agent is approved, scoped, versioned, and audited, but it does not read a repository's architectural constraints or return a verdict on the change the agent produces. An approved agent can introduce a forbidden dependency, cross a service boundary, or contradict an architectural decision record, and the registry will still show the agent as authorized and in good standing. Architectural governance is a separate layer that evaluates the diff against compiled, machine-evaluable constraints."}
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between agent fleet governance and architectural governance?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Agent fleet governance is identity- and authorization-scoped: it answers which agent is running, who owns it, what it may call, and whether it is allowed to operate. It draws a perimeter around the actor at gate time, before execution. Architectural governance is intent- and conformance-scoped: it answers whether the change an agent just made still matches what the team decided, evaluating the artifact at the moment of the change. They are orthogonal axes, not two stages of one maturity curve, and an enterprise running autonomous agents needs both."}
+          },
+          {
+            "@type": "Question",
+            "name": "Can a registry stop an agent from violating an architectural decision?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Not on its own. A registry enforces who and what is allowed to run; it has no view of the repository's invariants, so it cannot tell that a syntactically valid, fully authorized commit has violated an ADR or broken a layering rule. Preventing that requires architectural decisions compiled into deterministic constraints that run at hooks and in CI and return the same verdict regardless of which registered agent produced the change. Those constraints have to live in the repository every execution surface reads, not in a central registry an agent can be authorized at and route around."}
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
+      --border: #222226; --border2: #2e2e34;
+      --text: #e8e8ec; --muted: #a8a8b8;
+      --accent: #c8f060; --accent-dim: #a8d040; --teal: #8be0c8;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(12,12,13,0.95); backdrop-filter: blur(12px); z-index: 100; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-nav-cta { background: var(--accent); color: #0c0c0d; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: background 0.15s; }
+    .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
+
+    .article-wrap { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 7rem; }
+    .article-header { margin-bottom: 3.5rem; }
+    .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
+    .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
+
+    .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
+    .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .article-body h3 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--text); }
+    .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
+    .article-body p strong { color: var(--text); font-weight: 500; }
+    .article-body ul, .article-body ol { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body li { margin-bottom: 0.5rem; }
+    .article-body li strong { color: var(--text); font-weight: 500; }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+    .callout p strong { color: var(--accent); }
+
+    .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .back-link:hover { color: var(--text); }
+    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2rem; }
+    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--accent-dim); }
+
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .breadcrumb-nav { max-width: 720px; margin: 0 auto; padding: 1.75rem 2rem 0.85rem; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; list-style: none; font-size: 0.82rem; flex-wrap: wrap; }
+    .breadcrumb li + li::before { content: '/'; color: var(--border2); margin-right: 0.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb [aria-current="page"] { color: var(--text); }
+
+    .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 36px; height: 36px; border-radius: 6px; cursor: pointer; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; }
+
+    @media (max-width: 640px) {
+      nav { padding: 1rem 1.25rem; }
+      .article-wrap { padding: 3rem 1.25rem 5rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0; background: rgba(12,12,13,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0.5rem 1.25rem 1.25rem; z-index: 99; }
+      .nav-links.open { display: flex; }
+      .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.88rem; padding: 0.7rem 0; border-bottom: 1px solid var(--border); }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+    }
+
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    /* === Nav upgrade === */
+    .nav-hamburger {
+      display: none;
+      background: none;
+      border: 1px solid var(--border2);
+      color: var(--text);
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 0;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 4px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span {
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: currentColor;
+      border-radius: 1px;
+      transition: transform 0.25s ease, opacity 0.18s ease;
+      transform-origin: center;
+    }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    @media (max-width: 900px) {
+      html, body { overflow-x: clip; }
+      body.menu-open { overflow: hidden; }
+      nav, nav.site-nav { padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links {
+        display: flex !important;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        gap: 0;
+        background: rgba(12,12,13,0.98);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: 0 1.25rem;
+        z-index: 99;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        visibility: hidden;
+        transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s;
+      }
+      .nav-links.open {
+        max-height: 80vh;
+        opacity: 1;
+        visibility: visible;
+        padding: 0.5rem 1.25rem 1.25rem;
+        transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s;
+        overflow-y: auto;
+      }
+      .nav-links a:not(.btn-nav-cta) {
+        display: block;
+        color: var(--text);
+        font-size: 0.92rem;
+        padding: 0.85rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+    }
+
+    /* === Related reading === */
+    .related-panel { margin-top: 3.5rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .related-panel-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    .related-list li { margin: 0; }
+    .related-list a { display: block; padding: 1.15rem 1.35rem; background: var(--surface); text-decoration: none; transition: background 0.15s; }
+    .related-list a:hover { background: var(--surface2); }
+    .related-list .rel-title { color: var(--text); font-size: 0.92rem; font-weight: 600; margin-bottom: 0.35rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; letter-spacing: -0.005em; transition: color 0.15s; }
+    .related-list .rel-title::after { content: '\2192'; color: var(--accent); opacity: 0.4; transition: opacity 0.15s, transform 0.15s; flex-shrink: 0; }
+    .related-list a:hover .rel-title { color: var(--accent); }
+    .related-list a:hover .rel-title::after { opacity: 1; transform: translateX(3px); }
+    .related-list .rel-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.65; margin: 0; }
+
+    @media (max-width: 768px) { nav, .mobile-menu { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } }
+
+    /* === Diagram styles === */
+    .diag-box { fill: #141416; stroke: #2e2e34; }
+    .diag-box-active { fill: rgba(200,240,96,0.05); stroke: #c8f060; stroke-width: 1.5; }
+    .diag-box-teal { fill: rgba(139,224,200,0.05); stroke: #8be0c8; stroke-width: 1.2; }
+    .diag-text { fill: #e8e8ec; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; }
+    .diag-meta { fill: #88889a; font-family: 'DM Mono', monospace; font-size: 10px; }
+    .diag-accent-text { fill: #c8f060; }
+    .diag-teal-text { fill: #8be0c8; }
+    .diag-mono { font-family: 'DM Mono', monospace; }
+    .diag-arrow { stroke: #2e2e34; stroke-width: 1; fill: none; }
+    .diag-arrow-active { stroke: #c8f060; stroke-width: 1.5; fill: none; }
+    .diag-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; margin: 2.5rem 0; }
+    .diag-caption { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); margin-top: 1rem; text-align: center; letter-spacing: 0.06em; text-transform: uppercase; }
+    .gov-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.85rem; }
+    .gov-table th { background: var(--surface); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border2); }
+    .gov-table td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; }
+    .gov-table tr:last-child td { border-bottom: none; }
+    .gov-table td:first-child { color: var(--text); font-weight: 500; }
+    .gov-table tr.accent-row td { color: var(--accent); }
+    .gov-table tr.accent-row td:first-child { color: var(--accent); }
+  </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KL7FB67N" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<nav>
+  <a href="/" class="logo"><img src="/logo-v2.png" alt="Mneme HQ" height="36" style="display:block;"></a>
+  <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/concepts/">Concepts</a>
+    <a href="/use-cases/">Use cases</a>
+    <a href="/insights/" class="active">Insights</a>
+    <a href="/roadmap/">Roadmap</a>
+    <a href="/demo/">Demo</a>
+    <a href="/benchmark/">Benchmark</a>
+    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/TheoV823/mneme" class="btn-nav-cta">Get started</a>
+  </div>
+</nav>
+
+<main>
+<nav class="breadcrumb-nav" aria-label="Breadcrumb">
+  <ol class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/insights/">Insights</a></li>
+    <li aria-current="page">Google Cloud Agent Registry Governs Which Agents Run, Not Whether Their Output Stays Aligned</li>
+  </ol>
+</nav>
+
+<article class="article-wrap">
+  <header class="article-header">
+    <div class="article-eyebrow">
+      <span class="eyebrow-tag">Market Context</span>
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-meta">8 min read</span>
+    </div>
+    <h1>Google Cloud Agent Registry Governs Which Agents Run, Not Whether Their Output Stays Aligned</h1>
+    <p class="article-lede">Google Cloud&rsquo;s Agent Registry is a clear signal that AI agents are becoming an operational fleet rather than a pile of experiments. A registry catalogs that fleet, certifies who owns each agent, and decides which ones are allowed to run. But a registry draws a perimeter around the <em>actor</em>. It says nothing about whether the diff that actor just produced still matches the architecture it changed.</p>
+    <p class="byline">By <a href="/founder/">Theo Valmis</a><span class="sep">&middot;</span><time datetime="2026-06-01">June 2026</time></p>
+  </header>
+
+  <div class="article-body">
+
+<p>AI agents are getting easier to build. Managing them is getting harder.</p>
+<p>A year ago the hard part was making an autonomous system plan, call tools, and finish a task. That problem is mostly solved. The hard part now is that organizations are no longer running one agent. They are running a growing estate of agents, tools, MCP servers, identities, and runtimes spread across teams &mdash; and they have lost track of which ones exist, what they can touch, and who is accountable for them.</p>
+<p><a href="/insights/emerging-ai-agent-infrastructure-stack/">The emerging AI agent infrastructure stack</a> is the market formalizing an answer to that problem, layer by layer. Google Cloud&rsquo;s Agent Registry is one of the most concrete pieces of it yet: a vendor primitive that treats a fleet of agents as something to be inventoried and governed, not just deployed.</p>
+
+<h2>What Google Cloud Agent Registry does</h2>
+<p>Google describes Agent Registry as &ldquo;a centralized catalog that lets you store, discover, and govern Model Context Protocol (MCP) servers, tools, and AI agents within Google Cloud.&rdquo; It sits inside the Gemini Enterprise Agent Platform &mdash; formerly Vertex AI &mdash; which Google positions as a place to &ldquo;build, scale, govern and optimize agents,&rdquo; a one-stop shop for an organization&rsquo;s autonomous agents.</p>
+<p>The platform is organized into four pillars: Build, Scale, Govern, and Optimize. Agent Registry is the <strong>Govern</strong> pillar, alongside Agent Identity and Agent Gateway, and the docs call it &ldquo;the governance pillar and unified inventory of your agents, servers, and endpoints.&rdquo; Around it, Google has expanded managed connectivity: more than 50 Google-managed MCP servers are now generally available or in preview, giving agents a standardized way to reach external tools, data, and Google Cloud services.</p>
+<p>Read plainly, the product solves a real and growing operational problem. As an agent estate scales, you need to answer:</p>
+<ul>
+<li><strong>Which agents, tools, and MCP servers exist?</strong></li>
+<li><strong>Who owns each one, and which are approved?</strong></li>
+<li><strong>Who or what is authorized to discover and call them?</strong></li>
+<li><strong>Which runtimes are connected, and how is the fleet monitored?</strong></li>
+</ul>
+<p>Once agents can take actions, agent discovery stops being a convenience feature and becomes a governance concern. A registry is the right tool for that concern. None of what follows is a criticism of the product. It is an observation about the boundary of what a registry, by its nature, can do.</p>
+
+<h2>A registry governs the actor</h2>
+<p>Everything a registry does is organized around the <em>agent as an identity</em>. It assigns an agent an owner, a version, a set of scoped permissions, and an authorization to run. It records who called what. It lets an admin revoke an agent, gate access to a tool, or block an unapproved MCP server. This is identity and authorization governance, and it is genuinely valuable: it shrinks the attack surface, kills shadow agents, and gives a security team a place to stand.</p>
+<p>But notice the shape of every one of those controls. They all evaluate the <strong>actor</strong>, and they all evaluate it at the <strong>gate</strong> &mdash; before the agent runs. Is this agent approved? Is it scoped correctly? Is it allowed to call this tool? Pass the gate and the agent goes to work. The registry&rsquo;s job is finished the moment execution begins.</p>
+<div class="callout"><p><strong>A registry answers one question:</strong> is this agent allowed to operate? That is a question about the actor, decided before the work happens. It is necessary. It is also only half of the problem.</p></div>
+
+<h2>The diff it cannot see</h2>
+<p>Here is the failure a perfectly configured registry waves straight through.</p>
+<p>An agent is registered. It is owned, versioned, scoped to exactly the right repositories, and fully authorized to commit code. It does its job. In doing its job, it adds a dependency an <a href="/concepts/architectural-drift/">architectural decision record</a> prohibits, routes around an approved service boundary, or re-implements a pattern the team had already standardized somewhere else in the codebase.</p>
+<p>The registry&rsquo;s verdict: approved actor, valid action, green. Every control fired correctly. The agent was who it claimed to be, it was allowed to do what it did, and the audit log faithfully recorded all of it. The architecture&rsquo;s verdict: violated.</p>
+<p>This is the failure mode that does not look like a failure. The code compiles. The tests pass. The pull request is authored by a trusted, registered agent. Nothing in the identity layer is built to notice that a syntactically valid, fully authorized change just contradicted a decision the team made on purpose. Multiply it across a fleet &mdash; Google itself frames this as fleets of agents &mdash; and two registered agents can implement conflicting patterns in parallel, each one approved, each one green, the system drifting off its own design one locally-reasonable commit at a time.</p>
+<div class="callout"><p><strong>Operational trust is not architectural alignment.</strong> Certify that every agent in the fleet is approved, scoped, and audited, and the architecture is still completely unprotected &mdash; because nothing in the registry reads the repository&rsquo;s constraints or returns a verdict on the change.</p></div>
+
+<h2>Two orthogonal axes, not a ladder</h2>
+<p>The tempting way to read this is as a maturity curve: registries today, deeper governance later. That framing is wrong, and it is wrong in a way that costs you. Registry governance and architectural governance are not two points on one line. They are two different axes.</p>
+<p>One axis is about <strong>identity and authorization</strong>: which agent, owned by whom, allowed to run. It draws a perimeter around the actor, at gate time, before execution. The other axis is about <strong>intent and conformance</strong>: what the diff actually did, and whether it still matches the system the team designed. It returns a verdict on the artifact, at evaluation time, on the change itself. A registry can be fully mature on the first axis and the second axis is still at zero.</p>
+<div class="diag-wrap">
+  <svg viewBox="0 0 700 300" role="img" aria-label="Two orthogonal axes: a registry governs the actor by identity and authorization; architectural governance returns a verdict on the artifact by intent and conformance" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:640px;display:block;margin:0 auto;">
+    <rect x="20" y="20" width="310" height="262" rx="10" class="diag-box-teal"/>
+    <text x="175" y="48" text-anchor="middle" class="diag-text diag-teal-text">AGENT REGISTRY</text>
+    <text x="175" y="66" text-anchor="middle" class="diag-meta">perimeter around the ACTOR</text>
+    <text x="45" y="104" text-anchor="start" class="diag-meta">identity &amp; authorization</text>
+    <text x="45" y="130" text-anchor="start" class="diag-meta">which agent is running</text>
+    <text x="45" y="156" text-anchor="start" class="diag-meta">owner, version, scope</text>
+    <text x="45" y="182" text-anchor="start" class="diag-meta">approved to operate</text>
+    <text x="45" y="208" text-anchor="start" class="diag-meta">gate-time, before execution</text>
+    <text x="45" y="250" text-anchor="start" class="diag-meta diag-teal-text">verdict: approved actor</text>
+    <rect x="370" y="20" width="310" height="262" rx="10" class="diag-box-active"/>
+    <text x="525" y="48" text-anchor="middle" class="diag-text diag-accent-text">ARCHITECTURAL GOVERNANCE</text>
+    <text x="525" y="66" text-anchor="middle" class="diag-meta">verdict on the ARTIFACT</text>
+    <text x="395" y="104" text-anchor="start" class="diag-meta">intent &amp; conformance</text>
+    <text x="395" y="130" text-anchor="start" class="diag-meta">what the diff did</text>
+    <text x="395" y="156" text-anchor="start" class="diag-meta">ADRs, boundaries, invariants</text>
+    <text x="395" y="182" text-anchor="start" class="diag-meta">aligned with the design</text>
+    <text x="395" y="208" text-anchor="start" class="diag-meta">evaluation-time, on the change</text>
+    <text x="395" y="250" text-anchor="start" class="diag-meta diag-accent-text">verdict: conforming artifact</text>
+  </svg>
+  <p class="diag-caption">Same agent, two independent verdicts: allowed to run, and allowed to land</p>
+</div>
+<p>This is the same distinction <a href="/insights/ai-agent-governance-two-markets/">two markets of agent governance</a> draws between runtime and architectural governance, and the same one <a href="/insights/agent-manager-control-plane-governance/">the agent manager as a control plane</a> draws between supervising agents and enforcing on their output. A registry is the cleanest example yet of the pattern: it is an excellent control plane for the fleet and a non-control for the codebase.</p>
+
+<h2>Why the constraints live in the repo, not the registry</h2>
+<p>If a registry cannot see the diff, the obvious next thought is: then attach the architectural rules to the registry. Make the central catalog enforce them. This is the wrong move, and it is worth being precise about why.</p>
+<p>A central registry is a chokepoint. An agent is authorized there once and then executes somewhere else &mdash; in an IDE, a CLI, a CI job, a local runtime, an endpoint. <a href="/insights/governance-perimeter-is-moving-to-the-endpoint/">The governance perimeter is moving to the endpoint</a> precisely because that is where the work actually happens, and a cloud catalog has no presence there. The one artifact every one of those execution surfaces reads is the repository. So that is where the constraints have to live.</p>
+<p>What architectural governance requires is the team&rsquo;s decisions <a href="/concepts/governance-before-generation/">compiled before generation</a> into <a href="/concepts/deterministic-enforcement/">deterministic, machine-evaluable constraints</a> that run at hooks and in CI and return the same verdict regardless of which registered agent produced the change. Not prose in a wiki an agent is supposed to honor. Not a human reviewer expected to catch an ADR violation buried in a green pull request. An evaluation on the artifact that <a href="/concepts/governance-propagation/">propagates to every surface</a> the fleet touches, and that can explain, through <a href="/concepts/enforcement-provenance/">enforcement provenance</a>, exactly which decision a change violated and where that decision came from.</p>
+<div class="callout"><p><strong>Register the agent in the cloud; enforce the architecture in the repo.</strong> The registry governs the fleet. The repository is where the verdict on the work has to be rendered, because that is the one place every agent and every CI surface actually reads.</p></div>
+
+<h2>Both, not either</h2>
+<p>This is not an argument against agent registries. An enterprise running a fleet of autonomous agents needs to know which agents exist, who owns them, and which are allowed to run &mdash; and Google Cloud Agent Registry is a serious answer to that need. Filing it under a &ldquo;Govern&rdquo; pillar is honest: it is real governance of the fleet as a set of actors.</p>
+<p>It is simply governance on one axis. The other axis &mdash; whether the code, configs, and migrations the fleet generates still hold the line on the architecture they touch &mdash; is not something a registry was ever built to cover, and it does not arrive later as the registry matures. It is a different layer, running in a different place, answering a different question. Adopt the registry and your fleet is accountable. Add architectural governance and the systems that fleet is rewriting stay yours.</p>
+<div class="callout"><p><strong>A registry tells you the agent was allowed to act. It cannot tell you the system still matches what you decided after it did.</strong> Knowing which agents are authorized is the first half of agent fleet governance. The verdict on what they changed is the half that protects the architecture.</p></div>
+
+  </div><!-- /.article-body -->
+
+  <section class="article-faq" aria-labelledby="faq-heading" style="margin-top:3rem;">
+    <h2 id="faq-heading" style="margin-bottom:1.5rem;">Frequently asked questions</h2>
+    <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">What is the Google Cloud Agent Registry?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Google Cloud Agent Registry is a centralized catalog that lets organizations store, discover, and govern AI agents, tools, and Model Context Protocol (MCP) servers within Google Cloud. It is the governance pillar and unified inventory of the Gemini Enterprise Agent Platform (formerly Vertex AI), sitting alongside Agent Identity and Agent Gateway. Its job is fleet inventory and access: knowing which agents exist, who owns them, which tools and MCP servers are approved, and which are authorized to run.</div>
+    </details>
+    <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Does an agent registry provide architectural governance?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">No. A registry governs the actor, not the artifact. It can certify that an agent is approved, scoped, versioned, and audited, but it does not read a repository&rsquo;s architectural constraints or return a verdict on the change the agent produces. An approved agent can introduce a forbidden dependency, cross a service boundary, or contradict an architectural decision record, and the registry will still show the agent as authorized and in good standing. Architectural governance is a separate layer that evaluates the diff against compiled, machine-evaluable constraints.</div>
+    </details>
+    <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">What is the difference between agent fleet governance and architectural governance?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Agent fleet governance is identity- and authorization-scoped: it answers which agent is running, who owns it, what it may call, and whether it is allowed to operate. It draws a perimeter around the actor at gate time, before execution. Architectural governance is intent- and conformance-scoped: it answers whether the change an agent just made still matches what the team decided, evaluating the artifact at the moment of the change. They are orthogonal axes, not two stages of one maturity curve, and an enterprise running autonomous agents needs both.</div>
+    </details>
+    <details style="border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Can a registry stop an agent from violating an architectural decision?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Not on its own. A registry enforces who and what is allowed to run; it has no view of the repository&rsquo;s invariants, so it cannot tell that a syntactically valid, fully authorized commit has violated an ADR or broken a layering rule. Preventing that requires architectural decisions compiled into deterministic constraints that run at hooks and in CI and return the same verdict regardless of which registered agent produced the change. Those constraints have to live in the repository every execution surface reads, not in a central registry an agent can be authorized at and route around.</div>
+    </details>
+  </section>
+
+  <aside class="related-panel" aria-labelledby="related-concepts-label" style="margin-top:3rem;">
+    <div class="related-panel-label" id="related-concepts-label">Related governance concepts</div>
+    <ul class="related-list">
+      <li><a href="/concepts/governance-infrastructure/"><div class="rel-title">Governance Infrastructure</div><p class="rel-desc">Why governance for autonomous systems has to be infrastructure, not a checklist.</p></a></li>
+      <li><a href="/concepts/architectural-governance/"><div class="rel-title">Architectural Governance</div><p class="rel-desc">Preserving architectural intent as autonomous systems continuously modify software.</p></a></li>
+      <li><a href="/concepts/governance-propagation/"><div class="rel-title">Governance Propagation</div><p class="rel-desc">The same compiled constraints reaching every agent, tool, and runtime surface.</p></a></li>
+      <li><a href="/concepts/deterministic-enforcement/"><div class="rel-title">Deterministic Enforcement</div><p class="rel-desc">The same verdict on a change regardless of which agent produced it.</p></a></li>
+    </ul>
+  </aside>
+
+  <aside class="related-panel" aria-labelledby="related-essays-label" style="margin-top:1.5rem;padding-top:0;border-top:none;">
+    <div class="related-panel-label" id="related-essays-label">Related operational essays</div>
+    <ul class="related-list">
+      <li><a href="/insights/ai-agent-governance-two-markets/"><div class="rel-title">AI Agent Governance Is Splitting Into Two Markets</div><p class="rel-desc">Runtime governance protects the action; architectural governance protects the structure.</p></a></li>
+      <li><a href="/insights/agent-manager-control-plane-governance/"><div class="rel-title">The Agent Manager Is the New Control Plane</div><p class="rel-desc">Supervising a fleet of agents is not the same as enforcing on their output.</p></a></li>
+      <li><a href="/insights/emerging-ai-agent-infrastructure-stack/"><div class="rel-title">The Emerging AI Agent Infrastructure Stack</div><p class="rel-desc">Where registries, gateways, and governance sit in the new agent stack.</p></a></li>
+      <li><a href="/insights/governance-perimeter-is-moving-to-the-endpoint/"><div class="rel-title">The Governance Perimeter Is Moving to the Endpoint</div><p class="rel-desc">Enforcement is collapsing toward the repo, where the work actually happens.</p></a></li>
+    </ul>
+  </aside>
+
+  <footer class="article-footer">
+    <a href="/insights/" class="back-link">&larr; Back to Insights</a>
+    <div class="cta-block">
+      <h3>Architectural governance for your agent fleet</h3>
+      <p>A registry controls which agents run. Mneme controls whether their output stays aligned with your architecture. It is the open-source layer that compiles your architectural decisions and project rules into deterministic, machine-evaluable constraints and enforces them at hooks and in CI &mdash; the same verdict on every change, no matter which registered agent produced it.</p>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
+    </div>
+  </footer>
+</article>
+</main>
+
+<footer style="border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; text-align: left;">
+  <div style="max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2.5rem 2rem;">
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Product</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/use-cases/">Use cases</a></li>
+        <li><a href="/works-with/">Works with</a></li>
+        <li><a href="/platforms/">Platforms</a></li>
+        <li><a href="/integrations/">Integrations</a></li>
+        <li><a href="/compare/">Compare</a></li>
+        <li><a href="/demo/">Demo</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Learn</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/concepts/">Concepts</a></li>
+        <li><a href="/architecture/">Architecture</a></li>
+        <li><a href="/insights/">Insights</a></li>
+        <li><a href="/qa-glossary/">Q&amp;A and Glossary</a></li>
+        <li><a href="/standards/">Standards</a></li>
+        <li><a href="/benchmark/">Benchmark</a></li>
+        <li><a href="/docs/">Docs</a></li>
+        <li><a href="/docs/cli/">CLI reference</a></li>
+        <li><a href="/docs/governance-violations/">Governance violations</a></li>
+        <li><a href="/supported-languages/">Supported languages</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Company</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="/pilot/" style="color:var(--accent);">Request pilot</a></li>
+        <li><a href="/for/">For teams</a></li>
+        <li><a href="/founder/">Founder</a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/roadmap/">Roadmap</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Code</div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+        <li><a href="https://github.com/TheoV823/mneme">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://dev.to/mnemehq" target="_blank" rel="noopener">DEV.to</a></li>
+        <li><a href="/privacy/">Privacy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="max-width: 1080px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
+    <span style="display:inline-flex;align-items:center;gap:0.75rem;"><a href="/" aria-label="Mneme HQ home" style="display:inline-flex;opacity:0.75;"><img src="/favicon.png" alt="Mneme HQ" height="22" style="display:block;"></a><span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span></span>
+    <nav aria-label="Social media" style="display: flex; align-items: center; gap: 1rem;">
+      <a href="https://github.com/TheoV823/mneme" target="_blank" rel="noopener" aria-label="GitHub" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.16c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.27-1.69-1.27-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.34.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18.92-.26 1.91-.39 2.89-.39.98 0 1.97.13 2.89.39 2.2-1.49 3.17-1.18 3.17-1.18.62 1.58.23 2.75.12 3.04.73.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.26 5.68.41.35.78 1.05.78 2.12v3.15c0 .31.21.67.8.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener" aria-label="LinkedIn" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 .06.77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/@MnemeHQ" target="_blank" rel="noopener" aria-label="YouTube" style="color: var(--muted); display: inline-flex;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.12C19.55 3.5 12 3.5 12 3.5s-7.55 0-9.4.58A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.12c1.85.58 9.4.58 9.4.58s7.55 0 9.4-.58a3 3 0 0 0 2.1-2.12A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8zM9.6 15.57V8.43L15.82 12 9.6 15.57z"/></svg>
+      </a>
+      <a href="https://dev.to/mnemehq" target="_blank" rel="noopener" aria-label="DEV.to" style="color: var(--muted); display: inline-flex;">
+        <svg width="16" height="16" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true"><path d="M120.12 208.29c-3.88-2.9-7.77-4.35-11.65-4.35H91.03v104.47h17.45c3.88 0 7.77-1.45 11.65-4.35 3.88-2.9 5.82-7.25 5.82-13.06v-69.65c-.01-5.8-1.96-10.16-5.83-13.06zM404.1 32H43.9C19.7 32 .06 51.59 0 75.8v360.4C.06 460.41 19.7 480 43.9 480h360.2c24.21 0 43.84-19.59 43.9-43.8V75.8c-.06-24.21-19.7-43.8-43.9-43.8zM154.2 291.19c0 18.81-11.61 47.31-48.36 47.25h-46.4V172.98h47.38c35.44 0 47.36 28.46 47.36 47.28l.02 70.93zm100.68-88.66H201.6v38.42h32.57v29.57H201.6v38.41h53.29v29.57h-62.18c-11.16.29-20.44-8.53-20.72-19.69V193.7c-.27-11.15 8.56-20.41 19.71-20.69h63.19l-.01 29.52zm103.64 115.29c-13.2 30.75-36.85 24.63-47.44 0l-38.53-144.8h32.57l29.71 113.72 29.57-113.72h32.58l-38.46 144.8z"/></svg>
+      </a>
+    </nav>
+    <span>&copy; 2026</span>
+  </div>
+</footer>
+
+<script><!-- nav-active -->
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  var btn = document.querySelector('.nav-hamburger');
+  var links = document.querySelector('.nav-links');
+  if (!btn || !links) return;
+  function setOpen(open){
+    links.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('menu-open', open);
+  }
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    setOpen(!links.classList.contains('open'));
+  });
+  document.addEventListener('click', function(e){
+    if (!links.classList.contains('open')) return;
+    if (links.contains(e.target) || btn.contains(e.target)) return;
+    setOpen(false);
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && links.classList.contains('open')) setOpen(false);
+  });
+  links.addEventListener('click', function(e){
+    if (e.target.tagName === 'A') setOpen(false);
+  });
+  window.addEventListener('resize', function(){
+    if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false);
+  });
+})();
+</script>
+</body>
+</html>

@@ -184,6 +184,11 @@ TEMPLATE_MAP = {
     "og-insights-prompt-vs-harness.html": "insights/prompt-engineering-vs-harness-engineering/og.png",
     "og-insights-harness-verification.html": "insights/harness-engineering-verification-layer/og.png",
     "og-insights-two-markets.html": "insights/ai-agent-governance-two-markets/og.png",
+    "og-insights-gcloud-agent-registry.html": "insights/google-cloud-agent-registry-agent-fleet-governance/og.png",
+    "og-insights-github-trust-layer.html": "insights/github-ai-agent-validation-trust-layer/og.png",
+    "og-insights-post-vibe-coding.html": "insights/future-of-software-engineering-after-vibe-coding/og.png",
+    "og-insights-architectural-zero-trust.html": "insights/zero-trust-for-ai-agents-architectural-governance/og.png",
+    "og-insights-mckinsey-rewiring.html": "insights/mckinsey-agentic-software-delivery-governance/og.png",
     # Concepts
     "og-concepts-runtime-governance.html": "concepts/runtime-governance/og.png",
     "og-concepts-autonomous-se-governance.html": "concepts/autonomous-software-engineering-governance/og.png",

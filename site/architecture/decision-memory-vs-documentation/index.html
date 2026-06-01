@@ -3,24 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Decision Memory vs. Documentation — Architecture Deep Dive</title>
+  <title>What Is Decision Memory? Architectural Authority for AI Coding Agents — Mneme HQ</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="Decision memory and documentation look similar but solve different problems. Documentation surfaces information. Decision memory enforces constraints. The distinction determines whether your governance system actually works." />
+  <meta name="description" content="Decision memory stores architectural authority, scope, precedence, and supersession when decisions are recorded. Learn why AI coding agents need more than documentation, generic memory, or RAG retrieval." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/architecture/decision-memory-vs-documentation/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Decision Memory vs. Documentation — Architecture Deep Dive" />
-  <meta property="og:description" content="Decision memory and documentation look similar but solve different problems. Documentation surfaces information. Decision memory enforces constraints. The distinction determines whether your governance system actually works." />
+  <meta property="og:title" content="Decision Memory: Where Architectural Authority Lives" />
+  <meta property="og:description" content="Relevance is calculated at read time. Authority has to be recorded at write time. Decision memory is the layer where architectural authority lives — what documentation, generic memory, and RAG retrieval all leave out." />
   <meta property="og:url" content="https://mnemehq.com/architecture/decision-memory-vs-documentation/" />
   <meta property="og:image" content="https://mnemehq.com/architecture/decision-memory-vs-documentation/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Decision Memory vs. Documentation — Architecture Deep Dive" />
-  <meta name="twitter:description" content="Decision memory and documentation look similar but solve different problems. Documentation surfaces information. Decision memory enforces constraints. The distinction determines whether your governance system actually works." />
+  <meta name="twitter:title" content="Decision Memory: Where Architectural Authority Lives" />
+  <meta name="twitter:description" content="Relevance is calculated at read time. Authority has to be recorded at write time. Decision memory is the layer where architectural authority lives — what documentation, generic memory, and RAG retrieval all leave out." />
   <meta name="twitter:image" content="https://mnemehq.com/architecture/decision-memory-vs-documentation/og.png" />
   <meta name="author" content="Theo Valmis" />
   <meta property="article:published_time" content="2026-05-14T00:00:00Z" />
@@ -219,19 +219,19 @@
         "itemListElement": [
           {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
           {"@type": "ListItem", "position": 2, "name": "Architecture", "item": "https://mnemehq.com/architecture/"},
-          {"@type": "ListItem", "position": 3, "name": "Decision Memory vs. Documentation", "item": "https://mnemehq.com/architecture/decision-memory-vs-documentation/"}
+          {"@type": "ListItem", "position": 3, "name": "Decision Memory", "item": "https://mnemehq.com/architecture/decision-memory-vs-documentation/"}
         ]
       },
       {
         "@type": "TechArticle",
-        "headline": "Decision Memory vs. Documentation — Architecture Deep Dive",
-        "description": "Decision memory and documentation look similar but solve different problems. Documentation surfaces information. Decision memory enforces constraints. The distinction determines whether your governance system actually works.",
+        "headline": "Decision Memory: Where Architectural Authority Lives",
+        "description": "Decision memory stores architectural authority, scope, precedence, and supersession when decisions are recorded. Learn why AI coding agents need more than documentation, generic memory, or RAG retrieval.",
         "url": "https://mnemehq.com/architecture/decision-memory-vs-documentation/",
         "datePublished": "2026-05-14",
-        "dateModified": "2026-05-14",
+        "dateModified": "2026-06-01",
         "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
-        "image": "https://mnemehq.com/og.png",
+        "image": "https://mnemehq.com/architecture/decision-memory-vs-documentation/og.png",
         "mainEntityOfPage": "https://mnemehq.com/architecture/decision-memory-vs-documentation/",
         "proficiencyLevel": "Expert",
         "articleSection": "Architecture"
@@ -239,6 +239,16 @@
       {
         "@type": "FAQPage",
         "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is decision memory?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Decision memory is the layer where architectural authority is stored when a decision is recorded, not inferred later when context is retrieved. It holds which decisions are binding, what files they apply to, what they supersede, and what they forbid — as structured properties of the decision object, set at write time. Documentation records knowledge, RAG retrieves relevance, and generic memory preserves context; decision memory stores authority. In Mneme it is a corpus of typed decision records in .mneme/project_memory.json that a deterministic retriever and evaluator use to govern AI-generated code."}
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between decision memory and RAG?",
+            "acceptedAnswer": {"@type": "Answer", "text": "RAG ranks documents by similarity at read time, when a query arrives. Decision memory stores authority — precedence, scope, and supersession — at write time, when the decision is made. Similarity is not authority: the most semantically similar ADR is not necessarily the governing one, and a vector index cannot recover a precedence or supersession field that was never stored. The two are complementary: RAG surfaces what exists, decision memory resolves what is binding. A robust setup retrieves relevant material and then resolves authority deterministically over the structured decisions that apply."}
+          },
           {
             "@type": "Question",
             "name": "What is the difference between decision memory and documentation?",
@@ -294,14 +304,14 @@
 
 <main>
 <div class="answer-capsule">
-  <strong>Decision memory vs. documentation.</strong> Documentation is information you can retrieve. Decision memory is constraints you can enforce. An ADR wiki page is documentation. The same ADR compiled into a structured corpus with scope patterns, precedence fields, and status tracking is decision memory. The governance gap between the two is where AI coding agents produce architectural drift — because suggestion is not enforcement.
+  <strong>Decision memory</strong> is the layer where architectural authority — which decision is binding, what it applies to, what it supersedes — is stored when a decision is recorded, not inferred when context is retrieved later. Documentation records knowledge, RAG retrieves relevance, generic memory preserves context. Decision memory stores authority. Relevance is calculated at read time; authority has to be recorded at write time. That difference is why AI coding agents need decision memory, not just better retrieval.
 </div>
 
 <nav aria-label="Breadcrumb" class="breadcrumb-nav">
   <ol class="breadcrumb">
     <li><a href="/">Home</a></li>
     <li><a href="/architecture/">Architecture</a></li>
-    <li aria-current="page">Decision Memory vs. Documentation</li>
+    <li aria-current="page">Decision Memory</li>
   </ol>
 </nav>
 
@@ -310,10 +320,10 @@
     <div class="article-eyebrow">
       <span class="eyebrow-tag">Architecture</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">10 min read &nbsp;·&nbsp; May 2026</span>
+      <span class="eyebrow-meta">12 min read &nbsp;·&nbsp; Updated June 2026</span>
     </div>
-    <h1>Decision Memory vs. Documentation</h1>
-    <p class="article-lede">Most teams write architecture decisions as documentation. That is necessary but not sufficient for governing AI coding agents. Documentation surfaces information. Decision memory enforces constraints. The gap between the two is exactly where architectural drift enters AI-assisted codebases.</p>
+    <h1>Decision Memory: Where Architectural Authority Lives</h1>
+    <p class="article-lede">RAG retrieves relevant information. Documentation records knowledge. Generic memory preserves context. Decision memory does something none of them do: it stores architectural authority — precedence, scope, and supersession — as a property of the decision itself, recorded at write time. That is the layer AI coding agents need, and the reason retrieval alone cannot govern them.</p>
     <p class="byline">
       By <a href="/founder/">Theo Valmis</a>
       <span class="sep">&middot;</span>
@@ -322,6 +332,29 @@
   </header>
 
   <div class="article-body">
+
+    <h2>Decision memory is not another name for documentation</h2>
+
+    <p><strong>Decision memory is the layer where architectural authority is stored when a decision is recorded, not inferred later when context is retrieved.</strong> It is not documentation, it is not a generic memory layer, and it is not retrieval. It is the substrate that holds which decisions are binding, what they apply to, and which ones have been superseded — as structured properties of the decision itself, set the moment the decision is made.</p>
+
+    <p>The clearest way to separate it from its neighbors is by what each layer is optimized to do:</p>
+
+    <ul>
+      <li><strong>RAG</strong> retrieves relevant information from a corpus.</li>
+      <li><strong>Documentation</strong> records knowledge for humans to read.</li>
+      <li><strong>Generic memory</strong> preserves context across turns and sessions.</li>
+      <li><strong>Decision memory</strong> stores authority, precedence, scope, and supersession as properties of a decision object.</li>
+    </ul>
+
+    <p>Those are four different jobs. The first three are all read-time operations: they surface or rank existing material when a query arrives. Decision memory is categorically different, because the thing it stores is fixed at write time and does not depend on any query.</p>
+
+    <div class="callout">
+      <p><strong>Relevance is calculated at read time. Authority has to be recorded at write time.</strong> A retrieval system can rank documents by similarity. It cannot infer which architectural decision is binding, which rule applies to a particular surface, or which older decision has been superseded — unless that authority was explicitly stored when the decision was created. That is the role of decision memory.</p>
+    </div>
+
+    <p>This page is the canonical definition of that layer. It uses documentation as the first point of contrast, because documentation is the form most teams already have — then extends the same argument to generic memory and to RAG, which fail to govern AI coding agents for the same structural reason.</p>
+
+    <h2>Why documentation alone is insufficient</h2>
 
     <p>When a team ships their first ADR process, the instinct is to put the ADRs in a wiki or a <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">docs/adr/</code> folder and call it governance. In the human-only workflow, this works well enough — engineers read the ADRs, internalize the decisions, and apply them in code review.</p>
 
@@ -406,7 +439,7 @@
         <line x1="470" y1="216" x2="470" y2="246" stroke="#c8f060" stroke-width="1.5" marker-end="url(#arr2-accent)"/>
 
         <rect x="360" y="248" width="220" height="44" rx="8" fill="#141416" stroke="#8be0c8" stroke-width="1.5"/>
-        <text x="470" y="268" font-family="Inter,sans-serif" font-size="10" fill="#8be0c8" text-anchor="middle" font-weight="600">Evaluator: PASS / FAIL / WEAK</text>
+        <text x="470" y="268" font-family="Inter,sans-serif" font-size="10" fill="#8be0c8" text-anchor="middle" font-weight="600">Evaluator: PASS / WARN / FAIL</text>
         <text x="470" y="282" font-family="DM Mono,monospace" font-size="8.5" fill="#88889a" text-anchor="middle">enforced, auditable, blockable</text>
       </svg>
       <figcaption>Fig. 1 — Documentation path ends in suggestion. Decision memory path ends in enforcement. Same ADR source, different architectural handling.</figcaption>
@@ -566,10 +599,10 @@
 
     <p>The path from documentation to decision memory doesn't require rewriting your ADRs. Mneme's ADR import integration reads existing ADR files and extracts a <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">## Constraints</code> section that engineers add alongside (not replacing) the existing ADR structure.</p>
 
-    <p>Each constraint line in the Constraints section is compiled into a structured decision record in <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">project_memory.json</code>. The ADR body — context, rationale, consequences — remains documentation and is not imported into the enforcement corpus. The two layers coexist: documentation for human understanding, decision memory for machine enforcement.</p>
+    <p>Each constraint line in the Constraints section is compiled into a structured decision record in <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.mneme/project_memory.json</code>. The ADR body — context, rationale, consequences — remains documentation and is not imported into the governance corpus. The two layers coexist: documentation for human understanding, decision memory for machine evaluation.</p>
 
     <div class="callout-teal">
-      <p><strong>The ADR import workflow:</strong> Add a Constraints section to any existing ADR. Run <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">mneme import-adr --preview</code> to see what records would be created. Run without <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">--preview</code> to apply. Your ADRs gain enforcement capability without losing their documentation function.</p>
+      <p><strong>The ADR import workflow:</strong> Add a Constraints section to any existing ADR. Run <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">mneme adr import</code> to preview the records that would be created — it is dry-run by default — then re-run with <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">--apply</code> to write them. Dependency-style constraints become enforceable; the rest are stored as structured decisions, and your ADRs keep their documentation function.</p>
     </div>
 
     <h2>The full comparison</h2>
@@ -612,7 +645,7 @@
         <tr>
           <td>Enforcement point</td>
           <td>Suggestion via context injection</td>
-          <td>Post-generation evaluation with PASS/FAIL verdict</td>
+          <td>Deterministic evaluation with a PASS / WARN / FAIL verdict</td>
         </tr>
         <tr>
           <td>Audit trail</td>
@@ -633,9 +666,29 @@
     </table>
     </div>
 
-    <h2>When documentation is the right tool</h2>
+    <h2>Why generic memory is insufficient</h2>
 
-    <p>This isn't an argument against documentation. Documentation serves an irreplaceable function: it preserves the reasoning behind decisions in a form engineers can read, discuss, and learn from. A team with rich ADRs and architecture docs has a significant advantage over one without.</p>
+    <p>A generic memory layer — the kind that persists facts and context across an agent's turns and sessions — gets closer than documentation, because it is at least machine-readable. But remembering a decision as a fact is not the same as storing it as an authority. A memory layer can recall that the team chose PostgreSQL. It has no native notion that this choice is <em>binding</em> on <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">services/payments/**</code>, that it <em>outranks</em> an older SQLite note, or that it must win every retrieval where both appear. Memory preserves what was said. Decision memory preserves what was decided, and with what force. This is the line drawn in <a href="/insights/memory-is-not-governance/">memory is not governance</a> and <a href="/insights/rag-is-not-memory/">RAG is not memory</a>.</p>
+
+    <h2>Why RAG retrieval is insufficient</h2>
+
+    <p>RAG is the most common thing teams reach for when they want an agent to &ldquo;know&rdquo; their architecture: index the ADRs, retrieve the relevant ones, inject them into the prompt. It is genuinely useful for surfacing documentation, and it is the wrong tool for authority — for one structural reason.</p>
+
+    <div class="callout">
+      <p><strong>Similarity is not authority.</strong> The most semantically similar ADR is not necessarily the governing one. The decision that applies may be the one with higher precedence, narrower scope, or newer supersession status — none of which a similarity score can see.</p>
+    </div>
+
+    <p>The reason is architectural, not a tuning problem. A vector index assigns relevance <em>at read time</em>, when the query arrives. Precedence and supersession are properties that only exist if they were recorded <em>at write time</em>, on the decision object. No amount of reranking recovers a field that was never stored. Hand a retriever two equally-relevant passages — one a binding decision, one prior-art commentary that was later superseded — and no similarity score separates them, because by the measure RAG uses they are the same. This is the failure analyzed in <a href="/insights/why-rag-fails-for-architectural-governance/">why RAG fails for architectural governance</a>.</p>
+
+    <h2>Decision memory and RAG solve complementary problems</h2>
+
+    <p>None of this makes RAG or documentation wrong. They solve a different problem: surfacing what exists. Decision memory solves the adjacent one: resolving what is binding. The right architecture uses both — retrieve the relevant material, then resolve authority deterministically over the structured decisions that apply.</p>
+
+    <p>What the agent receives at the end of that resolution is the point. It does not need a wider window of semantically similar text. It needs the resolved set of decisions that bind the code it is about to write — the applicable, precedence-ordered constraints for the exact surface being edited. In Mneme that resolved set is delivered as a context packet: not top-k passages injected as suggestion, but the decisions that govern this change. The broader layer comparison is laid out in <a href="/compare/rag-vs-governance/">RAG vs governance</a> and <a href="/compare/rag-coding-memory/">RAG vs coding memory</a>.</p>
+
+    <h2>When documentation and retrieval are the right tools</h2>
+
+    <p>This isn't an argument against documentation or RAG. Documentation serves an irreplaceable function: it preserves the reasoning behind decisions in a form engineers can read, discuss, and learn from, and RAG makes that corpus searchable. A team with rich ADRs and good retrieval has a significant advantage over one without.</p>
 
     <p>The argument is narrower: <strong>documentation is not a governance system, and treating it as one creates a false sense of safety.</strong> When a team believes their ADR wiki is enforcing architectural decisions in the AI coding workflow, they are not protected against the violations they think they are.</p>
 
@@ -645,6 +698,14 @@
 
   <section class="article-faq">
     <h2>Frequently asked questions</h2>
+    <details>
+      <summary>What is decision memory?</summary>
+      <div class="faq-body">Decision memory is the layer where architectural authority is stored when a decision is recorded, not inferred later when context is retrieved. It holds which decisions are binding, what files they apply to, what they supersede, and what they forbid — as structured properties of the decision object, set at write time. Documentation records knowledge, RAG retrieves relevance, and generic memory preserves context; decision memory stores authority. In Mneme it is a corpus of typed decision records in <code style="font-family:'DM Mono',monospace">.mneme/project_memory.json</code> that a deterministic retriever and evaluator use to govern AI-generated code.</div>
+    </details>
+    <details>
+      <summary>What is the difference between decision memory and RAG?</summary>
+      <div class="faq-body">RAG ranks documents by similarity at read time, when a query arrives. Decision memory stores authority — precedence, scope, and supersession — at write time, when the decision is made. Similarity is not authority: the most semantically similar ADR is not necessarily the governing one, and a vector index cannot recover a precedence or supersession field that was never stored. The two are complementary: RAG surfaces what exists, decision memory resolves what is binding. A robust setup retrieves relevant material and then resolves authority deterministically over the structured decisions that apply.</div>
+    </details>
     <details>
       <summary>What is the difference between decision memory and documentation?</summary>
       <div class="faq-body">Documentation surfaces information — it is read by humans (or retrieved for AI context). Decision memory enforces constraints — it is a structured corpus of authoritative decisions that a governance system evaluates generated code against. Documentation answers "what does our system do?" Decision memory answers "what must every AI coding agent comply with?" The distinction matters because you cannot build enforcement on top of documentation retrieval.</div>
@@ -669,9 +730,13 @@
 
   <h2 id="related-reading">Related reading</h2>
   <ul>
-    <li><a href="/architecture/how-retrieval-works/">How Retrieval Works in Mneme — Pipeline Deep Dive</a></li>
-    <li><a href="/insights/memory-is-not-governance/">Memory Is Not Governance</a></li>
     <li><a href="/insights/why-rag-fails-for-architectural-governance/">Why RAG Fails for Architectural Governance</a></li>
+    <li><a href="/insights/rag-is-not-memory/">RAG Is Not Memory</a></li>
+    <li><a href="/compare/rag-vs-governance/">RAG vs Architectural Governance</a></li>
+    <li><a href="/compare/rag-coding-memory/">RAG vs Coding Memory</a></li>
+    <li><a href="/concepts/precedence-semantics/">Precedence Semantics</a></li>
+    <li><a href="/concepts/decision-continuity/">Decision Continuity</a></li>
+    <li><a href="/architecture/how-retrieval-works/">How Retrieval Works in Mneme — Pipeline Deep Dive</a></li>
     <li><a href="/integrations/adr-import/">ADR Import Integration</a></li>
   </ul>
 

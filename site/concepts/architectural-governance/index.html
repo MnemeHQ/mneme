@@ -283,6 +283,11 @@
           },
           {
             "@type": "Question",
+            "name": "Is architectural governance the same as zero trust for AI agents?",
+            "acceptedAnswer": {"@type": "Answer", "text": "No, but it completes it. Zero trust for AI agents is a security doctrine — never trust, always verify — applied to the agent's identity, permissions, and actions: can this agent do this, and how do we contain it if compromised. Architectural zero trust extends the same doctrine to the agent's output: it refuses the last implicit trust that a permitted, authenticated action produces an architecture-conforming change, and verifies every diff against compiled architectural constraints before it crosses into the codebase. Security verifies the actor; architectural governance verifies the change."}
+          },
+          {
+            "@type": "Question",
             "name": "How is architectural governance different from code review?",
             "acceptedAnswer": {"@type": "Answer", "text": "Code review is a sample of AI output after it has been written. Architectural governance is the constraint layer that shapes what the AI proposes before it writes. When teams conflate the two, code review becomes the enforcement layer — but it can't scale linearly with AI output volume. Governance upstream of generation means the review layer receives architecturally coherent code, not a stream of violations that must be caught and corrected one PR at a time."}
           },
@@ -532,6 +537,10 @@
     <details>
       <summary>What is architectural governance in AI coding?</summary>
       <div class="faq-body">Architectural governance in AI coding is the system that encodes team architectural decisions as machine-evaluable constraints and enforces those constraints before or at the moment of AI code generation — not after. It is distinct from code review, documentation, and conventions. It is an enforcement layer: the system that evaluates what an AI agent is about to write against the decisions the team has already made, and either shapes the agent's output or blocks the violation before it reaches review.</div>
+    </details>
+    <details>
+      <summary>Is architectural governance the same as zero trust for AI agents?</summary>
+      <div class="faq-body">No, but it completes it. Zero trust for AI agents is a security doctrine — never trust, always verify — applied to the agent's identity, permissions, and actions: can this agent do this, and how do we contain it if compromised. Architectural zero trust extends the same doctrine to the agent's output: it refuses the last implicit trust that a permitted, authenticated action produces an architecture-conforming change, and verifies every diff against compiled architectural constraints before it crosses into the codebase. This is the argument in <a href="/insights/zero-trust-for-ai-agents-architectural-governance/">architectural zero trust verifies the diff, not just the agent</a>. Security verifies the actor; architectural governance verifies the change.</div>
     </details>
     <details>
       <summary>How is architectural governance different from code review?</summary>

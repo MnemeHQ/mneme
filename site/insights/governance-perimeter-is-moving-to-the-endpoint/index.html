@@ -53,6 +53,7 @@
         "description": "On-device agents collapse the centralized governance perimeter toward the repository and the execution workflow. Governance has to become portable, repo-native, and deterministic.",
         "url": "https://mnemehq.com/insights/governance-perimeter-is-moving-to-the-endpoint/",
         "datePublished": "2026-05-26",
+        "dateModified": "2026-06-01",
         "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/"}
       }
@@ -312,6 +313,11 @@
     <p>That is a different design problem. It requires constraints to travel with the workflow rather than sit upstream of it.</p>
 
     <div class="callout"><p><strong>Architectural constraints have to be portable.</strong> If governance only exists at a centralized chokepoint, it is structurally optional the moment execution can avoid that chokepoint.</p></div>
+
+    <h2>The AI PC makes this concrete</h2>
+    <p>This stopped being a roadmap argument on 31 May 2026, when <a href="https://nvidianews.nvidia.com/news/nvidia-microsoft-windows-pcs-agents-rtx-spark" rel="noopener">NVIDIA and Microsoft announced they were rebuilding Windows around personal AI</a>. The NVIDIA RTX Spark superchip puts roughly a petaflop of local AI and up to 128GB of unified memory on consumer Windows machines &mdash; enough to run autonomous coding agents on-device that never round-trip to the cloud. On that hardware, the centralized inference chokepoint is optional by default.</p>
+    <p>Notably, NVIDIA shipped the runtime-governance half alongside it: NVIDIA OpenShell, a sandboxed, secure-by-design agent runtime built on new Windows containment primitives, governing what a local agent is permitted to do at execution time &mdash; file access, tool use, isolation. That is real and useful, and it is the <a href="/insights/ai-agent-governance-two-markets/">runtime-governance market</a>, not this one. OpenShell can contain what an agent is allowed to touch on the machine; it has no model of whether the diff that agent commits preserves an architectural decision the team made. The AI PC ships the containment layer and leaves the architectural one exactly where it was: in the repo, or nowhere.</p>
+    <p>What the AI PC really changes for architectural governance is arithmetic. A single constraint now has to fire identically across more local surfaces at once &mdash; the on-device IDE, the local terminal agent, the OS-orchestrated loop, and cloud CI &mdash; on the same machine, often with no network call between them. A constraint enforced only in cloud CI is not <em>late</em> to those surfaces; it is <em>absent</em> from them. That raises the propagation bar inside the architectural lane rather than creating a new one.</p>
 
     <h2>What portable governance looks like</h2>
     <p>Portable governance is not a vague idea. It is a small set of properties that distinguish enforcement that survives endpoint execution from enforcement that does not.</p>
