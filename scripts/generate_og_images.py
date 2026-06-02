@@ -133,6 +133,9 @@ TEMPLATE_MAP = {
     "og-supported-languages-js.html": "supported-languages/javascript-governance/og.png",
     "og-supported-languages-py.html": "supported-languages/python-governance/og.png",
     "og-supported-languages-ts.html": "supported-languages/typescript-governance/og.png",
+    "og-supported-languages-fastapi.html": "supported-languages/fastapi-governance/og.png",
+    "og-supported-languages-spring-boot.html": "supported-languages/spring-boot-governance/og.png",
+    "og-supported-languages-terraform.html": "supported-languages/terraform-governance/og.png",
     # Misc
     "og-about.html": "about/og.png",
     "og-benchmark.html": "benchmark/og.png",
