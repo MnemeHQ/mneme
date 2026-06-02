@@ -461,6 +461,21 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://mnemehq.com/supported-languages/fastapi-governance/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/supported-languages/spring-boot-governance/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/supported-languages/terraform-governance/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://mnemehq.com/docs/supported-languages/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>

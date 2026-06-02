@@ -521,6 +521,30 @@ TEMPLATES = [
         "Architectural governance for AI-assisted TypeScript development.",
         "supported-languages/typescript-governance",
     ),
+    (
+        "og-supported-languages-fastapi.html",
+        "Framework",
+        "FastAPI Governance",
+        "62px",
+        "Architectural governance for AI-generated FastAPI code.",
+        "supported-languages/fastapi-governance",
+    ),
+    (
+        "og-supported-languages-spring-boot.html",
+        "Framework",
+        "Spring Boot Governance",
+        "52px",
+        "Architectural governance for AI-generated Spring Boot code.",
+        "supported-languages/spring-boot-governance",
+    ),
+    (
+        "og-supported-languages-terraform.html",
+        "Infrastructure",
+        "Terraform Governance",
+        "62px",
+        "Architectural governance for AI-generated infrastructure as code.",
+        "supported-languages/terraform-governance",
+    ),
     # === MISC ===
     (
         "og-about.html",
@@ -695,6 +719,9 @@ NEW_MAP_ENTRIES = {
     "og-supported-languages-js.html": "supported-languages/javascript-governance/og.png",
     "og-supported-languages-py.html": "supported-languages/python-governance/og.png",
     "og-supported-languages-ts.html": "supported-languages/typescript-governance/og.png",
+    "og-supported-languages-fastapi.html": "supported-languages/fastapi-governance/og.png",
+    "og-supported-languages-spring-boot.html": "supported-languages/spring-boot-governance/og.png",
+    "og-supported-languages-terraform.html": "supported-languages/terraform-governance/og.png",
     # Misc
     "og-about.html": "about/og.png",
     "og-benchmark.html": "benchmark/og.png",
@@ -799,6 +826,9 @@ HTML_FIXES = {
     "site/supported-languages/javascript-governance/index.html": "https://mnemehq.com/supported-languages/javascript-governance/og.png",
     "site/supported-languages/python-governance/index.html": "https://mnemehq.com/supported-languages/python-governance/og.png",
     "site/supported-languages/typescript-governance/index.html": "https://mnemehq.com/supported-languages/typescript-governance/og.png",
+    "site/supported-languages/fastapi-governance/index.html": "https://mnemehq.com/supported-languages/fastapi-governance/og.png",
+    "site/supported-languages/spring-boot-governance/index.html": "https://mnemehq.com/supported-languages/spring-boot-governance/og.png",
+    "site/supported-languages/terraform-governance/index.html": "https://mnemehq.com/supported-languages/terraform-governance/og.png",
     "site/use-cases/index.html": "https://mnemehq.com/use-cases/og.png",
 }
 

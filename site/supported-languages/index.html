@@ -41,13 +41,16 @@
       {
         "@type": "CollectionPage",
         "name": "Architectural Governance for AI-Assisted Development &mdash; By Language",
-        "description": "Mneme HQ's architectural governance across Python, TypeScript, JavaScript, Go, Java, C#, and Rust.",
+        "description": "Mneme HQ's architectural governance across languages (Python, TypeScript, JavaScript, Go, Java, C#, Rust), frameworks (FastAPI, Spring Boot), and infrastructure as code (Terraform).",
         "url": "https://mnemehq.com/supported-languages/",
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
         "hasPart": [
           {"@type": "WebPage", "name": "Python governance", "url": "https://mnemehq.com/supported-languages/python-governance/"},
           {"@type": "WebPage", "name": "TypeScript governance", "url": "https://mnemehq.com/supported-languages/typescript-governance/"},
-          {"@type": "WebPage", "name": "JavaScript governance", "url": "https://mnemehq.com/supported-languages/javascript-governance/"}
+          {"@type": "WebPage", "name": "JavaScript governance", "url": "https://mnemehq.com/supported-languages/javascript-governance/"},
+          {"@type": "WebPage", "name": "FastAPI governance", "url": "https://mnemehq.com/supported-languages/fastapi-governance/"},
+          {"@type": "WebPage", "name": "Spring Boot governance", "url": "https://mnemehq.com/supported-languages/spring-boot-governance/"},
+          {"@type": "WebPage", "name": "Terraform governance", "url": "https://mnemehq.com/supported-languages/terraform-governance/"}
         ]
       }
     ]
@@ -89,6 +92,7 @@
     .lang-card .ltag { font-family: 'DM Mono', monospace; font-size: 0.64rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
     .lang-card.tier-1 .ltag { color: var(--accent); }
     .lang-card.tier-2 .ltag { color: var(--teal); }
+    .lang-card.eco .ltag { color: var(--teal); }
     .lang-card p { font-size: 0.86rem; color: var(--muted); line-height: 1.65; flex: 1; }
     .lang-card .read { font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--accent); margin-top: 0.3rem; }
     .lang-card.passive { opacity: 0.85; }
@@ -159,13 +163,13 @@
 <main>
 
 <div class="answer-capsule">
-  <strong>Mneme HQ</strong> provides architectural governance for AI-assisted development. The governance layer is language-agnostic by design; depth varies by ecosystem &mdash; deepest in Python, operationally strong in TypeScript and JavaScript, repo-level for Go, Java, C#, and Rust.
+  <strong>Mneme HQ</strong> provides architectural governance for AI-assisted development across languages, frameworks, and infrastructure ecosystems. The governance layer is language-agnostic by design; depth varies by ecosystem &mdash; deepest in Python, operationally strong in TypeScript and JavaScript, repo-level for Go, Java, C#, and Rust, and extended to frameworks (FastAPI, Spring Boot) and infrastructure as code (Terraform) through the same repo-native rules.
 </div>
 
 <section class="hero">
   <div class="section-eyebrow">Supported languages</div>
   <h1>Architectural governance for <em>AI-assisted</em> development</h1>
-  <p class="hero-sub">The wrong question is "does Mneme support Python." The right question is whether Mneme governs AI-assisted Python development. Same for TypeScript, JavaScript, and every language on this page.</p>
+  <p class="hero-sub">The wrong question is "does Mneme support Python." The right question is whether Mneme governs AI-assisted Python development. Same for TypeScript, JavaScript, the framework ecosystems, and the infrastructure-as-code surface on this page.</p>
 </section>
 
 <div class="wrap">
@@ -217,6 +221,33 @@
     </div>
   </div>
 
+  <h2 class="group-title">Frameworks &amp; ecosystems</h2>
+  <p class="group-lede">Framework-level governance pages. The same repo-native decision corpus, focused on the architectural surface of a specific ecosystem &mdash; no bespoke parser or framework plugin required.</p>
+
+  <div class="lang-grid">
+    <a class="lang-card eco" href="/supported-languages/fastapi-governance/">
+      <div class="lh"><span class="lname">FastAPI</span><span class="ltag">Python ecosystem &middot; repo-native</span></div>
+      <p>Router, service, repository, and schema boundaries. Thin route handlers, dependency-injection discipline, and consistent auth dependencies in fast-moving Python APIs.</p>
+      <span class="read">FastAPI governance &rarr;</span>
+    </a>
+    <a class="lang-card eco" href="/supported-languages/spring-boot-governance/">
+      <div class="lh"><span class="lname">Spring Boot</span><span class="ltag">JVM ecosystem &middot; repo-native</span></div>
+      <p>Controller, service, repository, and domain boundaries. Approved starters, transaction boundaries, and Spring Security and Actuator policy across enterprise Java.</p>
+      <span class="read">Spring Boot governance &rarr;</span>
+    </a>
+  </div>
+
+  <h2 class="group-title">Infrastructure as code</h2>
+  <p class="group-lede">Agents don't only modify application code &mdash; they modify the infrastructure and configuration where architectural decisions become operational reality. Governed through the same repo-native corpus.</p>
+
+  <div class="lang-grid">
+    <a class="lang-card eco" href="/supported-languages/terraform-governance/">
+      <div class="lh"><span class="lname">Terraform</span><span class="ltag">Infrastructure as code &middot; repo-native</span></div>
+      <p>Approved modules over direct resources, provider and region constraints, network-exposure and encryption rules, and protected state-backend and locking configuration.</p>
+      <span class="read">Terraform governance &rarr;</span>
+    </a>
+  </div>
+
   <div class="compat-strip">
     <p><strong>Integration-based compatibility.</strong> Mneme operates above the model and runtime layer. Any workflow using Claude Code, Cursor, GitHub Copilot, custom agent frameworks (LangGraph, AutoGen, CrewAI, OpenAI Agents SDK), or a CI pipeline inherits governance support &mdash; regardless of underlying language. See <a href="/works-with/" style="color:var(--accent);text-decoration:none;">Works With</a> for the full surface.</p>
   </div>
@@ -228,7 +259,7 @@
   </div>
 
   <h2 class="group-title" style="margin-top:3rem;">More ecosystems coming</h2>
-  <p class="group-lede">Framework-level governance pages are in progress. Next up: React, Next.js, FastAPI, Spring Boot, and Terraform.</p>
+  <p class="group-lede">More framework-level governance pages are in progress. Next up: React, Next.js, and Django.</p>
 
   <h2 class="group-title">Get started</h2>
   <div class="cta-grid">
