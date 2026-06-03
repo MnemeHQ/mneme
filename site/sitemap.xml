@@ -678,6 +678,7 @@
   <url><loc>https://mnemehq.com/works-with/antigravity/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://mnemehq.com/compare/devin-vs-architectural-governance/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://mnemehq.com/compare/google-antigravity-vs-mneme/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://mnemehq.com/compare/claude-md/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <!-- Previously orphaned indexable pages (added to sitemap) -->
   <url><loc>https://mnemehq.com/concepts/ai-agent-drift/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://mnemehq.com/concepts/enforcement-provenance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>

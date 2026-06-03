@@ -62,14 +62,15 @@
           {"@type": "WebPage", "name": "Mneme HQ vs Sourcegraph Cody", "url": "https://mnemehq.com/compare/sourcegraph-cody/"},
           {"@type": "WebPage", "name": "Mneme HQ vs RAG-based Governance", "url": "https://mnemehq.com/compare/rag-vs-governance/"},
           {"@type": "WebPage", "name": "Devin vs Architectural Governance", "url": "https://mnemehq.com/compare/devin-vs-architectural-governance/"},
-          {"@type": "WebPage", "name": "Google Antigravity vs Mneme", "url": "https://mnemehq.com/compare/google-antigravity-vs-mneme/"}
+          {"@type": "WebPage", "name": "Google Antigravity vs Mneme", "url": "https://mnemehq.com/compare/google-antigravity-vs-mneme/"},
+          {"@type": "WebPage", "name": "Mneme HQ vs CLAUDE.md", "url": "https://mnemehq.com/compare/claude-md/"}
         ]
       },
       {
         "@type": "ItemList",
         "name": "Mneme HQ alternatives comparisons",
         "description": "Structured comparisons of Mneme HQ against adjacent categories in AI coding governance.",
-        "numberOfItems": 12,
+        "numberOfItems": 13,
         "itemListOrder": "https://schema.org/ItemListOrderAscending",
         "itemListElement": [
           {"@type": "ListItem", "position": 1, "name": "Mneme HQ vs CodeRabbit", "url": "https://mnemehq.com/compare/coderabbit/"},
@@ -83,7 +84,8 @@
           {"@type": "ListItem", "position": 9, "name": "Mneme HQ vs Sourcegraph Cody", "url": "https://mnemehq.com/compare/sourcegraph-cody/"},
           {"@type": "ListItem", "position": 10, "name": "Mneme HQ vs RAG-based Governance", "url": "https://mnemehq.com/compare/rag-vs-governance/"},
           {"@type": "ListItem", "position": 11, "name": "Devin vs Architectural Governance", "url": "https://mnemehq.com/compare/devin-vs-architectural-governance/"},
-          {"@type": "ListItem", "position": 12, "name": "Google Antigravity vs Mneme", "url": "https://mnemehq.com/compare/google-antigravity-vs-mneme/"}
+          {"@type": "ListItem", "position": 12, "name": "Google Antigravity vs Mneme", "url": "https://mnemehq.com/compare/google-antigravity-vs-mneme/"},
+          {"@type": "ListItem", "position": 13, "name": "Mneme HQ vs CLAUDE.md", "url": "https://mnemehq.com/compare/claude-md/"}
         ]
       },
       {
@@ -327,7 +329,7 @@
     <span class="sep">&middot;</span>
     <time datetime="2026-05-27">Last updated May 2026</time>
     <span class="sep">&middot;</span>
-    <span>12 comparisons</span>
+    <span>13 comparisons</span>
   </p>
 </div>
 
@@ -375,6 +377,21 @@
         </div>
         <h3>Mneme HQ vs Claude Code Memory</h3>
         <p>Claude Code&rsquo;s CLAUDE.md provides instructions the model may follow. Mneme HQ hooks into Claude Code&rsquo;s edit operations and blocks violations before they happen. Instructions vs enforcement.</p>
+        <div class="card-footer">
+          <span class="read-link">Compare &rarr;</span>
+        </div>
+      </div>
+    </a>
+
+    <a href="/compare/claude-md/" class="compare-card-link">
+      <div class="compare-card">
+        <div class="card-meta">
+          <span class="card-tag">Instruction Files</span>
+          <span class="card-dot"></span>
+          <span class="card-tag">6 min read</span>
+        </div>
+        <h3>Mneme HQ vs CLAUDE.md</h3>
+        <p>A CLAUDE.md tells the model your conventions; Mneme HQ enforces the ones that must hold. Not competitors &mdash; two layers of the same workflow. Keep the prose, promote the load-bearing rules.</p>
         <div class="card-footer">
           <span class="read-link">Compare &rarr;</span>
         </div>
@@ -536,6 +553,12 @@
             <td>Built-in agent memory</td>
             <td>Session-scoped instructions</td>
             <td>Need deterministic recall across sessions and agents</td>
+          </tr>
+          <tr>
+            <td><a href="/compare/claude-md/">vs CLAUDE.md</a></td>
+            <td>Project instructions file</td>
+            <td>Advisory context, repo-wide</td>
+            <td>Need rules that block, scope, and survive file growth</td>
           </tr>
           <tr>
             <td><a href="/compare/rag-coding-memory/">vs RAG Coding Memory</a></td>

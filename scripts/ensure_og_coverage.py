@@ -663,6 +663,7 @@ TEMPLATES = [
     # === BATCH: New compare pages ===
     ("og-compare-devin-vs-architectural-governance.html", "Compare", "Devin vs Architectural Governance", "52px", "Why autonomous coding agents still need deterministic enforcement.", "compare/devin-vs-architectural-governance"),
     ("og-compare-google-antigravity-vs-mneme.html", "Compare", "Google Antigravity vs Mneme", "52px", "Agentic IDEs vs architectural governance. Different layers; they compose.", "compare/google-antigravity-vs-mneme"),
+    ("og-compare-claude-md.html", "Compare", "Mneme HQ vs CLAUDE.md", "56px", "A CLAUDE.md tells the model your rules. Mneme enforces the ones that must hold.", "compare/claude-md"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -785,6 +786,7 @@ NEW_MAP_ENTRIES = {
     # Batch May 2026: compare
     "og-compare-devin-vs-architectural-governance.html": "compare/devin-vs-architectural-governance/og.png",
     "og-compare-google-antigravity-vs-mneme.html": "compare/google-antigravity-vs-mneme/og.png",
+    "og-compare-claude-md.html": "compare/claude-md/og.png",
 }
 
 # ---------------------------------------------------------------------------

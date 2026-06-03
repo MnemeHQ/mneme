@@ -218,6 +218,8 @@ TEMPLATE_MAP = {
     "og-insights-convergence-trap.html": "insights/agentic-convergence-trap-architectural-governance/og.png",
     "og-insights-table-stakes-advantage.html": "insights/mckinsey-ai-table-stakes-to-advantage/og.png",
     "og-insights-agents-not-employees.html": "insights/ai-agents-are-not-employees-governance/og.png",
+    # Compare — new
+    "og-compare-claude-md.html": "compare/claude-md/og.png",
 }
 
 PORT = 8765
