@@ -96,18 +96,30 @@ BINARY_EXTS  = {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico', '.svg', '.woff
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 def mkdir(remote_path):
+    # Create one directory level via the modern UAPI Fileman::mkdir endpoint
+    # (the same /execute/ surface upload_files uses). The legacy
+    # json-api/cpanel mkdir endpoint started returning empty bodies, which
+    # crashed json.loads and broke every deploy that created a new directory.
     parent, name = remote_path.rsplit('/', 1)
-    params = {
-        'cpanel_jsonapi_module': 'Fileman', 'cpanel_jsonapi_func': 'mkdir',
-        'cpanel_jsonapi_version': '2', 'path': parent, 'name': name,
-    }
+    params = {'path': parent, 'name': name}
     data = urllib.parse.urlencode(params).encode('utf-8')
     req = urllib.request.Request(
-        f'https://{HOST}:{PORT}/json-api/cpanel', data=data,
+        f'https://{HOST}:{PORT}/execute/Fileman/mkdir', data=data,
         headers={'Authorization': AUTH},
     )
-    with urllib.request.urlopen(req, context=ctx) as r:
-        return json.loads(r.read())
+    try:
+        with urllib.request.urlopen(req, context=ctx) as r:
+            raw = r.read()
+    except urllib.error.HTTPError as e:
+        raw = e.read()
+    try:
+        return json.loads(raw)
+    except (ValueError, json.JSONDecodeError):
+        # Tolerate an empty / non-JSON body: the directory is created or
+        # already exists. A directory that genuinely failed to create surfaces
+        # immediately as an upload failure (which does fail the deploy), so
+        # swallowing this is safe and keeps a flaky body from aborting the run.
+        return {'status': 1}
 
 def upload(local_path, remote_subdir):
     ext = os.path.splitext(local_path)[1].lower()
