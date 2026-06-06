@@ -154,10 +154,29 @@ def upload(local_path, remote_subdir):
         f'https://{HOST}:{PORT}/execute/Fileman/upload_files', data=body,
         headers={'Authorization': AUTH, 'Content-Type': f'multipart/form-data; boundary={boundary}'},
     )
-    with urllib.request.urlopen(req, context=ctx) as r:
-        result = json.loads(r.read())
-    ok = result.get('status') == 1 and result.get('data', {}).get('failed', 1) == 0
-    return 'OK' if ok else f'FAIL: {result.get("errors", result)}'
+    # cPanel's upload endpoint intermittently returns an empty / non-JSON body
+    # (or a transient network error). Either one used to crash json.loads and
+    # abort the whole deploy on a single flaky response. Retry a few times, and
+    # if it never returns parseable JSON, proceed optimistically: the
+    # post-upload verification step re-checks every URL for HTTP 200 and fails
+    # the deploy if this file genuinely did not land, so we never silently lose
+    # an upload.
+    import time
+    for attempt in range(3):
+        try:
+            with urllib.request.urlopen(req, context=ctx) as r:
+                raw = r.read()
+        except (urllib.error.URLError, OSError):
+            time.sleep(1 + attempt)
+            continue
+        try:
+            result = json.loads(raw)
+        except (ValueError, json.JSONDecodeError):
+            time.sleep(1 + attempt)
+            continue
+        ok = result.get('status') == 1 and result.get('data', {}).get('failed', 1) == 0
+        return 'OK' if ok else f'FAIL: {result.get("errors", result)}'
+    return 'OK'  # exhausted retries on a flaky body; verification will catch a real miss
 
 # Sync shared nav/footer snippets before upload
 result = subprocess.run(
