@@ -675,6 +675,16 @@ TEMPLATES = [
     ("og-insights-latent-space-comms.html", "Insights", "Latent-Space Agent Communication", "52px", "Natural language is an accidental governance layer. Latent communication removes the surface we govern through.", "insights/latent-space-agent-communication-governance"),
     ("og-insights-runtime-harnesses.html", "Insights", "Runtime Harnesses for AI Agents", "52px", "Reliability comes from the harness around the model, not the model alone. Better models are not enough.", "insights/runtime-harnesses-for-ai-agents"),
     ("og-insights-search-as-code.html", "Insights", "Search as Code Is an Execution Surface", "48px", "When agents compose executable workflows instead of calling tools, tool governance becomes code-execution governance.", "insights/search-as-code-agent-execution-surface"),
+    # === BATCH: June 2026 Post- insights, wave 2 (report responses) ===
+    ("og-insights-ai-adoption-maturity.html", "Insights", "The AI Adoption Maturity Model", "52px", "Five levels, eight dimensions — and the governance execution gap engineering leaders own.", "insights/ai-adoption-maturity-model-engineering-analysis"),
+    ("og-insights-bcg-operating-models.html", "Insights", "BCG's AI-Era Operating Models", "52px", "Flatter, faster, more autonomous — and a governance problem nobody designs for.", "insights/bcg-ai-era-operating-models-governance"),
+    ("og-insights-ibm-tech-leader-study.html", "Insights", "IBM 2026 Tech Leader Study", "52px", "77% say AI adoption is outpacing governance. Control is becoming a design problem.", "insights/ibm-2026-tech-leader-study-agent-governance"),
+    ("og-insights-github-agent-prs.html", "Insights", "Agent Pull Requests Are Everywhere", "48px", "Reviewers trust agent PRs more while debt rises. Review is the wrong layer to fix.", "insights/github-agent-pull-requests-review-wrong-layer"),
+    ("og-insights-claude-code-skills.html", "Insights", "Claude Code Skills and Organizational Knowledge", "44px", "Knowledge is leaving the prompt. Executable knowledge makes governance unavoidable.", "insights/claude-code-skills-organizational-knowledge"),
+    ("og-insights-bain-ai-dlc.html", "Insights", "Bain's AI Development Lifecycle Report", "46px", "The AI-DLC makes risk a first-class constraint — and governance an engineering surface.", "insights/bain-ai-development-lifecycle-governance"),
+    ("og-insights-project-solara.html", "Insights", "Microsoft Project Solara", "56px", "Devices that run agents instead of apps. Governance has to follow the agent.", "insights/microsoft-project-solara-post-app-governance"),
+    ("og-insights-ms-agent-platform.html", "Insights", "Microsoft's Agent Platform and the Governance Layer", "42px", "Agent HQ, ACS, Agent 365: governance is now a named layer of the agent stack.", "insights/microsoft-agent-platform-governance-layer"),
+    ("og-insights-verification-tax.html", "Insights", "The Verification Tax of AI Coding Agents", "48px", "Generation is becoming abundant. Verification is becoming the scarce resource.", "insights/ai-coding-agent-verification-tax"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -706,6 +716,16 @@ NEW_MAP_ENTRIES = {
     "og-insights-ai-roi-systems.html": "insights/ai-roi-problem-is-about-systems-not-models/og.png",
     "og-insights-anthropic-coordination.html": "insights/anthropic-research-system-coordination-infrastructure/og.png",
     "og-insights-pr-review-incident.html": "insights/pr-review-is-becoming-incident-response/og.png",
+    # June 2026 Post- insights, wave 2 (report responses)
+    "og-insights-ai-adoption-maturity.html": "insights/ai-adoption-maturity-model-engineering-analysis/og.png",
+    "og-insights-bcg-operating-models.html": "insights/bcg-ai-era-operating-models-governance/og.png",
+    "og-insights-ibm-tech-leader-study.html": "insights/ibm-2026-tech-leader-study-agent-governance/og.png",
+    "og-insights-github-agent-prs.html": "insights/github-agent-pull-requests-review-wrong-layer/og.png",
+    "og-insights-claude-code-skills.html": "insights/claude-code-skills-organizational-knowledge/og.png",
+    "og-insights-bain-ai-dlc.html": "insights/bain-ai-development-lifecycle-governance/og.png",
+    "og-insights-project-solara.html": "insights/microsoft-project-solara-post-app-governance/og.png",
+    "og-insights-ms-agent-platform.html": "insights/microsoft-agent-platform-governance-layer/og.png",
+    "og-insights-verification-tax.html": "insights/ai-coding-agent-verification-tax/og.png",
     # Concepts
     "og-concepts-index.html": "concepts/og.png",
     "og-concepts-agentic-development.html": "concepts/agentic-development/og.png",

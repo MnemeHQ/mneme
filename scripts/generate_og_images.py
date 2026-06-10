@@ -233,6 +233,19 @@ TEMPLATE_MAP = {
     "og-insights-search-as-code.html": "insights/search-as-code-agent-execution-surface/og.png",
     # Misc
     "og-integration-opencode.html": "integrations/opencode/og.png",
+
+    # Insights — new
+    "og-insights-ai-adoption-maturity.html": "insights/ai-adoption-maturity-model-engineering-analysis/og.png",
+    "og-insights-bcg-operating-models.html": "insights/bcg-ai-era-operating-models-governance/og.png",
+    "og-insights-ibm-tech-leader-study.html": "insights/ibm-2026-tech-leader-study-agent-governance/og.png",
+    "og-insights-github-agent-prs.html": "insights/github-agent-pull-requests-review-wrong-layer/og.png",
+    "og-insights-claude-code-skills.html": "insights/claude-code-skills-organizational-knowledge/og.png",
+    "og-insights-bain-ai-dlc.html": "insights/bain-ai-development-lifecycle-governance/og.png",
+    "og-insights-project-solara.html": "insights/microsoft-project-solara-post-app-governance/og.png",
+    "og-insights-ms-agent-platform.html": "insights/microsoft-agent-platform-governance-layer/og.png",
+
+    # Insights — new
+    "og-insights-verification-tax.html": "insights/ai-coding-agent-verification-tax/og.png",
 }
 
 PORT = 8765
