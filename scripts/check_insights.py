@@ -365,7 +365,58 @@ def check_slug(
             f"in site/insights/index.html"
         )
 
+    # 9. inline body links must be styled (accessibility): an unstyled <a> in the
+    #    article body falls back to the browser-default blue (~2:1 contrast on the
+    #    #0c0c0d background — a WCAG fail). Require a `.article-body a` color rule.
+    if not re.search(r"\.article-body a\s*\{[^}]*color\s*:", html):
+        errors.append(
+            f"Inline body links not styled in {slug}: add a "
+            f"`.article-body a {{ color: #8be0c8; ... }}` rule. Unstyled links render "
+            f"the inaccessible browser-default blue on the dark background."
+        )
+
     return errors
+
+
+FUNNEL_RE = re.compile(r'href="/(?:pilot|demo|use-cases)/')
+
+
+def inbound_counts(slugs: list[str]) -> dict[str, int]:
+    """One pass over site/**.html: count distinct pages linking to each
+    /insights/<slug>/ (excluding the article's own index.html). Mesh warning."""
+    slug_set = set(slugs)
+    refs: dict[str, set[str]] = {s: set() for s in slugs}
+    for path in SITE_DIR.rglob("*.html"):
+        try:
+            text = path.read_text(encoding="utf-8")
+        except (UnicodeDecodeError, OSError):
+            continue
+        is_article_index = path.name == "index.html" and path.parent.name in slug_set
+        for s in set(re.findall(r'/insights/([^/"]+)/', text)):
+            if s in slug_set and not (is_article_index and path.parent.name == s):
+                refs[s].add(str(path))
+    return {s: len(v) for s, v in refs.items()}
+
+
+def article_region(html: str) -> str:
+    m = re.search(r"<article\b.*?</article>", html, re.DOTALL)
+    return m.group(0) if m else ""
+
+
+def slug_warnings(slug: str, html: str, inbound: int) -> list[str]:
+    """Non-blocking quality warnings: mesh depth and in-body funnel link."""
+    warns: list[str] = []
+    if inbound < 3:
+        warns.append(
+            f"under-meshed: only {inbound} inbound internal link(s) "
+            f"(aim for >= 3 reciprocal related-essays links)"
+        )
+    if not FUNNEL_RE.search(article_region(html)):
+        warns.append(
+            "no in-body funnel link (/pilot, /demo, or /use-cases) beyond the "
+            "global nav and GitHub CTA"
+        )
+    return warns
 
 
 def main() -> int:
@@ -388,6 +439,30 @@ def main() -> int:
             all_errors[slug] = errs
 
     total_errors = sum(len(v) for v in all_errors.values())
+
+    # Non-blocking quality warnings: mesh depth + in-body funnel link.
+    inbound = inbound_counts(slugs)
+    warnings: dict[str, list[str]] = {}
+    for slug in slugs:
+        try:
+            html = (INSIGHTS_DIR / slug / "index.html").read_text(encoding="utf-8")
+        except (UnicodeDecodeError, OSError):
+            continue
+        w = slug_warnings(slug, html, inbound.get(slug, 0))
+        if w:
+            warnings[slug] = w
+
+    if warnings:
+        nwarn = sum(len(v) for v in warnings.values())
+        print(
+            f"WARN  {len(warnings)}/{len(slugs)} insight articles have quality "
+            f"warnings ({nwarn}); non-blocking (mesh / funnel guidance)."
+        )
+        for slug in sorted(warnings):
+            print(f"  {slug}/")
+            for msg in warnings[slug]:
+                print(f"    - {msg}")
+        print()
 
     if total_errors:
         print(
