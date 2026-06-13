@@ -347,7 +347,18 @@ print(f"\n[OK] All {len(sitemap_urls)} sitemap URLs verified - deploy complete")
 def submit_indexnow(urls):
     key = os.environ.get('INDEXNOW_KEY', '')
     if not key:
-        print('[SKIP] IndexNow -- INDEXNOW_KEY not set')
+        # Fall back to the committed, publicly-served key file (site/<32 hex>.txt).
+        # The IndexNow key is public by design (served at keyLocation), so deriving it
+        # from the repo avoids depending on a CI secret that was never set -- which
+        # silently skipped IndexNow on every deploy.
+        import re, glob
+        for path in sorted(glob.glob(os.path.join(BASE_LOCAL, '*.txt'))):
+            stem = os.path.splitext(os.path.basename(path))[0]
+            if re.fullmatch(r'[0-9a-f]{32}', stem):
+                key = stem
+                break
+    if not key:
+        print('[SKIP] IndexNow -- no key (INDEXNOW_KEY unset and no key file found)')
         return
     payload = json.dumps({
         'host': 'mnemehq.com',
