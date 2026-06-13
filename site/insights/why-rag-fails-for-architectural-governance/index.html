@@ -256,7 +256,7 @@
         "description": "RAG retrieves similar text. Architectural governance requires authoritative, precedence-aware constraint enforcement. Here's why they're fundamentally different problems.",
         "url": "https://mnemehq.com/insights/why-rag-fails-for-architectural-governance/",
         "datePublished": "2026-05-05",
-        "dateModified": "2026-05-05",
+        "dateModified": "2026-06-13",
         "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
         "image": "https://mnemehq.com/og.png",
@@ -356,7 +356,7 @@
       <span class="sep">&middot;</span>
       <time datetime="2026-05-05">Published May 2026</time>
       <span class="sep">&middot;</span>
-      <time datetime="2026-05-05">Updated May 2026</time>
+      <time datetime="2026-06-13">Updated June 2026</time>
     </p>
   </header>
 
@@ -453,6 +453,22 @@
     <p>This isn't a theoretical concern. In practice, models under instruction to complete a coding task will prioritize task completion over constraint adherence when the two are in tension. A suggestion system isn't a governance system.</p>
 
     <p>Enforcement requires a layer that can inspect generated output against structured constraints and block or flag violations before they reach review. This is architecturally separate from the generation layer, and RAG has no role in it.</p>
+
+    <h2>Even perfect retrieval does not guarantee compliance</h2>
+
+    <p>The four failure modes above all assume retrieval is imperfect. Grant the opposite. Suppose the system surfaces exactly the right decision, ranked first, with no dilution &mdash; and the agent even restates it correctly in its own reasoning before writing code. Agents still violate decisions they have just acknowledged. That gap &mdash; between a retrieved-and-acknowledged constraint and a compliant change &mdash; is not a retrieval-quality problem at all. It is a property of how generation works.</p>
+
+    <p>It helps to remember what retrieval was built for. Retrieval-augmented generation, as introduced by <a href="https://arxiv.org/abs/2005.11401" target="_blank" rel="noopener">Lewis et al. (2020)</a>, combines a model&rsquo;s parametric memory with a non-parametric document index so that generation is <em>conditioned</em> on relevant passages. It is a knowledge-augmentation mechanism: it makes the right information available. Whether the model acts on that information is left entirely to the generation step. RAG was never designed to enforce a constraint, and four years of better embeddings have not changed what it is for.</p>
+
+    <p>Three behaviors make a retrieved-and-acknowledged decision get violated anyway:</p>
+
+    <ol>
+      <li><strong>Context dilution</strong> &mdash; the decision is present, but it competes with hundreds or thousands of other tokens describing the task, the code, and the tools. Presence is not salience.</li>
+      <li><strong>Competing objectives</strong> &mdash; the agent is shaped toward completing the task. When the cleanest path to a working result conflicts with a constraint, task completion tends to win.</li>
+      <li><strong>Probabilistic adherence</strong> &mdash; instruction-following is statistical, not guaranteed. Even strong models violate explicit instructions some fraction of the time, and the rate climbs as the number of simultaneous constraints grows. A constraint followed 90% of the time is, at agent volume, a constraint violated thousands of times.</li>
+    </ol>
+
+    <p>This is why retrieval and governance are different layers, not different settings of the same dial. Retrieval answers <em>what decisions exist</em>. Reasoning answers <em>how should I solve this</em>. Governance answers <em>am I allowed to do this</em>, and enforcement answers <em>does this change violate policy</em>. Most AI tooling stops at the first layer and hopes the rest follow. They do not follow reliably, because nothing makes them.</p>
 
     <h2>What a proper governance layer looks like</h2>
 

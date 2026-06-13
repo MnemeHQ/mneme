@@ -246,6 +246,12 @@ TEMPLATE_MAP = {
 
     # Insights — new
     "og-insights-verification-tax.html": "insights/ai-coding-agent-verification-tax/og.png",
+
+    # Insights — new
+    "og-insights-shared-memory-intent.html": "insights/shared-memory-is-not-shared-intent/og.png",
+    "og-insights-loop-engineering.html": "insights/loop-engineering-is-not-new/og.png",
+    "og-insights-productivity-rework.html": "insights/ai-coding-productivity-gains-rework/og.png",
+    "og-insights-copilot-review-economics.html": "insights/github-copilot-usage-based-billing-review-economics/og.png",
 }
 
 PORT = 8765

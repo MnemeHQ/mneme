@@ -685,6 +685,11 @@ TEMPLATES = [
     ("og-insights-project-solara.html", "Insights", "Microsoft Project Solara", "56px", "Devices that run agents instead of apps. Governance has to follow the agent.", "insights/microsoft-project-solara-post-app-governance"),
     ("og-insights-ms-agent-platform.html", "Insights", "Microsoft's Agent Platform and the Governance Layer", "42px", "Agent HQ, ACS, Agent 365: governance is now a named layer of the agent stack.", "insights/microsoft-agent-platform-governance-layer"),
     ("og-insights-verification-tax.html", "Insights", "The Verification Tax of AI Coding Agents", "48px", "Generation is becoming abundant. Verification is becoming the scarce resource.", "insights/ai-coding-agent-verification-tax"),
+    # === BATCH: June 2026 Post- insights, wave 3 ===
+    ("og-insights-shared-memory-intent.html", "Insights", "Shared Memory Is Not Shared Intent", "52px", "AI coding teams get shared memory. That solves context distribution, not governance.", "insights/shared-memory-is-not-shared-intent"),
+    ("og-insights-loop-engineering.html", "Insights", "Loop Engineering Is Not New", "54px", "Loops have been computing's core abstraction for seventy years. What's new is a probabilistic generator inside the loop.", "insights/loop-engineering-is-not-new"),
+    ("og-insights-productivity-rework.html", "Insights", "AI Productivity Gains Lead to More Rework", "44px", "Faros 2026: throughput up 33.7%, bugs per developer up 54%, code churn up 861%.", "insights/ai-coding-productivity-gains-rework"),
+    ("og-insights-copilot-review-economics.html", "Insights", "AI Code Review Is a Budget Line Item", "46px", "GitHub Copilot's usage-based billing meters code review. The real constraint is review economics.", "insights/github-copilot-usage-based-billing-review-economics"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -829,6 +834,11 @@ NEW_MAP_ENTRIES = {
     "og-insights-runtime-harnesses.html": "insights/runtime-harnesses-for-ai-agents/og.png",
     "og-insights-search-as-code.html": "insights/search-as-code-agent-execution-surface/og.png",
     "og-integration-opencode.html": "integrations/opencode/og.png",
+    # June 2026 Post- batch, wave 3
+    "og-insights-shared-memory-intent.html": "insights/shared-memory-is-not-shared-intent/og.png",
+    "og-insights-loop-engineering.html": "insights/loop-engineering-is-not-new/og.png",
+    "og-insights-productivity-rework.html": "insights/ai-coding-productivity-gains-rework/og.png",
+    "og-insights-copilot-review-economics.html": "insights/github-copilot-usage-based-billing-review-economics/og.png",
 }
 
 # ---------------------------------------------------------------------------
