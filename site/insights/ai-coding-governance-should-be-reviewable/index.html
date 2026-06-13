@@ -196,6 +196,19 @@
     .answer-capsule strong { color: var(--accent); }
   
     @media (max-width: 768px) { nav, .mobile-menu { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } }
+
+    /* === Related reading === */
+    .related-panel { margin-top: 3.5rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .related-panel-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    .related-list li { margin: 0; }
+    .related-list a { display: block; padding: 1.15rem 1.35rem; background: var(--surface); text-decoration: none; transition: background 0.15s; }
+    .related-list a:hover { background: var(--surface2); }
+    .related-list .rel-title { color: var(--text); font-size: 0.92rem; font-weight: 600; margin-bottom: 0.35rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; letter-spacing: -0.005em; transition: color 0.15s; }
+    .related-list .rel-title::after { content: '\2192'; color: var(--accent); opacity: 0.4; transition: opacity 0.15s, transform 0.15s; flex-shrink: 0; }
+    .related-list a:hover .rel-title { color: var(--accent); }
+    .related-list a:hover .rel-title::after { opacity: 1; transform: translateX(3px); }
+    .related-list .rel-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.65; margin: 0; }
   </style>
   <script type="application/ld+json">
   {
@@ -408,6 +421,16 @@
     <p>Most teams haven't confronted this distinction yet because they're still in the early phase of AI coding adoption, when the volume is low enough that opaque governance is survivable. As agent usage scales, the distinction will become unavoidable. Unreviewed governance state will produce unauditable violations. Opaque constraints will produce irreproducible incidents. Hidden AI memory will produce engineering debt that no one can trace.</p>
 
     <p>The time to establish the right model is before that debt accumulates — not after it.</p>
+
+    <aside class="related-panel" aria-labelledby="related-essays-label">
+      <div class="related-panel-label" id="related-essays-label">Related operational essays</div>
+      <ul class="related-list">
+        <li><a href="/insights/memory-is-not-governance/"><div class="rel-title">Memory Is Not Governance</div><p class="rel-desc">Memory, context, retrieval, and governance are four different systems with four different optimization targets &mdash; recall is not constraint enforcement.</p></a></li>
+        <li><a href="/insights/why-rag-fails-for-architectural-governance/"><div class="rel-title">Why RAG Fails for Architectural Governance</div><p class="rel-desc">RAG retrieves similar text; governance requires authoritative, precedence-aware constraint enforcement. They are fundamentally different problems.</p></a></li>
+        <li><a href="/insights/prompt-engineering-is-not-governance/"><div class="rel-title">Prompt Engineering Is Not Governance</div><p class="rel-desc">Prompt templates can nudge a model toward better output, but they cannot enforce architectural invariants, resolve decision conflicts, or prevent drift.</p></a></li>
+        <li><a href="/insights/machine-readable-pull-requests-agentic-development/"><div class="rel-title">Machine-Readable Pull Requests: The Next Frontier for Agentic Development</div><p class="rel-desc">Pull requests were built for human review; agentic development needs them dual-format, so machines can verify architectural intent, provenance, and policy before review begins.</p></a></li>
+      </ul>
+    </aside>
 
     <div class="article-footer">
       <a href="/insights/" class="back-link">&#8592; Back to Insights</a>

@@ -267,6 +267,18 @@
 }
   
     @media (max-width: 768px) { nav, .mobile-menu { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } }
+    /* === Related reading === */
+    .related-panel { margin-top: 3.5rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .related-panel-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    .related-list li { margin: 0; }
+    .related-list a { display: block; padding: 1.15rem 1.35rem; background: var(--surface); text-decoration: none; transition: background 0.15s; }
+    .related-list a:hover { background: var(--surface2); }
+    .related-list .rel-title { color: var(--text); font-size: 0.92rem; font-weight: 600; margin-bottom: 0.35rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; letter-spacing: -0.005em; transition: color 0.15s; }
+    .related-list .rel-title::after { content: '\2192'; color: var(--accent); opacity: 0.4; transition: opacity 0.15s, transform 0.15s; flex-shrink: 0; }
+    .related-list a:hover .rel-title { color: var(--accent); }
+    .related-list a:hover .rel-title::after { opacity: 1; transform: translateX(3px); }
+    .related-list .rel-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.65; margin: 0; }
   </style>
 </head>
 <body>
@@ -538,6 +550,16 @@
     </div>
 
   </div>
+
+  <aside class="related-panel" aria-labelledby="related-essays-label">
+    <div class="related-panel-label" id="related-essays-label">Related operational essays</div>
+    <ul class="related-list">
+      <li><a href="/insights/future-of-software-engineering-after-vibe-coding/"><div class="rel-title">The Future of Software Engineering After Vibe Coding</div><p class="rel-desc">Vibe coding changed how software gets built, but production engineering still demands judgment, governance, and accountability in an AI-agent world.</p></a></li>
+      <li><a href="/insights/what-is-harness-engineering/"><div class="rel-title">What Is Harness Engineering? The Execution Layer Between Models and Production</div><p class="rel-desc">The runtime that coordinates an AI model&rsquo;s tool calls, retries, state, and multi-step agent work between the model and production.</p></a></li>
+      <li><a href="/insights/prompt-engineering-vs-harness-engineering/"><div class="rel-title">Prompt Engineering Was About Inputs. Harness Engineering Is About Systems.</div><p class="rel-desc">How AI systems engineering moved from optimizing inputs to designing the agent runtime systems that wrap the model.</p></a></li>
+      <li><a href="/insights/ai-agents-are-not-employees-governance/"><div class="rel-title">Why You Shouldn&rsquo;t Treat AI Agents Like Employees: The Coding-Agent Corollary</div><p class="rel-desc">BCG and HBR find that humanizing AI agents erodes oversight; for coding agents the fix is enforcement, not trust.</p></a></li>
+    </ul>
+  </aside>
 
   <footer class="article-footer">
     <a href="/insights/" class="back-link">&larr; Back to Insights</a>

@@ -114,6 +114,18 @@
       .article-wrap { padding: 3rem 1.25rem 5rem; }
     }
     @media (max-width: 768px) { nav, .mobile-menu { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } }
+    /* === Related reading === */
+    .related-panel { margin-top: 3.5rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+    .related-panel-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
+    .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+    .related-list li { margin: 0; }
+    .related-list a { display: block; padding: 1.15rem 1.35rem; background: var(--surface); text-decoration: none; transition: background 0.15s; }
+    .related-list a:hover { background: var(--surface2); }
+    .related-list .rel-title { color: var(--text); font-size: 0.92rem; font-weight: 600; margin-bottom: 0.35rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; letter-spacing: -0.005em; transition: color 0.15s; }
+    .related-list .rel-title::after { content: '\2192'; color: var(--accent); opacity: 0.4; transition: opacity 0.15s, transform 0.15s; flex-shrink: 0; }
+    .related-list a:hover .rel-title { color: var(--accent); }
+    .related-list a:hover .rel-title::after { opacity: 1; transform: translateX(3px); }
+    .related-list .rel-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.65; margin: 0; }
   </style>
 </head>
 <body>
@@ -194,6 +206,16 @@
     <p>That is the difference between a delegated task with rails and a delegated task without them.</p>
 
   </div>
+
+  <aside class="related-panel" aria-labelledby="related-essays-label">
+    <div class="related-panel-label" id="related-essays-label">Related operational essays</div>
+    <ul class="related-list">
+      <li><a href="/insights/antigravity-solves-coordination-not-governance/"><div class="rel-title">Google Antigravity Solves Agent Coordination. It Does Not Solve Governance.</div><p class="rel-desc">Agent orchestration handles coordination, but the missing infrastructure layer once agents act across surfaces is architectural governance.</p></a></li>
+      <li><a href="/insights/agent-manager-control-plane-governance/"><div class="rel-title">The Agent Manager Is the New Control Plane for Software Development</div><p class="rel-desc">Manager views turn the agent manager into a control plane &mdash; but without policy enforcement, a control plane is only visibility.</p></a></li>
+      <li><a href="/insights/why-context-alone-doesnt-prevent-architectural-drift/"><div class="rel-title">Why Context Alone Doesn&rsquo;t Prevent Architectural Drift</div><p class="rel-desc">Context engineering improves recall but does not enforce constraints. The missing layer between orchestration and verification is governance.</p></a></li>
+      <li><a href="/insights/constraint-decay-coding-agents-architectural-governance/"><div class="rel-title">Constraint Decay: Why Coding Agents Need Architectural Governance</div><p class="rel-desc">Coding agents satisfy loose specs but lose fidelity to architectural patterns as requirements accumulate &mdash; governance must run before PR review.</p></a></li>
+    </ul>
+  </aside>
 
   <footer class="article-footer">
     <a href="/insights/" class="back-link">&larr; Back to Insights</a>
