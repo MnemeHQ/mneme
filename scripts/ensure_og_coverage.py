@@ -690,6 +690,15 @@ TEMPLATES = [
     ("og-insights-loop-engineering.html", "Insights", "Loop Engineering Is Not New", "54px", "Loops have been computing's core abstraction for seventy years. What's new is a probabilistic generator inside the loop.", "insights/loop-engineering-is-not-new"),
     ("og-insights-productivity-rework.html", "Insights", "AI Productivity Gains Lead to More Rework", "44px", "Faros 2026: throughput up 33.7%, bugs per developer up 54%, code churn up 861%.", "insights/ai-coding-productivity-gains-rework"),
     ("og-insights-copilot-review-economics.html", "Insights", "AI Code Review Is a Budget Line Item", "46px", "GitHub Copilot's usage-based billing meters code review. The real constraint is review economics.", "insights/github-copilot-usage-based-billing-review-economics"),
+    # === BATCH: June 2026 Post- insights, wave 4 (agentic governance + regulated industries) ===
+    ("og-insights-infrastructure-alone.html", "Insights", "Why the AI Race Won't Be Won on Infrastructure Alone", "40px", "Infrastructure explains how you access intelligence. Governance decides how much you can safely deploy.", "insights/ai-race-wont-be-won-on-infrastructure-alone"),
+    ("og-insights-governance-layers-coding.html", "Insights", "Governance Layers for AI Coding Assistants", "50px", "Policy, memory, enforcement, auditability — the missing enterprise infrastructure.", "insights/governance-layers-for-ai-coding-assistants"),
+    ("og-insights-okf-vs-governance.html", "Insights", "Open Knowledge Format vs Governance", "50px", "Google's OKF standardizes how agents find knowledge. Finding it is not following it.", "insights/open-knowledge-format-vs-governance"),
+    ("og-insights-rsi-orchestration.html", "Insights", "Recursive Self-Improvement Is an Orchestration Problem", "42px", "The fastest feedback loops are in the system around the model, not the model itself.", "insights/recursive-self-improvement-orchestration-problem"),
+    ("og-insights-governance-control-plane.html", "Insights", "The Next Layer Is a Governance Control Plane", "44px", "Frameworks coordinate execution. Meta-harnesses coordinate agents. Neither enforces architecture.", "insights/governance-control-plane-after-agent-frameworks"),
+    ("og-insights-regulated-industries.html", "Insights", "AI Governance for Regulated Industries", "52px", "Where the cost of architectural drift and undocumented agent actions is highest.", "insights/ai-governance-for-regulated-industries"),
+    ("og-insights-life-sciences.html", "Insights", "AI Coding Agents in Life Sciences", "52px", "FDA, GxP, validation. Governance before autonomy.", "insights/ai-coding-agents-life-sciences-governance"),
+    ("og-insights-financial-services.html", "Insights", "AI Coding Agents in Financial Services", "48px", "Architectural drift is a compliance risk. Every change needs an audit trail.", "insights/ai-coding-agents-financial-services-audit-trail"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -839,6 +848,15 @@ NEW_MAP_ENTRIES = {
     "og-insights-loop-engineering.html": "insights/loop-engineering-is-not-new/og.png",
     "og-insights-productivity-rework.html": "insights/ai-coding-productivity-gains-rework/og.png",
     "og-insights-copilot-review-economics.html": "insights/github-copilot-usage-based-billing-review-economics/og.png",
+    # June 2026 Post- batch, wave 4 (agentic governance + regulated industries)
+    "og-insights-infrastructure-alone.html": "insights/ai-race-wont-be-won-on-infrastructure-alone/og.png",
+    "og-insights-governance-layers-coding.html": "insights/governance-layers-for-ai-coding-assistants/og.png",
+    "og-insights-okf-vs-governance.html": "insights/open-knowledge-format-vs-governance/og.png",
+    "og-insights-rsi-orchestration.html": "insights/recursive-self-improvement-orchestration-problem/og.png",
+    "og-insights-governance-control-plane.html": "insights/governance-control-plane-after-agent-frameworks/og.png",
+    "og-insights-regulated-industries.html": "insights/ai-governance-for-regulated-industries/og.png",
+    "og-insights-life-sciences.html": "insights/ai-coding-agents-life-sciences-governance/og.png",
+    "og-insights-financial-services.html": "insights/ai-coding-agents-financial-services-audit-trail/og.png",
 }
 
 # ---------------------------------------------------------------------------

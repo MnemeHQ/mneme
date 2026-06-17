@@ -252,6 +252,16 @@ TEMPLATE_MAP = {
     "og-insights-loop-engineering.html": "insights/loop-engineering-is-not-new/og.png",
     "og-insights-productivity-rework.html": "insights/ai-coding-productivity-gains-rework/og.png",
     "og-insights-copilot-review-economics.html": "insights/github-copilot-usage-based-billing-review-economics/og.png",
+
+    # Insights — new
+    "og-insights-infrastructure-alone.html": "insights/ai-race-wont-be-won-on-infrastructure-alone/og.png",
+    "og-insights-governance-layers-coding.html": "insights/governance-layers-for-ai-coding-assistants/og.png",
+    "og-insights-okf-vs-governance.html": "insights/open-knowledge-format-vs-governance/og.png",
+    "og-insights-rsi-orchestration.html": "insights/recursive-self-improvement-orchestration-problem/og.png",
+    "og-insights-governance-control-plane.html": "insights/governance-control-plane-after-agent-frameworks/og.png",
+    "og-insights-regulated-industries.html": "insights/ai-governance-for-regulated-industries/og.png",
+    "og-insights-life-sciences.html": "insights/ai-coding-agents-life-sciences-governance/og.png",
+    "og-insights-financial-services.html": "insights/ai-coding-agents-financial-services-audit-trail/og.png",
 }
 
 PORT = 8765
