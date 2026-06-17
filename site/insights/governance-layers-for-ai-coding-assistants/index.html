@@ -3,28 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shared Memory Is Not Shared Intent: Why AI Coding Teams Need Governance &mdash; Mneme HQ</title>
+  <title>Building Governance Layers for AI Coding Assistants &mdash; Mneme HQ</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="AI coding teams are getting shared memory so every agent reads the same context. That solves distribution, not governance &mdash; and better shared memory can amplify architectural drift." />
+  <meta name="description" content="AI coding assistants are becoming agents that modify codebases, open PRs, and deploy. The missing enterprise infrastructure is a governance layer: policy, memory, enforcement, and auditability around what agents are allowed to do." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
-  <link rel="canonical" href="https://mnemehq.com/insights/shared-memory-is-not-shared-intent/" />
+  <link rel="canonical" href="https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Shared Memory Is Not Shared Intent: Why AI Coding Teams Need Governance" />
-  <meta property="og:description" content="AI coding teams are getting shared memory so every agent reads the same context. That solves distribution, not governance. Better shared memory can amplify architectural drift." />
-  <meta property="og:url" content="https://mnemehq.com/insights/shared-memory-is-not-shared-intent/" />
-  <meta property="og:image" content="https://mnemehq.com/insights/shared-memory-is-not-shared-intent/og.png" />
+  <meta property="og:title" content="Building Governance Layers for AI Coding Assistants" />
+  <meta property="og:description" content="AI coding assistants are becoming agents that modify codebases, open PRs, and deploy. The missing enterprise infrastructure is a governance layer: policy, memory, enforcement, and auditability around what agents are allowed to do." />
+  <meta property="og:url" content="https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/" />
+  <meta property="og:image" content="https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Shared Memory Is Not Shared Intent: Why AI Coding Teams Need Governance" />
-  <meta name="twitter:description" content="AI coding teams are getting shared memory so every agent reads the same context. That solves distribution, not governance. Better shared memory can amplify architectural drift." />
-  <meta name="twitter:image" content="https://mnemehq.com/insights/shared-memory-is-not-shared-intent/og.png" />
+  <meta name="twitter:title" content="Building Governance Layers for AI Coding Assistants" />
+  <meta name="twitter:description" content="AI coding assistants are becoming agents that modify codebases, open PRs, and deploy. The missing enterprise infrastructure is a governance layer: policy, memory, enforcement, and auditability around what agents are allowed to do." />
+  <meta name="twitter:image" content="https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/og.png" />
   <meta name="author" content="Theo Valmis" />
-  <meta property="article:published_time" content="2026-06-13T00:00:00Z" />
-  <meta property="article:modified_time" content="2026-06-17T00:00:00Z" />
+  <meta property="article:published_time" content="2026-06-17T00:00:00Z" />
   <meta property="article:author" content="https://mnemehq.com/founder/" />
   <meta property="article:section" content="Industry Analysis" />
 
@@ -45,18 +44,20 @@
         "itemListElement": [
           {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
           {"@type": "ListItem", "position": 2, "name": "Insights", "item": "https://mnemehq.com/insights/"},
-          {"@type": "ListItem", "position": 3, "name": "Shared Memory Is Not Shared Intent", "item": "https://mnemehq.com/insights/shared-memory-is-not-shared-intent/"}
+          {"@type": "ListItem", "position": 3, "name": "Building Governance Layers for AI Coding Assistants", "item": "https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/"}
         ]
       },
       {
         "@type": "TechArticle",
-        "headline": "Shared Memory Is Not Shared Intent: Why AI Coding Teams Need Governance",
-        "description": "AI coding teams are getting shared memory so every agent reads the same context. That solves distribution, not governance. Better shared memory can amplify architectural drift.",
-        "url": "https://mnemehq.com/insights/shared-memory-is-not-shared-intent/",
-        "datePublished": "2026-06-13",
+        "headline": "Building Governance Layers for AI Coding Assistants",
+        "description": "AI coding assistants are becoming agents that modify codebases, open PRs, and deploy. The missing enterprise infrastructure is a governance layer: policy, memory, enforcement, and auditability around what agents are allowed to do.",
+        "url": "https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/",
+        "datePublished": "2026-06-17",
         "dateModified": "2026-06-17",
         "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
-        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/"}
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/"},
+        "image": "https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/"
       }
     ]
   }
@@ -278,128 +279,114 @@
   <ol class="breadcrumb">
     <li><a href="/">Home</a></li>
     <li><a href="/insights/">Insights</a></li>
-    <li aria-current="page">Shared Memory Is Not Shared Intent</li>
+    <li aria-current="page">Building Governance Layers for AI Coding Assistants</li>
   </ol>
 </nav>
 
 <article class="article-wrap">
   <header class="article-header">
     <div class="article-eyebrow">
-      <span class="eyebrow-tag">Analysis</span>
+      <span class="eyebrow-tag">Thought Leadership</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">8 min read</span>
+      <span class="eyebrow-meta">10 min read</span>
     </div>
-    <h1>Shared Memory Is Not Shared Intent</h1>
-    <p class="article-lede">AI coding assistants are becoming AI coding teams. The newest products give a fleet of agents a shared memory layer so they stop repeating decisions and losing context between sessions. That solves how context is distributed. It does not solve whether every agent interprets that context the same way &mdash; or obeys it. Under a shared memory layer the harder problem is not retrieval. It is governance.</p>
-    <p class="byline">By <a href="/founder/">Theo Valmis</a><span class="sep">&middot;</span><time datetime="2026-06-13">June 2026</time></p>
+    <h1>Building Governance Layers for AI Coding Assistants</h1>
+    <p class="article-lede">The first wave of AI coding assistants was about generation. The next wave is about control. As assistants evolve into agents that modify codebases, open pull requests, run tests, and deploy infrastructure, the question stops being whether AI can write code and becomes how organizations ensure it writes the right code. At enterprise scale, that answer is infrastructure: a governance layer.</p>
+    <p class="byline">By <a href="/founder/">Theo Valmis</a><span class="sep">&middot;</span><time datetime="2026-06-17">June 2026</time></p>
   </header>
 
   <div class="article-body">
 
-    <h2>AI Assistants Are Becoming AI Coding Teams</h2>
-    <p>The framing in the AI coding market is shifting from a single assistant to a coordinated team of agents. Augment Code&rsquo;s <a href="https://tessl.io/blog/with-cosmos-augment-code-wants-to-give-ai-coding-teams-a-shared-memory-and-context/" target="_blank" rel="noopener">Cosmos</a>, launched into public preview this spring, is a clean example of the pattern: it sits across a company&rsquo;s development environment, coordinates multiple agents, stores what they learn, and lets that knowledge be reused across a team. The problem it targets is real. Most agents are effectively stateless between sessions, so they re-derive the same decisions, drift from team conventions, and lose context that someone already established.</p>
-    <p>The results vendors report from this shift are striking. In <a href="https://www.augmentcode.com/blog/what-do-engineers-do-when-agents-run-the-full-sdlc" target="_blank" rel="noopener">Augment&rsquo;s own account of running agents across the full SDLC</a>, large pull-request reviews fell from six or seven hours to about 45 minutes, root-cause analysis dropped from roughly 30 minutes to six, agents handled more than 80% of incidents, and weekly output tripled. The notable part is the cause Augment names. The breakthrough was not a smarter model but a system where agents could share context, remember patterns, and hand work across stages. The gains came from the system around the model. Coordination and memory are the visible half of that system. Governance is the half that decides whether what the system produces is actually allowed to ship.</p>
-    <p>The interesting part is not the memory. Everyone is converging on memory, context, retrieval, and agent coordination. The interesting part is the phrase: <strong>AI coding teams</strong>. Once multiple agents share memory and operate across the software lifecycle, a different set of questions appears, and none of them are retrieval questions.</p>
-    <ul>
-      <li>Which architectural decisions are authoritative when two agents disagree?</li>
-      <li>How does a decision that changed yesterday reach every agent working today?</li>
-      <li>How do you stop one agent from violating a constraint another agent depends on?</li>
-      <li>When a decision is broken, how do you audit which agent broke it, and why?</li>
-    </ul>
+    <h2>From Autocomplete to Autonomous Execution</h2>
+    <p>The capability curve of AI coding tools is easy to trace, and each step is a step away from the human keystroke. It started with autocomplete &mdash; GitHub Copilot suggesting the next line while a developer stayed in the driver&rsquo;s seat. Then came chat coding, where ChatGPT and Claude would draft whole functions and explain them on request. Then IDE-native agents like Cursor and Windsurf began editing multiple files, running commands, and iterating against test output. Now the frontier is multi-agent development systems and, beyond them, autonomous execution across the software development lifecycle: an agent that plans a change, writes it, tests it, opens a pull request, and pushes toward deploy.</p>
+    <p>Every step on that curve increases capability. Every step also increases risk. An autocomplete suggestion a developer rejects costs nothing. An autonomous agent that merges a non-compliant change into a payments service costs a great deal. The more an assistant can do without a human in the loop, the more the organization needs a way to constrain what it does &mdash; not after the fact, but before the change lands.</p>
 
-    <h2>What Shared Memory Solves</h2>
-    <p>Shared memory is genuinely useful. It addresses a cluster of coordination failures that single-session agents run into constantly: duplicated work, lost context, context-window limits, and fragmented project knowledge spread across people and tools. Give every agent the same record of what the team has done and decided, and they coordinate better. They start from prior runs instead of from scratch.</p>
-    <p>But coordination is not governance. Memory improves the odds that an agent <em>knows</em> a decision. It does nothing to guarantee the agent <em>complies</em> with it. Those are different problems, and shared memory only solves the first one.</p>
+    <h2>Why Traditional AI Guardrails Fail Here</h2>
+    <p>Most of what gets called &ldquo;AI governance&rdquo; today was built for a different problem. It covers content moderation, prompt filtering, data privacy, model safety, and toxic-output detection. Those controls matter, but they were designed for systems that generate text for humans to read. Software engineering generates artifacts that other systems execute, and that introduces a different class of risk entirely.</p>
+    <p>The risks that matter in a codebase are <strong>architectural drift</strong>, security violations, compliance violations, framework inconsistency, undocumented design decisions, and hidden technical debt. None of these are caught by a content filter. A model can produce code that is syntactically perfect, passes its tests, reads cleanly in review &mdash; and still violates a critical organizational standard. It can wire a service directly to a database that policy says must be accessed through a gateway. It can introduce a second HTTP client into a codebase that standardized on one. It can encode a design decision nobody approved and nobody wrote down.</p>
+    <p>Guardrails tuned for prose do not see any of this, because the violation is not in the words. It is in the structure. As we have argued in <a href="/insights/why-context-alone-doesnt-prevent-architectural-drift/">why context alone doesn&rsquo;t prevent architectural drift</a>, giving a model more information about your system improves what it knows without changing what it is allowed to do. Knowing a rule and being held to a rule are different mechanisms.</p>
 
-    <h2>Memory Does Not Enforce Decisions</h2>
-    <p>Here is the failure in its simplest form. A system decision states: <strong>all billing operations must go through BillingService</strong>. That decision lives in the shared memory layer. Every agent on the team can retrieve it. Perfect distribution.</p>
-    <p>An agent is asked to add subscription-upgrade support. It writes a direct Stripe integration with its own client and payment calls. The change is locally correct. The tests pass. And it bypasses the boundary the team agreed to hold. The decision was available. The decision was retrieved. The decision was still violated.</p>
-    <div class="callout"><p><strong>The failure was not retrieval.</strong> The agent had the decision. The failure was enforcement &mdash; there was no layer that checked the proposed change against the decision and rejected it.</p></div>
-    <p>This is the same structural gap that databases hit decades ago. Shared storage solved the problem of every process seeing the same data. It did not solve who was allowed to write what. The moment everyone shared the data, access control became necessary. Shared agent memory is at exactly that moment now.</p>
+    <h2>Governance Is Not Access Control</h2>
+    <p>This is the distinction most teams get wrong, and it is worth stating sharply. Access control answers a question about permission: <em>can the agent do this?</em> Governance answers a question about judgment: <em>should the agent do this?</em> They are not the same layer, and one does not imply the other.</p>
+    <p>Consider an agent with write access to a payments service. Access control has already done its job &mdash; the agent is authorized to modify those files. Governance is the layer that decides whether the specific modification it proposes violates an architecture rule, contradicts a recorded <a href="/insights/agent-governance-in-the-sdlc/">architectural decision</a>, crosses a security boundary, breaks a regulatory requirement, or ignores a team convention. The agent can be fully permitted and still wrong. Permission is necessary; it is not sufficient.</p>
+    <div class="callout"><p><strong>Access control gates the door. Governance reads what walked through it.</strong> An agent can have every permission it needs and still produce a change that should never ship.</p></div>
+    <p>This is also why governance cannot be solved by tightening permissions. You could remove the agent&rsquo;s access to the payments service entirely, but then it cannot do its job. The goal is not to lock agents out of important systems. It is to let them work inside those systems while guaranteeing that what they produce stays aligned with the rules a human already decided on.</p>
 
-    <h2>Context Propagation vs Governance Propagation</h2>
-    <p>It helps to name the two layers precisely, because the industry is busy building one and calling it the other. Context propagation moves information to where it is needed. <a href="/concepts/governance-propagation/">Governance propagation</a> moves enforceable decisions to where they are applied. They look similar and solve opposite halves of the problem.</p>
+    <h2>The Emerging Governance Stack</h2>
+    <p>A governance layer for AI coding is not a single feature. It is a stack of four distinct concerns, each of which fails differently when it is missing. The layers below build on one another: policy without enforcement is a wiki nobody reads; enforcement without auditability is a black box nobody trusts.</p>
 
     <div style="overflow-x:auto;margin:2rem 0;">
     <table class="gov-table">
-      <thead><tr><th>Dimension</th><th>Context propagation</th><th>Governance propagation</th></tr></thead>
+      <thead><tr><th>Layer</th><th>What it is</th><th>What it contains</th></tr></thead>
       <tbody>
-        <tr><td>Goal</td><td>Shares information</td><td>Enforces decisions</td></tr>
-        <tr><td>Problem type</td><td>Retrieval</td><td>Verification</td></tr>
-        <tr><td>Effect on agents</td><td>Helps them know</td><td>Ensures they comply</td></tr>
-        <tr><td>Failure mode</td><td>Stale or missing context</td><td>Known decision, violated anyway</td></tr>
-        <tr class="accent-row"><td>Layer</td><td>Memory</td><td>Governance</td></tr>
+        <tr><td>1. Policy</td><td>Human decisions</td><td>Architecture standards, security requirements, compliance rules</td></tr>
+        <tr><td>2. Memory</td><td>Organizational knowledge</td><td>ADRs, previous incidents, design rationales, lessons learned</td></tr>
+        <tr><td>3. Enforcement</td><td>Machine-verifiable controls</td><td>Policy validation, automated checks, CI/CD gates, agent constraints</td></tr>
+        <tr class="accent-row"><td>4. Auditability</td><td>Enterprise accountability</td><td>Why a decision was made, which policy applied, which agent acted</td></tr>
       </tbody>
     </table>
     </div>
 
-    <p>A shared memory layer is a context-propagation system. It is the layer directly beneath where enforcement has to sit. That is why memory vendors and governance are not competitors: the better the memory, the more it needs a governance layer on top of it.</p>
+    <p><strong>Policy</strong> is where humans set intent: the architecture standards, security requirements, and compliance rules that define what &ldquo;correct&rdquo; means for this organization. It is the only layer that should not be automated, because it encodes choices that belong to people.</p>
+    <p><strong>Memory</strong> is the organizational knowledge that gives policy its context &mdash; the ADRs that record why a boundary exists, the incident write-ups that explain what went wrong last time, the design rationales that keep a team from relitigating settled questions. Memory is what lets policy be specific instead of generic. It is also, as covered in <a href="/concepts/governance-propagation/">governance propagation</a>, the layer that has to reach every agent, every time.</p>
+    <p><strong>Enforcement</strong> is the part that turns policy and memory into something machine-verifiable: validation that runs against a proposed change, automated checks, CI/CD gates, and constraints applied to the agent at generation time. This is the layer that converts a known rule into an obeyed rule. Without it, the first three layers are documentation.</p>
+    <p><strong>Auditability</strong> closes the loop. For every change an agent makes, it answers why the decision was made, which policy applied, and which agent performed the action. This is the layer that makes the system explainable after the fact &mdash; and it is the one regulated enterprises cannot live without. The mechanism behind it is what we call <a href="/concepts/enforcement-provenance/">enforcement provenance</a>: a verifiable record linking each change to the rule that approved or rejected it.</p>
 
-    <h2>Why Shared Memory Can Amplify Drift</h2>
-    <p>Here is the counterintuitive part. Better shared memory can make <a href="/concepts/architectural-drift/">architectural drift</a> worse, not better. A single agent with poor memory makes a bounded number of mistakes, slowly. A team of capable agents with excellent shared memory makes more decisions, faster, each one informed by everything the others have done. Capability scales the rate of action. It does not scale compliance.</p>
-    <p>Shared memory raises the blast radius of an unenforced decision. When one agent adopts a slightly-off pattern and writes it into the shared record, every other agent can now retrieve and build on it. The mistake propagates as fluently as the correct decisions do. In a multi-agent setting, local optimizations compound, conflicting implementations appear, and architectural consistency degrades faster than any single reviewer can track. As capability goes up, governance becomes more important, not less.</p>
+    <h2>Why Regulated Industries Need This First</h2>
+    <p>For most teams, a governance layer is a competitive advantage. For regulated ones, it is a precondition for adoption. Financial services, healthcare, life sciences, insurance, and government cannot allow autonomous code generation without four properties: traceability of every change, repeatability of every decision, explainability of why the system did what it did, and standing evidence of compliance. An auditor does not accept &ldquo;the model decided.&rdquo; They require a record.</p>
+    <p>This is precisely where content-safety guardrails have nothing to offer. A prompt filter cannot demonstrate that a change to a claims-processing system honored the applicable regulatory boundary, and it cannot reconstruct the chain of policy that approved it. A governance layer can, because traceability and explainability are what it is built to produce. External frameworks point the same direction: NIST&rsquo;s <a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener">AI Risk Management Framework</a> treats governance, accountability, and auditability as core functions of any trustworthy AI system &mdash; the recognized reference for what an enterprise is expected to be able to show. Teams evaluating where this lands in practice can see the regulated-industry patterns in our <a href="/use-cases/">use cases</a>.</p>
+    <p>In these sectors the order of operations inverts. The governance layer is not something you add once agents are productive. It is the thing that has to exist before agents are allowed to touch the codebase at all.</p>
 
-    <h2>The Layer After Memory</h2>
-    <p>It is worth being explicit about the stack the industry is climbing. Each layer made agents more useful, and each made the next layer necessary.</p>
-    <ol>
-      <li><strong>Code generation</strong> &mdash; the model can write code.</li>
-      <li><strong>Long context</strong> &mdash; it can see more of the codebase at once.</li>
-      <li><strong>Memory</strong> &mdash; it remembers across sessions.</li>
-      <li><strong>Agent orchestration</strong> &mdash; multiple agents coordinate as a team.</li>
-      <li><strong>Governance</strong> &mdash; decisions are enforced across all of them.</li>
-    </ol>
-    <p>Memory makes agents smarter. Governance keeps them aligned. The reason governance is the next layer and not an optional add-on is that every prior layer increases an agent&rsquo;s capacity to act on shared information &mdash; which is precisely what makes an unenforced decision dangerous. This is the same point we make about <a href="/insights/coordination-governance-multi-agent-systems/">coordination governance</a>: parallel agents parallelize output and inconsistency at the same time, and only an enforcement layer resolves the second one.</p>
-
-    <h2>Shared Memory Creates Shared Knowledge, Not Shared Intent</h2>
-    <p>The future challenge for AI coding teams is not whether agents can remember decisions. Memory is being solved, and well. The challenge is whether they consistently obey them. Shared memory creates shared knowledge. It does not create shared intent. Intent has to be enforced, not just remembered &mdash; checked against every proposed change, deterministically, before that change becomes part of the system the next agent reads from.</p>
+    <h2>The Governance Layer Outlives the Model</h2>
+    <p>Here is the structural bet. The largest enterprises will not standardize on a single model. Models are commoditizing, swappable, and improving on a schedule no one controls. What they will standardize on is governance &mdash; the layer that stays constant while everything underneath it churns.</p>
+    <p>The analogy is identity. Two decades ago, authentication lived inside each application. Then identity became an independent layer &mdash; single sign-on, directory services, federated identity &mdash; and applications were rebuilt to defer to it. The applications changed constantly. The identity layer persisted, because it encoded something more durable than any one app: who is allowed to do what. Governance for AI coding is at the same inflection. Models change, agents change, workflows change. The encoded answer to <em>what is this code allowed to be</em> is the part worth making permanent. This is also why the market is splitting into <a href="/insights/ai-agent-governance-two-markets/">two distinct governance markets</a> &mdash; one for the agents themselves and one for the standards they answer to.</p>
+    <p>An organization that ties its safety to a specific model has to renegotiate that safety every time it switches models. An organization that puts its rules in a governance layer keeps them no matter what generates the code next year. And the advantage it gains is not the one the first wave was competing for.</p>
+    <p>The first wave of this market rewarded raw generation &mdash; whoever could produce the most code, fastest, with the least friction. That contest is largely over; the models are good enough that output is no longer scarce. The next advantage is not generating more code. It is ensuring that AI-generated code stays aligned with architecture, compliance, and organizational intent &mdash; at the volume and speed agents now operate.</p>
+    <p>That is what a governance layer delivers, and why it is becoming infrastructure rather than a feature. The teams that win the agentic era will not be the ones whose agents write the most. They will be the ones whose agents can be trusted, audited, and held to a standard &mdash; and, as we argue in <a href="/insights/ai-coding-governance-should-be-reviewable/">AI coding governance should be reviewable</a>, can prove it. Generation got us here. Governance is what gets us the rest of the way.</p>
 
   </div><!-- /.article-body -->
 
   <section class="article-faq" aria-labelledby="faq-heading" style="margin-top:3rem;">
     <h2 id="faq-heading" style="margin-bottom:1.5rem;">Frequently asked questions</h2>
     <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">What is an AI coding team?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">An AI coding team is a coordinated set of agents &mdash; planning, coding, review, and testing agents &mdash; that operate across the software lifecycle rather than a single assistant answering one prompt at a time. Recent products give these agents a shared memory layer so they reuse context and decisions across the team instead of re-deriving them every session.</div>
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">What is a governance layer for AI coding assistants?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">It is enterprise infrastructure that constrains what AI coding agents are allowed to do, built from four layers: policy (the human decisions that define correct), memory (ADRs and incident history that give policy context), enforcement (machine-verifiable checks and CI/CD gates applied to proposed changes), and auditability (a record of why each decision was made and which agent acted). It sits above access control and decides not whether an agent <em>can</em> change a system, but whether it <em>should</em>.</div>
     </details>
     <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Does shared memory prevent architectural drift?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">No. Shared memory ensures agents can retrieve a decision; it does not ensure they comply with it. An agent can retrieve an architectural decision, acknowledge it, and still write code that violates it. Preventing drift requires an enforcement layer that checks proposed changes against the decision and rejects violations &mdash; a verification problem, not a retrieval one.</div>
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">How is governance different from access control?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Access control answers whether an agent has permission to act on a system. Governance answers whether the specific change it proposes is acceptable &mdash; whether it honors architecture rules, ADRs, security boundaries, regulatory requirements, and team conventions. An agent can be fully permitted to modify a payments service and still produce a change that violates a recorded decision. Permission is necessary but not sufficient; governance is the layer that judges the change itself.</div>
     </details>
     <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">What is the difference between context propagation and governance propagation?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Context propagation moves information to where it is needed so agents know what the team has decided. Governance propagation moves enforceable decisions to where they are applied so agents comply. The first is a retrieval problem solved by memory; the second is a verification problem solved by a governance layer. Shared memory is a context-propagation system that sits directly beneath the enforcement layer.</div>
-    </details>
-    <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Can better memory make architectural drift worse?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">It can. Better shared memory makes agents more capable and better informed, so they act on more information faster. That raises the blast radius of any decision that is not enforced: a slightly-off pattern written into shared memory propagates to every agent that retrieves it. Memory amplifies whatever is in it, correct or not, which is exactly why a capable multi-agent team needs governance more, not less.</div>
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Why do regulated industries need a governance layer before adopting agents?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Financial services, healthcare, life sciences, insurance, and government require traceability, repeatability, explainability, and standing evidence of compliance for any change to a regulated system. An auditor will not accept &ldquo;the model decided.&rdquo; A governance layer produces the record &mdash; which policy applied, which agent acted, why &mdash; that content-safety guardrails cannot. In these sectors governance is not an add-on after agents become productive; it is the precondition for letting agents touch the codebase at all.</div>
     </details>
   </section>
 
-  <aside class="related-panel" aria-labelledby="related-concepts-label" style="margin-top:3rem;">
-    <div class="related-panel-label" id="related-concepts-label">Related governance concepts</div>
+  <aside class="related-panel" aria-labelledby="related-essays-label" style="margin-top:3rem;">
+    <div class="related-panel-label" id="related-essays-label">Related operational essays</div>
     <ul class="related-list">
-      <li><a href="/concepts/governance-propagation/"><div class="rel-title">Governance Propagation</div><p class="rel-desc">How a single enforced decision reaches every agent call in a workflow.</p></a></li>
-      <li><a href="/concepts/architectural-drift/"><div class="rel-title">Architectural Drift</div><p class="rel-desc">How locally valid changes erode a system&rsquo;s intended design over time.</p></a></li>
-      <li><a href="/concepts/multi-agent-continuity/"><div class="rel-title">Multi-Agent Continuity</div><p class="rel-desc">Architectural decisions persisting across every agent in a coordinated workflow.</p></a></li>
-      <li><a href="/concepts/deterministic-enforcement/"><div class="rel-title">Deterministic Enforcement</div><p class="rel-desc">Same change, same verdict &mdash; checks that do not depend on the model.</p></a></li>
+      <li><a href="/insights/ai-race-wont-be-won-on-infrastructure-alone/"><div class="rel-title">Why the AI Race Won&rsquo;t Be Won on Infrastructure Alone</div><p class="rel-desc">Infrastructure decides how much intelligence you can access; governance decides how much you can safely deploy.</p></a></li>
+      <li><a href="/insights/open-knowledge-format-vs-governance/"><div class="rel-title">Open Knowledge Format vs Governance</div><p class="rel-desc">Standardizing how agents find organizational knowledge does not make them follow it.</p></a></li>
+      <li><a href="/insights/agent-governance-in-the-sdlc/"><div class="rel-title">Agent Governance in the SDLC</div><p class="rel-desc">Where in the development lifecycle enforcement has to sit once agents act autonomously.</p></a></li>
+      <li><a href="/insights/ai-agent-governance-two-markets/"><div class="rel-title">AI Agent Governance Is Two Markets</div><p class="rel-desc">Governing the agents is a separate problem from governing the standards they answer to.</p></a></li>
+      <li><a href="/insights/ai-coding-governance-should-be-reviewable/"><div class="rel-title">AI Coding Governance Should Be Reviewable</div><p class="rel-desc">Why auditability, not just enforcement, is what makes a governance layer trustworthy.</p></a></li>
+      <li><a href="/insights/why-context-alone-doesnt-prevent-architectural-drift/"><div class="rel-title">Why Context Alone Doesn&rsquo;t Prevent Architectural Drift</div><p class="rel-desc">More information improves what an agent knows, not what it is allowed to do.</p></a></li>
     </ul>
   </aside>
 
-  <aside class="related-panel" aria-labelledby="related-essays-label" style="margin-top:1.5rem;padding-top:0;border-top:none;">
-    <div class="related-panel-label" id="related-essays-label">Related operational essays</div>
+  <aside class="related-panel" aria-labelledby="related-concepts-label" style="margin-top:1.5rem;padding-top:0;border-top:none;">
+    <div class="related-panel-label" id="related-concepts-label">Related governance concepts</div>
     <ul class="related-list">
-      <li><a href="/insights/memory-is-not-governance/"><div class="rel-title">Memory Is Not Governance</div><p class="rel-desc">Recall and enforcement are different systems with different optimization targets.</p></a></li>
-      <li><a href="/insights/coordination-governance-multi-agent-systems/"><div class="rel-title">The Next AI Infrastructure Layer Is Coordination Governance</div><p class="rel-desc">Subagents parallelize execution. They also parallelize inconsistency.</p></a></li>
-      <li><a href="/insights/why-context-alone-doesnt-prevent-architectural-drift/"><div class="rel-title">Why Context Alone Doesn&rsquo;t Prevent Architectural Drift</div><p class="rel-desc">Better recall improves what an agent knows, not what it is allowed to do.</p></a></li>
-      <li><a href="/insights/why-prompt-memory-fails-at-scale/"><div class="rel-title">Why Prompt Memory Fails at Scale</div><p class="rel-desc">Injecting decisions into context is not the same as enforcing them.</p></a></li>
+      <li><a href="/concepts/governance-propagation/"><div class="rel-title">Governance Propagation</div><p class="rel-desc">How an enforced decision reaches every agent and every generation call.</p></a></li>
+      <li><a href="/concepts/enforcement-provenance/"><div class="rel-title">Enforcement Provenance</div><p class="rel-desc">The verifiable record linking each change to the rule that approved or rejected it.</p></a></li>
     </ul>
   </aside>
 
   <footer class="article-footer">
     <a href="/insights/" class="back-link">&larr; Back to Insights</a>
     <div class="cta-block">
-      <h3>Give your AI coding team shared intent, not just shared memory.</h3>
-      <p>Mneme turns your architectural decisions into executable constraints that every agent retrieves at generation time and CI verifies deterministically &mdash; so a decision the team agreed to is enforced across all of them, not just remembered. Open source.</p>
+      <h3>Put a governance layer under your AI coding agents.</h3>
+      <p>Mneme turns your architecture standards and ADRs into executable constraints that every agent retrieves at generation time and CI verifies deterministically &mdash; with an audit trail showing which rule applied to which change. Policy, memory, enforcement, and auditability, in one open-source layer.</p>
       <a href="/demo/" style="display:inline-block;margin-right:1.25rem;color:#c8f060;font-family:'DM Mono',monospace;font-size:0.85rem;text-decoration:none;">See the live demo &rarr;</a>
       <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
     </div>
