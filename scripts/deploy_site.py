@@ -374,17 +374,20 @@ def submit_indexnow(urls):
         'keyLocation': f'https://mnemehq.com/{key}.txt',
         'urlList': urls,
     }).encode()
-    req = urllib.request.Request(
-        'https://api.indexnow.org/indexnow',
-        data=payload,
-        headers={'Content-Type': 'application/json; charset=utf-8'},
-        method='POST',
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=20) as r:
-            print(f'[OK] IndexNow -- {len(urls)} URL(s) submitted (HTTP {r.status})')
-    except urllib.error.HTTPError as e:
-        print(f'[WARN] IndexNow -- HTTP {e.code}: {e.read().decode()[:200]}')
+    for endpoint in ('https://www.bing.com/indexnow', 'https://api.indexnow.org/indexnow'):
+        req = urllib.request.Request(
+            endpoint,
+            data=payload,
+            headers={'Content-Type': 'application/json; charset=utf-8'},
+            method='POST',
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=20) as r:
+                label = endpoint.split('/')[2]
+                print(f'[OK] IndexNow ({label}) -- {len(urls)} URL(s) submitted (HTTP {r.status})')
+        except urllib.error.HTTPError as e:
+            label = endpoint.split('/')[2]
+            print(f'[WARN] IndexNow ({label}) -- HTTP {e.code}: {e.read().decode()[:200]}')
 
 print('\n-- IndexNow submission --')
 submit_indexnow(purge_urls if not full_deploy else sitemap_urls)
