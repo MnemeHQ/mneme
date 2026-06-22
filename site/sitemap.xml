@@ -91,6 +91,36 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://mnemehq.com/insights/stanford-ai-index-2026-engineering-governance/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/insights/enforce-engineering-standards-across-ai-assisted-teams/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/insights/agent-formation-engineering-performance-metrics/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/insights/agentic-resource-discovery-agent-governance/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/insights/block-builderbot-coordination-governance/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/insights/agentic-workforce-visibility-crisis/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://mnemehq.com/insights/topics/architectural-governance/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
