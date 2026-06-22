@@ -41,16 +41,38 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 SITE_DIR = REPO_ROOT / "site"
 INSIGHTS_DIR = SITE_DIR / "insights"
 HUB = INSIGHTS_DIR / "index.html"
+ARCHIVE = INSIGHTS_DIR / "all" / "index.html"
+TOPICS_DIR = INSIGHTS_DIR / "topics"
 SITEMAP = SITE_DIR / "sitemap.xml"
 
 SITE_BASE = "https://mnemehq.com"
 
+# Directories under site/insights/ that are index *surfaces*, not articles. They
+# carry article cards but must never be validated as insight slugs themselves.
+NON_ARTICLE_DIRS = {"all", "topics"}
+
+
+def index_surfaces() -> list[Path]:
+    """Every approved index surface that may card an article: the curated
+    homepage, the full archive, and each topic hub. The homepage is editorial
+    (optional cards); the archive + hubs are where every slug must appear."""
+    surfaces = [HUB, ARCHIVE]
+    if TOPICS_DIR.is_dir():
+        for child in sorted(TOPICS_DIR.iterdir()):
+            idx = child / "index.html"
+            if child.is_dir() and idx.exists():
+                surfaces.append(idx)
+    return [p for p in surfaces if p.exists()]
+
 
 def article_slugs() -> list[str]:
-    """Return every <slug> with an insights/<slug>/index.html, excluding the hub."""
+    """Return every <slug> with an insights/<slug>/index.html, excluding the hub
+    and the non-article index surfaces (all/, topics/)."""
     out = []
     for child in sorted(INSIGHTS_DIR.iterdir()):
         if not child.is_dir():
+            continue
+        if child.name in NON_ARTICLE_DIRS:
             continue
         if (child / "index.html").exists():
             out.append(child.name)
@@ -66,18 +88,23 @@ def sitemap_slugs() -> set[str]:
 
 
 def hub_card_slugs() -> set[str]:
-    """Return slugs that have a card (<a ... class='insight-card-link'>) on the hub."""
-    if not HUB.exists():
-        return set()
-    html = HUB.read_text(encoding="utf-8")
+    """Return slugs that have a card (<a ... class='insight-card-link'>) on ANY
+    approved index surface (homepage, /all/ archive, or a topic hub). A slug is
+    registered if it appears on at least one surface; the homepage is editorial
+    and not required to card every slug."""
     slugs = set()
-    for m in re.finditer(r'<a\s+([^>]+)>', html):
-        attrs = m.group(1)
-        if "insight-card-link" not in attrs:
+    for surface in index_surfaces():
+        try:
+            html = surface.read_text(encoding="utf-8")
+        except (UnicodeDecodeError, OSError):
             continue
-        href_m = re.search(r'href="/insights/([^/"]+)/"', attrs)
-        if href_m:
-            slugs.add(href_m.group(1))
+        for m in re.finditer(r'<a\s+([^>]+)>', html):
+            attrs = m.group(1)
+            if "insight-card-link" not in attrs:
+                continue
+            href_m = re.search(r'href="/insights/([^/"]+)/"', attrs)
+            if href_m and href_m.group(1) not in NON_ARTICLE_DIRS:
+                slugs.add(href_m.group(1))
     return slugs
 
 
@@ -258,19 +285,25 @@ def check_article_schema(slug: str, blocks: list[dict]) -> list[str]:
 
 
 def hub_haspart_slugs() -> set[str]:
-    """Slugs the hub's CollectionPage JSON-LD claims have a card."""
-    if not HUB.exists():
-        return set()
-    html = HUB.read_text(encoding="utf-8")
+    """Slugs that a CollectionPage JSON-LD claims as a part, across the archive
+    and homepage. The authoritative full hasPart lives on the /all/ archive; the
+    homepage may list only the curated subset."""
     slugs: set[str] = set()
-    for node in jsonld_blocks(html):
-        if node.get("@type") != "CollectionPage":
+    for surface in (ARCHIVE, HUB):
+        if not surface.exists():
             continue
-        for part in node.get("hasPart", []) or []:
-            url = part.get("url", "") if isinstance(part, dict) else ""
-            m = re.match(r"https://mnemehq\.com/insights/([^/]+)/", url)
-            if m:
-                slugs.add(m.group(1))
+        try:
+            html = surface.read_text(encoding="utf-8")
+        except (UnicodeDecodeError, OSError):
+            continue
+        for node in jsonld_blocks(html):
+            if node.get("@type") != "CollectionPage":
+                continue
+            for part in node.get("hasPart", []) or []:
+                url = part.get("url", "") if isinstance(part, dict) else ""
+                m = re.match(r"https://mnemehq\.com/insights/([^/]+)/", url)
+                if m and m.group(1) not in NON_ARTICLE_DIRS:
+                    slugs.add(m.group(1))
     return slugs
 
 
