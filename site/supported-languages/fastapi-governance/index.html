@@ -48,6 +48,31 @@
         "dateModified": "2026-06-02",
         "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}}
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How does Mneme HQ govern AI-generated FastAPI code?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Mneme HQ enforces repo-native architecture rules as the agent works: it keeps router, service, repository, and schema boundaries intact, keeps route handlers thin, and flags changes that break dependency-injection or auth conventions before the code reaches review."}
+          },
+          {
+            "@type": "Question",
+            "name": "Does it stop business logic and database access from leaking into route handlers?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Yes. The rules keep handlers thin, so an agent cannot embed business logic in a route or call the database directly from the router instead of going through the service and repository layers, and the violation is caught before merge."}
+          },
+          {
+            "@type": "Question",
+            "name": "Can it enforce dependency injection and Pydantic schema policy?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Yes. It flags ad hoc construction of dependencies where FastAPI's dependency-injection system should be used, and keeps request and response shaping inside declared Pydantic schemas so serialization stays consistent across endpoints."}
+          },
+          {
+            "@type": "Question",
+            "name": "Will it catch a protected route that is missing its auth dependency?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Yes. Auth dependencies on protected routers are expressed as a deterministic rule, so if an agent adds or edits a route that should require authentication and omits the dependency, the gap is surfaced before the change is reviewed."}
+          }
+        ]
       }
     ]
   }
