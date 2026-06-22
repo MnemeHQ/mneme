@@ -2,6 +2,16 @@
 
 Adding a new article under `site/insights/<slug>/index.html` is **not enough on its own**. The publishing pipeline does not auto-discover new articles. Each one requires explicit registration in four places. CI enforces this via `scripts/check_insights.py` (see `.github/workflows/check-insights.yml`).
 
+## Information architecture (since the 2026-06 overhaul)
+
+The Insights section has three kinds of index surface:
+
+- **`/insights/`** — a **curated editorial homepage**: one featured article, ~6 latest, the four topic-hub cards, a few foundational pieces, and a "View all insights" CTA. It is *not* required to card every article.
+- **`/insights/all/`** — the **canonical full archive**. Every article has a card here, and the authoritative `CollectionPage.hasPart` (the complete list) lives here.
+- **`/insights/topics/<hub>/`** — four **topic hubs** (`architectural-governance`, `ai-coding-agents`, `agent-infrastructure`, `engineering-performance`), each with an intro, a cornerstone, and a curated supporting set.
+
+A slug is "registered" if it is carded on **at least one approved index surface** — the archive or a topic hub. `check_insights.py` scans all surfaces and treats `all/` and `topics/` as index surfaces, never as article slugs.
+
 ## What the contract requires
 
 For every `site/insights/<slug>/index.html`, the following must all be true:
@@ -9,10 +19,10 @@ For every `site/insights/<slug>/index.html`, the following must all be true:
 **Registration**
 
 1. **Sitemap entry** — a `<url><loc>https://mnemehq.com/insights/<slug>/</loc>...</url>` block in [`site/sitemap.xml`](../../site/sitemap.xml).
-2. **Insights hub card** — an `<a href="/insights/<slug>/" class="insight-card-link">...</a>` card on [`site/insights/index.html`](../../site/insights/index.html).
+2. **Index card** — an `<a href="/insights/<slug>/" class="insight-card-link">...</a>` card on at least one approved index surface: the archive [`site/insights/all/index.html`](../../site/insights/all/index.html) or a topic hub under `site/insights/topics/<hub>/index.html`. (Featuring it on the curated homepage is optional.)
 3. **Local OG image** — `og.png` co-located in the article directory: `site/insights/<slug>/og.png`.
 4. **OG meta tags resolve** — both `<meta property="og:image">` and `<meta name="twitter:image">` in the article must point to a PNG file that actually exists under `site/`.
-5. **At least one incoming internal link** — at least one other HTML file under `site/` must link to `/insights/<slug>/`. The hub card from check (2) satisfies this; reciprocal links from related articles are recommended for SEO depth.
+5. **At least one incoming internal link** — at least one other HTML file under `site/` must link to `/insights/<slug>/`. The index card from check (2) satisfies this; reciprocal links from related articles are recommended for SEO depth.
 
 **Breadcrumb**
 
@@ -25,7 +35,7 @@ For every `site/insights/<slug>/index.html`, the following must all be true:
 
 **Hub schema**
 
-9. **CollectionPage hasPart entry** — the slug must appear in the `hasPart` array of the `CollectionPage` JSON-LD on the hub. The visible card (check 2) and the hub `hasPart` entry can drift independently and are both consumed by search engines; both must be present.
+9. **CollectionPage hasPart entry** — the slug must appear in the `hasPart` array of a `CollectionPage` JSON-LD on the **archive** (`/insights/all/`) or homepage. The archive carries the authoritative full list. The visible card (check 2) and the `hasPart` entry are checked independently; both must be present.
 
 ## How to register a new insight
 
@@ -60,11 +70,11 @@ Append a `<url>` block to `site/sitemap.xml`:
 </url>
 ```
 
-### 3. Insights hub card and `hasPart`
+### 3. Index card(s) and `hasPart`
 
-Add a card to `site/insights/index.html` in the most thematically appropriate `cards-section` (e.g. `governance-problem`, `ai-native`, `market-context`). Mirror the structure of neighboring cards: eyebrow tag, read time, `<h3>` title, summary `<p>`, and the `read-pill` footer.
+Add a card to **`site/insights/all/index.html`** (the archive) in the most thematically appropriate `cards-section`, **and** to the relevant topic hub under `site/insights/topics/<hub>/index.html`. Mirror the structure of neighboring cards: eyebrow tag, read time, `<h3>` title, summary `<p>`, and the `read-pill` footer. Optionally feature it on the curated homepage (`site/insights/index.html`) under Featured or Latest.
 
-**Also append a matching entry to the `hasPart` array** in the `CollectionPage` JSON-LD block at the top of the file. The visible card and the `hasPart` entry are checked independently — both are required.
+**Also append a matching entry to the `hasPart` array** in the `CollectionPage` JSON-LD of `site/insights/all/index.html`. The visible card and the `hasPart` entry are checked independently — both are required.
 
 ```json
 {"@type": "Article", "name": "Your Title", "url": "https://mnemehq.com/insights/<slug>/"}
@@ -83,6 +93,26 @@ The existing article template under any recent `site/insights/<slug>/index.html`
 ### 5. Internal links
 
 The hub card from step 3 already satisfies the "at least one incoming internal link" requirement. For SEO depth, also add reciprocal cross-links from thematically related insights (the article's own `related-essays` panel links outward; the reciprocal inward links are the high-value pairing).
+
+## When to publish (editorial rules)
+
+The archive is large. Growth now comes from authority and consolidation, not raw card count. Publish a new article only when it does **at least one** of:
+
+1. Targets a distinct commercial or category-defining query (not a near-duplicate of an existing page's intent).
+2. Adds new evidence to an existing Mneme thesis.
+3. Creates a credible entry point from a major report, vendor, paper, or industry development.
+4. Supports a cornerstone page through internal linking.
+
+Do **not** publish another article merely because a new company announcement can be reframed as "this also needs governance."
+
+Editorial pattern for every piece:
+
+- **News → Problem → Governance.** Never "Company X launched Y"; always "Y exposes governance challenge Z." Lead with the recognizable entity for SEO, pivot to the governance interpretation.
+- **Start from the pain, not the category.** Readers search the problem, then discover the category.
+- **Target engineering leaders** (CTO, VP Eng, Head of Platform, staff/principal), not individual developers. The buyer is organizational.
+- **Consolidate competing intent.** When several essays compete for the same query (the "memory" family, the "review" family), give them a cornerstone parent and sharpen each one's primary keyword so they stop cannibalizing each other.
+- **Answer five questions:** what changed, why it matters, what breaks, what teams should do, how governance helps. If a draft can't answer all five, it's commentary, not strategic content.
+- **House voice / brand:** concrete and declarative; never the word "bottleneck"; no em dashes as connective tissue; domain is always `mnemehq.com`. See the `publish-insight` skill for the full authoring procedure.
 
 ## Running the check locally
 
