@@ -48,6 +48,31 @@
         "dateModified": "2026-06-02",
         "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}}
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How does Mneme HQ govern AI-generated Spring Boot code?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Mneme HQ enforces repo-native architecture rules before AI-written code reaches review: it preserves controller, service, repository, and domain boundaries, restricts which Spring Boot starters and dependencies may be introduced, and flags violations of transaction and security policy as the agent edits the project."}
+          },
+          {
+            "@type": "Question",
+            "name": "Does it stop AI agents from breaking layered architecture in Java services?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Yes. Layer boundaries are expressed as deterministic rules, so an agent cannot have a controller call a repository directly, leak persistence types into the web layer, or move business logic out of the service layer without the change being caught before merge."}
+          },
+          {
+            "@type": "Question",
+            "name": "Can it enforce approved starters and dependency policy?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Yes. You declare which starters, libraries, and versions are permitted, and Mneme HQ blocks an AI agent from pulling in unapproved or duplicate dependencies, keeping the build reproducible and the dependency surface governed."}
+          },
+          {
+            "@type": "Question",
+            "name": "How is this different from a linter or static analysis?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Linters check style and known anti-patterns on code that already exists. Mneme HQ governs intent and architecture continuously while the agent works, so structural and security decisions are enforced before review rather than discovered after."}
+          }
+        ]
       }
     ]
   }
