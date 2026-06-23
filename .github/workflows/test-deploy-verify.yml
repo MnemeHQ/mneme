@@ -1,0 +1,45 @@
+name: test deploy verification helpers
+
+# Runs the unit tests for the pure post-deploy verification helpers
+# (scripts/deploy_verify.py) so the changed-URL / stale-200 / transient
+# classification logic cannot regress. deploy_site.py itself runs the deploy at
+# import time and is not importable in tests, which is why the logic lives in a
+# separate, tested module.
+#
+# Validator: scripts/test_deploy_verify.py
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/deploy_verify.py'
+      - 'scripts/test_deploy_verify.py'
+      - 'scripts/deploy_site.py'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/deploy_verify.py'
+      - 'scripts/test_deploy_verify.py'
+      - 'scripts/deploy_site.py'
+
+permissions:
+  contents: read
+
+jobs:
+  test-deploy-verify:
+    name: test_deploy_verify.py
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run deploy-verify unit tests
+        run: python scripts/test_deploy_verify.py
+
+      - name: Syntax-check deploy_site.py
+        run: python -m py_compile scripts/deploy_site.py
