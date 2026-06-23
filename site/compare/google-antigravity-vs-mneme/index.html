@@ -39,11 +39,12 @@
         {"@type": "ListItem", "position": 2, "name": "Compare", "item": "https://mnemehq.com/compare/"},
         {"@type": "ListItem", "position": 3, "name": "Google Antigravity vs Mneme", "item": "https://mnemehq.com/compare/google-antigravity-vs-mneme/"}
       ]},
-      {"@type": "TechArticle", "headline": "Google Antigravity vs Mneme: Agentic IDEs vs Architectural Governance", "description": "Antigravity is an agent execution and orchestration environment. Mneme is an architectural governance layer for those environments.", "url": "https://mnemehq.com/compare/google-antigravity-vs-mneme/", "datePublished": "2026-05-28", "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"}, "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/"}, "about": [{"@type": "Thing", "name": "Google Antigravity vs Mneme"}, {"@type": "Thing", "name": "Antigravity vs Cursor"}, {"@type": "Thing", "name": "Antigravity governance"}, {"@type": "Thing", "name": "Agentic IDE governance"}, {"@type": "Thing", "name": "AI coding agent governance"}]},
+      {"@type": "Article", "headline": "Google Antigravity vs Mneme: Agentic IDEs vs Architectural Governance", "description": "Antigravity is an agent execution and orchestration environment. Mneme is an architectural governance layer for those environments.", "url": "https://mnemehq.com/compare/google-antigravity-vs-mneme/", "datePublished": "2026-05-28", "dateModified": "2026-06-23", "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"}, "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}}, "image": "https://mnemehq.com/compare/google-antigravity-vs-mneme/og.png", "mainEntityOfPage": "https://mnemehq.com/compare/google-antigravity-vs-mneme/", "about": [{"@type": "Thing", "name": "Google Antigravity vs Mneme"}, {"@type": "Thing", "name": "Antigravity vs Cursor"}, {"@type": "Thing", "name": "Antigravity governance"}, {"@type": "Thing", "name": "Agentic IDE governance"}, {"@type": "Thing", "name": "AI coding agent governance"}]},
       {"@type": "FAQPage", "mainEntity": [
-        {"@type": "Question", "name": "Is Mneme an alternative to Google Antigravity?", "acceptedAnswer": {"@type": "Answer", "text": "No. Antigravity is an agent-first development environment — it orchestrates autonomous agents across editor, terminal, and browser. Mneme is an architectural governance layer — it preserves and enforces the architectural decisions that govern what the agent is allowed to do. The two operate at different layers and compose."}},
+        {"@type": "Question", "name": "Is Mneme an alternative to Google Antigravity?", "acceptedAnswer": {"@type": "Answer", "text": "No. Antigravity is an agent-first development environment: it orchestrates autonomous agents across editor, terminal, and browser. Mneme is an architectural governance layer that preserves and enforces the architectural decisions that govern what the agent is allowed to do. The two operate at different layers and compose."}},
         {"@type": "Question", "name": "Does Antigravity already have architectural governance built in?", "acceptedAnswer": {"@type": "Answer", "text": "Antigravity provides plans, Artifacts, browser-verified outputs, and Agent Manager visibility. Those are review and orchestration capabilities. Architectural governance as a separate layer provides binary verdicts, repo-native rules, CI-level enforcement, and provenance that travel with the codebase regardless of which agent ran."}},
-        {"@type": "Question", "name": "Why do agent-first IDEs make architectural governance more important?", "acceptedAnswer": {"@type": "Answer", "text": "Agent-first IDEs increase autonomous execution surface — editor, terminal, browser, multi-agent workspaces. The bottleneck shifts from generation quality to architectural coordination, which is exactly what a governance layer addresses."}}
+        {"@type": "Question", "name": "Why do agent-first IDEs make architectural governance more important?", "acceptedAnswer": {"@type": "Answer", "text": "Agent-first IDEs increase autonomous execution surface across editor, terminal, browser, and multi-agent workspaces. The hard part shifts from generation quality to architectural coordination, which is exactly what a governance layer addresses."}},
+        {"@type": "Question", "name": "When should a team run Mneme alongside Google Antigravity?", "acceptedAnswer": {"@type": "Answer", "text": "Add a governance layer once more than one agent or workspace is changing the same codebase, or when architectural decisions, security boundaries, and audit trails have to hold regardless of which agent ran. Antigravity executes and reviews the work; Mneme enforces the decisions the work must respect, before generation and again at commit and CI time."}}
       ]}
     ]
   }
@@ -172,6 +173,11 @@
 
     <div class="callout"><p><strong>Google Antigravity helps teams delegate more software work to agents.</strong> Mneme helps teams prevent those agents from silently violating architecture decisions while they work.</p></div>
 
+    <h2>Two jobs in the agentic stack</h2>
+    <p><strong>Google Antigravity</strong> is an agent-first development environment. It runs autonomous agents across the editor, terminal, and browser, drafts plans for the work ahead, executes the tool calls to carry them out, verifies outputs in a real browser, and surfaces the results as Artifacts that a human can review in an Agent Manager. Its job is to help a team delegate more of the software work to agents and keep that work visible.</p>
+    <p><strong>Mneme</strong> is an architectural governance layer that sits one level above whatever agent is running. It compiles the team's architectural decisions, the records that say which patterns, dependencies, and boundaries are allowed, into rules that are checked before the agent generates and again at commit and CI time. Its job is not to run the agent. Its job is to make sure that whatever the agent produces respects the decisions the team already made.</p>
+    <p>The comparison comes up because agent-first IDEs blur a line that used to be obvious. When a single developer wrote the code, architectural intent lived in that developer's head and in review. When fleets of agents write it across editor, terminal, and browser, that intent has to live somewhere the agents can be held to. That is the gap a governance layer fills.</p>
+
     <h2>The layer distinction</h2>
     <div style="overflow-x:auto;margin:2rem 0;">
     <table class="compare-table">
@@ -188,6 +194,12 @@
     </table>
     </div>
 
+    <h2>What Google Antigravity does well</h2>
+    <p>Antigravity is built to move execution forward. Plans break a task into steps, the agent works across editor, terminal, and browser to complete them, and browser-level verification checks that the result actually behaves as intended. The Agent Manager keeps multiple agents and their Artifacts visible in one place, so a reviewer can see what each agent did. For teams whose goal is to delegate more work to agents and keep that work reviewable, this is exactly the right surface.</p>
+
+    <h2>What architectural governance adds</h2>
+    <p>Visibility into what an agent did is not the same as enforcement of what it is allowed to do. An Artifact shows the change; it does not, on its own, decide whether the change keeps a service inside its layer, uses an approved dependency, or preserves a security boundary. Mneme makes those decisions machine-checkable: it turns architectural decisions into repo-native rules, returns a binary verdict on each change, and records provenance that travels with the codebase no matter which agent or IDE produced the diff. The reviewer is then judging conforming code instead of hunting for violations one Artifact at a time.</p>
+
     <h2>How they compose</h2>
     <p>The point of the comparison is not to choose one or the other. The point is to use both at the right layer.</p>
     <ul>
@@ -195,6 +207,20 @@
       <li><strong>Mneme</strong> sits one layer up. It injects the architectural decisions relevant to the task before the agent generates, and validates outputs against compiled constraints at hook, commit, and CI time.</li>
       <li>The reviewer sees both the agent&rsquo;s Artifacts (what it did) and the structured governance verdict (whether the work belongs in the system). Review focuses on judgment.</li>
     </ul>
+
+    <h2>How they meet in a real workflow</h2>
+    <p>Picture an agent in Antigravity picking up a task. It drafts a plan, edits files, runs the terminal, and verifies the result in a browser, then posts an Artifact. With Mneme in place, the relevant architectural decisions are compiled in before that work starts, so the agent is steered away from a forbidden dependency or a cross-layer call as it writes. When the change reaches a commit or CI, Mneme evaluates the diff against those compiled rules and returns a verdict with provenance attached. The reviewer opens one place and sees two things: the Artifact that says what the agent did, and the governance verdict that says whether it belongs in the system. Nothing about the agent's speed changes; what changes is that an architectural violation is caught at the seam instead of in production.</p>
+
+    <h2>When to use which</h2>
+    <p>The choice is rarely one or the other. A useful way to decide what to add and when:</p>
+    <ul>
+      <li><strong>Use Google Antigravity</strong> when the goal is to delegate execution: you want agents planning, writing, and browser-verifying work across the editor, terminal, and browser, with Artifacts a human can review.</li>
+      <li><strong>Add Mneme</strong> when more than one agent or workspace touches the same codebase, when architectural decisions and security boundaries have to hold regardless of which agent ran, or when you need an audit trail of which decision governed which change.</li>
+      <li><strong>Run both</strong> when you want agents to move fast and the architecture to stay intact: Antigravity executes, Mneme constrains, and the reviewer sees both the Artifact and the governance verdict.</li>
+    </ul>
+
+    <h2>Different layers, not competitors</h2>
+    <p>Comparing Google Antigravity and Mneme is not a question of which tool wins. They solve different problems at different layers of the agentic stack. Antigravity raises how much execution a team can safely delegate to agents. Mneme keeps that delegation inside the architecture the team has committed to. As more of the codebase is written by autonomous agents, both jobs matter, and the teams that pair them keep their throughput without trading away architectural control.</p>
 
     <h2>SEO sibling pages</h2>
     <p>For teams comparing agent-first IDEs and governance layers more broadly:</p>
