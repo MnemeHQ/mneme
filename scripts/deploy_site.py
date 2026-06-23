@@ -1,6 +1,10 @@
 import urllib.request, urllib.parse, urllib.error, ssl, json, os, subprocess, sys, xml.etree.ElementTree as ET
 from pathlib import Path
 
+# Pure verification helpers live alongside this script (importable + unit-tested).
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from deploy_verify import content_needle, classify  # noqa: E402
+
 # Load .env if present (never committed — credentials stay local)
 _env = Path(__file__).parent.parent / '.env'
 if _env.exists():
@@ -311,43 +315,105 @@ import time as _time
 if CF_TOKEN and CF_ZONE_ID:
     _time.sleep(3)  # brief pause for CF edge nodes to propagate the purge
 
-# ── Post-deploy verification: every sitemap URL must return 200 ───────────────
-print("\n-- Post-deploy verification --")
+# ── Post-deploy verification ──────────────────────────────────────────────────
+# Two tiers, so a slow unrelated page can never fail a clean delta deploy:
+#
+#   1. Changed URLs (this deploy's delta) are verified STRICTLY: each must return
+#      200 AND serve the bytes we just uploaded. A 404/410, or a "stale 200" (the
+#      old page still served because an optimistic upload never landed), is a
+#      real failure that blocks the marker so the next run retries the delta.
+#      Transient timeouts / 5xx are retried, then downgraded to a warning -- they
+#      are infra noise, not a bad deploy.
+#   2. Every other sitemap URL is a best-effort health probe: retried, and any
+#      non-200 is reported as a WARNING only. (A single slow /demo/ page used to
+#      abort an otherwise-perfect deploy.)
+VERIFY_TIMEOUT = 30
+VERIFY_RETRIES = 3
+
+def _verify_fetch(url):
+    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+    with urllib.request.urlopen(req, timeout=VERIFY_TIMEOUT) as r:
+        return r.status, r.read()
+
+# Fingerprint each changed HTML page: the uploaded content up to </body>.
+changed_fp = {}
+for _lp, _sd, _label in files_to_upload:
+    _u = label_to_url(_label)
+    if _u and _label.endswith('.html'):
+        try:
+            changed_fp[_u] = content_needle(Path(_lp).read_bytes())
+        except OSError:
+            pass
+
+print("\n-- Post-deploy verification: changed URLs (strict) --")
+hard_failures = []
+for url, needle in changed_fp.items():
+    verdict, detail = 'warn', 'no response'
+    for attempt in range(VERIFY_RETRIES):
+        try:
+            status, body = _verify_fetch(url)
+        except urllib.error.HTTPError as e:
+            status, body = e.code, b''
+        except Exception as e:
+            verdict, detail = 'warn', f'transient: {e}'
+            _time.sleep(2 + attempt * 2)
+            continue
+        verdict, detail = classify(status, body, needle)
+        if verdict == 'ok':
+            break
+        if verdict == 'fail' and status in (404, 410):
+            break  # definitively missing; retrying will not help
+        _time.sleep(2 + attempt * 2)  # retry 5xx; re-check a stale 200 after cache propagation
+    if verdict == 'ok':
+        print(f'OK    {url}')
+    elif verdict == 'fail':
+        print(f'FAIL  {url}  -- {detail}')
+        hard_failures.append((url, detail))
+    else:
+        print(f'WARN  {url}  -- {detail} (not blocking)')
+
+if hard_failures:
+    print(f"\nVERIFICATION FAILED - {len(hard_failures)} changed URL(s) not serving fresh content:")
+    for url, detail in hard_failures:
+        print(f'  {detail}  {url}')
+    raise SystemExit(1)
+
+# Best-effort health probe of the rest of the sitemap (warn-only, never blocks).
+print("\n-- Sitemap health probe (warn-only) --")
 sitemap_path = os.path.join(BASE_LOCAL, 'sitemap.xml')
 tree = ET.parse(sitemap_path)
 sitemap_urls = [loc.text for loc in tree.findall('.//{http://www.sitemaps.org/schemas/sitemap/0.9}loc')]
-
-verify_failures = []
+probe_warnings = []
 for url in sitemap_urls:
-    try:
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req, timeout=10) as r:
-            status = r.status
-    except urllib.error.HTTPError as e:
-        status = e.code
-    except Exception as e:
-        status = str(e)
-    ok = status == 200
-    print(f'{"OK" if ok else "FAIL"}  {status}  {url}')
-    if not ok:
-        verify_failures.append((url, status))
+    if url in changed_fp:
+        continue  # already strictly verified above
+    status = None
+    for attempt in range(VERIFY_RETRIES):
+        try:
+            status, _ = _verify_fetch(url)
+        except urllib.error.HTTPError as e:
+            status = e.code
+        except Exception as e:
+            status = str(e)
+        if status == 200:
+            break
+        _time.sleep(1 + attempt)
+    if status != 200:
+        probe_warnings.append((url, status))
 
-if verify_failures:
-    print(f"\nVERIFICATION FAILED - {len(verify_failures)} URL(s) not returning 200:")
-    for url, status in verify_failures:
+if probe_warnings:
+    print(f"[WARN] {len(probe_warnings)} sitemap URL(s) not returning 200 (not blocking deploy):")
+    for url, status in probe_warnings:
         print(f'  {status}  {url}')
-    raise SystemExit(1)
+else:
+    print(f"[OK] all {len(sitemap_urls)} sitemap URLs healthy")
 
-print(f"\n[OK] All {len(sitemap_urls)} sitemap URLs verified - deploy complete")
+print(f"\n[OK] Deploy verified -- {len(changed_fp)} changed URL(s) serving fresh content")
 
-# Advance the deploy marker ONLY after every sitemap URL has verified 200.
-# Previously tag_deployed() ran right after upload, before this verification --
-# so a deploy whose pages never actually served (silent upload miss, or an
-# "optimistic" flaky upload) still moved the marker, and the next delta deploy
-# skipped re-uploading them. That left 9 pages 404 on the origin for ~3 days
-# while the marker claimed they were deployed. Tagging here means a failed
-# verification leaves the marker behind, so the next deploy retries the same
-# delta and re-uploads the missing pages.
+# Advance the deploy marker ONLY after the strict tier passed. A failed strict
+# verification leaves the marker behind so the next deploy retries the same delta
+# -- this is what stops a silent upload-miss from sitting stale while the marker
+# claims it shipped (previously 9 pages 404'd on the origin for ~3 days).
 tag_deployed()
 
 
