@@ -71,6 +71,7 @@
     .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
     .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
     .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
+    .article-body h3 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; letter-spacing: -0.01em; margin: 1.75rem 0 0.5rem; color: var(--text); }
     .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
     .article-body p strong { color: var(--text); font-weight: 500; }
     .article-body ul { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
@@ -171,6 +172,7 @@
     <h2>Why it matters</h2>
     <p>Google Antigravity is one of the clearest expressions of the agent-first IDE category: autonomous agents that plan, execute, and verify work across editor, terminal, and browser, with Mission Control / Agent Manager for overseeing multiple agents and Artifacts for reviewable plans and verification outputs.</p>
     <p>That shape changes what surrounding infrastructure has to do. The developer is no longer guarding each line of code; the agent is. The governance layer therefore has to operate at agent speed, across all the surfaces the agent touches, deterministically enough to be trusted as a release gate.</p>
+    <p>Put differently, the agent-first model moves the moment of architectural risk earlier and multiplies it. A decision that used to be made once, by a person, and checked in review is now made many times, by agents, often in parallel, across editor, terminal, and browser. Antigravity governance is the response: the discipline of keeping those decisions enforceable at the exact point and pace the agents work.</p>
 
     <h2>Key claims</h2>
     <ul>
@@ -179,6 +181,15 @@
       <li><strong>Artifacts improve reviewability, but they do not enforce architectural invariants.</strong> Provenance is what happened; governance is what is allowed.</li>
       <li><strong>Governance must be deterministic, repo-native, and tied to ADRs.</strong> Same input, same verdict, every time. Rules that travel with the repository, not with the policy team or the prompt.</li>
     </ul>
+
+    <h2>What antigravity governance enforces</h2>
+    <p>Three things travel together under this discipline. <strong>Architectural constraints</strong> express which patterns, dependencies, and boundaries are allowed, and they are evaluated wherever the agent acts, not only on a finished pull request. <strong>Decision provenance</strong> ties each enforced rule back to the architectural decision record that justifies it, so a verdict is explainable rather than arbitrary. <strong>Verification checks</strong> turn those decisions into deterministic gates that either pass a change or block it. The combination is what lets a team trust an autonomous agent with the codebase: not because the agent is assumed correct, but because the decisions it must respect are enforced as it works.</p>
+
+    <h2>Reviewability is not enforcement</h2>
+    <p>Agent-first IDEs are good at making work inspectable. Antigravity surfaces plans before execution and Artifacts after it, and Mission Control keeps many agents visible at once. That is genuine progress for oversight, but it is provenance, a record of what happened, not a constraint on what is allowed to happen. A reviewer can read an Artifact and still miss that a change crossed a layer boundary, pulled in a forbidden dependency, or weakened a security rule, because nothing evaluated the change against the architecture. Antigravity governance closes that gap by adding the enforcement layer the Artifacts assume but do not provide.</p>
+
+    <h2>Governance at agent speed, across every surface</h2>
+    <p>Because the agent acts across editor, terminal, and browser, and because Mission Control runs agents in parallel, the governance layer has to meet three bars at once. It must be <strong>deterministic</strong>, returning the same verdict for the same change every time, so it can be trusted as a release gate. It must be <strong>repo-native</strong>, so the rules travel with the codebase rather than living in a prompt or a policy team the next agent never consults. And it must reach <strong>every surface and every agent</strong>, so that parallel agents cannot each make locally reasonable choices that compound into architectural inconsistency. Those requirements are why antigravity governance is a layer of its own, not a feature of any single agent.</p>
 
     <h2>Relationship to the broader concept</h2>
     <p>Antigravity governance is the Antigravity-specific specialization of <a href="/concepts/agentic-ide-governance/">agentic IDE governance</a>. Same discipline, applied to the specific surfaces Antigravity exposes &mdash; editor, terminal, browser, Mission Control, Artifacts.</p>
@@ -195,6 +206,26 @@
       <li><a href="/concepts/runtime-governance/">Runtime Governance</a> &mdash; the runtime-time complement at the agent execution layer</li>
       <li><a href="/concepts/artifact-provenance/">Artifact Provenance</a> &mdash; the trail that complements (but does not replace) governance</li>
     </ul>
+
+    <h2>Common questions</h2>
+
+    <h3>What is antigravity governance?</h3>
+    <p>Antigravity governance is the practice of applying architectural constraints, decision provenance, and verification checks to agent-first development workflows where coding agents operate across editor, terminal, and browser surfaces. It is the Antigravity-specific specialization of agentic IDE governance, applied to the particular surfaces Google Antigravity exposes: editor, terminal, browser, Mission Control, and Artifacts. As agents move from autocomplete to autonomous task execution, governance has to move out of human code review and into the execution path.</p>
+
+    <h3>Why do agent-first IDEs like Google Antigravity need governance?</h3>
+    <p>Google Antigravity runs autonomous agents that plan, execute, and verify work across editor, terminal, and browser, with Mission Control for overseeing multiple agents and Artifacts for reviewable plans and verification outputs. That shape changes what surrounding infrastructure has to do: the developer is no longer guarding each line of code, the agent is. The governance layer therefore has to operate at agent speed, across every surface the agent touches, and deterministically enough to be trusted as a release gate.</p>
+
+    <h3>Do Antigravity Artifacts already enforce architectural rules?</h3>
+    <p>No. Artifacts improve reviewability by making agent work inspectable, but they do not enforce architectural invariants. Provenance records what happened; governance decides what is allowed. Reviewability makes agent work inspectable, while governance makes it constrainable. The two are complementary: Artifacts give you the trail, and governance gives you the gate.</p>
+
+    <h3>How do multi-agent workspaces change governance requirements?</h3>
+    <p>Mission Control places many agents in parallel, which increases coordination complexity. Without a shared enforcement layer, the choices each agent makes can compound into inconsistency across the codebase. A common, deterministic governance layer gives every parallel agent the same verdict for the same input, so their independent work stays architecturally coherent rather than drifting apart.</p>
+
+    <h3>What properties must antigravity governance have?</h3>
+    <p>It must be deterministic, repo-native, and tied to architectural decision records. Deterministic means the same input produces the same verdict every time, which is what lets it serve as a trusted release gate. Repo-native means the rules travel with the repository, not with a policy team or a prompt. Tying enforcement to ADRs keeps the constraints anchored to the decisions the team has actually made, across editor, terminal, and browser surfaces alike.</p>
+
+    <h3>How does antigravity governance relate to agentic IDE governance?</h3>
+    <p>Antigravity governance is the Antigravity-specific specialization of <a href="/concepts/agentic-ide-governance/">agentic IDE governance</a>. It is the same discipline applied to the specific surfaces Antigravity exposes: editor, terminal, browser, Mission Control, and Artifacts. It also connects to <a href="/concepts/architectural-governance/">architectural governance</a> as the general discipline, <a href="/concepts/governance-propagation/">governance propagation</a> for how rules reach every agent surface, and <a href="/concepts/verification-contracts/">verification contracts</a> for the predefined checks that produce structured verdicts.</p>
 
   </div>
 
