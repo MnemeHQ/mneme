@@ -2,789 +2,927 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://mnemehq.com/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/demo/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/demo/adr-compiler/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/demo/architectural-drift/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/demo/multi-agent-governance/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/demo/storage-decision/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/demo/dependency-policy/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/demo/repository-pattern/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/use-cases/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/use-cases/coding-assistant-governance/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/use-cases/legacy-codebase-memory/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/use-cases/security-compliance-guardrails/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/use-cases/data-platform-governance/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/use-cases/design-system-governance/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/use-cases/multi-agent-workflow-governance/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/use-cases/ci-governance-for-ai-generated-code/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/all/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/stanford-ai-index-2026-engineering-governance/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/enforce-engineering-standards-across-ai-assisted-teams/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/agent-formation-engineering-performance-metrics/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/agentic-resource-discovery-agent-governance/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/block-builderbot-coordination-governance/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/agentic-workforce-visibility-crisis/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/topics/architectural-governance/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/topics/ai-coding-agents/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/topics/agent-infrastructure/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/topics/engineering-performance/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/harness-engineering-still-needs-governance/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/emerging-ai-agent-infrastructure-stack/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/why-context-alone-doesnt-prevent-architectural-drift/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/agent-skills-vs-architectural-governance/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/goal-driven-agents-architectural-governance/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/llm-wiki-library-not-law/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/ai-is-becoming-the-operating-layer-for-software-execution/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/models-are-temporary-architectural-intent-is-not/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/why-rag-fails-for-architectural-governance/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/why-code-review-cannot-scale-with-ai-output/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/mneme-vs-cursor-rules/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/prompt-engineering-is-not-governance/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/ai-code-review-does-not-scale-linearly/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/productivity-paradox-perception-vs-measurement/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/review-is-not-governance/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/deployment-quality-will-define-the-ai-era/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/why-prompt-memory-fails-at-scale/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/architectural-governance-across-heterogeneous-ai-coding-agents/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/why-architectural-governance-needs-precedence-semantics/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/memory-is-not-governance/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/ai-native-engineering-intent-debt/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/rise-of-agentic-engineering-education/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/spec-driven-development-still-needs-governance/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/openai-compatible-apis-are-commoditizing-models/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/why-claude-md-stops-scaling/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/datadog-state-of-ai-engineering-governance-crisis/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/acceleration-whiplash-governance-gap/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/agents-of-chaos-and-the-governance-gap/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/ai-coding-governance-should-be-reviewable/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/autonomous-code-remediation-requires-architectural-governance/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/github-copilot-space-framework/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/long-running-agents-need-governance/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/openclaw-and-the-limits-of-autonomous-coding/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/what-is-the-ai-sdlc/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/why-observability-is-not-governance/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/agentic-infrastructure-attack-surface/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/rag-is-not-memory/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/compare/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/compare/coderabbit/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/compare/cursor-rules/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/compare/claude-code-memory/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/compare/rag-vs-governance/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/compare/rag-coding-memory/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/compare/github-copilot/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/compare/aider/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/compare/continue-dev/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/compare/windsurf/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/compare/sourcegraph-cody/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/integrations/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/integrations/claude-code/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/integrations/opencode/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/integrations/cursor/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/integrations/vscode/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/integrations/github-actions/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/integrations/gitlab/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/integrations/adr-import/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/integrations/copilot/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/integrations/jetbrains/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/integrations/perplexity/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/integrations/claude-agent-sdk/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/integrations/warp/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/demo/agent-sdk-governance/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/benchmark/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/about/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/standards/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/for/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/pilot/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/works-with/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/docs/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/docs/cli/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/docs/governance-violations/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/generative-ai-software-engineering-stack/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/supported-languages/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/supported-languages/python-governance/</loc>
+    <lastmod>2026-06-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/supported-languages/typescript-governance/</loc>
+    <lastmod>2026-06-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/supported-languages/javascript-governance/</loc>
+    <lastmod>2026-06-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/supported-languages/fastapi-governance/</loc>
+    <lastmod>2026-06-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/supported-languages/spring-boot-governance/</loc>
+    <lastmod>2026-06-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/supported-languages/terraform-governance/</loc>
+    <lastmod>2026-06-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/docs/supported-languages/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/platforms/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/architecture/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/architecture/how-retrieval-works/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/architecture/decision-memory-vs-documentation/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/concepts/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/concepts/architectural-governance/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/concepts/governance-before-generation/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/concepts/ai-native-sdlc/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/concepts/architectural-drift/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/concepts/verification-contracts/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/concepts/agent-verification/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/concepts/governance-provenance/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/concepts/execution-surfaces/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/concepts/decision-continuity/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/concepts/architectural-compiler/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/concepts/deterministic-enforcement/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/concepts/agentic-development/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/concepts/governance-infrastructure/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/concepts/intent-debt/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/concepts/objective-driven-development/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/concepts/executable-architectural-intent/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/concepts/ai-operating-layer/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/concepts/model-independent-governance/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/qa-glossary/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/governance-perimeter-is-moving-to-the-endpoint/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/html-is-not-the-point-structure-is/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/runtime-verification-is-not-architectural-verification/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/ai-roi-problem-is-about-systems-not-models/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/anthropic-research-system-coordination-infrastructure/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mnemehq.com/insights/pr-review-is-becoming-incident-response/</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-  <url><loc>https://mnemehq.com/insights/microsoft-agentic-transformation-playbook-ai-agent-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/constraint-decay-coding-agents-architectural-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/ai-peer-review-context-loss-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/microsoft-agent-forge-enterprise-ai-infrastructure/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/machine-readable-pull-requests-agentic-development/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/long-context-windows-governance-infrastructure/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/agent-runtime-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/mistral-vibe-ai-coding-enterprise-infrastructure/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/coordination-governance-multi-agent-systems/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/ai-stack-determinism-probabilistic-models/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/snowflake-ai-data-engineering-governance-infrastructure/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/anthropic-claude-marketplace-ai-engineering-control-plane/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/devin-ai-software-engineer-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/antigravity-solves-coordination-not-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/artifacts-are-not-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/agent-manager-control-plane-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/agent-first-ides-need-architectural-invariants/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/ai-infrastructure-governance-category/</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://mnemehq.com/insights/barbara-liskov-python-encapsulation-ai-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/cursor-developer-habits-report-governance-infrastructure/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/dora-metrics-insufficient-for-agentic-development/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/google-gemini-deep-research-agent-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/what-is-harness-engineering/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/prompt-engineering-vs-harness-engineering/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/harness-engineering-verification-layer/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/ai-agent-governance-two-markets/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/google-cloud-agent-registry-agent-fleet-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/github-ai-agent-validation-trust-layer/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/future-of-software-engineering-after-vibe-coding/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/zero-trust-for-ai-agents-architectural-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/mckinsey-agentic-software-delivery-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/agentic-convergence-trap-architectural-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/mckinsey-ai-table-stakes-to-advantage/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/ai-agents-are-not-employees-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/rule-files-vs-retrieval-memory/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/beyond-security-by-design-governance-by-design/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/when-agents-launch-the-database/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/microsoft-execution-containers-ai-agent-runtime-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/agent-governance-in-the-sdlc/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/cloud-agents-need-architectural-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/latent-space-agent-communication-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/runtime-harnesses-for-ai-agents/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/search-as-code-agent-execution-surface/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/ai-adoption-maturity-model-engineering-analysis/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/bcg-ai-era-operating-models-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/ibm-2026-tech-leader-study-agent-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/github-agent-pull-requests-review-wrong-layer/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/claude-code-skills-organizational-knowledge/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/bain-ai-development-lifecycle-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/microsoft-project-solara-post-app-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/microsoft-agent-platform-governance-layer/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/ai-coding-agent-verification-tax/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/shared-memory-is-not-shared-intent/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/loop-engineering-is-not-new/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/ai-coding-productivity-gains-rework/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/github-copilot-usage-based-billing-review-economics/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/ai-race-wont-be-won-on-infrastructure-alone/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/open-knowledge-format-vs-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/recursive-self-improvement-orchestration-problem/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/governance-control-plane-after-agent-frameworks/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/ai-governance-for-regulated-industries/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/ai-coding-agents-life-sciences-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/insights/ai-coding-agents-financial-services-audit-trail/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/concepts/runtime-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/concepts/autonomous-software-engineering-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/concepts/agentic-ide-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/concepts/multi-agent-architectural-drift/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/concepts/artifact-provenance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/concepts/antigravity-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/concepts/ai-governance-infrastructure/</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://mnemehq.com/integrations/microsoft-agent-forge/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://mnemehq.com/integrations/antigravity/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://mnemehq.com/works-with/claude-marketplace/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://mnemehq.com/works-with/devin/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://mnemehq.com/works-with/antigravity/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://mnemehq.com/compare/devin-vs-architectural-governance/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://mnemehq.com/compare/google-antigravity-vs-mneme/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://mnemehq.com/compare/claude-md/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/microsoft-agentic-transformation-playbook-ai-agent-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/constraint-decay-coding-agents-architectural-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/ai-peer-review-context-loss-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/microsoft-agent-forge-enterprise-ai-infrastructure/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/machine-readable-pull-requests-agentic-development/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/long-context-windows-governance-infrastructure/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/agent-runtime-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/mistral-vibe-ai-coding-enterprise-infrastructure/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/coordination-governance-multi-agent-systems/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/ai-stack-determinism-probabilistic-models/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/snowflake-ai-data-engineering-governance-infrastructure/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/anthropic-claude-marketplace-ai-engineering-control-plane/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/devin-ai-software-engineer-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/antigravity-solves-coordination-not-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/artifacts-are-not-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/agent-manager-control-plane-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/agent-first-ides-need-architectural-invariants/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/ai-infrastructure-governance-category/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://mnemehq.com/insights/barbara-liskov-python-encapsulation-ai-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/cursor-developer-habits-report-governance-infrastructure/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/dora-metrics-insufficient-for-agentic-development/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/google-gemini-deep-research-agent-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/what-is-harness-engineering/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/prompt-engineering-vs-harness-engineering/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/harness-engineering-verification-layer/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/ai-agent-governance-two-markets/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/google-cloud-agent-registry-agent-fleet-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/github-ai-agent-validation-trust-layer/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/future-of-software-engineering-after-vibe-coding/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/zero-trust-for-ai-agents-architectural-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/mckinsey-agentic-software-delivery-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/agentic-convergence-trap-architectural-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/mckinsey-ai-table-stakes-to-advantage/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/ai-agents-are-not-employees-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/rule-files-vs-retrieval-memory/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/beyond-security-by-design-governance-by-design/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/when-agents-launch-the-database/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/microsoft-execution-containers-ai-agent-runtime-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/agent-governance-in-the-sdlc/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/cloud-agents-need-architectural-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/latent-space-agent-communication-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/runtime-harnesses-for-ai-agents/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/search-as-code-agent-execution-surface/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/ai-adoption-maturity-model-engineering-analysis/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/bcg-ai-era-operating-models-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/ibm-2026-tech-leader-study-agent-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/github-agent-pull-requests-review-wrong-layer/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/claude-code-skills-organizational-knowledge/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/bain-ai-development-lifecycle-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/microsoft-project-solara-post-app-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/microsoft-agent-platform-governance-layer/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/ai-coding-agent-verification-tax/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/shared-memory-is-not-shared-intent/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/loop-engineering-is-not-new/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/ai-coding-productivity-gains-rework/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/github-copilot-usage-based-billing-review-economics/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/ai-race-wont-be-won-on-infrastructure-alone/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/open-knowledge-format-vs-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/recursive-self-improvement-orchestration-problem/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/governance-control-plane-after-agent-frameworks/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/ai-governance-for-regulated-industries/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/ai-coding-agents-life-sciences-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/ai-coding-agents-financial-services-audit-trail/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/concepts/runtime-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/concepts/autonomous-software-engineering-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/concepts/agentic-ide-governance/</loc><lastmod>2026-06-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/concepts/multi-agent-architectural-drift/</loc><lastmod>2026-06-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/concepts/artifact-provenance/</loc><lastmod>2026-06-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/concepts/antigravity-governance/</loc><lastmod>2026-06-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/concepts/ai-governance-infrastructure/</loc><lastmod>2026-06-23</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://mnemehq.com/integrations/microsoft-agent-forge/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://mnemehq.com/integrations/antigravity/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://mnemehq.com/works-with/claude-marketplace/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://mnemehq.com/works-with/devin/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://mnemehq.com/works-with/antigravity/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://mnemehq.com/compare/devin-vs-architectural-governance/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://mnemehq.com/compare/google-antigravity-vs-mneme/</loc><lastmod>2026-06-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://mnemehq.com/compare/claude-md/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <!-- Previously orphaned indexable pages (added to sitemap) -->
-  <url><loc>https://mnemehq.com/concepts/ai-agent-drift/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/concepts/enforcement-provenance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/concepts/governance-propagation/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/concepts/multi-agent-continuity/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/concepts/precedence-semantics/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/concepts/reliable-delegation/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/concepts/spec-driven-development/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/docs/benchmark-methodology/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/docs/how-enforcement-works/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/for/cto/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/for/platform/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/for/principal-engineer/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://mnemehq.com/demo/governed-python-agent/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://mnemehq.com/roadmap/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://mnemehq.com/contact/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://mnemehq.com/founder/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://mnemehq.com/privacy/</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://mnemehq.com/concepts/ai-agent-drift/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/concepts/enforcement-provenance/</loc><lastmod>2026-06-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/concepts/governance-propagation/</loc><lastmod>2026-06-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/concepts/multi-agent-continuity/</loc><lastmod>2026-06-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/concepts/precedence-semantics/</loc><lastmod>2026-06-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/concepts/reliable-delegation/</loc><lastmod>2026-06-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/concepts/spec-driven-development/</loc><lastmod>2026-06-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/docs/benchmark-methodology/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/docs/how-enforcement-works/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/for/cto/</loc><lastmod>2026-06-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/for/platform/</loc><lastmod>2026-06-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/for/principal-engineer/</loc><lastmod>2026-06-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/demo/governed-python-agent/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://mnemehq.com/roadmap/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://mnemehq.com/contact/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://mnemehq.com/founder/</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://mnemehq.com/privacy/</loc><lastmod>2026-06-22</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>
 </urlset>
