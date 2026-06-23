@@ -1,0 +1,40 @@
+name: check supported-languages schema
+
+# Validates that every site/supported-languages/<slug>/index.html carries the
+# full JSON-LD graph: BreadcrumbList + TechArticle + FAQPage (>= 3 grounded
+# Q&A), so the pages earn FAQ rich-results and AI-citation surface.
+#
+# Validator: scripts/check_supported_languages.py
+#
+# Path filter: only runs on PRs that touch the cohort pages or the scripts.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'site/supported-languages/**'
+      - 'scripts/**'
+  push:
+    branches: [main]
+    paths:
+      - 'site/supported-languages/**'
+      - 'scripts/**'
+
+permissions:
+  contents: read
+
+jobs:
+  check-supported-languages:
+    name: check_supported_languages.py
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run supported-languages schema validator
+        run: python scripts/check_supported_languages.py
