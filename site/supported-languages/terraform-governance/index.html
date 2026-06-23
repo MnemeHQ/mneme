@@ -48,6 +48,31 @@
         "dateModified": "2026-06-02",
         "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}}
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How does Mneme HQ govern AI-generated Terraform and infrastructure as code?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Mneme HQ enforces repo-native rules on Terraform as the agent works: it requires approved modules, limits providers and regions, controls network exposure and encryption, and protects the state backend, so risky infrastructure changes are caught before they reach review."}
+          },
+          {
+            "@type": "Question",
+            "name": "Can it require approved modules instead of raw resources?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Yes. The approved module catalogue is expressed as a rule, so an agent that declares a direct resource where a sanctioned module should be used is flagged before the change lands."}
+          },
+          {
+            "@type": "Question",
+            "name": "Does it catch public network exposure and disabled encryption?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Yes. Rules cover network exposure and encryption, so an agent that opens a resource to the public network or disables encryption on a stored resource is caught before merge rather than after deploy."}
+          },
+          {
+            "@type": "Question",
+            "name": "Will it enforce pinned providers, allowed regions, tagging, and state locking?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Yes. Provider pinning, allowed regions, required tags and naming, and a locked state backend are all deterministic rules, so an agent that unpins a provider, uses an unapproved region, omits required tags, or weakens state locking is surfaced before the change is reviewed."}
+          }
+        ]
       }
     ]
   }

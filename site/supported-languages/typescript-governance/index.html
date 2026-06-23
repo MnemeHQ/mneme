@@ -48,6 +48,31 @@
         "dateModified": "2026-05-10",
         "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}}
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How does Mneme HQ govern AI-generated TypeScript code?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Mneme HQ enforces repo-native architecture rules for React, Next.js, and Node.js TypeScript at the file-write seam, without an AST-aware engine, so it catches boundary and dependency violations as the agent works rather than after review."}
+          },
+          {
+            "@type": "Question",
+            "name": "Can it stop a server-only import from leaking into a client component?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Yes. The server and client boundary is expressed as a rule, so an agent that pulls a server-only import into a client component in a Next.js app is flagged before the change lands."}
+          },
+          {
+            "@type": "Question",
+            "name": "Does it enforce the data layer and monorepo package boundaries?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Yes. It flags a direct fetch made outside the approved data layer and a cross-package import that breaks monorepo boundaries, keeping data access and package structure governed as the agent edits."}
+          },
+          {
+            "@type": "Question",
+            "name": "Will it block unauthorized state libraries and disallowed licenses?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Yes. Approved libraries and license policy are deterministic rules, so an agent that introduces an unauthorized state library or adds a GPL dependency to package.json is caught before merge."}
+          }
+        ]
       }
     ]
   }

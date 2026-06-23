@@ -48,6 +48,31 @@
         "dateModified": "2026-05-10",
         "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}}
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How does Mneme HQ govern AI-generated JavaScript code?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Mneme HQ applies repo-native architecture rules to Node.js services, Express APIs, and legacy React or Vue codebases as the agent works, catching module-system drift, misplaced business logic, and unsafe data access before the change reaches review."}
+          },
+          {
+            "@type": "Question",
+            "name": "Can it stop CommonJS and ESM module systems from drifting in one codebase?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Yes. The module convention a project uses is expressed as a rule, so an agent that mixes CommonJS and ESM, or switches a file from one to the other, is flagged before the inconsistency lands."}
+          },
+          {
+            "@type": "Question",
+            "name": "Does it catch business logic and raw SQL inside Express route handlers?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Yes. It keeps route handlers thin and flags raw SQL string concatenation, so an agent cannot bury business logic in an Express route or build queries by string interpolation instead of going through the approved data layer."}
+          },
+          {
+            "@type": "Question",
+            "name": "Will it enforce the approved scheduler and other framework conventions?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Yes. Conventions such as using the approved job scheduler rather than an ad hoc cron job are deterministic rules, so an agent that bypasses the sanctioned framework is caught at the file-write seam before merge."}
+          }
+        ]
       }
     ]
   }
