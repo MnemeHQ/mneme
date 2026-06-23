@@ -214,6 +214,41 @@
         "articleSection": "Concepts"
       },
       {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is governance propagation?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Governance propagation is the property that a single compiled decision reaches every agent, every developer, and every CI run with the same scope, the same precedence, and the same enforcement verdict. The hard problem in real teams is not enforcing a constraint in one session; it is making sure the same constraint, with the same meaning, is enforced in every session, by every agent, on every developer's machine, and in CI. A decision enforced in one developer's Claude Code session but not in another developer's Cursor session is a personal preference, not a team decision."}
+          },
+          {
+            "@type": "Question",
+            "name": "What are the components of governance propagation?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Propagation has three operational components, each of which must hold. Source identity means every consumer reads from the same compiled corpus, a single versioned and addressable artifact rather than a per-tool export. Semantic equivalence means consumers interpret that corpus identically, so the same scope selects the same files and the same precedence rules resolve conflicts the same way. Update propagation means that when the source changes, every consumer sees the change with bounded latency, so no consumer operates on a stale cached snapshot."}
+          },
+          {
+            "@type": "Question",
+            "name": "Why is governance propagation hard in practice?",
+            "acceptedAnswer": {"@type": "Answer", "text": "The hardness is not in the concept but in the consumers. AI coding agents are heterogeneous and were not designed to share governance state. Each agent has its own configuration surface: Claude Code reads CLAUDE.md and hook configs, Cursor reads .cursorrules, Copilot reads copilot-instructions.md, and CI reads its own files, none sharing a schema or query API. Each surface interprets context differently, and each tool has its own update model, so the same rule can be live in one tool and stale in another. Propagation in this environment is an engineering problem that requires a layer absorbing that heterogeneity behind a uniform query API on top of a single corpus."}
+          },
+          {
+            "@type": "Question",
+            "name": "Why isn't a shared CLAUDE.md or .cursorrules file enough for propagation?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Keeping a single CLAUDE.md or .cursorrules file in the repo is shared documentation, not shared governance. Each tool ingests the file differently: Claude Code may inject it into every prompt, Cursor may use it as a hint, Copilot may ignore it depending on file size, and CI may not read it at all. Decisions encoded in prose are interpreted by each consumer model, and interpretation varies across consumers, runs, and context windows. That is parallel interpretation of a shared hint, not propagation. Real propagation requires structured records and a query API: a predicate that every consumer can evaluate identically."}
+          },
+          {
+            "@type": "Question",
+            "name": "What execution surfaces must governance propagate across?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Propagation is too often treated as a property of source code alone, but long-running autonomous agents write everywhere the workflow touches. The same governance corpus must be evaluable across source code, branch names, commit messages, PR titles and descriptions, tags and releases, CI workflow and pipeline config, deployment artifacts, generated configuration, and agent-produced documentation. A governance layer that enforces compliance in src/ but ignores the surrounding automation artifacts is governing only a fraction of the agent's output, and the expensive failures live exactly at those boundaries."}
+          },
+          {
+            "@type": "Question",
+            "name": "What does governance propagation enable?",
+            "acceptedAnswer": {"@type": "Answer", "text": "When propagation holds, several downstream properties become possible that are otherwise unachievable. Decisions are enforced everywhere immediately rather than only as long as a file stays in sync. Onboarding becomes one bootstrap that works in every agent. Auditability improves because the same compiled record applies and every consumer returns the same answer. Drift becomes a detectable violation rather than the default. Above all, propagation is what makes governance composable: a Claude Code session can hand off to a Cursor refactor that merges through CI, and the same architectural decision is enforced at every step because every step queries the same corpus."}
+          }
+        ]
+      },
+      {
         "@type": "DefinedTerm",
         "name": "Governance Propagation",
         "description": "The property that a single compiled decision reaches every agent, every developer, every CI run, with identical scope and enforcement semantics.",

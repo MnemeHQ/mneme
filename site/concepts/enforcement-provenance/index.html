@@ -211,6 +211,41 @@
         "articleSection": "Concepts"
       },
       {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is enforcement provenance?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Enforcement provenance is the engineering property that every governance verdict can be traced back to the specific decision record, the precedence rule that selected it, and the source ADR. It turns an enforcement event from 'the system said no' into a citable chain: this specific team decision, written on this date, by this person, applies because of this precedence rule, and the rationale is at this URL. Without provenance, governance is opaque enforcement; with it, governance is auditable engineering."}
+          },
+          {
+            "@type": "Question",
+            "name": "Why does provenance have to be structural rather than narrative?",
+            "acceptedAnswer": {"@type": "Answer", "text": "A freeform message attached to a block ('Blocked because of the repository pattern rule') is narrative provenance: useful for humans but not enough. Narrative provenance cannot be programmatically queried, cannot be aggregated, and is generated rather than stored, so the rationale text can change run to run as templates evolve. Structural provenance (IDs, links, timestamps, versions) is the substrate underneath. The system can render any narrative on top of structural provenance, but it cannot derive structural provenance from narrative after the fact."}
+          },
+          {
+            "@type": "Question",
+            "name": "Are application logs the same as enforcement provenance?",
+            "acceptedAnswer": {"@type": "Answer", "text": "No. A log line is an artifact of execution, not a citable link. Real provenance has three properties logs lack: stable references, where the decision ID in the verdict still resolves to a record months later even if the ADR was renamed; versioned context, where the corpus version at the time of the verdict is part of the record; and bidirectional links, where you can list every verdict that cited a decision and every decision a verdict cited. Logs are one-directional and unindexed."}
+          },
+          {
+            "@type": "Question",
+            "name": "What does a full provenance chain contain?",
+            "acceptedAnswer": {"@type": "Answer", "text": "The chain runs through six links: the authoring source decision (git SHA, author, date), the compiled decision record with a stable decision_id, the retrieval step that recorded the query and candidate set, the precedence resolution that named both the winner and the rule that selected it, the evaluation record of the predicate that ran, and the enforcement verdict itself. Each link cites the one before it, so the chain is the audit record. The verdict links to all five upstream artifacts with no hidden step."}
+          },
+          {
+            "@type": "Question",
+            "name": "What does enforcement provenance enable that opaque enforcement cannot?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Provenance is the precondition for several capabilities: answering 'why did this block?' by following the chain to the authoring ADR, drift telemetry aggregated by decision_id, decision impact analysis such as 'this ADR blocked 14 PRs this quarter', regression detection by diffing the resolved chain across compilations, and compliance evidence you can show to an auditor. None of these are achievable by reading a freeform block message or guessing from tickets."}
+          },
+          {
+            "@type": "Question",
+            "name": "Why does provenance matter for engineer trust?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Governance systems live or die on engineer trust. An engineer blocked once by an opaque rule will look for a way around the gate next time, and a governance system that gets routed around is theater, not governance. Provenance is the mechanism by which engineers can interrogate the system, disagree with it productively, and either update the decision or accept the block on its merits. Without it the system is a black box that says no; with it the system is a colleague that cites its sources."}
+          }
+        ]
+      },
+      {
         "@type": "DefinedTerm",
         "name": "Enforcement Provenance",
         "description": "The property that every governance verdict can be traced back to the specific decision record, the precedence rule that selected it, and the source ADR.",

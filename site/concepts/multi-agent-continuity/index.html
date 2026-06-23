@@ -210,6 +210,41 @@
         "articleSection": "Concepts"
       },
       {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is multi-agent continuity?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Multi-agent continuity is the engineering property that architectural decisions persist across agents, sessions, and time, so that no agent ever has to re-derive what the team has already decided. A decision made on Monday by one agent is still enforced on Friday by a different agent in a different session. It is achieved not by giving agents more memory, but by giving the team a persistent corpus that every agent reads from. Continuity is the temporal counterpart to governance propagation: across context resets and across agent runtimes, the same compiled corpus answers the same questions the same way."}
+          },
+          {
+            "@type": "Question",
+            "name": "Why can't prompt memory provide continuity?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Longer context windows, persistent threads, chat history, and per-agent memory features are all per-agent: longer Claude memory does not help Cursor, longer Cursor memory does not help Copilot, and longer Copilot memory does not help CI. Prompt memory is useful for improving an agent's recall within a single session, but it cannot ensure that decisions persist across agents and across developers. Continuity is a property of the team's substrate, not a property of any one agent's recall."}
+          },
+          {
+            "@type": "Question",
+            "name": "What are the three operational properties of continuity?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Continuity has three operational properties, each addressing a specific failure mode of agent-side memory. It survives session boundaries: a decision recorded in one session is enforceable in the next, including one that starts five seconds later in a fresh context window. It survives agent transitions: a decision recorded in Claude Code is enforceable when the developer switches to Cursor mid-feature. And it survives developer transitions: a decision recorded by one developer's agent is enforceable when a different developer's agent picks up related work. In each case the decision lives in the corpus, not the session, so the next agent inherits the constraint simply by querying."}
+          },
+          {
+            "@type": "Question",
+            "name": "Why are handoff messages not the same as continuity?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Handoff messages, such as a long summary written into a wiki or pinned in an agent's chat, share decisions by convention rather than by structure. The failure modes are predictable: the next session does not read the wiki page, the handoff is truncated by the next context window, and after three or four handoffs the original intent is degraded. Continuity is what handoffs are trying to do, but the substrate-based model removes the need for handoffs entirely: every session inherits the same decisions automatically by querying."}
+          },
+          {
+            "@type": "Question",
+            "name": "How does continuity relate to governance propagation?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Continuity and governance propagation are two halves of the same substrate. Propagation is the spatial counterpart, across consumers, while continuity is the temporal counterpart, across time. Both depend on a shared substrate: the same compiled decision corpus that fans out to every agent, IDE, hook, and CI surface is also the corpus that outlives every session. Multi-agent continuity is also the operational realization of decision continuity in environments with many agents, and it is what prevents AI agent drift, the divergence that happens when each session re-derives the team's decisions from scratch."}
+          },
+          {
+            "@type": "Question",
+            "name": "What does multi-agent continuity make possible?",
+            "acceptedAnswer": {"@type": "Answer", "text": "When continuity holds, several downstream properties become available. Long-horizon refactors hold: a deprecation announced today is still enforced in PRs reviewed six months later, even though no agent present at the announcement is present at review. Multi-step agentic workflows maintain the same governance state as work hands off from a planning agent to a coding agent to a review agent. Onboarding accelerates because a new engineer's agent inherits the full decision register immediately. And cross-vendor portability holds, because switching agent runtimes does not lose architectural state: the corpus is the substrate and the runtime is interchangeable."}
+          }
+        ]
+      },
+      {
         "@type": "DefinedTerm",
         "name": "Multi-Agent Continuity",
         "description": "The property that architectural decisions persist across agents, sessions, and time — accessible to any agent, in any session, without re-derivation.",

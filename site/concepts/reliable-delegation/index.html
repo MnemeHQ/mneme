@@ -276,6 +276,41 @@
         "articleSection": "Concepts"
       },
       {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is reliable delegation?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Reliable delegation is the operating model for AI agents in production: the practice of assigning work to agents with verified confidence that the work stayed inside known architectural, security, and operational constraints. It is not just whether an agent can complete a task, but whether the team can verify that the completed work preserved the system's intent. Without governance and verification infrastructure, delegation is possible but unreliable, leaving capable agents producing unverified output that accumulates drift over time."}
+          },
+          {
+            "@type": "Question",
+            "name": "How is reliable delegation different from agent capability?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Capability measures what an agent can do given context and instructions. Reliable delegation is the system property that ensures what the agent does stays within defined constraints. A capable agent that freely crosses architectural boundaries is not a reliable delegate, it is an unpredictable one. Reliability is not a model property: it is what the governance and verification infrastructure layers add to model capability. Capability gets agents into the workflow; reliable delegation keeps them usable in production."}
+          },
+          {
+            "@type": "Question",
+            "name": "Why is reliable delegation a system property rather than a model property?",
+            "acceptedAnswer": {"@type": "Answer", "text": "No model is reliable by default. A model provides capability: it can generate code, refactor migrations, or modify infrastructure. That capability becomes reliable delegation only when the surrounding system can verify the agent's output stayed inside the intended boundaries and flag or refuse when it did not. Reliability is what the governance and verification infrastructure layers add to raw model capability, so it lives in the system around the model, not in the model itself."}
+          },
+          {
+            "@type": "Question",
+            "name": "Which infrastructure layers does reliable delegation depend on?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Four layers each contribute a distinct property. Memory gives the agent context: what has been done before and what the codebase looks like. Orchestration gives the agent workflow: which steps run, in what order, with which retries. Governance defines what the agent is allowed to do and which boundaries must not be crossed. Verification proves whether the agent did what was expected and whether constraints held. A system with memory and orchestration can delegate work; a system that adds governance and verification can delegate reliably."}
+          },
+          {
+            "@type": "Question",
+            "name": "Why is capability alone insufficient for deploying agents at scale?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Capability measures what an agent can do, while reliability measures whether what it does is predictable, bounded, and verifiable. The failure mode for agents at scale is not insufficient capability, it is insufficient infrastructure around that capability. The enterprise question has shifted from whether an agent can complete a task to whether the team can verify the agent completed it inside their constraints: whether it violated an ADR, crossed a dependency boundary, or drifted from approved patterns, and whether that verification can be automated rather than requiring human review of every diff."}
+          },
+          {
+            "@type": "Question",
+            "name": "How does Mneme support reliable delegation?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Mneme is the governance and verification layer for AI-assisted software development. It compiles a repository's architectural decisions into a deterministic constraint graph and enforces that graph at the boundaries where agents make consequential changes: session start, pre-tool-use, pre-commit, pre-PR, and CI. Governance packets inject constraints before generation, and verification contracts prove whether the agent's output preserved intent. Together they supply the two layers that convert agent capability into reliable delegation."}
+          }
+        ]
+      },
+      {
         "@type": "DefinedTerm",
         "name": "Reliable Delegation",
         "description": "The operating model for AI agents in production: teams can assign work to agents only when the system can verify that the work stayed inside known architectural, security, and operational constraints.",
