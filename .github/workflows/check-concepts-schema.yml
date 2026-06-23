@@ -1,0 +1,41 @@
+name: check concepts schema graph
+
+# Validates that every site/concepts/<slug>/index.html carries the full JSON-LD
+# graph: BreadcrumbList + TechArticle + DefinedTerm + FAQPage (>= 3 grounded
+# Q&A), so concept pages earn FAQ rich-results and AI-citation surface. This
+# complements check_concepts.py (hub/card registration).
+#
+# Validator: scripts/check_concepts_schema.py
+#
+# Path filter: only runs on PRs that touch the concept pages or the scripts.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'site/concepts/**'
+      - 'scripts/**'
+  push:
+    branches: [main]
+    paths:
+      - 'site/concepts/**'
+      - 'scripts/**'
+
+permissions:
+  contents: read
+
+jobs:
+  check-concepts-schema:
+    name: check_concepts_schema.py
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run concepts schema validator
+        run: python scripts/check_concepts_schema.py

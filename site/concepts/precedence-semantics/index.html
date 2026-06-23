@@ -211,6 +211,41 @@
         "articleSection": "Concepts"
       },
       {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What are precedence semantics in architectural governance?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Precedence semantics are the rules that determine which of two conflicting decisions wins when both apply to the same file or query. Formally, they are a function from a set of matching decisions to a single winning decision: given two or more records whose scope patterns both match, the semantics deterministically selects one and cites the rule that produced the selection. Without precedence semantics, a governance system is a stack of overlapping suggestions, and which one applies depends on the run."}
+          },
+          {
+            "@type": "Question",
+            "name": "What rules make up Mneme's precedence ladder?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Mneme's precedence ladder uses four rules evaluated top to bottom. Supersession comes first: an explicit supersedes-link wins, because it represents an authored statement that one decision replaces another. Scope specificity comes next: the deeper, more literal glob wins. Recency follows: the more recently created decision breaks ties between equally specific scopes. Severity is the final tiebreaker. The first rule that produces a winner halts the descent, and later rules never re-open a resolved precedence."}
+          },
+          {
+            "@type": "Question",
+            "name": "Why does supersession rank above scope specificity?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Supersession ranks first because it captures explicit team intent. When a newer decision declares supersedes: ADR-0017 in its metadata, the team has stated that decision A is replaced, not just refined, by decision B. Specificity only captures author-known scope narrowing, which is weaker than an authored replacement. A most-specific-wins rule alone cannot model one decision replacing another, so supersession needs its own higher rung on the ladder."}
+          },
+          {
+            "@type": "Question",
+            "name": "Why resolve precedence at compile time instead of runtime?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Compile-time precedence surfaces conflicts during build rather than during enforcement, so engineers see them in their PR or in CI instead of in production. The resolved corpus becomes a reviewable, versioned artifact that teams can inspect before any agent queries it. Most importantly, every consumer reads an already-resolved corpus, so no consumer re-implements the precedence rules and none can drift from them. Runtime precedence leaves each consumer to resolve conflicts itself, and two consumers can quietly disagree about the winner."}
+          },
+          {
+            "@type": "Question",
+            "name": "What happens when the precedence ladder cannot resolve a conflict?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Conflicts the ladder cannot resolve are compile-time errors. If two decisions share identical scope, identical severity, identical timestamps, and have no supersession link, the compiler refuses to emit the corpus until the team resolves the ambiguity. The runtime never sees an unresolved conflict, which is what keeps the resolution function total: every conflict the corpus does emit has a defined, single answer."}
+          },
+          {
+            "@type": "Question",
+            "name": "Why are first-match-wins and longest-rule-wins unsuitable for governance?",
+            "acceptedAnswer": {"@type": "Answer", "text": "First-match-wins makes resolution load-order-dependent, so it is non-deterministic across consumers. Longest-rule-wins conflates path depth with specificity and ignores authoring intent such as supersession. Most-specific-wins alone cannot express that one decision replaces another, and newest-wins alone lets a broad new rule silently shadow older targeted exceptions. The right model is a composition: supersession, then specificity, then recency, with severity as a final tiebreaker, because each rule alone fails in some real-world case."}
+          }
+        ]
+      },
+      {
         "@type": "DefinedTerm",
         "name": "Precedence Semantics",
         "description": "The rules that determine which of two conflicting decisions wins when both apply to a given file or query.",

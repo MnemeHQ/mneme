@@ -48,6 +48,31 @@
         "dateModified": "2026-05-10",
         "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
         "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}}
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How does Mneme HQ govern AI-generated Python code?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Mneme HQ enforces repo-native architecture rules across FastAPI, Django, and AI or ML pipeline code as the agent works, catching forbidden frameworks, misplaced business logic, and unsafe data access before the change reaches review, with a native CLI and Claude Code hook integration for CI gating."}
+          },
+          {
+            "@type": "Question",
+            "name": "Can it block an AI agent from introducing a forbidden ORM or async framework?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Yes. Approved frameworks are declared as rules, so an agent that introduces a forbidden ORM or regresses the sanctioned async job framework is flagged before the dependency and its usage land in the codebase."}
+          },
+          {
+            "@type": "Question",
+            "name": "Does it catch business logic and raw SQL inside FastAPI routes?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Yes. It keeps route handlers thin and flags raw SQL string concatenation, so an agent cannot embed business logic in a FastAPI route or build queries by string interpolation instead of going through the approved data layer."}
+          },
+          {
+            "@type": "Question",
+            "name": "Will it stop mock auth or missing observability from reaching production paths?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Yes. Rules cover production-path concerns such as mock authentication left in a real code path and missing observability middleware, so an agent that omits or stubs them is caught before the change is merged."}
+          }
+        ]
       }
     ]
   }

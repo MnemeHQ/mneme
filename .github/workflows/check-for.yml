@@ -1,0 +1,41 @@
+name: check for-persona schema
+
+# Validates that every site/for/<persona>/index.html carries the /compare/
+# gold-standard graph: BreadcrumbList + Article (with headline, dates, and a
+# canonical url) + FAQPage (>= 3 grounded Q&A), so the persona pages earn
+# FAQ rich-results and AI-citation surface.
+#
+# Validator: scripts/check_for.py
+#
+# Path filter: only runs on PRs that touch the persona pages or the scripts.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'site/for/**'
+      - 'scripts/**'
+  push:
+    branches: [main]
+    paths:
+      - 'site/for/**'
+      - 'scripts/**'
+
+permissions:
+  contents: read
+
+jobs:
+  check-for:
+    name: check_for.py
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run for-persona schema validator
+        run: python scripts/check_for.py
