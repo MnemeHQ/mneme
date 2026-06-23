@@ -270,14 +270,41 @@
         ]
       },
       {
-        "@type": "WebPage",
-        "name": "For CTOs and VP Engineering — Mneme HQ",
-        "description": "AI increases code throughput. Your review capacity does not. Mneme HQ enforces architectural governance before code reaches review.",
+        "@type": "Article",
+        "headline": "Architectural Governance for CTOs and VP Engineering",
+        "description": "AI increases code throughput; review capacity does not. Mneme HQ enforces architectural governance before AI-generated code reaches review.",
         "url": "https://mnemehq.com/for/cto/",
         "datePublished": "2026-04-15",
-        "dateModified": "2026-05-10",
+        "dateModified": "2026-06-23",
         "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
-        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}}
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
+        "image": "https://mnemehq.com/for/cto/og.png",
+        "mainEntityOfPage": "https://mnemehq.com/for/cto/"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Why do CTOs need architectural governance for AI coding agents?",
+            "acceptedAnswer": {"@type": "Answer", "text": "AI raises the volume of code produced, but human review capacity is fixed. Without enforced architecture rules, structural and security decisions are made implicitly by agents and only caught, if at all, in overloaded review. Mneme HQ moves that enforcement before review, so throughput can scale without surrendering architectural control."}
+          },
+          {
+            "@type": "Question",
+            "name": "How does enforcing governance before review change the economics of code review?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Review cannot scale linearly with AI output volume. When governance runs upstream of generation, the review layer receives architecturally conforming code instead of a stream of violations to catch one pull request at a time, so reviewer time goes to judgement rather than policing structure."}
+          },
+          {
+            "@type": "Question",
+            "name": "Why aren't rules files, prompts, and RAG enough on their own?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Those approaches all break at the same point: they inform the agent but do not deterministically enforce the team's decisions. Mneme HQ turns architectural decisions into machine-evaluable rules and applies them as a gate, so a decision is enforced consistently across every agent and session rather than depending on whether a prompt was read."}
+          },
+          {
+            "@type": "Question",
+            "name": "What assurance does this give engineering leadership on risk and audit?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Enforcement is deterministic and tested, and architecture is enforced before the code is written rather than discovered later. That gives leadership a consistent, auditable record of which decision governed a change, instead of relying on sampled review to catch architectural and security drift after the fact."}
+          }
+        ]
       }
     ]
   }
