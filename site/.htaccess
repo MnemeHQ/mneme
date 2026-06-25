@@ -55,6 +55,13 @@ ErrorDocument 404 /404.html
     Header unset Vary
     Header set Vary "Accept-Encoding"
 
+    # Security headers (P0 hardening). Low-risk, instantly reversible.
+    # Intentionally excludes HSTS and CSP for now (separate, higher-care rollouts).
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+
     # HTML
     <FilesMatch "\.(html|htm)$">
         Header set Cache-Control "public, max-age=3600"
