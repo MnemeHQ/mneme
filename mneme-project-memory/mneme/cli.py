@@ -3,6 +3,7 @@ cli.py — Command-line interface for Mneme.
 
 Subcommands
 -----------
+  init              Scaffold an empty project_memory.json.
   add_decision      Append a new Decision to a project_memory.json file.
   list_decisions    Print every Decision in the memory file.
   test_query        Run a query through the retriever and show scores + injected.
@@ -10,6 +11,7 @@ Subcommands
 
 Usage::
 
+    mneme init
     mneme list_decisions --memory examples/project_memory.json
     mneme add_decision --memory examples/project_memory.json \\
         --id mneme_042 --decision "Use JSON" --scope storage \\
@@ -48,6 +50,55 @@ from mneme.memory_store import MemoryStore
 
 def _utc_now() -> str:
     return datetime.now(tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+# ── Subcommand: init ─────────────────────────────────────────────────────────
+
+DEFAULT_MEMORY_PATH = ".mneme/project_memory.json"
+
+
+def _scaffold_memory() -> dict:
+    """Return a valid, empty, neutral project_memory.json skeleton.
+
+    No seeded decisions: every decision is enforceable, so sample content
+    would create phantom rules. The empty arrays let MemoryStore.load()
+    round-trip the file and let `mneme check` run cleanly (nothing to
+    enforce). meta.name and meta.description are the only fields the loader
+    requires; created_by and project are recorded for provenance.
+    """
+    return {
+        "meta": {
+            "name": "",
+            "description": "",
+            "project": "",
+            "created_by": "mneme init",
+            "created": _utc_now(),
+        },
+        "items": [],
+        "examples": [],
+        "decisions": [],
+    }
+
+
+def _cmd_init(args: argparse.Namespace) -> int:
+    path = Path(args.path)
+    if path.exists() and not args.force:
+        print(
+            f"ERROR: {path} already exists. Use --force to overwrite.",
+            flush=True,
+        )
+        return 1
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(_scaffold_memory(), indent=2) + "\n", encoding="utf-8")
+
+    print(f"Created {path}")
+    print()
+    print("Next steps:")
+    print(f"  mneme add_decision --memory {path} \\")
+    print('      --id my_001 --decision "..." --scope <area> --constraint "..."')
+    print(f"  mneme check --memory {path} --input <file> --query <context>")
+    return 0
 
 
 # ── Subcommand: list_decisions ───────────────────────────────────────────────
@@ -286,6 +337,20 @@ def _cmd_adr_import(args: argparse.Namespace) -> int:
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="mneme")
     sub = parser.add_subparsers(dest="cmd", required=True)
+
+    # init
+    p_init = sub.add_parser(
+        "init", help="Scaffold an empty project_memory.json"
+    )
+    p_init.add_argument(
+        "--path", default=DEFAULT_MEMORY_PATH,
+        help=f"Output path (default: {DEFAULT_MEMORY_PATH})",
+    )
+    p_init.add_argument(
+        "--force", action="store_true",
+        help="Overwrite an existing file at --path",
+    )
+    p_init.set_defaults(func=_cmd_init)
 
     # list_decisions
     p_list = sub.add_parser("list_decisions", help="List all decisions")
