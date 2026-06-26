@@ -31,6 +31,88 @@
   <!-- Google Tag Manager -->
   <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KL7FB67N');</script>
   <!-- End Google Tag Manager -->
+<!-- mneme:marketing-head:start -->
+<!-- mneme:marketing-head — consent controller + RB2B (head). Synced into <head> by scripts/sync_shared.py.
+     SCOPE (step 1 of 2): RB2B visitor identification only. Advertising (Google Ads + LinkedIn via GTM)
+     and its consent category arrive in step 2 — when added, bump VERSION to re-prompt. -->
+<script>
+(function () {
+  var COOKIE = 'mneme_consent';
+  var VERSION = 1;   /* bump when categories/vendors change -> re-prompt */
+
+  function readRaw(n){var m=document.cookie.match('(?:^|; )'+n.replace(/([.$?*|{}()\[\]\\\/\+^])/g,'\\$1')+'=([^;]*)');return m?decodeURIComponent(m[1]):null;}
+  function writeCookie(value){
+    var secure = location.protocol === 'https:' ? ';secure' : '';
+    document.cookie = COOKIE+'='+encodeURIComponent(JSON.stringify(value))+';path=/;max-age=15552000;samesite=Lax'+secure; /* 180d */
+  }
+  function parse(){
+    var raw = readRaw(COOKIE); if(!raw) return null;
+    try { var o = JSON.parse(raw); if(!o || o.v !== VERSION || typeof o.visitor_id !== 'boolean') return null; return o; }
+    catch(e){ return null; }   /* invalid / stale version -> treat as unset (re-prompt) */
+  }
+
+  window.__mnemePixels = window.__mnemePixels || [];   /* registry: {done, cat, fn} */
+  var geoReady = false;
+  function runPixels(){
+    window.__mnemePixels.forEach(function(p){
+      if(p.done || !C.consent[p.cat]) return;
+      if(p.cat === 'visitor_id' && !geoReady) return;   /* RB2B waits for country resolution */
+      try { p.fn(); p.done = true; }     /* mark done only AFTER success */
+      catch(e){ if(window.console) console.warn('[mneme-consent] pixel failed:', p.cat, e); }
+    });
+  }
+  /* Resolve visitor country from Cloudflare's edge trace (same-origin; no dashboard config needed).
+     Only called once visitor_id consent is granted, so non-consenting visitors trigger no request. */
+  function resolveGeo(){
+    if (geoReady) { runPixels(); return; }
+    try {
+      fetch('/cdn-cgi/trace', {cache:'no-store'}).then(function(r){ return r.text(); }).then(function(t){
+        var m = t.match(/(?:^|\n)loc=([A-Z]{2})/); window.__mnemeCountry = m ? m[1] : '';
+      }).catch(function(){}).then(function(){ geoReady = true; runPixels(); });
+    } catch(e){ geoReady = true; runPixels(); }
+  }
+
+  var stored = parse();
+  var C = window.MnemeConsent = {
+    version: VERSION,
+    state: stored ? 'set' : 'unset',
+    consent: { visitor_id: stored ? stored.visitor_id : false },
+    save: function(choices){
+      this.consent.visitor_id = !!choices.visitor_id;
+      this.state = 'set';
+      writeCookie({ v:VERSION, visitor_id:this.consent.visitor_id, ts:new Date().toISOString() });
+      if (this.consent.visitor_id) resolveGeo(); else runPixels();
+    },
+    withdraw: function(){ this.save({ visitor_id:false }); location.reload(); },  /* reload stops an already-loaded script */
+    reopen: function(){ if(this._reopen) this._reopen(); }                        /* wired by the banner in <body> */
+  };
+
+  if (stored && stored.visitor_id) resolveGeo();   /* returning consenter: resolve country, then load RB2B */
+})();
+</script>
+
+<!-- mneme:vendor:rb2b:start -->
+<script>
+/* RB2B — VISITOR IDENTIFICATION. Person-level identification is US-only (RB2B / GetEmails).
+   Loads ONLY when: (1) visitor_id consent granted, (2) visitor is US (window.__mnemeCountry, resolved
+   from Cloudflare /cdn-cgi/trace by the controller above), (3) page is high-intent.
+   The loader below is RB2B's exact dashboard script; the key is injected from RB2B_PIXEL_ID at deploy time. */
+window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
+  if ((window.__mnemeCountry || '').toUpperCase() !== 'US') return;   /* US-only until intl DPA cleared */
+  var p = location.pathname;
+  if (!(/^\/concepts(\/|$)/.test(p) || /^\/qa-glossary(\/|$)/.test(p) || /^\/pricing(\/|$)/.test(p) || /^\/demo(\/|$)/.test(p))) return;
+  !function(key) {
+    if (window.reb2b) return;
+    window.reb2b = {loaded: true};
+    var s = document.createElement("script");
+    s.async = true;
+    s.src = "https://ddwl4m2hdecbv.cloudfront.net/b/" + key + "/" + key + ".js.gz";
+    document.getElementsByTagName("script")[0].parentNode.insertBefore(s, document.getElementsByTagName("script")[0]);
+  }("46DJ4HG0DG61");
+}});
+</script>
+<!-- mneme:vendor:rb2b:end -->
+<!-- mneme:marketing-head:end -->
   <link rel="icon" href="/favicon.png" type="image/png">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -697,5 +779,51 @@
   window.addEventListener('resize', function(){ if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false); });
 })();
 </script>
+<script><!-- nav-active -->
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
+<!-- mneme:marketing-body:start -->
+<!-- mneme:marketing-body — visitor-identification consent banner (body). Synced before </body> by sync_shared.py.
+     SCOPE (step 1 of 2): RB2B only. The Advertising category (Google Ads + LinkedIn via GTM) is added in step 2. -->
+<style>
+  #mneme-consent{position:fixed;left:1rem;right:1rem;bottom:1rem;z-index:9999;max-width:600px;margin:0 auto;
+    background:var(--surface2,#1a1a1d);border:1px solid var(--border2,#2e2e34);border-radius:12px;
+    padding:1.1rem 1.2rem;box-shadow:0 8px 30px rgba(0,0,0,.45);font-size:.82rem;line-height:1.5;color:var(--text,#e8e8ec)}
+  #mneme-consent p{margin:0 0 .7rem}
+  #mneme-consent a{color:var(--accent,#c8f060)}
+  #mneme-consent .row{display:flex;gap:.6rem;justify-content:flex-end;flex-wrap:wrap}
+  /* Equal visual weight — no colour bias toward Accept. */
+  #mneme-consent button{font:inherit;cursor:pointer;border-radius:8px;padding:.5rem .95rem;
+    border:1px solid var(--border2,#2e2e34);background:var(--surface,#141416);color:var(--text,#e8e8ec)}
+</style>
+<div id="mneme-consent" hidden role="dialog" aria-modal="false" aria-label="Privacy choices">
+  <p><strong>Visitor identification.</strong> For eligible US visitors to certain pages, RB2B may associate your visit with your company and professional contact details (e.g. name, business email) so we can do B2B sales outreach. Analytics runs separately. See our <a href="/privacy/">Privacy Policy</a>.</p>
+  <div class="row">
+    <button type="button" id="mc-reject">Reject</button>
+    <button type="button" id="mc-accept">Accept</button>
+  </div>
+</div>
+<script>
+(function () {
+  var el = document.getElementById('mneme-consent');
+  if (!el || !window.MnemeConsent) return;
+  var C = window.MnemeConsent;
+  C._reopen = function(){ el.hidden = false; };
+  document.getElementById('mc-accept').addEventListener('click', function(){ C.save({visitor_id:true});  el.hidden = true; });
+  document.getElementById('mc-reject').addEventListener('click', function(){ C.save({visitor_id:false}); el.hidden = true; });
+  if (C.state === 'unset') el.hidden = false;   /* first visit / stale version -> prompt */
+})();
+</script>
+<!-- mneme:marketing-body:end -->
+
+
 </body>
 </html>
