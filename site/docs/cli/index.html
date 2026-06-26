@@ -227,6 +227,9 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     .cross-card .cl-title { font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; }
     .cross-card .cl-sub { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
 
+    .answer-capsule { max-width: 820px; margin: 0 auto; padding: 1.5rem 2rem; background: var(--surface); border-bottom: 1px solid rgba(200,240,96,0.18); font-size: 0.88rem; color: var(--muted); line-height: 1.8; }
+    .answer-capsule strong { color: var(--accent); }
+
     footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
     footer a { color: var(--muted); text-decoration: none; }
     footer a:hover { color: var(--text); }
@@ -346,6 +349,8 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     <li aria-current="page">CLI reference</li>
   </ol>
 </nav>
+
+<div class="answer-capsule"><strong>The <code>mneme</code> CLI</strong> exposes <code>list_decisions</code>, <code>add_decision</code>, <code>test_query</code>, <code>check</code>, and <code>cursor generate</code>. Every subcommand reads a <code>project_memory.json</code> corpus via <code>--memory</code> and returns Unix exit codes (0 pass, 1 warn, 2 fail).</div>
 
 <section class="hero">
   <div class="section-eyebrow">CLI reference</div>
