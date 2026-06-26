@@ -64,13 +64,12 @@ def _scaffold_memory() -> dict:
     would create phantom rules. The empty arrays let MemoryStore.load()
     round-trip the file and let `mneme check` run cleanly (nothing to
     enforce). meta.name and meta.description are the only fields the loader
-    requires; created_by and project are recorded for provenance.
+    requires; created_by is recorded for provenance.
     """
     return {
         "meta": {
             "name": "",
             "description": "",
-            "project": "",
             "created_by": "mneme init",
             "created": _utc_now(),
         },

@@ -18,7 +18,8 @@ def test_init_creates_default_path(tmp_path, monkeypatch, capsys):
 
     data = json.loads(target.read_text(encoding="utf-8"))
     assert data["meta"]["created_by"] == "mneme init"
-    assert data["meta"]["project"] == ""
+    assert data["meta"]["name"] == ""
+    assert data["meta"]["description"] == ""
     assert data["decisions"] == []
     # Success output should point at the created file.
     assert ".mneme" in captured
