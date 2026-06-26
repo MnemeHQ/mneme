@@ -219,6 +219,9 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     .answer-capsule { max-width: 820px; margin: 0 auto; padding: 1.5rem 2rem; background: var(--surface); border-bottom: 1px solid rgba(200,240,96,0.18); font-size: 0.88rem; color: var(--muted); line-height: 1.8; }
     .answer-capsule strong { color: var(--accent); }
 
+    .resolution { background: var(--surface2); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0; padding: 0.85rem 1rem; font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--text); overflow-x: auto; line-height: 1.6; margin: 0.5rem 0 0; }
+    .violation pre.resolution .comment { color: var(--accent-dim); }
+
     footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
     footer a { color: var(--muted); text-decoration: none; }
     footer a:hover { color: var(--text); }
@@ -397,6 +400,12 @@ const client = new BigQuery();</pre>
         <span class="flag">ADR violation</span>
         <span class="flag">architectural boundary breach</span>
       </div>
+      <p class="rule" style="margin-top:1rem;"><strong>Enforced pattern.</strong> The frontend route calls a backend service over HTTP; only the backend holds the BigQuery client.</p>
+      <pre class="resolution"><span class="comment">// compliant - the route fetches from a backend endpoint, no DB client in the frontend</span>
+export async function GET() {
+  const res = await fetch(`${process.env.API_URL}/reports/summary`);
+  return Response.json(await res.json());
+}</pre>
     </div>
 
     <div class="violation" id="v2">
@@ -411,6 +420,11 @@ def checkout():
         <span class="flag">logic in presentation layer</span>
         <span class="flag">missing service abstraction</span>
       </div>
+      <p class="rule" style="margin-top:1rem;"><strong>Enforced pattern.</strong> The controller stays thin and delegates pricing, tax, and inventory to a service.</p>
+      <pre class="resolution"><span class="comment"># compliant - business logic lives in the service layer</span>
+@app.post("/checkout")
+def checkout(cart: Cart):
+    return checkout_service.place_order(cart)</pre>
     </div>
 
     <div class="violation" id="v3">
@@ -421,6 +435,10 @@ def checkout():
         <span class="flag">non-approved state management</span>
         <span class="flag">stack divergence</span>
       </div>
+      <p class="rule" style="margin-top:1rem;"><strong>Enforced pattern.</strong> State management uses the approved library, Zustand.</p>
+      <pre class="resolution"><span class="comment">// compliant - uses the standardized Zustand store</span>
+import { create } from "zustand";
+const useStore = create((set) => ({ count: 0 }));</pre>
     </div>
   </section>
 
@@ -441,6 +459,11 @@ packages/auth/*</pre>
         <span class="flag">scoped ownership breach</span>
         <span class="flag">out-of-domain modification</span>
       </div>
+      <p class="rule" style="margin-top:1rem;"><strong>Enforced pattern.</strong> The billing agent edits only its own package and consumes auth through its published interface.</p>
+      <pre class="resolution"><span class="comment"># compliant - edits stay inside the owned package</span>
+packages/billing/*
+<span class="comment"># auth is imported, never modified</span>
+import { verifyToken } from "@org/auth";</pre>
     </div>
 
     <div class="violation" id="v10">
@@ -452,6 +475,10 @@ db/prod/migrations/*</pre>
         <span class="flag">restricted execution scope</span>
         <span class="flag">protected path mutation</span>
       </div>
+      <p class="rule" style="margin-top:1rem;"><strong>Enforced pattern.</strong> The agent writes proposed migrations to a staging directory; promotion to the production path is a human-gated step.</p>
+      <pre class="resolution"><span class="comment"># compliant - agent writes to the reviewable staging path only</span>
+db/staging/migrations/*
+<span class="comment"># a maintainer promotes to db/prod/migrations/ after review</span></pre>
     </div>
 
     <div class="violation" id="v11">
@@ -463,6 +490,12 @@ db/prod/migrations/*</pre>
         <span class="flag">policy conflict before generation</span>
         <span class="flag">governance-before-generation</span>
       </div>
+      <p class="rule" style="margin-top:1rem;"><strong>Enforced pattern.</strong> The agent declines the mock and wires in the vetted auth library to verify real tokens.</p>
+      <pre class="resolution"><span class="comment"># compliant - real verification, no fake validator</span>
+from app.auth import verify_jwt
+
+def authenticate(token: str) -> User:
+    return verify_jwt(token)  <span class="comment"># signature + expiry checked</span></pre>
     </div>
   </section>
 
@@ -482,6 +515,12 @@ db/prod/migrations/*</pre>
         <span class="flag">unsafe query construction</span>
         <span class="flag">secure coding rule breach</span>
       </div>
+      <p class="rule" style="margin-top:1rem;"><strong>Enforced pattern.</strong> The user input is bound as a parameter, never interpolated into the SQL string.</p>
+      <pre class="resolution"><span class="comment"># compliant - parameterized query, no string interpolation</span>
+cursor.execute(
+    "SELECT * FROM users WHERE id = %s",
+    (user_id,),
+)</pre>
     </div>
   </section>
 
@@ -502,6 +541,9 @@ db/prod/migrations/*</pre>
         <span class="flag">licensing policy violation</span>
         <span class="flag">approved-list deviation</span>
       </div>
+      <p class="rule" style="margin-top:1rem;"><strong>Enforced pattern.</strong> The dependency is swapped for an approved permissively-licensed (MIT or Apache-2.0) equivalent.</p>
+      <pre class="resolution"><span class="comment">// compliant - MIT-licensed library from the approved list</span>
+"some-mit-library": "^3.0.0"</pre>
     </div>
 
     <div class="violation" id="v9">
@@ -513,6 +555,12 @@ db/prod/migrations/*</pre>
         <span class="flag">outdated architecture pattern</span>
         <span class="flag">precedence-aware enforcement</span>
       </div>
+      <p class="rule" style="margin-top:1rem;"><strong>Enforced pattern.</strong> Async work is dispatched through Pub/Sub, the decision that supersedes Celery.</p>
+      <pre class="resolution"><span class="comment"># compliant - ADR-002: publish to Pub/Sub instead of Celery</span>
+from google.cloud import pubsub_v1
+
+publisher = pubsub_v1.PublisherClient()
+publisher.publish(topic_path, payload)</pre>
     </div>
   </section>
 
@@ -532,6 +580,12 @@ db/prod/migrations/*</pre>
         <span class="flag">bypassing approved infra workflow</span>
         <span class="flag">untracked change surface</span>
       </div>
+      <p class="rule" style="margin-top:1rem;"><strong>Enforced pattern.</strong> The instance is declared in a Terraform module and applied through the reviewed pipeline, not an imperative CLI call.</p>
+      <pre class="resolution"><span class="comment"># compliant - declarative Terraform, applied via CI</span>
+module "api_instance" {
+  source        = "./modules/compute"
+  machine_type  = "e2-standard-2"
+}</pre>
     </div>
 
     <div class="violation" id="v7">
@@ -542,6 +596,9 @@ db/prod/migrations/*</pre>
         <span class="flag">routing convention breach</span>
         <span class="flag">API governance mismatch</span>
       </div>
+      <p class="rule" style="margin-top:1rem;"><strong>Enforced pattern.</strong> The route is namespaced under the required <code>/v1/</code> version prefix.</p>
+      <pre class="resolution"><span class="comment"># compliant - versioned under /v1/</span>
+@app.route("/v1/users")</pre>
     </div>
 
     <div class="violation" id="v12">
@@ -555,6 +612,12 @@ def create_app():
         <span class="flag">observability standard breach</span>
         <span class="flag">platform compliance failure</span>
       </div>
+      <p class="rule" style="margin-top:1rem;"><strong>Enforced pattern.</strong> The service is instrumented with OpenTelemetry before it is returned.</p>
+      <pre class="resolution"><span class="comment"># compliant - emits OpenTelemetry traces</span>
+def create_app():
+    app = FastAPI()
+    FastAPIInstrumentor.instrument_app(app)
+    return app</pre>
     </div>
   </section>
 
