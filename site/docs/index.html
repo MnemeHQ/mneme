@@ -90,6 +90,12 @@
     .doc-card p { font-size: 0.86rem; color: var(--muted); line-height: 1.65; flex: 1; }
     .doc-card .read { font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--accent); margin-top: 0.3rem; }
 
+    .answer-capsule { max-width: 820px; margin: 0 auto; padding: 1.5rem 2rem; background: var(--surface); border-bottom: 1px solid rgba(200,240,96,0.18); font-size: 0.88rem; color: var(--muted); line-height: 1.8; }
+    .answer-capsule strong { color: var(--accent); }
+
+    .quickstart pre { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 0.95rem 1.1rem; font-family: 'DM Mono', monospace; font-size: 0.82rem; color: var(--text); overflow-x: auto; line-height: 1.7; margin: 1.25rem 0; max-width: 760px; }
+    .quickstart pre .cp { color: var(--accent); }
+
     footer a { color: var(--muted); text-decoration: none; }
     footer a:hover { color: var(--text); }
 
@@ -226,14 +232,22 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
 
 <main>
 
+<div class="answer-capsule"><strong>Mneme is an open-source CLI that governs AI coding agents.</strong> These docs cover installation, the <code>mneme check</code> enforcement flow, the governance violations Mneme blocks before generation, supported languages, and the deterministic benchmark methodology.</div>
+
 <section class="hero">
   <div class="section-eyebrow">Reference documentation</div>
   <h1>Docs.</h1>
   <p class="hero-sub">Reference for the CLI, the governance violations Mneme catches, supported languages, and the benchmark methodology.</p>
 </section>
 
-<div class="wrap">
-  <h2 style="font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:0 0 1.25rem;">Reference surfaces</h2>
+<div class="wrap quickstart">
+  <h2 style="font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:0 0 1.25rem;">Quick start</h2>
+  <p style="font-size:0.92rem;color:var(--muted);line-height:1.75;max-width:780px;margin:0;">Zero to a governed check in two commands. Python 3.10+.</p>
+<pre><span class="cp">$</span> pip install mneme-hq
+<span class="cp">$</span> mneme check --memory .mneme/project_memory.json --input prompt.txt --query "storage backend"</pre>
+  <p style="font-size:0.9rem;color:var(--muted);line-height:1.85;max-width:780px;margin:0 0 1rem;">Exit code <code>0</code> = pass, <code>1</code> = warn, <code>2</code> = fail. To enforce on every AI edit in Claude Code, install the PreToolUse hook: <code>python scripts/install_claude_code.py</code>. To generate a Cursor rules file: <code>mneme cursor generate --memory .mneme/project_memory.json --query "storage backend"</code>.</p>
+
+  <h2 style="font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:3.5rem 0 1.25rem;">Reference surfaces</h2>
   <p style="font-size:0.92rem;color:var(--muted);line-height:1.75;max-width:780px;margin:0 0 2rem;">Mneme HQ's documentation is intentionally narrow. We document the surfaces that engineers actually need to operate the governance layer: the CLI you run, the violations Mneme catches, the languages Mneme governs today, and the methodology behind the benchmark. Everything else lives in the source repository.</p>
 
   <div class="doc-grid">
