@@ -1,0 +1,80 @@
+<!-- mneme:marketing-head — consent controller + RB2B (head). Synced into <head> by scripts/sync_shared.py.
+     SCOPE (step 1 of 2): RB2B visitor identification only. Advertising (Google Ads + LinkedIn via GTM)
+     and its consent category arrive in step 2 — when added, bump VERSION to re-prompt. -->
+<script>
+(function () {
+  var COOKIE = 'mneme_consent';
+  var VERSION = 1;   /* bump when categories/vendors change -> re-prompt */
+
+  function readRaw(n){var m=document.cookie.match('(?:^|; )'+n.replace(/([.$?*|{}()\[\]\\\/\+^])/g,'\\$1')+'=([^;]*)');return m?decodeURIComponent(m[1]):null;}
+  function writeCookie(value){
+    var secure = location.protocol === 'https:' ? ';secure' : '';
+    document.cookie = COOKIE+'='+encodeURIComponent(JSON.stringify(value))+';path=/;max-age=15552000;samesite=Lax'+secure; /* 180d */
+  }
+  function parse(){
+    var raw = readRaw(COOKIE); if(!raw) return null;
+    try { var o = JSON.parse(raw); if(!o || o.v !== VERSION || typeof o.visitor_id !== 'boolean') return null; return o; }
+    catch(e){ return null; }   /* invalid / stale version -> treat as unset (re-prompt) */
+  }
+
+  window.__mnemePixels = window.__mnemePixels || [];   /* registry: {done, cat, fn} */
+  var geoReady = false;
+  function runPixels(){
+    window.__mnemePixels.forEach(function(p){
+      if(p.done || !C.consent[p.cat]) return;
+      if(p.cat === 'visitor_id' && !geoReady) return;   /* RB2B waits for country resolution */
+      try { p.fn(); p.done = true; }     /* mark done only AFTER success */
+      catch(e){ if(window.console) console.warn('[mneme-consent] pixel failed:', p.cat, e); }
+    });
+  }
+  /* Resolve visitor country from Cloudflare's edge trace (same-origin; no dashboard config needed).
+     Only called once visitor_id consent is granted, so non-consenting visitors trigger no request. */
+  function resolveGeo(){
+    if (geoReady) { runPixels(); return; }
+    try {
+      fetch('/cdn-cgi/trace', {cache:'no-store'}).then(function(r){ return r.text(); }).then(function(t){
+        var m = t.match(/(?:^|\n)loc=([A-Z]{2})/); window.__mnemeCountry = m ? m[1] : '';
+      }).catch(function(){}).then(function(){ geoReady = true; runPixels(); });
+    } catch(e){ geoReady = true; runPixels(); }
+  }
+
+  var stored = parse();
+  var C = window.MnemeConsent = {
+    version: VERSION,
+    state: stored ? 'set' : 'unset',
+    consent: { visitor_id: stored ? stored.visitor_id : false },
+    save: function(choices){
+      this.consent.visitor_id = !!choices.visitor_id;
+      this.state = 'set';
+      writeCookie({ v:VERSION, visitor_id:this.consent.visitor_id, ts:new Date().toISOString() });
+      if (this.consent.visitor_id) resolveGeo(); else runPixels();
+    },
+    withdraw: function(){ this.save({ visitor_id:false }); location.reload(); },  /* reload stops an already-loaded script */
+    reopen: function(){ if(this._reopen) this._reopen(); }                        /* wired by the banner in <body> */
+  };
+
+  if (stored && stored.visitor_id) resolveGeo();   /* returning consenter: resolve country, then load RB2B */
+})();
+</script>
+
+<!-- mneme:vendor:rb2b:start -->
+<script>
+/* RB2B — VISITOR IDENTIFICATION. Person-level identification is US-only (RB2B / GetEmails).
+   Loads ONLY when: (1) visitor_id consent granted, (2) visitor is US (window.__mnemeCountry, resolved
+   from Cloudflare /cdn-cgi/trace by the controller above), (3) page is high-intent.
+   The loader below is RB2B's exact dashboard script; the key is injected from RB2B_PIXEL_ID at deploy time. */
+window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
+  if ((window.__mnemeCountry || '').toUpperCase() !== 'US') return;   /* US-only until intl DPA cleared */
+  var p = location.pathname;
+  if (!(/^\/concepts(\/|$)/.test(p) || /^\/qa-glossary(\/|$)/.test(p) || /^\/pricing(\/|$)/.test(p) || /^\/demo(\/|$)/.test(p))) return;
+  !function(key) {
+    if (window.reb2b) return;
+    window.reb2b = {loaded: true};
+    var s = document.createElement("script");
+    s.async = true;
+    s.src = "https://ddwl4m2hdecbv.cloudfront.net/b/" + key + "/" + key + ".js.gz";
+    document.getElementsByTagName("script")[0].parentNode.insertBefore(s, document.getElementsByTagName("script")[0]);
+  }("__RB2B_PIXEL_ID__");
+}});
+</script>
+<!-- mneme:vendor:rb2b:end -->

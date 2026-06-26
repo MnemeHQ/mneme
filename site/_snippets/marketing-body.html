@@ -1,0 +1,31 @@
+<!-- mneme:marketing-body — visitor-identification consent banner (body). Synced before </body> by sync_shared.py.
+     SCOPE (step 1 of 2): RB2B only. The Advertising category (Google Ads + LinkedIn via GTM) is added in step 2. -->
+<style>
+  #mneme-consent{position:fixed;left:1rem;right:1rem;bottom:1rem;z-index:9999;max-width:600px;margin:0 auto;
+    background:var(--surface2,#1a1a1d);border:1px solid var(--border2,#2e2e34);border-radius:12px;
+    padding:1.1rem 1.2rem;box-shadow:0 8px 30px rgba(0,0,0,.45);font-size:.82rem;line-height:1.5;color:var(--text,#e8e8ec)}
+  #mneme-consent p{margin:0 0 .7rem}
+  #mneme-consent a{color:var(--accent,#c8f060)}
+  #mneme-consent .row{display:flex;gap:.6rem;justify-content:flex-end;flex-wrap:wrap}
+  /* Equal visual weight — no colour bias toward Accept. */
+  #mneme-consent button{font:inherit;cursor:pointer;border-radius:8px;padding:.5rem .95rem;
+    border:1px solid var(--border2,#2e2e34);background:var(--surface,#141416);color:var(--text,#e8e8ec)}
+</style>
+<div id="mneme-consent" hidden role="dialog" aria-modal="false" aria-label="Privacy choices">
+  <p><strong>Visitor identification.</strong> For eligible US visitors to certain pages, RB2B may associate your visit with your company and professional contact details (e.g. name, business email) so we can do B2B sales outreach. Analytics runs separately. See our <a href="/privacy/">Privacy Policy</a>.</p>
+  <div class="row">
+    <button type="button" id="mc-reject">Reject</button>
+    <button type="button" id="mc-accept">Accept</button>
+  </div>
+</div>
+<script>
+(function () {
+  var el = document.getElementById('mneme-consent');
+  if (!el || !window.MnemeConsent) return;
+  var C = window.MnemeConsent;
+  C._reopen = function(){ el.hidden = false; };
+  document.getElementById('mc-accept').addEventListener('click', function(){ C.save({visitor_id:true});  el.hidden = true; });
+  document.getElementById('mc-reject').addEventListener('click', function(){ C.save({visitor_id:false}); el.hidden = true; });
+  if (C.state === 'unset') el.hidden = false;   /* first visit / stale version -> prompt */
+})();
+</script>
