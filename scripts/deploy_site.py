@@ -83,8 +83,11 @@ def purge_cf_cache(urls=None):
         print(f'[WARN] Cloudflare purge error (deploy succeeded): {e}')
 
 # ── cPanel credentials ────────────────────────────────────────────────────────
-HOST  = os.environ.get('CPANEL_HOST',  '152.89.79.37')
-PORT  = os.environ.get('CPANEL_PORT',  '2083')
+# Endpoint is overridable via env (set CPANEL_HOST/CPANEL_PORT as repo Variables
+# in CI, e.g. cpanel.theovalmis.com / 443). `or` so an empty value falls back to
+# the default rather than blanking the host.
+HOST  = os.environ.get('CPANEL_HOST')  or '152.89.79.37'
+PORT  = os.environ.get('CPANEL_PORT')  or '2083'
 USER  = os.environ.get('CPANEL_USER',  'cadafdd1')
 TOKEN = os.environ.get('CPANEL_API_TOKEN', '')
 if not TOKEN:

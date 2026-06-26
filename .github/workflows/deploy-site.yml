@@ -16,11 +16,20 @@ permissions:
 jobs:
   deploy:
     name: Upload changed site files via cPanel API
-    # Self-hosted runner on the private wp-proxy VM: egress via the NAT IP
-    # whitelisted in Krystal. GitHub-hosted runners use rotating IPs that the
-    # cPanel firewall blocks (TCP connection timeouts to :2083), so the upload
-    # must originate from the whitelisted static IP. Shared with cdus.
-    runs-on: wp-private-runner
+    # Runs on a Mneme-specific self-hosted runner registered on the shared
+    # static-egress GCP VM (Cloud NAT egress 35.209.208.146, whitelisted in
+    # Krystal). GitHub-hosted runners use rotating IPs the cPanel firewall
+    # blocks, so the upload must leave from the whitelisted static IP.
+    #
+    # This is a SEPARATE runner registration from cdus's wp-private-runner —
+    # repo-scoped self-hosted runners are not shared across repositories, so the
+    # cdus runner is left untouched. Register a second runner service on the same
+    # VM, attached to this repo, with the labels `self-hosted` + `mneme-deploy`.
+    #
+    # Security: this job runs ONLY on trusted events (push to main, manual
+    # dispatch, schedule) and never on pull_request, so untrusted PR code is
+    # never executed on the self-hosted runner. Do not add a pull_request trigger.
+    runs-on: [self-hosted, mneme-deploy]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -34,6 +43,11 @@ jobs:
       - name: Deploy
         env:
           CPANEL_API_TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
+          # cPanel endpoint is configurable via repo Variables so we can point at
+          # the working HTTPS endpoint (e.g. cpanel.theovalmis.com / 443) without a
+          # code change. If unset, deploy_site.py falls back to its built-in default.
+          CPANEL_HOST: ${{ vars.CPANEL_HOST }}
+          CPANEL_PORT: ${{ vars.CPANEL_PORT }}
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
         run: python scripts/deploy_site.py
