@@ -35,7 +35,16 @@ ACTIVE_JS_BLOCK    = f"<script><!-- nav-active -->\n{ACTIVE_JS}\n</script>"
 MK_HEAD = load("marketing-head.html")
 MK_BODY = load("marketing-body.html")
 
+# The RB2B pixel key is a PUBLIC client-side id (same situation as the IndexNow key in
+# deploy_site.py): committed as the default so CI deploys — which don't carry .env — still
+# inject it instead of stripping the block. Override via RB2B_PIXEL_ID in .env; set it to
+# "off" to disable RB2B entirely.
+RB2B_DEFAULT = "46DJ4HG0DG61"
 RB2B_ID = os.environ.get("RB2B_PIXEL_ID", "").strip()
+if not RB2B_ID:
+    RB2B_ID = RB2B_DEFAULT
+elif RB2B_ID.lower() == "off":
+    RB2B_ID = ""
 RB2B_OK = bool(re.fullmatch(r"[A-Za-z0-9]{4,}", RB2B_ID))
 if RB2B_ID and not RB2B_OK:
     print(f"  WARN: RB2B_PIXEL_ID={RB2B_ID!r} is not [A-Za-z0-9]{{4,}} — RB2B disabled")
