@@ -1,5 +1,25 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- `mneme init` subcommand — scaffolds a valid, empty, neutral
+  `project_memory.json` (default `.mneme/project_memory.json`). Writes a
+  minimal skeleton (`meta` + empty `items` / `examples` / `decisions`) that
+  round-trips through `MemoryStore.load()` and passes `mneme check` with
+  nothing to enforce. No seeded decisions (every decision is enforceable, so
+  sample content would create phantom rules). Refuses to overwrite an existing
+  file unless `--force` is given; `--path` overrides the output location.
+
+### Tests
+
+- `tests/test_cli_init.py` — 6 tests (fresh create, MemoryStore round-trip,
+  refuse-existing, `--force` overwrite, custom `--path`, clean `mneme check`).
+- Full suite: 354 passed, 52 warnings.
+
+---
+
 ## v0.4.2 — 2026-05-05
 
 **Fix: module execution and exit propagation (completes hook reliability)**
