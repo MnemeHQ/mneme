@@ -16,7 +16,11 @@ permissions:
 jobs:
   deploy:
     name: Upload changed site files via cPanel API
-    runs-on: ubuntu-latest
+    # Self-hosted runner on the private wp-proxy VM: egress via the NAT IP
+    # whitelisted in Krystal. GitHub-hosted runners use rotating IPs that the
+    # cPanel firewall blocks (TCP connection timeouts to :2083), so the upload
+    # must originate from the whitelisted static IP. Shared with cdus.
+    runs-on: wp-private-runner
     steps:
       - uses: actions/checkout@v4
         with:

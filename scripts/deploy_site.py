@@ -112,7 +112,7 @@ def mkdir(remote_path):
         headers={'Authorization': AUTH},
     )
     try:
-        with urllib.request.urlopen(req, context=ctx) as r:
+        with urllib.request.urlopen(req, context=ctx, timeout=60) as r:
             raw = r.read()
     except urllib.error.HTTPError as e:
         raw = e.read()
@@ -168,7 +168,7 @@ def upload(local_path, remote_subdir):
     import time
     for attempt in range(3):
         try:
-            with urllib.request.urlopen(req, context=ctx) as r:
+            with urllib.request.urlopen(req, context=ctx, timeout=60) as r:
                 raw = r.read()
         except (urllib.error.URLError, OSError):
             time.sleep(1 + attempt)
