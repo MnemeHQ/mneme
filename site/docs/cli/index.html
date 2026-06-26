@@ -227,6 +227,9 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     .cross-card .cl-title { font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; }
     .cross-card .cl-sub { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
 
+    .answer-capsule { max-width: 820px; margin: 0 auto; padding: 1.5rem 2rem; background: var(--surface); border-bottom: 1px solid rgba(200,240,96,0.18); font-size: 0.88rem; color: var(--muted); line-height: 1.8; }
+    .answer-capsule strong { color: var(--accent); }
+
     footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
     footer a { color: var(--muted); text-decoration: none; }
     footer a:hover { color: var(--text); }
@@ -347,6 +350,8 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
   </ol>
 </nav>
 
+<div class="answer-capsule"><strong>The <code>mneme</code> CLI</strong> exposes <code>list_decisions</code>, <code>add_decision</code>, <code>test_query</code>, <code>check</code>, and <code>cursor generate</code>. Every subcommand reads a <code>project_memory.json</code> corpus via <code>--memory</code> and returns Unix exit codes (0 pass, 1 warn, 2 fail).</div>
+
 <section class="hero">
   <div class="section-eyebrow">CLI reference</div>
   <h1>The <code style="font-family:'DM Mono',monospace;font-size:0.78em;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:0.05em 0.4em;color:var(--accent);">mneme</code> command-line interface</h1>
@@ -375,10 +380,9 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     <h2>Install</h2>
     <p class="sub">Python 3.10+. MIT-licensed. No vector store, no ML runtime.</p>
     <div class="cmd-card">
-<pre><span class="cp">$</span> git clone https://github.com/TheoV823/mneme
-<span class="cp">$</span> cd mneme
-<span class="cp">$</span> pip install -e .</pre>
-      <p class="cdesc" style="margin-bottom:0;">After install, the <code>mneme</code> entry point is on your PATH. Every subcommand requires <code>--memory</code> pointing at a <code>project_memory.json</code> file. An example corpus ships at <code>examples/project_memory.json</code>.</p>
+<pre><span class="cp">$</span> pip install mneme-hq</pre>
+      <p class="cdesc">Installs the <code>mneme</code> entry point on your PATH. Every subcommand requires <code>--memory</code> pointing at a <code>project_memory.json</code> file. An example corpus ships at <code>examples/project_memory.json</code>.</p>
+      <p class="cdesc" style="margin-bottom:0;">From source (contributors): <code>git clone https://github.com/TheoV823/mneme &amp;&amp; cd mneme/mneme-project-memory &amp;&amp; pip install -e .</code></p>
     </div>
   </section>
 

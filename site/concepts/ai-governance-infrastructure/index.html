@@ -105,6 +105,8 @@
     .byline a { color: var(--muted); text-decoration: none; }
     .byline a:hover { color: var(--text); }
     .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+    .answer-capsule { max-width: 820px; margin: 0 auto; padding: 1.5rem 2rem; background: var(--surface); border-bottom: 1px solid rgba(200,240,96,0.18); font-size: 0.88rem; color: var(--muted); line-height: 1.8; }
+    .answer-capsule strong { color: var(--accent); }
     .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; padding: 0; flex-shrink: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; transition: border-color 0.15s, background 0.15s; }
     .nav-hamburger:hover { border-color: var(--accent); }
     .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -227,6 +229,10 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
 </nav>
 
 <main>
+<div class="answer-capsule">
+  <strong>AI governance infrastructure is the deterministic enforcement layer that preserves architectural intent across AI-assisted software development.</strong> It compiles architectural decisions into machine-evaluable constraints, applies them at every execution surface an AI agent touches, and produces structured verdicts that travel with the codebase no matter which agent or tool produced the change.
+</div>
+
 <nav class="breadcrumb-nav" aria-label="Breadcrumb">
   <ol class="breadcrumb">
     <li><a href="/">Home</a></li>

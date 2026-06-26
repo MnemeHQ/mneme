@@ -7,7 +7,7 @@
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="Cursor governance for AI-assisted teams. Mneme HQ holds the structured decision corpus and exports ADR-backed rules into Cursor every session — with conflict resolution and versioning that .cursorrules files lack." />
+  <meta name="description" content="Cursor governance for AI-assisted teams. Mneme HQ holds the structured decision corpus and generates ADR-backed rules into Cursor every session — with conflict resolution and versioning that flat Cursor Rules files lack." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/integrations/cursor/" />
@@ -15,12 +15,12 @@
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
   <meta property="og:title" content="Cursor Governance — Mneme HQ" />
-  <meta property="og:description" content="Cursor governance for AI-assisted teams. Mneme HQ holds the structured decision corpus and exports ADR-backed rules into Cursor every session — with conflict resolution and versioning that .cursorrules files lack." />
+  <meta property="og:description" content="Cursor governance for AI-assisted teams. Mneme HQ holds the structured decision corpus and generates ADR-backed rules into Cursor every session — with conflict resolution and versioning that flat Cursor Rules files lack." />
   <meta property="og:url" content="https://mnemehq.com/integrations/cursor/" />
   <meta property="og:image" content="https://mnemehq.com/integrations/cursor/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Cursor Governance — Mneme HQ" />
-  <meta name="twitter:description" content="Cursor governance for AI-assisted teams. Mneme HQ holds the structured decision corpus and exports ADR-backed rules into Cursor every session — with conflict resolution and versioning that .cursorrules files lack." />
+  <meta name="twitter:description" content="Cursor governance for AI-assisted teams. Mneme HQ holds the structured decision corpus and generates ADR-backed rules into Cursor every session — with conflict resolution and versioning that flat Cursor Rules files lack." />
   <meta name="twitter:image" content="https://mnemehq.com/integrations/cursor/og.png" />
   <meta name="author" content="Theo Valmis" />
   <meta property="article:published_time" content="2026-05-07T00:00:00Z" />
@@ -314,7 +314,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
       {
         "@type": "Article",
         "headline": "Mneme HQ + Cursor",
-        "description": "Keep architectural decisions in Mneme HQ. Surface them as Cursor Rules every session — with conflict resolution and versioning that .cursorrules files lack.",
+        "description": "Keep architectural decisions in Mneme HQ. Surface them as Cursor Rules every session — with conflict resolution and versioning that flat Cursor Rules files lack.",
         "url": "https://mnemehq.com/integrations/cursor/",
         "datePublished": "2026-05-07",
         "dateModified": "2026-05-07",
@@ -327,7 +327,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
         "@type": "FAQPage",
         "mainEntity": [
           {"@type": "Question", "name": "Does Mneme replace Cursor Rules entirely?", "acceptedAnswer": {"@type": "Answer", "text": "No — Mneme generates the Cursor Rules file from a structured source. Cursor still reads .cursor/rules/ at session start; the difference is that the file is now a derived artifact with precedence resolution and version history rather than a manual document."}},
-          {"@type": "Question", "name": "Can I edit .cursorrules directly while Mneme is in place?", "acceptedAnswer": {"@type": "Answer", "text": "You can, but the next regenerate will overwrite it. The recommended workflow is to update project_memory.json and re-run mneme cursor generate. That way the change is tracked as a decision-record edit rather than a quiet rule-file change."}},
+          {"@type": "Question", "name": "Can I edit .cursor/rules/mneme.mdc directly while Mneme is in place?", "acceptedAnswer": {"@type": "Answer", "text": "You can, but the next regenerate will overwrite it. The recommended workflow is to update project_memory.json and re-run mneme cursor generate. That way the change is tracked as a decision-record edit rather than a quiet rule-file change."}},
           {"@type": "Question", "name": "Does this work with Cursor's MCP integration?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Mneme is on the roadmap to expose its decision store as an MCP server; once shipped, Cursor's MCP-aware sessions can query the corpus directly without going through the rules file."}}
         ]
       }
@@ -384,34 +384,36 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
 
     <h2>How it works together</h2>
 
+    <p>Mneme regenerates the <code>.cursor/rules/mneme.mdc</code> file from the decision corpus each session, so Cursor always reads a current, conflict-resolved rule set rather than a hand-maintained file that drifts.</p>
+
     <ul>
       <li>Mneme HQ stores architectural decisions in <code>.mneme/project_memory.json</code> — typed, scoped, versioned</li>
-      <li>A single export command generates a <code>.cursorrules</code> file from the active decision corpus</li>
-      <li>Mneme's precedence engine resolves conflicts before export — Cursor sees a clean, non-contradictory rule set</li>
-      <li>You edit decisions in Mneme; re-export to update Cursor Rules</li>
+      <li>A single generate command writes a <code>.cursor/rules/mneme.mdc</code> file from the active decision corpus</li>
+      <li>Mneme's precedence engine resolves conflicts before generation — Cursor sees a clean, non-contradictory rule set</li>
+      <li>You edit decisions in Mneme; regenerate to update Cursor Rules</li>
     </ul>
 
     <h2>What Mneme adds to the workflow</h2>
 
     <ul>
-      <li><strong>Source of truth is structured JSON</strong> — not the <code>.cursorrules</code> file itself</li>
+      <li><strong>Source of truth is structured JSON</strong> — not the <code>.cursor/rules/mneme.mdc</code> file itself</li>
       <li><strong>Conflict resolution happens in Mneme</strong> before Cursor ever sees the rules</li>
-      <li>Decisions carry <code>rationale</code>, <code>supersedes</code>, and <code>status</code> fields — <code>.cursorrules</code> carries none of this</li>
+      <li>Decisions carry <code>rationale</code>, <code>supersedes</code>, and <code>status</code> fields — the generated rule file carries none of this</li>
       <li>When you add Claude Code to the stack, Mneme's hook-level enforcement applies automatically — no migration</li>
     </ul>
 
     <h2>Setup</h2>
 
     <pre><code>pip install mneme-hq
-# Export active decisions to .cursorrules
-mneme export --format cursor-rules > .cursorrules</code></pre>
+# Generate Cursor Rules from active decisions
+mneme cursor generate --memory .mneme/project_memory.json --query "service boundaries"</code></pre>
 
     <h2>Recommended workflow</h2>
 
     <ol>
       <li>Record decisions via <code>/mneme-record</code> (Claude Code) or edit <code>project_memory.json</code> directly</li>
-      <li>Re-export before opening Cursor: <code>mneme export --format cursor-rules &gt; .cursorrules</code></li>
-      <li>Commit both files — Mneme corpus is the source, <code>.cursorrules</code> is the derived surface</li>
+      <li>Regenerate before opening Cursor: <code>mneme cursor generate --memory .mneme/project_memory.json --query "..."</code></li>
+      <li>Commit both files — Mneme corpus is the source, <code>.cursor/rules/mneme.mdc</code> is the derived surface</li>
     </ol>
 
     <h2>If you use Cursor and Claude Code</h2>
@@ -419,7 +421,7 @@ mneme export --format cursor-rules > .cursorrules</code></pre>
     <p>Running both editors against the same codebase? Mneme keeps them consistent without duplication:</p>
 
     <ul>
-      <li>Cursor sessions use the <code>.cursorrules</code> export for context injection</li>
+      <li>Cursor sessions use the generated <code>.cursor/rules/mneme.mdc</code> file for context injection</li>
       <li>Claude Code sessions use the PreToolUse hook for enforcement</li>
       <li>Both draw from the same Mneme corpus — one authoritative source, two surfaces</li>
     </ul>
@@ -430,7 +432,7 @@ mneme export --format cursor-rules > .cursorrules</code></pre>
 
     <h2>What changes when you wire Mneme into Cursor</h2>
 
-    <p>Cursor's strength is interactive coding: an engineer types intent, the editor surfaces context, the model responds. The <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.cursorrules</code> file is how that context arrives at the model. Without governance, the file accumulates ad-hoc rules that the editor injects on every session &mdash; useful for personal preferences, weak as architectural enforcement.</p>
+    <p>Cursor's strength is interactive coding: an engineer types intent, the editor surfaces context, the model responds. The <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.cursor/rules/mneme.mdc</code> file is how that context arrives at the model. Without governance, that rule file accumulates ad-hoc rules that the editor injects on every session &mdash; useful for personal preferences, weak as architectural enforcement.</p>
 
     <p>With Mneme, the rules become a <em>generated artifact</em> rather than a hand-edited file. The decision corpus in <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">project_memory.json</code> is the source of truth; <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">mneme cursor generate</code> writes a scoped <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.cursor/rules/mneme.mdc</code> file that Cursor picks up automatically. Three things change in practice:</p>
 
@@ -448,7 +450,7 @@ mneme export --format cursor-rules > .cursorrules</code></pre>
         <div style="padding-top:0.85rem; font-size:0.85rem; color:var(--muted); line-height:1.8;">No &mdash; Mneme generates the Cursor Rules file from a structured source. Cursor still reads <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.cursor/rules/</code> at session start; the difference is that the file is now a derived artifact with precedence resolution and version history rather than a manual document. See <a href="/compare/cursor-rules/" style="color:var(--accent);">the full comparison</a>.</div>
       </details>
       <details class="faq-item" style="border-top:1px solid var(--border); padding:1.05rem 0;">
-        <summary style="cursor:pointer; font-size:0.92rem; color:var(--text); font-weight:500; list-style:none; position:relative; padding-right:2rem;">Can I edit <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.cursorrules</code> directly while Mneme is in place?</summary>
+        <summary style="cursor:pointer; font-size:0.92rem; color:var(--text); font-weight:500; list-style:none; position:relative; padding-right:2rem;">Can I edit <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.cursor/rules/mneme.mdc</code> directly while Mneme is in place?</summary>
         <div style="padding-top:0.85rem; font-size:0.85rem; color:var(--muted); line-height:1.8;">You can, but the next regenerate will overwrite it. The recommended workflow is to update <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">project_memory.json</code> and re-run <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">mneme cursor generate</code>. That way the change is tracked as a decision-record edit rather than a quiet rule-file change.</div>
       </details>
       <details class="faq-item" style="border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:1.05rem 0;">

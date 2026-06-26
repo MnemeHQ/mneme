@@ -171,6 +171,9 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
     .callout p strong { color: var(--accent); }
 
+    .cmd-snippet { background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0 1.5rem; font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--text); overflow-x: auto; white-space: pre; line-height: 1.5; }
+    .cmd-snippet .cp { color: var(--accent); user-select: none; margin-right: 0.5rem; }
+
     .comparison-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.85rem; }
     .comparison-table th { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border2); color: var(--muted); font-weight: 500; }
     .comparison-table td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
@@ -354,6 +357,8 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
 
   <div class="article-body">
 
+    <div class="callout"><p><strong>The bottom line.</strong> Retrieval surfaces relevant context probabilistically; governance enforces architectural decisions deterministically. RAG improves what the model sees; Mneme constrains what it is allowed to produce. They are complementary layers, not alternatives.</p></div>
+
     <h2>What RAG-based governance does</h2>
 
     <p>RAG (retrieval-augmented generation) applied to governance typically works like this: a vector store is indexed with ADRs, coding standards, architecture docs, or decision records. When a developer asks the AI to generate code, the relevant documents are retrieved and injected into the context window alongside the task.</p>
@@ -485,6 +490,9 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
       <li><strong>Track overrides explicitly.</strong> When a developer overrides a governance decision, the override is itself a decision record &mdash; with rationale, scope, and provenance. RAG can surface override history in future sessions.</li>
     </ol>
 
+    <p>Mneme runs as the enforcement step on whatever the model produces, independent of what RAG retrieved into context. The same command evaluates the edit against the decision corpus and blocks violations deterministically:</p>
+    <pre class="cmd-snippet"><span class="cp">$</span> mneme check --memory .mneme/project_memory.json --input changed_file.py --query "architectural constraints"</pre>
+
     <p>In this architecture, RAG and Mneme are not substitutes. They are sequential layers operating on the same corpus. Retrieval improves generation quality. Enforcement guarantees architectural integrity. A codebase governed by both has better outputs and harder compliance guarantees than either provides alone.</p>
 
     <section class="faq-list" aria-labelledby="faq-heading">
@@ -525,7 +533,8 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     <div class="cta-block">
       <h3>Deterministic enforcement, not better retrieval</h3>
       <p>Mneme HQ hooks into your AI coding agent&rsquo;s Edit and Write operations and blocks architectural violations before they reach the codebase. Open source, self-hosted, model-agnostic.</p>
-      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
+      <a href="/pilot/" class="btn-primary" style="margin-right:0.5rem;">Request a pilot &rarr;</a>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary" style="background:transparent;border:1px solid var(--accent);color:var(--accent);">View on GitHub &rarr;</a>
       <a href="/insights/why-rag-fails-for-architectural-governance/" class="cta-secondary">Read: Why RAG fails for architectural governance &rarr;</a>
     </div>
   </footer>

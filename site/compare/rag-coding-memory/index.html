@@ -171,6 +171,9 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
     .callout p strong { color: var(--accent); }
 
+    .cmd-snippet { background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0 1.5rem; font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--text); overflow-x: auto; white-space: pre; line-height: 1.5; }
+    .cmd-snippet .cp { color: var(--accent); user-select: none; margin-right: 0.5rem; }
+
     .comparison-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.85rem; }
     .comparison-table th { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border2); color: var(--muted); font-weight: 500; }
     .comparison-table td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
@@ -354,6 +357,8 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
 
   <div class="article-body">
 
+    <div class="callout"><p><strong>The bottom line.</strong> RAG surfaces contextual examples by probabilistic ranking; Mneme compiles architectural decisions into deterministic constraints that execute before generation. Use RAG for contextual memory and Mneme for decision memory. They solve different halves of project memory.</p></div>
+
     <h2>What teams mean by &ldquo;RAG for coding memory&rdquo;</h2>
 
     <p>The pattern is now familiar: index a repository&rsquo;s ADRs, design docs, code snippets, prior commits, and engineering wiki pages into a vector store. At each coding agent turn, retrieve the top-k most relevant chunks and inject them into the model&rsquo;s context. The goal is persistent project memory &mdash; the agent &ldquo;remembers&rdquo; what your team has decided, even across new sessions.</p>
@@ -485,6 +490,9 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
       <li><strong>Track overrides as first-class decision records.</strong> When a team intentionally diverges from a decision, the override is itself recorded with rationale and scope. RAG can surface the override discussion; Mneme governs the new boundary.</li>
     </ol>
 
+    <p>Mneme runs as the decision-recall step at edit time, independent of whatever RAG surfaced into context. The same command looks up the decisions that apply to the edited file and returns a deterministic verdict:</p>
+    <pre class="cmd-snippet"><span class="cp">$</span> mneme check --memory .mneme/project_memory.json --input services/auth/session.py --query "auth service boundaries"</pre>
+
     <p>In this architecture, RAG is the memory of <em>what we have written</em>. Mneme is the memory of <em>what we have decided</em>. A coding agent that uses both has stronger context and harder compliance guarantees than either provides alone &mdash; and the failure modes of RAG-as-decision-memory disappear, because RAG is no longer being asked to do the work it was never built for.</p>
 
     <section class="faq-list" aria-labelledby="faq-heading">
@@ -525,7 +533,8 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     <div class="cta-block">
       <h3>Decision memory that recalls every time</h3>
       <p>Mneme HQ hooks into your AI coding agent&rsquo;s Edit and Write operations, looks up architectural decisions by scope, and blocks violations deterministically. Open source, self-hosted, model-agnostic.</p>
-      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
+      <a href="/pilot/" class="btn-primary" style="margin-right:0.5rem;">Request a pilot &rarr;</a>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary" style="background:transparent;border:1px solid var(--accent);color:var(--accent);">View on GitHub &rarr;</a>
       <a href="/insights/why-prompt-memory-fails-at-scale/" class="cta-secondary">Read: Why prompt memory fails at scale &rarr;</a>
     </div>
   </footer>

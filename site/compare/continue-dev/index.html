@@ -171,6 +171,9 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
     .callout p strong { color: var(--accent); }
 
+    .cmd-snippet { background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0 1.5rem; font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--text); overflow-x: auto; white-space: pre; line-height: 1.5; }
+    .cmd-snippet .cp { color: var(--accent); user-select: none; margin-right: 0.5rem; }
+
     .comparison-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.85rem; }
     .comparison-table th { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border2); color: var(--muted); font-weight: 500; }
     .comparison-table td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
@@ -353,6 +356,8 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
   </header>
 
   <div class="article-body">
+    <div class="callout"><p><strong>The bottom line.</strong> Continue.dev is an IDE coding assistant with rules files; Mneme is a governance layer that enforces architectural decisions at Edit/Write with a precedence engine, so decisions are enforced rather than suggested. They compose: Continue generates, Mneme governs.</p></div>
+
     <h2>What Continue.dev brings to the IDE</h2>
 
     <p>Continue.dev is the closest open-source sibling to Cursor and the commercial AI coding assistants. It runs inside VS Code and JetBrains, supports a configurable model backend (Anthropic, OpenAI, local Ollama, others), and exposes two of the surfaces most relevant to a governance comparison: <strong>rules</strong> defined in <code style="font-family:'DM Mono',monospace;font-size:0.88em;color:var(--text);">config.yaml</code>, and <strong>context providers</strong> that pull project information into each session.</p>
@@ -473,6 +478,9 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
       <li><strong>Encode supersessions and overrides as decisions, not config ordering.</strong> Reading <code style="font-family:'DM Mono',monospace;font-size:0.88em;color:var(--text);">config.yaml</code> top-to-bottom should not be how a team learns which rule wins.</li>
     </ol>
 
+    <p>Mneme runs as the enforcement step on whatever Continue proposes. When Continue produces an edit, the same command evaluates it against your typed decisions at the Edit/Write hook:</p>
+    <pre class="cmd-snippet"><span class="cp">$</span> mneme check --memory .mneme/project_memory.json --input src/orchestration/runner.py --query "orchestration layer style"</pre>
+
     <p>In this architecture, Continue is the engineer&rsquo;s coding surface; Mneme is the team&rsquo;s enforcement layer. The two compose without overlap, and the failure modes of prose-as-rules disappear because prose is no longer being asked to do the work of typed precedence.</p>
 
     <section class="faq-list" aria-labelledby="faq-heading">
@@ -513,7 +521,8 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     <div class="cta-block">
       <h3>Precedence-aware governance underneath every coding agent</h3>
       <p>Mneme HQ enforces architectural decisions with explicit scope and a precedence engine. It runs at the Edit/Write hook for Continue, Cursor, Claude Code, Copilot, and any other AI coding agent. Open source, self-hosted, model-agnostic.</p>
-      <a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub &rarr;</a>
+      <a href="/pilot/" class="btn-primary" style="margin-right:0.5rem;">Request a pilot &rarr;</a>
+      <a href="https://github.com/TheoV823/mneme" class="btn-primary" style="background:transparent;border:1px solid var(--accent);color:var(--accent);">View on GitHub &rarr;</a>
       <a href="/insights/why-architectural-governance-needs-precedence-semantics/" class="cta-secondary">Read: Why architectural governance needs precedence semantics &rarr;</a>
     </div>
   </footer>

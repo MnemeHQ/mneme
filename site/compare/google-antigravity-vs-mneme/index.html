@@ -83,6 +83,8 @@
     .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
     .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
     .callout p strong { color: var(--accent); }
+    .cmd-snippet { background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0 1.5rem; font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--text); overflow-x: auto; white-space: pre; line-height: 1.5; }
+    .cmd-snippet .cp { color: var(--accent); user-select: none; margin-right: 0.5rem; }
     .compare-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.9rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
     .compare-table th { background: var(--surface2); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.95rem 1.1rem; text-align: left; border-bottom: 1px solid var(--border2); }
     .compare-table th.col-mneme { color: var(--accent); }
@@ -289,6 +291,8 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
       <li><strong>Mneme</strong> sits one layer up. It injects the architectural decisions relevant to the task before the agent generates, and validates outputs against compiled constraints at hook, commit, and CI time.</li>
       <li>The reviewer sees both the agent&rsquo;s Artifacts (what it did) and the structured governance verdict (whether the work belongs in the system). Review focuses on judgment.</li>
     </ul>
+    <p>Mneme runs as the enforcement step on whatever Antigravity produces. When an Artifact lands, the same command evaluates the changed file against your decisions:</p>
+    <pre class="cmd-snippet"><span class="cp">$</span> mneme check --memory .mneme/project_memory.json --input changed_file.py --query "service boundaries"</pre>
 
     <h2>How they meet in a real workflow</h2>
     <p>Picture an agent in Antigravity picking up a task. It drafts a plan, edits files, runs the terminal, and verifies the result in a browser, then posts an Artifact. With Mneme in place, the relevant architectural decisions are compiled in before that work starts, so the agent is steered away from a forbidden dependency or a cross-layer call as it writes. When the change reaches a commit or CI, Mneme evaluates the diff against those compiled rules and returns a verdict with provenance attached. The reviewer opens one place and sees two things: the Artifact that says what the agent did, and the governance verdict that says whether it belongs in the system. Nothing about the agent's speed changes; what changes is that an architectural violation is caught at the seam instead of in production.</p>
@@ -320,7 +324,8 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     <div class="cta-block">
       <h3>Use Mneme to add architectural governance to agent-first development workflows</h3>
       <p>Open source. Repo-native. Works alongside Antigravity and every other agentic IDE on the codebase.</p>
-      <a href="/integrations/antigravity/" class="btn-primary" style="margin-right:0.5rem;">Works with Antigravity &rarr;</a>
+      <a href="/pilot/" class="btn-primary" style="margin-right:0.5rem;">Request a pilot &rarr;</a>
+      <a href="/integrations/antigravity/" class="btn-primary" style="background:transparent;border:1px solid var(--accent);color:var(--accent);margin-right:0.5rem;">Works with Antigravity &rarr;</a>
       <a href="/insights/antigravity-solves-coordination-not-governance/" class="btn-primary" style="background:transparent;border:1px solid var(--accent);color:var(--accent);margin-right:0.5rem;">Read the analysis</a>
       <a href="https://github.com/TheoV823/mneme" class="btn-primary" style="background:transparent;border:1px solid var(--accent);color:var(--accent);">GitHub</a>
     </div>

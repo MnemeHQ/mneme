@@ -393,6 +393,8 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
 
     <h2>How it works</h2>
 
+    <p>The workflow runs <code>mneme check</code> against the changed files in the PR diff.</p>
+
     <ul>
       <li><code>mneme check</code> validates a file or diff against the decision corpus in <code>.mneme/project_memory.json</code></li>
       <li>Run against changed files in a PR to surface any architectural violations</li>
@@ -429,7 +431,7 @@ jobs:
       <li>CI enforcement gate is Phase 1 current focus — see the <a href="/roadmap/" style="color:var(--accent);text-decoration:none;">roadmap</a></li>
       <li>The <code>mneme check</code> command is available today via <code>pip install mneme-hq</code></li>
       <li>The GitHub Actions workflow above is the reference integration pattern</li>
-      <li>Managed GitHub Actions workflow artifact coming in Q3 2026</li>
+      <li>As of mneme-hq v0.4.x (June 2026), the manual workflow file above is the supported pattern. A managed GitHub Actions workflow artifact is slated for Q3 2026.</li>
     </ul>
 
     <h2>Layered governance model</h2>
