@@ -131,6 +131,59 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
           { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/" },
           { "@type": "ListItem", "position": 2, "name": "Pilot", "item": "https://mnemehq.com/pilot/" }
         ]
+      },
+      {
+        "@type": "Service",
+        "name": "Mneme Architectural Governance Pilot",
+        "serviceType": "Architectural governance for AI-assisted engineering teams",
+        "provider": { "@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/" },
+        "url": "https://mnemehq.com/pilot/",
+        "description": "A hands-on pilot that applies Mneme's deterministic architectural governance across a team's repositories, ADRs, and AI coding agent workflows."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Who is the Mneme pilot for?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Engineering teams already using AI coding tools (Cursor, Claude Code, GitHub Copilot, or agentic workflows) that have existing ADRs, repo rules, or engineering standards to enforce, and are seeing architectural drift, review delays, or consistency issues in AI-generated code. Strongest fit: platform, backend, infrastructure, or data-heavy systems with non-trivial architectural constraints."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Do I need a pilot to use Mneme?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. Mneme is open source under the MIT license and self-hosted. You can install it yourself any time with pip install mneme-hq and run mneme check against your repo. The pilot is for teams who want help applying it across their repositories, ADRs, and agent workflows."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Which AI coding tools does Mneme work with?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Mneme is repo-native and model-independent. It works alongside Cursor, Claude Code, GitHub Copilot, and agentic IDEs, enforcing the same architectural decisions regardless of which tool or model generates the code."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What do you need from us to start?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The AI coding tools your team uses, the architectural decisions or standards you want enforced (existing ADRs or repo rules are ideal), and the drift or consistency problem you are trying to solve. The form above captures this."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What happens after I submit the form?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Mneme reviews your request and responds within 1-2 business days."
+            }
+          }
+        ]
       }
     ]
   }
@@ -217,6 +270,49 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     .breadcrumb a { color: var(--muted); text-decoration: none; }
     .breadcrumb a:hover { color: var(--text); }
     .breadcrumb .sep { color: var(--border2); }
+
+    /* â”€â”€ ANSWER CAPSULE â”€â”€ */
+    .answer-capsule { max-width: 820px; margin: 0 auto; padding: 1.5rem 2rem; background: var(--surface); border-bottom: 1px solid rgba(200,240,96,0.18); font-size: 0.88rem; color: var(--muted); line-height: 1.8; }
+    .answer-capsule strong { color: var(--accent); }
+
+    /* â”€â”€ FAQ â”€â”€ */
+    .faq-section { border-top: 1px solid var(--border); margin-top: 3.5rem; padding-top: 2.5rem; }
+    .faq-section h2 {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin-bottom: 1.75rem;
+    }
+    .faq-item {
+      border-top: 1px solid var(--border);
+      padding: 1.4rem 0;
+    }
+    .faq-item:last-child { border-bottom: 1px solid var(--border); }
+    .faq-item h3 {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.6rem;
+      letter-spacing: -0.01em;
+    }
+    .faq-item p {
+      font-size: 0.86rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin: 0;
+    }
+    .faq-item code {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: 4px;
+      padding: 0.05rem 0.35rem;
+      color: var(--teal);
+    }
 
     /* â”€â”€ HEADER â”€â”€ */
     .page-tag {
@@ -502,6 +598,8 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     <span>Pilot</span>
   </div>
 
+  <div class="answer-capsule"><strong>A Mneme pilot brings deterministic architectural governance to engineering teams already using AI coding tools.</strong> Mneme enforces your team's architectural decisions across repositories, ADRs, and agent workflows in tools like Cursor, Claude Code, and GitHub Copilot, so standards are enforced at generation time rather than caught in review.</div>
+
   <div class="page-tag">Early access</div>
   <h1>Request a Mneme Pilot</h1>
   <p class="page-sub">Mneme is currently working with engineering teams using AI coding tools who need deterministic architectural governance across repositories, ADRs, and agent workflows.</p>
@@ -511,7 +609,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     <ul class="fit-list">
       <li>Cursor, Claude Code, GitHub Copilot, or agentic coding workflows in active use</li>
       <li>Existing ADRs, repo rules, or engineering standards to enforce</li>
-      <li>Architectural drift, review bottlenecks, or consistency issues appearing in AI-generated code</li>
+      <li>Architectural drift, review delays, or consistency issues appearing in AI-generated code</li>
       <li>Platform, backend, infrastructure, or data-heavy systems with non-trivial architectural constraints</li>
     </ul>
   </div>
@@ -557,7 +655,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
 
       <div class="field">
         <label for="pilot-challenge">What governance challenge are you trying to solve?</label>
-        <textarea id="pilot-challenge" name="challenge" placeholder="Describe the architectural drift, review bottleneck, or consistency problem you're dealing with…"></textarea>
+        <textarea id="pilot-challenge" name="challenge" placeholder="Describe the architectural drift, review delays, or consistency problem you're dealing with…"></textarea>
         <span class="field-hint">No minimum length — a sentence is fine.</span>
       </div>
 
@@ -577,6 +675,35 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
       <p style="font-size:0.88rem;color:var(--muted);margin:0;line-height:1.6;">Something went wrong. Please email <a href="mailto:theo@mnemehq.com" style="color:var(--accent);">theo@mnemehq.com</a> directly.</p>
     </div>
   </div>
+
+  <section class="faq-section">
+    <h2>Frequently asked</h2>
+
+    <div class="faq-item">
+      <h3>Who is the Mneme pilot for?</h3>
+      <p>Engineering teams already using AI coding tools (Cursor, Claude Code, GitHub Copilot, or agentic workflows) that have existing ADRs, repo rules, or engineering standards to enforce, and are seeing architectural drift, review delays, or consistency issues in AI-generated code. Strongest fit: platform, backend, infrastructure, or data-heavy systems with non-trivial architectural constraints.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Do I need a pilot to use Mneme?</h3>
+      <p>No. Mneme is open source under the MIT license and self-hosted. You can install it yourself any time with <code>pip install mneme-hq</code> and run <code>mneme check</code> against your repo. The pilot is for teams who want help applying it across their repositories, ADRs, and agent workflows.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Which AI coding tools does Mneme work with?</h3>
+      <p>Mneme is repo-native and model-independent. It works alongside Cursor, Claude Code, GitHub Copilot, and agentic IDEs, enforcing the same architectural decisions regardless of which tool or model generates the code.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>What do you need from us to start?</h3>
+      <p>The AI coding tools your team uses, the architectural decisions or standards you want enforced (existing ADRs or repo rules are ideal), and the drift or consistency problem you are trying to solve. The form above captures this.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>What happens after I submit the form?</h3>
+      <p>Mneme reviews your request and responds within 1-2 business days.</p>
+    </div>
+  </section>
 
 </div>
 </main>
