@@ -384,6 +384,8 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
 
     <h2>How it works together</h2>
 
+    <p>Mneme regenerates the <code>.cursor/rules/mneme.mdc</code> file from the decision corpus each session, so Cursor always reads a current, conflict-resolved rule set rather than a hand-maintained file that drifts.</p>
+
     <ul>
       <li>Mneme HQ stores architectural decisions in <code>.mneme/project_memory.json</code> — typed, scoped, versioned</li>
       <li>A single generate command writes a <code>.cursor/rules/mneme.mdc</code> file from the active decision corpus</li>
