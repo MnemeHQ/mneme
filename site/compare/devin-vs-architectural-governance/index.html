@@ -127,6 +127,9 @@
     .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
     .callout p strong { color: var(--accent); }
 
+    .cmd-snippet { background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0 1.5rem; font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--text); overflow-x: auto; white-space: pre; line-height: 1.5; }
+    .cmd-snippet .cp { color: var(--accent); user-select: none; margin-right: 0.5rem; }
+
     .compare-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.9rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
     .compare-table th { background: var(--surface2); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.95rem 1.1rem; text-align: left; border-bottom: 1px solid var(--border2); }
     .compare-table th.col-mneme { color: var(--accent); }
@@ -408,6 +411,8 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
       <li><strong>CI</strong> blocks merges that violate architectural invariants, with a provenance trace pointing back to the originating decision.</li>
       <li><strong>The reviewer</strong> sees both the agent&rsquo;s output and the structured governance verdict, so review focuses on judgment rather than constraint-spotting.</li>
     </ul>
+    <p>Mneme runs as the enforcement step on whatever Devin produces. The same deterministic command evaluates the changed file against your compiled decisions before the change reaches review:</p>
+    <pre class="cmd-snippet"><span class="cp">$</span> mneme check --memory .mneme/project_memory.json --input changed_file.py --query "service boundaries"</pre>
 
   </div><!-- /.article-body -->
 

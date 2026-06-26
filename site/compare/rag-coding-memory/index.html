@@ -171,6 +171,9 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
     .callout p strong { color: var(--accent); }
 
+    .cmd-snippet { background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0 1.5rem; font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--text); overflow-x: auto; white-space: pre; line-height: 1.5; }
+    .cmd-snippet .cp { color: var(--accent); user-select: none; margin-right: 0.5rem; }
+
     .comparison-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.85rem; }
     .comparison-table th { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border2); color: var(--muted); font-weight: 500; }
     .comparison-table td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
@@ -486,6 +489,9 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
       <li><strong>Use Mneme to enforce decision recall at edit time.</strong> Hook into Edit and Write operations. When the model produces an edit that violates an architectural decision, Mneme blocks it before it reaches the codebase.</li>
       <li><strong>Track overrides as first-class decision records.</strong> When a team intentionally diverges from a decision, the override is itself recorded with rationale and scope. RAG can surface the override discussion; Mneme governs the new boundary.</li>
     </ol>
+
+    <p>Mneme runs as the decision-recall step at edit time, independent of whatever RAG surfaced into context. The same command looks up the decisions that apply to the edited file and returns a deterministic verdict:</p>
+    <pre class="cmd-snippet"><span class="cp">$</span> mneme check --memory .mneme/project_memory.json --input services/auth/session.py --query "auth service boundaries"</pre>
 
     <p>In this architecture, RAG is the memory of <em>what we have written</em>. Mneme is the memory of <em>what we have decided</em>. A coding agent that uses both has stronger context and harder compliance guarantees than either provides alone &mdash; and the failure modes of RAG-as-decision-memory disappear, because RAG is no longer being asked to do the work it was never built for.</p>
 

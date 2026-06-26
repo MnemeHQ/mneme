@@ -171,6 +171,9 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
     .callout p strong { color: var(--accent); }
 
+    .cmd-snippet { background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0 1.5rem; font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--text); overflow-x: auto; white-space: pre; line-height: 1.5; }
+    .cmd-snippet .cp { color: var(--accent); user-select: none; margin-right: 0.5rem; }
+
     .comparison-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.85rem; }
     .comparison-table th { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border2); color: var(--muted); font-weight: 500; }
     .comparison-table td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
@@ -474,6 +477,9 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
       <li><strong>Hook Mneme into Edit/Write.</strong> When Continue proposes an edit, Mneme matches the scope, resolves precedence, and blocks violations before they land.</li>
       <li><strong>Encode supersessions and overrides as decisions, not config ordering.</strong> Reading <code style="font-family:'DM Mono',monospace;font-size:0.88em;color:var(--text);">config.yaml</code> top-to-bottom should not be how a team learns which rule wins.</li>
     </ol>
+
+    <p>Mneme runs as the enforcement step on whatever Continue proposes. When Continue produces an edit, the same command evaluates it against your typed decisions at the Edit/Write hook:</p>
+    <pre class="cmd-snippet"><span class="cp">$</span> mneme check --memory .mneme/project_memory.json --input src/orchestration/runner.py --query "orchestration layer style"</pre>
 
     <p>In this architecture, Continue is the engineer&rsquo;s coding surface; Mneme is the team&rsquo;s enforcement layer. The two compose without overlap, and the failure modes of prose-as-rules disappear because prose is no longer being asked to do the work of typed precedence.</p>
 
