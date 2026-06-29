@@ -395,6 +395,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
   }
 }
 </script>
+  <link rel="stylesheet" href="/assets/css/video.css">
 </head>
 <body>
 <!-- Google Tag Manager (noscript) -->
@@ -529,6 +530,11 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     <p>RAG retrieval quality is a function of embedding model quality, corpus size, and query construction. In small corpora (&lt;100 documents), RAG works reasonably well. As your decision corpus grows to hundreds of ADRs, style guides, runbooks, and policy documents, retrieval precision drops and recall degrades.</p>
 
     <p>More importantly, architectural decisions have precise scope signals — file patterns, service names, module boundaries — that embedding-based retrieval handles poorly. The embedding for "use dependency injection for service construction" is not significantly closer to a file path like <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">services/payments/handler.py</code> than it is to an unrelated document. Scope-aware retrieval requires structured matching, not vector similarity.</p>
+
+    <div class="yt-facade" data-video-id="0kC4OEG-yig" data-title="Why RAG Fails for Architectural Governance" role="button" tabindex="0" aria-label="Play video: Why RAG Fails for Architectural Governance">
+      <img class="yt-facade__thumb" src="https://i.ytimg.com/vi/0kC4OEG-yig/maxresdefault.jpg" alt="" loading="lazy">
+      <span class="yt-facade__play" aria-hidden="true"></span>
+    </div>
 
     <h2>Failure mode 4: Suggestion, not enforcement</h2>
 
@@ -851,5 +857,6 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
 <!-- mneme:marketing-body:end -->
 
 
+<script src="/assets/js/video.js" defer></script>
 </body>
 </html>

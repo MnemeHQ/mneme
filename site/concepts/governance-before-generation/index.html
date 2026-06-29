@@ -8,6 +8,7 @@
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
   <link rel="stylesheet" href="/assets/css/diagrams.css">
+  <link rel="stylesheet" href="/assets/css/video.css">
   <meta name="description" content="Governance before generation means enforcing architectural constraints before the AI writes code, not after it reaches review. The enforcement point is the strategic variable." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
@@ -656,6 +657,11 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
 
     <p>The table above describes a cost gradient. Every row to the right of pre-generation enforcement represents a stage where the violation already exists as written code and must be undone. The only enforcement point where the violation never exists is pre-generation. Every other point is catching something that already happened.</p>
 
+    <div class="yt-facade" data-video-id="tO_Z9rqXXfQ" data-title="Governance Before Generation" role="button" tabindex="0" aria-label="Play video: Governance Before Generation">
+      <img class="yt-facade__thumb" src="https://i.ytimg.com/vi/tO_Z9rqXXfQ/maxresdefault.jpg" alt="" loading="lazy">
+      <span class="yt-facade__play" aria-hidden="true"></span>
+    </div>
+
     <h2>The common misread: treating post-generation enforcement as equivalent</h2>
 
     <p>Teams that have invested in strong CI pipelines and thorough code review often argue that their post-generation enforcement is functionally equivalent to pre-generation governance. The reasoning: if the CI gate catches every violation and blocks every non-compliant merge, then no violations reach production — which is the goal.</p>
@@ -974,5 +980,6 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
 <!-- mneme:marketing-body:end -->
 
 
+<script src="/assets/js/video.js" defer></script>
 </body>
 </html>
