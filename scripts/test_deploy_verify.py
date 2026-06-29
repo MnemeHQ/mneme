@@ -46,6 +46,47 @@ def test_stale_200_is_fail():
     assert "stale" in detail
 
 
+# A page that lists an email — uploaded with a raw mailto + visible address.
+PAGE_EMAIL = (
+    b"<!DOCTYPE html>\n<html>\n<head><title>X</title></head>\n<body>\n"
+    b'<p>fresh content. Contact <a href="mailto:theo@mnemehq.com">theo@mnemehq.com</a>.</p>\n'
+    b"</body>\n</html>\n"
+)
+# What Cloudflare's Email Address Obfuscation actually serves: the mailto href
+# becomes /cdn-cgi/l/email-protection, the visible address becomes a
+# __cf_email__ span, and an email-decode script is injected before </body>.
+LIVE_EMAIL_OBFUSCATED = (
+    b"<!DOCTYPE html>\n<html>\n<head><title>X</title></head>\n<body>\n"
+    b'<p>fresh content. Contact <a href="/cdn-cgi/l/email-protection#0d61646c...">'
+    b'<span class="__cf_email__" data-cfemail="0d61646c...">[email&#160;protected]</span></a>.</p>\n'
+    b'<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>\n'
+    b'<script defer src="https://static.cloudflareinsights.com/beacon.min.js"></script>\n'
+    b"</body>\n</html>\n"
+)
+# Same Cloudflare obfuscation, but the page body is genuinely OLD content.
+LIVE_EMAIL_STALE = (
+    b"<!DOCTYPE html>\n<html>\n<head><title>X</title></head>\n<body>\n"
+    b'<p>OLD content. Contact <a href="/cdn-cgi/l/email-protection#0d61">'
+    b'<span class="__cf_email__" data-cfemail="0d61">[email&#160;protected]</span></a>.</p>\n'
+    b"</body>\n</html>\n"
+)
+
+
+def test_cloudflare_email_obfuscation_is_ok():
+    # The fresh page is served with Cloudflare email obfuscation; it must still
+    # verify OK (this is what was false-failing contact/founder/pilot/privacy).
+    needle = content_needle(PAGE_EMAIL)
+    assert classify(200, LIVE_EMAIL_OBFUSCATED, needle) == ("ok", "")
+
+
+def test_email_obfuscation_does_not_mask_stale():
+    # Email normalization must not let a genuinely stale page pass.
+    needle = content_needle(PAGE_EMAIL)
+    verdict, detail = classify(200, LIVE_EMAIL_STALE, needle)
+    assert verdict == "fail"
+    assert "stale" in detail
+
+
 def test_404_is_fail():
     assert classify(404, b"", content_needle(PAGE))[0] == "fail"
 
