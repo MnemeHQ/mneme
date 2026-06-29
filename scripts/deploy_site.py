@@ -1,4 +1,4 @@
-import urllib.request, urllib.parse, urllib.error, ssl, json, os, subprocess, sys, xml.etree.ElementTree as ET
+import urllib.request, urllib.parse, urllib.error, ssl, json, os, subprocess, sys, http.client, time, xml.etree.ElementTree as ET
 from pathlib import Path
 
 # Pure verification helpers live alongside this script (importable + unit-tested).
@@ -101,6 +101,64 @@ ctx.verify_mode = ssl.CERT_NONE
 BASE_REMOTE  = '/home/cadafdd1/mnemehq.com'
 BINARY_EXTS  = {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico', '.svg', '.woff2', '.woff', '.ttf', '.otf'}
 
+# ── cPanel transport: one keep-alive connection, paced + retried ──────────────
+# A delta deploy makes one UAPI call per changed file (238+ in a full sync).
+# cPanel's WAF (Imunify360) rate-limits NEW connections far more aggressively
+# than requests on an already-established one, so opening a fresh TLS connection
+# per call trips the limiter mid-run and the deploy IP gets dropped (connection
+# timeouts). Mitigations: reuse ONE keep-alive connection, pace the calls, and
+# retry each call with exponential backoff (rebuilding the connection on error).
+# A run of failures trips a circuit breaker so a sustained block aborts fast
+# instead of grinding through every remaining file.
+_PACE_SECONDS = 0.2
+_MAX_CONSEC_FAIL = 8
+_conn = None
+_consec_fail = 0
+
+def _cpanel_conn():
+    global _conn
+    if _conn is None:
+        _conn = http.client.HTTPSConnection(HOST, int(PORT), context=ctx, timeout=60)
+    return _conn
+
+def _cpanel_request(method, path, body=None, extra_headers=None, attempts=4):
+    """One UAPI call over the shared keep-alive connection. Paced, and retried
+    with exponential backoff (rebuilding the connection on any network error).
+    Returns raw response bytes. Raises ConnectionError after `attempts` failures;
+    after _MAX_CONSEC_FAIL consecutive failed calls raises SystemExit to abort
+    the whole deploy (a sustained block is not worth grinding through)."""
+    global _conn, _consec_fail
+    headers = {'Authorization': AUTH}
+    if extra_headers:
+        headers.update(extra_headers)
+    for attempt in range(attempts):
+        try:
+            conn = _cpanel_conn()
+            conn.request(method, path, body=body, headers=headers)
+            raw = conn.getresponse().read()   # fully drain so the connection can be reused
+            _consec_fail = 0
+            time.sleep(_PACE_SECONDS)          # gentle pacing to stay under the limiter
+            return raw
+        except (http.client.HTTPException, OSError):
+            try:
+                if _conn:
+                    _conn.close()
+            except Exception:
+                pass
+            _conn = None                       # force a fresh connection next attempt
+            if attempt < attempts - 1:
+                time.sleep(min(2 ** attempt, 20))   # backoff: ride out a transient throttle
+    _consec_fail += 1
+    if _consec_fail >= _MAX_CONSEC_FAIL:
+        raise SystemExit(
+            f'[FAIL] cPanel API at {HOST}:{PORT} unreachable for {_consec_fail} consecutive '
+            f'calls — likely an Imunify360/cPHulk rate-limit or block on the deploy IP '
+            f'({os.environ.get("RUNNER_NAME", "this runner")}). Aborting before grinding '
+            f'through the rest of the delta. Re-run once the block clears or the IP is '
+            f'exempted from the cPanel-API rate limiter.'
+        )
+    raise ConnectionError(f'cPanel request failed after {attempts} attempts: {method} {path}')
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
 def mkdir(remote_path):
     # Create one directory level via the modern UAPI Fileman::mkdir endpoint
@@ -108,24 +166,21 @@ def mkdir(remote_path):
     # json-api/cpanel mkdir endpoint started returning empty bodies, which
     # crashed json.loads and broke every deploy that created a new directory.
     parent, name = remote_path.rsplit('/', 1)
-    params = {'path': parent, 'name': name}
-    data = urllib.parse.urlencode(params).encode('utf-8')
-    req = urllib.request.Request(
-        f'https://{HOST}:{PORT}/execute/Fileman/mkdir', data=data,
-        headers={'Authorization': AUTH},
-    )
+    data = urllib.parse.urlencode({'path': parent, 'name': name}).encode('utf-8')
     try:
-        with urllib.request.urlopen(req, context=ctx, timeout=60) as r:
-            raw = r.read()
-    except urllib.error.HTTPError as e:
-        raw = e.read()
+        raw = _cpanel_request(
+            'POST', '/execute/Fileman/mkdir', body=data,
+            extra_headers={'Content-Type': 'application/x-www-form-urlencoded'},
+        )
+    except ConnectionError:
+        # Tolerate a flaky mkdir (the dir likely exists): a directory that
+        # genuinely failed surfaces as an upload failure + the verification step.
+        return {'status': 1}
     try:
         return json.loads(raw)
     except (ValueError, json.JSONDecodeError):
         # Tolerate an empty / non-JSON body: the directory is created or
-        # already exists. A directory that genuinely failed to create surfaces
-        # immediately as an upload failure (which does fail the deploy), so
-        # swallowing this is safe and keeps a flaky body from aborting the run.
+        # already exists.
         return {'status': 1}
 
 def upload(local_path, remote_subdir):
@@ -157,33 +212,24 @@ def upload(local_path, remote_subdir):
         f'Content-Type: {content_type}\r\n\r\n'
     ).encode('utf-8')
     body = header + content + f'\r\n--{boundary}--'.encode('utf-8')
-    req = urllib.request.Request(
-        f'https://{HOST}:{PORT}/execute/Fileman/upload_files', data=body,
-        headers={'Authorization': AUTH, 'Content-Type': f'multipart/form-data; boundary={boundary}'},
-    )
-    # cPanel's upload endpoint intermittently returns an empty / non-JSON body
-    # (or a transient network error). Either one used to crash json.loads and
-    # abort the whole deploy on a single flaky response. Retry a few times, and
-    # if it never returns parseable JSON, proceed optimistically: the
-    # post-upload verification step re-checks every URL for HTTP 200 and fails
-    # the deploy if this file genuinely did not land, so we never silently lose
-    # an upload.
-    import time
-    for attempt in range(3):
-        try:
-            with urllib.request.urlopen(req, context=ctx, timeout=60) as r:
-                raw = r.read()
-        except (urllib.error.URLError, OSError):
-            time.sleep(1 + attempt)
-            continue
-        try:
-            result = json.loads(raw)
-        except (ValueError, json.JSONDecodeError):
-            time.sleep(1 + attempt)
-            continue
-        ok = result.get('status') == 1 and result.get('data', {}).get('failed', 1) == 0
-        return 'OK' if ok else f'FAIL: {result.get("errors", result)}'
-    return 'OK'  # exhausted retries on a flaky body; verification will catch a real miss
+    # Upload over the shared keep-alive connection with pacing + backoff (see
+    # _cpanel_request). A persistently-flaky single file is tolerated as 'OK' —
+    # the post-upload verification step re-checks every URL for HTTP 200 and
+    # fails the deploy if a file genuinely did not land — but a sustained block
+    # trips the circuit breaker in _cpanel_request and aborts the run.
+    try:
+        raw = _cpanel_request(
+            'POST', '/execute/Fileman/upload_files', body=body,
+            extra_headers={'Content-Type': f'multipart/form-data; boundary={boundary}'},
+        )
+    except ConnectionError:
+        return 'OK'  # exhausted retries on this file; verification will catch a real miss
+    try:
+        result = json.loads(raw)
+    except (ValueError, json.JSONDecodeError):
+        return 'OK'  # flaky body; verification will catch a real miss
+    ok = result.get('status') == 1 and result.get('data', {}).get('failed', 1) == 0
+    return 'OK' if ok else f'FAIL: {result.get("errors", result)}'
 
 # Sync shared nav/footer snippets before upload
 result = subprocess.run(
