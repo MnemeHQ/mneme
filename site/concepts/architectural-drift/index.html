@@ -8,6 +8,7 @@
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
   <link rel="stylesheet" href="/assets/css/diagrams.css">
+  <link rel="stylesheet" href="/assets/css/video.css">
   <meta name="description" content="Architectural drift is the compound degradation in codebase coherence caused by AI agents producing code inconsistent with established decisions, uncorrected across sessions and agents." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
@@ -543,6 +544,11 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
 
     <p>The timeline above is not a worst case. It is the expected outcome of AI-assisted development without pre-generation governance. The compounding is not exceptional behavior — it is the natural result of agents using existing code as context, applied at high generation velocity.</p>
 
+    <div class="yt-facade" data-video-id="hP8jMyVA6D4" data-title="Architectural Drift" role="button" tabindex="0" aria-label="Play video: Architectural Drift">
+      <img class="yt-facade__thumb" src="https://i.ytimg.com/vi/hP8jMyVA6D4/maxresdefault.jpg" alt="" loading="lazy">
+      <span class="yt-facade__play" aria-hidden="true"></span>
+    </div>
+
     <h2>The common misread: treating drift as a per-PR problem</h2>
 
     <p>Teams that approach architectural drift with per-PR tooling — code review checklists, PR linting, violation count metrics — are measuring the wrong thing. They are measuring incidents when the problem is system-level degradation.</p>
@@ -804,5 +810,6 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
 <!-- mneme:marketing-body:end -->
 
 
+<script src="/assets/js/video.js" defer></script>
 </body>
 </html>
