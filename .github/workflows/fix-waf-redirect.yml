@@ -16,7 +16,12 @@ on:
 jobs:
   fix-waf:
     name: Add WAF exceptions (cPanel + Cloudflare)
-    runs-on: ubuntu-latest
+    # Runs on the self-hosted runner so cPanel API calls egress from the
+    # Krystal-whitelisted static IP (Cloud NAT on wp-proxy). ubuntu-latest
+    # exits from a non-whitelisted GitHub IP and is blocked by Imunify360.
+    # Triggers are trusted only (push to main, manual dispatch) — never
+    # pull_request — so untrusted PR code is not executed on the runner.
+    runs-on: [self-hosted, mneme-deploy]
     steps:
       - uses: actions/checkout@v4
 
@@ -27,6 +32,12 @@ jobs:
       - name: Add ModSec / CF WAF exceptions
         env:
           CPANEL_API_TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
+          # Point at the working HTTPS endpoint (cpanel.theovalmis.com / 443)
+          # via repo Variables, matching deploy-site.yml. Without these the
+          # script falls back to a hardcoded host:port that is not whitelisted.
+          CPANEL_HOST: ${{ vars.CPANEL_HOST }}
+          CPANEL_PORT: ${{ vars.CPANEL_PORT }}
+          CPANEL_USER: ${{ secrets.CPANEL_USER }}
           CF_WAF_TOKEN: ${{ secrets.CF_WAF_TOKEN }}
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
