@@ -1,0 +1,44 @@
+.yt-facade {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: 2.5rem 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface2);
+  cursor: pointer;
+}
+.yt-facade__thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.2s;
+}
+.yt-facade:hover .yt-facade__thumb { opacity: 0.85; }
+.yt-facade__play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 68px;
+  height: 48px;
+  transform: translate(-50%, -50%);
+  background: rgba(20, 24, 22, 0.82);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.yt-facade__play::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 52%;
+  transform: translate(-50%, -50%);
+  border-style: solid;
+  border-width: 11px 0 11px 18px;
+  border-color: transparent transparent transparent var(--accent, #c8f060);
+}
+.yt-facade:hover .yt-facade__play { background: rgba(20, 24, 22, 0.95); }
+.yt-facade:focus-visible { outline: 2px solid var(--accent, #c8f060); outline-offset: 2px; }
+.yt-facade iframe { width: 100%; height: 100%; border: 0; display: block; }
