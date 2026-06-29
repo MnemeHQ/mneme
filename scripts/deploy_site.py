@@ -83,8 +83,11 @@ def purge_cf_cache(urls=None):
         print(f'[WARN] Cloudflare purge error (deploy succeeded): {e}')
 
 # ── cPanel credentials ────────────────────────────────────────────────────────
-HOST  = os.environ.get('CPANEL_HOST',  '152.89.79.37')
-PORT  = os.environ.get('CPANEL_PORT',  '2083')
+# Endpoint is overridable via env (set CPANEL_HOST/CPANEL_PORT as repo Variables
+# in CI, e.g. cpanel.theovalmis.com / 443). `or` so an empty value falls back to
+# the default rather than blanking the host.
+HOST  = os.environ.get('CPANEL_HOST')  or '152.89.79.37'
+PORT  = os.environ.get('CPANEL_PORT')  or '2083'
 USER  = os.environ.get('CPANEL_USER',  'cadafdd1')
 TOKEN = os.environ.get('CPANEL_API_TOKEN', '')
 if not TOKEN:
@@ -112,7 +115,7 @@ def mkdir(remote_path):
         headers={'Authorization': AUTH},
     )
     try:
-        with urllib.request.urlopen(req, context=ctx) as r:
+        with urllib.request.urlopen(req, context=ctx, timeout=60) as r:
             raw = r.read()
     except urllib.error.HTTPError as e:
         raw = e.read()
@@ -168,7 +171,7 @@ def upload(local_path, remote_subdir):
     import time
     for attempt in range(3):
         try:
-            with urllib.request.urlopen(req, context=ctx) as r:
+            with urllib.request.urlopen(req, context=ctx, timeout=60) as r:
                 raw = r.read()
         except (urllib.error.URLError, OSError):
             time.sleep(1 + attempt)
