@@ -7,12 +7,8 @@ on:
       - 'site/**'
       - 'scripts/deploy_site.py'
   workflow_dispatch:
-  # Daily schedule paused 2026-06-29: the cPanel upload from the whitelisted
-  # runner is blocked (cPHulk/Imunify on authenticated cPanel-API calls), so the
-  # scheduled run only fails daily and trips the host firewall. Re-enable once the
-  # cPanel API access / token is sorted. Push-to-main and manual dispatch remain.
-  # schedule:
-  #   - cron: '0 6 * * *'  # 06:00 UTC daily — catches any commits that skipped the push trigger
+  schedule:
+    - cron: '0 6 * * *'  # 06:00 UTC daily — catches any commits that skipped the push trigger
 
 permissions:
   contents: write
