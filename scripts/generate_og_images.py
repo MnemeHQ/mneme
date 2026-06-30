@@ -262,6 +262,14 @@ TEMPLATE_MAP = {
     "og-insights-regulated-industries.html": "insights/ai-governance-for-regulated-industries/og.png",
     "og-insights-life-sciences.html": "insights/ai-coding-agents-life-sciences-governance/og.png",
     "og-insights-financial-services.html": "insights/ai-coding-agents-financial-services-audit-trail/og.png",
+
+    # Insights — new
+    "og-insights-anthropic-rsi.html": "insights/anthropic-recursive-self-improvement-engineering-governance/og.png",
+    "og-insights-morph-reflexes.html": "insights/morph-reflexes-agent-observability-engineering-governance/og.png",
+    "og-insights-nemo-toolkit.html": "insights/nvidia-nemo-agent-toolkit-engineering-governance/og.png",
+    "og-insights-palantir-agentic.html": "insights/palantir-agentic-governance-engineering-governance/og.png",
+    "og-insights-databricks-omnigent.html": "insights/databricks-omnigent-agent-infrastructure-governance/og.png",
+    "og-insights-gartner-ai-governance.html": "insights/gartner-ai-governance-engineering-governance/og.png",
 }
 
 PORT = 8765
