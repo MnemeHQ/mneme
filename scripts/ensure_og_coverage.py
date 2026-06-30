@@ -165,6 +165,54 @@ def make_template(tag: str, heading: str, font_size: str, subtitle: str, url_pat
 TEMPLATES = [
     # === INSIGHTS ===
     (
+        "og-insights-anthropic-rsi.html",
+        "Insights",
+        "Recursive Self-Improvement Makes Engineering Governance Inevitable",
+        "40px",
+        "Anthropic: Claude now writes 80%+ of the code merged into its codebase.",
+        "insights/anthropic-recursive-self-improvement-engineering-governance",
+    ),
+    (
+        "og-insights-morph-reflexes.html",
+        "Insights",
+        "Agent Observability Is Not Engineering Governance",
+        "46px",
+        "Morph Reflexes watches how agents behave. Governance decides what they build.",
+        "insights/morph-reflexes-agent-observability-engineering-governance",
+    ),
+    (
+        "og-insights-nemo-toolkit.html",
+        "Insights",
+        "NVIDIA NeMo Agent Toolkit: Who Governs the Code?",
+        "44px",
+        "Workflow tooling for agents, and the governance layer it leaves open.",
+        "insights/nvidia-nemo-agent-toolkit-engineering-governance",
+    ),
+    (
+        "og-insights-palantir-agentic.html",
+        "Insights",
+        "Palantir's Agentic Governance Reveals a Missing Layer",
+        "44px",
+        "Agent governance controls what agents do. Engineering governance controls what they build.",
+        "insights/palantir-agentic-governance-engineering-governance",
+    ),
+    (
+        "og-insights-databricks-omnigent.html",
+        "Insights",
+        "Databricks Omnigent and the Agent Infrastructure Layer",
+        "44px",
+        "Orchestration coordinates agents. Governance preserves intent.",
+        "insights/databricks-omnigent-agent-infrastructure-governance",
+    ),
+    (
+        "og-insights-gartner-ai-governance.html",
+        "Insights",
+        "Gartner Defined AI Governance. Engineering Needs Its Own Layer.",
+        "42px",
+        "Governing AI systems is different from governing the code agents change.",
+        "insights/gartner-ai-governance-engineering-governance",
+    ),
+    (
         "og-insights-acceleration-whiplash.html",
         "Insights",
         "The Acceleration Whiplash and the Governance Gap",
@@ -707,6 +755,12 @@ TEMPLATES = [
 # ---------------------------------------------------------------------------
 
 NEW_MAP_ENTRIES = {
+    "og-insights-anthropic-rsi.html": "insights/anthropic-recursive-self-improvement-engineering-governance/og.png",
+    "og-insights-morph-reflexes.html": "insights/morph-reflexes-agent-observability-engineering-governance/og.png",
+    "og-insights-nemo-toolkit.html": "insights/nvidia-nemo-agent-toolkit-engineering-governance/og.png",
+    "og-insights-palantir-agentic.html": "insights/palantir-agentic-governance-engineering-governance/og.png",
+    "og-insights-databricks-omnigent.html": "insights/databricks-omnigent-agent-infrastructure-governance/og.png",
+    "og-insights-gartner-ai-governance.html": "insights/gartner-ai-governance-engineering-governance/og.png",
     # Pre-existing templates missing from TEMPLATE_MAP
     "og-insights-genai-stack.html": "insights/generative-ai-software-engineering-stack/og.png",
     "og-insights-deployment-quality.html": "insights/deployment-quality-will-define-the-ai-era/og.png",

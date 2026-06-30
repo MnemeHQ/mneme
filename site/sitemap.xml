@@ -787,4 +787,34 @@
   <url><loc>https://mnemehq.com/contact/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://mnemehq.com/founder/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://mnemehq.com/privacy/</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url>
+    <loc>https://mnemehq.com/insights/anthropic-recursive-self-improvement-engineering-governance/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/insights/morph-reflexes-agent-observability-engineering-governance/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/insights/nvidia-nemo-agent-toolkit-engineering-governance/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/insights/palantir-agentic-governance-engineering-governance/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/insights/databricks-omnigent-agent-infrastructure-governance/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mnemehq.com/insights/gartner-ai-governance-engineering-governance/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>
