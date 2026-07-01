@@ -129,5 +129,5 @@ Mneme alignment is honest: tracking, design-aligned, planning to engage with fut
 - JavaScript governance (Tier 1, operationally supported): https://mnemehq.com/supported-languages/javascript-governance/
 - Supported languages canonical docs (coverage matrix, limitations, roadmap): https://mnemehq.com/docs/supported-languages/
 - Roadmap: https://mnemehq.com/roadmap/
-- Source: https://github.com/TheoV823/mneme
-- Benchmarks: https://github.com/TheoV823/mneme/tree/main/examples/benchmarks
+- Source: https://github.com/MnemeHQ/mneme
+- Benchmarks: https://github.com/MnemeHQ/mneme/tree/main/examples/benchmarks

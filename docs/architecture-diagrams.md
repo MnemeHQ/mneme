@@ -15,21 +15,23 @@ between coding agents and generated code.
 flowchart TD
   Dev[Developer]
   Agents["Claude Code / Cursor / Codex"]
-  Mneme["Mneme HQ<br/>Engineering Governance Layer"]
-  Decision{Governance decision}
-  Outcome["Allow / Reject / Guide"]
-  Code[Generated code]
+  Mneme["Mneme HQ<br/>Engineering Governance Layer for AI Coding Agents"]
+  Eval{Policy evaluation}
+  Code["Architecturally compliant code"]
+  Guidance[Guidance]
 
   Dev --> Agents --> Mneme
   Mneme --- ADRs[ADRs]
+  Mneme --- Standards[Standards]
   Mneme --- Rules[Engineering rules]
   Mneme --- Memory[Project memory]
-  Mneme --- Standards[Standards]
-  ADRs --> Decision
-  Rules --> Decision
-  Memory --> Decision
-  Standards --> Decision
-  Decision --> Outcome --> Code
+  ADRs --> Eval
+  Standards --> Eval
+  Rules --> Eval
+  Memory --> Eval
+  Eval -->|Allow| Code
+  Eval -->|Reject| Guidance
+  Guidance -->|retry| Agents
 ```
 
 ## 2. Generation flow

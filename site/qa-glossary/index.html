@@ -234,7 +234,7 @@
           {"@type": "Question", "name": "How does Mneme HQ relate to AI safety?", "acceptedAnswer": {"@type": "Answer", "text": "It's a narrow slice of AI safety: governance of AI-generated code at the project level. It's not AI alignment, not model safety, not RLHF. It's the boring, auditable, deterministic kind of safety that matters when AI is actually shipping code into production. The relevant safety claim is reproducibility: every verdict is reconstructable, no black box, no model in the verdict loop."}},
           {"@type": "Question", "name": "Can I use Mneme HQ for non-code governance (docs, configs, prompts)?", "acceptedAnswer": {"@type": "Answer", "text": "The mechanism is general — Decisions and ADRs are not code-specific. In practice, the v0.x integrations and benchmark focus on code. Governance of generated docs, configs, or prompts is a plausible extension but is not currently in scope."}},
           {"@type": "Question", "name": "How do I contribute to Mneme HQ?", "acceptedAnswer": {"@type": "Answer", "text": "The repository governs itself with Mneme. Read CLAUDE.md and the freeze artifact (docs/architecture/layer1-freeze-e73ff7d.md) before opening a PR. Changes to decision_retriever.py, enforcer.py, benchmark.py, or any benchmark fixture are charter-level changes requiring the freeze doc's amendment procedure. Docs, tooling, integrations, the site, and examples proceed normally with [memory] prefix discipline for project_memory.json edits."}},
-          {"@type": "Question", "name": "Is Mneme HQ open source?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, MIT licensed. The repository is at github.com/TheoV823/mneme. The mechanism, the benchmark methodology, the freeze artifact, the ADR compiler, and all integrations are open. Commercial offerings (managed governance, hosted policy packs, enterprise audit log) are planned for Layer 2 but the core stays open."}}
+          {"@type": "Question", "name": "Is Mneme HQ open source?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, MIT licensed. The repository is at github.com/MnemeHQ/mneme. The mechanism, the benchmark methodology, the freeze artifact, the ADR compiler, and all integrations are open. Commercial offerings (managed governance, hosted policy packs, enterprise audit log) are planned for Layer 2 but the core stays open."}}
         ]
       },
       {
@@ -389,7 +389,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     <a href="/concepts/">Concepts</a>
     <a href="/insights/">Insights</a>
     <a href="/docs/">Docs</a>
-    <a href="https://github.com/TheoV823/mneme">GitHub</a>
+    <a href="https://github.com/MnemeHQ/mneme">GitHub</a>
     <a href="/pilot/" class="btn-nav-cta">Request a pilot</a>
   </div>
 </nav>
@@ -432,7 +432,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
       <span class="sep">&middot;</span>
       <time datetime="2026-05-22">Published May 2026</time>
       <span class="sep">&middot;</span>
-      <a href="https://github.com/TheoV823/mneme">github.com/TheoV823/mneme</a>
+      <a href="https://github.com/MnemeHQ/mneme">github.com/MnemeHQ/mneme</a>
       <span class="sep">&middot;</span>
       MIT License
     </p>
@@ -489,7 +489,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
 
         <li class="qa-item"><h3 class="qa-question" id="q-contribute">How do I contribute to Mneme HQ?</h3><div class="qa-answer"><p>The repository governs itself with Mneme. Read <code>CLAUDE.md</code> and the freeze artifact (<code>docs/architecture/layer1-freeze-e73ff7d.md</code>) before opening a PR. Changes to <code>decision_retriever.py</code>, <code>enforcer.py</code>, <code>benchmark.py</code>, or any benchmark fixture are charter-level changes requiring the freeze doc's amendment procedure. Docs, tooling, integrations, the site, and examples proceed normally with <code>[memory]</code> prefix discipline for <code>project_memory.json</code> edits.</p></div></li>
 
-        <li class="qa-item"><h3 class="qa-question" id="q-open-source">Is Mneme HQ open source?</h3><div class="qa-answer"><p>Yes, MIT licensed. The repository is at <a href="https://github.com/TheoV823/mneme">github.com/TheoV823/mneme</a>. The mechanism, the benchmark methodology, the freeze artifact, the ADR compiler, and all integrations are open. Commercial offerings (managed governance, hosted policy packs, enterprise audit log) are planned for Layer 2 but the core stays open.</p></div></li>
+        <li class="qa-item"><h3 class="qa-question" id="q-open-source">Is Mneme HQ open source?</h3><div class="qa-answer"><p>Yes, MIT licensed. The repository is at <a href="https://github.com/MnemeHQ/mneme">github.com/MnemeHQ/mneme</a>. The mechanism, the benchmark methodology, the freeze artifact, the ADR compiler, and all integrations are open. Commercial offerings (managed governance, hosted policy packs, enterprise audit log) are planned for Layer 2 but the core stays open.</p></div></li>
 
         </ol>
       </section>
@@ -791,7 +791,7 @@ Body markdown follows.</code></pre>
       <h2 class="section-title">How to cite</h2>
       <div class="cite-block">
         <div class="cite-label">Canonical citation</div>
-        <p>Mneme HQ. <em>Q&amp;A and Glossary</em>. mnemehq.com. 2026. Available at: <a href="https://mnemehq.com/qa-glossary/">https://mnemehq.com/qa-glossary/</a> and <a href="https://github.com/TheoV823/mneme">https://github.com/TheoV823/mneme</a>.</p>
+        <p>Mneme HQ. <em>Q&amp;A and Glossary</em>. mnemehq.com. 2026. Available at: <a href="https://mnemehq.com/qa-glossary/">https://mnemehq.com/qa-glossary/</a> and <a href="https://github.com/MnemeHQ/mneme">https://github.com/MnemeHQ/mneme</a>.</p>
         <p>MIT License. Reproduction and citation encouraged.</p>
       </div>
     </section>
@@ -849,7 +849,7 @@ Body markdown follows.</code></pre>
     <div>
       <div style="font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.9rem;">Connect</div>
       <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
-        <li><a href="https://github.com/TheoV823/mneme">GitHub</a></li>
+        <li><a href="https://github.com/MnemeHQ/mneme">GitHub</a></li>
         <li><a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener">LinkedIn</a></li>
         <li><a href="https://dev.to/mnemehq" target="_blank" rel="noopener">DEV.to</a></li>
         <li><a href="https://www.youtube.com/@MnemeHQ" target="_blank" rel="noopener">YouTube</a></li>
@@ -872,7 +872,7 @@ Body markdown follows.</code></pre>
   <div style="max-width: 1080px; margin: 1.25rem auto 0; padding-top: 1.25rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.03em;">
     <span style="display:inline-flex;align-items:center;gap:0.75rem;"><a href="/" aria-label="Mneme HQ home" style="display:inline-flex;opacity:0.75;"><img src="/favicon.png" alt="Mneme HQ" height="22" style="display:block;"></a><span>Mneme HQ&trade; &middot; Open source &middot; MIT License</span></span>
     <nav aria-label="Social media" style="display: flex; align-items: center; gap: 1rem;">
-      <a href="https://github.com/TheoV823/mneme" target="_blank" rel="noopener" aria-label="GitHub" style="color: var(--muted); display: inline-flex;">
+      <a href="https://github.com/MnemeHQ/mneme" target="_blank" rel="noopener" aria-label="GitHub" style="color: var(--muted); display: inline-flex;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.16c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.27-1.69-1.27-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.34.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18.92-.26 1.91-.39 2.89-.39.98 0 1.97.13 2.89.39 2.2-1.49 3.17-1.18 3.17-1.18.62 1.58.23 2.75.12 3.04.73.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.26 5.68.41.35.78 1.05.78 2.12v3.15c0 .31.21.67.8.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
       </a>
       <a href="https://www.linkedin.com/company/mnemehq" target="_blank" rel="noopener" aria-label="LinkedIn" style="color: var(--muted); display: inline-flex;">

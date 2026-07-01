@@ -152,8 +152,8 @@ Marketing/SEO pages framed as "architectural governance for AI-assisted X develo
 
 ## Source and benchmarks
 
-- [GitHub repository](https://github.com/TheoV823/mneme)
-- [Benchmark scenarios](https://github.com/TheoV823/mneme/tree/main/examples/benchmarks)
+- [GitHub repository](https://github.com/MnemeHQ/mneme)
+- [Benchmark scenarios](https://github.com/MnemeHQ/mneme/tree/main/examples/benchmarks)
 
 ## Reported benchmark
 
