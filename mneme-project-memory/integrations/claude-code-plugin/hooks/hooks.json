@@ -1,0 +1,17 @@
+{
+  "description": "Mneme architectural-governance enforcement for Claude Code edits.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PY=\"$(command -v python3 || command -v python)\"; [ -z \"$PY\" ] && exit 0; W=\"${CLAUDE_PLUGIN_ROOT}/scripts/run_mneme_hook.py\"; [ -f \"$W\" ] || exit 0; exec \"$PY\" \"$W\"",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}
