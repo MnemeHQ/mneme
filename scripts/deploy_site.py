@@ -60,27 +60,34 @@ def purge_cf_cache(urls=None):
     if not CF_TOKEN or not CF_ZONE_ID:
         print('[SKIP] Cloudflare cache purge - CF_API_TOKEN or CF_ZONE_ID not set')
         return
+    def _post(payload, desc):
+        req = urllib.request.Request(
+            f'https://api.cloudflare.com/client/v4/zones/{CF_ZONE_ID}/purge_cache',
+            data=payload,
+            headers={'Authorization': f'Bearer {CF_TOKEN}', 'Content-Type': 'application/json'},
+            method='POST',
+        )
+        try:
+            with urllib.request.urlopen(req) as r:
+                result = json.loads(r.read())
+            if result.get('success'):
+                print(f'[OK] Cloudflare cache purged ({desc})')
+            else:
+                print(f'[WARN] Cloudflare purge failed: {result.get("errors")}')
+        except Exception as e:
+            print(f'[WARN] Cloudflare purge error (deploy succeeded): {e}')
+
     if urls:
-        payload = json.dumps({'files': urls}).encode()
-        desc = f'{len(urls)} URL(s): {", ".join(urls)}'
+        # Cloudflare purge-by-URL accepts at most 30 files per request; batch them
+        # so large deploys (e.g. a sitewide change touching every page's footer)
+        # don't get rejected with HTTP 400 and leave stale content served.
+        BATCH = 30
+        for i in range(0, len(urls), BATCH):
+            batch = urls[i:i + BATCH]
+            _post(json.dumps({'files': batch}).encode(),
+                  f'{len(batch)} URL(s), batch {i // BATCH + 1} of {(len(urls) + BATCH - 1) // BATCH}')
     else:
-        payload = json.dumps({'purge_everything': True}).encode()
-        desc = 'everything'
-    req = urllib.request.Request(
-        f'https://api.cloudflare.com/client/v4/zones/{CF_ZONE_ID}/purge_cache',
-        data=payload,
-        headers={'Authorization': f'Bearer {CF_TOKEN}', 'Content-Type': 'application/json'},
-        method='POST',
-    )
-    try:
-        with urllib.request.urlopen(req) as r:
-            result = json.loads(r.read())
-        if result.get('success'):
-            print(f'[OK] Cloudflare cache purged ({desc})')
-        else:
-            print(f'[WARN] Cloudflare purge failed: {result.get("errors")}')
-    except Exception as e:
-        print(f'[WARN] Cloudflare purge error (deploy succeeded): {e}')
+        _post(json.dumps({'purge_everything': True}).encode(), 'everything')
 
 # ── cPanel credentials ────────────────────────────────────────────────────────
 # Endpoint is overridable via env (set CPANEL_HOST/CPANEL_PORT as repo Variables
