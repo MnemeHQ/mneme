@@ -91,11 +91,34 @@ def find_memory(start: Path) -> Optional[Path]:
 
 _CHECK_TIMEOUT_SECONDS = 10
 
+_VALID_MODES = ("strict", "warn")
+
+# Environment variables consulted for the enforcement mode, in precedence order.
+# MNEME_HOOK_MODE is the explicit override; CLAUDE_PLUGIN_OPTION_MODE is set by
+# Claude Code from the plugin's `mode` userConfig option. The first one that is
+# present wins.
+_MODE_ENV_VARS = ("MNEME_HOOK_MODE", "CLAUDE_PLUGIN_OPTION_MODE")
+
+
+def resolve_mode() -> str:
+    """Resolve the Claude Code hook enforcement mode.
+
+    Precedence: ``MNEME_HOOK_MODE`` (explicit override) > ``CLAUDE_PLUGIN_OPTION_MODE``
+    (the Claude Code plugin's ``mode`` userConfig value, exported to hook
+    subprocesses) > ``"strict"`` (safe default). The first variable that is set
+    determines the mode; an unrecognized value falls back to ``"strict"`` so a
+    typo can never silently disable enforcement.
+    """
+    for name in _MODE_ENV_VARS:
+        value = os.environ.get(name)
+        if value is not None:
+            value = value.strip().lower()
+            return value if value in _VALID_MODES else "strict"
+    return "strict"
+
 
 def _run_check(event: ToolEvent, proposed_content: str, memory: Path, stderr: TextIO) -> int:
-    mode = os.environ.get("MNEME_HOOK_MODE", "strict")
-    if mode not in ("strict", "warn"):
-        mode = "strict"
+    mode = resolve_mode()
 
     with tempfile.NamedTemporaryFile(
         mode="w", suffix=".txt", delete=False, encoding="utf-8"

@@ -1,0 +1,18 @@
+{
+  "description": "Mneme architectural-enforcement hook for Claude Code edits.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "mneme-hook",
+            "args": [],
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

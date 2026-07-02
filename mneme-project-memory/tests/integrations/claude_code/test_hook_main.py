@@ -137,3 +137,33 @@ def test_subprocess_uses_sys_executable_not_bare_mneme(tmp_path):
     assert cmd[1] == "-m"
     assert cmd[2] == "mneme"
     assert cmd[3] == "check"
+
+
+# --- Additional fail-open boundaries at the main() level ---
+
+def test_malformed_event_fails_open():
+    """A non-JSON / malformed envelope must never block; main returns 0."""
+    with patch("mneme.integrations.claude_code.hook.subprocess.run") as mrun:
+        rc = main(stdin=io.StringIO("this is not json{"))
+    assert rc == 0
+    mrun.assert_not_called()
+
+
+def test_materialize_failure_fails_open(tmp_path):
+    """When proposed content cannot be reconstructed (old_string not in file),
+    main fails open and never shells out to mneme check."""
+    mem, target = _project_with_memory(tmp_path)  # target contains "import os\n"
+    envelope = json.dumps({
+        "hook_event_name": "PreToolUse",
+        "tool_name": "Edit",
+        "cwd": str(tmp_path),
+        "tool_input": {
+            "file_path": str(target),
+            "old_string": "THIS_STRING_IS_NOT_IN_THE_FILE",
+            "new_string": "x",
+        },
+    })
+    with patch("mneme.integrations.claude_code.hook.subprocess.run") as mrun:
+        rc = main(stdin=io.StringIO(envelope))
+    assert rc == 0
+    mrun.assert_not_called()
