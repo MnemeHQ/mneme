@@ -30,6 +30,14 @@ def test_manifest_is_valid_and_declares_mode_option():
     assert mode["default"] in ("strict", "warn")
 
 
+def test_manifest_omits_explicit_version_during_development():
+    """During active development the manifest declares no explicit `version`, so
+    git-source installs key on the commit SHA (no per-update version bump). Add
+    a version only when entering a stable marketplace release cycle."""
+    manifest = _load(".claude-plugin/plugin.json")
+    assert "version" not in manifest
+
+
 def test_hook_uses_exec_form_direct_invocation():
     hooks = _load("hooks/hooks.json")
     pre = hooks["hooks"]["PreToolUse"]

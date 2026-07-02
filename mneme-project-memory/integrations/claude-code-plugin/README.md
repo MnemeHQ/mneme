@@ -120,7 +120,7 @@ The hook is a first line of defence, not a complete audit.
 The hook allows the edit — never blocks — when:
 
 - `mneme-hook` is not on `PATH` (the exec-form spawn fails; non-blocking error)
-- The target file cannot be read (common for Write — the file doesn't exist yet)
+- The existing target file cannot be read or reconstructed for an Edit or MultiEdit operation
 - `.mneme/project_memory.json` cannot be found by walking up from the working dir
 - The tool event is malformed
 - `mneme check` times out (10 s internal) or any other execution error occurs
