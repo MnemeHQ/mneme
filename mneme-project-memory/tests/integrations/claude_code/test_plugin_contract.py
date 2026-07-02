@@ -5,6 +5,7 @@ running Claude Code or invoking any shell — so they catch regressions such as
 reintroducing a shell-string launcher or breaking the exec-form invocation.
 """
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -30,12 +31,23 @@ def test_manifest_is_valid_and_declares_mode_option():
     assert mode["default"] in ("strict", "warn")
 
 
-def test_manifest_omits_explicit_version_during_development():
-    """During active development the manifest declares no explicit `version`, so
-    git-source installs key on the commit SHA (no per-update version bump). Add
-    a version only when entering a stable marketplace release cycle."""
+# Official semver core + optional prerelease/build (semver.org).
+_SEMVER = re.compile(
+    r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)"
+    r"(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)"
+    r"(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?"
+    r"(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$"
+)
+
+
+def test_manifest_declares_valid_semver_version():
+    """`claude plugin validate --strict` treats a missing version as an error,
+    so the manifest must declare an explicit semver version."""
     manifest = _load(".claude-plugin/plugin.json")
-    assert "version" not in manifest
+    assert "version" in manifest, "manifest must declare a version for --strict"
+    assert _SEMVER.match(manifest["version"]), (
+        f"version {manifest['version']!r} is not valid semver"
+    )
 
 
 def test_hook_uses_exec_form_direct_invocation():

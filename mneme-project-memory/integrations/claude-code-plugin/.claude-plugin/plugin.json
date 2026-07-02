@@ -1,6 +1,7 @@
 {
   "name": "mneme",
   "displayName": "Mneme",
+  "version": "0.1.0",
   "description": "Enforce architectural decisions and engineering standards before Claude Code writes changes.",
   "author": {
     "name": "Mneme HQ",
