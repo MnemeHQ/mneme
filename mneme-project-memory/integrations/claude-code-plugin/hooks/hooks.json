@@ -1,5 +1,5 @@
 {
-  "description": "Mneme architectural-governance enforcement for Claude Code edits.",
+  "description": "Mneme architectural-enforcement hook for Claude Code edits.",
   "hooks": {
     "PreToolUse": [
       {
@@ -7,8 +7,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "PY=\"$(command -v python3 || command -v python)\"; [ -z \"$PY\" ] && exit 0; W=\"${CLAUDE_PLUGIN_ROOT}/scripts/run_mneme_hook.py\"; [ -f \"$W\" ] || exit 0; exec \"$PY\" \"$W\"",
-            "timeout": 15
+            "command": "mneme-hook",
+            "args": [],
+            "timeout": 30
           }
         ]
       }

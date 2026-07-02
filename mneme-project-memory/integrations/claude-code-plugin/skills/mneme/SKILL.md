@@ -52,11 +52,15 @@ and the violated decision id is surfaced in the error.
 
 ## Requirements & configuration
 
-- **Mneme must be installed:** `pipx install "mneme-hq>=0.4.2"`. Without it the
-  hook fails open (edits are never blocked) and prints an install hint.
-- **Enforcement mode** is set by the plugin's `mode` configuration option
-  (`strict` blocks violations, `warn` reports them without blocking). Switch to
-  `warn` while iterating on decisions to avoid friction.
+- **Mneme must be installed** and `mneme-hook` must be on `PATH`. The reliable
+  hook needs the `v0.4.2` fixes, which are not yet on PyPI (published: `0.4.0`);
+  until then install from the repository (`pip install -e mneme-project-memory`).
+  See the plugin README for details. Without Mneme the hook fails open (edits
+  are never blocked).
+- **Enforcement mode** is set by the plugin's `mode` configuration option and
+  reaches the hook as `CLAUDE_PLUGIN_OPTION_MODE`. Precedence:
+  `MNEME_HOOK_MODE` > `CLAUDE_PLUGIN_OPTION_MODE` > `strict`; unknown values fall
+  back to `strict`. Use `warn` while iterating on decisions to avoid friction.
 
 ## Related
 
