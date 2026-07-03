@@ -175,39 +175,121 @@ revoke it in the PyPI project settings and issue a new one.
 
 ## 14. Validate the public package from a clean `pipx` environment
 
-Verify what PyPI actually serves — from a *fresh* environment, not the build
-venv (which already has the local package installed).
+Verify what PyPI actually serves — from a *fresh*, isolated environment, not the
+build venv (which already has the local source package installed). Uninstall
+first so you cannot accidentally validate a stale install, then pin the exact
+published version.
 
 ```powershell
 deactivate
+pipx uninstall mneme-hq
 pipx install "mneme-hq==0.5.0"
+
+Get-Command mneme
+Get-Command mneme-hook
 mneme --help
-mneme-hook --help          # both console scripts resolve on PATH
 ```
 
-`pipx` installs into an isolated environment, so this proves the published
-wheel — not your local checkout — provides both entry points.
+Notes:
 
-## 15. Repeat Claude Code plugin strict validation
+- It is fine if `pipx uninstall` reports the package was not installed — the
+  point is to guarantee a clean starting state.
+- Confirm both console scripts resolve with `Get-Command` (they must point into
+  the `pipx` environment, not your source checkout).
+- Only `mneme` has a `--help`. **Do not run `mneme-hook --help`** — `mneme-hook`
+  is the Claude Code hook entrypoint: it reads a hook event from **stdin**, so
+  invoking it interactively (with or without `--help`) blocks waiting for EOF.
+  Its real validation is the Claude Code smoke test in steps 15–16.
+
+> The pytest end-to-end tests in
+> `tests/integrations/claude_code/test_hook_e2e.py` are **source-level
+> regression tests**, not public-package validation. They import the hook
+> adapter directly from the source checkout, and the adapter launches
+> `[sys.executable, "-m", "mneme", ...]`; run from `mneme-project-memory/` that
+> can execute the **local source** package rather than the `pipx`-installed
+> public one. Keep running them (step 5) as regression coverage, but validate
+> the *published* package only through the real plugin path below.
+
+## 15. Validate the plugin with Claude Code strict validation
+
+This and the next step are the **real** public-package validation: they exercise
+the `pipx`-installed `mneme` / `mneme-hook` commands through the actual Claude
+Code plugin, not through the source checkout.
+
+From the **repository root**, resolve the plugin directory once and run strict
+validation and a plugin-dir load with enforcement forced to `strict`:
 
 ```powershell
-claude plugin validate .\integrations\claude-code-plugin --strict
+$env:MNEME_HOOK_MODE = "strict"
+$pluginPath = (
+  Resolve-Path `
+    ".\mneme-project-memory\integrations\claude-code-plugin"
+).Path
+
+claude.cmd plugin validate $pluginPath --strict
+claude.cmd --plugin-dir $pluginPath
 ```
 
-Must pass `--strict` (valid manifest, semver version `0.1.0`, exec-form hook).
+`claude.cmd plugin validate ... --strict` must pass (valid manifest, semver
+version `0.1.0`, exec-form hook). `claude.cmd --plugin-dir $pluginPath` loads the
+plugin into a Claude Code session so you can run the smoke tests below.
 
-## 16. Repeat the compliant-Write and blocked-Write tests
+## 16. Run the compliant-Write and blocked-Write smoke tests through Claude Code
 
-With the published package on `PATH` (via `pipx`), re-run the end-to-end hook
-tests against the real binary to confirm enforcement works from the public
-install:
+Inside the Claude Code session started in step 15, issue the two prompts below
+verbatim. These drive the real `PreToolUse` hook (published `mneme-hook` →
+published `mneme check`), which is what actually validates the public package.
+
+**Compliant Write — must succeed.** Request this exact prompt:
+
+```text
+This is specifically a PreToolUse hook allow test.
+
+Attempt the Write tool, not Bash or Edit, to create:
+
+scripts/encoding_smoke_clean.py
+
+with exactly this content:
+
+open("out.txt", "w", encoding="utf-8").write("x")
+
+Do not change any other file.
+```
+
+The Write must succeed (the content pins `encoding="utf-8"`, so it does not
+violate ADR-009).
+
+**Blocked Write — must be blocked.** Request this exact prompt:
+
+```text
+This is specifically a PreToolUse hook-blocking test.
+
+Attempt the Write tool, not Bash or Edit, to create:
+
+scripts/encoding_smoke_block.py
+
+with exactly this content:
+
+open("out.txt", "w").write("x")
+
+Do not rewrite the content to comply. The purpose is to attempt this exact Write and verify that the hook blocks it. Do not change any other file.
+```
+
+The Write must be blocked by the `PreToolUse` hook (the content omits
+`encoding=`, violating ADR-009).
+
+**Clean up** the smoke-test artifacts and the forced mode, then confirm a clean
+tree:
 
 ```powershell
-python -m pytest tests/integrations/claude_code/test_hook_e2e.py -v
+Remove-Item .\scripts\encoding_smoke_clean.py -ErrorAction SilentlyContinue
+Remove-Item .\scripts\encoding_smoke_block.py -ErrorAction SilentlyContinue
+Remove-Item Env:MNEME_HOOK_MODE -ErrorAction SilentlyContinue
+git status --short
 ```
 
-A compliant Write is allowed (exit `0`); a violating Write is blocked (exit `2`)
-in strict mode.
+`git status --short` must report nothing (the clean Write is removed and the
+blocked Write was never created).
 
 ## 17. Create the GitHub release — only after public validation succeeds
 
@@ -237,9 +319,10 @@ Run in order. Do not advance past a failing step.
 - [ ] `v0.5.0` tag pushed on the exact built commit.
 - [ ] Uploaded only the named wheel + sdist with a project-scoped token.
 - [ ] Token removed from the environment.
-- [ ] `pipx install "mneme-hq==0.5.0"` → `mneme` and `mneme-hook` both resolve.
-- [ ] `claude plugin validate ... --strict` passes.
-- [ ] Compliant-Write allowed / violating-Write blocked, from the public install.
+- [ ] Clean `pipx`: `pipx uninstall mneme-hq` then `pipx install "mneme-hq==0.5.0"`; `Get-Command mneme` and `Get-Command mneme-hook` both resolve into the pipx env; `mneme --help` works (do **not** run `mneme-hook --help`).
+- [ ] `claude.cmd plugin validate $pluginPath --strict` passes; `claude.cmd --plugin-dir $pluginPath` loads the plugin (with `MNEME_HOOK_MODE=strict`).
+- [ ] Claude Code smoke tests: compliant Write (`encoding="utf-8"`) succeeds; blocked Write (no `encoding=`) is blocked by the `PreToolUse` hook.
+- [ ] Smoke artifacts removed, `MNEME_HOOK_MODE` cleared, `git status --short` clean.
 - [ ] GitHub release created for `v0.5.0`.
 - [ ] **Only then:** update the plugin README to drop the install workaround and
       advertise `pipx install "mneme-hq>=0.5.0"` (a separate, follow-up change —

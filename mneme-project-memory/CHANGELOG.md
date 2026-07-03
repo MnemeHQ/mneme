@@ -8,14 +8,22 @@ _Nothing yet._
 
 ## v0.5.0 — 2026-07-03
 
-**Installable Claude Code plugin, `mneme init`, and PyPI metadata realignment**
+**Directory-ready Claude Code plugin, `mneme init`, and PyPI metadata realignment**
 
 First minor release since v0.4.0. It ships new backwards-compatible,
-user-facing capabilities — a project scaffolder and a distributable Claude Code
-plugin — and folds in the v0.4.1 / v0.4.2 hook-reliability fixes that were
+user-facing capabilities — a project scaffolder and a directory-ready Claude
+Code plugin — and folds in the v0.4.1 / v0.4.2 hook-reliability fixes that were
 tagged on GitHub but never reflected in the published PyPI package metadata
 (PyPI still serves `0.4.0`). No `DecisionRetriever`, `ConflictDetector`,
 retrieval, or enforcement semantics change.
+
+The two artifacts are separate. The `mneme-hq` **PyPI package** provides the
+`mneme` and `mneme-hook` runtime console commands. The **Claude Code plugin**
+under `integrations/claude-code-plugin/` is a directory of plugin files that
+*drives* those commands. Installing the PyPI package does **not** install or
+enable the plugin, and vice versa — the plugin is loaded by Claude Code (via
+`--plugin-dir` or a marketplace) and expects `mneme` / `mneme-hook` already on
+`PATH`.
 
 ### Added
 
@@ -26,13 +34,17 @@ retrieval, or enforcement semantics change.
   nothing to enforce. No seeded decisions (every decision is enforceable, so
   sample content would create phantom rules). Refuses to overwrite an existing
   file unless `--force` is given; `--path` overrides the output location.
-- Installable Claude Code plugin under `integrations/claude-code-plugin/` —
+- Directory-ready Claude Code plugin under `integrations/claude-code-plugin/` —
   bundles the enforcement hook, the `mneme` skill, and four namespaced slash
   commands (`/mneme:context`, `/mneme:check`, `/mneme:record`,
-  `/mneme:review`) into a single distributable unit. The plugin manifest
-  (`.claude-plugin/plugin.json`) declares manifest version `0.1.0` (independent
-  of the `mneme-hq` package version) and a `mode` userConfig option
-  (`strict` | `warn`, default `strict`).
+  `/mneme:review`) into a single directory that Claude Code can load with
+  `--plugin-dir` (or via a marketplace). It depends on the `mneme` /
+  `mneme-hook` commands from the `mneme-hq` package being on `PATH`; installing
+  the package does not install the plugin. The plugin manifest
+  (`.claude-plugin/plugin.json`) declares manifest version `0.1.0` — correct for
+  its first directory release, and versioned independently of the `mneme-hq`
+  package version — and a `mode` userConfig option (`strict` | `warn`, default
+  `strict`). The plugin has not yet been publicly submitted to a marketplace.
 - Direct exec-form invocation of `mneme-hook` in the plugin hook config
   (`{ "type": "command", "command": "mneme-hook", "args": [] }`) — no shell
   string, no wrapper script, no interpreter probing. Claude Code resolves
