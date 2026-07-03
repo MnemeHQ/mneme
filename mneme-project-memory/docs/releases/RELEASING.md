@@ -57,6 +57,12 @@ python --version          # confirm >= 3.11 (the package requires-python)
 > If PowerShell blocks the activation script, allow it for this process only:
 > `Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned`.
 
+**Keep this same PowerShell session open through the entire procedure** — it
+holds the `$releaseVenv` variable and the activated venv. The session is
+deactivated exactly once (step 13, before the clean `pipx` validation) and the
+release venv is removed in step 17; only then do you close the shell. Do not
+close the shell after upload.
+
 ## 3. Install build, twine, and test dependencies
 
 ```powershell
@@ -153,29 +159,43 @@ git push origin v0.5.0
 ## 11. Upload only the verified wheel and sdist
 
 Use a **project-scoped** PyPI API token (scoped to the `mneme-hq` project, not an
-account-wide token). Provide it via environment variables so it never lands in
-shell history or a config file:
+account-wide token). Pass only the username on the command line and let Twine
+prompt for the token at its **hidden password prompt** — do not put the token in
+the command:
 
 ```powershell
-$env:TWINE_USERNAME = "__token__"
-$env:TWINE_PASSWORD = "pypi-...your-project-scoped-token..."
-
-python -m twine upload dist/mneme_hq-0.5.0-py3-none-any.whl dist/mneme_hq-0.5.0.tar.gz
+python -m twine upload `
+  --username __token__ `
+  dist/mneme_hq-0.5.0-py3-none-any.whl `
+  dist/mneme_hq-0.5.0.tar.gz
 ```
 
 Upload the two named artifacts explicitly — not `dist/*` — so nothing unexpected
 in `dist/` can be published by accident.
 
-## 12. Clean the token from the environment
+Enter the project-scoped PyPI API token **only at Twine's password prompt**. The
+token must never be placed in:
 
-Remove the token from the session immediately after upload:
+- a PowerShell command (or any command line);
+- the `TWINE_PASSWORD` environment variable;
+- shell history;
+- a script;
+- a repository file;
+- a Twine config file (e.g. `~/.pypirc`).
 
-```powershell
-Remove-Item Env:TWINE_USERNAME, Env:TWINE_PASSWORD
-```
+The password prompt reads the token directly and does not echo it, so it never
+enters your PowerShell history. If the token is ever pasted into a command,
+echoed, or logged anywhere, revoke it in the PyPI project settings and issue a
+new one.
 
-Then close the elevated/publish shell. If the token was ever echoed or logged,
-revoke it in the PyPI project settings and issue a new one.
+## 12. Confirm the token was not persisted
+
+Because the token was typed only at Twine's hidden password prompt, there is
+nothing to unset — it was never assigned to an environment variable, a command,
+a script, a config file, or a repository file. Do **not** close this shell:
+later steps still need the active session and the `$releaseVenv` variable. If the
+token was ever echoed or logged, revoke it in PyPI and issue a new one before
+continuing.
 
 ## 13. Validate the public package from a clean `pipx` environment
 
@@ -310,15 +330,17 @@ gh release create v0.5.0 `
 ## 17. Remove the temporary release environment
 
 Tear down the external release venv created in step 2 and confirm the working
-tree is clean (the venv lived outside the repo, so nothing should remain):
+tree is clean (the venv lived outside the repo, so nothing should remain). The
+venv was already deactivated once in step 13 (before the clean `pipx`
+validation), so do not `deactivate` again here:
 
 ```powershell
-deactivate
 Remove-Item -Recurse -Force $releaseVenv -ErrorAction SilentlyContinue
 git status --short
 ```
 
-`git status --short` must report nothing.
+`git status --short` must report nothing. Only now — after cleanup — is it safe
+to close the PowerShell session.
 
 ---
 
@@ -336,14 +358,15 @@ Run in order. Do not advance past a failing step.
 - [ ] `dist/` inspected — exactly the two expected artifacts.
 - [ ] **Artifact contract** (`test_packaging_contract.py` with `dist/` present): exactly one `mneme_hq-0.5.0-*.whl` + one `mneme_hq-0.5.0.tar.gz`; wheel METADATA and sdist PKG-INFO both declare `Name: mneme-hq` / `Version: 0.5.0`; wheel `entry_points.txt` is exactly the two console scripts. (`pip show` is only a source-env sanity check, not artifact inspection.)
 - [ ] `v0.5.0` tag pushed on the exact built commit.
-- [ ] Uploaded only the named wheel + sdist with a project-scoped token.
-- [ ] Token removed from the environment.
+- [ ] Uploaded only the named wheel + sdist; project-scoped token entered **only at Twine's hidden password prompt** (never in a command, `TWINE_PASSWORD`, history, script, repo file, or Twine config).
+- [ ] Same PowerShell session still open (token was never persisted, so nothing to unset).
+- [ ] `deactivate` run exactly once (step 13) before the clean `pipx` validation.
 - [ ] Clean `pipx`: `pipx uninstall mneme-hq` then `pipx install "mneme-hq==0.5.0"`; `Get-Command mneme` and `Get-Command mneme-hook` both resolve into the pipx env; `mneme --help` works (do **not** run `mneme-hook --help`).
 - [ ] `claude.cmd plugin validate $pluginPath --strict` passes; `claude.cmd --plugin-dir $pluginPath` loads the plugin (with `MNEME_HOOK_MODE=strict`).
 - [ ] Claude Code smoke tests: compliant Write (`encoding="utf-8"`) succeeds; blocked Write (no `encoding=`) is blocked by the `PreToolUse` hook.
 - [ ] Smoke artifacts removed, `MNEME_HOOK_MODE` cleared, `git status --short` clean.
 - [ ] GitHub release created for `v0.5.0` (`--notes-file .\mneme-project-memory\docs\releases\v0.5.0.md`, from repo root).
-- [ ] Temporary release venv removed; `git status --short` clean.
+- [ ] Temporary release venv removed (no second `deactivate`); `git status --short` clean; **then** close the shell.
 - [ ] **Only then:** update the plugin README to drop the install workaround and
       advertise `pipx install "mneme-hq>=0.5.0"` (a separate, follow-up change —
       the README is intentionally left unchanged in the alignment PR).
