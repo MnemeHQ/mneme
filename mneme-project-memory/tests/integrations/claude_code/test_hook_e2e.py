@@ -43,6 +43,18 @@ def _envelope(cwd, file_path, new_string):
     })
 
 
+def _write_envelope(cwd, file_path, content):
+    return json.dumps({
+        "hook_event_name": "PreToolUse",
+        "tool_name": "Write",
+        "cwd": str(cwd),
+        "tool_input": {
+            "file_path": str(file_path),
+            "content": content,
+        },
+    })
+
+
 @pytest.mark.skipif(shutil.which("mneme") is None, reason="mneme CLI not on PATH")
 def test_violation_blocks(project):
     cwd, target = project
@@ -57,4 +69,24 @@ def test_violation_blocks(project):
 def test_compliant_passes(project):
     cwd, target = project
     rc = main(stdin=io.StringIO(_envelope(cwd, target, "import sqlite3")))
+    assert rc == 0
+
+
+@pytest.mark.skipif(shutil.which("mneme") is None, reason="mneme CLI not on PATH")
+def test_violating_write_blocks(project):
+    cwd, target = project
+    err = io.StringIO()
+    rc = main(
+        stdin=io.StringIO(_write_envelope(cwd, target, "import psycopg2\n")),
+        stderr=err,
+    )
+    assert rc == 2
+    output = err.getvalue()
+    assert "test_001" in output or "psycopg2" in output
+
+
+@pytest.mark.skipif(shutil.which("mneme") is None, reason="mneme CLI not on PATH")
+def test_compliant_write_passes(project):
+    cwd, target = project
+    rc = main(stdin=io.StringIO(_write_envelope(cwd, target, "import sqlite3\n")))
     assert rc == 0
