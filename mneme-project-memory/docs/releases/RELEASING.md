@@ -39,9 +39,18 @@ a feature branch, a dirty tree, or a detached checkout.
 Never build or publish from your day-to-day interpreter. Use a throwaway venv so
 build/publish tooling can never leak into (or be contaminated by) other work.
 
+Create it **outside the repository** — a venv inside the working tree is not
+ignored and would make the later clean-tree check (`git status --short`) fail.
+Do not add a `.gitignore` rule just for the release environment; keep it out of
+the tree entirely and clean it up explicitly in step 17.
+
 ```powershell
-py -3.11 -m venv .release-venv
-.\.release-venv\Scripts\Activate.ps1
+$releaseVenv = Join-Path $env:TEMP "mneme-hq-release-0.5.0"
+
+Remove-Item -Recurse -Force $releaseVenv -ErrorAction SilentlyContinue
+py -3.11 -m venv $releaseVenv
+& "$releaseVenv\Scripts\Activate.ps1"
+
 python --version          # confirm >= 3.11 (the package requires-python)
 ```
 
@@ -103,41 +112,36 @@ Confirm exactly the two expected files exist and nothing stale remains:
 Get-ChildItem dist
 ```
 
-## 9. Confirm package name and version
+## 9. Verify package name, version, and console scripts from the artifacts
 
-```powershell
-python -m pip show mneme-hq        # Name: mneme-hq   Version: 0.5.0
-```
-
-The filenames in `dist/` must also carry `0.5.0`. If they do not, the version in
-`pyproject.toml` was not bumped — stop and fix it.
-
-## 10. Confirm the wheel contains both console scripts
-
-The wheel's `entry_points.txt` must declare **both** console scripts:
-
-```
-mneme = mneme.cli:main
-mneme-hook = mneme.integrations.claude_code.hook:cli_main
-```
-
-The packaging contract test verifies this automatically against the wheel you
-just built:
+**The packaging contract test is the authoritative check.** With `dist/`
+populated (step 6), run it against the built wheel and sdist:
 
 ```powershell
 python -m pytest tests/test_packaging_contract.py -v
 ```
 
-`test_built_wheel_contains_both_console_scripts` runs (rather than skipping)
-because `dist/` now holds a wheel. For a manual cross-check:
+It asserts, directly from the artifacts:
 
-```powershell
-python -c "import zipfile,glob; w=glob.glob('dist/mneme_hq-*.whl')[0]; z=zipfile.ZipFile(w); print(next(z.read(n).decode('utf-8') for n in z.namelist() if n.endswith('entry_points.txt')))"
-```
+- exactly one `mneme_hq-0.5.0-*.whl` and exactly one `mneme_hq-0.5.0.tar.gz`;
+- the wheel `*.dist-info/METADATA` declares `Name: mneme-hq` and
+  `Version: 0.5.0`;
+- the sdist `PKG-INFO` declares the same name and version;
+- the wheel `entry_points.txt` `[console_scripts]` is *exactly*:
+  ```
+  mneme = mneme.cli:main
+  mneme-hook = mneme.integrations.claude_code.hook:cli_main
+  ```
 
-Do not proceed unless both scripts are present.
+The declared version comes from `pyproject.toml`, so the test also proves the
+artifacts match the version you intend to ship. Do not proceed unless it passes.
 
-## 11. Tag the exact commit used for the build
+> `python -m pip show mneme-hq` (`Name: mneme-hq`, `Version: 0.5.0`) is only a
+> **source-environment sanity check** — it reports whatever is installed in the
+> active venv (the editable source from step 3), **not** the contents of the
+> built artifacts. It is not artifact inspection; the contract test above is.
+
+## 10. Tag the exact commit used for the build
 
 Tag the commit you just built and tested — not a later one.
 
@@ -146,7 +150,7 @@ git tag -a v0.5.0 -m "mneme-hq 0.5.0"
 git push origin v0.5.0
 ```
 
-## 12. Upload only the verified wheel and sdist
+## 11. Upload only the verified wheel and sdist
 
 Use a **project-scoped** PyPI API token (scoped to the `mneme-hq` project, not an
 account-wide token). Provide it via environment variables so it never lands in
@@ -162,7 +166,7 @@ python -m twine upload dist/mneme_hq-0.5.0-py3-none-any.whl dist/mneme_hq-0.5.0.
 Upload the two named artifacts explicitly — not `dist/*` — so nothing unexpected
 in `dist/` can be published by accident.
 
-## 13. Clean the token from the environment
+## 12. Clean the token from the environment
 
 Remove the token from the session immediately after upload:
 
@@ -173,7 +177,7 @@ Remove-Item Env:TWINE_USERNAME, Env:TWINE_PASSWORD
 Then close the elevated/publish shell. If the token was ever echoed or logged,
 revoke it in the PyPI project settings and issue a new one.
 
-## 14. Validate the public package from a clean `pipx` environment
+## 13. Validate the public package from a clean `pipx` environment
 
 Verify what PyPI actually serves — from a *fresh*, isolated environment, not the
 build venv (which already has the local source package installed). Uninstall
@@ -199,7 +203,7 @@ Notes:
 - Only `mneme` has a `--help`. **Do not run `mneme-hook --help`** — `mneme-hook`
   is the Claude Code hook entrypoint: it reads a hook event from **stdin**, so
   invoking it interactively (with or without `--help`) blocks waiting for EOF.
-  Its real validation is the Claude Code smoke test in steps 15–16.
+  Its real validation is the Claude Code smoke test in steps 14–15.
 
 > The pytest end-to-end tests in
 > `tests/integrations/claude_code/test_hook_e2e.py` are **source-level
@@ -210,7 +214,7 @@ Notes:
 > public one. Keep running them (step 5) as regression coverage, but validate
 > the *published* package only through the real plugin path below.
 
-## 15. Validate the plugin with Claude Code strict validation
+## 14. Validate the plugin with Claude Code strict validation
 
 This and the next step are the **real** public-package validation: they exercise
 the `pipx`-installed `mneme` / `mneme-hook` commands through the actual Claude
@@ -234,9 +238,9 @@ claude.cmd --plugin-dir $pluginPath
 version `0.1.0`, exec-form hook). `claude.cmd --plugin-dir $pluginPath` loads the
 plugin into a Claude Code session so you can run the smoke tests below.
 
-## 16. Run the compliant-Write and blocked-Write smoke tests through Claude Code
+## 15. Run the compliant-Write and blocked-Write smoke tests through Claude Code
 
-Inside the Claude Code session started in step 15, issue the two prompts below
+Inside the Claude Code session started in step 14, issue the two prompts below
 verbatim. These drive the real `PreToolUse` hook (published `mneme-hook` →
 published `mneme check`), which is what actually validates the public package.
 
@@ -291,14 +295,30 @@ git status --short
 `git status --short` must report nothing (the clean Write is removed and the
 blocked Write was never created).
 
-## 17. Create the GitHub release — only after public validation succeeds
+## 16. Create the GitHub release — only after public validation succeeds
 
 Only now, once the public package validates end to end, publish the GitHub
-release for the `v0.5.0` tag:
+release for the `v0.5.0` tag. Run this from the **repository root** (the same
+place as the smoke tests), so the notes path is repository-root-relative:
 
 ```powershell
-gh release create v0.5.0 --title "mneme-hq 0.5.0" --notes-file docs/releases/v0.5.0.md
+gh release create v0.5.0 `
+  --title "mneme-hq 0.5.0" `
+  --notes-file .\mneme-project-memory\docs\releases\v0.5.0.md
 ```
+
+## 17. Remove the temporary release environment
+
+Tear down the external release venv created in step 2 and confirm the working
+tree is clean (the venv lived outside the repo, so nothing should remain):
+
+```powershell
+deactivate
+Remove-Item -Recurse -Force $releaseVenv -ErrorAction SilentlyContinue
+git status --short
+```
+
+`git status --short` must report nothing.
 
 ---
 
@@ -307,15 +327,14 @@ gh release create v0.5.0 --title "mneme-hq 0.5.0" --notes-file docs/releases/v0.
 Run in order. Do not advance past a failing step.
 
 - [ ] `main` is clean and at the release-alignment squash commit.
-- [ ] Isolated release venv created; Python >= 3.11 confirmed.
+- [ ] Isolated release venv created **outside the repo** (`$env:TEMP`); Python >= 3.11 confirmed.
 - [ ] `build`, `twine`, and `.[dev]` installed.
 - [ ] `build/`, `dist/`, `*.egg-info` removed.
 - [ ] Full test suite passes (with the package installed, e2e hook tests run).
 - [ ] Wheel + sdist built.
 - [ ] `twine check dist/*` → both PASSED.
 - [ ] `dist/` inspected — exactly the two expected artifacts.
-- [ ] `pip show mneme-hq` → name `mneme-hq`, version `0.5.0`.
-- [ ] Wheel declares both console scripts (`test_packaging_contract.py`).
+- [ ] **Artifact contract** (`test_packaging_contract.py` with `dist/` present): exactly one `mneme_hq-0.5.0-*.whl` + one `mneme_hq-0.5.0.tar.gz`; wheel METADATA and sdist PKG-INFO both declare `Name: mneme-hq` / `Version: 0.5.0`; wheel `entry_points.txt` is exactly the two console scripts. (`pip show` is only a source-env sanity check, not artifact inspection.)
 - [ ] `v0.5.0` tag pushed on the exact built commit.
 - [ ] Uploaded only the named wheel + sdist with a project-scoped token.
 - [ ] Token removed from the environment.
@@ -323,7 +342,8 @@ Run in order. Do not advance past a failing step.
 - [ ] `claude.cmd plugin validate $pluginPath --strict` passes; `claude.cmd --plugin-dir $pluginPath` loads the plugin (with `MNEME_HOOK_MODE=strict`).
 - [ ] Claude Code smoke tests: compliant Write (`encoding="utf-8"`) succeeds; blocked Write (no `encoding=`) is blocked by the `PreToolUse` hook.
 - [ ] Smoke artifacts removed, `MNEME_HOOK_MODE` cleared, `git status --short` clean.
-- [ ] GitHub release created for `v0.5.0`.
+- [ ] GitHub release created for `v0.5.0` (`--notes-file .\mneme-project-memory\docs\releases\v0.5.0.md`, from repo root).
+- [ ] Temporary release venv removed; `git status --short` clean.
 - [ ] **Only then:** update the plugin README to drop the install workaround and
       advertise `pipx install "mneme-hq>=0.5.0"` (a separate, follow-up change —
       the README is intentionally left unchanged in the alignment PR).

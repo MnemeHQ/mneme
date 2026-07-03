@@ -14,8 +14,8 @@ First minor release since v0.4.0. It ships new backwards-compatible,
 user-facing capabilities — a project scaffolder and a directory-ready Claude
 Code plugin — and folds in the v0.4.1 / v0.4.2 hook-reliability fixes that were
 tagged on GitHub but never reflected in the published PyPI package metadata
-(PyPI still serves `0.4.0`). No `DecisionRetriever`, `ConflictDetector`,
-retrieval, or enforcement semantics change.
+(before v0.5.0, PyPI served only `0.4.0`). No `DecisionRetriever`,
+`ConflictDetector`, retrieval, or enforcement semantics change.
 
 The two artifacts are separate. The `mneme-hq` **PyPI package** provides the
 `mneme` and `mneme-hook` runtime console commands. The **Claude Code plugin**
@@ -65,9 +65,9 @@ enable the plugin, and vice versa — the plugin is loaded by Claude Code (via
 
 - Realigned the published package with the v0.4.1 / v0.4.2 hook-reliability
   fixes. Both were tagged on GitHub, but the fixes never reached the PyPI
-  package metadata — PyPI still serves `0.4.0`, which has the exit-code
-  propagation bug (a failed check could exit `0` and let a violating edit
-  through in strict mode). Publishing `0.5.0` makes `pip install mneme-hq`
+  package metadata — before v0.5.0, PyPI served only `0.4.0`, which has the
+  exit-code propagation bug (a failed check could exit `0` and let a violating
+  edit through in strict mode). Publishing `0.5.0` makes `pip install mneme-hq`
   deliver the reliable hook for the first time. The underlying fixes:
   - `mneme/__main__.py` so `python -m mneme` dispatches and
     `sys.exit(main())` propagates CLI exit codes (v0.4.2).
