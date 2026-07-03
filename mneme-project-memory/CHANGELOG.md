@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+_Nothing yet._
+
+---
+
+## v0.5.0 — 2026-07-03
+
+**Installable Claude Code plugin, `mneme init`, and PyPI metadata realignment**
+
+First minor release since v0.4.0. It ships new backwards-compatible,
+user-facing capabilities — a project scaffolder and a distributable Claude Code
+plugin — and folds in the v0.4.1 / v0.4.2 hook-reliability fixes that were
+tagged on GitHub but never reflected in the published PyPI package metadata
+(PyPI still serves `0.4.0`). No `DecisionRetriever`, `ConflictDetector`,
+retrieval, or enforcement semantics change.
+
 ### Added
 
 - `mneme init` subcommand — scaffolds a valid, empty, neutral
@@ -11,12 +26,75 @@
   nothing to enforce. No seeded decisions (every decision is enforceable, so
   sample content would create phantom rules). Refuses to overwrite an existing
   file unless `--force` is given; `--path` overrides the output location.
+- Installable Claude Code plugin under `integrations/claude-code-plugin/` —
+  bundles the enforcement hook, the `mneme` skill, and four namespaced slash
+  commands (`/mneme:context`, `/mneme:check`, `/mneme:record`,
+  `/mneme:review`) into a single distributable unit. The plugin manifest
+  (`.claude-plugin/plugin.json`) declares manifest version `0.1.0` (independent
+  of the `mneme-hq` package version) and a `mode` userConfig option
+  (`strict` | `warn`, default `strict`).
+- Direct exec-form invocation of `mneme-hook` in the plugin hook config
+  (`{ "type": "command", "command": "mneme-hook", "args": [] }`) — no shell
+  string, no wrapper script, no interpreter probing. Claude Code resolves
+  `mneme-hook` on `PATH` and spawns it directly, so the hook is
+  platform-independent by construction.
+- Enforcement-mode resolution for the Claude Code adapter (`resolve_mode()`
+  in `mneme/integrations/claude_code/hook.py`) with precedence
+  `MNEME_HOOK_MODE` > `CLAUDE_PLUGIN_OPTION_MODE` > `strict`. The plugin's
+  `mode` userConfig value reaches the hook subprocess as
+  `CLAUDE_PLUGIN_OPTION_MODE`; an explicit `MNEME_HOOK_MODE` overrides it.
+  Mode resolution stays inside the Claude Code adapter.
+- Strict fallback for invalid mode values — an unrecognized value in either
+  variable resolves to `strict`, so a typo can never silently disable
+  enforcement. A set-but-invalid explicit override does not fall through to the
+  plugin option; values are case- and whitespace-tolerant.
+
+### Fixed
+
+- Realigned the published package with the v0.4.1 / v0.4.2 hook-reliability
+  fixes. Both were tagged on GitHub, but the fixes never reached the PyPI
+  package metadata — PyPI still serves `0.4.0`, which has the exit-code
+  propagation bug (a failed check could exit `0` and let a violating edit
+  through in strict mode). Publishing `0.5.0` makes `pip install mneme-hq`
+  deliver the reliable hook for the first time. The underlying fixes:
+  - `mneme/__main__.py` so `python -m mneme` dispatches and
+    `sys.exit(main())` propagates CLI exit codes (v0.4.2).
+  - Hook subprocess uses `[sys.executable, "-m", "mneme", ...]` instead of a
+    bare `mneme`, so a missing Scripts directory on `PATH` (Windows Microsoft
+    Store Python) no longer makes the hook fail open silently (v0.4.1).
+
+### Changed
+
+- `pyproject.toml` version `0.4.0` → `0.5.0`.
 
 ### Tests
 
-- `tests/test_cli_init.py` — 6 tests (fresh create, MemoryStore round-trip,
+- `tests/test_cli_init.py` — 6 tests (fresh create, `MemoryStore` round-trip,
   refuse-existing, `--force` overwrite, custom `--path`, clean `mneme check`).
-- Full suite: 354 passed, 52 warnings.
+- `tests/integrations/claude_code/test_plugin_contract.py` — deterministic,
+  shell-free plugin contract tests: manifest is valid and declares the `mode`
+  option, manifest declares a valid semver version, the hook uses exec-form
+  direct invocation, the hook command carries no shell dependency, no wrapper
+  script remains, all four slash commands are present, the skill is present.
+- `tests/integrations/claude_code/test_hook_mode.py` — mode-precedence and
+  strict-fallback coverage.
+- `tests/integrations/claude_code/test_hook_e2e.py` — end-to-end against the
+  real `mneme check` binary via the hook shim: a compliant Write is allowed
+  (exit `0`) and a violating Write is blocked (exit `2`) in strict mode, plus
+  the equivalent Edit cases. (Skipped when `mneme` is not on `PATH`.)
+- `tests/test_packaging_contract.py` — deterministic packaging contract:
+  asserts `[project.scripts]` declares both console scripts
+  (`mneme = mneme.cli:main` and
+  `mneme-hook = mneme.integrations.claude_code.hook:cli_main`), and verifies
+  the same two entry points inside the built wheel when a `dist/` artifact is
+  present.
+
+### Release
+
+- Manual PyPI publication procedure and the post-merge checklist:
+  `docs/releases/RELEASING.md`. This PR does **not** publish, tag a release,
+  or advertise the new version in the plugin README — those steps run only
+  after `mneme-hq >= 0.5.0` is live on PyPI.
 
 ---
 
