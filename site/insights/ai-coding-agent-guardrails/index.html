@@ -3,29 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Building Governance Layers for AI Coding Assistants &mdash; Mneme HQ</title>
+  <title>AI Coding-Agent Guardrails: A Field Guide to What Actually Holds &mdash; Mneme HQ</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="AI coding assistants are becoming agents that modify codebases, open PRs, and deploy. The missing enterprise infrastructure is a governance layer: policy, memory, enforcement, and auditability around what agents are allowed to do." />
+  <meta name="description" content="A reference taxonomy of AI coding-agent guardrails: runtime, prompt, policy, architectural, and engineering-standards. What each layer catches, what it misses, and why architecture needs enforcement at edit time." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
-  <link rel="canonical" href="https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/" />
+  <link rel="canonical" href="https://mnemehq.com/insights/ai-coding-agent-guardrails/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Building Governance Layers for AI Coding Assistants" />
-  <meta property="og:description" content="AI coding assistants are becoming agents that modify codebases, open PRs, and deploy. The missing enterprise infrastructure is a governance layer: policy, memory, enforcement, and auditability around what agents are allowed to do." />
-  <meta property="og:url" content="https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/" />
-  <meta property="og:image" content="https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/og.png" />
+  <meta property="og:title" content="AI Coding-Agent Guardrails: A Field Guide to What Actually Holds" />
+  <meta property="og:description" content="A reference taxonomy of AI coding-agent guardrails: runtime, prompt, policy, architectural, and engineering-standards. What each layer catches, what it misses, and why architecture needs enforcement at edit time." />
+  <meta property="og:url" content="https://mnemehq.com/insights/ai-coding-agent-guardrails/" />
+  <meta property="og:image" content="https://mnemehq.com/insights/ai-coding-agent-guardrails/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Building Governance Layers for AI Coding Assistants" />
-  <meta name="twitter:description" content="AI coding assistants are becoming agents that modify codebases, open PRs, and deploy. The missing enterprise infrastructure is a governance layer: policy, memory, enforcement, and auditability around what agents are allowed to do." />
-  <meta name="twitter:image" content="https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/og.png" />
+  <meta name="twitter:title" content="AI Coding-Agent Guardrails: A Field Guide to What Actually Holds" />
+  <meta name="twitter:description" content="A reference taxonomy of AI coding-agent guardrails: runtime, prompt, policy, architectural, and engineering-standards. What each layer catches, what it misses, and why architecture needs enforcement at edit time." />
+  <meta name="twitter:image" content="https://mnemehq.com/insights/ai-coding-agent-guardrails/og.png" />
   <meta name="author" content="Theo Valmis" />
-  <meta property="article:published_time" content="2026-06-17T00:00:00Z" />
+  <meta property="article:published_time" content="2026-07-06T00:00:00Z" />
   <meta property="article:author" content="https://mnemehq.com/founder/" />
-  <meta property="article:section" content="Industry Analysis" />
+  <meta property="article:section" content="Engineering" />
 
   <!-- Consent defaults -->
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{'analytics_storage':'granted','ad_storage':'denied','ad_user_data':'denied','ad_personalization':'denied'});</script>
@@ -118,31 +118,51 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
   <link rel="icon" href="/favicon.png" type="image/png">
 
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
-          {"@type": "ListItem", "position": 2, "name": "Insights", "item": "https://mnemehq.com/insights/"},
-          {"@type": "ListItem", "position": 3, "name": "Building Governance Layers for AI Coding Assistants", "item": "https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/"}
-        ]
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://mnemehq.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Insights",
+          "item": "https://mnemehq.com/insights/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "AI Coding-Agent Guardrails",
+          "item": "https://mnemehq.com/insights/ai-coding-agent-guardrails/"
+        }
+      ]
+    },
+    {
+      "@type": "TechArticle",
+      "headline": "AI Coding-Agent Guardrails: A Field Guide to What Actually Holds",
+      "description": "A reference taxonomy of AI coding-agent guardrails: runtime, prompt, policy, architectural, and engineering-standards. What each layer catches, what it misses, and why architecture needs enforcement at edit time.",
+      "url": "https://mnemehq.com/insights/ai-coding-agent-guardrails/",
+      "datePublished": "2026-07-06",
+      "author": {
+        "@type": "Person",
+        "name": "Theo Valmis",
+        "url": "https://mnemehq.com/founder/"
       },
-      {
-        "@type": "TechArticle",
-        "headline": "Building Governance Layers for AI Coding Assistants",
-        "description": "AI coding assistants are becoming agents that modify codebases, open PRs, and deploy. The missing enterprise infrastructure is a governance layer: policy, memory, enforcement, and auditability around what agents are allowed to do.",
-        "url": "https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/",
-        "datePublished": "2026-06-17",
-        "dateModified": "2026-06-17",
-        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
-        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/"},
-        "image": "https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/og.png",
-        "mainEntityOfPage": "https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/"
+      "publisher": {
+        "@type": "Organization",
+        "name": "Mneme HQ",
+        "url": "https://mnemehq.com/"
       }
-    ]
-  }
+    }
+  ]
+}
   </script>
 
 <style>
@@ -361,109 +381,149 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
   <ol class="breadcrumb">
     <li><a href="/">Home</a></li>
     <li><a href="/insights/">Insights</a></li>
-    <li aria-current="page">Building Governance Layers for AI Coding Assistants</li>
+    <li aria-current="page">AI Coding-Agent Guardrails</li>
   </ol>
 </nav>
 
 <article class="article-wrap">
   <header class="article-header">
     <div class="article-eyebrow">
-      <span class="eyebrow-tag">Thought Leadership</span>
+      <span class="eyebrow-tag">Reference</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">10 min read</span>
+      <span class="eyebrow-meta">12 min read</span>
     </div>
-    <h1>Building Governance Layers for AI Coding Assistants</h1>
-    <p class="article-lede">The first wave of AI coding assistants was about generation. The next wave is about control. As assistants evolve into agents that modify codebases, open pull requests, run tests, and deploy infrastructure, the question stops being whether AI can write code and becomes how organizations ensure it writes the right code. At enterprise scale, that answer is infrastructure: a governance layer.</p>
-    <p class="byline">By <a href="/founder/">Theo Valmis</a><span class="sep">&middot;</span><time datetime="2026-06-17">June 2026</time></p>
+    <h1>AI Coding-Agent Guardrails: A Field Guide to What Actually Holds</h1>
+    <p class="article-lede">&ldquo;Guardrail&rdquo; has become a catch-all word. It is used for a sandbox that stops an agent deleting a table, for a system prompt that asks the model to be careful, for an org policy engine, and for an architectural rule that says billing data goes through one service. These are not the same mechanism, and they do not fail in the same way. This is a field guide to the five kinds of guardrail an AI coding agent runs into, what each one actually catches, and where the gap is that lets working code drift away from the architecture the team already decided on.</p>
+    <p class="byline">By <a href="/founder/">Theo Valmis</a><span class="sep">&middot;</span><time datetime="2026-07-06">July 2026</time></p>
   </header>
 
   <div class="article-body">
 
-    <h2>From Autocomplete to Autonomous Execution</h2>
-    <p>The capability curve of AI coding tools is easy to trace, and each step is a step away from the human keystroke. It started with autocomplete &mdash; GitHub Copilot suggesting the next line while a developer stayed in the driver&rsquo;s seat. Then came chat coding, where ChatGPT and Claude would draft whole functions and explain them on request. Then IDE-native agents like Cursor and Windsurf began editing multiple files, running commands, and iterating against test output. Now the frontier is multi-agent development systems and, beyond them, autonomous execution across the software development lifecycle: an agent that plans a change, writes it, tests it, opens a pull request, and pushes toward deploy.</p>
-    <p>Every step on that curve increases capability. Every step also increases risk. An autocomplete suggestion a developer rejects costs nothing. An autonomous agent that merges a non-compliant change into a payments service costs a great deal. The more an assistant can do without a human in the loop, the more the organization needs a way to constrain what it does &mdash; not after the fact, but before the change lands.</p>
+    <h2>What a Guardrail Actually Is</h2>
+    <p>A guardrail is a constraint that shapes or blocks what an agent may do. That is the whole definition, and it is worth holding onto, because the word gets stretched to cover very different things. A guardrail can be a hard wall the agent cannot cross &mdash; a sandbox that refuses a network call. It can be a soft instruction the agent is asked to follow &mdash; a line in a rule file. It can be a check that runs after the agent proposes a change and either passes it or sends it back.</p>
+    <p>The distinction that matters is not how strict a guardrail sounds. It is <em>where it sits</em> relative to the code the agent writes, and <em>what it can see</em> when it makes its decision. A guardrail that only sees the running process cannot reason about your service boundaries. A guardrail that only sees a paragraph of prose cannot deterministically block an unapproved dependency. Sorting guardrails by what they can see is the fastest way to tell which risks each one covers and which it leaves open.</p>
 
-    <h2>Why Traditional AI Guardrails Fail Here</h2>
-    <p>Most of what gets called &ldquo;AI governance&rdquo; today was built for a different problem. It covers content moderation, prompt filtering, data privacy, model safety, and toxic-output detection. Those controls matter, but they were designed for systems that generate text for humans to read. Software engineering generates artifacts that other systems execute, and that introduces a different class of risk entirely.</p>
-    <p>The risks that matter in a codebase are <strong>architectural drift</strong>, security violations, compliance violations, framework inconsistency, undocumented design decisions, and hidden technical debt. None of these are caught by a content filter. A model can produce code that is syntactically perfect, passes its tests, reads cleanly in review &mdash; and still violates a critical organizational standard. It can wire a service directly to a database that policy says must be accessed through a gateway. It can introduce a second HTTP client into a codebase that standardized on one. It can encode a design decision nobody approved and nobody wrote down.</p>
-    <p>Guardrails tuned for prose do not see any of this, because the violation is not in the words. It is in the structure. As we have argued in <a href="/insights/why-context-alone-doesnt-prevent-architectural-drift/">why context alone doesn&rsquo;t prevent architectural drift</a>, giving a model more information about your system improves what it knows without changing what it is allowed to do. Knowing a rule and being held to a rule are different mechanisms.</p>
+    <h2>The Taxonomy: Five Layers of Guardrail</h2>
+    <p>Most stacks running AI coding agents end up with some mix of five layers. They stack; they do not substitute. Here is each one, what it catches, and what it misses.</p>
 
-    <h2>Governance Is Not Access Control</h2>
-    <p>This is the distinction most teams get wrong, and it is worth stating sharply. Access control answers a question about permission: <em>can the agent do this?</em> Governance answers a question about judgment: <em>should the agent do this?</em> They are not the same layer, and one does not imply the other.</p>
-    <p>Consider an agent with write access to a payments service. Access control has already done its job &mdash; the agent is authorized to modify those files. Governance is the layer that decides whether the specific modification it proposes violates an architecture rule, contradicts a recorded <a href="/insights/agent-governance-in-the-sdlc/">architectural decision</a>, crosses a security boundary, breaks a regulatory requirement, or ignores a team convention. The agent can be fully permitted and still wrong. Permission is necessary; it is not sufficient.</p>
-    <div class="callout"><p><strong>Access control gates the door. Governance reads what walked through it.</strong> An agent can have every permission it needs and still produce a change that should never ship.</p></div>
-    <p>This is also why governance cannot be solved by tightening permissions. You could remove the agent&rsquo;s access to the payments service entirely, but then it cannot do its job. The goal is not to lock agents out of important systems. It is to let them work inside those systems while guaranteeing that what they produce stays aligned with the rules a human already decided on.</p>
+    <h3>1. Runtime Guardrails</h3>
+    <p><strong>What it is.</strong> Controls on what the agent process can do while it runs: a sandbox, a tool allow-list, resource and rate limits, network egress rules, filters on inputs and outputs. Open-source toolkits such as <a href="https://github.com/NVIDIA/NeMo-Guardrails" target="_blank" rel="noopener">NVIDIA NeMo Guardrails</a> formalize this layer, adding programmable input, output, dialog, retrieval, and execution rails around an LLM application so tool calls and responses pass through checks before they take effect.</p>
+    <p><strong>What it catches.</strong> Dangerous actions in the moment: a shell command that would wipe a directory, a call to an endpoint the agent should never touch, a prompt-injection attempt, a runaway loop burning tokens. This is the layer that stops an agent doing something destructive or unsafe right now.</p>
+    <p><strong>What it misses.</strong> Everything about whether the code is <em>architecturally correct</em>. A runtime guardrail sees system calls and API traffic; it does not know that your billing logic is supposed to live behind one service, or that the repo standardized on one HTTP client. Perfectly safe code at runtime can still violate every architectural decision the team made. <a href="/insights/runtime-verification-is-not-architectural-verification/">Runtime verification is not architectural verification</a>.</p>
 
-    <h2>The Emerging Governance Stack</h2>
-    <p>A governance layer for AI coding is not a single feature. It is a stack of four distinct concerns, each of which fails differently when it is missing. The layers below build on one another: policy without enforcement is a wiki nobody reads; enforcement without auditability is a black box nobody trusts.</p>
+    <h3>2. Prompt and Rule-File Guardrails</h3>
+    <p><strong>What it is.</strong> Instructions given to the model in language: the system prompt, a <code>CLAUDE.md</code> or <code>.cursorrules</code> file, project rule files loaded into context. &ldquo;Use our logging library.&rdquo; &ldquo;Do not add new dependencies without approval.&rdquo; &ldquo;Follow the existing error-handling pattern.&rdquo;</p>
+    <p><strong>What it catches.</strong> Broad tendencies. A well-written rule file nudges the model toward the house style and away from obvious mistakes, most of the time. For small, well-scoped work it raises the hit rate noticeably.</p>
+    <p><strong>What it misses.</strong> Anything the model does not attend to. Rule files are an always-on prompt prefix, and a prompt is a suggestion, not a control. They compete for the same token budget as the task, they have no precedence when two rules conflict, and they do not scale as the ruleset grows past what the model reliably weighs. Section 3 covers this in detail.</p>
+
+    <h3>3. Policy Guardrails</h3>
+    <p><strong>What it is.</strong> Organization-level policy engines: rules about data handling, licenses, secrets, compliance scopes, which model tiers may touch which repositories. Often enforced in CI or a platform layer, expressed as policy-as-code.</p>
+    <p><strong>What it catches.</strong> Cross-cutting organizational rules. A secret committed to a repo, a GPL dependency in a proprietary product, PII flowing to an unapproved destination. These rules are broad and apply across every project.</p>
+    <p><strong>What it misses.</strong> Project-specific architecture. Policy engines are built for uniform, org-wide constraints, not for the decision that <em>this</em> service owns the ledger and <em>that</em> one must call it through an API. The architectural intent of a single codebase is too specific and too local for a policy layer to carry.</p>
+
+    <h3>4. Architectural Guardrails</h3>
+    <p><strong>What it is.</strong> The recorded architectural decisions of a specific system &mdash; ADRs, service boundaries, approved patterns &mdash; turned into checks that run at edit time, before a change lands. This is <a href="/concepts/executable-architectural-intent/">executable architectural intent</a>: the decision is stored as structured data with its constraints, retrieved for the change in front of the agent, and checked deterministically.</p>
+    <p><strong>What it catches.</strong> Drift from the system&rsquo;s own decisions. An agent reaching around a service boundary, adding a second HTTP client, putting business logic in a layer that is supposed to stay thin, introducing a dependency the ADRs ruled out. The specific violations that runtime, prompt, and policy layers all miss.</p>
+    <p><strong>What it misses.</strong> It is not a safety sandbox and not an org policy engine. It will not stop a destructive shell command or catch a committed secret. It governs one thing well &mdash; conformance to the architecture &mdash; which is exactly the thing nothing else in the stack governs.</p>
+
+    <h3>5. Engineering-Standards Guardrails</h3>
+    <p><strong>What it is.</strong> The team&rsquo;s conventions and approved technology: naming rules, module layout, the sanctioned frameworks and libraries, the error-handling and logging patterns. Close relatives of architectural guardrails, and enforced the same way &mdash; as checks, not prose.</p>
+    <p><strong>What it catches.</strong> Consistency erosion. Code that works but does not look like the rest of the codebase: a new logging approach, an off-pattern name, an unapproved library doing a job an approved one already does.</p>
+    <p><strong>What it misses.</strong> Deeper structural decisions live one layer up, in the architectural guardrails. Standards keep the surface consistent; they assume the boundaries are already being enforced.</p>
 
     <div style="overflow-x:auto;margin:2rem 0;">
     <table class="gov-table">
-      <thead><tr><th>Layer</th><th>What it is</th><th>What it contains</th></tr></thead>
+      <thead><tr><th>Layer</th><th>Catches</th><th>Misses</th></tr></thead>
       <tbody>
-        <tr><td>1. Policy</td><td>Human decisions</td><td>Architecture standards, security requirements, compliance rules</td></tr>
-        <tr><td>2. Memory</td><td>Organizational knowledge</td><td>ADRs, previous incidents, design rationales, lessons learned</td></tr>
-        <tr><td>3. Enforcement</td><td>Machine-verifiable controls</td><td>Policy validation, automated checks, CI/CD gates, agent constraints</td></tr>
-        <tr class="accent-row"><td>4. Auditability</td><td>Enterprise accountability</td><td>Why a decision was made, which policy applied, which agent acted</td></tr>
+        <tr><td><strong>Runtime</strong></td><td>Destructive actions, unsafe tool calls, prompt injection, resource abuse</td><td>Whether the code respects any architectural decision</td></tr>
+        <tr><td><strong>Prompt / rule-file</strong></td><td>Broad tendencies toward house style</td><td>Anything the model does not attend to; no precedence or scale</td></tr>
+        <tr><td><strong>Policy</strong></td><td>Org-wide rules: secrets, licenses, data handling</td><td>Project-specific architecture and boundaries</td></tr>
+        <tr class="accent-row"><td><strong>Architectural</strong></td><td>Drift from a system&rsquo;s own recorded decisions and boundaries</td><td>Runtime safety and org policy (not its job)</td></tr>
+        <tr><td><strong>Engineering-standards</strong></td><td>Convention and approved-technology consistency</td><td>Deeper structural decisions one layer up</td></tr>
       </tbody>
     </table>
     </div>
+    <p>Read the table top to bottom and the gap is visible. Four of the five layers are strong on safety, organization-wide policy, and surface consistency. Exactly one governs whether generated code obeys the architecture of the specific system it is being written into &mdash; and that is the layer most stacks are missing. The sections that follow explain why the other common answers do not fill it.</p>
 
-    <p><strong>Policy</strong> is where humans set intent: the architecture standards, security requirements, and compliance rules that define what &ldquo;correct&rdquo; means for this organization. It is the only layer that should not be automated, because it encodes choices that belong to people.</p>
-    <p><strong>Memory</strong> is the organizational knowledge that gives policy its context &mdash; the ADRs that record why a boundary exists, the incident write-ups that explain what went wrong last time, the design rationales that keep a team from relitigating settled questions. Memory is what lets policy be specific instead of generic. It is also, as covered in <a href="/concepts/governance-propagation/">governance propagation</a>, the layer that has to reach every agent, every time.</p>
-    <p><strong>Enforcement</strong> is the part that turns policy and memory into something machine-verifiable: validation that runs against a proposed change, automated checks, CI/CD gates, and constraints applied to the agent at generation time. This is the layer that converts a known rule into an obeyed rule. Without it, the first three layers are documentation.</p>
-    <p><strong>Auditability</strong> closes the loop. For every change an agent makes, it answers why the decision was made, which policy applied, and which agent performed the action. This is the layer that makes the system explainable after the fact &mdash; and it is the one regulated enterprises cannot live without. The mechanism behind it is what we call <a href="/concepts/enforcement-provenance/">enforcement provenance</a>: a verifiable record linking each change to the rule that approved or rejected it.</p>
+    <h2>Why Prompts and Rule Files Are Not Enough</h2>
+    <p>Rule files are the most common first guardrail, and the most over-trusted. A <code>CLAUDE.md</code> at the repo root feels like governance: the rules are written down, the agent reads them, the code should follow. In practice a rule file is an always-on prompt prefix, and three properties of that prefix keep it from holding.</p>
+    <p><strong>Token budget.</strong> Every rule competes with the task for the model&rsquo;s attention. A short file works; a file that has grown to cover every hard-won decision the team ever made stops being reliably weighed. The rules do not get enforced less because they are wrong &mdash; they get enforced less because there are too many of them to hold in context at once.</p>
+    <p><strong>Precedence.</strong> When two instructions conflict, a prompt has no defined winner. &ldquo;Prefer composition&rdquo; and &ldquo;match the surrounding code&rdquo; can point opposite ways on the same edit, and nothing decides which one governs. A check has an explicit verdict. A paragraph does not.</p>
+    <p><strong>Scope.</strong> A rule file is global to the session, but architectural decisions are local to parts of the system. &ldquo;This boundary is sealed&rdquo; applies to three modules and is irrelevant to the rest, and prose has no clean way to say so. The result is a document that is either too broad to be precise or too long to be read. <a href="/insights/rule-files-vs-retrieval-memory/">Rule files, retrieval, and memory each solve a different problem</a>, and none of them is enforcement.</p>
 
-    <h2>Why Regulated Industries Need This First</h2>
-    <p>For most teams, a governance layer is a competitive advantage. For regulated ones, it is a precondition for adoption. Financial services, healthcare, life sciences, insurance, and government cannot allow autonomous code generation without four properties: traceability of every change, repeatability of every decision, explainability of why the system did what it did, and standing evidence of compliance. An auditor does not accept &ldquo;the model decided.&rdquo; They require a record.</p>
-    <p>This is precisely where content-safety guardrails have nothing to offer. A prompt filter cannot demonstrate that a change to a claims-processing system honored the applicable regulatory boundary, and it cannot reconstruct the chain of policy that approved it. A governance layer can, because traceability and explainability are what it is built to produce. External frameworks point the same direction: NIST&rsquo;s <a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener">AI Risk Management Framework</a> treats governance, accountability, and auditability as core functions of any trustworthy AI system &mdash; the recognized reference for what an enterprise is expected to be able to show. Teams evaluating where this lands in practice can see the regulated-industry patterns in our <a href="/use-cases/">use cases</a>.</p>
-    <p>In these sectors the order of operations inverts. The governance layer is not something you add once agents are productive. It is the thing that has to exist before agents are allowed to touch the codebase at all.</p>
+    <h2>Why RAG Is Not Enough</h2>
+    <p>The next instinct is retrieval: put the ADRs and standards in a vector store, retrieve the relevant ones for each change, feed them to the agent. This is strictly better than a static rule file &mdash; the agent now sees the decisions that actually apply to the edit in front of it. But retrieval solves the <em>seeing</em> problem, not the <em>obeying</em> problem.</p>
+    <p>Retrieving a decision and placing it in context does not enforce it. The agent still gets to weigh the retrieved text against everything else in its prompt and decide what to do. Retrieval can also miss: embedding similarity is fuzzy, and the one ADR that forbids this exact change may not surface for this exact phrasing. Even when it does surface, a retrieved constraint is still a suggestion. <a href="/insights/why-rag-fails-for-architectural-governance/">Retrieving context is not the same as enforcing it</a>. RAG improves the input to a decision the agent still makes freely; a guardrail removes the freedom to land a violating change.</p>
 
-    <h2>The Governance Layer Outlives the Model</h2>
-    <p>Here is the structural bet. The largest enterprises will not standardize on a single model. Models are commoditizing, swappable, and improving on a schedule no one controls. What they will standardize on is governance &mdash; the layer that stays constant while everything underneath it churns.</p>
-    <p>The analogy is identity. Two decades ago, authentication lived inside each application. Then identity became an independent layer &mdash; single sign-on, directory services, federated identity &mdash; and applications were rebuilt to defer to it. The applications changed constantly. The identity layer persisted, because it encoded something more durable than any one app: who is allowed to do what. Governance for AI coding is at the same inflection. Models change, agents change, workflows change. The encoded answer to <em>what is this code allowed to be</em> is the part worth making permanent. This is also why the market is splitting into <a href="/insights/ai-agent-governance-two-markets/">two distinct governance markets</a> &mdash; one for the agents themselves and one for the standards they answer to.</p>
-    <p>An organization that ties its safety to a specific model has to renegotiate that safety every time it switches models. An organization that puts its rules in a governance layer keeps them no matter what generates the code next year. And the advantage it gains is not the one the first wave was competing for.</p>
-    <p>The first wave of this market rewarded raw generation &mdash; whoever could produce the most code, fastest, with the least friction. That contest is largely over; the models are good enough that output is no longer scarce. The next advantage is not generating more code. It is ensuring that AI-generated code stays aligned with architecture, compliance, and organizational intent &mdash; at the volume and speed agents now operate.</p>
-    <p>That is what a governance layer delivers, and why it is becoming infrastructure rather than a feature. The teams that win the agentic era will not be the ones whose agents write the most. They will be the ones whose agents can be trusted, audited, and held to a standard &mdash; and, as we argue in <a href="/insights/ai-coding-governance-should-be-reviewable/">AI coding governance should be reviewable</a>, can prove it. Generation got us here. Governance is what gets us the rest of the way.</p>
+    <h2>Why Memory Is Not Enough</h2>
+    <p>Shared memory across agents and sessions is a real advance &mdash; it gives continuity, so an agent is not rediscovering the codebase from scratch every run. Teams reach for it as a governance answer: if all the agents share memory, surely they will share the architecture. They will not.</p>
+    <p>Continuity is not constraint. Memory tells an agent what was decided; it does not stop the agent from doing something else. An agent can have perfect recall of &ldquo;billing goes through the billing service&rdquo; and still write a direct database read, because remembering a decision and being blocked from violating it are different mechanisms. <a href="/insights/shared-memory-is-not-shared-intent/">Shared memory is not shared intent</a>. Memory is a better input to the agent&rsquo;s reasoning. It is not a check on the agent&rsquo;s output, and only a check can reject a change.</p>
+
+    <h2>Why Review Is Not Enough</h2>
+    <p>Review is the guardrail most teams trust most, and it works &mdash; for human-paced output. A reviewer reads the diff, spots the boundary violation, sends it back. The problem is not that review misses things. It is two structural facts about review.</p>
+    <p><strong>Review is detection after the fact.</strong> By the time a reviewer sees the change, it exists, it has been written into a branch, and reversing it costs more than never landing it would have. The violating pattern may already have been copied by the next agent that read the surrounding code. <a href="/insights/review-is-not-governance/">Review is detection, not governance</a>: it finds problems, it does not prevent them.</p>
+    <p><strong>Review does not scale with agent output.</strong> When agents generate changes faster than people can read them, review becomes the slow step, and the honest failure mode is not rejection &mdash; it is approval-by-fatigue. A reviewer who cannot keep pace with the volume waves things through. <a href="/insights/why-code-review-cannot-scale-with-ai-output/">Human review cannot scale with AI output</a>. The architectural checks that <em>can</em> keep pace are the ones that run automatically at edit time and never get tired.</p>
+
+    <h2>How Architectural Guardrails Actually Work</h2>
+    <p>An architectural guardrail is not a smarter prompt or a bigger memory. It is a check that runs on the proposed change and returns a verdict. The loop is deliberately boring, and boring is the point:</p>
+    <ol>
+      <li><strong>Record</strong> each architectural decision as structured data with its constraints &mdash; the boundary, the approved technology, the forbidden pattern &mdash; not a paragraph in a wiki.</li>
+      <li><strong>Retrieve</strong> the decisions relevant to the current change, whichever agent or model produced it.</li>
+      <li><strong>Check</strong> the proposed edit against them <a href="/concepts/deterministic-enforcement/">deterministically</a> &mdash; same change, same verdict, every time, independent of the model.</li>
+      <li><strong>Reject</strong> violations <a href="/concepts/governance-before-generation/">before the change lands</a>, not at review time, returning the exact decision that was broken.</li>
+      <li><strong>Return</strong> the named violation so the agent can retry compliantly instead of guessing what the rule was.</li>
+    </ol>
+    <p>The worked example makes the difference concrete. An agent is adding a feature and, to save a call, writes a direct read against the billing database &mdash; bypassing the billing service&rsquo;s API boundary. Walk it through the five layers. The <strong>runtime</strong> guardrail sees a normal database query and allows it; nothing unsafe happened. The <strong>rule file</strong> may say &ldquo;go through the billing service,&rdquo; but that line was one of forty and the model did not weigh it. <strong>Policy</strong> checks for secrets and licenses and finds none. <strong>Review</strong> might catch it, if the reviewer is fresh and reading carefully and not forty diffs deep. The <strong>architectural</strong> guardrail retrieves the recorded boundary decision, matches the direct read against it, and rejects the change before it lands &mdash; with a verdict that names the violated ADR: <em>billing data must be accessed through the billing service API</em>. The agent gets the specific rule back and retries through the API.</p>
+    <p>That verdict is deterministic and it carries its reason. Because the check depends on the recorded decision and not on which model ran, it holds when you swap models or add agents &mdash; the property that makes it <a href="/concepts/model-independent-governance/">model-independent governance</a>. And because the verdict names the decision it enforced, every block is traceable to an intent someone recorded on purpose, which is what <a href="/concepts/enforcement-provenance/">enforcement provenance</a> means. A guardrail that can tell you <em>which decision</em> it enforced and <em>why</em> is a different kind of object from a prompt that hoped the model would comply.</p>
+    <p>One more control matters in practice: warn versus block. Not every decision should hard-fail a change. A mature setup blocks on the sealed boundaries and the rules that must never bend, and warns on the softer conventions &mdash; surfacing the concern without stopping the work. The verdict is still deterministic; the team chooses the severity per decision.</p>
+
+    <h2>Choosing the Right Guardrail for the Risk</h2>
+    <p>The five layers are not competitors. A serious stack runs all of them, because each covers a risk the others cannot see. The mistake is not picking one &mdash; it is assuming the ones you already have cover a risk they were never built for.</p>
+    <p>Match the layer to the failure you are actually worried about. Afraid of a destructive action or a prompt injection? That is <strong>runtime</strong>. Worried about a committed secret or a license violation? That is <strong>policy</strong>. Want the model to lean toward the house style? A <strong>rule file</strong> helps at the margin. But if the risk is that a correctly running, safe, policy-clean change quietly violates the architecture your team spent months deciding &mdash; the direct database read, the crossed boundary, the second HTTP client &mdash; none of those layers is built to catch it. That risk needs a guardrail that sees the architecture and enforces it at edit time. That is the layer to add when the others are already in place and the code is still drifting. See where it fits in a real stack in <a href="/insights/governance-layers-for-ai-coding-assistants/">governance layers for AI coding assistants</a>, or <a href="/use-cases/">walk through the use cases</a> where architectural guardrails earn their place.</p>
 
   </div><!-- /.article-body -->
 
   <section class="article-faq" aria-labelledby="faq-heading" style="margin-top:3rem;">
     <h2 id="faq-heading" style="margin-bottom:1.5rem;">Frequently asked questions</h2>
     <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">What is a governance layer for AI coding assistants?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">It is enterprise infrastructure that constrains what AI coding agents are allowed to do, built from four layers: policy (the human decisions that define correct), memory (ADRs and incident history that give policy context), enforcement (machine-verifiable checks and CI/CD gates applied to proposed changes), and auditability (a record of why each decision was made and which agent acted). It sits above access control and decides not whether an agent <em>can</em> change a system, but whether it <em>should</em>.</div>
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">What are AI coding-agent guardrails?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">AI coding-agent guardrails are constraints that shape or block what a coding agent may do. They come in five layers: runtime guardrails (sandboxes, tool allow-lists, resource limits), prompt and rule-file guardrails (system prompts, CLAUDE.md), policy guardrails (org-wide policy engines), architectural guardrails (ADRs and boundaries enforced at edit time), and engineering-standards guardrails (conventions and approved technology). The layers stack rather than substitute &mdash; each catches a class of risk the others miss.</div>
     </details>
     <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">How is governance different from access control?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Access control answers whether an agent has permission to act on a system. Governance answers whether the specific change it proposes is acceptable &mdash; whether it honors architecture rules, ADRs, security boundaries, regulatory requirements, and team conventions. An agent can be fully permitted to modify a payments service and still produce a change that violates a recorded decision. Permission is necessary but not sufficient; governance is the layer that judges the change itself.</div>
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">What is the difference between runtime guardrails and architectural guardrails?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Runtime guardrails control what the agent process can do while it runs &mdash; blocking destructive shell commands, unsafe tool calls, prompt injection, and resource abuse. They see system calls and API traffic, not architecture. Architectural guardrails check a proposed change against the system&rsquo;s recorded decisions (ADRs, service boundaries, approved patterns) at edit time and reject violations before they land. Code can be perfectly safe at runtime and still violate every architectural decision, which is why runtime verification is not architectural verification.</div>
     </details>
     <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Why do regulated industries need a governance layer before adopting agents?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Financial services, healthcare, life sciences, insurance, and government require traceability, repeatability, explainability, and standing evidence of compliance for any change to a regulated system. An auditor will not accept &ldquo;the model decided.&rdquo; A governance layer produces the record &mdash; which policy applied, which agent acted, why &mdash; that content-safety guardrails cannot. In these sectors governance is not an add-on after agents become productive; it is the precondition for letting agents touch the codebase at all.</div>
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Why aren&rsquo;t rule files, RAG, and memory enough to govern AI coding agents?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Rule files are an always-on prompt prefix that fails on token budget, precedence, and scope &mdash; a prompt is a suggestion, not a control. RAG retrieves the relevant decisions but retrieving context is not enforcing it; the agent still weighs the text and decides freely. Memory gives continuity but continuity is not constraint &mdash; an agent can recall a decision perfectly and still violate it. None of the three rejects a violating change; only a deterministic check does.</div>
+    </details>
+    <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Why can&rsquo;t code review serve as the architectural guardrail?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Review is detection after the fact: by the time a reviewer sees a violation, the change already exists and may already have been copied by the next agent. Review also does not scale with agent output &mdash; when agents generate changes faster than people can read them, review degrades into approval-by-fatigue. Architectural checks that run automatically at edit time catch the violation before it lands and do not slow down as volume rises.</div>
     </details>
   </section>
 
-  <aside class="related-panel" aria-labelledby="related-essays-label" style="margin-top:3rem;">
-    <div class="related-panel-label" id="related-essays-label">Related operational essays</div>
+  <aside class="related-panel" aria-labelledby="related-concepts-label" style="margin-top:3rem;">
+    <div class="related-panel-label" id="related-concepts-label">Related governance concepts</div>
     <ul class="related-list">
-      <li><a href="/insights/enterprise-ai-guardrails-five-layers/"><div class="rel-title">Not All AI Guardrails Are the Same</div><p class="rel-desc">The five layers of enterprise AI guardrails &mdash; and the architectural layer most stacks miss.</p></a></li>
-      <li><a href="/insights/how-ai-coding-agents-use-adrs/"><div class="rel-title">How AI Coding Agents Use ADRs (Architecture Decision Records)</div><p class="rel-desc">An ADR records one architectural decision, its context, and its consequences. Here is how AI coding agents actually interact with ADRs today &mdash; ignored, advisory, or enforced &mdash; and how to make them executable.</p></a></li>
-      <li><a href="/insights/smart-routing-ai-coding-agents/"><div class="rel-title">Smart Routing for AI Coding Agents</div><p class="rel-desc">Routing optimizes execution; it does not enforce the architecture every routed agent must follow.</p></a></li>
-      <li><a href="/insights/ai-race-wont-be-won-on-infrastructure-alone/"><div class="rel-title">Why the AI Race Won&rsquo;t Be Won on Infrastructure Alone</div><p class="rel-desc">Infrastructure decides how much intelligence you can access; governance decides how much you can safely deploy.</p></a></li>
-      <li><a href="/insights/open-knowledge-format-vs-governance/"><div class="rel-title">Open Knowledge Format vs Governance</div><p class="rel-desc">Standardizing how agents find organizational knowledge does not make them follow it.</p></a></li>
-      <li><a href="/insights/agent-governance-in-the-sdlc/"><div class="rel-title">Agent Governance in the SDLC</div><p class="rel-desc">Where in the development lifecycle enforcement has to sit once agents act autonomously.</p></a></li>
-      <li><a href="/insights/ai-agent-governance-two-markets/"><div class="rel-title">AI Agent Governance Is Two Markets</div><p class="rel-desc">Governing the agents is a separate problem from governing the standards they answer to.</p></a></li>
-      <li><a href="/insights/ai-coding-governance-should-be-reviewable/"><div class="rel-title">AI Coding Governance Should Be Reviewable</div><p class="rel-desc">Why auditability, not just enforcement, is what makes a governance layer trustworthy.</p></a></li>
-      <li><a href="/insights/why-context-alone-doesnt-prevent-architectural-drift/"><div class="rel-title">Why Context Alone Doesn&rsquo;t Prevent Architectural Drift</div><p class="rel-desc">More information improves what an agent knows, not what it is allowed to do.</p></a></li>
+      <li><a href="/concepts/architectural-governance/"><div class="rel-title">Architectural Governance</div><p class="rel-desc">Keeping generated code aligned with the system&rsquo;s recorded decisions, whichever agent produced it.</p></a></li>
+      <li><a href="/concepts/executable-architectural-intent/"><div class="rel-title">Executable Architectural Intent</div><p class="rel-desc">Turning architectural decisions into constraints a machine can check, not prose in a wiki.</p></a></li>
+      <li><a href="/concepts/deterministic-enforcement/"><div class="rel-title">Deterministic Enforcement</div><p class="rel-desc">Same change, same verdict &mdash; checks that do not depend on which model ran.</p></a></li>
+      <li><a href="/concepts/governance-before-generation/"><div class="rel-title">Governance Before Generation</div><p class="rel-desc">Constraints applied where code is created, not discovered later in review.</p></a></li>
     </ul>
   </aside>
 
-  <aside class="related-panel" aria-labelledby="related-concepts-label" style="margin-top:1.5rem;padding-top:0;border-top:none;">
-    <div class="related-panel-label" id="related-concepts-label">Related governance concepts</div>
+  <aside class="related-panel" aria-labelledby="related-essays-label" style="margin-top:1.5rem;padding-top:0;border-top:none;">
+    <div class="related-panel-label" id="related-essays-label">Related operational essays</div>
     <ul class="related-list">
-      <li><a href="/concepts/governance-propagation/"><div class="rel-title">Governance Propagation</div><p class="rel-desc">How an enforced decision reaches every agent and every generation call.</p></a></li>
-      <li><a href="/concepts/enforcement-provenance/"><div class="rel-title">Enforcement Provenance</div><p class="rel-desc">The verifiable record linking each change to the rule that approved or rejected it.</p></a></li>
+      <li><a href="/insights/enterprise-ai-guardrails-five-layers/"><div class="rel-title">Not All AI Guardrails Are the Same</div><p class="rel-desc">The five layers of enterprise AI guardrails &mdash; and the architectural layer most stacks miss.</p></a></li>
+      <li><a href="/insights/ai-coding-agent-architecture/"><div class="rel-title">AI Coding-Agent Architecture</div><p class="rel-desc">A coding agent is not a model. It is a stack: the model, the harness, the governance layer, and the intent it enforces. Here is what each layer does, and which one most tools leave out.</p></a></li>
+      <li><a href="/insights/how-ai-coding-agents-use-adrs/"><div class="rel-title">How AI Coding Agents Use ADRs (Architecture Decision Records)</div><p class="rel-desc">An ADR records one architectural decision, its context, and its consequences. Here is how AI coding agents actually interact with ADRs today &mdash; ignored, advisory, or enforced &mdash; and how to make them executable.</p></a></li>
+      <li><a href="/insights/governance-layers-for-ai-coding-assistants/"><div class="rel-title">Building Governance Layers for AI Coding Assistants</div><p class="rel-desc">Where each guardrail belongs in a modern coding stack.</p></a></li>
+      <li><a href="/insights/why-rag-fails-for-architectural-governance/"><div class="rel-title">Why RAG Fails for Architectural Governance</div><p class="rel-desc">Retrieving the right ADR is not the same as enforcing it.</p></a></li>
+      <li><a href="/insights/review-is-not-governance/"><div class="rel-title">Review Is Detection, Not Governance</div><p class="rel-desc">Finding a violation after it lands is not the same as preventing it.</p></a></li>
+      <li><a href="/insights/runtime-verification-is-not-architectural-verification/"><div class="rel-title">Runtime Verification Is Not Architectural Verification</div><p class="rel-desc">Safe at runtime and architecturally wrong are two different verdicts.</p></a></li>
+      <li><a href="/insights/shared-memory-is-not-shared-intent/"><div class="rel-title">Shared Memory Is Not Shared Intent</div><p class="rel-desc">Continuity across agents is not a constraint on what they build.</p></a></li>
     </ul>
   </aside>
 
@@ -476,8 +536,8 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
   <footer class="article-footer">
     <a href="/insights/" class="back-link">&larr; Back to Insights</a>
     <div class="cta-block">
-      <h3>Put a governance layer under your AI coding agents.</h3>
-      <p>Mneme turns your architecture standards and ADRs into executable constraints that every agent retrieves at generation time and CI verifies deterministically &mdash; with an audit trail showing which rule applied to which change. Policy, memory, enforcement, and auditability, in one open-source layer.</p>
+      <h3>The guardrail that enforces your architecture.</h3>
+      <p>Mneme turns your architectural decisions into executable constraints that every coding agent retrieves at generation time and CI verifies deterministically &mdash; rejecting the boundary crossing before it lands and naming the decision it broke. Open source.</p>
       <a href="/demo/" style="display:inline-block;margin-right:1.25rem;color:#c8f060;font-family:'DM Mono',monospace;font-size:0.85rem;text-decoration:none;">See the live demo &rarr;</a>
       <a href="https://github.com/MnemeHQ/mneme" class="btn-primary">View on GitHub &rarr;</a>
     </div>

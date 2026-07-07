@@ -3,29 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Building Governance Layers for AI Coding Assistants &mdash; Mneme HQ</title>
+  <title>AI Coding-Agent Architecture: The Layers Between a Model and Production &mdash; Mneme HQ</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="AI coding assistants are becoming agents that modify codebases, open PRs, and deploy. The missing enterprise infrastructure is a governance layer: policy, memory, enforcement, and auditability around what agents are allowed to do." />
+  <meta name="description" content="A coding agent is not a model. It is a stack: the model, the harness, the governance layer, and the intent it enforces. Here is what each layer does, and which one most tools leave out." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
-  <link rel="canonical" href="https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/" />
+  <link rel="canonical" href="https://mnemehq.com/insights/ai-coding-agent-architecture/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Building Governance Layers for AI Coding Assistants" />
-  <meta property="og:description" content="AI coding assistants are becoming agents that modify codebases, open PRs, and deploy. The missing enterprise infrastructure is a governance layer: policy, memory, enforcement, and auditability around what agents are allowed to do." />
-  <meta property="og:url" content="https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/" />
-  <meta property="og:image" content="https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/og.png" />
+  <meta property="og:title" content="AI Coding-Agent Architecture: The Layers Between a Model and Production" />
+  <meta property="og:description" content="A coding agent is not a model. It is a stack: the model, the harness, the governance layer, and the intent it enforces. Here is what each layer does, and which one most tools leave out." />
+  <meta property="og:url" content="https://mnemehq.com/insights/ai-coding-agent-architecture/" />
+  <meta property="og:image" content="https://mnemehq.com/insights/ai-coding-agent-architecture/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Building Governance Layers for AI Coding Assistants" />
-  <meta name="twitter:description" content="AI coding assistants are becoming agents that modify codebases, open PRs, and deploy. The missing enterprise infrastructure is a governance layer: policy, memory, enforcement, and auditability around what agents are allowed to do." />
-  <meta name="twitter:image" content="https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/og.png" />
+  <meta name="twitter:title" content="AI Coding-Agent Architecture: The Layers Between a Model and Production" />
+  <meta name="twitter:description" content="A coding agent is not a model. It is a stack: the model, the harness, the governance layer, and the intent it enforces. Here is what each layer does, and which one most tools leave out." />
+  <meta name="twitter:image" content="https://mnemehq.com/insights/ai-coding-agent-architecture/og.png" />
   <meta name="author" content="Theo Valmis" />
-  <meta property="article:published_time" content="2026-06-17T00:00:00Z" />
+  <meta property="article:published_time" content="2026-07-06T00:00:00Z" />
   <meta property="article:author" content="https://mnemehq.com/founder/" />
-  <meta property="article:section" content="Industry Analysis" />
+  <meta property="article:section" content="Engineering" />
 
   <!-- Consent defaults -->
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{'analytics_storage':'granted','ad_storage':'denied','ad_user_data':'denied','ad_personalization':'denied'});</script>
@@ -118,31 +118,51 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
   <link rel="icon" href="/favicon.png" type="image/png">
 
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
-          {"@type": "ListItem", "position": 2, "name": "Insights", "item": "https://mnemehq.com/insights/"},
-          {"@type": "ListItem", "position": 3, "name": "Building Governance Layers for AI Coding Assistants", "item": "https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/"}
-        ]
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://mnemehq.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Insights",
+          "item": "https://mnemehq.com/insights/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "AI Coding-Agent Architecture",
+          "item": "https://mnemehq.com/insights/ai-coding-agent-architecture/"
+        }
+      ]
+    },
+    {
+      "@type": "TechArticle",
+      "headline": "AI Coding-Agent Architecture: The Layers Between a Model and Production",
+      "description": "A coding agent is not a model. It is a stack: the model, the harness, the governance layer, and the intent it enforces. Here is what each layer does, and which one most tools leave out.",
+      "url": "https://mnemehq.com/insights/ai-coding-agent-architecture/",
+      "datePublished": "2026-07-06",
+      "author": {
+        "@type": "Person",
+        "name": "Theo Valmis",
+        "url": "https://mnemehq.com/founder/"
       },
-      {
-        "@type": "TechArticle",
-        "headline": "Building Governance Layers for AI Coding Assistants",
-        "description": "AI coding assistants are becoming agents that modify codebases, open PRs, and deploy. The missing enterprise infrastructure is a governance layer: policy, memory, enforcement, and auditability around what agents are allowed to do.",
-        "url": "https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/",
-        "datePublished": "2026-06-17",
-        "dateModified": "2026-06-17",
-        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
-        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/"},
-        "image": "https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/og.png",
-        "mainEntityOfPage": "https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/"
+      "publisher": {
+        "@type": "Organization",
+        "name": "Mneme HQ",
+        "url": "https://mnemehq.com/"
       }
-    ]
-  }
+    }
+  ]
+}
   </script>
 
 <style>
@@ -361,109 +381,130 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
   <ol class="breadcrumb">
     <li><a href="/">Home</a></li>
     <li><a href="/insights/">Insights</a></li>
-    <li aria-current="page">Building Governance Layers for AI Coding Assistants</li>
+    <li aria-current="page">AI Coding-Agent Architecture</li>
   </ol>
 </nav>
 
 <article class="article-wrap">
   <header class="article-header">
     <div class="article-eyebrow">
-      <span class="eyebrow-tag">Thought Leadership</span>
+      <span class="eyebrow-tag">Analysis</span>
       <span class="eyebrow-dot"></span>
       <span class="eyebrow-meta">10 min read</span>
     </div>
-    <h1>Building Governance Layers for AI Coding Assistants</h1>
-    <p class="article-lede">The first wave of AI coding assistants was about generation. The next wave is about control. As assistants evolve into agents that modify codebases, open pull requests, run tests, and deploy infrastructure, the question stops being whether AI can write code and becomes how organizations ensure it writes the right code. At enterprise scale, that answer is infrastructure: a governance layer.</p>
-    <p class="byline">By <a href="/founder/">Theo Valmis</a><span class="sep">&middot;</span><time datetime="2026-06-17">June 2026</time></p>
+    <h1>AI Coding-Agent Architecture: The Layers Between a Model and Production</h1>
+    <p class="article-lede">When people say &ldquo;the coding agent wrote this,&rdquo; they usually mean the model did. But the model is one part of a larger machine. Between a raw language model and a change that safely lands in production sit several distinct layers, each with a different job. Confusing them is why teams keep asking a better model to solve a problem that is not the model&rsquo;s to solve. This is a map of the stack: the model, the harness, the governance layer, and the intent that governance enforces &mdash; and where most tools stop short.</p>
+    <p class="byline">By <a href="/founder/">Theo Valmis</a><span class="sep">&middot;</span><time datetime="2026-07-06">July 2026</time></p>
   </header>
 
   <div class="article-body">
 
-    <h2>From Autocomplete to Autonomous Execution</h2>
-    <p>The capability curve of AI coding tools is easy to trace, and each step is a step away from the human keystroke. It started with autocomplete &mdash; GitHub Copilot suggesting the next line while a developer stayed in the driver&rsquo;s seat. Then came chat coding, where ChatGPT and Claude would draft whole functions and explain them on request. Then IDE-native agents like Cursor and Windsurf began editing multiple files, running commands, and iterating against test output. Now the frontier is multi-agent development systems and, beyond them, autonomous execution across the software development lifecycle: an agent that plans a change, writes it, tests it, opens a pull request, and pushes toward deploy.</p>
-    <p>Every step on that curve increases capability. Every step also increases risk. An autocomplete suggestion a developer rejects costs nothing. An autonomous agent that merges a non-compliant change into a payments service costs a great deal. The more an assistant can do without a human in the loop, the more the organization needs a way to constrain what it does &mdash; not after the fact, but before the change lands.</p>
+    <h2>A Coding Agent Is Not Just a Model &mdash; It Is a Stack</h2>
+    <p>The word &ldquo;agent&rdquo; hides a lot of machinery. A model, on its own, is a function: text in, text out. It cannot read your repository, run your tests, open a pull request, or check whether the change it proposed obeys a decision your team made two years ago. Everything that turns a model into something that ships code is built <em>around</em> the model, not inside it.</p>
+    <p>Anthropic&rsquo;s guidance on <a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">building effective agents</a> makes the same distinction from the model builder&rsquo;s side: the foundational block is &ldquo;an LLM enhanced with augmentations such as retrieval, tools, and memory,&rdquo; and an agent is that model &ldquo;using tools based on environmental feedback in a loop.&rdquo; The model proposes. The system around it acts, observes, and decides what to do next.</p>
+    <p>Once you accept that a coding agent is a stack rather than a model, the useful question changes. It is no longer &ldquo;which model is best?&rdquo; It is &ldquo;which layers do I have, and which am I missing?&rdquo; Most teams have more of the stack than they realize, and are missing the same one or two layers as everyone else.</p>
 
-    <h2>Why Traditional AI Guardrails Fail Here</h2>
-    <p>Most of what gets called &ldquo;AI governance&rdquo; today was built for a different problem. It covers content moderation, prompt filtering, data privacy, model safety, and toxic-output detection. Those controls matter, but they were designed for systems that generate text for humans to read. Software engineering generates artifacts that other systems execute, and that introduces a different class of risk entirely.</p>
-    <p>The risks that matter in a codebase are <strong>architectural drift</strong>, security violations, compliance violations, framework inconsistency, undocumented design decisions, and hidden technical debt. None of these are caught by a content filter. A model can produce code that is syntactically perfect, passes its tests, reads cleanly in review &mdash; and still violates a critical organizational standard. It can wire a service directly to a database that policy says must be accessed through a gateway. It can introduce a second HTTP client into a codebase that standardized on one. It can encode a design decision nobody approved and nobody wrote down.</p>
-    <p>Guardrails tuned for prose do not see any of this, because the violation is not in the words. It is in the structure. As we have argued in <a href="/insights/why-context-alone-doesnt-prevent-architectural-drift/">why context alone doesn&rsquo;t prevent architectural drift</a>, giving a model more information about your system improves what it knows without changing what it is allowed to do. Knowing a rule and being held to a rule are different mechanisms.</p>
-
-    <h2>Governance Is Not Access Control</h2>
-    <p>This is the distinction most teams get wrong, and it is worth stating sharply. Access control answers a question about permission: <em>can the agent do this?</em> Governance answers a question about judgment: <em>should the agent do this?</em> They are not the same layer, and one does not imply the other.</p>
-    <p>Consider an agent with write access to a payments service. Access control has already done its job &mdash; the agent is authorized to modify those files. Governance is the layer that decides whether the specific modification it proposes violates an architecture rule, contradicts a recorded <a href="/insights/agent-governance-in-the-sdlc/">architectural decision</a>, crosses a security boundary, breaks a regulatory requirement, or ignores a team convention. The agent can be fully permitted and still wrong. Permission is necessary; it is not sufficient.</p>
-    <div class="callout"><p><strong>Access control gates the door. Governance reads what walked through it.</strong> An agent can have every permission it needs and still produce a change that should never ship.</p></div>
-    <p>This is also why governance cannot be solved by tightening permissions. You could remove the agent&rsquo;s access to the payments service entirely, but then it cannot do its job. The goal is not to lock agents out of important systems. It is to let them work inside those systems while guaranteeing that what they produce stays aligned with the rules a human already decided on.</p>
-
-    <h2>The Emerging Governance Stack</h2>
-    <p>A governance layer for AI coding is not a single feature. It is a stack of four distinct concerns, each of which fails differently when it is missing. The layers below build on one another: policy without enforcement is a wiki nobody reads; enforcement without auditability is a black box nobody trusts.</p>
-
+    <h2>The Layers, Bottom to Top</h2>
+    <p>Read the stack from the ground up. Each layer depends on the one below it and hands a well-defined job to the one above.</p>
+    <ul>
+      <li><strong>The model.</strong> This is the generator. Given a task and some context, it produces candidate code: a diff, a new file, a shell command, a plan. It is remarkably good at this and remarkably indifferent to whether the result fits your system. The model has no memory of your architecture and no stake in your conventions. It generates; it does not govern.</li>
+      <li><strong>The harness / execution layer.</strong> This is what makes the model useful. It assembles context (which files, which errors, which docs), exposes tools (read, edit, run tests, search), runs the model in a loop, and contains the work in a sandbox so a bad step is recoverable. The harness is the difference between a chat window and something that can actually operate on a codebase. We treat this layer in depth in <a href="/insights/what-is-harness-engineering/">what harness engineering is</a>; the short version is that a better harness makes a model more capable and more reliable, and it is where a great deal of current engineering effort goes.</li>
+      <li><strong>The governance layer.</strong> This is the layer that checks a proposed change against your recorded architectural decisions before the change lands. It does not generate code and it does not run tools. Its single job is to answer one question deterministically: does this diff violate a decision we already made? If the agent tries to add a second HTTP client, reach across a service boundary, or ignore a naming convention, the governance layer is what catches it &mdash; at generation time, not in a human review three days later. See <a href="/insights/governance-layers-for-ai-coding-assistants/">governance layers for AI coding assistants</a> for where this sits in a real stack.</li>
+      <li><strong>The intent layer.</strong> This is the durable material the governance layer enforces: the architecture decision records (ADRs), the engineering standards, the approved technologies, the project constraints. It is the answer to &ldquo;what did we decide, and why?&rdquo; expressed as data rather than prose. When intent lives as <a href="/concepts/executable-architectural-intent/">executable architectural intent</a> instead of a wiki page nobody reads, the governance layer has something concrete to check against. Models change; this layer does not, which is the whole point of <a href="/insights/models-are-temporary-architectural-intent-is-not/">treating intent as the stable asset</a>.</li>
+    </ul>
+    <p>Each layer has a job it owns and a set of jobs it deliberately refuses. Confusing the boundaries is the common failure: asking the model to remember your architecture, or asking the harness to enforce it, puts a responsibility on a layer that has no mechanism to carry it.</p>
     <div style="overflow-x:auto;margin:2rem 0;">
     <table class="gov-table">
-      <thead><tr><th>Layer</th><th>What it is</th><th>What it contains</th></tr></thead>
+      <thead><tr><th>Layer</th><th>Responsibility</th><th>What it does NOT do</th></tr></thead>
       <tbody>
-        <tr><td>1. Policy</td><td>Human decisions</td><td>Architecture standards, security requirements, compliance rules</td></tr>
-        <tr><td>2. Memory</td><td>Organizational knowledge</td><td>ADRs, previous incidents, design rationales, lessons learned</td></tr>
-        <tr><td>3. Enforcement</td><td>Machine-verifiable controls</td><td>Policy validation, automated checks, CI/CD gates, agent constraints</td></tr>
-        <tr class="accent-row"><td>4. Auditability</td><td>Enterprise accountability</td><td>Why a decision was made, which policy applied, which agent acted</td></tr>
+        <tr><td>Model</td><td>Generate candidate code from a task and context</td><td>Know your architecture or honor your conventions</td></tr>
+        <tr><td>Harness / execution</td><td>Assemble context, expose tools, run the loop, sandbox the work</td><td>Judge whether a change respects prior decisions</td></tr>
+        <tr><td>Governance</td><td>Check each proposed change against recorded decisions, deterministically</td><td>Generate code or decide what the rules are</td></tr>
+        <tr class="accent-row"><td>Intent</td><td>Hold the ADRs, standards, and constraints as checkable data</td><td>Run anything &mdash; it is the source of truth, not the engine</td></tr>
       </tbody>
     </table>
     </div>
 
-    <p><strong>Policy</strong> is where humans set intent: the architecture standards, security requirements, and compliance rules that define what &ldquo;correct&rdquo; means for this organization. It is the only layer that should not be automated, because it encodes choices that belong to people.</p>
-    <p><strong>Memory</strong> is the organizational knowledge that gives policy its context &mdash; the ADRs that record why a boundary exists, the incident write-ups that explain what went wrong last time, the design rationales that keep a team from relitigating settled questions. Memory is what lets policy be specific instead of generic. It is also, as covered in <a href="/concepts/governance-propagation/">governance propagation</a>, the layer that has to reach every agent, every time.</p>
-    <p><strong>Enforcement</strong> is the part that turns policy and memory into something machine-verifiable: validation that runs against a proposed change, automated checks, CI/CD gates, and constraints applied to the agent at generation time. This is the layer that converts a known rule into an obeyed rule. Without it, the first three layers are documentation.</p>
-    <p><strong>Auditability</strong> closes the loop. For every change an agent makes, it answers why the decision was made, which policy applied, and which agent performed the action. This is the layer that makes the system explainable after the fact &mdash; and it is the one regulated enterprises cannot live without. The mechanism behind it is what we call <a href="/concepts/enforcement-provenance/">enforcement provenance</a>: a verifiable record linking each change to the rule that approved or rejected it.</p>
+    <h2>Where Most Tools Stop</h2>
+    <p>The industry has invested heavily in the bottom two layers, and it shows. Models are more capable every quarter. Harnesses have improved just as fast: better context assembly, better tool interfaces, tighter loops, safer sandboxes. This is real progress. A team with a strong model and a strong harness can hand an agent a genuine task and get a working result back.</p>
+    <p>But almost every tool stops at the harness. The pitch is capability: this agent can do more, do it faster, do it with fewer interventions. And capability is worth having. The problem is that capability is not the same as consistency. A more capable agent produces more code, more quickly, across more of your system &mdash; which means a more capable agent produces architectural drift more quickly too, unless something above the harness is checking its output against your decisions.</p>
+    <div class="callout"><p><strong>A better harness makes an agent more capable. It does not make the agent consistent with your architecture.</strong> Those are two different properties, solved by two different layers. Improving the harness cannot close the gap the governance layer exists to close.</p></div>
+    <p>This is why harness work, on its own, reaches a ceiling. We have written before that <a href="/insights/harness-engineering-still-needs-governance/">harness engineering still needs governance</a> and that the shift from <a href="/insights/prompt-engineering-vs-harness-engineering/">prompt engineering to harness engineering</a> moved the frontier without closing it. The harness controls how the agent works. It does not control what the agent is allowed to build.</p>
 
-    <h2>Why Regulated Industries Need This First</h2>
-    <p>For most teams, a governance layer is a competitive advantage. For regulated ones, it is a precondition for adoption. Financial services, healthcare, life sciences, insurance, and government cannot allow autonomous code generation without four properties: traceability of every change, repeatability of every decision, explainability of why the system did what it did, and standing evidence of compliance. An auditor does not accept &ldquo;the model decided.&rdquo; They require a record.</p>
-    <p>This is precisely where content-safety guardrails have nothing to offer. A prompt filter cannot demonstrate that a change to a claims-processing system honored the applicable regulatory boundary, and it cannot reconstruct the chain of policy that approved it. A governance layer can, because traceability and explainability are what it is built to produce. External frameworks point the same direction: NIST&rsquo;s <a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener">AI Risk Management Framework</a> treats governance, accountability, and auditability as core functions of any trustworthy AI system &mdash; the recognized reference for what an enterprise is expected to be able to show. Teams evaluating where this lands in practice can see the regulated-industry patterns in our <a href="/use-cases/">use cases</a>.</p>
-    <p>In these sectors the order of operations inverts. The governance layer is not something you add once agents are productive. It is the thing that has to exist before agents are allowed to touch the codebase at all.</p>
+    <h2>Why the Governance and Intent Layers Are Usually Missing</h2>
+    <p>These two layers are not missing because they are unimportant. They are missing because, until recently, humans carried them implicitly.</p>
+    <p>On a human team, architectural intent lived in senior engineers&rsquo; heads and surfaced in code review. Someone who knew the system would look at a pull request and say &ldquo;we don&rsquo;t add HTTP clients, use the shared one&rdquo; or &ldquo;that service can&rsquo;t read the billing tables directly.&rdquo; The governance layer was a person. The intent layer was their memory. It worked, slowly, because human throughput was low enough that a human check per change was affordable.</p>
+    <p>Agents break that arrangement in one specific way: they raise the rate of change past what a human governance layer can keep up with. When an agent opens fifteen pull requests in an afternoon, the reviewer who used to hold the architecture in their head becomes the slowest part of the system, and the temptation is to wave changes through. The intent that used to be carried informally now has to be made explicit &mdash; recorded as data, retrieved automatically, and checked by machine &mdash; because the informal carrier no longer scales. This is the core argument for <a href="/concepts/governance-infrastructure/">governance infrastructure</a>: at agent velocity, the rules have to live somewhere the machine can read them.</p>
 
-    <h2>The Governance Layer Outlives the Model</h2>
-    <p>Here is the structural bet. The largest enterprises will not standardize on a single model. Models are commoditizing, swappable, and improving on a schedule no one controls. What they will standardize on is governance &mdash; the layer that stays constant while everything underneath it churns.</p>
-    <p>The analogy is identity. Two decades ago, authentication lived inside each application. Then identity became an independent layer &mdash; single sign-on, directory services, federated identity &mdash; and applications were rebuilt to defer to it. The applications changed constantly. The identity layer persisted, because it encoded something more durable than any one app: who is allowed to do what. Governance for AI coding is at the same inflection. Models change, agents change, workflows change. The encoded answer to <em>what is this code allowed to be</em> is the part worth making permanent. This is also why the market is splitting into <a href="/insights/ai-agent-governance-two-markets/">two distinct governance markets</a> &mdash; one for the agents themselves and one for the standards they answer to.</p>
-    <p>An organization that ties its safety to a specific model has to renegotiate that safety every time it switches models. An organization that puts its rules in a governance layer keeps them no matter what generates the code next year. And the advantage it gains is not the one the first wave was competing for.</p>
-    <p>The first wave of this market rewarded raw generation &mdash; whoever could produce the most code, fastest, with the least friction. That contest is largely over; the models are good enough that output is no longer scarce. The next advantage is not generating more code. It is ensuring that AI-generated code stays aligned with architecture, compliance, and organizational intent &mdash; at the volume and speed agents now operate.</p>
-    <p>That is what a governance layer delivers, and why it is becoming infrastructure rather than a feature. The teams that win the agentic era will not be the ones whose agents write the most. They will be the ones whose agents can be trusted, audited, and held to a standard &mdash; and, as we argue in <a href="/insights/ai-coding-governance-should-be-reviewable/">AI coding governance should be reviewable</a>, can prove it. Generation got us here. Governance is what gets us the rest of the way.</p>
+    <h2>How the Layers Compose</h2>
+    <p>The four layers are not a pipeline you run once. They compose into a loop that runs on every proposed change. The model proposes, the harness executes, governance checks against intent, and only compliant changes land. Spelled out, the loop is deliberately boring:</p>
+    <ol>
+      <li><strong>Record</strong> each architectural decision as structured data with its constraints &mdash; the intent layer &mdash; not a paragraph in a doc.</li>
+      <li><strong>Retrieve</strong> the decisions relevant to the change the agent is about to make, whichever model the harness is driving.</li>
+      <li><strong>Check</strong> the proposed edit against those decisions <a href="/concepts/deterministic-enforcement/">deterministically</a> &mdash; same change, same verdict, independent of which model ran.</li>
+      <li><strong>Reject</strong> violations <a href="/concepts/governance-before-generation/">before the change lands</a>, not at review time.</li>
+      <li><strong>Return</strong> the specific decision that was violated, so the agent can retry compliantly instead of guessing.</li>
+    </ol>
+    <p>Because the check is <a href="/concepts/model-independent-governance/">independent of the model</a>, the harness can swap models, add specialists, or upgrade to next quarter&rsquo;s frontier release, and the governance verdict stays the same. The layers compose precisely because their responsibilities do not overlap: the harness never has to know the rules, and the governance layer never has to know how the code was generated.</p>
+
+    <h2>A Concrete Pass Through the Stack</h2>
+    <p>Take one decision your team actually made: the billing service owns the billing tables, and every other service reaches billing through its API. No direct database reads. It is written down as an ADR, and it is the kind of boundary that quietly erodes the moment someone finds it convenient to ignore.</p>
+    <p>Now watch a change move through the stack. A feature request asks the reporting service to show a customer&rsquo;s recent invoices.</p>
+    <ul>
+      <li><strong>Model.</strong> The model, given the task and the reporting service&rsquo;s code, writes the most direct thing it can: a query straight against the <code>billing.invoices</code> table. It is correct code. It runs. The model has no idea the boundary exists.</li>
+      <li><strong>Harness.</strong> The harness assembles the context, lets the model edit the file, runs the tests, and the tests pass &mdash; because the direct query works. A harness optimized purely for capability would report success here. The change looks done.</li>
+      <li><strong>Governance.</strong> The governance layer retrieves the billing-boundary ADR, checks the diff, and finds a direct read of a table owned by another service. It rejects the change before it lands and returns the exact decision that was broken.</li>
+      <li><strong>Intent.</strong> The decision it checked against was not invented on the spot. It was the recorded ADR &mdash; billing owns its tables, others use the API &mdash; sitting in the intent layer, ready to be retrieved.</li>
+      <li><strong>Retry.</strong> Handed the specific violated decision, the agent rewrites the change to call the billing service&rsquo;s API. That version passes governance. It lands.</li>
+    </ul>
+    <p>Nothing here required a smarter model. It required a layer above the harness that knew the boundary existed and refused to let a locally reasonable change cross it. Without that layer, the direct query merges, the boundary erodes by one, and the next agent that finds the shortcut has precedent to follow.</p>
+
+    <h2>Architecture Is What Makes Agent Output Trustworthy at Scale</h2>
+    <p>It is tempting to believe the trust problem is a model problem &mdash; that a good-enough model would simply stop making these mistakes. It will not, because the mistakes are not failures of intelligence. They are failures of information: the model was never told what your team decided, and the harness had no mechanism to enforce it even if it had been.</p>
+    <p>What makes agent output trustworthy is not a bigger model. It is a complete stack &mdash; a model to generate, a harness to execute, a governance layer to check, and an intent layer that holds what &ldquo;correct for us&rdquo; means. The first two layers are arriving fast on their own. The top two are the ones teams have to build deliberately, because the humans who used to carry them cannot keep pace with the machine below. Get all four in place and agent velocity stops being a liability. That is the architecture worth building toward.</p>
 
   </div><!-- /.article-body -->
 
   <section class="article-faq" aria-labelledby="faq-heading" style="margin-top:3rem;">
     <h2 id="faq-heading" style="margin-bottom:1.5rem;">Frequently asked questions</h2>
     <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">What is a governance layer for AI coding assistants?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">It is enterprise infrastructure that constrains what AI coding agents are allowed to do, built from four layers: policy (the human decisions that define correct), memory (ADRs and incident history that give policy context), enforcement (machine-verifiable checks and CI/CD gates applied to proposed changes), and auditability (a record of why each decision was made and which agent acted). It sits above access control and decides not whether an agent <em>can</em> change a system, but whether it <em>should</em>.</div>
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">What are the layers of an AI coding agent's architecture?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">A coding agent is a stack of four distinct layers. The model generates candidate code from a task and context. The harness (or execution layer) assembles context, exposes tools, runs the model in a loop, and sandboxes the work. The governance layer checks each proposed change against recorded architectural decisions before it lands. The intent layer holds those decisions &mdash; the ADRs, standards, and constraints &mdash; as checkable data. Each layer owns one job and refuses the others: the model does not know your architecture, the harness does not judge whether a change respects it, and governance does not generate code.</div>
     </details>
     <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">How is governance different from access control?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Access control answers whether an agent has permission to act on a system. Governance answers whether the specific change it proposes is acceptable &mdash; whether it honors architecture rules, ADRs, security boundaries, regulatory requirements, and team conventions. An agent can be fully permitted to modify a payments service and still produce a change that violates a recorded decision. Permission is necessary but not sufficient; governance is the layer that judges the change itself.</div>
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">How is the governance layer different from the harness?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">The harness makes the agent capable: it decides how the agent works &mdash; what context it sees, what tools it can call, how many times it loops. The governance layer decides what the agent is allowed to build: it checks each proposed change against your recorded decisions and rejects violations before they land. Improving the harness makes an agent more capable and reliable, but capability is not consistency. A more capable harness will still let the model cross a service boundary or add an unapproved dependency unless a governance layer above it is checking the output.</div>
     </details>
     <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Why do regulated industries need a governance layer before adopting agents?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Financial services, healthcare, life sciences, insurance, and government require traceability, repeatability, explainability, and standing evidence of compliance for any change to a regulated system. An auditor will not accept &ldquo;the model decided.&rdquo; A governance layer produces the record &mdash; which policy applied, which agent acted, why &mdash; that content-safety guardrails cannot. In these sectors governance is not an add-on after agents become productive; it is the precondition for letting agents touch the codebase at all.</div>
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Why do most AI coding tools stop at the harness?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Because the harness is where capability lives, and capability is what tools compete on. Better context assembly, better tools, tighter loops, and safer sandboxes all make an agent visibly do more. The governance and intent layers were historically carried by humans &mdash; senior engineers holding the architecture in their heads and enforcing it in code review &mdash; so they were never built as software. At human throughput that worked. At agent velocity it does not, which is why those two layers now have to be made explicit.</div>
+    </details>
+    <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Does a better model remove the need for a governance layer?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">No. The mistakes a governance layer catches are not failures of intelligence, they are failures of information. The model was never told what your team decided, and no amount of raw capability supplies a decision it cannot see. A frontier model given a task will still write a direct database query across a boundary it does not know exists. Trustworthy agent output at scale comes from a complete stack &mdash; model, harness, governance, intent &mdash; not from a larger model.</div>
     </details>
   </section>
 
-  <aside class="related-panel" aria-labelledby="related-essays-label" style="margin-top:3rem;">
-    <div class="related-panel-label" id="related-essays-label">Related operational essays</div>
+  <aside class="related-panel" aria-labelledby="related-concepts-label" style="margin-top:3rem;">
+    <div class="related-panel-label" id="related-concepts-label">Related governance concepts</div>
     <ul class="related-list">
-      <li><a href="/insights/enterprise-ai-guardrails-five-layers/"><div class="rel-title">Not All AI Guardrails Are the Same</div><p class="rel-desc">The five layers of enterprise AI guardrails &mdash; and the architectural layer most stacks miss.</p></a></li>
-      <li><a href="/insights/how-ai-coding-agents-use-adrs/"><div class="rel-title">How AI Coding Agents Use ADRs (Architecture Decision Records)</div><p class="rel-desc">An ADR records one architectural decision, its context, and its consequences. Here is how AI coding agents actually interact with ADRs today &mdash; ignored, advisory, or enforced &mdash; and how to make them executable.</p></a></li>
-      <li><a href="/insights/smart-routing-ai-coding-agents/"><div class="rel-title">Smart Routing for AI Coding Agents</div><p class="rel-desc">Routing optimizes execution; it does not enforce the architecture every routed agent must follow.</p></a></li>
-      <li><a href="/insights/ai-race-wont-be-won-on-infrastructure-alone/"><div class="rel-title">Why the AI Race Won&rsquo;t Be Won on Infrastructure Alone</div><p class="rel-desc">Infrastructure decides how much intelligence you can access; governance decides how much you can safely deploy.</p></a></li>
-      <li><a href="/insights/open-knowledge-format-vs-governance/"><div class="rel-title">Open Knowledge Format vs Governance</div><p class="rel-desc">Standardizing how agents find organizational knowledge does not make them follow it.</p></a></li>
-      <li><a href="/insights/agent-governance-in-the-sdlc/"><div class="rel-title">Agent Governance in the SDLC</div><p class="rel-desc">Where in the development lifecycle enforcement has to sit once agents act autonomously.</p></a></li>
-      <li><a href="/insights/ai-agent-governance-two-markets/"><div class="rel-title">AI Agent Governance Is Two Markets</div><p class="rel-desc">Governing the agents is a separate problem from governing the standards they answer to.</p></a></li>
-      <li><a href="/insights/ai-coding-governance-should-be-reviewable/"><div class="rel-title">AI Coding Governance Should Be Reviewable</div><p class="rel-desc">Why auditability, not just enforcement, is what makes a governance layer trustworthy.</p></a></li>
-      <li><a href="/insights/why-context-alone-doesnt-prevent-architectural-drift/"><div class="rel-title">Why Context Alone Doesn&rsquo;t Prevent Architectural Drift</div><p class="rel-desc">More information improves what an agent knows, not what it is allowed to do.</p></a></li>
+      <li><a href="/concepts/executable-architectural-intent/"><div class="rel-title">Executable Architectural Intent</div><p class="rel-desc">The intent layer: architectural decisions expressed as constraints a machine can check, not prose in a wiki.</p></a></li>
+      <li><a href="/concepts/governance-infrastructure/"><div class="rel-title">Governance Infrastructure</div><p class="rel-desc">The standing machinery that records intent and enforces it at agent velocity.</p></a></li>
+      <li><a href="/concepts/model-independent-governance/"><div class="rel-title">Model-Independent Governance</div><p class="rel-desc">Checks that hold whichever model the harness is driving, so the stack can swap models freely.</p></a></li>
+      <li><a href="/concepts/deterministic-enforcement/"><div class="rel-title">Deterministic Enforcement</div><p class="rel-desc">Same change, same verdict &mdash; the governance layer does not depend on which model ran.</p></a></li>
     </ul>
   </aside>
 
-  <aside class="related-panel" aria-labelledby="related-concepts-label" style="margin-top:1.5rem;padding-top:0;border-top:none;">
-    <div class="related-panel-label" id="related-concepts-label">Related governance concepts</div>
+  <aside class="related-panel" aria-labelledby="related-essays-label" style="margin-top:1.5rem;padding-top:0;border-top:none;">
+    <div class="related-panel-label" id="related-essays-label">Related operational essays</div>
     <ul class="related-list">
-      <li><a href="/concepts/governance-propagation/"><div class="rel-title">Governance Propagation</div><p class="rel-desc">How an enforced decision reaches every agent and every generation call.</p></a></li>
-      <li><a href="/concepts/enforcement-provenance/"><div class="rel-title">Enforcement Provenance</div><p class="rel-desc">The verifiable record linking each change to the rule that approved or rejected it.</p></a></li>
+      <li><a href="/insights/how-ai-coding-agents-use-adrs/"><div class="rel-title">How AI Coding Agents Use ADRs (Architecture Decision Records)</div><p class="rel-desc">An ADR records one architectural decision, its context, and its consequences. Here is how AI coding agents actually interact with ADRs today &mdash; ignored, advisory, or enforced &mdash; and how to make them executable.</p></a></li>
+      <li><a href="/insights/ai-coding-agent-guardrails/"><div class="rel-title">AI Coding-Agent Guardrails</div><p class="rel-desc">A reference taxonomy of AI coding-agent guardrails: runtime, prompt, policy, architectural, and engineering-standards. What each layer catches, what it misses, and why architecture needs enforcement at edit time.</p></a></li>
+      <li><a href="/insights/what-is-harness-engineering/"><div class="rel-title">What Is Harness Engineering?</div><p class="rel-desc">A deep dive on the execution layer &mdash; the harness is one layer of the stack, not the whole of it.</p></a></li>
+      <li><a href="/insights/harness-engineering-still-needs-governance/"><div class="rel-title">Harness Engineering Still Needs Governance</div><p class="rel-desc">Why a better execution layer reaches a ceiling without a governance layer above it.</p></a></li>
+      <li><a href="/insights/governance-layers-for-ai-coding-assistants/"><div class="rel-title">Building Governance Layers for AI Coding Assistants</div><p class="rel-desc">Where enforcement belongs in a modern coding stack.</p></a></li>
+      <li><a href="/insights/models-are-temporary-architectural-intent-is-not/"><div class="rel-title">Models Are Temporary. Architectural Intent Is Not.</div><p class="rel-desc">Why the intent layer is the durable asset while the model underneath keeps changing.</p></a></li>
+      <li><a href="/insights/runtime-harnesses-for-ai-agents/"><div class="rel-title">Runtime Harnesses for AI Agents</div><p class="rel-desc">How the execution layer runs the model in a loop against real environment feedback.</p></a></li>
     </ul>
   </aside>
 
@@ -476,8 +517,8 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
   <footer class="article-footer">
     <a href="/insights/" class="back-link">&larr; Back to Insights</a>
     <div class="cta-block">
-      <h3>Put a governance layer under your AI coding agents.</h3>
-      <p>Mneme turns your architecture standards and ADRs into executable constraints that every agent retrieves at generation time and CI verifies deterministically &mdash; with an audit trail showing which rule applied to which change. Policy, memory, enforcement, and auditability, in one open-source layer.</p>
+      <h3>The two layers most stacks are missing.</h3>
+      <p>Mneme provides the governance and intent layers: record your architectural decisions as executable constraints, retrieve the relevant ones at generation time, and reject changes that violate them before they land &mdash; whichever model your harness is driving. Open source. See it on your own repository in the <a href="/demo/">demo</a>.</p>
       <a href="/demo/" style="display:inline-block;margin-right:1.25rem;color:#c8f060;font-family:'DM Mono',monospace;font-size:0.85rem;text-decoration:none;">See the live demo &rarr;</a>
       <a href="https://github.com/MnemeHQ/mneme" class="btn-primary">View on GitHub &rarr;</a>
     </div>

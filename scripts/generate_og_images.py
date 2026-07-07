@@ -272,6 +272,12 @@ TEMPLATE_MAP = {
     "og-insights-gartner-ai-governance.html": "insights/gartner-ai-governance-engineering-governance/og.png",
 
     # Insights — new
+    "og-insights-agent-guardrails.html": "insights/ai-coding-agent-guardrails/og.png",
+    "og-insights-agents-use-adrs.html": "insights/how-ai-coding-agents-use-adrs/og.png",
+    "og-insights-agent-architecture.html": "insights/ai-coding-agent-architecture/og.png",
+
+    # Insights — new
+    "og-insights-enterprise-guardrails.html": "insights/enterprise-ai-guardrails-five-layers/og.png",
     "og-insights-smart-routing.html": "insights/smart-routing-ai-coding-agents/og.png",
     "og-insights-loop-engineering-agents.html": "insights/loop-engineering-ai-coding-agents/og.png",
     "og-insights-github-spec-kit.html": "insights/github-spec-kit-who-enforces-architecture/og.png",
