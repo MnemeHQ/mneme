@@ -3,31 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Spec-Driven Development Still Needs Architectural Governance &mdash; Mneme HQ</title>
+  <title>Smart Routing for AI Coding Agents: What Happens After You&rsquo;ve Chosen the Right Model? &mdash; Mneme HQ</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="Spec-driven development replaces vibe coding with a structured intent-to-spec-to-code workflow. But a feature spec does not define which architectural decisions must hold while an AI agent implements it. That missing layer is architectural governance." />
+  <meta name="description" content="Smart routing decides which model or agent handles a request. It optimizes execution, not architecture: every correctly routed agent can still bypass your ADRs. Here is the layer routing leaves out." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
-  <link rel="canonical" href="https://mnemehq.com/insights/spec-driven-development-still-needs-governance/" />
+  <link rel="canonical" href="https://mnemehq.com/insights/smart-routing-ai-coding-agents/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Spec-Driven Development Still Needs Architectural Governance" />
-  <meta property="og:description" content="Spec-driven development replaces vibe coding with a structured intent-to-spec-to-code workflow. But a feature spec does not define which architectural decisions must hold while an AI agent implements it. That missing layer is architectural governance." />
-  <meta property="og:url" content="https://mnemehq.com/insights/spec-driven-development-still-needs-governance/" />
-  <meta property="og:image" content="https://mnemehq.com/insights/spec-driven-development-still-needs-governance/og.png" />
+  <meta property="og:title" content="Smart Routing for AI Coding Agents: What Happens After You&#x27;ve Chosen the Right Model?" />
+  <meta property="og:description" content="Smart routing decides which model or agent handles a request. It optimizes execution, not architecture: every correctly routed agent can still bypass your ADRs. Here is the layer routing leaves out." />
+  <meta property="og:url" content="https://mnemehq.com/insights/smart-routing-ai-coding-agents/" />
+  <meta property="og:image" content="https://mnemehq.com/insights/smart-routing-ai-coding-agents/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Spec-Driven Development Still Needs Architectural Governance" />
-  <meta name="twitter:description" content="Spec-driven development replaces vibe coding with a structured intent-to-spec-to-code workflow. But a feature spec does not define which architectural decisions must hold while an AI agent implements it. That missing layer is architectural governance." />
-  <meta name="twitter:image" content="https://mnemehq.com/insights/spec-driven-development-still-needs-governance/og.png" />
+  <meta name="twitter:title" content="Smart Routing for AI Coding Agents: What Happens After You&#x27;ve Chosen the Right Model?" />
+  <meta name="twitter:description" content="Smart routing decides which model or agent handles a request. It optimizes execution, not architecture: every correctly routed agent can still bypass your ADRs. Here is the layer routing leaves out." />
+  <meta name="twitter:image" content="https://mnemehq.com/insights/smart-routing-ai-coding-agents/og.png" />
   <meta name="author" content="Theo Valmis" />
-  <meta property="article:published_time" content="2026-05-31T00:00:00Z" />
+  <meta property="article:published_time" content="2026-07-06T00:00:00Z" />
   <meta property="article:author" content="https://mnemehq.com/founder/" />
-  <meta property="article:section" content="Industry Analysis" />
+  <meta property="article:section" content="Engineering" />
 
-    <!-- Consent defaults -->
+  <!-- Consent defaults -->
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{'analytics_storage':'granted','ad_storage':'denied','ad_user_data':'denied','ad_personalization':'denied'});</script>
 
   <!-- Google Tag Manager -->
@@ -116,43 +116,56 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
 <!-- mneme:vendor:rb2b:end -->
 <!-- mneme:marketing-head:end -->
   <link rel="icon" href="/favicon.png" type="image/png">
+
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
-          {"@type": "ListItem", "position": 2, "name": "Insights", "item": "https://mnemehq.com/insights/"},
-          {"@type": "ListItem", "position": 3, "name": "Spec-Driven Development Still Needs Architectural Governance", "item": "https://mnemehq.com/insights/spec-driven-development-still-needs-governance/"}
-        ]
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://mnemehq.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Insights",
+          "item": "https://mnemehq.com/insights/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Smart Routing for AI Coding Agents",
+          "item": "https://mnemehq.com/insights/smart-routing-ai-coding-agents/"
+        }
+      ]
+    },
+    {
+      "@type": "TechArticle",
+      "headline": "Smart Routing for AI Coding Agents: What Happens After You've Chosen the Right Model?",
+      "description": "Smart routing decides which model or agent handles a request. It optimizes execution, not architecture: every correctly routed agent can still bypass your ADRs. Here is the layer routing leaves out.",
+      "url": "https://mnemehq.com/insights/smart-routing-ai-coding-agents/",
+      "datePublished": "2026-07-06",
+      "author": {
+        "@type": "Person",
+        "name": "Theo Valmis",
+        "url": "https://mnemehq.com/founder/"
       },
-      {
-        "@type": "Article",
-        "headline": "Spec-Driven Development Still Needs Architectural Governance",
-        "description": "Spec-driven development replaces vibe coding with a structured intent-to-spec-to-code workflow. But a feature spec does not define which architectural decisions must hold while an AI agent implements it. That missing layer is architectural governance.",
-        "url": "https://mnemehq.com/insights/spec-driven-development-still-needs-governance/",
-        "datePublished": "2026-05-31",
-        "dateModified": "2026-05-31",
-        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
-        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/", "logo": {"@type": "ImageObject", "url": "https://mnemehq.com/logo-v2.png"}},
-        "image": "https://mnemehq.com/insights/spec-driven-development-still-needs-governance/og.png",
-        "mainEntityOfPage": "https://mnemehq.com/insights/spec-driven-development-still-needs-governance/"
-      },
-      {
-        "@type": "FAQPage",
-        "mainEntity": [
-          {"@type": "Question", "name": "What is spec-driven development?", "acceptedAnswer": {"@type": "Answer", "text": "Spec-driven development (SDD) is an AI-assisted software engineering workflow in which a structured specification becomes the source of truth for implementation. Instead of prompting an agent to write code directly, the work moves through requirements, design, an implementation plan, task decomposition, and code generation. Tools like AWS Kiro and GitHub Spec Kit popularized the approach."}},
-          {"@type": "Question", "name": "Does spec-driven development replace architectural governance?", "acceptedAnswer": {"@type": "Answer", "text": "No. A specification defines what an agent should build. Architectural governance defines which decisions and invariants must constrain how it is built. An agent can satisfy a feature spec and still introduce a forbidden dependency, bypass an approved abstraction, use a deprecated service pattern, or violate an ADR. The two are complementary layers, not competing ones."}},
-          {"@type": "Question", "name": "How do spec-driven development and Mneme work together?", "acceptedAnswer": {"@type": "Answer", "text": "Spec-driven development structures intent into a spec, a plan, and tasks. Mneme injects architectural constraints before the agent generates code and verifies the output against pre-registered verification contracts. SDD answers what to build; governance answers what must remain true while building it. The mature workflow runs spec, then plan, then governance retrieval and constraint injection, then agent execution, then verification."}},
-          {"@type": "Question", "name": "Is spec-driven development only a fix for vibe coding?", "acceptedAnswer": {"@type": "Answer", "text": "It is one of the healthiest responses to unstructured vibe coding, but its value is broader: it makes agent work reviewable and decomposable. The remaining gap is architectural. Specs improve generation; governance preserves architecture across repositories, sessions, and agents."}}
-        ]
+      "publisher": {
+        "@type": "Organization",
+        "name": "Mneme HQ",
+        "url": "https://mnemehq.com/"
       }
-    ]
-  }
+    }
+  ]
+}
   </script>
-  <style>
+
+<style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
@@ -171,84 +184,36 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     .btn-nav-cta:hover { background: var(--accent-dim); color: #0c0c0d; }
 
     .article-wrap { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 7rem; }
-    .article-header { margin-bottom: 3rem; }
+    .article-header { margin-bottom: 3.5rem; }
     .article-eyebrow { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
     .eyebrow-tag { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-family: 'DM Mono', monospace; }
     .eyebrow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); }
     .eyebrow-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
     .article-header h1 { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
     .article-lede { font-size: 1.1rem; color: var(--muted); line-height: 1.75; border-left: 2px solid var(--accent); padding-left: 1.25rem; }
-    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
-    .byline a { color: var(--muted); text-decoration: none; }
-    .byline a:hover { color: var(--text); }
-    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
 
     .article-body { font-size: 0.92rem; line-height: 1.9; color: var(--text); }
     .article-body h2 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; margin: 3rem 0 1rem; color: var(--text); }
-    .article-body h3 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; margin: 2rem 0 0.6rem; color: var(--text); }
+    .article-body h3 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--text); }
     .article-body p { margin-bottom: 1.25rem; color: var(--muted); }
     .article-body a { color: #8be0c8; text-decoration: none; border-bottom: 1px solid rgba(139,224,200,0.4); transition: border-color 0.15s; }
     .article-body a:hover { border-bottom-color: #8be0c8; }
     .article-body p strong { color: var(--text); font-weight: 500; }
-    .article-body ul { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
-    .article-body ul li { margin-bottom: 0.55rem; line-height: 1.8; }
-    .article-body ul li strong { color: var(--text); font-weight: 500; }
-    .article-body code { font-family: 'DM Mono', monospace; font-size: 0.82rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 0.05rem 0.4rem; color: var(--text); }
-    .article-body a.ext { color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(200,240,96,0.4); }
-    .article-body a.ext:hover { color: var(--accent-dim); border-bottom-color: rgba(200,240,96,0.7); }
-
-    .toc { position: static; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 0.9rem 1.25rem; margin: 0 0 2rem; }
-    .toc .toc-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.55rem; }
-    .toc ol { list-style: none; counter-reset: toc; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 0.25rem; }
-    .toc ol li { counter-increment: toc; font-size: 0.78rem; padding-left: 1.9rem; position: relative; line-height: 1.5; }
-    .toc ol li::before { content: counter(toc, decimal-leading-zero); position: absolute; left: 0; top: 0.05rem; font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.05em; }
-    .toc a { color: var(--text); text-decoration: none; transition: color 0.15s; }
-    .toc a:hover { color: var(--accent); }
-    @media (min-width: 720px) { .toc ol { grid-template-columns: 1fr 1fr; gap: 0.3rem 1.25rem; } }
-
-    .answer-capsule { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 0 0 2.5rem; }
-    .answer-capsule p { margin: 0; font-size: 0.92rem; color: var(--muted); line-height: 1.8; }
-    .answer-capsule p strong { color: var(--accent); }
+    .article-body ul, .article-body ol { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
+    .article-body li { margin-bottom: 0.5rem; }
+    .article-body li strong { color: var(--text); font-weight: 500; }
 
     .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
-    .callout p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
     .callout p strong { color: var(--accent); }
 
-    .program-grid { display: grid; grid-template-columns: 1fr; gap: 0.75rem; margin: 1.5rem 0 0.5rem; }
-    .program { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; }
-    .program .label { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
-    .program h4 { font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; color: var(--text); margin: 0 0 0.35rem; line-height: 1.35; }
-    .program p { font-size: 0.82rem; color: var(--muted); margin: 0 0 0.55rem; line-height: 1.6; }
-    .program a.ext { color: var(--accent); text-decoration: none; font-family: 'DM Mono', monospace; font-size: 0.78rem; }
-    .program a.ext:hover { color: var(--accent-dim); }
-
-    .compare-stack { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem; margin: 2rem 0; }
-    .compare-stack .cs-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.1rem; }
-    .compare-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 0.8rem 0; border-bottom: 1px solid var(--border); }
-    .compare-row:last-child { border-bottom: none; padding-bottom: 0; }
-    .compare-row:first-of-type { padding-top: 0; }
-    .compare-row .col-label { font-size: 0.78rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.04em; }
-    .compare-row .col-text { font-size: 0.85rem; color: var(--text); line-height: 1.7; }
-    @media (max-width: 540px) { .compare-row { grid-template-columns: 1fr; gap: 0.3rem; } }
-
-    .faq-list { margin-top: 1.5rem; }
-    .faq-item { border-top: 1px solid var(--border); padding: 1.05rem 0; }
-    .faq-item:last-child { border-bottom: 1px solid var(--border); }
-    .faq-item summary { cursor: pointer; font-size: 0.92rem; color: var(--text); font-weight: 500; list-style: none; position: relative; padding-right: 2rem; }
-    .faq-item summary::-webkit-details-marker { display: none; }
-    .faq-item summary::after { content: '+'; font-family: 'DM Mono', monospace; color: var(--muted); font-size: 1.1rem; position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
-    .faq-item[open] summary::after { content: '\2212'; }
-    .faq-body { padding-top: 0.85rem; font-size: 0.85rem; color: var(--muted); line-height: 1.8; }
-    .faq-body a { color: var(--accent); text-decoration: none; }
-    .faq-body a:hover { color: var(--accent-dim); }
-
     .article-footer { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
-    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; }
+    .back-link { color: var(--muted); font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
     .back-link:hover { color: var(--text); }
-    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; }
-    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .cta-block { margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 2rem; }
+    .cta-block h3 { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.6rem; }
     .cta-block p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; }
-    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; }
+    .btn-primary { display: inline-block; background: var(--accent); color: #0c0c0d; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; font-family: 'DM Mono', monospace; text-decoration: none; transition: background 0.15s; }
     .btn-primary:hover { background: var(--accent-dim); }
 
     footer { border-top: 1px solid var(--border); text-align: center; padding: 1.5rem 2rem; font-size: 0.78rem; color: var(--muted); }
@@ -263,6 +228,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     .breadcrumb [aria-current="page"] { color: var(--text); }
 
     .nav-hamburger { display: none; background: none; border: 1px solid var(--border2); color: var(--text); width: 36px; height: 36px; border-radius: 6px; cursor: pointer; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; }
+
     @media (max-width: 640px) {
       nav { padding: 1rem 1.25rem; }
       .article-wrap { padding: 3rem 1.25rem 5rem; }
@@ -272,83 +238,88 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
       .nav-links a:not(.btn-nav-cta) { display: block; color: var(--text); font-size: 0.88rem; padding: 0.7rem 0; border-bottom: 1px solid var(--border); }
       .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
     }
-/* === Nav upgrade (injected, overrides existing) === */
-.nav-hamburger {
-  display: none;
-  background: none;
-  border: 1px solid var(--border2);
-  color: var(--text);
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  cursor: pointer;
-  padding: 0;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 4px;
-  transition: border-color 0.15s, background 0.15s;
-}
-.nav-hamburger:hover { border-color: var(--accent); }
-.nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.nav-hamburger span {
-  display: block;
-  width: 18px;
-  height: 2px;
-  background: currentColor;
-  border-radius: 1px;
-  transition: transform 0.25s ease, opacity 0.18s ease;
-  transform-origin: center;
-}
-.nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
-.nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
-.nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
-@media (max-width: 900px) {
-  html, body { overflow-x: clip; }
-  body.menu-open { overflow: hidden; }
-  nav, nav.site-nav { padding: 1rem 1.25rem; }
-  .nav-hamburger { display: flex; }
-  .nav-links {
-    display: flex !important;
-    flex-direction: column;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    gap: 0;
-    background: rgba(12,12,13,0.98);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-    padding: 0 1.25rem;
-    z-index: 99;
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-    visibility: hidden;
-    transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s;
-  }
-  .nav-links.open {
-    max-height: 80vh;
-    opacity: 1;
-    visibility: visible;
-    padding: 0.5rem 1.25rem 1.25rem;
-    transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s;
-    overflow-y: auto;
-  }
-  .nav-links a:not(.btn-nav-cta) {
-    display: block;
-    color: var(--text);
-    font-size: 0.92rem;
-    padding: 0.85rem 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
-  .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
-}
-  
-    @media (max-width: 768px) { nav, .mobile-menu { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } }
+    .byline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 1.25rem; }
+    .byline a { color: var(--muted); text-decoration: none; }
+    .byline a:hover { color: var(--text); }
+    .byline .sep { color: var(--border2); margin: 0 0.5rem; }
+
+    /* === Nav upgrade === */
+    .nav-hamburger {
+      display: none;
+      background: none;
+      border: 1px solid var(--border2);
+      color: var(--text);
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 0;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 4px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .nav-hamburger:hover { border-color: var(--accent); }
+    .nav-hamburger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .nav-hamburger span {
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: currentColor;
+      border-radius: 1px;
+      transition: transform 0.25s ease, opacity 0.18s ease;
+      transform-origin: center;
+    }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    @media (max-width: 900px) {
+      html, body { overflow-x: clip; }
+      body.menu-open { overflow: hidden; }
+      nav, nav.site-nav { padding: 1rem 1.25rem; }
+      .nav-hamburger { display: flex; }
+      .nav-links {
+        display: flex !important;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        gap: 0;
+        background: rgba(12,12,13,0.98);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: 0 1.25rem;
+        z-index: 99;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        visibility: hidden;
+        transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.28s ease, visibility 0s linear 0.28s;
+      }
+      .nav-links.open {
+        max-height: 80vh;
+        opacity: 1;
+        visibility: visible;
+        padding: 0.5rem 1.25rem 1.25rem;
+        transition: max-height 0.32s ease, opacity 0.25s ease, padding 0.32s ease, visibility 0s;
+        overflow-y: auto;
+      }
+      .nav-links a:not(.btn-nav-cta) {
+        display: block;
+        color: var(--text);
+        font-size: 0.92rem;
+        padding: 0.85rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-links a:not(.btn-nav-cta):last-of-type { border-bottom: none; }
+      .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
+    }
+
     /* === Related reading === */
     .related-panel { margin-top: 3.5rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
     .related-panel-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
@@ -361,28 +332,30 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     .related-list a:hover .rel-title { color: var(--accent); }
     .related-list a:hover .rel-title::after { opacity: 1; transform: translateX(3px); }
     .related-list .rel-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.65; margin: 0; }
+
+    @media (max-width: 768px) { nav, .mobile-menu { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } }
+
+    /* === Diagram styles === */
+    .diag-box { fill: #141416; stroke: #2e2e34; }
+    .diag-box-active { fill: rgba(200,240,96,0.05); stroke: #c8f060; stroke-width: 1.5; }
+    .diag-box-teal { fill: rgba(139,224,200,0.05); stroke: #8be0c8; stroke-width: 1.2; }
+    .diag-text { fill: #e8e8ec; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; }
+    .diag-meta { fill: #88889a; font-family: 'DM Mono', monospace; font-size: 10px; }
+    .diag-accent-text { fill: #c8f060; }
+    .diag-teal-text { fill: #8be0c8; }
+    .diag-mono { font-family: 'DM Mono', monospace; }
+    .diag-arrow { stroke: #2e2e34; stroke-width: 1; fill: none; }
+    .diag-arrow-active { stroke: #c8f060; stroke-width: 1.5; fill: none; }
+    .diag-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; margin: 2.5rem 0; }
+    .diag-caption { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); margin-top: 1rem; text-align: center; letter-spacing: 0.06em; text-transform: uppercase; }
+    .gov-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.85rem; }
+    .gov-table th { background: var(--surface); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border2); }
+    .gov-table td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; }
+    .gov-table tr:last-child td { border-bottom: none; }
+    .gov-table td:first-child { color: var(--text); font-weight: 500; }
+    .gov-table tr.accent-row td { color: var(--accent); }
+    .gov-table tr.accent-row td:first-child { color: var(--accent); }
   </style>
-  <link rel="stylesheet" href="/assets/css/video.css">
-<script type="application/ld+json" data-video-schema="pcl4fd5myc8">
-{
-  "@context": "https://schema.org",
-  "@type": "VideoObject",
-  "name": "Spec-Driven Development Still Needs Governance | Architectural Governance for AI Coding Teams — Mneme HQ",
-  "description": "👉 Try Mneme HQ — architectural governance for AI coding: https://mnemehq.com/?utm_source=youtube&utm_medium=video&utm_campaign=mneme_youtube&utm_content=spec_driven_development_governance\nMneme HQ turns architectural decisions into enforceable rules for AI coding agents.",
-  "thumbnailUrl": "https://i.ytimg.com/vi/pcL4fD5MyC8/maxresdefault.jpg",
-  "uploadDate": "2026-06-23T17:36:34Z",
-  "embedUrl": "https://www.youtube.com/embed/pcL4fD5MyC8",
-  "contentUrl": "https://www.youtube.com/watch?v=pcL4fD5MyC8",
-  "publisher": {
-    "@type": "Organization",
-    "name": "Mneme HQ",
-    "logo": {
-      "@type": "ImageObject",
-      "url": "https://mnemehq.com/og.png"
-    }
-  }
-}
-</script>
 </head>
 <body>
 <!-- Google Tag Manager (noscript) -->
@@ -404,138 +377,118 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
 </nav>
 
 <main>
-<nav aria-label="Breadcrumb" class="breadcrumb-nav">
+<nav class="breadcrumb-nav" aria-label="Breadcrumb">
   <ol class="breadcrumb">
     <li><a href="/">Home</a></li>
     <li><a href="/insights/">Insights</a></li>
-    <li aria-current="page">Spec-driven development still needs governance</li>
+    <li aria-current="page">Smart Routing for AI Coding Agents</li>
   </ol>
 </nav>
+
 <article class="article-wrap">
   <header class="article-header">
     <div class="article-eyebrow">
-      <span class="eyebrow-tag">Industry Analysis</span>
+      <span class="eyebrow-tag">Analysis</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">10 min read &nbsp;&middot;&nbsp; May 2026</span>
+      <span class="eyebrow-meta">8 min read</span>
     </div>
-    <h1>Spec-Driven Development Still Needs Architectural Governance</h1>
-    <p class="article-lede">Spec-driven development is one of the healthiest responses to vibe coding. It replaces loosely prompted generation with a structured sequence. But it still leaves one question unanswered: which architectural decisions constrain the implementation while the agent works?</p>
-    <p class="byline">
-      By <a href="/founder/">Theo Valmis</a>
-      <span class="sep">&middot;</span>
-      <time datetime="2026-05-31">Published May 2026</time>
-      <span class="sep">&middot;</span>
-      <time datetime="2026-05-31">Updated May 2026</time>
-    </p>
+    <h1>Smart Routing for AI Coding Agents: What Happens After You&rsquo;ve Chosen the Right Model?</h1>
+    <p class="article-lede">Smart routing is becoming a standard layer in AI coding stacks: send the cheap request to a small model, the hard one to a frontier model, the database query to a tool. It is a real efficiency win. But routing answers only one question &mdash; <em>who should perform this task?</em> It says nothing about whether the agent it selects will honor the architecture the rest of the system already committed to. Routing optimizes execution. Architectural consistency is a different problem, and it needs a different layer.</p>
+    <p class="byline">By <a href="/founder/">Theo Valmis</a><span class="sep">&middot;</span><time datetime="2026-07-06">July 2026</time></p>
   </header>
 
   <div class="article-body">
 
-    <div class="answer-capsule">
-      <p><strong>What is spec-driven development?</strong> An AI-assisted workflow where a structured specification &mdash; not a one-off prompt &mdash; is the source of truth for what an agent builds. It is a real improvement. But a spec governs <em>what</em> gets built, not <em>which architectural decisions</em> must survive the build. That second layer is architectural governance, and AI coding agents still need it.</p>
-    </div>
+    <h2>Why Smart Routing Is Becoming Standard</h2>
+    <p>A year ago, most stacks sent every request to one model. That is ending. Coding platforms now route dynamically &mdash; a trivial rename goes to a small, fast model; a multi-file refactor goes to a frontier model; a schema question goes to a SQL tool instead of an LLM at all. Open frameworks such as <a href="https://github.com/lm-sys/RouteLLM" target="_blank" rel="noopener">RouteLLM</a> formalize the idea: learn which requests need the expensive model and send only those, cutting cost without a measurable quality drop.</p>
+    <p>The drivers are straightforward. Routing improves cost, latency, and accuracy at once by matching each request to the cheapest resource that can handle it. As stacks add specialized coding, reasoning, and search agents, some component has to decide which one runs. That decision is what smart routing is.</p>
 
-    <nav class="toc" aria-label="Table of contents">
-      <div class="toc-title">In this article</div>
-      <ol>
-        <li><a href="#what-changed">From prompt-to-code to intent-to-code</a></li>
-        <li><a href="#the-gap">The gap a spec does not close</a></li>
-        <li><a href="#mature-workflow">The mature workflow</a></li>
-        <li><a href="#complementary">Specs and governance are complementary</a></li>
-        <li><a href="#faq">FAQ</a></li>
-      </ol>
-    </nav>
-
-    <h2 id="what-changed">From prompt-to-code to intent-to-code</h2>
-    <p><a href="/concepts/spec-driven-development/">Spec-driven development</a> (SDD) has crossed from a tool-specific feature into a durable category term. AWS positions <a class="ext" href="https://aws.amazon.com/documentation-overview/kiro/" target="_blank" rel="noopener">Kiro</a> around it, describing specs as structured artifacts that turn high-level ideas into implementation plans with tracking and accountability. GitHub has published its own <a class="ext" href="https://github.com/github/spec-kit" target="_blank" rel="noopener">Spec Kit</a> methodology, in which specifications generate implementation rather than merely informing it. JetBrains has covered the workflow for AI coding agents, and the ecosystem now includes active open-source projects such as OpenSpec and cc-sdd.</p>
-    <p>The shared move is the same: stop going straight from a prompt to code, and route the work through an explicit, reviewable sequence.</p>
-    <div class="compare-stack">
-      <div class="cs-title">The shift</div>
-      <div class="compare-row">
-        <div class="col-label">Before</div>
-        <div class="col-text"><code>Prompt &rarr; Code</code></div>
-      </div>
-      <div class="compare-row">
-        <div class="col-label">After</div>
-        <div class="col-text"><code>Intent &rarr; Spec &rarr; Plan &rarr; Tasks &rarr; Code</code></div>
-      </div>
-    </div>
-    <p>This is genuinely good. It narrows ambiguity, makes agent work decomposable, and gives reviewers something more durable than a chat log. The criticism that follows is not that spec-driven development is wrong &mdash; it is that it solves one half of the problem and is sometimes sold as solving both.</p>
-
-    <h2 id="the-gap">The gap a spec does not close</h2>
-    <p>A specification defines <em>what</em> the agent should build. It does not, on its own, define <em>which architectural decisions must remain true</em> while the agent builds it. An agent can satisfy a feature spec completely and still:</p>
+    <h2>What Routing Gets You</h2>
+    <p>The benefits are concrete and worth stating plainly, because the argument here is not that routing is a distraction:</p>
     <ul>
-      <li>introduce a forbidden dependency</li>
-      <li>bypass an approved abstraction</li>
-      <li>use a deprecated service pattern</li>
-      <li>violate an ADR the team already ratified</li>
-      <li>apply the right pattern in one directory and the wrong one elsewhere</li>
-      <li>lose prior decisions across sessions or coding tools</li>
+      <li><strong>Lower cost.</strong> Most requests do not need a frontier model. Routing stops you paying frontier prices for autocomplete.</li>
+      <li><strong>Lower latency.</strong> Small models answer faster. Simple tasks stop waiting behind heavyweight inference.</li>
+      <li><strong>Higher success rates.</strong> A request sent to a model or tool suited to it succeeds more often than one sent to a general-purpose default.</li>
+      <li><strong>Specialization.</strong> Coding, reasoning, retrieval, and structured-output models each do what they are best at.</li>
     </ul>
-    <div class="callout"><p><strong>A spec answers &ldquo;what should the agent build?&rdquo;</strong> It does not answer &ldquo;which architectural decisions must remain true while it builds?&rdquo; Those are different questions, and only the second one prevents <a href="/concepts/architectural-drift/">architectural drift</a>.</p></div>
-    <p>The gap is structural, not a maturity problem with any particular spec tool. A spec is scoped to a feature or task. Architecture is scoped to the system, and it persists across every feature, session, and agent that touches the repository.</p>
+    <p>These are genuine gains, and every serious coding stack will adopt some form of them. That is exactly why routing on its own does not differentiate one AI engineering setup from another &mdash; and why the interesting question is what happens <em>after</em> the routing decision is made.</p>
 
-    <div class="yt-facade" data-video-id="pcL4fD5MyC8" data-title="Spec-Driven Development Still Needs Architectural Governance" role="button" tabindex="0" aria-label="Play video: Spec-Driven Development Still Needs Architectural Governance">
-      <img class="yt-facade__thumb" src="https://i.ytimg.com/vi/pcL4fD5MyC8/maxresdefault.jpg" alt="" loading="lazy">
-      <span class="yt-facade__play" aria-hidden="true"></span>
+    <h2>What Routing Does Not Solve</h2>
+    <p>Routing selects the performer. It has no opinion about whether the performer respects the system&rsquo;s existing decisions. Consider a single feature request that fans out across a modern stack:</p>
+    <ul>
+      <li>One agent, correctly routed to a fast model, adds a new HTTP client library because it was convenient &mdash; the repo already standardized on one.</li>
+      <li>Another, routed to a reasoning model for a &ldquo;hard&rdquo; task, reaches around a service boundary and reads a database another service owns.</li>
+      <li>A third, routed to a coding specialist, ignores the naming and error-handling conventions every other module follows.</li>
+      <li>Two agents, both correct in isolation, converge on conflicting patterns for the same concern.</li>
+    </ul>
+    <p>Every one of those requests was routed perfectly. Every one produced working code. None of them produced <em>consistent</em> software. The router did its job and the architecture drifted anyway, because the constraint that mattered &mdash; go through the billing service&rsquo;s API, do not add a second HTTP client, follow the ledger boundary &mdash; was never expressed anywhere the router or the selected agent could see it.</p>
+    <div class="callout"><p><strong>Routing decides who acts. It does not decide what they are allowed to build.</strong> A perfectly optimized routing layer will still let every agent it selects violate the same architectural decision, one convenient shortcut at a time.</p></div>
+
+    <h2>The Missing Layer: Architectural Guardrails</h2>
+    <p>The two decisions are independent and should be treated that way. Which model runs is an execution decision, tuned for cost and speed. What the running model is allowed to do is an <a href="/concepts/architectural-governance/">architectural governance</a> decision, and it has to hold no matter which model was selected. Put them in a table and the separation is obvious:</p>
+    <div style="overflow-x:auto;margin:2rem 0;">
+    <table class="gov-table">
+      <thead><tr><th>Smart routing decides</th><th>Architectural guardrails decide</th></tr></thead>
+      <tbody>
+        <tr><td>Which model or agent runs</td><td>Which decisions every agent must obey</td></tr>
+        <tr><td>Cost and latency budget</td><td>Approved technologies and boundaries</td></tr>
+        <tr><td>Task-to-specialist matching</td><td>Naming, patterns, and dependency rules</td></tr>
+        <tr class="accent-row"><td>Optimizes execution</td><td>Preserves engineering consistency</td></tr>
+      </tbody>
+    </table>
     </div>
+    <p>Every routed agent should inherit the same constraints: the recorded architectural decisions (ADRs), the engineering standards, the approved frameworks, the project conventions. Those constraints are the same whether the request went to one model or ten. When they live as <a href="/concepts/executable-architectural-intent/">executable architectural intent</a> rather than prose in a wiki, the routing layer can swap models freely and the engineering rules still hold.</p>
 
-    <h2 id="mature-workflow">The mature workflow</h2>
-    <p>The fix is not to abandon spec-driven development. It is to insert a governance step between planning and execution &mdash; constraints retrieved and injected <a href="/concepts/governance-before-generation/">before the agent generates code</a>, and proven afterward with <a href="/concepts/verification-contracts/">verification contracts</a>.</p>
-    <div class="compare-stack">
-      <div class="cs-title">The pipeline</div>
-      <div class="compare-row"><div class="col-label">Intent</div><div class="col-text">the goal</div></div>
-      <div class="compare-row"><div class="col-label">Spec</div><div class="col-text">what to build</div></div>
-      <div class="compare-row"><div class="col-label">Plan and tasks</div><div class="col-text">decomposition</div></div>
-      <div class="compare-row"><div class="col-label">Governance</div><div class="col-text">constraint retrieval and injection</div></div>
-      <div class="compare-row"><div class="col-label">Agent execution</div><div class="col-text">the agent writes code</div></div>
-      <div class="compare-row"><div class="col-label">Verification</div><div class="col-text">verification contracts prove compliance</div></div>
-      <div class="compare-row"><div class="col-label">Merge</div><div class="col-text">only after the line held</div></div>
-    </div>
-    <p>This <em>extends</em> spec-driven development rather than competing with it. The spec still drives what gets built. Governance just makes sure the implementation stays inside the architectural decisions the team has already made &mdash; and keeps doing so on the next agent, in the next session, in a different IDE.</p>
+    <h2>Where Mneme Fits</h2>
+    <p>Mneme sits below the router, not beside it. The routing layer picks the performer; the guardrail layer checks what the performer proposes against the decisions that must not change. The flow is deliberately boring:</p>
+    <ol>
+      <li><strong>Record</strong> each architectural decision as structured data with its constraints &mdash; not a paragraph in a doc.</li>
+      <li><strong>Retrieve</strong> the decisions relevant to the current change, whichever model the router selected.</li>
+      <li><strong>Check</strong> the proposed edit against them <a href="/concepts/deterministic-enforcement/">deterministically</a> &mdash; same change, same verdict, regardless of model.</li>
+      <li><strong>Reject</strong> violations <a href="/concepts/governance-before-generation/">before the change lands</a>, not at review time.</li>
+      <li><strong>Return</strong> the violated decision, so the agent can retry compliantly instead of guessing.</li>
+    </ol>
+    <p>Smart routing makes execution efficient. It is a good layer and it is arriving fast. But the more sophisticated the routing gets &mdash; the more models and agents a single feature touches &mdash; the more surfaces there are for a locally reasonable choice to diverge from a system-wide decision. The model that runs can change every week. The engineering rules should not. That is the layer routing leaves for someone else to build.</p>
 
-    <h2 id="complementary">Specs and governance are complementary</h2>
-    <p>Stacked side by side, the two layers answer different questions, and a verification layer closes the loop:</p>
-    <div class="compare-stack">
-      <div class="cs-title">Layers</div>
-      <div class="compare-row"><div class="col-label">Specification</div><div class="col-text">What should the agent build?</div></div>
-      <div class="compare-row"><div class="col-label">Architectural governance</div><div class="col-text">Which decisions and invariants must constrain the implementation?</div></div>
-      <div class="compare-row"><div class="col-label">Verification</div><div class="col-text">How do we prove the output complied?</div></div>
-    </div>
-    <div class="callout"><p><strong>Specs improve generation. Governance preserves architecture.</strong></p></div>
-    <p>If you are adopting spec-driven development, that is the right direction. Just budget for the layer underneath it. For the durable definition and where it sits in the wider ontology, see the concept page on <a href="/concepts/spec-driven-development/">spec-driven development</a>; for where it fits in the broader lifecycle, see <a href="/insights/what-is-the-ai-sdlc/">what is the AI SDLC?</a></p>
+  </div><!-- /.article-body -->
 
-    <h2 id="faq">FAQ</h2>
-    <div class="faq-list">
-      <details class="faq-item">
-        <summary>What is spec-driven development?</summary>
-        <div class="faq-body">Spec-driven development (SDD) is an AI-assisted software engineering workflow in which a structured specification becomes the source of truth for implementation. Instead of prompting an agent to write code directly, the work moves through requirements, design, an implementation plan, task decomposition, and code generation. Tools like AWS Kiro and GitHub Spec Kit popularized the approach.</div>
-      </details>
-      <details class="faq-item">
-        <summary>Does spec-driven development replace architectural governance?</summary>
-        <div class="faq-body">No. A specification defines what an agent should build. Architectural governance defines which decisions and invariants must constrain how it is built. An agent can satisfy a feature spec and still introduce a forbidden dependency, bypass an approved abstraction, use a deprecated service pattern, or violate an ADR. The two are complementary layers, not competing ones.</div>
-      </details>
-      <details class="faq-item">
-        <summary>How do spec-driven development and Mneme work together?</summary>
-        <div class="faq-body">Spec-driven development structures intent into a spec, a plan, and tasks. Mneme injects architectural constraints before the agent generates code and verifies the output against pre-registered verification contracts. SDD answers what to build; governance answers what must remain true while building it. The mature workflow runs spec, then plan, then governance retrieval and constraint injection, then agent execution, then verification.</div>
-      </details>
-      <details class="faq-item">
-        <summary>Is spec-driven development only a fix for vibe coding?</summary>
-        <div class="faq-body">It is one of the healthiest responses to unstructured vibe coding, but its value is broader: it makes agent work reviewable and decomposable. The remaining gap is architectural. Specs improve generation; governance preserves architecture across repositories, sessions, and agents.</div>
-      </details>
-    </div>
+  <section class="article-faq" aria-labelledby="faq-heading" style="margin-top:3rem;">
+    <h2 id="faq-heading" style="margin-bottom:1.5rem;">Frequently asked questions</h2>
+    <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">What is smart routing for AI coding agents?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Smart routing is the practice of dynamically deciding which model, agent, or tool should handle a given request instead of sending everything to one LLM. A simple task goes to a small, cheap model; a hard task goes to a frontier model; a structured query may go to a dedicated tool. The goal is to match each request to the cheapest resource that can handle it well, improving cost, latency, and success rate.</div>
+    </details>
+    <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Does smart routing improve code quality?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">It improves the odds that each request is handled by a capable model, which raises first-pass success rates. But routing is silent on architectural consistency: a correctly routed agent can still introduce an unapproved dependency, cross a service boundary, or ignore a convention. Better model selection does not guarantee that generated code follows the system&rsquo;s existing decisions.</div>
+    </details>
+    <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Why isn&rsquo;t choosing the right model enough?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Because the routing decision (who acts) is independent of the architectural decision (what they are allowed to build). A feature can be routed perfectly across several specialized agents and still drift, because each agent optimizes its local task without a machine-checkable statement of the system&rsquo;s intent. The router has no way to enforce ADRs, standards, or boundaries.</div>
+    </details>
+    <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">How do architectural guardrails work with smart routing?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">They sit as a separate layer below the router. After routing selects a model and that model proposes a change, the guardrail layer retrieves the relevant architectural decisions, checks the proposed change against them deterministically, and rejects violations before they land &mdash; returning the specific decision that was broken. The routing layer stays free to swap models while the engineering rules remain constant.</div>
+    </details>
+  </section>
 
-  </div>
+  <aside class="related-panel" aria-labelledby="related-concepts-label" style="margin-top:3rem;">
+    <div class="related-panel-label" id="related-concepts-label">Related governance concepts</div>
+    <ul class="related-list">
+      <li><a href="/concepts/architectural-governance/"><div class="rel-title">Architectural Governance</div><p class="rel-desc">Keeping generated code aligned with the system&rsquo;s recorded decisions, whichever agent produced it.</p></a></li>
+      <li><a href="/concepts/executable-architectural-intent/"><div class="rel-title">Executable Architectural Intent</div><p class="rel-desc">Turning architectural decisions into constraints a machine can check, not prose in a wiki.</p></a></li>
+      <li><a href="/concepts/deterministic-enforcement/"><div class="rel-title">Deterministic Enforcement</div><p class="rel-desc">Same change, same verdict &mdash; checks that do not depend on which model ran.</p></a></li>
+      <li><a href="/concepts/governance-before-generation/"><div class="rel-title">Governance Before Generation</div><p class="rel-desc">Constraints applied where code is created, not discovered later in review.</p></a></li>
+    </ul>
+  </aside>
 
-  <aside class="related-panel" aria-labelledby="related-essays-label">
+  <aside class="related-panel" aria-labelledby="related-essays-label" style="margin-top:1.5rem;padding-top:0;border-top:none;">
     <div class="related-panel-label" id="related-essays-label">Related operational essays</div>
     <ul class="related-list">
-      <li><a href="/insights/google-spec-driven-development-not-enough/"><div class="rel-title">Spec-Driven Development Is Not Enough</div><p class="rel-desc">Google&rsquo;s spec-driven paper, and why architectural compliance should be deterministic, not AI reviewing AI.</p></a></li>
-      <li><a href="/insights/github-spec-kit-who-enforces-architecture/"><div class="rel-title">GitHub Spec Kit Defines the Plan. Who Enforces the Architecture?</div><p class="rel-desc">Spec Kit structures intent; an independent layer still has to check the code obeys it.</p></a></li>
-      <li><a href="/insights/goal-driven-agents-architectural-governance/"><div class="rel-title">Goal-Driven Agents Need Architectural Governance</div><p class="rel-desc">As agents shift from prompt-based coding to objective-driven development, governance &mdash; not just tests &mdash; is what keeps the architecture intact.</p></a></li>
-      <li><a href="/insights/prompt-engineering-vs-harness-engineering/"><div class="rel-title">Prompt Engineering Was About Inputs. Harness Engineering Is About Systems.</div><p class="rel-desc">How AI systems engineering moved from optimizing inputs to designing the agent runtime systems that wrap the model.</p></a></li>
-      <li><a href="/insights/constraint-decay-coding-agents-architectural-governance/"><div class="rel-title">Constraint Decay: Why Coding Agents Need Architectural Governance</div><p class="rel-desc">The failure mode where agents satisfy loose functional specs but lose fidelity to architectural patterns as requirements accumulate &mdash; and why governance must run before PR review.</p></a></li>
-      <li><a href="/insights/future-of-software-engineering-after-vibe-coding/"><div class="rel-title">The Future of Software Engineering After Vibe Coding</div><p class="rel-desc">Vibe coding changed how software gets built, but production engineering still demands judgment, governance, and accountability in an AI-agent world.</p></a></li>
+      <li><a href="/insights/governance-layers-for-ai-coding-assistants/"><div class="rel-title">Building Governance Layers for AI Coding Assistants</div><p class="rel-desc">Where enforcement belongs in a modern coding stack.</p></a></li>
+      <li><a href="/insights/loop-engineering-ai-coding-agents/"><div class="rel-title">Loop Engineering for AI Coding Agents: Benefits and Limitations</div><p class="rel-desc">Loops make agents persistent; they do not make them architecturally consistent.</p></a></li>
+      <li><a href="/insights/github-spec-kit-who-enforces-architecture/"><div class="rel-title">GitHub Spec Kit Defines the Plan. Who Enforces the Architecture?</div><p class="rel-desc">Structured planning still leaves execution-time enforcement open.</p></a></li>
+      <li><a href="/insights/ai-coding-agent-verification-tax/"><div class="rel-title">The Verification Tax of AI Coding Agents</div><p class="rel-desc">Why faster generation shifts the cost to verification.</p></a></li>
     </ul>
   </aside>
 
@@ -548,8 +501,8 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
   <footer class="article-footer">
     <a href="/insights/" class="back-link">&larr; Back to Insights</a>
     <div class="cta-block">
-      <h3>Add governance to your spec-driven workflow</h3>
-      <p>Mneme is the open-source architectural governance layer &mdash; deterministic, ADR-derived constraints injected before generation and verified after. It plugs into spec-driven development without replacing it.</p>
+      <h3>Every routed agent, the same architecture.</h3>
+      <p>Mneme turns your architectural decisions into executable constraints that every coding agent retrieves at generation time and CI verifies deterministically &mdash; no matter which model your router selected. Open source.</p>
       <a href="/demo/" style="display:inline-block;margin-right:1.25rem;color:#c8f060;font-family:'DM Mono',monospace;font-size:0.85rem;text-decoration:none;">See the live demo &rarr;</a>
       <a href="https://github.com/MnemeHQ/mneme" class="btn-primary">View on GitHub &rarr;</a>
     </div>
@@ -647,6 +600,17 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
   </div>
 </footer>
 
+<script><!-- nav-active -->
+(function(){
+  var path = window.location.pathname;
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
 <script>
 (function(){
   var btn = document.querySelector('.nav-hamburger');
@@ -674,17 +638,6 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
   });
   window.addEventListener('resize', function(){
     if (window.innerWidth > 900 && links.classList.contains('open')) setOpen(false);
-  });
-})();
-</script>
-<script><!-- nav-active -->
-(function(){
-  var path = window.location.pathname;
-  document.querySelectorAll('.nav-links a').forEach(function(a){
-    var href = a.getAttribute('href');
-    if (href && href.startsWith('/') && href !== '/' && path.startsWith(href)) {
-      a.classList.add('active');
-    }
   });
 })();
 </script>
@@ -723,6 +676,5 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
 <!-- mneme:marketing-body:end -->
 
 
-<script src="/assets/js/video.js" defer></script>
 </body>
 </html>

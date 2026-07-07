@@ -3,29 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Building Governance Layers for AI Coding Assistants &mdash; Mneme HQ</title>
+  <title>GitHub Spec Kit Defines the Plan. Who Enforces the Architecture? &mdash; Mneme HQ</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="AI coding assistants are becoming agents that modify codebases, open PRs, and deploy. The missing enterprise infrastructure is a governance layer: policy, memory, enforcement, and auditability around what agents are allowed to do." />
+  <meta name="description" content="GitHub Spec Kit structures development intent: constitution, spec, plan, tasks, implement. But its constitution is interpreted by the coding agent. Mneme checks proposed changes independently at the execution boundary. Complementary layers, different jobs." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
-  <link rel="canonical" href="https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/" />
+  <link rel="canonical" href="https://mnemehq.com/insights/github-spec-kit-who-enforces-architecture/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Building Governance Layers for AI Coding Assistants" />
-  <meta property="og:description" content="AI coding assistants are becoming agents that modify codebases, open PRs, and deploy. The missing enterprise infrastructure is a governance layer: policy, memory, enforcement, and auditability around what agents are allowed to do." />
-  <meta property="og:url" content="https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/" />
-  <meta property="og:image" content="https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/og.png" />
+  <meta property="og:title" content="GitHub Spec Kit Defines the Plan. Who Enforces the Architecture?" />
+  <meta property="og:description" content="GitHub Spec Kit structures development intent: constitution, spec, plan, tasks, implement. But its constitution is interpreted by the coding agent. Mneme checks proposed changes independently at the execution boundary. Complementary layers, different jobs." />
+  <meta property="og:url" content="https://mnemehq.com/insights/github-spec-kit-who-enforces-architecture/" />
+  <meta property="og:image" content="https://mnemehq.com/insights/github-spec-kit-who-enforces-architecture/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Building Governance Layers for AI Coding Assistants" />
-  <meta name="twitter:description" content="AI coding assistants are becoming agents that modify codebases, open PRs, and deploy. The missing enterprise infrastructure is a governance layer: policy, memory, enforcement, and auditability around what agents are allowed to do." />
-  <meta name="twitter:image" content="https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/og.png" />
+  <meta name="twitter:title" content="GitHub Spec Kit Defines the Plan. Who Enforces the Architecture?" />
+  <meta name="twitter:description" content="GitHub Spec Kit structures development intent: constitution, spec, plan, tasks, implement. But its constitution is interpreted by the coding agent. Mneme checks proposed changes independently at the execution boundary. Complementary layers, different jobs." />
+  <meta name="twitter:image" content="https://mnemehq.com/insights/github-spec-kit-who-enforces-architecture/og.png" />
   <meta name="author" content="Theo Valmis" />
-  <meta property="article:published_time" content="2026-06-17T00:00:00Z" />
+  <meta property="article:published_time" content="2026-07-03T00:00:00Z" />
   <meta property="article:author" content="https://mnemehq.com/founder/" />
-  <meta property="article:section" content="Industry Analysis" />
+  <meta property="article:section" content="Engineering" />
 
   <!-- Consent defaults -->
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{'analytics_storage':'granted','ad_storage':'denied','ad_user_data':'denied','ad_personalization':'denied'});</script>
@@ -118,31 +118,51 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
   <link rel="icon" href="/favicon.png" type="image/png">
 
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
-          {"@type": "ListItem", "position": 2, "name": "Insights", "item": "https://mnemehq.com/insights/"},
-          {"@type": "ListItem", "position": 3, "name": "Building Governance Layers for AI Coding Assistants", "item": "https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/"}
-        ]
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://mnemehq.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Insights",
+          "item": "https://mnemehq.com/insights/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "GitHub Spec Kit and Architectural Enforcement",
+          "item": "https://mnemehq.com/insights/github-spec-kit-who-enforces-architecture/"
+        }
+      ]
+    },
+    {
+      "@type": "TechArticle",
+      "headline": "GitHub Spec Kit Defines the Plan. Who Enforces the Architecture?",
+      "description": "GitHub Spec Kit structures development intent: constitution, spec, plan, tasks, implement. But its constitution is interpreted by the coding agent. Mneme checks proposed changes independently at the execution boundary. Complementary layers, different jobs.",
+      "url": "https://mnemehq.com/insights/github-spec-kit-who-enforces-architecture/",
+      "datePublished": "2026-07-03",
+      "author": {
+        "@type": "Person",
+        "name": "Theo Valmis",
+        "url": "https://mnemehq.com/founder/"
       },
-      {
-        "@type": "TechArticle",
-        "headline": "Building Governance Layers for AI Coding Assistants",
-        "description": "AI coding assistants are becoming agents that modify codebases, open PRs, and deploy. The missing enterprise infrastructure is a governance layer: policy, memory, enforcement, and auditability around what agents are allowed to do.",
-        "url": "https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/",
-        "datePublished": "2026-06-17",
-        "dateModified": "2026-06-17",
-        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
-        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/"},
-        "image": "https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/og.png",
-        "mainEntityOfPage": "https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/"
+      "publisher": {
+        "@type": "Organization",
+        "name": "Mneme HQ",
+        "url": "https://mnemehq.com/"
       }
-    ]
-  }
+    }
+  ]
+}
   </script>
 
 <style>
@@ -361,109 +381,130 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
   <ol class="breadcrumb">
     <li><a href="/">Home</a></li>
     <li><a href="/insights/">Insights</a></li>
-    <li aria-current="page">Building Governance Layers for AI Coding Assistants</li>
+    <li aria-current="page">GitHub Spec Kit and Architectural Enforcement</li>
   </ol>
 </nav>
 
 <article class="article-wrap">
   <header class="article-header">
     <div class="article-eyebrow">
-      <span class="eyebrow-tag">Thought Leadership</span>
+      <span class="eyebrow-tag">Analysis</span>
       <span class="eyebrow-dot"></span>
       <span class="eyebrow-meta">10 min read</span>
     </div>
-    <h1>Building Governance Layers for AI Coding Assistants</h1>
-    <p class="article-lede">The first wave of AI coding assistants was about generation. The next wave is about control. As assistants evolve into agents that modify codebases, open pull requests, run tests, and deploy infrastructure, the question stops being whether AI can write code and becomes how organizations ensure it writes the right code. At enterprise scale, that answer is infrastructure: a governance layer.</p>
-    <p class="byline">By <a href="/founder/">Theo Valmis</a><span class="sep">&middot;</span><time datetime="2026-06-17">June 2026</time></p>
+    <h1>GitHub Spec Kit Defines the Plan. Who Enforces the Architecture?</h1>
+    <p class="article-lede">GitHub&rsquo;s Spec Kit gives AI-assisted development a real spine: a project constitution, then a spec, then a plan, then tasks, then implementation. It replaces vibe-driven prompting with an ordered process, and the process is good. But there is a seam worth naming. The constitution &mdash; the file that holds your project&rsquo;s governing principles &mdash; is a document the coding agent is <em>asked to read and honor</em>. Structuring the intent and independently checking that the code obeys it are two different jobs. Spec Kit does the first well. The second needs a different layer.</p>
+    <p class="byline">By <a href="/founder/">Theo Valmis</a><span class="sep">&middot;</span><time datetime="2026-07-03">July 2026</time></p>
   </header>
 
   <div class="article-body">
 
-    <h2>From Autocomplete to Autonomous Execution</h2>
-    <p>The capability curve of AI coding tools is easy to trace, and each step is a step away from the human keystroke. It started with autocomplete &mdash; GitHub Copilot suggesting the next line while a developer stayed in the driver&rsquo;s seat. Then came chat coding, where ChatGPT and Claude would draft whole functions and explain them on request. Then IDE-native agents like Cursor and Windsurf began editing multiple files, running commands, and iterating against test output. Now the frontier is multi-agent development systems and, beyond them, autonomous execution across the software development lifecycle: an agent that plans a change, writes it, tests it, opens a pull request, and pushes toward deploy.</p>
-    <p>Every step on that curve increases capability. Every step also increases risk. An autocomplete suggestion a developer rejects costs nothing. An autonomous agent that merges a non-compliant change into a payments service costs a great deal. The more an assistant can do without a human in the loop, the more the organization needs a way to constrain what it does &mdash; not after the fact, but before the change lands.</p>
+    <h2>Spec Kit Brings Structure to AI-Assisted Development</h2>
+    <p><a href="https://github.com/github/spec-kit" target="_blank" rel="noopener">Spec Kit</a> is a toolkit for spec-driven development, and its central move is to make the process explicit. Instead of one long prompt, you run an ordered set of commands. You establish a constitution with <code>/speckit.constitution</code>, describe what you want with <code>/speckit.specify</code>, produce a technical plan with <code>/speckit.plan</code>, break it into work with <code>/speckit.tasks</code>, and build with <code>/speckit.implement</code>. Optional steps like <code>/speckit.clarify</code> and <code>/speckit.analyze</code> tighten the loop. It is a serious, well-designed approach to <a href="/concepts/spec-driven-development/">spec-driven development</a>, and it is popular for good reason.</p>
+    <p>The constitution is the interesting part. Stored in <code>.specify/memory/constitution.md</code>, it holds your project&rsquo;s foundational principles &mdash; the rules meant to guide every later phase so decisions stay consistent. On paper this looks like governance. You write the principles once, and every specification, plan, and implementation is supposed to respect them. That is exactly the right instinct. The question is what &ldquo;respect them&rdquo; means mechanically.</p>
 
-    <h2>Why Traditional AI Guardrails Fail Here</h2>
-    <p>Most of what gets called &ldquo;AI governance&rdquo; today was built for a different problem. It covers content moderation, prompt filtering, data privacy, model safety, and toxic-output detection. Those controls matter, but they were designed for systems that generate text for humans to read. Software engineering generates artifacts that other systems execute, and that introduces a different class of risk entirely.</p>
-    <p>The risks that matter in a codebase are <strong>architectural drift</strong>, security violations, compliance violations, framework inconsistency, undocumented design decisions, and hidden technical debt. None of these are caught by a content filter. A model can produce code that is syntactically perfect, passes its tests, reads cleanly in review &mdash; and still violates a critical organizational standard. It can wire a service directly to a database that policy says must be accessed through a gateway. It can introduce a second HTTP client into a codebase that standardized on one. It can encode a design decision nobody approved and nobody wrote down.</p>
-    <p>Guardrails tuned for prose do not see any of this, because the violation is not in the words. It is in the structure. As we have argued in <a href="/insights/why-context-alone-doesnt-prevent-architectural-drift/">why context alone doesn&rsquo;t prevent architectural drift</a>, giving a model more information about your system improves what it knows without changing what it is allowed to do. Knowing a rule and being held to a rule are different mechanisms.</p>
+    <h2>The Constitution Matters, but It Is Agent-Interpreted</h2>
+    <p>Here is the seam. The constitution is a Markdown file the coding agent reads as context and is instructed to follow. It shapes the agent&rsquo;s behavior through prompting, and prompting is probabilistic. A principle sitting in the context window is an <em>input</em> to generation. It is not an independent gate that inspects the output. When the agent writes the plan, or writes the code, nothing outside the agent re-reads the constitution and blocks a change that breaks it.</p>
+    <p>This is not a flaw in Spec Kit. It is the nature of a document that guides an agent. A rule the model is told to obey and a rule a separate system enforces are different kinds of object. The first depends on the model attending to it, remembering it across a long task, and applying it correctly to a specific edit. The second holds regardless of what the model was thinking. Spec Kit gives you the first. <a href="/concepts/governance-before-generation/">Governance before generation</a> as an independent check is a distinct capability, and a constitution in the prompt does not provide it.</p>
+    <div class="callout"><p><strong>A principle the agent is asked to follow is not the same as a check the agent must pass.</strong> The constitution informs generation. It does not, on its own, verify the result.</p></div>
 
-    <h2>Governance Is Not Access Control</h2>
-    <p>This is the distinction most teams get wrong, and it is worth stating sharply. Access control answers a question about permission: <em>can the agent do this?</em> Governance answers a question about judgment: <em>should the agent do this?</em> They are not the same layer, and one does not imply the other.</p>
-    <p>Consider an agent with write access to a payments service. Access control has already done its job &mdash; the agent is authorized to modify those files. Governance is the layer that decides whether the specific modification it proposes violates an architecture rule, contradicts a recorded <a href="/insights/agent-governance-in-the-sdlc/">architectural decision</a>, crosses a security boundary, breaks a regulatory requirement, or ignores a team convention. The agent can be fully permitted and still wrong. Permission is necessary; it is not sufficient.</p>
-    <div class="callout"><p><strong>Access control gates the door. Governance reads what walked through it.</strong> An agent can have every permission it needs and still produce a change that should never ship.</p></div>
-    <p>This is also why governance cannot be solved by tightening permissions. You could remove the agent&rsquo;s access to the payments service entirely, but then it cannot do its job. The goal is not to lock agents out of important systems. It is to let them work inside those systems while guaranteeing that what they produce stays aligned with the rules a human already decided on.</p>
+    <h2>Feature Specifications and Architectural Decisions Are Different Artifacts</h2>
+    <p>The deeper point is that Spec Kit&rsquo;s primary unit &mdash; the feature spec &mdash; answers a different question than the one architecture asks. A feature spec describes what to build now. An architectural decision describes what must remain true while you build it. Consider a concrete case.</p>
+    <p>The feature spec says: <em>add asynchronous invoice processing so large batches do not block the request.</em> That is a clear, well-formed spec. Spec Kit will help the agent plan it and implement it.</p>
+    <p>The architectural decision says something the spec never mentions: <em>all async jobs must use the existing worker service on SQS. Do not introduce another queue.</em> That decision is not about this feature. It predates it and outlives it. It is a project-wide constraint recorded because a second queue technology would fracture operations, monitoring, and on-call. The feature spec is silent on it, and reasonably so &mdash; a spec is scoped to the change, not to the standing invariants of the system.</p>
+    <p>These two artifacts have different lifetimes and different owners. A feature spec is written, implemented, and retired. An architectural decision is durable; it constrains every feature that comes near it. Keeping <a href="/concepts/executable-architectural-intent/">executable architectural intent</a> in a per-feature spec conflates the two. The decision needs to live somewhere durable and be checked on its own terms.</p>
 
-    <h2>The Emerging Governance Stack</h2>
-    <p>A governance layer for AI coding is not a single feature. It is a stack of four distinct concerns, each of which fails differently when it is missing. The layers below build on one another: policy without enforcement is a wiki nobody reads; enforcement without auditability is a black box nobody trusts.</p>
+    <h2>Where Architectural Violations Still Happen</h2>
+    <p>Now watch how drift enters a perfectly good Spec Kit workflow. The spec is fine. The constitution even mentions using approved infrastructure. The agent plans the async invoice feature, and while implementing it, reaches for the tool it has seen most often in training:</p>
+    <ul>
+      <li>It adds Redis and BullMQ to run the invoice jobs, because that is a common, idiomatic async pattern &mdash; but the approved queue is SQS, and now the repo has two queue technologies.</li>
+      <li>It calls the billing database directly for a status write instead of going through the billing service&rsquo;s API, quietly crossing a service boundary the architecture draws deliberately.</li>
+      <li>It pulls in a second auth library for a token-signing helper because it was convenient, next to the one the rest of the codebase already standardized on.</li>
+    </ul>
+    <p>Each of these produced working code. Each satisfied the feature spec. The constitution was in context the whole time. Drift happened anyway, because the constraint that mattered lived as a principle the agent was asked to honor, not as a check the change had to pass. This is the same gap that <a href="/insights/runtime-verification-is-not-architectural-verification/">runtime verification does not close</a>: tests confirm the invoices process; they say nothing about which queue processed them.</p>
 
+    <h2>Spec Kit&rsquo;s Extension Model Is the Integration Point</h2>
+    <p>Spec Kit is not a closed system, and this is where the two layers meet cleanly. It ships an extension model: extensions add new capabilities and commands, presets override templates to enforce organizational standards, bundles assemble role-based sets, and a community catalog distributes all of it. There are lifecycle extension points around planning and implementation where additional steps can run.</p>
+    <p>That model is the natural home for an architectural check. A Spec Kit extension <em>could</em> invoke an independent decision-checking step after the plan is produced and again around implementation &mdash; not to rewrite the constitution, but to verify the generated plan and code against durable decisions the constitution references. The point is not that Spec Kit lacks structure. It is that the structure has a documented seam where a separate verifier belongs.</p>
+
+    <h2>What an Architectural-Guardrail Layer Should Add</h2>
+    <p>Whatever fills that seam should do a specific set of things, and it should do them independently of the agent doing the writing:</p>
+    <ol>
+      <li><strong>Keep durable decisions separate from feature specs.</strong> Architectural decisions are recorded as structured, standing constraints, not folded into whichever spec is active today.</li>
+      <li><strong>Retrieve only the relevant decisions.</strong> A change to invoice processing should surface the queue and service-boundary rules, not every decision in the project.</li>
+      <li><strong>Check both the plan and the edits.</strong> Catch the second-queue choice in the plan if possible, and catch it again at the edit if it slips through.</li>
+      <li><strong>Return a <a href="/concepts/deterministic-enforcement/">deterministic verdict</a> that names the violated decision.</strong> Not &ldquo;this looks off&rdquo; but &ldquo;this introduces BullMQ; ADR-014 requires SQS.&rdquo;</li>
+      <li><strong>Distinguish warn from block.</strong> Some decisions are advisory; some must stop the change. The layer should support both, with reviewable evidence attached.</li>
+      <li><strong>Work across agents.</strong> The check is <a href="/concepts/model-independent-governance/">model-independent</a>, so it holds whether the code came from Spec Kit&rsquo;s agent, a different assistant, or a human.</li>
+    </ol>
+    <p>These are <a href="/concepts/verification-contracts/">verification contracts</a>, and they are deliberately separate from generation. That separation is the whole value: a check that depends on the same model it is checking is not an independent check.</p>
+
+    <h2>How Mneme Complements Spec Kit</h2>
+    <p>Mneme is that layer, and it is complementary to Spec Kit rather than a replacement for it. The division of labor is clean. Spec Kit structures intent and drives the workflow. Mneme keeps the durable decisions and checks proposed changes against them at the execution boundary. In practice the two run together like this:</p>
+    <ol>
+      <li>Spec Kit runs its normal flow: constitution, spec, plan, tasks, implement.</li>
+      <li>Mneme loads the project&rsquo;s recorded ADRs as structured constraints, kept separate from the feature spec.</li>
+      <li>Around planning, Mneme can check the generated plan and flag a decision the plan would violate before any code is written.</li>
+      <li>At implementation, the Claude Code PreToolUse hook intercepts each Edit, Write, and MultiEdit. When a strict-mode check finds a violation &mdash; the second queue, the crossed boundary &mdash; the hook exits with code 2 and blocks the edit, returning the specific decision that was broken so the agent can retry compliantly.</li>
+      <li>The final diff is reviewed against the same decisions, so nothing that slipped past edit-time is missed.</li>
+    </ol>
+    <p>Be clear about the limits, because honesty is the point of a governance layer. Mneme&rsquo;s retrieval depends partly on file-path relevance, so a decision can be missed if a change touches files the retrieval did not associate with it. The edit-time hook is a strong first line of defense, not a full repository audit &mdash; it checks the change in front of it, which is why the plan check and the final-diff review matter alongside it. And to be precise about status: Mneme does not ship a Spec Kit extension today. The Claude Code PreToolUse hook is real and shipping. The Spec Kit integration is proposed &mdash; the extension model provides the point where it would attach.</p>
+
+    <h2>Two Forms of Intent</h2>
+    <p>The clean way to hold both tools in your head is to separate two kinds of intent. There is feature intent: what to build now, captured by the spec. And there is architectural intent: what must remain true while you build it, captured by the recorded decisions. Spec Kit is built around the first. Mneme is built around the second. They are not competing for the same job.</p>
     <div style="overflow-x:auto;margin:2rem 0;">
     <table class="gov-table">
-      <thead><tr><th>Layer</th><th>What it is</th><th>What it contains</th></tr></thead>
+      <thead><tr><th></th><th>GitHub Spec Kit</th><th>Mneme HQ</th></tr></thead>
       <tbody>
-        <tr><td>1. Policy</td><td>Human decisions</td><td>Architecture standards, security requirements, compliance rules</td></tr>
-        <tr><td>2. Memory</td><td>Organizational knowledge</td><td>ADRs, previous incidents, design rationales, lessons learned</td></tr>
-        <tr><td>3. Enforcement</td><td>Machine-verifiable controls</td><td>Policy validation, automated checks, CI/CD gates, agent constraints</td></tr>
-        <tr class="accent-row"><td>4. Auditability</td><td>Enterprise accountability</td><td>Why a decision was made, which policy applied, which agent acted</td></tr>
+        <tr><td>Primary unit</td><td>Feature spec</td><td>Architectural decision</td></tr>
+        <tr><td>Purpose</td><td>Structure feature development</td><td>Preserve architectural intent</td></tr>
+        <tr><td>Scope</td><td>The current change</td><td>Project-wide, across changes</td></tr>
+        <tr><td>Execution model</td><td>Agent-led workflow</td><td>Independent checks and hooks</td></tr>
+        <tr class="accent-row"><td>Result</td><td>A planned, built feature</td><td>Allow / warn / block with decision evidence</td></tr>
       </tbody>
     </table>
     </div>
-
-    <p><strong>Policy</strong> is where humans set intent: the architecture standards, security requirements, and compliance rules that define what &ldquo;correct&rdquo; means for this organization. It is the only layer that should not be automated, because it encodes choices that belong to people.</p>
-    <p><strong>Memory</strong> is the organizational knowledge that gives policy its context &mdash; the ADRs that record why a boundary exists, the incident write-ups that explain what went wrong last time, the design rationales that keep a team from relitigating settled questions. Memory is what lets policy be specific instead of generic. It is also, as covered in <a href="/concepts/governance-propagation/">governance propagation</a>, the layer that has to reach every agent, every time.</p>
-    <p><strong>Enforcement</strong> is the part that turns policy and memory into something machine-verifiable: validation that runs against a proposed change, automated checks, CI/CD gates, and constraints applied to the agent at generation time. This is the layer that converts a known rule into an obeyed rule. Without it, the first three layers are documentation.</p>
-    <p><strong>Auditability</strong> closes the loop. For every change an agent makes, it answers why the decision was made, which policy applied, and which agent performed the action. This is the layer that makes the system explainable after the fact &mdash; and it is the one regulated enterprises cannot live without. The mechanism behind it is what we call <a href="/concepts/enforcement-provenance/">enforcement provenance</a>: a verifiable record linking each change to the rule that approved or rejected it.</p>
-
-    <h2>Why Regulated Industries Need This First</h2>
-    <p>For most teams, a governance layer is a competitive advantage. For regulated ones, it is a precondition for adoption. Financial services, healthcare, life sciences, insurance, and government cannot allow autonomous code generation without four properties: traceability of every change, repeatability of every decision, explainability of why the system did what it did, and standing evidence of compliance. An auditor does not accept &ldquo;the model decided.&rdquo; They require a record.</p>
-    <p>This is precisely where content-safety guardrails have nothing to offer. A prompt filter cannot demonstrate that a change to a claims-processing system honored the applicable regulatory boundary, and it cannot reconstruct the chain of policy that approved it. A governance layer can, because traceability and explainability are what it is built to produce. External frameworks point the same direction: NIST&rsquo;s <a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener">AI Risk Management Framework</a> treats governance, accountability, and auditability as core functions of any trustworthy AI system &mdash; the recognized reference for what an enterprise is expected to be able to show. Teams evaluating where this lands in practice can see the regulated-industry patterns in our <a href="/use-cases/">use cases</a>.</p>
-    <p>In these sectors the order of operations inverts. The governance layer is not something you add once agents are productive. It is the thing that has to exist before agents are allowed to touch the codebase at all.</p>
-
-    <h2>The Governance Layer Outlives the Model</h2>
-    <p>Here is the structural bet. The largest enterprises will not standardize on a single model. Models are commoditizing, swappable, and improving on a schedule no one controls. What they will standardize on is governance &mdash; the layer that stays constant while everything underneath it churns.</p>
-    <p>The analogy is identity. Two decades ago, authentication lived inside each application. Then identity became an independent layer &mdash; single sign-on, directory services, federated identity &mdash; and applications were rebuilt to defer to it. The applications changed constantly. The identity layer persisted, because it encoded something more durable than any one app: who is allowed to do what. Governance for AI coding is at the same inflection. Models change, agents change, workflows change. The encoded answer to <em>what is this code allowed to be</em> is the part worth making permanent. This is also why the market is splitting into <a href="/insights/ai-agent-governance-two-markets/">two distinct governance markets</a> &mdash; one for the agents themselves and one for the standards they answer to.</p>
-    <p>An organization that ties its safety to a specific model has to renegotiate that safety every time it switches models. An organization that puts its rules in a governance layer keeps them no matter what generates the code next year. And the advantage it gains is not the one the first wave was competing for.</p>
-    <p>The first wave of this market rewarded raw generation &mdash; whoever could produce the most code, fastest, with the least friction. That contest is largely over; the models are good enough that output is no longer scarce. The next advantage is not generating more code. It is ensuring that AI-generated code stays aligned with architecture, compliance, and organizational intent &mdash; at the volume and speed agents now operate.</p>
-    <p>That is what a governance layer delivers, and why it is becoming infrastructure rather than a feature. The teams that win the agentic era will not be the ones whose agents write the most. They will be the ones whose agents can be trusted, audited, and held to a standard &mdash; and, as we argue in <a href="/insights/ai-coding-governance-should-be-reviewable/">AI coding governance should be reviewable</a>, can prove it. Generation got us here. Governance is what gets us the rest of the way.</p>
+    <p>Use Spec Kit to give AI-assisted work a spine. Add an <a href="/concepts/architectural-governance/">architectural governance</a> layer so the intent the spec never encodes still holds when the code lands. This is the tool-specific version of a general argument: <a href="/insights/spec-driven-development-still-needs-governance/">spec-driven development still needs governance</a>, and the same seam appears in <a href="/insights/google-spec-driven-development-not-enough/">Google&rsquo;s take on spec-driven development</a> too. The plan tells the agent what to do. A separate layer confirms the agent did not quietly change the architecture on the way.</p>
 
   </div><!-- /.article-body -->
 
   <section class="article-faq" aria-labelledby="faq-heading" style="margin-top:3rem;">
     <h2 id="faq-heading" style="margin-bottom:1.5rem;">Frequently asked questions</h2>
     <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">What is a governance layer for AI coding assistants?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">It is enterprise infrastructure that constrains what AI coding agents are allowed to do, built from four layers: policy (the human decisions that define correct), memory (ADRs and incident history that give policy context), enforcement (machine-verifiable checks and CI/CD gates applied to proposed changes), and auditability (a record of why each decision was made and which agent acted). It sits above access control and decides not whether an agent <em>can</em> change a system, but whether it <em>should</em>.</div>
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Does GitHub Spec Kit enforce architectural decisions?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Spec Kit structures development through an ordered workflow &mdash; constitution, spec, plan, tasks, implement &mdash; and its constitution holds project principles the coding agent is asked to follow. But the constitution is a Markdown file the agent reads as context, so it guides generation rather than acting as an independent check on the output. Spec Kit has checks, gates, and extension points; its core workflow still relies on the agent to interpret and apply those principles. Independent enforcement of a specific architectural decision at the moment code is written is a separate capability.</div>
     </details>
     <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">How is governance different from access control?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Access control answers whether an agent has permission to act on a system. Governance answers whether the specific change it proposes is acceptable &mdash; whether it honors architecture rules, ADRs, security boundaries, regulatory requirements, and team conventions. An agent can be fully permitted to modify a payments service and still produce a change that violates a recorded decision. Permission is necessary but not sufficient; governance is the layer that judges the change itself.</div>
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">What is the difference between a feature spec and an architectural decision?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">A feature spec describes what to build now, such as adding asynchronous invoice processing. It is written, implemented, and then retired. An architectural decision describes what must remain true across features, such as requiring all async jobs to use the existing SQS worker service rather than introducing a second queue. It is durable and constrains every feature that comes near it. Conflating the two by keeping decisions inside per-feature specs is why standing constraints get missed.</div>
     </details>
     <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Why do regulated industries need a governance layer before adopting agents?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Financial services, healthcare, life sciences, insurance, and government require traceability, repeatability, explainability, and standing evidence of compliance for any change to a regulated system. An auditor will not accept &ldquo;the model decided.&rdquo; A governance layer produces the record &mdash; which policy applied, which agent acted, why &mdash; that content-safety guardrails cannot. In these sectors governance is not an add-on after agents become productive; it is the precondition for letting agents touch the codebase at all.</div>
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Can Mneme and GitHub Spec Kit be used together?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Yes, and they are complementary rather than competing. Spec Kit structures the intent and drives the workflow; Mneme keeps the durable architectural decisions and checks proposed changes against them at the execution boundary. Spec Kit&rsquo;s extension model provides lifecycle extension points around planning and implementation where an independent check could attach. Note that a Spec Kit extension for Mneme is proposed, not shipped today; the Claude Code PreToolUse hook that blocks violating edits is real and shipping.</div>
+    </details>
+    <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">How does Mneme check code that an AI coding agent writes?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Mneme records architectural decisions as structured constraints kept separate from feature specs, retrieves the ones relevant to a change, and checks the proposed change against them deterministically. In Claude Code, a PreToolUse hook intercepts Edit, Write, and MultiEdit; when a strict-mode check finds a violation it exits with code 2, blocks the edit, and returns the specific decision that was broken. Retrieval depends partly on file-path relevance, and the edit-time hook is a first line of defense rather than a full repository audit, so a plan check and a final-diff review run alongside it.</div>
     </details>
   </section>
 
-  <aside class="related-panel" aria-labelledby="related-essays-label" style="margin-top:3rem;">
-    <div class="related-panel-label" id="related-essays-label">Related operational essays</div>
+  <aside class="related-panel" aria-labelledby="related-concepts-label" style="margin-top:3rem;">
+    <div class="related-panel-label" id="related-concepts-label">Related governance concepts</div>
     <ul class="related-list">
-      <li><a href="/insights/enterprise-ai-guardrails-five-layers/"><div class="rel-title">Not All AI Guardrails Are the Same</div><p class="rel-desc">The five layers of enterprise AI guardrails &mdash; and the architectural layer most stacks miss.</p></a></li>
-      <li><a href="/insights/how-ai-coding-agents-use-adrs/"><div class="rel-title">How AI Coding Agents Use ADRs (Architecture Decision Records)</div><p class="rel-desc">An ADR records one architectural decision, its context, and its consequences. Here is how AI coding agents actually interact with ADRs today &mdash; ignored, advisory, or enforced &mdash; and how to make them executable.</p></a></li>
-      <li><a href="/insights/smart-routing-ai-coding-agents/"><div class="rel-title">Smart Routing for AI Coding Agents</div><p class="rel-desc">Routing optimizes execution; it does not enforce the architecture every routed agent must follow.</p></a></li>
-      <li><a href="/insights/ai-race-wont-be-won-on-infrastructure-alone/"><div class="rel-title">Why the AI Race Won&rsquo;t Be Won on Infrastructure Alone</div><p class="rel-desc">Infrastructure decides how much intelligence you can access; governance decides how much you can safely deploy.</p></a></li>
-      <li><a href="/insights/open-knowledge-format-vs-governance/"><div class="rel-title">Open Knowledge Format vs Governance</div><p class="rel-desc">Standardizing how agents find organizational knowledge does not make them follow it.</p></a></li>
-      <li><a href="/insights/agent-governance-in-the-sdlc/"><div class="rel-title">Agent Governance in the SDLC</div><p class="rel-desc">Where in the development lifecycle enforcement has to sit once agents act autonomously.</p></a></li>
-      <li><a href="/insights/ai-agent-governance-two-markets/"><div class="rel-title">AI Agent Governance Is Two Markets</div><p class="rel-desc">Governing the agents is a separate problem from governing the standards they answer to.</p></a></li>
-      <li><a href="/insights/ai-coding-governance-should-be-reviewable/"><div class="rel-title">AI Coding Governance Should Be Reviewable</div><p class="rel-desc">Why auditability, not just enforcement, is what makes a governance layer trustworthy.</p></a></li>
-      <li><a href="/insights/why-context-alone-doesnt-prevent-architectural-drift/"><div class="rel-title">Why Context Alone Doesn&rsquo;t Prevent Architectural Drift</div><p class="rel-desc">More information improves what an agent knows, not what it is allowed to do.</p></a></li>
+      <li><a href="/concepts/spec-driven-development/"><div class="rel-title">Spec-Driven Development</div><p class="rel-desc">Turning ordered specifications into the driver of AI-assisted work, as Spec Kit does.</p></a></li>
+      <li><a href="/concepts/architectural-governance/"><div class="rel-title">Architectural Governance</div><p class="rel-desc">Keeping generated code aligned with durable decisions the feature spec never encodes.</p></a></li>
+      <li><a href="/concepts/executable-architectural-intent/"><div class="rel-title">Executable Architectural Intent</div><p class="rel-desc">Recording architectural decisions as constraints a machine can check, not prose the agent reads.</p></a></li>
+      <li><a href="/concepts/deterministic-enforcement/"><div class="rel-title">Deterministic Enforcement</div><p class="rel-desc">Same change, same verdict &mdash; a check that names the violated decision, independent of the model.</p></a></li>
     </ul>
   </aside>
 
-  <aside class="related-panel" aria-labelledby="related-concepts-label" style="margin-top:1.5rem;padding-top:0;border-top:none;">
-    <div class="related-panel-label" id="related-concepts-label">Related governance concepts</div>
+  <aside class="related-panel" aria-labelledby="related-essays-label" style="margin-top:1.5rem;padding-top:0;border-top:none;">
+    <div class="related-panel-label" id="related-essays-label">Related operational essays</div>
     <ul class="related-list">
-      <li><a href="/concepts/governance-propagation/"><div class="rel-title">Governance Propagation</div><p class="rel-desc">How an enforced decision reaches every agent and every generation call.</p></a></li>
-      <li><a href="/concepts/enforcement-provenance/"><div class="rel-title">Enforcement Provenance</div><p class="rel-desc">The verifiable record linking each change to the rule that approved or rejected it.</p></a></li>
+      <li><a href="/insights/spec-driven-development-still-needs-governance/"><div class="rel-title">Spec-Driven Development Still Needs Governance</div><p class="rel-desc">The general argument this article makes tool-specific for GitHub Spec Kit.</p></a></li>
+      <li><a href="/insights/google-spec-driven-development-not-enough/"><div class="rel-title">Google&rsquo;s Spec-Driven Development Is Not Enough on Its Own</div><p class="rel-desc">The same planning-versus-enforcement seam, seen from another vendor&rsquo;s approach.</p></a></li>
+      <li><a href="/insights/governance-layers-for-ai-coding-assistants/"><div class="rel-title">Building Governance Layers for AI Coding Assistants</div><p class="rel-desc">Where an independent enforcement layer belongs in a modern coding stack.</p></a></li>
+      <li><a href="/insights/enforce-engineering-standards-across-ai-assisted-teams/"><div class="rel-title">Enforce Engineering Standards Across AI-Assisted Teams</div><p class="rel-desc">Making standing constraints hold whichever agent or human writes the code.</p></a></li>
     </ul>
   </aside>
 
@@ -476,8 +517,8 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
   <footer class="article-footer">
     <a href="/insights/" class="back-link">&larr; Back to Insights</a>
     <div class="cta-block">
-      <h3>Put a governance layer under your AI coding agents.</h3>
-      <p>Mneme turns your architecture standards and ADRs into executable constraints that every agent retrieves at generation time and CI verifies deterministically &mdash; with an audit trail showing which rule applied to which change. Policy, memory, enforcement, and auditability, in one open-source layer.</p>
+      <h3>Plan with Spec Kit. Enforce with Mneme.</h3>
+      <p>Keep Spec Kit and Claude Code driving the workflow, and let Mneme load your ADRs, check the plan, and verify every agent edit through the PreToolUse hook &mdash; blocking the change that quietly breaks your architecture and naming the decision it broke. Open source.</p>
       <a href="/demo/" style="display:inline-block;margin-right:1.25rem;color:#c8f060;font-family:'DM Mono',monospace;font-size:0.85rem;text-decoration:none;">See the live demo &rarr;</a>
       <a href="https://github.com/MnemeHQ/mneme" class="btn-primary">View on GitHub &rarr;</a>
     </div>

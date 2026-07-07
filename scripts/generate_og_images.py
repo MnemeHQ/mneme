@@ -278,6 +278,11 @@ TEMPLATE_MAP = {
 
     # Insights — new
     "og-insights-enterprise-guardrails.html": "insights/enterprise-ai-guardrails-five-layers/og.png",
+    "og-insights-smart-routing.html": "insights/smart-routing-ai-coding-agents/og.png",
+    "og-insights-loop-engineering-agents.html": "insights/loop-engineering-ai-coding-agents/og.png",
+    "og-insights-github-spec-kit.html": "insights/github-spec-kit-who-enforces-architecture/og.png",
+    "og-insights-google-spec-driven.html": "insights/google-spec-driven-development-not-enough/og.png",
+    "og-insights-agentic-governance-execution.html": "insights/agentic-ai-governance-closer-to-execution/og.png",
 }
 
 PORT = 8765
