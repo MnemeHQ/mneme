@@ -270,6 +270,11 @@ TEMPLATE_MAP = {
     "og-insights-palantir-agentic.html": "insights/palantir-agentic-governance-engineering-governance/og.png",
     "og-insights-databricks-omnigent.html": "insights/databricks-omnigent-agent-infrastructure-governance/og.png",
     "og-insights-gartner-ai-governance.html": "insights/gartner-ai-governance-engineering-governance/og.png",
+
+    # Insights — new
+    "og-insights-agent-guardrails.html": "insights/ai-coding-agent-guardrails/og.png",
+    "og-insights-agents-use-adrs.html": "insights/how-ai-coding-agents-use-adrs/og.png",
+    "og-insights-agent-architecture.html": "insights/ai-coding-agent-architecture/og.png",
 }
 
 PORT = 8765

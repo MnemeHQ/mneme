@@ -747,6 +747,10 @@ TEMPLATES = [
     ("og-insights-regulated-industries.html", "Insights", "AI Governance for Regulated Industries", "52px", "Where the cost of architectural drift and undocumented agent actions is highest.", "insights/ai-governance-for-regulated-industries"),
     ("og-insights-life-sciences.html", "Insights", "AI Coding Agents in Life Sciences", "52px", "FDA, GxP, validation. Governance before autonomy.", "insights/ai-coding-agents-life-sciences-governance"),
     ("og-insights-financial-services.html", "Insights", "AI Coding Agents in Financial Services", "48px", "Architectural drift is a compliance risk. Every change needs an audit trail.", "insights/ai-coding-agents-financial-services-audit-trail"),
+    # === gap cluster (PR B) ===
+    ("og-insights-agent-guardrails.html", "Insights", "AI Coding-Agent Guardrails", "50px", "Runtime, prompt, policy, architectural. Which layer actually stops a bad change from landing.", "insights/ai-coding-agent-guardrails"),
+    ("og-insights-agents-use-adrs.html", "Insights", "How AI Coding Agents Use ADRs", "50px", "An ADR nobody enforces is a comment. An ADR a machine checks is a guardrail.", "insights/how-ai-coding-agents-use-adrs"),
+    ("og-insights-agent-architecture.html", "Insights", "AI Coding-Agent Architecture", "48px", "The layers between a model and production: model, harness, governance, intent.", "insights/ai-coding-agent-architecture"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -911,6 +915,10 @@ NEW_MAP_ENTRIES = {
     "og-insights-regulated-industries.html": "insights/ai-governance-for-regulated-industries/og.png",
     "og-insights-life-sciences.html": "insights/ai-coding-agents-life-sciences-governance/og.png",
     "og-insights-financial-services.html": "insights/ai-coding-agents-financial-services-audit-trail/og.png",
+    # gap cluster (PR B)
+    "og-insights-agent-guardrails.html": "insights/ai-coding-agent-guardrails/og.png",
+    "og-insights-agents-use-adrs.html": "insights/how-ai-coding-agents-use-adrs/og.png",
+    "og-insights-agent-architecture.html": "insights/ai-coding-agent-architecture/og.png",
 }
 
 # ---------------------------------------------------------------------------

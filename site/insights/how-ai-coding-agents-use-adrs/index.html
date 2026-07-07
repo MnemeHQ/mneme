@@ -3,29 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>How to Enforce Engineering Standards Across AI-Assisted Teams &mdash; Mneme HQ</title>
+  <title>How AI Coding Agents Use ADRs (Architecture Decision Records) &mdash; Mneme HQ</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="How engineering teams enforce architectural decisions, coding standards, and team conventions across AI-assisted development workflows while preventing architectural drift." />
+  <meta name="description" content="An ADR records one architectural decision, its context, and its consequences. Here is how AI coding agents actually interact with ADRs today &mdash; ignored, advisory, or enforced &mdash; and how to make them executable." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
-  <link rel="canonical" href="https://mnemehq.com/insights/enforce-engineering-standards-across-ai-assisted-teams/" />
+  <link rel="canonical" href="https://mnemehq.com/insights/how-ai-coding-agents-use-adrs/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="How to Enforce Engineering Standards Across AI-Assisted Teams" />
-  <meta property="og:description" content="How engineering teams enforce architectural decisions, coding standards, and team conventions across AI-assisted development workflows while preventing architectural drift." />
-  <meta property="og:url" content="https://mnemehq.com/insights/enforce-engineering-standards-across-ai-assisted-teams/" />
-  <meta property="og:image" content="https://mnemehq.com/insights/enforce-engineering-standards-across-ai-assisted-teams/og.png" />
+  <meta property="og:title" content="How AI Coding Agents Use ADRs (Architecture Decision Records)" />
+  <meta property="og:description" content="An ADR records one architectural decision, its context, and its consequences. Here is how AI coding agents actually interact with ADRs today &mdash; ignored, advisory, or enforced &mdash; and how to make them executable." />
+  <meta property="og:url" content="https://mnemehq.com/insights/how-ai-coding-agents-use-adrs/" />
+  <meta property="og:image" content="https://mnemehq.com/insights/how-ai-coding-agents-use-adrs/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="How to Enforce Engineering Standards Across AI-Assisted Teams" />
-  <meta name="twitter:description" content="How engineering teams enforce architectural decisions, coding standards, and team conventions across AI-assisted development workflows while preventing architectural drift." />
-  <meta name="twitter:image" content="https://mnemehq.com/insights/enforce-engineering-standards-across-ai-assisted-teams/og.png" />
+  <meta name="twitter:title" content="How AI Coding Agents Use ADRs (Architecture Decision Records)" />
+  <meta name="twitter:description" content="An ADR records one architectural decision, its context, and its consequences. Here is how AI coding agents actually interact with ADRs today &mdash; ignored, advisory, or enforced &mdash; and how to make them executable." />
+  <meta name="twitter:image" content="https://mnemehq.com/insights/how-ai-coding-agents-use-adrs/og.png" />
   <meta name="author" content="Theo Valmis" />
-  <meta property="article:published_time" content="2026-06-22T00:00:00Z" />
+  <meta property="article:published_time" content="2026-07-06T00:00:00Z" />
   <meta property="article:author" content="https://mnemehq.com/founder/" />
-  <meta property="article:section" content="Technical Deep Dive" />
+  <meta property="article:section" content="Engineering" />
 
   <!-- Consent defaults -->
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{'analytics_storage':'granted','ad_storage':'denied','ad_user_data':'denied','ad_personalization':'denied'});</script>
@@ -118,28 +118,51 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
   <link rel="icon" href="/favicon.png" type="image/png">
 
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
-          {"@type": "ListItem", "position": 2, "name": "Insights", "item": "https://mnemehq.com/insights/"},
-          {"@type": "ListItem", "position": 3, "name": "Enforce Engineering Standards Across AI-Assisted Teams", "item": "https://mnemehq.com/insights/enforce-engineering-standards-across-ai-assisted-teams/"}
-        ]
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://mnemehq.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Insights",
+          "item": "https://mnemehq.com/insights/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "How AI Coding Agents Use ADRs",
+          "item": "https://mnemehq.com/insights/how-ai-coding-agents-use-adrs/"
+        }
+      ]
+    },
+    {
+      "@type": "TechArticle",
+      "headline": "How AI Coding Agents Use ADRs (Architecture Decision Records)",
+      "description": "An ADR records one architectural decision, its context, and its consequences. Here is how AI coding agents actually interact with ADRs today &mdash; ignored, advisory, or enforced &mdash; and how to make them executable.",
+      "url": "https://mnemehq.com/insights/how-ai-coding-agents-use-adrs/",
+      "datePublished": "2026-07-06",
+      "author": {
+        "@type": "Person",
+        "name": "Theo Valmis",
+        "url": "https://mnemehq.com/founder/"
       },
-      {
-        "@type": "TechArticle",
-        "headline": "How to Enforce Engineering Standards Across AI-Assisted Teams",
-        "description": "How engineering teams enforce architectural decisions, coding standards, and team conventions across AI-assisted development workflows while preventing architectural drift.",
-        "url": "https://mnemehq.com/insights/enforce-engineering-standards-across-ai-assisted-teams/",
-        "datePublished": "2026-06-22",
-        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
-        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/"}
+      "publisher": {
+        "@type": "Organization",
+        "name": "Mneme HQ",
+        "url": "https://mnemehq.com/"
       }
-    ]
-  }
+    }
+  ]
+}
   </script>
 
 <style>
@@ -358,134 +381,119 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
   <ol class="breadcrumb">
     <li><a href="/">Home</a></li>
     <li><a href="/insights/">Insights</a></li>
-    <li aria-current="page">Enforce Engineering Standards Across AI-Assisted Teams</li>
+    <li aria-current="page">How AI Coding Agents Use ADRs</li>
   </ol>
 </nav>
 
 <article class="article-wrap">
   <header class="article-header">
     <div class="article-eyebrow">
-      <span class="eyebrow-tag">Technical Deep Dive</span>
+      <span class="eyebrow-tag">Guide</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">9 min read</span>
+      <span class="eyebrow-meta">10 min read</span>
     </div>
-    <h1>How to Enforce Engineering Standards Across AI-Assisted Teams</h1>
-    <p class="article-lede">The challenge is no longer getting developers to follow standards. It is ensuring that dozens of developers and hundreds of AI-generated changes follow them consistently, every day, across every repository. Architectural consistency does not automatically scale with code generation. As output rises, the gap between what your team decided and what actually ships widens, and it widens at machine speed.</p>
-    <p class="byline">By <a href="/founder/">Theo Valmis</a><span class="sep">&middot;</span><time datetime="2026-06-22">June 2026</time></p>
+    <h1>How AI Coding Agents Use ADRs (Architecture Decision Records)</h1>
+    <p class="article-lede">An Architecture Decision Record (ADR) is a short document that captures one architectural decision, why it was made, and what it commits the codebase to. For a decade ADRs were written for humans to read. Now the code is increasingly written by AI coding agents, and the question changes: does the agent see the ADR, and if it does, does anything check that the code obeys it? Loading an ADR into a prompt is not the same as enforcing it. This guide walks through how agents actually use ADRs today, and how to move an ADR from a document nobody checks to a constraint a machine does.</p>
+    <p class="byline">By <a href="/founder/">Theo Valmis</a><span class="sep">&middot;</span><time datetime="2026-07-06">July 2026</time></p>
   </header>
 
   <div class="article-body">
 
+    <h2>What an ADR Is, Briefly</h2>
+    <p>An Architecture Decision Record is a short, structured note about a single architectural decision. The format was popularized by Michael Nygard in <a href="https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions" target="_blank" rel="noopener">Documenting Architecture Decisions</a>, and it is deliberately minimal: a title, the <em>context</em> (the forces at play), the <em>decision</em> itself stated in plain active voice, and the <em>consequences</em> that follow from it. A status field tracks whether the decision is proposed, accepted, deprecated, or superseded.</p>
+    <p>The point of an ADR is to preserve the reasoning that would otherwise evaporate. Six months after a decision, the code shows <em>what</em> was built but not <em>why</em>, and the person who held the why in their head has moved teams. An ADR is the answer to &ldquo;why is it done this way?&rdquo; written down at the moment the choice was made. Examples are familiar: use PostgreSQL, not a document store; all async work goes through the existing worker service; services never read each other&rsquo;s databases directly.</p>
 
-    <h2>The Shift From Individual Developers to Human-Agent Teams</h2>
-    <p>For most of software&rsquo;s history, engineering standards were enforced by people. Experience told a senior engineer that a pattern was wrong. Culture made a team care about consistency. Mentorship passed conventions from one developer to the next. Code review caught the deviations that slipped through. Architectural leadership set direction and held the line. All of it ran at human speed, and at human speed it mostly worked.</p>
-    <p>That model assumed a roughly fixed ratio between the volume of code produced and the number of people available to reason about it. AI-assisted development breaks the assumption. A single engineer now generates features, refactors entire modules, scaffolds new services, provisions infrastructure, writes tests, and produces documentation in the time it once took to hand-write one function. Output rises by an order of magnitude. The capacity for oversight does not.</p>
-    <p>The result is an enforcement gap. The decisions that define how your systems are built still live where they always did, in the heads of senior engineers, in architecture documents, in the conventions a team absorbed over years. The work that has to honor those decisions is now produced faster than any of those mechanisms can inspect it. The constraint is no longer typing speed. It is consistency.</p>
+    <h2>Why ADRs Matter More in the Agent Era</h2>
+    <p>ADRs used to be a nicety. In a team of humans, the important decisions lived partly in the documents and partly in the shared memory of the people who made them. A new engineer absorbed the conventions by reading the code, asking questions, and getting corrected in review. That transmission was slow, but it worked because the pace of change matched the pace of a human reading and understanding.</p>
+    <p>AI coding agents break that assumption. An agent can touch twenty files in a minute, open a pull request, and move to the next task before anyone reads a line. It has no shared memory of the last standup and no scar tissue from the outage that produced a given rule. The decisions humans used to carry in their heads now have to be written down &mdash; and, more importantly, written down in a form something can act on. When generation is this fast, the only conventions that survive are the ones expressed explicitly. This is exactly why <a href="/insights/why-context-alone-doesnt-prevent-architectural-drift/">context alone does not prevent architectural drift</a>: an agent that produces plausible, working code at speed will produce plausible, working, <em>inconsistent</em> code just as fast unless something holds it to the recorded decisions.</p>
 
-    <h2>Why Existing Governance Processes Break Down</h2>
-    <p>The processes most teams rely on were designed for human-paced output. Three of them fail in specific, predictable ways once AI agents are doing the work.</p>
+    <h2>The Default Failure Mode</h2>
+    <p>Here is how ADRs usually work in an AI-assisted codebase, and why it is not enough. The ADRs live as Markdown files in <code>docs/adr/</code>. The agent may or may not have them in context, depending on how the prompt was assembled and how much of the repository fit in the window. Suppose it does read the relevant ADR. Nothing then checks that the code it writes actually obeys the decision. The ADR is advice the model may weigh, discard, or quietly misremember, alongside everything else competing for its attention.</p>
+    <p>The gap is the one teams keep rediscovering: <strong>loading an ADR into context is not the same as enforcing it.</strong> A document in the prompt shifts the odds. It does not close the door. The model can read &ldquo;all async work goes through the worker service&rdquo; and still reach for a new queue library because that pattern was more common in its training data, or because the local task felt easier that way. An ADR that only informs is a suggestion. An ADR that also verifies is a guardrail. Most teams have the first and assume it behaves like the second.</p>
+    <div class="callout"><p><strong>An ADR nobody checks is a comment. An ADR a machine checks is a constraint.</strong> The difference is not how well the document is written &mdash; it is whether a deterministic check reads the decision and can stop a change that breaks it.</p></div>
 
-    <h3>Problem 1: Architectural decisions become invisible</h3>
-    <p>An agent sees code. It does not see the <a href="/concepts/governance-before-generation/">architectural decision record</a> that explains why the code looks the way it does. Suppose your team wrote an ADR mandating that all billing logic route through a platform abstraction layer rather than calling the payment provider directly. A developer asks an agent to add a refund feature to <strong>BillingService</strong>. The agent inspects the surrounding code, finds the provider SDK already imported elsewhere, and ships a clean, working direct integration. Every test passes. The PR looks correct. And the architecture has just degraded, because the one constraint that mattered was never in the agent&rsquo;s context. Multiply that by every agent, every task, every day.</p>
+    <h2>The Three Ways Agents Interact With ADRs</h2>
+    <p>In practice, an ADR sits at one of three rungs on a ladder, and it is worth naming which rung your setup is on, because the jumps between them are where the value is.</p>
+    <ol>
+      <li><strong>Ignored.</strong> The ADR is not in the agent&rsquo;s context at all. It exists in the repository, but the prompt that produced the change never included it. The decision has zero influence on the generated code. This is the common case for large repositories where only a slice of files fits in the window.</li>
+      <li><strong>In-context but advisory.</strong> The ADR is retrieved and placed in the prompt, and the agent is told to follow it. Sometimes it does. This is a real improvement over ignored, and it is where most &ldquo;rules file&rdquo; and memory setups land. But it is probabilistic: compliance depends on the model weighing the instruction correctly against everything else, and it degrades as the context grows. We have written before on why <a href="/insights/rule-files-vs-retrieval-memory/">rule files and retrieval memory</a> raise the odds without closing the gap.</li>
+      <li><strong>Enforced.</strong> A deterministic check reads the relevant ADR and blocks a change that violates it, before the change lands. The agent is not trusted to comply; the compliance is verified. This is the rung that turns a decision into a guarantee, and it is what <a href="/concepts/deterministic-enforcement/">deterministic enforcement</a> means in practice.</li>
+    </ol>
+    <p>The move from rung two to rung three is the entire game. Advisory ADRs get better as models get better, but they never reach certainty, because a probabilistic system cannot produce a hard guarantee. An enforced ADR gives the same verdict on the same change every time, regardless of which model ran or how full the context was. That property &mdash; <a href="/concepts/governance-before-generation/">governance applied before generation is accepted</a> rather than hoped for after &mdash; is what separates a documented decision from an enforced one.</p>
 
-    <h3>Problem 2: Reviews happen too late</h3>
-    <p>The default loop is Generate, then PR, then Review, then Fix. At AI scale that loop inverts the economics of review. A reviewer who once read a handful of human-authored diffs a day is now asked to be the policy engine for hundreds of agent-authored changes. Review fatigue sets in within days. The reviewer becomes the single point through which all architectural judgment must pass, and a human reading diffs does not scale to machine-generated volume. Standards that are only enforced at review are standards that are enforced inconsistently, because no reviewer catches everything when the queue never empties.</p>
-
-    <h3>Problem 3: Standards are team-specific</h3>
-    <p>There is no single correct architecture across an organization. Team A built its services on the repository pattern and domain-driven design. Team B runs event-driven services with CQRS. Team C maintains a legacy monolith with conventions all its own, and changing them is out of scope for any given ticket. A general-purpose agent, asked to write code in any of these repositories, drifts toward the generic patterns most common in its training data. Those patterns are frequently incompatible with the local standard. The agent is not wrong in the abstract. It is wrong for this codebase, and it has no way to know the difference.</p>
-
-    <h2>The Hidden Cost: Architectural Drift</h2>
-    <p>When standards are not enforced at the point of generation, the cost does not show up as a single broken build. It accumulates as <a href="/concepts/architectural-drift/">architectural drift</a>, the slow divergence of a system from its intended design. Drift takes four recognizable forms.</p>
+    <h2>Making ADRs Executable</h2>
+    <p>Turning an ADR into something a machine enforces has three moving parts, and none of them require the ADR to stop being human-readable.</p>
     <ul>
-      <li><strong>Pattern drift.</strong> Approved patterns erode as agents introduce locally reasonable alternatives that do not match the codebase standard.</li>
-      <li><strong>Dependency drift.</strong> Forbidden or duplicate libraries enter the tree because the agent reached for whatever its training data favored.</li>
-      <li><strong>Service drift.</strong> Boundaries blur as direct integrations bypass the abstraction layers that were supposed to contain them.</li>
-      <li><strong>Knowledge drift.</strong> The reasoning behind decisions evaporates. Code exists; the rationale that would let the next agent honor it does not.</li>
+      <li><strong>Retrieve the relevant ADRs.</strong> For a given change, pull the decisions that actually govern it &mdash; the ones touching the files, modules, or concerns the edit affects. Not the whole catalogue; the ones that apply.</li>
+      <li><strong>Check the proposed edit against them.</strong> Compare what the agent wants to write to what the retrieved decisions require. This is a deterministic evaluation, not a second model forming an opinion.</li>
+      <li><strong>Reject with the specific ADR named.</strong> If the edit violates a decision, block it and say which one. &ldquo;This change violates ADR-014&rdquo; is actionable in a way that &ldquo;this looks wrong&rdquo; is not, and it lets the agent retry compliantly instead of guessing.</li>
     </ul>
-    <p>The reason traditional tooling does not catch this is that traditional tooling was built to answer different questions. Linters, scanners, and coverage gates check whether code is safe and well-formed. They do not check whether it is the code your team decided to write.</p>
+    <p>Make it concrete. <strong>ADR-014</strong> in a repository says all background work must use the existing worker service. An agent, asked to add an email-sending feature, proposes pulling in Redis and BullMQ to run the job on a new queue &mdash; a perfectly reasonable choice in the abstract, and probably a common pattern in its training data. At edit time, the check retrieves ADR-014, sees that the proposed change introduces a second async mechanism the decision forbids, and blocks the write with a message naming ADR-014 and its constraint. The agent does not get to add the dependency. It gets told exactly which recorded decision it broke, and it routes the work through the worker service instead.</p>
+    <p>Nothing about ADR-014 changed. It is the same short document a human could read. What changed is that the decision now carries <a href="/concepts/executable-architectural-intent/">executable architectural intent</a>: the constraint is expressed in a form a check can evaluate, so the ADR does more than sit in a folder. When the block fires, the reason is traceable back to a specific decision, which is the property <a href="/concepts/enforcement-provenance/">enforcement provenance</a> describes &mdash; every rejection points at the ADR that justified it.</p>
 
+    <h2>ADRs in CI and at Edit Time</h2>
+    <p>There are two moments where an ADR can be enforced, and they are complementary rather than competing.</p>
+    <p><strong>In CI</strong>, the check runs against a diff. A pull request arrives, the pipeline retrieves the ADRs the diff touches, evaluates the changes, and fails the build if any decision is violated. This is batch review: it catches everything before merge, and it is the natural home for enforcement in a team that already gates on CI. The cost is timing &mdash; the agent has already produced the whole change, and the feedback arrives after the fact, so a violation means a full rework cycle.</p>
+    <p><strong>At edit time</strong>, the check runs the instant the agent tries to write. Mneme&rsquo;s Claude Code integration does this through a PreToolUse hook: it intercepts the Edit, Write, or MultiEdit before it touches disk, evaluates the proposed change against the relevant ADRs, and can block a violating edit outright. The agent gets the verdict mid-task, while it still has the full context of what it was doing, and corrects course immediately. There is no rework cycle because the bad change never landed.</p>
+    <p>Most teams want both. Edit-time blocking keeps the agent honest as it works; CI is the backstop that guarantees nothing violating an ADR reaches the main branch regardless of how the code was produced. This layering is the substance of <a href="/insights/governance-layers-for-ai-coding-assistants/">building governance layers for AI coding assistants</a>, and it is why enforcement is not a single tool but a set of checkpoints. It is also worth being precise about what these checks verify: an ADR check confirms the code honors an architectural decision, which is a different guarantee from a test confirming the code runs, a distinction we draw out in <a href="/insights/runtime-verification-is-not-architectural-verification/">runtime verification is not architectural verification</a>.</p>
+
+    <h2>From Documentation to Enforcement</h2>
+    <p>The shift is small to describe and large in effect. An ADR is a good document either way. But a document that only records a decision depends entirely on someone &mdash; or some model &mdash; choosing to honor it. A document that a machine checks removes the choice: the decision holds because a check makes it hold. Set the two side by side and the difference is stark.</p>
     <div style="overflow-x:auto;margin:2rem 0;">
     <table class="gov-table">
-      <thead><tr><th>Traditional checks answer</th><th>Engineering governance answers</th></tr></thead>
+      <thead><tr><th>ADR as document</th><th>ADR as executable constraint</th></tr></thead>
       <tbody>
-        <tr><td>Is there a security vulnerability?</td><td>Does this use the approved pattern?</td></tr>
-        <tr><td>Is the formatting correct?</td><td>Does this comply with the relevant ADR?</td></tr>
-        <tr><td>Is this dependency a known risk?</td><td>Does this follow team conventions?</td></tr>
-        <tr><td>Is test coverage sufficient?</td><td>Is this design consistent with the system?</td></tr>
-        <tr class="accent-row"><td>(not addressed)</td><td>Is the decision&rsquo;s reasoning preserved for the next change?</td></tr>
+        <tr><td>Records the decision and its rationale</td><td>Records the decision and enforces it</td></tr>
+        <tr><td>May or may not be in the agent&rsquo;s context</td><td>Retrieved for every change it governs</td></tr>
+        <tr><td>Advisory: the agent can weigh or ignore it</td><td>Deterministic: a violating change is blocked</td></tr>
+        <tr><td>Verified by a human in review, if at all</td><td>Verified by a machine before the change lands</td></tr>
+        <tr class="accent-row"><td>Depends on someone choosing to comply</td><td>Holds regardless of which model ran</td></tr>
       </tbody>
     </table>
     </div>
-
-    <p>Both columns matter. The point is that passing everything on the left tells you nothing about the right. A change can be secure, formatted, dependency-clean, and well-tested, and still violate every architectural decision your team has ever made.</p>
-
-    <h2>What High-Performing Teams Move Toward</h2>
-    <p>The teams that keep consistency under AI-assisted load are not the ones that review harder. They are the ones that change where governance sits in the workflow. The default flow runs Generate, then Review, then Correct, with the standard applied after the fact, if at all. The flow that scales runs Context, then Govern, then Generate, then Verify.</p>
-    <p>The difference is that governance shifts left, to the moment of generation. Constraints reach the agent before it writes, so the relevant patterns, ADRs, and conventions are part of the prompt context rather than something a reviewer has to reconstruct afterward. Violations are prevented rather than discovered. The reviewer stops being the policy engine and goes back to reasoning about design.</p>
-
-    <div class="callout"><p><strong>Discovery does not scale; prevention does.</strong> Reviewing for standards after generation asks a fixed number of humans to inspect machine-scale output. Applying standards before generation moves the check to the one place in an AI-assisted workflow that keeps pace with the agents.</p></div>
-
-    <h2>A Practical Governance Model (Four Layers)</h2>
-    <p>Enforcing engineering standards across AI-assisted teams is a layered problem. Each layer answers a question the others cannot.</p>
-    <ul>
-      <li><strong>Layer 1: Architectural Decisions.</strong> The ADRs, platform decisions, service boundaries, and integration rules that define how systems are built. These are the constraints that the BillingService example violated.</li>
-      <li><strong>Layer 2: Engineering Standards.</strong> Approved patterns, testing requirements, documentation expectations, and naming conventions, expressed in a machine-consumable form rather than a wiki page an agent never reads.</li>
-      <li><strong>Layer 3: Team Context.</strong> Local practices, the history behind a convention, and the domain knowledge that explains why Team B uses CQRS and Team C does not. This is what lets one agent serve repositories with incompatible standards.</li>
-      <li><strong>Layer 4: Verification.</strong> Continuous checking at generation time, not a gate that fires once at review. This is the layer that makes the other three enforceable instead of aspirational.</li>
-    </ul>
-    <p>In practice the four layers run as a single loop on every AI-assisted change:</p>
-    <ol>
-      <li><strong>Record</strong> architectural decisions and standards as structured, machine-readable constraints.</li>
-      <li><strong>Retrieve</strong> the constraints relevant to the file, service, and team an agent is working in.</li>
-      <li><strong>Check</strong> each generated change against those constraints through <a href="/concepts/deterministic-enforcement/">deterministic enforcement</a>, so the same change earns the same verdict every time.</li>
-      <li><strong>Reject</strong> changes that violate a binding decision, before they reach a reviewer&rsquo;s queue.</li>
-      <li><strong>Return</strong> the specific reason and the decision behind it, so the agent can correct in the same turn rather than waiting for a human round trip.</li>
-    </ol>
-    <p>This is also where <a href="/concepts/spec-driven-development/">spec-driven development</a> connects: a spec describes what to build, and these four layers describe the constraints any implementation of that spec has to satisfy.</p>
-
-    <h2>The Manager&rsquo;s Perspective</h2>
-    <p>For an engineering leader, the strategic reframing is uncomfortable but clarifying. Productivity gains from AI, captured without governance, do not produce more good software. They produce more inconsistency, faster. The output goes up; the coherence of the system goes down; and the cost of that incoherence is paid later, in incidents, in rework, and in the slow tax of a codebase no one fully understands.</p>
-    <p>The strongest organizations in an AI-assisted era are not the ones generating the most code. They are the ones maintaining the highest consistency across thousands of AI-assisted decisions. Consistency is the asset that compounds. It is also the asset that traditional tooling and human review cannot defend at machine scale. Defending it is what an enforced governance layer is for. If you want to see what enforcement at generation time looks like against your own decisions, <a href="/demo/">walk through the live demo</a>.</p>
-
+    <p>ADRs were always the right idea. They capture the decisions that give a codebase its shape, in a form small enough that busy engineers actually write them. What the agent era adds is a reason to close the loop: with code being generated faster than anyone can review it, the decisions have to be enforced, not merely recorded. Enforcing engineering standards this way is how teams keep architecture intact as they <a href="/insights/enforce-engineering-standards-across-ai-assisted-teams/">enforce standards across AI-assisted teams</a> without paying an ever-growing <a href="/insights/ai-coding-agent-verification-tax/">verification tax</a> on every generated change. The ADR you already wrote is most of the work. Making a machine check it is the rest. If you want to see one of your own ADRs enforced against a real change, <a href="/pilot/">start a pilot</a>.</p>
 
   </div><!-- /.article-body -->
 
   <section class="article-faq" aria-labelledby="faq-heading" style="margin-top:3rem;">
     <h2 id="faq-heading" style="margin-bottom:1.5rem;">Frequently asked questions</h2>
     <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">What are engineering standards for AI coding agents?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Engineering standards for AI coding agents are the architectural decisions, approved patterns, dependency rules, team conventions, and integration boundaries that any AI-generated change must honor. Unlike human-facing style guides, they have to be expressed in a machine-consumable form and attached to the agent&rsquo;s context at generation time, because an agent sees code but does not see the wiki page or ADR that explains how the code is supposed to look.</div>
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">What is an ADR?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">An ADR, or Architecture Decision Record, is a short structured document that captures one architectural decision: its context (the forces that shaped it), the decision itself stated plainly, and the consequences that follow. The format was popularized by Michael Nygard in 2011. Its purpose is to preserve the reasoning behind a choice so that, months later, the codebase carries not just what was built but why.</div>
     </details>
     <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Why do code reviews fail to enforce standards at AI scale?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Code review was designed for human-paced output, where a reviewer reads a manageable number of diffs per day. When AI agents generate hundreds of changes, the reviewer becomes the single point through which all architectural judgment must pass. Review fatigue sets in, deviations slip through, and standards are enforced inconsistently because no human reading diffs keeps pace with machine-generated volume. Review still has value for design discussion; it just cannot be the only place standards are enforced.</div>
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">How do AI coding agents follow ADRs?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">In three ways, on a ladder. At the bottom, the ADR is ignored because it was never placed in the agent&rsquo;s context. In the middle, it is in context but advisory: the agent is told to follow it and sometimes does, which raises the odds without guaranteeing compliance. At the top, it is enforced: a deterministic check retrieves the relevant ADR and blocks a change that violates it before the change lands. Only the top rung turns a decision into a guarantee.</div>
     </details>
     <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">What is architectural drift?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Architectural drift is the slow divergence of a system from its intended design as locally reasonable changes accumulate. It shows up as pattern drift (approved patterns eroding), dependency drift (forbidden or duplicate libraries entering the tree), service drift (boundaries blurring through direct integrations), and knowledge drift (the reasoning behind decisions disappearing). With AI agents producing changes at machine speed, drift that once accrued over sprints now accrues daily.</div>
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Why isn&rsquo;t putting an ADR in the prompt enough?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Because loading an ADR into context is not the same as enforcing it. A document in the prompt shifts the model&rsquo;s odds of complying, but it does not close the door &mdash; the model can read a decision and still write code that breaks it, especially as the context grows and the instruction competes with everything else. Enforcement requires a deterministic check that verifies the code against the decision, not a model that is merely reminded of it.</div>
     </details>
     <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">How is engineering governance different from linting and static analysis?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Linters and static analysis answer whether code is safe and well-formed: is there a vulnerability, is the formatting correct, is a dependency a known risk, is coverage sufficient. Engineering governance answers a different question: is this the code your team decided to write? It checks whether a change uses the approved pattern, complies with the relevant ADR, follows team conventions, and stays consistent with the system&rsquo;s design. A change can pass every linter and still violate every architectural decision your team has made.</div>
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">How does an ADR check work at edit time versus in CI?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">In CI, the check runs against a pull request diff: it retrieves the ADRs the diff touches and fails the build if any is violated, catching everything before merge but only after the whole change is written. At edit time, the check runs the moment the agent tries to write &mdash; Mneme&rsquo;s Claude Code integration uses a PreToolUse hook to intercept an Edit or Write, evaluate it against the relevant ADRs, and block a violating change before it lands. Most teams use both: edit-time blocking to keep the agent honest, CI as the backstop.</div>
     </details>
   </section>
 
   <aside class="related-panel" aria-labelledby="related-concepts-label" style="margin-top:3rem;">
     <div class="related-panel-label" id="related-concepts-label">Related governance concepts</div>
     <ul class="related-list">
-      <li><a href="/concepts/governance-before-generation/"><div class="rel-title">Governance Before Generation</div><p class="rel-desc">Applying constraints at the moment code is created, ahead of review.</p></a></li>
-      <li><a href="/concepts/architectural-drift/"><div class="rel-title">Architectural Drift</div><p class="rel-desc">Small, locally reasonable changes that compound into a system nobody designed.</p></a></li>
-      <li><a href="/concepts/deterministic-enforcement/"><div class="rel-title">Deterministic Enforcement</div><p class="rel-desc">Same change, same verdict &mdash; architectural checks that do not depend on the model.</p></a></li>
+      <li><a href="/concepts/executable-architectural-intent/"><div class="rel-title">Executable Architectural Intent</div><p class="rel-desc">Turning an ADR&rsquo;s decision into a constraint a machine can check, not prose in a folder.</p></a></li>
+      <li><a href="/concepts/deterministic-enforcement/"><div class="rel-title">Deterministic Enforcement</div><p class="rel-desc">Same change, same verdict &mdash; the property that turns an advisory ADR into an enforced one.</p></a></li>
+      <li><a href="/concepts/governance-before-generation/"><div class="rel-title">Governance Before Generation</div><p class="rel-desc">Applying the decision where code is created, not discovering the violation later in review.</p></a></li>
+      <li><a href="/concepts/enforcement-provenance/"><div class="rel-title">Enforcement Provenance</div><p class="rel-desc">Every rejection points back to the specific ADR that justified it.</p></a></li>
     </ul>
   </aside>
 
   <aside class="related-panel" aria-labelledby="related-essays-label" style="margin-top:1.5rem;padding-top:0;border-top:none;">
     <div class="related-panel-label" id="related-essays-label">Related operational essays</div>
     <ul class="related-list">
-      <li><a href="/insights/how-ai-coding-agents-use-adrs/"><div class="rel-title">How AI Coding Agents Use ADRs (Architecture Decision Records)</div><p class="rel-desc">An ADR records one architectural decision, its context, and its consequences. Here is how AI coding agents actually interact with ADRs today &mdash; ignored, advisory, or enforced &mdash; and how to make them executable.</p></a></li>
-      <li><a href="/insights/review-is-not-governance/"><div class="rel-title">Review Is Not Governance</div><p class="rel-desc">Why catching violations in review is not the same as enforcing standards.</p></a></li>
-      <li><a href="/insights/why-code-review-cannot-scale-with-ai-output/"><div class="rel-title">Why Code Review Cannot Scale With AI Output</div><p class="rel-desc">The economics that break when one reviewer faces machine-scale diffs.</p></a></li>
-      <li><a href="/insights/constraint-decay-coding-agents-architectural-governance/"><div class="rel-title">Constraint Decay in Coding Agents</div><p class="rel-desc">How constraints fade across an agent&rsquo;s context and what restores them.</p></a></li>
+      <li><a href="/insights/ai-coding-agent-architecture/"><div class="rel-title">AI Coding-Agent Architecture</div><p class="rel-desc">A coding agent is not a model. It is a stack: the model, the harness, the governance layer, and the intent it enforces. Here is what each layer does, and which one most tools leave out.</p></a></li>
+      <li><a href="/insights/ai-coding-agent-guardrails/"><div class="rel-title">AI Coding-Agent Guardrails</div><p class="rel-desc">A reference taxonomy of AI coding-agent guardrails: runtime, prompt, policy, architectural, and engineering-standards. What each layer catches, what it misses, and why architecture needs enforcement at edit time.</p></a></li>
+      <li><a href="/insights/why-context-alone-doesnt-prevent-architectural-drift/"><div class="rel-title">Why Context Alone Doesn&rsquo;t Prevent Architectural Drift</div><p class="rel-desc">Reading an ADR raises the odds of compliance; it does not guarantee it.</p></a></li>
+      <li><a href="/insights/rule-files-vs-retrieval-memory/"><div class="rel-title">Rule Files vs Retrieval Memory</div><p class="rel-desc">Two ways to get an ADR into context, and why neither one enforces it.</p></a></li>
+      <li><a href="/insights/governance-layers-for-ai-coding-assistants/"><div class="rel-title">Building Governance Layers for AI Coding Assistants</div><p class="rel-desc">Where ADR enforcement belongs: at edit time and in CI, layered.</p></a></li>
+      <li><a href="/insights/enforce-engineering-standards-across-ai-assisted-teams/"><div class="rel-title">Enforcing Engineering Standards Across AI-Assisted Teams</div><p class="rel-desc">Keeping recorded decisions intact as generation outpaces review.</p></a></li>
     </ul>
   </aside>
 
@@ -498,8 +506,8 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
   <footer class="article-footer">
     <a href="/insights/" class="back-link">&larr; Back to Insights</a>
     <div class="cta-block">
-      <h3>Enforce your engineering standards on every AI-generated change</h3>
-      <p>Mneme stores your architectural decisions, patterns, and team conventions as structured, machine-readable constraints and verifies every agent-generated change against them at generation time. Open source.</p>
+      <h3>Make your ADRs executable, not just readable.</h3>
+      <p>Mneme turns your Architecture Decision Records into constraints every coding agent retrieves at generation time and blocks against deterministically &mdash; naming the specific ADR when it stops a violating change. Open source. See it enforce a decision on your codebase in a pilot.</p>
       <a href="/demo/" style="display:inline-block;margin-right:1.25rem;color:#c8f060;font-family:'DM Mono',monospace;font-size:0.85rem;text-decoration:none;">See the live demo &rarr;</a>
       <a href="https://github.com/MnemeHQ/mneme" class="btn-primary">View on GitHub &rarr;</a>
     </div>

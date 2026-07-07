@@ -741,6 +741,9 @@
   <url><loc>https://mnemehq.com/insights/bain-ai-development-lifecycle-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://mnemehq.com/insights/microsoft-project-solara-post-app-governance/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://mnemehq.com/insights/microsoft-agent-platform-governance-layer/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/ai-coding-agent-guardrails/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/how-ai-coding-agents-use-adrs/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/ai-coding-agent-architecture/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://mnemehq.com/insights/ai-coding-agent-verification-tax/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://mnemehq.com/insights/shared-memory-is-not-shared-intent/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://mnemehq.com/insights/loop-engineering-is-not-new/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
