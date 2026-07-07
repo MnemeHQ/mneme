@@ -747,6 +747,12 @@ TEMPLATES = [
     ("og-insights-regulated-industries.html", "Insights", "AI Governance for Regulated Industries", "52px", "Where the cost of architectural drift and undocumented agent actions is highest.", "insights/ai-governance-for-regulated-industries"),
     ("og-insights-life-sciences.html", "Insights", "AI Coding Agents in Life Sciences", "52px", "FDA, GxP, validation. Governance before autonomy.", "insights/ai-coding-agents-life-sciences-governance"),
     ("og-insights-financial-services.html", "Insights", "AI Coding Agents in Financial Services", "48px", "Architectural drift is a compliance risk. Every change needs an audit trail.", "insights/ai-coding-agents-financial-services-audit-trail"),
+    # === BATCH: July 2026 wave-7 (PR A) ===
+    ("og-insights-smart-routing.html", "Insights", "Smart Routing Optimizes Execution, Not Architecture", "42px", "Every correctly routed agent can still bypass your ADRs. Routing selects the model; it does not enforce the architecture.", "insights/smart-routing-ai-coding-agents"),
+    ("og-insights-loop-engineering-agents.html", "Insights", "Loop Engineering for AI Coding Agents", "50px", "Loops make agents persistent and self-correcting. Guardrails make them architecturally consistent.", "insights/loop-engineering-ai-coding-agents"),
+    ("og-insights-github-spec-kit.html", "Insights", "Spec Kit Defines the Plan. Who Enforces the Architecture?", "40px", "GitHub Spec Kit structures development intent. An independent layer still has to check the code obeys it.", "insights/github-spec-kit-who-enforces-architecture"),
+    ("og-insights-google-spec-driven.html", "Insights", "Spec-Driven Development Is Not Enough", "52px", "Google's paper: code is disposable, the spec is the asset. Architectural compliance should be deterministic, not AI reviewing AI.", "insights/google-spec-driven-development-not-enough"),
+    ("og-insights-agentic-governance-execution.html", "Insights", "Governance Moves Closer to Execution", "50px", "As AI agents gain autonomy, from central banks to software teams, constraints move in front of execution.", "insights/agentic-ai-governance-closer-to-execution"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -911,6 +917,12 @@ NEW_MAP_ENTRIES = {
     "og-insights-regulated-industries.html": "insights/ai-governance-for-regulated-industries/og.png",
     "og-insights-life-sciences.html": "insights/ai-coding-agents-life-sciences-governance/og.png",
     "og-insights-financial-services.html": "insights/ai-coding-agents-financial-services-audit-trail/og.png",
+    # July 2026 wave-7 (PR A)
+    "og-insights-smart-routing.html": "insights/smart-routing-ai-coding-agents/og.png",
+    "og-insights-loop-engineering-agents.html": "insights/loop-engineering-ai-coding-agents/og.png",
+    "og-insights-github-spec-kit.html": "insights/github-spec-kit-who-enforces-architecture/og.png",
+    "og-insights-google-spec-driven.html": "insights/google-spec-driven-development-not-enough/og.png",
+    "og-insights-agentic-governance-execution.html": "insights/agentic-ai-governance-closer-to-execution/og.png",
 }
 
 # ---------------------------------------------------------------------------
