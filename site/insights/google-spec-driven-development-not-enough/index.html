@@ -3,29 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Building Governance Layers for AI Coding Assistants &mdash; Mneme HQ</title>
+  <title>Spec-Driven Development Is Not Enough: Why AI Coding Needs Engineering Governance &mdash; Mneme HQ</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="AI coding assistants are becoming agents that modify codebases, open PRs, and deploy. The missing enterprise infrastructure is a governance layer: policy, memory, enforcement, and auditability around what agents are allowed to do." />
+  <meta name="description" content="Google&rsquo;s spec-driven development paper is right that code is disposable and specs are the durable asset. But its answer to trust leans on AI reviewing AI. Final architectural compliance needs deterministic engineering governance." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
-  <link rel="canonical" href="https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/" />
+  <link rel="canonical" href="https://mnemehq.com/insights/google-spec-driven-development-not-enough/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Building Governance Layers for AI Coding Assistants" />
-  <meta property="og:description" content="AI coding assistants are becoming agents that modify codebases, open PRs, and deploy. The missing enterprise infrastructure is a governance layer: policy, memory, enforcement, and auditability around what agents are allowed to do." />
-  <meta property="og:url" content="https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/" />
-  <meta property="og:image" content="https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/og.png" />
+  <meta property="og:title" content="Spec-Driven Development Is Not Enough: Why AI Coding Needs Engineering Governance" />
+  <meta property="og:description" content="Google&rsquo;s spec-driven development paper is right that code is disposable and specs are the durable asset. But its answer to trust leans on AI reviewing AI. Final architectural compliance needs deterministic engineering governance." />
+  <meta property="og:url" content="https://mnemehq.com/insights/google-spec-driven-development-not-enough/" />
+  <meta property="og:image" content="https://mnemehq.com/insights/google-spec-driven-development-not-enough/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Building Governance Layers for AI Coding Assistants" />
-  <meta name="twitter:description" content="AI coding assistants are becoming agents that modify codebases, open PRs, and deploy. The missing enterprise infrastructure is a governance layer: policy, memory, enforcement, and auditability around what agents are allowed to do." />
-  <meta name="twitter:image" content="https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/og.png" />
+  <meta name="twitter:title" content="Spec-Driven Development Is Not Enough: Why AI Coding Needs Engineering Governance" />
+  <meta name="twitter:description" content="Google&rsquo;s spec-driven development paper is right that code is disposable and specs are the durable asset. But its answer to trust leans on AI reviewing AI. Final architectural compliance needs deterministic engineering governance." />
+  <meta name="twitter:image" content="https://mnemehq.com/insights/google-spec-driven-development-not-enough/og.png" />
   <meta name="author" content="Theo Valmis" />
-  <meta property="article:published_time" content="2026-06-17T00:00:00Z" />
+  <meta property="article:published_time" content="2026-06-30T00:00:00Z" />
   <meta property="article:author" content="https://mnemehq.com/founder/" />
-  <meta property="article:section" content="Industry Analysis" />
+  <meta property="article:section" content="Analysis" />
 
   <!-- Consent defaults -->
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{'analytics_storage':'granted','ad_storage':'denied','ad_user_data':'denied','ad_personalization':'denied'});</script>
@@ -118,31 +118,51 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
   <link rel="icon" href="/favicon.png" type="image/png">
 
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
-          {"@type": "ListItem", "position": 2, "name": "Insights", "item": "https://mnemehq.com/insights/"},
-          {"@type": "ListItem", "position": 3, "name": "Building Governance Layers for AI Coding Assistants", "item": "https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/"}
-        ]
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://mnemehq.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Insights",
+          "item": "https://mnemehq.com/insights/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Spec-Driven Development Is Not Enough",
+          "item": "https://mnemehq.com/insights/google-spec-driven-development-not-enough/"
+        }
+      ]
+    },
+    {
+      "@type": "TechArticle",
+      "headline": "Spec-Driven Development Is Not Enough: Why AI Coding Needs Engineering Governance",
+      "description": "Google&rsquo;s spec-driven development paper is right that code is disposable and specs are the durable asset. But its answer to trust leans on AI reviewing AI. Final architectural compliance needs deterministic engineering governance.",
+      "url": "https://mnemehq.com/insights/google-spec-driven-development-not-enough/",
+      "datePublished": "2026-06-30",
+      "author": {
+        "@type": "Person",
+        "name": "Theo Valmis",
+        "url": "https://mnemehq.com/founder/"
       },
-      {
-        "@type": "TechArticle",
-        "headline": "Building Governance Layers for AI Coding Assistants",
-        "description": "AI coding assistants are becoming agents that modify codebases, open PRs, and deploy. The missing enterprise infrastructure is a governance layer: policy, memory, enforcement, and auditability around what agents are allowed to do.",
-        "url": "https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/",
-        "datePublished": "2026-06-17",
-        "dateModified": "2026-06-17",
-        "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
-        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/"},
-        "image": "https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/og.png",
-        "mainEntityOfPage": "https://mnemehq.com/insights/governance-layers-for-ai-coding-assistants/"
+      "publisher": {
+        "@type": "Organization",
+        "name": "Mneme HQ",
+        "url": "https://mnemehq.com/"
       }
-    ]
-  }
+    }
+  ]
+}
   </script>
 
 <style>
@@ -361,107 +381,136 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
   <ol class="breadcrumb">
     <li><a href="/">Home</a></li>
     <li><a href="/insights/">Insights</a></li>
-    <li aria-current="page">Building Governance Layers for AI Coding Assistants</li>
+    <li aria-current="page">Spec-Driven Development Is Not Enough</li>
   </ol>
 </nav>
 
 <article class="article-wrap">
   <header class="article-header">
     <div class="article-eyebrow">
-      <span class="eyebrow-tag">Thought Leadership</span>
+      <span class="eyebrow-tag">Report Response</span>
       <span class="eyebrow-dot"></span>
-      <span class="eyebrow-meta">10 min read</span>
+      <span class="eyebrow-meta">11 min read</span>
     </div>
-    <h1>Building Governance Layers for AI Coding Assistants</h1>
-    <p class="article-lede">The first wave of AI coding assistants was about generation. The next wave is about control. As assistants evolve into agents that modify codebases, open pull requests, run tests, and deploy infrastructure, the question stops being whether AI can write code and becomes how organizations ensure it writes the right code. At enterprise scale, that answer is infrastructure: a governance layer.</p>
-    <p class="byline">By <a href="/founder/">Theo Valmis</a><span class="sep">&middot;</span><time datetime="2026-06-17">June 2026</time></p>
+    <h1>Spec-Driven Development Is Not Enough: Why AI Coding Needs Engineering Governance</h1>
+    <p class="article-lede">Google&rsquo;s whitepaper on spec-driven, production-grade development gets the diagnosis right. Code is becoming disposable. The specification is the durable asset. And the hard part of AI-assisted engineering is no longer writing code &mdash; it is trusting the code that gets written, at a volume no human review team can absorb. The paper&rsquo;s answer to that trust problem leans heavily on one idea: put another AI in the pipeline to review the AI. That is a reasonable first move. It is not the last one. A probabilistic model reviewing probabilistic output does not establish architectural authority. Final compliance has to be checked against decisions that were made deliberately and recorded &mdash; not against another model&rsquo;s opinion.</p>
+    <p class="byline">By <a href="/founder/">Theo Valmis</a><span class="sep">&middot;</span><time datetime="2026-06-30">June 2026</time></p>
   </header>
 
   <div class="article-body">
 
-    <h2>From Autocomplete to Autonomous Execution</h2>
-    <p>The capability curve of AI coding tools is easy to trace, and each step is a step away from the human keystroke. It started with autocomplete &mdash; GitHub Copilot suggesting the next line while a developer stayed in the driver&rsquo;s seat. Then came chat coding, where ChatGPT and Claude would draft whole functions and explain them on request. Then IDE-native agents like Cursor and Windsurf began editing multiple files, running commands, and iterating against test output. Now the frontier is multi-agent development systems and, beyond them, autonomous execution across the software development lifecycle: an agent that plans a change, writes it, tests it, opens a pull request, and pushes toward deploy.</p>
-    <p>Every step on that curve increases capability. Every step also increases risk. An autocomplete suggestion a developer rejects costs nothing. An autonomous agent that merges a non-compliant change into a payments service costs a great deal. The more an assistant can do without a human in the loop, the more the organization needs a way to constrain what it does &mdash; not after the fact, but before the change lands.</p>
+    <p>The industry has moved past the question that dominated the last two years. &ldquo;Can an AI write this code?&rdquo; is answered. It can, and it does &mdash; a large and growing share of new code is now machine-generated. The open question is different and harder: how do you trust output arriving faster than any team can read it? Generation stopped being the scarce resource. Validating that what was generated fits the architecture is now the scarce resource.</p>
+    <p>Google&rsquo;s spec-driven development paper is one of the clearest statements of this shift to date. It is worth engaging seriously, because it is mostly right. Where it stops short is instructive, and it points directly at the layer that has to come next.</p>
 
-    <h2>Why Traditional AI Guardrails Fail Here</h2>
-    <p>Most of what gets called &ldquo;AI governance&rdquo; today was built for a different problem. It covers content moderation, prompt filtering, data privacy, model safety, and toxic-output detection. Those controls matter, but they were designed for systems that generate text for humans to read. Software engineering generates artifacts that other systems execute, and that introduces a different class of risk entirely.</p>
-    <p>The risks that matter in a codebase are <strong>architectural drift</strong>, security violations, compliance violations, framework inconsistency, undocumented design decisions, and hidden technical debt. None of these are caught by a content filter. A model can produce code that is syntactically perfect, passes its tests, reads cleanly in review &mdash; and still violates a critical organizational standard. It can wire a service directly to a database that policy says must be accessed through a gateway. It can introduce a second HTTP client into a codebase that standardized on one. It can encode a design decision nobody approved and nobody wrote down.</p>
-    <p>Guardrails tuned for prose do not see any of this, because the violation is not in the words. It is in the structure. As we have argued in <a href="/insights/why-context-alone-doesnt-prevent-architectural-drift/">why context alone doesn&rsquo;t prevent architectural drift</a>, giving a model more information about your system improves what it knows without changing what it is allowed to do. Knowing a rule and being held to a rule are different mechanisms.</p>
+    <h2>What Google&rsquo;s Spec-Driven Development Paper Shows</h2>
+    <p>The <a href="https://www.kaggle.com/whitepaper-spec-driven-production-grade-development-in-the-age-of-vibe-coding" target="_blank" rel="noopener">paper</a>, part of Google&rsquo;s 2026 AI Agents intensive, sets out to bridge the gap between fragile, &ldquo;vibe-coded&rdquo; prototypes and production-grade software. Its central moves are these:</p>
+    <ul>
+      <li><strong>Code is disposable; the specification is the durable asset.</strong> When a model can regenerate an implementation in seconds, the implementation stops being precious. The blueprint that describes intended behavior is what carries value across regenerations.</li>
+      <li><strong>The spec lives in the repo as the source of truth</strong> for humans and machines alike. The paper leans on behavior-driven, Gherkin-style specifications so that intended behavior is written down in a form both people and agents can work against.</li>
+      <li><strong>Implementation is no longer the limiting factor.</strong> The paper is direct that AI writes code &mdash; and potential mistakes &mdash; at a rate humans cannot match. The hard part shifts to review, integration, and trusting output at scale.</li>
+      <li><strong>Trust is engineered through a zero-trust pipeline.</strong> The paper recommends policy servers, deterministic structural gating, sandboxing, human-in-the-loop checkpoints, and automated AI code-review agents, organized into tiers a team can adopt incrementally.</li>
+    </ul>
+    <p>This is a strong, practitioner-grade framing. It names the real problem and refuses the fantasy that faster generation is a free lunch. Google&rsquo;s own tooling &mdash; Antigravity, the Gemini CLI, and MCP-based context wiring &mdash; sits underneath as the delivery vehicle. If you take one thing from the paper, take the reframing: the durable engineering artifact is intent, not code.</p>
 
-    <h2>Governance Is Not Access Control</h2>
-    <p>This is the distinction most teams get wrong, and it is worth stating sharply. Access control answers a question about permission: <em>can the agent do this?</em> Governance answers a question about judgment: <em>should the agent do this?</em> They are not the same layer, and one does not imply the other.</p>
-    <p>Consider an agent with write access to a payments service. Access control has already done its job &mdash; the agent is authorized to modify those files. Governance is the layer that decides whether the specific modification it proposes violates an architecture rule, contradicts a recorded <a href="/insights/agent-governance-in-the-sdlc/">architectural decision</a>, crosses a security boundary, breaks a regulatory requirement, or ignores a team convention. The agent can be fully permitted and still wrong. Permission is necessary; it is not sufficient.</p>
-    <div class="callout"><p><strong>Access control gates the door. Governance reads what walked through it.</strong> An agent can have every permission it needs and still produce a change that should never ship.</p></div>
-    <p>This is also why governance cannot be solved by tightening permissions. You could remove the agent&rsquo;s access to the payments service entirely, but then it cannot do its job. The goal is not to lock agents out of important systems. It is to let them work inside those systems while guaranteeing that what they produce stays aligned with the rules a human already decided on.</p>
+    <h2>The New Limiting Factor Is Validating Architectural Consistency</h2>
+    <p>Once implementation is cheap, the constraint moves downstream. Every generated change is plausible. Most of them work. The expensive question is whether each one is <em>consistent</em> with the system it just joined &mdash; whether it respected the service boundaries, used the approved libraries, followed the conventions, and honored the architectural decisions the team already made.</p>
+    <p>That is not a code-quality question. A change can be clean, tested, and locally correct and still quietly violate an architectural decision recorded eighteen months ago. When one feature fans out across several agents, each optimizing its own slice, the odds of a system-wide decision surviving untouched drop with every additional generation. This is the scarce resource now: not producing code, but verifying that a flood of produced code stays inside the architecture.</p>
 
-    <h2>The Emerging Governance Stack</h2>
-    <p>A governance layer for AI coding is not a single feature. It is a stack of four distinct concerns, each of which fails differently when it is missing. The layers below build on one another: policy without enforcement is a wiki nobody reads; enforcement without auditability is a black box nobody trusts.</p>
+    <h2>Where the Paper Is Strongest</h2>
+    <p>Most of the paper&rsquo;s prescriptions are correct and Mneme agrees with them without reservation. It is worth being specific about what genuinely holds up:</p>
+    <ul>
+      <li><strong>Spec-driven development itself.</strong> Writing intended behavior down before generation, in the repo, is the right foundation. It is the same premise behind treating <a href="/concepts/executable-architectural-intent/">architectural intent as something explicit</a> rather than tribal knowledge.</li>
+      <li><strong>Repo-local specs as source of truth.</strong> Keeping the spec next to the code, versioned with it, beats a stale wiki every time. Intent that drifts from the codebase is <a href="/concepts/intent-debt/">intent debt</a> waiting to be discovered in an outage.</li>
+      <li><strong>Policy servers and structural gating.</strong> Centralizing rules so they are applied uniformly, rather than re-litigated per pull request, is exactly the right instinct.</li>
+      <li><strong>Sandboxing and zero-trust posture.</strong> Treating agent output as untrusted until proven otherwise is sound security engineering. The default should be denial, not permission.</li>
+    </ul>
+    <p>None of this is in dispute. The disagreement is narrow, and it lives in one specific link of the chain: how the pipeline decides that a change is architecturally acceptable.</p>
 
+    <h2>Where Deterministic Governance Differs From AI Reviewing AI</h2>
+    <p>The paper&rsquo;s trust mechanism leans on automated review agents &mdash; models that inspect the output of other models and flag problems. This is useful for catching classes of defects. It is the wrong tool for establishing architectural authority, and the reason is structural.</p>
+    <p>Generation is probabilistic. A model produces a plausible answer, not a guaranteed one. Run the same prompt twice and you may get two different verdicts. That is acceptable for drafting code. It is not acceptable for the final decision about whether code is allowed to land. If the reviewer is also probabilistic, you have not established authority &mdash; you have added a second opinion that is confident, fast, and occasionally wrong in ways you cannot predict or reproduce.</p>
+    <p>Architecture is not a matter of opinion. &ldquo;This service may not read another service&rsquo;s database directly&rdquo; is a decision that was made once, for stated reasons, and recorded. Checking a change against that decision should return the same verdict every time, for the same change, forever. That is what <a href="/concepts/deterministic-enforcement/">deterministic enforcement</a> means, and it is precisely what a model-reviewing-a-model cannot promise.</p>
+    <div class="callout"><p><strong>A probabilistic reviewer can tell you a change looks fine. It cannot tell you the change obeys a specific recorded decision, the same way, every time.</strong> Authority over architecture has to be deterministic, or it is not authority &mdash; it is a well-informed guess.</p></div>
+    <p>The contrast is sharp enough to lay out directly:</p>
     <div style="overflow-x:auto;margin:2rem 0;">
     <table class="gov-table">
-      <thead><tr><th>Layer</th><th>What it is</th><th>What it contains</th></tr></thead>
+      <thead><tr><th>AI reviewing AI</th><th>Deterministic engineering governance</th></tr></thead>
       <tbody>
-        <tr><td>1. Policy</td><td>Human decisions</td><td>Architecture standards, security requirements, compliance rules</td></tr>
-        <tr><td>2. Memory</td><td>Organizational knowledge</td><td>ADRs, previous incidents, design rationales, lessons learned</td></tr>
-        <tr><td>3. Enforcement</td><td>Machine-verifiable controls</td><td>Policy validation, automated checks, CI/CD gates, agent constraints</td></tr>
-        <tr class="accent-row"><td>4. Auditability</td><td>Enterprise accountability</td><td>Why a decision was made, which policy applied, which agent acted</td></tr>
+        <tr><td>Probabilistic verdict, may vary run to run</td><td>Same change, same verdict, every time</td></tr>
+        <tr><td>Judges against a model&rsquo;s learned priors</td><td>Judges against recorded decisions (ADRs, standards)</td></tr>
+        <tr><td>Explains a rejection with generated prose</td><td>Names the exact decision that was violated</td></tr>
+        <tr><td>Confidence without provenance</td><td>Enforcement with <a href="/concepts/verification-contracts/">a checkable contract</a></td></tr>
+        <tr class="accent-row"><td>A second opinion</td><td>An authority</td></tr>
       </tbody>
     </table>
     </div>
+    <p>This is not a claim that AI review is worthless. It is a claim about where it belongs. AI review is excellent for the fuzzy, judgment-heavy layer &mdash; readability, likely bugs, missing edge cases. It is the wrong instrument for the yes/no question of whether a change is inside the architecture. That question deserves a check that does not change its mind. We have <a href="/insights/review-is-not-governance/">made this argument at length elsewhere</a>: review, human or machine, is not the same thing as governance.</p>
 
-    <p><strong>Policy</strong> is where humans set intent: the architecture standards, security requirements, and compliance rules that define what &ldquo;correct&rdquo; means for this organization. It is the only layer that should not be automated, because it encodes choices that belong to people.</p>
-    <p><strong>Memory</strong> is the organizational knowledge that gives policy its context &mdash; the ADRs that record why a boundary exists, the incident write-ups that explain what went wrong last time, the design rationales that keep a team from relitigating settled questions. Memory is what lets policy be specific instead of generic. It is also, as covered in <a href="/concepts/governance-propagation/">governance propagation</a>, the layer that has to reach every agent, every time.</p>
-    <p><strong>Enforcement</strong> is the part that turns policy and memory into something machine-verifiable: validation that runs against a proposed change, automated checks, CI/CD gates, and constraints applied to the agent at generation time. This is the layer that converts a known rule into an obeyed rule. Without it, the first three layers are documentation.</p>
-    <p><strong>Auditability</strong> closes the loop. For every change an agent makes, it answers why the decision was made, which policy applied, and which agent performed the action. This is the layer that makes the system explainable after the fact &mdash; and it is the one regulated enterprises cannot live without. The mechanism behind it is what we call <a href="/concepts/enforcement-provenance/">enforcement provenance</a>: a verifiable record linking each change to the rule that approved or rejected it.</p>
+    <h2>Engineering Governance Is a Distinct Layer</h2>
+    <p>It helps to be precise about what this layer does and does not do, because &ldquo;governance&rdquo; is an overloaded word. Engineering governance in this sense is not model-risk management, not regulatory compliance, not content safety. It is the layer that verifies generated code against the engineering organization&rsquo;s own recorded decisions:</p>
+    <ul>
+      <li><strong>Architectural decisions (ADRs).</strong> The boundaries, the layering, the &ldquo;we chose X over Y and here is why&rdquo; record.</li>
+      <li><strong>Service and module boundaries.</strong> What may call what, what owns which data, where the seams are.</li>
+      <li><strong>Approved technologies.</strong> The sanctioned libraries, frameworks, and patterns &mdash; and the ones deliberately ruled out.</li>
+      <li><strong>Conventions and standards.</strong> Naming, error handling, structure &mdash; the consistency that makes a codebase legible.</li>
+    </ul>
+    <p>These are all things a team already decided. Governance does not invent them. It <a href="/concepts/architectural-governance/">makes them enforceable</a>, so that a decision recorded once is honored by every agent, on every change, without a human re-explaining it each time. That is the difference between a specification, which tells an agent what to build, and governance, which verifies whether it was built within the architecture.</p>
 
-    <h2>Why Regulated Industries Need This First</h2>
-    <p>For most teams, a governance layer is a competitive advantage. For regulated ones, it is a precondition for adoption. Financial services, healthcare, life sciences, insurance, and government cannot allow autonomous code generation without four properties: traceability of every change, repeatability of every decision, explainability of why the system did what it did, and standing evidence of compliance. An auditor does not accept &ldquo;the model decided.&rdquo; They require a record.</p>
-    <p>This is precisely where content-safety guardrails have nothing to offer. A prompt filter cannot demonstrate that a change to a claims-processing system honored the applicable regulatory boundary, and it cannot reconstruct the chain of policy that approved it. A governance layer can, because traceability and explainability are what it is built to produce. External frameworks point the same direction: NIST&rsquo;s <a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener">AI Risk Management Framework</a> treats governance, accountability, and auditability as core functions of any trustworthy AI system &mdash; the recognized reference for what an enterprise is expected to be able to show. Teams evaluating where this lands in practice can see the regulated-industry patterns in our <a href="/use-cases/">use cases</a>.</p>
-    <p>In these sectors the order of operations inverts. The governance layer is not something you add once agents are productive. It is the thing that has to exist before agents are allowed to touch the codebase at all.</p>
+    <h2>Spec-Driven Development Plus Engineering Governance</h2>
+    <p>The right conclusion is not to reject spec-driven development. It is to finish it. Google&rsquo;s pipeline is close; it needs one more stage with different properties than the rest. The full shape looks like this:</p>
+    <ol>
+      <li><strong>Requirements.</strong> What the change should accomplish.</li>
+      <li><strong>Specification.</strong> The behavior, written down in the repo as the source of truth &mdash; the paper&rsquo;s core contribution.</li>
+      <li><strong>Generation.</strong> The agent produces an implementation against the spec.</li>
+      <li><strong>Deterministic governance.</strong> The change is checked against the recorded architectural decisions <a href="/concepts/governance-before-generation/">before it can land</a>. Same change, same verdict. Violations are rejected with the specific decision named, so the agent can retry compliantly.</li>
+      <li><strong>Risk-based review.</strong> What survives deterministic gating goes to review sized to its risk &mdash; AI review for the routine, human review for the consequential.</li>
+      <li><strong>Production.</strong> Only changes that passed both a deterministic architectural check and a risk-appropriate review.</li>
+    </ol>
+    <p>The critical insight is that steps 4 and 5 are different kinds of check and must not be collapsed into one. Step 5 is judgment, and probabilistic tools are fine there. Step 4 is authority, and it has to be deterministic. Google&rsquo;s paper effectively merges them into &ldquo;AI review with a policy server in front.&rdquo; Pulling architectural verification out into its own deterministic stage is the missing piece. This is the same conclusion our evergreen argument reaches: <a href="/insights/spec-driven-development-still-needs-governance/">spec-driven development still needs governance</a> &mdash; a spec defines intent, but something deterministic has to enforce it.</p>
 
-    <h2>The Governance Layer Outlives the Model</h2>
-    <p>Here is the structural bet. The largest enterprises will not standardize on a single model. Models are commoditizing, swappable, and improving on a schedule no one controls. What they will standardize on is governance &mdash; the layer that stays constant while everything underneath it churns.</p>
-    <p>The analogy is identity. Two decades ago, authentication lived inside each application. Then identity became an independent layer &mdash; single sign-on, directory services, federated identity &mdash; and applications were rebuilt to defer to it. The applications changed constantly. The identity layer persisted, because it encoded something more durable than any one app: who is allowed to do what. Governance for AI coding is at the same inflection. Models change, agents change, workflows change. The encoded answer to <em>what is this code allowed to be</em> is the part worth making permanent. This is also why the market is splitting into <a href="/insights/ai-agent-governance-two-markets/">two distinct governance markets</a> &mdash; one for the agents themselves and one for the standards they answer to.</p>
-    <p>An organization that ties its safety to a specific model has to renegotiate that safety every time it switches models. An organization that puts its rules in a governance layer keeps them no matter what generates the code next year. And the advantage it gains is not the one the first wave was competing for.</p>
-    <p>The first wave of this market rewarded raw generation &mdash; whoever could produce the most code, fastest, with the least friction. That contest is largely over; the models are good enough that output is no longer scarce. The next advantage is not generating more code. It is ensuring that AI-generated code stays aligned with architecture, compliance, and organizational intent &mdash; at the volume and speed agents now operate.</p>
-    <p>That is what a governance layer delivers, and why it is becoming infrastructure rather than a feature. The teams that win the agentic era will not be the ones whose agents write the most. They will be the ones whose agents can be trusted, audited, and held to a standard &mdash; and, as we argue in <a href="/insights/ai-coding-governance-should-be-reviewable/">AI coding governance should be reviewable</a>, can prove it. Generation got us here. Governance is what gets us the rest of the way.</p>
+    <h2>The Next Step After Spec-Driven Development</h2>
+    <p>Google is right that code is disposable and the spec is the durable asset. Google is right that trusting AI output is the real problem, and right to reach for zero-trust pipelines, policy servers, and sandboxing to solve it. The one place the paper stops short is treating architectural compliance as something another model can adjudicate. It cannot &mdash; not with authority, not reproducibly.</p>
+    <p>Specifications tell AI what to build. Engineering governance verifies whether it was built within the architecture. The next step after spec-driven development is not another reviewer with better prompts. It is a deterministic layer that checks every change against the decisions the team already made and recorded &mdash; and returns the same answer every time. That is the difference between hoping the architecture held and knowing it did.</p>
 
   </div><!-- /.article-body -->
 
   <section class="article-faq" aria-labelledby="faq-heading" style="margin-top:3rem;">
     <h2 id="faq-heading" style="margin-bottom:1.5rem;">Frequently asked questions</h2>
     <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">What is a governance layer for AI coding assistants?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">It is enterprise infrastructure that constrains what AI coding agents are allowed to do, built from four layers: policy (the human decisions that define correct), memory (ADRs and incident history that give policy context), enforcement (machine-verifiable checks and CI/CD gates applied to proposed changes), and auditability (a record of why each decision was made and which agent acted). It sits above access control and decides not whether an agent <em>can</em> change a system, but whether it <em>should</em>.</div>
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">What does Google&rsquo;s spec-driven development paper say?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Google&rsquo;s whitepaper on spec-driven, production-grade development argues that as AI generates a large share of new code, the code itself becomes disposable and the specification becomes the durable asset. It recommends keeping behavior-driven, Gherkin-style specs in the repo as the source of truth, and building a zero-trust pipeline with policy servers, deterministic structural gating, sandboxing, human-in-the-loop checkpoints, and automated AI code-review agents to trust output at scale.</div>
     </details>
     <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">How is governance different from access control?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Access control answers whether an agent has permission to act on a system. Governance answers whether the specific change it proposes is acceptable &mdash; whether it honors architecture rules, ADRs, security boundaries, regulatory requirements, and team conventions. An agent can be fully permitted to modify a payments service and still produce a change that violates a recorded decision. Permission is necessary but not sufficient; governance is the layer that judges the change itself.</div>
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Is spec-driven development enough on its own?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">No. Spec-driven development fixes the front of the pipeline by making intended behavior explicit before generation, which is genuinely valuable. But a spec tells an agent what to build; it does not verify that what was built stays inside the architecture. Without a deterministic layer that checks each change against recorded decisions &mdash; ADRs, boundaries, approved technologies, conventions &mdash; a perfectly spec-driven pipeline can still drift, one locally reasonable change at a time.</div>
     </details>
     <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Why do regulated industries need a governance layer before adopting agents?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Financial services, healthcare, life sciences, insurance, and government require traceability, repeatability, explainability, and standing evidence of compliance for any change to a regulated system. An auditor will not accept &ldquo;the model decided.&rdquo; A governance layer produces the record &mdash; which policy applied, which agent acted, why &mdash; that content-safety guardrails cannot. In these sectors governance is not an add-on after agents become productive; it is the precondition for letting agents touch the codebase at all.</div>
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Why isn&rsquo;t AI reviewing AI enough to trust generated code?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Because both the generator and the reviewer are probabilistic. A model reviewing another model&rsquo;s output produces a plausible verdict, not a guaranteed one, and the same change can get different verdicts on different runs. That is acceptable for judgment calls like readability or likely bugs, but not for the final decision about whether code obeys a specific architectural decision. Architectural authority has to be deterministic: same change, same verdict, every time.</div>
+    </details>
+    <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">How is engineering governance different from AI code review?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">AI code review judges a change against a model&rsquo;s learned priors and returns generated prose. Engineering governance checks a change against the team&rsquo;s own recorded decisions &mdash; architectural decisions, service boundaries, approved technologies, and conventions &mdash; and returns a deterministic verdict that names the exact decision violated. Review is a second opinion; governance is an authority. They are complementary layers, and the architectural check should be deterministic, not probabilistic.</div>
     </details>
   </section>
 
-  <aside class="related-panel" aria-labelledby="related-essays-label" style="margin-top:3rem;">
-    <div class="related-panel-label" id="related-essays-label">Related operational essays</div>
+  <aside class="related-panel" aria-labelledby="related-concepts-label" style="margin-top:3rem;">
+    <div class="related-panel-label" id="related-concepts-label">Related governance concepts</div>
     <ul class="related-list">
-      <li><a href="/insights/smart-routing-ai-coding-agents/"><div class="rel-title">Smart Routing for AI Coding Agents</div><p class="rel-desc">Routing optimizes execution; it does not enforce the architecture every routed agent must follow.</p></a></li>
-      <li><a href="/insights/ai-race-wont-be-won-on-infrastructure-alone/"><div class="rel-title">Why the AI Race Won&rsquo;t Be Won on Infrastructure Alone</div><p class="rel-desc">Infrastructure decides how much intelligence you can access; governance decides how much you can safely deploy.</p></a></li>
-      <li><a href="/insights/open-knowledge-format-vs-governance/"><div class="rel-title">Open Knowledge Format vs Governance</div><p class="rel-desc">Standardizing how agents find organizational knowledge does not make them follow it.</p></a></li>
-      <li><a href="/insights/agent-governance-in-the-sdlc/"><div class="rel-title">Agent Governance in the SDLC</div><p class="rel-desc">Where in the development lifecycle enforcement has to sit once agents act autonomously.</p></a></li>
-      <li><a href="/insights/ai-agent-governance-two-markets/"><div class="rel-title">AI Agent Governance Is Two Markets</div><p class="rel-desc">Governing the agents is a separate problem from governing the standards they answer to.</p></a></li>
-      <li><a href="/insights/ai-coding-governance-should-be-reviewable/"><div class="rel-title">AI Coding Governance Should Be Reviewable</div><p class="rel-desc">Why auditability, not just enforcement, is what makes a governance layer trustworthy.</p></a></li>
-      <li><a href="/insights/why-context-alone-doesnt-prevent-architectural-drift/"><div class="rel-title">Why Context Alone Doesn&rsquo;t Prevent Architectural Drift</div><p class="rel-desc">More information improves what an agent knows, not what it is allowed to do.</p></a></li>
+      <li><a href="/concepts/spec-driven-development/"><div class="rel-title">Spec-Driven Development</div><p class="rel-desc">Writing intended behavior down before generation, so agents build against explicit intent.</p></a></li>
+      <li><a href="/concepts/architectural-governance/"><div class="rel-title">Architectural Governance</div><p class="rel-desc">Verifying generated code against the system&rsquo;s recorded decisions, whichever agent produced it.</p></a></li>
+      <li><a href="/concepts/deterministic-enforcement/"><div class="rel-title">Deterministic Enforcement</div><p class="rel-desc">Same change, same verdict &mdash; the property AI reviewing AI cannot provide.</p></a></li>
+      <li><a href="/concepts/governance-before-generation/"><div class="rel-title">Governance Before Generation</div><p class="rel-desc">Architectural constraints applied where code is created, not discovered later in review.</p></a></li>
     </ul>
   </aside>
 
-  <aside class="related-panel" aria-labelledby="related-concepts-label" style="margin-top:1.5rem;padding-top:0;border-top:none;">
-    <div class="related-panel-label" id="related-concepts-label">Related governance concepts</div>
+  <aside class="related-panel" aria-labelledby="related-essays-label" style="margin-top:1.5rem;padding-top:0;border-top:none;">
+    <div class="related-panel-label" id="related-essays-label">Related operational essays</div>
     <ul class="related-list">
-      <li><a href="/concepts/governance-propagation/"><div class="rel-title">Governance Propagation</div><p class="rel-desc">How an enforced decision reaches every agent and every generation call.</p></a></li>
-      <li><a href="/concepts/enforcement-provenance/"><div class="rel-title">Enforcement Provenance</div><p class="rel-desc">The verifiable record linking each change to the rule that approved or rejected it.</p></a></li>
+      <li><a href="/insights/spec-driven-development-still-needs-governance/"><div class="rel-title">Spec-Driven Development Still Needs Governance</div><p class="rel-desc">The canonical argument: a spec defines intent, but something deterministic has to enforce it.</p></a></li>
+      <li><a href="/insights/review-is-not-governance/"><div class="rel-title">Review Is Not Governance</div><p class="rel-desc">Why inspection, human or machine, is a different thing from enforceable architectural authority.</p></a></li>
+      <li><a href="/insights/why-code-review-cannot-scale-with-ai-output/"><div class="rel-title">Why Code Review Cannot Scale With AI Output</div><p class="rel-desc">When generation outruns reading, review stops being a reliable gate.</p></a></li>
+      <li><a href="/insights/ai-coding-agent-verification-tax/"><div class="rel-title">The Verification Tax of AI Coding Agents</div><p class="rel-desc">Faster generation shifts the cost to verifying what was generated.</p></a></li>
     </ul>
   </aside>
 
@@ -474,8 +523,8 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
   <footer class="article-footer">
     <a href="/insights/" class="back-link">&larr; Back to Insights</a>
     <div class="cta-block">
-      <h3>Put a governance layer under your AI coding agents.</h3>
-      <p>Mneme turns your architecture standards and ADRs into executable constraints that every agent retrieves at generation time and CI verifies deterministically &mdash; with an audit trail showing which rule applied to which change. Policy, memory, enforcement, and auditability, in one open-source layer.</p>
+      <h3>Make your architectural decisions executable.</h3>
+      <p>Mneme turns your ADRs, engineering standards, and project constraints into deterministic checks every coding agent must satisfy before code lands &mdash; the deterministic layer spec-driven development leaves open. See it on your own architecture in a <a href="/demo/">short demo</a>. Open source.</p>
       <a href="/demo/" style="display:inline-block;margin-right:1.25rem;color:#c8f060;font-family:'DM Mono',monospace;font-size:0.85rem;text-decoration:none;">See the live demo &rarr;</a>
       <a href="https://github.com/MnemeHQ/mneme" class="btn-primary">View on GitHub &rarr;</a>
     </div>
