@@ -3,23 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dependency Policy Enforcement — Demo Scenario | Mneme HQ</title>
+  <title>Catching an unapproved dependency an AI agent added | Mneme HQ</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="A walkthrough of how Mneme catches an unapproved dependency (sqlalchemy) when an AI coding agent introduces it during a refactor. WARN verdict in mneme check, with the exact decision ID that flagged it." />
+  <meta name="description" content="An AI coding agent slips an unapproved dependency (sqlalchemy) into a refactor. Mneme catches it with a structured WARN in mneme check, names the exact decision that flagged it, and gives a tracked override path." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/demo/dependency-policy/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Dependency Policy Enforcement — Demo Scenario" />
+  <meta property="og:title" content="Catching an unapproved dependency an AI agent added" />
   <meta property="og:description" content="How Mneme flags unapproved dependencies (sqlalchemy) when an AI agent introduces them mid-refactor. WARN verdict with the originating decision ID." />
   <meta property="og:url" content="https://mnemehq.com/demo/dependency-policy/" />
   <meta property="og:image" content="https://mnemehq.com/demo/dependency-policy/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Dependency Policy Enforcement — Demo Scenario" />
+  <meta name="twitter:title" content="Catching an unapproved dependency an AI agent added" />
   <meta name="twitter:description" content="How Mneme flags unapproved dependencies (sqlalchemy) when an AI agent introduces them mid-refactor. WARN verdict with the originating decision ID." />
   <meta name="twitter:image" content="https://mnemehq.com/demo/dependency-policy/og.png" />
   <meta name="author" content="Theo Valmis" />
@@ -130,7 +130,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
       },
       {
         "@type": "Article",
-        "headline": "Dependency Policy Enforcement — Demo Scenario",
+        "headline": "Catching an unapproved dependency an AI agent added",
         "description": "How Mneme catches an unapproved dependency (sqlalchemy) when an AI coding agent introduces it during a refactor. Structured WARN verdict with the originating decision ID.",
         "url": "https://mnemehq.com/demo/dependency-policy/",
         "datePublished": "2026-05-09",
@@ -401,7 +401,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
       <span class="eyebrow-dot"></span>
       <span class="verdict-pill warn">WARN</span>
     </div>
-    <h1>Dependency policy enforcement</h1>
+    <h1>Catching an unapproved dependency an AI agent added</h1>
     <p class="lede">During a refactor, the AI agent reaches for <code>sqlalchemy</code> &mdash; a sensible choice in isolation, but not on the team's approved dependency list. Mneme catches it during <code>mneme check</code> and emits a structured WARN with the originating decision ID, so the diff is flagged for review without hard-blocking the work.</p>
     <p class="byline">
       By <a href="/founder/">Theo Valmis</a>

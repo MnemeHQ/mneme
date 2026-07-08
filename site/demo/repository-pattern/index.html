@@ -3,23 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Repository Pattern Enforcement — Demo Scenario | Mneme HQ</title>
+  <title>Blocking an AI agent that bypasses the repository pattern | Mneme HQ</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="A walkthrough of how Mneme blocks an ADR-004 violation when an AI coding agent bypasses the Repository pattern in user.service.ts. FAIL verdict that hard-blocks the diff in CI." />
+  <meta name="description" content="An AI coding agent bypasses the repository pattern in user.service.ts, writing raw SQL against the database. Mneme blocks the ADR-004 violation with a FAIL verdict that hard-blocks the diff in CI." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/demo/repository-pattern/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Repository Pattern Enforcement — Demo Scenario" />
+  <meta property="og:title" content="Blocking an AI agent that bypasses the repository pattern" />
   <meta property="og:description" content="How Mneme blocks an ADR-004 violation when an AI agent bypasses the Repository pattern in user.service.ts. Hard FAIL verdict that gates the PR." />
   <meta property="og:url" content="https://mnemehq.com/demo/repository-pattern/" />
   <meta property="og:image" content="https://mnemehq.com/demo/repository-pattern/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Repository Pattern Enforcement — Demo Scenario" />
+  <meta name="twitter:title" content="Blocking an AI agent that bypasses the repository pattern" />
   <meta name="twitter:description" content="How Mneme blocks an ADR-004 violation when an AI agent bypasses the Repository pattern in user.service.ts. Hard FAIL verdict that gates the PR." />
   <meta name="twitter:image" content="https://mnemehq.com/demo/repository-pattern/og.png" />
   <meta name="author" content="Theo Valmis" />
@@ -130,7 +130,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
       },
       {
         "@type": "Article",
-        "headline": "Repository Pattern Enforcement — Demo Scenario",
+        "headline": "Blocking an AI agent that bypasses the repository pattern",
         "description": "How Mneme blocks an ADR-004 violation when an AI coding agent bypasses the Repository pattern in user.service.ts. Hard FAIL verdict that gates the PR.",
         "url": "https://mnemehq.com/demo/repository-pattern/",
         "datePublished": "2026-05-09",
@@ -402,7 +402,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
       <span class="eyebrow-dot"></span>
       <span class="verdict-pill fail">FAIL</span>
     </div>
-    <h1>Repository pattern enforcement</h1>
+    <h1>Blocking an AI agent that bypasses the repository pattern</h1>
     <p class="lede">An AI coding agent refactors <code>user.service.ts</code> and reaches straight into the database connection &mdash; bypassing the Repository abstraction <code>ADR-004</code> exists to protect. The diff looks clean in the editor. Mneme's enforcement layer hard-fails it before it can land.</p>
     <p class="byline">
       By <a href="/founder/">Theo Valmis</a>

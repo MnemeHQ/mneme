@@ -52,6 +52,14 @@ Body structure: eyebrow + `<h1>` + `.article-lede` + byline; `<h2>` sections;
 where it fits; 4-item FAQ (`<details>`); two `.related-panel` asides (concepts +
 essays); `.article-footer` with `.cta-block`.
 
+CTA ladder (order matters — highest-intent first): the `.cta-block` leads with
+`<a href="/pilot/" class="btn-primary">Request a pilot &rarr;</a>` as its primary;
+demote demo/GitHub to inline text links (`style="display:inline-block;
+margin-right:1.25rem;color:var(--accent);font-family:'DM Mono',monospace;
+font-size:0.85rem;text-decoration:none;"`). The newsletter subscribe `<aside
+aria-label="Mneme HQ newsletter">` goes **below** the `.cta-block` (nurture for
+the not-yet-ready reader — never above the pilot CTA).
+
 ## 4. The three quality rules check_insights now enforces
 
 - **Accessible links (HARD):** include `.article-body a { color: #8be0c8;

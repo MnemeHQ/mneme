@@ -307,6 +307,11 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
             "@type": "Question",
             "name": "How does Mneme implement executable architectural intent?",
             "acceptedAnswer": {"@type": "Answer", "text": "Mneme treats architectural decisions as machine-evaluable constraints stored in a version-controlled corpus, retrieves them through a deterministic scoping layer before agents generate, and validates them at the hook and CI levels after generation. Each verdict carries provenance back to the source decision so enforcement is auditable, not opaque."}
+          },
+          {
+            "@type": "Question",
+            "name": "Can you give an example of executable architectural intent?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Take a recorded decision such as 'all outbound HTTP goes through the shared http_client; service code must not call requests or httpx directly.' As reference knowledge it is a paragraph in an ADR and a bullet in CLAUDE.md, read only if the agent loads that file and complied with only if it chooses to. As executable architectural intent it is a scoped constraint retrieved into the agent's context before it generates in a governed path, checked by a deterministic hook or CI gate against the produced diff, with the verdict traceable back to the source ADR. The decision is identical; only its enforceability changed."}
           }
         ]
       },
@@ -425,6 +430,44 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
 
     <p>If any one of these is missing, the rule is still doing useful work in the wiki, but it is not yet executable intent. It is documentation that has aspirations.</p>
 
+    <h2>Example: maintaining architectural intent for one rule</h2>
+    <p>Take a concrete decision a team has already made and recorded: <em>&ldquo;All outbound HTTP goes through the shared <code>http_client</code>; service code must not call <code>requests</code> or <code>httpx</code> directly&rdquo;</em> (say, ADR-014, made so retries, timeouts, and tracing are enforced in one place). The same decision can live at two very different levels of enforceability.</p>
+
+    <div style="overflow-x:auto;margin:2rem 0;">
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>As reference knowledge</th>
+          <th>As executable architectural intent</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>A paragraph in an ADR and a bullet in <code>CLAUDE.md</code> that says to use the shared client.</td>
+          <td>A scoped constraint keyed to the service directories it governs, encoded in a version-controlled corpus.</td>
+        </tr>
+        <tr>
+          <td>Read into context <em>if</em> the agent happens to load that file; weighed against task pressure.</td>
+          <td>Retrieved into the agent&rsquo;s context <em>before</em> it commits to a candidate change in a governed path.</td>
+        </tr>
+        <tr>
+          <td>Compliance verified, if at all, by a human noticing a stray <code>import httpx</code> in review.</td>
+          <td>Checked by a deterministic hook / CI gate that returns pass or fail against the produced diff.</td>
+        </tr>
+        <tr>
+          <td>When violated, the reason traces back to nothing in particular.</td>
+          <td>When enforced, the verdict traces back to ADR-014 &mdash; auditable, not opaque.</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>The decision never changed. What changed is that <strong>maintaining architectural intent</strong> stopped depending on whether an agent read the right doc and chose to comply, and started depending on a constraint the agent encounters at generation time and a check it cannot route around. That is the whole distinction between a rule that is <em>documented</em> and a rule that is <em>executable</em>.</p>
+
+    <div class="callout-teal">
+      <p><strong>The failure this prevents is narrow and common:</strong> the rule existed, the agent could have read it, and it generated a direct <code>httpx</code> call anyway. Executable architectural intent removes the discretion &mdash; not by detecting the drift after the fact, but by binding the constraint before the code is written and gating it before the code lands.</p>
+    </div>
+
     <h2>Why this category exists</h2>
     <p>Without an explicit name for this layer, teams end up putting binding rules into surfaces that were never designed to enforce them: long CLAUDE.md files, system prompts, prose in ADRs, PR review checklists. Each of those is a useful surface for its own purpose. None of them produces a deterministic verdict at the moment of generation.</p>
     <p>The result is a familiar failure mode: the rule was documented, the agent read it, the agent generated code that contradicted it, and the violation was caught (or missed) only in review. The cause was not missing knowledge. It was the absence of an enforcement surface for the knowledge that was already there.</p>
@@ -483,6 +526,10 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
       <summary>How does Mneme implement executable architectural intent?</summary>
       <div class="faq-body">Mneme treats architectural decisions as machine-evaluable constraints stored in a version-controlled corpus, retrieves them through a deterministic scoping layer before agents generate, and validates them at the hook and CI levels after generation. Each verdict carries provenance back to the source decision so enforcement is auditable, not opaque.</div>
     </details>
+    <details>
+      <summary>Can you give an example of executable architectural intent?</summary>
+      <div class="faq-body">Take a recorded decision such as &ldquo;all outbound HTTP goes through the shared <code>http_client</code>; service code must not call <code>requests</code> or <code>httpx</code> directly.&rdquo; As reference knowledge it is a paragraph in an ADR and a bullet in <code>CLAUDE.md</code>, read only if the agent loads that file and complied with only if it chooses to. As executable architectural intent it is a scoped constraint retrieved into the agent&rsquo;s context before it generates in a governed path, checked by a deterministic hook or CI gate against the produced diff, with the verdict traceable back to the source ADR. The decision is identical; only its enforceability changed.</div>
+    </details>
   </section>
 
   <h2 id="related-reading">Related reading</h2>
@@ -493,6 +540,9 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     <li><a href="/concepts/deterministic-enforcement/">Deterministic Enforcement</a></li>
     <li><a href="/concepts/enforcement-provenance/">Enforcement Provenance</a></li>
     <li><a href="/insights/llm-wiki-library-not-law/">Your LLM Wiki Is a Library, Not a Law</a></li>
+    <li><a href="/insights/ai-coding-agent-guardrails/">AI Coding-Agent Guardrails</a></li>
+    <li><a href="/compare/claude-md/">Executable intent vs a CLAUDE.md file</a></li>
+    <li><a href="/demo/">See enforcement in the demo</a></li>
   </ul>
 
   <footer class="article-footer">

@@ -5,7 +5,7 @@
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/favicon.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Governance gates in Claude Agent SDK workflows — Mneme HQ</title>
+  <title>Enforcing architectural decisions in Claude Agent SDK workflows | Mneme HQ</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
@@ -15,12 +15,12 @@
   <link rel="canonical" href="https://mnemehq.com/demo/agent-sdk-governance/" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Governance gates in Claude Agent SDK workflows" />
+  <meta property="og:title" content="Enforcing architectural decisions in Claude Agent SDK workflows" />
   <meta property="og:description" content="An autonomous agent tasked with caching introduces Redis — violating ADR-001. Mneme's pre-execution hook catches the violation before the file write executes and reroutes the agent to the compliant primitive." />
   <meta property="og:url" content="https://mnemehq.com/demo/agent-sdk-governance/" />
   <meta property="og:image" content="https://mnemehq.com/demo/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Governance gates in Claude Agent SDK workflows" />
+  <meta name="twitter:title" content="Enforcing architectural decisions in Claude Agent SDK workflows" />
   <meta name="twitter:description" content="An autonomous agent tasked with caching introduces Redis — violating ADR-001. Mneme catches the violation before the file write executes." />
   <meta name="twitter:image" content="https://mnemehq.com/demo/og.png" />
   <!-- Consent defaults -->
@@ -37,12 +37,12 @@
         "itemListElement": [
           {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
           {"@type": "ListItem", "position": 2, "name": "Demo", "item": "https://mnemehq.com/demo/"},
-          {"@type": "ListItem", "position": 3, "name": "Governance gates in Claude Agent SDK workflows", "item": "https://mnemehq.com/demo/agent-sdk-governance/"}
+          {"@type": "ListItem", "position": 3, "name": "Claude Agent SDK governance", "item": "https://mnemehq.com/demo/agent-sdk-governance/"}
         ]
       },
       {
         "@type": "Article",
-        "headline": "Governance gates in Claude Agent SDK workflows",
+        "headline": "Enforcing architectural decisions in Claude Agent SDK workflows",
         "description": "A Claude Agent SDK workflow where Mneme acts as the governance/runtime policy layer. An autonomous agent tasked with caching introduces Redis — violating ADR-001. Mneme's pre-execution hook catches the violation before the file write executes and reroutes the agent to the compliant primitive.",
         "url": "https://mnemehq.com/demo/agent-sdk-governance/",
         "datePublished": "2026-05-14",
@@ -329,7 +329,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     <ol class="breadcrumb">
       <li><a href="/">Home</a></li>
       <li><a href="/demo/">Demo</a></li>
-      <li aria-current="page">Governance gates in Claude Agent SDK workflows</li>
+      <li aria-current="page">Claude Agent SDK governance</li>
     </ol>
   </nav>
 
@@ -342,7 +342,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
         <span class="eyebrow-dot"></span>
         <span class="verdict-pill">FORWARD-LOOKING</span>
       </div>
-      <h1>Governance gates in <em>Claude Agent SDK</em> workflows.</h1>
+      <h1>Enforcing architectural decisions in <em>Claude Agent SDK</em> workflows.</h1>
       <p class="lede">An autonomous agent is tasked with "add caching to the user lookup service." Left unchecked, it introduces Redis &mdash; a clean, reasonable move that silently kills <code>ADR-001</code>. <strong>With Mneme's pre-execution governance hook wrapping the SDK tool call, the violation is caught before the file write executes and the agent is rerouted to the compliant in-process JSON cache primitive.</strong></p>
       <p class="byline">
         By <a href="/founder/">Theo Valmis</a>
@@ -528,7 +528,7 @@ python run.py</code></pre>
       <div class="next-bar">
         <a class="next-card" href="/demo/multi-agent-governance/">
           <div class="nc-label">Related demo</div>
-          <h4>Governance continuity across multiple actors</h4>
+          <h4>Keeping architecture consistent across multiple AI agents</h4>
           <p>Three agents, zero shared memory, one shared corpus. The same invariant-persistence property applied to a distributed execution scenario.</p>
           <span class="nc-arrow">Walk the multi-agent demo &rarr;</span>
         </a>
