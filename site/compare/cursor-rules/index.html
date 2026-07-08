@@ -308,6 +308,30 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     .related-list a:hover .rel-title { color: var(--accent); }
     .related-list a:hover .rel-title::after { opacity: 1; transform: translateX(3px); }
     .related-list .rel-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.65; margin: 0; }
+
+    /* Verdict box — quotable, answer-shaped conclusion for AI extraction */
+    .verdict-box { background: var(--surface); border: 1px solid var(--border2); border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; padding: 1.35rem 1.5rem; margin: 0 0 2.5rem; }
+    .verdict-box .verdict-label { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.6rem; }
+    .verdict-box p { margin: 0; font-size: 0.95rem; line-height: 1.75; color: var(--text); }
+    .verdict-box p strong { color: var(--text); font-weight: 600; }
+
+    /* Answer-shaped table (Tool | Best for | Weakness | When to use Mneme HQ) */
+    .answer-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0 2rem; font-size: 0.84rem; }
+    .answer-table th { text-align: left; padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--border2); color: var(--muted); font-weight: 500; font-size: 0.78rem; }
+    .answer-table td { padding: 0.9rem 0.9rem; border-bottom: 1px solid var(--border); vertical-align: top; color: var(--muted); line-height: 1.65; }
+    .answer-table td:first-child { color: var(--text); font-weight: 600; white-space: nowrap; }
+    .answer-table tr:last-child td { border-bottom: none; }
+
+    /* Best-for / Not-for extraction blocks */
+    .bestfor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; margin: 1.5rem 0 2rem; }
+    .bestfor-card { background: var(--surface); padding: 1.15rem 1.25rem; }
+    .bestfor-card .bf-tool { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 0.7rem; }
+    .bestfor-card .bf-row { font-size: 0.83rem; line-height: 1.6; color: var(--muted); margin-bottom: 0.5rem; }
+    .bestfor-card .bf-row:last-child { margin-bottom: 0; }
+    .bestfor-card .bf-tag { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.04em; text-transform: uppercase; margin-right: 0.4rem; }
+    .bestfor-card .bf-tag.yes { color: var(--accent); }
+    .bestfor-card .bf-tag.no { color: #e08b8b; }
+    @media (max-width: 640px) { .bestfor-grid { grid-template-columns: 1fr; } }
   </style>
   <script type="application/ld+json">
   {
@@ -336,6 +360,8 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
       {
         "@type": "FAQPage",
         "mainEntity": [
+          {"@type": "Question", "name": "Is Mneme HQ an alternative to Cursor Rules?", "acceptedAnswer": {"@type": "Answer", "text": "Not a drop-in replacement — a complementary enforcement layer. Cursor Rules give the model project context inside Cursor; Mneme HQ blocks a violating Edit or Write before it lands, across Claude Code and CI. If you are evaluating Cursor Rules alternatives because rules keep getting ignored or do not span your whole toolchain, Mneme HQ is the enforcement layer to add on top, not a swap. It governs generated code; it does not write it, and it does not replace Cursor."}},
+          {"@type": "Question", "name": "When should a team switch from Cursor Rules to Mneme HQ?", "acceptedAnswer": {"@type": "Answer", "text": "More precisely, when should a team add Mneme HQ — you keep the rules file. Add it when a rule needs to actually block rather than suggest, when rules differ by path (payments stricter than analytics), when more than one editor or agent touches the code, or when you need an audit trail of when a decision changed. Below those thresholds, Cursor Rules alone are sufficient."}},
           {"@type": "Question", "name": "Can I use Mneme HQ alongside Cursor Rules?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. They operate on different layers and do not conflict. Cursor Rules inject context into Cursor sessions; Mneme HQ runs as a hook on Edit and Write operations regardless of the editor. Many teams keep their .cursorrules file and add Mneme on top to gain structured enforcement, precedence resolution, and CI gating."}},
           {"@type": "Question", "name": "Do I have to migrate my .cursorrules file to use Mneme HQ?", "acceptedAnswer": {"@type": "Answer", "text": "Migration is the typical path but not required. Existing .cursorrules text becomes the starting input for project_memory.json — each rule is converted to a typed entry with id, scope (file glob), status (active / superseded), and rationale. The mneme init command scaffolds the schema; populating it is a one-time conversion."}},
           {"@type": "Question", "name": "Does Mneme HQ work in editors other than Cursor and Claude Code?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The decision corpus is tool-agnostic. Native hooks ship for Claude Code; Cursor uses standard rules export from the same corpus; GitHub Copilot, Windsurf, and custom SDK agents are governed via the post-generation enforcement step in CI. The architectural argument for tool independence is on the heterogeneous-agents article."}},
@@ -403,6 +429,55 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
   </header>
 
   <div class="article-body">
+
+    <div class="verdict-box">
+      <div class="verdict-label">Verdict</div>
+      <p><strong>Cursor Rules and Mneme HQ solve different halves of the same problem, so most teams use both.</strong> Cursor Rules are the fastest way to give the Cursor editor your project conventions as always-on context. Mneme HQ adds structured, hook-level enforcement that blocks a violating Edit or Write before it lands on disk &mdash; across Claude Code and CI, not just Cursor. A solo developer inside Cursor is fine with the rules file alone; a team that needs a rule to actually hold, across multiple agents and editors, adds Mneme HQ for enforcement. Mneme HQ governs generated code &mdash; it does not generate it, and it does not replace Cursor.</p>
+    </div>
+
+    <h2>Mneme HQ vs Cursor Rules</h2>
+
+    <p>At a glance &mdash; what each tool is best for, where it falls short, and the point at which teams add Mneme HQ:</p>
+
+    <div style="overflow-x:auto;">
+    <table class="answer-table">
+      <thead>
+        <tr>
+          <th>Tool</th>
+          <th>Best for</th>
+          <th>Weakness</th>
+          <th>When to use Mneme HQ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Cursor Rules</td>
+          <td>Giving the Cursor editor project conventions as always-on context; solo developers and small single-repo teams</td>
+          <td>Suggestions only &mdash; the model can ignore them; Cursor-only; one flat file with no per-path scope, precedence, or history</td>
+          <td>When a rule must block rather than suggest, spans more than one editor or agent, or needs per-path scope and precedence</td>
+        </tr>
+        <tr>
+          <td>Mneme HQ</td>
+          <td>Enforcing architectural decisions at Edit/Write time across Claude Code and CI; multi-agent teams</td>
+          <td>Governs, does not generate code; native hooks are Claude Code today (Cursor, Copilot, and Windsurf are governed via CI export)</td>
+          <td>Add it alongside Cursor Rules the moment enforcement, precedence, or multi-agent scope starts to matter</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="bestfor-grid">
+      <div class="bestfor-card">
+        <div class="bf-tool">Cursor Rules</div>
+        <div class="bf-row"><span class="bf-tag yes">Best for</span> solo developers in Cursor, uniform whole-repo conventions, fast setup with zero schema.</div>
+        <div class="bf-row"><span class="bf-tag no">Not for</span> hard blocking, multi-editor or agent workflows, per-path rules, or decision audit trails.</div>
+      </div>
+      <div class="bestfor-card">
+        <div class="bf-tool">Mneme HQ</div>
+        <div class="bf-row"><span class="bf-tag yes">Best for</span> teams that need a rule to actually hold &mdash; hook-level enforcement, deterministic precedence, CI gating.</div>
+        <div class="bf-row"><span class="bf-tag no">Not for</span> writing code for you, or replacing Cursor Rules &mdash; it runs alongside them as the enforcement layer.</div>
+      </div>
+    </div>
 
     <h2>What Cursor Rules are</h2>
 
@@ -504,13 +579,21 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
       <p><strong>The fundamental distinction:</strong> Cursor Rules are configuration — a text file the model is asked to respect. Mneme HQ is enforcement — a hook that runs at operation time and blocks violations before they happen. For teams where architectural boundaries must hold, configuration is not enough.</p>
     </div>
 
-    <h2>If you use both Cursor and Claude Code</h2>
+    <h2>Can Mneme HQ and Cursor Rules be used together?</h2>
 
-    <p>Many engineering teams use Cursor for interactive coding and Claude Code for agentic tasks (refactoring runs, code generation pipelines, automated PR workflows). In that setup, Cursor Rules cover the Cursor sessions and Mneme HQ covers the Claude Code sessions.</p>
+    <p>Yes &mdash; and for most teams that is the recommended setup. Many engineering teams use Cursor for interactive coding and Claude Code for agentic tasks (refactoring runs, code generation pipelines, automated PR workflows). In that setup, Cursor Rules cover the Cursor sessions and Mneme HQ covers the Claude Code sessions.</p>
 
     <p>They don't conflict — they operate on different editors. But only Mneme HQ provides enforcement at the hook level. If a rule violation matters enough to block, it needs to be in Mneme HQ regardless of which editor it originated from.</p>
 
-    <h2>The migration path</h2>
+    <h2>When should a team switch from Cursor Rules to Mneme HQ?</h2>
+
+    <p>In practice teams rarely switch away from Cursor Rules &mdash; they keep the rules file and <em>add</em> Mneme HQ for enforcement. The trigger to add it is when a rule must actually block rather than suggest, when rules differ by path (payments services stricter than analytics), when more than one editor or agent touches the code, or when you need an audit trail of when a decision changed and why. Below those thresholds, Cursor Rules alone are fine.</p>
+
+    <h2>Cursor Rules alternatives</h2>
+
+    <p>If you are evaluating <strong>Cursor Rules alternatives</strong>, they fall into three groups. Other rules-file formats (<code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">CLAUDE.md</code>, <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.clinerules</code>, Copilot Instructions) move the same plain-text approach to a different editor but keep its ceiling: suggestions the model can ignore. Retrieval or RAG memory surfaces past context at prompt time but still cannot block a violation. Enforcement layers &mdash; Mneme HQ is the one built for this &mdash; are the only category that turns a decision into a hook that blocks the Edit/Write call. Choose by what is failing: if rules are being <em>ignored</em>, you need enforcement, not another rules file.</p>
+
+    <h3>The migration path</h3>
 
     <p>Teams that have already written <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.cursorrules</code> files can treat them as a starting point for Mneme HQ's decision corpus. The rules are the same — the difference is converting them into typed JSON entries with scope, status, and rationale fields, then enabling hook-level enforcement.</p>
 
@@ -539,6 +622,16 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     <h2>FAQ</h2>
 
     <div class="faq-list">
+      <details class="faq-item">
+        <summary>Is Mneme HQ an alternative to Cursor Rules?</summary>
+        <div class="faq-body">Not a drop-in replacement &mdash; a complementary enforcement layer. Cursor Rules give the model project context inside Cursor; Mneme HQ blocks a violating Edit or Write before it lands, across Claude Code and CI. If you are searching for &ldquo;Cursor Rules alternatives&rdquo; because rules keep getting ignored or don&rsquo;t span your whole toolchain, Mneme HQ is the enforcement layer to add on top &mdash; not a swap. It governs generated code; it does not write it, and it does not claim to replace Cursor.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>When should a team switch from Cursor Rules to Mneme HQ?</summary>
+        <div class="faq-body">More precisely, when should a team <em>add</em> Mneme HQ &mdash; you keep the rules file. Add it when a rule needs to actually block rather than suggest, when rules differ by path (payments stricter than analytics), when more than one editor or agent touches the code, or when you need an audit trail of when a decision changed. Below those thresholds, Cursor Rules alone are sufficient.</div>
+      </details>
+
       <details class="faq-item">
         <summary>Can I use Mneme HQ alongside Cursor Rules?</summary>
         <div class="faq-body">Yes. They operate on different layers and do not conflict. Cursor Rules inject context into Cursor sessions; Mneme HQ runs as a hook on Edit and Write operations regardless of the editor. Many teams keep their <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--teal)">.cursorrules</code> file and add Mneme on top to gain structured enforcement, precedence resolution, and CI gating &mdash; see the <a href="/integrations/cursor/">Cursor integration guide</a>.</div>
