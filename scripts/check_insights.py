@@ -411,7 +411,11 @@ def check_slug(
     return errors
 
 
-FUNNEL_RE = re.compile(r'href="/(?:pilot|demo|use-cases)/')
+FUNNEL_RE = re.compile(r'href="/(?:pilot|demo|use-cases|compare)/')
+
+# Every article carries a topic-matched contextual conversion CTA, inserted by
+# scripts/insert_contextual_ctas.py and marked with this attribute.
+CONTEXT_CTA_MARKER = 'data-mneme-cta="context"'
 
 
 def inbound_counts(slugs: list[str]) -> dict[str, int]:
@@ -432,8 +436,18 @@ def inbound_counts(slugs: list[str]) -> dict[str, int]:
 
 
 def article_region(html: str) -> str:
+    """The article's own content, excluding the global nav and site footer, so
+    funnel/CTA checks don't trivially pass on the footer's nav links."""
     m = re.search(r"<article\b.*?</article>", html, re.DOTALL)
-    return m.group(0) if m else ""
+    if m:
+        return m.group(0)
+    # Older template variant: content lives in <div class="article-wrap"> with
+    # no <article> wrapper. Slice from there to the global site <footer style=…>.
+    start = html.find('class="article-wrap"')
+    if start == -1:
+        return ""
+    end = html.find("<footer style=", start)
+    return html[start:end] if end != -1 else html[start:]
 
 
 def slug_warnings(slug: str, html: str, inbound: int) -> list[str]:
@@ -444,10 +458,16 @@ def slug_warnings(slug: str, html: str, inbound: int) -> list[str]:
             f"under-meshed: only {inbound} inbound internal link(s) "
             f"(aim for >= 3 reciprocal related-essays links)"
         )
-    if not FUNNEL_RE.search(article_region(html)):
+    region = article_region(html)
+    if not FUNNEL_RE.search(region):
         warns.append(
-            "no in-body funnel link (/pilot, /demo, or /use-cases) beyond the "
-            "global nav and GitHub CTA"
+            "no in-body funnel link (/pilot, /demo, /use-cases, or /compare) "
+            "beyond the global nav and GitHub CTA"
+        )
+    if CONTEXT_CTA_MARKER not in region:
+        warns.append(
+            "no topic-matched contextual CTA in the article body "
+            "(run scripts/insert_contextual_ctas.py)"
         )
     return warns
 
