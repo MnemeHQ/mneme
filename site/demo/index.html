@@ -156,9 +156,9 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
         "@type": "ItemList",
         "name": "Mneme HQ flagship demos",
         "itemListElement": [
-          {"@type": "ListItem", "position": 1, "name": "Governed Python agent", "url": "https://mnemehq.com/demo/governed-python-agent/"},
-          {"@type": "ListItem", "position": 2, "name": "Architectural drift prevention", "url": "https://mnemehq.com/demo/architectural-drift/"},
-          {"@type": "ListItem", "position": 3, "name": "Multi-agent governance continuity", "url": "https://mnemehq.com/demo/multi-agent-governance/"}
+          {"@type": "ListItem", "position": 1, "name": "Blocking AI-generated code that violates an ADR", "url": "https://mnemehq.com/demo/governed-python-agent/"},
+          {"@type": "ListItem", "position": 2, "name": "Preventing architectural drift from AI coding agents", "url": "https://mnemehq.com/demo/architectural-drift/"},
+          {"@type": "ListItem", "position": 3, "name": "Keeping architecture consistent across multiple AI agents", "url": "https://mnemehq.com/demo/multi-agent-governance/"}
         ]
       },
       {
@@ -454,7 +454,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
             <span class="flagship-tag centerpiece">Runnable</span>
             <span class="flagship-tag runnable">Mneme dogfoods this</span>
           </div>
-          <h3>Governed Python agent &mdash; from bad code to compliant output</h3>
+          <h3>Blocking AI-generated code that violates an ADR</h3>
           <p class="fc-lede">A Python coding agent proposes <code style="font-family:'DM Mono',monospace;font-size:0.85em;background:var(--surface2);border-radius:3px;padding:0.05em 0.35em;">from MnemeHQ.memory_store import MemoryStore</code>. Locally reasonable &mdash; MnemeHQ is the brand name the agent has seen everywhere. Architecturally invalid &mdash; it violates ADR-005 (Brand vs Package Namespace Enforcement). Mneme retrieves the compiled decision, blocks the violation, injects the context, and the agent retries with <code style="font-family:'DM Mono',monospace;font-size:0.85em;background:var(--surface2);border-radius:3px;padding:0.05em 0.35em;">from mneme.memory_store import MemoryStore</code>. This is the product loop in full.</p>
           <div class="fc-evidence">
             <div class="fc-evidence-item"><strong>EVIDENCE</strong> Live animation + full enforcement trace</div>
@@ -477,7 +477,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
             <span class="flagship-num">Flagship 02</span>
             <span class="flagship-tag runnable">Runnable</span>
           </div>
-          <h3>Architectural drift prevention</h3>
+          <h3>Preventing architectural drift from AI coding agents</h3>
           <p class="fc-lede">A six-step timeline. An agent proposes reasonable-looking code that violates ADR-001. Three downstream changes amplify the divergence. A human reviewer would plausibly miss it. Mneme detects the invariant violation upstream, emits an enforcement trace explaining <em>why</em>, and the agent retries within the constraints. The system converges instead of forking.</p>
           <div class="fc-evidence">
             <div class="fc-evidence-item"><strong>EVIDENCE</strong> Timeline visualization + enforcement trace</div>
@@ -494,7 +494,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
             <span class="flagship-tag forward">Forward-looking</span>
             <span class="flagship-tag runnable">Runnable</span>
           </div>
-          <h3>Governance continuity across multiple actors</h3>
+          <h3>Keeping architecture consistent across multiple AI agents</h3>
           <p class="fc-lede">Three agents act sequentially against the same codebase. Agent A introduces a divergence. Agent B builds on it. Agent C tries to remediate. Mneme evaluates the architectural invariants at every step. The point isn't multi-agent runtime sophistication &mdash; it's that the governance layer remains coherent across actors, sessions, and retries. As AI execution becomes distributed and persistent, governance becomes the coordination layer.</p>
           <div class="fc-evidence">
             <div class="fc-evidence-item"><strong>EVIDENCE</strong> Scripted three-actor trace + governance log</div>
@@ -502,6 +502,31 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
             <div class="fc-evidence-item"><strong>SHOWS</strong> Invariant persistence under parallel/sequential actors</div>
           </div>
           <span class="fc-cta">See the governance trace &rarr;</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ===== 02b - TOOL-SPECIFIC COMPANION DEMO ===== -->
+    <section class="section" id="agent-runtimes">
+      <div class="section-header">
+        <span class="section-num">Also runnable &middot; Tool-specific</span>
+        <h2>The same governed loop, inside a specific agent runtime</h2>
+      </div>
+      <p class="section-lede">The flagships above are framework-agnostic. This one wires the identical enforcement loop into a concrete runtime &mdash; useful if you're evaluating Mneme for a specific agent stack.</p>
+
+      <div class="flagship-grid">
+        <a class="flagship-card" href="/demo/agent-sdk-governance/">
+          <div class="flagship-meta">
+            <span class="flagship-num">Claude Agent SDK</span>
+            <span class="flagship-tag forward">Runnable</span>
+          </div>
+          <h3>Enforcing architectural decisions in Claude Agent SDK workflows</h3>
+          <p class="fc-lede">An autonomous Claude Agent SDK agent tasked with adding caching introduces Redis &mdash; violating ADR-001. Mneme's pre-execution hook catches the violation before the file write executes and reroutes the agent to the compliant primitive. The governed loop, applied to a specific agent framework instead of a category narrative.</p>
+          <div class="fc-evidence">
+            <div class="fc-evidence-item"><strong>EVIDENCE</strong> Pre-execution hook trace + reroute</div>
+            <div class="fc-evidence-item"><strong>SHOWS</strong> Violation caught before the write lands</div>
+          </div>
+          <span class="fc-cta">See the pre-execution gate &rarr;</span>
         </a>
       </div>
     </section>
@@ -520,7 +545,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
             <span class="sc-verdict pass">PASS</span>
             <span class="sc-decision">ADR-001</span>
           </div>
-          <h3>Storage decision enforcement</h3>
+          <h3>Stopping an AI agent from swapping your storage backend</h3>
           <p>JSON-only storage. The agent extends the existing module instead of proposing a Postgres migration.</p>
           <span class="sc-arrow">Read &rarr;</span>
         </a>
@@ -529,7 +554,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
             <span class="sc-verdict warn">WARN</span>
             <span class="sc-decision">Approved-deps</span>
           </div>
-          <h3>Dependency policy enforcement</h3>
+          <h3>Catching an unapproved dependency an AI agent added</h3>
           <p>An unapproved dependency (<code style="font-family:'DM Mono',monospace;font-size:0.85em;">sqlalchemy</code>) is flagged with a structured WARN and a tracked override path.</p>
           <span class="sc-arrow">Read &rarr;</span>
         </a>
@@ -538,7 +563,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
             <span class="sc-verdict fail">FAIL</span>
             <span class="sc-decision">ADR-004</span>
           </div>
-          <h3>Repository pattern enforcement</h3>
+          <h3>Blocking an AI agent that bypasses the repository pattern</h3>
           <p>An ADR-004 violation in <code style="font-family:'DM Mono',monospace;font-size:0.85em;">user.service.ts</code> hard-fails <code style="font-family:'DM Mono',monospace;font-size:0.85em;">mneme check</code> in CI.</p>
           <span class="sc-arrow">Read &rarr;</span>
         </a>
@@ -560,7 +585,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
             <span class="infra-tag-sep">&middot;</span>
             <span class="infra-tag-sub">ADR compiler</span>
           </div>
-          <h3>ADR compiler &mdash; turn architectural decisions into infrastructure</h3>
+          <h3>ADR compiler &mdash; make AI coding agents follow the ADRs you already have</h3>
           <p>The governed Python agent demo works because ADR-005 was compiled from <code style="font-family:'DM Mono',monospace;font-size:0.85em;background:var(--surface2);border-radius:3px;padding:0.05em 0.35em;">docs/adr/</code> into <code style="font-family:'DM Mono',monospace;font-size:0.85em;background:var(--surface2);border-radius:3px;padding:0.05em 0.35em;">project_memory.json</code>. This page explains the compiler step: parse, validate, resolve precedence, emit. No vector store. No ML. Deterministic every run.</p>
           <span class="ic-arrow">See how ADRs become the governance corpus &rarr;</span>
         </a>
