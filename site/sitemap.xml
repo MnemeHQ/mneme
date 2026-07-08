@@ -141,6 +141,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://mnemehq.com/insights/topics/architectural-intent/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://mnemehq.com/insights/harness-engineering-still-needs-governance/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -743,6 +748,7 @@
   <url><loc>https://mnemehq.com/insights/microsoft-agent-platform-governance-layer/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://mnemehq.com/insights/enterprise-ai-guardrails-five-layers/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://mnemehq.com/insights/ai-coding-agent-guardrails/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://mnemehq.com/insights/how-to-maintain-architectural-intent-with-ai-coding-agents/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://mnemehq.com/insights/how-ai-coding-agents-use-adrs/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://mnemehq.com/insights/ai-coding-agent-architecture/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://mnemehq.com/insights/smart-routing-ai-coding-agents/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>

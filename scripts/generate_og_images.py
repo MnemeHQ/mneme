@@ -283,6 +283,9 @@ TEMPLATE_MAP = {
     "og-insights-github-spec-kit.html": "insights/github-spec-kit-who-enforces-architecture/og.png",
     "og-insights-google-spec-driven.html": "insights/google-spec-driven-development-not-enough/og.png",
     "og-insights-agentic-governance-execution.html": "insights/agentic-ai-governance-closer-to-execution/og.png",
+
+    # Insights — new
+    "og-insights-how-to-maintain-intent.html": "insights/how-to-maintain-architectural-intent-with-ai-coding-agents/og.png",
 }
 
 PORT = 8765

@@ -3,27 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Constraint Decay: Why Coding Agents Need Architectural Governance &mdash; Mneme HQ</title>
+  <title>How to Maintain Architectural Intent with AI Coding Agents &mdash; Mneme HQ</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="Constraint decay is the failure mode where LLM coding agents satisfy loose functional specs but lose fidelity to architectural patterns, ORM rules, and framework conventions as structural requirements accumulate. A new arXiv paper quantifies it. The implication: architectural governance must run before the PR review queue." />
+  <meta name="description" content="A practical guide to maintaining architectural intent in agent-first workflows: record decisions as constraints, retrieve them at generation, and check agent changes before they reach a pull request." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
-  <link rel="canonical" href="https://mnemehq.com/insights/constraint-decay-coding-agents-architectural-governance/" />
+  <link rel="canonical" href="https://mnemehq.com/insights/how-to-maintain-architectural-intent-with-ai-coding-agents/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Constraint Decay: Why Coding Agents Need Architectural Governance" />
-  <meta property="og:description" content="Constraint decay is the failure mode where LLM coding agents satisfy loose functional specs but lose fidelity to architectural patterns, ORM rules, and framework conventions as structural requirements accumulate. A new arXiv paper quantifies it. The implication: architectural governance must run before the PR review queue." />
-  <meta property="og:url" content="https://mnemehq.com/insights/constraint-decay-coding-agents-architectural-governance/" />
-  <meta property="og:image" content="https://mnemehq.com/insights/constraint-decay-coding-agents-architectural-governance/og.png" />
+  <meta property="og:title" content="How to Maintain Architectural Intent with AI Coding Agents" />
+  <meta property="og:description" content="A practical guide to maintaining architectural intent in agent-first workflows: record decisions as constraints, retrieve them at generation, and check agent changes before they reach a pull request." />
+  <meta property="og:url" content="https://mnemehq.com/insights/how-to-maintain-architectural-intent-with-ai-coding-agents/" />
+  <meta property="og:image" content="https://mnemehq.com/insights/how-to-maintain-architectural-intent-with-ai-coding-agents/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Constraint Decay: Why Coding Agents Need Architectural Governance" />
-  <meta name="twitter:description" content="Constraint decay is the failure mode where LLM coding agents satisfy loose functional specs but lose fidelity to architectural patterns, ORM rules, and framework conventions as structural requirements accumulate. A new arXiv paper quantifies it. The implication: architectural governance must run before the PR review queue." />
-  <meta name="twitter:image" content="https://mnemehq.com/insights/constraint-decay-coding-agents-architectural-governance/og.png" />
+  <meta name="twitter:title" content="How to Maintain Architectural Intent with AI Coding Agents" />
+  <meta name="twitter:description" content="A practical guide to maintaining architectural intent in agent-first workflows: record decisions as constraints, retrieve them at generation, and check agent changes before they reach a pull request." />
+  <meta name="twitter:image" content="https://mnemehq.com/insights/how-to-maintain-architectural-intent-with-ai-coding-agents/og.png" />
   <meta name="author" content="Theo Valmis" />
-  <meta property="article:published_time" content="2026-05-28T00:00:00Z" />
+  <meta property="article:published_time" content="2026-07-08T00:00:00Z" />
   <meta property="article:author" content="https://mnemehq.com/founder/" />
   <meta property="article:section" content="Engineering" />
 
@@ -126,66 +126,23 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
         "itemListElement": [
           {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mnemehq.com/"},
           {"@type": "ListItem", "position": 2, "name": "Insights", "item": "https://mnemehq.com/insights/"},
-          {"@type": "ListItem", "position": 3, "name": "Constraint Decay: Why Coding Agents Need Architectural Governance", "item": "https://mnemehq.com/insights/constraint-decay-coding-agents-architectural-governance/"}
+          {"@type": "ListItem", "position": 3, "name": "How to Maintain Architectural Intent with AI Coding Agents", "item": "https://mnemehq.com/insights/how-to-maintain-architectural-intent-with-ai-coding-agents/"}
         ]
       },
       {
         "@type": "TechArticle",
-        "headline": "Constraint Decay Is Why Coding Agents Need Architectural Governance",
-        "description": "Constraint decay is the failure mode where LLM coding agents satisfy loose functional specs but lose fidelity to architectural patterns, ORM rules, and framework conventions as structural requirements accumulate. A new arXiv paper quantifies it. The implication: architectural governance must run before the PR review queue.",
-        "url": "https://mnemehq.com/insights/constraint-decay-coding-agents-architectural-governance/",
-        "datePublished": "2026-05-28",
+        "headline": "How to Maintain Architectural Intent with AI Coding Agents",
+        "description": "A practical guide to maintaining architectural intent in agent-first workflows: record decisions as constraints, retrieve them at generation, and check agent changes before they reach a pull request.",
+        "url": "https://mnemehq.com/insights/how-to-maintain-architectural-intent-with-ai-coding-agents/",
+        "datePublished": "2026-07-08",
         "author": {"@type": "Person", "name": "Theo Valmis", "url": "https://mnemehq.com/founder/"},
-        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/"},
-        "about": [
-          {"@type": "Thing", "name": "Constraint decay"},
-          {"@type": "Thing", "name": "Architectural drift"},
-          {"@type": "Thing", "name": "AI coding agents architectural governance"},
-          {"@type": "Thing", "name": "Static verification for coding agents"},
-          {"@type": "Thing", "name": "LLM agents backend code generation"},
-          {"@type": "Thing", "name": "AI-assisted development governance"}
-        ],
-        "citation": {
-          "@type": "ScholarlyArticle",
-          "name": "Constraint Decay: The Fragility of LLM Agents in Backend Code Generation",
-          "url": "https://arxiv.org/abs/2605.06445"
-        }
-      },
-      {
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "What is constraint decay in LLM coding agents?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Constraint decay is the failure mode in which an LLM coding agent starts with a valid goal but loses adherence to structural requirements as the task becomes more constrained. The code may still pass behavioral tests while violating architectural patterns, ORM rules, framework conventions, or data-layer boundaries."}
-          },
-          {
-            "@type": "Question",
-            "name": "How is constraint decay different from a normal coding bug?",
-            "acceptedAnswer": {"@type": "Answer", "text": "A normal coding bug means the code does not work. Constraint decay means the code works but ignores the structure of the system it was supposed to extend — wrong layer, wrong access pattern, wrong dependency. The behavior is correct; the architecture is not."}
-          },
-          {
-            "@type": "Question",
-            "name": "How is constraint decay related to architectural drift?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Constraint decay is the local, per-change failure mode. Architectural drift is what happens when those local failures compound across many agent-generated changes over time. Decay is the mechanism; drift is the accumulated system-level consequence."}
-          },
-          {
-            "@type": "Question",
-            "name": "Why are tests not enough to catch constraint decay?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Tests validate behavior. They confirm that an endpoint returns the right response. They do not in general confirm that the implementation used the approved repository pattern, respected a service boundary, or complied with an ADR. Catching constraint decay requires static verification of intent, not just behavior."}
-          },
-          {
-            "@type": "Question",
-            "name": "What is architectural governance for AI-assisted development?",
-            "acceptedAnswer": {"@type": "Answer", "text": "Architectural governance turns architectural decisions, ADRs, and project constraints into executable checks that run before generation, during agent workflows, and in CI — not policy documents that depend on senior reviewers spotting violations after the fact."}
-          }
-        ]
+        "publisher": {"@type": "Organization", "name": "Mneme HQ", "url": "https://mnemehq.com/"}
       }
     ]
   }
   </script>
 
-  <style>
+<style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --bg: #0c0c0d; --surface: #141416; --surface2: #1a1a1d;
@@ -222,7 +179,6 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     .article-body ul, .article-body ol { margin: 0 0 1.25rem 1.5rem; color: var(--muted); }
     .article-body li { margin-bottom: 0.5rem; }
     .article-body li strong { color: var(--text); font-weight: 500; }
-    .article-body .tight { margin-bottom: 0.5rem; }
 
     .callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
     .callout p { margin: 0; color: var(--muted); font-size: 0.88rem; }
@@ -265,6 +221,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
     .byline a:hover { color: var(--text); }
     .byline .sep { color: var(--border2); margin: 0 0.5rem; }
 
+    /* === Nav upgrade === */
     .nav-hamburger {
       display: none;
       background: none;
@@ -340,6 +297,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
       .nav-links .btn-nav-cta { margin-top: 1rem; text-align: center; display: block; }
     }
 
+    /* === Related reading === */
     .related-panel { margin-top: 3.5rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
     .related-panel-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
     .related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
@@ -354,6 +312,19 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
 
     @media (max-width: 768px) { nav, .mobile-menu { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } }
 
+    /* === Diagram styles === */
+    .diag-box { fill: #141416; stroke: #2e2e34; }
+    .diag-box-active { fill: rgba(200,240,96,0.05); stroke: #c8f060; stroke-width: 1.5; }
+    .diag-box-teal { fill: rgba(139,224,200,0.05); stroke: #8be0c8; stroke-width: 1.2; }
+    .diag-text { fill: #e8e8ec; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; }
+    .diag-meta { fill: #88889a; font-family: 'DM Mono', monospace; font-size: 10px; }
+    .diag-accent-text { fill: #c8f060; }
+    .diag-teal-text { fill: #8be0c8; }
+    .diag-mono { font-family: 'DM Mono', monospace; }
+    .diag-arrow { stroke: #2e2e34; stroke-width: 1; fill: none; }
+    .diag-arrow-active { stroke: #c8f060; stroke-width: 1.5; fill: none; }
+    .diag-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; margin: 2.5rem 0; }
+    .diag-caption { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); margin-top: 1rem; text-align: center; letter-spacing: 0.06em; text-transform: uppercase; }
     .gov-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.85rem; }
     .gov-table th { background: var(--surface); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border2); }
     .gov-table td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; }
@@ -387,186 +358,115 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
   <ol class="breadcrumb">
     <li><a href="/">Home</a></li>
     <li><a href="/insights/">Insights</a></li>
-    <li aria-current="page">Constraint Decay: Why Coding Agents Need Architectural Governance</li>
+    <li aria-current="page">How to Maintain Architectural Intent</li>
   </ol>
 </nav>
 
 <article class="article-wrap">
   <header class="article-header">
     <div class="article-eyebrow">
-      <span class="eyebrow-tag">Research</span>
+      <span class="eyebrow-tag">Guide</span>
       <span class="eyebrow-dot"></span>
       <span class="eyebrow-meta">9 min read</span>
     </div>
-    <h1>Constraint Decay Is Why Coding Agents Need Architectural Governance</h1>
-    <p class="article-lede">Coding agents are getting better at producing code. That is no longer the interesting part. The more important question is whether the code they produce still belongs inside the system they are modifying. A new arXiv paper gives the failure mode a name &mdash; constraint decay &mdash; and quantifies it: capable agent configurations lose around 30 points in assertion pass rates as structural requirements accumulate.</p>
-    <p class="byline">By <a href="/founder/">Theo Valmis</a><span class="sep">&middot;</span><time datetime="2026-05-28">May 2026</time></p>
+    <h1>How to Maintain Architectural Intent with AI Coding Agents</h1>
+    <p class="article-lede">AI coding agents now plan changes and write code across your repository, not just autocomplete a line. They are fast, and most of the time the code works. The quieter problem is that an agent can produce locally valid code that drifts away from the architecture the team agreed to maintain. This is a practical guide to keeping architectural intent intact in an agent-first workflow, without slowing agents down.</p>
+    <p class="byline">By <a href="/founder/">Theo Valmis</a><span class="sep">&middot;</span><time datetime="2026-07-08">July 2026</time></p>
   </header>
 
   <div class="article-body">
 
-    <p>A new paper, <a href="https://arxiv.org/abs/2605.06445" rel="noopener"><strong>Constraint Decay: The Fragility of LLM Agents in Backend Code Generation</strong></a>, gives a useful name to a failure mode many engineering teams are already starting to feel. The authors study how LLM agents perform when backend generation tasks require not only functional correctness, but also adherence to structural constraints such as architectural patterns, databases, object-relational mappings, and framework conventions. Their finding is direct: agents perform well under loose specifications, but degrade as structural requirements accumulate. The paper evaluates <strong>80 greenfield generation tasks and 20 feature-implementation tasks across eight web frameworks</strong>, using both behavioral tests and static verifiers. Capable configurations lose around <strong>30 points on average</strong> in assertion pass rates from baseline to fully specified tasks.</p>
 
-    <p>That phenomenon is what the authors call <strong>constraint decay</strong>.</p>
+    <h2>What Changed: Agents Removed the Architectural Checkpoint</h2>
+    <p>For most of the last two years, AI assistance meant suggestions. A developer stayed in the loop, accepting or rejecting each line. That developer was also, without anyone naming it, an architectural checkpoint: the person who knew the ledger is reached only through its API and quietly declined the shortcut.</p>
+    <p>Agent-first workflows remove that checkpoint. Coding agents now read the repository, plan a change, edit several files, run the tests, and open a pull request. The human moves from author to reviewer of finished work. The speed is real, and so is the loss of the moment where someone used to ask whether the change was built the way the system is supposed to be built. <a href="/insights/agent-first-ides-need-architectural-invariants/">Agent-first IDEs need architectural invariants</a> precisely because the invariant no longer lives in a person&rsquo;s head at the point of change.</p>
 
-    <p>It is an important phrase because it separates two different problems.</p>
-
-    <p>The first problem is obvious: the generated code does not work.</p>
-
-    <p>The second problem is more dangerous: the generated code works, but violates the structure of the system.</p>
-
+    <h2>Why Architectural Intent Gets Lost</h2>
+    <p><a href="/concepts/executable-architectural-intent/">Architectural intent</a> is the set of system-level decisions a team commits to: which modules may depend on which, where data access is allowed, which boundaries are load-bearing, which patterns are approved. An agent loses that intent for four ordinary reasons.</p>
     <ul>
-      <li>It bypasses the intended data layer.</li>
-      <li>It ignores the ORM convention.</li>
-      <li>It places logic in the wrong boundary.</li>
-      <li>It follows the endpoint contract but not the architectural contract.</li>
-      <li>It satisfies a test while weakening the codebase.</li>
+      <li><strong>Context windows are finite.</strong> The agent sees the files in front of it, not the decision made eighteen months ago in a discussion that produced no durable artifact.</li>
+      <li><strong>Reasoning is repo-local.</strong> An agent optimizes the change it was asked for. A direct database read that shaves latency looks correct locally and violates a boundary globally.</li>
+      <li><strong>Instructions go stale.</strong> Rule files and CLAUDE.md capture intent as prose, then fall behind the code and get skipped under token pressure. That is why <a href="/insights/mneme-vs-cursor-rules/">Cursor Rules are not enough to hold architectural intent</a>.</li>
+      <li><strong>Autonomy compounds.</strong> Every step an agent takes without review removes a checkpoint faster than teams replace it, and <a href="/insights/why-context-alone-doesnt-prevent-architectural-drift/">context alone does not prevent the drift</a> that follows.</li>
     </ul>
 
-    <p>That distinction matters.</p>
+    <h2>The Failure Mode: Correct Code That Violates a Decision</h2>
+    <p>The failure is rarely broken code. It is correct code that breaks a decision. Take a concrete case. The billing service is supposed to reach the ledger only through its API boundary. An agent asked to cut latency adds a direct database read. The change works. The tests pass, because they test behavior and the behavior is fine. The latency target is met. And the architecture just drifted, because the constraint that mattered was never written anywhere a test could see it.</p>
+    <p><a href="/concepts/architectural-drift/">Architectural drift</a> compounds this way: a run of individually reasonable changes, each locally valid, each approved by a reviewer who had no machine-checkable statement of the system&rsquo;s intent. Fluent, well-formatted diffs are the engineering version of fluent prose. The polish is exactly what makes the drift hard to see.</p>
+    <div class="callout"><p><strong>Tests answer &ldquo;does it work?&rdquo;</strong> Maintaining architectural intent answers a different question: &ldquo;is this how our system is supposed to be built?&rdquo; Most pipelines have no automated answerer for the second question.</p></div>
 
-    <p>Functional correctness tells you whether the output behaves as expected. Structural correctness tells you whether the output preserves the system it was supposed to extend.</p>
+    <h2>The Loop: Record, Retrieve, Check, Reject, Return</h2>
+    <p>Maintaining architectural intent in an agent-first workflow is a loop, not a document. Each step is something an engineering team can put in place this quarter.</p>
+    <ol>
+      <li><strong>Record</strong> each architectural decision as structured data with its constraints, not as prose in a wiki. An <a href="https://adr.github.io/" target="_blank" rel="noopener">architecture decision record</a> is the right unit: the decision, its rationale, and the rule it implies.</li>
+      <li><strong>Retrieve</strong> the decisions relevant to the current change and put them in front of the agent at generation time, so it plans against the constraint instead of around it.</li>
+      <li><strong>Check</strong> the proposed change against those decisions deterministically, so the same change earns the same verdict independent of the model.</li>
+      <li><strong>Reject</strong> violations before the pull request exists, not after review has already spent someone&rsquo;s afternoon.</li>
+      <li><strong>Return</strong> the reason for the rejection, so the agent can retry compliantly instead of guessing.</li>
+    </ol>
+    <p>The property that makes the loop work is that the check runs <a href="/concepts/governance-before-generation/">before generation</a>, not after merge. A <a href="/concepts/verification-contracts/">verification contract</a> turns a recorded decision into a check the agent has to satisfy, and <a href="/concepts/deterministic-enforcement/">deterministic enforcement</a> keeps the verdict stable so agents and reviewers can trust it.</p>
 
-    <div class="callout"><p><strong>The problem is not that the agent cannot write code.</strong> The problem is that it cannot reliably preserve the rules that make the code belong to this system.</p></div>
-
-    <h2>Constraint decay becomes architectural drift</h2>
-    <p>Constraint decay is the local failure mode.</p>
-    <p><a href="/concepts/architectural-drift/">Architectural drift</a> is the accumulated consequence.</p>
-    <p>A single agent-generated change that ignores an ORM pattern may look harmless. A single shortcut around a service boundary may even pass review if the behavior is correct. But when agents are producing more code, more frequently, across more surfaces, those small structural violations compound.</p>
-    <p>Over time, the system starts to diverge from its intended architecture.</p>
-    <p>The issue is not that the team forgot its architecture. The issue is that the architecture was never made executable at the point where agents were generating code.</p>
-
+    <h2>What Teams Should Do</h2>
+    <p>You do not need to encode the whole architecture. You need the few decisions that hurt most when an agent breaks them.</p>
     <div style="overflow-x:auto;margin:2rem 0;">
     <table class="gov-table">
-      <thead><tr><th>Failure mode</th><th>What broke</th><th>Where it shows up</th></tr></thead>
+      <thead><tr><th>Step</th><th>What it means</th><th>What it replaces</th></tr></thead>
       <tbody>
-        <tr><td>Functional failure</td><td>The code does not work</td><td>Tests, runtime errors</td></tr>
-        <tr><td>Constraint decay</td><td>The code works but ignores structural rules</td><td>Per-PR &mdash; if anyone looks for it</td></tr>
-        <tr class="accent-row"><td>Architectural drift</td><td>Decay accumulated across the codebase</td><td>Months later, in rework and incidents</td></tr>
+        <tr><td>Capture decisions</td><td>Write the load-bearing decisions as ADRs with explicit constraints</td><td>Tribal knowledge and stale wiki pages</td></tr>
+        <tr><td>Make them enforceable</td><td>Turn each ADR into a machine-checkable guardrail</td><td>Prose instructions agents ignore</td></tr>
+        <tr><td>Bind checks to the agent workflow</td><td>Run the checks at generation and before edits land</td><td>Post-hoc discovery in code review</td></tr>
+        <tr class="accent-row"><td>Review violations, not diffs</td><td>Spend human attention on the constraint that was hit</td><td>Line-by-line reading of every generated change</td></tr>
       </tbody>
     </table>
     </div>
+    <p>Start with three or four decisions. The point is not coverage on day one. It is to move the highest-stakes intent out of people&rsquo;s heads and into a form an agent has to respect. <a href="/insights/ai-coding-agent-guardrails/">AI coding-agent guardrails</a> are how that intent stays enforced as the number of agents and the volume of generated code grow.</p>
 
-    <p>This is the core governance gap in AI-assisted development.</p>
-    <p>Teams already have decisions. They have ADRs, conventions, code review norms, database boundaries, framework preferences, and hard-won lessons about what not to do. But most of those constraints remain written for humans. They live in documents, comments, onboarding conversations, and senior engineers&rsquo; heads.</p>
-    <p>Coding agents do not reliably preserve that kind of context.</p>
-    <p>They need executable boundaries.</p>
+    <h2>Where Mneme HQ Fits</h2>
+    <p>Mneme is open-source infrastructure for exactly this loop. It records architectural decisions as structured, retrievable constraints, surfaces the relevant ones when an agent works, and checks a proposed change against them before generation and before edits land. When a change violates a decision, Mneme returns the reason so the agent can retry compliantly. The checks are deterministic: the same change earns the same verdict, and no decision depends on the model staying in a good mood.</p>
+    <p>It is worth being precise about the boundary. Mneme does not watch your repository for drift after the fact, and it does not reconstruct who changed what. The design point is earlier: catch the change that would break a decision at the moment an agent proposes it, so the drift never reaches the pull request. If you want to see that loop run, the <a href="/demo/">live demo</a> walks a violating change through record, check, and reject, and you can <a href="/pilot/">request a pilot</a> to try it against your own decisions.</p>
 
-    <h2>Tests are necessary, but not sufficient</h2>
-    <p>One of the most useful parts of the paper is its evaluation design. The authors use both end-to-end behavioral tests and static verifiers. That separation is critical. Behavioral tests evaluate whether the generated application works. Static verifiers evaluate whether the code satisfies structural requirements.</p>
-    <p>That maps directly to the infrastructure gap emerging around coding agents.</p>
-    <div class="callout"><p><strong>Tests validate behavior. Governance validates intent.</strong></p></div>
-    <p>A test can tell you whether an endpoint returns the right response. It may not tell you whether the implementation used the approved repository pattern. It may not detect that a dependency crossed the wrong layer. It may not know that the team has an ADR prohibiting a certain storage path, framework shortcut, or migration pattern.</p>
-    <p>In traditional development, senior engineers often caught these issues during review. That worked when code volume was human-paced.</p>
-    <p>AI changes the economics.</p>
-    <p>If agents increase the volume of generated code, and structural validation remains concentrated at PR review, then the review queue becomes the governance layer by accident. Senior engineers become constraint recovery systems.</p>
-    <p>That is not scalable.</p>
-
-    <h2>Backend systems expose the problem faster</h2>
-    <p>The paper&rsquo;s backend focus is especially useful because backend systems make structural decay harder to hide.</p>
-    <p>Frontend demos can often look plausible while hiding poor structure. Backend systems have more explicit architectural commitments: data access patterns, schema constraints, framework conventions, service boundaries, API contracts, and runtime behavior.</p>
-    <p>The authors find significant variation across frameworks. Agents do better in minimal, explicit environments such as Flask and worse in more convention-heavy environments such as FastAPI and Django. They also identify data-layer defects, including incorrect query composition and ORM runtime violations, as leading causes.</p>
-    <p>That is the part engineering leaders should pay attention to.</p>
-    <p>The more a system depends on conventions, implicit architecture, and layered data access, the more fragile agent-generated code becomes without governance.</p>
-    <p>This is not a prompt problem alone.</p>
-    <p>You can put more instructions in the prompt. You can ask the agent to be careful. You can paste the architecture into context. Those things may help, but they do not create a reliable enforcement layer.</p>
-    <div class="callout"><p><strong>Instructions are not invariants.</strong></p></div>
-
-    <h2>The next layer is architectural governance</h2>
-    <p>The AI coding stack is still heavily focused on generation.</p>
-    <ul>
-      <li>Better models.</li>
-      <li>Better IDEs.</li>
-      <li>Better autocomplete.</li>
-      <li>Better agent loops.</li>
-      <li>Better test generation.</li>
-      <li>Better PR summaries.</li>
-    </ul>
-    <p>All of that matters.</p>
-    <p>But as generation improves, the bottleneck shifts.</p>
-    <p>The question becomes: who preserves the architecture?</p>
-    <p>That is where <a href="/concepts/architectural-governance/">architectural governance</a> becomes infrastructure. Not governance in the abstract enterprise-policy sense. Governance as executable technical constraints inside the development workflow.</p>
-    <p>A governance layer should be able to answer questions like:</p>
-    <ul>
-      <li>Does this change violate an architectural decision?</li>
-      <li>Did the agent introduce a dependency across a forbidden boundary?</li>
-      <li>Did it bypass the approved data access pattern?</li>
-      <li>Did it modify a surface that should be out of scope?</li>
-      <li>Can we trace the violation back to the decision it contradicts?</li>
-      <li>Can this check run before the PR review queue?</li>
-    </ul>
-    <p>That is the shift from documentation to <a href="/concepts/verification-contracts/">verification contracts</a>.</p>
-    <p>Architecture cannot remain passive context when agents are actively generating code. It has to become enforceable.</p>
-
-    <h2>Where Mneme fits</h2>
-    <p>This is the category Mneme is being built for: <strong>architectural governance for AI-assisted development</strong>.</p>
-    <p>Mneme is not trying to be another semantic memory layer or generic RAG system. The goal is to make architectural decisions enforceable across the places where AI-assisted development happens.</p>
-    <p>That means turning decisions, ADRs, and project constraints into checks that can run <a href="/concepts/governance-before-generation/">before generation</a>, during agent workflows, and in CI.</p>
-    <p>A coding assistant can generate.</p>
-    <p>A test suite can validate behavior.</p>
-    <p>A PR reviewer can still apply judgment.</p>
-    <p>But the architectural invariants should not depend entirely on late human review. They should be available as executable guardrails.</p>
-    <p>That is why constraint decay is such a useful research framing. It gives language to the exact failure mode Mneme is designed to address.</p>
-    <ul>
-      <li><strong>Constraint decay</strong> is what happens when agents lose structural fidelity.</li>
-      <li><strong>Architectural drift</strong> is what happens when that decay compounds across a codebase.</li>
-      <li><strong>Architectural governance</strong> is the missing control layer.</li>
-    </ul>
-
-    <h2>Generation needs boundaries</h2>
-    <p>The answer is not to slow coding agents down.</p>
-    <p>The answer is to give them better boundaries.</p>
-    <p>As AI-assisted development becomes normal, teams will not only ask whether agents can produce more code. They will ask whether agents can preserve the architecture, respect the decisions already made, and avoid shifting structural risk into review queues.</p>
-    <p>That is the next maturity step.</p>
-    <div class="callout"><p><strong>The future of AI-assisted development will not be won by generation alone.</strong> It will be won by generation plus governance.</p></div>
 
   </div><!-- /.article-body -->
 
   <section class="article-faq" aria-labelledby="faq-heading" style="margin-top:3rem;">
     <h2 id="faq-heading" style="margin-bottom:1.5rem;">Frequently asked questions</h2>
     <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">What is constraint decay in LLM coding agents?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Constraint decay is the failure mode in which an LLM coding agent starts with a valid goal but loses adherence to structural requirements as the task becomes more constrained. The code may still pass behavioral tests while violating architectural patterns, ORM rules, framework conventions, or data-layer boundaries.</div>
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">How do you maintain architectural intent with AI coding agents?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Treat it as a loop, not a document. Record each load-bearing architectural decision as a structured constraint, retrieve the relevant ones and put them in front of the agent at generation time, check the proposed change against them deterministically, reject violations before the pull request exists, and return the reason so the agent can retry compliantly. The decisions live as machine-checkable guardrails rather than prose an agent can ignore.</div>
     </details>
     <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">How is constraint decay different from a normal coding bug?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">A normal coding bug means the code does not work. Constraint decay means the code works but ignores the structure of the system it was supposed to extend &mdash; wrong layer, wrong access pattern, wrong dependency. The behavior is correct; the architecture is not.</div>
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Why do AI coding agents cause architectural drift?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Because their context is finite and their reasoning is repo-local. An agent optimizes the change it was asked for and cannot see a decision that was never written down where it looks. The result is correct code that violates a system-level constraint &mdash; a direct database read that meets a latency goal while breaking an API boundary. Growing agent autonomy removes the human checkpoints that used to catch it.</div>
     </details>
     <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">How is constraint decay related to architectural drift?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Constraint decay is the local, per-change failure mode. Architectural drift is what happens when those local failures compound across many agent-generated changes over time. Decay is the mechanism; drift is the accumulated system-level consequence.</div>
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Are rule files or CLAUDE.md enough to keep agents aligned?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Not on their own. Prose instructions fall behind the code, compete for a finite context window, and get skipped under token pressure, with no precedence rules when two instructions conflict. They are useful for steering, but they are not enforcement. Architectural intent holds only when the decision is a check the agent has to satisfy, not a paragraph it is asked to remember.</div>
     </details>
     <details style="border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;">
-      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Why are tests not enough to catch constraint decay?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Tests validate behavior. They confirm that an endpoint returns the right response. They do not in general confirm that the implementation used the approved repository pattern, respected a service boundary, or complied with an ADR. Catching constraint decay requires static verification of intent, not just behavior.</div>
-    </details>
-    <details style="border:1px solid var(--border);border-radius:8px;overflow:hidden;">
-      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">What is architectural governance for AI-assisted development?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
-      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Architectural governance turns architectural decisions, ADRs, and project constraints into executable checks that run before generation, during agent workflows, and in CI &mdash; not policy documents that depend on senior reviewers spotting violations after the fact.</div>
+      <summary style="padding:1rem 1.25rem;cursor:pointer;font-weight:500;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">Can you enforce architectural intent without slowing agents down?<span style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-left:1rem;">+</span></summary>
+      <div style="padding:0 1.25rem 1.25rem;color:var(--muted);font-size:0.88rem;line-height:1.8;">Yes. Checks that run at generation time return a reason on rejection, so the agent retries compliantly in the same session rather than waiting on human review. Humans then spend their attention on the constraint that was hit, not on reading every generated diff line by line. The loop is designed to keep agent speed while removing the drift it would otherwise produce.</div>
     </details>
   </section>
 
   <aside class="related-panel" aria-labelledby="related-concepts-label" style="margin-top:3rem;">
     <div class="related-panel-label" id="related-concepts-label">Related governance concepts</div>
     <ul class="related-list">
-      <li><a href="/concepts/architectural-drift/"><div class="rel-title">Architectural Drift</div><p class="rel-desc">The gradual divergence between a system&rsquo;s actual state and its documented architectural intent.</p></a></li>
-      <li><a href="/concepts/architectural-governance/"><div class="rel-title">Architectural Governance</div><p class="rel-desc">Architecture made executable: constraints, checks, and release gates that travel with the repo.</p></a></li>
-      <li><a href="/concepts/governance-before-generation/"><div class="rel-title">Governance Before Generation</div><p class="rel-desc">Push architectural intent ahead of the model, not after the PR. Block the deviation, do not catch it.</p></a></li>
-      <li><a href="/concepts/verification-contracts/"><div class="rel-title">Verification Contracts</div><p class="rel-desc">Predefined checks that prove architectural intent survived the agent run.</p></a></li>
+      <li><a href="/concepts/executable-architectural-intent/"><div class="rel-title">Executable Architectural Intent</div><p class="rel-desc">Turning the decisions a team commits to into constraints an agent has to satisfy.</p></a></li>
+      <li><a href="/concepts/architectural-drift/"><div class="rel-title">Architectural Drift</div><p class="rel-desc">How locally valid changes erode a system&rsquo;s intended design over time.</p></a></li>
+      <li><a href="/concepts/governance-before-generation/"><div class="rel-title">Governance Before Generation</div><p class="rel-desc">Constraints applied where code is created, not after it reaches review.</p></a></li>
+      <li><a href="/concepts/verification-contracts/"><div class="rel-title">Verification Contracts</div><p class="rel-desc">Architectural decisions expressed as checks that run on every proposed change.</p></a></li>
     </ul>
   </aside>
 
   <aside class="related-panel" aria-labelledby="related-essays-label" style="margin-top:1.5rem;padding-top:0;border-top:none;">
-    <div class="related-panel-label" id="related-essays-label">Related operational essays</div>
+    <div class="related-panel-label" id="related-essays-label">More on maintaining architectural intent</div>
     <ul class="related-list">
-      <li><a href="/insights/how-to-maintain-architectural-intent-with-ai-coding-agents/"><div class="rel-title">How to Maintain Architectural Intent with AI Coding Agents</div><p class="rel-desc">The practical loop: record, retrieve, check, reject, return, before the pull request.</p></a></li>
-      <li><a href="/insights/topics/architectural-intent/"><div class="rel-title">Maintaining Architectural Intent in Agent-First Workflows</div><p class="rel-desc">The topic hub gathering the full cluster on keeping architectural intent enforced.</p></a></li>
-      <li><a href="/insights/why-context-alone-doesnt-prevent-architectural-drift/"><div class="rel-title">Why Context Alone Doesn’t Prevent Architectural Drift</div><p class="rel-desc">Retrieval helps recall; drift comes from local optimization, not forgetting.</p></a></li>
-      <li><a href="/insights/why-context-alone-doesnt-prevent-architectural-drift/"><div class="rel-title">Why Context Alone Doesn&rsquo;t Prevent Architectural Drift</div><p class="rel-desc">Better recall does not enforce constraints. The missing layer is governance.</p></a></li>
-      <li><a href="/insights/pr-review-is-becoming-incident-response/"><div class="rel-title">PR Review Is Becoming Incident Response</div><p class="rel-desc">As agent output grows, the review queue turns into a constraint-recovery system.</p></a></li>
-      <li><a href="/insights/ai-code-review-does-not-scale-linearly/"><div class="rel-title">AI Code Review Does Not Scale Linearly</div><p class="rel-desc">Generation throughput rises faster than review throughput. The math forces governance earlier.</p></a></li>
-      <li><a href="/insights/datadog-state-of-ai-engineering-governance-crisis/"><div class="rel-title">Datadog State of AI Engineering: The Governance Crisis</div><p class="rel-desc">Industry data shows the same pattern: more agent code, fewer enforced architectural invariants.</p></a></li>
-      <li><a href="/insights/ai-coding-productivity-gains-rework/"><div class="rel-title">Why AI Coding Productivity Gains Lead to More Rework</div><p class="rel-desc">Faros 2026 telemetry: throughput rises, but so do bugs, churn, and rework.</p></a></li>
+      <li><a href="/insights/topics/architectural-intent/"><div class="rel-title">Topic: Maintaining Architectural Intent in Agent-First Workflows</div><p class="rel-desc">The full cluster: how architectural intent is lost, and how teams keep it enforced.</p></a></li>
+      <li><a href="/insights/agent-first-ides-need-architectural-invariants/"><div class="rel-title">Agent-First IDEs Need Architectural Invariants</div><p class="rel-desc">Why the invariant has to live outside the developer&rsquo;s head once agents write the code.</p></a></li>
+      <li><a href="/insights/mneme-vs-cursor-rules/"><div class="rel-title">Mneme vs Cursor Rules</div><p class="rel-desc">Where prose rule files stop holding architectural intent, and what replaces them.</p></a></li>
+      <li><a href="/insights/why-context-alone-doesnt-prevent-architectural-drift/"><div class="rel-title">Why Context Alone Doesn&rsquo;t Prevent Architectural Drift</div><p class="rel-desc">Retrieval helps an agent see a decision; it does not make the agent obey it.</p></a></li>
+      <li><a href="/insights/ai-coding-agent-guardrails/"><div class="rel-title">AI Coding-Agent Guardrails</div><p class="rel-desc">How enforceable guardrails keep intent intact as agents and output scale.</p></a></li>
+      <li><a href="/insights/models-are-temporary-architectural-intent-is-not/"><div class="rel-title">Models Are Temporary, Architectural Intent Is Not</div><p class="rel-desc">Why the durable asset is the decision record, not the model that read it.</p></a></li>
     </ul>
   </aside>
 
@@ -579,8 +479,8 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
   <footer class="article-footer">
     <a href="/insights/" class="back-link">&larr; Back to Insights</a>
     <div class="cta-block">
-      <h3>Stop letting constraint decay reach the PR queue</h3>
-      <p>Mneme compiles ADRs and project constraints into deterministic checks that run before generation and in CI &mdash; the same rules, across every agent and tool. Open source.</p>
+      <h3>Make your architectural decisions executable.</h3>
+      <p>Mneme turns the decisions your team already made into constraints that coding agents retrieve at generation time and that CI checks deterministically, before drift reaches the pull request. Open source.</p>
       <a href="/demo/" style="display:inline-block;margin-right:1.25rem;color:#c8f060;font-family:'DM Mono',monospace;font-size:0.85rem;text-decoration:none;">See the live demo &rarr;</a>
       <a href="https://github.com/MnemeHQ/mneme" class="btn-primary">View on GitHub &rarr;</a>
     </div>
