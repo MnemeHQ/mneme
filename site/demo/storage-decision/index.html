@@ -3,23 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Storage Decision Enforcement — Demo Scenario | Mneme HQ</title>
+  <title>Stopping an AI agent from swapping your storage backend | Mneme HQ</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
-  <meta name="description" content="A walkthrough of how Mneme enforces ADR-001 — JSON-only storage, no external database — when an AI coding agent is asked to refactor a storage backend. Same prompt, same model, different answer." />
+  <meta name="description" content="An AI coding agent asked to refactor a storage backend proposes a Postgres migration. Mneme enforces ADR-001 — JSON-only storage, no external database — before generation, so the agent extends the existing module instead. Same prompt, same model, different answer." />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#0c0c0d" />
   <link rel="canonical" href="https://mnemehq.com/demo/storage-decision/" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Storage Decision Enforcement — Demo Scenario" />
+  <meta property="og:title" content="Stopping an AI agent from swapping your storage backend" />
   <meta property="og:description" content="How Mneme enforces ADR-001 (JSON-only storage) when an AI agent proposes migrating to PostgreSQL or Redis. PASS verdict in mneme check." />
   <meta property="og:url" content="https://mnemehq.com/demo/storage-decision/" />
   <meta property="og:image" content="https://mnemehq.com/demo/storage-decision/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Storage Decision Enforcement — Demo Scenario" />
+  <meta name="twitter:title" content="Stopping an AI agent from swapping your storage backend" />
   <meta name="twitter:description" content="How Mneme enforces ADR-001 (JSON-only storage) when an AI agent proposes migrating to PostgreSQL or Redis. PASS verdict in mneme check." />
   <meta name="twitter:image" content="https://mnemehq.com/demo/storage-decision/og.png" />
   <meta name="author" content="Theo Valmis" />
@@ -130,7 +130,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
       },
       {
         "@type": "Article",
-        "headline": "Storage Decision Enforcement — Demo Scenario",
+        "headline": "Stopping an AI agent from swapping your storage backend",
         "description": "Walkthrough of how Mneme enforces ADR-001 (JSON-only storage) when an AI coding agent proposes a database migration. Same prompt, same model, different answer.",
         "url": "https://mnemehq.com/demo/storage-decision/",
         "datePublished": "2026-05-09",
@@ -396,7 +396,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
       <span class="eyebrow-dot"></span>
       <span class="verdict-pill pass">PASS</span>
     </div>
-    <h1>Storage decision enforcement</h1>
+    <h1>Stopping an AI agent from swapping your storage backend</h1>
     <p class="lede">An AI coding agent is asked to refactor a storage backend "for scalability." Without governance it proposes a Postgres migration. With Mneme, ADR-001 is injected before generation and the agent extends the existing JSON storage module instead. Same prompt, same model, different answer.</p>
     <p class="byline">
       By <a href="/founder/">Theo Valmis</a>

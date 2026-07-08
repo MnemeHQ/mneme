@@ -5,7 +5,7 @@
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/favicon.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Architectural drift prevention — the AI SDLC entropy demo | Mneme HQ</title>
+  <title>Preventing architectural drift from AI coding agents | Mneme HQ</title>
   <link rel="preload" href="/assets/fonts/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
@@ -15,12 +15,12 @@
   <link rel="canonical" href="https://mnemehq.com/demo/architectural-drift/" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Mneme HQ" />
-  <meta property="og:title" content="Architectural drift prevention — the AI SDLC entropy demo" />
+  <meta property="og:title" content="Preventing architectural drift from AI coding agents" />
   <meta property="og:description" content="A six-step timeline. An agent proposes reasonable-looking code that violates an ADR. Downstream changes amplify the divergence. A reviewer would plausibly miss it. Mneme blocks the first divergence upstream and the system converges." />
   <meta property="og:url" content="https://mnemehq.com/demo/architectural-drift/" />
   <meta property="og:image" content="https://mnemehq.com/demo/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Architectural drift prevention — the AI SDLC entropy demo" />
+  <meta name="twitter:title" content="Preventing architectural drift from AI coding agents" />
   <meta name="twitter:description" content="A six-step timeline showing how drift compounds without a governance layer, and how Mneme blocks the first divergence upstream." />
   <meta name="twitter:image" content="https://mnemehq.com/demo/og.png" />
   <!-- Consent defaults -->
@@ -42,7 +42,7 @@
       },
       {
         "@type": "Article",
-        "headline": "Architectural drift prevention — the AI SDLC entropy demo",
+        "headline": "Preventing architectural drift from AI coding agents",
         "description": "Six-step timeline showing how drift compounds without a governance layer, and how Mneme blocks the first divergence upstream so the system converges.",
         "url": "https://mnemehq.com/demo/architectural-drift/",
         "datePublished": "2026-05-13",
@@ -371,7 +371,7 @@ window.__mnemePixels.push({ done:false, cat:'visitor_id', fn:function () {
         <span class="eyebrow-dot"></span>
         <span class="verdict-pill">RUNNABLE</span>
       </div>
-      <h1>Architectural drift prevention &mdash; the AI SDLC <em>entropy</em> demo.</h1>
+      <h1>Preventing architectural drift from <em>AI coding agents</em>.</h1>
       <p class="lede">AI accelerates entropy. Each agent-produced change is locally reasonable. The system as a whole still drifts because each change silently relaxes an invariant the team had already encoded. <strong>Without a governance layer, drift compounds faster than review can absorb it.</strong> This page walks the failure mode end-to-end and shows what changes when the first divergence is blocked upstream.</p>
       <p class="byline">
         By <a href="/founder/">Theo Valmis</a>
@@ -654,13 +654,13 @@ python run.py</code></pre>
       <div class="next-bar">
         <a class="next-card" href="/demo/governed-python-agent/">
           <div class="nc-label">Flagship 01 &middot; Centerpiece</div>
-          <h4>Governed Python agent</h4>
+          <h4>Blocking AI-generated code that violates an ADR</h4>
           <p>The full product loop: a Python agent proposes a violating import, Mneme blocks it, the agent retries with compliant output.</p>
           <span class="nc-arrow">See the product demo &rarr;</span>
         </a>
         <a class="next-card" href="/demo/multi-agent-governance/">
           <div class="nc-label">Flagship 03</div>
-          <h4>Governance continuity across actors</h4>
+          <h4>Keeping architecture consistent across multiple AI agents</h4>
           <p>The same timeline, scaled up: multiple agents acting on a shared invariant set. The category insight at the limit.</p>
           <span class="nc-arrow">See the trace &rarr;</span>
         </a>
