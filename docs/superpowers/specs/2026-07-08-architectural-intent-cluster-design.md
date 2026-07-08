@@ -84,3 +84,58 @@ All must pass before PR:
 2. The how-to page is live, fully registered, passes all validators.
 3. Each of the 9 members has ≥3 inbound internal links and links up to the hub.
 4. Zero validator failures; zero duplicate-intent pages created.
+
+---
+
+## Approved refinements (2026-07-08 review)
+
+### R1. Hub carries an extractable definition block (before the cards)
+
+The hub is a cluster/navigation surface, but its `.hub-intro` must open with a quotable, self-contained definition so AI systems can extract the cluster's meaning:
+
+> **Maintaining architectural intent in agent-first workflows means preserving system-level decisions, constraints, and engineering standards as AI coding agents plan and generate code.** The challenge is that agents can produce locally valid code while drifting from the architecture the team agreed to maintain.
+
+### R2. Mesh must be contextual, not mechanical
+
+Every member links **up** to the hub, but sibling links are chosen for relevance per source page — never the same three links copied everywhere (reads as over-optimized). Confirmed per-page targets:
+
+| Page | Contextual sibling links (beyond hub) |
+|---|---|
+| `mneme-vs-cursor-rules` | how-to, `agent-first-ides-need-architectural-invariants`, `/compare/cursor-rules/` |
+| `why-context-alone-doesnt-prevent-architectural-drift` | how-to, `/concepts/architectural-drift/`, `ai-coding-agent-guardrails` |
+| `ai-native-engineering-intent-debt` | how-to, `shared-memory-is-not-shared-intent`, `models-are-temporary-architectural-intent-is-not` |
+| `ai-coding-agent-guardrails` | how-to, `/demo/`, `/pilot/`, `/concepts/executable-architectural-intent/` |
+| `agent-first-ides-need-architectural-invariants` | how-to, `mneme-vs-cursor-rules`, `/concepts/executable-architectural-intent/` |
+| `models-are-temporary-architectural-intent-is-not` | how-to, `ai-native-engineering-intent-debt`, `/concepts/architectural-drift/` |
+| `constraint-decay-coding-agents-architectural-governance` | how-to, `why-context-alone-doesnt-prevent-architectural-drift`, `ai-coding-agent-guardrails` |
+| `shared-memory-is-not-shared-intent` | how-to, `ai-native-engineering-intent-debt`, `agent-first-ides-need-architectural-invariants` |
+
+(All targets verified to exist.)
+
+### R3. How-to page outline (practical/procedural, not opinion)
+
+1. **What changed** — AI coding agents now modify systems directly, not just suggest snippets.
+2. **Why architectural intent gets lost** — context windows, repo-local reasoning, stale instructions, agent autonomy.
+3. **The failure mode** — correct code that violates decisions, standards, or system boundaries.
+4. **The loop** — Record → Retrieve → Check → Reject → Return.
+5. **What teams should do** — capture ADRs, turn them into enforceable guardrails, bind checks to agent workflows, review violations.
+6. **Where Mneme HQ fits** — records architectural intent and checks agent actions before code generation/editing.
+7. **FAQ** — practical, bottom-funnel.
+
+### R4. Capability-claim guardrail (aligns to shipped v1)
+
+Per `project_memory.json`, Mneme v1 = deterministic keyword-scoring retrieval with tag boosting + ADR/rule-based checks that run **before** generation/edit. Allowed claims: records architectural intent (ADRs/rules), retrieves relevant governance context, checks agent actions pre-generation/pre-edit, rejects/returns violations. **Do not** imply continuous/real-time drift detection, monitoring, embeddings/semantic search, or post-hoc provenance unless explicitly marked roadmap.
+
+### R5. Execution guardrails (verbatim, applied to all page writing)
+
+- Do not create new thesis pages for topics already covered by existing insights.
+- The new topic hub must be a cluster/navigation surface, not a standalone essay competing with the member pages.
+- The new how-to page must be practical and procedural, not another opinion piece.
+- Use "architectural intent," "agent-first workflows," "AI coding-agent guardrails," and "architecture drift" naturally. Do not keyword-stuff.
+- Preserve existing page metadata unless the page itself is being newly created.
+- Every reciprocal link must be contextually relevant to the source page, not just copied across all pages.
+- Keep capability claims aligned with shipped Mneme behavior (see R4).
+
+### R6. PR title
+
+`site: add architectural intent insight cluster`
