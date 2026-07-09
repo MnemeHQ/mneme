@@ -758,6 +758,8 @@ TEMPLATES = [
     ("og-insights-github-spec-kit.html", "Insights", "Spec Kit Defines the Plan. Who Enforces the Architecture?", "40px", "GitHub Spec Kit structures development intent. An independent layer still has to check the code obeys it.", "insights/github-spec-kit-who-enforces-architecture"),
     ("og-insights-google-spec-driven.html", "Insights", "Spec-Driven Development Is Not Enough", "52px", "Google's paper: code is disposable, the spec is the asset. Architectural compliance should be deterministic, not AI reviewing AI.", "insights/google-spec-driven-development-not-enough"),
     ("og-insights-agentic-governance-execution.html", "Insights", "Governance Moves Closer to Execution", "50px", "As AI agents gain autonomy, from central banks to software teams, constraints move in front of execution.", "insights/agentic-ai-governance-closer-to-execution"),
+    # === July 2026: architectural-intent cluster ===
+    ("og-insights-how-to-maintain-intent.html", "Guide", "How to Maintain Architectural Intent with AI Coding Agents", "40px", "Record decisions as constraints, retrieve them at generation, and check agent changes before the pull request.", "insights/how-to-maintain-architectural-intent-with-ai-coding-agents"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -933,6 +935,8 @@ NEW_MAP_ENTRIES = {
     "og-insights-github-spec-kit.html": "insights/github-spec-kit-who-enforces-architecture/og.png",
     "og-insights-google-spec-driven.html": "insights/google-spec-driven-development-not-enough/og.png",
     "og-insights-agentic-governance-execution.html": "insights/agentic-ai-governance-closer-to-execution/og.png",
+    # July 2026: architectural-intent cluster
+    "og-insights-how-to-maintain-intent.html": "insights/how-to-maintain-architectural-intent-with-ai-coding-agents/og.png",
 }
 
 # ---------------------------------------------------------------------------
