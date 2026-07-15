@@ -50,8 +50,10 @@ theovalmis_index.html
 why-i-built-mneme.html
 scratch/
 
-# Stale processed assets in site root (logo-v2.png is tracked; logo.png is the old dark variant)
+# Stale processed assets in site root (ADR-003 asset versioning; current: logo-v3.png, favicon-v2.png)
 site/logo.png
+site/logo-v2.png
+site/favicon.png
 
 # Internal session memory
 .claude/
