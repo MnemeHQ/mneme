@@ -87,9 +87,10 @@ def collect_urls(prefix_filter: str | None) -> list[str]:
     return urls
 
 
-def fetch_psi(url: str, strategy: str, api_key: str, attempts: int = 3) -> dict:
-    """One PSI call. PSI intermittently returns 500s and read timeouts under load;
-    those are transient and retrying the same URL succeeds."""
+def fetch_psi(url: str, strategy: str, api_key: str, attempts: int = 5) -> dict:
+    """One PSI call. PSI returns 500s and read timeouts when it is being pushed;
+    they are transient, but recovering needs a wait longer than a couple of
+    seconds, so back off up to ~45s before giving the measurement up."""
     params = urllib.parse.urlencode({
         "url": url,
         "strategy": strategy,
@@ -105,7 +106,7 @@ def fetch_psi(url: str, strategy: str, api_key: str, attempts: int = 3) -> dict:
         except Exception as exc:
             last_exc = exc
             if attempt < attempts - 1:
-                time.sleep(3 * 2 ** attempt)  # 3s, 6s
+                time.sleep(3 * 2 ** attempt)  # 3s, 6s, 12s, 24s
     raise last_exc  # type: ignore[misc]
 
 
@@ -161,15 +162,39 @@ def build_row(samples: list[dict], url: str, strategy: str, fetched_at: str) -> 
     return row
 
 
-def measure(url: str, strategy: str, api_key: str, runs: int, delay: float,
-            fetched_at: str) -> dict:
-    """Measure one (url, strategy) `runs` times and return a median row."""
-    samples = []
-    for i in range(runs):
-        samples.append(extract_metrics(fetch_psi(url, strategy, api_key)))
-        if i < runs - 1:
-            time.sleep(delay)
-    return build_row(samples, url, strategy, fetched_at)
+def sample_pass(tasks: list, api_key: str, delay: float, workers: int,
+                samples: dict, pass_no: int, total_passes: int) -> int:
+    """One sweep over every (url, strategy), appending a sample to each.
+
+    Repeats are structured as whole-list passes rather than N back-to-back
+    calls per URL on purpose: PSI serves a cached Lighthouse result for a
+    short window after a request, so re-requesting the same URL seconds later
+    returns the identical run. A full sweep between repeats puts each URL's
+    samples far enough apart to be genuinely independent measurements.
+    """
+    lock = threading.Lock()
+    errors = 0
+
+    def run_one(task):
+        nonlocal errors
+        url, strategy = task
+        try:
+            met = extract_metrics(fetch_psi(url, strategy, api_key))
+        except Exception as exc:
+            with lock:
+                errors += 1
+                print(f"  [{pass_no}/{total_passes}] {strategy:7} {url}  ERROR: {exc}",
+                      flush=True)
+            return
+        with lock:
+            samples[task].append(met)
+            print(f"  [{pass_no}/{total_passes}] {strategy:7} {url}"
+                  f"  score={met['performance_score']}", flush=True)
+        time.sleep(delay)
+
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        list(pool.map(run_one, tasks))
+    return errors
 
 
 def _crux_p75(metrics: dict, key: str) -> float | None:
@@ -243,8 +268,10 @@ def main():
     ap.add_argument("--delay", type=float, default=1.5, help="Seconds between API calls (default 1.5)")
     ap.add_argument("--runs", type=int, default=3,
                     help="PSI runs per url+strategy; the median is stored (default 3)")
-    ap.add_argument("--workers", type=int, default=6,
-                    help="Concurrent url+strategy measurements (default 6)")
+    ap.add_argument("--workers", type=int, default=2,
+                    help="Concurrent PSI calls. PSI starts returning 500s under "
+                         "concurrency from one key: 6 workers produced a 47%% error "
+                         "rate, sequential ~1%%. (default 2)")
     ap.add_argument("--max-error-pct", type=float, default=5.0,
                     help="Fail the run only if more than this %% of measurements error (default 5)")
     args = ap.parse_args()
@@ -286,30 +313,29 @@ def main():
         client = bigquery.Client(project=project, credentials=creds, location=location)
         ensure_table(client, project, location)
 
-    rows: list[dict] = []
     fetched_at = datetime.datetime.utcnow().isoformat() + "Z"
+    samples: dict = {t: [] for t in tasks}
     errors = 0
-    lock = threading.Lock()
 
-    def run_task(task):
-        nonlocal errors
-        url, strategy = task
-        try:
-            row = measure(url, strategy, api_key, args.runs, args.delay, fetched_at)
-        except Exception as exc:
-            with lock:
-                errors += 1
-                print(f"  {strategy:7}  {url}  ERROR: {exc}", flush=True)
-            return
-        with lock:
-            rows.append(row)
-            spread = row["performance_score_max"] - row["performance_score_min"] \
-                if row["performance_score_min"] is not None else 0
-            print(f"  {strategy:7}  {url}  score={row['performance_score']}"
-                  f" (spread {spread})", flush=True)
+    for pass_no in range(1, args.runs + 1):
+        print(f"\n--- pass {pass_no}/{args.runs} ---", flush=True)
+        errors += sample_pass(tasks, api_key, args.delay, args.workers,
+                              samples, pass_no, args.runs)
 
-    with ThreadPoolExecutor(max_workers=args.workers) as pool:
-        list(pool.map(run_task, tasks))
+    rows = [build_row(s, url, strategy, fetched_at)
+            for (url, strategy), s in samples.items() if s]
+
+    measurements = len(tasks) * args.runs
+    spreads = [r["performance_score_max"] - r["performance_score_min"]
+               for r in rows if r["performance_score_min"] is not None]
+    if spreads:
+        identical = sum(1 for s in spreads if s == 0)
+        print(f"\nSpread across runs: mean {statistics.mean(spreads):.1f} pts, "
+              f"max {max(spreads)} pts, {identical}/{len(spreads)} identical")
+        if args.runs > 1 and identical > len(spreads) / 2:
+            print("WARN: over half the pages returned an identical score every run — "
+                  "PSI is likely serving cached results, so the medians are not "
+                  "independent samples.")
 
     if args.dry_run:
         print(json.dumps(rows, indent=2))
@@ -341,8 +367,8 @@ def main():
     # survived retries; failing the whole run on one blip just trains everyone
     # to ignore a permanently red job. Fail only on a systemic error rate.
     if errors:
-        pct = 100 * errors / len(tasks)
-        print(f"\n{errors}/{len(tasks)} measurement(s) failed ({pct:.1f}%)")
+        pct = 100 * errors / measurements
+        print(f"\n{errors}/{measurements} measurement(s) failed ({pct:.1f}%)")
         if pct > args.max_error_pct:
             print(f"FAIL: error rate above --max-error-pct ({args.max_error_pct}%)")
             sys.exit(1)
