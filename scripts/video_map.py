@@ -7,6 +7,7 @@ VIDEO_MAP = {
     "concepts/governance-before-generation": ("tO_Z9rqXXfQ", True),
     "concepts/precedence-semantics": ("tktp6ik0Gxk", True),
     "insights/ai-native-engineering-intent-debt": ("nwSBZXolBhA", True),
+    "insights/barbara-liskov-python-encapsulation-ai-governance": ("qAKrMdUycb8", True),
     "insights/architectural-governance-across-heterogeneous-ai-coding-agents": ("xtTDcb2JB2c", True),
     "insights/autonomous-code-remediation-requires-architectural-governance": ("DDo0x1lkBNI", True),
     "insights/github-copilot-space-framework": ("Rjlzm0psfB4", True),

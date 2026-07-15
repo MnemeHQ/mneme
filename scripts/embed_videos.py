@@ -138,9 +138,12 @@ def replace_video_wrap(html: str, facade: str):
     ``facade`` (in place, preserving any surrounding intro copy). Returns
     (new_html, replaced). No-op (replaced=False) if no .video-wrap is present or
     a yt-facade already exists."""
-    if "yt-facade" in html or 'class="video-wrap"' not in html:
+    if "yt-facade" in html:
         return html, False
-    m = re.search(r'<div class="video-wrap"[^>]*>', html)
+    # Hand-written embeds have used both wrapper classes. Matching only
+    # .video-wrap silently skipped the .video-embed pages, leaving a raw
+    # auto-loading iframe in place.
+    m = re.search(r'<div class="(?:video-wrap|video-embed)"[^>]*>', html)
     if not m:
         return html, False
     start = m.start()
