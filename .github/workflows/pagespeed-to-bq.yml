@@ -1,17 +1,22 @@
 name: PageSpeed → BigQuery
 
-# Runs every Monday at 07:00 UTC — after weekend traffic, before the work week.
-# Also triggerable manually for on-demand runs (e.g. post-deploy validation).
+# On-demand only. This ran weekly for 2+ months and never produced an
+# actionable per-page signal — single-run Lighthouse variance swung the
+# average page 30+ points between measurements, so the weekly deltas were
+# noise. Run it deliberately instead: to take a baseline, or to measure a
+# specific change after it deploys.
 
 on:
-  schedule:
-    - cron: '0 7 * * 1'
   workflow_dispatch:
     inputs:
       url_prefix:
         description: 'URL prefix filter (e.g. /insights/). Leave blank for all pages.'
         required: false
         default: ''
+      runs:
+        description: 'PSI runs per url+strategy; the median is stored.'
+        required: false
+        default: '3'
 
 permissions:
   contents: read
@@ -46,6 +51,7 @@ jobs:
           MNEME_GOOGLE_APPLICATION_CREDENTIALS: /tmp/bq-credentials.json
         run: |
           python scripts/pagespeed_to_bq.py \
+            --runs ${{ github.event.inputs.runs || '3' }} \
             ${{ github.event.inputs.url_prefix != '' && format('--url {0}', github.event.inputs.url_prefix) || '' }}
 
       - name: Clean up credentials
