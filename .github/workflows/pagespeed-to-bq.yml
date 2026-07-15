@@ -20,6 +20,9 @@ jobs:
   pagespeed:
     name: Fetch PSI scores and write to BQ
     runs-on: ubuntu-latest
+    # ~250 pages x 2 strategies x 3 runs, 6 at a time. The default 360m cap
+    # would kill the job partway and lose the batch.
+    timeout-minutes: 240
 
     steps:
       - uses: actions/checkout@v4
