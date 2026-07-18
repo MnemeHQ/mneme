@@ -643,9 +643,6 @@ cd mneme/mneme-project-memory
 
 # Core only
 pip install -e .
-
-# Core + API layer
-pip install -e ".[api]"
 ```
 
 ```bash
