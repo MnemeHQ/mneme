@@ -40,7 +40,7 @@ Copilot integration is generation-based, not hook-based: Mneme HQ compiles your 
 
 ### 7. Does Mneme HQ work with agent frameworks like LangChain, CrewAI, AutoGen?
 
-Yes. Mneme HQ exposes a Python API (`MemoryStore`, `DecisionRetriever`, `ContextBuilder`, `Pipeline`) and a minimal HTTP API (`POST /complete`). Either can be wired into an agent's planning or tool-use loop. The pattern is: build the context packet, inject as system prompt, run the agent step, optionally run `ConflictDetector` against the output.
+Yes. Mneme HQ exposes a Python API (`MemoryStore`, `DecisionRetriever`, `ContextBuilder`, `Pipeline`), which can be wired into an agent's planning or tool-use loop. The pattern is: build the context packet, inject as system prompt, run the agent step, optionally run `ConflictDetector` against the output. A historical `POST /complete` HTTP wrapper has been separated from active core; core is currently consumed through the Python package, the CLI and the supported integrations.
 
 ### 8. What is the `project_memory.json` file?
 
@@ -130,7 +130,7 @@ No. The retrieval, the injection, the conflict detection, and the verdict are al
 pip install mneme
 ```
 
-Dependencies: `anthropic >= 0.25.0`, `python-dotenv >= 1.0.0`. That's the whole list. Python 3.11+. Optional `[api]` extra adds FastAPI and Uvicorn for the HTTP layer. No vector database, no model server, no background service.
+Dependencies: `anthropic >= 0.25.0`, `python-dotenv >= 1.0.0`. That's the whole list. Python 3.11+. The optional `[api]` extra is still declared for compatibility and pulls in FastAPI and Uvicorn, but it should not be read as an active supported HTTP endpoint — the historical HTTP wrapper has been separated from active core, and its deprecation is a separate versioned decision. No vector database, no model server, no background service.
 
 ### 20. How do I add Mneme HQ to an existing project?
 
@@ -158,7 +158,7 @@ Recall@1 is the sharpest tuning dial under fixed methodology. Optimizing against
 
 ### 26. Can I use Mneme HQ without Claude Code?
 
-Yes. The Claude Code hook is one integration; the rest of the system is independent. Use `Pipeline` programmatically against any LLM, run `mneme check` in CI against any repo, generate Cursor rules, or call the HTTP API from an agent framework. The Claude Code hook is the flagship integration because Claude Code exposes a clean PreToolUse hook surface; other agents are reached via generated rules or pipeline integration.
+Yes. The Claude Code hook is one integration; the rest of the system is independent. Use `Pipeline` programmatically against any LLM, run `mneme check` in CI against any repo, or generate Cursor rules. The Claude Code hook is the flagship integration because Claude Code exposes a clean PreToolUse hook surface; other agents are reached via generated rules or pipeline integration.
 
 ### 27. Does Mneme HQ store any code or data externally?
 

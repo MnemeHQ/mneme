@@ -28,8 +28,9 @@ These are shipped but not under freeze; they may evolve without a charter amendm
 - Cursor rules export.
 - Claude Code hook integration.
 - ADR parser/compiler/validator pipeline.
-- The `POST /complete` minimal API surface (no auth, no persistence).
 - Site-level benchmark presentation copy.
+
+The active Layer 1 product surface is the `mneme` Python package, the `mneme` CLI, the enforcement interfaces (`mneme check`, the `mneme-hook` Claude Code hook, Cursor rules export) and the supported integrations. A historical `POST /complete` HTTP wrapper once shipped alongside the legacy benchmark application; it was extracted from core with that application and is no longer part of the product surface. The extraction was structural only — it did not change retrieval, enforcement or benchmark methodology. The `mneme-hq[api]` optional dependency remains declared for compatibility, but it no longer installs an active HTTP layer. Reviving an HTTP surface would require a separate architectural decision.
 
 ## What is deferred
 
@@ -38,7 +39,7 @@ Layer 2 territory. Listed in the freeze doc under §Deferred Work. Promoting any
 - ADR lineage and versioning.
 - Multi-developer / team governance.
 - Shared policy packs.
-- MCP / API surface beyond the minimal `POST /complete`.
+- MCP / HTTP API surface (core ships none today; see *What is experimental*).
 - Deeper IDE integrations (LSP, JetBrains).
 - CI enforcement evolution.
 - Policy compiler / higher-level DSL.
