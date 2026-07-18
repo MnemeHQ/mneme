@@ -1,9 +1,0 @@
-VALID_SCOPES = ("shared", "user_specific")
-VALID_SCORER_TYPES = ("layer1", "layer2", "layer3")
-VALID_ASSIGNMENT_STATUSES = ("pending", "in_progress", "completed", "skipped")
-VALID_AB = ("default", "mneme")
-VALID_WINNERS = ("a", "b", "tie")
-VALID_VISUAL_ORDERS = ("a_left", "a_right")
-VALID_EXECUTION_ORDERS = ("default_first", "mneme_first")
-SCORE_MIN = 1
-SCORE_MAX = 5
