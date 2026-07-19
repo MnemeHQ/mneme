@@ -7,8 +7,8 @@ deliberate, operator-run sequence.
 
 All commands assume:
 
-- You are in the **package directory** `mneme-project-memory/` (this is the
-  build root; `pyproject.toml` lives here).
+- You are in the **repository root** (this is the build root; `pyproject.toml`
+  lives here).
 - Windows 11 with **PowerShell** is the reference environment (this is where the
   hook is exercised in CI). Windows-specific steps below are written in
   PowerShell; the build, `twine`, and `pytest` invocations are cross-platform
@@ -229,7 +229,7 @@ Notes:
 > `tests/integrations/claude_code/test_hook_e2e.py` are **source-level
 > regression tests**, not public-package validation. They import the hook
 > adapter directly from the source checkout, and the adapter launches
-> `[sys.executable, "-m", "mneme", ...]`; run from `mneme-project-memory/` that
+> `[sys.executable, "-m", "mneme", ...]`; run from the repository root that
 > can execute the **local source** package rather than the `pipx`-installed
 > public one. Keep running them (step 5) as regression coverage, but validate
 > the *published* package only through the real plugin path below.
@@ -245,10 +245,7 @@ validation and a plugin-dir load with enforcement forced to `strict`:
 
 ```powershell
 $env:MNEME_HOOK_MODE = "strict"
-$pluginPath = (
-  Resolve-Path `
-    ".\mneme-project-memory\integrations\claude-code-plugin"
-).Path
+$pluginPath = (Resolve-Path ".\integrations\claude-code-plugin").Path
 
 claude.cmd plugin validate $pluginPath --strict
 claude.cmd --plugin-dir $pluginPath
@@ -324,7 +321,7 @@ place as the smoke tests), so the notes path is repository-root-relative:
 ```powershell
 gh release create v0.5.0 `
   --title "mneme-hq 0.5.0" `
-  --notes-file .\mneme-project-memory\docs\releases\v0.5.0.md
+  --notes-file .\docs\releases\v0.5.0.md
 ```
 
 ## 17. Remove the temporary release environment
@@ -365,7 +362,7 @@ Run in order. Do not advance past a failing step.
 - [ ] `claude.cmd plugin validate $pluginPath --strict` passes; `claude.cmd --plugin-dir $pluginPath` loads the plugin (with `MNEME_HOOK_MODE=strict`).
 - [ ] Claude Code smoke tests: compliant Write (`encoding="utf-8"`) succeeds; blocked Write (no `encoding=`) is blocked by the `PreToolUse` hook.
 - [ ] Smoke artifacts removed, `MNEME_HOOK_MODE` cleared, `git status --short` clean.
-- [ ] GitHub release created for `v0.5.0` (`--notes-file .\mneme-project-memory\docs\releases\v0.5.0.md`, from repo root).
+- [ ] GitHub release created for `v0.5.0` (`--notes-file .\docs\releases\v0.5.0.md`, from repo root).
 - [ ] Temporary release venv removed (no second `deactivate`); `git status --short` clean; **then** close the shell.
 - [ ] **Only then:** update the plugin README to drop the install workaround and
       advertise `pipx install "mneme-hq>=0.5.0"` (a separate, follow-up change —

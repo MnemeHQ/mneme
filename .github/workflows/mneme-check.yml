@@ -4,7 +4,7 @@ name: mneme self-check (warn mode)
 #
 # Mode is intentionally `warn`: the CLI returns exit code 0 for every
 # verdict, so verdicts are surfaced as a sticky PR comment but never
-# block a merge. Strict mode for narrow paths (.mneme/, mneme-project-memory/mneme/,
+# block a merge. Strict mode for narrow paths (.mneme/, mneme/,
 # docs/adr/) is a planned follow-up after we accumulate clean warn-history,
 # per the rollout plan in `.mneme/README.md`.
 #
@@ -51,7 +51,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install local mneme package
-        run: pip install -e mneme-project-memory
+        run: pip install -e .
 
       - name: Verify enforcement memory exists
         id: verify-memory
@@ -79,7 +79,7 @@ jobs:
           while IFS= read -r f; do
             [ -z "$f" ] && continue
             case "$f" in
-              mneme-project-memory/mneme/*|docs/adr/*|.mneme/*|site/*|scripts/*) ;;
+              mneme/*|docs/adr/*|.mneme/*|site/*|scripts/*) ;;
               *) continue ;;
             esac
             case "$f" in
@@ -112,7 +112,7 @@ jobs:
           } > "$summary"
 
           if [ ! -s /tmp/mneme/files.txt ]; then
-            echo "_No files in scope. Filter: \`mneme-project-memory/mneme/\`, \`docs/adr/\`, \`.mneme/\`, \`site/\`, \`scripts/\`._" >> "$summary"
+            echo "_No files in scope. Filter: \`mneme/\`, \`docs/adr/\`, \`.mneme/\`, \`site/\`, \`scripts/\`._" >> "$summary"
             cat "$summary"
             exit 0
           fi

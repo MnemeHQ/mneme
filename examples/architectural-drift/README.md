@@ -34,13 +34,13 @@ have fired upstream.
 ## How to run
 
 ```bash
-# From the repo root (after pip install -e mneme-project-memory):
+# From the repo root (after pip install -e .):
 cd examples/architectural-drift
 python run.py
 ```
 
 Requires the `mneme` package on `PYTHONPATH`. Either install it from
-this repo's `mneme-project-memory/` directory, or `pip install mneme-hq`.
+this repo's root, or `pip install mneme-hq`.
 
 ## Files
 

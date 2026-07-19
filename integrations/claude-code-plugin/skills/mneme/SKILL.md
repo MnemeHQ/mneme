@@ -54,7 +54,7 @@ and the violated decision id is surfaced in the error.
 
 - **Mneme must be installed** and `mneme-hook` must be on `PATH`. The reliable
   hook needs the `v0.4.2` fixes, which are not yet on PyPI (published: `0.4.0`);
-  until then install from the repository (`pip install -e mneme-project-memory`).
+  until then install from the repository root (`pip install -e .`).
   See the plugin README for details. Without Mneme the hook fails open (edits
   are never blocked).
 - **Enforcement mode** is set by the plugin's `mode` configuration option and
