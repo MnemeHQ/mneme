@@ -30,3 +30,6 @@ mneme-hook = "mneme.integrations.claude_code.hook:cli_main"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["mneme*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

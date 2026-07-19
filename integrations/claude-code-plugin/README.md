@@ -23,7 +23,7 @@ The plugin drives the `mneme-hook` / `mneme` CLI, which ships with the
 >
 > ```bash
 > git clone https://github.com/MnemeHQ/mneme
-> pip install -e mneme/mneme-project-memory   # or: pipx install ./mneme/mneme-project-memory
+> pip install -e mneme   # or: pipx install ./mneme
 > ```
 >
 > Once `mneme-hq >= 0.4.2` is on PyPI, `pipx install "mneme-hq>=0.4.2"` becomes
@@ -40,7 +40,7 @@ part of this plugin.)
 **Local development / trying it out:**
 
 ```bash
-claude --plugin-dir /path/to/mneme/mneme-project-memory/integrations/claude-code-plugin
+claude --plugin-dir /path/to/mneme/integrations/claude-code-plugin
 ```
 
 After changes, reload in-session with `/reload-plugins`.

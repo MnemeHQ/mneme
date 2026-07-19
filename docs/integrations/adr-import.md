@@ -92,12 +92,11 @@ mneme adr import docs/adr --memory .mneme/project_memory.json --apply --approve-
 
 ## Walkthrough: dogfooding with Mneme's own ADRs
 
-The `examples/mneme-own-adrs/` directory in `mneme-project-memory` contains
+The `examples/mneme-own-adrs/` directory contains
 four of Mneme HQ's own architectural decisions converted to the expected format.
 Running the demo shows the full import-to-enforcement pipeline in one command.
 
 ```bash
-cd mneme-project-memory
 python examples/demo-adr-import.py
 ```
 

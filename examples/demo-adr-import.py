@@ -9,7 +9,7 @@ AI coding guardrails. The walkthrough runs three stages:
   3. Enforcement check -- runs `mneme check` against a namespace violation
                           so ADR-005 fires on the wrong import path
 
-Usage (from the mneme-project-memory/ directory):
+Usage (from the repository root):
 
     python examples/demo-adr-import.py
 

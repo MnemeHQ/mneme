@@ -38,7 +38,7 @@ identical on disk for all three actors. That's the continuity.
 ## How to run
 
 ```bash
-# From the repo root (after pip install -e mneme-project-memory):
+# From the repo root (after pip install -e .):
 cd examples/multi-agent-governance
 python run.py
 ```

@@ -16,7 +16,7 @@ what should and shouldn't change in this repo.
 - **`README.md`** (this file) - what this directory is for and how to work
   with it.
 
-The file at `mneme-project-memory/examples/project_memory.json` is a
+The file at `examples/project_memory.json` is a
 **documentation snapshot** used by the flagship demo. It is not a competing
 source of truth. If a rule appears in both files, this directory's file wins.
 
@@ -76,7 +76,7 @@ We will tighten to `--mode strict` only after 2-3 weeks of clean warn runs,
 and only for changes that touch:
 
 - `.mneme/`
-- `mneme-project-memory/mneme/`
+- `mneme/`
 - `docs/adr/`
 
 Strict mode will not be applied globally.
