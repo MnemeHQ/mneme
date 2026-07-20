@@ -1,7 +1,7 @@
 {
   "meta": {
     "name": "mneme-repo",
-    "description": "Canonical live enforcement memory for the public Mneme repo. Mneme uses this file to govern its own repo. The flagship demo file at mneme-project-memory/examples/project_memory.json is a snapshot for documentation only - this file is the source of truth.",
+    "description": "Canonical live enforcement memory for the public Mneme repo. Mneme uses this file to govern its own repo. The flagship demo file at examples/project_memory.json is a snapshot for documentation only - this file is the source of truth.",
     "version": "1.0.0",
     "owner": "Mneme HQ",
     "created": "2026-05-06"
@@ -43,7 +43,7 @@
       "id": "rule-bench-retrieval-coupling",
       "type": "rule",
       "title": "Benchmark harness and core retrieval cannot change in the same PR",
-      "content": "Changes to the benchmark harness (mneme-project-memory/examples/benchmarks, scripts that drive benchmarking) must not land in the same PR as changes to core retrieval (mneme.retriever, mneme.context_builder, mneme.evaluator, mneme.pipeline). Splitting these PRs prevents a regression in retrieval from being silently absorbed by a tuned harness, and preserves an auditable benchmark history.",
+      "content": "Changes to the benchmark harness (examples/benchmarks, scripts that drive benchmarking) must not land in the same PR as changes to core retrieval (mneme.retriever, mneme.context_builder, mneme.evaluator, mneme.pipeline). Splitting these PRs prevents a regression in retrieval from being silently absorbed by a tuned harness, and preserves an auditable benchmark history.",
       "tags": [
         "benchmark",
         "retrieval",
@@ -121,7 +121,7 @@
       "id": "arch-canonical-memory-location",
       "type": "architecture_decision",
       "title": "Canonical memory location is .mneme/ at repo root",
-      "content": "The canonical live enforcement memory for this repo is .mneme/project_memory.json at the repo root. The file at mneme-project-memory/examples/project_memory.json is a documentation snapshot used by the flagship example only and must not diverge from this canonical file in ways that imply a competing source of truth.",
+      "content": "The canonical live enforcement memory for this repo is .mneme/project_memory.json at the repo root. The file at examples/project_memory.json is a documentation snapshot used by the flagship example only and must not diverge from this canonical file in ways that imply a competing source of truth.",
       "tags": [
         "meta",
         "memory",
