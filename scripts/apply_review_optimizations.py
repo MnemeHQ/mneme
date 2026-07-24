@@ -29,18 +29,18 @@ def add_related_css(html):
 # ── Hero CTA: View on GitHub → Install Mneme ─────────────────────────────────
 def fix_hero_cta(html):
     return html.replace(
-        '<a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub</a>\n'
+        '<a href="https://github.com/mnemeHQ/mneme" class="btn-primary">View on GitHub</a>\n'
         '      <a href="/#how-it-works" class="btn-ghost">How it works</a>',
-        '<a href="https://github.com/TheoV823/mneme" class="btn-primary">Install Mneme</a>\n'
-        '      <a href="https://github.com/TheoV823/mneme" class="btn-ghost">View GitHub</a>'
+        '<a href="https://github.com/mnemeHQ/mneme" class="btn-primary">Install Mneme</a>\n'
+        '      <a href="https://github.com/mnemeHQ/mneme" class="btn-ghost">View GitHub</a>'
     )
 
 # ── Bottom CTA: View on GitHub → Install Mneme ───────────────────────────────
 def fix_bottom_cta(html):
     return html.replace(
-        '<a href="https://github.com/TheoV823/mneme" class="btn-primary">View on GitHub</a>\n'
+        '<a href="https://github.com/mnemeHQ/mneme" class="btn-primary">View on GitHub</a>\n'
         '      <a href="/use-cases/" class="btn-ghost">More use cases</a>',
-        '<a href="https://github.com/TheoV823/mneme" class="btn-primary">Install Mneme</a>\n'
+        '<a href="https://github.com/mnemeHQ/mneme" class="btn-primary">Install Mneme</a>\n'
         '      <a href="/use-cases/" class="btn-ghost">More use cases</a>'
     )
 

@@ -11,7 +11,7 @@ scope: positioning.harness_vocab
 
 > Note: this ADR was originally numbered ADR-011 and was renumbered to ADR-014
 > during the 2026-05-26 legacy-ADR normalization pass (see PR following
-> [issue #139](https://github.com/TheoV823/mneme/issues/139)). The original
+> [issue #139](https://github.com/mnemeHQ/mneme/issues/139)). The original
 > ADR-011 number now belongs to "Knowledge-graph content architecture";
 > this ADR's content is unchanged except for cross-references to the renumbered
 > external-platform-presence ADR (now ADR-013).

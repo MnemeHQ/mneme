@@ -352,7 +352,7 @@ LINK_SECTIONS = ("insights", "use-cases", "compare", "integrations", "demo")
 
 # Pages or URL prefixes that count as "proof" surfaces for the linking
 # pattern: the demo, the benchmark methodology, and the public source.
-PROOF_PATTERNS = ("/demo/", "/benchmark/", "github.com/TheoV823/mneme")
+PROOF_PATTERNS = ("/demo/", "/benchmark/", "github.com/mnemeHQ/mneme")
 
 
 def rule_linking_pattern(html: str, ctx: PageContext) -> RuleResult:
