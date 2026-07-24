@@ -132,7 +132,7 @@ def main() -> None:
     print("  This is what governance continuity looks like operationally.")
     print()
     print("  Page:   https://mnemehq.com/demo/multi-agent-governance/")
-    print("  Source: https://github.com/TheoV823/mneme")
+    print("  Source: https://github.com/mnemeHQ/mneme")
     print(_rule())
 
 

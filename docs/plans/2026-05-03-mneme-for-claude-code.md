@@ -1069,7 +1069,7 @@ To switch modes: `export MNEME_HOOK_MODE=warn`.
 ## Related
 - Project memory: `.mneme/project_memory.json`
 - CLI reference: `mneme --help`
-- Docs: https://github.com/TheoV823/mneme
+- Docs: https://github.com/mnemeHQ/mneme
 ```
 
 **Step 2: Commit**
