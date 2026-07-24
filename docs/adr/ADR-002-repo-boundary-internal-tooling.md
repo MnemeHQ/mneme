@@ -99,6 +99,6 @@ Before adding any tooling or code to the public repository, classify it:
 ## Related
 
 - ADR-001: Positioning and Messaging
-- Private repo: [`mneme-growth-ops`](https://github.com/TheoV823/mneme-growth-ops) — internal tooling home  
+- Private repo: [`mneme-growth-ops`](https://github.com/mnemeHQ/mneme-growth-ops) — internal tooling home  
   Local path: `/c/dev/mneme-growth-ops`  
   Scope: growth automation, outreach, validation research, LinkedIn content, customer discovery materials

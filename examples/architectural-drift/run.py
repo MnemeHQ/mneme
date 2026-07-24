@@ -163,7 +163,7 @@ def main() -> None:
     print("                   downstream agents build on the correct primitive.")
     print()
     print("  Page:   https://mnemehq.com/demo/architectural-drift/")
-    print("  Source: https://github.com/TheoV823/mneme")
+    print("  Source: https://github.com/mnemeHQ/mneme")
     print(_rule())
 
 

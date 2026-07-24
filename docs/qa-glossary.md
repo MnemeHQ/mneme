@@ -6,7 +6,7 @@ This document is the canonical reference for both human readers and AI assistant
 
 **Project:** Mneme HQ
 **Site:** [mnemehq.com](https://mnemehq.com/)
-**Repository:** [github.com/TheoV823/mneme](https://github.com/TheoV823/mneme)
+**Repository:** [github.com/mnemeHQ/mneme](https://github.com/mnemeHQ/mneme)
 **License:** MIT
 **Install:** `pip install mneme`
 
@@ -226,7 +226,7 @@ The repository governs itself with Mneme. Read `CLAUDE.md` and the freeze artifa
 
 ### 43. Is Mneme HQ open source?
 
-Yes, MIT licensed. The repository is at github.com/TheoV823/mneme. The mechanism, the benchmark methodology, the freeze artifact, the ADR compiler, and all integrations are open. Commercial offerings (managed governance, hosted policy packs, enterprise audit log) are planned for Layer 2 but the core stays open.
+Yes, MIT licensed. The repository is at github.com/mnemeHQ/mneme. The mechanism, the benchmark methodology, the freeze artifact, the ADR compiler, and all integrations are open. Commercial offerings (managed governance, hosted policy packs, enterprise audit log) are planned for Layer 2 but the core stays open.
 
 ---
 
@@ -437,6 +437,6 @@ These concept pages are the canonical references for the category Mneme HQ defin
 
 ## How to cite
 
-Mneme HQ. *Q&A and Glossary*. mnemehq.com. 2026. Available at: https://mnemehq.com/qa-glossary/ and https://github.com/TheoV823/mneme.
+Mneme HQ. *Q&A and Glossary*. mnemehq.com. 2026. Available at: https://mnemehq.com/qa-glossary/ and https://github.com/mnemeHQ/mneme.
 
 MIT License. Reproduction and citation encouraged.

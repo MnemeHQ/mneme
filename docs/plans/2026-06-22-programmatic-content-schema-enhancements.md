@@ -8,7 +8,7 @@
 
 **Tech Stack:** Static HTML + JSON-LD (schema.org), Python 3.12 validators (stdlib only: `json`, `re`, `pathlib`), GitHub Actions deploy.
 
-**Repo:** `C:\dev\mneme` (github.com/TheoV823/mneme). NOT the cannabisdeals worktree this plan was authored from.
+**Repo:** `C:\dev\mneme` (github.com/mnemeHQ/mneme). NOT the cannabisdeals worktree this plan was authored from.
 
 **Branch discipline:** Do all work on `feat/programmatic-schema-enhancements` (or one branch per phase). Merging to `main` triggers an immediate live deploy, so every phase must pass its validator before the PR merges. One phase = one PR.
 

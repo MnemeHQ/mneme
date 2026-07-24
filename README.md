@@ -22,7 +22,7 @@ Mneme HQ is the architectural governance layer for AI-assisted development.
 </p>
 
 
-> **Current phase: Layer 1 — validation.** Mechanism is frozen at commit [`e73ff7d`](https://github.com/TheoV823/mneme/commit/e73ff7d). Local-repo, single-developer, project-scoped governance. Layer 2 (multi-repo, team sync, org policy distribution) is intentionally deferred. See [docs/architecture/current-phase.md](docs/architecture/current-phase.md) and [docs/architecture/layer1-freeze-e73ff7d.md](docs/architecture/layer1-freeze-e73ff7d.md).
+> **Current phase: Layer 1 — validation.** Mechanism is frozen at commit [`e73ff7d`](https://github.com/mnemeHQ/mneme/commit/e73ff7d). Local-repo, single-developer, project-scoped governance. Layer 2 (multi-repo, team sync, org policy distribution) is intentionally deferred. See [docs/architecture/current-phase.md](docs/architecture/current-phase.md) and [docs/architecture/layer1-freeze-e73ff7d.md](docs/architecture/layer1-freeze-e73ff7d.md).
 
 ---
 
@@ -731,7 +731,7 @@ python demo.py --dry-run
 ## Quickstart
 
 ```bash
-git clone https://github.com/TheoV823/mneme
+git clone https://github.com/mnemeHQ/mneme
 cd mneme
 
 # Core only
@@ -852,7 +852,7 @@ These are listed so they cannot be re-derived as "missing." The freeze doc's "In
 
 ## Status
 
-Mneme is in **Layer 1 — validation phase**. The mechanism is frozen at commit [`e73ff7d`](https://github.com/TheoV823/mneme/commit/e73ff7d): deterministic retrieval, pre-flight enforcement, two-layer benchmark methodology, charter discipline. The freeze artifact is at [docs/architecture/layer1-freeze-e73ff7d.md](docs/architecture/layer1-freeze-e73ff7d.md); the orientation doc is at [docs/architecture/current-phase.md](docs/architecture/current-phase.md).
+Mneme is in **Layer 1 — validation phase**. The mechanism is frozen at commit [`e73ff7d`](https://github.com/mnemeHQ/mneme/commit/e73ff7d): deterministic retrieval, pre-flight enforcement, two-layer benchmark methodology, charter discipline. The freeze artifact is at [docs/architecture/layer1-freeze-e73ff7d.md](docs/architecture/layer1-freeze-e73ff7d.md); the orientation doc is at [docs/architecture/current-phase.md](docs/architecture/current-phase.md).
 
 What remains in Layer 1 is **validation**, not extension. Layer 1 exit criteria are met when the wedge is validated against real repos with design partners; the open criteria are real-world drift prevention, design-partner validation, and governance wedge validation. Layer 2 (multi-repo, team sync, org policy distribution) opens only after exit.
 

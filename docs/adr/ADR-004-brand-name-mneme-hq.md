@@ -26,7 +26,7 @@ The public-facing brand name is **Mneme HQ** from 2026-05-03 onwards.
 | In scope | Out of scope |
 |----------|--------------|
 | Site titles, meta tags, OG/Twitter tags | Domain (`mnemehq.com` — unchanged) |
-| JSON-LD structured data `"name"` fields | GitHub repo slug (`TheoV823/mneme` — unchanged) |
+| JSON-LD structured data `"name"` fields | GitHub repo slug (`mnemeHQ/mneme` — unchanged) |
 | Body copy and prose references | Python package name (`mneme` — unchanged) |
 | App template headings | CLI commands (`mneme check`, `mneme cursor generate` — unchanged) |
 | README | PyPI package name (unchanged) |
@@ -41,7 +41,7 @@ The code-layer identity is permanently `mneme` and must never be changed as part
 | Python import path | `from mneme.*` | `pyproject.toml` line 30 |
 | CLI command | `mneme` | `pyproject.toml` line 25 |
 | Secondary CLI | `mneme-hook` | `pyproject.toml` line 26 |
-| GitHub repo slug | `TheoV823/mneme` | GitHub |
+| GitHub repo slug | `mnemeHQ/mneme` | GitHub |
 | Domain | `mnemehq.com` | DNS |
 
 **Rule:** "Mneme HQ" is the brand. `mneme` is the package. These are different namespaces and must never be conflated. Any site copy, docs, or templates that render code blocks, import paths, or CLI commands must use lowercase `mneme`, not "Mneme HQ".

@@ -11,7 +11,7 @@ scope: branding
 
 The public-facing brand name is **Mneme HQ** from 2026-05-03 onwards.
 
-The code-layer identity (package `mneme`, CLI `mneme`, slug `TheoV823/mneme`)
+The code-layer identity (package `mneme`, CLI `mneme`, slug `mnemeHQ/mneme`)
 is permanently unchanged and must never be modified as part of brand updates.
 
 ## Scope
@@ -19,7 +19,7 @@ is permanently unchanged and must never be modified as part of brand updates.
 | In scope | Out of scope |
 |---|---|
 | Site titles, meta tags, OG tags | Domain (mnemehq.com -- unchanged) |
-| JSON-LD name fields | GitHub slug (TheoV823/mneme -- unchanged) |
+| JSON-LD name fields | GitHub slug (mnemeHQ/mneme -- unchanged) |
 | Body copy and prose references | Python package name (mneme -- unchanged) |
 | README | CLI commands (mneme check, etc. -- unchanged) |
 

@@ -11,7 +11,7 @@ scope: distribution.external_platforms
 
 > Note: this ADR was originally numbered ADR-010 and was renumbered to ADR-013
 > during the 2026-05-26 legacy-ADR normalization pass (see PR following
-> [issue #139](https://github.com/TheoV823/mneme/issues/139)). The original
+> [issue #139](https://github.com/mnemeHQ/mneme/issues/139)). The original
 > ADR-010 number now belongs to "Automation-generated artifacts must inherit
 > repository governance conventions"; this ADR's content is unchanged.
 
@@ -89,15 +89,15 @@ Rules:
 - No emojis in list entries.
 - Do not address the reader ("you", "your") in list copy.
 - Do not use promotional language ("powerful", "revolutionary", "best").
-- Always link to the GitHub repo (`https://github.com/TheoV823/mneme`), not the marketing site,
+- Always link to the GitHub repo (`https://github.com/mnemeHQ/mneme`), not the marketing site,
   in awesome-list entries. Use the marketing site for directories that prefer landing pages.
 
 ---
 
 ### 3. Author attribution for submissions
 
-- **Author name:** `TheoV823`
-- **Author link:** `https://github.com/TheoV823`
+- **Author name:** `mnemeHQ`
+- **Author link:** `https://github.com/mnemeHQ`
 - **License:** MIT
 
 ---

@@ -181,7 +181,7 @@ def main() -> None:
     print("    6. Correct 'mneme' import path passed cleanly")
     print()
     print("  The same guardrail runs before every AI code generation step.")
-    print("  Commit fdcdb0a -- https://github.com/TheoV823/mneme")
+    print("  Commit fdcdb0a -- https://github.com/mnemeHQ/mneme")
     print(_rule())
 
 

@@ -11,7 +11,7 @@ Layer 1 is local-repo, single-developer, project-scoped architectural governance
 
 ## What is frozen
 
-Pinned at commit [`e73ff7d`](https://github.com/TheoV823/mneme/commit/e73ff7d) and documented in [layer1-freeze-e73ff7d.md](./layer1-freeze-e73ff7d.md):
+Pinned at commit [`e73ff7d`](https://github.com/mnemeHQ/mneme/commit/e73ff7d) and documented in [layer1-freeze-e73ff7d.md](./layer1-freeze-e73ff7d.md):
 
 - **Retrieval mechanics** — deterministic bag-of-tokens scoring with fixed weights, stopword floor, insertion-order tiebreak.
 - **Enforcement semantics** — `anti_patterns` → FAIL, `"no X"` constraints → WARN, top-K-only, word-boundary matching.

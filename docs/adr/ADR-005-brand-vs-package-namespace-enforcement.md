@@ -71,7 +71,7 @@ In code-bearing contexts, the only acceptable spellings are:
 | Import root | `mneme` | `Mneme HQ`, `MnemeHQ`, `mneme_hq` |
 | CLI entrypoint | `mneme` | `Mneme HQ`, `mneme-hq` |
 | Module invocation | `python -m mneme.cli` | `python -m Mneme HQ.cli` |
-| Repo slug | `TheoV823/mneme` | `TheoV823/mneme-hq` |
+| Repo slug | `mnemeHQ/mneme` | `mnemeHQ/mneme-hq` |
 | PyPI distribution name | `mneme-hq` | `mneme` (name taken by unrelated package) |
 | pip install command | `pip install mneme-hq` | `pip install mneme` |
 
