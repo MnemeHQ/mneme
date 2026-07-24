@@ -39,9 +39,9 @@ def cpanel_put(path, content):
 html = cpanel_get('index.html')
 
 # Add article link after the GitHub button in the Mneme block
-old = '<a href="https://github.com/TheoV823/mneme" target="_blank" rel="noopener" class="btn btn-primary"><i class="fa fa-github"></i> GitHub</a>'
+old = '<a href="https://github.com/mnemeHQ/mneme" target="_blank" rel="noopener" class="btn btn-primary"><i class="fa fa-github"></i> GitHub</a>'
 new = (
-    '<a href="https://github.com/TheoV823/mneme" target="_blank" rel="noopener" class="btn btn-primary"><i class="fa fa-github"></i> GitHub</a>\n'
+    '<a href="https://github.com/mnemeHQ/mneme" target="_blank" rel="noopener" class="btn btn-primary"><i class="fa fa-github"></i> GitHub</a>\n'
     '<br><br>\n'
     '<a href="/why-i-built-mneme.html" style="color:#c1a26e;font-size:14px;font-weight:600;">Read: Why I Built Mneme &rarr;</a>'
 )

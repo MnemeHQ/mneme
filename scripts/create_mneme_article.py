@@ -288,7 +288,7 @@ article_html = f"""<!DOCTYPE html>
     <h3>Try Mneme on your next project</h3>
     <p>Open source &middot; Repo-native &middot; Works with Cursor and Claude Code</p>
     <a href="https://mnemehq.com" target="_blank" rel="noopener" class="btn-gold">mnemehq.com</a>
-    <a href="https://github.com/TheoV823/mneme" target="_blank" rel="noopener" class="btn-outline-gold"><i class="fa fa-github"></i> View on GitHub</a>
+    <a href="https://github.com/mnemeHQ/mneme" target="_blank" rel="noopener" class="btn-outline-gold"><i class="fa fa-github"></i> View on GitHub</a>
   </div>
 </div>
 

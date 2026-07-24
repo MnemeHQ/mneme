@@ -1,3 +1,5 @@
+# Note: These are dependencies for the mneme web application (site/ app/)
+# For the mneme-hq python package dependencies, see pyproject.toml
 anthropic>=0.25.0
 python-dotenv>=1.0.0
 fastapi>=0.111.0

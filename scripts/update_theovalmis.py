@@ -117,7 +117,7 @@ mneme_block = """<!--[Mneme Project]-->
 <span style="color:#ef4444;">FAIL</span>&nbsp; Violates ADR-004 &mdash; Repository pattern bypassed
 </div>
 <a href="https://mnemehq.com" target="_blank" rel="noopener" class="btn btn-primary" style="margin-right:10px;">mnemehq.com</a>
-<a href="https://github.com/TheoV823/mneme" target="_blank" rel="noopener" class="btn btn-primary"><i class="fa fa-github"></i> GitHub</a>
+<a href="https://github.com/mnemeHQ/mneme" target="_blank" rel="noopener" class="btn btn-primary"><i class="fa fa-github"></i> GitHub</a>
 </div>
 </div>
 </div>
