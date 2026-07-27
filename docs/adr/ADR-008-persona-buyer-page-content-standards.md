@@ -1,7 +1,7 @@
 ---
 id: ADR-008
 title: "Persona / Buyer-Page Content Standards"
-status: accepted
+status: superseded
 priority: normal
 date: 2026-05-10
 scope: site.persona_pages
@@ -9,7 +9,11 @@ scope: site.persona_pages
 
 # ADR-008: Persona / Buyer-Page Content Standards
 
-**Status:** Accepted
+> **Superseded by [ADR-016: Site Governance Transfer to MnemeHQ/mnemehq-site](ADR-016-site-governance-transfer.md).**
+> Current publishing governance for mnemehq.com lives in MnemeHQ/mnemehq-site `PUBLISHING.md`.
+> This record is retained unchanged as an immutable historical decision.
+
+**Status:** Superseded (by ADR-016)
 **Date:** 2026-05-10
 **Deciders:** Theo Valmis
 

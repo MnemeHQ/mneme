@@ -1,7 +1,7 @@
 ---
 id: ADR-011
 title: "Knowledge-graph content architecture for /concepts/ and /insights/"
-status: accepted
+status: superseded
 priority: normal
 date: 2026-05-15
 scope: site.knowledge_graph
@@ -9,7 +9,11 @@ scope: site.knowledge_graph
 
 # ADR-011: Knowledge-graph content architecture for /concepts/ and /insights/
 
-**Status:** Accepted
+> **Superseded by [ADR-016: Site Governance Transfer to MnemeHQ/mnemehq-site](ADR-016-site-governance-transfer.md).**
+> Current publishing governance for mnemehq.com lives in MnemeHQ/mnemehq-site `PUBLISHING.md`.
+> This record is retained unchanged as an immutable historical decision.
+
+**Status:** Superseded (by ADR-016)
 **Date:** 2026-05-15
 **Deciders:** Theo Valmis
 
