@@ -1,7 +1,7 @@
 ---
 id: ADR-012
 title: "Conceptual-authority discipline for /concepts/, /insights/, and recurring frames"
-status: accepted
+status: superseded
 priority: normal
 date: 2026-05-15
 scope: site.conceptual_authority
@@ -9,7 +9,11 @@ scope: site.conceptual_authority
 
 # ADR-012: Conceptual-authority discipline for /concepts/, /insights/, and recurring frames
 
-**Status:** Accepted
+> **Superseded by [ADR-016: Site Governance Transfer to MnemeHQ/mnemehq-site](ADR-016-site-governance-transfer.md).**
+> Current publishing governance for mnemehq.com lives in MnemeHQ/mnemehq-site `PUBLISHING.md`.
+> This record is retained unchanged as an immutable historical decision.
+
+**Status:** Superseded (by ADR-016)
 **Date:** 2026-05-15
 **Deciders:** Theo Valmis
 

@@ -1,7 +1,7 @@
 ---
 id: ADR-015
 title: "Report-Anchored Insight Titles and Entity Front-Loading"
-status: accepted
+status: superseded
 priority: normal
 date: 2026-05-30
 scope: site.insights_seo.report_titles
@@ -9,7 +9,11 @@ scope: site.insights_seo.report_titles
 
 # ADR-015: Report-Anchored Insight Titles and Entity Front-Loading
 
-**Status:** Accepted
+> **Superseded by [ADR-016: Site Governance Transfer to MnemeHQ/mnemehq-site](ADR-016-site-governance-transfer.md).**
+> Current publishing governance for mnemehq.com lives in MnemeHQ/mnemehq-site `PUBLISHING.md`.
+> This record is retained unchanged as an immutable historical decision.
+
+**Status:** Superseded (by ADR-016)
 **Date:** 2026-05-30
 **Deciders:** Theo Valmis
 
