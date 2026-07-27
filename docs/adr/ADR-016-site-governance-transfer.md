@@ -19,6 +19,7 @@ supersedes:
 
 **Status:** Accepted
 **Date:** 2026-07-27
+**Amended:** 2026-07-27 (rollback retirement gate — see Decision §7–§8 and the Amendment note)
 **Deciders:** Theo Valmis
 
 ---
@@ -45,6 +46,18 @@ Those decisions now describe governance for content and tooling that no longer l
 repository. This ADR records the transfer of ownership and supersedes those seven ADRs so the
 compiled active set stops asserting website publishing governance from the core repository. It
 does not delete their historical record.
+
+**Amendment (2026-07-27).** This ADR is amended on the day it was accepted to replace its original
+rollback-retention window — which required BOTH at least 14 days elapsed since cutover AND at least
+10 successful automatic deployments from MnemeHQ/mnemehq-site — with a proportionate,
+evidence-based retirement gate. The repository owner has explicitly decided the old threshold is
+unnecessarily conservative for this cutover. Counting automatic deployments proved a poor proxy for
+cutover safety here: the deployment path's health was already established by a full production
+cutover *and* a real-content push deployment, so waiting an arbitrary 14 days and accumulating ten
+mostly no-op scheduled deployments would add calendar delay without adding evidence. The amended
+gate (Decision §7) keys retirement to the facts that actually demonstrate a safe, single-owner
+deployment path. See Decision §7–§8. This amendment changes governance only; it asserts no product,
+runtime, CLI, enforcement, package, or deployment behavior change.
 
 ## Decision
 
@@ -74,15 +87,48 @@ does not delete their historical record.
    and the `site-deployed` tag remain in this repository solely as rollback infrastructure for
    the cutover. They are not active governance and are not the deployment path in use.
 
-7. **Rollback-retention window.** The rollback infrastructure is retained until BOTH of the
-   following conditions are met, whichever takes longer:
-   - at least 14 days have elapsed since the production cutover; and
-   - at least 10 successful automatic (push- or schedule-triggered) deployments have completed
-     from MnemeHQ/mnemehq-site.
+7. **Rollback-retention gate (amended 2026-07-27).** The original retention window in this ADR
+   required BOTH at least 14 days elapsed since cutover AND at least 10 successful automatic
+   (push- or schedule-triggered) deployments from MnemeHQ/mnemehq-site. The repository owner has
+   explicitly decided to replace that threshold: deployment quantity was a poor proxy for cutover
+   safety in this case, because the path's health was already proven by the cutover plus a
+   real-content push deployment, and ten scheduled/no-op deployments over fourteen days would add
+   only delay. The rollback infrastructure is instead retained only until ALL of the following
+   proportionate conditions are met:
 
-8. **Retirement is a separate change.** Retiring the rollback infrastructure (removing the core
-   `site/**`, the deployment scripts, the disabled workflow, and the `site-deployed` tag)
-   requires a separate structural PR with its own validation. It is out of scope for this ADR.
+   1. The production cutover completed successfully.
+   2. At least one successful push-triggered deployment containing real production content
+      completed from MnemeHQ/mnemehq-site.
+   3. The nine articles in that deployment were individually validated.
+   4. Homepage, sitemap and deterministic production-page checks passed.
+   5. `site-deployed` advanced consistently.
+   6. No unresolved deployment failure or verification issue exists.
+   7. cPanel backup availability is confirmed.
+   8. The dedicated website repository and deployment path remain healthy.
+
+8. **Gate satisfied; retirement authorised as a separate structural PR.** As of 2026-07-27 the
+   eight-condition gate in §7 is satisfied:
+   - the production cutover succeeded (MnemeHQ/mnemehq-site Actions run 30202468065, event
+     `workflow_dispatch`, conclusion success, head 736a761, completed 2026-07-26T13:03Z);
+   - a real-content push deployment succeeded (run 30312953090, event `push`, conclusion success,
+     head aec909c8, completed 2026-07-27T23:10Z), publishing nine articles that were each
+     individually validated;
+   - the production homepage returns HTTP 200, and the sitemap returns HTTP 200 and parses (258
+     URLs at audit) with sampled production pages returning HTTP 200;
+   - the MnemeHQ/mnemehq-site `site-deployed` tag advanced to the deployed website commit and
+     tracks it consistently;
+   - cPanel already hosts the live production site and the owner confirms cPanel backups are
+     available;
+   - no unresolved deployment failure, retry, or verification issue exists, and the dedicated
+     website repository and deployment path remain healthy.
+
+   Because the gate is met, retirement of the core rollback infrastructure — the core `site/**`
+   tree, `scripts/deploy_site.py` and its proven website-only helper closure, the disabled
+   `deploy-site.yml` workflow, the `deploy_001` core rollback memory rule, and (as a post-merge
+   repository operation) the core `site-deployed` tag — is authorised to proceed immediately. It
+   must still land as a SEPARATE structural PR with its own validation, distinct from this
+   governance amendment; the two changes are not combined. This ADR is not deleted by that
+   retirement: it remains in `docs/adr/` as the historical transfer and retirement decision.
 
 9. **Governance-only change.** This ADR changes governance ownership only. It does not change
    runtime, CLI, enforcement, package, or deployment behavior. No product code, test, workflow
@@ -95,8 +141,11 @@ does not delete their historical record.
   carries them as active decisions.
 - Contributors to the website look to `MnemeHQ/mnemehq-site/PUBLISHING.md` for current rules, and
   to the superseded ADRs here only for historical rationale.
-- Rollback remains possible for the retention window: the core deploy workflow can be re-enabled
-  and the retained `site/**` re-deployed against the `site-deployed` tag if required.
+- The rollback-retention gate (§7, as amended 2026-07-27) is satisfied, so the retained core
+  rollback infrastructure is authorised for retirement via a separate structural PR. Until that PR
+  merges, rollback remains mechanically possible — the disabled core deploy workflow could be
+  re-enabled and the retained `site/**` re-deployed against the core `site-deployed` tag — but it
+  is no longer gated on the withdrawn 14-day / 10-deployment threshold.
 
 ## Related
 
