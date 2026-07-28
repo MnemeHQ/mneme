@@ -164,28 +164,6 @@
       ]
     },
     {
-      "id": "deploy_001",
-      "decision": "TEMPORARY CORE ROLLBACK RULE: while the core rollback deployment path is retained, the retained core scripts/deploy_site.py must be run from the core repository root, never from a worktree directory. mnemehq-site owns production deployment (ADR-016); this rule applies only to the core rollback path and must be removed when that rollback path is retired.",
-      "rationale": "The core deployment path is retained only as rollback infrastructure after the mnemehq.com site cutover (ADR-016). If a rollback deploy is ever run, deploy_site.py resolves SCRIPT_DIR from __file__ and uses it as the git working directory for tag comparisons; running from a worktree causes the site-deployed tag delta check to compare against the worktree branch HEAD rather than main, producing an empty diff and skipping all uploads silently. This rule is temporary and must be removed when the core rollback deployment path is retired.",
-      "scope": [
-        "deploy_site",
-        "deploy",
-        "scripts",
-        "rollback"
-      ],
-      "constraints": [
-        "This is a temporary core rollback rule; mnemehq-site owns production deployment (ADR-016)",
-        "Run the retained core scripts/deploy_site.py only from the core repository root, never from a worktree path",
-        "Applies only while the core rollback deployment path is retained; remove this rule when that path is retired"
-      ],
-      "anti_patterns": [
-        "worktrees",
-        "python scripts/deploy_site.py"
-      ],
-      "created_at": "2026-05-08T10:47:42Z",
-      "updated_at": "2026-05-08T10:47:42Z"
-    },
-    {
       "id": "encoding_001",
       "decision": "All automation that reads or writes text files must specify the encoding explicitly. UTF-8 for all source, docs, config, and automation files in this repo.",
       "rationale": "Default encodings are runtime- and platform-dependent. PowerShell 5.1 defaults to Windows-1252, not UTF-8. Silent re-encoding of UTF-8 files with non-ASCII characters produces invalid UTF-8 bytes with no error at write time \u2014 discovered only when a downstream tool opens the file. See Governance Incident 002 and ADR-009.",

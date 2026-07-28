@@ -79,13 +79,12 @@ jobs:
           while IFS= read -r f; do
             [ -z "$f" ] && continue
             case "$f" in
-              mneme/*|docs/adr/*|.mneme/*|site/*|scripts/*) ;;
+              mneme/*|docs/adr/*|.mneme/*|scripts/*) ;;
               *) continue ;;
             esac
             case "$f" in
               *.lock|*.png|*.jpg|*.jpeg|*.gif|*.ico|*.svg|*.webp|*.woff|*.woff2|*.ttf|*.eot|*.docx|*.xlsx|*.pdf|*.zip|*.tar|*.gz) continue ;;
               package-lock.json|yarn.lock|pnpm-lock.yaml|poetry.lock|Pipfile.lock|uv.lock) continue ;;
-              site/llms.txt|site/llms-full.txt) continue ;;
             esac
             [ -f "$f" ] || continue
             echo "$f" >> /tmp/mneme/files.txt
@@ -112,7 +111,7 @@ jobs:
           } > "$summary"
 
           if [ ! -s /tmp/mneme/files.txt ]; then
-            echo "_No files in scope. Filter: \`mneme/\`, \`docs/adr/\`, \`.mneme/\`, \`site/\`, \`scripts/\`._" >> "$summary"
+            echo "_No files in scope. Filter: \`mneme/\`, \`docs/adr/\`, \`.mneme/\`, \`scripts/\`._" >> "$summary"
             cat "$summary"
             exit 0
           fi
