@@ -6,6 +6,47 @@ _Nothing yet._
 
 ---
 
+## v0.5.1 — 2026-08-06
+
+**Claude Code hook reliability: trusted verdicts, warn-mode feedback, `replace_all`**
+
+Fixes four defects in the Claude Code `PreToolUse` hook. No retrieval or
+enforcement semantics change; the deterministic mechanism is untouched.
+
+### Added
+
+- `mneme check --json` — emits a versioned, machine-readable verdict payload
+  (`schema`, `verdict`, `mode`, `violations`, `freshness`) as the only stdout
+  content. Exit codes are unchanged. Consumers should trust the payload's
+  verdict rather than the exit code, and fail open on anything unparseable.
+
+### Fixed
+
+- **The hook could hard-block on a crash.** It converted every non-zero child
+  exit into exit 2 (block). Because `mneme check --mode strict` returns 1 for a
+  WARN verdict and Python also returns 1 for an uncaught exception, a malformed
+  memory file or a CLI crash was indistinguishable from a violation and blocked
+  the edit. The hook now blocks only on a parsed verdict and fails open
+  otherwise, matching the documented guarantee.
+- **Warn mode surfaced nothing.** It wrote to stderr and exited 0, and Claude
+  Code discards stderr from a hook that exits 0. Warn mode now emits a
+  `PreToolUse` JSON payload with `permissionDecision: "defer"` and the
+  violation detail as the reason. `defer` is deliberate: `allow` would
+  auto-approve the tool call and bypass the user's normal permission prompt, so
+  a warning mode must never use it.
+- **`replace_all` was ignored.** `Edit` and `MultiEdit` always materialized a
+  single replacement, so when Claude Code was about to replace every
+  occurrence, the checked content was not the content that would land on disk
+  and violations introduced by the second or later occurrence went unseen.
+- **The child CLI could be a different install than the hook.**
+  `sys.executable -m mneme` resolved against the child's `sys.path`, which can
+  be an older mneme that rejects `--json` — the hook would then fail open on
+  every edit with enforcement silently inactive. The child now inherits a
+  `PYTHONPATH` pinned to the hook's own package root, and a stale runtime
+  produces an explicit "enforcement is inactive" warning instead of silence.
+
+---
+
 ## v0.5.0 — 2026-07-03
 
 **Directory-ready Claude Code plugin, `mneme init`, and PyPI metadata realignment**
