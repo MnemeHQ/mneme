@@ -45,6 +45,11 @@ ALLOWLIST: dict[str, str] = {
     # Dated historical planning records. Rewriting them would falsify the
     # archive; they are not user-facing install instructions.
     "docs/plans/": "historical planning records, not user instructions",
+    # The gate itself must name the forbidden form to detect and explain it,
+    # and its tests must use it as fixture data. Without these entries the
+    # check fails on itself the moment it is committed.
+    "scripts/check_install_command.py": "the gate's own pattern and messages",
+    "tests/test_check_install_command.py": "the gate's own test fixtures",
 }
 
 

@@ -71,6 +71,17 @@ def test_allowlist_does_not_cover_user_docs():
     assert gate.is_allowlisted("docs/qa-glossary.md") is None
 
 
+def test_allowlist_covers_the_gate_itself():
+    """The gate must name the forbidden form to detect and explain it.
+
+    Regression: this was missed because `git ls-files` skips untracked files,
+    so the gate passed locally and only failed once its own source and tests
+    were committed.
+    """
+    assert gate.is_allowlisted("scripts/check_install_command.py")
+    assert gate.is_allowlisted("tests/test_check_install_command.py")
+
+
 def test_repo_is_clean():
     """The gate must pass on the repository as committed."""
     findings = gate.scan(gate.tracked_files())
