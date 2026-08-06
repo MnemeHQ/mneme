@@ -86,6 +86,46 @@ def test_violating_write_blocks(project):
 
 
 @pytest.mark.skipif(shutil.which("mneme") is None, reason="mneme CLI not on PATH")
+def test_malformed_memory_fails_open_against_real_cli(project):
+    """A corrupt memory file makes the real CLI crash. It must not block.
+
+    This is the fail-open guarantee end-to-end: the child process exits
+    non-zero with a traceback and no parseable verdict, and the edit proceeds.
+    """
+    cwd, target = project
+    (cwd / ".mneme" / "project_memory.json").write_text(
+        "{ this is not valid json", encoding="utf-8"
+    )
+    err = io.StringIO()
+    rc = main(
+        stdin=io.StringIO(_envelope(cwd, target, "import psycopg2")),
+        stderr=err,
+        stdout=io.StringIO(),
+    )
+    assert rc == 0, "a crashing check must never hard-block an edit"
+    assert "failing open" in err.getvalue().lower()
+
+
+@pytest.mark.skipif(shutil.which("mneme") is None, reason="mneme CLI not on PATH")
+def test_warn_mode_surfaces_violation_against_real_cli(project, monkeypatch):
+    """Warn mode must emit machine-readable feedback, not silence."""
+    monkeypatch.setenv("MNEME_HOOK_MODE", "warn")
+    cwd, target = project
+    out = io.StringIO()
+    rc = main(
+        stdin=io.StringIO(_envelope(cwd, target, "import psycopg2")),
+        stderr=io.StringIO(),
+        stdout=out,
+    )
+    assert rc == 0
+    emitted = json.loads(out.getvalue())
+    hso = emitted["hookSpecificOutput"]
+    assert hso["permissionDecision"] == "defer"
+    assert "psycopg2" in hso["permissionDecisionReason"] or \
+           "test_001" in hso["permissionDecisionReason"]
+
+
+@pytest.mark.skipif(shutil.which("mneme") is None, reason="mneme CLI not on PATH")
 def test_compliant_write_passes(project):
     cwd, target = project
     rc = main(stdin=io.StringIO(_write_envelope(cwd, target, "import sqlite3\n")))

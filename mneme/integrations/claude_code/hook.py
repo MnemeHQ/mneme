@@ -42,6 +42,18 @@ class MaterializeError(Exception):
     old_string not found, etc.). Caller should fail open."""
 
 
+def _replace_count(spec: Dict[str, Any]) -> int:
+    """Occurrence count for ``str.replace``, honouring Claude Code's ``replace_all``.
+
+    ``-1`` replaces every occurrence; ``1`` replaces only the first. Mirroring
+    the flag matters: if the hook materializes a single replacement while
+    Claude Code is about to replace all of them, the checked content is not the
+    content that will land on disk, and a violation introduced by the second or
+    later occurrence goes unseen.
+    """
+    return -1 if spec.get("replace_all") else 1
+
+
 def materialize_proposed_content(event: ToolEvent) -> str:
     ti = event.tool_input
     if event.tool_name == "Write":
@@ -60,7 +72,7 @@ def materialize_proposed_content(event: ToolEvent) -> str:
         old, new = ti.get("old_string", ""), ti.get("new_string", "")
         if old not in original:
             raise MaterializeError("old_string not found in file")
-        return original.replace(old, new, 1)
+        return original.replace(old, new, _replace_count(ti))
 
     if event.tool_name == "MultiEdit":
         content = original
@@ -68,7 +80,7 @@ def materialize_proposed_content(event: ToolEvent) -> str:
             old, new = edit.get("old_string", ""), edit.get("new_string", "")
             if old not in content:
                 raise MaterializeError(f"edit[{i}].old_string not found")
-            content = content.replace(old, new, 1)
+            content = content.replace(old, new, _replace_count(edit))
         return content
 
     raise MaterializeError(f"unsupported tool: {event.tool_name}")
@@ -117,7 +129,112 @@ def resolve_mode() -> str:
     return "strict"
 
 
-def _run_check(event: ToolEvent, proposed_content: str, memory: Path, stderr: TextIO) -> int:
+# <root>/mneme/integrations/claude_code/hook.py -> <root>
+_PACKAGE_ROOT = Path(__file__).resolve().parents[3]
+
+
+def _child_env() -> Dict[str, str]:
+    """Environment that pins the child CLI to *this* hook's package tree.
+
+    ``sys.executable -m mneme`` otherwise resolves against the child's sys.path,
+    which can be a different (older) mneme install than the hook was loaded
+    from. That mismatch is silent and total: an older CLI rejects ``--json``,
+    the hook sees no parseable verdict, fails open on every edit, and
+    enforcement is off without anyone being told. Putting the hook's own root
+    first guarantees hook and CLI are the same version.
+    """
+    env = dict(os.environ)
+    existing = env.get("PYTHONPATH", "")
+    root = str(_PACKAGE_ROOT)
+    env["PYTHONPATH"] = f"{root}{os.pathsep}{existing}" if existing else root
+    return env
+
+
+_CHECK_JSON_SCHEMA = "mneme.check/v1"
+
+_BLOCKING_VERDICTS = frozenset({"WARN", "FAIL"})
+
+_KNOWN_VERDICTS = frozenset({"PASS", "WARN", "FAIL"})
+
+
+def parse_verdict(stdout: str) -> Optional[Dict[str, Any]]:
+    """Return the trusted verdict payload, or ``None`` if there isn't one.
+
+    The exit code of ``mneme check`` cannot be trusted to mean "policy said
+    no": strict mode returns 1 for a WARN verdict, and the interpreter also
+    returns 1 for an uncaught exception, so a malformed memory file or a CLI
+    crash is indistinguishable from a violation. Only a payload that parses,
+    carries the expected schema, and names a known verdict counts as a verdict
+    at all. Everything else returns ``None`` and the caller fails open.
+    """
+    try:
+        payload = json.loads(stdout)
+    except (json.JSONDecodeError, TypeError):
+        return None
+    if not isinstance(payload, dict):
+        return None
+    if payload.get("schema") != _CHECK_JSON_SCHEMA:
+        return None
+    if payload.get("verdict") not in _KNOWN_VERDICTS:
+        return None
+    return payload
+
+
+def _is_stale_runtime(child_stderr: str) -> bool:
+    """True when the child CLI is too old to understand ``--json``."""
+    return "unrecognized arguments" in (child_stderr or "") and "--json" in (
+        child_stderr or ""
+    )
+
+
+def format_reason(payload: Dict[str, Any]) -> str:
+    """Render a payload's violations as human-readable enforcement feedback."""
+    violations = payload.get("violations") or []
+    if not violations:
+        return f"mneme: {payload.get('verdict')} (no violations reported)"
+
+    # ASCII only: this string is written to stderr, which Claude Code may read
+    # under a non-UTF-8 console codepage (cp1252 on Windows). Non-ASCII
+    # punctuation arrives mojibaked.
+    lines = [f"mneme: {payload.get('verdict')} - architectural decision violated"]
+    for v in violations:
+        lines.append(
+            f"  [{v.get('decision_id')}] {v.get('severity')} "
+            f"\"{v.get('rule')}\" - trigger: {v.get('trigger')}"
+        )
+        if v.get("decision_text"):
+            lines.append(f"      {v['decision_text']}")
+    return "\n".join(lines)
+
+
+def _emit_defer(reason: str, stdout: TextIO) -> None:
+    """Report a non-blocking warn-mode verdict to Claude Code.
+
+    ``defer`` hands the call back to the normal permission flow. ``allow``
+    would be wrong here: it auto-approves the tool call, so warn mode would
+    silently bypass whatever permission prompt the user would otherwise get --
+    a warning mode must not weaken permissions.
+    """
+    json.dump(
+        {
+            "hookSpecificOutput": {
+                "hookEventName": "PreToolUse",
+                "permissionDecision": "defer",
+                "permissionDecisionReason": reason,
+            }
+        },
+        stdout,
+    )
+    stdout.write("\n")
+
+
+def _run_check(
+    event: ToolEvent,
+    proposed_content: str,
+    memory: Path,
+    stderr: TextIO,
+    stdout: TextIO,
+) -> int:
     mode = resolve_mode()
 
     with tempfile.NamedTemporaryFile(
@@ -136,11 +253,13 @@ def _run_check(event: ToolEvent, proposed_content: str, memory: Path, stderr: Te
                     "--input", input_path,
                     "--query", f"edit to {rel}",
                     "--mode", mode,
+                    "--json",
                 ],
                 capture_output=True,
                 text=True,
                 check=False,
                 timeout=_CHECK_TIMEOUT_SECONDS,
+                env=_child_env(),
             )
         except FileNotFoundError:
             print(
@@ -153,11 +272,44 @@ def _run_check(event: ToolEvent, proposed_content: str, memory: Path, stderr: Te
             print(f"mneme-hook: check could not run ({e}). Failing open.", file=stderr)
             return 0
 
-        if proc.stdout:
-            print(proc.stdout, file=stderr)
-        if proc.stderr:
-            print(proc.stderr, file=stderr)
-        return 2 if proc.returncode != 0 else 0
+        payload = parse_verdict(proc.stdout)
+        if payload is None:
+            # No trusted verdict: a crash, a traceback, or an unexpected exit
+            # code. Never block on this.
+            if _is_stale_runtime(proc.stderr):
+                # Silence here would mean enforcement is off with nobody told.
+                print(
+                    "mneme-hook: the installed mneme CLI does not support "
+                    "--json, so no edit can be checked and ENFORCEMENT IS "
+                    "INACTIVE. Upgrade with: pipx install --force "
+                    "\"mneme-hq>=0.5.1\"",
+                    file=stderr,
+                )
+                return 0
+            print(
+                "mneme-hook: no parseable verdict from mneme check "
+                f"(exit {proc.returncode}). Failing open.",
+                file=stderr,
+            )
+            if proc.stderr:
+                print(proc.stderr, file=stderr)
+            return 0
+
+        verdict = payload["verdict"]
+        if verdict == "PASS":
+            return 0
+
+        reason = format_reason(payload)
+        if mode == "warn":
+            _emit_defer(reason, stdout)
+            return 0
+
+        if verdict in _BLOCKING_VERDICTS:
+            # Exit 2 is the documented blocking path: Claude Code feeds stderr
+            # back to the model as the reason the edit was refused.
+            print(reason, file=stderr)
+            return 2
+        return 0
     finally:
         try:
             os.unlink(input_path)
@@ -165,7 +317,11 @@ def _run_check(event: ToolEvent, proposed_content: str, memory: Path, stderr: Te
             pass
 
 
-def main(stdin: TextIO = sys.stdin, stderr: TextIO = sys.stderr) -> int:
+def main(
+    stdin: TextIO = sys.stdin,
+    stderr: TextIO = sys.stderr,
+    stdout: TextIO = sys.stdout,
+) -> int:
     try:
         raw = stdin.read()
         event = parse_event(raw)
@@ -186,7 +342,7 @@ def main(stdin: TextIO = sys.stdin, stderr: TextIO = sys.stderr) -> int:
         print(f"mneme-hook: cannot materialize content, failing open: {e}", file=stderr)
         return 0
 
-    return _run_check(event, proposed_content, memory, stderr)
+    return _run_check(event, proposed_content, memory, stderr, stdout)
 
 
 def cli_main() -> None:

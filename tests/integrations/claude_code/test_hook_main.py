@@ -53,9 +53,30 @@ def _edit_envelope(tmp_path, target):
     })
 
 
+def _verdict_payload(verdict):
+    """A trusted `mneme check --json` payload.
+
+    The hook blocks on the payload's verdict, not on the child exit code --
+    an exit code alone cannot distinguish a violation from a CLI crash.
+    """
+    return json.dumps({
+        "schema": "mneme.check/v1",
+        "verdict": verdict,
+        "mode": "strict",
+        "violations": [{
+            "decision_id": "mneme_001",
+            "decision_text": "Use JSON storage only",
+            "severity": verdict,
+            "rule": "no postgres",
+            "trigger": "psycopg2",
+        }],
+        "freshness": [],
+    })
+
+
 def test_strict_fail_returns_two(tmp_path):
     mem, target = _project_with_memory(tmp_path)
-    fake = MagicMock(returncode=2, stdout="FAIL: violates mneme_001", stderr="")
+    fake = MagicMock(returncode=2, stdout=_verdict_payload("FAIL"), stderr="")
     with patch("mneme.integrations.claude_code.hook.subprocess.run", return_value=fake) as mrun:
         rc = main(stdin=io.StringIO(_edit_envelope(tmp_path, target)))
     assert rc == 2
@@ -68,10 +89,10 @@ def test_strict_fail_returns_two(tmp_path):
     assert "--mode" in args
 
 
-def test_strict_warn_returncode_blocks(tmp_path):
-    """In strict mode, mneme check returncode 1 (WARN) should block."""
+def test_strict_warn_verdict_blocks(tmp_path):
+    """In strict mode, a WARN verdict should block."""
     mem, target = _project_with_memory(tmp_path)
-    fake = MagicMock(returncode=1, stdout="WARN", stderr="")
+    fake = MagicMock(returncode=1, stdout=_verdict_payload("WARN"), stderr="")
     with patch("mneme.integrations.claude_code.hook.subprocess.run", return_value=fake):
         rc = main(stdin=io.StringIO(_edit_envelope(tmp_path, target)))
     assert rc == 2
@@ -80,9 +101,9 @@ def test_strict_warn_returncode_blocks(tmp_path):
 def test_warn_mode_never_blocks(tmp_path, monkeypatch):
     monkeypatch.setenv("MNEME_HOOK_MODE", "warn")
     mem, target = _project_with_memory(tmp_path)
-    fake = MagicMock(returncode=0, stdout="WARN", stderr="")
+    fake = MagicMock(returncode=0, stdout=_verdict_payload("WARN"), stderr="")
     with patch("mneme.integrations.claude_code.hook.subprocess.run", return_value=fake):
-        rc = main(stdin=io.StringIO(_edit_envelope(tmp_path, target)))
+        rc = main(stdin=io.StringIO(_edit_envelope(tmp_path, target)), stdout=io.StringIO())
     assert rc == 0
 
 

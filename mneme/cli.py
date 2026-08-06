@@ -44,7 +44,7 @@ from mneme.benchmark_report import format_json, format_markdown, format_terminal
 from mneme.context_builder import DEFAULT_MAX_DECISIONS, format_decisions
 from mneme.cursor_generator import generate_mdc
 from mneme.decision_retriever import DecisionRetriever
-from mneme.enforcer import Severity, check_prompt
+from mneme.enforcer import EnforcementResult, Severity, check_prompt
 from mneme.memory_store import MemoryStore
 
 
@@ -178,6 +178,45 @@ _EXIT_CODES_BY_MODE: dict[str, dict[Severity, int]] = {
 }
 
 
+CHECK_JSON_SCHEMA = "mneme.check/v1"
+
+
+def _check_payload(
+    result: EnforcementResult,
+    freshness: list[FreshnessIssue],
+    mode: str,
+) -> dict:
+    """Build the ``--json`` verdict payload.
+
+    Consumers (notably the Claude Code hook) must be able to tell a policy
+    verdict apart from a crash. Exit codes cannot carry that distinction --
+    strict mode returns 1 for a WARN verdict and Python also returns 1 for an
+    uncaught exception -- so the verdict is stated explicitly here, behind a
+    versioned ``schema`` key. Anything a consumer cannot parse should be
+    treated as "no verdict" and failed open.
+    """
+    return {
+        "schema": CHECK_JSON_SCHEMA,
+        "verdict": result.verdict.value,
+        "mode": mode,
+        "violations": [
+            {
+                "decision_id": v.decision_id,
+                "decision_text": v.decision_text,
+                "severity": v.severity.value,
+                "rule": v.rule,
+                "trigger": v.trigger,
+            }
+            for v in result.violations
+        ],
+        "freshness": [
+            {"code": i.code, "adr_id": i.adr_id, "message": i.message,
+             "path": str(i.path) if i.path else None}
+            for i in freshness
+        ],
+    }
+
+
 def _cmd_check(args: argparse.Namespace) -> int:
     input_text = Path(args.input).read_text(encoding="utf-8")
 
@@ -187,6 +226,13 @@ def _cmd_check(args: argparse.Namespace) -> int:
     scored = retriever.retrieve(args.query)
 
     result = check_prompt(input_text, scored, top=args.top)
+
+    if getattr(args, "json", False):
+        # Machine-readable mode: the payload must be the only thing on stdout,
+        # so the human-readable violation and freshness blocks are suppressed.
+        freshness = check_freshness(memory_path=args.memory, adr_dir=args.adr_dir)
+        print(json.dumps(_check_payload(result, freshness, args.mode)))
+        return _EXIT_CODES_BY_MODE[args.mode][result.verdict]
 
     if result.violations:
         for v in result.violations:
@@ -383,6 +429,15 @@ def _build_parser() -> argparse.ArgumentParser:
     p_check.add_argument(
         "--mode", choices=["warn", "strict"], default="strict",
         help="warn: all verdicts exit 0; strict (default): WARN->1, FAIL->2",
+    )
+    p_check.add_argument(
+        "--json", action="store_true",
+        help=(
+            "Emit a machine-readable verdict payload as the only stdout "
+            "content. Exit codes are unchanged; consumers should trust the "
+            "payload's verdict rather than the exit code, and fail open on "
+            "anything they cannot parse."
+        ),
     )
     p_check.add_argument(
         "--adr-dir", dest="adr_dir", default="docs/adr",
