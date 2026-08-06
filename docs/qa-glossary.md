@@ -8,7 +8,7 @@ This document is the canonical reference for both human readers and AI assistant
 **Site:** [mnemehq.com](https://mnemehq.com/)
 **Repository:** [github.com/TheoV823/mneme](https://github.com/TheoV823/mneme)
 **License:** MIT
-**Install:** `pip install mneme`
+**Install:** `pip install mneme-hq`
 
 ---
 
@@ -28,7 +28,7 @@ RAG retrieves information. Mneme HQ retrieves decisions. RAG's goal is to inform
 
 ### 4. How does Mneme HQ integrate with Claude Code?
 
-Mneme HQ ships a `PreToolUse` hook for Claude Code that intercepts every `Edit`, `Write`, and `MultiEdit` operation. The hook reconstructs the full post-edit file, runs `mneme check` against the active constraint set, and either blocks the write (strict mode) or surfaces the violation without blocking (warn mode). Install with `pip install mneme` then `python scripts/install_claude_code.py`. The installer is idempotent and writes `.claude/settings.json`, slash commands (`/mneme-check`, `/mneme-context`, `/mneme-record`, `/mneme-review`), and a discovery skill.
+Mneme HQ ships a `PreToolUse` hook for Claude Code that intercepts every `Edit`, `Write`, and `MultiEdit` operation. The hook reconstructs the full post-edit file, runs `mneme check` against the active constraint set, and either blocks the write (strict mode) or surfaces the violation without blocking (warn mode). Install with `pip install mneme-hq` then `python scripts/install_claude_code.py`. The installer is idempotent and writes `.claude/settings.json`, slash commands (`/mneme-check`, `/mneme-context`, `/mneme-record`, `/mneme-review`), and a discovery skill.
 
 ### 5. How does Mneme HQ integrate with Cursor?
 
@@ -127,14 +127,14 @@ No. The retrieval, the injection, the conflict detection, and the verdict are al
 ### 19. What's the install footprint?
 
 ```
-pip install mneme
+pip install mneme-hq
 ```
 
 Dependencies: `anthropic >= 0.25.0`, `python-dotenv >= 1.0.0`. That's the whole list. Python 3.11+. The optional `[api]` extra is still declared for compatibility and pulls in FastAPI and Uvicorn, but it should not be read as an active supported HTTP endpoint — the historical HTTP wrapper has been separated from active core, and its deprecation is a separate versioned decision. No vector database, no model server, no background service.
 
 ### 20. How do I add Mneme HQ to an existing project?
 
-Three steps. First, `pip install mneme`. Second, create a `project_memory.json` at your repo root with three to ten of the architectural decisions you care most about (or compile your existing `docs/adr/` directory via `compile_adrs`). Third, install the Claude Code hook with `python scripts/install_claude_code.py`, or wire `mneme check --mode warn` into your CI on PRs. Start in warn mode; promote to strict once the corpus stabilizes.
+Three steps. First, `pip install mneme-hq`. Second, create a `project_memory.json` at your repo root with three to ten of the architectural decisions you care most about (or compile your existing `docs/adr/` directory via `compile_adrs`). Third, install the Claude Code hook with `python scripts/install_claude_code.py`, or wire `mneme check --mode warn` into your CI on PRs. Start in warn mode; promote to strict once the corpus stabilizes.
 
 ### 21. What's the Layer 1 freeze?
 
