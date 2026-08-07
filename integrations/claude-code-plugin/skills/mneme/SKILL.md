@@ -11,8 +11,9 @@ description: |
 # Mneme — project memory & governance
 
 This project uses Mneme to enforce architectural decisions. When this plugin is
-enabled, a `PreToolUse` hook checks every Edit / Write / MultiEdit against the
-project's recorded decisions and can block edits that violate them.
+enabled, a `PreToolUse` hook checks `Edit` and `Write` tool calls against the
+project's recorded decisions and can block edits that violate them. Files
+written by shell commands are not covered.
 
 ## When this skill activates
 
@@ -38,10 +39,15 @@ project's recorded decisions and can block edits that violate them.
 
 ## Hook enforcement
 
-A `PreToolUse` hook runs automatically on Edit / Write / MultiEdit. It
-reconstructs the full post-edit file content, then calls `mneme check` with the
-query `"edit to <file_path>"`. Decisions whose scope or text share tokens with
-the file name are retrieved and checked.
+A `PreToolUse` hook runs automatically on `Edit` and `Write` tool calls (the
+matcher also lists `MultiEdit` for compatibility). It reconstructs the full
+post-edit file content, then calls `mneme check --json` with the query
+`"edit to <file_path>"`. Decisions whose scope or text share tokens with the
+file name are retrieved and checked.
+
+**Not covered:** files written by `Bash` commands. A shell redirect or `sed`
+never fires a `PreToolUse` file-edit hook. Run `/mneme:review` after such
+changes.
 
 **Retrieval caveat:** The automatic hook query is derived from the file path, so
 decisions with scope keywords that don't appear in file names may not be retrieved
@@ -52,11 +58,10 @@ and the violated decision id is surfaced in the error.
 
 ## Requirements & configuration
 
-- **Mneme must be installed** and `mneme-hook` must be on `PATH`. The reliable
-  hook needs the `v0.4.2` fixes, which are not yet on PyPI (published: `0.4.0`);
-  until then install from the repository root (`pip install -e .`).
-  See the plugin README for details. Without Mneme the hook fails open (edits
-  are never blocked).
+- **Mneme must be installed** and `mneme-hook` must be on `PATH`:
+  `pipx install "mneme-hq>=0.5.1"`. The version floor is required — earlier
+  releases lack the `--json` verdict the hook depends on. Without Mneme the
+  hook fails open (edits are never blocked). See the plugin README for details.
 - **Enforcement mode** is set by the plugin's `mode` configuration option and
   reaches the hook as `CLAUDE_PLUGIN_OPTION_MODE`. Precedence:
   `MNEME_HOOK_MODE` > `CLAUDE_PLUGIN_OPTION_MODE` > `strict`; unknown values fall
