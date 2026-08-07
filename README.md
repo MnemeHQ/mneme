@@ -477,16 +477,43 @@ during the warn-first rollout.
 Architectural governance for [Claude Code](https://docs.anthropic.com/en/docs/claude-code).
 Enforce ADRs and engineering constraints automatically — before drift reaches your repo.
 
+Two steps — the runtime and the Claude Code integration are separate artifacts:
+
 ```bash
-pip install mneme-hq
-python scripts/install_claude_code.py        # project-scoped: writes to ./.claude/
-# or: python scripts/install_claude_code.py --user   # writes to ~/.claude/
+# 1. Install the runtime
+pipx install "mneme-hq>=0.5.1"
+
+# 2. Load the plugin
+claude --plugin-dir ./integrations/claude-code-plugin
 ```
 
-This installs a `PreToolUse` hook so every Edit / Write / MultiEdit is checked
-against `.mneme/project_memory.json` in strict mode by default. See
-[docs/integrations/claude-code.md](docs/integrations/claude-code.md) for
-details, including retrieval behaviour and mode switching.
+This registers a `PreToolUse` hook so `Edit` and `Write` tool calls are checked
+against `.mneme/project_memory.json`, in strict mode by default. Files written
+by shell commands are **not** covered — see the
+[plugin README](integrations/claude-code-plugin/README.md) for the coverage
+boundary, fail-open guarantees, and mode switching.
+
+<details>
+<summary>Legacy: flat installer (source checkout only)</summary>
+
+Before the plugin, the integration was installed by a script that writes
+`.claude/settings.json` and hyphenated commands (`/mneme-check`,
+`/mneme-context`, `/mneme-record`, `/mneme-review`) — distinct from the
+plugin's namespaced `/mneme:check` and friends.
+
+```bash
+python scripts/install_claude_code.py          # project-scoped: writes ./.claude/
+# or: python scripts/install_claude_code.py --user
+```
+
+**This requires a git clone.** `scripts/` is not shipped in the `mneme-hq`
+wheel, so the script does not exist in a `pip`/`pipx` install. Prefer the
+plugin above.
+
+</details>
+
+See [docs/integrations/claude-code.md](docs/integrations/claude-code.md) for
+retrieval behaviour and further detail.
 
 ---
 
