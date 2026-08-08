@@ -1,6 +1,7 @@
 """Claude Code hook shim — translates PreToolUse events into mneme check calls."""
 from __future__ import annotations
 
+import difflib
 import json
 import os
 import subprocess
@@ -84,6 +85,60 @@ def materialize_proposed_content(event: ToolEvent) -> str:
         return content
 
     raise MaterializeError(f"unsupported tool: {event.tool_name}")
+
+
+def _current_content(event: ToolEvent) -> str:
+    """What is on disk now, or "" for a file that does not exist yet."""
+    file_path = event.tool_input.get("file_path", "")
+    if not file_path:
+        return ""
+    try:
+        return Path(file_path).read_text(encoding="utf-8")
+    except (FileNotFoundError, OSError):
+        return ""
+
+
+def introduced_content(event: ToolEvent) -> str:
+    """The lines this edit adds, as one string.
+
+    An edit gate and an audit ask different questions. "Is this file
+    compliant?" is an audit, and ``mneme check --input <file>`` still answers
+    it over whole files. "Does this edit introduce a violation?" is the gate,
+    and attributing the whole file to it means a violation already present
+    blocks every later edit -- including edits to an unrelated function and the
+    remediation itself. On an existing repository that turns installation into
+    an immediate wall (#259). See ADR-018.
+
+    "Introduced" is the added lines of a diff from current content to proposed
+    content. One definition covers all three tools: a brand-new file diffs
+    against nothing, so all of it is introduced.
+
+    Two deliberate consequences:
+
+    - Relocating a violating line counts as introducing it at the new position.
+      That is the safe direction; the alternative lets an agent launder a
+      violation by shuffling lines.
+    - A rule can only match within an added line, so a violation split across
+      an added line and an untouched one is not seen here. Rules are literal
+      tokens rather than multi-line patterns, so this is a narrow gap, and the
+      whole-file audit path still covers it.
+    """
+    proposed = materialize_proposed_content(event)
+    current = _current_content(event)
+    if not current:
+        return proposed
+
+    added = [
+        line[1:]
+        for line in difflib.unified_diff(
+            current.splitlines(),
+            proposed.splitlines(),
+            lineterm="",
+            n=0,
+        )
+        if line.startswith("+") and not line.startswith("+++")
+    ]
+    return "\n".join(added)
 
 
 def find_memory(start: Path) -> Optional[Path]:
@@ -337,12 +392,20 @@ def main(
         return 0
 
     try:
-        proposed_content = materialize_proposed_content(event)
+        # The gate checks what this edit introduces, not the whole resulting
+        # file -- otherwise a violation already in the file blocks every later
+        # edit to it, including the one that removes it (#259, ADR-018).
+        checked_content = introduced_content(event)
     except MaterializeError as e:
         print(f"mneme-hook: cannot materialize content, failing open: {e}", file=stderr)
         return 0
 
-    return _run_check(event, proposed_content, memory, stderr, stdout)
+    if not checked_content.strip():
+        # The edit adds no new lines (pure deletion, or a whitespace-only
+        # change). There is nothing it could have introduced.
+        return 0
+
+    return _run_check(event, checked_content, memory, stderr, stdout)
 
 
 def cli_main() -> None:
