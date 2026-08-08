@@ -144,6 +144,28 @@ class ProjectMemory:
 
 
 @dataclass
+class ForbiddenLiteral:
+    """A literal string a decision forbids, with its own exemptions.
+
+    Exemptions are held per-rule rather than in a flat decision-level pool.
+    A shared pool would let an exemption written for one prohibition silently
+    neuter an identically-worded prohibition added later for a different
+    reason -- and a rule that silently stops applying is the failure this
+    vocabulary exists to prevent.
+
+    Attributes:
+        value:              The forbidden literal, matched case-insensitively.
+        allowed_containers: Literals that, when they *fully contain* an
+                            occurrence of ``value``, suppress it. Containment
+                            is strict: an exemption must cover the whole
+                            forbidden literal including any prefix. See ADR-019.
+    """
+
+    value: str
+    allowed_containers: list[str] = field(default_factory=list)
+
+
+@dataclass
 class Decision:
     """A structured project decision with rationale, scope, and constraints.
 
@@ -162,6 +184,11 @@ class Decision:
                        e.g. ["no postgres", "no external db"].
         anti_patterns: Explicitly forbidden approaches,
                        e.g. ["introduce ORM", "add migration layer"].
+        literal_rules: Typed literal prohibitions with per-rule exemptions.
+                       Unlike constraints/anti_patterns -- which are matched by
+                       exploding a phrase into terms, and are therefore
+                       heuristic -- these are exact spans and enforceable by
+                       construction. See ADR-019.
         created_at:    ISO 8601 timestamp of creation.
         updated_at:    ISO 8601 timestamp of last update.
     """
@@ -172,6 +199,7 @@ class Decision:
     scope: list[str] = field(default_factory=list)
     constraints: list[str] = field(default_factory=list)
     anti_patterns: list[str] = field(default_factory=list)
+    literal_rules: list[ForbiddenLiteral] = field(default_factory=list)
     created_at: str = ""
     updated_at: str = ""
 

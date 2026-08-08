@@ -50,6 +50,13 @@ ALLOWLIST: dict[str, str] = {
     # check fails on itself the moment it is committed.
     "scripts/check_install_command.py": "the gate's own pattern and messages",
     "tests/test_check_install_command.py": "the gate's own test fixtures",
+    # The FORBID_STRING vocabulary exists precisely to express ADR-005's rule,
+    # so its tests must carry the forbidden string as fixture data. That this
+    # entry is needed at all is the self-reference problem in #259: a
+    # hand-maintained path allowlist is a second source of truth that drifts
+    # from the decision record. Replacing it with per-rule exemptions recorded
+    # in the decision itself is the point of ADR-019.
+    "tests/test_literal_rules.py": "fixture data for the literal-rule matcher",
 }
 
 

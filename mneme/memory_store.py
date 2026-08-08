@@ -14,7 +14,37 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from mneme.schemas import Decision, DecisionExample, MemoryItem, ProjectMeta, ProjectMemory
+from mneme.schemas import (
+    Decision,
+    DecisionExample,
+    ForbiddenLiteral,
+    MemoryItem,
+    ProjectMeta,
+    ProjectMemory,
+)
+
+
+def _load_literal_rules(d: dict) -> list[ForbiddenLiteral]:
+    """Read a decision's ``literal_rules``, tolerating absence.
+
+    Absent on every memory written before ADR-019, so existing files load
+    unchanged with an empty list. Malformed entries are skipped rather than
+    raising: the loader is on the enforcement path, and a hard failure here
+    would take the whole check down rather than one rule -- authoring
+    validation belongs at import time.
+    """
+    out: list[ForbiddenLiteral] = []
+    for raw in d.get("literal_rules", []) or []:
+        if not isinstance(raw, dict):
+            continue
+        value = raw.get("value")
+        if not isinstance(value, str) or not value:
+            continue
+        containers = [
+            c for c in (raw.get("allowed_containers") or []) if isinstance(c, str) and c
+        ]
+        out.append(ForbiddenLiteral(value=value, allowed_containers=containers))
+    return out
 
 
 class MemoryStore:
@@ -91,6 +121,7 @@ class MemoryStore:
                 scope=list(d.get("scope", [])),
                 constraints=list(d.get("constraints", [])),
                 anti_patterns=list(d.get("anti_patterns", [])),
+                literal_rules=_load_literal_rules(d),
                 created_at=d.get("created_at", ""),
                 updated_at=d.get("updated_at", ""),
             )

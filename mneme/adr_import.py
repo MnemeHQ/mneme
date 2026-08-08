@@ -339,6 +339,13 @@ def apply_import(
             "created_at": decision.created_at,
             "updated_at": decision.updated_at,
         }
+        if decision.literal_rules:
+            # Written only when non-empty, so importing an ADR without literal
+            # rules leaves existing memory files byte-identical.
+            entry["literal_rules"] = [
+                {"value": r.value, "allowed_containers": list(r.allowed_containers)}
+                for r in decision.literal_rules
+            ]
         source_path = report.adr_sources_by_id.get(decision.id)
         if source_path:
             entry["source"] = {
