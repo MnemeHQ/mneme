@@ -1,0 +1,93 @@
+name: tests
+
+# Runs the pytest suite as a real merge gate.
+#
+# Until this workflow existed, CI ran only the encoding and install-command
+# checks plus `mneme check --mode warn` (non-blocking), so the test suite was
+# local-only evidence and a PR could merge with it red.
+#
+# Two setup steps matter, because without them 9 tests silently skip rather
+# than fail:
+#
+#   - `pip install -e ".[dev]" build` puts the `mneme` and `mneme-hook` console
+#     scripts on PATH. The Claude Code e2e tests shell out to the real binary
+#     and skip themselves via `shutil.which("mneme") is None` when it is
+#     absent. `build` is deliberately named here: it is NOT part of the [dev]
+#     extra, which contains only pytest.
+#
+#   - `python -m build` produces dist/. The packaging-contract tests assert
+#     against the built sdist and wheel and skip when dist/ is missing --
+#     exactly the tests whose absence let a broken artifact reach PyPI.
+#
+# The skip audit step turns a regression in either of the above into a failure
+# instead of a quiet green run.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pytest:
+    name: pytest (py${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11', '3.12']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install package and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]" build
+
+      - name: Verify console scripts are on PATH
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v mneme
+          command -v mneme-hook
+          mneme --help > /dev/null
+
+      - name: Build distribution artifacts
+        run: python -m build
+
+      - name: Run test suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pytest tests/ -v --tb=short -rs | tee /tmp/pytest.txt
+
+      - name: Audit skipped tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The two skip reasons this workflow exists to eliminate. If either
+          # reappears the environment regressed and the green run is not real.
+          if grep -q "mneme CLI not on PATH" /tmp/pytest.txt; then
+            echo "::error::e2e tests skipped -- the mneme console script is not on PATH"
+            exit 1
+          fi
+          if grep -q "no dist/ directory" /tmp/pytest.txt; then
+            echo "::error::packaging-contract tests skipped -- dist/ was not built"
+            exit 1
+          fi
+          skipped="$(grep -cE '^SKIPPED' /tmp/pytest.txt || true)"
+          echo "Skipped tests: ${skipped}"
