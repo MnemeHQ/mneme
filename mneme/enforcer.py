@@ -68,6 +68,64 @@ def _word_in_text(term: str, text: str) -> bool:
     return bool(re.search(r"\b" + re.escape(term) + r"\b", text, re.IGNORECASE))
 
 
+def _spans(needle: str, haystack: str) -> list[tuple[int, int]]:
+    """Every case-insensitive occurrence of needle, as half-open spans."""
+    if not needle:
+        return []
+    out: list[tuple[int, int]] = []
+    lowered, target = haystack.lower(), needle.lower()
+    start = lowered.find(target)
+    while start != -1:
+        out.append((start, start + len(target)))
+        start = lowered.find(target, start + 1)
+    return out
+
+
+def _literal_violations(
+    decision, input_text: str,
+) -> list[Violation]:
+    """Report each forbidden literal occurrence not covered by an exemption.
+
+    Neither of the simpler matchers works for the case this exists to solve
+    (ADR-005's `pip install mneme` vs `pip install mneme-hq`):
+
+    - term matching fires on any single token, so it flags the *correct*
+      command and any prose containing "install";
+    - plain substring matching flags the correct command too, because the
+      forbidden literal is a substring of it;
+    - word-boundary matching does not help either, since the hyphen is itself
+      a word boundary.
+
+    So: find every occurrence of the forbidden literal, then suppress an
+    occurrence only when an allowed container *fully contains* it. Containment
+    is strict on purpose. An exemption that merely overlaps -- ALLOW
+    `install mneme-hq` against FORBID `pip install mneme` -- leaves the
+    forbidden span's `pip ` prefix uncovered and the correct command is still
+    reported. That is an authoring hazard rather than an algorithm defect, and
+    it is pinned by test rather than smoothed over, because widening the rule
+    to "overlaps" would let a narrow exemption silently disable a broad
+    prohibition.
+    """
+    violations: list[Violation] = []
+    for rule in getattr(decision, "literal_rules", []) or []:
+        exempt: list[tuple[int, int]] = []
+        for container in rule.allowed_containers:
+            exempt.extend(_spans(container, input_text))
+
+        for start, end in _spans(rule.value, input_text):
+            covered = any(a <= start and end <= b for a, b in exempt)
+            if covered:
+                continue
+            violations.append(Violation(
+                decision_id=decision.id,
+                decision_text=decision.decision,
+                severity=Severity.FAIL,
+                rule=f"FORBID_STRING: {rule.value}",
+                trigger=rule.value,
+            ))
+    return violations
+
+
 def _top_nonzero(scored: list[ScoredDecision], top: int) -> list[ScoredDecision]:
     kept: list[ScoredDecision] = []
     seen: set[str] = set()
@@ -159,6 +217,12 @@ def check_prompt(
 
     for s, literal_only in _enforcement_scope(scored, top):
         d = s.decision
+
+        # Typed literal rules are enforceable by construction, so they apply to
+        # every decision regardless of retrieval score or tier (ADR-019). This
+        # is what makes the vocabulary worth having: it closes #254 for these
+        # rules outright, rather than via the term-count proxy in ADR-017.
+        violations.extend(_literal_violations(d, input_text))
 
         for ap in d.anti_patterns:
             if literal_only and not _is_literal_rule(ap):

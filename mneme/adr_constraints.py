@@ -24,6 +24,16 @@ VALID_KINDS: Final[frozenset[str]] = frozenset({
     "FORBID_DEPENDENCY",
     "FORBID_PATH",
     "REQUIRE_PATH",
+    # ADR-019: typed literal content rules. FORBID_STRING names an exact
+    # string; ALLOW_CONTAINING_STRING exempts occurrences of the *preceding*
+    # FORBID_STRING that are fully contained by it.
+    #
+    # Named for what it does. "ALLOW_STRING" would read as "this string is
+    # permitted", which is not the semantics -- it suppresses contained
+    # forbidden spans, and an author who reads it the other way writes an
+    # exemption that does not do what they expect.
+    "FORBID_STRING",
+    "ALLOW_CONTAINING_STRING",
 })
 
 
@@ -70,6 +80,17 @@ def parse_constraints_section(body: str) -> list[ConstraintDirective]:
             raise ConstraintParseError(
                 f"unknown constraint directive {kind!r} "
                 f"(expected one of {sorted(VALID_KINDS)})"
+            )
+        if kind == "ALLOW_CONTAINING_STRING" and not any(
+            d.kind == "FORBID_STRING" for d in out
+        ):
+            # An exemption attaches to the FORBID_STRING above it. With none,
+            # the author has written something that exempts nothing -- which
+            # would otherwise compile clean and enforce nothing.
+            raise ConstraintParseError(
+                f"ALLOW_CONTAINING_STRING must follow a FORBID_STRING "
+                f"directive it exempts; found {value!r} with no preceding "
+                f"FORBID_STRING"
             )
         out.append(ConstraintDirective(kind=kind, value=value))
     return out

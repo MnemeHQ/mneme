@@ -25,8 +25,40 @@ from mneme.adr_schema import (
     ADRPrecedenceError,
     ADRValidationError,
 )
-from mneme.schemas import Decision
+from mneme.schemas import Decision, ForbiddenLiteral
 from mneme.adr_constraints import ConstraintDirective, parse_constraints_section
+
+
+_LITERAL_KINDS = frozenset({"FORBID_STRING", "ALLOW_CONTAINING_STRING"})
+
+
+def _directives_to_literal_rules(
+    directives: list[ConstraintDirective],
+) -> list[ForbiddenLiteral]:
+    """Fold FORBID_STRING / ALLOW_CONTAINING_STRING pairs into typed rules.
+
+    Association is positional: each ALLOW_CONTAINING_STRING attaches to the
+    most recent FORBID_STRING above it. That keeps the ADR readable as prose --
+
+        - FORBID_STRING: import requests
+        - ALLOW_CONTAINING_STRING: import requests_cache
+
+    -- and makes the pairing visible on the page rather than through an id
+    the author has to invent. Order matters, and it is order the author can
+    see. ``parse_constraints_section`` rejects an exemption with no preceding
+    prohibition, so the dangling case never reaches here.
+
+    Unlike the older kinds, these do NOT also become constraint strings. A
+    literal rule that additionally went through the term-matching path would
+    re-introduce exactly the false positives it exists to avoid.
+    """
+    rules: list[ForbiddenLiteral] = []
+    for d in directives:
+        if d.kind == "FORBID_STRING":
+            rules.append(ForbiddenLiteral(value=d.value, allowed_containers=[]))
+        elif d.kind == "ALLOW_CONTAINING_STRING" and rules:
+            rules[-1].allowed_containers.append(d.value)
+    return rules
 
 
 def _directive_to_constraint_string(d: ConstraintDirective) -> str:
@@ -362,22 +394,25 @@ def adrs_to_decisions(adrs: list[ADR]) -> list[Decision]:
     Returns:
         Decision records in the same order as the input.
     """
-    return [
-        Decision(
+    out: list[Decision] = []
+    for adr in adrs:
+        directives = parse_constraints_section(adr.body)
+        out.append(Decision(
             id=adr.id,
             decision=adr.title,
             rationale=adr.body,
             scope=[adr.scope],
             constraints=[
                 _directive_to_constraint_string(d)
-                for d in parse_constraints_section(adr.body)
+                for d in directives
+                if d.kind not in _LITERAL_KINDS
             ],
             anti_patterns=[],
+            literal_rules=_directives_to_literal_rules(directives),
             created_at=adr.date,
             updated_at=adr.date,
-        )
-        for adr in adrs
-    ]
+        ))
+    return out
 
 
 __all__ = [
