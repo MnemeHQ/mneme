@@ -64,13 +64,16 @@ Reusing `anti_patterns` fails, and the failure is instructive:
    allowed container fully contains it; report the rest at FAIL severity.
 
 4. **Containment is strict, not overlap.** An exemption must cover the whole
-   forbidden literal including any prefix. `ALLOW_CONTAINING_STRING` for
-   `install mneme-hq` does *not* exempt a `FORBID_STRING` of
-   `pip install mneme`, because the forbidden span's `pip ` prefix is
-   uncovered, and the correct command is still reported. This is a real
-   authoring hazard, and it is pinned by test rather than smoothed over:
-   widening the rule to "overlaps" would let a narrow exemption silently
-   disable a broad prohibition.
+   forbidden literal including any prefix. Take a prohibition on the three-word
+   install command ending in the bare project name, exempted by
+   `ALLOW_CONTAINING_STRING: install mneme-hq` — the exemption omits the
+   leading `pip `, so it overlaps the forbidden span without containing it, and
+   the correct command is still reported. This is a real authoring hazard, and
+   it is pinned by test rather than smoothed over: widening the rule to
+   "overlaps" would let a narrow exemption silently disable a broad
+   prohibition. (Stated indirectly here because writing the forbidden form out
+   would trip this repository's own ADR-005 gate — an instance of the
+   self-reference problem noted under Consequences.)
 
 5. **Exemptions are per-rule, not a decision-level pool.** Stored as
    `ForbiddenLiteral(value, allowed_containers)`. A flat shared pool would let
