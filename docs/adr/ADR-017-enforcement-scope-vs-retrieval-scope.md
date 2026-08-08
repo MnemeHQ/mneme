@@ -107,8 +107,18 @@ block, and would have made strict mode unusable.
 - Issue #254 is closed for literal rules: the reproduction now reports FAIL under
   `service.py`, `models.py`, `db.py`, and `handler.py` as well as
   `storage_db.py`, and compliant content still passes under all of them.
-- False positives do not increase. Repo-wide FAIL count measured after this
-  change is 44 of 216 — identical to the pre-change baseline.
+- False positives do not increase. Measured over the same 216 tracked files
+  before and after, the repo-wide FAIL count is 44 in both cases.
+
+  Adding this ADR and its regression test brings the tracked set to 218 files
+  and the count to 46. Both new files fail on the pre-existing multi-term rules
+  `direct-to-main governance edits` and `unreviewed enforcement changes`,
+  triggered by the bare words `main` and `enforcement` appearing in prose that
+  documents enforcement. That is the #150 matcher behaving as it already did on
+  the retrieval-gated path, which this ADR does not change — and it is a
+  concrete instance of the self-reference problem: the document describing a
+  rule is itself flagged by it. Recorded here because it is the first thing a
+  reader will notice when re-running the measurement.
 - `tests/test_enforcer.py::test_zero_score_decisions_are_skipped` asserted the
   defective behaviour and is replaced by two tests pinning the new contract: a
   zero-scoring decision enforces its literal rules, and does not apply its
