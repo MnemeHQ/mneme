@@ -22,10 +22,28 @@ def project(tmp_path):
     (tmp_path / ".mneme" / "project_memory.json").write_text(
         FIXTURE.read_text(encoding="utf-8"), encoding="utf-8"
     )
-    # Use "storage_db.py" so the query "edit to .../storage_db.py" contains
-    # the token "storage", which matches the fixture decision's scope field
-    # and ensures the retriever returns a non-zero score.
+    # "storage_db.py" shares the token "storage" with the fixture decision's
+    # scope, so the retriever returns a non-zero score for it. This used to be
+    # a *requirement* for enforcement to fire at all; since ADR-017 it is just
+    # one case. `neutral_project` below covers the other.
     target = tmp_path / "storage_db.py"
+    target.write_text(SEED_OLD + "\n", encoding="utf-8")
+    return tmp_path, target
+
+
+@pytest.fixture
+def neutral_project(tmp_path):
+    """Same fixture, but a filename that scores zero against the decision.
+
+    Regression cover for #254: enforcement must not depend on the filename
+    sharing a token with the decision's scope. Before ADR-017 the hook let this
+    edit through with no violation.
+    """
+    (tmp_path / ".mneme").mkdir()
+    (tmp_path / ".mneme" / "project_memory.json").write_text(
+        FIXTURE.read_text(encoding="utf-8"), encoding="utf-8"
+    )
+    target = tmp_path / "service.py"
     target.write_text(SEED_OLD + "\n", encoding="utf-8")
     return tmp_path, target
 
@@ -129,4 +147,40 @@ def test_warn_mode_surfaces_violation_against_real_cli(project, monkeypatch):
 def test_compliant_write_passes(project):
     cwd, target = project
     rc = main(stdin=io.StringIO(_write_envelope(cwd, target, "import sqlite3\n")))
+    assert rc == 0
+
+
+# ── #254: enforcement under a filename that retrieves nothing ────────────────
+
+@pytest.mark.skipif(shutil.which("mneme") is None, reason="mneme CLI not on PATH")
+def test_violation_blocks_under_neutral_filename(neutral_project):
+    """The defect, end to end through the real CLI.
+
+    `service.py` scores 0.00 against the fixture decision, so before ADR-017
+    the decision was never evaluated and this edit was allowed.
+    """
+    cwd, target = neutral_project
+    err = io.StringIO()
+    rc = main(stdin=io.StringIO(_envelope(cwd, target, "import psycopg2")), stderr=err)
+    assert rc == 2, "a violating edit must block regardless of the filename"
+    assert "test_001" in err.getvalue() or "psycopg2" in err.getvalue()
+
+
+@pytest.mark.skipif(shutil.which("mneme") is None, reason="mneme CLI not on PATH")
+def test_violating_write_blocks_under_neutral_filename(neutral_project):
+    cwd, target = neutral_project
+    err = io.StringIO()
+    rc = main(
+        stdin=io.StringIO(_write_envelope(cwd, target, "import psycopg2\n")),
+        stderr=err,
+    )
+    assert rc == 2
+    assert "test_001" in err.getvalue() or "psycopg2" in err.getvalue()
+
+
+@pytest.mark.skipif(shutil.which("mneme") is None, reason="mneme CLI not on PATH")
+def test_compliant_passes_under_neutral_filename(neutral_project):
+    """Corpus-wide enforcement must not become blanket blocking."""
+    cwd, target = neutral_project
+    rc = main(stdin=io.StringIO(_envelope(cwd, target, "import sqlite3")))
     assert rc == 0
