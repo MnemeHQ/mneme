@@ -152,9 +152,36 @@ def test_violation_records_trigger_term():
     assert "postgres" in warn_v.trigger
 
 
-def test_zero_score_decisions_are_skipped():
+def test_zero_score_decision_still_enforces_its_literal_rules():
+    """Zero retrieval score no longer exempts a decision from enforcement.
+
+    Replaces `test_zero_score_decisions_are_skipped`, which pinned the #254
+    defect: `_top_nonzero` dropped every zero-scoring decision, so identical
+    content was caught or missed on the strength of the filename alone.
+
+    STORAGE's `no postgres` constraint is a one-term rule, so it applies
+    corpus-wide and WARNs here. Its `introduce ORM` anti_pattern is multi-term
+    and stays retrieval-gated, so it does not fire -- which is why the verdict
+    is WARN and not FAIL. See ADR-017.
+    """
     scored = [_scored(STORAGE, score=0.0)]
     result = check_prompt("Use postgres and introduce ORM.", scored)
+    assert result.verdict == Severity.WARN
+    assert any(v.trigger == "postgres" for v in result.violations)
+    assert not any(v.severity == Severity.FAIL for v in result.violations)
+
+
+def test_zero_score_decision_does_not_apply_multi_term_rules():
+    """The #150 guardrail: corpus-wide enforcement is literal rules only.
+
+    A multi-term rule explodes into individual tokens, any one of which fires
+    on its own. Applying those to every decision would turn documented
+    false-positive noise into a repo-wide edit block, so they remain gated.
+    """
+    scored = [_scored(STORAGE, score=0.0)]
+    # "introduce" alone would trigger the "introduce ORM" anti_pattern under
+    # the pre-#254 disjunctive matcher had the decision been retrieved.
+    result = check_prompt("Let me introduce the new reporting feature.", scored)
     assert result.verdict == Severity.PASS
 
 

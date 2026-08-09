@@ -426,7 +426,14 @@ def _build_parser() -> argparse.ArgumentParser:
     p_check.add_argument("--memory", required=True, help="Path to project_memory.json")
     p_check.add_argument("--input", required=True, help="Path to input file to check")
     p_check.add_argument("--query", required=True, help="Context query for retrieval")
-    p_check.add_argument("--top", type=int, default=DEFAULT_MAX_DECISIONS)
+    p_check.add_argument(
+        "--top", type=int, default=DEFAULT_MAX_DECISIONS,
+        help=(
+            "Size of the retrieval-gated tier. Bounds how many decisions have "
+            "their multi-term rules applied; unambiguous literal rules are "
+            "enforced across the whole corpus regardless (ADR-017)."
+        ),
+    )
     p_check.add_argument(
         "--mode", choices=["warn", "strict"], default="strict",
         help="warn: all verdicts exit 0; strict (default): WARN->1, FAIL->2",
