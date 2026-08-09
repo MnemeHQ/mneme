@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -514,7 +515,39 @@ def _build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _force_utf8_stdio() -> None:
+    """Make stdout/stderr able to carry any character a decision contains.
+
+    Decision text is arbitrary user content. This repo's own memory carries
+    U+2192 in the imported ADR-001, ADR-005 and ADR-014 decisions, and on
+    Windows the console defaults to cp1252, which cannot encode it -- so
+    rendering a perfectly valid decision crashed the CLI with
+    UnicodeEncodeError partway through its output (#253).
+
+    Source-level ASCII discipline cannot fix this, because the character comes
+    from the memory file rather than from mneme. Applied here in ``main`` so
+    every subcommand is covered: previously only ``benchmark`` and
+    ``adr import`` guarded themselves, while ``test_query`` and ``check``
+    -- both of which render decision text -- did not.
+
+    Note this differs from the Claude Code hook's ASCII-only rule. The hook
+    writes into a protocol another process parses, so it constrains what it
+    emits; the CLI writes for a human and instead widens what its stream can
+    carry.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            try:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+            except (ValueError, OSError):
+                # Detached or already-wrapped stream: rendering degrades to
+                # whatever the caller supplied, which is still better than
+                # refusing to run.
+                pass
+
+
 def main(argv: list[str] | None = None) -> int:
+    _force_utf8_stdio()
     parser = _build_parser()
     args = parser.parse_args(argv)
     return args.func(args)
