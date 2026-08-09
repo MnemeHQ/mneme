@@ -1,13 +1,19 @@
-name: tests
+name: Tests
 
 # Runs the pytest suite as a real merge gate.
 #
-# Until this workflow existed, CI ran only the encoding and install-command
-# checks plus `mneme check --mode warn` (non-blocking), so the test suite was
-# local-only evidence and a PR could merge with it red.
+# Extends the workflow contributed in PR #236 (ShantKhatri), which established
+# this gate. That PR is the reason CI runs pytest at all; this adds three
+# things found while fixing #254:
+#
+#   - a 3.12 leg alongside 3.11
+#   - the build/dist steps below
+#   - the skip audit
 #
 # Two setup steps matter, because without them 9 tests silently skip rather
-# than fail:
+# than fail. The agreed baseline on #236 was `379 passed, 5 skipped`; those
+# 5 are the packaging-contract tests, and they are exactly the ones that would
+# have caught a broken artifact before it reached PyPI:
 #
 #   - `pip install -e ".[dev]" build` puts the `mneme` and `mneme-hook` console
 #     scripts on PATH. The Claude Code e2e tests shell out to the real binary
