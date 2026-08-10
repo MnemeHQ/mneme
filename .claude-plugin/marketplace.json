@@ -1,0 +1,14 @@
+{
+  "name": "mneme",
+  "owner": {
+    "name": "Mneme HQ"
+  },
+  "description": "Claude Code plugins for architectural governance with Mneme.",
+  "plugins": [
+    {
+      "name": "mneme",
+      "source": "./integrations/claude-code-plugin",
+      "description": "Enforce architectural decisions and engineering standards before Claude Code writes changes."
+    }
+  ]
+}

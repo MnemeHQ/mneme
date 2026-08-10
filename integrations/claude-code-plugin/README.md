@@ -44,10 +44,15 @@ claude --plugin-dir /path/to/mneme/integrations/claude-code-plugin
 
 After changes, reload in-session with `/reload-plugins`.
 
-**From a marketplace:** not yet available. The plugin has not been submitted to
-the Claude Code community catalog, so `--plugin-dir` above is currently the
-only installation path. Once it is listed, enabling it from Claude Code's
-plugin UI will prompt for the **enforcement mode** (`strict` or `warn`).
+**From the Mneme marketplace:**
+
+```text
+/plugin marketplace add MnemeHQ/mneme
+/plugin install mneme@mneme
+```
+
+On enable, Claude Code prompts for the **enforcement mode** (`strict` or
+`warn`).
 
 ## How enforcement works
 
