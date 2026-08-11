@@ -11,6 +11,7 @@ wrong, because a violation does not stop being a violation when the filename
 happens to share no token with the decision's scope. See ADR-017.
 
 Severity semantics:
+    A typed FORBID_LITERAL match is a FAIL.
     FAIL  — input contains a term from a decision's anti_patterns list.
     WARN  — input mentions a term that a "no X" constraint forbids.
     PASS  — no violations found.
@@ -24,8 +25,10 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 from enum import Enum
+from pathlib import Path
 
 from mneme.decision_retriever import ScoredDecision
+from mneme.rule_matcher import literal_in_text
 
 
 class Severity(str, Enum):
@@ -41,6 +44,8 @@ class Violation:
     severity: Severity
     rule: str     # the constraint or anti_pattern string that triggered
     trigger: str  # the specific term found in the input
+    kind: str = "legacy"
+    rule_type: str | None = None
 
 
 @dataclass
@@ -66,6 +71,24 @@ def _rule_terms(text: str, min_len: int = 3) -> list[str]:
 def _word_in_text(term: str, text: str) -> bool:
     """True if term appears as a whole word (case-insensitive) in text."""
     return bool(re.search(r"\b" + re.escape(term) + r"\b", text, re.IGNORECASE))
+
+
+def _is_policy_source(
+    input_path: str | Path | None,
+    *policy_paths: str,
+) -> bool:
+    """Return whether the input stores or declares the decision's policy."""
+    if input_path is None:
+        return False
+    for policy_path in policy_paths:
+        if not policy_path:
+            continue
+        try:
+            if Path(input_path).resolve() == Path(policy_path).resolve():
+                return True
+        except OSError:
+            continue
+    return False
 
 
 def _top_nonzero(scored: list[ScoredDecision], top: int) -> list[ScoredDecision]:
@@ -137,6 +160,7 @@ def check_prompt(
     input_text: str,
     scored: list[ScoredDecision],
     top: int = 3,
+    input_path: str | Path | None = None,
 ) -> EnforcementResult:
     """Check input_text against the decision corpus.
 
@@ -151,6 +175,9 @@ def check_prompt(
         top:        Size of the retrieval-gated tier. This bounds how many
                     decisions have their *multi-term* rules applied; it never
                     limits which decisions are enforced.
+        input_path: Optional checked-file path. A typed rule does not enforce
+                    against its declaring ADR or policy-memory source, both of
+                    which must be able to contain the literal it defines.
 
     Returns:
         EnforcementResult with verdict and list of Violations.
@@ -159,6 +186,21 @@ def check_prompt(
 
     for s, literal_only in _enforcement_scope(scored, top):
         d = s.decision
+
+        if not _is_policy_source(input_path, d.source_path, d.memory_path):
+            for rule in d.rules:
+                if rule.type == "FORBID_LITERAL" and literal_in_text(
+                    rule.value, input_text
+                ):
+                    violations.append(Violation(
+                        decision_id=d.id,
+                        decision_text=d.decision,
+                        severity=Severity.FAIL,
+                        rule=rule.value,
+                        trigger=rule.value,
+                        kind="typed_rule",
+                        rule_type=rule.type,
+                    ))
 
         for ap in d.anti_patterns:
             if literal_only and not _is_literal_rule(ap):
@@ -171,6 +213,7 @@ def check_prompt(
                         severity=Severity.FAIL,
                         rule=ap,
                         trigger=term,
+                        kind="anti_pattern",
                     ))
                     break  # one violation per anti_pattern entry
 
@@ -190,6 +233,7 @@ def check_prompt(
                         severity=Severity.WARN,
                         rule=constraint,
                         trigger=term,
+                        kind="constraint",
                     ))
                     break
 

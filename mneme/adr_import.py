@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import json as _json
 import os
+import re
 import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -94,6 +95,7 @@ def project_decision_graph(adrs: list[ADR]) -> list[DecisionNode]:
 
 
 DiagnosticKind = Literal[
+    "no_enforceable_rules",
     "active_active_contradiction",  # same-scope tie the compiler couldn't break
     "same_id",                      # incoming id collides with existing memory id
     "validation_error",             # malformed ADR — shown but doesn't raise
@@ -125,6 +127,16 @@ class ImportReport:
     decisions: list[Decision]
     diagnostics: list[ImportDiagnostic]
     adr_sources_by_id: dict[str, str] = field(default_factory=dict)
+
+
+def _has_mechanically_enforceable_rule(decision: Decision) -> bool:
+    """Return whether the current runtime can enforce any payload."""
+    if decision.rules or decision.anti_patterns:
+        return True
+    return any(
+        re.match(r"^no\s+.+$", constraint.strip(), re.IGNORECASE)
+        for constraint in decision.constraints
+    )
 
 
 def compile_for_import(adr_dir: str | Path) -> ImportReport:
@@ -162,6 +174,19 @@ def compile_for_import(adr_dir: str | Path) -> ImportReport:
     active_ids = {a.id for a in active_adrs}
     active_nodes = [n for n in all_nodes if n.id in active_ids]
     decisions = adrs_to_decisions(active_adrs)
+    for decision in decisions:
+        if not _has_mechanically_enforceable_rule(decision):
+            diagnostics.append(ImportDiagnostic(
+                kind="no_enforceable_rules",
+                adr_id=decision.id,
+                existing_in="",
+                message=(
+                    f"{decision.id} yields 0 mechanically enforceable rules; "
+                    f"it will be imported for retrieval only. Add an "
+                    f"enforceable directive such as FORBID_LITERAL under "
+                    f"## Constraints to make enforcement explicit."
+                ),
+            ))
     adr_sources_by_id = {a.id: a.source_path for a in active_adrs if a.source_path}
 
     return ImportReport(
@@ -239,10 +264,12 @@ def format_preview(
         lines.append(f"  [{node.id}] status={node.status}")
         decision = next((d for d in report.decisions if d.id == node.id), None)
         if decision:
+            for rule in decision.rules:
+                lines.append(f"      rule: {rule.type} {rule.value}")
             for c in decision.constraints:
                 lines.append(f"      constraint: {c}")
-            if not decision.constraints:
-                lines.append("      (no ## Constraints directives)")
+            if not decision.rules and not decision.constraints:
+                lines.append("      (no supported ## Constraints directives)")
     lines.append("")
 
     # Section: full corpus (graph view)
@@ -271,6 +298,16 @@ def format_preview(
             "  To proceed despite the contradiction, re-run with "
             "--approve-conflicts."
         )
+        lines.append("")
+
+    unenforceable_diags = [
+        d for d in report.diagnostics
+        if d.kind == "no_enforceable_rules"
+    ]
+    if unenforceable_diags:
+        lines.append("Retrieval-only ADR warnings:")
+        for d in unenforceable_diags:
+            lines.append(f"  - {d.message}")
         lines.append("")
 
     # Section: collisions vs existing memory
@@ -336,6 +373,10 @@ def apply_import(
             "scope": list(decision.scope),
             "constraints": list(decision.constraints),
             "anti_patterns": list(decision.anti_patterns),
+            "rules": [
+                {"type": rule.type, "value": rule.value}
+                for rule in decision.rules
+            ],
             "created_at": decision.created_at,
             "updated_at": decision.updated_at,
         }

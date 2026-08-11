@@ -25,23 +25,30 @@ from mneme.adr_schema import (
     ADRPrecedenceError,
     ADRValidationError,
 )
-from mneme.schemas import Decision
+from mneme.schemas import Decision, Rule
 from mneme.adr_constraints import ConstraintDirective, parse_constraints_section
 
 
 def _directive_to_constraint_string(d: ConstraintDirective) -> str:
     """Render a directive as a Decision.constraint string.
 
-    FORBID_DEPENDENCY is rendered in the ``"no X"`` form so the existing
-    enforcer (mneme.enforcer.check_prompt) triggers a WARN when the
+    FORBID_LITERAL is routed to ``_directive_to_rule`` before this helper is
+    called. FORBID_DEPENDENCY is rendered in the ``"no X"`` form so the
+    existing enforcer (mneme.enforcer.check_prompt) triggers a WARN when the
     forbidden term appears in a checked input. FORBID_PATH and REQUIRE_PATH
-    persist verbatim -- they're stored for retrieval visibility, but glob-
-    vs-changed-file enforcement is not implemented (out of scope for the
-    import MVP; the enforcer is a term-matcher, not a path-matcher).
+    persist verbatim -- they're stored for retrieval visibility, but glob-vs-
+    changed-file enforcement is not implemented.
     """
     if d.kind == "FORBID_DEPENDENCY":
         return f"no {d.value}"
     return f"{d.kind} {d.value}"
+
+
+def _directive_to_rule(d: ConstraintDirective) -> Rule | None:
+    """Compile a directive whose semantics are implemented as a typed rule."""
+    if d.kind == "FORBID_LITERAL":
+        return Rule(type="FORBID_LITERAL", value=d.value)
+    return None
 
 
 # ── Validation ────────────────────────────────────────────────────────────────
@@ -351,9 +358,10 @@ def adrs_to_decisions(adrs: list[ADR]) -> list[Decision]:
         ADR.scope   -> Decision.scope (wrapped in a single-element list)
         ADR.date    -> Decision.created_at and Decision.updated_at
 
-    ``Decision.constraints`` is populated from the ADR body's optional
-    ``## Constraints`` section via ``parse_constraints_section`` and the
-    ``_directive_to_constraint_string`` bridge. ``Decision.anti_patterns``
+    ``Decision.constraints`` and ``Decision.rules`` are populated from the
+    ADR body's optional ``## Constraints`` section via
+    ``parse_constraints_section`` and the typed/legacy directive bridges.
+    ``Decision.anti_patterns``
     is left empty for v1 — anti-pattern modelling stays in manual memory.
 
     Args:
@@ -362,22 +370,30 @@ def adrs_to_decisions(adrs: list[ADR]) -> list[Decision]:
     Returns:
         Decision records in the same order as the input.
     """
-    return [
-        Decision(
+    out: list[Decision] = []
+    for adr in adrs:
+        directives = parse_constraints_section(adr.body)
+        constraints: list[str] = []
+        rules: list[Rule] = []
+        for directive in directives:
+            rule = _directive_to_rule(directive)
+            if rule is not None:
+                rules.append(rule)
+            else:
+                constraints.append(_directive_to_constraint_string(directive))
+        out.append(Decision(
             id=adr.id,
             decision=adr.title,
             rationale=adr.body,
             scope=[adr.scope],
-            constraints=[
-                _directive_to_constraint_string(d)
-                for d in parse_constraints_section(adr.body)
-            ],
+            constraints=constraints,
             anti_patterns=[],
+            rules=rules,
+            source_path=adr.source_path,
             created_at=adr.date,
             updated_at=adr.date,
-        )
-        for adr in adrs
-    ]
+        ))
+    return out
 
 
 __all__ = [

@@ -313,7 +313,10 @@ into `Decision` objects at load time; no changes needed to existing JSON files.
   "rationale": "Avoid infra complexity and keep local-first.",
   "scope": ["storage", "backend"],
   "constraints": ["no postgres", "no external database"],
-  "anti_patterns": ["introduce ORM", "add migration layer"]
+  "anti_patterns": ["introduce ORM", "add migration layer"],
+  "rules": [
+    {"type": "FORBID_LITERAL", "value": "install legacy-package"}
+  ]
 }
 ```
 
@@ -349,8 +352,8 @@ print(result.injected_decisions)  # list[Decision] actually sent
 
 ### Conflict detection
 
-`ConflictDetector` scans the LLM response for constraint and anti-pattern
-violations **after** the call. It is a detector, not a blocker:
+`ConflictDetector` scans the LLM response for constraint, anti-pattern, and
+typed-rule violations **after** the call. It is a detector, not a blocker:
 
 ```python
 from mneme.conflict_detector import ConflictDetector
@@ -360,6 +363,8 @@ conflicts = ConflictDetector().detect(response.content, injected_decisions)
 
 A term is only flagged when it appears **without** a negation signal nearby.
 `"Do not use Postgres"` is not a conflict. `"Switch to Postgres"` is.
+Typed `FORBID_LITERAL` rules do not use this heuristic: the exact literal is
+forbidden regardless of surrounding prose.
 
 ### CLI
 
@@ -574,6 +579,7 @@ Result: PASS
 | `PASS`  | No violations in top-N decisions | 0 | 0 |
 | `WARN`  | Input mentions a term forbidden by a `"no X"` constraint | 1 | 0 |
 | `FAIL`  | Input contains a term from a decision's `anti_patterns` list | 2 | 0 |
+| `FAIL`  | Input matches a typed `FORBID_LITERAL` rule | 2 | 0 |
 
 Detection is deterministic — no ML, no LLM, no external calls. Same input
 always returns the same verdict.
@@ -681,7 +687,9 @@ mneme adr import docs/adr --memory .mneme/project_memory.json --dry-run
 
 The default is dry-run: the preview shows the active set, the projected
 graph status of every ADR, the constraints that would be persisted, and
-any conflicts. Apply when you're satisfied:
+any conflicts or retrieval-only ADR warnings. A dry-run returns exit 1 when
+an active ADR has no mechanically enforceable rules. Apply when you're
+satisfied:
 
 ```bash
 mneme adr import docs/adr --memory .mneme/project_memory.json --apply
@@ -699,15 +707,22 @@ include an optional `## Constraints` section with directives:
 
 ```markdown
 ## Constraints
+- FORBID_LITERAL: install legacy-package
 - FORBID_DEPENDENCY: mongodb
 - FORBID_PATH: src/legacy/**
 - REQUIRE_PATH: billing/**
 ```
 
-Only `FORBID_DEPENDENCY` is currently end-to-end enforced (via
-`mneme check`); `FORBID_PATH` and `REQUIRE_PATH` persist into Decisions
-for retrieval visibility but glob-vs-changed-file enforcement is a
-follow-up.
+`FORBID_LITERAL` is persisted as a typed rule and produces `FAIL` through
+`mneme check`. Matching is case-sensitive and boundary-aware, so
+`pip install mneme` does not match `pip install mneme-hq`. The rule is checked
+across the decision corpus, independent of retrieval score. Its declaring ADR
+source and canonical memory file are exempt so policy storage can state the
+literal it governs.
+
+`FORBID_DEPENDENCY` retains its legacy `WARN` behavior. `FORBID_PATH` and
+`REQUIRE_PATH` persist into Decisions for retrieval visibility but are not yet
+enforced against changed-file paths.
 
 See [docs/integrations/adr-import.md](docs/integrations/adr-import.md)
 for the full reference.

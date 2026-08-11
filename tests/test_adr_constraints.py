@@ -21,6 +21,13 @@ Do not use mongo.
     assert out == [ConstraintDirective(kind="FORBID_DEPENDENCY", value="mongodb")]
 
 
+def test_parse_forbid_literal_directive():
+    body = "## Constraints\n- FORBID_LITERAL: pip install mneme\n"
+    assert parse_constraints_section(body) == [
+        ConstraintDirective(kind="FORBID_LITERAL", value="pip install mneme")
+    ]
+
+
 def test_parse_multiple_directives_in_order():
     body = """## Constraints
 - FORBID_PATH: src/legacy/billing/**

@@ -118,6 +118,9 @@ def _cmd_list(args: argparse.Namespace) -> int:
             print(f"    constraints: {', '.join(d.constraints)}")
         if d.anti_patterns:
             print(f"    avoid: {', '.join(d.anti_patterns)}")
+        if d.rules:
+            for rule in d.rules:
+                print(f"    rule: {rule.type} {rule.value}")
     return 0
 
 
@@ -207,6 +210,8 @@ def _check_payload(
                 "severity": v.severity.value,
                 "rule": v.rule,
                 "trigger": v.trigger,
+                "kind": v.kind,
+                "rule_type": v.rule_type,
             }
             for v in result.violations
         ],
@@ -226,7 +231,7 @@ def _cmd_check(args: argparse.Namespace) -> int:
     retriever = DecisionRetriever(store.decisions())
     scored = retriever.retrieve(args.query)
 
-    result = check_prompt(input_text, scored, top=args.top)
+    result = check_prompt(input_text, scored, top=args.top, input_path=args.input)
 
     if getattr(args, "json", False):
         # Machine-readable mode: the payload must be the only thing on stdout,
@@ -237,8 +242,11 @@ def _cmd_check(args: argparse.Namespace) -> int:
 
     if result.violations:
         for v in result.violations:
-            kind = "anti_pattern" if v.severity == Severity.FAIL else "constraint"
-            print(f"{v.severity.value:4}  [{v.decision_id}] {kind} \"{v.rule}\" -- trigger: {v.trigger}")
+            kind = v.rule_type or v.kind
+            print(
+                f"{v.severity.value:4}  [{v.decision_id}] "
+                f"{kind} \"{v.rule}\" -- trigger: {v.trigger}"
+            )
             print(f"      {v.decision_text}")
         print()
 
@@ -336,8 +344,8 @@ def _cmd_adr_import(args: argparse.Namespace) -> int:
 
     Exit codes:
         0 = success (preview shown in dry-run, or write completed in apply)
-        1 = diagnostics present (active-active contradiction or collisions)
-            in dry-run mode (informational; CI can use this to fail the PR)
+        1 = diagnostics present (retrieval-only ADR, active-active
+            contradiction, or collision) in dry-run mode
         2 = apply failed (refused due to unresolved diagnostics)
     """
     import sys

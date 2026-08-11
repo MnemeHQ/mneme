@@ -1,7 +1,7 @@
 """Top-N decision injection in ContextBuilder."""
 from mneme.context_builder import format_decisions, DEFAULT_MAX_DECISIONS
 from mneme.decision_retriever import ScoredDecision
-from mneme.schemas import Decision
+from mneme.schemas import Decision, Rule
 
 
 def _scored(decision_id: str, score: float) -> ScoredDecision:
@@ -45,6 +45,15 @@ def test_output_shows_decision_constraints_and_anti_patterns():
     assert "Decision a" in out
     assert "constraint-a" in out
     assert "anti-a" in out
+
+
+def test_output_shows_typed_rules():
+    scored = [_scored("a", score=5.0)]
+    scored[0].decision.rules.append(
+        Rule(type="FORBID_LITERAL", value="pip install mneme")
+    )
+    out = format_decisions(scored, max_items=3)
+    assert "FORBID_LITERAL: pip install mneme" in out
 
 
 def test_empty_input_returns_empty_string():
