@@ -18,6 +18,7 @@ Severity semantics:
 
 Exit codes for the CLI:
     0 = PASS, 1 = WARN, 2 = FAIL
+    Path applicability UNKNOWN is an operational exit 2, not a policy verdict.
 """
 
 from __future__ import annotations
@@ -28,6 +29,11 @@ from enum import Enum
 from pathlib import Path
 
 from mneme.decision_retriever import ScoredDecision
+from mneme.path_selectors import (
+    RuleEvaluation,
+    SelectorOutcome,
+    evaluate_path_selectors,
+)
 from mneme.rule_matcher import literal_in_text
 
 
@@ -46,12 +52,22 @@ class Violation:
     trigger: str  # the specific term found in the input
     kind: str = "legacy"
     rule_type: str | None = None
+    input_path: str | None = None
+    selector: str | None = None
 
 
 @dataclass
 class EnforcementResult:
     verdict: Severity
     violations: list[Violation] = field(default_factory=list)
+    applicability: list[RuleEvaluation] = field(default_factory=list)
+
+    @property
+    def evaluation_complete(self) -> bool:
+        return not any(
+            item.outcome == SelectorOutcome.UNKNOWN
+            for item in self.applicability
+        )
 
 
 # Words that appear frequently in rule descriptions but carry no domain signal.
@@ -71,24 +87,6 @@ def _rule_terms(text: str, min_len: int = 3) -> list[str]:
 def _word_in_text(term: str, text: str) -> bool:
     """True if term appears as a whole word (case-insensitive) in text."""
     return bool(re.search(r"\b" + re.escape(term) + r"\b", text, re.IGNORECASE))
-
-
-def _is_policy_source(
-    input_path: str | Path | None,
-    *policy_paths: str,
-) -> bool:
-    """Return whether the input stores or declares the decision's policy."""
-    if input_path is None:
-        return False
-    for policy_path in policy_paths:
-        if not policy_path:
-            continue
-        try:
-            if Path(input_path).resolve() == Path(policy_path).resolve():
-                return True
-        except OSError:
-            continue
-    return False
 
 
 def _top_nonzero(scored: list[ScoredDecision], top: int) -> list[ScoredDecision]:
@@ -183,24 +181,46 @@ def check_prompt(
         EnforcementResult with verdict and list of Violations.
     """
     violations: list[Violation] = []
+    applicability: list[RuleEvaluation] = []
 
     for s, literal_only in _enforcement_scope(scored, top):
         d = s.decision
 
-        if not _is_policy_source(input_path, d.source_path, d.memory_path):
-            for rule in d.rules:
-                if rule.type == "FORBID_LITERAL" and literal_in_text(
-                    rule.value, input_text
-                ):
-                    violations.append(Violation(
-                        decision_id=d.id,
-                        decision_text=d.decision,
-                        severity=Severity.FAIL,
-                        rule=rule.value,
-                        trigger=rule.value,
-                        kind="typed_rule",
-                        rule_type=rule.type,
-                    ))
+        for rule_index, rule in enumerate(d.rules):
+            selection = evaluate_path_selectors(
+                include_paths=rule.include_paths,
+                exclude_paths=rule.exclude_paths,
+                input_path=input_path,
+                memory_path=d.memory_path,
+                policy_paths=(d.source_path, d.memory_path),
+            )
+            applicability.append(RuleEvaluation(
+                decision_id=d.id,
+                rule_type=rule.type,
+                rule_value=rule.value,
+                rule_index=rule_index,
+                path_scoped=rule.is_path_scoped,
+                outcome=selection.outcome,
+                input_path=selection.input_path,
+                selector=selection.selector,
+                reason=selection.reason,
+            ))
+            if (
+                selection.outcome == SelectorOutcome.APPLIED
+                and rule.type == "FORBID_LITERAL"
+                and literal_in_text(rule.value, input_text)
+            ):
+                violations.append(Violation(
+                    decision_id=d.id,
+                    decision_text=d.decision,
+                    severity=Severity.FAIL,
+                    rule=rule.value,
+                    trigger=rule.value,
+                    kind="typed_rule",
+                    rule_type=rule.type,
+                    input_path=selection.input_path,
+                    selector=selection.selector,
+                ))
 
         for ap in d.anti_patterns:
             if literal_only and not _is_literal_rule(ap):
@@ -244,4 +264,8 @@ def check_prompt(
     else:
         verdict = Severity.PASS
 
-    return EnforcementResult(verdict=verdict, violations=violations)
+    return EnforcementResult(
+        verdict=verdict,
+        violations=violations,
+        applicability=applicability,
+    )

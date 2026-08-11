@@ -9,11 +9,21 @@
   score, and human/JSON output identifies the rule type.
 - Retrieval-only import diagnostics for active ADRs that yield zero
   mechanically enforceable rules.
+- Explicit path applicability for typed rules. Structured ADR directives can
+  persist `include_paths` and `exclude_paths`; enforcement, conflict detection,
+  context output, and the Claude Code hook share deterministic, case-sensitive
+  selector semantics and emit per-rule applicability traces.
+- `mneme check --target-path` for checking temporary/materialized content
+  against the path of the artifact that will actually be changed. Unknown
+  scoped applicability is an operational failure in the CLI and an explicit
+  fail-open diagnostic in integrations.
 
 ### Compatibility
 
 - Existing `constraints` and `anti_patterns` retain their current matching and
   severity behavior. Memory files without `rules` continue to load unchanged.
+- Existing scalar typed rules remain global. Selector fields are additive and
+  the check JSON schema remains `mneme.check/v1` with additive fields.
 
 ---
 

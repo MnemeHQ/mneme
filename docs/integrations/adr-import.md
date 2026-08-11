@@ -40,6 +40,13 @@ machine-readable directives:
 ```markdown
 ## Constraints
 - FORBID_LITERAL: install legacy-package
+- FORBID_LITERAL:
+    value: install legacy-client
+    include_paths:
+      - "docs/**"
+      - "**/*.md"
+    exclude_paths:
+      - "docs/generated/**"
 - FORBID_DEPENDENCY: mongodb
 - FORBID_PATH: src/legacy/billing/**
 - REQUIRE_PATH: billing/**
@@ -52,14 +59,15 @@ rather than being silently dropped -- a typo should not defeat governance.
 
 | Directive | Parsed and stored? | Enforced by `mneme check`? |
 |---|---|---|
-| `FORBID_LITERAL: text` | Yes, as a typed entry in `Decision.rules` | Yes -- exact, case-sensitive, boundary-aware match triggers FAIL |
+| `FORBID_LITERAL: text` | Yes, as a global typed entry in `Decision.rules` | Yes -- exact, case-sensitive, boundary-aware match triggers FAIL |
+| Structured `FORBID_LITERAL` with path selectors | Yes, including `include_paths` / `exclude_paths` | Yes when the artifact path is included and not excluded |
 | `FORBID_DEPENDENCY: X` | Yes, as `"no X"` in Decision.constraints | Yes -- triggers WARN |
 | `FORBID_PATH: glob` | Yes, as `"FORBID_PATH glob"` in Decision.constraints | No (stored for visibility) |
 | `REQUIRE_PATH: glob` | Yes, as `"REQUIRE_PATH glob"` in Decision.constraints | No (stored for visibility) |
 
-Glob-vs-changed-file enforcement for `FORBID_PATH` and `REQUIRE_PATH` is
-out of scope for the MVP -- the existing enforcer is a term-matcher, not a
-path-matcher. This is a follow-up capability.
+`FORBID_PATH` and `REQUIRE_PATH` remain retrieval-only directives. Path
+applicability is implemented only for typed `FORBID_LITERAL` rules; it does not
+give those legacy directive names new semantics.
 
 `FORBID_LITERAL` does not split prose into keywords. It checks the declared
 value directly and requires identifier/slug boundaries at identifier-like
@@ -68,6 +76,13 @@ passes. The comparison is case-sensitive. Typed rules are enforced regardless
 of retrieval score; retrieval still controls context injection only. When ADR
 source provenance is available, a rule is not applied to its own declaring ADR
 or canonical memory file, so policy storage can state the literal it governs.
+
+The scalar form remains global. The structured form requires a non-empty
+`include_paths` list; `exclude_paths` is optional and wins when both match.
+Patterns are repository-relative, forward-slash, and case-sensitive. `*`
+matches within one segment and a complete `**` segment matches zero or more
+segments. Absolute paths, backslashes, `.`, `..`, empty segments, negation,
+bracket syntax, `?`, and embedded `**` are rejected during compilation.
 
 An active ADR with no mechanically enforceable rules is still importable for
 retrieval, but preview prints a `Retrieval-only ADR warnings` diagnostic. A

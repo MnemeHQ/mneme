@@ -47,7 +47,12 @@ def _directive_to_constraint_string(d: ConstraintDirective) -> str:
 def _directive_to_rule(d: ConstraintDirective) -> Rule | None:
     """Compile a directive whose semantics are implemented as a typed rule."""
     if d.kind == "FORBID_LITERAL":
-        return Rule(type="FORBID_LITERAL", value=d.value)
+        return Rule(
+            type="FORBID_LITERAL",
+            value=d.value,
+            include_paths=d.include_paths,
+            exclude_paths=d.exclude_paths,
+        )
     return None
 
 

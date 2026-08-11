@@ -155,6 +155,23 @@ def test_generate_mdc_contains_typed_rules():
     assert "FORBID_LITERAL: pip install mneme" in result
 
 
+def test_generate_mdc_contains_typed_rule_path_scope():
+    scored = _scored_decisions()
+    scored[0].decision.rules.append(Rule(
+        type="FORBID_LITERAL",
+        value="install legacy-client",
+        include_paths=("docs/**",),
+        exclude_paths=("docs/generated/**",),
+    ))
+    result = generate_mdc(
+        scored,
+        query="docs",
+        memory_path="memory.json",
+    )
+    assert "Applies to: docs/**" in result
+    assert "Except: docs/generated/**" in result
+
+
 def test_generate_mdc_contains_warning():
     scored = _scored_decisions()
     result = generate_mdc(

@@ -121,6 +121,10 @@ def _cmd_list(args: argparse.Namespace) -> int:
         if d.rules:
             for rule in d.rules:
                 print(f"    rule: {rule.type} {rule.value}")
+                if rule.include_paths is not None:
+                    print(f"      applies to: {', '.join(rule.include_paths)}")
+                if rule.exclude_paths:
+                    print(f"      except: {', '.join(rule.exclude_paths)}")
     return 0
 
 
@@ -203,6 +207,21 @@ def _check_payload(
         "schema": CHECK_JSON_SCHEMA,
         "verdict": result.verdict.value,
         "mode": mode,
+        "evaluation_complete": result.evaluation_complete,
+        "applicability": [
+            {
+                "decision_id": item.decision_id,
+                "rule_type": item.rule_type,
+                "rule_value": item.rule_value,
+                "rule_index": item.rule_index,
+                "path_scoped": item.path_scoped,
+                "input_path": item.input_path,
+                "outcome": item.outcome.value,
+                "selector": item.selector,
+                "reason": item.reason,
+            }
+            for item in result.applicability
+        ],
         "violations": [
             {
                 "decision_id": v.decision_id,
@@ -212,6 +231,8 @@ def _check_payload(
                 "trigger": v.trigger,
                 "kind": v.kind,
                 "rule_type": v.rule_type,
+                "input_path": v.input_path,
+                "selector": v.selector,
             }
             for v in result.violations
         ],
@@ -231,13 +252,21 @@ def _cmd_check(args: argparse.Namespace) -> int:
     retriever = DecisionRetriever(store.decisions())
     scored = retriever.retrieve(args.query)
 
-    result = check_prompt(input_text, scored, top=args.top, input_path=args.input)
+    target_path = args.target_path or args.input
+    result = check_prompt(
+        input_text,
+        scored,
+        top=args.top,
+        input_path=target_path,
+    )
 
     if getattr(args, "json", False):
         # Machine-readable mode: the payload must be the only thing on stdout,
         # so the human-readable violation and freshness blocks are suppressed.
         freshness = check_freshness(memory_path=args.memory, adr_dir=args.adr_dir)
         print(json.dumps(_check_payload(result, freshness, args.mode)))
+        if not result.evaluation_complete:
+            return 2
         return _EXIT_CODES_BY_MODE[args.mode][result.verdict]
 
     if result.violations:
@@ -248,6 +277,26 @@ def _cmd_check(args: argparse.Namespace) -> int:
                 f"{kind} \"{v.rule}\" -- trigger: {v.trigger}"
             )
             print(f"      {v.decision_text}")
+            if v.input_path:
+                selector = f" via {v.selector}" if v.selector else ""
+                print(f"      path: {v.input_path}{selector}")
+        print()
+
+    scoped_traces = [item for item in result.applicability if item.path_scoped]
+    if scoped_traces:
+        for item in scoped_traces:
+            if item.outcome.value == "UNKNOWN":
+                print(
+                    f"ERROR PATH_APPLICABILITY_UNKNOWN [{item.decision_id}] "
+                    f"{item.rule_type} {item.rule_value!r} -- {item.reason}"
+                )
+                continue
+            path = item.input_path or "(unknown)"
+            selector = f" via {item.selector}" if item.selector else ""
+            print(
+                f"PATH  {item.outcome.value:8} [{item.decision_id}] "
+                f"{path}{selector} -- {item.reason}"
+            )
         print()
 
     # ADR freshness diagnostics are warn-only: they print to stdout but
@@ -260,6 +309,9 @@ def _cmd_check(args: argparse.Namespace) -> int:
             _print_freshness_issue(issue)
         print()
 
+    if not result.evaluation_complete:
+        print("Result: INCOMPLETE")
+        return 2
     print(f"Result: {result.verdict.value}")
     return _EXIT_CODES_BY_MODE[args.mode][result.verdict]
 
@@ -433,6 +485,14 @@ def _build_parser() -> argparse.ArgumentParser:
     p_check = sub.add_parser("check", help="Enforce decisions against an input prompt")
     p_check.add_argument("--memory", required=True, help="Path to project_memory.json")
     p_check.add_argument("--input", required=True, help="Path to input file to check")
+    p_check.add_argument(
+        "--target-path",
+        default=None,
+        help=(
+            "Artifact path used for typed-rule applicability when --input "
+            "contains materialized or introduced content from another file"
+        ),
+    )
     p_check.add_argument("--query", required=True, help="Context query for retrieval")
     p_check.add_argument(
         "--top", type=int, default=DEFAULT_MAX_DECISIONS,

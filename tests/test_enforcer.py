@@ -599,3 +599,79 @@ def test_typed_rule_does_not_flag_its_policy_memory_file(tmp_path):
         input_path=memory,
     )
     assert result.verdict == Severity.PASS
+
+
+def test_scoped_typed_rule_applies_only_to_included_paths(tmp_path):
+    memory = tmp_path / ".mneme" / "project_memory.json"
+    rule = Rule(
+        type="FORBID_LITERAL",
+        value="install legacy-client",
+        include_paths=("docs/**",),
+    )
+    decision = Decision(
+        id="ADR-020",
+        decision="Scope the rule",
+        rules=[rule],
+        memory_path=str(memory),
+    )
+
+    applied = check_prompt(
+        "install legacy-client",
+        [_scored(decision, score=0.0)],
+        input_path=tmp_path / "docs" / "guide.md",
+    )
+    excluded = check_prompt(
+        "install legacy-client",
+        [_scored(decision, score=0.0)],
+        input_path=tmp_path / "src" / "app.py",
+    )
+
+    assert applied.verdict == Severity.FAIL
+    assert applied.evaluation_complete
+    assert applied.applicability[0].outcome.value == "APPLIED"
+    assert applied.applicability[0].selector == "docs/**"
+    assert excluded.verdict == Severity.PASS
+    assert excluded.applicability[0].outcome.value == "EXCLUDED"
+
+
+def test_scoped_typed_rule_exclude_overrides_include(tmp_path):
+    memory = tmp_path / ".mneme" / "project_memory.json"
+    decision = Decision(
+        id="ADR-020",
+        decision="Scope the rule",
+        rules=[Rule(
+            type="FORBID_LITERAL",
+            value="install legacy-client",
+            include_paths=("docs/**",),
+            exclude_paths=("docs/generated/**",),
+        )],
+        memory_path=str(memory),
+    )
+    result = check_prompt(
+        "install legacy-client",
+        [_scored(decision, score=0.0)],
+        input_path=tmp_path / "docs" / "generated" / "guide.md",
+    )
+    assert result.verdict == Severity.PASS
+    assert result.applicability[0].outcome.value == "EXCLUDED"
+    assert result.applicability[0].selector == "docs/generated/**"
+
+
+def test_scoped_typed_rule_missing_path_reports_unknown():
+    decision = Decision(
+        id="ADR-020",
+        decision="Scope the rule",
+        rules=[Rule(
+            type="FORBID_LITERAL",
+            value="install legacy-client",
+            include_paths=("docs/**",),
+        )],
+        memory_path="project_memory.json",
+    )
+    result = check_prompt(
+        "install legacy-client",
+        [_scored(decision, score=0.0)],
+    )
+    assert result.verdict == Severity.PASS
+    assert not result.evaluation_complete
+    assert result.applicability[0].outcome.value == "UNKNOWN"

@@ -243,9 +243,10 @@ def parse_verdict(stdout: str) -> Optional[Dict[str, Any]]:
 
 
 def _is_stale_runtime(child_stderr: str) -> bool:
-    """True when the child CLI is too old to understand ``--json``."""
-    return "unrecognized arguments" in (child_stderr or "") and "--json" in (
-        child_stderr or ""
+    """True when the child CLI lacks required machine/path-aware options."""
+    return "unrecognized arguments" in (child_stderr or "") and any(
+        option in (child_stderr or "")
+        for option in ("--json", "--target-path")
     )
 
 
@@ -266,6 +267,24 @@ def format_reason(payload: Dict[str, Any]) -> str:
         )
         if v.get("decision_text"):
             lines.append(f"      {v['decision_text']}")
+        if v.get("input_path"):
+            selector = f" via {v.get('selector')}" if v.get("selector") else ""
+            lines.append(f"      path: {v['input_path']}{selector}")
+    return "\n".join(lines)
+
+
+def format_applicability_reason(payload: Dict[str, Any]) -> str:
+    """Render scoped-rule UNKNOWN traces for fail-open diagnostics."""
+    traces = [
+        item for item in (payload.get("applicability") or [])
+        if isinstance(item, dict) and item.get("outcome") == "UNKNOWN"
+    ]
+    lines = ["mneme-hook: typed-rule path applicability is unknown; failing open."]
+    for item in traces:
+        lines.append(
+            f"  [{item.get('decision_id')}] {item.get('rule_type')} "
+            f"{item.get('rule_value')!r}: {item.get('reason')}"
+        )
     return "\n".join(lines)
 
 
@@ -307,16 +326,22 @@ def _run_check(
 
     try:
         rel = event.file_path or "(unknown)"
+        target_path = event.file_path
+        if target_path and not Path(target_path).is_absolute() and event.cwd:
+            target_path = str(Path(event.cwd) / target_path)
+        command = [
+            sys.executable, "-m", "mneme", "check",
+            "--memory", str(memory),
+            "--input", input_path,
+            "--query", f"edit to {rel}",
+            "--mode", mode,
+            "--json",
+        ]
+        if target_path:
+            command.extend(["--target-path", target_path])
         try:
             proc = subprocess.run(
-                [
-                    sys.executable, "-m", "mneme", "check",
-                    "--memory", str(memory),
-                    "--input", input_path,
-                    "--query", f"edit to {rel}",
-                    "--mode", mode,
-                    "--json",
-                ],
+                command,
                 capture_output=True,
                 text=True,
                 check=False,
@@ -342,9 +367,9 @@ def _run_check(
                 # Silence here would mean enforcement is off with nobody told.
                 print(
                     "mneme-hook: the installed mneme CLI does not support "
-                    "--json, so no edit can be checked and ENFORCEMENT IS "
-                    "INACTIVE. Upgrade with: pipx install --force "
-                    "\"mneme-hq>=0.5.1\"",
+                    "the required JSON/path-aware check options, so no edit "
+                    "can be checked and ENFORCEMENT IS "
+                    "INACTIVE. Upgrade with: pipx upgrade mneme-hq",
                     file=stderr,
                 )
                 return 0
@@ -358,6 +383,9 @@ def _run_check(
             return 0
 
         verdict = payload["verdict"]
+        if payload.get("evaluation_complete") is False:
+            print(format_applicability_reason(payload), file=stderr)
+            return 0
         if verdict == "PASS":
             return 0
 

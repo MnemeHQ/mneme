@@ -260,6 +260,41 @@ def test_apply_import_persists_typed_rules(tmp_path):
     }]
 
 
+def test_apply_import_persists_typed_rule_path_selectors(tmp_path):
+    from mneme.adr_import import ImportReport, apply_import
+    from mneme.schemas import Decision, Rule
+
+    target = tmp_path / "project_memory.json"
+    target.write_text(json.dumps({
+        "meta": {"name": "test", "description": "test"},
+        "items": [], "examples": [], "decisions": [],
+    }), encoding="utf-8")
+    node = DecisionNode(id="ADR-020", status="active")
+    report = ImportReport(
+        active_nodes=[node],
+        all_nodes=[node],
+        decisions=[Decision(
+            id="ADR-020",
+            decision="Scope the rule",
+            rules=[Rule(
+                type="FORBID_LITERAL",
+                value="install legacy-client",
+                include_paths=("docs/**",),
+                exclude_paths=("docs/generated/**",),
+            )],
+        )],
+        diagnostics=[],
+    )
+    apply_import(report, target_path=target)
+    persisted = json.loads(target.read_text(encoding="utf-8"))
+    assert persisted["decisions"][0]["rules"] == [{
+        "type": "FORBID_LITERAL",
+        "value": "install legacy-client",
+        "include_paths": ["docs/**"],
+        "exclude_paths": ["docs/generated/**"],
+    }]
+
+
 def test_apply_import_refuses_overwrite_without_allow_update(tmp_path):
     """Same-id collision must block apply unless allow_update=True."""
     from mneme.adr_import import apply_import, compile_for_import

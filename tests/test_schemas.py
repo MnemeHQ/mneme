@@ -53,6 +53,38 @@ def test_typed_rule_validates_type_and_value():
         Rule(type="FORBID_LITERAL", value="   ")
 
 
+def test_typed_rule_accepts_valid_path_scope():
+    rule = Rule(
+        type="FORBID_LITERAL",
+        value="install legacy-client",
+        include_paths=("docs/**",),
+        exclude_paths=("docs/generated/**",),
+    )
+    assert rule.is_path_scoped
+    assert rule.include_paths == ("docs/**",)
+
+
+def test_typed_rule_path_scope_is_strict_and_immutable():
+    with pytest.raises(ValueError, match="non-empty tuple"):
+        Rule(
+            type="FORBID_LITERAL",
+            value="bad",
+            include_paths=(),
+        )
+    with pytest.raises(ValueError, match="require include_paths"):
+        Rule(
+            type="FORBID_LITERAL",
+            value="bad",
+            exclude_paths=("tests/**",),
+        )
+    with pytest.raises(ValueError, match="forward slashes"):
+        Rule(
+            type="FORBID_LITERAL",
+            value="bad",
+            include_paths=("docs\\**",),
+        )
+
+
 def test_mneme_conflict_error_carries_conflicts_and_result():
     from mneme.schemas import MnemeConflictError
 

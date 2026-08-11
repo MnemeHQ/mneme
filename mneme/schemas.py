@@ -32,6 +32,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
+from mneme.path_selectors import validate_path_pattern
+
 
 # ── Type aliases ─────────────────────────────────────────────────────────────
 
@@ -140,12 +142,16 @@ class Rule:
     semantics before joining ``VALID_RULE_TYPES``.
 
     Attributes:
-        type:  One of ``VALID_RULE_TYPES``.
-        value: Non-empty literal value consumed by the rule matcher.
+        type:          One of ``VALID_RULE_TYPES``.
+        value:         Non-empty literal value consumed by the rule matcher.
+        include_paths: Optional non-empty selector tuple. ``None`` is global.
+        exclude_paths: Selector tuple that overrides matching includes.
     """
 
     type: RuleType
     value: str
+    include_paths: tuple[str, ...] | None = None
+    exclude_paths: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if self.type not in VALID_RULE_TYPES:
@@ -155,6 +161,27 @@ class Rule:
             )
         if not isinstance(self.value, str) or not self.value.strip():
             raise ValueError("rule value must be a non-empty string")
+        if self.include_paths is not None:
+            if (
+                not isinstance(self.include_paths, tuple)
+                or not self.include_paths
+            ):
+                raise ValueError(
+                    "include_paths must be a non-empty tuple when provided"
+                )
+            for pattern in self.include_paths:
+                validate_path_pattern(pattern)
+        if not isinstance(self.exclude_paths, tuple):
+            raise ValueError("exclude_paths must be a tuple")
+        if self.exclude_paths and self.include_paths is None:
+            raise ValueError("exclude_paths require include_paths")
+        for pattern in self.exclude_paths:
+            validate_path_pattern(pattern)
+
+    @property
+    def is_path_scoped(self) -> bool:
+        """Whether this rule requires an artifact path for applicability."""
+        return self.include_paths is not None
 
 
 @dataclass

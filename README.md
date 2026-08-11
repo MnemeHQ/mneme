@@ -315,10 +315,18 @@ into `Decision` objects at load time; no changes needed to existing JSON files.
   "constraints": ["no postgres", "no external database"],
   "anti_patterns": ["introduce ORM", "add migration layer"],
   "rules": [
-    {"type": "FORBID_LITERAL", "value": "install legacy-package"}
+    {
+      "type": "FORBID_LITERAL",
+      "value": "install legacy-package",
+      "include_paths": ["docs/**", "**/*.md"],
+      "exclude_paths": ["docs/generated/**"]
+    }
   ]
 }
 ```
+
+Omitting `include_paths` keeps a typed rule global. A scoped rule requires a
+non-empty `include_paths`; matching `exclude_paths` take precedence.
 
 Add a top-level `"decisions"` array alongside `"items"` and `"examples"` in
 `project_memory.json`. All seven fields are optional except `id` and `decision`.
@@ -357,14 +365,21 @@ typed-rule violations **after** the call. It is a detector, not a blocker:
 
 ```python
 from mneme.conflict_detector import ConflictDetector
-conflicts = ConflictDetector().detect(response.content, injected_decisions)
+conflicts = ConflictDetector().detect(
+    response.content,
+    injected_decisions,
+    target_path="docs/guide.md",
+)
 # Conflict(violated_decision_id, reason, snippet) per match
 ```
 
 A term is only flagged when it appears **without** a negation signal nearby.
 `"Do not use Postgres"` is not a conflict. `"Switch to Postgres"` is.
 Typed `FORBID_LITERAL` rules do not use this heuristic: the exact literal is
-forbidden regardless of surrounding prose.
+forbidden regardless of surrounding prose. Pass `target_path` when injected
+decisions may contain scoped rules. `evaluate()` returns applicability traces
+and an `evaluation_complete` flag; the compatibility `detect()` helper raises
+when a scoped rule cannot be evaluated without a path.
 
 ### CLI
 
@@ -541,6 +556,13 @@ mneme check --memory project_memory.json \
        └── FAIL (exit 2)  → anti-pattern match — blocked
 ```
 
+Normally `--input` is also the artifact path used by scoped typed rules. When
+`--input` is a temporary file containing materialized or introduced content,
+pass the real artifact separately with `--target-path`. If a scoped rule cannot
+resolve that path relative to the policy root, the result is `INCOMPLETE` and
+the command exits 2 in either mode; JSON output sets
+`evaluation_complete: false` and includes the `UNKNOWN` applicability trace.
+
 **Try it with the included examples:**
 
 ```bash
@@ -708,6 +730,13 @@ include an optional `## Constraints` section with directives:
 ```markdown
 ## Constraints
 - FORBID_LITERAL: install legacy-package
+- FORBID_LITERAL:
+    value: install legacy-client
+    include_paths:
+      - "docs/**"
+      - "**/*.md"
+    exclude_paths:
+      - "docs/generated/**"
 - FORBID_DEPENDENCY: mongodb
 - FORBID_PATH: src/legacy/**
 - REQUIRE_PATH: billing/**
@@ -719,6 +748,14 @@ include an optional `## Constraints` section with directives:
 across the decision corpus, independent of retrieval score. Its declaring ADR
 source and canonical memory file are exempt so policy storage can state the
 literal it governs.
+
+The structured form scopes one typed rule to repository-relative paths.
+Selectors use forward slashes and case-sensitive matching: `*` stays within a
+single path segment, while a complete `**` segment spans zero or more segments.
+Absolute paths, backslashes, dot segments, negation, bracket syntax, `?`, and
+embedded `**` are rejected. For canonical `.mneme/project_memory.json`, the
+repository root is the parent of `.mneme`; custom memory files use their own
+parent directory as the policy root.
 
 `FORBID_DEPENDENCY` retains its legacy `WARN` behavior. `FORBID_PATH` and
 `REQUIRE_PATH` persist into Decisions for retrieval visibility but are not yet

@@ -2,6 +2,8 @@
 """Tests for the ## Constraints body directive parser."""
 from __future__ import annotations
 
+import pytest
+
 from mneme.adr_constraints import (
     ConstraintDirective,
     ConstraintParseError,
@@ -26,6 +28,67 @@ def test_parse_forbid_literal_directive():
     assert parse_constraints_section(body) == [
         ConstraintDirective(kind="FORBID_LITERAL", value="pip install mneme")
     ]
+
+
+def test_parse_structured_path_scoped_forbid_literal():
+    body = """## Constraints
+- FORBID_LITERAL:
+    value: install legacy-client
+    include_paths:
+      - "**/*.md"
+      - "docs/**"
+    exclude_paths:
+      - "docs/generated/**"
+"""
+    assert parse_constraints_section(body) == [ConstraintDirective(
+        kind="FORBID_LITERAL",
+        value="install legacy-client",
+        include_paths=("**/*.md", "docs/**"),
+        exclude_paths=("docs/generated/**",),
+    )]
+
+
+@pytest.mark.parametrize("body,match", [
+    (
+        "## Constraints\n- FORBID_LITERAL:\n    value: bad\n",
+        "include_paths",
+    ),
+    (
+        "## Constraints\n- FORBID_LITERAL:\n"
+        "    value: bad\n    include_paths: []\n",
+        "non-empty",
+    ),
+    (
+        "## Constraints\n- FORBID_LITERAL:\n"
+        "    value: bad\n    include_paths: docs/**\n",
+        "list",
+    ),
+    (
+        "## Constraints\n- FORBID_LITERAL:\n"
+        "    value: bad\n    include_paths:\n      - ../docs/**\n",
+        "invalid",
+    ),
+    (
+        "## Constraints\n- FORBID_LITERAL:\n"
+        "    value: bad\n    include_paths:\n      - docs/**\n"
+        "    unknown: value\n",
+        "unknown",
+    ),
+    (
+        "## Constraints\n- FORBID_LITERAL:\n"
+        "    value: first\n    value: second\n"
+        "    include_paths:\n      - docs/**\n",
+        "duplicate",
+    ),
+    (
+        "## Constraints\n- FORBID_DEPENDENCY:\n"
+        "    value: mongodb\n    include_paths:\n      - docs/**\n",
+        "not supported",
+    ),
+])
+def test_structured_directive_validation_is_strict(body, match):
+    with pytest.raises(ConstraintParseError, match=match):
+        parse_constraints_section(body)
 
 
 def test_parse_multiple_directives_in_order():
@@ -91,9 +154,6 @@ def test_directive_value_strips_whitespace():
 #
 # This matters most right before a new directive vocabulary lands (#250), when
 # authors are typing names they have never typed before.
-
-import pytest
-
 
 @pytest.mark.parametrize("line,reason", [
     ("- forbid_dependency: mongodb", "lowercase kind"),

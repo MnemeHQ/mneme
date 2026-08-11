@@ -86,6 +86,53 @@ def test_unknown_typed_rule_fails_loudly(tmp_path):
         MemoryStore(memory_path).load()
 
 
+def test_loads_path_scoped_typed_rule(tmp_path):
+    memory_path = tmp_path / ".mneme" / "project_memory.json"
+    memory_path.parent.mkdir()
+    memory_path.write_text(json.dumps({
+        "meta": {"name": "test", "description": "test"},
+        "decisions": [{
+            "id": "ADR-020",
+            "decision": "Scope the rule",
+            "rules": [{
+                "type": "FORBID_LITERAL",
+                "value": "install legacy-client",
+                "include_paths": ["docs/**"],
+                "exclude_paths": ["docs/generated/**"],
+            }],
+        }],
+    }), encoding="utf-8")
+
+    [decision] = MemoryStore(memory_path).load().decisions
+    [rule] = decision.rules
+    assert rule.include_paths == ("docs/**",)
+    assert rule.exclude_paths == ("docs/generated/**",)
+
+
+@pytest.mark.parametrize("field,value", [
+    ("include_paths", "docs/**"),
+    ("exclude_paths", "tests/**"),
+])
+def test_memory_rejects_non_list_selector_fields(tmp_path, field, value):
+    memory_path = tmp_path / "project_memory.json"
+    record = {
+        "type": "FORBID_LITERAL",
+        "value": "bad",
+        "include_paths": ["docs/**"],
+        field: value,
+    }
+    memory_path.write_text(json.dumps({
+        "meta": {"name": "test", "description": "test"},
+        "decisions": [{
+            "id": "bad",
+            "decision": "Bad rule",
+            "rules": [record],
+        }],
+    }), encoding="utf-8")
+    with pytest.raises(ValueError, match=field):
+        MemoryStore(memory_path).load()
+
+
 def test_mismatched_adr_source_name_cannot_create_rule_exemption(tmp_path):
     memory_path = tmp_path / "project_memory.json"
     memory_path.write_text(json.dumps({
