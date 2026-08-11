@@ -55,25 +55,34 @@ needed an explicit allowlist for the same reason, in two repositories.
    complete file. An edit gate and an audit ask different questions, and both
    are legitimate; conflating them is what produced the defect.
 
-3. **"Introduced" is the added lines of a diff** from the file's current
-   content to the content the tool is about to write. One definition covers
-   `Edit`, `MultiEdit` and `Write`: a file that does not exist yet diffs
-   against nothing, so all of its content is introduced.
+3. **"Introduced" is the inserted or replaced lines of a deterministic diff**
+   from one snapshot of the file's current content to the content the tool is
+   about to write. The implementation uses `difflib.SequenceMatcher` with
+   `autojunk=False` and checks proposed lines from `insert` and `replace`
+   opcodes. One definition covers `Edit`, `MultiEdit`, and `Write`: a new file
+   diffs against nothing, so all of its content is introduced; a `Write` over
+   an existing file checks only its inserted or replaced lines.
 
-4. **Relocation counts as introduction.** Moving a violating line attributes it
-   to the edit that moved it. This is the deliberately conservative direction —
-   the alternative lets an agent launder a violation by shuffling lines.
+4. **Movement attribution follows the deterministic diff.** A moved line that
+   the diff represents as an insertion is checked. A block aligned as unchanged
+   is not, even if its absolute line number moved. Two text snapshots cannot
+   establish semantic author intent, so this gate does not claim universal move
+   detection. Whole-file audit remains the standing-compliance backstop.
 
-5. **An edit that adds no lines is not checked.** A pure deletion, or a
-   whitespace-only change, cannot introduce a violation.
+5. **An edit with no inserted or replaced non-blank lines is not checked.** A
+   pure deletion cannot introduce a non-blank mechanical rule value. A
+   whitespace edit that replaces a non-blank line is still checked as a
+   replacement; it is not silently classified as deletion-only.
 
 6. **This does not resolve self-reference.** Introducing an ADR that names a
    forbidden string *is* introducing that string, so the document explaining a
    rule still trips it on the commit that creates it. Solving that needs
-   per-rule exemptions or path applicability, which is deliberately left to
-   #250 and #150 rather than papered over here with a global allowlist. A path
-   allowlist that is not recorded in the decision recreates exactly the
-   invisible governance this project exists to remove.
+   per-rule exemptions or path applicability. ADR-019 deliberately provides
+   only canonical policy-source exemptions for `FORBID_LITERAL`; broader
+   applicability remains open under #150 and the unresolved half of #259. It
+   is not papered over here with a global allowlist, because an allowlist not
+   recorded in the decision recreates the invisible governance this project
+   exists to remove.
 
 ## Consequences
 
@@ -82,17 +91,20 @@ needed an explicit allowlist for the same reason, in two repositories.
   "remediate before you can edit".
 - Remediation edits are never blocked by the violation they remove, which was
   previously a genuine deadlock: the only way out was to disable the hook.
+- This resolves the pre-existing-violation half of #259. The issue remains open
+  for rule self-reference and applicability; this ADR does not claim otherwise.
 - A file can remain non-compliant indefinitely if nobody edits the offending
   lines. That is the accepted trade: the gate's job is to stop new violations,
   and the audit path exists to report standing ones. A repo-wide audit mode
   (#251) is the right surface for the second question.
-- A rule can only match within an added line. A violation split across an added
-  line and an untouched one is not caught at the gate. Rules today are literal
-  tokens rather than multi-line patterns, so the exposure is narrow, and the
-  whole-file audit still sees it.
-- The hook now reads the file's current content in addition to materializing
-  the proposed content. A file that cannot be read is treated as empty, so a
-  new file is enforced in full rather than skipped.
+- A rule can only match within introduced lines. A violation split across an
+  introduced line and an untouched one is not caught at the gate. Rules today
+  are literal tokens rather than multi-line patterns, so the exposure is
+  narrow, and the whole-file audit still sees it.
+- The hook reads the file's current content once and derives both current and
+  proposed snapshots from that read. A missing, unreadable, or non-UTF-8 target
+  of `Write` is conservatively treated as new, so its proposed content is
+  enforced in full rather than skipped.
 - This ADR asserts no change to the CLI's behaviour, exit codes, or JSON
   verdict schema.
 
@@ -101,8 +113,8 @@ needed an explicit allowlist for the same reason, in two repositories.
 **Final-state compliance (the previous behaviour).** Stronger guarantee: after
 any accepted edit the file is fully compliant. Rejected because it is
 unachievable on an existing codebase without a remediation project first, and
-because it blocks its own remediation. It also makes rule documentation
-unwritable.
+because it blocks its own remediation. It does not solve self-reference either;
+new rule documentation can still introduce the literal it describes.
 
 **Baseline/suppression file.** Record existing violations and ignore them until
 touched. Rejected for now as a second source of truth that drifts from the
@@ -112,5 +124,8 @@ decision record — the same failure mode as the hand-built ADR-005 gate.
 
 - ADR-017: Enforcement Scope Is Independent of Retrieval Scope — settles which
   decisions apply; this ADR settles which text they apply to
-- Issue #259 (this decision), #250 (typed rule vocabulary and per-rule
-  exemptions), #150 (rule applicability), #251 (repo-wide audit mode)
+- ADR-019: Typed Literal Rule Contract — defines the current typed vocabulary
+  and its canonical policy-source exemptions
+- Issue #259 (partially resolved here; self-reference remains), #150 (rule
+  applicability), #251 (repo-wide audit mode), #250 (completed typed-rule
+  capability)

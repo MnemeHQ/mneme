@@ -53,6 +53,16 @@ def test_new_file_write_introduces_everything(tmp_path):
     assert VIOLATION in got
 
 
+def test_non_utf8_write_target_is_checked_as_new_content(tmp_path):
+    target = tmp_path / "binary.py"
+    target.write_bytes(b"\xff\xfe")
+
+    got = introduced_content(
+        _event("Write", {"file_path": str(target), "content": f"{VIOLATION}\n"})
+    )
+    assert VIOLATION in got
+
+
 def test_unchanged_line_is_not_introduced(tmp_path):
     """The core fix: a pre-existing violation is not this edit's problem."""
     target = tmp_path / "legacy.py"
@@ -96,6 +106,30 @@ def test_removing_a_violation_introduces_nothing(tmp_path):
     assert CLEAN in got
 
 
+def test_pure_deletion_introduces_nothing(tmp_path):
+    target = tmp_path / "svc.py"
+    target.write_text(f"{VIOLATION}\n", encoding="utf-8")
+
+    got = introduced_content(_event("Edit", {
+        "file_path": str(target),
+        "old_string": f"{VIOLATION}\n",
+        "new_string": "",
+    }))
+    assert got == ""
+
+
+def test_nonblank_whitespace_replacement_is_still_introduced(tmp_path):
+    target = tmp_path / "svc.py"
+    target.write_text("value = 1\n", encoding="utf-8")
+
+    got = introduced_content(_event("Edit", {
+        "file_path": str(target),
+        "old_string": "value = 1",
+        "new_string": "    value = 1",
+    }))
+    assert got == "    value = 1"
+
+
 def test_write_over_existing_file_only_introduces_the_difference(tmp_path):
     target = tmp_path / "svc.py"
     target.write_text(f"{VIOLATION}\ndef handler():\n    pass\n", encoding="utf-8")
@@ -108,13 +142,8 @@ def test_write_over_existing_file_only_introduces_the_difference(tmp_path):
     assert VIOLATION not in got
 
 
-def test_moving_a_violating_line_counts_as_introducing_it(tmp_path):
-    """Deliberately conservative: relocation re-introduces at the new position.
-
-    Attributing a moved violation to the edit that moved it is the safe
-    direction -- the alternative lets an agent launder a violation by shuffling
-    lines.
-    """
+def test_line_move_represented_as_insertion_is_introduced(tmp_path):
+    """A moved line is checked when deterministic alignment calls it inserted."""
     target = tmp_path / "svc.py"
     target.write_text(f"def handler():\n    pass\n{VIOLATION}\n", encoding="utf-8")
 
@@ -123,6 +152,54 @@ def test_moving_a_violating_line_counts_as_introducing_it(tmp_path):
         "content": f"{VIOLATION}\ndef handler():\n    pass\n",
     }))
     assert VIOLATION in got
+
+
+def test_block_aligned_as_unchanged_is_not_claimed_as_semantic_move(tmp_path):
+    """Movement attribution follows the diff; it does not infer author intent."""
+    target = tmp_path / "svc.py"
+    block = f"{VIOLATION}\na\nb\nc\nd"
+    target.write_text(f"header\n{block}\n", encoding="utf-8")
+
+    got = introduced_content(_event("Write", {
+        "file_path": str(target),
+        "content": f"{block}\nheader\n",
+    }))
+    assert got == "header"
+    assert VIOLATION not in got
+
+
+def test_added_line_starting_with_two_plus_characters_is_introduced(tmp_path):
+    """Regression: unified-diff parsing mistook `++...` content for a header."""
+    target = tmp_path / "config.txt"
+    target.write_text("keep\n", encoding="utf-8")
+
+    got = introduced_content(_event("Write", {
+        "file_path": str(target),
+        "content": "keep\n++danger\n",
+    }))
+    assert got == "++danger"
+
+
+def test_edit_reads_current_file_once(tmp_path, monkeypatch):
+    target = tmp_path / "svc.py"
+    target.write_text("value = 1\n", encoding="utf-8")
+    original_read_text = Path.read_text
+    reads: list[Path] = []
+
+    def counted_read_text(path, *args, **kwargs):
+        if path == target:
+            reads.append(path)
+        return original_read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", counted_read_text)
+    got = introduced_content(_event("Edit", {
+        "file_path": str(target),
+        "old_string": "value = 1",
+        "new_string": "value = 2",
+    }))
+
+    assert got == "value = 2"
+    assert reads == [target]
 
 
 def test_multiedit_introduces_only_its_additions(tmp_path):

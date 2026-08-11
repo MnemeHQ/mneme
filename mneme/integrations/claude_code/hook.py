@@ -55,25 +55,38 @@ def _replace_count(spec: Dict[str, Any]) -> int:
     return -1 if spec.get("replace_all") else 1
 
 
-def materialize_proposed_content(event: ToolEvent) -> str:
-    ti = event.tool_input
-    if event.tool_name == "Write":
-        return ti.get("content", "")
-
-    file_path = ti.get("file_path", "")
+def _read_current(file_path: str, *, missing_ok: bool) -> str:
+    """Read one source snapshot, optionally treating unreadable as new."""
     if not file_path:
+        if missing_ok:
+            return ""
         raise MaterializeError("missing file_path")
-
     try:
-        original = Path(file_path).read_text(encoding="utf-8")
-    except (FileNotFoundError, OSError) as e:
-        raise MaterializeError(f"cannot read {file_path}: {e}") from e
+        return Path(file_path).read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as exc:
+        if missing_ok:
+            # A Write can replace a missing, unreadable, or non-UTF-8 file.
+            # Treating it as new checks the complete proposed content, which
+            # is the conservative enforcement direction.
+            return ""
+        raise MaterializeError(f"cannot read {file_path}: {exc}") from exc
+
+
+def _materialize_change(event: ToolEvent) -> tuple[str, str]:
+    """Return ``(current, proposed)`` from a single current-file snapshot."""
+    ti = event.tool_input
+    file_path = ti.get("file_path", "")
+
+    if event.tool_name == "Write":
+        return _read_current(file_path, missing_ok=True), ti.get("content", "")
+
+    original = _read_current(file_path, missing_ok=False)
 
     if event.tool_name == "Edit":
         old, new = ti.get("old_string", ""), ti.get("new_string", "")
         if old not in original:
             raise MaterializeError("old_string not found in file")
-        return original.replace(old, new, _replace_count(ti))
+        return original, original.replace(old, new, _replace_count(ti))
 
     if event.tool_name == "MultiEdit":
         content = original
@@ -82,20 +95,14 @@ def materialize_proposed_content(event: ToolEvent) -> str:
             if old not in content:
                 raise MaterializeError(f"edit[{i}].old_string not found")
             content = content.replace(old, new, _replace_count(edit))
-        return content
+        return original, content
 
     raise MaterializeError(f"unsupported tool: {event.tool_name}")
 
 
-def _current_content(event: ToolEvent) -> str:
-    """What is on disk now, or "" for a file that does not exist yet."""
-    file_path = event.tool_input.get("file_path", "")
-    if not file_path:
-        return ""
-    try:
-        return Path(file_path).read_text(encoding="utf-8")
-    except (FileNotFoundError, OSError):
-        return ""
+def materialize_proposed_content(event: ToolEvent) -> str:
+    """Reconstruct the complete content that the tool event would write."""
+    return _materialize_change(event)[1]
 
 
 def introduced_content(event: ToolEvent) -> str:
@@ -109,35 +116,35 @@ def introduced_content(event: ToolEvent) -> str:
     remediation itself. On an existing repository that turns installation into
     an immediate wall (#259). See ADR-018.
 
-    "Introduced" is the added lines of a diff from current content to proposed
-    content. One definition covers all three tools: a brand-new file diffs
-    against nothing, so all of it is introduced.
+    "Introduced" is every proposed line in an ``insert`` or ``replace`` opcode
+    from a deterministic sequence diff. One definition covers all three tools:
+    a brand-new file diffs against nothing, so all of it is introduced.
 
     Two deliberate consequences:
 
-    - Relocating a violating line counts as introducing it at the new position.
-      That is the safe direction; the alternative lets an agent launder a
-      violation by shuffling lines.
-    - A rule can only match within an added line, so a violation split across
-      an added line and an untouched one is not seen here. Rules are literal
-      tokens rather than multi-line patterns, so this is a narrow gap, and the
-      whole-file audit path still covers it.
+    - Movement attribution follows the diff alignment. A moved line represented
+      as an insertion is checked; a block aligned as unchanged is not. The gate
+      does not claim semantic move detection from two text snapshots.
+    - A rule can only match within introduced lines, so a violation split
+      across an introduced line and an untouched one is not seen here. Rules
+      are literal tokens rather than multi-line patterns, so this is a narrow
+      gap, and the whole-file audit path still covers it.
     """
-    proposed = materialize_proposed_content(event)
-    current = _current_content(event)
+    current, proposed = _materialize_change(event)
     if not current:
         return proposed
 
-    added = [
-        line[1:]
-        for line in difflib.unified_diff(
-            current.splitlines(),
-            proposed.splitlines(),
-            lineterm="",
-            n=0,
-        )
-        if line.startswith("+") and not line.startswith("+++")
-    ]
+    before = current.splitlines()
+    after = proposed.splitlines()
+    matcher = difflib.SequenceMatcher(
+        a=before,
+        b=after,
+        autojunk=False,
+    )
+    added: list[str] = []
+    for tag, _i1, _i2, j1, j2 in matcher.get_opcodes():
+        if tag in {"insert", "replace"}:
+            added.extend(after[j1:j2])
     return "\n".join(added)
 
 
@@ -401,8 +408,8 @@ def main(
         return 0
 
     if not checked_content.strip():
-        # The edit adds no new lines (pure deletion, or a whitespace-only
-        # change). There is nothing it could have introduced.
+        # The edit introduces no non-blank lines (for example, a pure
+        # deletion). Mechanically enforceable typed rules cannot be blank.
         return 0
 
     return _run_check(event, checked_content, memory, stderr, stdout)
