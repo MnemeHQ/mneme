@@ -1,6 +1,7 @@
 """Claude Code hook shim — translates PreToolUse events into mneme check calls."""
 from __future__ import annotations
 
+import difflib
 import json
 import os
 import subprocess
@@ -54,25 +55,38 @@ def _replace_count(spec: Dict[str, Any]) -> int:
     return -1 if spec.get("replace_all") else 1
 
 
-def materialize_proposed_content(event: ToolEvent) -> str:
-    ti = event.tool_input
-    if event.tool_name == "Write":
-        return ti.get("content", "")
-
-    file_path = ti.get("file_path", "")
+def _read_current(file_path: str, *, missing_ok: bool) -> str:
+    """Read one source snapshot, optionally treating unreadable as new."""
     if not file_path:
+        if missing_ok:
+            return ""
         raise MaterializeError("missing file_path")
-
     try:
-        original = Path(file_path).read_text(encoding="utf-8")
-    except (FileNotFoundError, OSError) as e:
-        raise MaterializeError(f"cannot read {file_path}: {e}") from e
+        return Path(file_path).read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as exc:
+        if missing_ok:
+            # A Write can replace a missing, unreadable, or non-UTF-8 file.
+            # Treating it as new checks the complete proposed content, which
+            # is the conservative enforcement direction.
+            return ""
+        raise MaterializeError(f"cannot read {file_path}: {exc}") from exc
+
+
+def _materialize_change(event: ToolEvent) -> tuple[str, str]:
+    """Return ``(current, proposed)`` from a single current-file snapshot."""
+    ti = event.tool_input
+    file_path = ti.get("file_path", "")
+
+    if event.tool_name == "Write":
+        return _read_current(file_path, missing_ok=True), ti.get("content", "")
+
+    original = _read_current(file_path, missing_ok=False)
 
     if event.tool_name == "Edit":
         old, new = ti.get("old_string", ""), ti.get("new_string", "")
         if old not in original:
             raise MaterializeError("old_string not found in file")
-        return original.replace(old, new, _replace_count(ti))
+        return original, original.replace(old, new, _replace_count(ti))
 
     if event.tool_name == "MultiEdit":
         content = original
@@ -81,9 +95,57 @@ def materialize_proposed_content(event: ToolEvent) -> str:
             if old not in content:
                 raise MaterializeError(f"edit[{i}].old_string not found")
             content = content.replace(old, new, _replace_count(edit))
-        return content
+        return original, content
 
     raise MaterializeError(f"unsupported tool: {event.tool_name}")
+
+
+def materialize_proposed_content(event: ToolEvent) -> str:
+    """Reconstruct the complete content that the tool event would write."""
+    return _materialize_change(event)[1]
+
+
+def introduced_content(event: ToolEvent) -> str:
+    """The lines this edit adds, as one string.
+
+    An edit gate and an audit ask different questions. "Is this file
+    compliant?" is an audit, and ``mneme check --input <file>`` still answers
+    it over whole files. "Does this edit introduce a violation?" is the gate,
+    and attributing the whole file to it means a violation already present
+    blocks every later edit -- including edits to an unrelated function and the
+    remediation itself. On an existing repository that turns installation into
+    an immediate wall (#259). See ADR-018.
+
+    "Introduced" is every proposed line in an ``insert`` or ``replace`` opcode
+    from a deterministic sequence diff. One definition covers all three tools:
+    a brand-new file diffs against nothing, so all of it is introduced.
+
+    Two deliberate consequences:
+
+    - Movement attribution follows the diff alignment. A moved line represented
+      as an insertion is checked; a block aligned as unchanged is not. The gate
+      does not claim semantic move detection from two text snapshots.
+    - A rule can only match within introduced lines, so a violation split
+      across an introduced line and an untouched one is not seen here. Rules
+      are literal tokens rather than multi-line patterns, so this is a narrow
+      gap, and the whole-file audit path still covers it.
+    """
+    current, proposed = _materialize_change(event)
+    if not current:
+        return proposed
+
+    before = current.splitlines()
+    after = proposed.splitlines()
+    matcher = difflib.SequenceMatcher(
+        a=before,
+        b=after,
+        autojunk=False,
+    )
+    added: list[str] = []
+    for tag, _i1, _i2, j1, j2 in matcher.get_opcodes():
+        if tag in {"insert", "replace"}:
+            added.extend(after[j1:j2])
+    return "\n".join(added)
 
 
 def find_memory(start: Path) -> Optional[Path]:
@@ -337,12 +399,20 @@ def main(
         return 0
 
     try:
-        proposed_content = materialize_proposed_content(event)
+        # The gate checks what this edit introduces, not the whole resulting
+        # file -- otherwise a violation already in the file blocks every later
+        # edit to it, including the one that removes it (#259, ADR-018).
+        checked_content = introduced_content(event)
     except MaterializeError as e:
         print(f"mneme-hook: cannot materialize content, failing open: {e}", file=stderr)
         return 0
 
-    return _run_check(event, proposed_content, memory, stderr, stdout)
+    if not checked_content.strip():
+        # The edit introduces no non-blank lines (for example, a pure
+        # deletion). Mechanically enforceable typed rules cannot be blank.
+        return 0
+
+    return _run_check(event, checked_content, memory, stderr, stdout)
 
 
 def cli_main() -> None:
