@@ -8,7 +8,7 @@ from mneme.cli import main
 from mneme.decision_retriever import DecisionRetriever, ScoredDecision
 from mneme.enforcer import EnforcementResult, Severity, Violation, check_prompt
 from mneme.memory_store import MemoryStore
-from mneme.schemas import Decision
+from mneme.schemas import Decision, Rule
 
 EXAMPLE_MEMORY = Path(__file__).parent.parent / "examples" / "project_memory.json"
 
@@ -520,3 +520,65 @@ def test_check_cmd_reads_input_from_file(tmp_path):
         "--query", "storage",
     ])
     assert exit_code == 2
+
+
+# --- typed deterministic rules (#250) ---
+
+def test_forbid_literal_fails_even_when_decision_scores_zero():
+    decision = Decision(
+        id="ADR-201",
+        decision="Use the published distribution name",
+        rules=[Rule(type="FORBID_LITERAL", value="pip install mneme")],
+    )
+    result = check_prompt(
+        "pip install mneme\n",
+        [_scored(decision, score=0.0)],
+    )
+    assert result.verdict == Severity.FAIL
+    [violation] = result.violations
+    assert violation.kind == "typed_rule"
+    assert violation.rule_type == "FORBID_LITERAL"
+    assert violation.trigger == "pip install mneme"
+
+
+def test_forbid_literal_does_not_match_longer_slug():
+    decision = Decision(
+        id="ADR-201",
+        decision="Use the published distribution name",
+        rules=[Rule(type="FORBID_LITERAL", value="pip install mneme")],
+    )
+    result = check_prompt(
+        "pip install mneme-hq\n",
+        [_scored(decision, score=0.0)],
+    )
+    assert result.verdict == Severity.PASS
+
+
+def test_forbid_literal_is_case_sensitive():
+    decision = Decision(
+        id="ADR-201",
+        decision="Use the published distribution name",
+        rules=[Rule(type="FORBID_LITERAL", value="pip install mneme")],
+    )
+    result = check_prompt(
+        "PIP INSTALL MNEME\n",
+        [_scored(decision, score=0.0)],
+    )
+    assert result.verdict == Severity.PASS
+
+
+def test_typed_rule_does_not_flag_its_declaring_adr(tmp_path):
+    source = tmp_path / "ADR-201.md"
+    source.write_text("- FORBID_LITERAL: pip install mneme\n", encoding="utf-8")
+    decision = Decision(
+        id="ADR-201",
+        decision="Use the published distribution name",
+        rules=[Rule(type="FORBID_LITERAL", value="pip install mneme")],
+        source_path=str(source),
+    )
+    result = check_prompt(
+        source.read_text(encoding="utf-8"),
+        [_scored(decision, score=0.0)],
+        input_path=source,
+    )
+    assert result.verdict == Severity.PASS

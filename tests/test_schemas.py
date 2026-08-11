@@ -1,5 +1,7 @@
 """Tests for the new Decision dataclass."""
-from mneme.schemas import Decision
+import pytest
+
+from mneme.schemas import Decision, Rule
 
 
 def test_decision_minimal_construction():
@@ -10,6 +12,7 @@ def test_decision_minimal_construction():
     assert d.scope == []
     assert d.constraints == []
     assert d.anti_patterns == []
+    assert d.rules == []
 
 
 def test_decision_full_construction():
@@ -34,6 +37,19 @@ def test_decision_defaults_are_independent_lists():
     b = Decision(id="b", decision="y")
     a.scope.append("storage")
     assert b.scope == []
+
+
+def test_typed_rule_validates_type_and_value():
+    rule = Rule(type="FORBID_LITERAL", value="pip install mneme")
+    assert rule.type == "FORBID_LITERAL"
+    assert rule.value == "pip install mneme"
+
+    with pytest.raises(ValueError, match="unknown rule type"):
+        Rule(type="FORBID_REGEX", value="mneme")
+    with pytest.raises(ValueError, match="non-empty"):
+        Rule(type="FORBID_LITERAL", value="")
+    with pytest.raises(ValueError, match="non-empty"):
+        Rule(type="FORBID_LITERAL", value="   ")
 
 
 def test_mneme_conflict_error_carries_conflicts_and_result():

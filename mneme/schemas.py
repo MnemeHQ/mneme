@@ -46,6 +46,10 @@ MemoryItemType = Literal[
 
 Priority = Literal["high", "medium", "low"]
 
+RuleType = Literal["FORBID_LITERAL"]
+
+VALID_RULE_TYPES: frozenset[str] = frozenset({"FORBID_LITERAL"})
+
 PRIORITY_WEIGHT: dict[str, float] = {
     "high": 1.5,
     "medium": 1.0,
@@ -126,6 +130,33 @@ class DecisionExample:
     tags: list[str] = field(default_factory=list)
 
 
+@dataclass(frozen=True)
+class Rule:
+    """A mechanically enforceable rule with explicit runtime semantics.
+
+    ``FORBID_LITERAL`` is intentionally the first and only rule type. Its
+    value is matched as an exact, case-sensitive token sequence by the
+    deterministic enforcer. New rule types must define equally precise
+    semantics before joining ``VALID_RULE_TYPES``.
+
+    Attributes:
+        type:  One of ``VALID_RULE_TYPES``.
+        value: Non-empty literal value consumed by the rule matcher.
+    """
+
+    type: RuleType
+    value: str
+
+    def __post_init__(self) -> None:
+        if self.type not in VALID_RULE_TYPES:
+            raise ValueError(
+                f"unknown rule type {self.type!r} "
+                f"(expected one of {sorted(VALID_RULE_TYPES)})"
+            )
+        if not isinstance(self.value, str) or not self.value.strip():
+            raise ValueError("rule value must be a non-empty string")
+
+
 @dataclass
 class ProjectMemory:
     """The full memory store for one project.
@@ -162,6 +193,11 @@ class Decision:
                        e.g. ["no postgres", "no external db"].
         anti_patterns: Explicitly forbidden approaches,
                        e.g. ["introduce ORM", "add migration layer"].
+        rules:          Mechanically enforceable typed rules. Unlike legacy
+                       constraint prose, each type has exact semantics.
+        source_path:    Resolved ADR source path when provenance is available.
+                       Runtime-only; persisted under the existing ``source``
+                       block rather than as a top-level Decision field.
         created_at:    ISO 8601 timestamp of creation.
         updated_at:    ISO 8601 timestamp of last update.
     """
@@ -174,6 +210,8 @@ class Decision:
     anti_patterns: list[str] = field(default_factory=list)
     created_at: str = ""
     updated_at: str = ""
+    rules: list[Rule] = field(default_factory=list)
+    source_path: str = ""
 
 
 # ── Pipeline models ───────────────────────────────────────────────────────────

@@ -31,7 +31,7 @@ def test_adr_import_dry_run_prints_preview_and_does_not_write(tmp_path, capsys):
         "--dry-run",
     ])
 
-    assert rc == 0
+    assert rc == 1
     out = capsys.readouterr().out
     assert "ADR import preview" in out
     assert "ADR-101" in out
@@ -52,7 +52,7 @@ def test_adr_import_default_is_dry_run(tmp_path):
         "--memory", str(target),
     ])
 
-    assert rc == 0
+    assert rc == 1
     assert target.read_text(encoding="utf-8") == before
 
 

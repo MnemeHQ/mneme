@@ -39,6 +39,7 @@ machine-readable directives:
 
 ```markdown
 ## Constraints
+- FORBID_LITERAL: install legacy-package
 - FORBID_DEPENDENCY: mongodb
 - FORBID_PATH: src/legacy/billing/**
 - REQUIRE_PATH: billing/**
@@ -51,6 +52,7 @@ rather than being silently dropped -- a typo should not defeat governance.
 
 | Directive | Parsed and stored? | Enforced by `mneme check`? |
 |---|---|---|
+| `FORBID_LITERAL: text` | Yes, as a typed entry in `Decision.rules` | Yes -- exact, case-sensitive, boundary-aware match triggers FAIL |
 | `FORBID_DEPENDENCY: X` | Yes, as `"no X"` in Decision.constraints | Yes -- triggers WARN |
 | `FORBID_PATH: glob` | Yes, as `"FORBID_PATH glob"` in Decision.constraints | No (stored for visibility) |
 | `REQUIRE_PATH: glob` | Yes, as `"REQUIRE_PATH glob"` in Decision.constraints | No (stored for visibility) |
@@ -58,6 +60,20 @@ rather than being silently dropped -- a typo should not defeat governance.
 Glob-vs-changed-file enforcement for `FORBID_PATH` and `REQUIRE_PATH` is
 out of scope for the MVP -- the existing enforcer is a term-matcher, not a
 path-matcher. This is a follow-up capability.
+
+`FORBID_LITERAL` does not split prose into keywords. It checks the declared
+value directly and requires identifier/slug boundaries at identifier-like
+edges. For example, `pip install mneme` fails while `pip install mneme-hq`
+passes. The comparison is case-sensitive. Typed rules are enforced regardless
+of retrieval score; retrieval still controls context injection only. When ADR
+source provenance is available, a rule is not applied to its own declaring ADR
+so the source can state the literal it governs.
+
+An active ADR with no mechanically enforceable rules is still importable for
+retrieval, but preview prints a `Retrieval-only ADR warnings` diagnostic. A
+dry-run with that warning exits 1 so CI cannot mistake a toothless import for a
+clean enforcement payload. `--apply` may still persist the decision and exits 0
+when the write succeeds.
 
 ---
 
@@ -85,7 +101,7 @@ mneme adr import docs/adr --memory .mneme/project_memory.json --apply --approve-
 | Code | Meaning |
 |:---:|---|
 | 0 | Clean preview or successful apply |
-| 1 | Dry-run: diagnostics present (active-active contradiction or collisions). Useful as a CI signal. |
+| 1 | Dry-run: diagnostics present (including retrieval-only ADRs, active-active contradictions, or collisions). Useful as a CI signal. |
 | 2 | Apply refused (unresolved diagnostics or invalid input path) |
 
 ---
@@ -197,14 +213,18 @@ These are deliberate exclusions, not gaps:
    files. The enforcer is a term-matcher; path enforcement is a separate
    design problem.
 
-4. **Anti-pattern modelling via `## Constraints`.**
+4. **Automatic Correct/Forbidden table inference.** Tables remain human
+   documentation. Authors must declare `FORBID_LITERAL` explicitly; the
+   compiler does not guess which table cells are executable policy.
+
+5. **Anti-pattern modelling via `## Constraints`.**
    `Decision.anti_patterns` stays empty for ADR-derived records in v1.
 
-5. **`mneme adr suggest`.** A future augmentation layer for drafting ADRs
+6. **`mneme adr suggest`.** A future augmentation layer for drafting ADRs
    from existing code patterns. The import flow is its foundation, not its
    replacement.
 
-6. **Modifying `.mneme/project_memory.json` as part of this feature.** Per the
+7. **Modifying `.mneme/project_memory.json` as part of this feature.** Per the
    repo's governance rules, editing the canonical memory file requires a
    separate `[memory]`-tagged PR.
 
@@ -212,11 +232,10 @@ These are deliberate exclusions, not gaps:
 
 ## Integration with existing pipeline
 
-Imported decisions enter the existing
-`MemoryStore -> DecisionRetriever -> check_prompt` pipeline without any
-changes to those modules. Once persisted, they are retrieved by relevance,
-injected into context, and enforced by `mneme check` exactly like manually
-authored decisions.
+Imported decisions enter the
+`MemoryStore -> DecisionRetriever -> check_prompt` pipeline. Legacy constraints
+retain their historical behavior; typed rules are loaded separately and
+enforced deterministically by `mneme check`.
 
 ```python
 # Example: import then check in one session

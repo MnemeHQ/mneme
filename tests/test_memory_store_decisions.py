@@ -1,5 +1,8 @@
 """Tests for MemoryStore loading Decision records (native + legacy migration)."""
 from pathlib import Path
+import json
+
+import pytest
 
 from mneme.memory_store import MemoryStore
 
@@ -42,6 +45,62 @@ def test_decisions_accessor():
     store.load()
     assert len(store.decisions()) == 1
     assert store.decisions()[0].id == "mneme_001"
+
+
+def test_loads_typed_rules_and_resolves_adr_source(tmp_path):
+    adr = tmp_path / "docs" / "adr" / "ADR-001.md"
+    adr.parent.mkdir(parents=True)
+    adr.write_text("# ADR-001\n", encoding="utf-8")
+    memory_path = tmp_path / ".mneme" / "project_memory.json"
+    memory_path.parent.mkdir()
+    memory_path.write_text(json.dumps({
+        "meta": {"name": "test", "description": "test"},
+        "decisions": [{
+            "id": "ADR-001",
+            "decision": "Forbid bad install command",
+            "rules": [
+                {"type": "FORBID_LITERAL", "value": "pip install mneme"}
+            ],
+            "source": {"type": "adr", "path": "../docs/adr/ADR-001.md"},
+        }],
+    }), encoding="utf-8")
+
+    [decision] = MemoryStore(memory_path).load().decisions
+    assert decision.rules[0].value == "pip install mneme"
+    assert Path(decision.source_path) == adr.resolve()
+
+
+def test_unknown_typed_rule_fails_loudly(tmp_path):
+    memory_path = tmp_path / "project_memory.json"
+    memory_path.write_text(json.dumps({
+        "meta": {"name": "test", "description": "test"},
+        "decisions": [{
+            "id": "bad",
+            "decision": "Bad rule",
+            "rules": [{"type": "FORBID_REGEX", "value": ".*"}],
+        }],
+    }), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="unknown rule type"):
+        MemoryStore(memory_path).load()
+
+
+def test_mismatched_adr_source_name_cannot_create_rule_exemption(tmp_path):
+    memory_path = tmp_path / "project_memory.json"
+    memory_path.write_text(json.dumps({
+        "meta": {"name": "test", "description": "test"},
+        "decisions": [{
+            "id": "ADR-001",
+            "decision": "Forbid bad install command",
+            "rules": [
+                {"type": "FORBID_LITERAL", "value": "pip install mneme"}
+            ],
+            "source": {"type": "adr", "path": "../README.md"},
+        }],
+    }), encoding="utf-8")
+
+    [decision] = MemoryStore(memory_path).load().decisions
+    assert decision.source_path == ""
 
 
 def test_legacy_anti_pattern_migration_does_not_dump_content_into_anti_patterns():

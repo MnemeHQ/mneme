@@ -71,6 +71,11 @@ def test_allowlist_does_not_cover_user_docs():
     assert gate.is_allowlisted("docs/qa-glossary.md") is None
 
 
+def test_allowlist_covers_test_fixtures():
+    assert gate.is_allowlisted("tests/test_enforcer.py")
+    assert gate.is_allowlisted("tests/fixtures/adrs_literal/ADR-201.md")
+
+
 def test_allowlist_covers_the_gate_itself():
     """The gate must name the forbidden form to detect and explain it.
 

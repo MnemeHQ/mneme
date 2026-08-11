@@ -2,7 +2,18 @@
 
 ## Unreleased
 
-_Nothing yet._
+### Added
+
+- Typed ADR enforcement with `FORBID_LITERAL`. ADR import now persists
+  explicit typed rules, `mneme check` applies them independently of retrieval
+  score, and human/JSON output identifies the rule type.
+- Retrieval-only import diagnostics for active ADRs that yield zero
+  mechanically enforceable rules.
+
+### Compatibility
+
+- Existing `constraints` and `anti_patterns` retain their current matching and
+  severity behavior. Memory files without `rules` continue to load unchanged.
 
 ---
 

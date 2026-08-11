@@ -5,6 +5,7 @@ Mneme ADR bodies may include an optional ``## Constraints`` section listing
 machine-actionable directives, one per line, in the form::
 
     ## Constraints
+    - FORBID_LITERAL: install legacy-package
     - FORBID_DEPENDENCY: mongodb
     - FORBID_PATH: src/legacy/**
     - REQUIRE_PATH: billing/**
@@ -30,6 +31,7 @@ from typing import Final
 
 
 VALID_KINDS: Final[frozenset[str]] = frozenset({
+    "FORBID_LITERAL",
     "FORBID_DEPENDENCY",
     "FORBID_PATH",
     "REQUIRE_PATH",
