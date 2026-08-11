@@ -29,6 +29,13 @@ VIOLATION = re.compile(
     r"\b(?:pip|pipx|uv pip)\s+install\s+(?P<flags>(?:-[\w-]+\s+)*)mneme(?!-hq)(?![\w-])"
 )
 
+# A typed rule's declaring ADR must be able to state the literal it forbids.
+# Keep this exemption line-scoped and exact: it does not allow prose or other
+# files containing the same install command.
+TYPED_LITERAL_DIRECTIVE = re.compile(
+    r"^\s*-\s+FORBID_LITERAL:\s+(?P<value>.+?)\s*$"
+)
+
 # `pip install -e mneme` / `--editable mneme` takes a *local directory path*,
 # not a PyPI distribution name, so it never resolves to the wrong package.
 # Installing a source checkout that happens to live in a folder called `mneme`
@@ -45,11 +52,14 @@ ALLOWLIST: dict[str, str] = {
     # Dated historical planning records. Rewriting them would falsify the
     # archive; they are not user-facing install instructions.
     "docs/plans/": "historical planning records, not user instructions",
-    # The gate itself must name the forbidden form to detect and explain it,
-    # and its tests must use it as fixture data. Without these entries the
-    # check fails on itself the moment it is committed.
+    # The gate itself must name the forbidden form to detect and explain it.
+    # Tests may also use forbidden literals as fixture data; they are not
+    # user-facing install instructions.
     "scripts/check_install_command.py": "the gate's own pattern and messages",
-    "tests/test_check_install_command.py": "the gate's own test fixtures",
+    "tests/": "test fixtures and assertions, not user instructions",
+    ".mneme/project_memory.json": (
+        "canonical policy storage may contain the literals it enforces"
+    ),
 }
 
 
@@ -58,6 +68,14 @@ def is_allowlisted(path: str) -> str | None:
         if path.startswith(prefix):
             return reason
     return None
+
+
+def is_declaring_typed_rule(path: str, line: str, match: re.Match[str]) -> bool:
+    """Return whether an ADR directive declares exactly this matched literal."""
+    if not path.startswith("docs/adr/"):
+        return False
+    directive = TYPED_LITERAL_DIRECTIVE.match(line)
+    return bool(directive and directive.group("value") == match.group(0))
 
 
 def tracked_files() -> list[str]:
@@ -82,6 +100,8 @@ def scan(paths: list[str]) -> list[tuple[str, int, str]]:
                 continue
             flags = match.group("flags").split()
             if any(f in EDITABLE_FLAGS for f in flags):
+                continue
+            if is_declaring_typed_rule(path, line, match):
                 continue
             # A line that names both the correct and the forbidden form is a
             # correct-vs-wrong comparison (as in ADR-005's own table), not an

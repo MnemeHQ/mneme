@@ -14,7 +14,40 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from mneme.schemas import Decision, DecisionExample, MemoryItem, ProjectMeta, ProjectMemory
+from mneme.schemas import (
+    Decision,
+    DecisionExample,
+    MemoryItem,
+    ProjectMeta,
+    ProjectMemory,
+    Rule,
+)
+
+
+def _resolve_source_path(
+    memory_path: Path,
+    source: object,
+    decision_id: str,
+) -> str:
+    """Resolve an imported ADR provenance path for runtime comparisons.
+
+    Older and hand-authored decisions have no ``source`` block. Malformed
+    optional provenance is ignored here because freshness validation owns its
+    diagnostics; loading enforcement memory must remain backward compatible.
+    """
+    if not isinstance(source, dict) or source.get("type") != "adr":
+        return ""
+    raw_path = source.get("path")
+    if not isinstance(raw_path, str) or not raw_path:
+        return ""
+    source_name = Path(raw_path).name
+    if Path(source_name).suffix.lower() != ".md":
+        return ""
+    if source_name != f"{decision_id}.md" and not source_name.startswith(
+        f"{decision_id}-"
+    ):
+        return ""
+    return str((memory_path.parent / raw_path).resolve())
 
 
 class MemoryStore:
@@ -91,6 +124,16 @@ class MemoryStore:
                 scope=list(d.get("scope", [])),
                 constraints=list(d.get("constraints", [])),
                 anti_patterns=list(d.get("anti_patterns", [])),
+                rules=[
+                    Rule(type=rule["type"], value=rule["value"])
+                    for rule in d.get("rules", [])
+                ],
+                source_path=_resolve_source_path(
+                    self.path,
+                    d.get("source"),
+                    d["id"],
+                ),
+                memory_path=str(self.path.resolve()),
                 created_at=d.get("created_at", ""),
                 updated_at=d.get("updated_at", ""),
             )

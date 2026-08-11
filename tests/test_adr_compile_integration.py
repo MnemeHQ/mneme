@@ -129,3 +129,14 @@ def test_adrs_to_decisions_no_constraints_section_yields_empty_constraints():
     decisions = adrs_to_decisions(compile_adrs(FIXTURES / "adrs_e2e_clean"))
     for d in decisions:
         assert d.constraints == []
+        assert d.rules == []
+
+
+def test_adrs_to_decisions_compiles_forbid_literal_as_typed_rule():
+    decisions = adrs_to_decisions(compile_adrs(FIXTURES / "adrs_literal"))
+    [decision] = decisions
+    [rule] = decision.rules
+    assert rule.type == "FORBID_LITERAL"
+    assert rule.value == "pip install mneme"
+    assert decision.constraints == []
+    assert Path(decision.source_path).name == "ADR-201-forbid-install-command.md"

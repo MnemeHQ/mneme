@@ -18,7 +18,7 @@ def generate_mdc(
 
     Filters to top-N scored decisions (score > 0). Returns a file with YAML
     frontmatter, a warning header, and one section per decision containing its
-    constraints and anti-patterns.
+    constraints, anti-patterns, and typed rules.
     """
     kept: list[ScoredDecision] = []
     seen: set[str] = set()
@@ -74,6 +74,11 @@ def generate_mdc(
             lines.append("**Avoid:**")
             for a in d.anti_patterns:
                 lines.append(f"- {a}")
+            lines.append("")
+        if d.rules:
+            lines.append("**Typed rules:**")
+            for rule in d.rules:
+                lines.append(f"- {rule.type}: {rule.value}")
             lines.append("")
 
     return "\n".join(lines)

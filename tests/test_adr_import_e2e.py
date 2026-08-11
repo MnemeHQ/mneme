@@ -60,3 +60,71 @@ def test_mneme_check_warn_mode_against_imported_memory(tmp_path):
         "--mode", "warn",
     ])
     assert rc == 0  # warn mode -> always exit 0
+
+
+def test_imported_forbid_literal_fails_and_allows_longer_distribution(tmp_path):
+    target = tmp_path / "project_memory.json"
+    _seed(target)
+    report = compile_for_import(FIXTURES / "adrs_literal")
+    apply_import(report, target_path=target)
+
+    store = MemoryStore(target)
+    store.load()
+    scored = DecisionRetriever(store.decisions()).retrieve("edit to README.md")
+
+    violating = check_prompt("pip install mneme\n", scored, top=3)
+    compliant = check_prompt("pip install mneme-hq\n", scored, top=3)
+    assert violating.verdict == Severity.FAIL
+    assert compliant.verdict == Severity.PASS
+
+
+def test_imported_literal_rule_exempts_its_source_adr(tmp_path):
+    target = tmp_path / "project_memory.json"
+    _seed(target)
+    report = compile_for_import(FIXTURES / "adrs_literal")
+    apply_import(report, target_path=target)
+
+    store = MemoryStore(target)
+    store.load()
+    [decision] = store.decisions()
+    scored = DecisionRetriever([decision]).retrieve("edit to ADR-201.md")
+    source = Path(decision.source_path)
+    result = check_prompt(
+        source.read_text(encoding="utf-8"),
+        scored,
+        input_path=source,
+    )
+    assert result.verdict == Severity.PASS
+
+
+def test_mneme_check_exempts_imported_literal_rule_source(tmp_path):
+    target = tmp_path / "project_memory.json"
+    _seed(target)
+    report = compile_for_import(FIXTURES / "adrs_literal")
+    apply_import(report, target_path=target)
+    [decision] = MemoryStore(target).load().decisions
+
+    rc = cli_main([
+        "check",
+        "--memory", str(target),
+        "--input", decision.source_path,
+        "--query", "edit to ADR-201.md",
+        "--mode", "strict",
+    ])
+    assert rc == 0
+
+
+def test_mneme_check_exempts_policy_memory_file(tmp_path):
+    target = tmp_path / "project_memory.json"
+    _seed(target)
+    report = compile_for_import(FIXTURES / "adrs_literal")
+    apply_import(report, target_path=target)
+
+    rc = cli_main([
+        "check",
+        "--memory", str(target),
+        "--input", str(target),
+        "--query", "update project memory",
+        "--mode", "strict",
+    ])
+    assert rc == 0

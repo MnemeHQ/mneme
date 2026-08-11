@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -117,6 +118,9 @@ def _cmd_list(args: argparse.Namespace) -> int:
             print(f"    constraints: {', '.join(d.constraints)}")
         if d.anti_patterns:
             print(f"    avoid: {', '.join(d.anti_patterns)}")
+        if d.rules:
+            for rule in d.rules:
+                print(f"    rule: {rule.type} {rule.value}")
     return 0
 
 
@@ -206,6 +210,8 @@ def _check_payload(
                 "severity": v.severity.value,
                 "rule": v.rule,
                 "trigger": v.trigger,
+                "kind": v.kind,
+                "rule_type": v.rule_type,
             }
             for v in result.violations
         ],
@@ -225,7 +231,7 @@ def _cmd_check(args: argparse.Namespace) -> int:
     retriever = DecisionRetriever(store.decisions())
     scored = retriever.retrieve(args.query)
 
-    result = check_prompt(input_text, scored, top=args.top)
+    result = check_prompt(input_text, scored, top=args.top, input_path=args.input)
 
     if getattr(args, "json", False):
         # Machine-readable mode: the payload must be the only thing on stdout,
@@ -236,8 +242,11 @@ def _cmd_check(args: argparse.Namespace) -> int:
 
     if result.violations:
         for v in result.violations:
-            kind = "anti_pattern" if v.severity == Severity.FAIL else "constraint"
-            print(f"{v.severity.value:4}  [{v.decision_id}] {kind} \"{v.rule}\" -- trigger: {v.trigger}")
+            kind = v.rule_type or v.kind
+            print(
+                f"{v.severity.value:4}  [{v.decision_id}] "
+                f"{kind} \"{v.rule}\" -- trigger: {v.trigger}"
+            )
             print(f"      {v.decision_text}")
         print()
 
@@ -335,8 +344,8 @@ def _cmd_adr_import(args: argparse.Namespace) -> int:
 
     Exit codes:
         0 = success (preview shown in dry-run, or write completed in apply)
-        1 = diagnostics present (active-active contradiction or collisions)
-            in dry-run mode (informational; CI can use this to fail the PR)
+        1 = diagnostics present (retrieval-only ADR, active-active
+            contradiction, or collision) in dry-run mode
         2 = apply failed (refused due to unresolved diagnostics)
     """
     import sys
@@ -425,7 +434,14 @@ def _build_parser() -> argparse.ArgumentParser:
     p_check.add_argument("--memory", required=True, help="Path to project_memory.json")
     p_check.add_argument("--input", required=True, help="Path to input file to check")
     p_check.add_argument("--query", required=True, help="Context query for retrieval")
-    p_check.add_argument("--top", type=int, default=DEFAULT_MAX_DECISIONS)
+    p_check.add_argument(
+        "--top", type=int, default=DEFAULT_MAX_DECISIONS,
+        help=(
+            "Size of the retrieval-gated tier. Bounds how many decisions have "
+            "their multi-term rules applied; unambiguous literal rules are "
+            "enforced across the whole corpus regardless (ADR-017)."
+        ),
+    )
     p_check.add_argument(
         "--mode", choices=["warn", "strict"], default="strict",
         help="warn: all verdicts exit 0; strict (default): WARN->1, FAIL->2",
@@ -514,7 +530,39 @@ def _build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _force_utf8_stdio() -> None:
+    """Make stdout/stderr able to carry any character a decision contains.
+
+    Decision text is arbitrary user content. This repo's own memory carries
+    U+2192 in the imported ADR-001, ADR-005 and ADR-014 decisions, and on
+    Windows the console defaults to cp1252, which cannot encode it -- so
+    rendering a perfectly valid decision crashed the CLI with
+    UnicodeEncodeError partway through its output (#253).
+
+    Source-level ASCII discipline cannot fix this, because the character comes
+    from the memory file rather than from mneme. Applied here in ``main`` so
+    every subcommand is covered: previously only ``benchmark`` and
+    ``adr import`` guarded themselves, while ``test_query`` and ``check``
+    -- both of which render decision text -- did not.
+
+    Note this differs from the Claude Code hook's ASCII-only rule. The hook
+    writes into a protocol another process parses, so it constrains what it
+    emits; the CLI writes for a human and instead widens what its stream can
+    carry.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            try:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+            except (ValueError, OSError):
+                # Detached or already-wrapped stream: rendering degrades to
+                # whatever the caller supplied, which is still better than
+                # refusing to run.
+                pass
+
+
 def main(argv: list[str] | None = None) -> int:
+    _force_utf8_stdio()
     parser = _build_parser()
     args = parser.parse_args(argv)
     return args.func(args)

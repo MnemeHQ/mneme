@@ -65,6 +65,31 @@ def test_json_violations_carry_decision_and_rule(tmp_path, capsys):
     assert v["rule"] and v["trigger"] and v["decision_text"]
 
 
+def test_json_identifies_typed_rule(tmp_path, capsys):
+    mem = tmp_path / "project_memory.json"
+    mem.write_text(json.dumps({
+        "meta": {"name": "test", "description": "test"},
+        "decisions": [{
+            "id": "ADR-201",
+            "decision": "Use the published distribution name",
+            "rules": [{
+                "type": "FORBID_LITERAL",
+                "value": "pip install mneme",
+            }],
+        }],
+    }), encoding="utf-8")
+    inp = _input(tmp_path, "pip install mneme")
+    code = main([
+        "check", "--memory", str(mem), "--input", str(inp),
+        "--query", "edit to README.md", "--json",
+    ])
+    payload = json.loads(capsys.readouterr().out)
+    assert code == 2
+    [violation] = payload["violations"]
+    assert violation["kind"] == "typed_rule"
+    assert violation["rule_type"] == "FORBID_LITERAL"
+
+
 # ── exit codes are unchanged by --json ───────────────────────────────────────
 
 def test_json_preserves_strict_exit_codes(tmp_path, capsys):

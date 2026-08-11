@@ -1,6 +1,6 @@
 """Post-response conflict detection against injected decisions."""
 from mneme.conflict_detector import ConflictDetector, Conflict
-from mneme.schemas import Decision
+from mneme.schemas import Decision, Rule
 
 
 def _decisions():
@@ -58,3 +58,26 @@ def test_snippet_contains_surrounding_context():
     conflicts = ConflictDetector().detect(response, _decisions())
     # Snippet must contain the triggering phrase.
     assert any("postgres" in c.snippet.lower() for c in conflicts)
+
+
+def test_detects_typed_literal_without_heuristic_negation():
+    decision = Decision(
+        id="ADR-201",
+        decision="Use the published distribution name",
+        rules=[Rule(type="FORBID_LITERAL", value="pip install mneme")],
+    )
+    conflicts = ConflictDetector().detect(
+        "Do not run pip install mneme; use the published package instead.",
+        [decision],
+    )
+    assert len(conflicts) == 1
+    assert "FORBID_LITERAL" in conflicts[0].reason
+
+
+def test_typed_literal_does_not_match_longer_slug():
+    decision = Decision(
+        id="ADR-201",
+        decision="Use the published distribution name",
+        rules=[Rule(type="FORBID_LITERAL", value="pip install mneme")],
+    )
+    assert ConflictDetector().detect("pip install mneme-hq", [decision]) == []

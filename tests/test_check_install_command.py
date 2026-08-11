@@ -71,6 +71,32 @@ def test_allowlist_does_not_cover_user_docs():
     assert gate.is_allowlisted("docs/qa-glossary.md") is None
 
 
+def test_allowlist_covers_test_fixtures():
+    assert gate.is_allowlisted("tests/test_enforcer.py")
+    assert gate.is_allowlisted("tests/fixtures/adrs_literal/ADR-201.md")
+
+
+def test_allowlist_covers_only_the_canonical_policy_memory_file():
+    assert gate.is_allowlisted(".mneme/project_memory.json")
+    assert gate.is_allowlisted("examples/project_memory.json") is None
+    assert gate.is_allowlisted(".mneme/other.json") is None
+
+
+def test_exact_typed_rule_declaration_is_exempt_only_in_adr_sources():
+    line = "- FORBID_LITERAL: pip install mneme"
+    match = gate.VIOLATION.search(line)
+    assert match is not None
+    assert gate.is_declaring_typed_rule("docs/adr/ADR-005.md", line, match)
+    assert not gate.is_declaring_typed_rule("README.md", line, match)
+
+
+def test_typed_rule_declaration_must_match_the_entire_value():
+    line = "- FORBID_LITERAL: pip install mneme in tutorials"
+    match = gate.VIOLATION.search(line)
+    assert match is not None
+    assert not gate.is_declaring_typed_rule("docs/adr/ADR-005.md", line, match)
+
+
 def test_allowlist_covers_the_gate_itself():
     """The gate must name the forbidden form to detect and explain it.
 

@@ -77,6 +77,10 @@ In code-bearing contexts, the only acceptable spellings are:
 
 **Note on distribution name vs import name:** The PyPI distribution name (`mneme-hq`) intentionally diverges from the Python import root and CLI command (both `mneme`). This follows the standard Python packaging pattern where distribution and import names differ (e.g. `pip install scikit-learn` → `import sklearn`, `pip install Pillow` → `import PIL`). The PyPI name `mneme` is occupied by an unrelated note-taking package (mneme 0.201, uploaded 2014). Users install with `pip install mneme-hq` but import and invoke as `mneme`.
 
+## Constraints
+
+- FORBID_LITERAL: pip install mneme
+
 ## Required Fixes (this ADR's acceptance criteria)
 
 1. README.md code block and CLI examples corrected to `mneme`.
