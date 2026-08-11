@@ -98,9 +98,11 @@ block, and would have made strict mode unusable.
 
 6. **This is an interim boundary, not the destination.** Splitting rules by term
    count is a proxy for "mechanically decidable". The durable fix is an explicit
-   typed vocabulary (`FORBID_LITERAL` and a containment-based exemption) whose
-   rules are enforceable by construction, at which point the term-count proxy is
-   retired. That work is issue #250 and is not part of this decision.
+   typed vocabulary whose rules are enforceable by construction. Issue #250
+   subsequently shipped `FORBID_LITERAL`; ADR-019 defines its exact contract.
+   The containment-based exemption anticipated when this ADR was accepted did
+   not ship and is not part of that rule type. The term-count proxy remains for
+   legacy rules until migration or benchmark evidence justifies changing it.
 
 ## Consequences
 
