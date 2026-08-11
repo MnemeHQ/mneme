@@ -717,7 +717,8 @@ include an optional `## Constraints` section with directives:
 `mneme check`. Matching is case-sensitive and boundary-aware, so
 `pip install mneme` does not match `pip install mneme-hq`. The rule is checked
 across the decision corpus, independent of retrieval score. Its declaring ADR
-source is exempt so the policy document can state the literal it governs.
+source and canonical memory file are exempt so policy storage can state the
+literal it governs.
 
 `FORBID_DEPENDENCY` retains its legacy `WARN` behavior. `FORBID_PATH` and
 `REQUIRE_PATH` persist into Decisions for retrieval visibility but are not yet

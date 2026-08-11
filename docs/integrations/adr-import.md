@@ -67,7 +67,7 @@ edges. For example, `pip install mneme` fails while `pip install mneme-hq`
 passes. The comparison is case-sensitive. Typed rules are enforced regardless
 of retrieval score; retrieval still controls context injection only. When ADR
 source provenance is available, a rule is not applied to its own declaring ADR
-so the source can state the literal it governs.
+or canonical memory file, so policy storage can state the literal it governs.
 
 An active ADR with no mechanically enforceable rules is still importable for
 retrieval, but preview prints a `Retrieval-only ADR warnings` diagnostic. A

@@ -13,6 +13,7 @@ def test_decision_minimal_construction():
     assert d.constraints == []
     assert d.anti_patterns == []
     assert d.rules == []
+    assert d.memory_path == ""
 
 
 def test_decision_full_construction():

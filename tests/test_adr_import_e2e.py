@@ -112,3 +112,19 @@ def test_mneme_check_exempts_imported_literal_rule_source(tmp_path):
         "--mode", "strict",
     ])
     assert rc == 0
+
+
+def test_mneme_check_exempts_policy_memory_file(tmp_path):
+    target = tmp_path / "project_memory.json"
+    _seed(target)
+    report = compile_for_import(FIXTURES / "adrs_literal")
+    apply_import(report, target_path=target)
+
+    rc = cli_main([
+        "check",
+        "--memory", str(target),
+        "--input", str(target),
+        "--query", "update project memory",
+        "--mode", "strict",
+    ])
+    assert rc == 0

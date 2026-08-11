@@ -582,3 +582,20 @@ def test_typed_rule_does_not_flag_its_declaring_adr(tmp_path):
         input_path=source,
     )
     assert result.verdict == Severity.PASS
+
+
+def test_typed_rule_does_not_flag_its_policy_memory_file(tmp_path):
+    memory = tmp_path / "project_memory.json"
+    memory.write_text('"value": "pip install mneme"\n', encoding="utf-8")
+    decision = Decision(
+        id="ADR-201",
+        decision="Use the published distribution name",
+        rules=[Rule(type="FORBID_LITERAL", value="pip install mneme")],
+        memory_path=str(memory),
+    )
+    result = check_prompt(
+        memory.read_text(encoding="utf-8"),
+        [_scored(decision, score=0.0)],
+        input_path=memory,
+    )
+    assert result.verdict == Severity.PASS

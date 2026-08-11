@@ -73,14 +73,22 @@ def _word_in_text(term: str, text: str) -> bool:
     return bool(re.search(r"\b" + re.escape(term) + r"\b", text, re.IGNORECASE))
 
 
-def _is_declaring_source(input_path: str | Path | None, source_path: str) -> bool:
-    """Return whether an input is the ADR that declared this decision."""
-    if input_path is None or not source_path:
+def _is_policy_source(
+    input_path: str | Path | None,
+    *policy_paths: str,
+) -> bool:
+    """Return whether the input stores or declares the decision's policy."""
+    if input_path is None:
         return False
-    try:
-        return Path(input_path).resolve() == Path(source_path).resolve()
-    except OSError:
-        return False
+    for policy_path in policy_paths:
+        if not policy_path:
+            continue
+        try:
+            if Path(input_path).resolve() == Path(policy_path).resolve():
+                return True
+        except OSError:
+            continue
+    return False
 
 
 def _top_nonzero(scored: list[ScoredDecision], top: int) -> list[ScoredDecision]:
@@ -168,8 +176,8 @@ def check_prompt(
                     decisions have their *multi-term* rules applied; it never
                     limits which decisions are enforced.
         input_path: Optional checked-file path. A typed rule does not enforce
-                    against its own declaring ADR source, which must be able to
-                    contain the literal it defines.
+                    against its declaring ADR or policy-memory source, both of
+                    which must be able to contain the literal it defines.
 
     Returns:
         EnforcementResult with verdict and list of Violations.
@@ -179,7 +187,7 @@ def check_prompt(
     for s, literal_only in _enforcement_scope(scored, top):
         d = s.decision
 
-        if not _is_declaring_source(input_path, d.source_path):
+        if not _is_policy_source(input_path, d.source_path, d.memory_path):
             for rule in d.rules:
                 if rule.type == "FORBID_LITERAL" and literal_in_text(
                     rule.value, input_text

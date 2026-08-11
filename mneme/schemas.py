@@ -198,6 +198,9 @@ class Decision:
         source_path:    Resolved ADR source path when provenance is available.
                        Runtime-only; persisted under the existing ``source``
                        block rather than as a top-level Decision field.
+        memory_path:    Resolved policy-memory path that loaded this decision.
+                       Runtime-only; permits a typed rule to be represented in
+                       its own canonical storage file without self-enforcement.
         created_at:    ISO 8601 timestamp of creation.
         updated_at:    ISO 8601 timestamp of last update.
     """
@@ -212,6 +215,7 @@ class Decision:
     updated_at: str = ""
     rules: list[Rule] = field(default_factory=list)
     source_path: str = ""
+    memory_path: str = ""
 
 
 # ── Pipeline models ───────────────────────────────────────────────────────────

@@ -133,6 +133,7 @@ class MemoryStore:
                     d.get("source"),
                     d["id"],
                 ),
+                memory_path=str(self.path.resolve()),
                 created_at=d.get("created_at", ""),
                 updated_at=d.get("updated_at", ""),
             )

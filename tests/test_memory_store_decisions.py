@@ -68,6 +68,7 @@ def test_loads_typed_rules_and_resolves_adr_source(tmp_path):
     [decision] = MemoryStore(memory_path).load().decisions
     assert decision.rules[0].value == "pip install mneme"
     assert Path(decision.source_path) == adr.resolve()
+    assert Path(decision.memory_path) == memory_path.resolve()
 
 
 def test_unknown_typed_rule_fails_loudly(tmp_path):
