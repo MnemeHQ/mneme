@@ -90,6 +90,86 @@ def test_json_identifies_typed_rule(tmp_path, capsys):
     assert violation["rule_type"] == "FORBID_LITERAL"
 
 
+def _scoped_memory(tmp_path):
+    mem = tmp_path / ".mneme" / "project_memory.json"
+    mem.parent.mkdir()
+    mem.write_text(json.dumps({
+        "meta": {"name": "test", "description": "test"},
+        "decisions": [{
+            "id": "ADR-020",
+            "decision": "Scope the install rule",
+            "rules": [{
+                "type": "FORBID_LITERAL",
+                "value": "install legacy-client",
+                "include_paths": ["docs/**"],
+                "exclude_paths": ["docs/generated/**"],
+            }],
+        }],
+    }), encoding="utf-8")
+    return mem
+
+
+def test_json_target_path_controls_scoped_rule_applicability(tmp_path, capsys):
+    mem = _scoped_memory(tmp_path)
+    introduced = _input(tmp_path, "install legacy-client")
+    target = tmp_path / "docs" / "guide.md"
+    code = main([
+        "check", "--memory", str(mem), "--input", str(introduced),
+        "--target-path", str(target), "--query", "edit docs", "--json",
+    ])
+    payload = json.loads(capsys.readouterr().out)
+    assert code == 2
+    assert payload["evaluation_complete"] is True
+    assert payload["applicability"] == [{
+        "decision_id": "ADR-020",
+        "rule_type": "FORBID_LITERAL",
+        "rule_value": "install legacy-client",
+        "rule_index": 0,
+        "path_scoped": True,
+        "input_path": "docs/guide.md",
+        "outcome": "APPLIED",
+        "selector": "docs/**",
+        "reason": "an include selector matched",
+    }]
+    assert payload["violations"][0]["input_path"] == "docs/guide.md"
+
+
+def test_json_unknown_applicability_is_operational_failure_even_warn_mode(
+    tmp_path,
+    capsys,
+):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    mem = _scoped_memory(repo)
+    introduced = _input(repo, "install legacy-client")
+    outside = tmp_path / "outside" / "guide.md"
+    code = main([
+        "check", "--memory", str(mem), "--input", str(introduced),
+        "--target-path", str(outside), "--query", "edit docs",
+        "--mode", "warn", "--json",
+    ])
+    payload = json.loads(capsys.readouterr().out)
+    assert code == 2
+    assert payload["verdict"] == "PASS"
+    assert payload["evaluation_complete"] is False
+    assert payload["applicability"][0]["outcome"] == "UNKNOWN"
+
+
+def test_human_output_includes_scoped_applicability_trace(tmp_path, capsys):
+    mem = _scoped_memory(tmp_path)
+    introduced = _input(tmp_path, "safe text")
+    target = tmp_path / "docs" / "generated" / "guide.md"
+    code = main([
+        "check", "--memory", str(mem), "--input", str(introduced),
+        "--target-path", str(target), "--query", "edit docs",
+    ])
+    out = capsys.readouterr().out
+    assert code == 0
+    assert "PATH  EXCLUDED" in out
+    assert "docs/generated/guide.md via docs/generated/**" in out
+    assert "Result: PASS" in out
+
+
 # ── exit codes are unchanged by --json ───────────────────────────────────────
 
 def test_json_preserves_strict_exit_codes(tmp_path, capsys):

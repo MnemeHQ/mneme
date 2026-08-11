@@ -1,5 +1,11 @@
 """Post-response conflict detection against injected decisions."""
-from mneme.conflict_detector import ConflictDetector, Conflict
+import pytest
+
+from mneme.conflict_detector import (
+    Conflict,
+    ConflictDetector,
+    PathApplicabilityUnknownError,
+)
 from mneme.schemas import Decision, Rule
 
 
@@ -81,3 +87,41 @@ def test_typed_literal_does_not_match_longer_slug():
         rules=[Rule(type="FORBID_LITERAL", value="pip install mneme")],
     )
     assert ConflictDetector().detect("pip install mneme-hq", [decision]) == []
+
+
+def _scoped_decision(tmp_path):
+    return Decision(
+        id="ADR-020",
+        decision="Scope the rule",
+        rules=[Rule(
+            type="FORBID_LITERAL",
+            value="install legacy-client",
+            include_paths=("docs/**",),
+        )],
+        memory_path=str(tmp_path / ".mneme" / "project_memory.json"),
+    )
+
+
+def test_scoped_conflict_detection_accepts_target_path(tmp_path):
+    decision = _scoped_decision(tmp_path)
+    detector = ConflictDetector()
+    assert len(detector.detect(
+        "install legacy-client",
+        [decision],
+        target_path=tmp_path / "docs" / "guide.md",
+    )) == 1
+    assert detector.detect(
+        "install legacy-client",
+        [decision],
+        target_path=tmp_path / "src" / "app.py",
+    ) == []
+
+
+def test_text_only_scoped_conflict_detection_reports_non_evaluation(tmp_path):
+    decision = _scoped_decision(tmp_path)
+    detector = ConflictDetector()
+    result = detector.evaluate("install legacy-client", [decision])
+    assert not result.evaluation_complete
+    assert result.applicability[0].outcome.value == "UNKNOWN"
+    with pytest.raises(PathApplicabilityUnknownError, match="input path"):
+        detector.detect("install legacy-client", [decision])

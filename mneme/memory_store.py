@@ -50,6 +50,26 @@ def _resolve_source_path(
     return str((memory_path.parent / raw_path).resolve())
 
 
+def _load_rule(record: object) -> Rule:
+    if not isinstance(record, dict):
+        raise ValueError("rule record must be an object")
+    include_paths: tuple[str, ...] | None = None
+    if "include_paths" in record:
+        raw_include = record["include_paths"]
+        if not isinstance(raw_include, list):
+            raise ValueError("rule include_paths must be a list")
+        include_paths = tuple(raw_include)
+    raw_exclude = record.get("exclude_paths", [])
+    if not isinstance(raw_exclude, list):
+        raise ValueError("rule exclude_paths must be a list")
+    return Rule(
+        type=record["type"],
+        value=record["value"],
+        include_paths=include_paths,
+        exclude_paths=tuple(raw_exclude),
+    )
+
+
 class MemoryStore:
     """Loads project memory from a JSON file and exposes typed accessors.
 
@@ -125,7 +145,7 @@ class MemoryStore:
                 constraints=list(d.get("constraints", [])),
                 anti_patterns=list(d.get("anti_patterns", [])),
                 rules=[
-                    Rule(type=rule["type"], value=rule["value"])
+                    _load_rule(rule)
                     for rule in d.get("rules", [])
                 ],
                 source_path=_resolve_source_path(

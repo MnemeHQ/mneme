@@ -56,6 +56,19 @@ def test_output_shows_typed_rules():
     assert "FORBID_LITERAL: pip install mneme" in out
 
 
+def test_output_shows_typed_rule_path_scope():
+    scored = [_scored("d1", 2.0)]
+    scored[0].decision.rules.append(Rule(
+        type="FORBID_LITERAL",
+        value="install legacy-client",
+        include_paths=("docs/**",),
+        exclude_paths=("docs/generated/**",),
+    ))
+    out = format_decisions(scored)
+    assert "Applies to: docs/**" in out
+    assert "Except: docs/generated/**" in out
+
+
 def test_empty_input_returns_empty_string():
     assert format_decisions([], max_items=3) == ""
 

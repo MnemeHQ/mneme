@@ -140,3 +140,29 @@ def test_adrs_to_decisions_compiles_forbid_literal_as_typed_rule():
     assert rule.value == "pip install mneme"
     assert decision.constraints == []
     assert Path(decision.source_path).name == "ADR-201-forbid-install-command.md"
+
+
+def test_adrs_to_decisions_compiles_structured_path_selectors():
+    from mneme.adr_schema import ADR
+
+    adr = ADR(
+        id="ADR-020",
+        title="Scope typed rules",
+        status="accepted",
+        priority="normal",
+        date="2026-08-11",
+        scope="",
+        body=(
+            "## Constraints\n"
+            "- FORBID_LITERAL:\n"
+            "    value: install legacy-client\n"
+            "    include_paths:\n"
+            "      - docs/**\n"
+            "    exclude_paths:\n"
+            "      - docs/generated/**\n"
+        ),
+    )
+    [decision] = adrs_to_decisions([adr])
+    [rule] = decision.rules
+    assert rule.include_paths == ("docs/**",)
+    assert rule.exclude_paths == ("docs/generated/**",)

@@ -30,7 +30,7 @@ from mneme.adr_compiler import (
     validate_corpus,
 )
 from mneme.adr_parser import parse_adr_directory
-from mneme.schemas import Decision
+from mneme.schemas import Decision, Rule
 
 # Note: mneme.adr_freshness is imported lazily inside ``apply_import`` to
 # avoid a module-init cycle (adr_freshness needs project_decision_graph
@@ -38,6 +38,18 @@ from mneme.schemas import Decision
 
 
 GraphStatus = Literal["active", "superseded", "deprecated", "inactive"]
+
+
+def _serialize_rule(rule: Rule) -> dict[str, object]:
+    payload: dict[str, object] = {
+        "type": rule.type,
+        "value": rule.value,
+    }
+    if rule.include_paths is not None:
+        payload["include_paths"] = list(rule.include_paths)
+    if rule.exclude_paths:
+        payload["exclude_paths"] = list(rule.exclude_paths)
+    return payload
 
 
 @dataclass(frozen=True)
@@ -266,6 +278,14 @@ def format_preview(
         if decision:
             for rule in decision.rules:
                 lines.append(f"      rule: {rule.type} {rule.value}")
+                if rule.include_paths is not None:
+                    lines.append(
+                        f"        include_paths: {', '.join(rule.include_paths)}"
+                    )
+                if rule.exclude_paths:
+                    lines.append(
+                        f"        exclude_paths: {', '.join(rule.exclude_paths)}"
+                    )
             for c in decision.constraints:
                 lines.append(f"      constraint: {c}")
             if not decision.rules and not decision.constraints:
@@ -373,10 +393,7 @@ def apply_import(
             "scope": list(decision.scope),
             "constraints": list(decision.constraints),
             "anti_patterns": list(decision.anti_patterns),
-            "rules": [
-                {"type": rule.type, "value": rule.value}
-                for rule in decision.rules
-            ],
+            "rules": [_serialize_rule(rule) for rule in decision.rules],
             "created_at": decision.created_at,
             "updated_at": decision.updated_at,
         }

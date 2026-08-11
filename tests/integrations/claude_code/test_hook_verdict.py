@@ -252,6 +252,51 @@ def test_check_is_invoked_with_json_flag(tmp_path):
     assert "--json" in mrun.call_args.args[0]
 
 
+def test_check_receives_real_edit_target_for_path_applicability(tmp_path):
+    mem, target = _project_with_memory(tmp_path)
+    fake = MagicMock(
+        returncode=0,
+        stdout=_payload("PASS", violations=[]),
+        stderr="",
+    )
+    with patch(
+        "mneme.integrations.claude_code.hook.subprocess.run",
+        return_value=fake,
+    ) as mrun:
+        main(
+            stdin=io.StringIO(_edit_envelope(tmp_path, target)),
+            stderr=io.StringIO(),
+            stdout=io.StringIO(),
+        )
+    command = mrun.call_args.args[0]
+    index = command.index("--target-path")
+    assert Path(command[index + 1]) == target
+
+
+def test_unknown_path_applicability_fails_open_with_reason(tmp_path):
+    mem, target = _project_with_memory(tmp_path)
+    payload = json.loads(_payload("PASS", violations=[]))
+    payload["evaluation_complete"] = False
+    payload["applicability"] = [{
+        "decision_id": "ADR-020",
+        "rule_type": "FORBID_LITERAL",
+        "rule_value": "install legacy-client",
+        "outcome": "UNKNOWN",
+        "reason": "a scoped rule requires an input path",
+    }]
+    rc, err, out = _run(
+        tmp_path,
+        target,
+        returncode=2,
+        stdout=json.dumps(payload),
+    )
+    assert rc == 0
+    assert out == ""
+    assert "failing open" in err
+    assert "ADR-020" in err
+    assert "requires an input path" in err
+
+
 # ── reason formatting ────────────────────────────────────────────────────────
 
 def test_format_reason_includes_rule_and_trigger():
