@@ -57,6 +57,9 @@ ALLOWLIST: dict[str, str] = {
     # user-facing install instructions.
     "scripts/check_install_command.py": "the gate's own pattern and messages",
     "tests/": "test fixtures and assertions, not user instructions",
+    ".mneme/project_memory.json": (
+        "canonical policy storage may contain the literals it enforces"
+    ),
 }
 
 

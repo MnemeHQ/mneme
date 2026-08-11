@@ -76,6 +76,12 @@ def test_allowlist_covers_test_fixtures():
     assert gate.is_allowlisted("tests/fixtures/adrs_literal/ADR-201.md")
 
 
+def test_allowlist_covers_only_the_canonical_policy_memory_file():
+    assert gate.is_allowlisted(".mneme/project_memory.json")
+    assert gate.is_allowlisted("examples/project_memory.json") is None
+    assert gate.is_allowlisted(".mneme/other.json") is None
+
+
 def test_exact_typed_rule_declaration_is_exempt_only_in_adr_sources():
     line = "- FORBID_LITERAL: pip install mneme"
     match = gate.VIOLATION.search(line)
