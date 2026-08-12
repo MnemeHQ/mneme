@@ -1,7 +1,7 @@
 ---
 id: ADR-003
 title: "Site Publishing Guidelines"
-status: accepted
+status: superseded
 priority: normal
 date: 2026-05-01
 scope: site.publishing
@@ -9,7 +9,11 @@ scope: site.publishing
 
 # ADR-003: Site Publishing Guidelines
 
-**Status:** Accepted  
+> **Superseded by [ADR-016: Site Governance Transfer to MnemeHQ/mnemehq-site](ADR-016-site-governance-transfer.md).**
+> Current publishing governance for mnemehq.com lives in MnemeHQ/mnemehq-site `PUBLISHING.md`.
+> This record is retained unchanged as an immutable historical decision.
+
+**Status:** Superseded (by ADR-016)
 **Date:** 2026-05-01  
 **Deciders:** Theo Valmis
 

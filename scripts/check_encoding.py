@@ -16,7 +16,7 @@ this kind of corruption is caught at PR time, not on the live site.
 
 Usage:
   python scripts/check_encoding.py            # scan default paths
-  python scripts/check_encoding.py site docs  # scan specific roots
+  python scripts/check_encoding.py docs       # scan specific roots
 """
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
-DEFAULT_ROOTS = ["site", "docs", "scripts"]
+DEFAULT_ROOTS = ["docs", "scripts"]
 TEXT_SUFFIXES = {".html", ".css", ".js", ".xml", ".txt", ".md", ".json", ".svg"}
 
 BOM = b"\xef\xbb\xbf"

@@ -184,6 +184,18 @@ def format_decisions(
             lines.append("  Avoid:")
             for a in d.anti_patterns:
                 lines.append(f"    - {a}")
+        if d.rules:
+            lines.append("  Typed rules:")
+            for rule in d.rules:
+                lines.append(f"    - {rule.type}: {rule.value}")
+                if rule.include_paths is not None:
+                    lines.append(
+                        f"      Applies to: {', '.join(rule.include_paths)}"
+                    )
+                if rule.exclude_paths:
+                    lines.append(
+                        f"      Except: {', '.join(rule.exclude_paths)}"
+                    )
         blocks.append("\n".join(lines))
 
     return "\n\n".join(blocks)

@@ -41,7 +41,8 @@ diagnostics (silently passes -- there is no hash to compare).
 
 The checker reads the memory file raw (json.load) rather than via
 MemoryStore so the ``source`` block survives the round-trip; the
-Decision dataclass intentionally does not carry source provenance.
+runtime Decision model carries only the resolved source path needed to avoid
+self-enforcement, not the stored hash needed for freshness comparison.
 """
 from __future__ import annotations
 

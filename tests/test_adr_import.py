@@ -110,10 +110,22 @@ def test_compile_for_import_surfaces_precedence_ambiguity_as_diagnostic():
 def test_compile_for_import_clean_corpus_has_no_diagnostics():
     from mneme.adr_import import compile_for_import
 
-    report = compile_for_import(FIXTURES / "adrs_import_basic")
+    report = compile_for_import(FIXTURES / "adrs_literal")
     assert report.diagnostics == []
     active_ids = {n.id for n in report.active_nodes}
-    assert active_ids == {"ADR-101", "ADR-102"}
+    assert active_ids == {"ADR-201"}
+
+
+def test_compile_for_import_warns_when_active_adr_is_retrieval_only():
+    from mneme.adr_import import compile_for_import
+
+    report = compile_for_import(FIXTURES / "adrs_import_basic")
+    warnings = [
+        d for d in report.diagnostics
+        if d.kind == "no_enforceable_rules"
+    ]
+    assert [d.adr_id for d in warnings] == ["ADR-102"]
+    assert "0 mechanically enforceable rules" in warnings[0].message
 
 
 def test_format_preview_lists_active_nodes_and_constraints():
@@ -134,6 +146,16 @@ def test_format_preview_lists_active_nodes_and_constraints():
     # ADR-103 is superseded -> shown but flagged
     assert "ADR-103" in out
     assert "superseded" in out
+    assert "Retrieval-only ADR warnings" in out
+    assert "ADR-102" in out
+
+
+def test_format_preview_lists_typed_rules():
+    from mneme.adr_import import compile_for_import, format_preview
+
+    report = compile_for_import(FIXTURES / "adrs_literal")
+    out = format_preview(report, collisions=[])
+    assert "rule: FORBID_LITERAL pip install mneme" in out
 
 
 def test_format_preview_includes_collision_diagnostics():
@@ -217,6 +239,60 @@ def test_apply_import_writes_source_provenance_block(tmp_path):
         resolved = (target.parent / source["path"]).resolve()
         expected = hashlib.sha256(resolved.read_bytes()).hexdigest()
         assert source["sha256"] == expected
+
+
+def test_apply_import_persists_typed_rules(tmp_path):
+    from mneme.adr_import import apply_import, compile_for_import
+
+    target = tmp_path / "project_memory.json"
+    target.write_text(json.dumps({
+        "meta": {"name": "test", "description": "test"},
+        "items": [], "examples": [], "decisions": [],
+    }), encoding="utf-8")
+
+    report = compile_for_import(FIXTURES / "adrs_literal")
+    apply_import(report, target_path=target)
+
+    persisted = json.loads(target.read_text(encoding="utf-8"))
+    assert persisted["decisions"][0]["rules"] == [{
+        "type": "FORBID_LITERAL",
+        "value": "pip install mneme",
+    }]
+
+
+def test_apply_import_persists_typed_rule_path_selectors(tmp_path):
+    from mneme.adr_import import ImportReport, apply_import
+    from mneme.schemas import Decision, Rule
+
+    target = tmp_path / "project_memory.json"
+    target.write_text(json.dumps({
+        "meta": {"name": "test", "description": "test"},
+        "items": [], "examples": [], "decisions": [],
+    }), encoding="utf-8")
+    node = DecisionNode(id="ADR-020", status="active")
+    report = ImportReport(
+        active_nodes=[node],
+        all_nodes=[node],
+        decisions=[Decision(
+            id="ADR-020",
+            decision="Scope the rule",
+            rules=[Rule(
+                type="FORBID_LITERAL",
+                value="install legacy-client",
+                include_paths=("docs/**",),
+                exclude_paths=("docs/generated/**",),
+            )],
+        )],
+        diagnostics=[],
+    )
+    apply_import(report, target_path=target)
+    persisted = json.loads(target.read_text(encoding="utf-8"))
+    assert persisted["decisions"][0]["rules"] == [{
+        "type": "FORBID_LITERAL",
+        "value": "install legacy-client",
+        "include_paths": ["docs/**"],
+        "exclude_paths": ["docs/generated/**"],
+    }]
 
 
 def test_apply_import_refuses_overwrite_without_allow_update(tmp_path):

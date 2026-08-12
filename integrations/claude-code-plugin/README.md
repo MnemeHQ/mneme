@@ -12,23 +12,22 @@ into a single distributable unit.
 ## Prerequisite: install Mneme
 
 The plugin drives the `mneme-hook` / `mneme` CLI, which ships with the
-`mneme-hq` package.
+`mneme-hq` package. Installation is two steps — the runtime and the plugin are
+separate artifacts, and installing one does not install the other.
 
-> **Current install state (verified 2026-07-02).** The reliable Claude Code
-> hook requires the `v0.4.2` fixes (module execution + exit-code propagation).
-> The published PyPI release is **`0.4.0`**, which has the known exit-propagation
-> bug — a failed check could exit 0 and let a violating edit through. `v0.4.2`
-> is tagged and released on GitHub but **not yet published to PyPI**. Until it
-> is, install Mneme from the repository so you get the reliable hook:
->
-> ```bash
-> git clone https://github.com/MnemeHQ/mneme
-> pip install -e mneme   # or: pipx install ./mneme
-> ```
->
-> Once `mneme-hq >= 0.4.2` is on PyPI, `pipx install "mneme-hq>=0.4.2"` becomes
-> the one-line install. See the PR / release notes for the outstanding publish
-> step.
+**Step 1 — install the runtime:**
+
+```bash
+pipx install "mneme-hq>=0.5.1"
+```
+
+`>=0.5.1` is a real requirement, not a preference. Earlier releases do not
+support the `--json` verdict the hook relies on; on `0.5.0` and below a
+crashing check could hard-block an edit, and `warn` mode reported nothing at
+all. If the installed runtime is too old, the hook says so explicitly rather
+than silently disabling enforcement.
+
+**Step 2 — install the plugin** (see below).
 
 If `mneme-hook` is not on `PATH`, the hook **fails open**: Claude Code reports a
 non-blocking hook error and the edit proceeds. Enforcement simply stays inactive
@@ -45,15 +44,25 @@ claude --plugin-dir /path/to/mneme/integrations/claude-code-plugin
 
 After changes, reload in-session with `/reload-plugins`.
 
-**From a marketplace** (once published), add the marketplace and enable the
-`mneme` plugin from Claude Code's plugin UI. On enable, Claude Code prompts for
-the **enforcement mode** (`strict` or `warn`).
+**From a marketplace:** not yet available. The plugin has not been submitted to
+the Claude Code community catalog, so `--plugin-dir` above is currently the
+only installation path. Once it is listed, enabling it from Claude Code's
+plugin UI will prompt for the **enforcement mode** (`strict` or `warn`).
 
 ## How enforcement works
 
-The plugin registers a `PreToolUse` hook on `Edit|Write|MultiEdit`. The hook
-uses Claude Code's **exec form** — it invokes the `mneme-hook` console script
-directly on `PATH`, with no shell in between:
+The plugin registers a `PreToolUse` hook matching `Edit|Write|MultiEdit`.
+
+> **What this covers.** `Edit` and `Write` tool calls, which is how Claude Code
+> edits files directly. The matcher also lists `MultiEdit` for compatibility;
+> current Claude Code documents `Edit` and `Write`. **Edits made by shell
+> commands are not covered** — a `Bash` call that writes a file does not fire a
+> `PreToolUse` file-edit hook and is never checked. Complete working-tree
+> coverage would need a `Stop`-hook audit, which this plugin does not ship. Use
+> `/mneme:review` to catch what the per-edit hook misses.
+
+The hook uses Claude Code's **exec form** — it invokes the `mneme-hook` console
+script directly on `PATH`, with no shell in between:
 
 ```json
 { "type": "command", "command": "mneme-hook", "args": [], "timeout": 30 }
@@ -61,14 +70,18 @@ directly on `PATH`, with no shell in between:
 
 `mneme-hook` (the existing Claude Code adapter, unchanged by this plugin):
 
-1. Reconstructs the full post-edit file content (not just the changed string).
+1. Reconstructs the full post-edit file content (not just the changed string),
+   honouring `replace_all` so the checked content matches what will land on disk.
 2. Discovers `.mneme/project_memory.json` by walking up from the working dir.
-3. Runs `mneme check` with a query derived from the target file path.
-4. Exits **2** (block) on a violating verdict in `strict` mode, or **0** (allow)
-   otherwise. In `warn` mode it never blocks.
+3. Runs `mneme check --json` with a query derived from the target file path.
+4. Reads the **structured verdict** from that payload. In `strict` mode a
+   violating verdict exits **2** (block); in `warn` mode it never blocks.
 
-Exit code **2 is the only blocking result**; any other exit code is a
-non-blocking hook error, so execution failures never block an edit.
+The hook blocks **only** on a verdict it could parse and trust. An exit code on
+its own is not treated as a verdict — `mneme check --mode strict` returns 1 for
+a WARN verdict, but Python also returns 1 for an uncaught exception, so a
+malformed memory file would otherwise be indistinguishable from a violation.
+Anything unparseable fails open with a note on stderr.
 
 Claude Code surfaces the block as an error containing the violated decision id,
 so it can adjust course without you intervening.
@@ -99,6 +112,15 @@ precedence:
 An unrecognized value falls back to `strict`, so a typo never silently disables
 enforcement. Use `warn` while iterating on decisions to avoid friction.
 
+In `warn` mode the hook emits a `PreToolUse` JSON payload with
+`permissionDecision: "defer"` and the violation detail as the reason, rather
+than writing to stderr — Claude Code discards stderr from a hook that exits 0,
+which is why warn mode previously reported nothing at all. `defer` is
+deliberate: `allow` would auto-approve the tool call and bypass the permission
+prompt you would otherwise get, so a *warning* mode must never use it. How
+Claude Code renders a `defer` reason has not been confirmed end-to-end in a
+live session.
+
 ## Retrieval: what the hook checks and what it misses
 
 The automatic hook query is `"edit to <file_path>"` — tokens from the target
@@ -124,8 +146,13 @@ The hook allows the edit — never blocks — when:
 - `.mneme/project_memory.json` cannot be found by walking up from the working dir
 - The tool event is malformed
 - `mneme check` times out (10 s internal) or any other execution error occurs
+- `mneme check` crashes, or returns anything the hook cannot parse as a trusted
+  verdict — a corrupt memory file, a traceback, or an unexpected exit code
+- The installed `mneme-hq` is older than 0.5.1 and rejects `--json` (the hook
+  warns loudly that enforcement is inactive rather than failing silently)
 
-Only a real violating verdict from `mneme check` in `strict` mode blocks an edit.
+Only a parsed, violating verdict from `mneme check` in `strict` mode blocks an
+edit.
 
 ## Platform support
 

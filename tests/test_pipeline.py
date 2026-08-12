@@ -1,4 +1,5 @@
 """End-to-end pipeline: load -> score -> inject top-N -> call LLM -> detect conflicts."""
+import json
 from pathlib import Path
 
 from mneme.pipeline import Pipeline, PipelineResult
@@ -38,6 +39,40 @@ def test_pipeline_runs_conflict_detection_after_response():
     assert any(
         "postgres" in c.snippet.lower() for c in result.conflicts
     ), f"expected a postgres conflict, got {result.conflicts!r}"
+
+
+def test_pipeline_reports_scoped_rule_non_evaluation_and_accepts_target(tmp_path):
+    memory = tmp_path / ".mneme" / "project_memory.json"
+    memory.parent.mkdir()
+    memory.write_text(json.dumps({
+        "meta": {"name": "test", "description": "test"},
+        "decisions": [{
+            "id": "ADR-020",
+            "decision": "Legacy client documentation",
+            "scope": ["docs"],
+            "rules": [{
+                "type": "FORBID_LITERAL",
+                "value": "install legacy-client",
+                "include_paths": ["docs/**"],
+            }],
+        }],
+    }), encoding="utf-8")
+    pipeline = Pipeline(memory_path=memory, dry_run=True)
+
+    unknown = pipeline.run(
+        "update docs",
+        _override_response="install legacy-client",
+    )
+    applied = pipeline.run(
+        "update docs",
+        _override_response="install legacy-client",
+        target_path=tmp_path / "docs" / "guide.md",
+    )
+
+    assert not unknown.evaluation_complete
+    assert unknown.conflicts == []
+    assert applied.evaluation_complete
+    assert len(applied.conflicts) == 1
 
 
 def test_top_n_respected_even_when_more_match():

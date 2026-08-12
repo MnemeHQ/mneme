@@ -8,7 +8,7 @@ This document is the canonical reference for both human readers and AI assistant
 **Site:** [mnemehq.com](https://mnemehq.com/)
 **Repository:** [github.com/TheoV823/mneme](https://github.com/TheoV823/mneme)
 **License:** MIT
-**Install:** `pip install mneme`
+**Install:** `pip install mneme-hq`
 
 ---
 
@@ -28,7 +28,7 @@ RAG retrieves information. Mneme HQ retrieves decisions. RAG's goal is to inform
 
 ### 4. How does Mneme HQ integrate with Claude Code?
 
-Mneme HQ ships a `PreToolUse` hook for Claude Code that intercepts every `Edit`, `Write`, and `MultiEdit` operation. The hook reconstructs the full post-edit file, runs `mneme check` against the active constraint set, and either blocks the write (strict mode) or surfaces the violation without blocking (warn mode). Install with `pip install mneme` then `python scripts/install_claude_code.py`. The installer is idempotent and writes `.claude/settings.json`, slash commands (`/mneme-check`, `/mneme-context`, `/mneme-record`, `/mneme-review`), and a discovery skill.
+Mneme HQ ships a `PreToolUse` hook for Claude Code that intercepts `Edit` and `Write` tool calls. The hook reconstructs the full post-edit file, runs `mneme check` against the active constraint set, and either blocks the write (strict mode) or reports the violation without blocking (warn mode). Files written by shell commands are not covered, since a `Bash` call does not fire a file-edit hook. Install in two steps: `pipx install "mneme-hq>=0.5.1"` for the runtime, then load the plugin with `claude --plugin-dir ./integrations/claude-code-plugin`, which provides namespaced commands (`/mneme:check`, `/mneme:context`, `/mneme:record`, `/mneme:review`) and a discovery skill. A legacy flat installer (`python scripts/install_claude_code.py`, hyphenated `/mneme-check` commands) still exists but requires a git clone — `scripts/` is not shipped in the wheel.
 
 ### 5. How does Mneme HQ integrate with Cursor?
 
@@ -127,14 +127,14 @@ No. The retrieval, the injection, the conflict detection, and the verdict are al
 ### 19. What's the install footprint?
 
 ```
-pip install mneme
+pipx install "mneme-hq>=0.5.1"
 ```
 
-Dependencies: `anthropic >= 0.25.0`, `python-dotenv >= 1.0.0`. That's the whole list. Python 3.11+. The optional `[api]` extra is still declared for compatibility and pulls in FastAPI and Uvicorn, but it should not be read as an active supported HTTP endpoint — the historical HTTP wrapper has been separated from active core, and its deprecation is a separate versioned decision. No vector database, no model server, no background service.
+Dependencies: `anthropic >= 0.25.0`, `python-dotenv >= 1.0.0`, `PyYAML >= 6.0`. That's the whole list. Python 3.11+. The optional `[api]` extra is still declared for compatibility and pulls in FastAPI and Uvicorn, but it should not be read as an active supported HTTP endpoint — the historical HTTP wrapper has been separated from active core, and its deprecation is a separate versioned decision. No vector database, no model server, no background service.
 
 ### 20. How do I add Mneme HQ to an existing project?
 
-Three steps. First, `pip install mneme`. Second, create a `project_memory.json` at your repo root with three to ten of the architectural decisions you care most about (or compile your existing `docs/adr/` directory via `compile_adrs`). Third, install the Claude Code hook with `python scripts/install_claude_code.py`, or wire `mneme check --mode warn` into your CI on PRs. Start in warn mode; promote to strict once the corpus stabilizes.
+Three steps. First, `pipx install "mneme-hq>=0.5.1"`. Second, create a `project_memory.json` at your repo root with three to ten of the architectural decisions you care most about (or compile your existing `docs/adr/` directory via `compile_adrs`). Third, load the Claude Code plugin with `claude --plugin-dir ./integrations/claude-code-plugin`, or wire `mneme check --mode warn` into your CI on PRs. Start in warn mode; promote to strict once the corpus stabilizes.
 
 ### 21. What's the Layer 1 freeze?
 
@@ -274,7 +274,7 @@ The set of load-bearing principles that govern Mneme HQ's design: deterministic 
 
 ### Claude Code hook
 
-A `PreToolUse` hook for Claude Code that intercepts every `Edit`, `Write`, and `MultiEdit` operation. Reconstructs the post-edit file, runs `mneme check`, blocks (strict) or warns (warn) based on configured mode. Shipped in v0.3.2. Install with `python scripts/install_claude_code.py`.
+A `PreToolUse` hook for Claude Code that intercepts `Edit` and `Write` tool calls (not files written by shell commands). Reconstructs the post-edit file, runs `mneme check --json`, blocks (strict) or reports without blocking (warn) based on configured mode. Shipped in v0.3.2; hook reliability fixed in v0.5.1. Install via the plugin — see the Claude Code integration entry above.
 
 ### Conflict detector
 

@@ -10,16 +10,23 @@ v1 matching is deliberately simple:
   - A violation fires when the phrase appears in the response AND the
     surrounding 10-word window is NOT dominated by negation signals.
 
-Upgrade path: swap ``_appears_recommended`` for a model-based classifier
-without changing the public API.
+Upgrade path: swap the legacy phrase classifier for a model-based classifier
+while preserving the structured conflict and applicability results.
 """
 
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Iterable
 
+from mneme.path_selectors import (
+    RuleEvaluation,
+    SelectorOutcome,
+    evaluate_path_selectors,
+)
+from mneme.rule_matcher import literal_in_text
 from mneme.schemas import Decision
 
 
@@ -45,6 +52,35 @@ class Conflict:
     violated_decision_id: str
     reason: str
     snippet: str
+
+
+@dataclass
+class ConflictDetectionResult:
+    conflicts: list[Conflict] = field(default_factory=list)
+    applicability: list[RuleEvaluation] = field(default_factory=list)
+
+    @property
+    def evaluation_complete(self) -> bool:
+        return not any(
+            item.outcome == SelectorOutcome.UNKNOWN
+            for item in self.applicability
+        )
+
+
+class PathApplicabilityUnknownError(RuntimeError):
+    """Raised when detect() cannot safely evaluate a scoped typed rule."""
+
+    def __init__(self, applicability: list[RuleEvaluation]) -> None:
+        self.applicability = applicability
+        reasons = sorted({
+            item.reason
+            for item in applicability
+            if item.outcome == SelectorOutcome.UNKNOWN
+        })
+        super().__init__(
+            "typed-rule path applicability could not be evaluated: "
+            + "; ".join(reasons)
+        )
 
 
 def _extract_candidate_phrases(decision: Decision) -> list[tuple[str, str]]:
@@ -83,21 +119,61 @@ def _window_is_negated(snippet: str) -> bool:
 class ConflictDetector:
     """Detects violations of injected decisions in LLM output."""
 
-    def detect(
+    def evaluate(
         self,
         response: str,
         decisions: Iterable[Decision],
-    ) -> list[Conflict]:
+        target_path: str | Path | None = None,
+    ) -> ConflictDetectionResult:
         """Return a list of Conflicts — empty if no violation detected.
 
         Args:
             response:  The LLM response text to audit.
             decisions: The Decisions that were injected into the call.
+            target_path: Artifact path the response is intended to modify.
         """
         conflicts: list[Conflict] = []
+        applicability: list[RuleEvaluation] = []
         seen: set[tuple[str, str]] = set()  # (decision_id, phrase)
 
         for d in decisions:
+            for rule_index, rule in enumerate(d.rules):
+                if rule.type != "FORBID_LITERAL":
+                    continue
+                selection = evaluate_path_selectors(
+                    include_paths=rule.include_paths,
+                    exclude_paths=rule.exclude_paths,
+                    input_path=target_path,
+                    memory_path=d.memory_path,
+                    policy_paths=(d.source_path, d.memory_path),
+                )
+                applicability.append(RuleEvaluation(
+                    decision_id=d.id,
+                    rule_type=rule.type,
+                    rule_value=rule.value,
+                    rule_index=rule_index,
+                    path_scoped=rule.is_path_scoped,
+                    outcome=selection.outcome,
+                    input_path=selection.input_path,
+                    selector=selection.selector,
+                    reason=selection.reason,
+                ))
+                if selection.outcome != SelectorOutcome.APPLIED:
+                    continue
+                if not literal_in_text(rule.value, response):
+                    continue
+                key = (d.id, f"{rule.type}:{rule.value}")
+                if key in seen:
+                    continue
+                seen.add(key)
+                conflicts.append(Conflict(
+                    violated_decision_id=d.id,
+                    reason=(
+                        f"response contains {rule.type} value {rule.value!r}"
+                    ),
+                    snippet=_find_snippet(response, rule.value) or rule.value,
+                ))
+
             for phrase, field_label in _extract_candidate_phrases(d):
                 # Pick the most content-bearing word as the search anchor.
                 words = _content_words(phrase)
@@ -122,4 +198,27 @@ class ConflictDetector:
                     snippet=snippet,
                 ))
 
-        return conflicts
+        return ConflictDetectionResult(
+            conflicts=conflicts,
+            applicability=applicability,
+        )
+
+    def detect(
+        self,
+        response: str,
+        decisions: Iterable[Decision],
+        target_path: str | Path | None = None,
+    ) -> list[Conflict]:
+        """Return conflicts, raising if scoped applicability is unknown."""
+        result = self.evaluate(response, decisions, target_path=target_path)
+        if not result.evaluation_complete:
+            raise PathApplicabilityUnknownError(result.applicability)
+        return result.conflicts
+
+
+__all__ = [
+    "Conflict",
+    "ConflictDetectionResult",
+    "ConflictDetector",
+    "PathApplicabilityUnknownError",
+]

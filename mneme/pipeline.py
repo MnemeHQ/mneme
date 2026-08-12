@@ -23,6 +23,7 @@ from mneme.context_builder import DEFAULT_MAX_DECISIONS, format_decisions
 from mneme.decision_retriever import DecisionRetriever, ScoredDecision
 from mneme.llm_adapter import LLMAdapter
 from mneme.memory_store import MemoryStore
+from mneme.path_selectors import RuleEvaluation, SelectorOutcome
 from mneme.schemas import Decision, LLMResponse
 
 
@@ -45,6 +46,14 @@ class PipelineResult:
     system_prompt: str
     response: LLMResponse
     conflicts: list[Conflict] = field(default_factory=list)
+    applicability: list[RuleEvaluation] = field(default_factory=list)
+
+    @property
+    def evaluation_complete(self) -> bool:
+        return not any(
+            item.outcome == SelectorOutcome.UNKNOWN
+            for item in self.applicability
+        )
 
 
 class Pipeline:
@@ -93,6 +102,7 @@ class Pipeline:
         self,
         query: str,
         _override_response: str | None = None,
+        target_path: str | Path | None = None,
     ) -> PipelineResult:
         """Execute the full pipeline for one query.
 
@@ -134,7 +144,11 @@ class Pipeline:
                 user=query, system=system_prompt or None
             )
 
-        conflicts = self.detector.detect(response.content, injected)
+        detection = self.detector.evaluate(
+            response.content,
+            injected,
+            target_path=target_path,
+        )
 
         result = PipelineResult(
             query=query,
@@ -142,11 +156,15 @@ class Pipeline:
             injected_decisions=injected,
             system_prompt=system_prompt,
             response=response,
-            conflicts=conflicts,
+            conflicts=detection.conflicts,
+            applicability=detection.applicability,
         )
 
-        if self.enforcement_mode == "strict" and conflicts:
+        if self.enforcement_mode == "strict" and detection.conflicts:
             from mneme.schemas import MnemeConflictError
-            raise MnemeConflictError(conflicts=conflicts, result=result)
+            raise MnemeConflictError(
+                conflicts=detection.conflicts,
+                result=result,
+            )
 
         return result

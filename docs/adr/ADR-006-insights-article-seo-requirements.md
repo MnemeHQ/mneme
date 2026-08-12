@@ -1,7 +1,7 @@
 ---
 id: ADR-006
 title: "Insights Article SEO and Schema Requirements"
-status: accepted
+status: superseded
 priority: normal
 date: 2026-05-06
 scope: site.insights_seo
@@ -9,7 +9,11 @@ scope: site.insights_seo
 
 # ADR-006: Insights Article SEO and Schema Requirements
 
-**Status:** Accepted  
+> **Superseded by [ADR-016: Site Governance Transfer to MnemeHQ/mnemehq-site](ADR-016-site-governance-transfer.md).**
+> Current publishing governance for mnemehq.com lives in MnemeHQ/mnemehq-site `PUBLISHING.md`.
+> This record is retained unchanged as an immutable historical decision.
+
+**Status:** Superseded (by ADR-016)
 **Date:** 2026-05-06  
 **Deciders:** Theo Valmis
 

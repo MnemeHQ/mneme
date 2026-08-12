@@ -14,7 +14,60 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from mneme.schemas import Decision, DecisionExample, MemoryItem, ProjectMeta, ProjectMemory
+from mneme.schemas import (
+    Decision,
+    DecisionExample,
+    MemoryItem,
+    ProjectMeta,
+    ProjectMemory,
+    Rule,
+)
+
+
+def _resolve_source_path(
+    memory_path: Path,
+    source: object,
+    decision_id: str,
+) -> str:
+    """Resolve an imported ADR provenance path for runtime comparisons.
+
+    Older and hand-authored decisions have no ``source`` block. Malformed
+    optional provenance is ignored here because freshness validation owns its
+    diagnostics; loading enforcement memory must remain backward compatible.
+    """
+    if not isinstance(source, dict) or source.get("type") != "adr":
+        return ""
+    raw_path = source.get("path")
+    if not isinstance(raw_path, str) or not raw_path:
+        return ""
+    source_name = Path(raw_path).name
+    if Path(source_name).suffix.lower() != ".md":
+        return ""
+    if source_name != f"{decision_id}.md" and not source_name.startswith(
+        f"{decision_id}-"
+    ):
+        return ""
+    return str((memory_path.parent / raw_path).resolve())
+
+
+def _load_rule(record: object) -> Rule:
+    if not isinstance(record, dict):
+        raise ValueError("rule record must be an object")
+    include_paths: tuple[str, ...] | None = None
+    if "include_paths" in record:
+        raw_include = record["include_paths"]
+        if not isinstance(raw_include, list):
+            raise ValueError("rule include_paths must be a list")
+        include_paths = tuple(raw_include)
+    raw_exclude = record.get("exclude_paths", [])
+    if not isinstance(raw_exclude, list):
+        raise ValueError("rule exclude_paths must be a list")
+    return Rule(
+        type=record["type"],
+        value=record["value"],
+        include_paths=include_paths,
+        exclude_paths=tuple(raw_exclude),
+    )
 
 
 class MemoryStore:
@@ -91,6 +144,16 @@ class MemoryStore:
                 scope=list(d.get("scope", [])),
                 constraints=list(d.get("constraints", [])),
                 anti_patterns=list(d.get("anti_patterns", [])),
+                rules=[
+                    _load_rule(rule)
+                    for rule in d.get("rules", [])
+                ],
+                source_path=_resolve_source_path(
+                    self.path,
+                    d.get("source"),
+                    d["id"],
+                ),
+                memory_path=str(self.path.resolve()),
                 created_at=d.get("created_at", ""),
                 updated_at=d.get("updated_at", ""),
             )

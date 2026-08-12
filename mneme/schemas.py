@@ -32,6 +32,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
+from mneme.path_selectors import validate_path_pattern
+
 
 # ── Type aliases ─────────────────────────────────────────────────────────────
 
@@ -45,6 +47,10 @@ MemoryItemType = Literal[
 ]
 
 Priority = Literal["high", "medium", "low"]
+
+RuleType = Literal["FORBID_LITERAL"]
+
+VALID_RULE_TYPES: frozenset[str] = frozenset({"FORBID_LITERAL"})
 
 PRIORITY_WEIGHT: dict[str, float] = {
     "high": 1.5,
@@ -126,6 +132,58 @@ class DecisionExample:
     tags: list[str] = field(default_factory=list)
 
 
+@dataclass(frozen=True)
+class Rule:
+    """A mechanically enforceable rule with explicit runtime semantics.
+
+    ``FORBID_LITERAL`` is intentionally the first and only rule type. Its
+    value is matched as an exact, case-sensitive token sequence by the
+    deterministic enforcer. New rule types must define equally precise
+    semantics before joining ``VALID_RULE_TYPES``.
+
+    Attributes:
+        type:          One of ``VALID_RULE_TYPES``.
+        value:         Non-empty literal value consumed by the rule matcher.
+        include_paths: Optional non-empty selector tuple. ``None`` is global.
+        exclude_paths: Selector tuple that overrides matching includes.
+    """
+
+    type: RuleType
+    value: str
+    include_paths: tuple[str, ...] | None = None
+    exclude_paths: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        if self.type not in VALID_RULE_TYPES:
+            raise ValueError(
+                f"unknown rule type {self.type!r} "
+                f"(expected one of {sorted(VALID_RULE_TYPES)})"
+            )
+        if not isinstance(self.value, str) or not self.value.strip():
+            raise ValueError("rule value must be a non-empty string")
+        if self.include_paths is not None:
+            if (
+                not isinstance(self.include_paths, tuple)
+                or not self.include_paths
+            ):
+                raise ValueError(
+                    "include_paths must be a non-empty tuple when provided"
+                )
+            for pattern in self.include_paths:
+                validate_path_pattern(pattern)
+        if not isinstance(self.exclude_paths, tuple):
+            raise ValueError("exclude_paths must be a tuple")
+        if self.exclude_paths and self.include_paths is None:
+            raise ValueError("exclude_paths require include_paths")
+        for pattern in self.exclude_paths:
+            validate_path_pattern(pattern)
+
+    @property
+    def is_path_scoped(self) -> bool:
+        """Whether this rule requires an artifact path for applicability."""
+        return self.include_paths is not None
+
+
 @dataclass
 class ProjectMemory:
     """The full memory store for one project.
@@ -162,6 +220,14 @@ class Decision:
                        e.g. ["no postgres", "no external db"].
         anti_patterns: Explicitly forbidden approaches,
                        e.g. ["introduce ORM", "add migration layer"].
+        rules:          Mechanically enforceable typed rules. Unlike legacy
+                       constraint prose, each type has exact semantics.
+        source_path:    Resolved ADR source path when provenance is available.
+                       Runtime-only; persisted under the existing ``source``
+                       block rather than as a top-level Decision field.
+        memory_path:    Resolved policy-memory path that loaded this decision.
+                       Runtime-only; permits a typed rule to be represented in
+                       its own canonical storage file without self-enforcement.
         created_at:    ISO 8601 timestamp of creation.
         updated_at:    ISO 8601 timestamp of last update.
     """
@@ -174,6 +240,9 @@ class Decision:
     anti_patterns: list[str] = field(default_factory=list)
     created_at: str = ""
     updated_at: str = ""
+    rules: list[Rule] = field(default_factory=list)
+    source_path: str = ""
+    memory_path: str = ""
 
 
 # ── Pipeline models ───────────────────────────────────────────────────────────

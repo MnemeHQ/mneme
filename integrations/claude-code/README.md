@@ -1,16 +1,28 @@
-# Mneme for Claude Code
+# Mneme for Claude Code — legacy flat integration
+
+> **Superseded by the [plugin](../claude-code-plugin/).** This is the original
+> script-installed integration, kept for existing setups. New installs should
+> use the plugin, which bundles the same hook with namespaced commands.
+>
+> Two differences matter when following older docs:
+>
+> - This integration installs **hyphenated** commands (`/mneme-check`,
+>   `/mneme-context`, `/mneme-record`, `/mneme-review`). The plugin installs
+>   **namespaced** ones (`/mneme:check`, …). They are not interchangeable.
+> - The installer below requires a **git clone**. `scripts/` is not shipped in
+>   the `mneme-hq` wheel, so `python scripts/install_claude_code.py` does not
+>   exist in a `pip` or `pipx` install.
 
 Architectural governance for [Claude Code](https://docs.anthropic.com/en/docs/claude-code).
 Enforce ADRs and engineering constraints automatically — before drift reaches your repo.
 
 ## Quick install
 
-> **Version requirement:** Use **v0.4.2 or later** for Claude Code hooks.
-> v0.4.1 fixed PATH lookup but exit-code propagation was incomplete —
-> failed checks could return exit 0 and allow violating edits through.
-> v0.4.2 is the first fully reliable hook release.
+> **Version requirement:** use **`mneme-hq>=0.5.1`**. Earlier releases lack the
+> `--json` verdict the hook depends on; on 0.5.0 and below a crashing check
+> could hard-block an edit and `warn` mode reported nothing at all.
 
-1. `pip install mneme-hq>=0.4.2`  (or `pip install -e .` from this repo)
+1. `pipx install "mneme-hq>=0.5.1"`  (or `pip install -e .` from this repo)
 2. Run the installer: `python scripts/install_claude_code.py`
 3. Confirm: edit a file in Claude Code that violates a decision in
    `.mneme/project_memory.json` — Claude Code should be blocked with

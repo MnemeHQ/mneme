@@ -20,7 +20,7 @@ permissions:
 
 jobs:
   check-encoding:
-    name: Scan site/docs/scripts for mojibake + BOM
+    name: Scan docs/scripts for mojibake + BOM
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

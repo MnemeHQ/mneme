@@ -8,7 +8,7 @@ from mneme.cli import main
 from mneme.decision_retriever import DecisionRetriever, ScoredDecision
 from mneme.enforcer import EnforcementResult, Severity, Violation, check_prompt
 from mneme.memory_store import MemoryStore
-from mneme.schemas import Decision
+from mneme.schemas import Decision, Rule
 
 EXAMPLE_MEMORY = Path(__file__).parent.parent / "examples" / "project_memory.json"
 
@@ -152,9 +152,36 @@ def test_violation_records_trigger_term():
     assert "postgres" in warn_v.trigger
 
 
-def test_zero_score_decisions_are_skipped():
+def test_zero_score_decision_still_enforces_its_literal_rules():
+    """Zero retrieval score no longer exempts a decision from enforcement.
+
+    Replaces `test_zero_score_decisions_are_skipped`, which pinned the #254
+    defect: `_top_nonzero` dropped every zero-scoring decision, so identical
+    content was caught or missed on the strength of the filename alone.
+
+    STORAGE's `no postgres` constraint is a one-term rule, so it applies
+    corpus-wide and WARNs here. Its `introduce ORM` anti_pattern is multi-term
+    and stays retrieval-gated, so it does not fire -- which is why the verdict
+    is WARN and not FAIL. See ADR-017.
+    """
     scored = [_scored(STORAGE, score=0.0)]
     result = check_prompt("Use postgres and introduce ORM.", scored)
+    assert result.verdict == Severity.WARN
+    assert any(v.trigger == "postgres" for v in result.violations)
+    assert not any(v.severity == Severity.FAIL for v in result.violations)
+
+
+def test_zero_score_decision_does_not_apply_multi_term_rules():
+    """The #150 guardrail: corpus-wide enforcement is literal rules only.
+
+    A multi-term rule explodes into individual tokens, any one of which fires
+    on its own. Applying those to every decision would turn documented
+    false-positive noise into a repo-wide edit block, so they remain gated.
+    """
+    scored = [_scored(STORAGE, score=0.0)]
+    # "introduce" alone would trigger the "introduce ORM" anti_pattern under
+    # the pre-#254 disjunctive matcher had the decision been retrieved.
+    result = check_prompt("Let me introduce the new reporting feature.", scored)
     assert result.verdict == Severity.PASS
 
 
@@ -493,3 +520,158 @@ def test_check_cmd_reads_input_from_file(tmp_path):
         "--query", "storage",
     ])
     assert exit_code == 2
+
+
+# --- typed deterministic rules (#250) ---
+
+def test_forbid_literal_fails_even_when_decision_scores_zero():
+    decision = Decision(
+        id="ADR-201",
+        decision="Use the published distribution name",
+        rules=[Rule(type="FORBID_LITERAL", value="pip install mneme")],
+    )
+    result = check_prompt(
+        "pip install mneme\n",
+        [_scored(decision, score=0.0)],
+    )
+    assert result.verdict == Severity.FAIL
+    [violation] = result.violations
+    assert violation.kind == "typed_rule"
+    assert violation.rule_type == "FORBID_LITERAL"
+    assert violation.trigger == "pip install mneme"
+
+
+def test_forbid_literal_does_not_match_longer_slug():
+    decision = Decision(
+        id="ADR-201",
+        decision="Use the published distribution name",
+        rules=[Rule(type="FORBID_LITERAL", value="pip install mneme")],
+    )
+    result = check_prompt(
+        "pip install mneme-hq\n",
+        [_scored(decision, score=0.0)],
+    )
+    assert result.verdict == Severity.PASS
+
+
+def test_forbid_literal_is_case_sensitive():
+    decision = Decision(
+        id="ADR-201",
+        decision="Use the published distribution name",
+        rules=[Rule(type="FORBID_LITERAL", value="pip install mneme")],
+    )
+    result = check_prompt(
+        "PIP INSTALL MNEME\n",
+        [_scored(decision, score=0.0)],
+    )
+    assert result.verdict == Severity.PASS
+
+
+def test_typed_rule_does_not_flag_its_declaring_adr(tmp_path):
+    source = tmp_path / "ADR-201.md"
+    source.write_text("- FORBID_LITERAL: pip install mneme\n", encoding="utf-8")
+    decision = Decision(
+        id="ADR-201",
+        decision="Use the published distribution name",
+        rules=[Rule(type="FORBID_LITERAL", value="pip install mneme")],
+        source_path=str(source),
+    )
+    result = check_prompt(
+        source.read_text(encoding="utf-8"),
+        [_scored(decision, score=0.0)],
+        input_path=source,
+    )
+    assert result.verdict == Severity.PASS
+
+
+def test_typed_rule_does_not_flag_its_policy_memory_file(tmp_path):
+    memory = tmp_path / "project_memory.json"
+    memory.write_text('"value": "pip install mneme"\n', encoding="utf-8")
+    decision = Decision(
+        id="ADR-201",
+        decision="Use the published distribution name",
+        rules=[Rule(type="FORBID_LITERAL", value="pip install mneme")],
+        memory_path=str(memory),
+    )
+    result = check_prompt(
+        memory.read_text(encoding="utf-8"),
+        [_scored(decision, score=0.0)],
+        input_path=memory,
+    )
+    assert result.verdict == Severity.PASS
+
+
+def test_scoped_typed_rule_applies_only_to_included_paths(tmp_path):
+    memory = tmp_path / ".mneme" / "project_memory.json"
+    rule = Rule(
+        type="FORBID_LITERAL",
+        value="install legacy-client",
+        include_paths=("docs/**",),
+    )
+    decision = Decision(
+        id="ADR-020",
+        decision="Scope the rule",
+        rules=[rule],
+        memory_path=str(memory),
+    )
+
+    applied = check_prompt(
+        "install legacy-client",
+        [_scored(decision, score=0.0)],
+        input_path=tmp_path / "docs" / "guide.md",
+    )
+    excluded = check_prompt(
+        "install legacy-client",
+        [_scored(decision, score=0.0)],
+        input_path=tmp_path / "src" / "app.py",
+    )
+
+    assert applied.verdict == Severity.FAIL
+    assert applied.evaluation_complete
+    assert applied.applicability[0].outcome.value == "APPLIED"
+    assert applied.applicability[0].selector == "docs/**"
+    assert excluded.verdict == Severity.PASS
+    assert excluded.applicability[0].outcome.value == "EXCLUDED"
+
+
+def test_scoped_typed_rule_exclude_overrides_include(tmp_path):
+    memory = tmp_path / ".mneme" / "project_memory.json"
+    decision = Decision(
+        id="ADR-020",
+        decision="Scope the rule",
+        rules=[Rule(
+            type="FORBID_LITERAL",
+            value="install legacy-client",
+            include_paths=("docs/**",),
+            exclude_paths=("docs/generated/**",),
+        )],
+        memory_path=str(memory),
+    )
+    result = check_prompt(
+        "install legacy-client",
+        [_scored(decision, score=0.0)],
+        input_path=tmp_path / "docs" / "generated" / "guide.md",
+    )
+    assert result.verdict == Severity.PASS
+    assert result.applicability[0].outcome.value == "EXCLUDED"
+    assert result.applicability[0].selector == "docs/generated/**"
+
+
+def test_scoped_typed_rule_missing_path_reports_unknown():
+    decision = Decision(
+        id="ADR-020",
+        decision="Scope the rule",
+        rules=[Rule(
+            type="FORBID_LITERAL",
+            value="install legacy-client",
+            include_paths=("docs/**",),
+        )],
+        memory_path="project_memory.json",
+    )
+    result = check_prompt(
+        "install legacy-client",
+        [_scored(decision, score=0.0)],
+    )
+    assert result.verdict == Severity.PASS
+    assert not result.evaluation_complete
+    assert result.applicability[0].outcome.value == "UNKNOWN"

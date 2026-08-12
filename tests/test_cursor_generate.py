@@ -7,7 +7,7 @@ import pytest
 from mneme.cli import main
 from mneme.cursor_generator import generate_mdc
 from mneme.decision_retriever import DecisionRetriever, ScoredDecision
-from mneme.schemas import Decision
+from mneme.schemas import Decision, Rule
 
 
 # ── fixtures ─────────────────────────────────────────────────────────────────
@@ -138,6 +138,38 @@ def test_generate_mdc_contains_anti_patterns():
         timestamp="2026-04-24T12:00:00Z",
     )
     assert "introduce ORM" in result
+
+
+def test_generate_mdc_contains_typed_rules():
+    scored = _scored_decisions()
+    scored[0].decision.rules.append(
+        Rule(type="FORBID_LITERAL", value="pip install mneme")
+    )
+    result = generate_mdc(
+        scored=scored,
+        query="storage layer",
+        memory_path="examples/project_memory.json",
+        top=3,
+        timestamp="2026-04-24T12:00:00Z",
+    )
+    assert "FORBID_LITERAL: pip install mneme" in result
+
+
+def test_generate_mdc_contains_typed_rule_path_scope():
+    scored = _scored_decisions()
+    scored[0].decision.rules.append(Rule(
+        type="FORBID_LITERAL",
+        value="install legacy-client",
+        include_paths=("docs/**",),
+        exclude_paths=("docs/generated/**",),
+    ))
+    result = generate_mdc(
+        scored,
+        query="docs",
+        memory_path="memory.json",
+    )
+    assert "Applies to: docs/**" in result
+    assert "Except: docs/generated/**" in result
 
 
 def test_generate_mdc_contains_warning():

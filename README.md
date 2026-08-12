@@ -313,9 +313,20 @@ into `Decision` objects at load time; no changes needed to existing JSON files.
   "rationale": "Avoid infra complexity and keep local-first.",
   "scope": ["storage", "backend"],
   "constraints": ["no postgres", "no external database"],
-  "anti_patterns": ["introduce ORM", "add migration layer"]
+  "anti_patterns": ["introduce ORM", "add migration layer"],
+  "rules": [
+    {
+      "type": "FORBID_LITERAL",
+      "value": "install legacy-package",
+      "include_paths": ["docs/**", "**/*.md"],
+      "exclude_paths": ["docs/generated/**"]
+    }
+  ]
 }
 ```
+
+Omitting `include_paths` keeps a typed rule global. A scoped rule requires a
+non-empty `include_paths`; matching `exclude_paths` take precedence.
 
 Add a top-level `"decisions"` array alongside `"items"` and `"examples"` in
 `project_memory.json`. All seven fields are optional except `id` and `decision`.
@@ -349,17 +360,26 @@ print(result.injected_decisions)  # list[Decision] actually sent
 
 ### Conflict detection
 
-`ConflictDetector` scans the LLM response for constraint and anti-pattern
-violations **after** the call. It is a detector, not a blocker:
+`ConflictDetector` scans the LLM response for constraint, anti-pattern, and
+typed-rule violations **after** the call. It is a detector, not a blocker:
 
 ```python
 from mneme.conflict_detector import ConflictDetector
-conflicts = ConflictDetector().detect(response.content, injected_decisions)
+conflicts = ConflictDetector().detect(
+    response.content,
+    injected_decisions,
+    target_path="docs/guide.md",
+)
 # Conflict(violated_decision_id, reason, snippet) per match
 ```
 
 A term is only flagged when it appears **without** a negation signal nearby.
 `"Do not use Postgres"` is not a conflict. `"Switch to Postgres"` is.
+Typed `FORBID_LITERAL` rules do not use this heuristic: the exact literal is
+forbidden regardless of surrounding prose. Pass `target_path` when injected
+decisions may contain scoped rules. `evaluate()` returns applicability traces
+and an `evaluation_complete` flag; the compatibility `detect()` helper raises
+when a scoped rule cannot be evaluated without a path.
 
 ### CLI
 
@@ -477,16 +497,43 @@ during the warn-first rollout.
 Architectural governance for [Claude Code](https://docs.anthropic.com/en/docs/claude-code).
 Enforce ADRs and engineering constraints automatically — before drift reaches your repo.
 
+Two steps — the runtime and the Claude Code integration are separate artifacts:
+
 ```bash
-pip install mneme-hq
-python scripts/install_claude_code.py        # project-scoped: writes to ./.claude/
-# or: python scripts/install_claude_code.py --user   # writes to ~/.claude/
+# 1. Install the runtime
+pipx install "mneme-hq>=0.5.1"
+
+# 2. Load the plugin
+claude --plugin-dir ./integrations/claude-code-plugin
 ```
 
-This installs a `PreToolUse` hook so every Edit / Write / MultiEdit is checked
-against `.mneme/project_memory.json` in strict mode by default. See
-[docs/integrations/claude-code.md](docs/integrations/claude-code.md) for
-details, including retrieval behaviour and mode switching.
+This registers a `PreToolUse` hook so `Edit` and `Write` tool calls are checked
+against `.mneme/project_memory.json`, in strict mode by default. Files written
+by shell commands are **not** covered — see the
+[plugin README](integrations/claude-code-plugin/README.md) for the coverage
+boundary, fail-open guarantees, and mode switching.
+
+<details>
+<summary>Legacy: flat installer (source checkout only)</summary>
+
+Before the plugin, the integration was installed by a script that writes
+`.claude/settings.json` and hyphenated commands (`/mneme-check`,
+`/mneme-context`, `/mneme-record`, `/mneme-review`) — distinct from the
+plugin's namespaced `/mneme:check` and friends.
+
+```bash
+python scripts/install_claude_code.py          # project-scoped: writes ./.claude/
+# or: python scripts/install_claude_code.py --user
+```
+
+**This requires a git clone.** `scripts/` is not shipped in the `mneme-hq`
+wheel, so the script does not exist in a `pip`/`pipx` install. Prefer the
+plugin above.
+
+</details>
+
+See [docs/integrations/claude-code.md](docs/integrations/claude-code.md) for
+retrieval behaviour and further detail.
 
 ---
 
@@ -508,6 +555,13 @@ mneme check --memory project_memory.json \
        ├── WARN (exit 1)  → constraint mention — review before proceeding
        └── FAIL (exit 2)  → anti-pattern match — blocked
 ```
+
+Normally `--input` is also the artifact path used by scoped typed rules. When
+`--input` is a temporary file containing materialized or introduced content,
+pass the real artifact separately with `--target-path`. If a scoped rule cannot
+resolve that path relative to the policy root, the result is `INCOMPLETE` and
+the command exits 2 in either mode; JSON output sets
+`evaluation_complete: false` and includes the `UNKNOWN` applicability trace.
 
 **Try it with the included examples:**
 
@@ -547,6 +601,7 @@ Result: PASS
 | `PASS`  | No violations in top-N decisions | 0 | 0 |
 | `WARN`  | Input mentions a term forbidden by a `"no X"` constraint | 1 | 0 |
 | `FAIL`  | Input contains a term from a decision's `anti_patterns` list | 2 | 0 |
+| `FAIL`  | Input matches a typed `FORBID_LITERAL` rule | 2 | 0 |
 
 Detection is deterministic — no ML, no LLM, no external calls. Same input
 always returns the same verdict.
@@ -654,7 +709,9 @@ mneme adr import docs/adr --memory .mneme/project_memory.json --dry-run
 
 The default is dry-run: the preview shows the active set, the projected
 graph status of every ADR, the constraints that would be persisted, and
-any conflicts. Apply when you're satisfied:
+any conflicts or retrieval-only ADR warnings. A dry-run returns exit 1 when
+an active ADR has no mechanically enforceable rules. Apply when you're
+satisfied:
 
 ```bash
 mneme adr import docs/adr --memory .mneme/project_memory.json --apply
@@ -672,15 +729,37 @@ include an optional `## Constraints` section with directives:
 
 ```markdown
 ## Constraints
+- FORBID_LITERAL: install legacy-package
+- FORBID_LITERAL:
+    value: install legacy-client
+    include_paths:
+      - "docs/**"
+      - "**/*.md"
+    exclude_paths:
+      - "docs/generated/**"
 - FORBID_DEPENDENCY: mongodb
 - FORBID_PATH: src/legacy/**
 - REQUIRE_PATH: billing/**
 ```
 
-Only `FORBID_DEPENDENCY` is currently end-to-end enforced (via
-`mneme check`); `FORBID_PATH` and `REQUIRE_PATH` persist into Decisions
-for retrieval visibility but glob-vs-changed-file enforcement is a
-follow-up.
+`FORBID_LITERAL` is persisted as a typed rule and produces `FAIL` through
+`mneme check`. Matching is case-sensitive and boundary-aware, so
+`pip install mneme` does not match `pip install mneme-hq`. The rule is checked
+across the decision corpus, independent of retrieval score. Its declaring ADR
+source and canonical memory file are exempt so policy storage can state the
+literal it governs.
+
+The structured form scopes one typed rule to repository-relative paths.
+Selectors use forward slashes and case-sensitive matching: `*` stays within a
+single path segment, while a complete `**` segment spans zero or more segments.
+Absolute paths, backslashes, dot segments, negation, bracket syntax, `?`, and
+embedded `**` are rejected. For canonical `.mneme/project_memory.json`, the
+repository root is the parent of `.mneme`; custom memory files use their own
+parent directory as the policy root.
+
+`FORBID_DEPENDENCY` retains its legacy `WARN` behavior. `FORBID_PATH` and
+`REQUIRE_PATH` persist into Decisions for retrieval visibility but are not yet
+enforced against changed-file paths.
 
 See [docs/integrations/adr-import.md](docs/integrations/adr-import.md)
 for the full reference.

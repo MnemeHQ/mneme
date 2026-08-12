@@ -9,9 +9,10 @@ reach your repository.
 ## The hook as the hero
 
 Every Edit, Write, or MultiEdit Claude Code attempts is intercepted by `mneme-hook`
-before it writes to disk. The hook reconstructs the full post-edit file content, checks
-it against your recorded decisions, and either allows the edit (exit 0) or blocks it
-with the violated decision id surfaced as feedback (exit 2).
+before it writes to disk. The hook reconstructs the edit, checks only the non-blank
+content it introduces, and passes the real edited-file path separately for typed-rule
+applicability. It either allows the edit (exit 0) or blocks it with the violated
+decision id surfaced as feedback (exit 2).
 
 Claude Code sees the block as an error message, can read the decision id and rule, and
 adjusts its approach without you having to intervene.
@@ -70,8 +71,11 @@ After installing, four slash commands are available in Claude Code:
 ## Retrieval: what the hook checks and what it misses
 
 The hook query is `"edit to <file_path>"` — tokens from the target file name determine
-which decisions are retrieved and checked. Decisions are scored by keyword overlap
-between the query and their `scope`, `id`, decision text, and anti-pattern fields.
+which decisions are retrieved for legacy heuristic checks. Typed
+`FORBID_LITERAL` rules are checked across the corpus independently of retrieval
+score, then filtered by their own path selectors when present. Decisions are
+scored by keyword overlap between the query and their `scope`, `id`, decision
+text, and anti-pattern fields.
 
 **What this means in practice:**
 
@@ -103,7 +107,7 @@ coverage on domains where file names are not self-describing.
 
 | Mode | Behaviour | Set via |
 |------|-----------|---------|
-| `strict` (default) | Block on any non-zero verdict from `mneme check` | `export MNEME_HOOK_MODE=strict` |
+| `strict` (default) | Block on a trusted, complete WARN or FAIL verdict | `export MNEME_HOOK_MODE=strict` |
 | `warn` | Surface warning to Claude, never block | `export MNEME_HOOK_MODE=warn` |
 
 Switch to `warn` while you're iterating on decisions to avoid friction:
@@ -121,8 +125,11 @@ The hook **never blocks** on execution errors. It exits 0 (allow) when:
 - The target file cannot be read (common for Write — the file doesn't exist yet)
 - `mneme check` times out (limit: 10 s)
 - Any other OS-level error occurs
+- A scoped typed rule's target path cannot be resolved against its policy root
 
-Only a real verdict returned by `mneme check` can cause a block.
+The last case emits an explicit applicability reason before failing open; an
+unknown path is never reported as `PASS`. Only a complete, trusted verdict
+returned by `mneme check` can cause a block.
 
 ---
 

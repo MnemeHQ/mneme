@@ -1,0 +1,20 @@
+name: install command check
+
+# ADR-005: the PyPI distribution is `mneme-hq`. `pip install mneme` resolves to
+# an unrelated, abandoned third-party package this project does not own.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check-install-command:
+    name: Verify install commands name mneme-hq
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run ADR-005 install-command gate
+        run: python scripts/check_install_command.py
