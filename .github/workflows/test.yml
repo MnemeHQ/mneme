@@ -33,8 +33,10 @@ jobs:
       run: python -m build
         
     - name: Run tests with pytest
+      shell: bash
       run: |
-        pytest tests/ -v | tee pytest-results.txt
+        set -euo pipefail
+        python -m pytest tests/ -v | tee pytest-results.txt
         
     - name: Check for skipped tests
       run: |
