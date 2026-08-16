@@ -1,0 +1,84 @@
+{
+  "schema": "mneme.guidance-storage-target-2x2.collection/v1",
+  "study_id": "post-r6-storage-target-2x2",
+  "frozen_at": "2026-08-14T16:24:09.569Z",
+  "status": "FROZEN_AWAITING_INDEPENDENT_BLINDED_REVIEW",
+  "frozen_design": {
+    "path": "docs/validation/pre-generation-guidance-storage-target-2x2-design-lock.json",
+    "sha256": "BC22485945DAA33EDFA607D5AD5759A17A9ABD462B0B7D9DEC6724C4AE2497EC"
+  },
+  "frozen_execution_lock": {
+    "path": "docs/validation/pre-generation-guidance-storage-target-2x2-execution-lock.json",
+    "sha256": "AE71210E98B5C7050C7B55AF0701928CB7B51FAAE876624D1C2F2DAB859F581B"
+  },
+  "collection": {
+    "expected_valid_trials": 12,
+    "valid_trials": 12,
+    "technical_invalid_trials": 0,
+    "isolation_failures": 0,
+    "first_attempts_captured": 12,
+    "workspaces_changed": 12,
+    "blinded_packages": 12,
+    "cells": {
+      "A": {
+        "guidance": "baseline",
+        "target_instruction": "original",
+        "trials": 3
+      },
+      "B": {
+        "guidance": "role_aware",
+        "target_instruction": "original",
+        "trials": 3
+      },
+      "C": {
+        "guidance": "baseline",
+        "target_instruction": "explicit_existing_class",
+        "trials": 3
+      },
+      "D": {
+        "guidance": "role_aware",
+        "target_instruction": "explicit_existing_class",
+        "trials": 3
+      }
+    }
+  },
+  "observed_execution_identity": {
+    "resolved_model": [
+      "claude-sonnet-5"
+    ],
+    "claude_code_version": [
+      "2.1.202"
+    ]
+  },
+  "raw_artifact_freeze": {
+    "scope": "All files under the study artifact directory except this collection manifest and its checksum.",
+    "raw_file_count": 157,
+    "sorted_relative_path_and_file_hash_aggregate_sha256": "D953284739281BE1DD9EBC7ED052AEF1A0F7A642143F11E8ED443329A62C1599"
+  },
+  "blinding": {
+    "assignment_map_created": true,
+    "assignment_map_semantically_inspected": false,
+    "arm_level_outcomes_calculated": false,
+    "trial_outputs_scored": false,
+    "independent_blinded_reviews_required": 2,
+    "adjudication_required_before_reveal": true
+  },
+  "protected_state": {
+    "r6_result_path": "docs/validation/artifacts/pre-generation-guidance-role-r6-2026-08-14/mechanism_isolation/mechanism-result-r6-20260814.json",
+    "r6_result_sha256": "BCF682EDC1DEAF2110A004ADEC648AA843B15D179A4CF019BABC36D526B7ACA4",
+    "r6_diagnosis_path": "docs/validation/artifacts/pre-generation-guidance-role-r6-2026-08-14/mechanism_isolation/post-r6-failure-diagnosis-20260814.json",
+    "r6_diagnosis_sha256": "8B9890BFFB9E891739438978B09C0E94EF6555029ECD6DAB274DD092C5CB6A5C",
+    "production_effectiveness": "PAUSED_NOT_STARTED"
+  },
+  "mutation_attestation": {
+    "production_guidance_changed": false,
+    "retrieval_changed": false,
+    "classifier_changed": false,
+    "adjacent_wording_changed": false,
+    "fixture_changed": false,
+    "r6_changed": false,
+    "production_effectiveness_started": false,
+    "remediation_implemented": false
+  },
+  "next_required_step": "Two independent reviewers score the 12 blinded packages, followed by blinded adjudication before assignment reveal."
+}

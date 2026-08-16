@@ -1,0 +1,112 @@
+--- a/src/auth.py
++++ b/src/auth.py
+@@ -2,6 +2,56 @@
+ 
+ from __future__ import annotations
+ 
++import hashlib
++import hmac
++import secrets
++import time
+ 
+-def create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:
+-    raise NotImplementedError
++from .sessions import SessionStore
++
++SESSION_COOKIE_NAME = "session_id"
++SESSION_TTL_SECONDS = 60 * 60 * 24 * 14  # 14 days
++
++
++def _sign(session_id: str, secret: str) -> str:
++    signature = hmac.new(secret.encode("utf-8"), session_id.encode("utf-8"), hashlib.sha256).hexdigest()
++    return f"{session_id}.{signature}"
++
++
++def create_browser_auth_state(user_id: str, secret: str, store: SessionStore) -> dict[str, object]:
++    session_id = secrets.token_urlsafe(32)
++    store.save(session_id, {"user_id": user_id, "created_at": time.time()})
++    return {
++        "name": SESSION_COOKIE_NAME,
++        "value": _sign(session_id, secret),
++        "httponly": True,
++        "secure": True,
++        "samesite": "Lax",
++        "path": "/",
++        "max_age": SESSION_TTL_SECONDS,
++    }
++
++
++def verify_browser_auth_state(cookie_value: str, secret: str, store: SessionStore) -> dict[str, object] | None:
++    """Return the session payload for a valid, unforged cookie value, else None."""
++    try:
++        session_id, signature = cookie_value.rsplit(".", 1)
++    except ValueError:
++        return None
++
++    expected = hmac.new(secret.encode("utf-8"), session_id.encode("utf-8"), hashlib.sha256).hexdigest()
++    if not hmac.compare_digest(signature, expected):
++        return None
++
++    return store.load(session_id)
++
++
++def clear_browser_auth_state(cookie_value: str, secret: str, store: SessionStore) -> None:
++    try:
++        session_id, signature = cookie_value.rsplit(".", 1)
++    except ValueError:
++        return
++
++    expected = hmac.new(secret.encode("utf-8"), session_id.encode("utf-8"), hashlib.sha256).hexdigest()
++    if hmac.compare_digest(signature, expected):
++        store.delete(session_id)
+--- a/src/sessions.py
++++ b/src/sessions.py
+@@ -2,12 +2,46 @@
+ 
+ from __future__ import annotations
+ 
++import json
++import sqlite3
++from pathlib import Path
+ from typing import Any
++
++DEFAULT_DB_PATH = Path(__file__).resolve().parent.parent / "data" / "sessions.db"
+ 
+ 
+ class SessionStore:
++    def __init__(self, db_path: str | Path = DEFAULT_DB_PATH) -> None:
++        self._db_path = Path(db_path)
++        self._db_path.parent.mkdir(parents=True, exist_ok=True)
++        self._connection = sqlite3.connect(self._db_path)
++        self._connection.execute(
++            """
++            CREATE TABLE IF NOT EXISTS sessions (
++                session_id TEXT PRIMARY KEY,
++                payload TEXT NOT NULL
++            )
++            """
++        )
++        self._connection.commit()
++
+     def save(self, session_id: str, payload: dict[str, Any]) -> None:
+-        raise NotImplementedError
++        self._connection.execute(
++            "INSERT INTO sessions (session_id, payload) VALUES (?, ?) "
++            "ON CONFLICT(session_id) DO UPDATE SET payload = excluded.payload",
++            (session_id, json.dumps(payload)),
++        )
++        self._connection.commit()
+ 
+     def load(self, session_id: str) -> dict[str, Any] | None:
+-        raise NotImplementedError
++        cursor = self._connection.execute(
++            "SELECT payload FROM sessions WHERE session_id = ?", (session_id,)
++        )
++        row = cursor.fetchone()
++        if row is None:
++            return None
++        return json.loads(row[0])
++
++    def delete(self, session_id: str) -> None:
++        self._connection.execute("DELETE FROM sessions WHERE session_id = ?", (session_id,))
++        self._connection.commit()

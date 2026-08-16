@@ -1,0 +1,2562 @@
+{
+  "collection": {
+    "adjudicated_scores_sha256": "E5B9D1021D2ECA5CF8FC5492B88D0680F406034560A95DA5D88F363450EFB666",
+    "blinded_packages": 42,
+    "invalidations": 0,
+    "valid_runs": 42
+  },
+  "created_at": "2026-08-16T18:09:16.703681+00:00",
+  "execution_lock_sha256": "AE01F8DEC22BB5777E7773211483544F6271F12AC394E9D5F1983D1B141FB9D5",
+  "files": {
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-015f8740e82f4c74b5f2b45157219a0d/review.json": {
+      "sha256": "FF59BE490784CDD4627B23B41A844F6F914037E2141509BEC4D4149B480D779C",
+      "size_bytes": 8808
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-07794e9549d44cd68099888060c1e58d/review.json": {
+      "sha256": "EBA296CBE957A64E7E66B82A3589CC5C5333F76113FFBB7A613F283DBD689CD2",
+      "size_bytes": 3889
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-09f8dadc4fe3475a85c6a8f732b90fa8/review.json": {
+      "sha256": "7C55ABEA904E3A57FAA906A07F1017607B707456ED111F1849C307F44AFDD367",
+      "size_bytes": 3899
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-0c3685ae043c4c53b7a87dbbe03d7b54/review.json": {
+      "sha256": "8B7735790872B05D53D70E20513EFDCCE330662F58B049B71D9E0C62EB89B16C",
+      "size_bytes": 6101
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-11bea48f87ae402689f8447364706f9e/review.json": {
+      "sha256": "43F2C27D09403423636473656F3C0BF5764ED9B89D1514CFCF2BD94057637AA0",
+      "size_bytes": 7974
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-159f495f58a74de18f9cc9196363dd20/review.json": {
+      "sha256": "6824B342A4BC2AFC3589DF49777E816FFA2D9128C8E9BF29BA654898078E2929",
+      "size_bytes": 2837
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-226bf363065a42198f84efb37003364d/review.json": {
+      "sha256": "3AB62CE6C6AE6E09C4CAEB073674BBAB64C693433EA652F527E4082E21987331",
+      "size_bytes": 3668
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-356828b0bb2444ea8b255b9b5d339573/review.json": {
+      "sha256": "1F186CA9E6EF90B7E1A10F5D2C3541BE73756E56460CE71F16679349377B00AA",
+      "size_bytes": 3889
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-3b35263916504ae4ba722857a4b1f452/review.json": {
+      "sha256": "701405AD08EBF13236A2425A68AB196AA4B28E003D8E091F5F9FF4BCF6F0049E",
+      "size_bytes": 8040
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-3d4bac3bc6484133aa12c3262909320c/review.json": {
+      "sha256": "BB5BDFEB16A4BC9880F6953A5D580BF4F5ED01AF35FD1AD4433511944B2EF5F2",
+      "size_bytes": 9721
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-4c126478b4444af9852b64c2241d2d10/review.json": {
+      "sha256": "9C3FDC4F14E1D2B966B90D9ED01CFEC3AA148BCD836DB11326A73880376F1C91",
+      "size_bytes": 7830
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-50550e996b6945bf821687b2412fc2a8/review.json": {
+      "sha256": "F5DC59596202C6F2E7AC40EC343BC7071788B243FAC8592F534B39343C237E11",
+      "size_bytes": 7007
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-55519d0e11444e94b209a9d4659200a1/review.json": {
+      "sha256": "7F11F8E667CA691C59E67C8808D3427A905FCF46BC5E9C5901737EBBCAE45CE3",
+      "size_bytes": 3889
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-564120ede18a42b9a8f414de3dcdaf92/review.json": {
+      "sha256": "14FAC77EE00BD6DDD6A03FEF0F82F243A0F92170D54ACFC3CA4FF804DF559CA8",
+      "size_bytes": 3680
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-565900547b5f425ea704decd4fc2a042/review.json": {
+      "sha256": "5493E5986D6EFD343C9B77BE667A578FC6E304C5CDC59879FF4E0A6761ECB011",
+      "size_bytes": 4241
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-5d56b8cd95ed4a498f7d9b6c982f89ff/review.json": {
+      "sha256": "81CB7E36CF8E9ABCE63EB0F1E9D851A969A37A26F91F6C5354ED7AE9BA977266",
+      "size_bytes": 3680
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-68be7e40027444b59e4421f0c1d36d4e/review.json": {
+      "sha256": "6DA7D3DB3952474C8BBE8E1843DD038E3A824E71788271FEAAE865019267FB77",
+      "size_bytes": 3680
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-6c4585be7f2347dbafe811d1ee8c0a48/review.json": {
+      "sha256": "12F7FB87C001C172E2036688403B238E8B06E4499A6EA69A54C10E3BCD2D946A",
+      "size_bytes": 2837
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-6efb3093ad7f4b96acfceeac92ef56f6/review.json": {
+      "sha256": "957D9CB9A8641E0B0EE3BEE22A490D1A28F695577E5352417C5CEE42EB033BFD",
+      "size_bytes": 6325
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-6f6d4c58fe5d4fdba957a94dcbc2bd84/review.json": {
+      "sha256": "49A7F36FEC1219370D6B50678AD33CB911BEC17839EEF6CE27A97CE0F901837B",
+      "size_bytes": 3668
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-7069f273f8074ae78b8048b36a9f085a/review.json": {
+      "sha256": "A16DA353243607BA1CE20E9BD91E8AC336E516C1C733AC6969512B7BF1E061CA",
+      "size_bytes": 4241
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-72366db7f74c4423952126230f995fc5/review.json": {
+      "sha256": "6D0CC4ABB0BDA5AB5DCB086AA7EC37B7830114886B6EAE749C20A4E6A151FD54",
+      "size_bytes": 4135
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-73834379f838414d9b4eef105658de44/review.json": {
+      "sha256": "726A4C04323E9C17188216BC02024515A4947A2090E06F4D64F72F29510BB652",
+      "size_bytes": 2837
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-798a9fba35c3475b8c497291b295ab80/review.json": {
+      "sha256": "71DF696CBCBFF911B31AE82FDABC007876EF106AB063822EE125CC906199F143",
+      "size_bytes": 3680
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-7b413d15c3474ec3b3d4e19ffb529bf5/review.json": {
+      "sha256": "D5DF6D7244548AEC87A846C1DB19BDA7AFCAE919F753C116B17078A5E5C47D1B",
+      "size_bytes": 2874
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-7ebd39c7a44448f2a87815bbca6e8096/review.json": {
+      "sha256": "3B0534A46C68748BC02DCE2D241A67927B6C936945F7C93A3EC56B8014193EE3",
+      "size_bytes": 3889
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-8dc923e289954bb4997809a78faa24cd/review.json": {
+      "sha256": "50BB60DF624A4B6650BC71048D874C227008DACBCEA3AF554E7C360BE130EFF1",
+      "size_bytes": 5853
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-8f6baec3d2084ab197d9ec3b0a92d770/review.json": {
+      "sha256": "60A6F85E2600907852831B7440A2BF18A11C985381C3950B37F4B6AEE253EE1A",
+      "size_bytes": 4241
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-93481532382d4020917ed4a056d4e42a/review.json": {
+      "sha256": "7539D34559EE35F221640FEEA58939DC8A589ED5F325043E1F847698016F770A",
+      "size_bytes": 2874
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-957320ecc2c34801aea05c6c24346d2f/review.json": {
+      "sha256": "60AB94B398FB17E63428F42F0BECB13CA47C582B6E2CD471A909701207CA9302",
+      "size_bytes": 2837
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-996c7e94e8d244128380176862e1930e/review.json": {
+      "sha256": "A7C745979A475F233A44F154C6E80E29F5AF54B7C80A15C47011E1FC71AB3CFB",
+      "size_bytes": 2837
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-9c1258590f844609b1f58ca0f907fc5b/review.json": {
+      "sha256": "DE642A2366D0FD64B42257F041C475328218D23CF71606DA98BF063BDC0065ED",
+      "size_bytes": 9371
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-9e2de9e04a4642f399e0e22eb35b1600/review.json": {
+      "sha256": "7B795AC369A32856E1112E4168C561F6D1344BFE4FDC18D4903B5EB1C91E7F8B",
+      "size_bytes": 4135
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-a15ce961cd274c919d7e402617130fa1/review.json": {
+      "sha256": "ED5A56ADD1E83615DEFCFE9E9DA89431B5692A630FE7C3773E34B23E28455CD9",
+      "size_bytes": 5777
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-a5afc0f810be4d0aab638a3658a4d667/review.json": {
+      "sha256": "E2F51DFF9CE6238FBFD5AD492BC14FBBEA49E5A5EAAFF2BC2A81BA0CBBBBFE72",
+      "size_bytes": 2837
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-ae8eef8ee5024196a1c15a92db0034bc/review.json": {
+      "sha256": "4CA763EAEE07E00CB3BA0BC304ED1222BAAEB254D1EC72DE7EA8D7F5E2827652",
+      "size_bytes": 4241
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-c46e741a26884394bf14b07c1aaf25b4/review.json": {
+      "sha256": "58E35FC1B9261BB0884E6E4253E26CB288549358BFF7706B6953E76BD66FAD56",
+      "size_bytes": 4183
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-c7dbf336e5f240f59c47eb9f264e7587/review.json": {
+      "sha256": "B1CC96DEFDE936B59043FBCB647FE490FEB69B2B1A03CD01598B3FE54B203803",
+      "size_bytes": 2874
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-d16f25f4d9ea426c97446f9ad9ddf71f/review.json": {
+      "sha256": "AE99E8A4547D8A0E099798C7EEF292D072001679BAA18A342E9CC63F403A161F",
+      "size_bytes": 2874
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-d6b1594a874a47018271801512538f40/review.json": {
+      "sha256": "7FA5B1F9C5ABE60833ADE116A66765EF13E43D5F1EF3BE5EB87A33951E0CE259",
+      "size_bytes": 8667
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-f607222b81244eeeb5040e09c38b1b0e/review.json": {
+      "sha256": "CF6BBEAE5477141F1B419471D30E40D2AEBFF0AA5D8F69EC674AC107DC2DFAD8",
+      "size_bytes": 2874
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/review-fc82907111d44398879d4aef061ea7b6/review.json": {
+      "sha256": "95A5EC5D408B49A426715D3EE72BA1582ABC99DCBEB54DF1144AA5BF12EFDA0C",
+      "size_bytes": 3889
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded_scores/adjudicated-scores-20260816.json": {
+      "sha256": "E5B9D1021D2ECA5CF8FC5492B88D0680F406034560A95DA5D88F363450EFB666",
+      "size_bytes": 33351
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded_scores/adjudicated-scores-20260816.json.sha256": {
+      "sha256": "AB32822AEDA006F30C2C6A02F5A3A5CFEF33F570BC1DF636A2EC6DDD1DEDE51E",
+      "size_bytes": 99
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded_scores/independent-reviewer-1-20260816.json": {
+      "sha256": "22173261E319D47733A6EA66E12AEA5012040D04A72D6A89F8F2F62397009424",
+      "size_bytes": 32146
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded_scores/independent-reviewer-1-20260816.json.sha256": {
+      "sha256": "CE32C13BF6EB17BA04BE5E18A6459CE7E4B102DAB17560885AA064DCCDDAB37B",
+      "size_bytes": 103
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded_scores/independent-reviewer-2-20260816.json": {
+      "sha256": "B59A3E65247B984C44ED53BED6AEC43F41F6A730C69039658EBE3BA4BCFBE615",
+      "size_bytes": 32109
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded_scores/independent-reviewer-2-20260816.json.sha256": {
+      "sha256": "76DF01A887116F85C0B1531BD8AD06EE747A80E85A598EA1DCD1BC3539D71B29",
+      "size_bytes": 103
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/private/blinding-map.json": {
+      "sha256": "4642A94742FF81DCBE1DAA8541EC32E7767E81136C17A1DD70BEBA6F181BBE76",
+      "size_bytes": 3182
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r1/attempts.json": {
+      "sha256": "AD3ED4550B5D1A257A0FE1ACFE6CB65666A589F8A42B39239BA1CC16095F8EE2",
+      "size_bytes": 1249
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r1/event_timing.json": {
+      "sha256": "E18B23CF60C6CF33B50D67A4BBF7648BD0D1406ED38F2162C572BEE1D54E508A",
+      "size_bytes": 9161
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r1/final_workspace.json": {
+      "sha256": "9CB807C107785775F3DDC2641EFD00E001D1C549E285DF20E21CF89CBF25004B",
+      "size_bytes": 2112
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r1/first_attempt.diff": {
+      "sha256": "4930EC94D30479A5325E2DF102DD6555D4314445520FA4B3B4AC0E359FCEBF51",
+      "size_bytes": 281
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r1/first_attempt.json": {
+      "sha256": "3784295445803EB163D3D84453EDE2A8908800088B9898998C8C3805AACB92FF",
+      "size_bytes": 2749
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r1/first_attempt_workspace.json": {
+      "sha256": "9CB807C107785775F3DDC2641EFD00E001D1C549E285DF20E21CF89CBF25004B",
+      "size_bytes": 2112
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r1/hook_events.json": {
+      "sha256": "E96089D9F2E8E8E2197F3CA897349C9A455519B3F55613EF28B72DED147049A7",
+      "size_bytes": 1443
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r1/injection_delivery.json": {
+      "sha256": "BAF9CBFFB7060B341A8587A898F9DD4C4333B9DDA44381B738B4D1D501E15351",
+      "size_bytes": 1835
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r1/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r1/metadata.json": {
+      "sha256": "5781075B6B5A056BF66A746197CA63357A2D93B854BA9A854EB3D4F3230C579F",
+      "size_bytes": 4931
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r1/offline_enforcement.json": {
+      "sha256": "E52E1DEBF6C62231CCAB93DCECA0D35FC83DA9D02C7E59BC6EC15C2E626B53E5",
+      "size_bytes": 676
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r1/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r1/stdout.jsonl": {
+      "sha256": "9FE2991631B96822B64E815273F332CA7624471A113ACE140A43FC14F7E1A19A",
+      "size_bytes": 36276
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r1/workspace.diff": {
+      "sha256": "4930EC94D30479A5325E2DF102DD6555D4314445520FA4B3B4AC0E359FCEBF51",
+      "size_bytes": 281
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r2/attempts.json": {
+      "sha256": "80810C5CFDBEDA422D3CD8722C24E6A49EB07812B44C3B17BC902B6391D34034",
+      "size_bytes": 1356
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r2/event_timing.json": {
+      "sha256": "45B86B2998EE9939B1B69C7FA4912EC99C6D7EE0F6F55E93FFB8EF4D961397E6",
+      "size_bytes": 9163
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r2/final_workspace.json": {
+      "sha256": "9CB807C107785775F3DDC2641EFD00E001D1C549E285DF20E21CF89CBF25004B",
+      "size_bytes": 2112
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r2/first_attempt.diff": {
+      "sha256": "4930EC94D30479A5325E2DF102DD6555D4314445520FA4B3B4AC0E359FCEBF51",
+      "size_bytes": 281
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r2/first_attempt.json": {
+      "sha256": "C7A66DBC40A10B3C9EAC7E1AD6A21618019413E87C5ECE860A37984944090429",
+      "size_bytes": 3095
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r2/first_attempt_workspace.json": {
+      "sha256": "9CB807C107785775F3DDC2641EFD00E001D1C549E285DF20E21CF89CBF25004B",
+      "size_bytes": 2112
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r2/hook_events.json": {
+      "sha256": "65473EE4AEDA93B5D847CB617C075AE8EA67F15FEF924B9A27DC07E1D8F965EC",
+      "size_bytes": 1443
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r2/injection_delivery.json": {
+      "sha256": "27407FCC087A98653AD0AD8909C6327862CAD1A75CF085F65B166E9B45E6F4FC",
+      "size_bytes": 1835
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r2/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r2/metadata.json": {
+      "sha256": "0AA114E6D18B8F0AFE012E24076C3353D377872A37F74A0490E770D4F39CDD6B",
+      "size_bytes": 4931
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r2/offline_enforcement.json": {
+      "sha256": "E52E1DEBF6C62231CCAB93DCECA0D35FC83DA9D02C7E59BC6EC15C2E626B53E5",
+      "size_bytes": 676
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r2/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r2/stdout.jsonl": {
+      "sha256": "E01E5A264B5A09BBFB758244269C245E8DE606527CB60B84066459306BDFD522",
+      "size_bytes": 36996
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r2/workspace.diff": {
+      "sha256": "4930EC94D30479A5325E2DF102DD6555D4314445520FA4B3B4AC0E359FCEBF51",
+      "size_bytes": 281
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r3/attempts.json": {
+      "sha256": "5A5F700BFCE50BFC349B08E2282E2A466C8B2B100D0FF0D7B6AA7215438C6CE5",
+      "size_bytes": 1356
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r3/event_timing.json": {
+      "sha256": "E1A4F4B793F9120403C7E22141919DC17D16FEB182F5D18DCA2BB4A3D972E646",
+      "size_bytes": 8881
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r3/final_workspace.json": {
+      "sha256": "9CB807C107785775F3DDC2641EFD00E001D1C549E285DF20E21CF89CBF25004B",
+      "size_bytes": 2112
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r3/first_attempt.diff": {
+      "sha256": "4930EC94D30479A5325E2DF102DD6555D4314445520FA4B3B4AC0E359FCEBF51",
+      "size_bytes": 281
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r3/first_attempt.json": {
+      "sha256": "F8D5D51646FDE5EDBD433F85F43DB9A7FC4E722B89A57DF3D340523F52783773",
+      "size_bytes": 2855
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r3/first_attempt_workspace.json": {
+      "sha256": "9CB807C107785775F3DDC2641EFD00E001D1C549E285DF20E21CF89CBF25004B",
+      "size_bytes": 2112
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r3/hook_events.json": {
+      "sha256": "3B71971441FF9BCAA0DD4EE8D5BDCCBBC52A305194E33AFB89092BC0EF8C5E29",
+      "size_bytes": 1443
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r3/injection_delivery.json": {
+      "sha256": "366797C34EB046F3160E03F64E8F674F3F0F5E3670CB1C0176724E4EEBD971EE",
+      "size_bytes": 1835
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r3/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r3/metadata.json": {
+      "sha256": "405DF509711DBA4D5C123A70EC2A36B1E4F4BC9AFE8BC2F0BB5047B8B7285D8D",
+      "size_bytes": 4931
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r3/offline_enforcement.json": {
+      "sha256": "E52E1DEBF6C62231CCAB93DCECA0D35FC83DA9D02C7E59BC6EC15C2E626B53E5",
+      "size_bytes": 676
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r3/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r3/stdout.jsonl": {
+      "sha256": "D7639EDE3E42C4E085ECF0AA878DA4AC690A101BCD9FAEA31DA2792CB5ACEFBD",
+      "size_bytes": 35179
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__baseline__r3/workspace.diff": {
+      "sha256": "4930EC94D30479A5325E2DF102DD6555D4314445520FA4B3B4AC0E359FCEBF51",
+      "size_bytes": 281
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r1/attempts.json": {
+      "sha256": "739C6CA5B6241C664D5FF6B10C1D93F88A8A3F68691A6C62C3AEAAE2CCBDBD9A",
+      "size_bytes": 1357
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r1/event_timing.json": {
+      "sha256": "9FD1A63ACB2374E4339CC2B18B1AF990D3D854F02B35FAB05F32961396586DDB",
+      "size_bytes": 9968
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r1/final_workspace.json": {
+      "sha256": "9CB807C107785775F3DDC2641EFD00E001D1C549E285DF20E21CF89CBF25004B",
+      "size_bytes": 2112
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r1/first_attempt.diff": {
+      "sha256": "4930EC94D30479A5325E2DF102DD6555D4314445520FA4B3B4AC0E359FCEBF51",
+      "size_bytes": 281
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r1/first_attempt.json": {
+      "sha256": "3803CA0B0BA441CA934D50734B7FE297F19DE8A3787788D7F92DF6CDC4F0ADD9",
+      "size_bytes": 3084
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r1/first_attempt_workspace.json": {
+      "sha256": "9CB807C107785775F3DDC2641EFD00E001D1C549E285DF20E21CF89CBF25004B",
+      "size_bytes": 2112
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r1/hook_events.json": {
+      "sha256": "A3D5859AC3E0FAC2B362725297287061F6B3254BCE6D181D223959ED5902CD94",
+      "size_bytes": 2881
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r1/injection_delivery.json": {
+      "sha256": "9C73AE2C713E05B58EDC0B0D2EA9E0F675FA976840A84B9E009BBD60D585DAA5",
+      "size_bytes": 1937
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r1/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r1/metadata.json": {
+      "sha256": "9F3487FE88953937CE3ACDEE0B06ED3D80E231C2B4238248B7C3E7B7B9CC6BDF",
+      "size_bytes": 5067
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r1/offline_enforcement.json": {
+      "sha256": "E52E1DEBF6C62231CCAB93DCECA0D35FC83DA9D02C7E59BC6EC15C2E626B53E5",
+      "size_bytes": 676
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r1/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r1/stdout.jsonl": {
+      "sha256": "8C4D56831581DB7ECD69D74920FE092B83E1DAAA85F8BC7129BA099ECE6058DA",
+      "size_bytes": 39441
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r1/workspace.diff": {
+      "sha256": "4930EC94D30479A5325E2DF102DD6555D4314445520FA4B3B4AC0E359FCEBF51",
+      "size_bytes": 281
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r2/attempts.json": {
+      "sha256": "D0C1839677610DC892C6D6512DF8B23035A79AAE5E7D175F641D826ABF98D18D",
+      "size_bytes": 1250
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r2/event_timing.json": {
+      "sha256": "283870A224093BF8E133E2CDA17A704F17FCA0A44816ECD7502012055B2CAC11",
+      "size_bytes": 7817
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r2/final_workspace.json": {
+      "sha256": "9CB807C107785775F3DDC2641EFD00E001D1C549E285DF20E21CF89CBF25004B",
+      "size_bytes": 2112
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r2/first_attempt.diff": {
+      "sha256": "4930EC94D30479A5325E2DF102DD6555D4314445520FA4B3B4AC0E359FCEBF51",
+      "size_bytes": 281
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r2/first_attempt.json": {
+      "sha256": "64F36C0A4DA93FDFDD038076E1C7C509273CDC995B3347599BC7CBD769750230",
+      "size_bytes": 2230
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r2/first_attempt_workspace.json": {
+      "sha256": "9CB807C107785775F3DDC2641EFD00E001D1C549E285DF20E21CF89CBF25004B",
+      "size_bytes": 2112
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r2/hook_events.json": {
+      "sha256": "44C1790A1F7AA8A38C16CC14E24FF0D889D4A604861C989258C660F9D22C07FA",
+      "size_bytes": 2881
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r2/injection_delivery.json": {
+      "sha256": "2CEDC0301D2EF33355B429C5D122BD2662220E19E4C152902A7EBFD93A2B0775",
+      "size_bytes": 1937
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r2/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r2/metadata.json": {
+      "sha256": "84010A2443DE338A662169D3D575C961EA73A236B59DB4AE7EA04558800A7A14",
+      "size_bytes": 4815
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r2/offline_enforcement.json": {
+      "sha256": "E52E1DEBF6C62231CCAB93DCECA0D35FC83DA9D02C7E59BC6EC15C2E626B53E5",
+      "size_bytes": 676
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r2/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r2/stdout.jsonl": {
+      "sha256": "40CE1636270D18B7E4E0513019D18DBE49EA1AD355A4A6421E48853C76251A4A",
+      "size_bytes": 22579
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r2/workspace.diff": {
+      "sha256": "4930EC94D30479A5325E2DF102DD6555D4314445520FA4B3B4AC0E359FCEBF51",
+      "size_bytes": 281
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r3/attempts.json": {
+      "sha256": "9ECD16834542BB46F75A406814CB3D5A42DC5D0CD1DF2FBDD64BE8E61062A76A",
+      "size_bytes": 1354
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r3/event_timing.json": {
+      "sha256": "1D8E62D5DA62D0C78C62C4C4B073577726E093769F0B41E5D71EED17A400DEF7",
+      "size_bytes": 7266
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r3/final_workspace.json": {
+      "sha256": "9CB807C107785775F3DDC2641EFD00E001D1C549E285DF20E21CF89CBF25004B",
+      "size_bytes": 2112
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r3/first_attempt.diff": {
+      "sha256": "4930EC94D30479A5325E2DF102DD6555D4314445520FA4B3B4AC0E359FCEBF51",
+      "size_bytes": 281
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r3/first_attempt.json": {
+      "sha256": "BA2E76A54763DE77D7D4CFAB3C314D30C452C7833613B82C9D0ECFC54384C202",
+      "size_bytes": 2336
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r3/first_attempt_workspace.json": {
+      "sha256": "9CB807C107785775F3DDC2641EFD00E001D1C549E285DF20E21CF89CBF25004B",
+      "size_bytes": 2112
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r3/hook_events.json": {
+      "sha256": "C3DF553DDB2387E43897813CA53B4E2641DACA6A8B909609AD9B094046620EC9",
+      "size_bytes": 2881
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r3/injection_delivery.json": {
+      "sha256": "149EA1761E35DE6C34F1ACFE24222251A01AEC23FC262641519B72A68EE1F498",
+      "size_bytes": 1937
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r3/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r3/metadata.json": {
+      "sha256": "FF8516196E5C4B6DE114851E315EF3F7F82C227253DC0D8BCB623EEE50801C69",
+      "size_bytes": 4814
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r3/offline_enforcement.json": {
+      "sha256": "E52E1DEBF6C62231CCAB93DCECA0D35FC83DA9D02C7E59BC6EC15C2E626B53E5",
+      "size_bytes": 676
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r3/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r3/stdout.jsonl": {
+      "sha256": "C8AF9B5588C15D332B820FACC4E498571522FBADE8A29DBBCA0B71FCC366BF1C",
+      "size_bytes": 21833
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/api-1__treatment__r3/workspace.diff": {
+      "sha256": "4930EC94D30479A5325E2DF102DD6555D4314445520FA4B3B4AC0E359FCEBF51",
+      "size_bytes": 281
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r1/attempts.json": {
+      "sha256": "4A67383DE463842F20AC3C4A83C2604BB889B147BB2EB23942A66FCCD43C833A",
+      "size_bytes": 1744
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r1/event_timing.json": {
+      "sha256": "2CBF680D762AC93C430254CAD9102E7C9A77359BA750F4CD89BDFE824D26A85D",
+      "size_bytes": 11596
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r1/final_workspace.json": {
+      "sha256": "FC36DF469055734C1E39E46538A9B2C35A7B4804EBB5831708017BDA80653A7E",
+      "size_bytes": 2505
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r1/first_attempt.diff": {
+      "sha256": "5CBA3C2E1185FFF4A621C7810D34380589DF69FD8C043FB81033BCA8B894E5FD",
+      "size_bytes": 667
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r1/first_attempt.json": {
+      "sha256": "409E5EBA3BD15FCAF1090D93CE671F00EC9990340C0542A67D3ABBF58F8A94B0",
+      "size_bytes": 4634
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r1/first_attempt_workspace.json": {
+      "sha256": "FC36DF469055734C1E39E46538A9B2C35A7B4804EBB5831708017BDA80653A7E",
+      "size_bytes": 2505
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r1/hook_events.json": {
+      "sha256": "26CAF82A8284E917A860C716A8A183F5F5591C20A33DA66ACDC8773A15581751",
+      "size_bytes": 1443
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r1/injection_delivery.json": {
+      "sha256": "C23D6478CAFC0C7C908C89064801892D723BAC4395137B1D1E0C3C63050298AD",
+      "size_bytes": 1847
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r1/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r1/metadata.json": {
+      "sha256": "866D01AB34282BEA5FBB5AABEDCFC9363731E62A3EACDBF80A1FAEA2212FB278",
+      "size_bytes": 4981
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r1/offline_enforcement.json": {
+      "sha256": "23645C2361B7287DD7D397F615178EA84F7926983580CAC8ECB117955682337E",
+      "size_bytes": 678
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r1/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r1/stdout.jsonl": {
+      "sha256": "A6411C1CAC1282440789D881FDE2833ED859F72C0EC09E8931D062FC2B7DBD0F",
+      "size_bytes": 46477
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r1/workspace.diff": {
+      "sha256": "5CBA3C2E1185FFF4A621C7810D34380589DF69FD8C043FB81033BCA8B894E5FD",
+      "size_bytes": 667
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r2/attempts.json": {
+      "sha256": "60A52D1BD9E3747BC36C564EB59FDE6F0569588109D2F547801BE8BA27CF873F",
+      "size_bytes": 2029
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r2/event_timing.json": {
+      "sha256": "2BB013BFD00C43477C4D81A467566029EF90454AE980D3EC95597F3FD16DC566",
+      "size_bytes": 10239
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r2/final_workspace.json": {
+      "sha256": "56B3B29F5DA862201C7B236AEFD1336EC6CFC340457549F159241986341D322B",
+      "size_bytes": 2790
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r2/first_attempt.diff": {
+      "sha256": "21D691D5CF9B9F53A8BB481AB12AB8DC45DBB56E5DDA290C0EBA0AB03BCCBF30",
+      "size_bytes": 953
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r2/first_attempt.json": {
+      "sha256": "582D03AC1ABA8EF983563B1B0F8AA823D6DD24F90C3EB3D331E867FC11BE888F",
+      "size_bytes": 4466
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r2/first_attempt_workspace.json": {
+      "sha256": "56B3B29F5DA862201C7B236AEFD1336EC6CFC340457549F159241986341D322B",
+      "size_bytes": 2790
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r2/hook_events.json": {
+      "sha256": "5B60B42A1D5ACE5528312250310E0B285FE9DF06E12E8DF1B04E1278F1E3863E",
+      "size_bytes": 1443
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r2/injection_delivery.json": {
+      "sha256": "AEE3BAFB5A9827CBA7CEAF3A688DBB3AB878E8B47A46C012EDC8D0217470B3DC",
+      "size_bytes": 1847
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r2/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r2/metadata.json": {
+      "sha256": "FAE19068100F3D40578C3A48601583669137D8E9A8973DD792F008CDFA801A0B",
+      "size_bytes": 4978
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r2/offline_enforcement.json": {
+      "sha256": "23645C2361B7287DD7D397F615178EA84F7926983580CAC8ECB117955682337E",
+      "size_bytes": 678
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r2/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r2/stdout.jsonl": {
+      "sha256": "73F96F4AE49AB622633666B7A3D41FE490685CDECF941C619824E33ADAAA56BC",
+      "size_bytes": 43432
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r2/workspace.diff": {
+      "sha256": "21D691D5CF9B9F53A8BB481AB12AB8DC45DBB56E5DDA290C0EBA0AB03BCCBF30",
+      "size_bytes": 953
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r3/attempts.json": {
+      "sha256": "1882F610EDA70A89A93842F8B8E57917C1616AE48A29B691B769AABC3187F049",
+      "size_bytes": 8369
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r3/event_timing.json": {
+      "sha256": "387AACEDA5C581ACF71BB8D9324F8CD41131ED2811B9DA8931F92F9BFC3FA61D",
+      "size_bytes": 18365
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r3/final_workspace.json": {
+      "sha256": "D63836ABF4ED358BF6DD693C09A3DE5DCC8E9B756C4AB61E36A845FE52A82651",
+      "size_bytes": 3386
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r3/first_attempt.diff": {
+      "sha256": "D25D343C8C12B95A955B1F044EC040F569555FA2CE79D78F43B530844A3A6080",
+      "size_bytes": 1527
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r3/first_attempt.json": {
+      "sha256": "1ED46C3E438AC048CFFC20357C308F8D5CDE6C416D6B395B06C6CB2B6FE4B769",
+      "size_bytes": 7152
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r3/first_attempt_workspace.json": {
+      "sha256": "25D6FBE69BD8ABE5B467FAE32D4758868212907CC03BC3A50E1EAC77F6BF0AEF",
+      "size_bytes": 3358
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r3/hook_events.json": {
+      "sha256": "EAB11603F4C3235D9F3B97ADE4C23557232CD88FB3A8B78123C4D10A86225B5D",
+      "size_bytes": 2507
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r3/injection_delivery.json": {
+      "sha256": "6F501798F38F9BA4E4C961AEB8ADBAFEC1B4A5C3663313BDBC69920EBC973310",
+      "size_bytes": 1847
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r3/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r3/metadata.json": {
+      "sha256": "517472F34A1EB7A3214E0DAAF172228DAD4156AB60E78CE10F46929DA737624B",
+      "size_bytes": 4959
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r3/offline_enforcement.json": {
+      "sha256": "C0CF587C0A5479933D9BE3E564E3501FCA0052E1C592F0283B12A3D304E84720",
+      "size_bytes": 1062
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r3/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r3/stdout.jsonl": {
+      "sha256": "61334E7CD946F98F3E42DB8DC587C95D2106CC11ED5680222B19B1891983A503",
+      "size_bytes": 75117
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__baseline__r3/workspace.diff": {
+      "sha256": "108B31D287A86B67A887A530EB53569886952467FD2EC9C83E4E808492811534",
+      "size_bytes": 1555
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r1/attempts.json": {
+      "sha256": "0ECE2F5F2D2E8B8A909779AB4C43337F1D127FEE128A93582E912D0608D3A49F",
+      "size_bytes": 5133
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r1/event_timing.json": {
+      "sha256": "058BAF981F87C889CC61F055631297F4BD8D20D1DD365EF5E4F1C2592F9E4974",
+      "size_bytes": 12683
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r1/final_workspace.json": {
+      "sha256": "B35C1A4D4712796EBED9F21EF6F5411CC506534476765CF326FE79535C7E5602",
+      "size_bytes": 2630
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r1/first_attempt.diff": {
+      "sha256": "9BD0BAFD25A54331596BF2BBECF2B16B20502F97B09E8764B89A105F97BA24CA",
+      "size_bytes": 776
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r1/first_attempt.json": {
+      "sha256": "B57D627391B9A5DE017BD0437EBA8685907E64A4953B3A9D611E4D5D4FFAB0ED",
+      "size_bytes": 3352
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r1/first_attempt_workspace.json": {
+      "sha256": "AA1696176C300BF2131B538CCB5985C77305BA0C239E065BAED9B1432DFB2144",
+      "size_bytes": 2616
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r1/hook_events.json": {
+      "sha256": "CCC7272A9F796242B94AF020B8FEC6A2B6AFB25AFD4C0F878153D6F083412F97",
+      "size_bytes": 5153
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r1/injection_delivery.json": {
+      "sha256": "9A1AB55D7070C0ED5CB796974ACF39FC42F4BF01CFE6B0A580E1A7E35F42DBA6",
+      "size_bytes": 1965
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r1/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r1/metadata.json": {
+      "sha256": "0E1D7DE7FCE7ADE9DC451E5B39F390E60EC52BB66929D0AC2DE2EE2B3FCA7584",
+      "size_bytes": 4863
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r1/offline_enforcement.json": {
+      "sha256": "C0CF587C0A5479933D9BE3E564E3501FCA0052E1C592F0283B12A3D304E84720",
+      "size_bytes": 1062
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r1/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r1/stdout.jsonl": {
+      "sha256": "83160AAC96510F7D4296CFE536B1C2670831A215731D03C915AE7207908D33DF",
+      "size_bytes": 43389
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r1/workspace.diff": {
+      "sha256": "B59C117332BCD113A415D69B42F072A6C8362A0A47D65F304DB5F79F410726BE",
+      "size_bytes": 790
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r2/attempts.json": {
+      "sha256": "0512E49B64A16E2DD5BD041FDB067A72212DCE90553C15DC0367E4EA125DDB62",
+      "size_bytes": 1806
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r2/event_timing.json": {
+      "sha256": "AF319AFBA78B15B4ACB4B714162B5A26FA9D66B8503FDBBF19641BD35FBA2E18",
+      "size_bytes": 10517
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r2/final_workspace.json": {
+      "sha256": "B3288408A9A8FD36656A59E2DE371F1EC0626C4B3E5470904890AC95C34F6B6F",
+      "size_bytes": 2567
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r2/first_attempt.diff": {
+      "sha256": "6EE523D735E2A373E8014B3C6F68E93A60EA49A678DA44EE62ABFABE69ED5E70",
+      "size_bytes": 729
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r2/first_attempt.json": {
+      "sha256": "438AB4DE16B87D8816B79D9C178E7989FC1D6DE967412233957AC1B176CB1539",
+      "size_bytes": 4013
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r2/first_attempt_workspace.json": {
+      "sha256": "B3288408A9A8FD36656A59E2DE371F1EC0626C4B3E5470904890AC95C34F6B6F",
+      "size_bytes": 2567
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r2/hook_events.json": {
+      "sha256": "D6A5EAD93B8DCF970DB16549B6449162399CC8DFBB1B07EEEF3E9C513286FEDC",
+      "size_bytes": 4089
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r2/injection_delivery.json": {
+      "sha256": "CE2DFF54D27DDB7DAD8FCCDE4A21A4D9050ED894DD10B305F56523C580B34A7E",
+      "size_bytes": 1965
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r2/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r2/metadata.json": {
+      "sha256": "EDAC2735EAFE823C1144E4F084C30FDE758EFC8825B31193EBB9B3EDAE26F9DB",
+      "size_bytes": 5099
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r2/offline_enforcement.json": {
+      "sha256": "23645C2361B7287DD7D397F615178EA84F7926983580CAC8ECB117955682337E",
+      "size_bytes": 678
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r2/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r2/stdout.jsonl": {
+      "sha256": "F84830DF34F1059C22F6E323A0D79D4767C50B039348EED5429CC9A6E76BE832",
+      "size_bytes": 47157
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r2/workspace.diff": {
+      "sha256": "6EE523D735E2A373E8014B3C6F68E93A60EA49A678DA44EE62ABFABE69ED5E70",
+      "size_bytes": 729
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r3/attempts.json": {
+      "sha256": "8969B571505ED508CFC137244B6F9C97FCCEC18431DDABDD01F205CB626FEFC8",
+      "size_bytes": 1725
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r3/event_timing.json": {
+      "sha256": "0302DB8B6DEECA31112CC94EC72843BAEAB24612B84A92F5221465C9F3BC13EE",
+      "size_bytes": 10792
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r3/final_workspace.json": {
+      "sha256": "FB2E20BC320207337E680D825ACB657031BE73EBCC4D21AE16F9194AEC7EC6D6",
+      "size_bytes": 2487
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r3/first_attempt.diff": {
+      "sha256": "A8C69AAB9F771B41B73553994797D275750C3E3BD050E095AA3C8A04B8E5A5F3",
+      "size_bytes": 651
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r3/first_attempt.json": {
+      "sha256": "C4D4D56182CD7F11E881E1AFF69D93D098C689CB511AF115E9D42A75C723AC77",
+      "size_bytes": 4096
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r3/first_attempt_workspace.json": {
+      "sha256": "FB2E20BC320207337E680D825ACB657031BE73EBCC4D21AE16F9194AEC7EC6D6",
+      "size_bytes": 2487
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r3/hook_events.json": {
+      "sha256": "C627258F6ABA4ED9E4AFABD5D4838F31395245132B9327A271028DBDEF211C5F",
+      "size_bytes": 4089
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r3/injection_delivery.json": {
+      "sha256": "C3731C9AF6ACE38607E893A4DEE50AED1EA6EF0BF7994CF5CDAA325F80C39D2D",
+      "size_bytes": 1965
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r3/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r3/metadata.json": {
+      "sha256": "B658BB0AC204DEE2817CB2A6859312CB50C75626B11E14C74A80068BC18E1DC3",
+      "size_bytes": 5099
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r3/offline_enforcement.json": {
+      "sha256": "23645C2361B7287DD7D397F615178EA84F7926983580CAC8ECB117955682337E",
+      "size_bytes": 678
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r3/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r3/stdout.jsonl": {
+      "sha256": "D190E6EC1243FE4FFA2E2406B67E19DF11D52EC0535C9433522071E792C351C0",
+      "size_bytes": 47381
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/auth-1__treatment__r3/workspace.diff": {
+      "sha256": "A8C69AAB9F771B41B73553994797D275750C3E3BD050E095AA3C8A04B8E5A5F3",
+      "size_bytes": 651
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r1/attempts.json": {
+      "sha256": "52405ECCA54B7D6C17057A78233F1ED61B476AD243D6F3E89061CC22F43C59F6",
+      "size_bytes": 1019
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r1/event_timing.json": {
+      "sha256": "F65E45C6C0A6E5E26254AAF50B11355E958C23F7A5A1FDDCB83BA54AFF0D82C4",
+      "size_bytes": 6998
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r1/final_workspace.json": {
+      "sha256": "075EBBFE7333EF08DADF0C0A4D0B71858937105BFD2470476CEA3968160A0E39",
+      "size_bytes": 2081
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r1/first_attempt.diff": {
+      "sha256": "97F7BF7FB7F8C65D1362798B42E676453E73837EB7CF6D4D742DCF6263AA2B31",
+      "size_bytes": 192
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r1/first_attempt.json": {
+      "sha256": "6CC8F9A5FA1D7BD4A2653C08946AE322574ACCCF2BEF349C84EAC7B609E3A996",
+      "size_bytes": 1945
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r1/first_attempt_workspace.json": {
+      "sha256": "075EBBFE7333EF08DADF0C0A4D0B71858937105BFD2470476CEA3968160A0E39",
+      "size_bytes": 2081
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r1/hook_events.json": {
+      "sha256": "297B8E1BF79476D95B6953D4C26BF09DA762C94C2968BF56A33F0B11DEA86726",
+      "size_bytes": 1443
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r1/injection_delivery.json": {
+      "sha256": "93FC8253732FF6202E58E5A9D378B11FE62CF1BA79CDB50EA3E24B9374051715",
+      "size_bytes": 1749
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r1/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r1/metadata.json": {
+      "sha256": "EECB28B1CD65FB399994F2D88929CBA250AF27C8A864C930B84F93FDCDFD675E",
+      "size_bytes": 4613
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r1/offline_enforcement.json": {
+      "sha256": "412432B5C767BFCEB13824BBBF70DC6EBB948DF3EAA3BDF28A27CC3B6DE31408",
+      "size_bytes": 686
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r1/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r1/stdout.jsonl": {
+      "sha256": "C0756EEF938BF0725CD7D212C3F049E1B30F7EB002311650EFCF4C371E9714CC",
+      "size_bytes": 16282
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r1/workspace.diff": {
+      "sha256": "97F7BF7FB7F8C65D1362798B42E676453E73837EB7CF6D4D742DCF6263AA2B31",
+      "size_bytes": 192
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r2/attempts.json": {
+      "sha256": "5CB3631C8C7E95B0D80F936D39DE8563C4DFB5A2DE518D73F5FE535FE5D63D11",
+      "size_bytes": 1018
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r2/event_timing.json": {
+      "sha256": "EED8389F22BD9BE2A2613D8BC0C391E83FDA255C1C293E659AF7FC598A62FAAE",
+      "size_bytes": 5380
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r2/final_workspace.json": {
+      "sha256": "075EBBFE7333EF08DADF0C0A4D0B71858937105BFD2470476CEA3968160A0E39",
+      "size_bytes": 2081
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r2/first_attempt.diff": {
+      "sha256": "97F7BF7FB7F8C65D1362798B42E676453E73837EB7CF6D4D742DCF6263AA2B31",
+      "size_bytes": 192
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r2/first_attempt.json": {
+      "sha256": "F00AB0227762A67F81E964C582CCCFF90A32F406947AFC8D7C95CF3304D3782B",
+      "size_bytes": 1831
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r2/first_attempt_workspace.json": {
+      "sha256": "075EBBFE7333EF08DADF0C0A4D0B71858937105BFD2470476CEA3968160A0E39",
+      "size_bytes": 2081
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r2/hook_events.json": {
+      "sha256": "D862144C2AFA40194FEB0659527087ACDAA6AF3896A1FC2AD054238FB85CA8B5",
+      "size_bytes": 1443
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r2/injection_delivery.json": {
+      "sha256": "3E1F1A9032BF4FD5F04EF9DABA4ACCF16624C74108D6B594CC8753CDAD89A2AC",
+      "size_bytes": 1749
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r2/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r2/metadata.json": {
+      "sha256": "48AD36AA5C640ABBCDA53BEA4A8B35D53758E756A5287876E54A29F3B54BB455",
+      "size_bytes": 4613
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r2/offline_enforcement.json": {
+      "sha256": "412432B5C767BFCEB13824BBBF70DC6EBB948DF3EAA3BDF28A27CC3B6DE31408",
+      "size_bytes": 686
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r2/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r2/stdout.jsonl": {
+      "sha256": "D478F41EAC4BA1E56163045FA4EA58F0633B66DC4FEC48F883C6198F1F48FAFF",
+      "size_bytes": 12492
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r2/workspace.diff": {
+      "sha256": "97F7BF7FB7F8C65D1362798B42E676453E73837EB7CF6D4D742DCF6263AA2B31",
+      "size_bytes": 192
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r3/attempts.json": {
+      "sha256": "1AC9970D2F10EC6CF8C00F08CA8FFE257F3C219481915D46F43BD7090A9ADC77",
+      "size_bytes": 1018
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r3/event_timing.json": {
+      "sha256": "1E0084665B0A4E2F22355EE2A8C79C0AF744B0CFB26B3B8A99CEC1287A88E32D",
+      "size_bytes": 7538
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r3/final_workspace.json": {
+      "sha256": "075EBBFE7333EF08DADF0C0A4D0B71858937105BFD2470476CEA3968160A0E39",
+      "size_bytes": 2081
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r3/first_attempt.diff": {
+      "sha256": "97F7BF7FB7F8C65D1362798B42E676453E73837EB7CF6D4D742DCF6263AA2B31",
+      "size_bytes": 192
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r3/first_attempt.json": {
+      "sha256": "AAD0B80BF348D76A86640A36F283165BC28F201211845FD2D97580CCA4B52193",
+      "size_bytes": 2247
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r3/first_attempt_workspace.json": {
+      "sha256": "075EBBFE7333EF08DADF0C0A4D0B71858937105BFD2470476CEA3968160A0E39",
+      "size_bytes": 2081
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r3/hook_events.json": {
+      "sha256": "C4B778360366730527B50D1A97468AAA4FC6D954118220A60DD7C8B59BB7CC07",
+      "size_bytes": 1443
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r3/injection_delivery.json": {
+      "sha256": "698429394C9C2FC6C3CE35FE2B1866CD43FDD945DE49EEB74E7AC0B7D5689CE2",
+      "size_bytes": 1749
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r3/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r3/metadata.json": {
+      "sha256": "7DC6F8403043025B81C1549B7CF1F3AF8EFD0F6BB98F595F4045F8F84B66AAB0",
+      "size_bytes": 4614
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r3/offline_enforcement.json": {
+      "sha256": "412432B5C767BFCEB13824BBBF70DC6EBB948DF3EAA3BDF28A27CC3B6DE31408",
+      "size_bytes": 686
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r3/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r3/stdout.jsonl": {
+      "sha256": "2C665E6EFA3087B2E27A3B178325F4B82CCA9F1D17CAF51F5F84136D58642E2F",
+      "size_bytes": 17530
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__baseline__r3/workspace.diff": {
+      "sha256": "97F7BF7FB7F8C65D1362798B42E676453E73837EB7CF6D4D742DCF6263AA2B31",
+      "size_bytes": 192
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r1/attempts.json": {
+      "sha256": "15CB3510790A38571E78AB8BEED39F8D1F2C5B473F5C477E379E11B438D7950C",
+      "size_bytes": 2010
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r1/event_timing.json": {
+      "sha256": "8212DA8CEA01D413E3576D59A8362BC5678A562EA4B435C531D8979816CFC380",
+      "size_bytes": 7545
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r1/final_workspace.json": {
+      "sha256": "075EBBFE7333EF08DADF0C0A4D0B71858937105BFD2470476CEA3968160A0E39",
+      "size_bytes": 2081
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r1/first_attempt.diff": {
+      "sha256": "97F7BF7FB7F8C65D1362798B42E676453E73837EB7CF6D4D742DCF6263AA2B31",
+      "size_bytes": 192
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r1/first_attempt.json": {
+      "sha256": "9C75962CB6571141A7302C1BA97362F9167176349B019252F79A7DC9E80A6D8A",
+      "size_bytes": 1876
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r1/first_attempt_workspace.json": {
+      "sha256": "075EBBFE7333EF08DADF0C0A4D0B71858937105BFD2470476CEA3968160A0E39",
+      "size_bytes": 2081
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r1/hook_events.json": {
+      "sha256": "552D9B819B5960FE11576DED209C42D6183A61B757FF7749EA75F858609144D2",
+      "size_bytes": 1443
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r1/injection_delivery.json": {
+      "sha256": "595FA239234102BC6B89591F6BB896305B21F288E86C8BD10D0BAB8927D61C7C",
+      "size_bytes": 1750
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r1/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r1/metadata.json": {
+      "sha256": "C5C3D94E612B6D04ACA000C1B58E0138979CC3883BC85720D60114F4CC7787D6",
+      "size_bytes": 4627
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r1/offline_enforcement.json": {
+      "sha256": "412432B5C767BFCEB13824BBBF70DC6EBB948DF3EAA3BDF28A27CC3B6DE31408",
+      "size_bytes": 686
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r1/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r1/stdout.jsonl": {
+      "sha256": "FEAD2F823E6D2FA92BABF89A77ED6351D69C3664281A633D5BCA947AEFABB231",
+      "size_bytes": 16987
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r1/workspace.diff": {
+      "sha256": "97F7BF7FB7F8C65D1362798B42E676453E73837EB7CF6D4D742DCF6263AA2B31",
+      "size_bytes": 192
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r2/attempts.json": {
+      "sha256": "C1485FC4F5006EB436F6FB5BAC20B9891BEDAA3E022B1A2660EEE2522B4BE1AD",
+      "size_bytes": 1018
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r2/event_timing.json": {
+      "sha256": "8CEA4D7AE639F83108328F420B8FBC87328A08F372F0DAF61923EEFE0E7F91EC",
+      "size_bytes": 6725
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r2/final_workspace.json": {
+      "sha256": "075EBBFE7333EF08DADF0C0A4D0B71858937105BFD2470476CEA3968160A0E39",
+      "size_bytes": 2081
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r2/first_attempt.diff": {
+      "sha256": "97F7BF7FB7F8C65D1362798B42E676453E73837EB7CF6D4D742DCF6263AA2B31",
+      "size_bytes": 192
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r2/first_attempt.json": {
+      "sha256": "B33CD43A7E83961C58468C5579FA743BC23710CF386F0DF80F2047942EEDB081",
+      "size_bytes": 1945
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r2/first_attempt_workspace.json": {
+      "sha256": "075EBBFE7333EF08DADF0C0A4D0B71858937105BFD2470476CEA3968160A0E39",
+      "size_bytes": 2081
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r2/hook_events.json": {
+      "sha256": "B94BF2156A28550CD0BF589CD57213003955415959A2F45B3301B0730E1BDCC3",
+      "size_bytes": 1443
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r2/injection_delivery.json": {
+      "sha256": "A564FBFA23B4E4C67B12C93A1C9549600DA7AC2A544DCFDBE88C2E748EFE1DEA",
+      "size_bytes": 1750
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r2/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r2/metadata.json": {
+      "sha256": "40B18899BBB8784B665F98F4A5E43B3756C3E5640F078352D9D5944710C138F6",
+      "size_bytes": 4614
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r2/offline_enforcement.json": {
+      "sha256": "412432B5C767BFCEB13824BBBF70DC6EBB948DF3EAA3BDF28A27CC3B6DE31408",
+      "size_bytes": 686
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r2/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r2/stdout.jsonl": {
+      "sha256": "B71DE5F6162BB0B81CFC114CD0E88A502B6799DA23D4F53FB1FC1BAC3BA54799",
+      "size_bytes": 15493
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r2/workspace.diff": {
+      "sha256": "97F7BF7FB7F8C65D1362798B42E676453E73837EB7CF6D4D742DCF6263AA2B31",
+      "size_bytes": 192
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r3/attempts.json": {
+      "sha256": "3ED0413126D2E6415F3181C4E6932C569D51B461FF0681BD0B1364C06C82D2CA",
+      "size_bytes": 2008
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r3/event_timing.json": {
+      "sha256": "81A5BA3B47B772BD6E4EF43E8E5DDF03EC03193002BEEC2C20DB16CEBBA732A4",
+      "size_bytes": 5924
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r3/final_workspace.json": {
+      "sha256": "075EBBFE7333EF08DADF0C0A4D0B71858937105BFD2470476CEA3968160A0E39",
+      "size_bytes": 2081
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r3/first_attempt.diff": {
+      "sha256": "97F7BF7FB7F8C65D1362798B42E676453E73837EB7CF6D4D742DCF6263AA2B31",
+      "size_bytes": 192
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r3/first_attempt.json": {
+      "sha256": "D2DD4F88E7C672A076A4F9D3CF4AAC19EC41BD705AFC7CF697276DE3D7AC2543",
+      "size_bytes": 1552
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r3/first_attempt_workspace.json": {
+      "sha256": "075EBBFE7333EF08DADF0C0A4D0B71858937105BFD2470476CEA3968160A0E39",
+      "size_bytes": 2081
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r3/hook_events.json": {
+      "sha256": "68E89A806FA00F9DB82F1BC5FDE626AB13116959FFA73218F2A67908B64750A7",
+      "size_bytes": 1443
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r3/injection_delivery.json": {
+      "sha256": "E3E3303DA6352C892985E3245F97DFC9E3B4398DA176ECE3C9E574032EEC2A0E",
+      "size_bytes": 1750
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r3/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r3/metadata.json": {
+      "sha256": "259418FB890EB0984B1ECB386E3C5CA0243AA40FF33AE80E0A1539D02B2B5B2F",
+      "size_bytes": 4602
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r3/offline_enforcement.json": {
+      "sha256": "412432B5C767BFCEB13824BBBF70DC6EBB948DF3EAA3BDF28A27CC3B6DE31408",
+      "size_bytes": 686
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r3/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r3/stdout.jsonl": {
+      "sha256": "F8C8B760EB3B16B88F17ABCE5B53E34BAB265534E62E8A086FEB5938E4FF3A5F",
+      "size_bytes": 13444
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-1__treatment__r3/workspace.diff": {
+      "sha256": "97F7BF7FB7F8C65D1362798B42E676453E73837EB7CF6D4D742DCF6263AA2B31",
+      "size_bytes": 192
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r1/attempts.json": {
+      "sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+      "size_bytes": 4
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r1/event_timing.json": {
+      "sha256": "E8501F90DEC4785E1803FC2EC354302C757B492FEDB08F4D6D61678461C265C9",
+      "size_bytes": 4568
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r1/final_workspace.json": {
+      "sha256": "8F53E28DBB9E215EE90557CD9F98DEFB699B07080559210E36DE7BA9AC4D0962",
+      "size_bytes": 2080
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r1/first_attempt.diff": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r1/first_attempt.json": {
+      "sha256": "B45424C5B4EB5B56F7E705BD70A05FFF61FAE4FBF28D7EBF337393C3DE99A46B",
+      "size_bytes": 325
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r1/first_attempt_workspace.json": {
+      "sha256": "ABDFBFFECBE18ED94DF9829819E596EE285B52A94AA108514452A9121721C789",
+      "size_bytes": 6
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r1/hook_events.json": {
+      "sha256": "4820C1AE9FB88851B190A72F28CC531946EE5E9C68AAAB4A801AE9DBB460E4AE",
+      "size_bytes": 731
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r1/injection_delivery.json": {
+      "sha256": "749EF66C7953C49D35A8C91B50813F914E68AD836B9079023B1636DFC8639FEA",
+      "size_bytes": 1751
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r1/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r1/metadata.json": {
+      "sha256": "B1C69CCED734B8C3E6C0D88138CF43C9C947CB5D60126AD660FBD79D917AB9DE",
+      "size_bytes": 4581
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r1/offline_enforcement.json": {
+      "sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+      "size_bytes": 4
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r1/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r1/stdout.jsonl": {
+      "sha256": "DF3A5C5017309795963707AD4225567D5679D0B0800D1ED28EDFEDCC8D70FCE4",
+      "size_bytes": 11176
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r1/workspace.diff": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r2/attempts.json": {
+      "sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+      "size_bytes": 4
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r2/event_timing.json": {
+      "sha256": "5759D2013412CBF7C5E3D6338CD3D825AFFEE6A03C5657507C83F5B0ED12AA3C",
+      "size_bytes": 4568
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r2/final_workspace.json": {
+      "sha256": "8F53E28DBB9E215EE90557CD9F98DEFB699B07080559210E36DE7BA9AC4D0962",
+      "size_bytes": 2080
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r2/first_attempt.diff": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r2/first_attempt.json": {
+      "sha256": "B45424C5B4EB5B56F7E705BD70A05FFF61FAE4FBF28D7EBF337393C3DE99A46B",
+      "size_bytes": 325
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r2/first_attempt_workspace.json": {
+      "sha256": "ABDFBFFECBE18ED94DF9829819E596EE285B52A94AA108514452A9121721C789",
+      "size_bytes": 6
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r2/hook_events.json": {
+      "sha256": "EB2AE945DC887C2EAA4F17CC44CED8E1A33F3E59AF601BD55F82C0E846237AC6",
+      "size_bytes": 731
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r2/injection_delivery.json": {
+      "sha256": "D4C336119EF58ED478D9325339F8C1D5D2DD8F34A0897F57CA0E8220DA64ED7B",
+      "size_bytes": 1751
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r2/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r2/metadata.json": {
+      "sha256": "8F9FFDDB5FE1228717E6B825F3537378BF5347A170101BC53900BC2EE5FB84D5",
+      "size_bytes": 4580
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r2/offline_enforcement.json": {
+      "sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+      "size_bytes": 4
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r2/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r2/stdout.jsonl": {
+      "sha256": "B0E53C50F6FBD8B5D0CADACD9C91FE31F4C26BD4FDFD9C04336FE36C2BD4D3F0",
+      "size_bytes": 10371
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r2/workspace.diff": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r3/attempts.json": {
+      "sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+      "size_bytes": 4
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r3/event_timing.json": {
+      "sha256": "A686AB9ED06CEEB17DDE01B4EE555C1C54AE588B22A443C28FFD6C00F8CAD563",
+      "size_bytes": 5645
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r3/final_workspace.json": {
+      "sha256": "8F53E28DBB9E215EE90557CD9F98DEFB699B07080559210E36DE7BA9AC4D0962",
+      "size_bytes": 2080
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r3/first_attempt.diff": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r3/first_attempt.json": {
+      "sha256": "B45424C5B4EB5B56F7E705BD70A05FFF61FAE4FBF28D7EBF337393C3DE99A46B",
+      "size_bytes": 325
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r3/first_attempt_workspace.json": {
+      "sha256": "ABDFBFFECBE18ED94DF9829819E596EE285B52A94AA108514452A9121721C789",
+      "size_bytes": 6
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r3/hook_events.json": {
+      "sha256": "7181FD776B6A4652677E270188627BA26B9D442C602B890F12384EB089002DF7",
+      "size_bytes": 731
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r3/injection_delivery.json": {
+      "sha256": "AA1D1F87AF12BD0EC04CFB1E1C5F2E0B2E16D2209A0F33F28A13A0640169475E",
+      "size_bytes": 1751
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r3/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r3/metadata.json": {
+      "sha256": "2CAC55FC2491F49071F8D81B65E40A7CF39B8001ACA4F20C91A987D127032C33",
+      "size_bytes": 4581
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r3/offline_enforcement.json": {
+      "sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+      "size_bytes": 4
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r3/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r3/stdout.jsonl": {
+      "sha256": "0E610F2699820BFA7B1C16A38ABBD09B088B350DE2720951D8F30BEE8C663B15",
+      "size_bytes": 13146
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__baseline__r3/workspace.diff": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r1/attempts.json": {
+      "sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+      "size_bytes": 4
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r1/event_timing.json": {
+      "sha256": "E075032E071425FBBF90A23F52A4A3C074009FEBEED14E7FFAA6E0820930075D",
+      "size_bytes": 5105
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r1/final_workspace.json": {
+      "sha256": "8F53E28DBB9E215EE90557CD9F98DEFB699B07080559210E36DE7BA9AC4D0962",
+      "size_bytes": 2080
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r1/first_attempt.diff": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r1/first_attempt.json": {
+      "sha256": "B45424C5B4EB5B56F7E705BD70A05FFF61FAE4FBF28D7EBF337393C3DE99A46B",
+      "size_bytes": 325
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r1/first_attempt_workspace.json": {
+      "sha256": "ABDFBFFECBE18ED94DF9829819E596EE285B52A94AA108514452A9121721C789",
+      "size_bytes": 6
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r1/hook_events.json": {
+      "sha256": "B214B40A51F7A22135E11C6B3B1C391C9ED1E21505A754335AE9A986DD6B14EB",
+      "size_bytes": 731
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r1/injection_delivery.json": {
+      "sha256": "22D647DFF2EF2C18088639DD145762A50E999F69759BABCC7FF5CE7455625692",
+      "size_bytes": 1752
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r1/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r1/metadata.json": {
+      "sha256": "29889E1701BD36A357E732BBDFED898EA12D642B57410B057232B493A1867368",
+      "size_bytes": 4581
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r1/offline_enforcement.json": {
+      "sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+      "size_bytes": 4
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r1/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r1/stdout.jsonl": {
+      "sha256": "45ABFD458210DD1B6F517A380E688A31C469C68CBE00FE44400F48BF129F7860",
+      "size_bytes": 11475
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r1/workspace.diff": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r2/attempts.json": {
+      "sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+      "size_bytes": 4
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r2/event_timing.json": {
+      "sha256": "82D833CD0BDF988C1236F268F8CE266DC67BE1BB9291364AF54331BD7E0D0FBE",
+      "size_bytes": 3758
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r2/final_workspace.json": {
+      "sha256": "8F53E28DBB9E215EE90557CD9F98DEFB699B07080559210E36DE7BA9AC4D0962",
+      "size_bytes": 2080
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r2/first_attempt.diff": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r2/first_attempt.json": {
+      "sha256": "B45424C5B4EB5B56F7E705BD70A05FFF61FAE4FBF28D7EBF337393C3DE99A46B",
+      "size_bytes": 325
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r2/first_attempt_workspace.json": {
+      "sha256": "ABDFBFFECBE18ED94DF9829819E596EE285B52A94AA108514452A9121721C789",
+      "size_bytes": 6
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r2/hook_events.json": {
+      "sha256": "1C239E159F40F82AC3A0DCBB96C036A8E77F9503D0D6D4B2698D864B6AD96E24",
+      "size_bytes": 731
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r2/injection_delivery.json": {
+      "sha256": "1F5B30ACB1CAF09F301E57DDB2EE13944C8D1FC15400245D57F774118EDAF299",
+      "size_bytes": 1752
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r2/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r2/metadata.json": {
+      "sha256": "A397A4D444CB134BDBFC2630432315EF7A543F798222DF44639B38B10FCB398F",
+      "size_bytes": 4582
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r2/offline_enforcement.json": {
+      "sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+      "size_bytes": 4
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r2/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r2/stdout.jsonl": {
+      "sha256": "70C3A78B67522B066BDA0517BEA490BE823C4F5CF8491294BE75DE9AFC7DC5DD",
+      "size_bytes": 8735
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r2/workspace.diff": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r3/attempts.json": {
+      "sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+      "size_bytes": 4
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r3/event_timing.json": {
+      "sha256": "D8E07FAD78A1EAF8D299F8CEA1CEA485D64DEFC87EF906DA3B704A66455FB88E",
+      "size_bytes": 4835
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r3/final_workspace.json": {
+      "sha256": "8F53E28DBB9E215EE90557CD9F98DEFB699B07080559210E36DE7BA9AC4D0962",
+      "size_bytes": 2080
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r3/first_attempt.diff": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r3/first_attempt.json": {
+      "sha256": "B45424C5B4EB5B56F7E705BD70A05FFF61FAE4FBF28D7EBF337393C3DE99A46B",
+      "size_bytes": 325
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r3/first_attempt_workspace.json": {
+      "sha256": "ABDFBFFECBE18ED94DF9829819E596EE285B52A94AA108514452A9121721C789",
+      "size_bytes": 6
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r3/hook_events.json": {
+      "sha256": "524BC2BEB131D8DC83CE43E2B7A125CD1AEDCEED3FF137D63E75F28DD38FEEC0",
+      "size_bytes": 731
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r3/injection_delivery.json": {
+      "sha256": "8420C39E0F9386D6E74AF46B4773DB6D438D9A9AF8F5EDB93A7B0B107059ECE7",
+      "size_bytes": 1752
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r3/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r3/metadata.json": {
+      "sha256": "53AEFB40D42083CCF72408B84DCCA615BDBA23E57C1349BDF7B2D8AE15257537",
+      "size_bytes": 4583
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r3/offline_enforcement.json": {
+      "sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+      "size_bytes": 4
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r3/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r3/stdout.jsonl": {
+      "sha256": "4AA17A4176BEC370F863C3CB4E9B13233B9C22553AC4F833F4E4966770FC600A",
+      "size_bytes": 11926
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/control-2__treatment__r3/workspace.diff": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r1/attempts.json": {
+      "sha256": "7220182C9AB60D41050D0E77A9262014C3FD7BA5B8B43AD22CD163C524EB8FED",
+      "size_bytes": 1134
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r1/event_timing.json": {
+      "sha256": "D95811B05233A816161C1241D2C03C7AC0D8DF41CDB6232D7861652DDD9BCFE7",
+      "size_bytes": 9167
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r1/final_workspace.json": {
+      "sha256": "B9B67CE0C0CF67DCAF0915B641C0628820912BEF5E46E8D198CEE0611EF66B2F",
+      "size_bytes": 2078
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r1/first_attempt.diff": {
+      "sha256": "C3B3CB468543E730AD9C9373B5E4370A298312CA4CA1DA46CB6F8544DCE80F5B",
+      "size_bytes": 224
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r1/first_attempt.json": {
+      "sha256": "56C133A6868D66736AD98433C85B012A525234788FC85614BE6E104F1FE5E6E0",
+      "size_bytes": 2828
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r1/first_attempt_workspace.json": {
+      "sha256": "B9B67CE0C0CF67DCAF0915B641C0628820912BEF5E46E8D198CEE0611EF66B2F",
+      "size_bytes": 2078
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r1/hook_events.json": {
+      "sha256": "3945ED51BF784DA131EAE94C91D84F6AE802559B6CAA753F59E43885B1AE8CBD",
+      "size_bytes": 1443
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r1/injection_delivery.json": {
+      "sha256": "EE26E5AEC7F1E32F42F83E63324090E4C11B0CE3719DFE3344B2CDC49DE4119A",
+      "size_bytes": 1853
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r1/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r1/metadata.json": {
+      "sha256": "ADD305AFBBD1A06B9847A70242687F06E1BF9313BA783DE1B3EAE86451CBEF09",
+      "size_bytes": 4968
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r1/offline_enforcement.json": {
+      "sha256": "0E8AB8DF6A653958D0493F9FDE6DF81DA56A40AC68889AD436DF227FBCE91178",
+      "size_bytes": 698
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r1/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r1/stdout.jsonl": {
+      "sha256": "92758971124C4472A3B060E5CB8C57751772AB8053D34CFE595340E5FB6C3F1A",
+      "size_bytes": 37852
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r1/workspace.diff": {
+      "sha256": "C3B3CB468543E730AD9C9373B5E4370A298312CA4CA1DA46CB6F8544DCE80F5B",
+      "size_bytes": 224
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r2/attempts.json": {
+      "sha256": "C13896B4EA76D45A9B5B173B3C8429F9DFA5A2C09B7959F239C4AADFDAFC5E79",
+      "size_bytes": 1208
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r2/event_timing.json": {
+      "sha256": "CAA25A185F50BA5F0F59F1C3CE46F252206A6B1387B5D02E4F3FF0E3D2E4DEC4",
+      "size_bytes": 10790
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r2/final_workspace.json": {
+      "sha256": "D677A9432CF9E9C5EFA2D799FD615755B3A7892E07859BEFFA233BF04A09E862",
+      "size_bytes": 2151
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r2/first_attempt.diff": {
+      "sha256": "1FF04F32D0322E11EF355E6769DD222387C24291EFE4D38B2F23B44E869859EF",
+      "size_bytes": 292
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r2/first_attempt.json": {
+      "sha256": "E2B89C00C0C64E5DF78F27946A8C6B51AF4481E057C088F6B5AADCE951C0833E",
+      "size_bytes": 3215
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r2/first_attempt_workspace.json": {
+      "sha256": "D677A9432CF9E9C5EFA2D799FD615755B3A7892E07859BEFFA233BF04A09E862",
+      "size_bytes": 2151
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r2/hook_events.json": {
+      "sha256": "1C0AB7B8E3F845B4D32EA305D17F4A7C417FE986682F603C1D5B883B20B96F90",
+      "size_bytes": 1443
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r2/injection_delivery.json": {
+      "sha256": "83F185FEEDCB98C8EBC4219D27A17BDA4DA674910E869C2576B66A2BE742511C",
+      "size_bytes": 1853
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r2/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r2/metadata.json": {
+      "sha256": "ED7B0B2CB0EA61386249659A04489EF10AEAEC4EAD5C0AC89A84878A8D468643",
+      "size_bytes": 4968
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r2/offline_enforcement.json": {
+      "sha256": "0E8AB8DF6A653958D0493F9FDE6DF81DA56A40AC68889AD436DF227FBCE91178",
+      "size_bytes": 698
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r2/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r2/stdout.jsonl": {
+      "sha256": "4261570D96C7CC93ECFE421DE36618C64CF257426E484C9F2AB08986D5D2C174",
+      "size_bytes": 42557
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r2/workspace.diff": {
+      "sha256": "1FF04F32D0322E11EF355E6769DD222387C24291EFE4D38B2F23B44E869859EF",
+      "size_bytes": 292
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r3/attempts.json": {
+      "sha256": "9A3006825728693B56C2CA2BEF12EE733D4E1816C9FD765E8B5082D923C46884",
+      "size_bytes": 1135
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r3/event_timing.json": {
+      "sha256": "6C7A4AEF087079D3EBA41D898BDD72EC27F5A06D98C197CFD688D62EDC1BD288",
+      "size_bytes": 9705
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r3/final_workspace.json": {
+      "sha256": "B9B67CE0C0CF67DCAF0915B641C0628820912BEF5E46E8D198CEE0611EF66B2F",
+      "size_bytes": 2078
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r3/first_attempt.diff": {
+      "sha256": "C3B3CB468543E730AD9C9373B5E4370A298312CA4CA1DA46CB6F8544DCE80F5B",
+      "size_bytes": 224
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r3/first_attempt.json": {
+      "sha256": "879865AD7D7873C5B21037867AEC9072FFDFA775F681C8EAEF4406F704E2D640",
+      "size_bytes": 2581
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r3/first_attempt_workspace.json": {
+      "sha256": "B9B67CE0C0CF67DCAF0915B641C0628820912BEF5E46E8D198CEE0611EF66B2F",
+      "size_bytes": 2078
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r3/hook_events.json": {
+      "sha256": "D536B9D08AB1F9826DDFD5598D7090F03DB9981E9C4F2C19E1C9CDEFCCBE5D9C",
+      "size_bytes": 1443
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r3/injection_delivery.json": {
+      "sha256": "16FC59FA2E3143A0286ACFE1FE595AE7AE45D43A636440353EB56996EEB847D2",
+      "size_bytes": 1853
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r3/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r3/metadata.json": {
+      "sha256": "E2286E999F5D93687C17B88E4FEC146E63002EB80C4DD3E7DA3E3F450DB1C82E",
+      "size_bytes": 4968
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r3/offline_enforcement.json": {
+      "sha256": "0E8AB8DF6A653958D0493F9FDE6DF81DA56A40AC68889AD436DF227FBCE91178",
+      "size_bytes": 698
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r3/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r3/stdout.jsonl": {
+      "sha256": "E0A74830444842532AE3AF9D1224A93EB0B3E5E8E9A4D58CB438DBF81C7AA785",
+      "size_bytes": 38947
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__baseline__r3/workspace.diff": {
+      "sha256": "C3B3CB468543E730AD9C9373B5E4370A298312CA4CA1DA46CB6F8544DCE80F5B",
+      "size_bytes": 224
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r1/attempts.json": {
+      "sha256": "FEE1FC48995B99BC9BF6289EB56B84566BA736FD9B5D36DCFAB06C8CD0621A2F",
+      "size_bytes": 1136
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r1/event_timing.json": {
+      "sha256": "434051F2454447C90E0751E7CA5645F525E72E8A1517215BB56EDC5DDC1B870F",
+      "size_bytes": 10783
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r1/final_workspace.json": {
+      "sha256": "B9B67CE0C0CF67DCAF0915B641C0628820912BEF5E46E8D198CEE0611EF66B2F",
+      "size_bytes": 2078
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r1/first_attempt.diff": {
+      "sha256": "C3B3CB468543E730AD9C9373B5E4370A298312CA4CA1DA46CB6F8544DCE80F5B",
+      "size_bytes": 224
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r1/first_attempt.json": {
+      "sha256": "B3999302302FE6C7A31630A11368C191C4C8727F90A8322105DF8D52D71D8B12",
+      "size_bytes": 3121
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r1/first_attempt_workspace.json": {
+      "sha256": "B9B67CE0C0CF67DCAF0915B641C0628820912BEF5E46E8D198CEE0611EF66B2F",
+      "size_bytes": 2078
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r1/hook_events.json": {
+      "sha256": "E66EADD1EAC18FE55CB137B6D22BBD240A1F6AA2AF85EBE49D3B7E6B06E9F4A1",
+      "size_bytes": 3817
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r1/injection_delivery.json": {
+      "sha256": "8309AE3ABAA18526F89BF41A04543F582EC2445E2CBE7669124FB6A797183D2C",
+      "size_bytes": 1977
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r1/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r1/metadata.json": {
+      "sha256": "DE386735161D3EF5EC28FC63AAA0AA2AAF3142C6EC5DE2A1ECBE4F4689910E05",
+      "size_bytes": 5139
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r1/offline_enforcement.json": {
+      "sha256": "0E8AB8DF6A653958D0493F9FDE6DF81DA56A40AC68889AD436DF227FBCE91178",
+      "size_bytes": 698
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r1/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r1/stdout.jsonl": {
+      "sha256": "382929FDA28C44BA7F0DC1419303A79372D14F37463E21FEB85C7EE448749B92",
+      "size_bytes": 44976
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r1/workspace.diff": {
+      "sha256": "C3B3CB468543E730AD9C9373B5E4370A298312CA4CA1DA46CB6F8544DCE80F5B",
+      "size_bytes": 224
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r2/attempts.json": {
+      "sha256": "D6AC3CBB13FAE1CF05F69A4E162C7F98145FAF68C8CAB926C99747B749460EC0",
+      "size_bytes": 1135
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r2/event_timing.json": {
+      "sha256": "08D3FCD0402D7D0BB1490F6D63706521F576F01F36DD89411A1450FE49C5CB66",
+      "size_bytes": 8357
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r2/final_workspace.json": {
+      "sha256": "B9B67CE0C0CF67DCAF0915B641C0628820912BEF5E46E8D198CEE0611EF66B2F",
+      "size_bytes": 2078
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r2/first_attempt.diff": {
+      "sha256": "C3B3CB468543E730AD9C9373B5E4370A298312CA4CA1DA46CB6F8544DCE80F5B",
+      "size_bytes": 224
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r2/first_attempt.json": {
+      "sha256": "5686447FE0DDDF62B5AE44A1433F2F9BFB496073FC5720499456B39266BD936D",
+      "size_bytes": 2657
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r2/first_attempt_workspace.json": {
+      "sha256": "B9B67CE0C0CF67DCAF0915B641C0628820912BEF5E46E8D198CEE0611EF66B2F",
+      "size_bytes": 2078
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r2/hook_events.json": {
+      "sha256": "798C8C31D134E32162955B8E3105040BA9AAB87D11910882BA70A1034CB84CA8",
+      "size_bytes": 3817
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r2/injection_delivery.json": {
+      "sha256": "7DFCBA97A54618544A91459C898BC9FF29639887032B87A45C81E0B51D27A97B",
+      "size_bytes": 1977
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r2/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r2/metadata.json": {
+      "sha256": "7E793161699B596C7F979A29ABDFF675810191529639B10F75AEB3AE9D6F69B0",
+      "size_bytes": 5117
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r2/offline_enforcement.json": {
+      "sha256": "0E8AB8DF6A653958D0493F9FDE6DF81DA56A40AC68889AD436DF227FBCE91178",
+      "size_bytes": 698
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r2/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r2/stdout.jsonl": {
+      "sha256": "258CF71E242994B3AFB7EBD94046AD4EF0EB8A8FE376E484E7DFBD87057E3655",
+      "size_bytes": 36501
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r2/workspace.diff": {
+      "sha256": "C3B3CB468543E730AD9C9373B5E4370A298312CA4CA1DA46CB6F8544DCE80F5B",
+      "size_bytes": 224
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r3/attempts.json": {
+      "sha256": "6005E442251FCE25E9DB82721FDC8941E841405832D5E4C28F95299F8EC494FC",
+      "size_bytes": 1132
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r3/event_timing.json": {
+      "sha256": "973538261FB4743CDB11FE195EEC439374A4EA4003824AB26014C52C178D67BA",
+      "size_bytes": 8073
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r3/final_workspace.json": {
+      "sha256": "B9B67CE0C0CF67DCAF0915B641C0628820912BEF5E46E8D198CEE0611EF66B2F",
+      "size_bytes": 2078
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r3/first_attempt.diff": {
+      "sha256": "C3B3CB468543E730AD9C9373B5E4370A298312CA4CA1DA46CB6F8544DCE80F5B",
+      "size_bytes": 224
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r3/first_attempt.json": {
+      "sha256": "FA8FA88D3743420655D427231BFB941DCD0BC6E9F2A54D27A36711466EA399DB",
+      "size_bytes": 2338
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r3/first_attempt_workspace.json": {
+      "sha256": "B9B67CE0C0CF67DCAF0915B641C0628820912BEF5E46E8D198CEE0611EF66B2F",
+      "size_bytes": 2078
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r3/hook_events.json": {
+      "sha256": "32715D54A29D8BBE0A7A0A7596F0F5077BE400C2B50ADF3B0B970624A4FD2925",
+      "size_bytes": 3817
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r3/injection_delivery.json": {
+      "sha256": "AAF1536AFF39A5FF3FE5C8F7E6F72E07837F67E5D001034B802880D5DDF1597D",
+      "size_bytes": 1977
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r3/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r3/metadata.json": {
+      "sha256": "44733CB5FDA67F332E91DAB8D4049B837DA1B4363BC25AA9DE1926F91CCAD84E",
+      "size_bytes": 5138
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r3/offline_enforcement.json": {
+      "sha256": "0E8AB8DF6A653958D0493F9FDE6DF81DA56A40AC68889AD436DF227FBCE91178",
+      "size_bytes": 698
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r3/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r3/stdout.jsonl": {
+      "sha256": "A9DC67041726252E86FC78FE4A3BB9C309DFEC237B57E191ABCBE5920F33D6EB",
+      "size_bytes": 36266
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/jobs-1__treatment__r3/workspace.diff": {
+      "sha256": "C3B3CB468543E730AD9C9373B5E4370A298312CA4CA1DA46CB6F8544DCE80F5B",
+      "size_bytes": 224
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r1/attempts.json": {
+      "sha256": "D841B834B0CC622EA27DD35676BE61F56B79BBDE7DDE2BF7F21EC3D0A09BF5E8",
+      "size_bytes": 2363
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r1/event_timing.json": {
+      "sha256": "EC38CAA3DFE3F162DC434FEA44E2E77FA7372B37490A1B4102D7FA8E26B077CC",
+      "size_bytes": 11864
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r1/final_workspace.json": {
+      "sha256": "56B107211F89C5391969A29A20ABCE07558166BA4ADD04891E54A51A53CDBF00",
+      "size_bytes": 2844
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r1/first_attempt.diff": {
+      "sha256": "C801343450FC37A5FD6F0C18D4DD8FD67915B34F2F4531F60AD54BDE616A389B",
+      "size_bytes": 1214
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r1/first_attempt.json": {
+      "sha256": "D4674E3495FF6649EDE6C4C5ADF5984E4CA1A12F528D34B4E50D1E48E78ADF19",
+      "size_bytes": 5272
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r1/first_attempt_workspace.json": {
+      "sha256": "56B107211F89C5391969A29A20ABCE07558166BA4ADD04891E54A51A53CDBF00",
+      "size_bytes": 2844
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r1/hook_events.json": {
+      "sha256": "D0C977B240D5D56A379AE15E151F4BB64B42B3A1D241F18FBA40A3AB196847C7",
+      "size_bytes": 1443
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r1/injection_delivery.json": {
+      "sha256": "9F28C4422A90125D6CF9F23DAF4ED006EA1D5A70B938632C5EC9EBAF5EC86926",
+      "size_bytes": 1850
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r1/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r1/metadata.json": {
+      "sha256": "51E87B4E7C402BC51159A0DD215D26988DA33C91ABCA7D2E003A0CDE45A318DF",
+      "size_bytes": 4963
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r1/offline_enforcement.json": {
+      "sha256": "D2EB42551BCD8830EFF77ED37AC3EE52467E3240C0DF59B97374C365FA2492CF",
+      "size_bytes": 686
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r1/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r1/stdout.jsonl": {
+      "sha256": "3CC25BE80BB9C5906DB2F8E3ABBF9EB7664324B1C52938A049BF7B4249673A0B",
+      "size_bytes": 47809
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r1/workspace.diff": {
+      "sha256": "C801343450FC37A5FD6F0C18D4DD8FD67915B34F2F4531F60AD54BDE616A389B",
+      "size_bytes": 1214
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r2/attempts.json": {
+      "sha256": "FFC5612E2B0CC078D9FDC947B390E98E1E2B4512C92C905FE354B2E9A1DF7D48",
+      "size_bytes": 2615
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r2/event_timing.json": {
+      "sha256": "84EC3B17A4D1F97B647425806C476059286F353E989245ADDC335D68DCE8B2DA",
+      "size_bytes": 13493
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r2/final_workspace.json": {
+      "sha256": "A8CF8A6FC14430DE2873988762772B87B42FAB16DFC277678B609F333509FFBA",
+      "size_bytes": 3498
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r2/first_attempt.diff": {
+      "sha256": "0DDC03321C8D5EC442F8388126101F1F329C0884C396115AE70C8DFC315A505E",
+      "size_bytes": 1697
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r2/first_attempt.json": {
+      "sha256": "EEE1DAC2D9A55894A90A87167CF24D1AAA4BFBC31D63FC07C9DAD43E854BA305",
+      "size_bytes": 7013
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r2/first_attempt_workspace.json": {
+      "sha256": "A8CF8A6FC14430DE2873988762772B87B42FAB16DFC277678B609F333509FFBA",
+      "size_bytes": 3498
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r2/hook_events.json": {
+      "sha256": "C207BB2CD570991E894C9246E465303F66F7B9FBBC0F027FAD6A8682233275E6",
+      "size_bytes": 1445
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r2/injection_delivery.json": {
+      "sha256": "E8FA182B082BDACFD74B4891273CDC2B6C0E758FE3EAFFDC3A0775A87B4CCD55",
+      "size_bytes": 1850
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r2/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r2/metadata.json": {
+      "sha256": "D3E225A5F8A6E60C1297DDA9B87BF545F1E45FE92E3A614DCF2B38622BEF99ED",
+      "size_bytes": 4966
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r2/offline_enforcement.json": {
+      "sha256": "D2EB42551BCD8830EFF77ED37AC3EE52467E3240C0DF59B97374C365FA2492CF",
+      "size_bytes": 686
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r2/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r2/stdout.jsonl": {
+      "sha256": "B43EEF1AA9D6DDA5F4CCE2283AECD754B31C56C97A383824D51FCB8B6B97BAAC",
+      "size_bytes": 55515
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r2/workspace.diff": {
+      "sha256": "0DDC03321C8D5EC442F8388126101F1F329C0884C396115AE70C8DFC315A505E",
+      "size_bytes": 1697
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r3/attempts.json": {
+      "sha256": "A031192AEFD909F7359A20865687EA85A944C582DC27C6C2479F3DBEDD6DF8CC",
+      "size_bytes": 2683
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r3/event_timing.json": {
+      "sha256": "42B64825D478783C0738DD5D858646333D6AFFE1667E2742ECF73D1F62EF0D68",
+      "size_bytes": 10792
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r3/final_workspace.json": {
+      "sha256": "40A0B55BBF32BB4440F2FF1BD406D4B1E7502B479A8D6E998E29173B511AA5B8",
+      "size_bytes": 3164
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r3/first_attempt.diff": {
+      "sha256": "2A4064A62984F76711E23AD08BC2EDCBCC5C1FE3AF8B157CC63FD80ADC4D70AC",
+      "size_bytes": 1381
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r3/first_attempt.json": {
+      "sha256": "31902DFEDEA72E3EE17C5E7C5647A9A8AC9376E127A960DD3BA0A26DAFDE2439",
+      "size_bytes": 5761
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r3/first_attempt_workspace.json": {
+      "sha256": "40A0B55BBF32BB4440F2FF1BD406D4B1E7502B479A8D6E998E29173B511AA5B8",
+      "size_bytes": 3164
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r3/hook_events.json": {
+      "sha256": "40AC78D09C1E99D5C493CE8C0EB644BA8B04BCD2F4317583F3F3B75AF40119BF",
+      "size_bytes": 1443
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r3/injection_delivery.json": {
+      "sha256": "7F506FD7FC2286FD27F68559B76ABA9855F3F4CD15D7D89658D4E37EBA89B6A3",
+      "size_bytes": 1850
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r3/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r3/metadata.json": {
+      "sha256": "A25D47663B606F17B2769AC54B82D16F3C9A2138B28F516A3E47477C4F6EC58E",
+      "size_bytes": 4683
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r3/offline_enforcement.json": {
+      "sha256": "D2EB42551BCD8830EFF77ED37AC3EE52467E3240C0DF59B97374C365FA2492CF",
+      "size_bytes": 686
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r3/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r3/stdout.jsonl": {
+      "sha256": "E97911DF5EC526ED32235A5A8BA86FF20C1250756ED1AB4F4B8D26D039E2FB7B",
+      "size_bytes": 35299
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__baseline__r3/workspace.diff": {
+      "sha256": "2A4064A62984F76711E23AD08BC2EDCBCC5C1FE3AF8B157CC63FD80ADC4D70AC",
+      "size_bytes": 1381
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r1/attempts.json": {
+      "sha256": "311D76D8330B85455B875AA5E199CB46FF44E27C1E1286BAB050E287F48DB16E",
+      "size_bytes": 2398
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r1/event_timing.json": {
+      "sha256": "808DA0A4557717C5867E890EA64D0250BFE054C122AF68DDBE9EF67704F4F046",
+      "size_bytes": 7814
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r1/final_workspace.json": {
+      "sha256": "7DABA8AF1398B09FFF926D842F233818DCF47C01038FA8342745A4C577A93315",
+      "size_bytes": 2879
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r1/first_attempt.diff": {
+      "sha256": "6CCF97AFFE44187EDB21628B1A460A8861E471EDF463103BB393C08C022E9A45",
+      "size_bytes": 1251
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r1/first_attempt.json": {
+      "sha256": "7BB2C76D8761129ED9B67ADD75A94F979413D8E1EDD4073CA926E55C60EB6FF7",
+      "size_bytes": 4435
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r1/first_attempt_workspace.json": {
+      "sha256": "7DABA8AF1398B09FFF926D842F233818DCF47C01038FA8342745A4C577A93315",
+      "size_bytes": 2879
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r1/hook_events.json": {
+      "sha256": "60D9D7FA5CD76101F477F8713E9A7CD71F803FB34F00074A68CED1310A4B7A40",
+      "size_bytes": 4089
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r1/injection_delivery.json": {
+      "sha256": "7456FC533F82C0C3F77B237E7F68B4FE356AC5FFAE7B0BDBED60010285A308A0",
+      "size_bytes": 1968
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r1/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r1/metadata.json": {
+      "sha256": "745D067AE466E8FAECBA1438318345C235D0942264CB3BFE46E76C7596D54427",
+      "size_bytes": 4850
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r1/offline_enforcement.json": {
+      "sha256": "D2EB42551BCD8830EFF77ED37AC3EE52467E3240C0DF59B97374C365FA2492CF",
+      "size_bytes": 686
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r1/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r1/stdout.jsonl": {
+      "sha256": "94BF21831911918BEECCF5A6729AA40A2778BFE112726E634596455BA20EE9ED",
+      "size_bytes": 27045
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r1/workspace.diff": {
+      "sha256": "6CCF97AFFE44187EDB21628B1A460A8861E471EDF463103BB393C08C022E9A45",
+      "size_bytes": 1251
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r2/attempts.json": {
+      "sha256": "272CC0C59B9F5716A0011DB1054345481FC458B72AF314EE2A218B67A45A6925",
+      "size_bytes": 2414
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r2/event_timing.json": {
+      "sha256": "89057795BF9A2E0FB4B30A724B736E3FFE2330AE1AB4D11FC8541A8FD14E5378",
+      "size_bytes": 9156
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r2/final_workspace.json": {
+      "sha256": "5D83A9092C394213CD979DAA7D02C78FBF8E58C7267808228E8C052AA060A6B1",
+      "size_bytes": 2895
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r2/first_attempt.diff": {
+      "sha256": "1B38F03A65F157D8C08294732E7A6EFC8FB7F11A9AF3ED1907DA1A12A2D70E01",
+      "size_bytes": 1266
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r2/first_attempt.json": {
+      "sha256": "F8048FFB3198864F881A319C0B6CED5DC5307F6990226B753E8ADAA728902EB5",
+      "size_bytes": 5397
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r2/first_attempt_workspace.json": {
+      "sha256": "5D83A9092C394213CD979DAA7D02C78FBF8E58C7267808228E8C052AA060A6B1",
+      "size_bytes": 2895
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r2/hook_events.json": {
+      "sha256": "7E66390BB123E94F99B2A613F15F3336C84F2D1DF9FACCDE54783050DB400D03",
+      "size_bytes": 4089
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r2/injection_delivery.json": {
+      "sha256": "5DA7F5EEDF3786EAAE7D29DE9E98F15A7EACF9ED7FCCD4FDE9C95751B88596C9",
+      "size_bytes": 1968
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r2/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r2/metadata.json": {
+      "sha256": "85E3E6B8511AF1FC917DEF44B8591A9227E7231841B16E220E211F5169E3C6E8",
+      "size_bytes": 5091
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r2/offline_enforcement.json": {
+      "sha256": "D2EB42551BCD8830EFF77ED37AC3EE52467E3240C0DF59B97374C365FA2492CF",
+      "size_bytes": 686
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r2/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r2/stdout.jsonl": {
+      "sha256": "31238838661DAE67EF4C71163BD2263C00BAA71BCE8904AF8ED333551E283D15",
+      "size_bytes": 43593
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r2/workspace.diff": {
+      "sha256": "1B38F03A65F157D8C08294732E7A6EFC8FB7F11A9AF3ED1907DA1A12A2D70E01",
+      "size_bytes": 1266
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r3/attempts.json": {
+      "sha256": "47BFC90F3AE3A754AF560CE836FC3B5112B5CEEFF2202F04D9D8DCCF530629AE",
+      "size_bytes": 2352
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r3/event_timing.json": {
+      "sha256": "72D58EA6EC2541B4C175E4245A0875F9042D7822A2845329FF3C2CBCC27A0D21",
+      "size_bytes": 8353
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r3/final_workspace.json": {
+      "sha256": "8A057033C5DD042BA90B59D55E341936569A577DDD0A79A3324A7A293A8F9CF6",
+      "size_bytes": 3237
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r3/first_attempt.diff": {
+      "sha256": "EAF7B80E93CDC01E68CABE65F019F96806AFCE4791AE687BA6493A3E7E1E9845",
+      "size_bytes": 1439
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r3/first_attempt.json": {
+      "sha256": "E905F7D4FA0DBC3FAB5A201ED4B879E1817A205E0503D5D018991AE3CCC0324C",
+      "size_bytes": 5271
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r3/first_attempt_workspace.json": {
+      "sha256": "8A057033C5DD042BA90B59D55E341936569A577DDD0A79A3324A7A293A8F9CF6",
+      "size_bytes": 3237
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r3/hook_events.json": {
+      "sha256": "51B2791E86D22BF2CBCAC454B8C53A19DA629440336B2C79BD045ACDC8D055D1",
+      "size_bytes": 4091
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r3/injection_delivery.json": {
+      "sha256": "A3462581307E9CA3B31FF96E2CFB21A9F11840B3F2645D51F1A20720F97FB1E6",
+      "size_bytes": 1968
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r3/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r3/metadata.json": {
+      "sha256": "FB0EE9BB8C9DF2D621DAD85C0DD0E992BEE6BF2E0EAAFE789571AFD834167DA8",
+      "size_bytes": 5089
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r3/offline_enforcement.json": {
+      "sha256": "D2EB42551BCD8830EFF77ED37AC3EE52467E3240C0DF59B97374C365FA2492CF",
+      "size_bytes": 686
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r3/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r3/stdout.jsonl": {
+      "sha256": "482C2A83F2AB3AE1D73556CE88B6E247368CC3BCAD39679AA1C38D9E397B304E",
+      "size_bytes": 41668
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/storage-1__treatment__r3/workspace.diff": {
+      "sha256": "EAF7B80E93CDC01E68CABE65F019F96806AFCE4791AE687BA6493A3E7E1E9845",
+      "size_bytes": 1439
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r1/attempts.json": {
+      "sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+      "size_bytes": 4
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r1/event_timing.json": {
+      "sha256": "9B50E7034E06092DF88262295B7696F4CFC1F146D7666326194FA03AE46C5ED1",
+      "size_bytes": 11598
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r1/final_workspace.json": {
+      "sha256": "8F53E28DBB9E215EE90557CD9F98DEFB699B07080559210E36DE7BA9AC4D0962",
+      "size_bytes": 2080
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r1/first_attempt.diff": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r1/first_attempt.json": {
+      "sha256": "B45424C5B4EB5B56F7E705BD70A05FFF61FAE4FBF28D7EBF337393C3DE99A46B",
+      "size_bytes": 325
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r1/first_attempt_workspace.json": {
+      "sha256": "ABDFBFFECBE18ED94DF9829819E596EE285B52A94AA108514452A9121721C789",
+      "size_bytes": 6
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r1/hook_events.json": {
+      "sha256": "4C530F047D5C3DC2A19FA6E138EA3D35338DE8F16E6A705397A7CAE28BA721E7",
+      "size_bytes": 731
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r1/injection_delivery.json": {
+      "sha256": "0DA41CEBB34424A4DB64B2814334733B556EB85BF74E42F0A921C8F56959502A",
+      "size_bytes": 1833
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r1/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r1/metadata.json": {
+      "sha256": "98012A0235259EC386B6D814752BA22EBFD99A46C28C5BD6A3C5B2B5993799BC",
+      "size_bytes": 4696
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r1/offline_enforcement.json": {
+      "sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+      "size_bytes": 4
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r1/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r1/stdout.jsonl": {
+      "sha256": "79265435F379231E079C86D69D7F50F880F235743CB4AF1C9A11429EA0B0224F",
+      "size_bytes": 41398
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r1/workspace.diff": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r2/attempts.json": {
+      "sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+      "size_bytes": 4
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r2/event_timing.json": {
+      "sha256": "20ABA65CE99F51B033827EF9FB38A0CE5E6756C9EEC837B24871E7E537B42D8F",
+      "size_bytes": 12146
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r2/final_workspace.json": {
+      "sha256": "8F53E28DBB9E215EE90557CD9F98DEFB699B07080559210E36DE7BA9AC4D0962",
+      "size_bytes": 2080
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r2/first_attempt.diff": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r2/first_attempt.json": {
+      "sha256": "B45424C5B4EB5B56F7E705BD70A05FFF61FAE4FBF28D7EBF337393C3DE99A46B",
+      "size_bytes": 325
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r2/first_attempt_workspace.json": {
+      "sha256": "ABDFBFFECBE18ED94DF9829819E596EE285B52A94AA108514452A9121721C789",
+      "size_bytes": 6
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r2/hook_events.json": {
+      "sha256": "08F60B140BCC3320ABFD29C4833AB552FA62B4F9BC96A2ABD609F52E184BA964",
+      "size_bytes": 731
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r2/injection_delivery.json": {
+      "sha256": "1E82409EF08E225AE6681448864F84B58A216DDAD2D0C64C87B810C7DC08863F",
+      "size_bytes": 1833
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r2/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r2/metadata.json": {
+      "sha256": "72C60B61790FC8E5739F8CF12CB87FFC3D760AD9E13871FE3B0C135197E2CE61",
+      "size_bytes": 4695
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r2/offline_enforcement.json": {
+      "sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+      "size_bytes": 4
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r2/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r2/stdout.jsonl": {
+      "sha256": "9156C65245FB7F73603C0E3571A2A36C3AE25D00D753D554BA8640FAEC76B0BE",
+      "size_bytes": 44323
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r2/workspace.diff": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r3/attempts.json": {
+      "sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+      "size_bytes": 4
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r3/event_timing.json": {
+      "sha256": "277AE99FE59BB148A40D3AA94114C7B0E52F4F05F699B2AA7CA23AAB3EAE9865",
+      "size_bytes": 12408
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r3/final_workspace.json": {
+      "sha256": "8F53E28DBB9E215EE90557CD9F98DEFB699B07080559210E36DE7BA9AC4D0962",
+      "size_bytes": 2080
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r3/first_attempt.diff": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r3/first_attempt.json": {
+      "sha256": "B45424C5B4EB5B56F7E705BD70A05FFF61FAE4FBF28D7EBF337393C3DE99A46B",
+      "size_bytes": 325
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r3/first_attempt_workspace.json": {
+      "sha256": "ABDFBFFECBE18ED94DF9829819E596EE285B52A94AA108514452A9121721C789",
+      "size_bytes": 6
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r3/hook_events.json": {
+      "sha256": "786DE242E2A7C374185B40E5FDEB1DF76ABD8890DE4E72E20DC801C13234153D",
+      "size_bytes": 731
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r3/injection_delivery.json": {
+      "sha256": "A61754B734875DF8DE7FD287C99E96F90E2BC3EF4D1A38349985ABA38547FD85",
+      "size_bytes": 1833
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r3/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r3/metadata.json": {
+      "sha256": "8769FE523C514EE5555899BA1AEC272A90C5532B58C0204A4C0801CF75FD4B75",
+      "size_bytes": 4696
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r3/offline_enforcement.json": {
+      "sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+      "size_bytes": 4
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r3/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r3/stdout.jsonl": {
+      "sha256": "6E2FE7A2EFAE50DFE99C9CF145C7C6FFFD60D25A58B258F8E4AE4DEEFE9AFEEC",
+      "size_bytes": 46462
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__baseline__r3/workspace.diff": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r1/attempts.json": {
+      "sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+      "size_bytes": 4
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r1/event_timing.json": {
+      "sha256": "B85CC616A01C023A9BE1727DB663A8EDD02BC492B9F96D980AC8A300AE8DF6F3",
+      "size_bytes": 11599
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r1/final_workspace.json": {
+      "sha256": "8F53E28DBB9E215EE90557CD9F98DEFB699B07080559210E36DE7BA9AC4D0962",
+      "size_bytes": 2080
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r1/first_attempt.diff": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r1/first_attempt.json": {
+      "sha256": "B45424C5B4EB5B56F7E705BD70A05FFF61FAE4FBF28D7EBF337393C3DE99A46B",
+      "size_bytes": 325
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r1/first_attempt_workspace.json": {
+      "sha256": "ABDFBFFECBE18ED94DF9829819E596EE285B52A94AA108514452A9121721C789",
+      "size_bytes": 6
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r1/hook_events.json": {
+      "sha256": "733B029E5B0C341D35B91D400B1627B3A51A3043B84CB29E86E2229F59341D0B",
+      "size_bytes": 2311
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r1/injection_delivery.json": {
+      "sha256": "B15296200E5B514B85A5FD22F29DD9A8D665289678DC7B887C3EFDCBF2F34318",
+      "size_bytes": 1929
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r1/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r1/metadata.json": {
+      "sha256": "55A61B6F43E5AF899E564E508B025C00C4C5D084870A59CCF981951B72E36DA5",
+      "size_bytes": 4821
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r1/offline_enforcement.json": {
+      "sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+      "size_bytes": 4
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r1/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r1/stdout.jsonl": {
+      "sha256": "63775E2833BE29D150EDA0E6BFFD86ABBBE3FC2587BEB575DD2ABF564B24CFD4",
+      "size_bytes": 44071
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r1/workspace.diff": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r2/attempts.json": {
+      "sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+      "size_bytes": 4
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r2/event_timing.json": {
+      "sha256": "F4D60CB11AAB163306C0923974FB1840A8FB18602E194FA319FAD49AC14AF43F",
+      "size_bytes": 12137
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r2/final_workspace.json": {
+      "sha256": "8F53E28DBB9E215EE90557CD9F98DEFB699B07080559210E36DE7BA9AC4D0962",
+      "size_bytes": 2080
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r2/first_attempt.diff": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r2/first_attempt.json": {
+      "sha256": "B45424C5B4EB5B56F7E705BD70A05FFF61FAE4FBF28D7EBF337393C3DE99A46B",
+      "size_bytes": 325
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r2/first_attempt_workspace.json": {
+      "sha256": "ABDFBFFECBE18ED94DF9829819E596EE285B52A94AA108514452A9121721C789",
+      "size_bytes": 6
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r2/hook_events.json": {
+      "sha256": "CC5DCA50B8F07E8F812A74D86394E4DBF8F1B15823090244A4612525A0EBA0FE",
+      "size_bytes": 2311
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r2/injection_delivery.json": {
+      "sha256": "EAE390CD35541385FD3F9340784C63A6A384366FA73A67E37D18525BAD72014F",
+      "size_bytes": 1929
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r2/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r2/metadata.json": {
+      "sha256": "531CF7AE71364A93F1BF59AE885D46E2F476194158102100F2C9705D9AAC75FF",
+      "size_bytes": 4830
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r2/offline_enforcement.json": {
+      "sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+      "size_bytes": 4
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r2/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r2/stdout.jsonl": {
+      "sha256": "6CC0B085961EC09D564635AA78E36DDAAA9241044E52B722952EDB688E6043FC",
+      "size_bytes": 42770
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r2/workspace.diff": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r3/attempts.json": {
+      "sha256": "53D4D097F96F7B5B37F70E28807A412A63EC80292B6CA0FA78F73265240DF3B7",
+      "size_bytes": 1106
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r3/event_timing.json": {
+      "sha256": "B6A96DFF57DCC62215F992990E50791450A9101F584EF10AFE35FBC1876CB7CF",
+      "size_bytes": 11060
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r3/final_workspace.json": {
+      "sha256": "9E98D63027E46890037CD939004B0F940D8988B401230F6B3C1BBF4BF2CAEEC9",
+      "size_bytes": 2106
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r3/first_attempt.diff": {
+      "sha256": "42B2E7E8894811ACED41A189B6345FB0D5AFC6CE4B14591513720576DF9BD421",
+      "size_bytes": 238
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r3/first_attempt.json": {
+      "sha256": "BFD734563441090F67275ED0BF2C3A2B9CA78C6FEBE264F8B4B0D95AE11BF47E",
+      "size_bytes": 3428
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r3/first_attempt_workspace.json": {
+      "sha256": "9E98D63027E46890037CD939004B0F940D8988B401230F6B3C1BBF4BF2CAEEC9",
+      "size_bytes": 2106
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r3/hook_events.json": {
+      "sha256": "69677DF1550A1BA735E2FF713E28537298750A2B298FF8DDB58F0FE452C77DCD",
+      "size_bytes": 3023
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r3/injection_delivery.json": {
+      "sha256": "C1A9A379073D22E29BDCB8F5DD18E8D582B293CC3A97E14C6F275C4D183B676B",
+      "size_bytes": 1927
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r3/isolation.json": {
+      "sha256": "0795966C4009B8A5CA528106A657914C2FD72B3381A6173709DBFC5556FAE604",
+      "size_bytes": 88
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r3/metadata.json": {
+      "sha256": "A15E6E4E6CCB21936A7A9E37FA3BF786C5F9B1B40337680147D921DF53ECC865",
+      "size_bytes": 5093
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r3/offline_enforcement.json": {
+      "sha256": "CB9FAC29A01E0EB99A4127693682BA4B9A2299279CAE03D07AD18C649815F724",
+      "size_bytes": 686
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r3/stderr.log": {
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "size_bytes": 0
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r3/stdout.jsonl": {
+      "sha256": "B08881DA7608A089C3C70971577157C0B041E30975333BED515B6808A7EECC86",
+      "size_bytes": 41567
+    },
+    "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/runs/typed-1__treatment__r3/workspace.diff": {
+      "sha256": "42B2E7E8894811ACED41A189B6345FB0D5AFC6CE4B14591513720576DF9BD421",
+      "size_bytes": 238
+    }
+  },
+  "schema": "mneme.production-effectiveness-artifact-manifest/v1"
+}
+

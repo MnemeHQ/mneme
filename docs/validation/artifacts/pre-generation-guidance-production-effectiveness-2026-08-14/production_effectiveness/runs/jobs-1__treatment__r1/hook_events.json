@@ -1,0 +1,48 @@
+[
+  {
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "4da48ce3-a105-4cd3-8b75-ec89e07011f1",
+    "hook_name": "UserPromptSubmit",
+    "session_id": "fb3f6922-f8cc-4588-92f1-01731f7dbb3c",
+    "subtype": "hook_started",
+    "type": "system",
+    "uuid": "894097e5-00ea-4227-8922-e88fee4873bd"
+  },
+  {
+    "exit_code": 0,
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "4da48ce3-a105-4cd3-8b75-ec89e07011f1",
+    "hook_name": "UserPromptSubmit",
+    "outcome": "success",
+    "output": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"[Mneme architectural guidance]\\nUse these decisions only to guide the work the user requested. They do not\\nexpand the task. Do not add components, storage, dependencies, interfaces,\\nrefactors, or other architecture solely because a decision appears below.\\n\\nDIRECT DECISION [ADR-JOBS]\\nThis decision directly governs the requested work. Apply it to implementation\\nchoices within the user's requested scope.\\nDecision: Email delivery remains synchronous in the first release\\n  Scope: jobs, queue, worker, email, delivery, background\\n  Constraints:\\n    - no celery\\n    - no redis\\n  Avoid:\\n    - distributed task queue\\n\\nADJACENT CONSTRAINT [ADR-RELEASE-NOTES] \\u2014 DO NOT IMPLEMENT AS EXTRA WORK\\nThis decision may constrain the requested work only if that work actually\\ntouches its area. Do not implement this decision merely because it is shown.\\nDo not add components, storage, dependencies, interfaces, refactors, or other\\narchitecture solely to satisfy it.\\nDecision: Release notes describe shipped behavior only\\n  Scope: release, communications\"}}\r\n",
+    "session_id": "fb3f6922-f8cc-4588-92f1-01731f7dbb3c",
+    "stderr": "",
+    "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"[Mneme architectural guidance]\\nUse these decisions only to guide the work the user requested. They do not\\nexpand the task. Do not add components, storage, dependencies, interfaces,\\nrefactors, or other architecture solely because a decision appears below.\\n\\nDIRECT DECISION [ADR-JOBS]\\nThis decision directly governs the requested work. Apply it to implementation\\nchoices within the user's requested scope.\\nDecision: Email delivery remains synchronous in the first release\\n  Scope: jobs, queue, worker, email, delivery, background\\n  Constraints:\\n    - no celery\\n    - no redis\\n  Avoid:\\n    - distributed task queue\\n\\nADJACENT CONSTRAINT [ADR-RELEASE-NOTES] \\u2014 DO NOT IMPLEMENT AS EXTRA WORK\\nThis decision may constrain the requested work only if that work actually\\ntouches its area. Do not implement this decision merely because it is shown.\\nDo not add components, storage, dependencies, interfaces, refactors, or other\\narchitecture solely to satisfy it.\\nDecision: Release notes describe shipped behavior only\\n  Scope: release, communications\"}}\r\n",
+    "subtype": "hook_response",
+    "type": "system",
+    "uuid": "a88388d6-701e-4523-bfcc-ba2728e62cd0"
+  },
+  {
+    "hook_event": "PreToolUse",
+    "hook_id": "df016115-e584-49b6-8e14-1ad9ca835f2f",
+    "hook_name": "PreToolUse:Edit",
+    "session_id": "fb3f6922-f8cc-4588-92f1-01731f7dbb3c",
+    "subtype": "hook_started",
+    "type": "system",
+    "uuid": "50612098-cb85-4d58-8cf2-5c28c927ef30"
+  },
+  {
+    "exit_code": 0,
+    "hook_event": "PreToolUse",
+    "hook_id": "df016115-e584-49b6-8e14-1ad9ca835f2f",
+    "hook_name": "PreToolUse:Edit",
+    "outcome": "success",
+    "output": "",
+    "session_id": "fb3f6922-f8cc-4588-92f1-01731f7dbb3c",
+    "stderr": "",
+    "stdout": "",
+    "subtype": "hook_response",
+    "type": "system",
+    "uuid": "4262e6f9-730c-4c3b-874b-27bb0dbf39b8"
+  }
+]

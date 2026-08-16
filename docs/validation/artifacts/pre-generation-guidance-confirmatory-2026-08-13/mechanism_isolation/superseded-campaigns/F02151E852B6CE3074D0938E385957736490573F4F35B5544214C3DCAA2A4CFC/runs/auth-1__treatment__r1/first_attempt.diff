@@ -1,0 +1,67 @@
+--- a/src/auth.py
++++ b/src/auth.py
+@@ -2,6 +2,63 @@
+ 
+ from __future__ import annotations
+ 
++import base64
++import hashlib
++import hmac
++import json
++import time
++
++COOKIE_NAME = "session"
++MAX_AGE_SECONDS = 60 * 60 * 24 * 14  # 14 days
++
++
++def _sign(encoded_payload: str, secret: str) -> str:
++    digest = hmac.new(secret.encode("utf-8"), encoded_payload.encode("ascii"), hashlib.sha256).digest()
++    return base64.urlsafe_b64encode(digest).decode("ascii").rstrip("=")
++
+ 
+ def create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:
+-    raise NotImplementedError
++    """Build a signed, HTTP-only cookie descriptor for a logged-in user.
++
++    The signed value is only ever meant for a Set-Cookie header; no bearer
++    token is returned for client-side (e.g. localStorage) storage.
++    """
++    payload = json.dumps(
++        {"user_id": user_id, "issued_at": int(time.time())}, separators=(",", ":")
++    ).encode("utf-8")
++    encoded_payload = base64.urlsafe_b64encode(payload).decode("ascii").rstrip("=")
++    signature = _sign(encoded_payload, secret)
++
++    return {
++        "name": COOKIE_NAME,
++        "value": f"{encoded_payload}.{signature}",
++        "http_only": True,
++        "secure": True,
++        "same_site": "Lax",
++        "max_age": MAX_AGE_SECONDS,
++        "path": "/",
++    }
++
++
++def verify_browser_auth_state(cookie_value: str, secret: str) -> dict[str, object] | None:
++    """Validate a cookie value produced by create_browser_auth_state.
++
++    Returns the decoded payload (user_id, issued_at) on success, or None if
++    the signature is invalid, missing, or malformed.
++    """
++    try:
++        encoded_payload, signature = cookie_value.split(".", 1)
++    except ValueError:
++        return None
++
++    expected_signature = _sign(encoded_payload, secret)
++    if not hmac.compare_digest(signature, expected_signature):
++        return None
++
++    padding = "=" * (-len(encoded_payload) % 4)
++    try:
++        payload = json.loads(base64.urlsafe_b64decode(encoded_payload + padding))
++    except (ValueError, json.JSONDecodeError):
++        return None
++
++    return payload

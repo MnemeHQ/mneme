@@ -1,0 +1,25 @@
+[
+  {
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "7f8a903e-3e4c-4556-91e8-02868102ea51",
+    "hook_name": "UserPromptSubmit",
+    "session_id": "04285243-e52a-431c-bcbd-d57a6df8c1fc",
+    "subtype": "hook_started",
+    "type": "system",
+    "uuid": "52593316-85d1-432e-bc5f-5bdf18ed7d06"
+  },
+  {
+    "exit_code": 0,
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "7f8a903e-3e4c-4556-91e8-02868102ea51",
+    "hook_name": "UserPromptSubmit",
+    "outcome": "success",
+    "output": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"[Mneme architectural guidance]\\nRecorded project decisions relevant to the submitted task follow. Path-scoped typed rules list conditional selectors; applicability is determined only when a target artifact is known.\\n\\nDECISION [ADR-SERIALIZATION]: Public API payloads use JSON serialization\\n  Scope: api, serialization, response, payload, json\\n  Constraints:\\n    - no pickle\\n  Avoid:\\n    - binary python object payload\"}}\r\n",
+    "session_id": "04285243-e52a-431c-bcbd-d57a6df8c1fc",
+    "stderr": "",
+    "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"[Mneme architectural guidance]\\nRecorded project decisions relevant to the submitted task follow. Path-scoped typed rules list conditional selectors; applicability is determined only when a target artifact is known.\\n\\nDECISION [ADR-SERIALIZATION]: Public API payloads use JSON serialization\\n  Scope: api, serialization, response, payload, json\\n  Constraints:\\n    - no pickle\\n  Avoid:\\n    - binary python object payload\"}}\r\n",
+    "subtype": "hook_response",
+    "type": "system",
+    "uuid": "2d1020c9-d78b-43fd-b472-45d42997053a"
+  }
+]

@@ -1,0 +1,19 @@
+--- a/src/api.py
++++ b/src/api.py
+@@ -2,8 +2,15 @@
+ 
+ from __future__ import annotations
+ 
++import json
+ from typing import Any
++
++# Allowlist, not blocklist: this boundary is public-facing, so new account
++# fields (password hashes, tokens, internal ids, etc.) must opt in to
++# exposure rather than being exposed by default.
++_PUBLIC_FIELDS = ("id", "username", "display_name", "avatar_url", "created_at")
+ 
+ 
+ def serialize_account(account: dict[str, Any]) -> bytes:
+-    raise NotImplementedError
++    payload = {field: account[field] for field in _PUBLIC_FIELDS if field in account}
++    return json.dumps(payload).encode("utf-8")

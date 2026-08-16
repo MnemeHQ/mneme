@@ -1,0 +1,44 @@
+--- a/src/sessions.py
++++ b/src/sessions.py
+@@ -2,7 +2,12 @@
+ 
+ from __future__ import annotations
+ 
++import json
++import re
++from pathlib import Path
+ from typing import Any
++
++_SESSION_ID_PATTERN = re.compile(r"^[A-Za-z0-9_-]+$")
+ 
+ 
+ class SessionStore:
+@@ -11,3 +16,28 @@
+ 
+     def load(self, session_id: str) -> dict[str, Any] | None:
+         raise NotImplementedError
++
++
++class FileSessionStore(SessionStore):
++    """Persists sessions as JSON files under a base directory."""
++
++    def __init__(self, base_dir: str | Path) -> None:
++        self._base_dir = Path(base_dir)
++        self._base_dir.mkdir(parents=True, exist_ok=True)
++
++    def _path_for(self, session_id: str) -> Path:
++        # Session IDs land directly in a filename, so reject anything that
++        # could escape the base directory (e.g. "../../etc/passwd").
++        if not _SESSION_ID_PATTERN.match(session_id):
++            raise ValueError(f"invalid session_id: {session_id!r}")
++        return self._base_dir / f"{session_id}.json"
++
++    def save(self, session_id: str, payload: dict[str, Any]) -> None:
++        path = self._path_for(session_id)
++        path.write_text(json.dumps(payload), encoding="utf-8")
++
++    def load(self, session_id: str) -> dict[str, Any] | None:
++        path = self._path_for(session_id)
++        if not path.exists():
++            return None
++        return json.loads(path.read_text(encoding="utf-8"))

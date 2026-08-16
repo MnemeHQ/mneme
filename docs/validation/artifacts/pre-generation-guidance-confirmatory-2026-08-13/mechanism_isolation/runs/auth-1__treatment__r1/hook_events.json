@@ -1,0 +1,25 @@
+[
+  {
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "dcc832cc-2908-4bbb-a7bf-9b9c19ab348b",
+    "hook_name": "UserPromptSubmit",
+    "session_id": "256d1df3-f5df-42f8-b380-8da36c20ddde",
+    "subtype": "hook_started",
+    "type": "system",
+    "uuid": "a13968fe-fd47-427f-b9d1-f0a7a279fe44"
+  },
+  {
+    "exit_code": 0,
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "dcc832cc-2908-4bbb-a7bf-9b9c19ab348b",
+    "hook_name": "UserPromptSubmit",
+    "outcome": "success",
+    "output": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"[Mneme architectural guidance]\\nRecorded project decisions relevant to the submitted task follow. Path-scoped typed rules list conditional selectors; applicability is determined only when a target artifact is known.\\n\\nDECISION [ADR-AUTH]: Authentication state uses signed HTTP-only cookies\\n  Scope: authentication, auth, login, cookies, session, sessions\\n  Constraints:\\n    - no jwt in browser storage\\n  Avoid:\\n    - localStorage bearer token\\n\\nDECISION [ADR-STORAGE]: Persist user sessions in SQLite\\n  Scope: storage, database, persistence, session, sessions, login\\n  Constraints:\\n    - no postgres\\n    - no psycopg2\\n  Avoid:\\n    - external database\\n    - database server\"}}\r\n",
+    "session_id": "256d1df3-f5df-42f8-b380-8da36c20ddde",
+    "stderr": "",
+    "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"[Mneme architectural guidance]\\nRecorded project decisions relevant to the submitted task follow. Path-scoped typed rules list conditional selectors; applicability is determined only when a target artifact is known.\\n\\nDECISION [ADR-AUTH]: Authentication state uses signed HTTP-only cookies\\n  Scope: authentication, auth, login, cookies, session, sessions\\n  Constraints:\\n    - no jwt in browser storage\\n  Avoid:\\n    - localStorage bearer token\\n\\nDECISION [ADR-STORAGE]: Persist user sessions in SQLite\\n  Scope: storage, database, persistence, session, sessions, login\\n  Constraints:\\n    - no postgres\\n    - no psycopg2\\n  Avoid:\\n    - external database\\n    - database server\"}}\r\n",
+    "subtype": "hook_response",
+    "type": "system",
+    "uuid": "013d7bbb-7bb4-41b8-90ef-c0a6a8eb6b4d"
+  }
+]

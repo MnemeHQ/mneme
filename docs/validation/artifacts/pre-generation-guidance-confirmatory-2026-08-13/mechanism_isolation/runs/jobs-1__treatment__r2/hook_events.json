@@ -1,0 +1,25 @@
+[
+  {
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "5fc52222-7e62-4683-bdf7-2f83f1551886",
+    "hook_name": "UserPromptSubmit",
+    "session_id": "5c4c708b-e2c3-45c5-b4d8-6dde0d0f1315",
+    "subtype": "hook_started",
+    "type": "system",
+    "uuid": "52b84f77-7b53-47fd-8786-a2891eda1d6d"
+  },
+  {
+    "exit_code": 0,
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "5fc52222-7e62-4683-bdf7-2f83f1551886",
+    "hook_name": "UserPromptSubmit",
+    "outcome": "success",
+    "output": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"[Mneme architectural guidance]\\nRecorded project decisions relevant to the submitted task follow. Path-scoped typed rules list conditional selectors; applicability is determined only when a target artifact is known.\\n\\nDECISION [ADR-JOBS]: Email delivery remains synchronous in the first release\\n  Scope: jobs, queue, worker, email, delivery, background\\n  Constraints:\\n    - no celery\\n    - no redis\\n  Avoid:\\n    - distributed task queue\\n\\nDECISION [ADR-RELEASE-NOTES]: Release notes describe shipped behavior only\\n  Scope: release, communications\"}}\r\n",
+    "session_id": "5c4c708b-e2c3-45c5-b4d8-6dde0d0f1315",
+    "stderr": "",
+    "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"[Mneme architectural guidance]\\nRecorded project decisions relevant to the submitted task follow. Path-scoped typed rules list conditional selectors; applicability is determined only when a target artifact is known.\\n\\nDECISION [ADR-JOBS]: Email delivery remains synchronous in the first release\\n  Scope: jobs, queue, worker, email, delivery, background\\n  Constraints:\\n    - no celery\\n    - no redis\\n  Avoid:\\n    - distributed task queue\\n\\nDECISION [ADR-RELEASE-NOTES]: Release notes describe shipped behavior only\\n  Scope: release, communications\"}}\r\n",
+    "subtype": "hook_response",
+    "type": "system",
+    "uuid": "e649a252-e4da-4e0e-8bc4-67062502fec8"
+  }
+]

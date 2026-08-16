@@ -1,0 +1,122 @@
+{
+  "clock": "time.perf_counter_ns",
+  "event_count": 16,
+  "line_count": 16,
+  "lines": [
+    {
+      "elapsed_seconds_from_process_start": 1.886124,
+      "elapsed_seconds_from_prompt_submission": 1.872489,
+      "event_index": 0,
+      "line_index": 0,
+      "line_sha256": "2AFFE7CD13CDD5566FCB75E664EA7015C5C4A5494AFCC6622CE5BB8848C30B32"
+    },
+    {
+      "elapsed_seconds_from_process_start": 2.42434,
+      "elapsed_seconds_from_prompt_submission": 2.410704,
+      "event_index": 1,
+      "line_index": 1,
+      "line_sha256": "C3AD2AD16097F31714669EE835342749F79A6AF2D0DF6490C5EBB581A2DC32AD"
+    },
+    {
+      "elapsed_seconds_from_process_start": 2.429478,
+      "elapsed_seconds_from_prompt_submission": 2.415842,
+      "event_index": 2,
+      "line_index": 2,
+      "line_sha256": "DFD78F376C88F61A6C6F9DFB09791C8184C7BDF92502707169D53AF623EBB30D"
+    },
+    {
+      "elapsed_seconds_from_process_start": 2.71494,
+      "elapsed_seconds_from_prompt_submission": 2.701304,
+      "event_index": 3,
+      "line_index": 3,
+      "line_sha256": "A2ED2D8C3D7ABA18DE93FFAA4824F57584CB0C53F2C7C0A27B9553581DECBDEB"
+    },
+    {
+      "elapsed_seconds_from_process_start": 4.14159,
+      "elapsed_seconds_from_prompt_submission": 4.127954,
+      "event_index": 4,
+      "line_index": 4,
+      "line_sha256": "EBFD5C821654357735D2FFC66DF236184EBD44CE30E2232BC99B39753A8E75E8"
+    },
+    {
+      "elapsed_seconds_from_process_start": 4.147442,
+      "elapsed_seconds_from_prompt_submission": 4.133807,
+      "event_index": 5,
+      "line_index": 5,
+      "line_sha256": "621B3ABB635C7CE869FDCAE147B0141C54D8686010CD91D35AD728F92B05BC61"
+    },
+    {
+      "elapsed_seconds_from_process_start": 4.173734,
+      "elapsed_seconds_from_prompt_submission": 4.160098,
+      "event_index": 6,
+      "line_index": 6,
+      "line_sha256": "4D0ECAE753C6B12DE658B7E5747FB8EE1B9D401A02BE0F0FC511C5040E9A68FF"
+    },
+    {
+      "elapsed_seconds_from_process_start": 4.966182,
+      "elapsed_seconds_from_prompt_submission": 4.952546,
+      "event_index": 7,
+      "line_index": 7,
+      "line_sha256": "DD45280D8B3FAE6223BCA098ADDD6945A05989DA4D3DE1675B3CF93CE46B142B"
+    },
+    {
+      "elapsed_seconds_from_process_start": 5.076483,
+      "elapsed_seconds_from_prompt_submission": 5.062847,
+      "event_index": 8,
+      "line_index": 8,
+      "line_sha256": "2DF0415E2E37A15C2038807FFD19B59BE464D246644FFCDD65E325344E70ABC1"
+    },
+    {
+      "elapsed_seconds_from_process_start": 7.437954,
+      "elapsed_seconds_from_prompt_submission": 7.424318,
+      "event_index": 9,
+      "line_index": 9,
+      "line_sha256": "3E50C85A2BA25C498EDA4CA3C3CB698E3E3EF58E7C31108DB162F1B2C4CB0B9A"
+    },
+    {
+      "elapsed_seconds_from_process_start": 7.439251,
+      "elapsed_seconds_from_prompt_submission": 7.425615,
+      "event_index": 10,
+      "line_index": 10,
+      "line_sha256": "B3642FAB22977DABB306C4629D345BBF61CBEBBCEFF21CB85DEDE64412305331"
+    },
+    {
+      "elapsed_seconds_from_process_start": 7.511641,
+      "elapsed_seconds_from_prompt_submission": 7.498005,
+      "event_index": 11,
+      "line_index": 11,
+      "line_sha256": "F78F8CD0C9697C2E6BD0F024275712CA538AF027BA53688A132F39697BECEF9B"
+    },
+    {
+      "elapsed_seconds_from_process_start": 9.217002,
+      "elapsed_seconds_from_prompt_submission": 9.203366,
+      "event_index": 12,
+      "line_index": 12,
+      "line_sha256": "D21DADA2AE212ECFC92BA18D096748BAE383447FB28C1DB7C42354FCB91BFC4B"
+    },
+    {
+      "elapsed_seconds_from_process_start": 9.225618,
+      "elapsed_seconds_from_prompt_submission": 9.211982,
+      "event_index": 13,
+      "line_index": 13,
+      "line_sha256": "E754E5699085B5DD599163EE30A72A7C6572773BB9F3EAAB2F85BF86EA0E257B"
+    },
+    {
+      "elapsed_seconds_from_process_start": 10.611996,
+      "elapsed_seconds_from_prompt_submission": 10.59836,
+      "event_index": 14,
+      "line_index": 14,
+      "line_sha256": "4331BC52BAECD3A9C963996CA97FAF754BFC076019A913C7FF7123C72756AA27"
+    },
+    {
+      "elapsed_seconds_from_process_start": 10.630466,
+      "elapsed_seconds_from_prompt_submission": 10.61683,
+      "event_index": 15,
+      "line_index": 15,
+      "line_sha256": "5719EB67EEC4D3A9724F5C9003217BF6E1F43190E1726B319BEA1450D96ED503"
+    }
+  ],
+  "process_started_utc": "2026-08-16T17:49:29.674367+00:00",
+  "prompt_submission_started_seconds_after_process_start": 0.013636,
+  "schema": "mneme.production-stream-timing/v1"
+}

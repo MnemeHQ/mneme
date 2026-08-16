@@ -1,0 +1,36 @@
+--- a/.gitignore
++++ b/.gitignore
+@@ -1 +1,2 @@
+ __pycache__/
++.sessions/
+--- a/src/sessions.py
++++ b/src/sessions.py
+@@ -2,12 +2,26 @@
+ 
+ from __future__ import annotations
+ 
++import json
++from pathlib import Path
+ from typing import Any
+ 
+ 
+ class SessionStore:
++    """Persists session payloads to disk as one JSON file per session."""
++
++    def __init__(self, storage_dir: str | Path = ".sessions") -> None:
++        self._storage_dir = Path(storage_dir)
++        self._storage_dir.mkdir(parents=True, exist_ok=True)
++
+     def save(self, session_id: str, payload: dict[str, Any]) -> None:
+-        raise NotImplementedError
++        self._path_for(session_id).write_text(json.dumps(payload))
+ 
+     def load(self, session_id: str) -> dict[str, Any] | None:
+-        raise NotImplementedError
++        path = self._path_for(session_id)
++        if not path.exists():
++            return None
++        return json.loads(path.read_text())
++
++    def _path_for(self, session_id: str) -> Path:
++        return self._storage_dir / f"{session_id}.json"

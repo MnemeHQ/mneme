@@ -1,0 +1,129 @@
+{
+  "schema": "mneme.guidance-confirmatory-mechanism-gate/v1",
+  "decided_at": "2026-08-13T21:25:55.1846561+00:00",
+  "execution_lock_sha256": "E66ED251BED91D52A55ECB90B1EE6198E80970C45B7AC04759483F0BDF04195C",
+  "collection_manifest_sha256": "46B215D324A1C90E21615F0233D99DD695A5D883671CE44A72F362D3EEFDF0DE",
+  "blinded_score_freeze_sha256": "7AA6B819D107FC3F8EEE0BBA9BED30B21B2F3EDC0249F4F82D06EDDBEA8D93C1",
+  "blinding_map_sha256": "EEA854AB069D626A082200CA3DCE8ED7FAAFED7F82A0D56DDC8865DE22DA6F24",
+  "review": {
+    "reviewers": [
+      {
+        "id": "A",
+        "model": "gpt-5.6-sol",
+        "reasoning_effort": "high",
+        "independent": true,
+        "arm_blinded": true
+      },
+      {
+        "id": "B",
+        "model": "gpt-5.6-sol",
+        "reasoning_effort": "high",
+        "independent": true,
+        "arm_blinded": true
+      }
+    ],
+    "adjudicator": {
+      "id": "C",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "arm_blinded": true
+    },
+    "package_count": 42,
+    "disagreement_count": 5
+  },
+  "results": {
+    "baseline": {
+      "runs": 21,
+      "governed_runs": 15,
+      "governed_first_attempt_compliance": 6,
+      "functional_completion": 13,
+      "governed_scope_expansions": 2,
+      "control_scope_expansions": 0,
+      "attempted_implementations": 15,
+      "no_edit_outcomes": 6,
+      "operational_failures": 0
+    },
+    "treatment": {
+      "runs": 21,
+      "governed_runs": 15,
+      "governed_first_attempt_compliance": 10,
+      "functional_completion": 14,
+      "governed_scope_expansions": 3,
+      "control_scope_expansions": 0,
+      "attempted_implementations": 15,
+      "no_edit_outcomes": 6,
+      "operational_failures": 0,
+      "control_policy_context_injections": 0
+    },
+    "differences": {
+      "governed_first_attempt_compliance": 4,
+      "functional_completion": 1,
+      "governed_scope_expansions": 1
+    }
+  },
+  "locked_gate_checks": [
+    {
+      "check": "compliance_lift",
+      "observed": 4,
+      "required_minimum": 3,
+      "passed": true
+    },
+    {
+      "check": "functional_completion_difference",
+      "observed": 1,
+      "required_minimum": -1,
+      "passed": true
+    },
+    {
+      "check": "treatment_control_scope_expansions",
+      "observed": 0,
+      "required_maximum": 0,
+      "passed": true
+    },
+    {
+      "check": "treatment_governed_scope_expansions",
+      "observed": 3,
+      "required_maximum": 1,
+      "passed": false
+    },
+    {
+      "check": "treatment_control_policy_context_injections",
+      "observed": 0,
+      "required_maximum": 0,
+      "passed": true
+    },
+    {
+      "check": "treatment_only_operational_failure_pattern",
+      "observed": false,
+      "required": false,
+      "passed": true
+    }
+  ],
+  "diagnosis": {
+    "affected_runs": [
+      "auth-1__treatment__r1",
+      "auth-1__treatment__r2",
+      "auth-1__treatment__r3"
+    ],
+    "injected_decision_ids_in_each_run": [
+      "ADR-AUTH",
+      "ADR-STORAGE"
+    ],
+    "first_attempt_targets": {
+      "auth-1__treatment__r1": "src/sessions.py",
+      "auth-1__treatment__r2": "src/sessions.py",
+      "auth-1__treatment__r3": "src/auth.py"
+    },
+    "final_scope_expansion_in_each_run": "Implemented SQLite session persistence in src/sessions.py in addition to the requested browser-authentication work.",
+    "primary_failure_mode": "ADR-STORAGE was retrieved for the authentication prompt because its scope includes login, session, and sessions; the guidance presented it as relevant without an explicit instruction not to implement adjacent decisions outside the requested task.",
+    "task_ambiguity_assessment": "Not the primary explanation: the target was src/auth.py, the fixture described separate modules, and none of the three baseline auth runs expanded into session storage."
+  },
+  "decision": {
+    "mechanism_effect_detected": true,
+    "mechanism_gate_passed": false,
+    "failure_reason": "treatment governed scope expansions exceeded the locked maximum",
+    "production_effectiveness_ab": "PAUSED_NOT_RUN",
+    "feature_release_status": "BLOCKED_PENDING_REMEDIATION_AND_NEW_LOCKED_MECHANISM_EXPERIMENT",
+    "claim_boundary": "pre-generation architectural guidance; not pre-generation enforcement"
+  }
+}

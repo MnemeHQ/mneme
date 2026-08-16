@@ -1,0 +1,37 @@
+--- a/src/sessions.py
++++ b/src/sessions.py
+@@ -2,12 +2,32 @@
+ 
+ from __future__ import annotations
+ 
++import hashlib
++import json
++from pathlib import Path
+ from typing import Any
+ 
+ 
+ class SessionStore:
++    """Persists session payloads to disk as JSON, keyed by session id."""
++
++    def __init__(self, storage_dir: str | Path = ".sessions") -> None:
++        self._storage_dir = Path(storage_dir)
++        self._storage_dir.mkdir(parents=True, exist_ok=True)
++
++    def _path(self, session_id: str) -> Path:
++        # Hash the id so it can never be used for path traversal, regardless
++        # of what a caller passes in as session_id.
++        digest = hashlib.sha256(session_id.encode("utf-8")).hexdigest()
++        return self._storage_dir / f"{digest}.json"
++
+     def save(self, session_id: str, payload: dict[str, Any]) -> None:
+-        raise NotImplementedError
++        tmp_path = self._path(session_id).with_suffix(".tmp")
++        tmp_path.write_text(json.dumps(payload), encoding="utf-8")
++        tmp_path.replace(self._path(session_id))
+ 
+     def load(self, session_id: str) -> dict[str, Any] | None:
+-        raise NotImplementedError
++        path = self._path(session_id)
++        if not path.exists():
++            return None
++        return json.loads(path.read_text(encoding="utf-8"))

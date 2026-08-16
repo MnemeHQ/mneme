@@ -1,0 +1,10 @@
+{
+  "schema": "mneme.guidance-confirmatory-quarantine/v1",
+  "slot": "storage-1__baseline__r1",
+  "external_model_turn_occurred": true,
+  "model_isolation_passed": true,
+  "confirmatory_eligible": false,
+  "reason": "The post-run offline observer evaluated path-scoped rules relative to the randomized external memory directory and inherited the source repository ADR freshness directory. The model output itself was not exposed to enforcement feedback, but the observer evidence was not valid under the locked protocol.",
+  "superseded_execution_lock_sha256": "9D37BC162FF4902B56B42D1E678FD2A074281200D586830D02D0AA98D14F59FC",
+  "disposition": "Preserved under invalidations. Rerun this slot only after the corrected observer is mechanically verified and a new execution lock is created."
+}

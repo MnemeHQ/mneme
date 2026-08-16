@@ -1,0 +1,9 @@
+--- a/src/email_delivery.py
++++ b/src/email_delivery.py
+@@ -18,4 +18,5 @@
+ 
+ 
+ def deliver_email(message: EmailMessage, transport: EmailTransport) -> None:
+-    raise NotImplementedError
++    """Send the message synchronously via the given transport."""
++    transport.send(message)

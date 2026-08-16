@@ -1,0 +1,53 @@
+{
+  "schema": "mneme.guidance-confirmatory-design-lock/v1",
+  "locked_at": "2026-08-13",
+  "status": "design_locked_execution_paused",
+  "diagnostic_campaign": {
+    "artifact_directory": "docs/validation/artifacts/pre-generation-guidance-live-ab-2026-08-13",
+    "completed_valid_runs": 15,
+    "remaining_runs_paused": 27,
+    "confirmatory_eligible": false
+  },
+  "protocol": {
+    "path": "docs/validation/pre-generation-guidance-live-ab.md",
+    "sha256": "8029EACBB4C8032A491486CE881E9415966C27606DA7CC2631CEA868EA4BF604"
+  },
+  "diagnostic_report": {
+    "path": "docs/validation/pre-generation-guidance-protocol-discovery.md",
+    "sha256": "624DD46123C80054FA7419320EDBC87959CD8C8DD9DD15179D6CC367C17A679A"
+  },
+  "fixtures": {
+    "decision_corpus": {
+      "path": "tests/fixtures/guidance_retrieval/project_memory.json",
+      "sha256": "983BAA775AAF38AB36C5D83CA07379C16F72A931BD7568BBA58D13C25B2C45DD"
+    },
+    "retrieval_cases": {
+      "path": "tests/fixtures/guidance_retrieval/cases.json",
+      "sha256": "27B45E547E8B10D8EAE39CB4BAB1488D3822AA4F1B81010D5148379B24FEA261"
+    }
+  },
+  "evaluations": {
+    "mechanism_isolation": {
+      "runs": 42,
+      "confirmatory_artifacts_must_be_new": true
+    },
+    "production_effectiveness": {
+      "runs": 42,
+      "confirmatory_artifacts_must_be_new": true
+    }
+  },
+  "claude_trial_configuration": {
+    "claude_code_version": "2.1.202",
+    "model_alias": "sonnet",
+    "resolved_model_must_be_recorded": true,
+    "effort": "high",
+    "fallback_model": null,
+    "permission_mode": "acceptEdits",
+    "allowed_tools": ["Read", "Edit", "Write", "Glob", "Grep"],
+    "skills_disabled": true,
+    "auto_memory_disabled": true,
+    "claude_md_loading_disabled": true,
+    "session_persistence": false
+  },
+  "execution_lock_required_before_external_runs": true
+}

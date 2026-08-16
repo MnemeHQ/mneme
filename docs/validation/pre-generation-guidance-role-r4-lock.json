@@ -1,0 +1,94 @@
+{
+  "schema": "mneme.pre-generation-guidance-role-r4-lock/v1",
+  "locked_at": "2026-08-13",
+  "status": "R4_LOCKED_READY_FOR_R5",
+  "r3_lock": {
+    "path": "docs/validation/pre-generation-guidance-role-r3-lock.json",
+    "sha256": "741860213095F6CCE21C02BE70498C2B3CF1CBF5C9F3660A55C01D18ADDBF600"
+  },
+  "result": {
+    "path": "docs/validation/pre-generation-guidance-role-r4-result.md",
+    "sha256": "0908AEE751E5D857D094B1B53193A9F342E30266375E6A0B6C75D028AFDB23BD"
+  },
+  "production_runtime": {
+    "mneme/guidance.py": "B4D7A63C867ECD35D059FA527EA5E26B152A11CD480EEC7C999625DD64A0DBF8",
+    "mneme/guidance_roles.py": "CEB4D88D5D6557D5256358E58A470C13BBE764C4C0F5A335889BE0FEB22C6694",
+    "mneme/decision_retriever.py": "F86B3BA2E50BB42D92DBFEA879E24A919A07B5AEBB71284F7596D65CC1C74882",
+    "mneme/integrations/claude_code/guidance_hook.py": "A3F55FAD4A221B9BB1E526C8C223ED784C83FA5BA3E9044A61AE65124AC6E3BB",
+    "mneme/integrations/claude_code/hook.py": "12BAA6DDC718DDEE013E7053D787C171EFC0A5D5649C8BC59C9E8B226D3D983C"
+  },
+  "production_change": {
+    "previous_guidance_sha256": "C1ADE2E3F7623F5EC5E4AC682063B275DE3AFC6E5B2E1E523EF52830D9994ED3",
+    "role_classifier_wired_to_build_guidance": true,
+    "canonical_global_wording_enabled": true,
+    "canonical_direct_wording_enabled": true,
+    "canonical_adjacent_wording_enabled": true,
+    "runtime_files_changed_from_r3": [
+      "mneme/guidance.py"
+    ]
+  },
+  "evaluator": {
+    "mneme/guidance_applicability_eval.py": "3694C11A047436AC3A3ED404391CAF82AE2A96BC239DCF742741137414670524",
+    "historical_diagnosis_reproduced": true,
+    "role_contract_reproduced": true,
+    "role_formatting_contract_reproduced": true
+  },
+  "tests": {
+    "tests/test_guidance.py": "E06D9C69F9EE587D1EA599289BCCD563A8A147E91E1820748DFC5ADB360F7BA4",
+    "tests/test_guidance_roles.py": "4E206D7EB8A0E6AF7FEC0D6A478B84FDED7E24FECE2988317ACBD008FC8AAEB2",
+    "tests/test_guidance_applicability_eval.py": "39D3D47F47E887C217D60AE3A5BE8A197B3234265C061FD2BF58A74A1832690C",
+    "focused_passed": 35,
+    "full_passed": 624,
+    "full_skipped": 5,
+    "full_warnings": 52
+  },
+  "locked_fixtures": {
+    "tests/fixtures/guidance_applicability/cases.json": "2408DD615BB54E3BB8E03B8A28CA1BE9CDC0670E5C4BBA6C04541BA902BADEAB",
+    "tests/fixtures/guidance_retrieval/cases.json": "27B45E547E8B10D8EAE39CB4BAB1488D3822AA4F1B81010D5148379B24FEA261",
+    "tests/fixtures/guidance_retrieval/project_memory.json": "983BAA775AAF38AB36C5D83CA07379C16F72A931BD7568BBA58D13C25B2C45DD"
+  },
+  "role_metrics": {
+    "historical_adjacent_undifferentiated_selections": 2,
+    "current_adjacent_undifferentiated_selections": 0,
+    "current_adjacent_authorizing_selections": 0,
+    "role_snapshot_matches": "4/4",
+    "role_aware_formatting_matches": "4/4",
+    "non_authorizing_wording_matches": "4/4",
+    "direct_role_macro_recall": 1.0,
+    "known_adjacent_role_hits": "2/2",
+    "selection_changed_cases": 0,
+    "unexpected_selections": 0,
+    "locked_retrieval_expected_direct_hits": "18/18"
+  },
+  "preservation": {
+    "selected_ids": true,
+    "selected_scores": true,
+    "selected_order": true,
+    "retrieval_k": true,
+    "confidence_behavior": true,
+    "context_char_budget": 8000,
+    "complete_block_budget_behavior": true,
+    "hook_code": true,
+    "enforcement_behavior": true,
+    "adr020_path_applicability": true
+  },
+  "e66_evidence": {
+    "execution_lock_sha256": "E66ED251BED91D52A55ECB90B1EE6198E80970C45B7AC04759483F0BDF04195C",
+    "protected_file_count": 547,
+    "collection_manifest_sha256": "46B215D324A1C90E21615F0233D99DD695A5D883671CE44A72F362D3EEFDF0DE",
+    "production_effectiveness_artifact_directory_exists": false
+  },
+  "r5_authorized_scope": {
+    "mechanical_validation_only": true,
+    "rerun_deterministic_tests": true,
+    "verify_install_and_package_contracts": true,
+    "verify_budget_and_platform_neutral_output": true,
+    "freeze_candidate_hashes_for_r6": true,
+    "change_retrieval_or_k": false,
+    "change_role_semantics_or_wording": false,
+    "change_hooks_or_enforcement": false,
+    "run_claude_trials": false
+  },
+  "production_effectiveness_ab": "PAUSED_NOT_RUN",
+  "fresh_execution_task_boundary": "After the R6 execution lock is frozen and immediately before live Claude trials"
+}

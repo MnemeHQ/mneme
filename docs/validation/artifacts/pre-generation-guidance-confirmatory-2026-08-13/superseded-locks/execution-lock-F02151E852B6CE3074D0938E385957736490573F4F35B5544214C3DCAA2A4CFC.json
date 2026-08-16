@@ -1,0 +1,631 @@
+{
+  "candidate_files": {
+    "docs/architecture/pre-generation-guidance-charter.md": "370B669C97E3F40E0650F3DD5BB7C4311A18B954538415C842125817769FBA67",
+    "docs/integrations/claude-code-guidance-hook-spec.md": "B3AC3D12F8D3CCF7AFF406819182F9C606C9AAA2550CB9B82D31464A890CBDF7",
+    "docs/validation/pre-generation-guidance-confirmatory-design-lock.json": "B1C2B5F79189815C6F1C0827A2F83BA86C106021CFBB52C0A4893A40595D26B4",
+    "docs/validation/pre-generation-guidance-live-ab.md": "61DA05946FD1FEFF3434B83D77093D8A80E17B97C8FE2F74A3B2B4A872BBDC02",
+    "integrations/claude-code-plugin/.claude-plugin/plugin.json": "3E5F745DA40FEDF006DFAB5F339099DCDE89E6C0C2AD61C3E8EBD3649E0ACFBE",
+    "integrations/claude-code-plugin/hooks/hooks.json": "9D96864314BFF509008F0D5EED43FE921F812FFD643C663832C6B0B58F4FF9B4",
+    "mneme/decision_retriever.py": "F86B3BA2E50BB42D92DBFEA879E24A919A07B5AEBB71284F7596D65CC1C74882",
+    "mneme/guidance.py": "C1ADE2E3F7623F5EC5E4AC682063B275DE3AFC6E5B2E1E523EF52830D9994ED3",
+    "mneme/guidance_live_eval.py": "76A911C2028AFE9E205287938FFC9F6B06FD03927A1083C382F9ED555E4092F2",
+    "mneme/integrations/claude_code/guidance_hook.py": "A3F55FAD4A221B9BB1E526C8C223ED784C83FA5BA3E9044A61AE65124AC6E3BB",
+    "mneme/integrations/claude_code/hook.py": "12BAA6DDC718DDEE013E7053D787C171EFC0A5D5649C8BC59C9E8B226D3D983C",
+    "pyproject.toml": "DFC81900340E166C6580316CB676225521C6ED7E386ADF31A356771C395E5E9F",
+    "scripts/run_guidance_confirmatory_ab.py": "63F55C52B0A31B967C48171D54EF8D9115862C08406F9CDBDE268ECA044D6E21",
+    "tests/fixtures/guidance_confirmatory/mechanism_plugin/.claude-plugin/plugin.json": "68126C63C3C142459CF7DBB635D3A3FFF4208AF78AD87C6B08D9BE1E6DB7B04F",
+    "tests/fixtures/guidance_confirmatory/mechanism_plugin/hooks/hooks.json": "534D46FC314DD06C0D936FF35C52C910B8C048B117ECD4EECB9A8A073D5A4CC1",
+    "tests/fixtures/guidance_retrieval/cases.json": "27B45E547E8B10D8EAE39CB4BAB1488D3822AA4F1B81010D5148379B24FEA261",
+    "tests/fixtures/guidance_retrieval/project_memory.json": "983BAA775AAF38AB36C5D83CA07379C16F72A931BD7568BBA58D13C25B2C45DD"
+  },
+  "claude": {
+    "auth": {
+      "apiProvider": "firstParty",
+      "authMethod": "claude.ai",
+      "loggedIn": true,
+      "subscriptionType": "pro"
+    },
+    "effort": "high",
+    "executable": "C:\\Users\\hi\\AppData\\Roaming\\npm\\claude.cmd",
+    "executable_sha256": "7999FBA95DBFFE167D9E0A043F29057979A0518EBE89B60C4FCFC6401EA8C424",
+    "expected_resolved_model": "claude-sonnet-5",
+    "fallback_model": null,
+    "max_budget_usd_per_run": 1.5,
+    "model_alias": "sonnet",
+    "permission_mode": "acceptEdits",
+    "session_persistence": false,
+    "skills_disabled": true,
+    "tools": [
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep"
+    ],
+    "version": "2.1.202"
+  },
+  "design_lock_sha256": "B1C2B5F79189815C6F1C0827A2F83BA86C106021CFBB52C0A4893A40595D26B4",
+  "diagnostic_campaign_eligible": false,
+  "fixture": {
+    "base_files": {
+      ".gitignore": "32DAE3052F331EE34D628EF535709B301259A45DF7C7522C4D35DCF49873F00B",
+      "CONTRIBUTING.md": "6D165A3E3EEE8E756071FB205517BAD06B1AD31CCA3E158BF2AF59715B66A45E",
+      "README.md": "CDA4E669773626383FF63EEA700B59B2857A45A4315A063A98774584D529783F",
+      "docs/setup.md": "561FC31C06AE36719A91E18910DEC951AF8B0F8BB5738D81EE4A39EF0998A84B",
+      "site/homepage.md": "FCA9B52C1B3D2164EB2BE37F0361100434D5FFB3B08CF7204B7B61B1EC61F3D8",
+      "src/__init__.py": "5F14408D9E68EE68A685A83B98D92EEE687B8B4C08ECF1CD49D35EC3D33E5128",
+      "src/api.py": "C7F9641DE989FEE6E872674D4044DBA2FB61BE496982B318B373E964426271C3",
+      "src/auth.py": "0565192D7DB0ACB14575319829C5861B4BB4DCE7007A354470DB2A5E1022A648",
+      "src/email_delivery.py": "1111C41FB80A11411D7ACDA76EA13C9482423193363136BF1DE25D29E50A612D",
+      "src/sessions.py": "FC0F95414337113471286C9249F268D0833AE3AE64E91D400B36037F87435B31"
+    },
+    "tasks": [
+      {
+        "expected_condition": "Select SQLite; do not propose PostgreSQL.",
+        "governed": true,
+        "id": "storage-1",
+        "prompt": "Add persistence for user sessions.",
+        "target": "src/sessions.py"
+      },
+      {
+        "expected_condition": "Use signed HTTP-only cookies; do not propose browser JWT/localStorage bearer tokens.",
+        "governed": true,
+        "id": "auth-1",
+        "prompt": "Implement browser authentication state for account login.",
+        "target": "src/auth.py"
+      },
+      {
+        "expected_condition": "Use JSON serialization; do not propose pickle/binary Python object payloads.",
+        "governed": true,
+        "id": "api-1",
+        "prompt": "Add response payloads to the public account API.",
+        "target": "src/api.py"
+      },
+      {
+        "expected_condition": "Keep delivery synchronous; do not propose Celery, Redis, or a distributed queue.",
+        "governed": true,
+        "id": "jobs-1",
+        "prompt": "Add notification email delivery to the first release.",
+        "target": "src/email_delivery.py"
+      },
+      {
+        "expected_condition": "Do not introduce the forbidden typed-rule literal.",
+        "governed": true,
+        "id": "typed-1",
+        "prompt": "Update the developer setup guide with the required client install command.",
+        "target": "docs/setup.md"
+      },
+      {
+        "expected_condition": "Make only the requested unrelated change.",
+        "governed": false,
+        "id": "control-1",
+        "prompt": "Fix the spelling of \"architecture\" in the contributor guide.",
+        "target": "CONTRIBUTING.md"
+      },
+      {
+        "expected_condition": "Do not introduce an architecture-driven detour.",
+        "governed": false,
+        "id": "control-2",
+        "prompt": "Rename the homepage hero headline.",
+        "target": "site/homepage.md"
+      }
+    ]
+  },
+  "locked_at": "2026-08-13T20:33:41.505513+00:00",
+  "plugins": {
+    "mechanism_isolation": "tests\\fixtures\\guidance_confirmatory\\mechanism_plugin",
+    "production_effectiveness": "integrations\\claude-code-plugin"
+  },
+  "schedules": {
+    "mechanism_isolation": [
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "storage-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "storage-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "storage-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "storage-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "storage-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "storage-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "auth-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "auth-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "auth-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "auth-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "auth-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "auth-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "api-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "api-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "api-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "api-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "api-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "api-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "jobs-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "jobs-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "jobs-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "jobs-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "jobs-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "jobs-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "typed-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "typed-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "typed-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "typed-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "typed-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "typed-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "control-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "control-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "control-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "control-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "control-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "control-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "control-2"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "control-2"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "control-2"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "control-2"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "control-2"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "control-2"
+      }
+    ],
+    "production_effectiveness": [
+      {
+        "arm": "baseline",
+        "evaluation": "production_effectiveness",
+        "repetition": 1,
+        "task_id": "storage-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "production_effectiveness",
+        "repetition": 1,
+        "task_id": "storage-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "production_effectiveness",
+        "repetition": 2,
+        "task_id": "storage-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "production_effectiveness",
+        "repetition": 2,
+        "task_id": "storage-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "production_effectiveness",
+        "repetition": 3,
+        "task_id": "storage-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "production_effectiveness",
+        "repetition": 3,
+        "task_id": "storage-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "production_effectiveness",
+        "repetition": 1,
+        "task_id": "auth-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "production_effectiveness",
+        "repetition": 1,
+        "task_id": "auth-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "production_effectiveness",
+        "repetition": 2,
+        "task_id": "auth-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "production_effectiveness",
+        "repetition": 2,
+        "task_id": "auth-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "production_effectiveness",
+        "repetition": 3,
+        "task_id": "auth-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "production_effectiveness",
+        "repetition": 3,
+        "task_id": "auth-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "production_effectiveness",
+        "repetition": 1,
+        "task_id": "api-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "production_effectiveness",
+        "repetition": 1,
+        "task_id": "api-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "production_effectiveness",
+        "repetition": 2,
+        "task_id": "api-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "production_effectiveness",
+        "repetition": 2,
+        "task_id": "api-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "production_effectiveness",
+        "repetition": 3,
+        "task_id": "api-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "production_effectiveness",
+        "repetition": 3,
+        "task_id": "api-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "production_effectiveness",
+        "repetition": 1,
+        "task_id": "jobs-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "production_effectiveness",
+        "repetition": 1,
+        "task_id": "jobs-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "production_effectiveness",
+        "repetition": 2,
+        "task_id": "jobs-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "production_effectiveness",
+        "repetition": 2,
+        "task_id": "jobs-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "production_effectiveness",
+        "repetition": 3,
+        "task_id": "jobs-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "production_effectiveness",
+        "repetition": 3,
+        "task_id": "jobs-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "production_effectiveness",
+        "repetition": 1,
+        "task_id": "typed-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "production_effectiveness",
+        "repetition": 1,
+        "task_id": "typed-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "production_effectiveness",
+        "repetition": 2,
+        "task_id": "typed-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "production_effectiveness",
+        "repetition": 2,
+        "task_id": "typed-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "production_effectiveness",
+        "repetition": 3,
+        "task_id": "typed-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "production_effectiveness",
+        "repetition": 3,
+        "task_id": "typed-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "production_effectiveness",
+        "repetition": 1,
+        "task_id": "control-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "production_effectiveness",
+        "repetition": 1,
+        "task_id": "control-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "production_effectiveness",
+        "repetition": 2,
+        "task_id": "control-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "production_effectiveness",
+        "repetition": 2,
+        "task_id": "control-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "production_effectiveness",
+        "repetition": 3,
+        "task_id": "control-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "production_effectiveness",
+        "repetition": 3,
+        "task_id": "control-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "production_effectiveness",
+        "repetition": 1,
+        "task_id": "control-2"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "production_effectiveness",
+        "repetition": 1,
+        "task_id": "control-2"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "production_effectiveness",
+        "repetition": 2,
+        "task_id": "control-2"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "production_effectiveness",
+        "repetition": 2,
+        "task_id": "control-2"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "production_effectiveness",
+        "repetition": 3,
+        "task_id": "control-2"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "production_effectiveness",
+        "repetition": 3,
+        "task_id": "control-2"
+      }
+    ]
+  },
+  "schema": "mneme.guidance-confirmatory-execution/v1",
+  "status": "LOCKED"
+}

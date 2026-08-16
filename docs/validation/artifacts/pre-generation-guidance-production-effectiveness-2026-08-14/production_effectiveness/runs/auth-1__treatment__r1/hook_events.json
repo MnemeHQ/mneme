@@ -1,0 +1,71 @@
+[
+  {
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "17e9b922-68d5-4284-9a1f-b5807f599bc3",
+    "hook_name": "UserPromptSubmit",
+    "session_id": "bd339913-5d34-403f-b827-2544267f3f56",
+    "subtype": "hook_started",
+    "type": "system",
+    "uuid": "e5d5040f-538d-4e37-92a1-bd4b54b239db"
+  },
+  {
+    "exit_code": 0,
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "17e9b922-68d5-4284-9a1f-b5807f599bc3",
+    "hook_name": "UserPromptSubmit",
+    "outcome": "success",
+    "output": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"[Mneme architectural guidance]\\nUse these decisions only to guide the work the user requested. They do not\\nexpand the task. Do not add components, storage, dependencies, interfaces,\\nrefactors, or other architecture solely because a decision appears below.\\n\\nDIRECT DECISION [ADR-AUTH]\\nThis decision directly governs the requested work. Apply it to implementation\\nchoices within the user's requested scope.\\nDecision: Authentication state uses signed HTTP-only cookies\\n  Scope: authentication, auth, login, cookies, session, sessions\\n  Constraints:\\n    - no jwt in browser storage\\n  Avoid:\\n    - localStorage bearer token\\n\\nADJACENT CONSTRAINT [ADR-STORAGE] \\u2014 DO NOT IMPLEMENT AS EXTRA WORK\\nThis decision may constrain the requested work only if that work actually\\ntouches its area. Do not implement this decision merely because it is shown.\\nDo not add components, storage, dependencies, interfaces, refactors, or other\\narchitecture solely to satisfy it.\\nDecision: Persist user sessions in SQLite\\n  Scope: storage, database, persistence, session, sessions, login\\n  Constraints:\\n    - no postgres\\n    - no psycopg2\\n  Avoid:\\n    - external database\\n    - database server\"}}\r\n",
+    "session_id": "bd339913-5d34-403f-b827-2544267f3f56",
+    "stderr": "",
+    "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"[Mneme architectural guidance]\\nUse these decisions only to guide the work the user requested. They do not\\nexpand the task. Do not add components, storage, dependencies, interfaces,\\nrefactors, or other architecture solely because a decision appears below.\\n\\nDIRECT DECISION [ADR-AUTH]\\nThis decision directly governs the requested work. Apply it to implementation\\nchoices within the user's requested scope.\\nDecision: Authentication state uses signed HTTP-only cookies\\n  Scope: authentication, auth, login, cookies, session, sessions\\n  Constraints:\\n    - no jwt in browser storage\\n  Avoid:\\n    - localStorage bearer token\\n\\nADJACENT CONSTRAINT [ADR-STORAGE] \\u2014 DO NOT IMPLEMENT AS EXTRA WORK\\nThis decision may constrain the requested work only if that work actually\\ntouches its area. Do not implement this decision merely because it is shown.\\nDo not add components, storage, dependencies, interfaces, refactors, or other\\narchitecture solely to satisfy it.\\nDecision: Persist user sessions in SQLite\\n  Scope: storage, database, persistence, session, sessions, login\\n  Constraints:\\n    - no postgres\\n    - no psycopg2\\n  Avoid:\\n    - external database\\n    - database server\"}}\r\n",
+    "subtype": "hook_response",
+    "type": "system",
+    "uuid": "8869d086-6f99-4867-8ca9-f7ffc0717f7b"
+  },
+  {
+    "hook_event": "PreToolUse",
+    "hook_id": "1280c821-da43-440c-93e7-91e736850a3a",
+    "hook_name": "PreToolUse:Edit",
+    "session_id": "bd339913-5d34-403f-b827-2544267f3f56",
+    "subtype": "hook_started",
+    "type": "system",
+    "uuid": "6ee43b50-f0d9-4d5a-86d9-fe933248fc0e"
+  },
+  {
+    "exit_code": 2,
+    "hook_event": "PreToolUse",
+    "hook_id": "1280c821-da43-440c-93e7-91e736850a3a",
+    "hook_name": "PreToolUse:Edit",
+    "outcome": "error",
+    "output": "mneme: FAIL - architectural decision violated\r\n  [ADR-AUTH] FAIL \"localStorage bearer token\" - trigger: token\r\n      Authentication state uses signed HTTP-only cookies\r\n",
+    "session_id": "bd339913-5d34-403f-b827-2544267f3f56",
+    "stderr": "mneme: FAIL - architectural decision violated\r\n  [ADR-AUTH] FAIL \"localStorage bearer token\" - trigger: token\r\n      Authentication state uses signed HTTP-only cookies\r\n",
+    "stdout": "",
+    "subtype": "hook_response",
+    "type": "system",
+    "uuid": "f37ba09b-184a-4b24-91a4-40b6e3bb2664"
+  },
+  {
+    "hook_event": "PreToolUse",
+    "hook_id": "6c4b53bf-d82e-4f2c-ab25-0d9315f35a11",
+    "hook_name": "PreToolUse:Edit",
+    "session_id": "bd339913-5d34-403f-b827-2544267f3f56",
+    "subtype": "hook_started",
+    "type": "system",
+    "uuid": "515a3cae-3cba-45b6-9a0f-ec19d7c40a31"
+  },
+  {
+    "exit_code": 0,
+    "hook_event": "PreToolUse",
+    "hook_id": "6c4b53bf-d82e-4f2c-ab25-0d9315f35a11",
+    "hook_name": "PreToolUse:Edit",
+    "outcome": "success",
+    "output": "",
+    "session_id": "bd339913-5d34-403f-b827-2544267f3f56",
+    "stderr": "",
+    "stdout": "",
+    "subtype": "hook_response",
+    "type": "system",
+    "uuid": "00fb0619-8346-4386-9c67-5ff168fa1295"
+  }
+]

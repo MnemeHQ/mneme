@@ -1,0 +1,206 @@
+{
+  "clock": "time.perf_counter_ns",
+  "event_count": 28,
+  "line_count": 28,
+  "lines": [
+    {
+      "elapsed_seconds_from_process_start": 1.660203,
+      "elapsed_seconds_from_prompt_submission": 1.646497,
+      "event_index": 0,
+      "line_index": 0,
+      "line_sha256": "0FD697DA612A3F828522D99A8D15B3FB1CE19BE4BF81F90ABE05640498EEBF6C"
+    },
+    {
+      "elapsed_seconds_from_process_start": 2.061719,
+      "elapsed_seconds_from_prompt_submission": 2.048013,
+      "event_index": 1,
+      "line_index": 1,
+      "line_sha256": "96DCC451C10B1FD2D4E455D5C351A63B2BC162FCF504569C88E4659F72C4F3BA"
+    },
+    {
+      "elapsed_seconds_from_process_start": 2.06612,
+      "elapsed_seconds_from_prompt_submission": 2.052414,
+      "event_index": 2,
+      "line_index": 2,
+      "line_sha256": "7A098BC2033201D32F3C33186B77C6CAB0B9EBFD984FABCC3EE95216A617B47C"
+    },
+    {
+      "elapsed_seconds_from_process_start": 2.989302,
+      "elapsed_seconds_from_prompt_submission": 2.975596,
+      "event_index": 3,
+      "line_index": 3,
+      "line_sha256": "F1C29FD470DFDC718EDCD1285780DF26F12CAA7994DF2FEEAF3AC1E219516E2D"
+    },
+    {
+      "elapsed_seconds_from_process_start": 3.537451,
+      "elapsed_seconds_from_prompt_submission": 3.523745,
+      "event_index": 4,
+      "line_index": 4,
+      "line_sha256": "7898C8463ECF751FD682B3324C95029B1AE8F7404BFB2A848EEF9C7566E4506E"
+    },
+    {
+      "elapsed_seconds_from_process_start": 3.537789,
+      "elapsed_seconds_from_prompt_submission": 3.524083,
+      "event_index": 5,
+      "line_index": 5,
+      "line_sha256": "48CC51750433A7CDB10C594604D15A246F6CD0EB7884B56993F11C4FB39C2BCA"
+    },
+    {
+      "elapsed_seconds_from_process_start": 3.554439,
+      "elapsed_seconds_from_prompt_submission": 3.540733,
+      "event_index": 6,
+      "line_index": 6,
+      "line_sha256": "FD3119A974BF5B01D71E235245FEAEA8B8130382A81A597D7D7E7694554244E4"
+    },
+    {
+      "elapsed_seconds_from_process_start": 4.565451,
+      "elapsed_seconds_from_prompt_submission": 4.551745,
+      "event_index": 7,
+      "line_index": 7,
+      "line_sha256": "DA29DD9516BB375B1A055119B8D88D158D86DEEAA2CE833ACC19838DD0A93C24"
+    },
+    {
+      "elapsed_seconds_from_process_start": 4.567344,
+      "elapsed_seconds_from_prompt_submission": 4.553638,
+      "event_index": 8,
+      "line_index": 8,
+      "line_sha256": "1AD16C0705D58F7D15A5F4C6F2300042188066775F1AE6F382E940ED12F54D81"
+    },
+    {
+      "elapsed_seconds_from_process_start": 4.64838,
+      "elapsed_seconds_from_prompt_submission": 4.634674,
+      "event_index": 9,
+      "line_index": 9,
+      "line_sha256": "6BFBEB84063D4F54ADFE49B76E30C991F724865FA2541FE323EFB3E5C445074C"
+    },
+    {
+      "elapsed_seconds_from_process_start": 6.570536,
+      "elapsed_seconds_from_prompt_submission": 6.55683,
+      "event_index": 10,
+      "line_index": 10,
+      "line_sha256": "542D194AAD3DFF9F6D0CBE889C52824452A58BC0AAE64C99B01E3E7D74B831E8"
+    },
+    {
+      "elapsed_seconds_from_process_start": 6.579725,
+      "elapsed_seconds_from_prompt_submission": 6.566019,
+      "event_index": 11,
+      "line_index": 11,
+      "line_sha256": "815FBF11A3FAA3B05CC07FA0FC5E661F13F44A274990F7B9C3F344C09AFE4980"
+    },
+    {
+      "elapsed_seconds_from_process_start": 7.042913,
+      "elapsed_seconds_from_prompt_submission": 7.029207,
+      "event_index": 12,
+      "line_index": 12,
+      "line_sha256": "76C31B5D41F6EB3DA93489D07F18F5D596D9BC21D7548AABB33C0F5AB63DEF34"
+    },
+    {
+      "elapsed_seconds_from_process_start": 7.050878,
+      "elapsed_seconds_from_prompt_submission": 7.037172,
+      "event_index": 13,
+      "line_index": 13,
+      "line_sha256": "3735D59489C3A49044AEC3BD3551FFA8B5B1CF3967E15B8357EA4F219EE5F88D"
+    },
+    {
+      "elapsed_seconds_from_process_start": 8.455412,
+      "elapsed_seconds_from_prompt_submission": 8.441706,
+      "event_index": 14,
+      "line_index": 14,
+      "line_sha256": "031EFED15A1EE06C1B77571903E726C3C88FCDEED36423A5FCB7F5BE84EDF767"
+    },
+    {
+      "elapsed_seconds_from_process_start": 9.551943,
+      "elapsed_seconds_from_prompt_submission": 9.538237,
+      "event_index": 15,
+      "line_index": 15,
+      "line_sha256": "871549F63F3E7BC4EF6691DE65E7E0B01DB16C76B8DFFC20C349E4F40036F0CA"
+    },
+    {
+      "elapsed_seconds_from_process_start": 9.553264,
+      "elapsed_seconds_from_prompt_submission": 9.539558,
+      "event_index": 16,
+      "line_index": 16,
+      "line_sha256": "8D560B3DDF10CFD83F5FDE0C2D46E3A7CCE18B73DC0783B6E69024BF3D77A8E9"
+    },
+    {
+      "elapsed_seconds_from_process_start": 10.266528,
+      "elapsed_seconds_from_prompt_submission": 10.252823,
+      "event_index": 17,
+      "line_index": 17,
+      "line_sha256": "6CF629E4192CEEC3315ADBFF8480404582B70C943ACEEE489F6278249D982EEC"
+    },
+    {
+      "elapsed_seconds_from_process_start": 10.35517,
+      "elapsed_seconds_from_prompt_submission": 10.341464,
+      "event_index": 18,
+      "line_index": 18,
+      "line_sha256": "475D8B3797B46C3E0197D73CC031F1BDB28389387B371E7A4CACBD1604337C6F"
+    },
+    {
+      "elapsed_seconds_from_process_start": 12.395508,
+      "elapsed_seconds_from_prompt_submission": 12.381802,
+      "event_index": 19,
+      "line_index": 19,
+      "line_sha256": "B5ACFF2746FCFA0EDB614D6B52C87939A167A0C17303296BF94C68E386513F18"
+    },
+    {
+      "elapsed_seconds_from_process_start": 12.929209,
+      "elapsed_seconds_from_prompt_submission": 12.915503,
+      "event_index": 20,
+      "line_index": 20,
+      "line_sha256": "1E08EF8899A76C2E2ACDCDF94C2C330221B9E0B0E05CDE4D57F03F90BAB12C19"
+    },
+    {
+      "elapsed_seconds_from_process_start": 12.932691,
+      "elapsed_seconds_from_prompt_submission": 12.918985,
+      "event_index": 21,
+      "line_index": 21,
+      "line_sha256": "14D50278F3F6A9689891F59D1AFAE387A82596382DDB2FA14DE502E0F70406CE"
+    },
+    {
+      "elapsed_seconds_from_process_start": 16.381134,
+      "elapsed_seconds_from_prompt_submission": 16.367428,
+      "event_index": 22,
+      "line_index": 22,
+      "line_sha256": "7AA2D756FA911E27D1255A28DC14C0409EDBFB9B6AA9840EE4A1D7D4A8695D19"
+    },
+    {
+      "elapsed_seconds_from_process_start": 16.384453,
+      "elapsed_seconds_from_prompt_submission": 16.370747,
+      "event_index": 23,
+      "line_index": 23,
+      "line_sha256": "6A35036B37CCAA711B9B0257F159EC1013F5FF70654CFD320DE84C6A7124E4EA"
+    },
+    {
+      "elapsed_seconds_from_process_start": 16.908142,
+      "elapsed_seconds_from_prompt_submission": 16.894437,
+      "event_index": 24,
+      "line_index": 24,
+      "line_sha256": "725E8301719D350ADE99E227106C47C82089C9706386FE5BE6C76B6221773FF0"
+    },
+    {
+      "elapsed_seconds_from_process_start": 16.935121,
+      "elapsed_seconds_from_prompt_submission": 16.921415,
+      "event_index": 25,
+      "line_index": 25,
+      "line_sha256": "2A306643F5C18A272A9FD1A2B4A9B28756AEC44ED4F9F18D765358EB8310C60F"
+    },
+    {
+      "elapsed_seconds_from_process_start": 18.67886,
+      "elapsed_seconds_from_prompt_submission": 18.665154,
+      "event_index": 26,
+      "line_index": 26,
+      "line_sha256": "06FC1B5BEB5630084B4A5540A0090B5985A98EA82372C6D1204C5F41FAF6AAF4"
+    },
+    {
+      "elapsed_seconds_from_process_start": 18.709833,
+      "elapsed_seconds_from_prompt_submission": 18.696128,
+      "event_index": 27,
+      "line_index": 27,
+      "line_sha256": "FB351233B85D810751AD466DCAD2CC58192779F53634947E142B6CC9FDAFB748"
+    }
+  ],
+  "process_started_utc": "2026-08-16T17:34:46.548339+00:00",
+  "prompt_submission_started_seconds_after_process_start": 0.013706,
+  "schema": "mneme.production-stream-timing/v1"
+}

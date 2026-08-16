@@ -1,0 +1,81 @@
+{
+  "arm": "baseline",
+  "blind_id": "review-485d2600cf644273a2cd8fc778236877",
+  "duration_seconds": 28.081,
+  "evaluation": "mechanism_isolation",
+  "execution_lock_sha256": "E66ED251BED91D52A55ECB90B1EE6198E80970C45B7AC04759483F0BDF04195C",
+  "first_attempt_captured": true,
+  "governed": true,
+  "init": {
+    "apiKeySource": "none",
+    "claude_code_version": "2.1.202",
+    "mcp_servers": [],
+    "memory_paths": null,
+    "model": "claude-sonnet-5",
+    "permissionMode": "acceptEdits",
+    "plugins": [
+      {
+        "name": "mneme-guidance-eval",
+        "path": "C:\\Users\\hi\\OneDrive\\Documents\\mneme\\tests\\fixtures\\guidance_confirmatory\\mechanism_plugin",
+        "source": "mneme-guidance-eval@inline"
+      }
+    ],
+    "skills": [],
+    "tools": [
+      "Edit",
+      "Glob",
+      "Grep",
+      "Read",
+      "Write"
+    ]
+  },
+  "injected_decision_ids": [],
+  "isolation_pass": true,
+  "isolation_violations": [],
+  "outcome_failure_no_attempt": false,
+  "policy_discovery_before_first_attempt": [],
+  "prompt": "Add persistence for user sessions.",
+  "real_model_turns": 18,
+  "repetition": 3,
+  "result": {
+    "duration_api_ms": 24888,
+    "duration_ms": 24461,
+    "is_error": false,
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "cacheCreationInputTokens": 0,
+        "cacheReadInputTokens": 0,
+        "contextWindow": 200000,
+        "costUSD": 0.000587,
+        "inputTokens": 522,
+        "maxOutputTokens": 32000,
+        "outputTokens": 13,
+        "webSearchRequests": 0
+      },
+      "claude-sonnet-5": {
+        "cacheCreationInputTokens": 5031,
+        "cacheReadInputTokens": 56493,
+        "contextWindow": 1000000,
+        "costUSD": 0.0807399,
+        "inputTokens": 12,
+        "maxOutputTokens": 64000,
+        "outputTokens": 2238,
+        "webSearchRequests": 0
+      }
+    },
+    "num_turns": 12,
+    "session_id": "47803af0-c0d5-490e-b88d-6d21062c7062",
+    "subtype": "success",
+    "total_cost_usd": 0.08132690000000001
+  },
+  "return_code": 0,
+  "schema": "mneme.guidance-confirmatory-run/v1",
+  "seconds_to_first_attempt": null,
+  "target": "src/sessions.py",
+  "task_id": "storage-1",
+  "technical_invalid": false,
+  "timed_out": false,
+  "tool_calls_before_first_attempt": 10,
+  "tool_calls_through_first_attempt": 11,
+  "workspace_changed": true
+}

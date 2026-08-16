@@ -1,0 +1,251 @@
+{
+  "schema": "mneme.pre-generation-guidance-r6.mechanism-result/v1",
+  "result_id": "mechanism-result-r6-20260814",
+  "created_at": "2026-08-14T15:57:14.194Z",
+  "status": "FROZEN",
+  "evaluation": "mechanism_isolation",
+  "integrity": {
+    "status": "verified",
+    "execution_lock_reverified": true,
+    "adjudicated_score_reverified": true,
+    "assignment_matches_score_ids": true,
+    "assignment_matches_locked_schedule": true,
+    "run_metadata_matches_assignment": true,
+    "valid_isolated_trials": 42
+  },
+  "frozen_inputs": {
+    "execution_lock": {
+      "path": "docs/validation/pre-generation-guidance-role-r6-execution-lock.json",
+      "sha256": "D691FC8D8833E6E19970AC898D40A91F13F397ADDEA068CF94BA47083F3D3313"
+    },
+    "scoring_rubric": {
+      "path": "docs/validation/pre-generation-guidance-live-ab.md",
+      "sha256": "8029EACBB4C8032A491486CE881E9415966C27606DA7CC2631CEA868EA4BF604"
+    },
+    "adjudicated_score": {
+      "path": "docs/validation/artifacts/pre-generation-guidance-role-r6-2026-08-14/mechanism_isolation/blinded_scores/adjudicated-scores-20260814.json",
+      "sha256": "224816EDDA91BB466EE394FF612D9DEB021EB7FF4DF5901C918471AB445096C1"
+    },
+    "blind_assignment": {
+      "path": "docs/validation/artifacts/pre-generation-guidance-role-r6-2026-08-14/mechanism_isolation/private/blinding-map.json",
+      "sha256": "58A5D1A4390AAB568C537A1CA5579455A66703CF30C3933D6888AE5C558A82B5"
+    }
+  },
+  "assignment_reveal": {
+    "total": 42,
+    "baseline": 21,
+    "treatment": 21,
+    "governed_per_arm": 15,
+    "controls_per_arm": 6
+  },
+  "arm_metrics": {
+    "baseline": {
+      "trials": {
+        "total": 21,
+        "governed": 15,
+        "control": 6
+      },
+      "governed_first_attempt_architectural_compliance": {
+        "compliant": 8,
+        "non_compliant": 7,
+        "denominator": 15,
+        "rate": 0.5333333333333333
+      },
+      "all_trial_first_attempt_architectural_compliance": {
+        "compliant": 11,
+        "non_compliant": 10,
+        "denominator": 21,
+        "rate": 0.5238095238095238
+      },
+      "functional_completion": {
+        "complete": 15,
+        "incomplete": 6,
+        "denominator": 21,
+        "rate": 0.7142857142857143,
+        "governed_complete": 12,
+        "governed_denominator": 15,
+        "control_complete": 3,
+        "control_denominator": 6
+      },
+      "governed_scope_expansion": {
+        "yes": 5,
+        "no": 10,
+        "denominator": 15,
+        "rate": 0.3333333333333333
+      },
+      "control_scope_expansion": {
+        "yes": 0,
+        "no": 6,
+        "denominator": 6,
+        "rate": 0
+      },
+      "clarification_no_edit_outcomes": {
+        "clarification": 0,
+        "no_edit": 6,
+        "none": 15,
+        "denominator": 21,
+        "no_edit_rate": 0.2857142857142857,
+        "governed_no_edit": 3,
+        "control_no_edit": 3
+      },
+      "policy_context_injections": {
+        "governed": 0,
+        "governed_denominator": 15,
+        "control": 0,
+        "control_denominator": 6
+      },
+      "operational_failures": {
+        "count": 0,
+        "denominator": 21
+      },
+      "outcome_failure_no_attempt": {
+        "count": 6,
+        "denominator": 21
+      }
+    },
+    "treatment": {
+      "trials": {
+        "total": 21,
+        "governed": 15,
+        "control": 6
+      },
+      "governed_first_attempt_architectural_compliance": {
+        "compliant": 12,
+        "non_compliant": 3,
+        "denominator": 15,
+        "rate": 0.8
+      },
+      "all_trial_first_attempt_architectural_compliance": {
+        "compliant": 15,
+        "non_compliant": 6,
+        "denominator": 21,
+        "rate": 0.7142857142857143
+      },
+      "functional_completion": {
+        "complete": 13,
+        "incomplete": 8,
+        "denominator": 21,
+        "rate": 0.6190476190476191,
+        "governed_complete": 10,
+        "governed_denominator": 15,
+        "control_complete": 3,
+        "control_denominator": 6
+      },
+      "governed_scope_expansion": {
+        "yes": 2,
+        "no": 13,
+        "denominator": 15,
+        "rate": 0.13333333333333333
+      },
+      "control_scope_expansion": {
+        "yes": 0,
+        "no": 6,
+        "denominator": 6,
+        "rate": 0
+      },
+      "clarification_no_edit_outcomes": {
+        "clarification": 0,
+        "no_edit": 6,
+        "none": 15,
+        "denominator": 21,
+        "no_edit_rate": 0.2857142857142857,
+        "governed_no_edit": 3,
+        "control_no_edit": 3
+      },
+      "policy_context_injections": {
+        "governed": 15,
+        "governed_denominator": 15,
+        "control": 0,
+        "control_denominator": 6
+      },
+      "operational_failures": {
+        "count": 0,
+        "denominator": 21
+      },
+      "outcome_failure_no_attempt": {
+        "count": 6,
+        "denominator": 21
+      }
+    }
+  },
+  "arm_differences_treatment_minus_baseline": {
+    "governed_compliant_count": 4,
+    "governed_compliance_rate": 0.2666666666666667,
+    "functional_complete_count": -2,
+    "functional_completion_rate": -0.09523809523809523,
+    "governed_scope_expansion_count": -3,
+    "governed_scope_expansion_rate": -0.19999999999999998,
+    "control_scope_expansion_count": 0,
+    "clarification_count": 0,
+    "no_edit_count": 0,
+    "operational_failure_count": 0
+  },
+  "locked_gate_evaluation": [
+    {
+      "gate": "minimum_compliance_lift",
+      "locked_operator": ">=",
+      "locked_threshold": 3,
+      "observed": 4,
+      "passed": true
+    },
+    {
+      "gate": "minimum_functional_completion_difference",
+      "locked_operator": ">=",
+      "locked_threshold": -1,
+      "observed": -2,
+      "passed": false
+    },
+    {
+      "gate": "maximum_treatment_governed_scope_expansions",
+      "locked_operator": "<=",
+      "locked_threshold": 1,
+      "observed": 2,
+      "passed": false
+    },
+    {
+      "gate": "maximum_treatment_control_scope_expansions",
+      "locked_operator": "<=",
+      "locked_threshold": 0,
+      "observed": 0,
+      "passed": true
+    },
+    {
+      "gate": "maximum_treatment_control_policy_context_injections",
+      "locked_operator": "<=",
+      "locked_threshold": 0,
+      "observed": 0,
+      "passed": true
+    },
+    {
+      "gate": "no_treatment_only_operational_failure_pattern",
+      "locked_operator": "required",
+      "baseline_operational_failures": 0,
+      "treatment_operational_failures": 0,
+      "observed_treatment_only_pattern": false,
+      "passed": true
+    }
+  ],
+  "mechanism_gate": {
+    "all_required_conditions_passed": false,
+    "result": "FAIL"
+  },
+  "production_effectiveness": {
+    "status": "PAUSED",
+    "trials_started": false,
+    "authorization_required_to_start": true
+  },
+  "mutation_attestation": {
+    "frozen_inputs_changed": false,
+    "code_changed": false,
+    "configuration_changed": false,
+    "scoring_changed": false,
+    "rubric_changed": false,
+    "locks_changed": false,
+    "trials_run_or_changed": false,
+    "remediation_behavior_changed": false,
+    "only_new_artifacts": [
+      "docs/validation/artifacts/pre-generation-guidance-role-r6-2026-08-14/mechanism_isolation/mechanism-result-r6-20260814.json",
+      "docs/validation/artifacts/pre-generation-guidance-role-r6-2026-08-14/mechanism_isolation/mechanism-result-r6-20260814.sha256"
+    ]
+  }
+}

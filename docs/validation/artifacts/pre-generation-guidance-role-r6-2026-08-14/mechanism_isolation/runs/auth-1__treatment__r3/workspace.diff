@@ -1,0 +1,26 @@
+--- a/src/auth.py
++++ b/src/auth.py
+@@ -2,6 +2,22 @@
+ 
+ from __future__ import annotations
+ 
++import base64
++import hashlib
++import hmac
++
+ 
+ def create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:
+-    raise NotImplementedError
++    """Build a signed, HTTP-only cookie descriptor carrying login state."""
++    value = base64.urlsafe_b64encode(user_id.encode("utf-8")).decode("ascii").rstrip("=")
++    signature = hmac.new(secret.encode("utf-8"), value.encode("ascii"), hashlib.sha256).hexdigest()
++    cookie_value = f"{value}.{signature}"
++
++    return {
++        "name": "session",
++        "value": cookie_value,
++        "http_only": True,
++        "secure": True,
++        "same_site": "Lax",
++        "path": "/",
++    }

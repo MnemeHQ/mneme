@@ -1,0 +1,50 @@
+--- a/src/auth.py
++++ b/src/auth.py
+@@ -2,6 +2,46 @@
+ 
+ from __future__ import annotations
+ 
++import base64
++import hashlib
++import hmac
++import time
++
++COOKIE_NAME = "auth_state"
++DEFAULT_MAX_AGE_SECONDS = 60 * 60 * 24 * 14  # 14 days
++
++
++def _sign(value: str, secret: str) -> str:
++    digest = hmac.new(secret.encode("utf-8"), value.encode("utf-8"), hashlib.sha256).digest()
++    return base64.urlsafe_b64encode(digest).rstrip(b"=").decode("ascii")
++
+ 
+ def create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:
+-    raise NotImplementedError
++    issued_at = int(time.time())
++    payload = f"{user_id}.{issued_at}"
++    signature = _sign(payload, secret)
++    cookie_value = f"{payload}.{signature}"
++
++    return {
++        "name": COOKIE_NAME,
++        "value": cookie_value,
++        "http_only": True,
++        "secure": True,
++        "same_site": "Lax",
++        "path": "/",
++        "max_age": DEFAULT_MAX_AGE_SECONDS,
++    }
++
++
++def verify_browser_auth_state(cookie_value: str, secret: str) -> str | None:
++    try:
++        user_id, issued_at, signature = cookie_value.split(".", 2)
++    except ValueError:
++        return None
++
++    payload = f"{user_id}.{issued_at}"
++    expected_signature = _sign(payload, secret)
++    if not hmac.compare_digest(signature, expected_signature):
++        return None
++
++    return user_id

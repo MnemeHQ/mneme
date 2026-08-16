@@ -1,0 +1,24 @@
+[
+  {
+    "event_index": 47,
+    "message_id": "msg_011Ce1PYAhEUNbg8b3LeWhAh",
+    "ordinal": 1,
+    "timestamp": null,
+    "tool_calls": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01PYYM6LZjYZ57YydvmtKb6a",
+        "input": {
+          "file_path": "$WORKSPACE\\src\\sessions.py",
+          "new_string": "\"\"\"User-session persistence boundary.\"\"\"\n\nfrom __future__ import annotations\n\nimport hashlib\nimport json\nfrom pathlib import Path\nfrom typing import Any\n\n\nclass SessionStore:\n    \"\"\"Persists session payloads to disk as JSON, keyed by session id.\"\"\"\n\n    def __init__(self, storage_dir: str | Path = \".sessions\") -> None:\n        self._storage_dir = Path(storage_dir)\n        self._storage_dir.mkdir(parents=True, exist_ok=True)\n\n    def _path(self, session_id: str) -> Path:\n        # Hash the id so it can never be used for path traversal, regardless\n        # of what a caller passes in as session_id.\n        digest = hashlib.sha256(session_id.encode(\"utf-8\")).hexdigest()\n        return self._storage_dir / f\"{digest}.json\"\n\n    def save(self, session_id: str, payload: dict[str, Any]) -> None:\n        tmp_path = self._path(session_id).with_suffix(\".tmp\")\n        tmp_path.write_text(json.dumps(payload), encoding=\"utf-8\")\n        tmp_path.replace(self._path(session_id))\n\n    def load(self, session_id: str) -> dict[str, Any] | None:\n        path = self._path(session_id)\n        if not path.exists():\n            return None\n        return json.loads(path.read_text(encoding=\"utf-8\"))",
+          "old_string": "\"\"\"User-session persistence boundary.\"\"\"\n\nfrom __future__ import annotations\n\nfrom typing import Any\n\n\nclass SessionStore:\n    def save(self, session_id: str, payload: dict[str, Any]) -> None:\n        raise NotImplementedError\n\n    def load(self, session_id: str) -> dict[str, Any] | None:\n        raise NotImplementedError",
+          "replace_all": false
+        },
+        "name": "Edit",
+        "type": "tool_use"
+      }
+    ]
+  }
+]

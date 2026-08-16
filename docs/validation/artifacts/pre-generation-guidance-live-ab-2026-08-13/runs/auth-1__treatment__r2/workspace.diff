@@ -1,0 +1,85 @@
+--- a/src/auth.py
++++ b/src/auth.py
+@@ -2,6 +2,37 @@
+ 
+ from __future__ import annotations
+ 
++import base64
++import hashlib
++import hmac
++import json
++import time
++
++COOKIE_NAME = "session"
++DEFAULT_MAX_AGE_SECONDS = 60 * 60 * 24 * 14  # 14 days
++
++
++def _sign(data: bytes, secret: str) -> str:
++    digest = hmac.new(secret.encode("utf-8"), data, hashlib.sha256).digest()
++    return base64.urlsafe_b64encode(digest).rstrip(b"=").decode("ascii")
++
+ 
+ def create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:
+-    raise NotImplementedError
++    """Build a signed HttpOnly cookie descriptor carrying auth state."""
++    payload = {"user_id": user_id, "issued_at": int(time.time())}
++    encoded_payload = (
++        base64.urlsafe_b64encode(json.dumps(payload, separators=(",", ":")).encode("utf-8"))
++        .rstrip(b"=")
++        .decode("ascii")
++    )
++    signature = _sign(encoded_payload.encode("ascii"), secret)
++
++    return {
++        "name": COOKIE_NAME,
++        "value": f"{encoded_payload}.{signature}",
++        "http_only": True,
++        "secure": True,
++        "same_site": "Strict",
++        "path": "/",
++        "max_age": DEFAULT_MAX_AGE_SECONDS,
++    }
+--- a/src/sessions.py
++++ b/src/sessions.py
+@@ -2,12 +2,39 @@
+ 
+ from __future__ import annotations
+ 
++import json
++import sqlite3
+ from typing import Any
++
++DEFAULT_DB_PATH = "sessions.sqlite3"
++
++_SCHEMA = """
++CREATE TABLE IF NOT EXISTS sessions (
++    session_id TEXT PRIMARY KEY,
++    payload TEXT NOT NULL
++)
++"""
+ 
+ 
+ class SessionStore:
++    def __init__(self, db_path: str = DEFAULT_DB_PATH) -> None:
++        self._connection = sqlite3.connect(db_path)
++        self._connection.execute(_SCHEMA)
++        self._connection.commit()
++
+     def save(self, session_id: str, payload: dict[str, Any]) -> None:
+-        raise NotImplementedError
++        self._connection.execute(
++            "INSERT INTO sessions (session_id, payload) VALUES (?, ?) "
++            "ON CONFLICT(session_id) DO UPDATE SET payload = excluded.payload",
++            (session_id, json.dumps(payload)),
++        )
++        self._connection.commit()
+ 
+     def load(self, session_id: str) -> dict[str, Any] | None:
+-        raise NotImplementedError
++        row = self._connection.execute(
++            "SELECT payload FROM sessions WHERE session_id = ?",
++            (session_id,),
++        ).fetchone()
++        if row is None:
++            return None
++        return json.loads(row[0])

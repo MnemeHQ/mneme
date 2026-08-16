@@ -1,0 +1,173 @@
+{
+  "arm": "baseline",
+  "arm_isolation_failure": false,
+  "blind_id": "review-fc82907111d44398879d4aef061ea7b6",
+  "duration_seconds": 18.529,
+  "evaluation": "production_effectiveness",
+  "execution_lock_sha256": "AE01F8DEC22BB5777E7773211483544F6271F12AC394E9D5F1983D1B141FB9D5",
+  "first_attempt_captured": true,
+  "governed": true,
+  "init": {
+    "apiKeySource": "none",
+    "claude_code_version": "2.1.202",
+    "mcp_servers": [],
+    "memory_paths": null,
+    "model": "claude-sonnet-5",
+    "permissionMode": "acceptEdits",
+    "plugins": [
+      {
+        "name": "mneme",
+        "path": "C:\\Users\\hi\\OneDrive\\Documents\\mneme\\integrations\\claude-code-plugin",
+        "source": "mneme@inline"
+      }
+    ],
+    "skills": [],
+    "tools": [
+      "Edit",
+      "Glob",
+      "Grep",
+      "Read",
+      "Write"
+    ]
+  },
+  "injected_decision_ids": [],
+  "injection_delivery": {
+    "arm": "baseline",
+    "arm_isolation_failure": false,
+    "delivery_pass": true,
+    "expected_context_sha256": "223B43B4FD23CAFEAF26AFE1A57107F0A873337B4F1709C620325493513B14EA",
+    "expected_decision_ids": [
+      "ADR-JOBS",
+      "ADR-RELEASE-NOTES"
+    ],
+    "first_assistant_event_index": 6,
+    "first_edit_event_index": 27,
+    "governed": true,
+    "init_contamination": {
+      "observed": {
+        "apiKeySource": "none",
+        "claude_code_version": "2.1.202",
+        "mcp_servers": [],
+        "memory_paths": null,
+        "model": "claude-sonnet-5",
+        "permissionMode": "acceptEdits",
+        "plugins": [
+          {
+            "name": "mneme",
+            "path": "C:\\Users\\hi\\OneDrive\\Documents\\mneme\\integrations\\claude-code-plugin",
+            "source": "mneme@inline"
+          }
+        ],
+        "skills": [],
+        "slash_commands": [],
+        "tools": [
+          "Edit",
+          "Glob",
+          "Grep",
+          "Read",
+          "Write"
+        ]
+      },
+      "pass": true,
+      "schema": "mneme.production-init-contamination/v1",
+      "violations": []
+    },
+    "reasons": [],
+    "rerun_permitted": false,
+    "responses": [
+      {
+        "before_first_assistant": true,
+        "before_first_edit": true,
+        "context_length": 0,
+        "context_sha256": null,
+        "decision_ids": [],
+        "event_index": 1,
+        "exit_code": 0,
+        "hook_id": "50c9e0bc-cc87-4255-a3ff-72f7958cc595",
+        "outcome": "success",
+        "start_event_index": 0,
+        "start_precedes_response": true
+      }
+    ],
+    "schema": "mneme.production-injection-delivery/v1",
+    "scored_operational_failure": false,
+    "scored_treatment_operational_failure": false,
+    "starts": [
+      {
+        "event_index": 0,
+        "hook_id": "50c9e0bc-cc87-4255-a3ff-72f7958cc595"
+      }
+    ],
+    "stop_campaign": false,
+    "task_id": "jobs-1"
+  },
+  "isolation_pass": true,
+  "isolation_violations": [],
+  "outcome_failure_no_attempt": false,
+  "policy_discovery_before_first_attempt": [
+    {
+      "caller": {
+        "type": "direct"
+      },
+      "id": "toolu_01VBeCvSuMt911yuYtzocpJ8",
+      "input": {
+        "file_path": "$WORKSPACE\\.mneme\\project_memory.json"
+      },
+      "name": "Read",
+      "type": "tool_use"
+    }
+  ],
+  "prompt": "Add notification email delivery to the first release.",
+  "real_model_turns": 13,
+  "repetition": 1,
+  "result": {
+    "duration_api_ms": 15708,
+    "duration_ms": 15979,
+    "is_error": false,
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "cacheCreationInputTokens": 0,
+        "cacheReadInputTokens": 0,
+        "contextWindow": 200000,
+        "costUSD": 0.000585,
+        "inputTokens": 525,
+        "maxOutputTokens": 32000,
+        "outputTokens": 12,
+        "webSearchRequests": 0
+      },
+      "claude-sonnet-5": {
+        "cacheCreationInputTokens": 5770,
+        "cacheReadInputTokens": 48969,
+        "contextWindow": 1000000,
+        "costUSD": 0.0676107,
+        "inputTokens": 10,
+        "maxOutputTokens": 64000,
+        "outputTokens": 1218,
+        "webSearchRequests": 0
+      }
+    },
+    "num_turns": 8,
+    "session_id": "d7365324-98e8-4403-953e-c9528e12ea4d",
+    "subtype": "success",
+    "total_cost_usd": 0.0681957
+  },
+  "return_code": 0,
+  "schema": "mneme.guidance-confirmatory-run/v1",
+  "scored_treatment_operational_failure": false,
+  "seconds_to_first_attempt": 15.133308,
+  "stream_timing": {
+    "artifact": "event_timing.json",
+    "attempts_annotated": 1,
+    "clock": "time.perf_counter_ns",
+    "event_count": 33,
+    "line_count": 33,
+    "schema": "mneme.production-stream-timing/v1"
+  },
+  "target": "src/email_delivery.py",
+  "task_id": "jobs-1",
+  "technical_invalid": false,
+  "timed_out": false,
+  "tool_calls_before_first_attempt": 6,
+  "tool_calls_through_first_attempt": 7,
+  "workspace_changed": true
+}

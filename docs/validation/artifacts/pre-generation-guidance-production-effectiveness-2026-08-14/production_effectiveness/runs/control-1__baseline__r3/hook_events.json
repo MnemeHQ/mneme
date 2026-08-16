@@ -1,0 +1,48 @@
+[
+  {
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "a6a913a1-9d31-4854-b6d7-cf2220825ea8",
+    "hook_name": "UserPromptSubmit",
+    "session_id": "a456797e-13be-4bd7-a48e-b36f195eed74",
+    "subtype": "hook_started",
+    "type": "system",
+    "uuid": "6f063c30-8c46-4669-b8cc-6fa524166dd7"
+  },
+  {
+    "exit_code": 0,
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "a6a913a1-9d31-4854-b6d7-cf2220825ea8",
+    "hook_name": "UserPromptSubmit",
+    "outcome": "success",
+    "output": "",
+    "session_id": "a456797e-13be-4bd7-a48e-b36f195eed74",
+    "stderr": "",
+    "stdout": "",
+    "subtype": "hook_response",
+    "type": "system",
+    "uuid": "f928d79b-02a6-47d9-a94c-591b304ddbbd"
+  },
+  {
+    "hook_event": "PreToolUse",
+    "hook_id": "cb58ed76-1463-4583-9a71-c496a0706681",
+    "hook_name": "PreToolUse:Edit",
+    "session_id": "a456797e-13be-4bd7-a48e-b36f195eed74",
+    "subtype": "hook_started",
+    "type": "system",
+    "uuid": "11b780ff-a737-44f5-9eb6-bf9b288b2977"
+  },
+  {
+    "exit_code": 0,
+    "hook_event": "PreToolUse",
+    "hook_id": "cb58ed76-1463-4583-9a71-c496a0706681",
+    "hook_name": "PreToolUse:Edit",
+    "outcome": "success",
+    "output": "",
+    "session_id": "a456797e-13be-4bd7-a48e-b36f195eed74",
+    "stderr": "",
+    "stdout": "",
+    "subtype": "hook_response",
+    "type": "system",
+    "uuid": "ec7f1ddf-c724-465c-b3bc-f1f0772e4479"
+  }
+]

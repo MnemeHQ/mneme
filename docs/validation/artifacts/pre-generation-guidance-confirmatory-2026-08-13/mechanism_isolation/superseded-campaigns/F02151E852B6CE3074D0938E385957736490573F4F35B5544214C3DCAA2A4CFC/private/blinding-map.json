@@ -1,0 +1,13 @@
+{
+  "runs": {
+    "review-25f96f9d45e946c2b910c61091b79b0c": "storage-1__baseline__r2",
+    "review-456ca9f51a7b470c91199e54c2266f06": "storage-1__treatment__r3",
+    "review-79014a8ac5c84484821dd126dc4128f1": "auth-1__baseline__r1",
+    "review-a4939010cd8f4e8e87227749769b9d35": "auth-1__treatment__r1",
+    "review-d0ab8992e8b242cd971ff8e57048bffa": "storage-1__treatment__r2",
+    "review-d26cbc6460b34100a93f80db920edbc9": "storage-1__baseline__r3",
+    "review-e72a1f3eeddb4c888ff52f3ac663e7e0": "storage-1__treatment__r1",
+    "review-f81116abf61e4119b487bf6a2f1371ab": "storage-1__baseline__r1"
+  },
+  "schema": "mneme.guidance-confirmatory-blinding-map/v1"
+}

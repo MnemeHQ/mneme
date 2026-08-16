@@ -1,0 +1,83 @@
+{
+  "arm": "treatment",
+  "blind_id": "review-b6b72912ad8748649bad3a005c0045c2",
+  "duration_seconds": 19.269,
+  "evaluation": "mechanism_isolation",
+  "execution_lock_sha256": "D691FC8D8833E6E19970AC898D40A91F13F397ADDEA068CF94BA47083F3D3313",
+  "first_attempt_captured": true,
+  "governed": true,
+  "init": {
+    "apiKeySource": "none",
+    "claude_code_version": "2.1.202",
+    "mcp_servers": [],
+    "memory_paths": null,
+    "model": "claude-sonnet-5",
+    "permissionMode": "acceptEdits",
+    "plugins": [
+      {
+        "name": "mneme-guidance-eval",
+        "path": "C:\\Users\\hi\\OneDrive\\Documents\\mneme\\tests\\fixtures\\guidance_confirmatory\\mechanism_plugin",
+        "source": "mneme-guidance-eval@inline"
+      }
+    ],
+    "skills": [],
+    "tools": [
+      "Edit",
+      "Glob",
+      "Grep",
+      "Read",
+      "Write"
+    ]
+  },
+  "injected_decision_ids": [
+    "ADR-SERIALIZATION"
+  ],
+  "isolation_pass": true,
+  "isolation_violations": [],
+  "outcome_failure_no_attempt": false,
+  "policy_discovery_before_first_attempt": [],
+  "prompt": "Add response payloads to the public account API.",
+  "real_model_turns": 12,
+  "repetition": 3,
+  "result": {
+    "duration_api_ms": 16808,
+    "duration_ms": 16531,
+    "is_error": false,
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "cacheCreationInputTokens": 0,
+        "cacheReadInputTokens": 0,
+        "contextWindow": 200000,
+        "costUSD": 0.000612,
+        "inputTokens": 527,
+        "maxOutputTokens": 32000,
+        "outputTokens": 17,
+        "webSearchRequests": 0
+      },
+      "claude-sonnet-5": {
+        "cacheCreationInputTokens": 3602,
+        "cacheReadInputTokens": 54411,
+        "contextWindow": 1000000,
+        "costUSD": 0.0558513,
+        "inputTokens": 12,
+        "maxOutputTokens": 64000,
+        "outputTokens": 1192,
+        "webSearchRequests": 0
+      }
+    },
+    "num_turns": 7,
+    "session_id": "e03c04e0-ecd5-4eae-9dd3-a125b60d1fa7",
+    "subtype": "success",
+    "total_cost_usd": 0.0564633
+  },
+  "return_code": 0,
+  "schema": "mneme.guidance-confirmatory-run/v1",
+  "seconds_to_first_attempt": null,
+  "target": "src/api.py",
+  "task_id": "api-1",
+  "technical_invalid": false,
+  "timed_out": false,
+  "tool_calls_before_first_attempt": 5,
+  "tool_calls_through_first_attempt": 6,
+  "workspace_changed": true
+}

@@ -1,0 +1,43 @@
+--- a/src/sessions.py
++++ b/src/sessions.py
+@@ -2,12 +2,38 @@
+ 
+ from __future__ import annotations
+ 
++import json
++import sqlite3
+ from typing import Any
+ 
+ 
+ class SessionStore:
++    def __init__(self, db_path: str = "sessions.db") -> None:
++        self._db_path = db_path
++        with self._connect() as conn:
++            conn.execute(
++                """
++                CREATE TABLE IF NOT EXISTS sessions (
++                    session_id TEXT PRIMARY KEY,
++                    payload TEXT NOT NULL
++                )
++                """
++            )
++
++    def _connect(self) -> sqlite3.Connection:
++        return sqlite3.connect(self._db_path)
++
+     def save(self, session_id: str, payload: dict[str, Any]) -> None:
+-        raise NotImplementedError
++        with self._connect() as conn:
++            conn.execute(
++                "INSERT OR REPLACE INTO sessions (session_id, payload) VALUES (?, ?)",
++                (session_id, json.dumps(payload)),
++            )
+ 
+     def load(self, session_id: str) -> dict[str, Any] | None:
+-        raise NotImplementedError
++        with self._connect() as conn:
++            row = conn.execute(
++                "SELECT payload FROM sessions WHERE session_id = ?",
++                (session_id,),
++            ).fetchone()
++        return json.loads(row[0]) if row else None

@@ -1,0 +1,34 @@
+[
+  {
+    "elapsed_seconds_from_process_start": 12.5372,
+    "elapsed_seconds_from_prompt_submission": 12.526562,
+    "event_index": 21,
+    "message_id": "msg_011Ce6rDiaGNzCTdGyz37ajC",
+    "model_usage_through_attempt": {
+      "assistant_message_count": 5,
+      "cache_creation_input_tokens": 2414,
+      "cache_read_input_tokens": 43452,
+      "input_tokens": 10,
+      "method": "sum maxima per unique assistant message id",
+      "output_tokens": 44
+    },
+    "ordinal": 1,
+    "timestamp": null,
+    "tool_calls": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01SH2LtTbZVywiRCCZ7dRt56",
+        "input": {
+          "file_path": "$WORKSPACE\\CONTRIBUTING.md",
+          "new_string": "Keep architecture decisions explicit and reviewable.",
+          "old_string": "Keep architecure decisions explicit and reviewable.",
+          "replace_all": false
+        },
+        "name": "Edit",
+        "type": "tool_use"
+      }
+    ]
+  }
+]

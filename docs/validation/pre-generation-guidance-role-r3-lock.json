@@ -1,0 +1,74 @@
+{
+  "schema": "mneme.pre-generation-guidance-role-r3-lock/v1",
+  "locked_at": "2026-08-13",
+  "status": "R3_LOCKED_READY_FOR_R4",
+  "r2_lock": {
+    "path": "docs/validation/pre-generation-guidance-role-r2-lock.json",
+    "sha256": "0BBAA6130D1E9B0100938845775A01723317B880326629EF1086961A59445F13"
+  },
+  "result": {
+    "path": "docs/validation/pre-generation-guidance-role-r3-result.md",
+    "sha256": "D80697D9745355C3C61A1061E8BA0A76F7EAD73F54237CF6136A1B8CA86D2C53"
+  },
+  "implementation": {
+    "mneme/guidance_roles.py": "CEB4D88D5D6557D5256358E58A470C13BBE764C4C0F5A335889BE0FEB22C6694",
+    "mneme/guidance_applicability_eval.py": "3BEDCBEAF18FD15D99E2A79D6EF47FD03750A051AC5279BACD164D39C34DE507"
+  },
+  "tests": {
+    "tests/test_guidance_roles.py": "4E206D7EB8A0E6AF7FEC0D6A478B84FDED7E24FECE2988317ACBD008FC8AAEB2",
+    "tests/test_guidance_applicability_eval.py": "4E24DC42B30CACE157D1A275A38277D85DEDA45D8B1CB79762FEF2A17845A72F",
+    "focused_guidance_retrieval_passed": 49,
+    "full_passed": 622,
+    "full_skipped": 5,
+    "full_warnings": 52
+  },
+  "locked_fixtures": {
+    "tests/fixtures/guidance_applicability/cases.json": "2408DD615BB54E3BB8E03B8A28CA1BE9CDC0670E5C4BBA6C04541BA902BADEAB",
+    "tests/fixtures/guidance_retrieval/cases.json": "27B45E547E8B10D8EAE39CB4BAB1488D3822AA4F1B81010D5148379B24FEA261"
+  },
+  "role_metrics": {
+    "role_snapshot_matches": "4/4",
+    "direct_role_macro_recall": 1.0,
+    "known_adjacent_role_hits": "2/2",
+    "unclassified_selected_decisions": 0,
+    "selection_changed_cases": 0,
+    "unexpected_selections": 0,
+    "locked_retrieval_expected_direct_hits": "18/18",
+    "role_contract_reproduced": true
+  },
+  "preservation": {
+    "original_scored_decision_objects": true,
+    "selected_order": true,
+    "scores": true,
+    "match_evidence": true,
+    "selected_ids": true,
+    "deterministic_output": true
+  },
+  "production_runtime_unchanged": {
+    "mneme/decision_retriever.py": "F86B3BA2E50BB42D92DBFEA879E24A919A07B5AEBB71284F7596D65CC1C74882",
+    "mneme/guidance.py": "C1ADE2E3F7623F5EC5E4AC682063B275DE3AFC6E5B2E1E523EF52830D9994ED3",
+    "mneme/integrations/claude_code/guidance_hook.py": "A3F55FAD4A221B9BB1E526C8C223ED784C83FA5BA3E9044A61AE65124AC6E3BB"
+  },
+  "production_integration": {
+    "classifier_imported_by_guidance_formatter": false,
+    "classifier_imported_by_claude_hook": false,
+    "runtime_role_formatting_enabled": false,
+    "production_behavior_changed": false
+  },
+  "e66_evidence": {
+    "execution_lock_sha256": "E66ED251BED91D52A55ECB90B1EE6198E80970C45B7AC04759483F0BDF04195C",
+    "collection_manifest_sha256": "46B215D324A1C90E21615F0233D99DD695A5D883671CE44A72F362D3EEFDF0DE"
+  },
+  "r4_authorized_scope": {
+    "wire_classifier_into_build_guidance": true,
+    "apply_locked_role_wording": true,
+    "preserve_selection_and_context_budget": true,
+    "update_formatter_and_integration_tests": true,
+    "change_retrieval_or_k": false,
+    "change_hooks_or_plugin_configuration": false,
+    "change_enforcement_or_adr020_applicability": false,
+    "run_claude_trials": false
+  },
+  "production_effectiveness_ab": "PAUSED_NOT_RUN",
+  "fresh_execution_task_boundary": "After the R6 execution lock is frozen and immediately before live Claude trials"
+}

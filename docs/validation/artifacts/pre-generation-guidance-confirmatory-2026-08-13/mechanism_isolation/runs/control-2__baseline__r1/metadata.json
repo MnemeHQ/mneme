@@ -1,0 +1,81 @@
+{
+  "arm": "baseline",
+  "blind_id": "review-21dd466b158841258269365007b547e0",
+  "duration_seconds": 12.716,
+  "evaluation": "mechanism_isolation",
+  "execution_lock_sha256": "E66ED251BED91D52A55ECB90B1EE6198E80970C45B7AC04759483F0BDF04195C",
+  "first_attempt_captured": false,
+  "governed": false,
+  "init": {
+    "apiKeySource": "none",
+    "claude_code_version": "2.1.202",
+    "mcp_servers": [],
+    "memory_paths": null,
+    "model": "claude-sonnet-5",
+    "permissionMode": "acceptEdits",
+    "plugins": [
+      {
+        "name": "mneme-guidance-eval",
+        "path": "C:\\Users\\hi\\OneDrive\\Documents\\mneme\\tests\\fixtures\\guidance_confirmatory\\mechanism_plugin",
+        "source": "mneme-guidance-eval@inline"
+      }
+    ],
+    "skills": [],
+    "tools": [
+      "Edit",
+      "Glob",
+      "Grep",
+      "Read",
+      "Write"
+    ]
+  },
+  "injected_decision_ids": [],
+  "isolation_pass": true,
+  "isolation_violations": [],
+  "outcome_failure_no_attempt": true,
+  "policy_discovery_before_first_attempt": [],
+  "prompt": "Rename the homepage hero headline.",
+  "real_model_turns": 8,
+  "repetition": 1,
+  "result": {
+    "duration_api_ms": 9242,
+    "duration_ms": 9085,
+    "is_error": false,
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "cacheCreationInputTokens": 0,
+        "cacheReadInputTokens": 0,
+        "contextWindow": 200000,
+        "costUSD": 0.000588,
+        "inputTokens": 523,
+        "maxOutputTokens": 32000,
+        "outputTokens": 13,
+        "webSearchRequests": 0
+      },
+      "claude-sonnet-5": {
+        "cacheCreationInputTokens": 2126,
+        "cacheReadInputTokens": 33888,
+        "contextWindow": 1000000,
+        "costUSD": 0.0291414,
+        "inputTokens": 8,
+        "maxOutputTokens": 64000,
+        "outputTokens": 413,
+        "webSearchRequests": 0
+      }
+    },
+    "num_turns": 4,
+    "session_id": "6e487fc0-0689-4240-a778-da4fdce5b3c6",
+    "subtype": "success",
+    "total_cost_usd": 0.0297294
+  },
+  "return_code": 0,
+  "schema": "mneme.guidance-confirmatory-run/v1",
+  "seconds_to_first_attempt": null,
+  "target": "site/homepage.md",
+  "task_id": "control-2",
+  "technical_invalid": false,
+  "timed_out": false,
+  "tool_calls_before_first_attempt": 0,
+  "tool_calls_through_first_attempt": 0,
+  "workspace_changed": false
+}

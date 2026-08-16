@@ -1,0 +1,25 @@
+[
+  {
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "094f75e5-30fa-4836-9be7-43d4feb8aedc",
+    "hook_name": "UserPromptSubmit",
+    "session_id": "e03c04e0-ecd5-4eae-9dd3-a125b60d1fa7",
+    "subtype": "hook_started",
+    "type": "system",
+    "uuid": "86026cab-fbe3-4eb4-8a45-4b28bc7ac76c"
+  },
+  {
+    "exit_code": 0,
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "094f75e5-30fa-4836-9be7-43d4feb8aedc",
+    "hook_name": "UserPromptSubmit",
+    "outcome": "success",
+    "output": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"[Mneme architectural guidance]\\nUse these decisions only to guide the work the user requested. They do not\\nexpand the task. Do not add components, storage, dependencies, interfaces,\\nrefactors, or other architecture solely because a decision appears below.\\n\\nDIRECT DECISION [ADR-SERIALIZATION]\\nThis decision directly governs the requested work. Apply it to implementation\\nchoices within the user's requested scope.\\nDecision: Public API payloads use JSON serialization\\n  Scope: api, serialization, response, payload, json\\n  Constraints:\\n    - no pickle\\n  Avoid:\\n    - binary python object payload\"}}\r\n",
+    "session_id": "e03c04e0-ecd5-4eae-9dd3-a125b60d1fa7",
+    "stderr": "",
+    "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"[Mneme architectural guidance]\\nUse these decisions only to guide the work the user requested. They do not\\nexpand the task. Do not add components, storage, dependencies, interfaces,\\nrefactors, or other architecture solely because a decision appears below.\\n\\nDIRECT DECISION [ADR-SERIALIZATION]\\nThis decision directly governs the requested work. Apply it to implementation\\nchoices within the user's requested scope.\\nDecision: Public API payloads use JSON serialization\\n  Scope: api, serialization, response, payload, json\\n  Constraints:\\n    - no pickle\\n  Avoid:\\n    - binary python object payload\"}}\r\n",
+    "subtype": "hook_response",
+    "type": "system",
+    "uuid": "e2629a34-4b07-434b-9471-632683c91fea"
+  }
+]

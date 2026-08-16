@@ -1,0 +1,31 @@
+{
+  "arm": "treatment",
+  "assistant_turns": 1,
+  "candidate_sha256": "b34d3c1a04cf91e97beafc1e19d30e4569ce0baac206fd66b00f3732d211b470",
+  "duration_seconds": 3.565,
+  "first_proposal_tool_count": 0,
+  "governed": true,
+  "injected_decision_ids": [
+    "ADR-SERIALIZATION"
+  ],
+  "prompt": "Add response payloads to the public account API.",
+  "real_model_turns": 0,
+  "repetition": 2,
+  "result": {
+    "duration_api_ms": 0,
+    "duration_ms": 1062,
+    "is_error": true,
+    "modelUsage": {},
+    "num_turns": 1,
+    "session_id": "3f1a2ca5-5377-4ba9-b7ee-eed76b6c14dd",
+    "subtype": "success",
+    "total_cost_usd": 0
+  },
+  "return_code": 1,
+  "schema": "mneme.guidance-live-ab-run/v1",
+  "target": "src/api.py",
+  "task_id": "api-1",
+  "technical_invalid": true,
+  "timed_out": false,
+  "workspace_changed": false
+}

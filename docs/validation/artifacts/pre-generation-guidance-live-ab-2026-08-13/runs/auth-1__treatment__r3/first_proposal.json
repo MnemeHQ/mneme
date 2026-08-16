@@ -1,0 +1,14 @@
+[
+  {
+    "caller": {
+      "type": "direct"
+    },
+    "id": "toolu_01SPC79PkfyRTWdKVNJjNKQM",
+    "input": {
+      "content": "\"\"\"Browser authentication-state boundary.\"\"\"\n\nfrom __future__ import annotations\n\nimport hashlib\nimport hmac\nimport secrets\n\nSESSION_COOKIE_NAME = \"session_id\"\nSESSION_TTL_SECONDS = 60 * 60 * 24 * 14  # 14 days\n\n\ndef _sign(session_id: str, secret: str) -> str:\n    return hmac.new(secret.encode(), session_id.encode(), hashlib.sha256).hexdigest()\n\n\ndef create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:\n    session_id = secrets.token_urlsafe(32)\n    cookie_value = f\"{session_id}.{_sign(session_id, secret)}\"\n\n    return {\n        \"session_id\": session_id,\n        \"user_id\": user_id,\n        \"cookie\": {\n            \"name\": SESSION_COOKIE_NAME,\n            \"value\": cookie_value,\n            \"http_only\": True,\n            \"secure\": True,\n            \"same_site\": \"Lax\",\n            \"path\": \"/\",\n            \"max_age\": SESSION_TTL_SECONDS,\n        },\n    }\n\n\ndef verify_browser_auth_state(cookie_value: str, secret: str) -> str | None:\n    session_id, _, signature = cookie_value.partition(\".\")\n    if not signature or not hmac.compare_digest(signature, _sign(session_id, secret)):\n        return None\n    return session_id\n",
+      "file_path": "C:\\Users\\hi\\AppData\\Local\\Temp\\mneme-guidance-ab-wr5n8h_n\\workspace\\src\\auth.py"
+    },
+    "name": "Write",
+    "type": "tool_use"
+  }
+]

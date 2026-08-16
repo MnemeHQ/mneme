@@ -1,0 +1,9 @@
+{
+  "schema": "mneme.guidance-confirmatory-superseded-campaign/v1",
+  "execution_lock_sha256": "F02151E852B6CE3074D0938E385957736490573F4F35B5544214C3DCAA2A4CFC",
+  "completed_scored_runs": 8,
+  "additional_invalidated_runs": 1,
+  "confirmatory_eligible": false,
+  "reason": "Claude Code auto memory was enabled. Its dynamic system context exposed a per-project memory path, and one run attempted four reads outside the disposable workspace. No Mneme policy was obtained through that route, but the locked mechanism-isolation confinement condition was not guaranteed symmetrically.",
+  "correction": "Disable auto memory and all CLAUDE.md loading in both arms, verify that the init event exposes no memory_paths value, re-lock, and restart all 42 mechanism slots."
+}

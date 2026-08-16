@@ -1,0 +1,24 @@
+[
+  {
+    "event_index": 45,
+    "message_id": "msg_011Ce1PkMBMRuTSWfz8AZoVW",
+    "ordinal": 1,
+    "timestamp": null,
+    "tool_calls": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_011ASCUgxLL1HityUA37tPAG",
+        "input": {
+          "file_path": "$WORKSPACE\\src\\auth.py",
+          "new_string": "\"\"\"Browser authentication-state boundary.\"\"\"\n\nfrom __future__ import annotations\n\nimport base64\nimport hashlib\nimport hmac\nimport json\nimport time\n\nCOOKIE_NAME = \"session\"\nMAX_AGE_SECONDS = 60 * 60 * 24 * 14  # 14 days\n\n\ndef _sign(encoded_payload: str, secret: str) -> str:\n    digest = hmac.new(secret.encode(\"utf-8\"), encoded_payload.encode(\"ascii\"), hashlib.sha256).digest()\n    return base64.urlsafe_b64encode(digest).decode(\"ascii\").rstrip(\"=\")\n\n\ndef create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:\n    \"\"\"Build a signed, HTTP-only cookie descriptor for a logged-in user.\n\n    The signed value is only ever meant for a Set-Cookie header; no bearer\n    token is returned for client-side (e.g. localStorage) storage.\n    \"\"\"\n    payload = json.dumps(\n        {\"user_id\": user_id, \"issued_at\": int(time.time())}, separators=(\",\", \":\")\n    ).encode(\"utf-8\")\n    encoded_payload = base64.urlsafe_b64encode(payload).decode(\"ascii\").rstrip(\"=\")\n    signature = _sign(encoded_payload, secret)\n\n    return {\n        \"name\": COOKIE_NAME,\n        \"value\": f\"{encoded_payload}.{signature}\",\n        \"http_only\": True,\n        \"secure\": True,\n        \"same_site\": \"Lax\",\n        \"max_age\": MAX_AGE_SECONDS,\n        \"path\": \"/\",\n    }\n\n\ndef verify_browser_auth_state(cookie_value: str, secret: str) -> dict[str, object] | None:\n    \"\"\"Validate a cookie value produced by create_browser_auth_state.\n\n    Returns the decoded payload (user_id, issued_at) on success, or None if\n    the signature is invalid, missing, or malformed.\n    \"\"\"\n    try:\n        encoded_payload, signature = cookie_value.split(\".\", 1)\n    except ValueError:\n        return None\n\n    expected_signature = _sign(encoded_payload, secret)\n    if not hmac.compare_digest(signature, expected_signature):\n        return None\n\n    padding = \"=\" * (-len(encoded_payload) % 4)\n    try:\n        payload = json.loads(base64.urlsafe_b64decode(encoded_payload + padding))\n    except (ValueError, json.JSONDecodeError):\n        return None\n\n    return payload",
+          "old_string": "\"\"\"Browser authentication-state boundary.\"\"\"\n\nfrom __future__ import annotations\n\n\ndef create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:\n    raise NotImplementedError",
+          "replace_all": false
+        },
+        "name": "Edit",
+        "type": "tool_use"
+      }
+    ]
+  }
+]

@@ -1,0 +1,25 @@
+[
+  {
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "4f1296d6-697d-4e51-bf46-cdd81d983c80",
+    "hook_name": "UserPromptSubmit",
+    "session_id": "f210c3da-aa36-47ce-872e-5b948b0ce725",
+    "subtype": "hook_started",
+    "type": "system",
+    "uuid": "eb841075-2e88-4ac7-9668-254918f281d7"
+  },
+  {
+    "exit_code": 0,
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "4f1296d6-697d-4e51-bf46-cdd81d983c80",
+    "hook_name": "UserPromptSubmit",
+    "outcome": "success",
+    "output": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"[Mneme architectural guidance]\\nRecorded project decisions relevant to the submitted task follow. Path-scoped typed rules list conditional selectors; applicability is determined only when a target artifact is known.\\n\\nDECISION [ADR-STORAGE]: Persist user sessions in SQLite\\n  Scope: storage, database, persistence, session, sessions, login\\n  Constraints:\\n    - no postgres\\n    - no psycopg2\\n  Avoid:\\n    - external database\\n    - database server\\n\\nDECISION [ADR-AUTH]: Authentication state uses signed HTTP-only cookies\\n  Scope: authentication, auth, login, cookies, session, sessions\\n  Constraints:\\n    - no jwt in browser storage\\n  Avoid:\\n    - localStorage bearer token\"}}\r\n",
+    "session_id": "f210c3da-aa36-47ce-872e-5b948b0ce725",
+    "stderr": "",
+    "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"[Mneme architectural guidance]\\nRecorded project decisions relevant to the submitted task follow. Path-scoped typed rules list conditional selectors; applicability is determined only when a target artifact is known.\\n\\nDECISION [ADR-STORAGE]: Persist user sessions in SQLite\\n  Scope: storage, database, persistence, session, sessions, login\\n  Constraints:\\n    - no postgres\\n    - no psycopg2\\n  Avoid:\\n    - external database\\n    - database server\\n\\nDECISION [ADR-AUTH]: Authentication state uses signed HTTP-only cookies\\n  Scope: authentication, auth, login, cookies, session, sessions\\n  Constraints:\\n    - no jwt in browser storage\\n  Avoid:\\n    - localStorage bearer token\"}}\r\n",
+    "subtype": "hook_response",
+    "type": "system",
+    "uuid": "6c6791b7-5d79-4247-84fa-f22843be41ae"
+  }
+]

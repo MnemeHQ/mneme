@@ -1,0 +1,83 @@
+{
+  "arm": "treatment",
+  "blind_id": "review-771105d7693b4fb8bdeb79d0fbb7cb31",
+  "duration_seconds": 26.164,
+  "evaluation": "mechanism_isolation",
+  "execution_lock_sha256": "D691FC8D8833E6E19970AC898D40A91F13F397ADDEA068CF94BA47083F3D3313",
+  "first_attempt_captured": true,
+  "governed": true,
+  "init": {
+    "apiKeySource": "none",
+    "claude_code_version": "2.1.202",
+    "mcp_servers": [],
+    "memory_paths": null,
+    "model": "claude-sonnet-5",
+    "permissionMode": "acceptEdits",
+    "plugins": [
+      {
+        "name": "mneme-guidance-eval",
+        "path": "C:\\Users\\hi\\OneDrive\\Documents\\mneme\\tests\\fixtures\\guidance_confirmatory\\mechanism_plugin",
+        "source": "mneme-guidance-eval@inline"
+      }
+    ],
+    "skills": [],
+    "tools": [
+      "Edit",
+      "Glob",
+      "Grep",
+      "Read",
+      "Write"
+    ]
+  },
+  "injected_decision_ids": [
+    "ADR-AUTH"
+  ],
+  "isolation_pass": true,
+  "isolation_violations": [],
+  "outcome_failure_no_attempt": false,
+  "policy_discovery_before_first_attempt": [],
+  "prompt": "Implement browser authentication state for account login.",
+  "real_model_turns": 13,
+  "repetition": 2,
+  "result": {
+    "duration_api_ms": 24026,
+    "duration_ms": 23579,
+    "is_error": false,
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "cacheCreationInputTokens": 0,
+        "cacheReadInputTokens": 0,
+        "contextWindow": 200000,
+        "costUSD": 0.0006,
+        "inputTokens": 525,
+        "maxOutputTokens": 32000,
+        "outputTokens": 15,
+        "webSearchRequests": 0
+      },
+      "claude-sonnet-5": {
+        "cacheCreationInputTokens": 5224,
+        "cacheReadInputTokens": 47038,
+        "contextWindow": 1000000,
+        "costUSD": 0.07862040000000001,
+        "inputTokens": 10,
+        "maxOutputTokens": 64000,
+        "outputTokens": 2209,
+        "webSearchRequests": 0
+      }
+    },
+    "num_turns": 9,
+    "session_id": "2cce84ec-01bb-4073-bd5a-102816b398ce",
+    "subtype": "success",
+    "total_cost_usd": 0.0792204
+  },
+  "return_code": 0,
+  "schema": "mneme.guidance-confirmatory-run/v1",
+  "seconds_to_first_attempt": null,
+  "target": "src/auth.py",
+  "task_id": "auth-1",
+  "technical_invalid": false,
+  "timed_out": false,
+  "tool_calls_before_first_attempt": 7,
+  "tool_calls_through_first_attempt": 8,
+  "workspace_changed": true
+}

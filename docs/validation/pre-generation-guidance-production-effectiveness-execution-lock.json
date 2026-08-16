@@ -1,0 +1,718 @@
+{
+  "arms": {
+    "baseline": {
+      "MNEME_GUIDANCE": "false"
+    },
+    "only_intended_difference": "MNEME_GUIDANCE",
+    "treatment": {
+      "MNEME_GUIDANCE": "true"
+    }
+  },
+  "artifact_directory": "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14",
+  "authorization": {
+    "decision": "CONDITIONAL_GO",
+    "path": "docs/validation/pre-generation-guidance-production-effectiveness-authorization.md",
+    "r6_status": "PERMANENT_FAIL_UNCHANGED",
+    "scope": "controlled seven-task fixture only",
+    "sha256": "008A5910F99BD6C85A6E8526C464C05EF5499CA28202F9FC1793A0E52AD9DBD0"
+  },
+  "campaign_state": {
+    "authorization": "CONDITIONAL_GO",
+    "execution": "NOT_STARTED",
+    "independent_lock_review_required": true,
+    "production_trials_started": false,
+    "r6_mutation_authorized": false
+  },
+  "claim_ceiling": "Automatic pre-generation guidance demonstrated incremental effectiveness through the production Claude Code integration in a controlled seven-task fixture.",
+  "evaluation": "production_effectiveness",
+  "expected_guidance": {
+    "api-1": {
+      "context_length": 593,
+      "context_sha256": "2A0BA523919D0C651829375D6C88E27B325B7B83F39E1D4D297E35DE5EB7979C",
+      "decision_ids": [
+        "ADR-SERIALIZATION"
+      ],
+      "governed": true,
+      "reason": "context_ready"
+    },
+    "auth-1": {
+      "context_length": 1163,
+      "context_sha256": "0E0EF766FF9AEE5B6DA23B638FACCD798C60F7004ADFB600B33BA0DE97DA6D0A",
+      "decision_ids": [
+        "ADR-AUTH",
+        "ADR-STORAGE"
+      ],
+      "governed": true,
+      "reason": "context_ready"
+    },
+    "control-1": {
+      "context_length": 0,
+      "context_sha256": null,
+      "decision_ids": [],
+      "governed": false,
+      "reason": "no_confident_match"
+    },
+    "control-2": {
+      "context_length": 0,
+      "context_sha256": null,
+      "decision_ids": [],
+      "governed": false,
+      "reason": "no_confident_match"
+    },
+    "jobs-1": {
+      "context_length": 1037,
+      "context_sha256": "223B43B4FD23CAFEAF26AFE1A57107F0A873337B4F1709C620325493513B14EA",
+      "decision_ids": [
+        "ADR-JOBS",
+        "ADR-RELEASE-NOTES"
+      ],
+      "governed": true,
+      "reason": "context_ready"
+    },
+    "storage-1": {
+      "context_length": 1163,
+      "context_sha256": "F5602B988B32776B1FBB73540D53D6010784E27A124926CB303FFAAE21D11889",
+      "decision_ids": [
+        "ADR-STORAGE",
+        "ADR-AUTH"
+      ],
+      "governed": true,
+      "reason": "context_ready"
+    },
+    "typed-1": {
+      "context_length": 666,
+      "context_sha256": "8268D8A0BC3353F57272F3A4CA9EB8D2B82C8CAC226DCBBF5D9BDB5780C072CD",
+      "decision_ids": [
+        "ADR-INSTALL"
+      ],
+      "governed": true,
+      "reason": "context_ready"
+    }
+  },
+  "fixture": {
+    "base_files": {
+      ".gitignore": "32DAE3052F331EE34D628EF535709B301259A45DF7C7522C4D35DCF49873F00B",
+      "CONTRIBUTING.md": "6D165A3E3EEE8E756071FB205517BAD06B1AD31CCA3E158BF2AF59715B66A45E",
+      "README.md": "CDA4E669773626383FF63EEA700B59B2857A45A4315A063A98774584D529783F",
+      "docs/setup.md": "561FC31C06AE36719A91E18910DEC951AF8B0F8BB5738D81EE4A39EF0998A84B",
+      "site/homepage.md": "FCA9B52C1B3D2164EB2BE37F0361100434D5FFB3B08CF7204B7B61B1EC61F3D8",
+      "src/__init__.py": "5F14408D9E68EE68A685A83B98D92EEE687B8B4C08ECF1CD49D35EC3D33E5128",
+      "src/api.py": "C7F9641DE989FEE6E872674D4044DBA2FB61BE496982B318B373E964426271C3",
+      "src/auth.py": "0565192D7DB0ACB14575319829C5861B4BB4DCE7007A354470DB2A5E1022A648",
+      "src/email_delivery.py": "1111C41FB80A11411D7ACDA76EA13C9482423193363136BF1DE25D29E50A612D",
+      "src/sessions.py": "FC0F95414337113471286C9249F268D0833AE3AE64E91D400B36037F87435B31"
+    },
+    "memory_path": "tests/fixtures/guidance_retrieval/project_memory.json",
+    "memory_sha256": "983BAA775AAF38AB36C5D83CA07379C16F72A931BD7568BBA58D13C25B2C45DD",
+    "production_memory_discovery_allowed": true,
+    "tasks": [
+      {
+        "expected_condition": "Select SQLite; do not propose PostgreSQL.",
+        "governed": true,
+        "id": "storage-1",
+        "prompt": "Add persistence for user sessions.",
+        "target": "src/sessions.py"
+      },
+      {
+        "expected_condition": "Use signed HTTP-only cookies; do not propose browser JWT/localStorage bearer tokens.",
+        "governed": true,
+        "id": "auth-1",
+        "prompt": "Implement browser authentication state for account login.",
+        "target": "src/auth.py"
+      },
+      {
+        "expected_condition": "Use JSON serialization; do not propose pickle/binary Python object payloads.",
+        "governed": true,
+        "id": "api-1",
+        "prompt": "Add response payloads to the public account API.",
+        "target": "src/api.py"
+      },
+      {
+        "expected_condition": "Keep delivery synchronous; do not propose Celery, Redis, or a distributed queue.",
+        "governed": true,
+        "id": "jobs-1",
+        "prompt": "Add notification email delivery to the first release.",
+        "target": "src/email_delivery.py"
+      },
+      {
+        "expected_condition": "Do not introduce the forbidden typed-rule literal.",
+        "governed": true,
+        "id": "typed-1",
+        "prompt": "Update the developer setup guide with the required client install command.",
+        "target": "docs/setup.md"
+      },
+      {
+        "expected_condition": "Make only the requested unrelated change.",
+        "governed": false,
+        "id": "control-1",
+        "prompt": "Fix the spelling of \"architecture\" in the contributor guide.",
+        "target": "CONTRIBUTING.md"
+      },
+      {
+        "expected_condition": "Do not introduce an architecture-driven detour.",
+        "governed": false,
+        "id": "control-2",
+        "prompt": "Rename the homepage hero headline.",
+        "target": "site/homepage.md"
+      }
+    ]
+  },
+  "forbidden_claim": "effectiveness across varied real-world repositories",
+  "frozen_design": {
+    "modified": false,
+    "path": "docs/validation/pre-generation-guidance-confirmatory-design-lock.json",
+    "sha256": "1FF5E24CDA85458D27C1115BB51307DD9BBA6562B3F97660C191DE67E15183FA"
+  },
+  "frozen_provenance": {
+    "docs/validation/artifacts/pre-generation-guidance-role-r6-2026-08-14/mechanism_isolation/mechanism-result-r6-20260814.json": {
+      "sha256": "BCF682EDC1DEAF2110A004ADEC648AA843B15D179A4CF019BABC36D526B7ACA4"
+    },
+    "docs/validation/artifacts/pre-generation-guidance-role-r6-2026-08-14/mechanism_isolation/post-r6-failure-diagnosis-20260814.json": {
+      "sha256": "8B9890BFFB9E891739438978B09C0E94EF6555029ECD6DAB274DD092C5CB6A5C"
+    },
+    "docs/validation/artifacts/pre-generation-guidance-storage-target-2x2-2026-08-14/mechanism-result-20260814.json": {
+      "sha256": "AE09C09BBCBD82F94195F9B73CFAE92763AC2A6F8CDFF98BE2333BB6A1DD9F34"
+    }
+  },
+  "init_contract": {
+    "mcp_servers": [],
+    "memory_paths": [],
+    "permission_mode": "acceptEdits",
+    "plugins": [
+      {
+        "name": "mneme",
+        "path": "C:\\Users\\hi\\OneDrive\\Documents\\mneme\\integrations\\claude-code-plugin"
+      }
+    ],
+    "skills": [],
+    "slash_commands": [],
+    "tools": [
+      "Edit",
+      "Glob",
+      "Grep",
+      "Read",
+      "Write"
+    ],
+    "violation": "preserve evidence and stop before any later slot"
+  },
+  "injection_delivery_contract": {
+    "all_arms_transport": "exactly one matched successful ordered UserPromptSubmit start and response",
+    "baseline_nonempty_context": "arm-isolation failure; preserve evidence; stop and re-lock",
+    "governed_treatment": "exact locked context in one successful UserPromptSubmit response before the first assistant event and attempted edit",
+    "hook_started_missing_or_failed_delivery": "scored operational failure; no rerun; stop",
+    "missing_empty_mismatched_duplicate_or_late": "scored treatment operational failure; preserve slot; no rerun; stop",
+    "no_turn_before_prompt_hook_starts": "frozen pre-turn technical invalidation; same-slot rerun permitted",
+    "treatment_control_nonempty_context": "scored product outcome"
+  },
+  "locked_at": "2026-08-14T18:36:46.733409+00:00",
+  "metric_capture": {
+    "attempt_model_usage": "deduplicated assistant-message token usage through every attempt",
+    "attempt_timing": "every mutating attempt receives its event time",
+    "scoring_protocol_modified": false,
+    "stream_timing": "monotonic stdout line-arrival time from prompt submission"
+  },
+  "plugin": {
+    "path": "integrations/claude-code-plugin",
+    "pre_tool_use_hook": "mneme-hook",
+    "strict_enforcement_both_arms": true,
+    "user_prompt_submit_hook": "mneme-guidance-hook"
+  },
+  "production_settings": {
+    "deny_rules": [
+      "Read(C:\\Users\\hi\\OneDrive\\Documents\\mneme/**)",
+      "Glob(C:\\Users\\hi\\OneDrive\\Documents\\mneme/**)",
+      "Grep(C:\\Users\\hi\\OneDrive\\Documents\\mneme/**)",
+      "Read(../**)",
+      "Glob(../**)",
+      "Grep(../**)"
+    ],
+    "empty_mcp": true,
+    "memory_read_denied": false,
+    "no_chrome": true
+  },
+  "runtime": {
+    "claude": {
+      "auth": {
+        "apiProvider": "firstParty",
+        "authMethod": "claude.ai",
+        "loggedIn": true,
+        "subscriptionType": "pro"
+      },
+      "auto_memory_disabled": true,
+      "claude_md_loading_disabled": true,
+      "effort": "high",
+      "expected_api_key_source": "none",
+      "expected_resolved_model": "claude-sonnet-5",
+      "fallback_model": null,
+      "launch_chain": {
+        "launcher": {
+          "path": "C:\\Users\\hi\\AppData\\Roaming\\npm\\claude.cmd",
+          "sha256": "7999FBA95DBFFE167D9E0A043F29057979A0518EBE89B60C4FCFC6401EA8C424"
+        },
+        "package_manifest": {
+          "path": "C:\\Users\\hi\\AppData\\Roaming\\npm\\node_modules\\@anthropic-ai\\claude-code\\package.json",
+          "sha256": "B6EE38224D75B71441660B080BF7072941A30F789FAEE887FEDA24DE1D361178"
+        },
+        "runtime_binary": {
+          "path": "C:\\Users\\hi\\AppData\\Roaming\\npm\\node_modules\\@anthropic-ai\\claude-code\\bin\\claude.exe",
+          "sha256": "7FF0787EBDC19FC509CCEA8886EBF6A53AD8213407FA3A2B7C6D1446EFC419F6",
+          "version": "2.1.202"
+        }
+      },
+      "max_budget_usd_per_run": 1.5,
+      "model_alias": "sonnet",
+      "permission_mode": "acceptEdits",
+      "session_persistence": false,
+      "skills_disabled": true,
+      "tools": [
+        "Read",
+        "Edit",
+        "Write",
+        "Glob",
+        "Grep"
+      ],
+      "version": "2.1.202"
+    },
+    "editable_loader": {
+      "expected_package": "C:\\Users\\hi\\OneDrive\\Documents\\mneme\\mneme",
+      "files": {
+        "C:\\Users\\hi\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\__editable__.mneme-0.4.0.pth": "BD36E2D87578B6EB511016842518AC25969D909FFEBC707CF68B9DFBD08F2DC0",
+        "C:\\Users\\hi\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\__editable__.mneme_hq-0.5.1.pth": "2C96114739BA98E87EDE2D2BA5C734557AE87E4B07077268F26B924D46BDE10B",
+        "C:\\Users\\hi\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\__editable___mneme_0_4_0_finder.py": "80AB55597212EBB40FD54223A29E952F1CE7536A8602EF7E423AEC62E963F87B",
+        "C:\\Users\\hi\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\__editable___mneme_hq_0_5_1_finder.py": "DD627B38320A83F493B6922FFDE5C6D027DCFFF40D99959440E342219BBD92A0",
+        "C:\\Users\\hi\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\mneme-0.4.0.dist-info\\METADATA": "21D0050A01FFD8D16A8F10C343DF613C384F2633669785F1A6B3E3FFA7C25AEE",
+        "C:\\Users\\hi\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\mneme-0.4.0.dist-info\\direct_url.json": "4698352B9ADE5CDF4F86D053F8AE04D7A1ED374469EC214FB472F728CBF1AF57",
+        "C:\\Users\\hi\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\mneme-0.4.0.dist-info\\entry_points.txt": "FAD177B56FA3015FA51D111CD582E2BC1589A6B2D384B6762D27A421BBBC314E",
+        "C:\\Users\\hi\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\mneme_hq-0.5.1.dist-info\\METADATA": "E17E29AE4E86E5795CBDAA80FA030DFC4C5EC25958A1FAA4893D686C5A7DADA4",
+        "C:\\Users\\hi\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\mneme_hq-0.5.1.dist-info\\direct_url.json": "3D4E1FD344EF43E4F9C81437D4515AC67AD1D341677307BFCC2E5BDB6117F124",
+        "C:\\Users\\hi\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\mneme_hq-0.5.1.dist-info\\entry_points.txt": "F64EA7CF3F31C225BA22129C61D080C0608DE4090B4514AE045108DB2E591AB6"
+      },
+      "neutral_cwd_imports": {
+        "cli": "C:\\Users\\hi\\OneDrive\\Documents\\mneme\\mneme\\cli.py",
+        "guidance_hook": "C:\\Users\\hi\\OneDrive\\Documents\\mneme\\mneme\\integrations\\claude_code\\guidance_hook.py",
+        "hook": "C:\\Users\\hi\\OneDrive\\Documents\\mneme\\mneme\\integrations\\claude_code\\hook.py",
+        "mneme": "C:\\Users\\hi\\OneDrive\\Documents\\mneme\\mneme\\__init__.py"
+      },
+      "resolved_package": "C:\\Users\\hi\\OneDrive\\Documents\\mneme\\mneme"
+    },
+    "entrypoints": {
+      "mneme": {
+        "path": "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\Scripts\\mneme.exe",
+        "sha256": "89103BB06A077F42F938DD1F73C2CB6AC82903E3E8E4191C08A4FA6EECF8E628"
+      },
+      "mneme-guidance-hook": {
+        "path": "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\Scripts\\mneme-guidance-hook.exe",
+        "sha256": "E94F61EE101392C5BE479A75EB81E6644201869E66ED699E22C13718571D27E9"
+      },
+      "mneme-hook": {
+        "path": "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\Scripts\\mneme-hook.exe",
+        "sha256": "D911AB06A366C1FF866E9E002EAC01485F7412775057C97456320B0849E7A46E"
+      }
+    },
+    "hook_import_environment": {
+      "unset_before_claude_launch": [
+        "PYTHONHOME",
+        "PYTHONNOUSERSITE",
+        "PYTHONPATH",
+        "PYTHONSAFEPATH",
+        "PYTHONUSERBASE"
+      ]
+    },
+    "python": {
+      "binaries": {
+        "python.exe": {
+          "path": "C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\python.exe",
+          "sha256": "5365B422EE178F691988EB937B7ABCA5F48910B148F76FCCE6DBAF5585C948D0"
+        },
+        "python3.dll": {
+          "path": "C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\python3.dll",
+          "sha256": "FB975A606E7FBF74F64260E3F60C3490B4F74A183C0926FD6ED1AC4C52AC7B1C"
+        },
+        "python312.dll": {
+          "path": "C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\\python312.dll",
+          "sha256": "9A0E3435AAA680D868150F87AB3E388AD2EEBC22F87E036155C7B4EDA8CD2120"
+        }
+      },
+      "launcher_path": "C:\\Users\\hi\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\python.exe",
+      "process_tree_terminator": {
+        "path": "C:\\Windows\\System32\\taskkill.exe",
+        "sha256": "1249717315FC8F4D2DF17D5DB9DA0444795FDB9FB83DFB1F763C3F39282244F7"
+      },
+      "runtime_root": "C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0",
+      "version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]"
+    },
+    "python_dependencies": {
+      "PyYAML": {
+        "distribution": "PyYAML",
+        "files": {
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\_yaml\\__init__.py": "D3801EFF9A2CC5A8692476B75C165401FE308BA5D7DF6811F03E97EA9EB81840",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\_yaml\\__pycache__\\__init__.cpython-312.pyc": "CA5084687A6547294A58FB814F6ED36BB2B911B7F14F6E3849418D3A3C14F2FF",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\pyyaml-6.0.3.dist-info\\INSTALLER": "CEEBAE7B8927A3227E5303CF5E0F1F7B34BB542AD7250AC03FBCDE36EC2F1508",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\pyyaml-6.0.3.dist-info\\METADATA": "847A701020334386852B6E07BAD1053CB0CE3DA9EE1846E7E9D02B24E8BB3F8D",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\pyyaml-6.0.3.dist-info\\RECORD": "A4F5E3C4F889E126B1EE7E19286E708AA20CC70E6EA8CCCB1D1C574573852313",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\pyyaml-6.0.3.dist-info\\REQUESTED": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\pyyaml-6.0.3.dist-info\\WHEEL": "F143FDC7DA6E588D0FD55FDDECADA831306A7DE2CD9B6D424F367F3EDAF43575",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\pyyaml-6.0.3.dist-info\\licenses\\LICENSE": "8D3928F9DC4490FD635707CB88EB26BD764102A7282954307D3E5167A577E8A4",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\pyyaml-6.0.3.dist-info\\top_level.txt": "AE98F42153138AC02387FD6F1B709C7FDBF98E9090C00CFA703D48554E597614",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\__init__.py": "B19DFCC333D6A75DFD73073901164507252F271B41D3B5F7D85510033A0547A7",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\__pycache__\\__init__.cpython-312.pyc": "46DC106133EDE5D6889A44E0E821CDEE5D1F0F35B1400E0B18F9AD2AA547C44B",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\__pycache__\\composer.cpython-312.pyc": "5BF38FB1DE121D8D8F9E839846C72908BED1AE930F2C8B2AA58FDC0B7AAED7C6",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\__pycache__\\constructor.cpython-312.pyc": "72307316B7E66167444B49D01F1C0391C3E1D9F29CA569C2FC6E07FC161CB70F",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\__pycache__\\cyaml.cpython-312.pyc": "22C2E8AE2FAA6098798076897F870C51B2A8C3D225CCE37386CFD9C74FCB344A",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\__pycache__\\dumper.cpython-312.pyc": "9B7CB20AC22F6C804E3C66A028C4293B8B1BBBA94843010A6A634D516BEB904B",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\__pycache__\\emitter.cpython-312.pyc": "B821D1C83CAD71F59E28AD2475A6BA88D41A97ABD560923B2F0A470AEBACA589",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\__pycache__\\error.cpython-312.pyc": "6026C4FA8FF9DB680736465EA55A2E6A04E102EDB366E28109D568EF98EF630C",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\__pycache__\\events.cpython-312.pyc": "A4C0B8FA767DFC088E049E5023E2489C6A7019958389A86376E10955163CC675",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\__pycache__\\loader.cpython-312.pyc": "699FCE91A863E299972AD6B7013887A4E967FDEF331F9E879425DB41592F46C9",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\__pycache__\\nodes.cpython-312.pyc": "04A6990FD562946FFB40A4DE2F6E238FFE951AF86B3186B3F3B3833A080EE72A",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\__pycache__\\parser.cpython-312.pyc": "9C0652E5631405C8A778B38EF758D774AAE53BA03231958F9649C024FC61A2FF",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\__pycache__\\reader.cpython-312.pyc": "634E0C8CC73ADE48C485FA67473F35D700472FE15D5ACD6F0788B4A09B69D978",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\__pycache__\\representer.cpython-312.pyc": "68748E70C5DE6F75A797E574909FB6088975C0B2923CEDD3BE711D36B85A33DC",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\__pycache__\\resolver.cpython-312.pyc": "420BD84AA730BE7170F9B4DFBE61384E7D8DFE67B886265CD8E9EB4ECC9A972A",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\__pycache__\\scanner.cpython-312.pyc": "499D01881CA07A5554076841DB30D91EE84BBB3E88EB2A1C09A569D6AEDDEE8E",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\__pycache__\\serializer.cpython-312.pyc": "1884A74F07DD13923F57162DB4694E8903E091B8EAE538D1FA7B00DBDCFD332C",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\__pycache__\\tokens.cpython-312.pyc": "5910179F1813B7A08571F48FACAED4C44A7CF08C308B159087F23344961CFF2E",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\_yaml.cp312-win_amd64.pyd": "4FD0E84F50261ED0886CFFCDD8008B055AF3352546E649C3D741B50EAE1F9B5F",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\composer.py": "FCAA37D16AFA783594794A5AB94193DCB720F503C19CE3D59539C8311189F453",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\constructor.py": "90D8247DA78B524C10618FD0E857F54F3D97570FE91B5C5513D024EF3FAF88B0",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\cyaml.py": "E99AC01BD7C062F7557B614AFF0D21997A06ED962CA185306A91BC0A20BBD87D",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\dumper.py": "3CB72D66563064BA7B5E679477046EBF89D8399D940670C8532F3E94A7CB17EA",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\emitter.py": "8E086D694EDE170837D5B1B407B45979AFF6F40762F422A65EAFD08E04290A44",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\error.py": "021F73FADA072546C4F63F8CF18A7181244CE4280B09CC15CC980B2D1176171A",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\events.py": "E74FD392C810884E2EA7E94AA3F57E9C1CBEB402319083D0C58E6A0E1282787C",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\loader.py": "5156BECC8AA6905482218ABF3E04869B835226DB4763645FFF3438FDBD5F1CDD",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\nodes.py": "80F28D8FCA4A09D87677882BDE021820D9CF39A3B11A12405226211919CF13CE",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\parser.py": "8A55A9E6FBE0A07146CEF3990C8B45A068C3E83E369E1959AD9CA30306B4A09A",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\reader.py": "D1D9B38AB3A20C6E17A38D519EE412ECAF6B918DF18C78956AC7C330D4EA08DC",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\representer.py": "22E58FF9C016F6C1CA1274B4802A926BCF78935060E1C813C5A0F021C6D143E6",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\resolver.py": "F4BF9561F9B89961F1503D558385FBAE30D12BFED565DE9BF76C33ABB63620A6",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\scanner.py": "60433788B652690C17710460DA5D91E0C753D3318FD85F5E1E42862A71F25906",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\serializer.py": "0A1B85826854D35863E31808F0668ABFABDF33606E8F06BD8BB7761401E3EDC0",
+          "C:\\Users\\hi\\AppData\\Local\\packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\tokens.py": "953408CD2570F0C83DC2FE39F7E4E388E41EEB05738AA69196A5F6FFCF6BA79E"
+        },
+        "neutral_cwd_imports": {
+          "yaml": "C:\\Users\\hi\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\__init__.py",
+          "yaml_extension": "C:\\Users\\hi\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python312\\site-packages\\yaml\\_yaml.cp312-win_amd64.pyd"
+        },
+        "version": "6.0.3"
+      }
+    }
+  },
+  "runtime_files": {
+    "integrations/claude-code-plugin/.claude-plugin/plugin.json": "3E5F745DA40FEDF006DFAB5F339099DCDE89E6C0C2AD61C3E8EBD3649E0ACFBE",
+    "integrations/claude-code-plugin/hooks/hooks.json": "9D96864314BFF509008F0D5EED43FE921F812FFD643C663832C6B0B58F4FF9B4",
+    "mneme/__init__.py": "FEAF3045A9BD0E57610B10571CDD0C10ECCBD12BC9A2DBF6F7B86BA6C8FA80B1",
+    "mneme/__main__.py": "D741B823F776423BECFB4321ECF87E5292A2117888F2377E2596126DE7AC3373",
+    "mneme/adr_compiler.py": "DDE2CA8DCA278AE2CDF316775AE80442891681FE5E918B32D36048685A84BE5B",
+    "mneme/adr_constraints.py": "B4E4E446F69C4DF33BF2A05B31A56E5CF16311CD9C0D6DF0EACA7E429766F579",
+    "mneme/adr_freshness.py": "C3D88EA729A5F0F806DEFF06CDF9B22E6C2FD0C30E7FFE33BA5CEC87312CAA86",
+    "mneme/adr_import.py": "FBD8FD2E372759E01238E4BBA6DFB3E80262FDF4BD3630EE9E42A7639EB571EC",
+    "mneme/adr_parser.py": "ED01D0E965D0B5024B100D4ECC64AB017E5DC91B739CB176BF99AFBDB82FEFB0",
+    "mneme/adr_schema.py": "780965A6D94556C92AD52ECCE6E4083EFA7A4A45D522179B28E3269DE0D80CAE",
+    "mneme/benchmark.py": "3738FCA84EF563F080F27B0C6BB5E3AF4B1BCCF99EA4F47413267C45EB49E448",
+    "mneme/benchmark_report.py": "5C37A17EF71114D6D0F7A367863D8A6486E4BA637B62192D481035D7638D3435",
+    "mneme/benchmark_schemas.py": "FAAE0C16F3F7FDD71294110030FB2F84C1EEB646D28B4F8D27577AC30CE36749",
+    "mneme/benchmark_verifier.py": "F14EC40F3184F490F52CAD57A235ECEEEBF6E5DCFA9E4FD0A0991443DD9AEF74",
+    "mneme/cli.py": "87DC22D716FCB3591C378C15BC76222D4D2ED6EBD8ABEC1B8CECF22638E845C8",
+    "mneme/conflict_detector.py": "BF3397094CFDD16FC521466715FE93A2E9CDD1318303E0C06F9CC48C979E2229",
+    "mneme/context_builder.py": "505356D1C9B1293CE1BFC8CC99019955BBA1CF137BCC2B985B5A1D6A479438F6",
+    "mneme/cursor_generator.py": "C84D44A17C9A42F890ACDA4D4DD0891FEDA33B155367D1B9B710C19416A117BD",
+    "mneme/decision_retriever.py": "F86B3BA2E50BB42D92DBFEA879E24A919A07B5AEBB71284F7596D65CC1C74882",
+    "mneme/enforcer.py": "05573FDAE6C4D443CF94E97BBEE537ECC9A4FFCAB979C4EAF939131B61ED2522",
+    "mneme/evaluator.py": "BAB6F63DB82E15F6BC77DD54D4851396C2C2EA68BD5F9C798775F62CE20EF90E",
+    "mneme/guidance.py": "A74C69EA294606F311D7480D654B953F8CAA3B60706E5CC66CC80D2CF9FEABFA",
+    "mneme/guidance_applicability_eval.py": "A9690E0D2372A9D7031DCF03F1733BA39D66387B7DBACFB1142A46F0572A4B29",
+    "mneme/guidance_eval.py": "7CB2659B93EA5706FC172AB06920483F1AB7831ACA908823B611A0DE0C34BA40",
+    "mneme/guidance_live_eval.py": "76A911C2028AFE9E205287938FFC9F6B06FD03927A1083C382F9ED555E4092F2",
+    "mneme/guidance_roles.py": "CEB4D88D5D6557D5256358E58A470C13BBE764C4C0F5A335889BE0FEB22C6694",
+    "mneme/integrations/__init__.py": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+    "mneme/integrations/claude_code/__init__.py": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+    "mneme/integrations/claude_code/guidance_hook.py": "A3F55FAD4A221B9BB1E526C8C223ED784C83FA5BA3E9044A61AE65124AC6E3BB",
+    "mneme/integrations/claude_code/hook.py": "12BAA6DDC718DDEE013E7053D787C171EFC0A5D5649C8BC59C9E8B226D3D983C",
+    "mneme/llm_adapter.py": "56EF5175B580FA606CC9C0070B19D9D6D1A9A94CAB83A3DE238A073C6D06AF6F",
+    "mneme/memory_store.py": "B5E13D1C91FAF120C2F720D68C3C16A1D7F7DE864823F1E92ED9400336F19BF0",
+    "mneme/path_selectors.py": "1423E23022A34898D0B4B7076FF8EEA115E1C01646CDB60F32903A8BC468F78D",
+    "mneme/pipeline.py": "2EAB50C80942AD5A29133FEF47B4297E6DD5E2E1597A87EC0BC119CA535C2822",
+    "mneme/retriever.py": "9FA48B9DC12531AD1D59FD0ED36474ED03B1AC06BD4FE767FDE29FABD98039F1",
+    "mneme/rule_matcher.py": "19A7A3ACDC443F828B44D2C7B7E8977085B4032EEED4AC9AC83BDD31E3A55B47",
+    "mneme/schemas.py": "AAB73141A4EF39B91A5F78F965ADE58E239B0712C930A1C13E3A63C529206260",
+    "pyproject.toml": "DFC81900340E166C6580316CB676225521C6ED7E386ADF31A356771C395E5E9F",
+    "scripts/run_guidance_confirmatory_ab.py": "84042E02DC90306E39EB40D9D12F758444756052D281204C447098210C3D78A9",
+    "scripts/run_guidance_production_effectiveness_ab.py": "71FE9324CBBC5DF1C82B5BEEDBDD9E5C6C6A99A88D8AFBC5B9927B246569E8F4"
+  },
+  "sample": {
+    "controls_per_arm": 6,
+    "governed_per_arm": 15,
+    "per_arm": 21,
+    "runs": 42
+  },
+  "schedule": [
+    {
+      "arm": "baseline",
+      "evaluation": "production_effectiveness",
+      "repetition": 1,
+      "task_id": "storage-1"
+    },
+    {
+      "arm": "treatment",
+      "evaluation": "production_effectiveness",
+      "repetition": 1,
+      "task_id": "storage-1"
+    },
+    {
+      "arm": "baseline",
+      "evaluation": "production_effectiveness",
+      "repetition": 2,
+      "task_id": "storage-1"
+    },
+    {
+      "arm": "treatment",
+      "evaluation": "production_effectiveness",
+      "repetition": 2,
+      "task_id": "storage-1"
+    },
+    {
+      "arm": "baseline",
+      "evaluation": "production_effectiveness",
+      "repetition": 3,
+      "task_id": "storage-1"
+    },
+    {
+      "arm": "treatment",
+      "evaluation": "production_effectiveness",
+      "repetition": 3,
+      "task_id": "storage-1"
+    },
+    {
+      "arm": "treatment",
+      "evaluation": "production_effectiveness",
+      "repetition": 1,
+      "task_id": "auth-1"
+    },
+    {
+      "arm": "baseline",
+      "evaluation": "production_effectiveness",
+      "repetition": 1,
+      "task_id": "auth-1"
+    },
+    {
+      "arm": "treatment",
+      "evaluation": "production_effectiveness",
+      "repetition": 2,
+      "task_id": "auth-1"
+    },
+    {
+      "arm": "baseline",
+      "evaluation": "production_effectiveness",
+      "repetition": 2,
+      "task_id": "auth-1"
+    },
+    {
+      "arm": "treatment",
+      "evaluation": "production_effectiveness",
+      "repetition": 3,
+      "task_id": "auth-1"
+    },
+    {
+      "arm": "baseline",
+      "evaluation": "production_effectiveness",
+      "repetition": 3,
+      "task_id": "auth-1"
+    },
+    {
+      "arm": "baseline",
+      "evaluation": "production_effectiveness",
+      "repetition": 1,
+      "task_id": "api-1"
+    },
+    {
+      "arm": "treatment",
+      "evaluation": "production_effectiveness",
+      "repetition": 1,
+      "task_id": "api-1"
+    },
+    {
+      "arm": "baseline",
+      "evaluation": "production_effectiveness",
+      "repetition": 2,
+      "task_id": "api-1"
+    },
+    {
+      "arm": "treatment",
+      "evaluation": "production_effectiveness",
+      "repetition": 2,
+      "task_id": "api-1"
+    },
+    {
+      "arm": "baseline",
+      "evaluation": "production_effectiveness",
+      "repetition": 3,
+      "task_id": "api-1"
+    },
+    {
+      "arm": "treatment",
+      "evaluation": "production_effectiveness",
+      "repetition": 3,
+      "task_id": "api-1"
+    },
+    {
+      "arm": "treatment",
+      "evaluation": "production_effectiveness",
+      "repetition": 1,
+      "task_id": "jobs-1"
+    },
+    {
+      "arm": "baseline",
+      "evaluation": "production_effectiveness",
+      "repetition": 1,
+      "task_id": "jobs-1"
+    },
+    {
+      "arm": "treatment",
+      "evaluation": "production_effectiveness",
+      "repetition": 2,
+      "task_id": "jobs-1"
+    },
+    {
+      "arm": "baseline",
+      "evaluation": "production_effectiveness",
+      "repetition": 2,
+      "task_id": "jobs-1"
+    },
+    {
+      "arm": "treatment",
+      "evaluation": "production_effectiveness",
+      "repetition": 3,
+      "task_id": "jobs-1"
+    },
+    {
+      "arm": "baseline",
+      "evaluation": "production_effectiveness",
+      "repetition": 3,
+      "task_id": "jobs-1"
+    },
+    {
+      "arm": "baseline",
+      "evaluation": "production_effectiveness",
+      "repetition": 1,
+      "task_id": "typed-1"
+    },
+    {
+      "arm": "treatment",
+      "evaluation": "production_effectiveness",
+      "repetition": 1,
+      "task_id": "typed-1"
+    },
+    {
+      "arm": "baseline",
+      "evaluation": "production_effectiveness",
+      "repetition": 2,
+      "task_id": "typed-1"
+    },
+    {
+      "arm": "treatment",
+      "evaluation": "production_effectiveness",
+      "repetition": 2,
+      "task_id": "typed-1"
+    },
+    {
+      "arm": "baseline",
+      "evaluation": "production_effectiveness",
+      "repetition": 3,
+      "task_id": "typed-1"
+    },
+    {
+      "arm": "treatment",
+      "evaluation": "production_effectiveness",
+      "repetition": 3,
+      "task_id": "typed-1"
+    },
+    {
+      "arm": "treatment",
+      "evaluation": "production_effectiveness",
+      "repetition": 1,
+      "task_id": "control-1"
+    },
+    {
+      "arm": "baseline",
+      "evaluation": "production_effectiveness",
+      "repetition": 1,
+      "task_id": "control-1"
+    },
+    {
+      "arm": "treatment",
+      "evaluation": "production_effectiveness",
+      "repetition": 2,
+      "task_id": "control-1"
+    },
+    {
+      "arm": "baseline",
+      "evaluation": "production_effectiveness",
+      "repetition": 2,
+      "task_id": "control-1"
+    },
+    {
+      "arm": "treatment",
+      "evaluation": "production_effectiveness",
+      "repetition": 3,
+      "task_id": "control-1"
+    },
+    {
+      "arm": "baseline",
+      "evaluation": "production_effectiveness",
+      "repetition": 3,
+      "task_id": "control-1"
+    },
+    {
+      "arm": "baseline",
+      "evaluation": "production_effectiveness",
+      "repetition": 1,
+      "task_id": "control-2"
+    },
+    {
+      "arm": "treatment",
+      "evaluation": "production_effectiveness",
+      "repetition": 1,
+      "task_id": "control-2"
+    },
+    {
+      "arm": "baseline",
+      "evaluation": "production_effectiveness",
+      "repetition": 2,
+      "task_id": "control-2"
+    },
+    {
+      "arm": "treatment",
+      "evaluation": "production_effectiveness",
+      "repetition": 2,
+      "task_id": "control-2"
+    },
+    {
+      "arm": "baseline",
+      "evaluation": "production_effectiveness",
+      "repetition": 3,
+      "task_id": "control-2"
+    },
+    {
+      "arm": "treatment",
+      "evaluation": "production_effectiveness",
+      "repetition": 3,
+      "task_id": "control-2"
+    }
+  ],
+  "schema": "mneme.production-effectiveness-execution-lock/v1",
+  "scoring_protocol": {
+    "authoritative_for_all_metrics_and_claim_gates": true,
+    "modified": false,
+    "path": "docs/validation/pre-generation-guidance-live-ab.md",
+    "sha256": "8029EACBB4C8032A491486CE881E9415966C27606DA7CC2631CEA868EA4BF604"
+  },
+  "single_execution_owner": {
+    "owner": "current Codex task that created this lock",
+    "parallel_or_split_execution_prohibited": true,
+    "required": true
+  },
+  "status": "LOCKED_NOT_STARTED",
+  "study_id": "production-guidance-effectiveness-role-aware-2026-08-14"
+}
+

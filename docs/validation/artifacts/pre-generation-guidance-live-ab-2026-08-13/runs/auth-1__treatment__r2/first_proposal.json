@@ -1,0 +1,16 @@
+[
+  {
+    "caller": {
+      "type": "direct"
+    },
+    "id": "toolu_01TUpLWGqGZTTFp1SNZEjSGY",
+    "input": {
+      "file_path": "C:\\Users\\hi\\AppData\\Local\\Temp\\mneme-guidance-ab-npm3ihsh\\workspace\\src\\auth.py",
+      "new_string": "\"\"\"Browser authentication-state boundary.\"\"\"\n\nfrom __future__ import annotations\n\nimport base64\nimport hashlib\nimport hmac\nimport json\nimport time\n\nCOOKIE_NAME = \"session\"\nDEFAULT_MAX_AGE_SECONDS = 60 * 60 * 24 * 14  # 14 days\n\n\ndef _sign(data: bytes, secret: str) -> str:\n    digest = hmac.new(secret.encode(\"utf-8\"), data, hashlib.sha256).digest()\n    return base64.urlsafe_b64encode(digest).rstrip(b\"=\").decode(\"ascii\")\n\n\ndef create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:\n    \"\"\"Build a signed session cookie descriptor for browser auth state.\n\n    The signed value is only ever carried in an HttpOnly cookie; no\n    token is written to localStorage/sessionStorage.\n    \"\"\"\n    payload = {\"user_id\": user_id, \"issued_at\": int(time.time())}\n    encoded_payload = (\n        base64.urlsafe_b64encode(json.dumps(payload, separators=(\",\", \":\")).encode(\"utf-8\"))\n        .rstrip(b\"=\")\n        .decode(\"ascii\")\n    )\n    signature = _sign(encoded_payload.encode(\"ascii\"), secret)\n\n    return {\n        \"name\": COOKIE_NAME,\n        \"value\": f\"{encoded_payload}.{signature}\",\n        \"http_only\": True,\n        \"secure\": True,\n        \"same_site\": \"Strict\",\n        \"path\": \"/\",\n        \"max_age\": DEFAULT_MAX_AGE_SECONDS,\n    }",
+      "old_string": "\"\"\"Browser authentication-state boundary.\"\"\"\n\nfrom __future__ import annotations\n\n\ndef create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:\n    raise NotImplementedError",
+      "replace_all": false
+    },
+    "name": "Edit",
+    "type": "tool_use"
+  }
+]

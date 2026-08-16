@@ -1,0 +1,81 @@
+--- a/src/auth.py
++++ b/src/auth.py
+@@ -2,6 +2,34 @@
+ 
+ from __future__ import annotations
+ 
++import hashlib
++import hmac
++import secrets
++import time
++
++from .sessions import SessionStore
++
++_SESSION_TTL_SECONDS = 60 * 60 * 24 * 14  # 14 days
++_session_store = SessionStore()
++
++
++def _sign(session_id: str, secret: str) -> str:
++    return hmac.new(secret.encode("utf-8"), session_id.encode("utf-8"), hashlib.sha256).hexdigest()
++
+ 
+ def create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:
+-    raise NotImplementedError
++    """Create a signed, HTTP-only session cookie backed by a persisted SQLite session."""
++    session_id = secrets.token_urlsafe(32)
++    _session_store.save(session_id, {"user_id": user_id, "issued_at": int(time.time())})
++
++    cookie_value = f"{session_id}.{_sign(session_id, secret)}"
++
++    return {
++        "cookie_name": "session",
++        "value": cookie_value,
++        "http_only": True,
++        "secure": True,
++        "same_site": "Lax",
++        "path": "/",
++        "max_age": _SESSION_TTL_SECONDS,
++    }
+--- a/src/sessions.py
++++ b/src/sessions.py
+@@ -2,12 +2,38 @@
+ 
+ from __future__ import annotations
+ 
++import json
++import sqlite3
+ from typing import Any
+ 
+ 
+ class SessionStore:
++    """Persists sessions in SQLite (no external database server)."""
++
++    def __init__(self, db_path: str = "sessions.sqlite3") -> None:
++        self._connection = sqlite3.connect(db_path, check_same_thread=False)
++        self._connection.execute(
++            """
++            CREATE TABLE IF NOT EXISTS sessions (
++                session_id TEXT PRIMARY KEY,
++                payload TEXT NOT NULL
++            )
++            """
++        )
++        self._connection.commit()
++
+     def save(self, session_id: str, payload: dict[str, Any]) -> None:
+-        raise NotImplementedError
++        self._connection.execute(
++            "INSERT OR REPLACE INTO sessions (session_id, payload) VALUES (?, ?)",
++            (session_id, json.dumps(payload)),
++        )
++        self._connection.commit()
+ 
+     def load(self, session_id: str) -> dict[str, Any] | None:
+-        raise NotImplementedError
++        row = self._connection.execute(
++            "SELECT payload FROM sessions WHERE session_id = ?",
++            (session_id,),
++        ).fetchone()
++        if row is None:
++            return None
++        return json.loads(row[0])

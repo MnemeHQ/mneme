@@ -1,0 +1,28 @@
+[
+  {
+    "path": "src/sessions.py",
+    "payload": {
+      "applicability": [
+        {
+          "decision_id": "ADR-INSTALL",
+          "input_path": "src/sessions.py",
+          "outcome": "EXCLUDED",
+          "path_scoped": true,
+          "reason": "no include selector matched",
+          "rule_index": 0,
+          "rule_type": "FORBID_LITERAL",
+          "rule_value": "legacy-client",
+          "selector": null
+        }
+      ],
+      "evaluation_complete": true,
+      "freshness": [],
+      "mode": "strict",
+      "schema": "mneme.check/v1",
+      "verdict": "PASS",
+      "violations": []
+    },
+    "return_code": 0,
+    "stderr": ""
+  }
+]

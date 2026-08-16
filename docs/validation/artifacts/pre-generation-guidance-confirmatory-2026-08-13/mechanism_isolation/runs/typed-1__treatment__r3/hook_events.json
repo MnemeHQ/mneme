@@ -1,0 +1,25 @@
+[
+  {
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "9a985de5-a503-4f52-b2ee-03571668ef63",
+    "hook_name": "UserPromptSubmit",
+    "session_id": "1a5d4597-c331-4f8b-a1bf-5fc6869a598f",
+    "subtype": "hook_started",
+    "type": "system",
+    "uuid": "377a51fc-b3fb-4a1b-8119-157661027f5c"
+  },
+  {
+    "exit_code": 0,
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "9a985de5-a503-4f52-b2ee-03571668ef63",
+    "hook_name": "UserPromptSubmit",
+    "outcome": "success",
+    "output": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"[Mneme architectural guidance]\\nRecorded project decisions relevant to the submitted task follow. Path-scoped typed rules list conditional selectors; applicability is determined only when a target artifact is known.\\n\\nDECISION [ADR-INSTALL]: Use only the supported installation command\\n  Scope: distribution, installation, documentation, setup\\n  Rule FORBID_LITERAL (forbidden exact literal): legacy-client\\n    Applies when editing: docs/**, README.md\\n    Excludes: docs/history/**, tests/**\"}}\r\n",
+    "session_id": "1a5d4597-c331-4f8b-a1bf-5fc6869a598f",
+    "stderr": "",
+    "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"[Mneme architectural guidance]\\nRecorded project decisions relevant to the submitted task follow. Path-scoped typed rules list conditional selectors; applicability is determined only when a target artifact is known.\\n\\nDECISION [ADR-INSTALL]: Use only the supported installation command\\n  Scope: distribution, installation, documentation, setup\\n  Rule FORBID_LITERAL (forbidden exact literal): legacy-client\\n    Applies when editing: docs/**, README.md\\n    Excludes: docs/history/**, tests/**\"}}\r\n",
+    "subtype": "hook_response",
+    "type": "system",
+    "uuid": "2347d49f-1cfb-4ce2-8571-e022a4a00a29"
+  }
+]

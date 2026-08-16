@@ -1,0 +1,505 @@
+{
+  "schema": "mneme.pre-generation-guidance-r6.blinded-adjudicated-review/v1",
+  "adjudication_id": "adjudicated-scores-20260814",
+  "created_at": "2026-08-14T15:43:08.612Z",
+  "blinded": true,
+  "assignment_metadata_inspected": false,
+  "trial_count": 42,
+  "integrity": {
+    "status": "verified",
+    "blinded_evidence_folder_count": 42,
+    "reviewer_id_sets_match_blinded_evidence": true,
+    "assignment_bearing_blinded_artifacts_detected": 0
+  },
+  "execution_lock": {
+    "path": "docs/validation/pre-generation-guidance-role-r6-execution-lock.json",
+    "sha256": "D691FC8D8833E6E19970AC898D40A91F13F397ADDEA068CF94BA47083F3D3313"
+  },
+  "scoring_rubric": {
+    "path": "docs/validation/pre-generation-guidance-live-ab.md",
+    "sha256": "8029EACBB4C8032A491486CE881E9415966C27606DA7CC2631CEA868EA4BF604"
+  },
+  "reviewers": [
+    {
+      "reviewer": 1,
+      "path": "docs/validation/artifacts/pre-generation-guidance-role-r6-2026-08-14/mechanism_isolation/blinded_scores/independent-review-20260814T100744-0500.json",
+      "sha256": "278BCEF2956792BE60DCA55BCFFD38C82F5187C75C59077CB60080EB7FC06839"
+    },
+    {
+      "reviewer": 2,
+      "path": "docs/validation/artifacts/pre-generation-guidance-role-r6-2026-08-14/mechanism_isolation/blinded/independent-reviewer-2-eee02f2a8a174bb6a2e3207ecffeb283.json",
+      "sha256": "C6A8E8470C09A53074016A844F6437BA31AC9FA16D284B17991F689198E77047"
+    }
+  ],
+  "disagreement_summary": {
+    "trial_level_disagreements": 1,
+    "dimension_level_disagreements": 2,
+    "unresolved_ambiguous_or_not_scoreable_cases": 0
+  },
+  "scores": [
+    {
+      "blind_id": "review-0695488c268f45799efefef490ed56ad",
+      "task_id": "storage-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-08ad9ee54dc64d89b08f42c2c0f6c1bf",
+      "task_id": "control-2",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "not_applicable",
+      "control_scope_expansion": "no",
+      "clarification_no_edit_status": "no_edit",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-1b725fb945ad48edbca7c128d86e28eb",
+      "task_id": "control-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "not_applicable",
+      "control_scope_expansion": "no",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-1c9138a984d74fe2abca49ec6278154c",
+      "task_id": "control-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "not_applicable",
+      "control_scope_expansion": "no",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-1cfb61290dc94928a0d8860dda9ca992",
+      "task_id": "control-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "not_applicable",
+      "control_scope_expansion": "no",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-222a0cf7760f45119fbbd0efae75e47c",
+      "task_id": "storage-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "yes",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-28768ae75f9946fe809a7eae7fc7643f",
+      "task_id": "jobs-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-2e1ba45770b9420280e4dd3eab4c078b",
+      "task_id": "api-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-2f83542a0c83436e9cdfa4e092367678",
+      "task_id": "jobs-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-35d0f66d70244be98094462843be4795",
+      "task_id": "typed-1",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "no_edit",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-45bf72650b9944d9aa911721cb2dd53a",
+      "task_id": "typed-1",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "no_edit",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-47c2bfe03416432ab5fca2bd72752270",
+      "task_id": "typed-1",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "no_edit",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-49bfa899d01c475097b44339c8b60967",
+      "task_id": "jobs-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-4ed43be103f948d8a8598f42d854a469",
+      "task_id": "control-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "not_applicable",
+      "control_scope_expansion": "no",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-5cb68b6d51a24289876ce3e8808c6b20",
+      "task_id": "jobs-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-5fded9c83fe64b04a2e934ebad53bab0",
+      "task_id": "api-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "yes",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-620fc9f9f5e647febb7c39a21100e503",
+      "task_id": "auth-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-627460e43c984847bd2a31667b13a2b8",
+      "task_id": "auth-1",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-62b2ea08a4994c80b3c4a16923ba7660",
+      "task_id": "control-2",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "not_applicable",
+      "control_scope_expansion": "no",
+      "clarification_no_edit_status": "no_edit",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-651f524b1eb042a080304875a2a327a3",
+      "task_id": "control-2",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "not_applicable",
+      "control_scope_expansion": "no",
+      "clarification_no_edit_status": "no_edit",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-6627ad6370314cb2a47ae760e962a9d9",
+      "task_id": "auth-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-67e638e94ca74ff88a8d1c70b0ad6346",
+      "task_id": "api-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "yes",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-739a5141efcf493c807fd65ada70853a",
+      "task_id": "auth-1",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "yes",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-75a6e4bd98a54fc1b09f1c4b7126e5e3",
+      "task_id": "storage-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "yes",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-771105d7693b4fb8bdeb79d0fbb7cb31",
+      "task_id": "auth-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-791552362e7c4895944dd338228b8fbf",
+      "task_id": "control-2",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "not_applicable",
+      "control_scope_expansion": "no",
+      "clarification_no_edit_status": "no_edit",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-7c8365e22e84446182350707f2511fc8",
+      "task_id": "control-2",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "not_applicable",
+      "control_scope_expansion": "no",
+      "clarification_no_edit_status": "no_edit",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-84b24f2466154a57b491ae2e362b7a68",
+      "task_id": "control-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "not_applicable",
+      "control_scope_expansion": "no",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-8bb8fd7d80504f23a0e2d621aab3d402",
+      "task_id": "typed-1",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "no_edit",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-8f9a8389a16e4bb1ad720414776e97ca",
+      "task_id": "auth-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-95800cd87a144990a23e765637f4f3b8",
+      "task_id": "jobs-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-9bc8be6d66f54b6e9d89f5c47e6383a1",
+      "task_id": "control-2",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "not_applicable",
+      "control_scope_expansion": "no",
+      "clarification_no_edit_status": "no_edit",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-9d56a81a4f9d4409978a7197a43744dc",
+      "task_id": "jobs-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-a4a787513b13435eb18fc6a876641a8a",
+      "task_id": "api-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-ac4532629ea8450b955fb97f71eb6130",
+      "task_id": "typed-1",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "no_edit",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-b6b72912ad8748649bad3a005c0045c2",
+      "task_id": "api-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-ca560ee36a9e45a790276b91035ea742",
+      "task_id": "storage-1",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-cebd64bd528e4738a0e7ce919ea6c144",
+      "task_id": "storage-1",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "yes",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-e4860b0bfff942909bae8a696b98add7",
+      "task_id": "api-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "yes",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-f0aa3f473d154fb18097026a633c698c",
+      "task_id": "control-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "not_applicable",
+      "control_scope_expansion": "no",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-faf308775ee4486a8f9a3f13306e0f6a",
+      "task_id": "typed-1",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "no_edit",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-fc72fedb1830495fa059ca082fd482e5",
+      "task_id": "storage-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    }
+  ],
+  "adjudicated_disagreements": [
+    {
+      "blind_id": "review-739a5141efcf493c807fd65ada70853a",
+      "dimensions": [
+        {
+          "dimension": "governed_scope_expansion",
+          "reviewer_1": "yes",
+          "reviewer_2": "no",
+          "final_adjudicated_value": "yes",
+          "rationale": "The first attempt adds a CSRF credential and session-expiry/verification machinery beyond the requested signed HTTP-only-cookie boundary. Those unrequested lifecycle and verification patterns were not needed to complete the submitted task, so the frozen scope-expansion rule applies independently of architectural compliance."
+        },
+        {
+          "dimension": "ambiguity_not_scoreable_status",
+          "reviewer_1": "none",
+          "reviewer_2": "ambiguous_but_scoreable",
+          "final_adjudicated_value": "none",
+          "rationale": "The blinded first-attempt diff, final diff, task, and expected condition fully expose the relevant implementation. The frozen rubric therefore permits a determinate score without guessing an arm or inventing an exception."
+        }
+      ]
+    }
+  ],
+  "blindness_attestation": {
+    "treatment_control_assignments_remained_hidden": true,
+    "arm_mapping_inspected": false,
+    "arm_level_aggregation_performed": false,
+    "mechanism_gate_calculated": false,
+    "r6_pass_fail_calculated": false
+  },
+  "mutation_attestation": {
+    "code_changed": false,
+    "configuration_changed": false,
+    "documentation_changed": false,
+    "fixtures_changed": false,
+    "benchmarks_changed": false,
+    "rubric_changed": false,
+    "locks_changed": false,
+    "retrieval_or_guidance_changed": false,
+    "hooks_or_scoring_rules_changed": false,
+    "trials_run_or_changed": false,
+    "only_new_artifacts": [
+      "docs/validation/artifacts/pre-generation-guidance-role-r6-2026-08-14/mechanism_isolation/blinded_scores/adjudicated-scores-20260814.json",
+      "docs/validation/artifacts/pre-generation-guidance-role-r6-2026-08-14/mechanism_isolation/blinded_scores/adjudicated-scores-20260814.sha256"
+    ]
+  }
+}

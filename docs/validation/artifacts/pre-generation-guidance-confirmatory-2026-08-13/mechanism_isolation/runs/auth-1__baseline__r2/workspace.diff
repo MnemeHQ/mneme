@@ -1,0 +1,35 @@
+--- a/src/auth.py
++++ b/src/auth.py
+@@ -2,6 +2,31 @@
+ 
+ from __future__ import annotations
+ 
++import hashlib
++import hmac
++import secrets
++import time
++
++_STATE_TTL_SECONDS = 24 * 60 * 60
++
+ 
+ def create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:
+-    raise NotImplementedError
++    if not user_id:
++        raise ValueError("user_id is required")
++    if not secret:
++        raise ValueError("secret is required")
++
++    issued_at = int(time.time())
++    expires_at = issued_at + _STATE_TTL_SECONDS
++    nonce = secrets.token_hex(16)
++
++    message = f"{user_id}:{issued_at}:{expires_at}:{nonce}".encode("utf-8")
++    signature = hmac.new(secret.encode("utf-8"), message, hashlib.sha256).hexdigest()
++
++    return {
++        "user_id": user_id,
++        "issued_at": issued_at,
++        "expires_at": expires_at,
++        "nonce": nonce,
++        "signature": signature,
++    }

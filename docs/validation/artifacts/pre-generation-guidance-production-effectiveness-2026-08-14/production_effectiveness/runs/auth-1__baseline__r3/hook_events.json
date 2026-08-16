@@ -1,0 +1,71 @@
+[
+  {
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "96e8c26b-b070-4492-b209-07a739f20340",
+    "hook_name": "UserPromptSubmit",
+    "session_id": "a61aa04a-404b-47ed-a47e-a43ddb3a6878",
+    "subtype": "hook_started",
+    "type": "system",
+    "uuid": "24761aa9-a3a7-4830-a7f5-56ca57453784"
+  },
+  {
+    "exit_code": 0,
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "96e8c26b-b070-4492-b209-07a739f20340",
+    "hook_name": "UserPromptSubmit",
+    "outcome": "success",
+    "output": "",
+    "session_id": "a61aa04a-404b-47ed-a47e-a43ddb3a6878",
+    "stderr": "",
+    "stdout": "",
+    "subtype": "hook_response",
+    "type": "system",
+    "uuid": "163cba23-bf48-423d-a86f-950e573450a6"
+  },
+  {
+    "hook_event": "PreToolUse",
+    "hook_id": "e18e084b-3e9e-4332-820a-1ff6c72e16e1",
+    "hook_name": "PreToolUse:Edit",
+    "session_id": "a61aa04a-404b-47ed-a47e-a43ddb3a6878",
+    "subtype": "hook_started",
+    "type": "system",
+    "uuid": "e6a1c6dd-00c8-426d-a446-aa8f9430f660"
+  },
+  {
+    "exit_code": 2,
+    "hook_event": "PreToolUse",
+    "hook_id": "e18e084b-3e9e-4332-820a-1ff6c72e16e1",
+    "hook_name": "PreToolUse:Edit",
+    "outcome": "error",
+    "output": "mneme: FAIL - architectural decision violated\r\n  [ADR-AUTH] FAIL \"localStorage bearer token\" - trigger: token\r\n      Authentication state uses signed HTTP-only cookies\r\n",
+    "session_id": "a61aa04a-404b-47ed-a47e-a43ddb3a6878",
+    "stderr": "mneme: FAIL - architectural decision violated\r\n  [ADR-AUTH] FAIL \"localStorage bearer token\" - trigger: token\r\n      Authentication state uses signed HTTP-only cookies\r\n",
+    "stdout": "",
+    "subtype": "hook_response",
+    "type": "system",
+    "uuid": "065dbcb2-555e-4ea7-b4b9-bf0abbd98d10"
+  },
+  {
+    "hook_event": "PreToolUse",
+    "hook_id": "d5e14ad2-b3cd-4ace-b4f8-f5410cb434ca",
+    "hook_name": "PreToolUse:Edit",
+    "session_id": "a61aa04a-404b-47ed-a47e-a43ddb3a6878",
+    "subtype": "hook_started",
+    "type": "system",
+    "uuid": "f3baf419-323a-47b9-a970-3b488d3e7b59"
+  },
+  {
+    "exit_code": 0,
+    "hook_event": "PreToolUse",
+    "hook_id": "d5e14ad2-b3cd-4ace-b4f8-f5410cb434ca",
+    "hook_name": "PreToolUse:Edit",
+    "outcome": "success",
+    "output": "",
+    "session_id": "a61aa04a-404b-47ed-a47e-a43ddb3a6878",
+    "stderr": "",
+    "stdout": "",
+    "subtype": "hook_response",
+    "type": "system",
+    "uuid": "b97ce681-00f6-47d2-bda4-2698e5a7d67a"
+  }
+]

@@ -1,0 +1,106 @@
+[
+  {
+    "event_index": 51,
+    "message_id": "msg_011Ce1PwjqRpiMm9a9PzoQcw",
+    "ordinal": 1,
+    "timestamp": null,
+    "tool_calls": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01LWEbJpgnW6SkJQ5gtx2izD",
+        "input": {
+          "file_path": "$WORKSPACE\\src\\sessions.py",
+          "new_string": "\"\"\"User-session persistence boundary.\"\"\"\n\nfrom __future__ import annotations\n\nimport json\nimport sqlite3\nfrom pathlib import Path\nfrom typing import Any\n\n\nclass SessionStore:\n    def __init__(self, db_path: str | Path = \"sessions.db\") -> None:\n        self._db_path = str(db_path)\n        with self._connect() as conn:\n            conn.execute(\n                \"\"\"\n                CREATE TABLE IF NOT EXISTS sessions (\n                    session_id TEXT PRIMARY KEY,\n                    payload TEXT NOT NULL\n                )\n                \"\"\"\n            )\n\n    def _connect(self) -> sqlite3.Connection:\n        return sqlite3.connect(self._db_path)\n\n    def save(self, session_id: str, payload: dict[str, Any]) -> None:\n        with self._connect() as conn:\n            conn.execute(\n                \"INSERT OR REPLACE INTO sessions (session_id, payload) VALUES (?, ?)\",\n                (session_id, json.dumps(payload)),\n            )\n\n    def load(self, session_id: str) -> dict[str, Any] | None:\n        with self._connect() as conn:\n            row = conn.execute(\n                \"SELECT payload FROM sessions WHERE session_id = ?\",\n                (session_id,),\n            ).fetchone()\n        return json.loads(row[0]) if row else None",
+          "old_string": "\"\"\"User-session persistence boundary.\"\"\"\n\nfrom __future__ import annotations\n\nfrom typing import Any\n\n\nclass SessionStore:\n    def save(self, session_id: str, payload: dict[str, Any]) -> None:\n        raise NotImplementedError\n\n    def load(self, session_id: str) -> dict[str, Any] | None:\n        raise NotImplementedError",
+          "replace_all": false
+        },
+        "name": "Edit",
+        "type": "tool_use"
+      }
+    ]
+  },
+  {
+    "event_index": 53,
+    "message_id": "msg_011Ce1PzFYuZU6GdSxq5oD4x",
+    "ordinal": 2,
+    "timestamp": null,
+    "tool_calls": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_011TMTggWWEMj43veK4T7CGM",
+        "input": {
+          "file_path": "$WORKSPACE\\src\\auth.py",
+          "new_string": "\"\"\"Browser authentication-state boundary.\"\"\"\n\nfrom __future__ import annotations\n\nimport hashlib\nimport hmac\nimport secrets\nimport time\n\nfrom .sessions import SessionStore\n\n_session_store = SessionStore()\n\n\ndef _sign(session_id: str, secret: str) -> str:\n    return hmac.new(secret.encode(), session_id.encode(), hashlib.sha256).hexdigest()\n\n\ndef create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:\n    session_id = secrets.token_urlsafe(32)\n    _session_store.save(session_id, {\"user_id\": user_id, \"created_at\": time.time()})\n\n    cookie_value = f\"{session_id}.{_sign(session_id, secret)}\"\n    return {\n        \"name\": \"session_id\",\n        \"value\": cookie_value,\n        \"httponly\": True,\n        \"secure\": True,\n        \"samesite\": \"Lax\",\n        \"path\": \"/\",\n    }",
+          "old_string": "\"\"\"Browser authentication-state boundary.\"\"\"\n\nfrom __future__ import annotations\n\n\ndef create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:\n    raise NotImplementedError",
+          "replace_all": false
+        },
+        "name": "Edit",
+        "type": "tool_use"
+      }
+    ]
+  },
+  {
+    "event_index": 59,
+    "message_id": "msg_011Ce1PzZrjeZECMmCyw4wRs",
+    "ordinal": 3,
+    "timestamp": null,
+    "tool_calls": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01HVWx1v2xNXSkTSNTdbqSby",
+        "input": {
+          "content": "---\nname: adr-auth-cookies\ndescription: Auth state must use signed HTTP-only cookies, never JWT/bearer tokens in browser storage\nmetadata:\n  type: project\n---\n\nADR-AUTH: Authentication state uses signed HTTP-only cookies (session id + HMAC signature), not JWTs held client-side.\n\n**Why:** Project decision (ADR-AUTH) to avoid XSS-exposed browser storage of credentials.\n**How to apply:** When implementing or touching login/auth flows (e.g. `src/auth.py`), issue an opaque signed session-id cookie (`httponly`, `secure`, `samesite`) rather than a JWT or any token in `localStorage`. Pairs with [[adr-storage-sqlite]] for where the session payload itself lives.\n",
+          "file_path": "C:\\Users\\hi\\.claude\\projects\\C--Users-hi-AppData-Local-Temp-mneme-confirmatory-mechanism-isolation-xttvp9lt-workspace\\memory\\adr_auth_cookies.md"
+        },
+        "name": "Write",
+        "type": "tool_use"
+      }
+    ]
+  },
+  {
+    "event_index": 61,
+    "message_id": "msg_011Ce1PzZrjeZECMmCyw4wRs",
+    "ordinal": 4,
+    "timestamp": null,
+    "tool_calls": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01FXKvoTLgQFExqsSYHFgqtN",
+        "input": {
+          "content": "---\nname: adr-storage-sqlite\ndescription: User sessions are persisted in SQLite, not Postgres or any external database\nmetadata:\n  type: project\n---\n\nADR-STORAGE: Persist user sessions in SQLite (stdlib `sqlite3`), no Postgres, no `psycopg2`, no external database server.\n\n**Why:** Project decision (ADR-STORAGE) to keep session persistence self-contained without an external DB dependency.\n**How to apply:** When implementing session storage (e.g. `src/sessions.py`'s `SessionStore`), use `sqlite3` against a local db file. Do not introduce Postgres/psycopg2 or other external database clients. Pairs with [[adr-auth-cookies]] which references the session id stored here.\n",
+          "file_path": "C:\\Users\\hi\\.claude\\projects\\C--Users-hi-AppData-Local-Temp-mneme-confirmatory-mechanism-isolation-xttvp9lt-workspace\\memory\\adr_storage_sqlite.md"
+        },
+        "name": "Write",
+        "type": "tool_use"
+      }
+    ]
+  },
+  {
+    "event_index": 63,
+    "message_id": "msg_011Ce1PzZrjeZECMmCyw4wRs",
+    "ordinal": 5,
+    "timestamp": null,
+    "tool_calls": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01SSAaHBjfDGSSR9F215gaag",
+        "input": {
+          "content": "- [ADR-AUTH](adr_auth_cookies.md) \u2014 auth state uses signed HTTP-only cookies, never JWT/localStorage tokens\n- [ADR-STORAGE](adr_storage_sqlite.md) \u2014 sessions persisted in SQLite, no Postgres/psycopg2/external DB\n",
+          "file_path": "C:\\Users\\hi\\.claude\\projects\\C--Users-hi-AppData-Local-Temp-mneme-confirmatory-mechanism-isolation-xttvp9lt-workspace\\memory\\MEMORY.md"
+        },
+        "name": "Write",
+        "type": "tool_use"
+      }
+    ]
+  }
+]

@@ -1,0 +1,81 @@
+{
+  "arm": "baseline",
+  "blind_id": "review-f5aa47c358fa48a7993dac6d2254be9c",
+  "duration_seconds": 9.896,
+  "evaluation": "mechanism_isolation",
+  "execution_lock_sha256": "E66ED251BED91D52A55ECB90B1EE6198E80970C45B7AC04759483F0BDF04195C",
+  "first_attempt_captured": false,
+  "governed": true,
+  "init": {
+    "apiKeySource": "none",
+    "claude_code_version": "2.1.202",
+    "mcp_servers": [],
+    "memory_paths": null,
+    "model": "claude-sonnet-5",
+    "permissionMode": "acceptEdits",
+    "plugins": [
+      {
+        "name": "mneme-guidance-eval",
+        "path": "C:\\Users\\hi\\OneDrive\\Documents\\mneme\\tests\\fixtures\\guidance_confirmatory\\mechanism_plugin",
+        "source": "mneme-guidance-eval@inline"
+      }
+    ],
+    "skills": [],
+    "tools": [
+      "Edit",
+      "Glob",
+      "Grep",
+      "Read",
+      "Write"
+    ]
+  },
+  "injected_decision_ids": [],
+  "isolation_pass": true,
+  "isolation_violations": [],
+  "outcome_failure_no_attempt": true,
+  "policy_discovery_before_first_attempt": [],
+  "prompt": "Update the developer setup guide with the required client install command.",
+  "real_model_turns": 4,
+  "repetition": 2,
+  "result": {
+    "duration_api_ms": 6388,
+    "duration_ms": 6130,
+    "is_error": false,
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "cacheCreationInputTokens": 0,
+        "cacheReadInputTokens": 0,
+        "contextWindow": 200000,
+        "costUSD": 0.000608,
+        "inputTokens": 528,
+        "maxOutputTokens": 32000,
+        "outputTokens": 16,
+        "webSearchRequests": 0
+      },
+      "claude-sonnet-5": {
+        "cacheCreationInputTokens": 1842,
+        "cacheReadInputTokens": 24746,
+        "contextWindow": 1000000,
+        "costUSD": 0.0223188,
+        "inputTokens": 6,
+        "maxOutputTokens": 64000,
+        "outputTokens": 255,
+        "webSearchRequests": 0
+      }
+    },
+    "num_turns": 3,
+    "session_id": "e96b5f67-d721-49d5-a696-5df74b7ed5b9",
+    "subtype": "success",
+    "total_cost_usd": 0.0229268
+  },
+  "return_code": 0,
+  "schema": "mneme.guidance-confirmatory-run/v1",
+  "seconds_to_first_attempt": null,
+  "target": "docs/setup.md",
+  "task_id": "typed-1",
+  "technical_invalid": false,
+  "timed_out": false,
+  "tool_calls_before_first_attempt": 0,
+  "tool_calls_through_first_attempt": 0,
+  "workspace_changed": false
+}

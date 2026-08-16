@@ -1,0 +1,107 @@
+[
+  {
+    "path": "src/sessions.py",
+    "payload": {
+      "applicability": [
+        {
+          "decision_id": "ADR-INSTALL",
+          "input_path": null,
+          "outcome": "UNKNOWN",
+          "path_scoped": true,
+          "reason": "input path 'C:\\\\Users\\\\hi\\\\AppData\\\\Local\\\\Temp\\\\mneme-confirmatory-mechanism_isolation-g11h9rxo\\\\workspace\\\\src\\\\sessions.py' is outside or cannot be resolved against policy root",
+          "rule_index": 0,
+          "rule_type": "FORBID_LITERAL",
+          "rule_value": "legacy-client",
+          "selector": null
+        }
+      ],
+      "evaluation_complete": false,
+      "freshness": [
+        {
+          "adr_id": "ADR-001",
+          "code": "ADR_UNIMPORTED",
+          "message": "ADR-001 exists in docs\\adr\\ADR-001-positioning-and-messaging.md but no matching decision is present in memory-e4c784f44773404d9b8ed8caf8a6b058.json. Run `mneme adr import` to import it.",
+          "path": "docs\\adr\\ADR-001-positioning-and-messaging.md"
+        },
+        {
+          "adr_id": "ADR-002",
+          "code": "ADR_UNIMPORTED",
+          "message": "ADR-002 exists in docs\\adr\\ADR-002-repo-boundary-internal-tooling.md but no matching decision is present in memory-e4c784f44773404d9b8ed8caf8a6b058.json. Run `mneme adr import` to import it.",
+          "path": "docs\\adr\\ADR-002-repo-boundary-internal-tooling.md"
+        },
+        {
+          "adr_id": "ADR-004",
+          "code": "ADR_UNIMPORTED",
+          "message": "ADR-004 exists in docs\\adr\\ADR-004-brand-name-mneme-hq.md but no matching decision is present in memory-e4c784f44773404d9b8ed8caf8a6b058.json. Run `mneme adr import` to import it.",
+          "path": "docs\\adr\\ADR-004-brand-name-mneme-hq.md"
+        },
+        {
+          "adr_id": "ADR-005",
+          "code": "ADR_UNIMPORTED",
+          "message": "ADR-005 exists in docs\\adr\\ADR-005-brand-vs-package-namespace-enforcement.md but no matching decision is present in memory-e4c784f44773404d9b8ed8caf8a6b058.json. Run `mneme adr import` to import it.",
+          "path": "docs\\adr\\ADR-005-brand-vs-package-namespace-enforcement.md"
+        },
+        {
+          "adr_id": "ADR-009",
+          "code": "ADR_UNIMPORTED",
+          "message": "ADR-009 exists in docs\\adr\\ADR-009-explicit-text-encoding-in-automation.md but no matching decision is present in memory-e4c784f44773404d9b8ed8caf8a6b058.json. Run `mneme adr import` to import it.",
+          "path": "docs\\adr\\ADR-009-explicit-text-encoding-in-automation.md"
+        },
+        {
+          "adr_id": "ADR-010",
+          "code": "ADR_UNIMPORTED",
+          "message": "ADR-010 exists in docs\\adr\\ADR-010-automation-artifact-governance.md but no matching decision is present in memory-e4c784f44773404d9b8ed8caf8a6b058.json. Run `mneme adr import` to import it.",
+          "path": "docs\\adr\\ADR-010-automation-artifact-governance.md"
+        },
+        {
+          "adr_id": "ADR-013",
+          "code": "ADR_UNIMPORTED",
+          "message": "ADR-013 exists in docs\\adr\\ADR-013-external-platform-presence-standards.md but no matching decision is present in memory-e4c784f44773404d9b8ed8caf8a6b058.json. Run `mneme adr import` to import it.",
+          "path": "docs\\adr\\ADR-013-external-platform-presence-standards.md"
+        },
+        {
+          "adr_id": "ADR-014",
+          "code": "ADR_UNIMPORTED",
+          "message": "ADR-014 exists in docs\\adr\\ADR-014-harness-complementary-positioning-vocabulary.md but no matching decision is present in memory-e4c784f44773404d9b8ed8caf8a6b058.json. Run `mneme adr import` to import it.",
+          "path": "docs\\adr\\ADR-014-harness-complementary-positioning-vocabulary.md"
+        },
+        {
+          "adr_id": "ADR-016",
+          "code": "ADR_UNIMPORTED",
+          "message": "ADR-016 exists in docs\\adr\\ADR-016-site-governance-transfer.md but no matching decision is present in memory-e4c784f44773404d9b8ed8caf8a6b058.json. Run `mneme adr import` to import it.",
+          "path": "docs\\adr\\ADR-016-site-governance-transfer.md"
+        },
+        {
+          "adr_id": "ADR-017",
+          "code": "ADR_UNIMPORTED",
+          "message": "ADR-017 exists in docs\\adr\\ADR-017-enforcement-scope-vs-retrieval-scope.md but no matching decision is present in memory-e4c784f44773404d9b8ed8caf8a6b058.json. Run `mneme adr import` to import it.",
+          "path": "docs\\adr\\ADR-017-enforcement-scope-vs-retrieval-scope.md"
+        },
+        {
+          "adr_id": "ADR-018",
+          "code": "ADR_UNIMPORTED",
+          "message": "ADR-018 exists in docs\\adr\\ADR-018-introduced-delta-enforcement-at-the-edit-gate.md but no matching decision is present in memory-e4c784f44773404d9b8ed8caf8a6b058.json. Run `mneme adr import` to import it.",
+          "path": "docs\\adr\\ADR-018-introduced-delta-enforcement-at-the-edit-gate.md"
+        },
+        {
+          "adr_id": "ADR-019",
+          "code": "ADR_UNIMPORTED",
+          "message": "ADR-019 exists in docs\\adr\\ADR-019-typed-literal-rule-contract.md but no matching decision is present in memory-e4c784f44773404d9b8ed8caf8a6b058.json. Run `mneme adr import` to import it.",
+          "path": "docs\\adr\\ADR-019-typed-literal-rule-contract.md"
+        },
+        {
+          "adr_id": "ADR-020",
+          "code": "ADR_UNIMPORTED",
+          "message": "ADR-020 exists in docs\\adr\\ADR-020-explicit-path-applicability-for-typed-rules.md but no matching decision is present in memory-e4c784f44773404d9b8ed8caf8a6b058.json. Run `mneme adr import` to import it.",
+          "path": "docs\\adr\\ADR-020-explicit-path-applicability-for-typed-rules.md"
+        }
+      ],
+      "mode": "strict",
+      "schema": "mneme.check/v1",
+      "verdict": "PASS",
+      "violations": []
+    },
+    "return_code": 2,
+    "stderr": ""
+  }
+]

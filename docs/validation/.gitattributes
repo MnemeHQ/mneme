@@ -1,0 +1,3 @@
+# Validation records include hash-addressed evidence. Preserve exact bytes.
+artifacts/** -text
+pre-generation-guidance-* -text

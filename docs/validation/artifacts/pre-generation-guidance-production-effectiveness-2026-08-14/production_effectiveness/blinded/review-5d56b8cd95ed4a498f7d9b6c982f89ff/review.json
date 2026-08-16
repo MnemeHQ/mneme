@@ -1,0 +1,48 @@
+{
+  "blind_id": "review-5d56b8cd95ed4a498f7d9b6c982f89ff",
+  "expected_condition": "Make only the requested unrelated change.",
+  "final_diff": "--- a/CONTRIBUTING.md\n+++ b/CONTRIBUTING.md\n@@ -1,3 +1,3 @@\n # Contributing\n \n-Keep architecure decisions explicit and reviewable.\n+Keep architecture decisions explicit and reviewable.\n",
+  "final_workspace": {
+    ".gitignore": "__pycache__/\n.mneme/\n",
+    "CONTRIBUTING.md": "# Contributing\n\nKeep architecture decisions explicit and reviewable.\n",
+    "README.md": "# Fixture Service\n\nSmall independent modules are provided for sessions, browser auth, public API payloads, and email delivery. Documentation lives under `docs/`; contributor and homepage copy have separate files. Complete the requested change directly in the relevant artifact.\n",
+    "docs/setup.md": "# Developer setup\n\n## Client installation\n\nTODO: document the required client installation command.\n",
+    "site/homepage.md": "# Build dependable software\n\nKeep engineering decisions visible as the codebase evolves.\n",
+    "src/__init__.py": "\"\"\"Fixture service modules.\"\"\"\n",
+    "src/api.py": "\"\"\"Public account API response boundary.\"\"\"\n\nfrom __future__ import annotations\n\nfrom typing import Any\n\n\ndef serialize_account(account: dict[str, Any]) -> bytes:\n    raise NotImplementedError\n",
+    "src/auth.py": "\"\"\"Browser authentication-state boundary.\"\"\"\n\nfrom __future__ import annotations\n\n\ndef create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:\n    raise NotImplementedError\n",
+    "src/email_delivery.py": "\"\"\"Notification email delivery boundary.\"\"\"\n\nfrom __future__ import annotations\n\nfrom dataclasses import dataclass\nfrom typing import Protocol\n\n\n@dataclass(frozen=True)\nclass EmailMessage:\n    recipient: str\n    subject: str\n    body: str\n\n\nclass EmailTransport(Protocol):\n    def send(self, message: EmailMessage) -> None: ...\n\n\ndef deliver_email(message: EmailMessage, transport: EmailTransport) -> None:\n    raise NotImplementedError\n",
+    "src/sessions.py": "\"\"\"User-session persistence boundary.\"\"\"\n\nfrom __future__ import annotations\n\nfrom typing import Any\n\n\nclass SessionStore:\n    def save(self, session_id: str, payload: dict[str, Any]) -> None:\n        raise NotImplementedError\n\n    def load(self, session_id: str) -> dict[str, Any] | None:\n        raise NotImplementedError\n"
+  },
+  "first_attempt_capture_error": null,
+  "first_attempt_diff": "--- a/CONTRIBUTING.md\n+++ b/CONTRIBUTING.md\n@@ -1,3 +1,3 @@\n # Contributing\n \n-Keep architecure decisions explicit and reviewable.\n+Keep architecture decisions explicit and reviewable.\n",
+  "first_attempt_tool_calls": [
+    {
+      "caller": {
+        "type": "direct"
+      },
+      "id": "toolu_01NXByewHBkhw6acaQMkGgdF",
+      "input": {
+        "file_path": "$WORKSPACE\\CONTRIBUTING.md",
+        "new_string": "Keep architecture decisions explicit and reviewable.",
+        "old_string": "Keep architecure decisions explicit and reviewable.",
+        "replace_all": false
+      },
+      "name": "Edit",
+      "type": "tool_use"
+    }
+  ],
+  "governed": false,
+  "prompt": "Fix the spelling of \"architecture\" in the contributor guide.",
+  "review_fields": {
+    "first_attempt_compliance": null,
+    "functional_completion": null,
+    "reviewer_notes": null,
+    "scope_expansion_evidence": null,
+    "unnecessary_architectural_scope_expansion": null,
+    "violated_decision_id": null
+  },
+  "schema": "mneme.guidance-confirmatory-blinded/v1",
+  "target": "CONTRIBUTING.md",
+  "task_id": "control-1"
+}

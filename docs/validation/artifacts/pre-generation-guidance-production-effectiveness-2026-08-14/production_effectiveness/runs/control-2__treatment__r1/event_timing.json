@@ -1,0 +1,136 @@
+{
+  "clock": "time.perf_counter_ns",
+  "event_count": 18,
+  "line_count": 18,
+  "lines": [
+    {
+      "elapsed_seconds_from_process_start": 1.716354,
+      "elapsed_seconds_from_prompt_submission": 1.704401,
+      "event_index": 0,
+      "line_index": 0,
+      "line_sha256": "6A4E3E613E44971B1A7004ADED2DABFB4E92FD430A5DB00AE39EA3F05CCD6268"
+    },
+    {
+      "elapsed_seconds_from_process_start": 2.130385,
+      "elapsed_seconds_from_prompt_submission": 2.118431,
+      "event_index": 1,
+      "line_index": 1,
+      "line_sha256": "EC1ECCEFC48663589C6FFFFBC9527A37463B63A645E0045F9DD419C7D39C27C4"
+    },
+    {
+      "elapsed_seconds_from_process_start": 2.135031,
+      "elapsed_seconds_from_prompt_submission": 2.123077,
+      "event_index": 2,
+      "line_index": 2,
+      "line_sha256": "BE49BF9331D9F06C926C5DF9558E5A980A03E24BB491C4B5FEDE0D1839F67D38"
+    },
+    {
+      "elapsed_seconds_from_process_start": 2.568777,
+      "elapsed_seconds_from_prompt_submission": 2.556824,
+      "event_index": 3,
+      "line_index": 3,
+      "line_sha256": "1C73BF6CE7D00DB44B7FF5FE48452ED5DAF74DFCA6C8A14BE37CD77C4CE78A75"
+    },
+    {
+      "elapsed_seconds_from_process_start": 3.835402,
+      "elapsed_seconds_from_prompt_submission": 3.823448,
+      "event_index": 4,
+      "line_index": 4,
+      "line_sha256": "12BF803A5FD51D7324DDFD242A7EA74F35819F5FABBEED65C87A3E9525DD02C7"
+    },
+    {
+      "elapsed_seconds_from_process_start": 3.835834,
+      "elapsed_seconds_from_prompt_submission": 3.823881,
+      "event_index": 5,
+      "line_index": 5,
+      "line_sha256": "59775A55019119A4CE63C12AF89B2E46F7588CCE8DDDF59AEA8D12B8300A6802"
+    },
+    {
+      "elapsed_seconds_from_process_start": 3.853646,
+      "elapsed_seconds_from_prompt_submission": 3.841693,
+      "event_index": 6,
+      "line_index": 6,
+      "line_sha256": "7AD623C5D04E656DA91CC13EA80C8D3713FC405D2C17778D7C6CE64F99E831CF"
+    },
+    {
+      "elapsed_seconds_from_process_start": 4.596547,
+      "elapsed_seconds_from_prompt_submission": 4.584594,
+      "event_index": 7,
+      "line_index": 7,
+      "line_sha256": "3CC9D8223BC755E0BB34490F9071376DE0F6FE0E3417D7B577F156E0170D88E1"
+    },
+    {
+      "elapsed_seconds_from_process_start": 4.693865,
+      "elapsed_seconds_from_prompt_submission": 4.681912,
+      "event_index": 8,
+      "line_index": 8,
+      "line_sha256": "5F4A452075E9162CDEB63E10466CB57A8C9B8FD122AA1695293A94797318B60E"
+    },
+    {
+      "elapsed_seconds_from_process_start": 5.907451,
+      "elapsed_seconds_from_prompt_submission": 5.895497,
+      "event_index": 9,
+      "line_index": 9,
+      "line_sha256": "F3D8AD739D43340764980ECF36A46B6037BF4150C75CB2F6B3AF536D4718A06E"
+    },
+    {
+      "elapsed_seconds_from_process_start": 5.909041,
+      "elapsed_seconds_from_prompt_submission": 5.897088,
+      "event_index": 10,
+      "line_index": 10,
+      "line_sha256": "AD3D2D3B0DBA6126313255DCF1E86AE8717C5B506F64158A4F528E368115B3E1"
+    },
+    {
+      "elapsed_seconds_from_process_start": 5.910492,
+      "elapsed_seconds_from_prompt_submission": 5.898538,
+      "event_index": 11,
+      "line_index": 11,
+      "line_sha256": "7DD36B1663EE8A27C9609D5FABE387745FB2D119002C2400D27CBD7228BD90E8"
+    },
+    {
+      "elapsed_seconds_from_process_start": 5.912631,
+      "elapsed_seconds_from_prompt_submission": 5.900678,
+      "event_index": 12,
+      "line_index": 12,
+      "line_sha256": "951BF7A0CFEF6160A211DF3D71E2FB17B65A58475AACB77EF09D3687DC6A6A09"
+    },
+    {
+      "elapsed_seconds_from_process_start": 5.99092,
+      "elapsed_seconds_from_prompt_submission": 5.978966,
+      "event_index": 13,
+      "line_index": 13,
+      "line_sha256": "9333C3781499C1EA14CD584F73F11A42C702468B3CA51B90BC549200523848CE"
+    },
+    {
+      "elapsed_seconds_from_process_start": 7.692233,
+      "elapsed_seconds_from_prompt_submission": 7.68028,
+      "event_index": 14,
+      "line_index": 14,
+      "line_sha256": "9CEBAE3DF661927EEA73892C242B222320C4DBB6281FDA070B1CD430A07C5A8E"
+    },
+    {
+      "elapsed_seconds_from_process_start": 7.702445,
+      "elapsed_seconds_from_prompt_submission": 7.690491,
+      "event_index": 15,
+      "line_index": 15,
+      "line_sha256": "29E170D380D0647F196847BDAAA2CBFEBF93148171B6B7C9673374879DCA05F4"
+    },
+    {
+      "elapsed_seconds_from_process_start": 8.862841,
+      "elapsed_seconds_from_prompt_submission": 8.850887,
+      "event_index": 16,
+      "line_index": 16,
+      "line_sha256": "FE7AE8E967121FE23AB5A895E4A7A36C7AF5C28F4406F94550F1548E852F3B1F"
+    },
+    {
+      "elapsed_seconds_from_process_start": 8.883329,
+      "elapsed_seconds_from_prompt_submission": 8.871375,
+      "event_index": 17,
+      "line_index": 17,
+      "line_sha256": "1618ABE18AB4844864E5EC0E4804132331D3CDD74C57EFD05C801E35757F6570"
+    }
+  ],
+  "process_started_utc": "2026-08-16T17:49:43.434514+00:00",
+  "prompt_submission_started_seconds_after_process_start": 0.011954,
+  "schema": "mneme.production-stream-timing/v1"
+}

@@ -1,0 +1,80 @@
+{
+  "schema": "mneme.pre-generation-guidance-role-r5-lock/v1",
+  "locked_at": "2026-08-14",
+  "status": "R5_LOCKED_READY_FOR_R6",
+  "r4_lock": {
+    "path": "docs/validation/pre-generation-guidance-role-r4-lock.json",
+    "sha256": "49C4ADAA6C812E86594567CE30DE6169D1DE180EB300FD0BE86BE1E3D939B198"
+  },
+  "result": {
+    "path": "docs/validation/pre-generation-guidance-role-r5-result.md",
+    "sha256": "D58275545CD4656AF89E61B3277E3A3A0917E072265FE2FFB657C1DEB336B5FA"
+  },
+  "changed_surface_ruff_gate": {
+    "status": "PASS",
+    "ruff_version": "0.16.3",
+    "configuration": "repository discovery; no Ruff configuration present",
+    "command": "uvx ruff check mneme/guidance.py mneme/guidance_applicability_eval.py tests/test_guidance.py tests/test_guidance_applicability_eval.py",
+    "files": {
+      "mneme/guidance.py": "A74C69EA294606F311D7480D654B953F8CAA3B60706E5CC66CC80D2CF9FEABFA",
+      "mneme/guidance_applicability_eval.py": "A9690E0D2372A9D7031DCF03F1733BA39D66387B7DBACFB1142A46F0572A4B29",
+      "tests/test_guidance.py": "3E338038F8A1E98014DC708EFE49642CDC812D90273C1D0792BD20E322F9B4BE",
+      "tests/test_guidance_applicability_eval.py": "30DC822548E44E4C0197B110625ED677AA01AC7E93D080EF0D784E073B8D6A15"
+    },
+    "findings": 0
+  },
+  "whole_repository_ruff_baseline": {
+    "status": "RECORDED_EXCLUDED_FROM_EXPERIMENT_GATE",
+    "configuration_present": false,
+    "pre_existing_findings": 145,
+    "cleanup_authorized": false,
+    "new_lint_policy_authorized": false
+  },
+  "production_candidate": {
+    "mneme/guidance.py": "A74C69EA294606F311D7480D654B953F8CAA3B60706E5CC66CC80D2CF9FEABFA",
+    "mneme/guidance_roles.py": "CEB4D88D5D6557D5256358E58A470C13BBE764C4C0F5A335889BE0FEB22C6694",
+    "mneme/decision_retriever.py": "F86B3BA2E50BB42D92DBFEA879E24A919A07B5AEBB71284F7596D65CC1C74882",
+    "mneme/integrations/claude_code/guidance_hook.py": "A3F55FAD4A221B9BB1E526C8C223ED784C83FA5BA3E9044A61AE65124AC6E3BB",
+    "mneme/integrations/claude_code/hook.py": "12BAA6DDC718DDEE013E7053D787C171EFC0A5D5649C8BC59C9E8B226D3D983C"
+  },
+  "mechanical_gates": {
+    "full_pytest": {
+      "passed": 624,
+      "skipped": 5,
+      "warnings": 52
+    },
+    "focused_guidance_plugin_package": {
+      "passed": 49,
+      "skipped": 5
+    },
+    "compileall_mneme": true,
+    "claude_plugin_strict_validation": true,
+    "retrieval_benchmark_passed": true,
+    "applicability_characterization_passed": true,
+    "deterministic_locked_cases": "22/22",
+    "deterministic_matrix_sha256": "95D5BA7370280387C17907D0A67E9B079DC2542F292638D007666207CDF04B37",
+    "maximum_observed_guidance_chars": 1189,
+    "guidance_char_budget": 8000,
+    "selection_changed_cases": 0,
+    "retrieval_k": 3
+  },
+  "locked_fixtures": {
+    "tests/fixtures/guidance_applicability/cases.json": "2408DD615BB54E3BB8E03B8A28CA1BE9CDC0670E5C4BBA6C04541BA902BADEAB",
+    "tests/fixtures/guidance_retrieval/cases.json": "27B45E547E8B10D8EAE39CB4BAB1488D3822AA4F1B81010D5148379B24FEA261",
+    "tests/fixtures/guidance_retrieval/project_memory.json": "983BAA775AAF38AB36C5D83CA07379C16F72A931BD7568BBA58D13C25B2C45DD"
+  },
+  "e66_evidence": {
+    "execution_lock_sha256": "E66ED251BED91D52A55ECB90B1EE6198E80970C45B7AC04759483F0BDF04195C",
+    "protected_file_count": 547,
+    "collection_manifest_sha256": "46B215D324A1C90E21615F0233D99DD695A5D883671CE44A72F362D3EEFDF0DE",
+    "unchanged": true
+  },
+  "r6_boundary": {
+    "execution_lock_path": "docs/validation/pre-generation-guidance-role-r6-execution-lock.json",
+    "artifact_directory": "docs/validation/artifacts/pre-generation-guidance-role-r6-2026-08-14",
+    "mechanism_isolation_only_until_gate_passes": true,
+    "production_effectiveness_ab": "PAUSED_NOT_RUN",
+    "run_claude_in_this_task": false,
+    "next_task_must_be_execution_only": true
+  }
+}

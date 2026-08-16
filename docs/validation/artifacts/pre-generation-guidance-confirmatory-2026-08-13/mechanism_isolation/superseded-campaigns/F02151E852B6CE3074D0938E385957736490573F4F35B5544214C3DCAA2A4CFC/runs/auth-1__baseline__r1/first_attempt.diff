@@ -1,0 +1,40 @@
+--- a/src/auth.py
++++ b/src/auth.py
+@@ -2,6 +2,36 @@
+ 
+ from __future__ import annotations
+ 
++import hashlib
++import hmac
++import secrets
++import time
++
++SESSION_LIFETIME_SECONDS = 60 * 60 * 24 * 14  # 14 days
++
+ 
+ def create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:
+-    raise NotImplementedError
++    issued_at = int(time.time())
++    expires_at = issued_at + SESSION_LIFETIME_SECONDS
++    session_id = secrets.token_urlsafe(32)
++
++    payload = f"{user_id}:{session_id}:{expires_at}"
++    signature = hmac.new(
++        secret.encode("utf-8"), payload.encode("utf-8"), hashlib.sha256
++    ).hexdigest()
++
++    return {
++        "user_id": user_id,
++        "session_id": session_id,
++        "issued_at": issued_at,
++        "expires_at": expires_at,
++        "signature": signature,
++        "cookie": {
++            "name": "auth_state",
++            "value": f"{session_id}.{signature}",
++            "http_only": True,
++            "secure": True,
++            "same_site": "Lax",
++            "max_age": SESSION_LIFETIME_SECONDS,
++        },
++    }

@@ -1,0 +1,86 @@
+{
+  "schema": "mneme.pre-generation-guidance-role-r2-lock/v1",
+  "locked_at": "2026-08-13",
+  "status": "R2_DESIGN_LOCKED_IMPLEMENTATION_PENDING_R3",
+  "r1_lock": {
+    "path": "docs/validation/pre-generation-guidance-role-r1-lock.json",
+    "sha256": "873A050A512A7F4ABDD389963EE24C840398D1231DE797BF844CC0F16FA7D5E0"
+  },
+  "classifier_design": {
+    "path": "docs/architecture/pre-generation-guidance-role-classifier-design.md",
+    "sha256": "9A6A9E155B540D57308E433E44AF902C1B0459267199528ECA2576A1793F3972",
+    "name": "unique primary anchor",
+    "input": "ordered output of select_guidance_decisions()",
+    "direct_rule": "Assign direct only to a sole highest-scoring selected decision.",
+    "adjacent_rule": "Assign every other selected decision adjacent_constraint.",
+    "tie_rule": "If the highest score is tied, assign no direct role and classify every selected decision adjacent_constraint.",
+    "maximum_direct_roles": 1,
+    "changes_selected_ids": false,
+    "changes_selected_order": false,
+    "changes_scores": false
+  },
+  "reason_codes": {
+    "unique_highest_retrieval_rank": "direct",
+    "secondary_retrieval_candidate": "adjacent_constraint",
+    "top_score_tie_no_direct_anchor": "adjacent_constraint"
+  },
+  "evidence": {
+    "retrieval_fixture": {
+      "path": "tests/fixtures/guidance_retrieval/cases.json",
+      "sha256": "27B45E547E8B10D8EAE39CB4BAB1488D3822AA4F1B81010D5148379B24FEA261",
+      "relevant_cases": 18,
+      "expected_direct_assignments": 18,
+      "expected_direct_hits": 18,
+      "direct_macro_recall": 1.0,
+      "secondary_selected_decisions": 6,
+      "top_score_ties": 0,
+      "no_relevance_cases_with_selection": 0
+    },
+    "role_characterization_fixture": {
+      "path": "tests/fixtures/guidance_applicability/cases.json",
+      "sha256": "2408DD615BB54E3BB8E03B8A28CA1BE9CDC0670E5C4BBA6C04541BA902BADEAB",
+      "case_count": 4,
+      "direct_macro_recall": 1.0,
+      "known_adjacent_assignments": 2,
+      "unexpected_selections": 0,
+      "top_score_ties": 0
+    }
+  },
+  "rejected_candidates": [
+    "all selected decisions direct",
+    "absolute score threshold",
+    "score-gap or score-ratio threshold",
+    "scope-only field heuristic",
+    "authored decision-level selectors or roles",
+    "target-path inference at UserPromptSubmit",
+    "all top-score ties direct"
+  ],
+  "production_runtime_unchanged": {
+    "mneme/decision_retriever.py": "F86B3BA2E50BB42D92DBFEA879E24A919A07B5AEBB71284F7596D65CC1C74882",
+    "mneme/guidance.py": "C1ADE2E3F7623F5EC5E4AC682063B275DE3AFC6E5B2E1E523EF52830D9994ED3",
+    "mneme/integrations/claude_code/guidance_hook.py": "A3F55FAD4A221B9BB1E526C8C223ED784C83FA5BA3E9044A61AE65124AC6E3BB"
+  },
+  "r2_did_not_change": [
+    "production code",
+    "prompt formatting",
+    "hooks or plugin configuration",
+    "retrieval scores or weights",
+    "K",
+    "selection gates",
+    "canonical policy or schemas",
+    "enforcement or ADR-020 applicability",
+    "E66 evidence",
+    "Claude trial state"
+  ],
+  "r3_authorized_scope": {
+    "pure_classifier_api": true,
+    "characterization_evaluator_role_fields": true,
+    "focused_classifier_tests": true,
+    "production_build_guidance_wiring": false,
+    "production_formatter_change": false,
+    "hook_change": false,
+    "claude_trials": false
+  },
+  "production_effectiveness_ab": "PAUSED_NOT_RUN",
+  "fresh_execution_task_boundary": "After the R6 execution lock is frozen and immediately before live Claude trials"
+}

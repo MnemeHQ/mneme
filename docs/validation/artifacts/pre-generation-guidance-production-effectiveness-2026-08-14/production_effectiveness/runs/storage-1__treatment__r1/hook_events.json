@@ -1,0 +1,48 @@
+[
+  {
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "8ab32c18-f8c3-48ec-bec5-c718c08559cd",
+    "hook_name": "UserPromptSubmit",
+    "session_id": "baca2897-d8fa-46ec-b3e6-8a3fd89885a5",
+    "subtype": "hook_started",
+    "type": "system",
+    "uuid": "d281247c-db73-4b81-b349-b9f1faa67331"
+  },
+  {
+    "exit_code": 0,
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "8ab32c18-f8c3-48ec-bec5-c718c08559cd",
+    "hook_name": "UserPromptSubmit",
+    "outcome": "success",
+    "output": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"[Mneme architectural guidance]\\nUse these decisions only to guide the work the user requested. They do not\\nexpand the task. Do not add components, storage, dependencies, interfaces,\\nrefactors, or other architecture solely because a decision appears below.\\n\\nDIRECT DECISION [ADR-STORAGE]\\nThis decision directly governs the requested work. Apply it to implementation\\nchoices within the user's requested scope.\\nDecision: Persist user sessions in SQLite\\n  Scope: storage, database, persistence, session, sessions, login\\n  Constraints:\\n    - no postgres\\n    - no psycopg2\\n  Avoid:\\n    - external database\\n    - database server\\n\\nADJACENT CONSTRAINT [ADR-AUTH] \\u2014 DO NOT IMPLEMENT AS EXTRA WORK\\nThis decision may constrain the requested work only if that work actually\\ntouches its area. Do not implement this decision merely because it is shown.\\nDo not add components, storage, dependencies, interfaces, refactors, or other\\narchitecture solely to satisfy it.\\nDecision: Authentication state uses signed HTTP-only cookies\\n  Scope: authentication, auth, login, cookies, session, sessions\\n  Constraints:\\n    - no jwt in browser storage\\n  Avoid:\\n    - localStorage bearer token\"}}\r\n",
+    "session_id": "baca2897-d8fa-46ec-b3e6-8a3fd89885a5",
+    "stderr": "",
+    "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"[Mneme architectural guidance]\\nUse these decisions only to guide the work the user requested. They do not\\nexpand the task. Do not add components, storage, dependencies, interfaces,\\nrefactors, or other architecture solely because a decision appears below.\\n\\nDIRECT DECISION [ADR-STORAGE]\\nThis decision directly governs the requested work. Apply it to implementation\\nchoices within the user's requested scope.\\nDecision: Persist user sessions in SQLite\\n  Scope: storage, database, persistence, session, sessions, login\\n  Constraints:\\n    - no postgres\\n    - no psycopg2\\n  Avoid:\\n    - external database\\n    - database server\\n\\nADJACENT CONSTRAINT [ADR-AUTH] \\u2014 DO NOT IMPLEMENT AS EXTRA WORK\\nThis decision may constrain the requested work only if that work actually\\ntouches its area. Do not implement this decision merely because it is shown.\\nDo not add components, storage, dependencies, interfaces, refactors, or other\\narchitecture solely to satisfy it.\\nDecision: Authentication state uses signed HTTP-only cookies\\n  Scope: authentication, auth, login, cookies, session, sessions\\n  Constraints:\\n    - no jwt in browser storage\\n  Avoid:\\n    - localStorage bearer token\"}}\r\n",
+    "subtype": "hook_response",
+    "type": "system",
+    "uuid": "847f1eb4-f2fd-48ea-82c1-644c55a6bb94"
+  },
+  {
+    "hook_event": "PreToolUse",
+    "hook_id": "12f1d949-eb51-4025-9fd9-3023deed8885",
+    "hook_name": "PreToolUse:Edit",
+    "session_id": "baca2897-d8fa-46ec-b3e6-8a3fd89885a5",
+    "subtype": "hook_started",
+    "type": "system",
+    "uuid": "e37049ab-edef-46b2-975e-b7109979af7e"
+  },
+  {
+    "exit_code": 0,
+    "hook_event": "PreToolUse",
+    "hook_id": "12f1d949-eb51-4025-9fd9-3023deed8885",
+    "hook_name": "PreToolUse:Edit",
+    "outcome": "success",
+    "output": "",
+    "session_id": "baca2897-d8fa-46ec-b3e6-8a3fd89885a5",
+    "stderr": "",
+    "stdout": "",
+    "subtype": "hook_response",
+    "type": "system",
+    "uuid": "67c28457-3005-4325-87e0-f94ae079ca9e"
+  }
+]

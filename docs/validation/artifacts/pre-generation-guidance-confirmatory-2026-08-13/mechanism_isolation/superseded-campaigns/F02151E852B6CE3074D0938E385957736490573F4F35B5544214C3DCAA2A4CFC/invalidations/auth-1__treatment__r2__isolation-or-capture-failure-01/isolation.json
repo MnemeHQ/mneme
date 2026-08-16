@@ -1,0 +1,7 @@
+{
+  "evaluation": "mechanism_isolation",
+  "pass": false,
+  "violations": [
+    "4 model filesystem call(s) escaped the workspace"
+  ]
+}

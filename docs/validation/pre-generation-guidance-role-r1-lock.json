@@ -1,0 +1,64 @@
+{
+  "schema": "mneme.pre-generation-guidance-role-r1-lock/v1",
+  "locked_at": "2026-08-13",
+  "status": "R1_LOCKED_NO_RUNTIME_IMPLEMENTATION",
+  "architecture_term": "guidance role classification",
+  "pipeline_position": "after retrieval and before prompt formatting",
+  "roles": {
+    "direct": "The decision directly governs the work requested by the user. It may guide implementation choices within the requested scope.",
+    "adjacent_constraint": "The decision is relevant because the requested work may interact with constraints it defines, but it does not authorize, require, or expand the requested implementation."
+  },
+  "normative_invariant": "An adjacent_constraint must never become an implementation objective.",
+  "contract": {
+    "path": "docs/architecture/pre-generation-guidance-role-contract.md",
+    "sha256": "7E94CF0410EE0D5BE83CD7038067EE148F1AD8F001FA60C1BB63E253899BDA33",
+    "canonical_wording_sections": [
+      "4.1 Global scope boundary",
+      "4.2 Direct decision prefix",
+      "4.3 Adjacent constraint prefix"
+    ]
+  },
+  "diagnosis": {
+    "path": "docs/validation/pre-generation-guidance-applicability-diagnosis.md",
+    "sha256": "8BA35553DA83C65D2F390F3784C0B25D0DFFCB20E0222B290B5C0626197C325A"
+  },
+  "characterization_benchmark": {
+    "path": "tests/fixtures/guidance_applicability/cases.json",
+    "sha256": "2408DD615BB54E3BB8E03B8A28CA1BE9CDC0670E5C4BBA6C04541BA902BADEAB",
+    "memory_path": "tests/fixtures/guidance_retrieval/project_memory.json",
+    "memory_sha256": "983BAA775AAF38AB36C5D83CA07379C16F72A931BD7568BBA58D13C25B2C45DD",
+    "baseline": {
+      "direct_macro_recall_at_k": 1.0,
+      "adjacent_undifferentiated_selections": 2,
+      "unexpected_selections": 0
+    }
+  },
+  "e66_evidence": {
+    "execution_lock_sha256": "E66ED251BED91D52A55ECB90B1EE6198E80970C45B7AC04759483F0BDF04195C",
+    "collection_manifest_sha256": "46B215D324A1C90E21615F0233D99DD695A5D883671CE44A72F362D3EEFDF0DE",
+    "gate_result_path": "docs/validation/artifacts/pre-generation-guidance-confirmatory-2026-08-13/mechanism_isolation/scoring/gate-result.json",
+    "gate_result_sha256": "60E708F7705862706183DF1E7B9D6193EB45F1DC87AE519739CCFD860CA27197"
+  },
+  "production_runtime_unchanged": {
+    "mneme/decision_retriever.py": "F86B3BA2E50BB42D92DBFEA879E24A919A07B5AEBB71284F7596D65CC1C74882",
+    "mneme/guidance.py": "C1ADE2E3F7623F5EC5E4AC682063B275DE3AFC6E5B2E1E523EF52830D9994ED3",
+    "mneme/integrations/claude_code/guidance_hook.py": "A3F55FAD4A221B9BB1E526C8C223ED784C83FA5BA3E9044A61AE65124AC6E3BB"
+  },
+  "r1_exclusions": [
+    "classification algorithm",
+    "score thresholds or ratios",
+    "retrieval weights",
+    "K",
+    "DecisionRetriever behavior",
+    "runtime prompt formatting",
+    "Claude Code hook behavior",
+    "decision or memory schema",
+    "ADR-020 typed-rule path applicability",
+    "enforcement behavior",
+    "Claude trials"
+  ],
+  "r2_question": "What deterministic, explainable evidence assigns a retrieved decision to direct, adjacent_constraint, or no emitted role?",
+  "classifier": null,
+  "production_effectiveness_ab": "PAUSED_NOT_RUN",
+  "fresh_execution_task_boundary": "After the R6 execution lock is frozen and immediately before live Claude trials"
+}

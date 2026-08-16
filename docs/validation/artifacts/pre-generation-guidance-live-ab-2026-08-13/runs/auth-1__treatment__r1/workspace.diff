@@ -1,0 +1,67 @@
+--- a/src/auth.py
++++ b/src/auth.py
+@@ -2,6 +2,22 @@
+ 
+ from __future__ import annotations
+ 
++import hashlib
++import hmac
++import time
++
+ 
+ def create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:
+-    raise NotImplementedError
++    """Build a signed HTTP-only cookie asserting the user's login state."""
++    issued_at = int(time.time())
++    payload = f"{user_id}.{issued_at}"
++    signature = hmac.new(secret.encode(), payload.encode(), hashlib.sha256).hexdigest()
++
++    return {
++        "name": "session",
++        "value": f"{payload}.{signature}",
++        "http_only": True,
++        "secure": True,
++        "same_site": "Strict",
++        "path": "/",
++    }
+--- a/src/sessions.py
++++ b/src/sessions.py
+@@ -2,12 +2,36 @@
+ 
+ from __future__ import annotations
+ 
++import json
++import sqlite3
++from pathlib import Path
+ from typing import Any
+ 
+ 
+ class SessionStore:
++    def __init__(self, db_path: str | Path = "sessions.db") -> None:
++        self._connection = sqlite3.connect(db_path)
++        self._connection.execute(
++            "CREATE TABLE IF NOT EXISTS sessions ("
++            "session_id TEXT PRIMARY KEY, "
++            "payload TEXT NOT NULL"
++            ")"
++        )
++        self._connection.commit()
++
+     def save(self, session_id: str, payload: dict[str, Any]) -> None:
+-        raise NotImplementedError
++        self._connection.execute(
++            "INSERT INTO sessions (session_id, payload) VALUES (?, ?) "
++            "ON CONFLICT(session_id) DO UPDATE SET payload = excluded.payload",
++            (session_id, json.dumps(payload)),
++        )
++        self._connection.commit()
+ 
+     def load(self, session_id: str) -> dict[str, Any] | None:
+-        raise NotImplementedError
++        row = self._connection.execute(
++            "SELECT payload FROM sessions WHERE session_id = ?",
++            (session_id,),
++        ).fetchone()
++        if row is None:
++            return None
++        return json.loads(row[0])

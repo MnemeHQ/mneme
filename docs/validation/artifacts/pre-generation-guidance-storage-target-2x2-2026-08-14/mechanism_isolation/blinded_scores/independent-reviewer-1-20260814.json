@@ -1,0 +1,178 @@
+{
+  "schema": "mneme.guidance-storage-target-2x2.blinded-independent-review/v1",
+  "reviewer": 1,
+  "created_at": "2026-08-14T17:03:19.109Z",
+  "blinded": true,
+  "assignment_metadata_inspected": false,
+  "trial_count": 12,
+  "integrity_status": {
+    "status": "verified",
+    "frozen_hashes_match": true,
+    "design_lock_sha256": "BC22485945DAA33EDFA607D5AD5759A17A9ABD462B0B7D9DEC6724C4AE2497EC",
+    "execution_lock_sha256": "AE71210E98B5C7050C7B55AF0701928CB7B51FAAE876624D1C2F2DAB859F581B",
+    "collection_manifest_sha256": "328699D93AE963EE95C51CF62BA1A764D1F5CD7DA123A1C6343916787D349F6E",
+    "rubric_sha256": "8029EACBB4C8032A491486CE881E9415966C27606DA7CC2631CEA868EA4BF604",
+    "review_artifact_count": 12,
+    "unique_blind_id_count": 12,
+    "first_attempt_capture_error_count": 0,
+    "zero_first_attempt_tool_call_count": 0
+  },
+  "scoring_scope": "first_attempt_only",
+  "scores": [
+    {
+      "blind_id": "review-0a9eea638ce84dc4bf73e0683de6903e",
+      "task_id": "storage-explicit",
+      "implementation_target_shape": "direct_existing_sessionstore",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none",
+      "evidence": "The first Edit replaces both SessionStore placeholders with syntactically valid sqlite3 table creation, upsert, and JSON-backed load logic; it adds no parallel class or unrelated work."
+    },
+    {
+      "blind_id": "review-13b6956a4eba48989ce2847131a10a27",
+      "task_id": "storage-original",
+      "implementation_target_shape": "direct_existing_sessionstore",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none",
+      "evidence": "The first Edit directly replaces both SessionStore placeholders with syntactically valid sqlite3 schema, upsert, and JSON load persistence, without PostgreSQL or unnecessary architectural additions."
+    },
+    {
+      "blind_id": "review-1fa10ec5209c4d0da8e09a06911a5a06",
+      "task_id": "storage-original",
+      "implementation_target_shape": "direct_existing_sessionstore",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none",
+      "evidence": "The first Edit directly removes both placeholders and implements syntactically valid atomic JSON-file persistence in SessionStore, but selects filesystem storage rather than SQLite."
+    },
+    {
+      "blind_id": "review-3f75538c8c604f7491a61537a8f436a8",
+      "task_id": "storage-original",
+      "implementation_target_shape": "new_parallel_subclass",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "yes",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none",
+      "evidence": "The first Edit leaves both supplied SessionStore placeholders intact and adds a parallel FileSessionStore using JSON files. It neither selects SQLite nor completes the required supplied target; the unnecessary parallel class duplicates the interface instead of implementing it directly."
+    },
+    {
+      "blind_id": "review-4e79754ec69d47a081c97bf595554f94",
+      "task_id": "storage-original",
+      "implementation_target_shape": "direct_existing_sessionstore",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none",
+      "evidence": "The first Edit directly replaces the SessionStore placeholders with an instance-local dictionary. The code is syntactically valid but is not durable persistence and does not select SQLite."
+    },
+    {
+      "blind_id": "review-949cb03bf0a948d0bdab7f7b4ffa229d",
+      "task_id": "storage-original",
+      "implementation_target_shape": "direct_existing_sessionstore",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none",
+      "evidence": "The first Edit directly replaces both SessionStore placeholders with syntactically valid sqlite3 table initialization, upsert, and JSON load persistence, with no PostgreSQL proposal or excess scope."
+    },
+    {
+      "blind_id": "review-9b2b43dda9f54232ba07f5352fc7ed85",
+      "task_id": "storage-original",
+      "implementation_target_shape": "direct_existing_sessionstore",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none",
+      "evidence": "The first Edit directly removes both placeholders and implements syntactically valid sqlite3 schema creation, upsert, and JSON-backed loading in SessionStore; no unnecessary work is introduced."
+    },
+    {
+      "blind_id": "review-a705f0025c8f44288a5462511b66f003",
+      "task_id": "storage-explicit",
+      "implementation_target_shape": "direct_existing_sessionstore",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none",
+      "evidence": "The first Edit implements the existing SessionStore directly, removes both placeholders, and adds syntactically valid sqlite3 schema, upsert, and JSON load persistence without unrelated scope."
+    },
+    {
+      "blind_id": "review-c92a524fdd994972a159dbaad696ed78",
+      "task_id": "storage-explicit",
+      "implementation_target_shape": "direct_existing_sessionstore",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none",
+      "evidence": "The first Edit directly removes the existing SessionStore placeholders and implements syntactically valid JSON-file save/load persistence with path validation, but it does not select SQLite."
+    },
+    {
+      "blind_id": "review-dc35bfe2731f416fa1e89b7428802e04",
+      "task_id": "storage-explicit",
+      "implementation_target_shape": "direct_existing_sessionstore",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none",
+      "evidence": "The first Write directly replaces the target file with a syntactically valid SessionStore implementation using sqlite3 schema creation, upsert, and JSON-backed load logic; both placeholders are removed."
+    },
+    {
+      "blind_id": "review-dea2d7d05f894a72b9ae3e0400ff0fb7",
+      "task_id": "storage-explicit",
+      "implementation_target_shape": "direct_existing_sessionstore",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none",
+      "evidence": "The first Edit implements the existing SessionStore directly, removes both placeholders, and provides syntactically valid atomic JSON-file persistence, but selects filesystem storage instead of SQLite."
+    },
+    {
+      "blind_id": "review-e6b0a7e645ec487b8a49d4789ce1be33",
+      "task_id": "storage-explicit",
+      "implementation_target_shape": "direct_existing_sessionstore",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none",
+      "evidence": "The first Write directly replaces both SessionStore placeholders with syntactically valid JSON-file save/load persistence and session-ID validation, but it does not select SQLite."
+    }
+  ],
+  "summary": {
+    "ambiguous_count": 0,
+    "not_scoreable_count": 0,
+    "arm_level_aggregation_performed": false,
+    "assignment_guessed": false
+  },
+  "mutation_attestation": {
+    "files_written_by_reviewer": false,
+    "arm_mapping_inspected": false,
+    "unblinded_runs_inspected": false
+  }
+}

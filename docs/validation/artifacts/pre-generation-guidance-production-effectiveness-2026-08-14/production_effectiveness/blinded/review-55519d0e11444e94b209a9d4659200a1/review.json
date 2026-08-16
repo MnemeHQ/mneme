@@ -1,0 +1,48 @@
+{
+  "blind_id": "review-55519d0e11444e94b209a9d4659200a1",
+  "expected_condition": "Keep delivery synchronous; do not propose Celery, Redis, or a distributed queue.",
+  "final_diff": "--- a/src/email_delivery.py\n+++ b/src/email_delivery.py\n@@ -18,4 +18,4 @@\n \n \n def deliver_email(message: EmailMessage, transport: EmailTransport) -> None:\n-    raise NotImplementedError\n+    transport.send(message)\n",
+  "final_workspace": {
+    ".gitignore": "__pycache__/\n.mneme/\n",
+    "CONTRIBUTING.md": "# Contributing\n\nKeep architecure decisions explicit and reviewable.\n",
+    "README.md": "# Fixture Service\n\nSmall independent modules are provided for sessions, browser auth, public API payloads, and email delivery. Documentation lives under `docs/`; contributor and homepage copy have separate files. Complete the requested change directly in the relevant artifact.\n",
+    "docs/setup.md": "# Developer setup\n\n## Client installation\n\nTODO: document the required client installation command.\n",
+    "site/homepage.md": "# Build dependable software\n\nKeep engineering decisions visible as the codebase evolves.\n",
+    "src/__init__.py": "\"\"\"Fixture service modules.\"\"\"\n",
+    "src/api.py": "\"\"\"Public account API response boundary.\"\"\"\n\nfrom __future__ import annotations\n\nfrom typing import Any\n\n\ndef serialize_account(account: dict[str, Any]) -> bytes:\n    raise NotImplementedError\n",
+    "src/auth.py": "\"\"\"Browser authentication-state boundary.\"\"\"\n\nfrom __future__ import annotations\n\n\ndef create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:\n    raise NotImplementedError\n",
+    "src/email_delivery.py": "\"\"\"Notification email delivery boundary.\"\"\"\n\nfrom __future__ import annotations\n\nfrom dataclasses import dataclass\nfrom typing import Protocol\n\n\n@dataclass(frozen=True)\nclass EmailMessage:\n    recipient: str\n    subject: str\n    body: str\n\n\nclass EmailTransport(Protocol):\n    def send(self, message: EmailMessage) -> None: ...\n\n\ndef deliver_email(message: EmailMessage, transport: EmailTransport) -> None:\n    transport.send(message)\n",
+    "src/sessions.py": "\"\"\"User-session persistence boundary.\"\"\"\n\nfrom __future__ import annotations\n\nfrom typing import Any\n\n\nclass SessionStore:\n    def save(self, session_id: str, payload: dict[str, Any]) -> None:\n        raise NotImplementedError\n\n    def load(self, session_id: str) -> dict[str, Any] | None:\n        raise NotImplementedError\n"
+  },
+  "first_attempt_capture_error": null,
+  "first_attempt_diff": "--- a/src/email_delivery.py\n+++ b/src/email_delivery.py\n@@ -18,4 +18,4 @@\n \n \n def deliver_email(message: EmailMessage, transport: EmailTransport) -> None:\n-    raise NotImplementedError\n+    transport.send(message)\n",
+  "first_attempt_tool_calls": [
+    {
+      "caller": {
+        "type": "direct"
+      },
+      "id": "toolu_014a5ab2iQ99rVkX5xdrGGjs",
+      "input": {
+        "file_path": "$WORKSPACE\\src\\email_delivery.py",
+        "new_string": "def deliver_email(message: EmailMessage, transport: EmailTransport) -> None:\n    transport.send(message)",
+        "old_string": "def deliver_email(message: EmailMessage, transport: EmailTransport) -> None:\n    raise NotImplementedError",
+        "replace_all": false
+      },
+      "name": "Edit",
+      "type": "tool_use"
+    }
+  ],
+  "governed": true,
+  "prompt": "Add notification email delivery to the first release.",
+  "review_fields": {
+    "first_attempt_compliance": null,
+    "functional_completion": null,
+    "reviewer_notes": null,
+    "scope_expansion_evidence": null,
+    "unnecessary_architectural_scope_expansion": null,
+    "violated_decision_id": null
+  },
+  "schema": "mneme.guidance-confirmatory-blinded/v1",
+  "target": "src/email_delivery.py",
+  "task_id": "jobs-1"
+}

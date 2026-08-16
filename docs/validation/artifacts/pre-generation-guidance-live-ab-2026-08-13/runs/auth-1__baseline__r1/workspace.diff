@@ -1,0 +1,53 @@
+--- a/src/auth.py
++++ b/src/auth.py
+@@ -2,6 +2,48 @@
+ 
+ from __future__ import annotations
+ 
++import base64
++import hashlib
++import hmac
++import json
++import time
+ 
+-def create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:
+-    raise NotImplementedError
++_DEFAULT_TTL_SECONDS = 60 * 60 * 24 * 14  # 14 days
++_COOKIE_NAME = "auth_state"
++
++
++def _b64encode(data: bytes) -> str:
++    return base64.urlsafe_b64encode(data).rstrip(b"=").decode("ascii")
++
++
++def _sign(payload: str, secret: str) -> str:
++    digest = hmac.new(secret.encode("utf-8"), payload.encode("ascii"), hashlib.sha256).digest()
++    return _b64encode(digest)
++
++
++def create_browser_auth_state(
++    user_id: str,
++    secret: str,
++    *,
++    issued_at: int | None = None,
++    ttl_seconds: int = _DEFAULT_TTL_SECONDS,
++) -> dict[str, object]:
++    """Build a signed, HTTP-only cookie carrying the authenticated session."""
++    issued_at = int(time.time()) if issued_at is None else issued_at
++    expires_at = issued_at + ttl_seconds
++
++    claims = {"sub": user_id, "iat": issued_at, "exp": expires_at}
++    encoded_claims = _b64encode(json.dumps(claims, separators=(",", ":"), sort_keys=True).encode("utf-8"))
++    signature = _sign(encoded_claims, secret)
++    cookie_value = f"{encoded_claims}.{signature}"
++
++    return {
++        "name": _COOKIE_NAME,
++        "value": cookie_value,
++        "http_only": True,
++        "secure": True,
++        "same_site": "Lax",
++        "path": "/",
++        "max_age": ttl_seconds,
++        "expires_at": expires_at,
++    }

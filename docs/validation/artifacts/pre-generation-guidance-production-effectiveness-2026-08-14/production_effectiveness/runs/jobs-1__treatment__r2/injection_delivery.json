@@ -1,0 +1,73 @@
+{
+  "arm": "treatment",
+  "arm_isolation_failure": false,
+  "delivery_pass": true,
+  "expected_context_sha256": "223B43B4FD23CAFEAF26AFE1A57107F0A873337B4F1709C620325493513B14EA",
+  "expected_decision_ids": [
+    "ADR-JOBS",
+    "ADR-RELEASE-NOTES"
+  ],
+  "first_assistant_event_index": 6,
+  "first_edit_event_index": 24,
+  "governed": true,
+  "init_contamination": {
+    "observed": {
+      "apiKeySource": "none",
+      "claude_code_version": "2.1.202",
+      "mcp_servers": [],
+      "memory_paths": null,
+      "model": "claude-sonnet-5",
+      "permissionMode": "acceptEdits",
+      "plugins": [
+        {
+          "name": "mneme",
+          "path": "C:\\Users\\hi\\OneDrive\\Documents\\mneme\\integrations\\claude-code-plugin",
+          "source": "mneme@inline"
+        }
+      ],
+      "skills": [],
+      "slash_commands": [],
+      "tools": [
+        "Edit",
+        "Glob",
+        "Grep",
+        "Read",
+        "Write"
+      ]
+    },
+    "pass": true,
+    "schema": "mneme.production-init-contamination/v1",
+    "violations": []
+  },
+  "reasons": [],
+  "rerun_permitted": false,
+  "responses": [
+    {
+      "before_first_assistant": true,
+      "before_first_edit": true,
+      "context_length": 1037,
+      "context_sha256": "223B43B4FD23CAFEAF26AFE1A57107F0A873337B4F1709C620325493513B14EA",
+      "decision_ids": [
+        "ADR-JOBS",
+        "ADR-RELEASE-NOTES"
+      ],
+      "event_index": 1,
+      "exit_code": 0,
+      "hook_id": "89a01da9-c021-4b6f-9498-56c2da251b34",
+      "outcome": "success",
+      "start_event_index": 0,
+      "start_precedes_response": true
+    }
+  ],
+  "schema": "mneme.production-injection-delivery/v1",
+  "scored_operational_failure": false,
+  "scored_treatment_operational_failure": false,
+  "starts": [
+    {
+      "event_index": 0,
+      "hook_id": "89a01da9-c021-4b6f-9498-56c2da251b34"
+    }
+  ],
+  "stop_campaign": false,
+  "task_id": "jobs-1"
+}

@@ -1,0 +1,28 @@
+{
+  "arm": "baseline",
+  "assistant_turns": 1,
+  "candidate_sha256": "b34d3c1a04cf91e97beafc1e19d30e4569ce0baac206fd66b00f3732d211b470",
+  "duration_seconds": 2.627,
+  "first_proposal_tool_count": 0,
+  "governed": true,
+  "injected_decision_ids": [],
+  "prompt": "Add persistence for user sessions.",
+  "repetition": 1,
+  "result": {
+    "duration_api_ms": 0,
+    "duration_ms": 943,
+    "is_error": true,
+    "modelUsage": {},
+    "num_turns": 1,
+    "session_id": "6d5a4cb2-78f4-4233-992d-a1de4ebea795",
+    "subtype": "success",
+    "total_cost_usd": 0
+  },
+  "return_code": 1,
+  "schema": "mneme.guidance-live-ab-run/v1",
+  "target": "src/sessions.py",
+  "task_id": "storage-1",
+  "technical_invalid": false,
+  "timed_out": false,
+  "workspace_changed": false
+}

@@ -1,0 +1,270 @@
+{
+  "schema": "mneme.guidance-storage-target-2x2-design/v1",
+  "study_id": "post-r6-storage-target-2x2",
+  "locked_at": "2026-08-14T16:15:20.584Z",
+  "status": "LOCKED_BEFORE_EXECUTION",
+  "objective": "Distinguish target-instruction ambiguity from role-aware-guidance interaction and ordinary model variance in the storage-only mechanism scenario.",
+  "relationship_to_r6": {
+    "r6_status": "COMPLETE_FAIL",
+    "r6_modified": false,
+    "derived_diagnosis_path": "docs/validation/artifacts/pre-generation-guidance-role-r6-2026-08-14/mechanism_isolation/post-r6-failure-diagnosis-20260814.json",
+    "derived_diagnosis_sha256": "8B9890BFFB9E891739438978B09C0E94EF6555029ECD6DAB274DD092C5CB6A5C",
+    "production_effectiveness": "PAUSED"
+  },
+  "design": {
+    "type": "locked_2x2_factorial",
+    "repetitions_per_cell": 3,
+    "total_valid_trials": 12,
+    "factors": {
+      "guidance": [
+        {
+          "level": "baseline",
+          "runner_arm": "baseline",
+          "definition": "No prompt-time Mneme guidance context."
+        },
+        {
+          "level": "role_aware",
+          "runner_arm": "treatment",
+          "definition": "Frozen R6 prompt-time role-aware guidance using the mechanism-isolation plugin."
+        }
+      ],
+      "target_instruction": [
+        {
+          "level": "original",
+          "task_id": "storage-original",
+          "prompt": "Add persistence for user sessions."
+        },
+        {
+          "level": "explicit_existing_class",
+          "task_id": "storage-explicit",
+          "prompt": "Add persistence for user sessions. Implement the existing SessionStore class directly."
+        }
+      ]
+    },
+    "cells": [
+      {
+        "cell": "A",
+        "guidance": "baseline",
+        "target_instruction": "original",
+        "task_id": "storage-original",
+        "runner_arm": "baseline"
+      },
+      {
+        "cell": "B",
+        "guidance": "role_aware",
+        "target_instruction": "original",
+        "task_id": "storage-original",
+        "runner_arm": "treatment"
+      },
+      {
+        "cell": "C",
+        "guidance": "baseline",
+        "target_instruction": "explicit_existing_class",
+        "task_id": "storage-explicit",
+        "runner_arm": "baseline"
+      },
+      {
+        "cell": "D",
+        "guidance": "role_aware",
+        "target_instruction": "explicit_existing_class",
+        "task_id": "storage-explicit",
+        "runner_arm": "treatment"
+      }
+    ]
+  },
+  "held_constant_from_r6": {
+    "evaluation": "mechanism_isolation",
+    "fixture": "Exact R6 pristine fixture; no fixture file or content changes.",
+    "fixture_src_sessions_sha256": "FC0F95414337113471286C9249F268D0833AE3AE64E91D400B36037F87435B31",
+    "decision_corpus_path": "tests/fixtures/guidance_retrieval/project_memory.json",
+    "decision_corpus_sha256": "983BAA775AAF38AB36C5D83CA07379C16F72A931BD7568BBA58D13C25B2C45DD",
+    "model_alias": "sonnet",
+    "expected_resolved_model": "claude-sonnet-5",
+    "claude_code_version": "2.1.202",
+    "effort": "high",
+    "permission_mode": "acceptEdits",
+    "tools": [
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep"
+    ],
+    "auto_memory_disabled": true,
+    "claude_md_loading_disabled": true,
+    "skills_disabled": true,
+    "mcp_servers": [],
+    "session_persistence": false,
+    "max_budget_usd_per_run": 1.5,
+    "repetitions": 3,
+    "isolation_rules": "Identical to the frozen R6 mechanism-isolation runner."
+  },
+  "allowed_difference": {
+    "only_experimental_factors": [
+      "Whether frozen role-aware guidance is present.",
+      "Whether the task explicitly targets the existing SessionStore class."
+    ],
+    "fixture_changed": false,
+    "guidance_changed": false,
+    "retrieval_changed": false,
+    "classifier_changed": false,
+    "adjacent_wording_changed": false
+  },
+  "frozen_schedule": [
+    {
+      "order": 1,
+      "cell": "A",
+      "task_id": "storage-original",
+      "arm": "baseline",
+      "repetition": 1
+    },
+    {
+      "order": 2,
+      "cell": "B",
+      "task_id": "storage-original",
+      "arm": "treatment",
+      "repetition": 1
+    },
+    {
+      "order": 3,
+      "cell": "A",
+      "task_id": "storage-original",
+      "arm": "baseline",
+      "repetition": 2
+    },
+    {
+      "order": 4,
+      "cell": "B",
+      "task_id": "storage-original",
+      "arm": "treatment",
+      "repetition": 2
+    },
+    {
+      "order": 5,
+      "cell": "A",
+      "task_id": "storage-original",
+      "arm": "baseline",
+      "repetition": 3
+    },
+    {
+      "order": 6,
+      "cell": "B",
+      "task_id": "storage-original",
+      "arm": "treatment",
+      "repetition": 3
+    },
+    {
+      "order": 7,
+      "cell": "D",
+      "task_id": "storage-explicit",
+      "arm": "treatment",
+      "repetition": 1
+    },
+    {
+      "order": 8,
+      "cell": "C",
+      "task_id": "storage-explicit",
+      "arm": "baseline",
+      "repetition": 1
+    },
+    {
+      "order": 9,
+      "cell": "D",
+      "task_id": "storage-explicit",
+      "arm": "treatment",
+      "repetition": 2
+    },
+    {
+      "order": 10,
+      "cell": "C",
+      "task_id": "storage-explicit",
+      "arm": "baseline",
+      "repetition": 2
+    },
+    {
+      "order": 11,
+      "cell": "D",
+      "task_id": "storage-explicit",
+      "arm": "treatment",
+      "repetition": 3
+    },
+    {
+      "order": 12,
+      "cell": "C",
+      "task_id": "storage-explicit",
+      "arm": "baseline",
+      "repetition": 3
+    }
+  ],
+  "locked_outcomes": {
+    "primary": {
+      "name": "implementation_target_shape",
+      "values": [
+        "direct_existing_sessionstore",
+        "new_parallel_subclass",
+        "other_or_no_attempt"
+      ],
+      "rule": "Classify the first attempted implementation by whether persistence is implemented on the supplied SessionStore or placed in a new parallel subclass."
+    },
+    "secondary": [
+      {
+        "name": "functional_completion",
+        "rule": "The requested artifact changes, remains syntactically valid, removes the supplied SessionStore save/load placeholders, and implements persistence."
+      },
+      {
+        "name": "governed_scope_expansion",
+        "rule": "Yes when unrequested architectural work not needed for the submitted task is introduced; a parallel subclass is judged from the frozen rubric and evidence, not mechanically assumed."
+      },
+      {
+        "name": "first_attempt_architectural_compliance",
+        "rule": "The first attempted implementation selects SQLite and does not select or propose PostgreSQL."
+      }
+    ]
+  },
+  "blinded_review": {
+    "arm_blinded": true,
+    "target_instruction_blinded": false,
+    "reviewers": 2,
+    "independent_reviews_required": true,
+    "adjudicate_before_assignment_reveal": true,
+    "do_not_infer_pairs": true,
+    "comparison_unit": "Locked cell and repetition as explicitly listed in the schedule."
+  },
+  "locked_interpretation_rules": [
+    {
+      "diagnosis": "fixture_ambiguity_dominates",
+      "evidence_pattern": "Both explicit-target cells C and D eliminate parallel-subclass outcomes and restore direct functional completion, while at least one original-target cell does not."
+    },
+    {
+      "diagnosis": "guidance_interaction_remains_plausible",
+      "evidence_pattern": "Role-aware cells are worse than baseline cells on direct implementation under both target versions, with the same direction in functional completion or scope expansion."
+    },
+    {
+      "diagnosis": "ordinary_model_variance_dominates",
+      "evidence_pattern": "Material within-cell variation persists without a stable role-aware-versus-baseline direction across the two target versions."
+    },
+    {
+      "diagnosis": "mixed_or_unresolved",
+      "evidence_pattern": "Observed outcomes do not satisfy one evidence pattern cleanly; preserve the ambiguity rather than inventing a conclusion."
+    }
+  ],
+  "invalidation_and_stopping": {
+    "stop_after_valid_trials": 12,
+    "technical_invalidation": "Use the frozen R6 technical invalidation rules and rerun only the same slot unchanged.",
+    "real_model_no_attempt": "Outcome failure, not technical invalidation.",
+    "code_changes_during_execution": false
+  },
+  "frozen_implementation": {
+    "experiment_runner_path": "scripts/run_guidance_storage_target_2x2.py",
+    "experiment_runner_sha256": "7F585882C7531220B41A724F00CC9A57E244919B9971A0E7890F685989045190",
+    "frozen_r6_runner_path": "scripts/run_guidance_confirmatory_ab.py",
+    "frozen_r6_runner_sha256": "84042E02DC90306E39EB40D9D12F758444756052D281204C447098210C3D78A9"
+  },
+  "prohibitions": [
+    "Do not modify R6 locks, artifacts, scores, diagnosis, or result.",
+    "Do not start the production-effectiveness A/B.",
+    "Do not change production guidance, retrieval weights, ranking, K, classifier behavior, adjacent wording, or the fixture.",
+    "Do not design or implement remediation from unscored trial output.",
+    "Do not reveal assignments before two independent blinded reviews and adjudication."
+  ]
+}

@@ -1,0 +1,25 @@
+[
+  {
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "2d6d74b7-6550-43c0-ab67-c91acffa5f87",
+    "hook_name": "UserPromptSubmit",
+    "session_id": "ba60d1f2-1e66-4115-8280-039b2b7c0b1c",
+    "subtype": "hook_started",
+    "type": "system",
+    "uuid": "dc2b2f71-7dde-4262-9dfa-5f4771cbf30b"
+  },
+  {
+    "exit_code": 0,
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "2d6d74b7-6550-43c0-ab67-c91acffa5f87",
+    "hook_name": "UserPromptSubmit",
+    "outcome": "success",
+    "output": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"[Mneme architectural guidance]\\nUse these decisions only to guide the work the user requested. They do not\\nexpand the task. Do not add components, storage, dependencies, interfaces,\\nrefactors, or other architecture solely because a decision appears below.\\n\\nDIRECT DECISION [ADR-INSTALL]\\nThis decision directly governs the requested work. Apply it to implementation\\nchoices within the user's requested scope.\\nDecision: Use only the supported installation command\\n  Scope: distribution, installation, documentation, setup\\n  Rule FORBID_LITERAL (forbidden exact literal): legacy-client\\n    Applies when editing: docs/**, README.md\\n    Excludes: docs/history/**, tests/**\"}}\r\n",
+    "session_id": "ba60d1f2-1e66-4115-8280-039b2b7c0b1c",
+    "stderr": "",
+    "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"[Mneme architectural guidance]\\nUse these decisions only to guide the work the user requested. They do not\\nexpand the task. Do not add components, storage, dependencies, interfaces,\\nrefactors, or other architecture solely because a decision appears below.\\n\\nDIRECT DECISION [ADR-INSTALL]\\nThis decision directly governs the requested work. Apply it to implementation\\nchoices within the user's requested scope.\\nDecision: Use only the supported installation command\\n  Scope: distribution, installation, documentation, setup\\n  Rule FORBID_LITERAL (forbidden exact literal): legacy-client\\n    Applies when editing: docs/**, README.md\\n    Excludes: docs/history/**, tests/**\"}}\r\n",
+    "subtype": "hook_response",
+    "type": "system",
+    "uuid": "934caa9b-250a-480b-847d-2ccd396723a4"
+  }
+]

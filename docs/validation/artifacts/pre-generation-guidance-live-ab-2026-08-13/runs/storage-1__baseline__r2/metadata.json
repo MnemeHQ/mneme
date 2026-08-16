@@ -1,0 +1,50 @@
+{
+  "arm": "baseline",
+  "assistant_turns": 15,
+  "candidate_sha256": "b34d3c1a04cf91e97beafc1e19d30e4569ce0baac206fd66b00f3732d211b470",
+  "duration_seconds": 25.457,
+  "first_proposal_tool_count": 1,
+  "governed": true,
+  "injected_decision_ids": [],
+  "prompt": "Add persistence for user sessions.",
+  "real_model_turns": 15,
+  "repetition": 2,
+  "result": {
+    "duration_api_ms": 23134,
+    "duration_ms": 23620,
+    "is_error": false,
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "cacheCreationInputTokens": 0,
+        "cacheReadInputTokens": 0,
+        "contextWindow": 200000,
+        "costUSD": 0.000587,
+        "inputTokens": 522,
+        "maxOutputTokens": 32000,
+        "outputTokens": 13,
+        "webSearchRequests": 0
+      },
+      "claude-sonnet-5": {
+        "cacheCreationInputTokens": 18792,
+        "cacheReadInputTokens": 572092,
+        "contextWindow": 1000000,
+        "costUSD": 0.3133296,
+        "inputTokens": 10,
+        "maxOutputTokens": 64000,
+        "outputTokens": 1928,
+        "webSearchRequests": 0
+      }
+    },
+    "num_turns": 9,
+    "session_id": "7730795a-8431-449b-a31f-4c710dfcb4b8",
+    "subtype": "success",
+    "total_cost_usd": 0.3139166
+  },
+  "return_code": 0,
+  "schema": "mneme.guidance-live-ab-run/v1",
+  "target": "src/sessions.py",
+  "task_id": "storage-1",
+  "technical_invalid": false,
+  "timed_out": false,
+  "workspace_changed": true
+}

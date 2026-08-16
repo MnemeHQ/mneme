@@ -1,0 +1,48 @@
+[
+  {
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "d73ab590-3f9b-4195-a6e0-f7f1253ad01a",
+    "hook_name": "UserPromptSubmit",
+    "session_id": "0186d89b-4d15-42ca-ba87-a20fe8da6e0a",
+    "subtype": "hook_started",
+    "type": "system",
+    "uuid": "a68df115-0b14-4fe5-aeca-2f20da6d7553"
+  },
+  {
+    "exit_code": 0,
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "d73ab590-3f9b-4195-a6e0-f7f1253ad01a",
+    "hook_name": "UserPromptSubmit",
+    "outcome": "success",
+    "output": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"[Mneme architectural guidance]\\nUse these decisions only to guide the work the user requested. They do not\\nexpand the task. Do not add components, storage, dependencies, interfaces,\\nrefactors, or other architecture solely because a decision appears below.\\n\\nDIRECT DECISION [ADR-SERIALIZATION]\\nThis decision directly governs the requested work. Apply it to implementation\\nchoices within the user's requested scope.\\nDecision: Public API payloads use JSON serialization\\n  Scope: api, serialization, response, payload, json\\n  Constraints:\\n    - no pickle\\n  Avoid:\\n    - binary python object payload\"}}\r\n",
+    "session_id": "0186d89b-4d15-42ca-ba87-a20fe8da6e0a",
+    "stderr": "",
+    "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"[Mneme architectural guidance]\\nUse these decisions only to guide the work the user requested. They do not\\nexpand the task. Do not add components, storage, dependencies, interfaces,\\nrefactors, or other architecture solely because a decision appears below.\\n\\nDIRECT DECISION [ADR-SERIALIZATION]\\nThis decision directly governs the requested work. Apply it to implementation\\nchoices within the user's requested scope.\\nDecision: Public API payloads use JSON serialization\\n  Scope: api, serialization, response, payload, json\\n  Constraints:\\n    - no pickle\\n  Avoid:\\n    - binary python object payload\"}}\r\n",
+    "subtype": "hook_response",
+    "type": "system",
+    "uuid": "6e6705e9-77ab-45d8-8476-8daea97ee641"
+  },
+  {
+    "hook_event": "PreToolUse",
+    "hook_id": "43aa75ad-41ec-4a30-a5de-f25d19d97cbc",
+    "hook_name": "PreToolUse:Edit",
+    "session_id": "0186d89b-4d15-42ca-ba87-a20fe8da6e0a",
+    "subtype": "hook_started",
+    "type": "system",
+    "uuid": "d9645b1d-972d-4643-9b0a-185d553ffd4f"
+  },
+  {
+    "exit_code": 0,
+    "hook_event": "PreToolUse",
+    "hook_id": "43aa75ad-41ec-4a30-a5de-f25d19d97cbc",
+    "hook_name": "PreToolUse:Edit",
+    "outcome": "success",
+    "output": "",
+    "session_id": "0186d89b-4d15-42ca-ba87-a20fe8da6e0a",
+    "stderr": "",
+    "stdout": "",
+    "subtype": "hook_response",
+    "type": "system",
+    "uuid": "5d89dc2d-c497-4ea6-ba4c-770494a24d3e"
+  }
+]

@@ -1,0 +1,39 @@
+--- a/src/sessions.py
++++ b/src/sessions.py
+@@ -2,12 +2,34 @@
+ 
+ from __future__ import annotations
+ 
++import json
++import re
++from pathlib import Path
+ from typing import Any
++
++_VALID_SESSION_ID = re.compile(r"^[A-Za-z0-9_-]+$")
+ 
+ 
+ class SessionStore:
++    """Persists session payloads as JSON files under a storage directory."""
++
++    def __init__(self, storage_dir: str | Path = "data/sessions") -> None:
++        self._storage_dir = Path(storage_dir)
++        self._storage_dir.mkdir(parents=True, exist_ok=True)
++
++    def _path_for(self, session_id: str) -> Path:
++        if not _VALID_SESSION_ID.match(session_id):
++            raise ValueError(f"invalid session_id: {session_id!r}")
++        return self._storage_dir / f"{session_id}.json"
++
+     def save(self, session_id: str, payload: dict[str, Any]) -> None:
+-        raise NotImplementedError
++        path = self._path_for(session_id)
++        tmp_path = path.with_suffix(".tmp")
++        tmp_path.write_text(json.dumps(payload), encoding="utf-8")
++        tmp_path.replace(path)
+ 
+     def load(self, session_id: str) -> dict[str, Any] | None:
+-        raise NotImplementedError
++        path = self._path_for(session_id)
++        if not path.exists():
++            return None
++        return json.loads(path.read_text(encoding="utf-8"))

@@ -1,0 +1,158 @@
+{
+  "arm": "treatment",
+  "arm_isolation_failure": false,
+  "blind_id": "review-73834379f838414d9b4eef105658de44",
+  "duration_seconds": 9.504,
+  "evaluation": "production_effectiveness",
+  "execution_lock_sha256": "AE01F8DEC22BB5777E7773211483544F6271F12AC394E9D5F1983D1B141FB9D5",
+  "first_attempt_captured": false,
+  "governed": false,
+  "init": {
+    "apiKeySource": "none",
+    "claude_code_version": "2.1.202",
+    "mcp_servers": [],
+    "memory_paths": null,
+    "model": "claude-sonnet-5",
+    "permissionMode": "acceptEdits",
+    "plugins": [
+      {
+        "name": "mneme",
+        "path": "C:\\Users\\hi\\OneDrive\\Documents\\mneme\\integrations\\claude-code-plugin",
+        "source": "mneme@inline"
+      }
+    ],
+    "skills": [],
+    "tools": [
+      "Edit",
+      "Glob",
+      "Grep",
+      "Read",
+      "Write"
+    ]
+  },
+  "injected_decision_ids": [],
+  "injection_delivery": {
+    "arm": "treatment",
+    "arm_isolation_failure": false,
+    "delivery_pass": true,
+    "expected_context_sha256": null,
+    "expected_decision_ids": [],
+    "first_assistant_event_index": 6,
+    "first_edit_event_index": null,
+    "governed": false,
+    "init_contamination": {
+      "observed": {
+        "apiKeySource": "none",
+        "claude_code_version": "2.1.202",
+        "mcp_servers": [],
+        "memory_paths": null,
+        "model": "claude-sonnet-5",
+        "permissionMode": "acceptEdits",
+        "plugins": [
+          {
+            "name": "mneme",
+            "path": "C:\\Users\\hi\\OneDrive\\Documents\\mneme\\integrations\\claude-code-plugin",
+            "source": "mneme@inline"
+          }
+        ],
+        "skills": [],
+        "slash_commands": [],
+        "tools": [
+          "Edit",
+          "Glob",
+          "Grep",
+          "Read",
+          "Write"
+        ]
+      },
+      "pass": true,
+      "schema": "mneme.production-init-contamination/v1",
+      "violations": []
+    },
+    "reasons": [],
+    "rerun_permitted": false,
+    "responses": [
+      {
+        "before_first_assistant": true,
+        "before_first_edit": true,
+        "context_length": 0,
+        "context_sha256": null,
+        "decision_ids": [],
+        "event_index": 1,
+        "exit_code": 0,
+        "hook_id": "5794367c-1cad-40c0-824b-65a4c644595b",
+        "outcome": "success",
+        "start_event_index": 0,
+        "start_precedes_response": true
+      }
+    ],
+    "schema": "mneme.production-injection-delivery/v1",
+    "scored_operational_failure": false,
+    "scored_treatment_operational_failure": false,
+    "starts": [
+      {
+        "event_index": 0,
+        "hook_id": "5794367c-1cad-40c0-824b-65a4c644595b"
+      }
+    ],
+    "stop_campaign": false,
+    "task_id": "control-2"
+  },
+  "isolation_pass": true,
+  "isolation_violations": [],
+  "outcome_failure_no_attempt": true,
+  "policy_discovery_before_first_attempt": [],
+  "prompt": "Rename the homepage hero headline.",
+  "real_model_turns": 6,
+  "repetition": 1,
+  "result": {
+    "duration_api_ms": 7472,
+    "duration_ms": 7208,
+    "is_error": false,
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "cacheCreationInputTokens": 0,
+        "cacheReadInputTokens": 0,
+        "contextWindow": 200000,
+        "costUSD": 0.000588,
+        "inputTokens": 523,
+        "maxOutputTokens": 32000,
+        "outputTokens": 13,
+        "webSearchRequests": 0
+      },
+      "claude-sonnet-5": {
+        "cacheCreationInputTokens": 2045,
+        "cacheReadInputTokens": 33800,
+        "contextWindow": 1000000,
+        "costUSD": 0.027384000000000002,
+        "inputTokens": 8,
+        "maxOutputTokens": 64000,
+        "outputTokens": 330,
+        "webSearchRequests": 0
+      }
+    },
+    "num_turns": 4,
+    "session_id": "82571b69-1bbd-402c-8e7d-52e5d9044e21",
+    "subtype": "success",
+    "total_cost_usd": 0.027972
+  },
+  "return_code": 0,
+  "schema": "mneme.guidance-confirmatory-run/v1",
+  "scored_treatment_operational_failure": false,
+  "seconds_to_first_attempt": null,
+  "stream_timing": {
+    "artifact": "event_timing.json",
+    "attempts_annotated": 0,
+    "clock": "time.perf_counter_ns",
+    "event_count": 18,
+    "line_count": 18,
+    "schema": "mneme.production-stream-timing/v1"
+  },
+  "target": "site/homepage.md",
+  "task_id": "control-2",
+  "technical_invalid": false,
+  "timed_out": false,
+  "tool_calls_before_first_attempt": 0,
+  "tool_calls_through_first_attempt": 0,
+  "workspace_changed": false
+}

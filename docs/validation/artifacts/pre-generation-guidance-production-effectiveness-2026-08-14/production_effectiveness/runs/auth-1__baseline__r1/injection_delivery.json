@@ -1,0 +1,70 @@
+{
+  "arm": "baseline",
+  "arm_isolation_failure": false,
+  "delivery_pass": true,
+  "expected_context_sha256": "0E0EF766FF9AEE5B6DA23B638FACCD798C60F7004ADFB600B33BA0DE97DA6D0A",
+  "expected_decision_ids": [
+    "ADR-AUTH",
+    "ADR-STORAGE"
+  ],
+  "first_assistant_event_index": 6,
+  "first_edit_event_index": 36,
+  "governed": true,
+  "init_contamination": {
+    "observed": {
+      "apiKeySource": "none",
+      "claude_code_version": "2.1.202",
+      "mcp_servers": [],
+      "memory_paths": null,
+      "model": "claude-sonnet-5",
+      "permissionMode": "acceptEdits",
+      "plugins": [
+        {
+          "name": "mneme",
+          "path": "C:\\Users\\hi\\OneDrive\\Documents\\mneme\\integrations\\claude-code-plugin",
+          "source": "mneme@inline"
+        }
+      ],
+      "skills": [],
+      "slash_commands": [],
+      "tools": [
+        "Edit",
+        "Glob",
+        "Grep",
+        "Read",
+        "Write"
+      ]
+    },
+    "pass": true,
+    "schema": "mneme.production-init-contamination/v1",
+    "violations": []
+  },
+  "reasons": [],
+  "rerun_permitted": false,
+  "responses": [
+    {
+      "before_first_assistant": true,
+      "before_first_edit": true,
+      "context_length": 0,
+      "context_sha256": null,
+      "decision_ids": [],
+      "event_index": 1,
+      "exit_code": 0,
+      "hook_id": "fd0e30ff-ea53-43ed-911a-8a84842da543",
+      "outcome": "success",
+      "start_event_index": 0,
+      "start_precedes_response": true
+    }
+  ],
+  "schema": "mneme.production-injection-delivery/v1",
+  "scored_operational_failure": false,
+  "scored_treatment_operational_failure": false,
+  "starts": [
+    {
+      "event_index": 0,
+      "hook_id": "fd0e30ff-ea53-43ed-911a-8a84842da543"
+    }
+  ],
+  "stop_campaign": false,
+  "task_id": "auth-1"
+}

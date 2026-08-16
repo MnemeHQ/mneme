@@ -1,0 +1,25 @@
+[
+  {
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "4dbaae4c-174b-48e6-9777-46d7f1b4be26",
+    "hook_name": "UserPromptSubmit",
+    "session_id": "52fdd9d0-9679-4a1a-96ba-38eac6ed3af8",
+    "subtype": "hook_started",
+    "type": "system",
+    "uuid": "3c468828-d650-45f7-b168-cee8d87e5d11"
+  },
+  {
+    "exit_code": 0,
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "4dbaae4c-174b-48e6-9777-46d7f1b4be26",
+    "hook_name": "UserPromptSubmit",
+    "outcome": "success",
+    "output": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"[Mneme architectural guidance]\\nRecorded project decisions relevant to the submitted task follow. Path-scoped typed rules list conditional selectors; applicability is determined only when a target artifact is known.\\n\\nDECISION [ADR-JOBS]: Email delivery remains synchronous in the first release\\n  Scope: jobs, queue, worker, email, delivery, background\\n  Constraints:\\n    - no celery\\n    - no redis\\n  Avoid:\\n    - distributed task queue\\n\\nDECISION [ADR-RELEASE-NOTES]: Release notes describe shipped behavior only\\n  Scope: release, communications\"}}\r\n",
+    "session_id": "52fdd9d0-9679-4a1a-96ba-38eac6ed3af8",
+    "stderr": "",
+    "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"[Mneme architectural guidance]\\nRecorded project decisions relevant to the submitted task follow. Path-scoped typed rules list conditional selectors; applicability is determined only when a target artifact is known.\\n\\nDECISION [ADR-JOBS]: Email delivery remains synchronous in the first release\\n  Scope: jobs, queue, worker, email, delivery, background\\n  Constraints:\\n    - no celery\\n    - no redis\\n  Avoid:\\n    - distributed task queue\\n\\nDECISION [ADR-RELEASE-NOTES]: Release notes describe shipped behavior only\\n  Scope: release, communications\"}}\r\n",
+    "subtype": "hook_response",
+    "type": "system",
+    "uuid": "74678eb2-49a7-497a-8f2d-2fe0da4bd32e"
+  }
+]

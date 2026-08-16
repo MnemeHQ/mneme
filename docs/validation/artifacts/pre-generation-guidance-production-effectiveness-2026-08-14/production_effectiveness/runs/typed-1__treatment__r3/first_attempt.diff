@@ -1,0 +1,12 @@
+--- a/docs/setup.md
++++ b/docs/setup.md
+@@ -2,4 +2,8 @@
+ 
+ ## Client installation
+ 
+-TODO: document the required client installation command.
++Install the supported client with:
++
++```
++pip install fixture-service-client
++```

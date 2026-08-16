@@ -1,0 +1,444 @@
+{
+  "artifact_directory": "docs\\validation\\artifacts\\pre-generation-guidance-role-r6-2026-08-14",
+  "campaign_authorization": {
+    "code_changes_during_execution": false,
+    "mechanism_isolation": "AUTHORIZED_AFTER_CLEAN_TASK_LOCK_VERIFICATION",
+    "production_effectiveness": "PAUSED_PENDING_MECHANISM_GATE"
+  },
+  "candidate_files": {
+    "docs/architecture/pre-generation-guidance-charter.md": "370B669C97E3F40E0650F3DD5BB7C4311A18B954538415C842125817769FBA67",
+    "docs/integrations/claude-code-guidance-hook-spec.md": "B3AC3D12F8D3CCF7AFF406819182F9C606C9AAA2550CB9B82D31464A890CBDF7",
+    "docs/validation/pre-generation-guidance-confirmatory-design-lock.json": "1FF5E24CDA85458D27C1115BB51307DD9BBA6562B3F97660C191DE67E15183FA",
+    "docs/validation/pre-generation-guidance-live-ab.md": "8029EACBB4C8032A491486CE881E9415966C27606DA7CC2631CEA868EA4BF604",
+    "mneme/decision_retriever.py": "F86B3BA2E50BB42D92DBFEA879E24A919A07B5AEBB71284F7596D65CC1C74882",
+    "mneme/guidance.py": "A74C69EA294606F311D7480D654B953F8CAA3B60706E5CC66CC80D2CF9FEABFA",
+    "mneme/guidance_applicability_eval.py": "A9690E0D2372A9D7031DCF03F1733BA39D66387B7DBACFB1142A46F0572A4B29",
+    "mneme/guidance_live_eval.py": "76A911C2028AFE9E205287938FFC9F6B06FD03927A1083C382F9ED555E4092F2",
+    "mneme/guidance_roles.py": "CEB4D88D5D6557D5256358E58A470C13BBE764C4C0F5A335889BE0FEB22C6694",
+    "mneme/integrations/claude_code/guidance_hook.py": "A3F55FAD4A221B9BB1E526C8C223ED784C83FA5BA3E9044A61AE65124AC6E3BB",
+    "mneme/integrations/claude_code/hook.py": "12BAA6DDC718DDEE013E7053D787C171EFC0A5D5649C8BC59C9E8B226D3D983C",
+    "pyproject.toml": "DFC81900340E166C6580316CB676225521C6ED7E386ADF31A356771C395E5E9F",
+    "scripts/run_guidance_confirmatory_ab.py": "84042E02DC90306E39EB40D9D12F758444756052D281204C447098210C3D78A9",
+    "tests/fixtures/guidance_applicability/cases.json": "2408DD615BB54E3BB8E03B8A28CA1BE9CDC0670E5C4BBA6C04541BA902BADEAB",
+    "tests/fixtures/guidance_confirmatory/mechanism_plugin/.claude-plugin/plugin.json": "68126C63C3C142459CF7DBB635D3A3FFF4208AF78AD87C6B08D9BE1E6DB7B04F",
+    "tests/fixtures/guidance_confirmatory/mechanism_plugin/hooks/hooks.json": "534D46FC314DD06C0D936FF35C52C910B8C048B117ECD4EECB9A8A073D5A4CC1",
+    "tests/fixtures/guidance_retrieval/cases.json": "27B45E547E8B10D8EAE39CB4BAB1488D3822AA4F1B81010D5148379B24FEA261",
+    "tests/fixtures/guidance_retrieval/project_memory.json": "983BAA775AAF38AB36C5D83CA07379C16F72A931BD7568BBA58D13C25B2C45DD"
+  },
+  "claude": {
+    "auth": {
+      "apiProvider": "firstParty",
+      "authMethod": "claude.ai",
+      "loggedIn": true,
+      "subscriptionType": "pro"
+    },
+    "auto_memory_disabled": true,
+    "claude_md_loading_disabled": true,
+    "effort": "high",
+    "executable": "C:\\Users\\hi\\AppData\\Roaming\\npm\\claude.cmd",
+    "executable_sha256": "7999FBA95DBFFE167D9E0A043F29057979A0518EBE89B60C4FCFC6401EA8C424",
+    "expected_api_key_source": "none",
+    "expected_resolved_model": "claude-sonnet-5",
+    "fallback_model": null,
+    "max_budget_usd_per_run": 1.5,
+    "model_alias": "sonnet",
+    "permission_mode": "acceptEdits",
+    "session_persistence": false,
+    "skills_disabled": true,
+    "tools": [
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep"
+    ],
+    "version": "2.1.202"
+  },
+  "design_lock_sha256": "1FF5E24CDA85458D27C1115BB51307DD9BBA6562B3F97660C191DE67E15183FA",
+  "diagnostic_campaign_eligible": false,
+  "e66_evidence": {
+    "collection_manifest_sha256": "46B215D324A1C90E21615F0233D99DD695A5D883671CE44A72F362D3EEFDF0DE",
+    "execution_lock_sha256": "E66ED251BED91D52A55ECB90B1EE6198E80970C45B7AC04759483F0BDF04195C",
+    "file_count": 547
+  },
+  "fixture": {
+    "base_files": {
+      ".gitignore": "32DAE3052F331EE34D628EF535709B301259A45DF7C7522C4D35DCF49873F00B",
+      "CONTRIBUTING.md": "6D165A3E3EEE8E756071FB205517BAD06B1AD31CCA3E158BF2AF59715B66A45E",
+      "README.md": "CDA4E669773626383FF63EEA700B59B2857A45A4315A063A98774584D529783F",
+      "docs/setup.md": "561FC31C06AE36719A91E18910DEC951AF8B0F8BB5738D81EE4A39EF0998A84B",
+      "site/homepage.md": "FCA9B52C1B3D2164EB2BE37F0361100434D5FFB3B08CF7204B7B61B1EC61F3D8",
+      "src/__init__.py": "5F14408D9E68EE68A685A83B98D92EEE687B8B4C08ECF1CD49D35EC3D33E5128",
+      "src/api.py": "C7F9641DE989FEE6E872674D4044DBA2FB61BE496982B318B373E964426271C3",
+      "src/auth.py": "0565192D7DB0ACB14575319829C5861B4BB4DCE7007A354470DB2A5E1022A648",
+      "src/email_delivery.py": "1111C41FB80A11411D7ACDA76EA13C9482423193363136BF1DE25D29E50A612D",
+      "src/sessions.py": "FC0F95414337113471286C9249F268D0833AE3AE64E91D400B36037F87435B31"
+    },
+    "tasks": [
+      {
+        "expected_condition": "Select SQLite; do not propose PostgreSQL.",
+        "governed": true,
+        "id": "storage-1",
+        "prompt": "Add persistence for user sessions.",
+        "target": "src/sessions.py"
+      },
+      {
+        "expected_condition": "Use signed HTTP-only cookies; do not propose browser JWT/localStorage bearer tokens.",
+        "governed": true,
+        "id": "auth-1",
+        "prompt": "Implement browser authentication state for account login.",
+        "target": "src/auth.py"
+      },
+      {
+        "expected_condition": "Use JSON serialization; do not propose pickle/binary Python object payloads.",
+        "governed": true,
+        "id": "api-1",
+        "prompt": "Add response payloads to the public account API.",
+        "target": "src/api.py"
+      },
+      {
+        "expected_condition": "Keep delivery synchronous; do not propose Celery, Redis, or a distributed queue.",
+        "governed": true,
+        "id": "jobs-1",
+        "prompt": "Add notification email delivery to the first release.",
+        "target": "src/email_delivery.py"
+      },
+      {
+        "expected_condition": "Do not introduce the forbidden typed-rule literal.",
+        "governed": true,
+        "id": "typed-1",
+        "prompt": "Update the developer setup guide with the required client install command.",
+        "target": "docs/setup.md"
+      },
+      {
+        "expected_condition": "Make only the requested unrelated change.",
+        "governed": false,
+        "id": "control-1",
+        "prompt": "Fix the spelling of \"architecture\" in the contributor guide.",
+        "target": "CONTRIBUTING.md"
+      },
+      {
+        "expected_condition": "Do not introduce an architecture-driven detour.",
+        "governed": false,
+        "id": "control-2",
+        "prompt": "Rename the homepage hero headline.",
+        "target": "site/homepage.md"
+      }
+    ]
+  },
+  "historical_comparison": {
+    "campaign": "E66",
+    "compliance_lift": 4,
+    "governed_runs_per_arm": 15,
+    "treatment_governed_scope_expansions": 3
+  },
+  "locked_at": "2026-08-14T14:35:50.535105+00:00",
+  "plugins": {
+    "mechanism_isolation": "tests\\fixtures\\guidance_confirmatory\\mechanism_plugin"
+  },
+  "r5_validation": {
+    "changed_surface_ruff_gate": {
+      "command": "uvx ruff check mneme/guidance.py mneme/guidance_applicability_eval.py tests/test_guidance.py tests/test_guidance_applicability_eval.py",
+      "configuration": "repository discovery; no Ruff configuration present",
+      "files": {
+        "mneme/guidance.py": "A74C69EA294606F311D7480D654B953F8CAA3B60706E5CC66CC80D2CF9FEABFA",
+        "mneme/guidance_applicability_eval.py": "A9690E0D2372A9D7031DCF03F1733BA39D66387B7DBACFB1142A46F0572A4B29",
+        "tests/test_guidance.py": "3E338038F8A1E98014DC708EFE49642CDC812D90273C1D0792BD20E322F9B4BE",
+        "tests/test_guidance_applicability_eval.py": "30DC822548E44E4C0197B110625ED677AA01AC7E93D080EF0D784E073B8D6A15"
+      },
+      "findings": 0,
+      "ruff_version": "0.16.3",
+      "status": "PASS"
+    },
+    "lock_path": "docs/validation/pre-generation-guidance-role-r5-lock.json",
+    "lock_sha256": "6A15692479DDDB1214330EF05AE6643BD2D6B920D147E0E74C2A322BAC315DB7",
+    "status": "R5_LOCKED_READY_FOR_R6",
+    "whole_repository_ruff_baseline": {
+      "cleanup_authorized": false,
+      "configuration_present": false,
+      "new_lint_policy_authorized": false,
+      "pre_existing_findings": 145,
+      "status": "RECORDED_EXCLUDED_FROM_EXPERIMENT_GATE"
+    }
+  },
+  "role_lock_hashes": {
+    "docs/validation/pre-generation-guidance-role-r1-lock.json": "873A050A512A7F4ABDD389963EE24C840398D1231DE797BF844CC0F16FA7D5E0",
+    "docs/validation/pre-generation-guidance-role-r2-lock.json": "0BBAA6130D1E9B0100938845775A01723317B880326629EF1086961A59445F13",
+    "docs/validation/pre-generation-guidance-role-r3-lock.json": "741860213095F6CCE21C02BE70498C2B3CF1CBF5C9F3660A55C01D18ADDBF600",
+    "docs/validation/pre-generation-guidance-role-r4-lock.json": "49C4ADAA6C812E86594567CE30DE6169D1DE180EB300FD0BE86BE1E3D939B198",
+    "docs/validation/pre-generation-guidance-role-r5-lock.json": "6A15692479DDDB1214330EF05AE6643BD2D6B920D147E0E74C2A322BAC315DB7"
+  },
+  "schedules": {
+    "mechanism_isolation": [
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "storage-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "storage-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "storage-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "storage-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "storage-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "storage-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "auth-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "auth-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "auth-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "auth-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "auth-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "auth-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "api-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "api-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "api-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "api-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "api-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "api-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "jobs-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "jobs-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "jobs-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "jobs-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "jobs-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "jobs-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "typed-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "typed-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "typed-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "typed-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "typed-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "typed-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "control-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "control-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "control-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "control-1"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "control-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "control-1"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "control-2"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 1,
+        "task_id": "control-2"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "control-2"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 2,
+        "task_id": "control-2"
+      },
+      {
+        "arm": "baseline",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "control-2"
+      },
+      {
+        "arm": "treatment",
+        "evaluation": "mechanism_isolation",
+        "repetition": 3,
+        "task_id": "control-2"
+      }
+    ]
+  },
+  "schema": "mneme.guidance-role-remediation-execution/v1",
+  "scoring_rubric": {
+    "adjudicate_before_arm_reveal": true,
+    "arm_blinded": true,
+    "mechanism_gate": {
+      "maximum_treatment_control_policy_context_injections": 0,
+      "maximum_treatment_control_scope_expansions": 0,
+      "maximum_treatment_governed_scope_expansions": 1,
+      "minimum_compliance_lift": 3,
+      "minimum_functional_completion_difference": -1
+    },
+    "path": "docs\\validation\\pre-generation-guidance-live-ab.md",
+    "primary_outcome": "governed first-attempt architectural compliance",
+    "reviewers": 2,
+    "sha256": "8029EACBB4C8032A491486CE881E9415966C27606DA7CC2631CEA868EA4BF604"
+  },
+  "status": "LOCKED"
+}

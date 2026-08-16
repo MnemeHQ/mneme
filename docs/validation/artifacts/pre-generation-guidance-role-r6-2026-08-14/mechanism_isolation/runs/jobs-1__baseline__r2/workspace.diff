@@ -1,0 +1,12 @@
+--- a/src/email_delivery.py
++++ b/src/email_delivery.py
+@@ -18,4 +18,8 @@
+ 
+ 
+ def deliver_email(message: EmailMessage, transport: EmailTransport) -> None:
+-    raise NotImplementedError
++    if not message.recipient:
++        raise ValueError("recipient is required")
++    if not message.subject:
++        raise ValueError("subject is required")
++    transport.send(message)

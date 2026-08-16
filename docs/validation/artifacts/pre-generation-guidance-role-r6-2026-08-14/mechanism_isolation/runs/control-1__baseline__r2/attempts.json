@@ -1,0 +1,24 @@
+[
+  {
+    "event_index": 12,
+    "message_id": "msg_011Ce2qF56SkP6uH4sbtQP9S",
+    "ordinal": 1,
+    "timestamp": null,
+    "tool_calls": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01Bw9q3ALoeevoivyNsAGLmw",
+        "input": {
+          "file_path": "$WORKSPACE\\CONTRIBUTING.md",
+          "new_string": "Keep architecture decisions explicit and reviewable.",
+          "old_string": "Keep architecure decisions explicit and reviewable.",
+          "replace_all": false
+        },
+        "name": "Edit",
+        "type": "tool_use"
+      }
+    ]
+  }
+]

@@ -1,0 +1,25 @@
+[
+  {
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "6dc6a5c2-4132-4d08-b75f-ec3b4f1bc13c",
+    "hook_name": "UserPromptSubmit",
+    "session_id": "e8a5162f-bfb0-49aa-8b20-86634879ced0",
+    "subtype": "hook_started",
+    "type": "system",
+    "uuid": "48c6716a-331e-452e-9967-3da89b688975"
+  },
+  {
+    "exit_code": 0,
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "6dc6a5c2-4132-4d08-b75f-ec3b4f1bc13c",
+    "hook_name": "UserPromptSubmit",
+    "outcome": "success",
+    "output": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"[Mneme architectural guidance]\\nRecorded project decisions relevant to the submitted task follow. Path-scoped typed rules list conditional selectors; applicability is determined only when a target artifact is known.\\n\\nDECISION [ADR-JOBS]: Email delivery remains synchronous in the first release\\n  Scope: jobs, queue, worker, email, delivery, background\\n  Constraints:\\n    - no celery\\n    - no redis\\n  Avoid:\\n    - distributed task queue\\n\\nDECISION [ADR-RELEASE-NOTES]: Release notes describe shipped behavior only\\n  Scope: release, communications\"}}\r\n",
+    "session_id": "e8a5162f-bfb0-49aa-8b20-86634879ced0",
+    "stderr": "",
+    "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"UserPromptSubmit\", \"additionalContext\": \"[Mneme architectural guidance]\\nRecorded project decisions relevant to the submitted task follow. Path-scoped typed rules list conditional selectors; applicability is determined only when a target artifact is known.\\n\\nDECISION [ADR-JOBS]: Email delivery remains synchronous in the first release\\n  Scope: jobs, queue, worker, email, delivery, background\\n  Constraints:\\n    - no celery\\n    - no redis\\n  Avoid:\\n    - distributed task queue\\n\\nDECISION [ADR-RELEASE-NOTES]: Release notes describe shipped behavior only\\n  Scope: release, communications\"}}\r\n",
+    "subtype": "hook_response",
+    "type": "system",
+    "uuid": "94a3d52d-76f8-4748-8356-cc7fd653ba82"
+  }
+]

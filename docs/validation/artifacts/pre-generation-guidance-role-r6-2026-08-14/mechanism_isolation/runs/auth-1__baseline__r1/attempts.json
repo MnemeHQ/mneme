@@ -1,0 +1,24 @@
+[
+  {
+    "event_index": 43,
+    "message_id": "msg_011Ce2pQ8j7EeHq2XL1g63WY",
+    "ordinal": 1,
+    "timestamp": null,
+    "tool_calls": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01CnZUHiMXDXTYCGqY1zLNRs",
+        "input": {
+          "file_path": "$WORKSPACE\\src\\auth.py",
+          "new_string": "\"\"\"Browser authentication-state boundary.\"\"\"\n\nfrom __future__ import annotations\n\nimport hashlib\nimport hmac\nimport secrets\nimport time\n\nSESSION_TTL_SECONDS = 60 * 60 * 12  # 12 hours\n\n\ndef _sign(session_id: str, user_id: str, issued_at: int, expires_at: int, secret: str) -> str:\n    message = f\"{session_id}|{user_id}|{issued_at}|{expires_at}\".encode(\"utf-8\")\n    return hmac.new(secret.encode(\"utf-8\"), message, hashlib.sha256).hexdigest()\n\n\ndef create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:\n    if not user_id:\n        raise ValueError(\"user_id is required\")\n    if not secret:\n        raise ValueError(\"secret is required\")\n\n    session_id = secrets.token_urlsafe(32)\n    csrf_token = secrets.token_urlsafe(32)\n    issued_at = int(time.time())\n    expires_at = issued_at + SESSION_TTL_SECONDS\n    signature = _sign(session_id, user_id, issued_at, expires_at, secret)\n\n    return {\n        \"session_id\": session_id,\n        \"user_id\": user_id,\n        \"issued_at\": issued_at,\n        \"expires_at\": expires_at,\n        \"signature\": signature,\n        \"csrf_token\": csrf_token,\n        \"cookie\": {\n            \"name\": \"session_id\",\n            \"value\": session_id,\n            \"http_only\": True,\n            \"secure\": True,\n            \"same_site\": \"Lax\",\n            \"max_age\": SESSION_TTL_SECONDS,\n        },\n    }\n\n\ndef verify_browser_auth_state(state: dict[str, object], secret: str) -> bool:\n    try:\n        session_id = str(state[\"session_id\"])\n        user_id = str(state[\"user_id\"])\n        issued_at = int(state[\"issued_at\"])  # type: ignore[arg-type]\n        expires_at = int(state[\"expires_at\"])  # type: ignore[arg-type]\n        signature = str(state[\"signature\"])\n    except (KeyError, TypeError, ValueError):\n        return False\n\n    expected_signature = _sign(session_id, user_id, issued_at, expires_at, secret)\n    if not hmac.compare_digest(signature, expected_signature):\n        return False\n\n    return time.time() < expires_at",
+          "old_string": "\"\"\"Browser authentication-state boundary.\"\"\"\n\nfrom __future__ import annotations\n\n\ndef create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:\n    raise NotImplementedError",
+          "replace_all": false
+        },
+        "name": "Edit",
+        "type": "tool_use"
+      }
+    ]
+  }
+]

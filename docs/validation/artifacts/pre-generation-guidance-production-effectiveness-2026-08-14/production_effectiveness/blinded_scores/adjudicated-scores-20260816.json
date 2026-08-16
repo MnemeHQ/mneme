@@ -1,0 +1,698 @@
+{
+  "schema": "mneme.guidance-confirmatory-blinded-adjudication/v1",
+  "adjudication_id": "production-effectiveness-blinded-adjudication-20260816",
+  "created_at": "2026-08-16T18:00:52Z",
+  "evaluation": "production_effectiveness",
+  "blinded": true,
+  "assignment_metadata_inspected": false,
+  "trial_count": 42,
+  "execution": {
+    "input_surface": "frozen blinded production-effectiveness review packages",
+    "root": "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded",
+    "package_count": 42,
+    "package_manifest_sha256": "0726f0c273bcea5dd33520196c9b832f68906bf720a0cb181608fd324639ccce",
+    "package_manifest_hash_rule": "SHA-256 of UTF-8 sorted lines '<review_json_sha256><two spaces><blind_id>/review.json\\n', including the final LF",
+    "package_hashes": {
+      "review-015f8740e82f4c74b5f2b45157219a0d": "ff59be490784cdd4627b23b41a844f6f914037e2141509bec4d4149b480d779c",
+      "review-07794e9549d44cd68099888060c1e58d": "eba296cbe957a64e7e66b82a3589cc5c5333f76113ffbb7a613f283dbd689cd2",
+      "review-09f8dadc4fe3475a85c6a8f732b90fa8": "7c55abea904e3a57faa906a07f1017607b707456ed111f1849c307f44afdd367",
+      "review-0c3685ae043c4c53b7a87dbbe03d7b54": "8b7735790872b05d53d70e20513efdcce330662f58b049b71d9e0c62eb89b16c",
+      "review-11bea48f87ae402689f8447364706f9e": "43f2c27d09403423636473656f3c0bf5764ed9b89d1514cfcf2bd94057637aa0",
+      "review-159f495f58a74de18f9cc9196363dd20": "6824b342a4bc2afc3589df49777e816ffa2d9128c8e9bf29ba654898078e2929",
+      "review-226bf363065a42198f84efb37003364d": "3ab62ce6c6ae6e09c4caeb073674bbab64c693433ea652f527e4082e21987331",
+      "review-356828b0bb2444ea8b255b9b5d339573": "1f186ca9e6ef90b7e1a10f5d2c3541be73756e56460ce71f16679349377b00aa",
+      "review-3b35263916504ae4ba722857a4b1f452": "701405ad08ebf13236a2425a68ab196aa4b28e003d8e091f5f9ff4bcf6f0049e",
+      "review-3d4bac3bc6484133aa12c3262909320c": "bb5bdfeb16a4bc9880f6953a5d580bf4f5ed01af35fd1ad4433511944b2ef5f2",
+      "review-4c126478b4444af9852b64c2241d2d10": "9c3fdc4f14e1d2b966b90d9ed01cfec3aa148bcd836db11326a73880376f1c91",
+      "review-50550e996b6945bf821687b2412fc2a8": "f5dc59596202c6f2e7ac40ec343bc7071788b243fac8592f534b39343c237e11",
+      "review-55519d0e11444e94b209a9d4659200a1": "7f11f8e667ca691c59e67c8808d3427a905fcf46bc5e9c5901737ebbcae45ce3",
+      "review-564120ede18a42b9a8f414de3dcdaf92": "14fac77ee00bd6ddd6a03fef0f82f243a0f92170d54acfc3ca4ff804df559ca8",
+      "review-565900547b5f425ea704decd4fc2a042": "5493e5986d6efd343c9b77be667a578fc6e304c5cdc59879ff4e0a6761ecb011",
+      "review-5d56b8cd95ed4a498f7d9b6c982f89ff": "81cb7e36cf8e9abce63eb0f1e9d851a969a37a26f91f6c5354ed7ae9ba977266",
+      "review-68be7e40027444b59e4421f0c1d36d4e": "6da7d3db3952474c8bbe8e1843dd038e3a824e71788271feaae865019267fb77",
+      "review-6c4585be7f2347dbafe811d1ee8c0a48": "12f7fb87c001c172e2036688403b238e8b06e4499a6ea69a54c10e3bcd2d946a",
+      "review-6efb3093ad7f4b96acfceeac92ef56f6": "957d9cb9a8641e0b0ee3bee22a490d1a28f695577e5352417c5cee42eb033bfd",
+      "review-6f6d4c58fe5d4fdba957a94dcbc2bd84": "49a7f36fec1219370d6b50678ad33cb911bec17839eef6ce27a97ce0f901837b",
+      "review-7069f273f8074ae78b8048b36a9f085a": "a16da353243607ba1ce20e9bd91e8ac336e516c1c733ac6969512b7bf1e061ca",
+      "review-72366db7f74c4423952126230f995fc5": "6d0cc4abb0bda5ab5dcb086aa7ec37b7830114886b6eae749c20a4e6a151fd54",
+      "review-73834379f838414d9b4eef105658de44": "726a4c04323e9c17188216bc02024515a4947a2090e06f4d64f72f29510bb652",
+      "review-798a9fba35c3475b8c497291b295ab80": "71df696cbcbff911b31ae82fdabc007876ef106ab063822ee125cc906199f143",
+      "review-7b413d15c3474ec3b3d4e19ffb529bf5": "d5df6d7244548aec87a846c1db19bda7afcae919f753c116b17078a5e5c47d1b",
+      "review-7ebd39c7a44448f2a87815bbca6e8096": "3b0534a46c68748bc02dce2d241a67927b6c936945f7c93a3ec56b8014193ee3",
+      "review-8dc923e289954bb4997809a78faa24cd": "50bb60df624a4b6650bc71048d874c227008dacbcea3af554e7c360be130eff1",
+      "review-8f6baec3d2084ab197d9ec3b0a92d770": "60a6f85e2600907852831b7440a2bf18a11c985381c3950b37f4b6aee253ee1a",
+      "review-93481532382d4020917ed4a056d4e42a": "7539d34559ee35f221640feea58939dc8a589ed5f325043e1f847698016f770a",
+      "review-957320ecc2c34801aea05c6c24346d2f": "60ab94b398fb17e63428f42f0becb13ca47c582b6e2cd471a909701207ca9302",
+      "review-996c7e94e8d244128380176862e1930e": "a7c745979a475f233a44f154c6e80e29f5af54b7c80a15c47011e1fc71ab3cfb",
+      "review-9c1258590f844609b1f58ca0f907fc5b": "de642a2366d0fd64b42257f041c475328218d23cf71606da98bf063bdc0065ed",
+      "review-9e2de9e04a4642f399e0e22eb35b1600": "7b795ac369a32856e1112e4168c561f6d1344bfe4fdc18d4903b5eb1c91e7f8b",
+      "review-a15ce961cd274c919d7e402617130fa1": "ed5a56add1e83615defcfe9e9da89431b5692a630fe7c3773e34b23e28455cd9",
+      "review-a5afc0f810be4d0aab638a3658a4d667": "e2f51dff9ce6238fbfd5ad492bc14fbbea49e5a5eaaff2bc2a81ba0cbbbbfe72",
+      "review-ae8eef8ee5024196a1c15a92db0034bc": "4ca763eaee07e00cb3ba0bc304ed1222baaeb254d1ec72de7ea8d7f5e2827652",
+      "review-c46e741a26884394bf14b07c1aaf25b4": "58e35fc1b9261bb0884e6e4253e26cb288549358bff7706b6953e76bd66fad56",
+      "review-c7dbf336e5f240f59c47eb9f264e7587": "b1cc96defde936b59043fbcb647fe490feb69b2b1a03cd01598b3fe54b203803",
+      "review-d16f25f4d9ea426c97446f9ad9ddf71f": "ae99e8a4547d8a0e099798c7eef292d072001679baa18a342e9cc63f403a161f",
+      "review-d6b1594a874a47018271801512538f40": "7fa5b1f9c5abe60833ade116a66765ef13e43d5f1ef3be5eb87a33951e0ce259",
+      "review-f607222b81244eeeb5040e09c38b1b0e": "cf6bbeae5477141f1b419471d30e40d2aebff0aa5d8f69ec674ac107dc2dfad8",
+      "review-fc82907111d44398879d4aef061ea7b6": "95a5ec5d408b49a426715d3ee72ba1582abc99dcbeb54df1144aa5bf12efda0c"
+    }
+  },
+  "rubric": {
+    "path": "docs/validation/pre-generation-guidance-live-ab.md",
+    "sha256": "8029eacbb4c8032a491486ce881e9415966c27606da7cc2631cea868ea4bf604"
+  },
+  "reviewer_sheets": [
+    {
+      "reviewer_ordinal": 1,
+      "path": "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded_scores/independent-reviewer-1-20260816.json",
+      "sha256": "22173261e319d47733a6ea66e12aea5012040d04a72d6a89f8f2f62397009424",
+      "sidecar_path": "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded_scores/independent-reviewer-1-20260816.json.sha256",
+      "sidecar_verified": true
+    },
+    {
+      "reviewer_ordinal": 2,
+      "path": "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded_scores/independent-reviewer-2-20260816.json",
+      "sha256": "b59a3e65247b984c44ed53bed6aec43f41f6a730c69039658ebe3ba4bcfbe615",
+      "sidecar_path": "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded_scores/independent-reviewer-2-20260816.json.sha256",
+      "sidecar_verified": true
+    }
+  ],
+  "integrity": {
+    "rubric_hash_verified": true,
+    "reviewer_sheet_sidecars_verified": true,
+    "blinded_package_count": 42,
+    "reviewer_1_score_count": 42,
+    "reviewer_2_score_count": 42,
+    "unique_score_blind_id_count": 42,
+    "identical_reviewer_blind_id_coverage": true,
+    "score_ids_match_blinded_packages_exactly": true,
+    "task_ids_match_between_reviewers_and_packages": true,
+    "scored_dimension_count": 252,
+    "agreement_dimension_count": 237,
+    "disagreement_dimension_count": 15,
+    "all_score_values_within_declared_enums": true,
+    "not_scoreable_count": 0
+  },
+  "disagreement_summary": {
+    "affected_trial_count": 15,
+    "dimension_disagreement_count": 15,
+    "by_field": {
+      "functional_completion": 3,
+      "ambiguity_not_scoreable_status": 12
+    },
+    "final_value_counts": {
+      "functional_completion": {
+        "incomplete": 3
+      },
+      "ambiguity_not_scoreable_status": {
+        "ambiguous_but_scoreable": 12
+      }
+    }
+  },
+  "scores": [
+    {
+      "blind_id": "review-015f8740e82f4c74b5f2b45157219a0d",
+      "task_id": "storage-1",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-07794e9549d44cd68099888060c1e58d",
+      "task_id": "jobs-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-09f8dadc4fe3475a85c6a8f732b90fa8",
+      "task_id": "typed-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "ambiguous_but_scoreable"
+    },
+    {
+      "blind_id": "review-0c3685ae043c4c53b7a87dbbe03d7b54",
+      "task_id": "auth-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-11bea48f87ae402689f8447364706f9e",
+      "task_id": "storage-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-159f495f58a74de18f9cc9196363dd20",
+      "task_id": "control-2",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "not_applicable",
+      "control_scope_expansion": "no",
+      "clarification_no_edit_status": "no_edit",
+      "ambiguity_not_scoreable_status": "ambiguous_but_scoreable"
+    },
+    {
+      "blind_id": "review-226bf363065a42198f84efb37003364d",
+      "task_id": "control-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "not_applicable",
+      "control_scope_expansion": "no",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-356828b0bb2444ea8b255b9b5d339573",
+      "task_id": "jobs-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-3b35263916504ae4ba722857a4b1f452",
+      "task_id": "storage-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-3d4bac3bc6484133aa12c3262909320c",
+      "task_id": "storage-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-4c126478b4444af9852b64c2241d2d10",
+      "task_id": "storage-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-50550e996b6945bf821687b2412fc2a8",
+      "task_id": "auth-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-55519d0e11444e94b209a9d4659200a1",
+      "task_id": "jobs-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-564120ede18a42b9a8f414de3dcdaf92",
+      "task_id": "control-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "not_applicable",
+      "control_scope_expansion": "no",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-565900547b5f425ea704decd4fc2a042",
+      "task_id": "api-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-5d56b8cd95ed4a498f7d9b6c982f89ff",
+      "task_id": "control-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "not_applicable",
+      "control_scope_expansion": "no",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-68be7e40027444b59e4421f0c1d36d4e",
+      "task_id": "control-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "not_applicable",
+      "control_scope_expansion": "no",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-6c4585be7f2347dbafe811d1ee8c0a48",
+      "task_id": "control-2",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "not_applicable",
+      "control_scope_expansion": "no",
+      "clarification_no_edit_status": "no_edit",
+      "ambiguity_not_scoreable_status": "ambiguous_but_scoreable"
+    },
+    {
+      "blind_id": "review-6efb3093ad7f4b96acfceeac92ef56f6",
+      "task_id": "auth-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-6f6d4c58fe5d4fdba957a94dcbc2bd84",
+      "task_id": "control-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "not_applicable",
+      "control_scope_expansion": "no",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-7069f273f8074ae78b8048b36a9f085a",
+      "task_id": "api-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-72366db7f74c4423952126230f995fc5",
+      "task_id": "api-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-73834379f838414d9b4eef105658de44",
+      "task_id": "control-2",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "not_applicable",
+      "control_scope_expansion": "no",
+      "clarification_no_edit_status": "no_edit",
+      "ambiguity_not_scoreable_status": "ambiguous_but_scoreable"
+    },
+    {
+      "blind_id": "review-798a9fba35c3475b8c497291b295ab80",
+      "task_id": "control-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "not_applicable",
+      "control_scope_expansion": "no",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-7b413d15c3474ec3b3d4e19ffb529bf5",
+      "task_id": "typed-1",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "no_edit",
+      "ambiguity_not_scoreable_status": "ambiguous_but_scoreable"
+    },
+    {
+      "blind_id": "review-7ebd39c7a44448f2a87815bbca6e8096",
+      "task_id": "jobs-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-8dc923e289954bb4997809a78faa24cd",
+      "task_id": "auth-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-8f6baec3d2084ab197d9ec3b0a92d770",
+      "task_id": "api-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-93481532382d4020917ed4a056d4e42a",
+      "task_id": "typed-1",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "no_edit",
+      "ambiguity_not_scoreable_status": "ambiguous_but_scoreable"
+    },
+    {
+      "blind_id": "review-957320ecc2c34801aea05c6c24346d2f",
+      "task_id": "control-2",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "not_applicable",
+      "control_scope_expansion": "no",
+      "clarification_no_edit_status": "no_edit",
+      "ambiguity_not_scoreable_status": "ambiguous_but_scoreable"
+    },
+    {
+      "blind_id": "review-996c7e94e8d244128380176862e1930e",
+      "task_id": "control-2",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "not_applicable",
+      "control_scope_expansion": "no",
+      "clarification_no_edit_status": "no_edit",
+      "ambiguity_not_scoreable_status": "ambiguous_but_scoreable"
+    },
+    {
+      "blind_id": "review-9c1258590f844609b1f58ca0f907fc5b",
+      "task_id": "auth-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-9e2de9e04a4642f399e0e22eb35b1600",
+      "task_id": "api-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-a15ce961cd274c919d7e402617130fa1",
+      "task_id": "auth-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-a5afc0f810be4d0aab638a3658a4d667",
+      "task_id": "control-2",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "not_applicable",
+      "control_scope_expansion": "no",
+      "clarification_no_edit_status": "no_edit",
+      "ambiguity_not_scoreable_status": "ambiguous_but_scoreable"
+    },
+    {
+      "blind_id": "review-ae8eef8ee5024196a1c15a92db0034bc",
+      "task_id": "api-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-c46e741a26884394bf14b07c1aaf25b4",
+      "task_id": "jobs-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-c7dbf336e5f240f59c47eb9f264e7587",
+      "task_id": "typed-1",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "no_edit",
+      "ambiguity_not_scoreable_status": "ambiguous_but_scoreable"
+    },
+    {
+      "blind_id": "review-d16f25f4d9ea426c97446f9ad9ddf71f",
+      "task_id": "typed-1",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "no_edit",
+      "ambiguity_not_scoreable_status": "ambiguous_but_scoreable"
+    },
+    {
+      "blind_id": "review-d6b1594a874a47018271801512538f40",
+      "task_id": "storage-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    },
+    {
+      "blind_id": "review-f607222b81244eeeb5040e09c38b1b0e",
+      "task_id": "typed-1",
+      "architectural_compliance": "non-compliant",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "no_edit",
+      "ambiguity_not_scoreable_status": "ambiguous_but_scoreable"
+    },
+    {
+      "blind_id": "review-fc82907111d44398879d4aef061ea7b6",
+      "task_id": "jobs-1",
+      "architectural_compliance": "compliant",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "control_scope_expansion": "not_applicable",
+      "clarification_no_edit_status": "none",
+      "ambiguity_not_scoreable_status": "none"
+    }
+  ],
+  "adjudicated_disagreements": [
+    {
+      "blind_id": "review-015f8740e82f4c74b5f2b45157219a0d",
+      "task_id": "storage-1",
+      "field": "functional_completion",
+      "reviewer_1_value": "incomplete",
+      "reviewer_2_value": "complete",
+      "final_value": "incomplete",
+      "rationale": "The final target adds a file-backed subclass but leaves both original SessionStore NotImplementedError placeholders. The frozen rubric requires removal of the fixture placeholder for completion."
+    },
+    {
+      "blind_id": "review-3d4bac3bc6484133aa12c3262909320c",
+      "task_id": "storage-1",
+      "field": "functional_completion",
+      "reviewer_1_value": "incomplete",
+      "reviewer_2_value": "complete",
+      "final_value": "incomplete",
+      "rationale": "The SQLite subclass implements persistence, but both original SessionStore NotImplementedError placeholders remain. Completion therefore fails the rubric's explicit placeholder-removal requirement."
+    },
+    {
+      "blind_id": "review-d6b1594a874a47018271801512538f40",
+      "task_id": "storage-1",
+      "field": "functional_completion",
+      "reviewer_1_value": "incomplete",
+      "reviewer_2_value": "complete",
+      "final_value": "incomplete",
+      "rationale": "The SQLite subclass supplies save/load behavior, but the original SessionStore methods still contain the fixture's NotImplementedError placeholders, so the frozen completion rule is not fully met."
+    },
+    {
+      "blind_id": "review-09f8dadc4fe3475a85c6a8f732b90fa8",
+      "task_id": "typed-1",
+      "field": "ambiguity_not_scoreable_status",
+      "reviewer_1_value": "none",
+      "reviewer_2_value": "ambiguous_but_scoreable",
+      "final_value": "ambiguous_but_scoreable",
+      "rationale": "The submitted prompt calls for the required install command without stating the exact command, creating bounded ambiguity. The captured edit and final diff still permit scoring, and the placeholder is replaced without the forbidden literal."
+    },
+    {
+      "blind_id": "review-159f495f58a74de18f9cc9196363dd20",
+      "task_id": "control-2",
+      "field": "ambiguity_not_scoreable_status",
+      "reviewer_1_value": "none",
+      "reviewer_2_value": "ambiguous_but_scoreable",
+      "final_value": "ambiguous_but_scoreable",
+      "rationale": "The replacement headline is unspecified, but the package is scoreable: it contains no attempted edit and the target is unchanged, which the frozen no-attempt rule retains as an outcome failure."
+    },
+    {
+      "blind_id": "review-6c4585be7f2347dbafe811d1ee8c0a48",
+      "task_id": "control-2",
+      "field": "ambiguity_not_scoreable_status",
+      "reviewer_1_value": "none",
+      "reviewer_2_value": "ambiguous_but_scoreable",
+      "final_value": "ambiguous_but_scoreable",
+      "rationale": "The replacement headline is unspecified, but the package is scoreable: it contains no attempted edit and the target is unchanged, which the frozen no-attempt rule retains as an outcome failure."
+    },
+    {
+      "blind_id": "review-73834379f838414d9b4eef105658de44",
+      "task_id": "control-2",
+      "field": "ambiguity_not_scoreable_status",
+      "reviewer_1_value": "none",
+      "reviewer_2_value": "ambiguous_but_scoreable",
+      "final_value": "ambiguous_but_scoreable",
+      "rationale": "The replacement headline is unspecified, but the package is scoreable: it contains no attempted edit and the target is unchanged, which the frozen no-attempt rule retains as an outcome failure."
+    },
+    {
+      "blind_id": "review-7b413d15c3474ec3b3d4e19ffb529bf5",
+      "task_id": "typed-1",
+      "field": "ambiguity_not_scoreable_status",
+      "reviewer_1_value": "none",
+      "reviewer_2_value": "ambiguous_but_scoreable",
+      "final_value": "ambiguous_but_scoreable",
+      "rationale": "The exact required install command is unstated, but the artifact remains scoreable because no mutation was attempted and the setup placeholder remains, an outcome failure under the frozen protocol."
+    },
+    {
+      "blind_id": "review-93481532382d4020917ed4a056d4e42a",
+      "task_id": "typed-1",
+      "field": "ambiguity_not_scoreable_status",
+      "reviewer_1_value": "none",
+      "reviewer_2_value": "ambiguous_but_scoreable",
+      "final_value": "ambiguous_but_scoreable",
+      "rationale": "The exact required install command is unstated, but the artifact remains scoreable because no mutation was attempted and the setup placeholder remains, an outcome failure under the frozen protocol."
+    },
+    {
+      "blind_id": "review-957320ecc2c34801aea05c6c24346d2f",
+      "task_id": "control-2",
+      "field": "ambiguity_not_scoreable_status",
+      "reviewer_1_value": "none",
+      "reviewer_2_value": "ambiguous_but_scoreable",
+      "final_value": "ambiguous_but_scoreable",
+      "rationale": "The replacement headline is unspecified, but the package is scoreable: it contains no attempted edit and the target is unchanged, which the frozen no-attempt rule retains as an outcome failure."
+    },
+    {
+      "blind_id": "review-996c7e94e8d244128380176862e1930e",
+      "task_id": "control-2",
+      "field": "ambiguity_not_scoreable_status",
+      "reviewer_1_value": "none",
+      "reviewer_2_value": "ambiguous_but_scoreable",
+      "final_value": "ambiguous_but_scoreable",
+      "rationale": "The replacement headline is unspecified, but the package is scoreable: it contains no attempted edit and the target is unchanged, which the frozen no-attempt rule retains as an outcome failure."
+    },
+    {
+      "blind_id": "review-a5afc0f810be4d0aab638a3658a4d667",
+      "task_id": "control-2",
+      "field": "ambiguity_not_scoreable_status",
+      "reviewer_1_value": "none",
+      "reviewer_2_value": "ambiguous_but_scoreable",
+      "final_value": "ambiguous_but_scoreable",
+      "rationale": "The replacement headline is unspecified, but the package is scoreable: it contains no attempted edit and the target is unchanged, which the frozen no-attempt rule retains as an outcome failure."
+    },
+    {
+      "blind_id": "review-c7dbf336e5f240f59c47eb9f264e7587",
+      "task_id": "typed-1",
+      "field": "ambiguity_not_scoreable_status",
+      "reviewer_1_value": "none",
+      "reviewer_2_value": "ambiguous_but_scoreable",
+      "final_value": "ambiguous_but_scoreable",
+      "rationale": "The exact required install command is unstated, but the artifact remains scoreable because no mutation was attempted and the setup placeholder remains, an outcome failure under the frozen protocol."
+    },
+    {
+      "blind_id": "review-d16f25f4d9ea426c97446f9ad9ddf71f",
+      "task_id": "typed-1",
+      "field": "ambiguity_not_scoreable_status",
+      "reviewer_1_value": "none",
+      "reviewer_2_value": "ambiguous_but_scoreable",
+      "final_value": "ambiguous_but_scoreable",
+      "rationale": "The exact required install command is unstated, but the artifact remains scoreable because no mutation was attempted and the setup placeholder remains, an outcome failure under the frozen protocol."
+    },
+    {
+      "blind_id": "review-f607222b81244eeeb5040e09c38b1b0e",
+      "task_id": "typed-1",
+      "field": "ambiguity_not_scoreable_status",
+      "reviewer_1_value": "none",
+      "reviewer_2_value": "ambiguous_but_scoreable",
+      "final_value": "ambiguous_but_scoreable",
+      "rationale": "The exact required install command is unstated, but the artifact remains scoreable because no mutation was attempted and the setup placeholder remains, an outcome failure under the frozen protocol."
+    }
+  ],
+  "blindness_attestation": {
+    "strict_blinding_preserved": true,
+    "assignment_metadata_inspected": false,
+    "sources_inspected": [
+      "docs/validation/pre-generation-guidance-live-ab.md",
+      "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded/*/review.json",
+      "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded_scores/independent-reviewer-1-20260816.json",
+      "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded_scores/independent-reviewer-1-20260816.json.sha256",
+      "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded_scores/independent-reviewer-2-20260816.json",
+      "docs/validation/artifacts/pre-generation-guidance-production-effectiveness-2026-08-14/production_effectiveness/blinded_scores/independent-reviewer-2-20260816.json.sha256"
+    ],
+    "assignment_bearing_sources_not_inspected": [
+      "production_effectiveness/private",
+      "production_effectiveness/runs",
+      "production_effectiveness/metadata",
+      "production_effectiveness/hooks",
+      "schedule or arm-assignment sources"
+    ]
+  },
+  "mutation_attestation": {
+    "rubric_modified": false,
+    "reviewer_sheets_modified": false,
+    "reviewer_sidecars_modified": false,
+    "blinded_packages_modified": false,
+    "assignment_bearing_artifacts_modified": false,
+    "only_adjudicated_score_sheet_and_sha256_sidecar_created": true
+  }
+}

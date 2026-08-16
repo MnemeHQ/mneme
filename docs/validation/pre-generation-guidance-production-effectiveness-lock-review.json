@@ -1,0 +1,31 @@
+{
+  "schema": "mneme.production-effectiveness-lock-review/v1",
+  "reviewed_at": "2026-08-14T18:43:05.5077887Z",
+  "reviewer": "/root/production_lock_review",
+  "status": "PASS",
+  "execution_lock_sha256": "AE01F8DEC22BB5777E7773211483544F6271F12AC394E9D5F1983D1B141FB9D5",
+  "authorization_sha256": "008A5910F99BD6C85A6E8526C464C05EF5499CA28202F9FC1793A0E52AD9DBD0",
+  "independent_of_execution_owner": true,
+  "trials_started_at_review": false,
+  "open_blocking_findings": 0,
+  "review_scope": [
+    "prospective authorization and permanent R6 FAIL boundary",
+    "exact execution lock, sidecar, frozen provenance, runtime inventories, fixture, and schedule",
+    "pre-generation delivery ordering and scored non-rerunnable failure behavior",
+    "arm isolation, contamination, contiguous ordering, and preserved-artifact integrity",
+    "monotonic event timing, per-attempt usage capture, and timeout process-tree handling",
+    "not-started production filesystem state"
+  ],
+  "evidence": {
+    "execution_lock_verification": "PASS",
+    "read_only_tests_passed": 159,
+    "schedule_slots": 42,
+    "runs_per_arm": 21,
+    "governed_runs_per_arm": 15,
+    "control_runs_per_arm": 6,
+    "production_output_directory_present": false,
+    "r6_status": "PERMANENT_FAIL_UNCHANGED",
+    "reviewer_conclusion": "No open blocking findings; evidence supports the owner's prospective readiness attestation only."
+  }
+}
+

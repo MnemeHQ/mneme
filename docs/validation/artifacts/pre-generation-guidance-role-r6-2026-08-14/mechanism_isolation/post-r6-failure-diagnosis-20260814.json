@@ -1,0 +1,81 @@
+{
+  "schema": "mneme.pre-generation-guidance-r6.derived-failure-diagnosis/v1",
+  "diagnosis_id": "post-r6-failure-diagnosis-20260814",
+  "created_at": "2026-08-14T16:08:26.979Z",
+  "status": "FROZEN_DERIVED_POST_R6",
+  "derivation_only": true,
+  "frozen_sources": {
+    "r6_mechanism_result": {
+      "path": "docs/validation/artifacts/pre-generation-guidance-role-r6-2026-08-14/mechanism_isolation/mechanism-result-r6-20260814.json",
+      "sha256": "BCF682EDC1DEAF2110A004ADEC648AA843B15D179A4CF019BABC36D526B7ACA4"
+    },
+    "adjudicated_score": {
+      "path": "docs/validation/artifacts/pre-generation-guidance-role-r6-2026-08-14/mechanism_isolation/blinded_scores/adjudicated-scores-20260814.json",
+      "sha256": "224816EDDA91BB466EE394FF612D9DEB021EB7FF4DF5901C918471AB445096C1"
+    },
+    "execution_lock": {
+      "path": "docs/validation/pre-generation-guidance-role-r6-execution-lock.json",
+      "sha256": "D691FC8D8833E6E19970AC898D40A91F13F397ADDEA068CF94BA47083F3D3313"
+    }
+  },
+  "frozen_diagnosis_statement": "R6 demonstrated that guidance-role classification eliminated the diagnosed adjacent-constraint expansion mechanism. The overall gate failed because two treatment storage trials introduced unnecessary parallel subclasses and failed to implement the supplied class. This represents a distinct direct-guidance implementation-targeting failure.",
+  "findings": {
+    "r6_product_mechanism_gate": "FAIL",
+    "diagnosed_adjacent_constraint_expansion_mechanism": "ELIMINATED_IN_R6_EVIDENCE",
+    "guidance_role_classification_intended_function": "SUCCEEDED",
+    "remaining_failure_mode": "DIRECT_GUIDANCE_IMPLEMENTATION_TARGETING",
+    "affected_trials": [
+      {
+        "blind_id": "review-222a0cf7760f45119fbbd0efae75e47c",
+        "revealed_cell": "storage-1__treatment__r2",
+        "governed_scope_expansion": "yes",
+        "functional_completion": "incomplete"
+      },
+      {
+        "blind_id": "review-75a6e4bd98a54fc1b09f1c4b7126e5e3",
+        "revealed_cell": "storage-1__treatment__r3",
+        "governed_scope_expansion": "yes",
+        "functional_completion": "incomplete"
+      }
+    ],
+    "coupled_gate_effect": {
+      "treatment_governed_scope_expansions": 2,
+      "functional_completion_difference_treatment_minus_baseline": -2,
+      "interpretation": "The two failed gate dimensions arise from one localized parallel-subclass failure mode rather than two independent defects."
+    },
+    "symmetric_non_deficit_outcomes": {
+      "typed_1": "Both arms were 0/3 complete and 3/3 no-edit.",
+      "control_2": "Both arms were 0/3 complete and 3/3 no-edit.",
+      "interpretation": "These under-specification outcomes did not create the treatment functional-completion deficit."
+    },
+    "adjacent_constraint_became_implementation_objective": false
+  },
+  "next_evidence_scope": {
+    "purpose": "Discriminate among ambiguous task/fixture targeting, direct-decision or rendered-guidance language, and ordinary model variance before any remediation design.",
+    "authorized_frozen_inputs_only": [
+      "The exact storage-1 starting fixture.",
+      "The complete ADR-STORAGE decision text.",
+      "The exact treatment guidance rendered to storage-1 repetitions 1 through 3."
+    ]
+  },
+  "conclusions_not_authorized": [
+    "Do not infer that a new scope-discipline instruction is required before the three-input comparison.",
+    "Do not change classifier behavior, retrieval weights, ranking, K, or adjacent wording.",
+    "Do not start the production-effectiveness A/B.",
+    "Do not propose or implement remediation from this artifact alone."
+  ],
+  "mutation_attestation": {
+    "frozen_sources_changed": false,
+    "code_changed": false,
+    "configuration_changed": false,
+    "scoring_changed": false,
+    "rubric_changed": false,
+    "locks_changed": false,
+    "trials_run_or_changed": false,
+    "remediation_behavior_changed": false,
+    "only_new_artifacts": [
+      "docs/validation/artifacts/pre-generation-guidance-role-r6-2026-08-14/mechanism_isolation/post-r6-failure-diagnosis-20260814.json",
+      "docs/validation/artifacts/pre-generation-guidance-role-r6-2026-08-14/mechanism_isolation/post-r6-failure-diagnosis-20260814.sha256"
+    ]
+  }
+}

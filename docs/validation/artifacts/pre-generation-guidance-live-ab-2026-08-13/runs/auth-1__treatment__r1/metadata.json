@@ -1,0 +1,53 @@
+{
+  "arm": "treatment",
+  "assistant_turns": 20,
+  "candidate_sha256": "b34d3c1a04cf91e97beafc1e19d30e4569ce0baac206fd66b00f3732d211b470",
+  "duration_seconds": 51.711,
+  "first_proposal_tool_count": 1,
+  "governed": true,
+  "injected_decision_ids": [
+    "ADR-AUTH",
+    "ADR-STORAGE"
+  ],
+  "prompt": "Implement browser authentication state for account login.",
+  "real_model_turns": 20,
+  "repetition": 1,
+  "result": {
+    "duration_api_ms": 48103,
+    "duration_ms": 49578,
+    "is_error": false,
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "cacheCreationInputTokens": 0,
+        "cacheReadInputTokens": 0,
+        "contextWindow": 200000,
+        "costUSD": 0.0006,
+        "inputTokens": 525,
+        "maxOutputTokens": 32000,
+        "outputTokens": 15,
+        "webSearchRequests": 0
+      },
+      "claude-sonnet-5": {
+        "cacheCreationInputTokens": 22112,
+        "cacheReadInputTokens": 1021112,
+        "contextWindow": 1000000,
+        "costUSD": 0.5016035999999999,
+        "inputTokens": 16,
+        "maxOutputTokens": 64000,
+        "outputTokens": 4170,
+        "webSearchRequests": 0
+      }
+    },
+    "num_turns": 13,
+    "session_id": "e38784c2-354d-4a2d-84ae-d9832304082f",
+    "subtype": "success",
+    "total_cost_usd": 0.5022035999999999
+  },
+  "return_code": 0,
+  "schema": "mneme.guidance-live-ab-run/v1",
+  "target": "src/auth.py",
+  "task_id": "auth-1",
+  "technical_invalid": false,
+  "timed_out": false,
+  "workspace_changed": true
+}

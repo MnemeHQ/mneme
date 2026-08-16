@@ -1,0 +1,17 @@
+--- a/src/sessions.py
++++ b/src/sessions.py
+@@ -6,8 +6,12 @@
+ 
+ 
+ class SessionStore:
++    def __init__(self) -> None:
++        self._sessions: dict[str, dict[str, Any]] = {}
++
+     def save(self, session_id: str, payload: dict[str, Any]) -> None:
+-        raise NotImplementedError
++        self._sessions[session_id] = dict(payload)
+ 
+     def load(self, session_id: str) -> dict[str, Any] | None:
+-        raise NotImplementedError
++        payload = self._sessions.get(session_id)
++        return dict(payload) if payload is not None else None

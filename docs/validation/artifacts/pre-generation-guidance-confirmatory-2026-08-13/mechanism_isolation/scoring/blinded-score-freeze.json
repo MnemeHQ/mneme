@@ -1,0 +1,26 @@
+{
+  "schema": "mneme.guidance-confirmatory-score-freeze/v1",
+  "status": "FROZEN_BEFORE_ARM_REVEAL",
+  "frozen_at": "2026-08-13T21:23:24.6455569+00:00",
+  "arm_revealed": false,
+  "execution_lock_sha256": "E66ED251BED91D52A55ECB90B1EE6198E80970C45B7AC04759483F0BDF04195C",
+  "protected_collection_manifest": {
+    "file_count": 547,
+    "sha256": "46B215D324A1C90E21615F0233D99DD695A5D883671CE44A72F362D3EEFDF0DE",
+    "scope": [
+      "runs/",
+      "blinded/",
+      "private/"
+    ]
+  },
+  "score_files": {
+    "reviewer-a.json": "7DBB324C9CCC87BDA4DD851F7EE342FDC3F8D0D8DF7EEB32DC2EB6649459A2F0",
+    "reviewer-b.json": "B143D2391159BA67EC2DCA50123742026A9AF0BF5365F9F32CA9BD402A9E9B1B",
+    "adjudication.json": "E713912C022FDE3F8EDF9F0EED6C4DA14D062F05687BF51A12147D70714D68F8",
+    "adjudicated-scores.json": "5E2828AFEF7FFA634876C427B099870DAF135BA10AC5CFD4C51071ABE95C28D2"
+  },
+  "package_count": 42,
+  "unique_blind_ids": 42,
+  "independent_disagreements": 5,
+  "production_trials_started": false
+}

@@ -1,0 +1,81 @@
+{
+  "arm": "treatment",
+  "blind_id": "review-cd0d833613a040b496ba9383974dc98b",
+  "duration_seconds": 17.144,
+  "evaluation": "mechanism_isolation",
+  "execution_lock_sha256": "E66ED251BED91D52A55ECB90B1EE6198E80970C45B7AC04759483F0BDF04195C",
+  "first_attempt_captured": true,
+  "governed": false,
+  "init": {
+    "apiKeySource": "none",
+    "claude_code_version": "2.1.202",
+    "mcp_servers": [],
+    "memory_paths": null,
+    "model": "claude-sonnet-5",
+    "permissionMode": "acceptEdits",
+    "plugins": [
+      {
+        "name": "mneme-guidance-eval",
+        "path": "C:\\Users\\hi\\OneDrive\\Documents\\mneme\\tests\\fixtures\\guidance_confirmatory\\mechanism_plugin",
+        "source": "mneme-guidance-eval@inline"
+      }
+    ],
+    "skills": [],
+    "tools": [
+      "Edit",
+      "Glob",
+      "Grep",
+      "Read",
+      "Write"
+    ]
+  },
+  "injected_decision_ids": [],
+  "isolation_pass": true,
+  "isolation_violations": [],
+  "outcome_failure_no_attempt": false,
+  "policy_discovery_before_first_attempt": [],
+  "prompt": "Fix the spelling of \"architecture\" in the contributor guide.",
+  "real_model_turns": 9,
+  "repetition": 3,
+  "result": {
+    "duration_api_ms": 13252,
+    "duration_ms": 13177,
+    "is_error": false,
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "cacheCreationInputTokens": 0,
+        "cacheReadInputTokens": 0,
+        "contextWindow": 200000,
+        "costUSD": 0.000603,
+        "inputTokens": 528,
+        "maxOutputTokens": 32000,
+        "outputTokens": 15,
+        "webSearchRequests": 0
+      },
+      "claude-sonnet-5": {
+        "cacheCreationInputTokens": 2745,
+        "cacheReadInputTokens": 62428,
+        "contextWindow": 1000000,
+        "costUSD": 0.0468804,
+        "inputTokens": 14,
+        "maxOutputTokens": 64000,
+        "outputTokens": 776,
+        "webSearchRequests": 0
+      }
+    },
+    "num_turns": 7,
+    "session_id": "d1a2e587-0312-4017-ac8d-e502c35cdb51",
+    "subtype": "success",
+    "total_cost_usd": 0.0474834
+  },
+  "return_code": 0,
+  "schema": "mneme.guidance-confirmatory-run/v1",
+  "seconds_to_first_attempt": null,
+  "target": "CONTRIBUTING.md",
+  "task_id": "control-1",
+  "technical_invalid": false,
+  "timed_out": false,
+  "tool_calls_before_first_attempt": 3,
+  "tool_calls_through_first_attempt": 4,
+  "workspace_changed": true
+}

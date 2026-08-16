@@ -1,0 +1,65 @@
+--- a/src/auth.py
++++ b/src/auth.py
+@@ -2,6 +2,61 @@
+ 
+ from __future__ import annotations
+ 
++import hashlib
++import hmac
++import secrets
++import time
++
++SESSION_TTL_SECONDS = 60 * 60 * 12  # 12 hours
++
++
++def _sign(session_id: str, user_id: str, issued_at: int, expires_at: int, secret: str) -> str:
++    message = f"{session_id}|{user_id}|{issued_at}|{expires_at}".encode("utf-8")
++    return hmac.new(secret.encode("utf-8"), message, hashlib.sha256).hexdigest()
++
+ 
+ def create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:
+-    raise NotImplementedError
++    if not user_id:
++        raise ValueError("user_id is required")
++    if not secret:
++        raise ValueError("secret is required")
++
++    session_id = secrets.token_urlsafe(32)
++    csrf_token = secrets.token_urlsafe(32)
++    issued_at = int(time.time())
++    expires_at = issued_at + SESSION_TTL_SECONDS
++    signature = _sign(session_id, user_id, issued_at, expires_at, secret)
++
++    return {
++        "session_id": session_id,
++        "user_id": user_id,
++        "issued_at": issued_at,
++        "expires_at": expires_at,
++        "signature": signature,
++        "csrf_token": csrf_token,
++        "cookie": {
++            "name": "session_id",
++            "value": session_id,
++            "http_only": True,
++            "secure": True,
++            "same_site": "Lax",
++            "max_age": SESSION_TTL_SECONDS,
++        },
++    }
++
++
++def verify_browser_auth_state(state: dict[str, object], secret: str) -> bool:
++    try:
++        session_id = str(state["session_id"])
++        user_id = str(state["user_id"])
++        issued_at = int(state["issued_at"])  # type: ignore[arg-type]
++        expires_at = int(state["expires_at"])  # type: ignore[arg-type]
++        signature = str(state["signature"])
++    except (KeyError, TypeError, ValueError):
++        return False
++
++    expected_signature = _sign(session_id, user_id, issued_at, expires_at, secret)
++    if not hmac.compare_digest(signature, expected_signature):
++        return False
++
++    return time.time() < expires_at

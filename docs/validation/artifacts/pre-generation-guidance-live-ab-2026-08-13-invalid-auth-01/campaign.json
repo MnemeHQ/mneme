@@ -1,0 +1,80 @@
+{
+  "candidate": {
+    "files": {
+      "docs/validation/pre-generation-guidance-live-ab.md": "a2c1a8e2d40c3cbaa29e99b2a05c5fe3d52809748cd2fbadb65e4f9ea26bba03",
+      "integrations/claude-code-plugin/.claude-plugin/plugin.json": "3e5f745da40fedf006dfab5f339099dcde89e6c0c2ad61c3e8ebd3649e0acfbe",
+      "integrations/claude-code-plugin/hooks/hooks.json": "9d96864314bff509008f0d5eed43fe921f812ffd643c663832c6b0b58f4ff9b4",
+      "mneme/decision_retriever.py": "f86b3ba2e50bb42d92dbfea879e24a919a07b5aebb71284f7596d65cc1c74882",
+      "mneme/guidance.py": "c1ade2e3f7623f5ec5e4ac682063b275de3afc6e5b2e1e523ef52830d9994ed3",
+      "mneme/integrations/claude_code/guidance_hook.py": "a3f55fad4a221b9bb1e526c8c223ed784c83fa5ba3e9044a61ae65124ac6e3bb",
+      "mneme/integrations/claude_code/hook.py": "12baa6ddc718ddee013e7053d787c171efc0a5d5649c8bc59c9e8b226d3d983c",
+      "pyproject.toml": "dfc81900340e166c6580316cb676225521c6ed7e386adf31a356771c395e5e9f",
+      "tests/fixtures/guidance_retrieval/cases.json": "27b45e547e8b10d8eae39cb4bab1488d3822aa4f1b81010d5148379b24fea261",
+      "tests/fixtures/guidance_retrieval/project_memory.json": "983baa775aaf38ab36c5d83ca07379c16f72a931bd7568bba58d13c25b2c45dd"
+    },
+    "sha256": "b34d3c1a04cf91e97beafc1e19d30e4569ce0baac206fd66b00f3732d211b470"
+  },
+  "claude_code_version": "2.1.202",
+  "date": "2026-08-13",
+  "effort": "high",
+  "fallback_model": null,
+  "max_budget_usd_per_run": 1.5,
+  "model": "sonnet",
+  "permission_mode": "acceptEdits",
+  "repetitions_per_arm": 3,
+  "runner_sha256": "f9f6595a8383ecbb2f46e5f8c223adb819d108b6f5e1ab33dcd53a9edcac6e74",
+  "schema": "mneme.guidance-live-ab/v1",
+  "session_persistence": false,
+  "skills_disabled": true,
+  "tasks": [
+    {
+      "governed": true,
+      "id": "storage-1",
+      "prompt": "Add persistence for user sessions.",
+      "target": "src/sessions.py"
+    },
+    {
+      "governed": true,
+      "id": "auth-1",
+      "prompt": "Implement browser authentication state for account login.",
+      "target": "src/auth.py"
+    },
+    {
+      "governed": true,
+      "id": "api-1",
+      "prompt": "Add response payloads to the public account API.",
+      "target": "src/api.py"
+    },
+    {
+      "governed": true,
+      "id": "jobs-1",
+      "prompt": "Add notification email delivery to the first release.",
+      "target": "src/email_delivery.py"
+    },
+    {
+      "governed": true,
+      "id": "typed-1",
+      "prompt": "Update the developer setup guide with the required client install command.",
+      "target": "docs/setup.md"
+    },
+    {
+      "governed": false,
+      "id": "control-1",
+      "prompt": "Fix the spelling of \u201carchitecture\u201d in the contributor guide.",
+      "target": "CONTRIBUTING.md"
+    },
+    {
+      "governed": false,
+      "id": "control-2",
+      "prompt": "Rename the homepage hero headline.",
+      "target": "site/homepage.md"
+    }
+  ],
+  "tools": [
+    "Read",
+    "Edit",
+    "Write",
+    "Glob",
+    "Grep"
+  ]
+}

@@ -1,0 +1,161 @@
+{
+  "arm": "baseline",
+  "arm_isolation_failure": false,
+  "blind_id": "review-015f8740e82f4c74b5f2b45157219a0d",
+  "duration_seconds": 25.228,
+  "evaluation": "production_effectiveness",
+  "execution_lock_sha256": "AE01F8DEC22BB5777E7773211483544F6271F12AC394E9D5F1983D1B141FB9D5",
+  "first_attempt_captured": true,
+  "governed": true,
+  "init": {
+    "apiKeySource": "none",
+    "claude_code_version": "2.1.202",
+    "mcp_servers": [],
+    "memory_paths": null,
+    "model": "claude-sonnet-5",
+    "permissionMode": "acceptEdits",
+    "plugins": [
+      {
+        "name": "mneme",
+        "path": "C:\\Users\\hi\\OneDrive\\Documents\\mneme\\integrations\\claude-code-plugin",
+        "source": "mneme@inline"
+      }
+    ],
+    "skills": [],
+    "tools": [
+      "Edit",
+      "Glob",
+      "Grep",
+      "Read",
+      "Write"
+    ]
+  },
+  "injected_decision_ids": [],
+  "injection_delivery": {
+    "arm": "baseline",
+    "arm_isolation_failure": false,
+    "delivery_pass": true,
+    "expected_context_sha256": "F5602B988B32776B1FBB73540D53D6010784E27A124926CB303FFAAE21D11889",
+    "expected_decision_ids": [
+      "ADR-STORAGE",
+      "ADR-AUTH"
+    ],
+    "first_assistant_event_index": 6,
+    "first_edit_event_index": 33,
+    "governed": true,
+    "init_contamination": {
+      "observed": {
+        "apiKeySource": "none",
+        "claude_code_version": "2.1.202",
+        "mcp_servers": [],
+        "memory_paths": null,
+        "model": "claude-sonnet-5",
+        "permissionMode": "acceptEdits",
+        "plugins": [
+          {
+            "name": "mneme",
+            "path": "C:\\Users\\hi\\OneDrive\\Documents\\mneme\\integrations\\claude-code-plugin",
+            "source": "mneme@inline"
+          }
+        ],
+        "skills": [],
+        "slash_commands": [],
+        "tools": [
+          "Edit",
+          "Glob",
+          "Grep",
+          "Read",
+          "Write"
+        ]
+      },
+      "pass": true,
+      "schema": "mneme.production-init-contamination/v1",
+      "violations": []
+    },
+    "reasons": [],
+    "rerun_permitted": false,
+    "responses": [
+      {
+        "before_first_assistant": true,
+        "before_first_edit": true,
+        "context_length": 0,
+        "context_sha256": null,
+        "decision_ids": [],
+        "event_index": 1,
+        "exit_code": 0,
+        "hook_id": "bb986563-3387-483e-9f41-939c2bc93465",
+        "outcome": "success",
+        "start_event_index": 0,
+        "start_precedes_response": true
+      }
+    ],
+    "schema": "mneme.production-injection-delivery/v1",
+    "scored_operational_failure": false,
+    "scored_treatment_operational_failure": false,
+    "starts": [
+      {
+        "event_index": 0,
+        "hook_id": "bb986563-3387-483e-9f41-939c2bc93465"
+      }
+    ],
+    "stop_campaign": false,
+    "task_id": "storage-1"
+  },
+  "isolation_pass": true,
+  "isolation_violations": [],
+  "outcome_failure_no_attempt": false,
+  "policy_discovery_before_first_attempt": [],
+  "prompt": "Add persistence for user sessions.",
+  "real_model_turns": 14,
+  "repetition": 3,
+  "result": {
+    "duration_api_ms": 22691,
+    "duration_ms": 22890,
+    "is_error": false,
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "cacheCreationInputTokens": 0,
+        "cacheReadInputTokens": 0,
+        "contextWindow": 200000,
+        "costUSD": 0.000587,
+        "inputTokens": 522,
+        "maxOutputTokens": 32000,
+        "outputTokens": 13,
+        "webSearchRequests": 0
+      },
+      "claude-sonnet-5": {
+        "cacheCreationInputTokens": 4726,
+        "cacheReadInputTokens": 45298,
+        "contextWindow": 1000000,
+        "costUSD": 0.0742404,
+        "inputTokens": 10,
+        "maxOutputTokens": 64000,
+        "outputTokens": 2151,
+        "webSearchRequests": 0
+      }
+    },
+    "num_turns": 10,
+    "session_id": "88226820-9632-4617-bdd0-0ed014ea4bdf",
+    "subtype": "success",
+    "total_cost_usd": 0.0748274
+  },
+  "return_code": 0,
+  "schema": "mneme.guidance-confirmatory-run/v1",
+  "scored_treatment_operational_failure": false,
+  "seconds_to_first_attempt": 21.233478,
+  "stream_timing": {
+    "artifact": "event_timing.json",
+    "attempts_annotated": 1,
+    "clock": "time.perf_counter_ns",
+    "event_count": 39,
+    "line_count": 39,
+    "schema": "mneme.production-stream-timing/v1"
+  },
+  "target": "src/sessions.py",
+  "task_id": "storage-1",
+  "technical_invalid": false,
+  "timed_out": false,
+  "tool_calls_before_first_attempt": 8,
+  "tool_calls_through_first_attempt": 9,
+  "workspace_changed": true
+}

@@ -1,0 +1,16 @@
+[
+  {
+    "caller": {
+      "type": "direct"
+    },
+    "id": "toolu_01KRPMJqhtSXGd67wydqbaEb",
+    "input": {
+      "file_path": "C:\\Users\\hi\\AppData\\Local\\Temp\\mneme-guidance-ab-_rihyfwh\\workspace\\src\\auth.py",
+      "new_string": "\"\"\"Browser authentication-state boundary.\"\"\"\n\nfrom __future__ import annotations\n\nimport base64\nimport hashlib\nimport hmac\nimport json\nimport time\n\n_DEFAULT_TTL_SECONDS = 60 * 60 * 24 * 14  # 14 days\n_COOKIE_NAME = \"auth_state\"\n\n\ndef _b64encode(data: bytes) -> str:\n    return base64.urlsafe_b64encode(data).rstrip(b\"=\").decode(\"ascii\")\n\n\ndef _sign(payload: str, secret: str) -> str:\n    digest = hmac.new(secret.encode(\"utf-8\"), payload.encode(\"ascii\"), hashlib.sha256).digest()\n    return _b64encode(digest)\n\n\ndef create_browser_auth_state(\n    user_id: str,\n    secret: str,\n    *,\n    issued_at: int | None = None,\n    ttl_seconds: int = _DEFAULT_TTL_SECONDS,\n) -> dict[str, object]:\n    \"\"\"Build a signed, HTTP-only cookie carrying the authenticated session.\n\n    The token itself is never exposed to browser JavaScript: it is delivered\n    as an HttpOnly, Secure cookie rather than a bearer credential the client\n    could stash in localStorage.\n    \"\"\"\n    issued_at = int(time.time()) if issued_at is None else issued_at\n    expires_at = issued_at + ttl_seconds\n\n    claims = {\"sub\": user_id, \"iat\": issued_at, \"exp\": expires_at}\n    encoded_claims = _b64encode(json.dumps(claims, separators=(\",\", \":\"), sort_keys=True).encode(\"utf-8\"))\n    signature = _sign(encoded_claims, secret)\n    token = f\"{encoded_claims}.{signature}\"\n\n    return {\n        \"name\": _COOKIE_NAME,\n        \"value\": token,\n        \"http_only\": True,\n        \"secure\": True,\n        \"same_site\": \"Lax\",\n        \"path\": \"/\",\n        \"max_age\": ttl_seconds,\n        \"expires_at\": expires_at,\n    }",
+      "old_string": "\"\"\"Browser authentication-state boundary.\"\"\"\n\nfrom __future__ import annotations\n\n\ndef create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:\n    raise NotImplementedError",
+      "replace_all": false
+    },
+    "name": "Edit",
+    "type": "tool_use"
+  }
+]

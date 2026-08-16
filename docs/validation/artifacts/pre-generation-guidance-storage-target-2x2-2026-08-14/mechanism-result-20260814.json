@@ -1,0 +1,302 @@
+{
+  "schema": "mneme.guidance-storage-target-2x2.mechanism-result/v1",
+  "study_id": "post-r6-storage-target-2x2",
+  "created_at": "2026-08-14T17:09:29.142Z",
+  "status": "COMPLETE",
+  "trial_count": 12,
+  "repetitions_per_cell": 3,
+  "frozen_inputs": {
+    "design_lock": {
+      "path": "docs/validation/pre-generation-guidance-storage-target-2x2-design-lock.json",
+      "sha256": "BC22485945DAA33EDFA607D5AD5759A17A9ABD462B0B7D9DEC6724C4AE2497EC"
+    },
+    "execution_lock": {
+      "path": "docs/validation/pre-generation-guidance-storage-target-2x2-execution-lock.json",
+      "sha256": "AE71210E98B5C7050C7B55AF0701928CB7B51FAAE876624D1C2F2DAB859F581B"
+    },
+    "collection_manifest": {
+      "path": "docs/validation/artifacts/pre-generation-guidance-storage-target-2x2-2026-08-14/collection-manifest.json",
+      "sha256": "328699D93AE963EE95C51CF62BA1A764D1F5CD7DA123A1C6343916787D349F6E"
+    },
+    "reviewer_1": {
+      "path": "docs/validation/artifacts/pre-generation-guidance-storage-target-2x2-2026-08-14/mechanism_isolation/blinded_scores/independent-reviewer-1-20260814.json",
+      "sha256": "67037A7D259D0B4E4EE3E476CE1FF89700D6C5482929F3169C9CD8139BB472A6"
+    },
+    "reviewer_2": {
+      "path": "docs/validation/artifacts/pre-generation-guidance-storage-target-2x2-2026-08-14/mechanism_isolation/blinded_scores/independent-reviewer-2-20260814.json",
+      "sha256": "22B860AFC5F518B05A1E6D8D955E03CB3B703770857FCD7B6B2614C8217E16B4"
+    },
+    "adjudicated_scores": {
+      "path": "docs/validation/artifacts/pre-generation-guidance-storage-target-2x2-2026-08-14/mechanism_isolation/blinded_scores/adjudicated-scores-20260814.json",
+      "sha256": "83ED5DBA54A8A081AFFC3B19220EED8FB2D133B4FF6A9B6F272706BA7CBCE7C5"
+    },
+    "blinding_map": {
+      "path": "docs/validation/artifacts/pre-generation-guidance-storage-target-2x2-2026-08-14/mechanism_isolation/private/blinding-map.json",
+      "sha256": "A196931C065C6C0A42B9DE9C8475958D8FA7D558157D606CAEDC398C586DBB4F"
+    }
+  },
+  "adjudication": {
+    "trial_level_disagreements": 0,
+    "dimension_level_disagreements": 0,
+    "ambiguous_cases": 0,
+    "not_scoreable_cases": 0,
+    "unresolved_cases": 0
+  },
+  "revealed_trials": [
+    {
+      "cell": "A",
+      "guidance": "baseline",
+      "target_instruction": "original",
+      "repetition": 1,
+      "blind_id": "review-4e79754ec69d47a081c97bf595554f94",
+      "implementation_target_shape": "direct_existing_sessionstore",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "no",
+      "first_attempt_architectural_compliance": "non-compliant"
+    },
+    {
+      "cell": "A",
+      "guidance": "baseline",
+      "target_instruction": "original",
+      "repetition": 2,
+      "blind_id": "review-1fa10ec5209c4d0da8e09a06911a5a06",
+      "implementation_target_shape": "direct_existing_sessionstore",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "first_attempt_architectural_compliance": "non-compliant"
+    },
+    {
+      "cell": "A",
+      "guidance": "baseline",
+      "target_instruction": "original",
+      "repetition": 3,
+      "blind_id": "review-3f75538c8c604f7491a61537a8f436a8",
+      "implementation_target_shape": "new_parallel_subclass",
+      "functional_completion": "incomplete",
+      "governed_scope_expansion": "yes",
+      "first_attempt_architectural_compliance": "non-compliant"
+    },
+    {
+      "cell": "B",
+      "guidance": "role_aware",
+      "target_instruction": "original",
+      "repetition": 1,
+      "blind_id": "review-949cb03bf0a948d0bdab7f7b4ffa229d",
+      "implementation_target_shape": "direct_existing_sessionstore",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "first_attempt_architectural_compliance": "compliant"
+    },
+    {
+      "cell": "B",
+      "guidance": "role_aware",
+      "target_instruction": "original",
+      "repetition": 2,
+      "blind_id": "review-9b2b43dda9f54232ba07f5352fc7ed85",
+      "implementation_target_shape": "direct_existing_sessionstore",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "first_attempt_architectural_compliance": "compliant"
+    },
+    {
+      "cell": "B",
+      "guidance": "role_aware",
+      "target_instruction": "original",
+      "repetition": 3,
+      "blind_id": "review-13b6956a4eba48989ce2847131a10a27",
+      "implementation_target_shape": "direct_existing_sessionstore",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "first_attempt_architectural_compliance": "compliant"
+    },
+    {
+      "cell": "C",
+      "guidance": "baseline",
+      "target_instruction": "explicit_existing_class",
+      "repetition": 1,
+      "blind_id": "review-e6b0a7e645ec487b8a49d4789ce1be33",
+      "implementation_target_shape": "direct_existing_sessionstore",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "first_attempt_architectural_compliance": "non-compliant"
+    },
+    {
+      "cell": "C",
+      "guidance": "baseline",
+      "target_instruction": "explicit_existing_class",
+      "repetition": 2,
+      "blind_id": "review-c92a524fdd994972a159dbaad696ed78",
+      "implementation_target_shape": "direct_existing_sessionstore",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "first_attempt_architectural_compliance": "non-compliant"
+    },
+    {
+      "cell": "C",
+      "guidance": "baseline",
+      "target_instruction": "explicit_existing_class",
+      "repetition": 3,
+      "blind_id": "review-dea2d7d05f894a72b9ae3e0400ff0fb7",
+      "implementation_target_shape": "direct_existing_sessionstore",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "first_attempt_architectural_compliance": "non-compliant"
+    },
+    {
+      "cell": "D",
+      "guidance": "role_aware",
+      "target_instruction": "explicit_existing_class",
+      "repetition": 1,
+      "blind_id": "review-a705f0025c8f44288a5462511b66f003",
+      "implementation_target_shape": "direct_existing_sessionstore",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "first_attempt_architectural_compliance": "compliant"
+    },
+    {
+      "cell": "D",
+      "guidance": "role_aware",
+      "target_instruction": "explicit_existing_class",
+      "repetition": 2,
+      "blind_id": "review-dc35bfe2731f416fa1e89b7428802e04",
+      "implementation_target_shape": "direct_existing_sessionstore",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "first_attempt_architectural_compliance": "compliant"
+    },
+    {
+      "cell": "D",
+      "guidance": "role_aware",
+      "target_instruction": "explicit_existing_class",
+      "repetition": 3,
+      "blind_id": "review-0a9eea638ce84dc4bf73e0683de6903e",
+      "implementation_target_shape": "direct_existing_sessionstore",
+      "functional_completion": "complete",
+      "governed_scope_expansion": "no",
+      "first_attempt_architectural_compliance": "compliant"
+    }
+  ],
+  "cell_metrics": [
+    {
+      "cell": "A",
+      "guidance": "baseline",
+      "target_instruction": "original",
+      "n": 3,
+      "implementation_target_shape": {
+        "direct_existing_sessionstore": { "count": 2, "rate": 0.666667 },
+        "new_parallel_subclass": { "count": 1, "rate": 0.333333 },
+        "other_or_no_attempt": { "count": 0, "rate": 0.0 }
+      },
+      "functional_completion": { "count": 1, "rate": 0.333333 },
+      "governed_scope_expansion": { "count": 1, "rate": 0.333333 },
+      "first_attempt_architectural_compliance": { "count": 0, "rate": 0.0 }
+    },
+    {
+      "cell": "B",
+      "guidance": "role_aware",
+      "target_instruction": "original",
+      "n": 3,
+      "implementation_target_shape": {
+        "direct_existing_sessionstore": { "count": 3, "rate": 1.0 },
+        "new_parallel_subclass": { "count": 0, "rate": 0.0 },
+        "other_or_no_attempt": { "count": 0, "rate": 0.0 }
+      },
+      "functional_completion": { "count": 3, "rate": 1.0 },
+      "governed_scope_expansion": { "count": 0, "rate": 0.0 },
+      "first_attempt_architectural_compliance": { "count": 3, "rate": 1.0 }
+    },
+    {
+      "cell": "C",
+      "guidance": "baseline",
+      "target_instruction": "explicit_existing_class",
+      "n": 3,
+      "implementation_target_shape": {
+        "direct_existing_sessionstore": { "count": 3, "rate": 1.0 },
+        "new_parallel_subclass": { "count": 0, "rate": 0.0 },
+        "other_or_no_attempt": { "count": 0, "rate": 0.0 }
+      },
+      "functional_completion": { "count": 3, "rate": 1.0 },
+      "governed_scope_expansion": { "count": 0, "rate": 0.0 },
+      "first_attempt_architectural_compliance": { "count": 0, "rate": 0.0 }
+    },
+    {
+      "cell": "D",
+      "guidance": "role_aware",
+      "target_instruction": "explicit_existing_class",
+      "n": 3,
+      "implementation_target_shape": {
+        "direct_existing_sessionstore": { "count": 3, "rate": 1.0 },
+        "new_parallel_subclass": { "count": 0, "rate": 0.0 },
+        "other_or_no_attempt": { "count": 0, "rate": 0.0 }
+      },
+      "functional_completion": { "count": 3, "rate": 1.0 },
+      "governed_scope_expansion": { "count": 0, "rate": 0.0 },
+      "first_attempt_architectural_compliance": { "count": 3, "rate": 1.0 }
+    }
+  ],
+  "locked_contrasts": {
+    "role_aware_minus_baseline_by_target_instruction": {
+      "original": {
+        "direct_existing_sessionstore_rate_difference": 0.333333,
+        "functional_completion_rate_difference": 0.666667,
+        "governed_scope_expansion_rate_difference": -0.333333,
+        "first_attempt_architectural_compliance_rate_difference": 1.0
+      },
+      "explicit_existing_class": {
+        "direct_existing_sessionstore_rate_difference": 0.0,
+        "functional_completion_rate_difference": 0.0,
+        "governed_scope_expansion_rate_difference": 0.0,
+        "first_attempt_architectural_compliance_rate_difference": 1.0
+      }
+    },
+    "explicit_minus_original_by_guidance": {
+      "baseline": {
+        "direct_existing_sessionstore_rate_difference": 0.333333,
+        "functional_completion_rate_difference": 0.666667,
+        "governed_scope_expansion_rate_difference": -0.333333,
+        "first_attempt_architectural_compliance_rate_difference": 0.0
+      },
+      "role_aware": {
+        "direct_existing_sessionstore_rate_difference": 0.0,
+        "functional_completion_rate_difference": 0.0,
+        "governed_scope_expansion_rate_difference": 0.0,
+        "first_attempt_architectural_compliance_rate_difference": 0.0
+      }
+    }
+  },
+  "locked_interpretation": {
+    "diagnosis": "fixture_ambiguity_dominates",
+    "rule_satisfied": "Both explicit-target cells C and D eliminated parallel-subclass outcomes and restored direct functional completion, while original-target cell A did not.",
+    "guidance_interaction_remains_plausible_rule_satisfied": false,
+    "ordinary_model_variance_dominates_rule_satisfied": false,
+    "mixed_or_unresolved_rule_satisfied": false,
+    "interpretive_boundary": "The observed 3-per-cell pattern can expose a strong targeting effect or guidance interaction, but cannot precisely estimate the underlying rate of ordinary model variance. No inferential rate estimate or significance test was performed."
+  },
+  "integrity_attestation": {
+    "assignment_ids_match_adjudicated_ids": true,
+    "assignment_slots_match_frozen_schedule": true,
+    "raw_artifact_files_checked": 157,
+    "raw_artifact_aggregate_unchanged": true,
+    "raw_artifact_aggregate_sha256": "D953284739281BE1DD9EBC7ED052AEF1A0F7A642143F11E8ED443329A62C1599",
+    "execution_lock_candidate_files_checked": 18,
+    "execution_lock_candidate_file_mismatches": 0,
+    "r6_result_unchanged": true,
+    "r6_result_sha256": "BCF682EDC1DEAF2110A004ADEC648AA843B15D179A4CF019BABC36D526B7ACA4",
+    "r6_diagnosis_unchanged": true,
+    "r6_diagnosis_sha256": "8B9890BFFB9E891739438978B09C0E94EF6555029ECD6DAB274DD092C5CB6A5C",
+    "production_effectiveness_ab": "PAUSED_NOT_STARTED"
+  },
+  "mutation_attestation": {
+    "code_changed": false,
+    "configuration_changed": false,
+    "rubric_changed": false,
+    "locks_changed": false,
+    "trials_changed": false,
+    "r6_changed": false,
+    "production_effectiveness_started": false,
+    "only_new_post_reveal_artifacts": [
+      "docs/validation/artifacts/pre-generation-guidance-storage-target-2x2-2026-08-14/mechanism-result-20260814.json",
+      "docs/validation/artifacts/pre-generation-guidance-storage-target-2x2-2026-08-14/mechanism-result-20260814.sha256"
+    ]
+  }
+}

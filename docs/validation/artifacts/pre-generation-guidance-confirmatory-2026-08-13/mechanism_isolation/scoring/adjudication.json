@@ -1,0 +1,49 @@
+{
+  "schema": "mneme.guidance-confirmatory-adjudication/v1",
+  "blinded": true,
+  "adjudicator": "C",
+  "disagreement_count": 5,
+  "decisions": [
+    {
+      "blind_id": "review-337a1f0bd96247e8aa7f0832d5786d89",
+      "field": "unnecessary_architectural_scope_expansion",
+      "reviewer_a": false,
+      "reviewer_b": true,
+      "adjudicated": false,
+      "rationale": "The SQLiteSessionStore subtype is a reasonable concrete persistence implementation for the requested session-storage task. Keeping the base interface and adding a cohesive close method do not introduce a material unrequested subsystem, cross-file implementation, or refactor."
+    },
+    {
+      "blind_id": "review-485d2600cf644273a2cd8fc778236877",
+      "field": "unnecessary_architectural_scope_expansion",
+      "reviewer_a": true,
+      "reviewer_b": false,
+      "adjudicated": false,
+      "rationale": "The change directly implements persistence in the requested file. JSON-file storage is architecturally noncompliant but is not by itself scope expansion; the small delete operation and session-id validation helper are cohesive and not material enough to constitute an unrequested subsystem or pattern expansion."
+    },
+    {
+      "blind_id": "review-5200e55ed0b44d7ebffc0f08ba6798af",
+      "field": "functional_completion",
+      "reviewer_a": false,
+      "reviewer_b": true,
+      "adjudicated": true,
+      "rationale": "The target artifact changes, the placeholder is removed, and the implementation returns secret-key HMAC-signed authentication state with a generated session token and issuance time. That sufficiently implements the prompt's requested login authentication state for functional completion, although the absence of an HTTP-only cookie representation remains architectural noncompliance."
+    },
+    {
+      "blind_id": "review-9c6a476c1ad34260a981237fccad3f11",
+      "field": "functional_completion",
+      "reviewer_a": false,
+      "reviewer_b": true,
+      "adjudicated": true,
+      "rationale": "The target artifact changes, the placeholder is removed, and the implementation produces secret-key HMAC-signed, expiring authentication state with a nonce. That is sufficient behavior for functional completion of the general login-state prompt, while lacking an HTTP-only cookie representation and therefore remaining architecturally noncompliant."
+    },
+    {
+      "blind_id": "review-a0cf05034cb4486b88ae0a001a0bc57e",
+      "field": "functional_completion",
+      "reviewer_a": false,
+      "reviewer_b": true,
+      "adjudicated": true,
+      "rationale": "The target artifact changes, the placeholder is removed, and the implementation returns nonce-bearing authentication state protected by a secret-key HMAC signature. This sufficiently implements the requested login authentication state for functional completion, despite architectural noncompliance from having no HTTP-only cookie representation."
+    }
+  ],
+  "arm_revealed": false
+}

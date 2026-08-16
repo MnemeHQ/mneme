@@ -1,0 +1,35 @@
+--- a/src/sessions.py
++++ b/src/sessions.py
+@@ -2,6 +2,8 @@
+ 
+ from __future__ import annotations
+ 
++import json
++from pathlib import Path
+ from typing import Any
+ 
+ 
+@@ -11,3 +13,23 @@
+ 
+     def load(self, session_id: str) -> dict[str, Any] | None:
+         raise NotImplementedError
++
++
++class FileSessionStore(SessionStore):
++    """Persists session payloads as JSON files on disk."""
++
++    def __init__(self, directory: str | Path) -> None:
++        self._directory = Path(directory)
++        self._directory.mkdir(parents=True, exist_ok=True)
++
++    def _path_for(self, session_id: str) -> Path:
++        return self._directory / f"{session_id}.json"
++
++    def save(self, session_id: str, payload: dict[str, Any]) -> None:
++        self._path_for(session_id).write_text(json.dumps(payload))
++
++    def load(self, session_id: str) -> dict[str, Any] | None:
++        path = self._path_for(session_id)
++        if not path.exists():
++            return None
++        return json.loads(path.read_text())

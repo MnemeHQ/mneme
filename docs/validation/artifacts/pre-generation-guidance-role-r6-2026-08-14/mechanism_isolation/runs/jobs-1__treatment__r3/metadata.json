@@ -1,0 +1,83 @@
+{
+  "arm": "treatment",
+  "blind_id": "review-9d56a81a4f9d4409978a7197a43744dc",
+  "duration_seconds": 18.452,
+  "evaluation": "mechanism_isolation",
+  "execution_lock_sha256": "D691FC8D8833E6E19970AC898D40A91F13F397ADDEA068CF94BA47083F3D3313",
+  "first_attempt_captured": true,
+  "governed": true,
+  "init": {
+    "apiKeySource": "none",
+    "claude_code_version": "2.1.202",
+    "mcp_servers": [],
+    "memory_paths": null,
+    "model": "claude-sonnet-5",
+    "permissionMode": "acceptEdits",
+    "plugins": [
+      {
+        "name": "mneme-guidance-eval",
+        "path": "C:\\Users\\hi\\OneDrive\\Documents\\mneme\\tests\\fixtures\\guidance_confirmatory\\mechanism_plugin",
+        "source": "mneme-guidance-eval@inline"
+      }
+    ],
+    "skills": [],
+    "tools": [
+      "Edit",
+      "Glob",
+      "Grep",
+      "Read",
+      "Write"
+    ]
+  },
+  "injected_decision_ids": [
+    "ADR-JOBS"
+  ],
+  "isolation_pass": true,
+  "isolation_violations": [],
+  "outcome_failure_no_attempt": false,
+  "policy_discovery_before_first_attempt": [],
+  "prompt": "Add notification email delivery to the first release.",
+  "real_model_turns": 13,
+  "repetition": 3,
+  "result": {
+    "duration_api_ms": 16698,
+    "duration_ms": 15785,
+    "is_error": false,
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "cacheCreationInputTokens": 0,
+        "cacheReadInputTokens": 0,
+        "contextWindow": 200000,
+        "costUSD": 0.000585,
+        "inputTokens": 525,
+        "maxOutputTokens": 32000,
+        "outputTokens": 12,
+        "webSearchRequests": 0
+      },
+      "claude-sonnet-5": {
+        "cacheCreationInputTokens": 4182,
+        "cacheReadInputTokens": 46956,
+        "contextWindow": 1000000,
+        "costUSD": 0.058063800000000006,
+        "inputTokens": 10,
+        "maxOutputTokens": 64000,
+        "outputTokens": 1257,
+        "webSearchRequests": 0
+      }
+    },
+    "num_turns": 8,
+    "session_id": "a9fb1e39-1ef5-40fe-8a4e-e6be7ddb62a8",
+    "subtype": "success",
+    "total_cost_usd": 0.05864880000000001
+  },
+  "return_code": 0,
+  "schema": "mneme.guidance-confirmatory-run/v1",
+  "seconds_to_first_attempt": null,
+  "target": "src/email_delivery.py",
+  "task_id": "jobs-1",
+  "technical_invalid": false,
+  "timed_out": false,
+  "tool_calls_before_first_attempt": 6,
+  "tool_calls_through_first_attempt": 7,
+  "workspace_changed": true
+}

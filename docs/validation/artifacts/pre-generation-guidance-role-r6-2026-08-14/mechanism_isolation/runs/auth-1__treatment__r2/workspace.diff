@@ -1,0 +1,26 @@
+--- a/src/auth.py
++++ b/src/auth.py
+@@ -2,6 +2,22 @@
+ 
+ from __future__ import annotations
+ 
++import hashlib
++import hmac
++import time
++
+ 
+ def create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:
+-    raise NotImplementedError
++    """Build a signed, HTTP-only cookie payload for the logged-in user."""
++    issued_at = str(int(time.time()))
++    payload = f"{user_id}:{issued_at}"
++    signature = hmac.new(secret.encode(), payload.encode(), hashlib.sha256).hexdigest()
++
++    return {
++        "name": "session",
++        "value": f"{payload}:{signature}",
++        "http_only": True,
++        "secure": True,
++        "same_site": "Strict",
++        "path": "/",
++    }

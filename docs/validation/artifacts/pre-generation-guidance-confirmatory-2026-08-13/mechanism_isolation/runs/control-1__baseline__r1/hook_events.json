@@ -1,0 +1,25 @@
+[
+  {
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "5d8bd138-e4c3-484f-bb4f-eb763978a622",
+    "hook_name": "UserPromptSubmit",
+    "session_id": "5707acaa-eeee-4680-a4f4-d6c4f20d06ee",
+    "subtype": "hook_started",
+    "type": "system",
+    "uuid": "ba2c0378-a1fc-4fa4-8d58-8dde45c20914"
+  },
+  {
+    "exit_code": 0,
+    "hook_event": "UserPromptSubmit",
+    "hook_id": "5d8bd138-e4c3-484f-bb4f-eb763978a622",
+    "hook_name": "UserPromptSubmit",
+    "outcome": "success",
+    "output": "",
+    "session_id": "5707acaa-eeee-4680-a4f4-d6c4f20d06ee",
+    "stderr": "",
+    "stdout": "",
+    "subtype": "hook_response",
+    "type": "system",
+    "uuid": "720896f3-5593-4586-9069-9716e545a026"
+  }
+]

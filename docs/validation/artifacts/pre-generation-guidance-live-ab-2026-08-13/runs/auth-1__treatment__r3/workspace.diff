@@ -1,0 +1,83 @@
+--- a/src/auth.py
++++ b/src/auth.py
+@@ -2,6 +2,39 @@
+ 
+ from __future__ import annotations
+ 
++import hashlib
++import hmac
++import secrets
++
++SESSION_COOKIE_NAME = "session_id"
++SESSION_TTL_SECONDS = 60 * 60 * 24 * 14  # 14 days
++
++
++def _sign(session_id: str, secret: str) -> str:
++    return hmac.new(secret.encode(), session_id.encode(), hashlib.sha256).hexdigest()
++
+ 
+ def create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:
+-    raise NotImplementedError
++    session_id = secrets.token_urlsafe(32)
++    cookie_value = f"{session_id}.{_sign(session_id, secret)}"
++
++    return {
++        "session_id": session_id,
++        "user_id": user_id,
++        "cookie": {
++            "name": SESSION_COOKIE_NAME,
++            "value": cookie_value,
++            "http_only": True,
++            "secure": True,
++            "same_site": "Lax",
++            "path": "/",
++            "max_age": SESSION_TTL_SECONDS,
++        },
++    }
++
++
++def verify_browser_auth_state(cookie_value: str, secret: str) -> str | None:
++    session_id, _, signature = cookie_value.partition(".")
++    if not signature or not hmac.compare_digest(signature, _sign(session_id, secret)):
++        return None
++    return session_id
+--- a/src/sessions.py
++++ b/src/sessions.py
+@@ -2,12 +2,35 @@
+ 
+ from __future__ import annotations
+ 
++import json
++import sqlite3
++from pathlib import Path
+ from typing import Any
+ 
+ 
+ class SessionStore:
++    def __init__(self, db_path: str | Path = "sessions.db") -> None:
++        self._connection = sqlite3.connect(str(db_path))
++        self._connection.execute(
++            """
++            CREATE TABLE IF NOT EXISTS sessions (
++                session_id TEXT PRIMARY KEY,
++                payload TEXT NOT NULL
++            )
++            """
++        )
++        self._connection.commit()
++
+     def save(self, session_id: str, payload: dict[str, Any]) -> None:
+-        raise NotImplementedError
++        self._connection.execute(
++            "INSERT OR REPLACE INTO sessions (session_id, payload) VALUES (?, ?)",
++            (session_id, json.dumps(payload)),
++        )
++        self._connection.commit()
+ 
+     def load(self, session_id: str) -> dict[str, Any] | None:
+-        raise NotImplementedError
++        row = self._connection.execute(
++            "SELECT payload FROM sessions WHERE session_id = ?",
++            (session_id,),
++        ).fetchone()
++        return json.loads(row[0]) if row else None

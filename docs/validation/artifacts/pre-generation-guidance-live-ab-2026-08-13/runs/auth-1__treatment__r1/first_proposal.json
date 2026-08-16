@@ -1,0 +1,16 @@
+[
+  {
+    "caller": {
+      "type": "direct"
+    },
+    "id": "toolu_011WCGguMK4KjAhV9rD1z7NP",
+    "input": {
+      "file_path": "C:\\Users\\hi\\AppData\\Local\\Temp\\mneme-guidance-ab-9_7r4h8w\\workspace\\src\\auth.py",
+      "new_string": "\"\"\"Browser authentication-state boundary.\"\"\"\n\nfrom __future__ import annotations\n\nimport hashlib\nimport hmac\nimport time\n\n\ndef create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:\n    \"\"\"Build a signed HTTP-only cookie asserting the user's login state.\"\"\"\n    issued_at = int(time.time())\n    payload = f\"{user_id}.{issued_at}\"\n    signature = hmac.new(secret.encode(), payload.encode(), hashlib.sha256).hexdigest()\n\n    return {\n        \"name\": \"session\",\n        \"value\": f\"{payload}.{signature}\",\n        \"http_only\": True,\n        \"secure\": True,\n        \"same_site\": \"Strict\",\n        \"path\": \"/\",\n    }",
+      "old_string": "\"\"\"Browser authentication-state boundary.\"\"\"\n\nfrom __future__ import annotations\n\n\ndef create_browser_auth_state(user_id: str, secret: str) -> dict[str, object]:\n    raise NotImplementedError",
+      "replace_all": false
+    },
+    "name": "Edit",
+    "type": "tool_use"
+  }
+]

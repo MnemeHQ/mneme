@@ -1,0 +1,51 @@
+--- a/src/sessions.py
++++ b/src/sessions.py
+@@ -2,12 +2,46 @@
+ 
+ from __future__ import annotations
+ 
++import json
++import sqlite3
++from pathlib import Path
+ from typing import Any
++
++DEFAULT_DB_PATH = Path(__file__).resolve().parent.parent / "data" / "sessions.db"
+ 
+ 
+ class SessionStore:
++    def __init__(self, db_path: str | Path = DEFAULT_DB_PATH) -> None:
++        self._db_path = Path(db_path)
++        self._db_path.parent.mkdir(parents=True, exist_ok=True)
++        self._connection = sqlite3.connect(self._db_path)
++        self._connection.execute(
++            """
++            CREATE TABLE IF NOT EXISTS sessions (
++                session_id TEXT PRIMARY KEY,
++                payload TEXT NOT NULL
++            )
++            """
++        )
++        self._connection.commit()
++
+     def save(self, session_id: str, payload: dict[str, Any]) -> None:
+-        raise NotImplementedError
++        self._connection.execute(
++            "INSERT INTO sessions (session_id, payload) VALUES (?, ?) "
++            "ON CONFLICT(session_id) DO UPDATE SET payload = excluded.payload",
++            (session_id, json.dumps(payload)),
++        )
++        self._connection.commit()
+ 
+     def load(self, session_id: str) -> dict[str, Any] | None:
+-        raise NotImplementedError
++        cursor = self._connection.execute(
++            "SELECT payload FROM sessions WHERE session_id = ?", (session_id,)
++        )
++        row = cursor.fetchone()
++        if row is None:
++            return None
++        return json.loads(row[0])
++
++    def delete(self, session_id: str) -> None:
++        self._connection.execute("DELETE FROM sessions WHERE session_id = ?", (session_id,))
++        self._connection.commit()

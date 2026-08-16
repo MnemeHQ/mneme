@@ -1,0 +1,26 @@
+--- a/src/api.py
++++ b/src/api.py
+@@ -2,8 +2,22 @@
+ 
+ from __future__ import annotations
+ 
++import json
+ from typing import Any
++
++# Only these fields are ever exposed on the public API. Account records may
++# carry internal fields (password hashes, secrets, session tokens, etc.);
++# allowlisting keeps those from leaking if the record grows new fields.
++PUBLIC_ACCOUNT_FIELDS = (
++    "id",
++    "username",
++    "display_name",
++    "avatar_url",
++    "bio",
++    "created_at",
++)
+ 
+ 
+ def serialize_account(account: dict[str, Any]) -> bytes:
+-    raise NotImplementedError
++    payload = {field: account[field] for field in PUBLIC_ACCOUNT_FIELDS if field in account}
++    return json.dumps(payload).encode("utf-8")
