@@ -296,6 +296,54 @@ No version required. Create GitHub issues instead.
 
 ---
 
+## Checkpoint 9: AWS AgentCore benchmark + integration path
+
+**Goal:** Use AWS AgentCore as a controlled multi-agent execution substrate for architecture-compliance benchmarking before committing to a deeper product integration.
+
+### Priority
+
+Medium-high strategic priority. Evidence-first: pursue after/alongside current benchmark and pilot work, not as a replacement for it.
+
+### Actions
+
+1. Reuse the AgentCore coding-agent competition pattern to run the same architectural task across supported coding agents such as Claude Code, Codex, Cursor, and Kiro.
+2. Add Mneme architecture-compliance outcomes alongside normal functional outcomes:
+   - functional correctness
+   - architectural compliance
+   - scope expansion
+   - architectural drift / rule violations
+3. Run controlled treatments:
+   - agent alone
+   - agent + repository instructions
+   - agent + explicit ADR/context
+   - agent + Mneme
+4. Prefer deterministic scoring and frozen fixtures so results are reproducible.
+5. Test Mneme inside the AgentCore runtime against the changed working tree, with MCP/context exposure only where it improves the experiment.
+6. If the benchmark is stable, evaluate an upstream AgentCore sample contribution or AWS outreach around architecture-compliance evaluation.
+7. Only then decide whether a dedicated AgentCore product integration is justified by user pull or ecosystem value.
+
+### Positioning constraint
+
+Keep Mneme differentiated from AgentCore policy controls:
+
+> AgentCore governs what an agent can do. Mneme governs what an agent can build.
+
+Avoid generic positioning around "deterministic agent governance" where it creates unnecessary overlap with AgentCore's policy layer.
+
+### Exit criteria
+
+- One reproducible AgentCore architectural-compliance fixture runs end to end.
+- At least two coding agents can be compared on the same frozen task.
+- Baseline vs Mneme results are scored deterministically where possible.
+- Results are suitable for inclusion in the broader Mneme architecture-compliance benchmark.
+- A go/no-go decision is made on an upstream contribution or deeper AgentCore integration.
+
+### Initial effort
+
+Target a small 1-3 engineering-day experiment before expanding scope.
+
+---
+
 ## What not to build yet
 
 Avoid these until there is user pull:
