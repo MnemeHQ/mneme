@@ -53,6 +53,18 @@ def _utc_now() -> str:
     return datetime.now(tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+def _error_exit(message: str) -> int:
+    """Report a pre-execution user-input error and return the usage exit code.
+
+    Missing files and bad paths print ``ERROR: ...`` to stderr and exit 2
+    with empty stdout, so machine consumers (``--json``, the Claude Code
+    hook) see no verdict payload and fail open. Verdict exit codes 0/1/2
+    are reserved for actual enforcement results.
+    """
+    print(f"ERROR: {message}", file=sys.stderr, flush=True)
+    return 2
+
+
 # ── Subcommand: init ─────────────────────────────────────────────────────────
 
 DEFAULT_MEMORY_PATH = ".mneme/project_memory.json"
@@ -104,6 +116,9 @@ def _cmd_init(args: argparse.Namespace) -> int:
 # ── Subcommand: list_decisions ───────────────────────────────────────────────
 
 def _cmd_list(args: argparse.Namespace) -> int:
+    memory_path = Path(args.memory)
+    if not memory_path.exists():
+        return _error_exit(f"memory file {memory_path} does not exist")
     store = MemoryStore(args.memory)
     store.load()
     decisions = store.decisions()
@@ -132,6 +147,8 @@ def _cmd_list(args: argparse.Namespace) -> int:
 
 def _cmd_add(args: argparse.Namespace) -> int:
     path = Path(args.memory)
+    if not path.exists():
+        return _error_exit(f"memory file {path} does not exist")
     data = json.loads(path.read_text(encoding="utf-8"))
     data.setdefault("decisions", [])
 
@@ -159,6 +176,9 @@ def _cmd_add(args: argparse.Namespace) -> int:
 # ── Subcommand: test_query ───────────────────────────────────────────────────
 
 def _cmd_test(args: argparse.Namespace) -> int:
+    memory_path = Path(args.memory)
+    if not memory_path.exists():
+        return _error_exit(f"memory file {memory_path} does not exist")
     store = MemoryStore(args.memory)
     store.load()
     retriever = DecisionRetriever(store.decisions())
@@ -245,7 +265,13 @@ def _check_payload(
 
 
 def _cmd_check(args: argparse.Namespace) -> int:
-    input_text = Path(args.input).read_text(encoding="utf-8")
+    input_path = Path(args.input)
+    if not input_path.exists():
+        return _error_exit(f"input file {input_path} does not exist")
+    memory_path = Path(args.memory)
+    if not memory_path.exists():
+        return _error_exit(f"memory file {memory_path} does not exist")
+    input_text = input_path.read_text(encoding="utf-8")
 
     store = MemoryStore(args.memory)
     store.load()
@@ -330,6 +356,9 @@ def _print_freshness_issue(issue: FreshnessIssue) -> None:
 # ── Subcommand: cursor generate ──────────────────────────────────────────────
 
 def _cmd_cursor_generate(args: argparse.Namespace) -> int:
+    memory_path = Path(args.memory)
+    if not memory_path.exists():
+        return _error_exit(f"memory file {memory_path} does not exist")
     store = MemoryStore(args.memory)
     store.load()
     retriever = DecisionRetriever(store.decisions())
