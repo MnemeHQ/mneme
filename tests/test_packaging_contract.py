@@ -68,6 +68,18 @@ def test_pyproject_declares_no_unexpected_console_scripts():
     assert set(_load_pyproject()["project"]["scripts"]) == set(EXPECTED_SCRIPTS)
 
 
+def test_runtime_version_matches_declared_version():
+    # mneme.__version__ is the runtime-exported version string. It must
+    # track pyproject's declared version so `import mneme` never reports
+    # a stale release number (drifted 0.1.0 vs 0.5.1 across v0.4.0-v0.5.1).
+    import mneme
+
+    assert mneme.__version__ == _declared_version(), (
+        f"mneme.__version__ = {mneme.__version__!r} does not match "
+        f"pyproject version {_declared_version()!r}"
+    )
+
+
 # ── Layer 2: built-artifact contract ─────────────────────────────────────────
 #
 # Skipped unless a matching build is present under dist/ (release flow):
