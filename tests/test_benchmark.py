@@ -252,8 +252,10 @@ def test_layer1_irrelevant_injection_false_when_only_expected_retrieved():
 def test_layer1_excludes_zero_score_decisions():
     """Zero-score (or negative) decisions never count as retrieved.
 
-    Mirrors enforcer._top_nonzero so Layer 1 retrieval matches what the
-    enforcer actually sees.
+    Mirrors the injection-side top-K selection (context_builder.format_decisions /
+    Pipeline.injected_decisions), so Layer 1 measures what retrieval actually
+    injects. Since ADR-017 this is not "what the enforcer sees" — enforcement
+    evaluates the full corpus independent of retrieval score.
     """
     scored = _scored(("d1", 5.0), ("zero", 0.0), ("d2", 0.0))
     s = score_layer1(scored, expected_ids=["d1", "d2"], acceptable_ids=[], k=5)

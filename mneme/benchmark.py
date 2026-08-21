@@ -188,10 +188,12 @@ class Layer1Score:
     """Retrieval score for one scenario, ignoring enforcement.
 
     `retrieved_ids` is the ordered list of decision IDs in the runner's top-K
-    (positive-score, matching what the enforcer actually sees via
-    enforcer._top_nonzero). Recall and precision are computed against that
-    set; `irrelevant_injection` flips True when at least one retrieved ID is
-    neither expected nor explicitly acceptable.
+    (positive-score) — the same selection the injection surface applies
+    (context_builder.format_decisions / Pipeline.injected_decisions). It is
+    not "what the enforcer sees": since ADR-017, enforcement evaluates the
+    full corpus independent of retrieval score. Recall and precision are
+    computed against that set; `irrelevant_injection` flips True when at
+    least one retrieved ID is neither expected nor explicitly acceptable.
     """
 
     k: int

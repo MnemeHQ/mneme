@@ -14,7 +14,7 @@ Layer 1 is local-repo, single-developer, project-scoped architectural governance
 Pinned at commit [`e73ff7d`](https://github.com/TheoV823/mneme/commit/e73ff7d) and documented in [layer1-freeze-e73ff7d.md](./layer1-freeze-e73ff7d.md):
 
 - **Retrieval mechanics** — deterministic bag-of-tokens scoring with fixed weights, stopword floor, insertion-order tiebreak.
-- **Enforcement semantics** — `anti_patterns` → FAIL, `"no X"` constraints → WARN, top-K-only, word-boundary matching.
+- **Enforcement semantics** — `anti_patterns` → FAIL, `"no X"` constraints → WARN, word-boundary matching. Frozen at `e73ff7d` as top-K-only (enforcement bounded by the retrieval top-N); [ADR-017](../adr/ADR-017-enforcement-scope-vs-retrieval-scope.md) subsequently separated enforcement scope from retrieval scope, so enforcement now evaluates the full decision corpus (literal rules corpus-wide, multi-term rules still retrieval-gated), with typed-rule semantics under [ADR-019](../adr/ADR-019-typed-literal-rule-contract.md)/[ADR-020](../adr/ADR-020-explicit-path-applicability-for-typed-rules.md).
 - **Benchmark methodology** — two-layer scoring (retrieval vs. enforcement), structured-fixture path with TXT fallback, five-verdict semantics, K=3 canonical.
 - **Charter principles** — deterministic > clever, auditable > autonomous, prevention before review, no passive ingestion, no auto-learning, no hidden vector magic.
 - **Scope wedge** — local-repo, single-developer, project-scoped. Multi-repo / team / org sync is Layer 2.
