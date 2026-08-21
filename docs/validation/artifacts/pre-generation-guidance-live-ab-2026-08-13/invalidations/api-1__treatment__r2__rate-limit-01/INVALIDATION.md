@@ -1,4 +1,4 @@
-﻿# Technical invalidation
+# Technical invalidation
 
 Run slot: `api-1 treatment r2`
 
