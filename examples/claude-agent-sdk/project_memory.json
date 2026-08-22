@@ -1,0 +1,20 @@
+{
+  "meta": {
+    "name": "governed-loop-demo",
+    "description": "Isolated decision corpus for the claude_agent_sdk governed-loop example. Deliberately separate from any canonical project memory.",
+    "version": "0.1.0",
+    "owner": "example",
+    "created": "2026-08-22"
+  },
+  "items": [],
+  "decisions": [
+    {
+      "id": "store_001",
+      "decision": "Use SQLite for local storage and database access",
+      "rationale": "single-file portability; no server dependency for local deployments",
+      "scope": ["storage", "database", "persistence"],
+      "constraints": ["no postgres"],
+      "anti_patterns": ["psycopg2"]
+    }
+  ]
+}
