@@ -1,0 +1,1 @@
+﻿Infrastructure failure: agent loop never scheduled after prompt admission (shared opencode.db contention with concurrent OpenCode processes). Fixed by per-run isolated XDG_DATA_HOME. Evidence preserved.

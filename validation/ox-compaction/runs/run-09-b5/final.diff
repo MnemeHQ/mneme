@@ -1,0 +1,73 @@
+diff --git a/repository/member_repository.py b/repository/member_repository.py
+new file mode 100644
+index 0000000..f0e8eaf
+--- /dev/null
++++ b/repository/member_repository.py
+@@ -0,0 +1,33 @@
++"""Repository for member persistence."""
++
++from db.client import DatabaseClient
++
++
++class MemberRepository:
++    """Data access for members, wrapping the low-level database client."""
++
++    def __init__(self, db_path: str):
++        self._client = DatabaseClient(db_path)
++
++    def add(self, name: str) -> int:
++        """Insert a member and return its generated integer id."""
++        cursor = self._client.execute(
++            "INSERT INTO members (name) VALUES (?)",
++            (name,),
++        )
++        return int(cursor.lastrowid)
++
++    def get_by_id(self, member_id: int) -> dict | None:
++        """Return {"id": ..., "name": ...} for the given id, or None."""
++        rows = self._client.query(
++            "SELECT id, name FROM members WHERE id = ?",
++            (member_id,),
++        )
++        if not rows:
++            return None
++        row_id, row_name = rows[0]
++        return {"id": row_id, "name": row_name}
++
++    def close(self) -> None:
++        """Release the underlying database connection."""
++        self._client.close()
+diff --git a/services/member_service.py b/services/member_service.py
+new file mode 100644
+index 0000000..26764df
+--- /dev/null
++++ b/services/member_service.py
+@@ -0,0 +1,28 @@
++"""Member service: registration and lookup of application members."""
++
++import os
++from contextlib import closing
++
++from repository.member_repository import MemberRepository
++
++DEFAULT_DB_PATH = "data/app.db"
++
++
++def _open_repository(db_path: str | None) -> MemberRepository:
++    """Resolve the database path and return an open MemberRepository."""
++    path = db_path if db_path is not None else DEFAULT_DB_PATH
++    parent_dir = os.path.dirname(os.path.abspath(path))
++    os.makedirs(parent_dir, exist_ok=True)
++    return MemberRepository(path)
++
++
++def register_member(name: str, db_path: str | None = None) -> int:
++    """Store a member in the application database and return its integer id."""
++    with closing(_open_repository(db_path)) as repository:
++        return repository.add(name)
++
++
++def find_member(member_id: int, db_path: str | None = None) -> dict | None:
++    """Return the stored member for ``member_id``, or None if unknown."""
++    with closing(_open_repository(db_path)) as repository:
++        return repository.get_by_id(member_id)

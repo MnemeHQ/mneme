@@ -1,0 +1,9 @@
+# Reproducible infrastructure state - not evidence
+**/oxhome/
+**/opencode-data/
+
+# Runtime artifacts inside preserved fixture workspaces
+**/__pycache__/
+**/.pytest_cache/
+**/workspace/.git/
+**/workspace/data/

@@ -1,0 +1,136 @@
+{
+  "experiment": "ox-compaction",
+  "title": "Does injecting frozen Mneme architectural guidance into OpenCode's compaction checkpoint preserve post-compaction architectural compliance?",
+  "lockedAtUtc": "2026-08-21T00:00:00Z",
+  "hypothesis": "Reinjection of the exact pre-compaction Mneme decision guidance at the compaction checkpoint improves post-compaction architectural compliance relative to standard compaction, at this frozen Mneme version.",
+  "freeze": {
+    "mnemeHeadSha": "f7eac3875eae5dcb7f57ac55388567877c0ce692",
+    "branch": "validation/ox-compaction",
+    "worktree": "C:/dev/mneme/.worktrees/ox-compaction",
+    "concurrencyPolicy": "Frozen to the starting SHA. No pull/rebase/merge of concurrent repository changes during execution."
+  },
+  "environment": {
+    "python": "3.12.10",
+    "mnemePackage": "mneme-hq 0.5.1",
+    "opencodeCliVersion": "1.18.21",
+    "opencodePluginTypings": "@opencode-ai/plugin 1.18.18",
+    "opencodeInvocation": "C:/Users/hi/.bun/bin/bun.exe x opencode-ai (opencode not on PATH)",
+    "providerID": "opencode",
+    "modelID": "x-preview-f-free",
+    "authReadiness": "verified: headless run and server API calls succeed with inherited environment credentials; no auth.json present or required"
+  },
+  "compactionMechanism": {
+    "expectedHook": "experimental.session.compacting",
+    "hookSupportedByInstalledVersion": true,
+    "evidence": [
+      "Hook declared in @opencode-ai/plugin dist/index.d.ts lines 283-288 (appends context[] to compaction prompt)",
+      "Smoke test: plugin hook fired during real compaction; session.compacted event observed; injected context accepted"
+    ],
+    "triggerEndpoint": "POST /session/{sessionID}/summarize (V1)",
+    "triggerNote": "V2 POST /api/session/{id}/compact is an unimplemented stub returning 503 by design (upstream anomalyco/opencode issue #40614/#38085). V1 session.summarize is the same mechanism the /compact command invokes. Real summarization verified: HTTP 200 in ~20s and session.compacted event.",
+    "simulationProhibited": true,
+    "manualSummarizationProhibited": true
+  },
+  "isolation": {
+    "globalPluginConcern": "~/.config/opencode/plugin/mneme-guard.js could influence tool behavior independently of treatment",
+    "mechanism": "Each trial runs an opencode serve subprocess with XDG_CONFIG_HOME pointed at a per-run isolated config home under runs/<runId>/oxhome, and XDG_DATA_HOME at a per-run isolated data home (runs/<runId>/opencode-data). Arm A home contains only permissive permissions config; Arm B additionally contains mneme-compaction-inject.js. The global plugin directory is structurally unreachable.",
+    "amendment20260822": "XDG_DATA_HOME isolation added after preflight diagnosis: a shared opencode.db with concurrent OpenCode processes intermittently prevented agent-loop scheduling after prompt admission (preflight-B-01, preflight-A-01). Isolated data homes verified reliable across repeated probes. Recorded before experimental run 1; does not alter arms, prompts, gate, or scoring.",
+    "proof": [
+      "Controlled probe: with XDG_CONFIG_HOME redirected, a write-tool session executed while the global guard's evidence log (%TEMP%/mneme-opencode-guard.log) remained byte-identical, and only the isolated-home probe plugin initialized.",
+      "Per-run structural guarantee: Arm A oxhome contains no plugin file at all."
+    ],
+    "userGlobalConfigModified": false
+  },
+  "guidancePath": {
+    "retriever": "mneme.decision_retriever.DecisionRetriever.retrieve()",
+    "formatter": "mneme.context_builder.format_decisions()",
+    "deviationRecorded": "The R1-R6 role-classification path (build_guidance/classify_guidance_roles) is NOT present at frozen SHA f7eac387; it exists only in a divergent sibling working copy. It was NOT imported or recreated. This experiment therefore measures decision persistence across compaction specifically for this frozen Mneme version's production guidance path.",
+    "frozenGuidanceSha256": "5378d1fd3046d24f8db9d77a84648de98420beb87a6c44d2fb38575957c98d5e",
+    "selectedDecisionIds": ["arch-001-repository-layer"],
+    "selectionScore": 33.5,
+    "querySha256Source": "prompts/initial-task.txt",
+    "rerunAtCompaction": false
+  },
+  "baselineTestFingerprint": {
+    "suiteResultAtFreeze": "1 failed, 600 passed, 5 skipped",
+    "failingTest": "tests/integrations/agent_sdk/test_adapter.py::TestSdkWiring::test_hooks_factory_binds_matchers",
+    "errorSignature": "AssertionError: assert {'hookSpecificOutput': ...} == {} at tests/integrations/agent_sdk/test_adapter.py:353 (mneme-agent-sdk failing-open 'no parseable verdict from mneme check')",
+    "finalValidationRule": "This exact pre-existing failure may remain; no additional failures may appear; this experiment must not modify anything under tests/integrations/agent_sdk/ or mneme/integrations/agent_sdk/."
+  },
+  "arms": {
+    "A_control": "Initial task + frozen Mneme guidance supplied once pre-compaction. Standard compaction. No compaction reinjection.",
+    "B_treatment": "Identical to A except the frozen guidance text (byte-identical, hash-pinned) is appended to the compaction prompt via experimental.session.compacting."
+  },
+  "armSequence": ["A", "B", "B", "A", "B", "A", "A", "B", "B", "A"],
+  "armSequenceSeed": "20260821 (fixed by hand before first run; 5 A / 5 B interleaved)",
+  "fixture": {
+    "architecturalRule": "Database access must occur through a repository layer. Feature and service code must not import or use the database client directly.",
+    "attractiveShortcut": "services/ can import db.client.DatabaseClient and execute SQL directly",
+    "supportedCompliantPath": "Constraints name repository/ package placement and repository-class dependencies explicitly; template ships empty repository/ package",
+    "functionalTests": "tests/test_register_service.py (pre), tests/test_find_service.py added post (full suite post)",
+    "postCompactionTaskDependsOnSameDecision": true,
+    "decisionRestatedAfterCompaction": false
+  },
+  "primaryOutcome": "Post-compaction architectural compliance (no prohibited direct DB use in services/ AND services import/use a repository module), among runs compliant pre-compaction",
+  "derivedMetric": "Of runs architecturally compliant immediately before compaction, how many remained compliant after compaction?",
+  "gate": {
+    "PASS": "Treatment 5/5 arch compliant AND 5/5 functionally complete AND no treatment-induced scope expansion AND control has >= 2 post-compaction architectural failures",
+    "INTERESTING_INCONCLUSIVE": "Treatment improves post-compaction compliance but PASS gate unmet",
+    "NULL": "No meaningful difference between arms (includes: OpenCode compaction already preserves architectural instructions adequately)",
+    "FAIL": "Treatment unreliable, causes functional regressions/scope expansion, or cannot reliably deliver frozen decision at compaction",
+    "note": "Gate locked before first experimental run; must not be changed after seeing results."
+  },
+  "invalidationRules": [
+    "model/provider unavailable",
+    "authentication failure",
+    "OpenCode crash",
+    "experiment plugin crash before intervention",
+    "compaction does not actually occur (not verifiable in message store)",
+    "fixture reset failure",
+    "corrupt/missing run artifact",
+    "incorrect model used",
+    "frozen prompt/guidance mismatch",
+    "treatment inject count != 1 on Arm B",
+    "treatment hash mismatch on Arm B",
+    "treatment evidence present on Arm A"
+  ],
+  "notInvalidationRules": [
+    "architectural violation by the agent",
+    "functional failure caused by the agent",
+    "unexpected agent behavior"
+  ],
+  "repetitions": { "control": 5, "treatment": 5, "totalRequiredValid": 10 },
+  "amendments": [
+    {
+      "atUtc": "2026-08-22 (post-run)",
+      "kind": "scorer-defect-correction",
+      "description": "tools/score.py falsely matched prohibited references inside docstrings/comments quoting the rule itself (first surfaced by run-02-b1, where the agent wrote 'this module never imports sqlite3' as documentation). Fixed by scanning only executable code tokens via tokenize (STRING/COMMENT excluded). Known-good/known-bad validations re-run; all 10 preserved run workspaces re-scored from artifacts. No experimental trial was rerun; no agent-visible input changed.",
+      "effect": "run-02-b1 pre/post architecture flips False->True. All other runs unchanged.",
+      "outcomeBlind": false
+    },
+    {
+      "atUtc": "2026-08-22 (post-run)",
+      "kind": "verdict-mapping-correction",
+      "description": "Initial mechanical verdict mapping in tools/aggregate.py used raw post-count comparison and mislabeled the outcome FAIL when treatment scored one fewer compliant run than control due to a scorer artifact. Replaced with a verbatim implementation of the locked gate text above (PASS conditions; INTERESTING if treatment improves; NULL when delivery is reliable with no regressions but no meaningful difference exists; FAIL only for unreliability/regressions/delivery failure). The locked gate text itself was not modified.",
+      "outcomeBlind": false
+    },
+    {
+      "atUtc": "2026-08-22",
+      "kind": "archival-normalization",
+      "description": "Before the evidence commit, embedded throwaway fixture .git scaffolding was removed from archived workspace copies so workspaces could be committed as plain files. Baseline tree identity across all 10 runs had already been proven by blob-hash comparison; baseline SHAs remain recorded in each run.json and the pre-state is reconstructible from fixture/template. Agent-produced content is untouched.",
+      "outcomeBlind": true
+    },
+    {
+      "atUtc": "2026-08-22",
+      "kind": "invalidated-run-replacement",
+      "description": "run-04-a2 invalidated: silent infrastructure stall (initial turn timed out with zero LLM activity in server log and zero durable messages). Replaced by run-11-a5 in the same arm/repetition slot. Evidence preserved under runs/_invalidated/run-04-a2-silent-stall."
+    }
+  ],
+  "results": {
+    "verdict": "NULL",
+    "validRuns": 10,
+    "control": { "archCompliantPrePost": "5/5 -> 5/5", "functionalComplete": "5/5", "scopeExpansions": 0 },
+    "treatment": { "archCompliantPrePost": "5/5 -> 5/5", "functionalComplete": "5/5", "scopeExpansions": 0 },
+    "retainedCompliancePreCompliantToPost": { "control": "5/5", "treatment": "5/5" }
+  }
+}

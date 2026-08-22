@@ -1,0 +1,85 @@
+diff --git a/repository/member_repository.py b/repository/member_repository.py
+new file mode 100644
+index 0000000..5cc1e9c
+--- /dev/null
++++ b/repository/member_repository.py
+@@ -0,0 +1,40 @@
++"""Repository layer for member persistence.
++
++All SQL for members lives here. Services must depend on this class,
++never on ``db.client.DatabaseClient`` directly.
++"""
++
++from db.client import DatabaseClient
++
++
++class MemberRepository:
++    """Data access object wrapping the low-level database client."""
++
++    def __init__(self, client: DatabaseClient):
++        self._client = client
++
++    @classmethod
++    def from_path(cls, db_path: str) -> "MemberRepository":
++        """Create a repository backed by the SQLite file at *db_path*."""
++        return cls(DatabaseClient(db_path))
++
++    def add(self, name: str) -> int:
++        """Insert a member and return its generated integer id."""
++        cursor = self._client.execute(
++            "INSERT INTO members (name) VALUES (?)", (name,)
++        )
++        return int(cursor.lastrowid)
++
++    def get(self, member_id: int) -> dict | None:
++        """Return the member as a dict, or None if no such id exists."""
++        rows = self._client.query(
++            "SELECT id, name FROM members WHERE id = ?", (member_id,)
++        )
++        if not rows:
++            return None
++        row = rows[0]
++        return {"id": int(row[0]), "name": str(row[1])}
++
++    def close(self) -> None:
++        """Release the underlying database connection."""
++        self._client.close()
+diff --git a/services/member_service.py b/services/member_service.py
+new file mode 100644
+index 0000000..d05f4b0
+--- /dev/null
++++ b/services/member_service.py
+@@ -0,0 +1,33 @@
++"""Member service: registration and lookup of application members."""
++
++import os
++
++from repository.member_repository import MemberRepository
++
++DEFAULT_DB_PATH = os.path.join("data", "app.db")
++
++
++def _resolve_db_path(db_path: str | None) -> str:
++    """Return the database path to use, creating parent dirs if needed."""
++    path = db_path if db_path is not None else DEFAULT_DB_PATH
++    parent = os.path.dirname(os.path.abspath(path))
++    os.makedirs(parent, exist_ok=True)
++    return path
++
++
++def register_member(name: str, db_path: str | None = None) -> int:
++    """Store a member in the application database and return its id."""
++    repository = MemberRepository.from_path(_resolve_db_path(db_path))
++    try:
++        return repository.add(name)
++    finally:
++        repository.close()
++
++
++def find_member(member_id: int, db_path: str | None = None) -> dict | None:
++    """Return a stored member as {"id": ..., "name": ...}, or None."""
++    repository = MemberRepository.from_path(_resolve_db_path(db_path))
++    try:
++        return repository.get(member_id)
++    finally:
++        repository.close()

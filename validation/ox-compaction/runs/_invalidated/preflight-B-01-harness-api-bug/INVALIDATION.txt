@@ -1,0 +1,1 @@
+﻿Harness defect (not an experimental trial): orchestrator used V1 message/status APIs which are invisible for V2 sessions; initial_turn_timeout was a measurement artifact. Evidence preserved.

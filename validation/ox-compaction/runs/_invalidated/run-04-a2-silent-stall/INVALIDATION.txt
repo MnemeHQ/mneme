@@ -1,0 +1,1 @@
+﻿Infrastructure failure: initial turn timed out with ZERO LLM activity in server log and zero durable messages (silent scheduler/agent stall of unknown cause, despite isolated data home). Agent behavior cannot be implicated; infrastructure invalidation per lock rules. Evidence preserved.
