@@ -105,7 +105,7 @@ rank first.
 | **C. Memory-content hygiene** | Dedupe near-duplicate records; separate ADR prose from governance fields | Both modes, at the source; touches fixture corpus if applied to `examples/`, requiring re-baselining |
 | **F. Injection floor** | Inject only decisions above a score floor | Tail noise only; does not address top-rank noise |
 | **T. Tokenizer extension** | Function-word stopwords / stemming | Both modes partially; named frozen surface |
-| **W. Field/weight reform** | Restructure `rationale`, re-weigh fields | Top-rank noise; largest blast radius |
+| **W. Field/weight reform** | Restructure `rationale`, re-weigh fields | Top-rank noise; changes field contribution for every query that overlaps rationale text |
 
 ## 6. Amendment analysis
 
@@ -125,10 +125,10 @@ precision@3 ≈ 0.333 is structurally pinned by the K=3 fixture shape rather tha
 quality signal. Layer-1 metrics remain valid as regression metrics for the frozen corpus; they do not
 measure retrieval quality against the current live memory.
 
-Separate live-memory probes show genuine lexical-noise failures that the frozen benchmark does not
-measure: low-relevance padding in ranks 2–3, and off-topic rank-1 retrievals driven by function-word
-overlap against long rationale prose. The second mode is the more significant finding because it
-affects the primary injected decision, not merely unused slots.
+Separate live-memory probes show lexical-noise failures that the frozen benchmark does not measure:
+low-relevance padding in ranks 2–3, and off-topic rank-1 retrievals driven by function-word overlap
+against long rationale prose. The two modes affect different parts of retrieval: top-rank noise
+changes the first injected decision, while tail noise affects lower-ranked slots.
 
 No retrieval change is selected by this diagnosis. The next step is to evaluate candidate
 interventions against both the frozen regression corpus and current live-memory probes, then
