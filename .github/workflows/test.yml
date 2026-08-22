@@ -1,0 +1,46 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install build
+        python -m pip install -e ".[dev]"
+        
+    - name: Build distribution
+      run: python -m build
+        
+    - name: Run tests with pytest
+      shell: bash
+      run: |
+        set -euo pipefail
+        python -m pytest tests/ -v | tee pytest-results.txt
+        
+    - name: Check for skipped tests
+      run: |
+        if grep -q " skipped" pytest-results.txt; then
+          echo "Error: Tests were silently skipped. Packaging-contract tests require dist/."
+          exit 1
+        fi
