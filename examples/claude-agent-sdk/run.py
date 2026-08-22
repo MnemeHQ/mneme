@@ -6,8 +6,11 @@ Reproduces, in one script, the exact loop proven live in PR #293:
                      before any work starts.
     2. ENFORCEMENT   a proposed file mutation is evaluated by the same
                      `mneme check` path the Claude Code hook uses.
-    3. RECOVERY      a blocked proposal carries the governing decision
+    3. CORRECTION    a blocked proposal carries the governing decision
                      back to the caller; the corrected proposal passes.
+                     Deterministic mode scripts both proposals; --live
+                     mode lets the model perform the correction from
+                     the block reason.
 
 Two modes:
 
@@ -98,7 +101,7 @@ def run_deterministic() -> int:
     show_guidance(gated)
 
     print("=" * 64)
-    print("2. ENFORCEMENT + 3. AUTONOMOUS RECOVERY")
+    print("2. ENFORCEMENT + 3. CORRECTION PATH")
     print("   task: add database persistence; the first proposal uses")
     print("   a forbidden server database driver.")
     print("=" * 64)

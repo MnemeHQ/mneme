@@ -130,7 +130,7 @@ print(response.content)
 
 ## Works with
 
-**Explicitly integrated (hook-level enforcement):**
+**Explicitly supported integrations:**
 
 - **Claude Agent SDK** - relevant decisions injected before agent work;
   proposed file mutations deterministically evaluated before execution.

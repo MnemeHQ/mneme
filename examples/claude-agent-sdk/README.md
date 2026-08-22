@@ -12,8 +12,10 @@ complete, isolated reproduction of the loop proven there.
 2. **Enforcement** — a proposed file mutation is materialized, reduced to
    its introduced lines (ADR-018), and evaluated by the same `mneme check`
    path the Claude Code hook uses (`PreToolUse` -> allow/deny).
-3. **Autonomous recovery** — a blocked proposal carries the governing
-   decision id and reason back to the model; the corrected proposal passes.
+3. **Correction path** — a blocked proposal carries the governing
+   decision id and reason back to the caller. In deterministic mode the
+   corrected second proposal is scripted; with `--live`, the model
+   performs the correction itself from the block reason.
 
 Mneme governs; the model performs the correction. Mneme itself does not
 edit code and does not generate code.
