@@ -1,21 +1,43 @@
 # Pre-generation guidance: canonical closeout
 
-Status: **experiment closed; implementation retained; no R7 planned**  
-Date: 2026-08-14
+Status: **experiment closed; candidate implementation preserved in archived experimental tree; never merged to main; no R7 planned**  
+Date: 2026-08-14  
+Lineage corrected: 2026-08-22 — see
+[lineage reconciliation](r1-r6-architecture-lineage-reconciliation.md)
+
+## Lineage reconciliation (2026-08-22)
+
+A P0 Git-lineage investigation established that R1–R6 did **not** run against
+canonical `main`:
+
+- The campaign executed on an unmerged experimental working copy whose
+  role-aware implementation was never committed at the time. It is preserved
+  byte-exactly in the post-hoc archival snapshot
+  `archive/r1-r6-experimental-tree-2026-08-22` (commit `53d4377`), which is
+  evidence preservation only and is never to be merged.
+- That tree's `DecisionRetriever` (locked SHA-256 `F86B3BA2E50BB42D92DBFEA879E24A919A07B5AEBB71284F7596D65CC1C74882`)
+  contained a typed-rule scoring term absent from every commit of `main`.
+- Consequently, the product-finding, code-quality, and supported-boundary
+  claims below describe that experimental candidate configuration only. The
+  frozen R6 FAIL applies to that candidate and is not an evaluation of the
+  shipped production path (`MemoryStore → DecisionRetriever → format_decisions()`).
+
+The original text below is otherwise preserved unmodified.
 
 ## Product finding
 
-Mneme can retrieve multiple relevant decisions while distinguishing the one
-that directly governs the task from secondary decisions that must not become
-extra implementation work.
+The experimental candidate demonstrated a mechanism for distinguishing a
+directly governing retrieved decision from adjacent constraints. This
+mechanism was never part of the shipped production path.
 
 The original defect was action-shape ambiguity: every retrieved decision was
 rendered as equally actionable, so an authentication task could cause an
 adjacent storage decision to become an unrequested SQLite implementation. The
-implemented change assigns a unique top-scoring decision the `direct` role,
-marks remaining selected decisions as `adjacent_constraint`, and renders the
-roles differently without changing retrieval, ranking, K, or enforcement. A
-top-score tie deliberately produces no direct anchor. The role contract
+experimental candidate assigned a unique top-scoring decision the `direct`
+role, marked remaining selected decisions as `adjacent_constraint`, and
+rendered the roles differently without changing its own retrieval selection,
+ranking, K, or enforcement relative to that candidate's baseline. A top-score
+tie deliberately produces no direct anchor. The role contract
 document was never committed to `main`; it exists only in the archived
 experimental tree (`archive/r1-r6-experimental-tree-2026-08-22`, at
 `docs/architecture/pre-generation-guidance-role-contract.md`). See the
@@ -48,12 +70,12 @@ experimental tree (`archive/r1-r6-experimental-tree-2026-08-22`, at
 
 ## Code-quality audit
 
-The retained production mechanism is small and readable: retrieval selects;
-`classify_guidance_roles()` wraps selected objects without copying, rescoring,
-reordering, or mutating them; `build_guidance()` formats the assignments; and
-the Claude Code hook remains opt-in and fail-open. Focused classifier,
-formatter, hook, retrieval, plugin, and packaging-contract tests produced
-55 passes and 5 expected built-artifact skips.
+The experimental candidate mechanism is small and readable: its retrieval
+selects; `classify_guidance_roles()` wraps selected objects without copying,
+rescoring, reordering, or mutating them; `build_guidance()` formats the
+assignments; and the Claude Code hook remains opt-in and fail-open. Focused
+classifier, formatter, hook, retrieval, plugin, and packaging-contract tests
+produced 55 passes and 5 expected built-artifact skips.
 
 No unnecessary abstraction, duplicated implementation path, or substantive
 correctness defect was found. One non-functional documentation inconsistency
@@ -63,14 +85,18 @@ justify reopening the implementation or broadening the diff.
 
 ## Supported boundary and decision
 
-Supported: the role-aware presentation fixed the diagnosed adjacent-decision
-leakage mechanism and preserved a strong architectural-compliance signal in
-synthetic mechanism tests. The implementation is retained as a worthwhile
-incremental improvement.
+Supported: the frozen experimental candidate showed evidence that role-aware
+presentation can reduce adjacent-decision scope leakage while preserving an
+architectural-compliance signal in synthetic mechanism tests. Because the
+candidate also used non-canonical retrieval scoring, the experiment does not
+isolate role-aware presentation as the sole cause.
 
-Not supported: production-effectiveness claims, a precise estimate of ordinary
-model variance, or a claim that R6 passed. The storage 2x2 had only three
-trials per cell, and R6 remains permanently **FAIL** under its frozen rule.
+Not supported: claims that shipped Mneme currently provides role-aware
+guidance, claims about current production effectiveness, causal attribution of
+the observed improvement to role-aware presentation alone, a precise estimate
+of ordinary model variance, or a claim that R6 passed. The storage 2x2 had
+only three trials per cell, and R6 remains permanently **FAIL** under its
+frozen rule — for that candidate configuration.
 
 Synthetic experimentation stops here. Do not create R7 or another confirmatory
 campaign. The production-effectiveness A/B remains paused; replacing its failed
