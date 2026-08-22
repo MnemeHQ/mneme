@@ -9,7 +9,7 @@ mneme CLI) and prints the structured verdict.
 What this script proves:
     1. Without a governance layer, every agent's proposal is locally
        reasonable and the system drifts.
-    2. With Mneme, the first divergence is blocked before it lands,
+    2. With Mneme, the first divergence returns FAIL before it lands,
        the retry converges within constraints, and downstream agents
        build on the corrected codebase by construction.
 
@@ -99,7 +99,7 @@ def _without_governance_timeline() -> None:
 
 
 def _with_governance_timeline() -> None:
-    _header("With Mneme -- upstream block + retry convergence")
+    _header("With Mneme -- upstream FAIL + retry convergence")
 
     print("  Same agents. Same prompts. Every proposed diff is evaluated")
     print("  against the same project_memory.json before it lands.")
@@ -152,6 +152,8 @@ def main() -> None:
     print("  Memory: project_memory.json (ADR-001 JSON-only storage, ADR-003 no ORM)")
     print("  Inputs: 4 fixture diffs simulating three sequential agents")
     print("  Mode:   mneme check --mode warn")
+    print("  Note:   --mode warn always exits 0 -- FAIL is a verdict, not a halt.")
+    print("          A --mode strict CI gate maps this same FAIL to exit 2.")
 
     _without_governance_timeline()
     _with_governance_timeline()
@@ -159,7 +161,7 @@ def main() -> None:
     _header("Summary")
     print("  Same corpus on disk for both timelines.")
     print("  Without governance: 3 silently-violating PRs land.")
-    print("  With governance: first divergence blocked, retry converges,")
+    print("  With governance: first divergence returns FAIL, retry converges,")
     print("                   downstream agents build on the correct primitive.")
     print()
     print("  Page:   https://mnemehq.com/demo/architectural-drift/")
