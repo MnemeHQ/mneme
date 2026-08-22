@@ -9,21 +9,22 @@ five-field weights, no typed-rule term).
 
 ---
 
-## 0. Premise correction (found during reproduction)
+## 0. Corpus scope clarification
 
-The shipped claim "recall@3 = 1.00, precision@3 = 0.33" was reproduced exactly — but only against
-the **demo fixture corpus** `examples/project_memory.json` (11 decisions incl. legacy-migrated
-`anti-*`/`rule-*` records), which is what generated `examples/benchmarks/reports/results.json`.
+The benchmark uses a **frozen 11-decision corpus** (`examples/project_memory.json`: three native
+decisions plus legacy-migrated `anti-*`/`rule-*` records) that has diverged from the repo's current
+`.mneme/project_memory.json` (15 decisions). The Layer-1 freeze defines the benchmark as a
+regression/integrity instrument over that fixed pool and does not make a production or
+generalization claim.
 
-Against the **canonical live memory** `.mneme/project_memory.json` (15 decisions: `workflow-001`,
-`encoding_001`, `ADR-001…ADR-020`), the same benchmark currently yields
-**recall@3 = 0.00 / precision@3 = 0.00** for all five protected scenarios — not because retrieval got
-worse, but because the protected IDs (`mneme_storage_json`, `mneme_retrieval_deterministic`,
-`anti-001`, `anti-002`) do not exist in that corpus. The fixtures are stale relative to canonical memory.
+Both measurement surfaces were exercised during this diagnosis:
 
-Both facts matter for the verdict below.
+| Surface | Corpus | Result |
+|---|---|---|
+| Frozen benchmark regression | `examples/project_memory.json` | recall@3 = 1.00, protected-scenario precision@3 = 0.333 — reproduces the shipped report exactly |
+| Canonical live-memory probes | `.mneme/project_memory.json` | protected benchmark IDs absent from this corpus by design; probes show off-topic rank-1 retrievals (§4) |
 
----
+Benchmark metrics are therefore **fixture-scoped** and are labeled as such throughout this report.
 
 ## 1. Which benchmark queries produce each false positive?
 
@@ -37,8 +38,9 @@ Reproduced top-3 (canonical retriever, `--memory examples/project_memory.json`, 
 | retrieval_complexity_violation | `mneme_retrieval_deterministic` (#1) | + `rule-002`, `rule-005` | 0.33 |
 | storage_backend_violation | `mneme_storage_json` (#1) | + `rule-003`, `rule-002` | 0.33 |
 
-**Key structural observation:** the protected decision ranks **#1 in all five scenarios**. The
-precision@3 deficit comes entirely from slots 2–3 being force-filled by fixed top-K.
+All protected benchmark decisions rank first in the frozen scenarios. Under the frozen K=3 fixture
+shape (one expected ID, zero acceptable IDs), precision@3 is structurally constrained and is not an
+appropriate tuning target; the Step 3C charter records this explicitly.
 
 ## 2. Which field/token overlap caused each score?
 
@@ -50,88 +52,84 @@ Token-level trace (weight × matched tokens):
 | `anti-003` (feature_boundary) | 2.5 | `decision`+`anti_patterns` ×2.5 via **`between`** ("state between sessions") |
 | `anti-002` (framework_abstraction) | 3.0 | `constraints` ×3 via **`layer`**, **`mneme`** |
 | `mneme_storage_json` (framework_abstraction) | 1.5 | `anti_patterns` ×1.5 via **`layer`** ("storage layer") |
-| `mneme_no_agents_v1` (infra_scope_creep) | 4.0 | `loops`, `tool` — near-duplicate of the protected record itself |
+| `mneme_no_agents_v1` (infra_scope_creep) | 4.0 | `loops`, `tool` — near-duplicate record of the protected decision |
 | `rule-004` (infra_scope_creep) | 3.0 | `constraints` ×3 via **`services`**, **`this`** |
-| `rule-002` (retrieval_complexity) | 2.5 | `retrieval` in title + constraints (topically adjacent rule) |
+| `rule-002` (retrieval_complexity) | 2.5 | `retrieval` in title + constraints |
 | `rule-005` (retrieval_complexity) | 2.5 | `system` in title + constraints |
 | `rule-003` (storage_backend) | 3.5 | `decision` ×2 + `constraints` via **`memory`, `project`** (title: "Separate project memory…") |
 | `rule-002` (storage_backend) | 1.5 | `memory` |
 
-Outside-fixture probe (canonical `.mneme` corpus) found the same mechanism at its worst:
+## 3. Observed overlap mechanisms
 
-> Query: *"What database should we use for analytics?"*
-> → #1 `ADR-001` (**positioning & messaging rules**) score 2.0, driven by **four rationale-token
-> collisions: `what`, `should`, `database`, `analytics`** — two of them interrogative function words.
-> Cause: migrated `rationale` fields embed whole imported ADR markdown documents, so generic English
-> prose mass-produces 0.5× hits that outrank genuine signal.
-
-Also confirmed: *"Can we switch the newsletter to Mailchimp?"* produces three decisions at
-**score 0.0**, which still inject because `format_decisions(min_score=0.0)` keeps zero scores
-(`context_builder.py:132`).
-
-## 3. Root-cause classification
-
-Ranked by measured contribution:
-
-1. **Fixed top-K padding with no relevance floor** (mechanics): slots 2–3 always fill, even at score
-   0.0. This alone accounts for ~half the precision deficit; rank-1 is already correct in 7/7.
+1. **Fixed top-K padding**: slots 2–3 always fill, including at score 0.0 (`openai_provider_violation`
+   surfaces three decisions at 0.0).
 2. **Function-word tokens survive tokenization**: `len(w) >= 4` admits `what`, `should`, `this`,
    `between`, `using`. `_STOPWORDS` covers only six short verbs.
-3. **Rationale-field noise**: legacy migration stuffed full ADR prose into `rationale`; at 0.5× per
-   token across long prose, noise sums above true signal (ADR-001 case above).
-4. **Corpus duplication & self-reference**: `mneme_no_agents_v1` ≈ `anti-002` express one concept
-   twice (native vs migrated); the token `mneme` appears in nearly every record's own text and acts
-   as a universal booster.
-5. **Shared domain vocabulary in a narrow corpus**: `rule-002`/`rule-005` are genuinely about
-   retrieval/systems — topically adjacent, not misranked; K=3 converts adjacency into false positives.
-6. **No stemming**: `agent`/`agents` count separately (minor; cuts both ways).
+3. **Rationale-field prose**: migrated `rationale` fields embed imported ADR markdown; generic words
+   in that prose produce 0.5× hits that accumulate across many tokens.
+4. **Corpus duplication and self-reference** (fixture corpus): `mneme_no_agents_v1` ≈ `anti-002`;
+   the token `mneme` appears in most records' own text.
+5. **Shared domain vocabulary**: `rule-002`/`rule-005` are about retrieval/systems — topically
+   adjacent to the retrieval-complexity query rather than mis-scored.
+6. **No stemming**: `agent`/`agents` count separately.
 
-Not causes: scoring weights behaved as specified; ranking order among relevant records was correct;
-enforcement untouched (7/7 preserved throughout this diagnosis).
+## 4. Live-memory probes (separate diagnostic surface)
 
-## 4. Are the false positives reproducible outside benchmark fixtures?
+Probes against current `.mneme/project_memory.json` show off-topic rank-1 retrievals:
 
-Yes — demonstrated above against `.mneme/project_memory.json` with natural developer queries:
-interrogative-function-word rationale collisions put an off-topic positioning ADR at rank #1, and
-out-of-domain queries still inject three score-0 decisions. The mechanism is a property of the
-canonical retriever + memory content, not of the fixture corpus. (Conversely, the *specific* 1.00/0.33
-numbers are fixture-bound: they do not reproduce against canonical memory today.)
+> Query: *"What database should we use for analytics?"*
+> → #1 `ADR-001` (**positioning & messaging rules**) score 2.0, from four rationale-token
+> collisions: `what`, `should`, `database`, `analytics`. Two are interrogative function words.
 
-## 5. Smallest prospective intervention(s)
+> Query: *"Can we switch the newsletter to Mailchimp?"*
+> → three decisions surfaced at **score 0.0** (`format_decisions(min_score=0.0)` keeps zero scores,
+> `context_builder.py:132`).
 
-Ordered by invasiveness; **none implemented here**.
+Other probes (*deploy site*, *CLI rewrite*, *pagination*) returned top results dominated by small
+rationale-token counts (1–3 hits) with no clearly relevant decision at rank 1.
 
-| Option | Change surface | Expected effect on precision@3 |
+The live-memory probes show two distinct failure modes:
+
+- **Tail noise:** low- or zero-relevance decisions fill ranks 2–3.
+- **Top-rank noise:** generic lexical overlap against long rationale prose can place an irrelevant
+  decision at rank 1.
+
+These failure modes are not measured by the frozen benchmark scenarios, where protected decisions
+rank first.
+
+## 5. Candidate interventions (none implemented)
+
+| Option | Change surface | Addresses |
 |---|---|---|
-| **R. Metric/reporting fix** | Report precision@1 alongside @3; stop averaging vacuous control scenarios | Corrects the narrative; no behavior change. Rank-1 precision is 7/7 today |
-| **C. Corpus hygiene** | Dedupe `mneme_no_agents_v1`/`anti-002`; de-self-reference `Mneme` tokens; separate ADR prose from governance fields | Removes duplicate FPs and rationale noise at the source |
-| **F. Injection floor** | Inject only decisions scoring ≥ a fraction of top score (or absolute floor > 0) | Directly eliminates slot-padding; largest behavioral gain |
-| **T. Tokenizer extension** | Extend `_STOPWORDS` with interrogatives/function words; optional stemming | Removes `what`/`should`/`this`/`between` collisions |
-| **W. Weight/field reform** | Demote or restructure `rationale`; re-weigh fields | Addresses the deepest cause (noise source) but largest blast radius |
-
-**Smallest genuinely effective pair:** F (floor) + T (function-word stopwords). C is prerequisite
-hygiene for any honest re-measurement but is a memory-content operation, not a retriever change.
+| **L. Labeling/reporting** | State the benchmark's frozen-corpus scope in methodology artifacts; continue reporting recall@1 as the tuning signal; report canonical-live-memory probes separately as diagnostics | Interpretation scope, not behavior |
+| **C. Memory-content hygiene** | Dedupe near-duplicate records; separate ADR prose from governance fields | Both modes, at the source; touches fixture corpus if applied to `examples/`, requiring re-baselining |
+| **F. Injection floor** | Inject only decisions above a score floor | Tail noise only; does not address top-rank noise |
+| **T. Tokenizer extension** | Function-word stopwords / stemming | Both modes partially; named frozen surface |
+| **W. Field/weight reform** | Restructure `rationale`, re-weigh fields | Top-rank noise; largest blast radius |
 
 ## 6. Amendment analysis
 
 Per the frozen architecture (retrieval mechanics protected; ADR-017 separates enforcement from
-retrieval):
+retrieval; Step 3C freezes memory-pool composition):
 
-- **Requires explicit amendment:** F (alters effective K/selection semantics), T (tokenizer is named
-  frozen surface), W (weights/fields).
-- **Does not require a retrieval amendment:** R (measurement/reporting only) and C (memory content),
-  with one caveat each — R edits a citeable methodology artifact (`RESULTS.md`), and C mutates
-  `examples/project_memory.json`, which doubles as the benchmark fixture, so any fixture-affecting
-  change needs an explicit re-baselining decision rather than silent tuning.
+- **Requires explicit amendment:** F (alters selection semantics), T (tokenizer is named frozen
+  surface), W (weights/fields).
+- **Does not require a retrieval amendment:** L (reporting only) and C applied to live `.mneme`
+  content only — with the caveat that C applied to the fixture corpus requires an explicit
+  re-baselining decision, which this diagnosis does not make.
 
 ## Verdict
 
-Precision@3 = 0.33 is **not a ranking failure** — it is (a) fixed-K padding without a floor,
-(b) function-word token leakage, and (c) rationale-prose noise from migrated memory, compounded by a
-duplicated demo corpus. The single most consequential non-code fact: **the shipped benchmark numbers
-describe the demo fixture corpus, while the canonical `.mneme` memory has drifted so far that its
-protected IDs no longer exist** — so Layer-1 metrics currently measure neither production nor reality
-without an explicit statement of which corpus is under test.
+The frozen benchmark retrieval is functioning as designed: all protected decisions rank first, and
+precision@3 ≈ 0.333 is structurally pinned by the K=3 fixture shape rather than being a Layer-1
+quality signal. Layer-1 metrics remain valid as regression metrics for the frozen corpus; they do not
+measure retrieval quality against the current live memory.
 
-Recommended sequence: R + C first (no amendment, restores meaningful measurement), then a single
-prospective amendment covering F + T if precision beyond rank-1 remains unsatisfactory.
+Separate live-memory probes show genuine lexical-noise failures that the frozen benchmark does not
+measure: low-relevance padding in ranks 2–3, and off-topic rank-1 retrievals driven by function-word
+overlap against long rationale prose. The second mode is the more significant finding because it
+affects the primary injected decision, not merely unused slots.
+
+No retrieval change is selected by this diagnosis. The next step is to evaluate candidate
+interventions against both the frozen regression corpus and current live-memory probes, then
+determine whether an architecture amendment is required.
