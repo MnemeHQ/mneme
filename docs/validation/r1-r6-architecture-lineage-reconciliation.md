@@ -142,8 +142,7 @@ No disappearance event occurred (rules out class A): **the code never entered th
 
 - **Primary (B):** R1–R6 ran against an unmerged experimental clone whose role-aware implementation
   never entered canonical production. The closeout's "implementation retained" claim is wrong w.r.t. `main`.
-- **Retrieval-provenance defect (additional finding, the most consequential new fact beyond the original
-  P0):** R4–R6 used not only role-aware guidance but also a **non-canonical `DecisionRetriever`**
+- **Retrieval-provenance defect (additional finding):** R4–R6 used not only role-aware guidance but also a **non-canonical `DecisionRetriever`**
   (`F86B3BA2…`, typed-rule scoring term absent from every commit of `main`). The experiment was therefore
   a **configuration**, not merely a formatter change: one cannot transplant the role-aware code onto
   canonical retrieval and assume one is reproducing the R6 candidate. Class D does not apply — all stages
@@ -157,7 +156,6 @@ The evidence remains valid but its scope shrinks: it is evidence about an **expe
 configuration**, not about the shipped Mneme production path (`format_decisions()` on canonical
 retrieval). The frozen R6 FAIL applies to that candidate and must not be presented as an evaluation of
 current production behavior.
-
 ---
 
 ## 8. Answers to the six acceptance questions
@@ -193,7 +191,7 @@ Ordered, narrowly scoped, each a separate PR:
    restate "implementation retained" as "campaign executed on an unmerged experimental tree, preserved
    by archival snapshot"; repair or remove the phantom architecture-contract link; explicitly record the
    non-canonical retriever (`F86B3BA2…`). Do not rewrite the frozen R1–R6 locks, results, or artifacts.
-3. **Close P0.** Canonical `main` becomes unquestionably authoritative for future work.
+3. **Close P0.** Canonical `main` is the authoritative production baseline for future work.
 4. **Then open P1 retrieval precision against canonical `main`.**
    Do not use the OneDrive retriever as a starting point.
 5. **If role-aware guidance is reconsidered later, treat it as a new prospective feature.**
@@ -203,7 +201,7 @@ Ordered, narrowly scoped, each a separate PR:
      operates strictly after canonical retrieval and demonstrably does not alter scores, ranking, K,
      selection IDs, or retrieval semantics (per ADR-017, retrieval is the context-injection ranking
      layer, separate from enforcement).
-   - The experimental typed-rule scoring term (`"rules": 1.5` overlap weight) **absolutely requires an
+   - The experimental typed-rule scoring term (`"rules": 1.5` overlap weight) **requires an
      explicit amendment** before any adoption, since it modifies `DecisionRetriever` scoring itself.
 
 Explicitly **not** recommended: silently re-committing the OneDrive tree onto `main`, treating the
