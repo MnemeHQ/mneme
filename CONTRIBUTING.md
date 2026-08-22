@@ -51,3 +51,9 @@ If you need to change `.mneme/project_memory.json` (the repository's own governa
 
 - If you add a new command or modify an existing one, update `README.md` or the relevant `docs/` file.
 - Changes to API boundaries should be documented.
+- State observations, scope, configuration, and evidence before interpretation. Distinguish benchmark fixtures, experimental candidates, live repo memory, and shipped production behavior when the distinction affects a claim.
+- Prefer measured descriptions over evaluative labels. Do not use phrases such as "headline finding", "important implication", "meaningfully improves", "strong signal", "promising", "worthwhile", "largest", "deepest", or "winning" as substitutes for a metric, observed mechanism, or explicit comparison criterion.
+- When one result matters more than another, state the concrete reason (for example, "affects rank 1 rather than ranks 2–3") instead of labeling it "more significant" or "more consequential".
+- Separate observation from inference. If causality is not isolated, say so; do not attribute an observed change to one mechanism when multiple variables changed.
+- Do not rewrite frozen locks, run artifacts, or preserved experiment outputs for editorial style. Record corrections or changed interpretation in a separate reconciliation or diagnosis document so the original evidence remains byte-stable.
+- Accepted ADRs are architecture records, not copy-edit targets. Change them through the ADR/amendment process when their substance needs revision; do not reopen them solely to normalize wording.
