@@ -45,7 +45,7 @@ import os
 import subprocess
 import sys
 import tempfile
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
@@ -53,7 +53,6 @@ from mneme.context_builder import DEFAULT_MAX_DECISIONS, format_decisions
 from mneme.decision_retriever import DecisionRetriever
 from mneme.integrations.claude_code.hook import (
     ToolEvent,
-    _CHECK_JSON_SCHEMA,
     _CHECK_TIMEOUT_SECONDS,
     _child_env,
     find_memory,
@@ -426,5 +425,4 @@ __all__ = [
     "ACTION_WARN",
     "ACTION_FAIL_OPEN",
     "ACTION_SKIP",
-    "_CHECK_JSON_SCHEMA",
 ]
