@@ -1,0 +1,10 @@
+{
+  "name": "mneme-guidance-eval",
+  "displayName": "Mneme Guidance Evaluation",
+  "version": "0.1.0",
+  "description": "Minimal prompt-context adapter used by the locked guidance evaluation.",
+  "author": {
+    "name": "Mneme HQ"
+  },
+  "license": "MIT"
+}

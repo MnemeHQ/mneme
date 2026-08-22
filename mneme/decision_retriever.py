@@ -8,6 +8,7 @@ Scoring formula (deterministic, no external libraries):
       + overlap(query, scope)         * 2.0
       + overlap(query, constraints)   * 1.5
       + overlap(query, anti_patterns) * 1.5
+      + overlap(query, typed rules)   * 1.5
       + overlap(query, rationale)     * 0.5
 
 A ``ScoredDecision`` bundles the decision with its score and a per-field
@@ -28,6 +29,7 @@ _WEIGHTS: dict[str, float] = {
     "scope": 2.0,
     "constraints": 1.5,
     "anti_patterns": 1.5,
+    "rules": 1.5,
     "rationale": 0.5,
 }
 
@@ -113,6 +115,12 @@ class DecisionRetriever:
             "scope": _tokenize_list(d.scope),
             "constraints": _tokenize_list(d.constraints),
             "anti_patterns": _tokenize_list(d.anti_patterns),
+            # Typed rules are first-class governance content.  Excluding their
+            # values creates a schema-asymmetry miss: a task that names an
+            # exact FORBID_LITERAL can retrieve nothing even though the rule is
+            # independently enforceable.  Path selectors describe eventual
+            # artifact applicability and do not contribute query relevance.
+            "rules": _tokenize_list(rule.value for rule in d.rules),
             "rationale": _tokenize(d.rationale),
         }
         matches = {name: len(query_tokens & toks) for name, toks in fields.items()}

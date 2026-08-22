@@ -1,0 +1,196 @@
+{
+  "schema": "mneme.guidance-retrieval-eval/v1",
+  "locked_on": "2026-08-13",
+  "memory": "project_memory.json",
+  "k": 3,
+  "gates": {
+    "safety_critical_recall_at_k": 1.0,
+    "holdout_macro_recall_at_k": 0.9,
+    "max_no_relevance_false_injection_rate": 0.1,
+    "max_low_signal_injections": 0
+  },
+  "cases": [
+    {
+      "id": "dev-storage-sessions",
+      "split": "development",
+      "prompt": "Add persistent storage for user sessions",
+      "expected_ids": ["ADR-STORAGE"],
+      "acceptable_ids": ["ADR-AUTH"],
+      "safety_critical": true
+    },
+    {
+      "id": "dev-storage-prohibited-backend",
+      "split": "development",
+      "prompt": "Replace SQLite session persistence with Postgres and psycopg2",
+      "expected_ids": ["ADR-STORAGE"],
+      "acceptable_ids": [],
+      "safety_critical": true
+    },
+    {
+      "id": "dev-auth-jwt",
+      "split": "development",
+      "prompt": "Issue JWT bearer tokens for browser authentication",
+      "expected_ids": ["ADR-AUTH"],
+      "acceptable_ids": [],
+      "safety_critical": true
+    },
+    {
+      "id": "dev-api-pickle",
+      "split": "development",
+      "prompt": "Return pickle payloads from the public API",
+      "expected_ids": ["ADR-SERIALIZATION"],
+      "acceptable_ids": [],
+      "safety_critical": true
+    },
+    {
+      "id": "dev-background-celery",
+      "split": "development",
+      "prompt": "Send email jobs to a Celery background worker",
+      "expected_ids": ["ADR-JOBS"],
+      "acceptable_ids": [],
+      "safety_critical": true
+    },
+    {
+      "id": "dev-logging",
+      "split": "development",
+      "prompt": "Add JSON structured logging to request handlers",
+      "expected_ids": ["ADR-LOGGING"],
+      "acceptable_ids": [],
+      "safety_critical": false
+    },
+    {
+      "id": "dev-pytest",
+      "split": "development",
+      "prompt": "Add pytest fixtures for the new unit tests",
+      "expected_ids": ["ADR-TESTING"],
+      "acceptable_ids": [],
+      "safety_critical": false
+    },
+    {
+      "id": "dev-dependency",
+      "split": "development",
+      "prompt": "Install another runtime dependency for one helper function",
+      "expected_ids": ["ADR-DEPENDENCIES"],
+      "acceptable_ids": [],
+      "safety_critical": false
+    },
+    {
+      "id": "dev-typed-rule-value",
+      "split": "development",
+      "prompt": "Use legacy-client",
+      "expected_ids": ["ADR-INSTALL"],
+      "acceptable_ids": [],
+      "safety_critical": true
+    },
+    {
+      "id": "dev-rationale-noise",
+      "split": "development",
+      "prompt": "Add automatic Claude Code task context before code generation so architectural constraints guide the first proposed implementation",
+      "expected_ids": ["ADR-GUIDANCE"],
+      "acceptable_ids": [],
+      "safety_critical": false
+    },
+    {
+      "id": "dev-no-relevance-ui",
+      "split": "development",
+      "prompt": "Change the button color on the landing page",
+      "expected_ids": [],
+      "acceptable_ids": [],
+      "safety_critical": false,
+      "no_relevance": true
+    },
+    {
+      "id": "dev-low-signal-yes",
+      "split": "development",
+      "prompt": "yes",
+      "expected_ids": [],
+      "acceptable_ids": [],
+      "safety_critical": false,
+      "no_relevance": true,
+      "low_signal": true
+    },
+    {
+      "id": "holdout-storage-login",
+      "split": "holdout",
+      "prompt": "Persist login sessions in the local database",
+      "expected_ids": ["ADR-STORAGE"],
+      "acceptable_ids": ["ADR-AUTH"],
+      "safety_critical": true
+    },
+    {
+      "id": "holdout-auth-cookie",
+      "split": "holdout",
+      "prompt": "Move auth state into signed HTTP-only cookies",
+      "expected_ids": ["ADR-AUTH"],
+      "acceptable_ids": [],
+      "safety_critical": true
+    },
+    {
+      "id": "holdout-api-json",
+      "split": "holdout",
+      "prompt": "Expose response bodies as JSON API payloads",
+      "expected_ids": ["ADR-SERIALIZATION"],
+      "acceptable_ids": [],
+      "safety_critical": true
+    },
+    {
+      "id": "holdout-email-synchronous",
+      "split": "holdout",
+      "prompt": "Keep email delivery synchronous and do not add a background queue",
+      "expected_ids": ["ADR-JOBS"],
+      "acceptable_ids": [],
+      "safety_critical": false
+    },
+    {
+      "id": "holdout-request-ids",
+      "split": "holdout",
+      "prompt": "Capture request IDs in structured logs",
+      "expected_ids": ["ADR-LOGGING"],
+      "acceptable_ids": [],
+      "safety_critical": false
+    },
+    {
+      "id": "holdout-add-tests",
+      "split": "holdout",
+      "prompt": "Now add pytest tests",
+      "expected_ids": ["ADR-TESTING"],
+      "acceptable_ids": [],
+      "safety_critical": false
+    },
+    {
+      "id": "holdout-install-docs",
+      "split": "holdout",
+      "prompt": "Document the legacy-client setup command",
+      "expected_ids": ["ADR-INSTALL"],
+      "acceptable_ids": [],
+      "safety_critical": true
+    },
+    {
+      "id": "holdout-guidance",
+      "split": "holdout",
+      "prompt": "Inject decision retrieval guidance into each Claude Code prompt",
+      "expected_ids": ["ADR-GUIDANCE"],
+      "acceptable_ids": [],
+      "safety_critical": false
+    },
+    {
+      "id": "holdout-no-relevance-copy",
+      "split": "holdout",
+      "prompt": "Rename the homepage hero headline",
+      "expected_ids": [],
+      "acceptable_ids": [],
+      "safety_critical": false,
+      "no_relevance": true
+    },
+    {
+      "id": "holdout-low-signal-continue",
+      "split": "holdout",
+      "prompt": "continue",
+      "expected_ids": [],
+      "acceptable_ids": [],
+      "safety_critical": false,
+      "no_relevance": true,
+      "low_signal": true
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  "meta": {
+    "name": "guidance-retrieval-eval",
+    "description": "Locked decision corpus for task-to-decision guidance retrieval evaluation",
+    "version": "1.0.0",
+    "owner": "Mneme HQ",
+    "created": "2026-08-13"
+  },
+  "items": [],
+  "examples": [],
+  "decisions": [
+    {
+      "id": "ADR-STORAGE",
+      "decision": "Persist user sessions in SQLite",
+      "rationale": "Local single-file persistence keeps deployment and recovery simple.",
+      "scope": ["storage", "database", "persistence", "session", "sessions", "login"],
+      "constraints": ["no postgres", "no psycopg2"],
+      "anti_patterns": ["external database", "database server"]
+    },
+    {
+      "id": "ADR-AUTH",
+      "decision": "Authentication state uses signed HTTP-only cookies",
+      "rationale": "The service does not expose bearer credentials to browser JavaScript.",
+      "scope": ["authentication", "auth", "login", "cookies", "session", "sessions"],
+      "constraints": ["no jwt in browser storage"],
+      "anti_patterns": ["localStorage bearer token"]
+    },
+    {
+      "id": "ADR-SERIALIZATION",
+      "decision": "Public API payloads use JSON serialization",
+      "rationale": "JSON is interoperable and inspectable by clients.",
+      "scope": ["api", "serialization", "response", "payload", "json"],
+      "constraints": ["no pickle"],
+      "anti_patterns": ["binary python object payload"]
+    },
+    {
+      "id": "ADR-JOBS",
+      "decision": "Email delivery remains synchronous in the first release",
+      "rationale": "A background worker would add operational infrastructure before demand is proven.",
+      "scope": ["jobs", "queue", "worker", "email", "delivery", "background"],
+      "constraints": ["no celery", "no redis"],
+      "anti_patterns": ["distributed task queue"]
+    },
+    {
+      "id": "ADR-LOGGING",
+      "decision": "Request handling emits structured JSON logs",
+      "rationale": "Stable fields make production events searchable without parsing prose.",
+      "scope": ["logging", "logs", "observability", "request", "requests"],
+      "constraints": [],
+      "anti_patterns": ["unstructured print logging"]
+    },
+    {
+      "id": "ADR-TESTING",
+      "decision": "Python unit tests use pytest fixtures",
+      "rationale": "The existing test harness and contributor workflow are pytest based.",
+      "scope": ["test", "tests", "testing", "pytest", "fixture", "fixtures"],
+      "constraints": ["no unittest TestCase hierarchy"],
+      "anti_patterns": []
+    },
+    {
+      "id": "ADR-DEPENDENCIES",
+      "decision": "Runtime dependencies stay minimal",
+      "rationale": "Prefer the standard library unless a package provides measured product value.",
+      "scope": ["dependency", "dependencies", "package", "packages", "runtime"],
+      "constraints": ["no speculative dependency"],
+      "anti_patterns": ["framework for one helper"]
+    },
+    {
+      "id": "ADR-INSTALL",
+      "decision": "Use only the supported installation command",
+      "rationale": "Package onboarding must not recommend retired tooling.",
+      "scope": ["distribution", "installation", "documentation", "setup"],
+      "constraints": [],
+      "anti_patterns": [],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "legacy-client",
+          "include_paths": ["docs/**", "README.md"],
+          "exclude_paths": ["docs/history/**", "tests/**"]
+        }
+      ]
+    },
+    {
+      "id": "ADR-GUIDANCE",
+      "decision": "Inject relevant decisions as prompt-time architectural guidance",
+      "rationale": "Task context should shape code generation before the independent edit gate evaluates proposed content.",
+      "scope": ["claude_code", "prompt_guidance", "decision_retrieval"],
+      "constraints": ["no model call", "current prompt only"],
+      "anti_patterns": ["conversation history inference"]
+    },
+    {
+      "id": "ADR-EXTERNAL-COPY",
+      "decision": "External directory copy uses approved product language",
+      "rationale": "Claude Code task context before code generation may describe architectural constraints that guide the first proposed implementation, but external copy must remain stable.",
+      "scope": ["marketing", "distribution"],
+      "constraints": [],
+      "anti_patterns": []
+    },
+    {
+      "id": "ADR-DOC-TAXONOMY",
+      "decision": "Documentation pages follow the approved taxonomy",
+      "rationale": "The documentation explains how Claude Code task context before code generation carries architectural constraints into the first proposed implementation.",
+      "scope": ["documentation", "taxonomy"],
+      "constraints": [],
+      "anti_patterns": []
+    },
+    {
+      "id": "ADR-RELEASE-NOTES",
+      "decision": "Release notes describe shipped behavior only",
+      "rationale": "When Claude Code receives task context before code generation, architectural constraints can guide the first proposed implementation; release claims still require evidence.",
+      "scope": ["release", "communications"],
+      "constraints": [],
+      "anti_patterns": []
+    }
+  ]
+}

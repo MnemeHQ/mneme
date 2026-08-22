@@ -1,0 +1,46 @@
+{
+  "schema": "mneme.guidance-decision-applicability-eval/v1",
+  "locked_on": "2026-08-13",
+  "memory": "../guidance_retrieval/project_memory.json",
+  "memory_sha256": "983BAA775AAF38AB36C5D83CA07379C16F72A931BD7568BBA58D13C25B2C45DD",
+  "k": 3,
+  "expected_baseline": {
+    "direct_macro_recall_at_k": 1.0,
+    "adjacent_undifferentiated_selections": 2,
+    "unexpected_selections": 0
+  },
+  "cases": [
+    {
+      "id": "e66-auth-storage-overreach",
+      "prompt": "Implement browser authentication state for account login.",
+      "target": "src/auth.py",
+      "direct_ids": ["ADR-AUTH"],
+      "adjacent_ids": ["ADR-STORAGE"],
+      "expected_current_selected_ids": ["ADR-AUTH", "ADR-STORAGE"]
+    },
+    {
+      "id": "e66-storage-adjacent-auth",
+      "prompt": "Add persistence for user sessions.",
+      "target": "src/sessions.py",
+      "direct_ids": ["ADR-STORAGE"],
+      "adjacent_ids": ["ADR-AUTH"],
+      "expected_current_selected_ids": ["ADR-STORAGE", "ADR-AUTH"]
+    },
+    {
+      "id": "specific-auth-without-adjacent-storage",
+      "prompt": "Use secure signed cookies for browser auth.",
+      "target": "src/auth.py",
+      "direct_ids": ["ADR-AUTH"],
+      "adjacent_ids": [],
+      "expected_current_selected_ids": ["ADR-AUTH"]
+    },
+    {
+      "id": "unrelated-copy-control",
+      "prompt": "Rename the homepage hero headline.",
+      "target": "site/homepage.md",
+      "direct_ids": [],
+      "adjacent_ids": [],
+      "expected_current_selected_ids": []
+    }
+  ]
+}

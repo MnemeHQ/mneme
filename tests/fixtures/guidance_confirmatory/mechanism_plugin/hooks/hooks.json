@@ -1,0 +1,17 @@
+{
+  "description": "Prompt-context hook only; deliberately contains no edit-time enforcement hook.",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "mneme-guidance-hook",
+            "args": [],
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
