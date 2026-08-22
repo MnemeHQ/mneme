@@ -1,7 +1,8 @@
 # `.mneme/` - live enforcement memory for the Mneme repo
 
 This directory holds the canonical project memory that Mneme uses to govern
-**its own** repository. Mneme protects Mneme.
+**its own** repository. The repository therefore exercises the same governance
+memory path described for users.
 
 If you are a contributor, you do not need to know how Mneme works internally
 to read this - the file is plain JSON, and the rules describe constraints on
@@ -114,9 +115,6 @@ If a warning ever feels wrong, the right move is to file an issue or open a
 
 ## Why this exists
 
-Mneme's job is to keep AI-assisted development consistent with prior
-decisions. The strongest credibility signal we can give is to use Mneme
-on Mneme - and to do it in public, in a way contributors can read, audit,
-and learn from.
-
-That is what this directory is.
+Using Mneme on this repository makes its governance behavior observable in the
+same place as the code it governs. Contributors can inspect the memory,
+configuration, warnings, and enforcement behavior directly.
