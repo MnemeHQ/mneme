@@ -4,6 +4,14 @@
 
 ### Added
 
+- Claude Agent SDK integration (`mneme.integrations.agent_sdk`). Reuses the
+  existing retrieval and enforcement semantics: relevant decisions are
+  injected before agent work via `UserPromptSubmit`, and proposed
+  Write/Edit/MultiEdit calls are evaluated by `mneme check` before
+  execution via `PreToolUse`, returning allow/deny with Mneme's reason.
+  Warn-mode and unevaluated outcomes are surfaced as visible context, never
+  silently converted to PASS. A runnable governed-loop demo lives under
+  `examples/claude-agent-sdk/`.
 - Typed ADR enforcement with `FORBID_LITERAL`. ADR import now persists
   explicit typed rules, `mneme check` applies them independently of retrieval
   score, and human/JSON output identifies the rule type.

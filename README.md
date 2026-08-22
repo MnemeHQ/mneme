@@ -130,9 +130,23 @@ print(response.content)
 
 ## Works with
 
+**Explicitly supported integrations:**
+
+- **Claude Agent SDK** - relevant decisions injected before agent work;
+  proposed file mutations deterministically evaluated before execution.
+  See [docs/integrations/agent-sdk.md](docs/integrations/agent-sdk.md)
+  and the runnable governed-loop example under
+  [examples/claude-agent-sdk/](examples/claude-agent-sdk/).
+- **Claude Code** - `PreToolUse` hook blocks violating Edit/Write/MultiEdit
+  calls before they reach disk. See below.
+- **Cursor** - rules compiled from the same decision corpus. See below.
+
+**Reached through the Python API or generated rules:**
+
 - Direct LLM API integrations
-- IDE coding assistants (Cursor, Copilot, Cline)
-- Agent frameworks (LangChain, CrewAI, AutoGen)
+- Other IDE coding assistants (Copilot, Cline)
+- Agent frameworks (LangChain, CrewAI, AutoGen) via
+  `MemoryStore` / `DecisionRetriever` / `Pipeline`
 - Managed agent platforms
 - Internal prompt pipelines
 
