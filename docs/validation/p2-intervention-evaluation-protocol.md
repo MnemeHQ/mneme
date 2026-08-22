@@ -45,20 +45,20 @@ No sixth query is inferred or added. The probe set is fixed before any candidate
 
 ### Relevance judgment method
 
-Single-rater proposal by the investigating agent, ratified or amended by the maintainer
-**at protocol review, before execution**. Labels are frozen thereafter.
+Labels proposed by the investigating agent, **amended and ratified by the maintainer at protocol
+review before execution** (ratified 2026-08-22). Labels are frozen thereafter.
 
-| # | Expected relevant IDs | Rationale for label |
+| # | Label | Rationale for label |
 |---|---|---|
 | Q1 | *(none)* | Current live memory contains no storage/database decision; any injection is noise |
 | Q2 | *(none)* | No vendor/platform-provider selection decision exists in live memory |
-| Q3 | *(acceptable: `ADR-016`)* | ADR-016 (site governance transfer) partially governs site topics; deployment mechanics are otherwise uncovered |
+| Q3 | *(expected: `ADR-016`)* | ADR-016 transfers source and deployment ownership of mnemehq.com to `MnemeHQ/mnemehq-site` and names `PUBLISHING.md` there as the canonical deployment-governance source — it directly governs deployment questions |
 | Q4 | *(none)* | No language/rewrite-scope decision exists |
-| Q5 | *(none)* | No frontend-feature scope decision exists |
+| Q5 | *(expected: `ADR-016`)* | ADR-016 records that core no longer owns active website governance (scope `repo.site_transfer`); an insights-listing change is directly governed by that ownership transfer — the correct outcome is retrieval of `ADR-016`, routing the work to `mnemehq-site` |
 
-Metrics on S2: rank-1 correct-relevance rate, MRR over the five probes, count of
-irrelevant decisions injected at ranks 2–K, count of score-0.0 injections.
-"Relevant" = expected ∪ acceptable as labeled above.
+Q1/Q2/Q4 deliberately remain *none*: lexical overlap with tangential memory text
+(analytics, marketing, CLI vocabulary) does not make a decision relevant, and labeling such
+overlap as relevant would weaken the diagnostic.
 
 ## 4. Candidate definitions
 
