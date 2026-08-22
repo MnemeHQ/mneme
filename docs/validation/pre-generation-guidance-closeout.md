@@ -15,8 +15,10 @@ adjacent storage decision to become an unrequested SQLite implementation. The
 implemented change assigns a unique top-scoring decision the `direct` role,
 marks remaining selected decisions as `adjacent_constraint`, and renders the
 roles differently without changing retrieval, ranking, K, or enforcement. A
-top-score tie deliberately produces no direct anchor. See the
-[role contract](../architecture/pre-generation-guidance-role-contract.md) and
+top-score tie deliberately produces no direct anchor. The role contract
+document was never committed to `main`; it exists only in the archived
+experimental tree (`archive/r1-r6-experimental-tree-2026-08-22`, at
+`docs/architecture/pre-generation-guidance-role-contract.md`). See the
 [R4 wiring result](pre-generation-guidance-role-r4-result.md).
 
 ## Frozen evidence
