@@ -18,7 +18,11 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from mneme.conflict_detector import Conflict, ConflictDetector
+from mneme.conflict_detector import (
+    Conflict,
+    ConflictDetector,
+    PathApplicabilityUnknownError,
+)
 from mneme.context_builder import DEFAULT_MAX_DECISIONS, format_decisions
 from mneme.decision_retriever import DecisionRetriever, ScoredDecision
 from mneme.llm_adapter import LLMAdapter
@@ -113,6 +117,13 @@ class Pipeline:
 
         Returns:
             A PipelineResult with every stage's output recorded.
+
+        Raises:
+            MnemeConflictError: strict mode and a conflict was detected.
+            PathApplicabilityUnknownError: strict mode and a scoped typed rule
+                could not be evaluated (no usable target path). Mirrors the CLI's
+                operational-failure precedence and ConflictDetector.detect();
+                unavailable applicability never becomes a silent pass (ADR-020).
         """
         scored = self.retriever.retrieve(query)
         system_prompt = format_decisions(
@@ -166,5 +177,13 @@ class Pipeline:
                 conflicts=detection.conflicts,
                 result=result,
             )
+
+        # Strict mode must not silently complete while a scoped typed rule was
+        # unevaluated: the conflict set above cannot be trusted as "governed"
+        # when part of it never ran (ADR-020 sec. 6). The CLI already treats
+        # this state as an operational failure and ConflictDetector.detect()
+        # raises; this is the same contract for the Pipeline surface.
+        if self.enforcement_mode == "strict" and not detection.evaluation_complete:
+            raise PathApplicabilityUnknownError(detection.applicability)
 
         return result

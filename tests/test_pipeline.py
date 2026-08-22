@@ -41,6 +41,106 @@ def test_pipeline_runs_conflict_detection_after_response():
     ), f"expected a postgres conflict, got {result.conflicts!r}"
 
 
+def test_pipeline_strict_mode_raises_when_scoped_rule_is_unevaluated(tmp_path):
+    """Regression (adversarial review AR-001): strict mode must not silently
+    complete while a scoped typed rule could not be evaluated.
+
+    The CLI treats PATH_APPLICABILITY_UNKNOWN as an operational failure (exit 2,
+    never a policy verdict) and ConflictDetector.detect() raises
+    PathApplicabilityUnknownError. Pipeline.run() in strict mode did neither:
+    the unevaluated scoped rule was skipped, conflicts stayed empty, and the
+    call returned normally even though the response contained the forbidden
+    literal. ADR-020 sec. 6 forbids unavailable applicability from becoming a
+    silent successful evaluation.
+    """
+    from mneme.conflict_detector import PathApplicabilityUnknownError
+
+    memory = tmp_path / ".mneme" / "project_memory.json"
+    memory.parent.mkdir()
+    memory.write_text(json.dumps({
+        "meta": {"name": "test", "description": "test"},
+        "decisions": [{
+            "id": "ADR-020",
+            "decision": "Legacy client documentation",
+            "scope": ["docs"],
+            "rules": [{
+                "type": "FORBID_LITERAL",
+                "value": "install legacy-client",
+                "include_paths": ["docs/**"],
+            }],
+        }],
+    }), encoding="utf-8")
+    p = Pipeline(memory_path=memory, dry_run=True, enforcement_mode="strict")
+
+    with pytest.raises(PathApplicabilityUnknownError) as excinfo:
+        p.run(
+            "update docs",
+            _override_response="install legacy-client",
+        )
+
+    # The error exposes exactly which rule could not be evaluated and why.
+    assert any(
+        item.outcome.value == "UNKNOWN" and item.rule_value == "install legacy-client"
+        for item in excinfo.value.applicability
+    )
+
+
+def test_pipeline_strict_mode_still_raises_conflict_when_target_resolves(tmp_path):
+    """The AR-001 fix must not disturb the normal strict-mode contract: with a
+    target path that resolves applicability, a violating response still raises
+    MnemeConflictError."""
+    from mneme.schemas import MnemeConflictError
+
+    memory = tmp_path / ".mneme" / "project_memory.json"
+    memory.parent.mkdir()
+    memory.write_text(json.dumps({
+        "meta": {"name": "test", "description": "test"},
+        "decisions": [{
+            "id": "ADR-020",
+            "decision": "Legacy client documentation",
+            "scope": ["docs"],
+            "rules": [{
+                "type": "FORBID_LITERAL",
+                "value": "install legacy-client",
+                "include_paths": ["docs/**"],
+            }],
+        }],
+    }), encoding="utf-8")
+    p = Pipeline(memory_path=memory, dry_run=True, enforcement_mode="strict")
+
+    with pytest.raises(MnemeConflictError):
+        p.run(
+            "update docs",
+            _override_response="install legacy-client",
+            target_path=tmp_path / "docs" / "guide.md",
+        )
+
+
+def test_pipeline_warn_mode_keeps_reporting_unknown_without_raising(tmp_path):
+    """warn mode keeps returning a result; the caller inspects
+    evaluation_complete. Only strict mode escalates to an operational error."""
+    memory = tmp_path / ".mneme" / "project_memory.json"
+    memory.parent.mkdir()
+    memory.write_text(json.dumps({
+        "meta": {"name": "test", "description": "test"},
+        "decisions": [{
+            "id": "ADR-020",
+            "decision": "Legacy client documentation",
+            "scope": ["docs"],
+            "rules": [{
+                "type": "FORBID_LITERAL",
+                "value": "install legacy-client",
+                "include_paths": ["docs/**"],
+            }],
+        }],
+    }), encoding="utf-8")
+    p = Pipeline(memory_path=memory, dry_run=True, enforcement_mode="warn")
+
+    result = p.run("update docs", _override_response="install legacy-client")
+    assert not result.evaluation_complete
+    assert result.conflicts == []
+
+
 def test_pipeline_reports_scoped_rule_non_evaluation_and_accepts_target(tmp_path):
     memory = tmp_path / ".mneme" / "project_memory.json"
     memory.parent.mkdir()
