@@ -9,7 +9,7 @@
 | Billing account | `01C41B-59FB59-15D3F8` (shared billing account with cannabisdeals; separate project) |
 | Region / location | `US` |
 
-Room left for `mneme-hq-dev` when dev/prod separation becomes worthwhile.
+Reserve `mneme-hq-dev` for a future separate development environment if operating requirements require dev/prod isolation.
 
 ## Service Account
 
