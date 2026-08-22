@@ -142,11 +142,12 @@ No disappearance event occurred (rules out class A): **the code never entered th
 
 - **Primary (B):** R1–R6 ran against an unmerged experimental clone whose role-aware implementation
   never entered canonical production. The closeout's "implementation retained" claim is wrong w.r.t. `main`.
-- **Retrieval-provenance defect (additional finding):** R4–R6 used not only role-aware guidance but also a **non-canonical `DecisionRetriever`**
-  (`F86B3BA2…`, typed-rule scoring term absent from every commit of `main`). The experiment was therefore
-  a **configuration**, not merely a formatter change: one cannot transplant the role-aware code onto
-  canonical retrieval and assume one is reproducing the R6 candidate. Class D does not apply — all stages
-  resolved to one coherent experimental lineage; the divergence is from production, not between R stages.
+- **Retrieval-provenance defect (additional finding):** R4–R6 used not only role-aware guidance but also a
+  **non-canonical `DecisionRetriever`** (`F86B3BA2…`, typed-rule scoring term absent from every commit of
+  `main`). The experiment was therefore a **configuration**, not merely a formatter change: one cannot
+  transplant the role-aware code onto canonical retrieval and assume one is reproducing the R6 candidate.
+  Class D does not apply — all stages resolved to one coherent experimental lineage; the divergence is
+  from production, not between R stages.
 - **Not C:** provenance is proven — locks, artifacts, and run metadata all resolve to one concrete tree.
 - The R6 FAIL remains frozen and untouched by this finding.
 
@@ -156,6 +157,7 @@ The evidence remains valid but its scope shrinks: it is evidence about an **expe
 configuration**, not about the shipped Mneme production path (`format_decisions()` on canonical
 retrieval). The frozen R6 FAIL applies to that candidate and must not be presented as an evaluation of
 current production behavior.
+
 ---
 
 ## 8. Answers to the six acceptance questions
