@@ -1,0 +1,31 @@
+{
+  "workspace": "C:\\dev\\mneme\\.worktrees\\ox-compaction\\validation\\ox-compaction\\runs\\run-01-a1\\workspace",
+  "phase": "pre",
+  "functional": {
+    "command": "python -m pytest -q tests/test_register_service.py",
+    "exit_code": 0,
+    "passed": true,
+    "summary": "3 passed in 0.10s"
+  },
+  "architecture": {
+    "compliant": true,
+    "no_prohibited_use": true,
+    "repo_layer_used": true,
+    "details": {
+      "prohibited_hits": {},
+      "any": false,
+      "repository_module_exists": true,
+      "services_import_repository": true,
+      "used": true
+    }
+  },
+  "changed_paths": [
+    "repository/database.py",
+    "repository/member_repository.py",
+    "services/member_service.py"
+  ],
+  "scope_expansion": {
+    "expanded": false,
+    "paths": []
+  }
+}

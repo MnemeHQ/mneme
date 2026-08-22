@@ -1,0 +1,44 @@
+{
+  "runId": "preflight-A-02",
+  "arm": "A",
+  "repetition": 0,
+  "model": {
+    "providerID": "opencode",
+    "modelID": "x-preview-f-free"
+  },
+  "mnemeSha": "f7eac3875eae5dcb7f57ac55388567877c0ce692",
+  "fixtureBaselineGitSha": "f12d2ea97d01e9d87cc20f159f6b69f065a5068f",
+  "frozenGuidanceSha256": "5378d1fd3046d24f8db9d77a84648de98420beb87a6c44d2fb38575957c98d5e",
+  "initialPromptSha256": "0a7940955bdd74519ebc9f8ba071e66c0413380abce3c263d409269dfa30776e",
+  "continuationPromptSha256": "27fa0f6f661fcbf4633e4e641a6e5557fab53637084a8942223f2562d11fa830",
+  "startedUtc": "2026-08-22T04:44:00Z",
+  "sessionID": "ses_fd8377badffe7P5k5rBtl7bHf3",
+  "initialAdmittedMessageID": "msg_027c891220010izEKN4JfelwAH",
+  "preScoreValid": true,
+  "summarizeHttpStatus": 200,
+  "summarizeSeconds": 4.0,
+  "compaction": {
+    "compacted": true,
+    "evidence": {
+      "kind": "server-log-agent-compaction-stream",
+      "matchingLines": 1,
+      "excerpt": "mestamp=2026-08-22T04:48:20.577Z level=INFO run=365be6d1 message=stream providerID=opencode modelID=x-preview-f-free session.id=ses_fd8377badffe7P5k5rBtl7bHf3 small=false agent=compaction mode=primary"
+    },
+    "serverErrors": []
+  },
+  "treatmentInjectCount": 0,
+  "treatmentGuidanceHashes": [],
+  "continuationAdmittedMessageID": "msg_027cc6ee80014TfmYWr8pcdhK1",
+  "postScoreValid": true,
+  "sessionExported": true,
+  "finishedUtc": "2026-08-22T04:49:25Z",
+  "invalid": false,
+  "invalidationReasons": [],
+  "artifactHashes": {
+    "server.log": "79a48a9f5e3d43c94b4ba8761fc2b565c56a875afdffb2d5abb03e724defb981",
+    "scores/pre.json": "7379088bd8fc43c3a49268ef9ae9e56c227621643f47f35cccc4aa96b05b83ca",
+    "scores/post.json": "38f29a1c44db69818415102fb76cb0193b315a26a87c06ad56ef28cc9ac4e113",
+    "final.diff": "32b74646c654e5f31f2e7496209fb72dde5e7f9edfa83f6f5ad77b970d9f21f9",
+    "session-export.json": "411e8e147692310ff161bad08ee84f08a63c84e2a06d48ffa987220ed8e03446"
+  }
+}

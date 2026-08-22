@@ -1,0 +1,1 @@
+﻿Harness defect: mid-turn assistant steps (finish=tool-calls) were counted as turn completion, truncating turns. Fixed: only terminal responses count.

@@ -1,0 +1,13 @@
+[Mneme decisions applied]
+
+DECISION [arch-001-repository-layer]: Database access must occur through a repository layer. Feature and service code must not import or use the database client directly.
+  Why:          Keeping SQL behind repository interfaces isolates schema changes, makes service logic testable without a database, and prevents connection handling from leaking across layers.
+  Scope:        database, repository, services, persistence, storage, data access
+  Constraints:
+    - service code must depend on repository classes, never on db.client.DatabaseClient
+    - repository classes that wrap the database client must live under the repository/ package
+    - new data operations needed by services must be exposed as methods on a repository class
+  Avoid:
+    - importing sqlite3 or db.client inside any module under services/
+    - calling DatabaseClient.execute or DatabaseClient.query from service code
+    - opening raw database connections in service modules

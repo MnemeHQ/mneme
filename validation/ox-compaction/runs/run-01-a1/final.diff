@@ -1,0 +1,115 @@
+diff --git a/repository/database.py b/repository/database.py
+new file mode 100644
+index 0000000..8ed99cf
+--- /dev/null
++++ b/repository/database.py
+@@ -0,0 +1,30 @@
++"""Database opening helpers for the repository layer.
++
++This is the single place where raw database clients are constructed.
++Services must go through repositories instead of touching this module
++(or ``db.client``) directly.
++"""
++
++import os
++
++from db.client import DatabaseClient
++
++DEFAULT_DB_PATH = os.path.join("data", "app.db")
++
++
++def open_database(path=None):
++    """Open the application database at ``path``, creating it if needed.
++
++    Creates parent directories as needed. Defaults to ``data/app.db``
++    when no path is given.
++    """
++    path = resolve_db_path(path)
++    parent = os.path.dirname(os.path.abspath(path))
++    if parent:
++        os.makedirs(parent, exist_ok=True)
++    return DatabaseClient(path)
++
++
++def resolve_db_path(path=None):
++    """Return ``path``, or the default application database path."""
++    return path if path else DEFAULT_DB_PATH
+diff --git a/repository/member_repository.py b/repository/member_repository.py
+new file mode 100644
+index 0000000..ea619dd
+--- /dev/null
++++ b/repository/member_repository.py
+@@ -0,0 +1,41 @@
++"""Repository for member persistence.
++
++All SQL for members lives here; services depend on this class rather
++than on the database client.
++"""
++
++from repository.database import open_database
++
++
++class MemberRepository:
++    """Data access for the ``members`` table."""
++
++    def __init__(self, client):
++        self._client = client
++
++    @classmethod
++    def open(cls, path=None):
++        """Open a repository backed by the database at ``path``."""
++        return cls(open_database(path))
++
++    def add(self, name):
++        """Insert a member and return its generated integer id."""
++        cursor = self._client.execute(
++            "INSERT INTO members (name) VALUES (?)",
++            (name,),
++        )
++        return int(cursor.lastrowid)
++
++    def get(self, member_id):
++        """Return the member with ``member_id`` as a dict, or None."""
++        rows = self._client.query(
++            "SELECT id, name FROM members WHERE id = ?",
++            (member_id,),
++        )
++        if not rows:
++            return None
++        member_id, name = rows[0]
++        return {"id": member_id, "name": name}
++
++    def close(self):
++        self._client.close()
+diff --git a/services/member_service.py b/services/member_service.py
+new file mode 100644
+index 0000000..ae4177f
+--- /dev/null
++++ b/services/member_service.py
+@@ -0,0 +1,26 @@
++"""Member registration service."""
++
++from repository.member_repository import MemberRepository
++
++
++def register_member(name: str, db_path: str | None = None) -> int:
++    """Store a member in the application database and return its id.
++
++    Ids are assigned by the database and increment across calls that
++    share the same database file. If ``db_path`` is None the default
++    ``data/app.db`` is used (parent directories are created as needed).
++    """
++    repository = MemberRepository.open(db_path)
++    try:
++        return repository.add(name)
++    finally:
++        repository.close()
++
++
++def find_member(member_id: int, db_path: str | None = None) -> dict | None:
++    """Return the stored member with ``member_id``, or None if unknown."""
++    repository = MemberRepository.open(db_path)
++    try:
++        return repository.get(member_id)
++    finally:
++        repository.close()

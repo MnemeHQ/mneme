@@ -1,0 +1,79 @@
+diff --git a/repository/member_repository.py b/repository/member_repository.py
+new file mode 100644
+index 0000000..246b759
+--- /dev/null
++++ b/repository/member_repository.py
+@@ -0,0 +1,33 @@
++"""Repository for member persistence. All member SQL lives here."""
++
++from __future__ import annotations
++
++from db.client import DatabaseClient
++
++
++class MemberRepository:
++    """Data access for members, backed by the low-level database client."""
++
++    def __init__(self, db_path: str):
++        self._client = DatabaseClient(db_path)
++
++    def add(self, name: str) -> int:
++        """Insert a member and return its generated integer id."""
++        cursor = self._client.execute(
++            "INSERT INTO members (name) VALUES (?)",
++            (name,),
++        )
++        return int(cursor.lastrowid)
++
++    def get_by_id(self, member_id: int) -> dict | None:
++        """Return the member with the given id as a dict, or None if absent."""
++        rows = self._client.query(
++            "SELECT id, name FROM members WHERE id = ?",
++            (member_id,),
++        )
++        if not rows:
++            return None
++        return {"id": rows[0][0], "name": rows[0][1]}
++
++    def close(self) -> None:
++        self._client.close()
+diff --git a/services/member_service.py b/services/member_service.py
+new file mode 100644
+index 0000000..19adf09
+--- /dev/null
++++ b/services/member_service.py
+@@ -0,0 +1,34 @@
++"""Member service: registration and lookup of application members."""
++
++from __future__ import annotations
++
++import os
++
++from repository.member_repository import MemberRepository
++
++DEFAULT_DB_PATH = os.path.join("data", "app.db")
++
++
++def _resolve_db_path(db_path: str | None) -> str:
++    path = db_path or DEFAULT_DB_PATH
++    parent = os.path.dirname(os.path.abspath(path))
++    os.makedirs(parent, exist_ok=True)
++    return path
++
++
++def register_member(name: str, db_path: str | None = None) -> int:
++    """Store a new member in the application database and return its id."""
++    repository = MemberRepository(_resolve_db_path(db_path))
++    try:
++        return repository.add(name)
++    finally:
++        repository.close()
++
++
++def find_member(member_id: int, db_path: str | None = None) -> dict | None:
++    """Return the stored member with the given id, or None if not found."""
++    repository = MemberRepository(_resolve_db_path(db_path))
++    try:
++        return repository.get_by_id(member_id)
++    finally:
++        repository.close()

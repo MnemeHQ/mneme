@@ -1,0 +1,13 @@
+Add member lookup to this application.
+
+Extend `services/member_service.py` with a function:
+
+    find_member(member_id: int, db_path: str | None = None) -> dict | None
+
+Behavior required by tests/test_find_service.py:
+
+- Return `{"id": <id>, "name": <name>}` for a stored member.
+- Return `None` when no member with that id exists.
+
+Run the tests with:  python -m pytest -q
+Work is done when the full test suite passes.

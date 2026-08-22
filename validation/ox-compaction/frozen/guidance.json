@@ -1,0 +1,22 @@
+{
+  "mneme_sha": "f7eac3875eae5dcb7f57ac55388567877c0ce692",
+  "query": "Implement member registration for this application.\n\nCreate `services/member_service.py` with a function:\n\n    register_member(name: str, db_path: str | None = None) -> int\n\nBehavior required by tests/test_register_service.py:\n\n- Store the member in the application database and return its integer id.\n- Ids must increment across calls that share the same database file.\n- The row must be retrievable afterwards through db.client.DatabaseClient.\n- If db_path is None, use \"data/app.db\" (create parent directories as needed).\n\nRun the tests with:  python -m pytest -q tests/test_register_service.py\nWork is done when those tests pass. Do not modify existing test files or db/client.py.\n",
+  "query_sha256": "caabbc2cea86d38c0d716b69f7f3693a7bdd6a9aa8671676efa2a08e9fc7975b",
+  "selected_decisions": [
+    {
+      "id": "arch-001-repository-layer",
+      "score": 33.5,
+      "matches": {
+        "decision": 5,
+        "scope": 3,
+        "constraints": 9,
+        "anti_patterns": 5,
+        "rationale": 3
+      }
+    }
+  ],
+  "formatter": "mneme.context_builder.format_decisions",
+  "retriever": "mneme.decision_retriever.DecisionRetriever",
+  "guidance_sha256": "5378d1fd3046d24f8db9d77a84648de98420beb87a6c44d2fb38575957c98d5e",
+  "guidance_chars": 980
+}

@@ -1,0 +1,47 @@
+{
+  "runId": "run-02-b1",
+  "arm": "B",
+  "repetition": 1,
+  "model": {
+    "providerID": "opencode",
+    "modelID": "x-preview-f-free"
+  },
+  "mnemeSha": "f7eac3875eae5dcb7f57ac55388567877c0ce692",
+  "fixtureBaselineGitSha": "0824e68e3a58000e726ede5f671da777046e6f55",
+  "frozenGuidanceSha256": "5378d1fd3046d24f8db9d77a84648de98420beb87a6c44d2fb38575957c98d5e",
+  "initialPromptSha256": "0a7940955bdd74519ebc9f8ba071e66c0413380abce3c263d409269dfa30776e",
+  "continuationPromptSha256": "27fa0f6f661fcbf4633e4e641a6e5557fab53637084a8942223f2562d11fa830",
+  "startedUtc": "2026-08-22T04:55:24Z",
+  "sessionID": "ses_fd82ce919ffeZ0MpZ6KHbodDLQ",
+  "initialAdmittedMessageID": "msg_027d31ee90013hTJaradapko9t",
+  "preScoreValid": true,
+  "summarizeHttpStatus": 200,
+  "summarizeSeconds": 15.9,
+  "compaction": {
+    "compacted": true,
+    "evidence": {
+      "kind": "server-log-agent-compaction-stream",
+      "matchingLines": 1,
+      "excerpt": "mestamp=2026-08-22T04:58:28.279Z level=INFO run=3b5b92f4 message=stream providerID=opencode modelID=x-preview-f-free session.id=ses_fd82ce919ffeZ0MpZ6KHbodDLQ small=false agent=compaction mode=primary"
+    },
+    "serverErrors": []
+  },
+  "treatmentInjectCount": 1,
+  "treatmentGuidanceHashes": [
+    "5378d1fd3046d24f8db9d77a84648de98420beb87a6c44d2fb38575957c98d5e"
+  ],
+  "continuationAdmittedMessageID": "msg_027d5e314001GOEC4xGKDS6wss",
+  "postScoreValid": true,
+  "sessionExported": true,
+  "finishedUtc": "2026-08-22T04:59:32Z",
+  "invalid": false,
+  "invalidationReasons": [],
+  "artifactHashes": {
+    "server.log": "4cc51bf4dcb47bd71ac0bfffba18474c69fd461e4a5365347e435b2aa5912b68",
+    "scores/pre.json": "6fb2b115ec3e8a68aa63902a3ea273601584d91ffd760e2775559f2aeacdaed1",
+    "scores/post.json": "ec3d610f04a1f7905716b542543e1b6540f6d512e77d24d821a7f4b5075e0116",
+    "final.diff": "f5cc7ed52f622f2c325f5f815133815266d9723205b9d2c5927efcb87cf14a08",
+    "session-export.json": "bd9de2a23e51e69106d126ed81fc1819400472f407749850412c58d08735d524",
+    "treatment-plugin.log": "60191e9dea21f2b72d42ef574af0a72dc27b19ce30ad5cdf6e872bd3b0571651"
+  }
+}

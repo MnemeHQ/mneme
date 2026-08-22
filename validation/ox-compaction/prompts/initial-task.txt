@@ -1,0 +1,15 @@
+Implement member registration for this application.
+
+Create `services/member_service.py` with a function:
+
+    register_member(name: str, db_path: str | None = None) -> int
+
+Behavior required by tests/test_register_service.py:
+
+- Store the member in the application database and return its integer id.
+- Ids must increment across calls that share the same database file.
+- The row must be retrievable afterwards through db.client.DatabaseClient.
+- If db_path is None, use "data/app.db" (create parent directories as needed).
+
+Run the tests with:  python -m pytest -q tests/test_register_service.py
+Work is done when those tests pass. Do not modify existing test files or db/client.py.
