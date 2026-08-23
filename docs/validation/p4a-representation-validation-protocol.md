@@ -41,25 +41,27 @@ The archived experimental retriever (`F86B3BA2…`) remains excluded.
 | Q4 | `Should we rewrite the CLI in Rust?` | none |
 | Q5 | `Add pagination to the insights listing page` | expected: `ADR-016` |
 
-### 3b. Expanded probes (proposed now, frozen before execution; labels ratified at review)
+### 3b. Expanded probes (ratified 2026-08-23, frozen before execution)
 
 Expansion rule used: one natural developer query per distinct governance family in live memory that a
 governing decision demonstrably answers, plus two negative controls spanning families with no
 governing decision. No probe is derived from planned ADR-016 wording.
 
-| # | Query string (exact) | Proposed label | Governing source |
+Labels below were proposed by the investigating agent, reviewed by the maintainer, amended
+(E1 query reworded; E2/E3/E4 relabeled), and **ratified on 2026-08-23**. Frozen thereafter.
+
+| # | Query string (exact) | Ratified label | Governing source |
 |---|---|---|---|
-| E1 | `Can I push directly to main to fix a one-line typo quickly?` | expected: `workflow-001` | workflow-001 requires PR review for governance/architecture changes to main |
-| E2 | `Our release script writes a JSON report without setting an encoding — is that fine?` | acceptable: `encoding_001`, `ADR-009` | both decisions require explicit encodings in automation file writes |
-| E3 | `For PyPI, should the package be named mneme or mneme-hq?` | expected: `ADR-005`; acceptable: `ADR-004` | ADR-005 governs brand vs package namespace enforcement |
-| E4 | `Where should a new internal ops dashboard script live?` | expected: `ADR-002` | ADR-002 sets the repository boundary for internal operational tooling |
-| E5 | `We want to forbid an exact install-command literal in onboarding docs — how is that encoded?` | expected: `ADR-019`; acceptable: `ADR-020` | typed-literal rule contract and its path applicability |
+| E1 | `Can I push a one-line governance change directly to main without a PR?` | expected: `workflow-001` | workflow-001 governs meaningful governance/architectural changes reaching main without PR review; the ratified phrasing targets that boundary rather than arbitrary typo fixes |
+| E2 | `Our release script writes a JSON report without setting an encoding — is that fine?` | expected: `ADR-009`; acceptable: `encoding_001` | ADR-009 is the ADR-backed primary: automation file writes must specify explicit encodings; `encoding_001` also directly governs |
+| E3 | `For PyPI, should the package be named mneme or mneme-hq?` | expected: `ADR-005` | ADR-005 sets the distribution name (`mneme-hq`), matching current `pyproject.toml`. **`ADR-004` is deliberately not relevant here**: its PyPI statement conflicts with the later/current ADR-005 contract and current package metadata — counting it relevant would score a contradictory answer as correct. This pre-existing ADR-004/ADR-005 inconsistency is recorded, not fixed, inside P4A |
+| E4 | `Where should a new internal ops dashboard script live?` | expected: `ADR-002`; acceptable: `rule-public-boundary` | ADR-002 sets the repository boundary for internal operational tooling; `rule-public-boundary` reaches the retrievable pool via legacy-rule migration and states the same boundary, so an otherwise-correct retrieval must not be counted as noise |
+| E5 | `We want to forbid an exact install-command literal in onboarding docs — how is that encoded?` | expected: `ADR-019`; acceptable: `ADR-020` | ADR-019 defines how `FORBID_LITERAL` is authored; ADR-020 is legitimately adjacent because the query names onboarding docs as the governed artifact |
 | N1 | `What framework should we use for the mobile app?` | *(none)* | no mobile decision exists in live memory |
 | N2 | `Should we migrate CI from GitHub Actions to CircleCI?` | *(none)* | no CI-vendor selection decision exists in live memory |
 
 Metrics over governed probes = Q3, Q5, E1–E5. Negative controls contribute only noise metrics.
-Labels are **proposed by the investigating agent and must be ratified or amended by the maintainer
-at protocol review, before execution**; they are frozen thereafter.
+**Relevant IDs for a probe = expected ∪ acceptable** under its ratified label.
 
 ## 4. Candidate-change definition constraints (from ratified P3)
 
@@ -95,9 +97,13 @@ Gates (all must hold):
 | Gate | Requirement |
 |---|---|
 | G1 | S1 verdicts PASS-capable (7/7) and mean recall@3 = 1.00 |
-| G2 | Every governed probe's expected ID appears in top-K (no new misses vs B0′) |
-| G3 | Q5 resolves `ADR-016` at rank 1 |
-| G4 | No governed probe regresses from hit to miss; rank-1 relevance rate across governed probes ≥ B0′ |
+| G2 | **Preservation:** no governed probe that is a top-K relevance hit under B0′ (i.e., contains at least one relevant ID, where relevant = expected ∪ acceptable) becomes a miss after the representation change |
+| G3 | **Intervention objective:** Q5 resolves `ADR-016` at rank 1 |
+| G4 | Rank-1 relevance rate across governed probes is ≥ B0′ |
+
+G2 is a preservation gate only: the P3-authorized change preserves unrelated retrieval; it is not
+responsible for repairing any pre-existing miss among the expanded probes. G3 is the single
+intervention-specific success condition.
 
 Recorded, not gated: `layer1_retrieved_ids` compositions; precision@3 (structurally constrained);
 tail-injection counts; zero-score injection counts; recall@1 reported per governed probe.
