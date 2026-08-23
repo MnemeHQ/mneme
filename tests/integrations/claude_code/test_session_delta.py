@@ -125,6 +125,22 @@ class TestDelta:
         d = ss.compute_session_delta(repo, base)
         assert "same.py" not in d.modified and "same.py" not in d.new
 
+    def test_exact_content_move_recorded_as_rename_not_new(self, repo):
+        (repo / "orig.py").write_text("a = 1\nb = 2\n", encoding="utf-8")
+        base = _capture(repo)
+        (repo / "orig.py").rename(repo / "renamed.py")
+        d = ss.compute_session_delta(repo, base)
+        assert d.renamed.get("renamed.py") == "orig.py"
+        assert "renamed.py" not in d.new
+
+    def test_copy_from_live_source_stays_new(self, repo):
+        (repo / "src.py").write_text("a = 1\n", encoding="utf-8")
+        base = _capture(repo)
+        (repo / "dst.py").write_text("a = 1\n", encoding="utf-8")  # src still present
+        d = ss.compute_session_delta(repo, base)
+        assert "dst.py" in d.new
+        assert "dst.py" not in d.renamed
+
 
 class TestSnapshotStore:
     def test_snapshot_lands_outside_repo_and_keys_by_root_and_session(self, repo, tmp_path, monkeypatch):

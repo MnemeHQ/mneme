@@ -38,6 +38,7 @@ class SessionDelta:
     modified: Dict[str, str] = field(default_factory=dict)   # rel -> introduced text
     deleted: List[str] = field(default_factory=list)
     skipped: Dict[str, str] = field(default_factory=dict)  # rel -> reason
+    renamed: Dict[str, str] = field(default_factory=dict)  # new rel -> vanished source rel
 
 
 def state_dir() -> Path:
@@ -201,6 +202,19 @@ def compute_session_delta(
     after_names = current_files if current_files is not None else (enumerate_repo_files(root) or [])
     after_names = [rel for rel in after_names if not _is_snapshot_artifact(root, rel)]
 
+    # Exact-content move detection: a baseline path that has vanished while its
+    # byte-identical content reappears at a new path is a rename/move of
+    # pre-session content. Attributing the whole target to the session would
+    # blame pre-existing lines on this session (the ADR-018 wall at a new
+    # boundary). Only exact vanished-source matches qualify; copies from live
+    # sources stay fully attributed (conservative direction).
+    current_set = set(after_names)
+    vanished_by_sha: Dict[str, str] = {}
+    for old_rel, entry in before_files.items():
+        if old_rel not in current_set and isinstance(entry.get("sha256"), str):
+            vanished_by_sha.setdefault(entry["sha256"], old_rel)
+    renamed: Dict[str, str] = {}
+
     for rel in after_names:
         abs_path = root / rel
         before = before_files.get(rel)
@@ -216,6 +230,10 @@ def compute_session_delta(
         current_sha = hashlib.sha256(data).hexdigest()
 
         if before is None:
+            source_rel = vanished_by_sha.pop(current_sha, None)
+            if source_rel is not None:
+                renamed[rel] = source_rel
+                continue
             delta.new.append(rel)
             continue
 
@@ -240,4 +258,5 @@ def compute_session_delta(
         if introduced.strip():
             delta.modified[rel] = introduced
 
+    delta.renamed = renamed
     return delta

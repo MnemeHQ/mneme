@@ -111,9 +111,14 @@ the baseline, and derives, per changed file, the **introduced lines** using
 the same deterministic diff definition as ADR-018 (insert/replace opcodes,
 baseline as `before`, current as `after`). New files introduce everything;
 deleted files introduce nothing and are never blocked (deletion-only
-remediation must pass). Each candidate is checked through the existing
-enforcement path with its real target path, preserving ADR-020 applicability
-authority end to end.
+remediation must pass). One exact-content exception applies: a baseline path
+that has vanished while byte-identical content reappears at a new path is a
+move of pre-session content, not an introduction — attributing it would blame
+pre-existing lines on the session. Only exact vanished-source matches
+qualify; a copy whose source still exists, or a rename combined with any
+edit, remains fully attributed (conservative direction). Each candidate is
+checked through the existing enforcement path with its real target path,
+preserving ADR-020 applicability authority end to end.
 
 **Attribution correctness.** Because the baseline is captured at session
 start, dirty state that existed beforehand is indistinguishable from
@@ -127,11 +132,14 @@ when it is true; Claude Code's own eight-consecutive-block cap remains the
 outer guard. After a blocked Stop, the baseline is *not* refreshed: the next
 Stop re-evaluates the same session delta, so a repair converges to a pass.
 
-**Explicit operational states.** The gate refuses to fabricate results:
+**Explicit operational states.** The gate refuses to fabricate results, and
+because Claude never sees stderr from an exit-0 hook (it goes to the debug
+log only), every degraded-but-permit state is additionally surfaced to the
+agent as non-blocking Stop feedback (`hookSpecificOutput.additionalContext`):
 
 - No baseline exists (plugin installed mid-session): one is created at Stop,
-  a visible diagnostic records that earlier changes could not be attributed,
-  and the turn proceeds. Later Stops in that session enforce normally.
+  a diagnostic records that earlier changes could not be attributed, and the
+  turn proceeds. Later Stops in that session enforce normally.
 - Not a git work tree: the gate reports itself inactive and does not block.
 - A file whose baseline content is unavailable (oversized or binary) but
   which changed during the session is reported as *not evaluated*; it is

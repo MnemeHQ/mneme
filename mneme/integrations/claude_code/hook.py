@@ -665,6 +665,23 @@ def stop_event(
         print(f"mneme-hook: {note}", file=stderr)
 
     if not offenders:
+        if notes:
+            # Claude never sees stderr from an exit-0 hook (debug log only).
+            # A degraded-but-permit state must still be operationally visible,
+            # so surface it as non-blocking Stop feedback instead.
+            json.dump(
+                {
+                    "hookSpecificOutput": {
+                        "hookEventName": "Stop",
+                        "additionalContext": (
+                            "mneme session-delta gate completed with "
+                            "unevaluated changes: " + " ".join(notes)
+                        ),
+                    }
+                },
+                stdout,
+            )
+            stdout.write("\n")
         return 0
 
     shown = offenders[:_MAX_BLOCKED_ARTIFACTS]

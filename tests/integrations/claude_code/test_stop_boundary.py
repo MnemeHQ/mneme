@@ -150,6 +150,33 @@ class TestAttribution:
         rc, _, out = _run(_stop_event(repo))
         assert out.strip() == ""
 
+    def test_exact_content_move_not_attributed_to_session(self, repo):
+        """mv of a pre-session artifact must not blame its lines on Claude."""
+        (repo / "legacy.py").write_text("import psycopg2\n", encoding="utf-8")
+        assert _run(_session_start(repo))[0] == 0
+        (repo / "legacy.py").rename(repo / "moved.py")
+        rc, _, out = _run(_stop_event(repo))
+        assert out.strip() == "", "an exact-content move introduces nothing new"
+
+    def test_copy_of_violating_artifact_still_attributed(self, repo):
+        """A copy whose source still exists is new content: attributed."""
+        (repo / "src_bad.py").write_text("import psycopg2\n", encoding="utf-8")
+        assert _run(_session_start(repo))[0] == 0
+        (repo / "copy_bad.py").write_text("import psycopg2\n", encoding="utf-8")
+        rc, _, out = _run(_stop_event(repo))
+        reason = json.loads(out)["reason"]
+        assert "copy_bad.py" in reason
+
+    def test_moved_then_edited_is_attributed_for_its_edit(self, repo):
+        """Rename plus edit falls back to full attribution (conservative)."""
+        (repo / "a.py").write_text("x = 1\n", encoding="utf-8")
+        assert _run(_session_start(repo))[0] == 0
+        target = repo / "b.py"
+        target.write_text("x = 1\nimport psycopg2\n", encoding="utf-8")
+        (repo / "a.py").unlink()
+        rc, _, out = _run(_stop_event(repo))
+        assert json.loads(out)["decision"] == "block"
+
 
 class TestLoopSafetyAndDegrade:
     def test_stop_hook_active_short_circuits_even_with_violations(self, repo):
@@ -215,8 +242,13 @@ class TestLoopSafetyAndDegrade:
         big.write_text("y" * (ss.MAX_FILE_BYTES + 5), encoding="utf-8")
         rc, err, out = _run(_stop_event(repo))
         assert rc == 0
-        assert out.strip() == ""
-        assert "big.log" in err
+        # Claude never sees exit-0 stderr, so the unevaluated delta must be
+        # surfaced as non-blocking Stop feedback instead.
+        emitted = json.loads(out)
+        context = emitted["hookSpecificOutput"]["additionalContext"]
+        assert "big.log" in context
+        assert "not evaluated" in context
+        assert "decision" not in emitted
 
     def test_crashing_checker_fails_open_with_diagnostics(self, repo):
         assert _run(_session_start(repo))[0] == 0
@@ -226,9 +258,10 @@ class TestLoopSafetyAndDegrade:
         (repo / "storage_db.py").write_text("import psycopg2\n", encoding="utf-8")
         rc, err, out = _run(_stop_event(repo))
         assert rc == 0
-        assert out.strip() == "", "an untrusted verdict must never block"
-        lowered = err.lower()
-        assert "fail" in lowered or "verdict" in lowered or "could not" in lowered
+        emitted = json.loads(out)
+        assert "decision" not in emitted, "an untrusted verdict must never block"
+        context = emitted["hookSpecificOutput"]["additionalContext"]
+        assert "could not be evaluated" in context
 
     def test_warn_mode_reports_without_blocking(self, repo, monkeypatch):
         monkeypatch.setenv("MNEME_HOOK_MODE", "warn")
