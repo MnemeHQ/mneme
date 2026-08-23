@@ -1,15 +1,39 @@
 {
-  "description": "Mneme architectural-enforcement hook for Claude Code edits.",
+  "description": "Mneme architectural-enforcement hooks for Claude Code: pre-execution gates plus a session-delta backstop at Stop.",
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Edit|Write|MultiEdit",
+        "matcher": "Edit|Write|MultiEdit|Bash",
         "hooks": [
           {
             "type": "command",
             "command": "mneme-hook",
             "args": [],
             "timeout": 30
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "mneme-hook",
+            "args": [],
+            "timeout": 120
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "mneme-hook",
+            "args": [],
+            "timeout": 120
           }
         ]
       }

@@ -51,31 +51,30 @@ plugin UI will prompt for the **enforcement mode** (`strict` or `warn`).
 
 ## How enforcement works
 
-The plugin registers a `PreToolUse` hook matching `Edit|Write|MultiEdit`.
+The plugin registers three hooks, all exec-form invocations of `mneme-hook`:
 
-> **What this covers.** `Edit` and `Write` tool calls, which is how Claude Code
-> edits files directly. The matcher also lists `MultiEdit` for compatibility;
-> current Claude Code documents `Edit` and `Write`. **Edits made by shell
-> commands are not covered** — a `Bash` call that writes a file does not fire a
-> `PreToolUse` file-edit hook and is never checked. Complete working-tree
-> coverage would need a `Stop`-hook audit, which this plugin does not ship. Use
-> `/mneme:review` to catch what the per-edit hook misses.
+| Event | Matcher | Role |
+|---|---|---|
+| `PreToolUse` | `Edit\|Write\|MultiEdit\|Bash` | **Prevent**: block violating mutations before they land. |
+| `SessionStart` | (all sources) | Capture the per-session repository baseline used by the Stop boundary. |
+| `Stop` | — | **Catch**: evaluate the session delta before the agent completes. |
 
-The hook uses Claude Code's **exec form** — it invokes the `mneme-hook` console
-script directly on `PATH`, with no shell in between:
-
-```json
-{ "type": "command", "command": "mneme-hook", "args": [], "timeout": 30 }
-```
-
-`mneme-hook` (the existing Claude Code adapter, unchanged by this plugin):
-
-1. Reconstructs the full post-edit file content (not just the changed string),
-   honouring `replace_all` so the checked content matches what will land on disk.
-2. Discovers `.mneme/project_memory.json` by walking up from the working dir.
-3. Runs `mneme check --json` with a query derived from the target file path.
-4. Reads the **structured verdict** from that payload. In `strict` mode a
-   violating verdict exits **2** (block); in `warn` mode it never blocks.
+> **Coverage boundary (ADR-021): prevent -> catch -> verify.**
+>
+> - Direct file tools (`Edit`, `Write`, `MultiEdit`) are checked
+>   deterministically before mutation, on introduced lines only.
+> - Shell calls are checked before execution only when Mneme can prove from
+>   the command string alone what will land and where: a single simple
+>   `cat > path << 'EOF'` / `cat >> path << 'EOF'` with a quoted delimiter.
+>   Every other shell form — pipelines, substitutions, generators,
+>   interpreters, unquoted delimiters — is **not** preflight-blocked; it is
+>   allowed to run and its results are evaluated at `Stop`.
+> - The `Stop` hook audits content this session introduced (baseline ->
+>   working-tree diff with the same introduced-line semantics as the edit
+>   gate). It blocks completion with actionable reasons in strict mode and
+>   never blocks on dirty state that predates the session. It requires git;
+>   without git it reports itself inactive.
+> - CI remains the final verification boundary.
 
 The hook blocks **only** on a verdict it could parse and trust. An exit code on
 its own is not treated as a verdict — `mneme check --mode strict` returns 1 for
@@ -119,7 +118,9 @@ which is why warn mode previously reported nothing at all. `defer` is
 deliberate: `allow` would auto-approve the tool call and bypass the permission
 prompt you would otherwise get, so a *warning* mode must never use it. How
 Claude Code renders a `defer` reason has not been confirmed end-to-end in a
-live session.
+live session. In `warn` mode the `Stop` boundary likewise reports through
+non-blocking feedback (`hookSpecificOutput.additionalContext`) and never
+blocks completion.
 
 ## Retrieval: what the hook checks and what it misses
 

@@ -22,14 +22,21 @@ def _merge_settings(target: Path, template: dict) -> dict:
     if target.exists():
         existing = json.loads(target.read_text(encoding="utf-8"))
     hooks = existing.setdefault("hooks", {})
-    pre = hooks.setdefault("PreToolUse", [])
-    # Idempotency: don't double-add our matcher.
-    for entry in pre:
-        if entry.get("matcher") == "Edit|Write|MultiEdit" and any(
-            h.get("command") == "mneme-hook" for h in entry.get("hooks", [])
-        ):
-            return existing
-    pre.extend(template["hooks"]["PreToolUse"])
+    for event_name, template_groups in template["hooks"].items():
+        target_groups = hooks.setdefault(event_name, [])
+        for group in template_groups:
+            matcher = group.get("matcher", "")
+            already = any(
+                g.get("matcher", "") == matcher
+                and all(
+                    any(h.get("command") == nh.get("command") for h in g.get("hooks", []))
+                    for nh in group.get("hooks", [])
+                )
+                for g in target_groups
+            )
+            # Idempotency: don't double-add a matcher we already installed.
+            if not already:
+                target_groups.append(group)
     return existing
 
 

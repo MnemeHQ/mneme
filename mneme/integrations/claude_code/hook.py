@@ -1,4 +1,14 @@
-"""Claude Code hook shim — translates PreToolUse events into mneme check calls."""
+"""Claude Code hook shim — translates hook events into mneme check calls.
+
+Surfaces (ADR-021):
+
+- ``PreToolUse`` x ``Edit|Write|MultiEdit``: introduced-delta gate
+  (ADR-017/018/019/020 semantics, unchanged).
+- ``PreToolUse`` x ``Bash``: pre-execution gate for deterministically
+  reconstructable shell mutations only (see shell_preflight).
+- ``SessionStart``: per-session repository baseline capture (session_state).
+- ``Stop``: post-mutation / pre-completion session-delta backstop.
+"""
 from __future__ import annotations
 
 import difflib
@@ -10,6 +20,22 @@ import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Optional, TextIO
+
+from mneme.integrations.claude_code.session_state import (
+    capture_baseline,
+    cleanup_stale,
+    compute_session_delta,
+    enumerate_repo_files,
+    load_snapshot,
+    save_snapshot,
+    snapshot_path,
+)
+from mneme.integrations.claude_code.shell_preflight import (
+    Classification,
+    classify_command,
+    reconstruct_heredoc_write,
+)
+from mneme.path_selectors import policy_root
 
 
 @dataclass(frozen=True)
@@ -105,20 +131,43 @@ def materialize_proposed_content(event: ToolEvent) -> str:
     return _materialize_change(event)[1]
 
 
+def introduced_between(before: str, after: str) -> str:
+    """The lines ``after`` adds over ``before``, per ADR-018's definition.
+
+    Inserted or replaced lines of a deterministic sequence diff. Shared by
+    the direct-tool gate and the Stop session-delta boundary so both
+    boundaries attribute exactly the same way.
+    """
+    if not before:
+        return after
+    before_lines = before.splitlines()
+    after_lines = after.splitlines()
+    matcher = difflib.SequenceMatcher(
+        a=before_lines,
+        b=after_lines,
+        autojunk=False,
+    )
+    added: list[str] = []
+    for tag, _i1, _i2, j1, j2 in matcher.get_opcodes():
+        if tag in {"insert", "replace"}:
+            added.extend(after_lines[j1:j2])
+    return "\n".join(added)
+
+
 def introduced_content(event: ToolEvent) -> str:
     """The lines this edit adds, as one string.
 
-    An edit gate and an audit ask different questions. "Is this file
-    compliant?" is an audit, and ``mneme check --input <file>`` still answers
-    it over whole files. "Does this edit introduce a violation?" is the gate,
-    and attributing the whole file to it means a violation already present
+    An edit gate and an audit ask different questions. "Is this artifact
+    compliant?" is an audit, and ``mneme check --input <artifact>`` still answers
+    it over whole artifacts. "Does this edit introduce a violation?" is the gate,
+    and attributing the whole artifact to it means a violation already present
     blocks every later edit -- including edits to an unrelated function and the
     remediation itself. On an existing repository that turns installation into
     an immediate wall (#259). See ADR-018.
 
     "Introduced" is every proposed line in an ``insert`` or ``replace`` opcode
     from a deterministic sequence diff. One definition covers all three tools:
-    a brand-new file diffs against nothing, so all of it is introduced.
+    a brand-new artifact diffs against nothing, so all of it is introduced.
 
     Two deliberate consequences:
 
@@ -128,24 +177,10 @@ def introduced_content(event: ToolEvent) -> str:
     - A rule can only match within introduced lines, so a violation split
       across an introduced line and an untouched one is not seen here. Rules
       are literal tokens rather than multi-line patterns, so this is a narrow
-      gap, and the whole-file audit path still covers it.
+      gap, and the whole-artifact audit path still covers it.
     """
     current, proposed = _materialize_change(event)
-    if not current:
-        return proposed
-
-    before = current.splitlines()
-    after = proposed.splitlines()
-    matcher = difflib.SequenceMatcher(
-        a=before,
-        b=after,
-        autojunk=False,
-    )
-    added: list[str] = []
-    for tag, _i1, _i2, j1, j2 in matcher.get_opcodes():
-        if tag in {"insert", "replace"}:
-            added.extend(after[j1:j2])
-    return "\n".join(added)
+    return introduced_between(current, proposed)
 
 
 def find_memory(start: Path) -> Optional[Path]:
@@ -309,38 +344,48 @@ def _emit_defer(reason: str, stdout: TextIO) -> None:
     stdout.write("\n")
 
 
-def _run_check(
-    event: ToolEvent,
-    proposed_content: str,
+def _resolve_target(event: ToolEvent) -> tuple[str, str]:
+    """Return ``(rel_label, absolute_or_empty_target)`` for a tool event."""
+    rel = event.file_path or "(unknown)"
+    target_path = event.file_path
+    if target_path and not Path(target_path).is_absolute() and event.cwd:
+        target_path = str(Path(event.cwd) / target_path)
+    return rel, target_path
+
+
+def _invoke_check(
     memory: Path,
-    stderr: TextIO,
-    stdout: TextIO,
-) -> int:
+    rel_label: str,
+    target_path: str,
+    checked_content: str,
+    stderr: TextIO = sys.stderr,
+) -> Optional[subprocess.CompletedProcess]:
+    """Run ``mneme check`` over one proposed delta; return the child result.
+
+    Returns ``None`` when the child could not be launched or timed out; the
+    caller owns verdict interpretation and its fail-open policy.
+    """
     mode = resolve_mode()
 
     with tempfile.NamedTemporaryFile(
         mode="w", suffix=".txt", delete=False, encoding="utf-8"
     ) as tf:
-        tf.write(proposed_content)
+        tf.write(checked_content)
         input_path = tf.name
 
     try:
-        rel = event.file_path or "(unknown)"
-        target_path = event.file_path
-        if target_path and not Path(target_path).is_absolute() and event.cwd:
-            target_path = str(Path(event.cwd) / target_path)
         command = [
             sys.executable, "-m", "mneme", "check",
             "--memory", str(memory),
             "--input", input_path,
-            "--query", f"edit to {rel}",
+            "--query", f"edit to {rel_label}",
             "--mode", mode,
             "--json",
         ]
         if target_path:
             command.extend(["--target-path", target_path])
         try:
-            proc = subprocess.run(
+            return subprocess.run(
                 command,
                 capture_output=True,
                 text=True,
@@ -354,57 +399,350 @@ def _run_check(
                 "Failing open.",
                 file=stderr,
             )
-            return 0
+            return None
         except (OSError, subprocess.TimeoutExpired) as e:
             print(f"mneme-hook: check could not run ({e}). Failing open.", file=stderr)
-            return 0
-
-        payload = parse_verdict(proc.stdout)
-        if payload is None:
-            # No trusted verdict: a crash, a traceback, or an unexpected exit
-            # code. Never block on this.
-            if _is_stale_runtime(proc.stderr):
-                # Silence here would mean enforcement is off with nobody told.
-                print(
-                    "mneme-hook: the installed mneme CLI does not support "
-                    "the required JSON/path-aware check options, so no edit "
-                    "can be checked and ENFORCEMENT IS "
-                    "INACTIVE. Upgrade with: pipx upgrade mneme-hq",
-                    file=stderr,
-                )
-                return 0
-            print(
-                "mneme-hook: no parseable verdict from mneme check "
-                f"(exit {proc.returncode}). Failing open.",
-                file=stderr,
-            )
-            if proc.stderr:
-                print(proc.stderr, file=stderr)
-            return 0
-
-        verdict = payload["verdict"]
-        if payload.get("evaluation_complete") is False:
-            print(format_applicability_reason(payload), file=stderr)
-            return 0
-        if verdict == "PASS":
-            return 0
-
-        reason = format_reason(payload)
-        if mode == "warn":
-            _emit_defer(reason, stdout)
-            return 0
-
-        if verdict in _BLOCKING_VERDICTS:
-            # Exit 2 is the documented blocking path: Claude Code feeds stderr
-            # back to the model as the reason the edit was refused.
-            print(reason, file=stderr)
-            return 2
-        return 0
+            return None
     finally:
         try:
             os.unlink(input_path)
         except OSError:
             pass
+
+
+def _run_check(
+    event: ToolEvent,
+    proposed_content: str,
+    memory: Path,
+    stderr: TextIO,
+    stdout: TextIO,
+) -> int:
+    mode = resolve_mode()
+
+    rel, target_path = _resolve_target(event)
+    proc = _invoke_check(memory, rel, target_path, proposed_content, stderr=stderr)
+    if proc is None:
+        return 0
+
+    payload = parse_verdict(proc.stdout)
+    if payload is None:
+        # No trusted verdict: a crash, a traceback, or an unexpected exit
+        # code. Never block on this.
+        if _is_stale_runtime(proc.stderr):
+            # Silence here would mean enforcement is off with nobody told.
+            print(
+                "mneme-hook: the installed mneme CLI does not support "
+                "the required JSON/path-aware check options, so no edit "
+                "can be checked and ENFORCEMENT IS "
+                "INACTIVE. Upgrade with: pipx upgrade mneme-hq",
+                file=stderr,
+            )
+            return 0
+        print(
+            "mneme-hook: no parseable verdict from mneme check "
+            f"(exit {proc.returncode}). Failing open.",
+            file=stderr,
+        )
+        if proc.stderr:
+            print(proc.stderr, file=stderr)
+        return 0
+
+    verdict = payload["verdict"]
+    if payload.get("evaluation_complete") is False:
+        print(format_applicability_reason(payload), file=stderr)
+        return 0
+    if verdict == "PASS":
+        return 0
+
+    reason = format_reason(payload)
+    if mode == "warn":
+        _emit_defer(reason, stdout)
+        return 0
+
+    if verdict in _BLOCKING_VERDICTS:
+        # Exit 2 is the documented blocking path: Claude Code feeds stderr
+        # back to the model as the reason the edit was refused.
+        print(reason, file=stderr)
+        return 2
+    return 0
+
+
+# ── ADR-021: Bash pre-execution gate ─────────────────────────────────────────
+
+_SHELL_TRACE_PREFIX = "mneme-hook: Bash"
+
+
+def bash_tool_event(
+    event: ToolEvent,
+    stderr: TextIO,
+    stdout: TextIO,
+) -> int:
+    """Preflight a Bash call when — and only when — it is reconstructable.
+
+    Class A (quoted-delimiter heredoc writes) is materialized and checked
+    before execution. Classes B/C pass through; the Stop boundary audits what
+    they actually did. Classification alone never blocks.
+    """
+    command = event.tool_input.get("command", "") or ""
+    rec = reconstruct_heredoc_write(command)
+    if rec is None:
+        cls = classify_command(command)
+        print(
+            f"{_SHELL_TRACE_PREFIX} classified {cls.value}: no deterministic "
+            "pre-execution check (session-delta backstop still applies).",
+            file=stderr,
+        )
+        return 0
+
+    memory = find_memory(Path(event.cwd or "."))
+    if memory is None:
+        return 0
+
+    target_abs = rec.target_path
+    if not Path(target_abs).is_absolute() and event.cwd:
+        target_abs = str(Path(event.cwd) / target_abs)
+
+    try:
+        current = _read_current(target_abs, missing_ok=True)
+    except MaterializeError:
+        current = ""
+    proposed = current + rec.proposed_content if rec.append else rec.proposed_content
+    checked = introduced_between(current, proposed)
+    if not checked.strip():
+        # Pure re-append of lines the artifact already ends with introduces
+        # nothing new (ADR-018 blank-delta rule).
+        return 0
+
+    shell_event = ToolEvent(
+        tool_name="Bash",
+        file_path=target_abs,
+        cwd=event.cwd,
+        tool_input={},
+    )
+    return _run_check(shell_event, checked, memory, stderr, stdout)
+
+
+# ── ADR-021: session lifecycle surfaces ─────────────────────────────────────
+
+_MAX_BLOCKED_ARTIFACTS = 5
+
+
+def session_start_event(envelope: Dict[str, Any], stderr: TextIO) -> int:
+    """Capture the per-session repository baseline.
+
+    Only a fresh ``startup`` refreshes an existing snapshot; resume, clear,
+    compact, and fork keep it so mid-session compaction cannot launder deltas
+    introduced earlier in the same working tree.
+    """
+    memory = find_memory(Path(envelope.get("cwd") or "."))
+    if memory is None:
+        return 0
+    root = policy_root(memory)
+    cleanup_stale()
+    source = str(envelope.get("source") or "startup")
+    spath = snapshot_path(root, str(envelope.get("session_id") or ""))
+    if source != "startup" and load_snapshot(spath, expected_root=root) is not None:
+        return 0
+    try:
+        save_snapshot(spath, capture_baseline(root))
+    except OSError as e:
+        print(f"mneme-hook: baseline capture failed ({e}).", file=stderr)
+    return 0
+
+
+def stop_event(
+    envelope: Dict[str, Any],
+    stderr: TextIO,
+    stdout: TextIO,
+) -> int:
+    """Session-delta backstop: post-mutation, pre-completion.
+
+    Evaluates only content this session introduced (baseline -> now diff with
+    ADR-018 semantics). Blocks via the documented Stop JSON decision on a
+    trusted blocking verdict; every degraded path is visible and never a
+    fabricated pass.
+    """
+    if envelope.get("stop_hook_active"):
+        # Claude Code is already continuing because of a stop hook; blocking
+        # again risks an unresolvable loop. The harness's own consecutive-block
+        # cap remains the outer guard.
+        return 0
+
+    memory = find_memory(Path(envelope.get("cwd") or "."))
+    if memory is None:
+        return 0
+
+    root = policy_root(memory)
+
+    files = enumerate_repo_files(root)
+    if files is None:
+        print(
+            "mneme-hook: not inside a git work tree; the session-delta gate "
+            "is inactive for this turn.",
+            file=stderr,
+        )
+        return 0
+
+    spath = snapshot_path(root, str(envelope.get("session_id") or ""))
+    baseline = load_snapshot(spath, expected_root=root)
+    if baseline is None:
+        try:
+            save_snapshot(spath, capture_baseline(root))
+        except OSError as e:
+            print(f"mneme-hook: late baseline capture failed ({e}).", file=stderr)
+            return 0
+        print(
+            "mneme-hook: no session baseline was found; captured one now. "
+            "Repository mutations made before this point cannot be attributed "
+            "to this session and were not evaluated.",
+            file=stderr,
+        )
+        return 0
+
+    delta = compute_session_delta(root, baseline, files)
+
+    mode = resolve_mode()
+    offenders: list[tuple[str, str]] = []  # (rel, reason)
+    unevaluated = list(delta.skipped.items())
+
+    candidates: list[tuple[str, str]] = []
+    for rel in delta.new:
+        abs_path = root / rel
+        try:
+            body = abs_path.read_text(encoding="utf-8")
+        except (OSError, UnicodeError) as e:
+            unevaluated.append((rel, f"unreadable during evaluation: {e}"))
+            continue
+        if body.strip():
+            candidates.append((rel, body))
+    for rel, introduced in delta.modified.items():
+        candidates.append((rel, introduced))
+
+    untrusted = 0
+    incomplete = 0
+    for rel, body in candidates:
+        proc = _invoke_check(memory, rel, str(root / rel), body, stderr=stderr)
+        if proc is None:
+            untrusted += 1
+            continue
+        payload = parse_verdict(proc.stdout)
+        if payload is None:
+            untrusted += 1
+            if _is_stale_runtime(proc.stderr):
+                print(
+                    "mneme-hook: installed CLI lacks required JSON/path-aware "
+                    "options; ENFORCEMENT IS INACTIVE. Upgrade with: "
+                    "pipx upgrade mneme-hq",
+                    file=stderr,
+                )
+            continue
+        if payload.get("evaluation_complete") is False:
+            incomplete += 1
+            print(format_applicability_reason(payload), file=stderr)
+            continue
+        if payload["verdict"] in _BLOCKING_VERDICTS:
+            offenders.append((rel, format_reason(payload)))
+
+    notes: list[str] = []
+    if untrusted:
+        notes.append(
+            f"{untrusted} changed artifact(s) could not be evaluated "
+            "(untrusted checker result); failing open per transport policy."
+        )
+    if incomplete:
+        notes.append(
+            f"{incomplete} changed artifact(s) had incomplete rule-path "
+            "evaluation (see applicability diagnostics above)."
+        )
+    if unevaluated:
+        listing = ", ".join(rel for rel, _ in unevaluated[:10])
+        notes.append(
+            "session delta not evaluated for: "
+            + listing
+            + ("..." if len(unevaluated) > 10 else "")
+        )
+    for note in notes:
+        print(f"mneme-hook: {note}", file=stderr)
+
+    if not offenders:
+        return 0
+
+    shown = offenders[:_MAX_BLOCKED_ARTIFACTS]
+    parts = [
+        "mneme: repository mutations made during this session violate "
+        f"{len(offenders)} governed artifact(s):"
+    ]
+    for rel, reason in shown:
+        parts.append(f"[{rel}]")
+        parts.append(reason)
+    if len(offenders) > len(shown):
+        parts.append(f"(+{len(offenders) - len(shown)} more)")
+    reason_text = "\n".join(parts)
+
+    if mode == "warn":
+        json.dump(
+            {
+                "hookSpecificOutput": {
+                    "hookEventName": "Stop",
+                    "additionalContext": reason_text,
+                }
+            },
+            stdout,
+        )
+        stdout.write("\n")
+        return 0
+
+    json.dump({"decision": "block", "reason": reason_text}, stdout)
+    stdout.write("\n")
+    return 0
+
+
+# ── dispatch ─────────────────────────────────────────────────────────────────
+
+
+def handle_event(
+    envelope: Any,
+    stderr: TextIO = sys.stderr,
+    stdout: TextIO = sys.stdout,
+) -> int:
+    """Route one decoded hook envelope to its boundary handler."""
+    if not isinstance(envelope, dict):
+        print("mneme-hook: bad envelope: not a JSON object", file=stderr)
+        return 0
+    name = envelope.get("hook_event_name")
+    if name == "SessionStart":
+        return session_start_event(envelope, stderr)
+    if name == "Stop":
+        return stop_event(envelope, stderr, stdout)
+    try:
+        event = parse_event(json.dumps(envelope))
+    except (json.JSONDecodeError, KeyError, TypeError) as e:
+        print(f"mneme-hook: bad envelope: {e}", file=stderr)
+        return 0
+    if event.tool_name == "Bash":
+        return bash_tool_event(event, stderr, stdout)
+    if not should_check(event.tool_name):
+        return 0
+
+    memory = find_memory(Path(event.cwd or "."))
+    if memory is None:
+        return 0
+
+    try:
+        # The gate checks what this edit introduces, not the whole resulting
+        # artifact -- otherwise a violation already present blocks every later
+        # edit to it, including the one that removes it (#259, ADR-018).
+        checked_content = introduced_content(event)
+    except MaterializeError as e:
+        print(f"mneme-hook: cannot materialize content, failing open: {e}", file=stderr)
+        return 0
+
+    if not checked_content.strip():
+        # The edit introduces no non-blank lines (for example, a pure
+        # deletion). Mechanically enforceable typed rules cannot be blank.
+        return 0
+
+    return _run_check(event, checked_content, memory, stderr, stdout)
 
 
 def main(
@@ -414,17 +752,11 @@ def main(
 ) -> int:
     try:
         raw = stdin.read()
-        event = parse_event(raw)
-    except (json.JSONDecodeError, KeyError) as e:
+        envelope = json.loads(raw)
+    except json.JSONDecodeError as e:
         print(f"mneme-hook: bad envelope: {e}", file=stderr)
         return 0
-
-    if not should_check(event.tool_name):
-        return 0
-
-    memory = find_memory(Path(event.cwd or "."))
-    if memory is None:
-        return 0
+    return handle_event(envelope, stderr, stdout)
 
     try:
         # The gate checks what this edit introduces, not the whole resulting

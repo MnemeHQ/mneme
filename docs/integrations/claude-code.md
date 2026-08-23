@@ -19,6 +19,34 @@ adjusts its approach without you having to intervene.
 
 ---
 
+## Coverage: prevent -> catch -> verify
+
+| Stage | Surface | What is guaranteed |
+|---|---|---|
+| **Prevent** | `PreToolUse` x `Edit\|Write\|MultiEdit` | Deterministic pre-mutation checks on the lines an edit introduces (ADR-018). |
+| **Prevent** | `PreToolUse` x `Bash` | Pre-execution checks for explicitly supported reconstructable shell mutations: single simple `cat > path << 'EOF'` / `cat >> path << 'EOF'` commands with a quoted delimiter (ADR-021). Everything else passes through unblocked. |
+| **Catch** | `Stop` | Post-mutation, pre-completion session-delta checks: content introduced during this Claude session through any mutation path that escaped pre-execution interception is evaluated before the turn ends; violations block completion with actionable reasons (ADR-021). Requires git. |
+| **Verify** | CI (`mneme check`) | Final repository-boundary verification, unchanged. |
+
+Precise claim boundaries:
+
+- Not every shell command is understood. Commands outside the supported
+  grammar (pipelines, substitutions, generators, scripts, unquoted heredoc
+  delimiters) are never blocked on guessed semantics — they are caught by the
+  Stop boundary instead of being prevented.
+- The Stop boundary does not prevent the original mutation and is not
+  pre-generation tooling; it audits what the session actually introduced,
+  measured against a baseline captured at session start, so dirty state that
+  existed beforehand is never attributed to the session.
+- Retrieval quality does not control whether a deterministic typed rule is
+  enforced (ADR-017); the shell and Stop surfaces reuse the same check path
+  and real target paths, so ADR-020 applicability stays authoritative.
+- Session attribution depends on git file discovery and UTF-8-readable
+  artifacts within size budgets; degraded cases surface visible diagnostics
+  rather than fabricated passes or silent blocks.
+
+---
+
 ## Install
 
 ### 1. Install the package
