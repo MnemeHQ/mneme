@@ -47,6 +47,12 @@ repository. This ADR records the transfer of ownership and supersedes those seve
 compiled active set stops asserting website publishing governance from the core repository. It
 does not delete their historical record.
 
+**Governance coverage note.** The transferred ownership covers all mnemehq.com website content and
+pages - including the insights listing and related insight pages, whose presentation and SEO
+governance previously lived in the superseded site.insights_seo, site.persona_pages, and
+site.insights_seo.report_titles decisions. Any change to a website page of mnemehq.com is governed
+in MnemeHQ/mnemehq-site (see PUBLISHING.md there); this repository no longer owns or reviews such
+changes.
 **Amendment (2026-07-27).** This ADR is amended on the day it was accepted to replace its original
 rollback-retention window — which required BOTH at least 14 days elapsed since cutover AND at least
 10 successful automatic deployments from MnemeHQ/mnemehq-site — with a proportionate,
