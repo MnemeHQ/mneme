@@ -45,6 +45,7 @@ Thumbs.db
 .mneme/private*
 .mneme/*.local.json
 .mneme/secrets*
+.mneme/task_context.json
 
 # Working / scratch files (ADR-003 — not for deploy, not tracked)
 theovalmis_index.html

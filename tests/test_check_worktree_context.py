@@ -7,6 +7,7 @@ condition which cannot be faked with mocks.
 from __future__ import annotations
 
 import importlib.util
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -80,18 +81,19 @@ def test_detached_head_fails(repo: Path) -> None:
     assert "detached HEAD" in failures[0]
 
 
-def test_missing_expected_branch_argument_fails(capsys: pytest.CaptureFixture[str]) -> None:
-    with pytest.raises(SystemExit) as excinfo:
-        check.main(["--expected-root", str(REPO_ROOT)])
-    assert excinfo.value.code != 0
-    assert "required" in capsys.readouterr().err.lower()
+def test_missing_expected_branch_argument_falls_back_to_context_file(repo: Path) -> None:
+    """Without --expected-branch the checker falls back to .mneme/task_context.json."""
+    _write_task_context(repo, "main", repo)
+    assert check.main(["--expected-root", str(repo)], repo=repo) == 0
 
 
-def test_missing_expected_root_argument_fails(capsys: pytest.CaptureFixture[str]) -> None:
-    with pytest.raises(SystemExit) as excinfo:
-        check.main(["--expected-branch", "main"])
-    assert excinfo.value.code != 0
-    assert "required" in capsys.readouterr().err.lower()
+def test_missing_expected_root_argument_falls_back_to_context_file(repo: Path) -> None:
+    _write_task_context(repo, "main", repo)
+    assert check.main(["--expected-branch", "main"], repo=repo) == 0
+
+
+def test_missing_both_arguments_and_no_context_file_fails_closed(repo: Path) -> None:
+    assert check.main([], repo=repo) == 1
 
 
 def test_main_passes_against_live_repo() -> None:
@@ -119,3 +121,130 @@ def test_not_a_git_repository_fails(tmp_path: Path) -> None:
     failures = check.evaluate(state, empty, "main")
     assert len(failures) == 1
     assert "not a git repository" in failures[0]
+
+
+# --- task context file (.mneme/task_context.json) resolution ---
+
+
+def _write_task_context(repo: Path, branch: str, worktree: Path, raw: str | None = None) -> None:
+    context_dir = repo / ".mneme"
+    context_dir.mkdir(exist_ok=True)
+    if raw is not None:
+        (context_dir / "task_context.json").write_text(raw, encoding="utf-8")
+    else:
+        payload = {"branch": branch, "worktree": str(worktree)}
+        (context_dir / "task_context.json").write_text(
+            json.dumps(payload), encoding="utf-8"
+        )
+
+
+def test_load_task_context_reads_file(repo: Path) -> None:
+    _write_task_context(repo, "feat/example", repo)
+    context = check.load_task_context(repo)
+    assert context == {"branch": "feat/example", "worktree": str(repo)}
+
+
+def test_load_task_context_missing_returns_none(repo: Path) -> None:
+    assert check.load_task_context(repo) is None
+
+
+def test_load_task_context_malformed_raises(repo: Path) -> None:
+    _write_task_context(repo, "", repo, raw="{not json")
+    with pytest.raises(json.JSONDecodeError):
+        check.load_task_context(repo)
+    _write_task_context(repo, "", repo, raw='{"branch": "main"}')
+    with pytest.raises(ValueError):
+        check.load_task_context(repo)
+
+
+def test_main_no_args_uses_task_context_passes(repo: Path) -> None:
+    _write_task_context(repo, "main", repo)
+    assert check.main([], repo=repo) == 0
+
+
+def test_main_no_args_task_context_branch_mismatch_fails(repo: Path) -> None:
+    _write_task_context(repo, "some/other-branch", repo)
+    assert check.main([], repo=repo) == 1
+
+
+def test_main_no_args_task_context_wrong_worktree_fails(repo: Path, tmp_path: Path) -> None:
+    elsewhere = tmp_path / "elsewhere"
+    elsewhere.mkdir()
+    _write_task_context(repo, "main", elsewhere)
+    assert check.main([], repo=repo) == 1
+
+
+def test_main_no_args_without_task_context_fails_closed(repo: Path) -> None:
+    assert check.main([], repo=repo) == 1
+
+
+def test_explicit_args_override_task_context(repo: Path) -> None:
+    _write_task_context(repo, "stale/branch", tmp_path_factory := repo.parent / "stale-wt")
+    assert (
+        check.main(["--expected-root", str(repo), "--expected-branch", "main"], repo=repo) == 0
+    )
+
+
+# --- new_task_worktree provisioning ---
+
+
+@pytest.fixture()
+def provisioner():
+    spec = importlib.util.spec_from_file_location(
+        "new_task_worktree", REPO_ROOT / "scripts" / "new_task_worktree.py"
+    )
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_slugify(provisioner) -> None:
+    assert provisioner.slugify("feat/example-task") == "feat-example-task"
+    assert provisioner.slugify("ci/pytest_merge_gate") == "ci-pytest-merge-gate"
+
+
+def test_git_calls_are_scoped_to_script_repo_root(provisioner, tmp_path, monkeypatch) -> None:
+    """Regression: git calls must target the script's repo, not the caller's cwd."""
+    recorded = {}
+
+    def fake_run(cmd, **kwargs):
+        recorded["cwd"] = kwargs.get("cwd")
+        return subprocess.CompletedProcess(cmd, 0, stdout="", stderr="")
+
+    monkeypatch.setattr(provisioner.subprocess, "run", fake_run)
+    unrelated_cwd = tmp_path / "unrelated"
+    unrelated_cwd.mkdir()
+    result = provisioner.create_task_worktree(
+        "feat/regression", "origin/main", tmp_path / "wt"
+    )
+    assert result == 0
+    assert recorded["cwd"] is not None
+    assert Path(recorded["cwd"]).resolve() == REPO_ROOT.resolve()
+
+
+def test_relative_path_resolves_against_repo_root(provisioner, tmp_path, monkeypatch) -> None:
+    """Regression: a relative --path must land under REPO_ROOT even when the
+    invoking process runs from an unrelated cwd (git resolves relative paths
+    against its cwd=REPO_ROOT; python writes must agree)."""
+    fake_repo = tmp_path / "fake-repo"
+    fake_repo.mkdir()
+    monkeypatch.setattr(provisioner, "REPO_ROOT", fake_repo)
+
+    recorded = {}
+
+    def fake_run(cmd, **kwargs):
+        recorded["cwd"] = kwargs.get("cwd")
+        return subprocess.CompletedProcess(cmd, 0, stdout="", stderr="")
+
+    monkeypatch.setattr(provisioner.subprocess, "run", fake_run)
+    unrelated_cwd = tmp_path / "unrelated-cwd"
+    unrelated_cwd.mkdir()
+    monkeypatch.chdir(unrelated_cwd)
+
+    exit_code = provisioner.main(["feat/rel-path", "--path", ".worktrees/foo", "--base", "origin/main"])
+
+    assert exit_code == 0
+    worktree = fake_repo / ".worktrees" / "foo"
+    assert (worktree / ".mneme" / "task_context.json").is_file()
+    context = json.loads((worktree / ".mneme" / "task_context.json").read_text(encoding="utf-8"))
+    assert context == {"branch": "feat/rel-path", "worktree": str(worktree)}
