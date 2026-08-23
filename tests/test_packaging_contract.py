@@ -3,11 +3,12 @@
 Two layers:
 
 1. **Source declaration** (always runs, no build): ``pyproject.toml``
-   ``[project.scripts]`` declares exactly the two console scripts the Claude
-   Code integration depends on::
+   ``[project.scripts]`` declares exactly the three console scripts the
+   integrations depend on::
 
-       mneme      = mneme.cli:main
-       mneme-hook = mneme.integrations.claude_code.hook:cli_main
+        mneme            = mneme.cli:main
+        mneme-hook       = mneme.integrations.claude_code.hook:cli_main
+        mneme-kiro-hook  = mneme.integrations.kiro.hook:cli_main
 
 2. **Built-artifact contract** (runs when ``dist/`` holds a build): the wheel
    and sdist are inspected directly. This is the authoritative verification of
@@ -39,6 +40,7 @@ PACKAGE_NAME = "mneme-hq"
 EXPECTED_SCRIPTS = {
     "mneme": "mneme.cli:main",
     "mneme-hook": "mneme.integrations.claude_code.hook:cli_main",
+    "mneme-kiro-hook": "mneme.integrations.kiro.hook:cli_main",
 }
 
 
@@ -143,7 +145,7 @@ def test_sdist_pkg_info_declares_name_and_version():
     assert meta.get("Version") == version, f"sdist Version = {meta.get('Version')!r}"
 
 
-def test_wheel_entry_points_are_exactly_the_two_console_scripts():
+def test_wheel_entry_points_are_exactly_the_declared_console_scripts():
     version = _declared_version()
     wheel = _sole_artifact(f"mneme_hq-{version}-*.whl")
     with zipfile.ZipFile(wheel) as zf:
