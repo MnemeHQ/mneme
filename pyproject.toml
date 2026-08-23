@@ -26,6 +26,7 @@ dev = [
 [project.scripts]
 mneme = "mneme.cli:main"
 mneme-hook = "mneme.integrations.claude_code.hook:cli_main"
+mneme-kiro-hook = "mneme.integrations.kiro.hook:cli_main"
 
 [tool.setuptools.packages.find]
 where = ["."]
