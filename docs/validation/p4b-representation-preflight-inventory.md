@@ -63,7 +63,7 @@ the copy's location, discarded, and superseded by the at-depth run below.
 |---|---|
 | Record counts | 15 → 15; nothing added or removed |
 | **Content-field divergence** | **NONE** — `decision`, `rationale`, `scope`, `constraints`, `anti_patterns` reproduce byte-identically for all 13 ADR-backed entries, including `ADR-016` |
-| `rules` key normalization | 8 entries (`ADR-001, -002, -004, -009, -010, -013, -014` + one further legacy-migrated record): live file has absent/null `rules`; import emits `[]` |
+| `rules` key normalization | 7 entries (`ADR-001, -002, -004, -009, -010, -013, -014`): live file omits `rules`; import emits `[]` |
 | Stale `source.sha256` | 6 entries: `ADR-005, -016, -017, -018, -019, -020` — stored hash ≠ current ADR-file hash; these ADRs were edited after their last import without re-import |
 
 Stale-hash detail:
@@ -82,7 +82,7 @@ file contents directly at capture time.
 
 ## 6. Disposition of findings
 
-The eight `rules` normalizations and six stale hashes are **baseline evidence and are deliberately
+The seven `rules` normalizations and six stale hashes are **baseline evidence and are deliberately
 not fixed in P4B**. Re-import during the future representation change will incidentally refresh both;
 the change PR must disclose those refreshes as expected regeneration side effects, distinct from the
 substantive ADR-016 clarification.
