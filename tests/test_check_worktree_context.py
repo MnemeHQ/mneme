@@ -220,3 +220,31 @@ def test_git_calls_are_scoped_to_script_repo_root(provisioner, tmp_path, monkeyp
     assert result == 0
     assert recorded["cwd"] is not None
     assert Path(recorded["cwd"]).resolve() == REPO_ROOT.resolve()
+
+
+def test_relative_path_resolves_against_repo_root(provisioner, tmp_path, monkeypatch) -> None:
+    """Regression: a relative --path must land under REPO_ROOT even when the
+    invoking process runs from an unrelated cwd (git resolves relative paths
+    against its cwd=REPO_ROOT; python writes must agree)."""
+    fake_repo = tmp_path / "fake-repo"
+    fake_repo.mkdir()
+    monkeypatch.setattr(provisioner, "REPO_ROOT", fake_repo)
+
+    recorded = {}
+
+    def fake_run(cmd, **kwargs):
+        recorded["cwd"] = kwargs.get("cwd")
+        return subprocess.CompletedProcess(cmd, 0, stdout="", stderr="")
+
+    monkeypatch.setattr(provisioner.subprocess, "run", fake_run)
+    unrelated_cwd = tmp_path / "unrelated-cwd"
+    unrelated_cwd.mkdir()
+    monkeypatch.chdir(unrelated_cwd)
+
+    exit_code = provisioner.main(["feat/rel-path", "--path", ".worktrees/foo", "--base", "origin/main"])
+
+    assert exit_code == 0
+    worktree = fake_repo / ".worktrees" / "foo"
+    assert (worktree / ".mneme" / "task_context.json").is_file()
+    context = json.loads((worktree / ".mneme" / "task_context.json").read_text(encoding="utf-8"))
+    assert context == {"branch": "feat/rel-path", "worktree": str(worktree)}

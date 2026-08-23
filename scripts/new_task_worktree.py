@@ -76,6 +76,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     path = Path(args.path) if args.path else REPO_ROOT / ".worktrees" / slugify(args.branch)
+    if not path.is_absolute():
+        path = REPO_ROOT / path
     if path.exists():
         print(f"[new-task] FAIL -- path already exists: {path}", file=sys.stderr)
         return 1
