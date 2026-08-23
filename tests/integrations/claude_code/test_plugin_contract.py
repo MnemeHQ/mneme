@@ -55,7 +55,7 @@ def test_hook_uses_exec_form_direct_invocation():
     pre = hooks["hooks"]["PreToolUse"]
     assert len(pre) == 1
     group = pre[0]
-    assert group["matcher"] == "Edit|Write|MultiEdit"
+    assert group["matcher"] == "Edit|Write|MultiEdit|Bash"
     inner = group["hooks"]
     assert len(inner) == 1
     hook = inner[0]
