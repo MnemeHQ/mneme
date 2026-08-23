@@ -28,6 +28,12 @@ python scripts/check_worktree_context.py --expected-root <worktree-root> --expec
 
 It is read-only and fails closed (exit 1) with expected-vs-actual output on any mismatch. Never pass it values you did not receive from the task definition.
 
+Provisioning and the automatic commit gate:
+
+- Create each task worktree with `python scripts/new_task_worktree.py <branch>` — it creates the branch from current `origin/main` and writes `.mneme/task_context.json` inside the worktree.
+- When run without explicit arguments, the checker reads `.mneme/task_context.json`; the versioned pre-commit hook (`scripts/githooks/pre-commit`) runs it before every commit in worktrees that have a context file.
+- One-time setup for the hook: `git config core.hooksPath scripts/githooks`.
+
 ## Worktree Lifecycle
 
 `C:/dev/mneme` is the administrative checkout. Keep it on `main` and do not use it for development work.

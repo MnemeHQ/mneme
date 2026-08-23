@@ -1,0 +1,26 @@
+#!/bin/sh
+# Repo-wide pre-commit gate (installed via: git config core.hooksPath scripts/githooks)
+#
+# 1. Block private/internal files from entering the public repo.
+#    Sensitive strategy, GTM, competitor, investor, and customer material
+#    belongs in the mneme-internal repo instead.
+# 2. Task context guard: if this worktree has a task context file (written by
+#    scripts/new_task_worktree.py), verify the commit is happening in the
+#    declared worktree on the declared branch. Worktrees without a context
+#    file (e.g. the administrative checkout) are skipped.
+
+blocked_patterns="private/ internal/ strategy/ gtm/ competitors/ investor-notes/ customer-notes/ .private.md .internal.md"
+
+for pattern in $blocked_patterns; do
+  if git diff --cached --name-only | grep -q "$pattern"; then
+    echo "ERROR: private/internal file detected matching pattern: $pattern"
+    echo "Move this file to the mneme-internal repo instead."
+    exit 1
+  fi
+done
+
+if [ -f .mneme/task_context.json ]; then
+  python scripts/check_worktree_context.py || exit 1
+fi
+
+exit 0

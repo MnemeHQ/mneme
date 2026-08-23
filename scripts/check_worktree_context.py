@@ -19,9 +19,12 @@ Exit codes:
 from __future__ import annotations
 
 import argparse
+import json
 import subprocess
 import sys
 from pathlib import Path
+
+TASK_CONTEXT_FILENAME = ".mneme/task_context.json"
 
 
 def _git(repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
@@ -69,15 +72,49 @@ def evaluate(state: dict[str, object], expected_root: Path, expected_branch: str
     return failures
 
 
-def main(argv: list[str] | None = None) -> int:
+def load_task_context(repo: Path) -> dict[str, str] | None:
+    """Return the task context written by scripts/new_task_worktree.py, if any.
+
+    Expected shape: {"branch": "<task-branch>", "worktree": "<worktree-root>"}.
+    Returns None when the file does not exist; raises ValueError on malformed
+    content so callers can fail closed.
+    """
+    path = repo / TASK_CONTEXT_FILENAME
+    if not path.is_file():
+        return None
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict) or "branch" not in data or "worktree" not in data:
+        raise ValueError(f"{TASK_CONTEXT_FILENAME} must be an object with 'branch' and 'worktree' keys")
+    return {"branch": str(data["branch"]), "worktree": str(data["worktree"])}
+
+
+def main(argv: list[str] | None = None, repo: Path | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--expected-root", required=True, help="worktree root this task must run in")
-    parser.add_argument("--expected-branch", required=True, help="branch this task must be on")
+    parser.add_argument("--expected-root", default=None, help="worktree root this task must run in")
+    parser.add_argument("--expected-branch", default=None, help="branch this task must be on")
     args = parser.parse_args(argv)
 
-    repo = Path.cwd()
+    repo = repo or Path.cwd()
     state = gather_state(repo)
-    failures = evaluate(state, Path(args.expected_root), args.expected_branch)
+
+    expected_root = args.expected_root
+    expected_branch = args.expected_branch
+    if expected_root is None or expected_branch is None:
+        try:
+            context = load_task_context(repo)
+        except (json.JSONDecodeError, ValueError) as exc:
+            print("[context-check] FAIL -- malformed task context")
+            print(f"  {exc}")
+            return 1
+        if context is None:
+            print(f"[context-check] FAIL -- no explicit arguments and no {TASK_CONTEXT_FILENAME} found")
+            print("  Provision a task worktree with: python scripts/new_task_worktree.py <branch>")
+            print("  Or pass --expected-root/--expected-branch explicitly.")
+            return 1
+        expected_root = expected_root or context["worktree"]
+        expected_branch = expected_branch or context["branch"]
+
+    failures = evaluate(state, Path(expected_root), expected_branch)
     if not failures:
         print(
             f"[context-check] OK (root={Path(str(state['toplevel'])).resolve()}, "
