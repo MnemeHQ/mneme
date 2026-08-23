@@ -119,11 +119,14 @@ class Pipeline:
             A PipelineResult with every stage's output recorded.
 
         Raises:
-            MnemeConflictError: strict mode and a conflict was detected.
             PathApplicabilityUnknownError: strict mode and a scoped typed rule
-                could not be evaluated (no usable target path). Mirrors the CLI's
-                operational-failure precedence and ConflictDetector.detect();
-                unavailable applicability never becomes a silent pass (ADR-020).
+                could not be evaluated (no usable target path). Operational
+                failure; takes precedence over any conflict raise. Mirrors the
+                CLI's INCOMPLETE handling and ConflictDetector.detect();
+                unavailable applicability never becomes a silent pass or an
+                ordinary policy verdict (ADR-020).
+            MnemeConflictError: strict mode, evaluation complete, and a
+                conflict was detected.
         """
         scored = self.retriever.retrieve(query)
         system_prompt = format_decisions(
@@ -171,19 +174,19 @@ class Pipeline:
             applicability=detection.applicability,
         )
 
+        # Operational failure takes precedence over any policy verdict,
+        # mirroring the CLI (Result: INCOMPLETE / exit 2 regardless of
+        # violations found) and ConflictDetector.detect(): a conflict set
+        # produced by a partially-run evaluation cannot be trusted as
+        # "governed", so it must not surface as an ordinary verdict raise.
+        if self.enforcement_mode == "strict" and not detection.evaluation_complete:
+            raise PathApplicabilityUnknownError(detection.applicability)
+
         if self.enforcement_mode == "strict" and detection.conflicts:
             from mneme.schemas import MnemeConflictError
             raise MnemeConflictError(
                 conflicts=detection.conflicts,
                 result=result,
             )
-
-        # Strict mode must not silently complete while a scoped typed rule was
-        # unevaluated: the conflict set above cannot be trusted as "governed"
-        # when part of it never ran (ADR-020 sec. 6). The CLI already treats
-        # this state as an operational failure and ConflictDetector.detect()
-        # raises; this is the same contract for the Pipeline surface.
-        if self.enforcement_mode == "strict" and not detection.evaluation_complete:
-            raise PathApplicabilityUnknownError(detection.applicability)
 
         return result
