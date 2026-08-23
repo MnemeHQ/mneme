@@ -1,8 +1,8 @@
 # P3 — Retrieval Intervention Architecture Decision
 
-Status: **DECISION RATIFIED by maintainer 2026-08-22 — Option A selected, B rejected-for-now,
+Status: **DECISION RATIFIED by maintainer 2026-08-23 — Option A selected, B rejected-for-now,
 C not justified. Nothing implemented; record only.**
-Date: 2026-08-22
+Date: 2026-08-22 (analysis); ratified 2026-08-23
 Mode: read-only. `decision_retriever.py`, `.mneme/project_memory.json`, benchmark fixtures, and all
 ADRs are untouched.
 
@@ -150,9 +150,9 @@ architecture.
 
 | Criterion | A — memory representation | B — tie semantics | C — other |
 |---|---|---|---|
-| Addresses observed Q5 failure | Yes, via derivable authority vocabulary | No evidence-backed rule exists; would be outcome-fitted | n/a |
-| Generality beyond Q5 | High — fixes reliance on imported prose corpus-wide | Addresses tie class generally, but class observed once | — |
-| Smallest justified change | Yes (content-only) | No (global mechanics, n=1 evidence) | — |
+| Addresses observed Q5 failure | Directly targets the missing represented authority; effectiveness not yet validated | No evidence-backed rule exists; would be outcome-fitted | n/a |
+| Generality beyond Q5 | Potentially broader — Q3/Q5 show dependence on imported prose; broader effect requires validation | Addresses tie class generally, but class observed once | — |
+| Smallest justified change | Yes — governed representation; no retrieval-code change | No (global mechanics, n=1 evidence) | — |
 | Deterministic / auditable | Preserved | Preservable, but new contract | — |
 | Frozen S1 guarantees | Untouched | Potentially material shifts | — |
 | Special-casing risk | Managed by derivability standard | High in practice | — |
@@ -161,7 +161,7 @@ architecture.
 
 ## 6. Selected intervention class
 
-**A/B/C disposition (ratified by maintainer, 2026-08-22):**
+**A/B/C disposition (ratified by maintainer, 2026-08-23):**
 
 - **A — SELECTED.** Smallest evidence-backed intervention class; code-side `NO_CHANGE`.
 - **B — REJECTED FOR NOW.** One observed tie is insufficient evidence to change globally frozen tie
@@ -193,8 +193,10 @@ tie-frequency diagnosis establishing how often tied rank-1 pairs occur on live m
 
 ## 8. Implementation-validation gate (high level only)
 
-1. Memory PR proposes scope/title representations for affected live decisions, each addition annotated
-   with its ADR-source justification.
+1. ADR-backed representation PR proposes only derivable clarifications to the governing ADR source,
+   then regenerates/re-imports the corresponding memory entry through the existing compiler/import
+   path. Any `.mneme/project_memory.json` change must be reproducible from that source; no manual
+   divergence is permitted.
 2. Evaluation protocol locked **before** results are inspected: frozen S1 regression suite (existing
    gates: 7/7 verdicts, recall@3 = 1.00) plus the ratified five-probe set plus an expanded
    live-memory probe set frozen in advance.
