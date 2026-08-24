@@ -258,6 +258,31 @@ def parse_update_file(command: Any, current_content: Any) -> Tuple[str, str]:
     return target_path, "\n".join(introduced)
 
 
+def operation_kind(command: Any) -> str:
+    """Return the single operation kind (e.g. ``'*** Add File'``).
+
+    Validates the envelope first; raises :class:`CodexPatchParseError` for
+    malformed envelopes, missing operations, or multi-operation patches.
+    """
+    _validate_envelope(command)
+    return _operation_kind(_single_operation(_body_lines(command))[1])
+
+
+def update_target_path(command: Any) -> str:
+    """Return the validated target path of an Update File-only script."""
+    _validate_envelope(command)
+    body_lines = _body_lines(command)
+    op_index, op_line = _single_operation(body_lines)
+    if _operation_kind(op_line) != UPDATE_FILE_HEADER.rstrip(":").strip():
+        raise CodexPatchParseError(
+            f"not an Update File patch: {_operation_kind(op_line)!r}"
+        )
+    _, sep, raw_path = op_line.partition(":")
+    if not sep:
+        raise CodexPatchParseError("Update File has a malformed header")
+    return _check_update_path(raw_path.strip())
+
+
 def parse_pretooluse_payload(payload: Any, current_content: Any = None) -> Tuple[str, str]:
     """Extract ``(target_path, introduced_content)`` from a PreToolUse event.
 

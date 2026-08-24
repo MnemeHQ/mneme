@@ -265,3 +265,126 @@ def test_blank_introduced_content_skips(tmp_path, monkeypatch):
         payload, cwd=str(project), check_runner=RecordingRunner(stdout=_verdict_stdout())
     )
     assert result.action == SKIP
+
+
+# --- M1e-d: Update File path --------------------------------------------------
+
+
+def _update_payload(tmp_path, command):
+    return {
+        "hook_event_name": "PreToolUse",
+        "tool_name": "apply_patch",
+        "cwd": str(tmp_path),
+        "tool_input": {"command": command},
+    }
+
+
+def _seeded_project(tmp_path, monkeypatch, seed='def existing():\n    return 1\n'):
+    project, memory = _governed_project(tmp_path, monkeypatch)
+    (project / "service.py").write_text(seed, encoding="utf-8")
+    return project
+
+
+def _update_command(path, body="@@\n def existing():\n-    return 1\n+    return 42\n"):
+    return f"*** Begin Patch\n*** Update File: {path}\n{body}*** End Patch"
+
+
+def test_update_introducing_violation_denies_with_real_target_path(
+        tmp_path, monkeypatch):
+    project = _seeded_project(tmp_path, monkeypatch)
+    runner = RecordingRunner(stdout=_verdict_stdout("FAIL"))
+    result = evaluate_apply_patch(
+        _update_payload(project, _update_command(project / "service.py")),
+        cwd=str(project), check_runner=runner)
+    assert result.action == DENY
+    command, _ = runner.last
+    assert command[command.index("--target-path") + 1] == str(project / "service.py")
+
+
+def test_compliant_update_passes_and_sends_snapshot_delta(tmp_path, monkeypatch):
+    project = _seeded_project(tmp_path, monkeypatch)
+    runner = RecordingRunner(stdout=_verdict_stdout("PASS"))
+    result = evaluate_apply_patch(
+        _update_payload(project, _update_command(project / "service.py")),
+        cwd=str(project), check_runner=runner)
+    assert result.action == PASS
+    command, _ = runner.last
+    input_path = Path(command[command.index("--input") + 1])
+    assert not input_path.exists()  # consumed and cleaned up
+
+
+def test_update_warn_mode_is_non_blocking(tmp_path, monkeypatch):
+    project = _seeded_project(tmp_path, monkeypatch)
+    runner = RecordingRunner(stdout=_verdict_stdout("FAIL"))
+    result = evaluate_apply_patch(
+        _update_payload(project, _update_command(project / "service.py")),
+        cwd=str(project), mode="warn", check_runner=runner)
+    assert result.action == WARN
+
+
+def test_update_target_outside_root_fails_open_not_evaluated(
+        tmp_path, monkeypatch):
+    project = _seeded_project(tmp_path, monkeypatch)
+    outside = tmp_path.parent / "elsewhere.py"
+    result = evaluate_apply_patch(
+        _update_payload(project, _update_command(outside)),
+        cwd=str(project), check_runner=RecordingRunner())
+    assert result.action == FAIL_OPEN
+    assert "escapes" in result.reason
+    assert "not evaluated" in result.reason
+
+
+def test_update_missing_file_fails_open_not_evaluated(tmp_path, monkeypatch):
+    project, _ = _governed_project(tmp_path, monkeypatch)
+    result = evaluate_apply_patch(
+        _update_payload(project, _update_command(project / "missing.py")),
+        cwd=str(project), check_runner=RecordingRunner())
+    assert result.action == FAIL_OPEN
+    assert "could not be read" in result.reason
+
+
+def test_update_non_utf8_file_fails_open_not_evaluated(tmp_path, monkeypatch):
+    project, _ = _governed_project(tmp_path, monkeypatch)
+    target = project / "service.py"
+    target.write_bytes(b"\xff\xfe\x00bad")
+    result = evaluate_apply_patch(
+        _update_payload(project, _update_command(target)),
+        cwd=str(project), check_runner=RecordingRunner())
+    assert result.action == FAIL_OPEN
+    assert "not evaluated" in result.reason
+
+
+def test_update_parser_mismatch_fails_open_not_evaluated(tmp_path, monkeypatch):
+    project = _seeded_project(
+        tmp_path, monkeypatch, seed="def existing():\n    return UNRELATED\n")
+    result = evaluate_apply_patch(
+        _update_payload(project, _update_command(project / "service.py")),
+        cwd=str(project), check_runner=RecordingRunner())
+    assert result.action == FAIL_OPEN
+    assert "proposal not evaluated" in result.reason
+
+
+def test_relative_update_path_resolves_inside_root(tmp_path, monkeypatch):
+    project = _seeded_project(tmp_path, monkeypatch)
+    runner = RecordingRunner(stdout=_verdict_stdout("PASS"))
+    result = evaluate_apply_patch(
+        _update_payload(project, _update_command("service.py")),
+        cwd=str(project), check_runner=runner)
+    assert result.action == PASS
+    command, _ = runner.last
+    assert command[command.index("--target-path") + 1] == str(project / "service.py")
+
+
+def test_blank_only_update_skips(tmp_path, monkeypatch):
+    project = _seeded_project(tmp_path, monkeypatch)
+    cmd = _update_command(
+        project / "service.py",
+        "@@\n def existing():\n-    return 1\n+\n+\n+def third():\n+    return 3\n")
+    # make it blank-only: additions that are all blank
+    cmd = ("*** Begin Patch\n*** Update File: "
+           + str(project / "service.py").replace(chr(92), chr(92))
+           + "\n@@\n def existing():\n-    return 1\n+\n*** End Patch")
+    result = evaluate_apply_patch(
+        _update_payload(project, cmd), cwd=str(project),
+        check_runner=RecordingRunner(stdout=_verdict_stdout()))
+    assert result.action == SKIP
