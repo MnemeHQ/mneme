@@ -93,6 +93,9 @@ Seven shipped scenarios under [examples/benchmarks/](mneme-project-memory/exampl
 - **Cursor rules export** ([cursor_generator.py](mneme-project-memory/mneme/cursor_generator.py)) — emits `.cursor/rules` from the same memory.
 - **Claude Code hook** ([integrations/claude_code/hook.py](mneme-project-memory/mneme/integrations/claude_code/hook.py)) — pre-prompt enforcement integrated with the Claude Code agent harness.
 
+
+> **Note (2026-08-24):** This section records the integration surface at the freeze commit. For current support status, see [docs/integrations/README.md](../integrations/README.md).
+
 ### ADR-aware governance workflow
 - **ADR parser, validator, compiler** ([adr_parser.py](mneme-project-memory/mneme/adr_parser.py), [adr_compiler.py](mneme-project-memory/mneme/adr_compiler.py), [adr_schema.py](mneme-project-memory/mneme/adr_schema.py)) — Architecture Decision Records under `docs/adr/` are parseable, validatable, and reconcilable against `project_memory.json`.
 

@@ -1,6 +1,8 @@
-﻿# Mneme HQ
+# Mneme HQ
 
-**Architectural decisions, enforced on every AI call.**
+**Architectural drift prevention for the AI SDLC.**
+
+Mneme turns architectural decisions and ADRs into deterministic guardrails across AI coding agents, generated rules and CI gates.
 
 Mneme HQ is the architectural governance layer for AI-assisted development.
 
@@ -130,29 +132,23 @@ print(response.content)
 
 ## Works with
 
-**Explicitly supported integrations:**
+One decision corpus, labelled by actual support level. The authoritative,
+maintained matrix lives in [docs/integrations/README.md](docs/integrations/README.md).
 
-- **Claude Agent SDK** - relevant decisions injected before agent work;
-  proposed file mutations deterministically evaluated before execution.
-  See [docs/integrations/agent-sdk.md](docs/integrations/agent-sdk.md)
-  and the runnable governed-loop example under
-  [examples/claude-agent-sdk/](examples/claude-agent-sdk/).
-- **Claude Code** - `PreToolUse` hook blocks violating Edit/Write/MultiEdit
-  calls before they reach disk. See below.
-- **Cursor** - rules compiled from the same decision corpus. See below.
+| Level | Surfaces |
+| --- | --- |
+| Native integration | Claude Code, Claude Agent SDK, Google Antigravity, Codex CLI |
+| Validated compatibility | Paperclip — CLI and ACP transports, no adapter required |
+| Rules export | Cursor |
+| CLI-based CI gates | GitHub Actions, GitLab CI |
+| In validation | — (Codex CLI promoted to native on merge of PR #321) |
+| Experimental / planned | OpenCode, Kiro (open PR), Deep Agents middleware POC |
 
-**Reached through the Python API or generated rules:**
-
-- Direct LLM API integrations
-- Other IDE coding assistants (Copilot, Cline)
-- Agent frameworks (LangChain, CrewAI, AutoGen) via
-  `MemoryStore` / `DecisionRetriever` / `Pipeline`
-- Managed agent platforms
-- Internal prompt pipelines
+Per-integration documentation: [docs/integrations/](docs/integrations/).
 
 ## How it works
 
-Mneme HQ turns architectural decisions into structured context packets injected into every LLM call.
+Mneme applies the same decision corpus at the earliest reliable boundary each workflow exposes: before generation through context injection, before supported mutations through agent hooks, after bypassable mutations through working-tree audits, and before merge through CI gates.
 
 The pipeline is:
 
