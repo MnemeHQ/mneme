@@ -55,7 +55,9 @@ def test_drift_sqlalchemy_introduction_is_failed():
 def test_drift_migration_layer_is_failed():
     """AI output that adds a migration layer violates the storage anti_pattern."""
     scored, top = _retrieve("storage persistence")
-    output = "To support schema evolution, let's add a migration layer using Alembic."
+    # Phrase matching requires the rule's complete ordered sequence
+    # (ADR-017 amendment), so the input carries its own wording.
+    output = "To support schema evolution, the plan is to add migration layer tooling using Alembic."
     result = check_prompt(output, scored, top=top)
     assert result.verdict == Severity.FAIL
 
@@ -63,7 +65,9 @@ def test_drift_migration_layer_is_failed():
 def test_drift_orm_mention_is_failed():
     """Direct ORM suggestion against JSON-only storage decision."""
     scored, top = _retrieve("storage backend")
-    output = "Wrap the JSON reads with an ORM so we get type safety automatically."
+    # Multi-term anti-patterns match as their complete ordered phrase
+    # (ADR-017 amendment), so the input carries the rule's own wording.
+    output = "The plan is to introduce ORM data mappers over the JSON store."
     result = check_prompt(output, scored, top=top)
     assert result.verdict == Severity.FAIL
 
@@ -92,7 +96,8 @@ def test_drift_sentence_transformers_is_failed():
 def test_drift_vector_database_is_failed():
     """Adding a vector database violates the deterministic-retrieval decision."""
     scored, top = _retrieve("retrieval ranking")
-    output = "Let's introduce a vector database like Pinecone for retrieval."
+    # Phrase matching requires the rule's complete ordered sequence.
+    output = "The plan is to add vector database storage like Pinecone for retrieval."
     result = check_prompt(output, scored, top=top)
     assert result.verdict == Severity.FAIL
 
@@ -177,8 +182,9 @@ def test_cursor_output_following_rules_passes():
 def test_drift_cursor_retrieval_output_adds_embeddings():
     """Cursor suggestion to add embeddings to retrieval violates the determinism decision."""
     scored, top = _retrieve("retrieval ranking")
+    # Phrase matching requires the rule's complete ordered sequence.
     cursor_output = (
-        "Replace keyword scoring with embeddings from sentence-transformers "
+        "Replace keyword scoring with embeddings: add sentence-transformers "
         "for higher recall."
     )
     result = check_prompt(cursor_output, scored, top=top)

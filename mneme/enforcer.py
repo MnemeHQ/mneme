@@ -12,7 +12,9 @@ happens to share no token with the decision's scope. See ADR-017.
 
 Severity semantics:
     A typed FORBID_LITERAL match is a FAIL.
-    FAIL  — input contains a term from a decision's anti_patterns list.
+    FAIL  — input contains a single-term anti-pattern term, or the complete
+            ordered term sequence of a multi-term anti-pattern (ADR-017
+            amendment, 2026-08-24).
     WARN  — input mentions a term that a "no X" constraint forbids.
     PASS  — no violations found.
 
@@ -49,7 +51,10 @@ class Violation:
     decision_text: str
     severity: Severity
     rule: str     # the constraint or anti_pattern string that triggered
-    trigger: str  # the specific term found in the input
+    trigger: str  # the matched term (single-term rules) or the matched rule
+                  # expression (multi-term phrase match). For a phrase match
+                  # this is the rule's text as authored; it need not appear
+                  # verbatim in the input, since separators normalize away.
     kind: str = "legacy"
     rule_type: str | None = None
     input_path: str | None = None
@@ -89,6 +94,36 @@ def _word_in_text(term: str, text: str) -> bool:
     return bool(re.search(r"\b" + re.escape(term) + r"\b", text, re.IGNORECASE))
 
 
+def _phrase_tokens(text: str) -> list[str]:
+    """All lowercased alphanumeric tokens of a phrase, in order.
+
+    Rule and input use exactly the same normalization: whitespace,
+    underscores, hyphens, and punctuation separate tokens identically, and
+    nothing is dropped -- stopwords and short tokens included. Every token in
+    the rule is therefore required to occur in the input, so
+    ``assume_awin_awin_us_same_source`` normalizes to the same sequence as
+    "assume awin awin us same source", while "foo bar" can never satisfy a
+    rule stating "foo and bar".
+    """
+    return re.findall(r"[a-z0-9]+", text.lower())
+
+
+def _phrase_in_text(phrase: list[str], text: str) -> bool:
+    """True if the complete ordered token sequence occurs contiguously.
+
+    A multi-term legacy anti-pattern is prose describing a pattern, not a bag
+    of independent forbidden words (ADR-017 amendment). Requiring the whole
+    sequence together and in order prevents benign prose that merely contains
+    one ordinary term -- `awin`, `live`, `content` -- from failing the check,
+    while still matching the rule's canonical or identifier spelling.
+    """
+    if not phrase:
+        return False
+    tokens = re.findall(r"[a-z0-9]+", text.lower())
+    n = len(phrase)
+    return any(tokens[i:i + n] == phrase for i in range(len(tokens) - n + 1))
+
+
 def _top_nonzero(scored: list[ScoredDecision], top: int) -> list[ScoredDecision]:
     kept: list[ScoredDecision] = []
     seen: set[str] = set()
@@ -114,11 +149,13 @@ def _is_literal_rule(text: str, min_len: int = 3) -> bool:
     against every decision in the corpus.
 
     Multi-term rules are the opposite. ``"open() without encoding= in Python"``
-    explodes into {open, without, encoding, python}, any one of which fires on
-    its own -- so the rule reports a violation on prose that merely contains
-    the word "open". Evaluating those corpus-wide turns a documented
-    false-positive nuisance (#150) into a repo-wide edit block, so they stay
-    behind retrieval until a typed literal vocabulary replaces them (#250).
+    is prose describing a pattern. Treating its terms as independent forbidden
+    words made any single occurrence -- a bare "open", "without", or "content"
+    -- fail benign prose (#150, and the 2026-08 dogfood false positives).
+    They stay retrieval-gated here, and since the ADR-017 amendment they
+    additionally match only as a complete ordered phrase (see
+    ``_phrase_in_text``), so the gated tier no longer fires on incidental
+    tokens either.
     """
     return len(_rule_terms(text, min_len=min_len)) == 1
 
@@ -164,7 +201,9 @@ def check_prompt(
 
     Unambiguous literal rules are checked against every decision supplied,
     regardless of retrieval score; multi-term rules are checked only for the
-    top-N retrieved decisions. See ``_enforcement_scope``.
+    top-N retrieved decisions, and there they match their complete ordered
+    term sequence rather than any single term (ADR-017 amendment). See
+    ``_enforcement_scope``.
 
     Args:
         input_text: The prompt or content to validate.
@@ -225,17 +264,28 @@ def check_prompt(
         for ap in d.anti_patterns:
             if literal_only and not _is_literal_rule(ap):
                 continue
-            for term in _rule_terms(ap):
-                if _word_in_text(term, input_text):
-                    violations.append(Violation(
-                        decision_id=d.id,
-                        decision_text=d.decision,
-                        severity=Severity.FAIL,
-                        rule=ap,
-                        trigger=term,
-                        kind="anti_pattern",
-                    ))
-                    break  # one violation per anti_pattern entry
+            if _is_literal_rule(ap):
+                # One significant term: term matching and literal matching
+                # coincide, so the pre-existing whole-word behaviour is kept.
+                trigger = next(
+                    (t for t in _rule_terms(ap) if _word_in_text(t, input_text)),
+                    None,
+                )
+            else:
+                # Multi-term: the complete ordered phrase must be present.
+                if _phrase_in_text(_phrase_tokens(ap), input_text):
+                    trigger = ap
+                else:
+                    trigger = None
+            if trigger is not None:
+                violations.append(Violation(
+                    decision_id=d.id,
+                    decision_text=d.decision,
+                    severity=Severity.FAIL,
+                    rule=ap,
+                    trigger=trigger,
+                    kind="anti_pattern",
+                ))
 
         for constraint in d.constraints:
             # Only handle "no X" style constraints.
