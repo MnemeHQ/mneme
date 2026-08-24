@@ -86,12 +86,14 @@ def main(
     event_name = payload.get("hook_event_name")
     if event_name == "Stop":
         return stop_audit.handle_stop(payload, stderr=stderr, stdout=stdout)
+    if event_name == "SessionStart":
+        return stop_audit.handle_session_start(payload, stderr=stderr,
+                                               stdout=stdout)
 
     if event_name in ("PreToolUse", "PostToolUse"):
-        # Capture the session baseline on the first mutating-capable event --
-        # PreToolUse fires before that tool executes, so the snapshot is
-        # pre-mutation even for shell writes (M2a). Reads also trigger this,
-        # which only makes the baseline earlier and safer.
+        # Secondary net: capture the session baseline if SessionStart did not
+        # (e.g. sessions whose first event bypasses it). PreToolUse fires
+        # before the tool executes, so the snapshot is still pre-mutation.
         stop_audit.ensure_session_baseline(payload, stderr=stderr)
 
     # The hooks.json matcher scopes registration to apply_patch; anything else

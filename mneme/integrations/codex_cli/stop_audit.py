@@ -73,11 +73,13 @@ def _write_block_count(spath: Path, count: int) -> None:
 
 
 def ensure_session_baseline(payload: Any, stderr=None) -> Optional[Path]:
-    """Capture the session baseline on the first mutating-capable event.
+    """Capture the session baseline if none exists yet.
 
-    Called from PreToolUse *before* the tool executes, so the snapshot is
-    pre-mutation by construction even for shell writes. Returns the snapshot
-    path when a baseline exists (pre-existing or freshly captured).
+    Called from SessionStart (before any work) and from PreToolUse (as a
+    secondary net for sessions whose first event bypasses SessionStart).
+    PreToolUse fires before that tool executes, so either way the snapshot
+    is pre-mutation. An existing baseline is never overwritten (resume,
+    compaction, and mid-session calls keep attribution intact).
     """
     if not isinstance(payload, dict):
         return None
@@ -106,6 +108,12 @@ def ensure_session_baseline(payload: Any, stderr=None) -> Optional[Path]:
                   file=stderr)
         return None
     return spath
+
+
+def handle_session_start(payload: Any, stderr=None, stdout=None) -> int:
+    """SessionStart handler: establish the baseline before any work."""
+    ensure_session_baseline(payload, stderr=stderr or sys.stderr)
+    return 0
 
 
 def _find_memory_for(payload: dict):

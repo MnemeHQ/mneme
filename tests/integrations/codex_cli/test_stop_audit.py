@@ -170,3 +170,45 @@ def test_remediation_passes_and_block_cap_bounds_loops(tmp_path):
     assert wire.get("continue") is True          # loop released, not blocked
     assert "cap" in wire["systemMessage"].lower() or \
         "releasing" in wire["systemMessage"].lower()
+
+
+def test_session_start_captures_baseline_for_pure_shell_sessions(tmp_path):
+    """SessionStart establishes the baseline before any work, covering
+    sessions whose mutations are all shell-based (production PreToolUse is
+    scoped to apply_patch)."""
+    project = _project(tmp_path)
+    code = stop_audit.handle_session_start(
+        {"hook_event_name": "SessionStart", "session_id": "sess-ss",
+         "cwd": str(project), "source": "startup"})
+    assert code == 0
+    spath = stop_audit.snapshot_path(project.resolve(), "sess-ss")
+    baseline = json.loads(spath.read_text(encoding="utf-8"))
+    assert "seed.py" in baseline["files"]
+
+    # An existing baseline is never overwritten by a later SessionStart:
+    (project / "later.py").write_text("later\n", encoding="utf-8")
+    stop_audit.handle_session_start(
+        {"hook_event_name": "SessionStart", "session_id": "sess-ss",
+         "cwd": str(project), "source": "resume"})
+    baseline2 = json.loads(spath.read_text(encoding="utf-8"))
+    assert "later.py" not in baseline2["files"]
+
+
+def test_session_start_then_shell_violation_blocks(tmp_path):
+    """The pure-shell-session flow end to end: SessionStart baseline ->
+    shell write -> Stop blocks naming the file."""
+    project = _project(tmp_path)
+    stop_audit.handle_session_start(
+        {"hook_event_name": "SessionStart", "session_id": "sess-ss2",
+         "cwd": str(project), "source": "startup"})
+    (project / "shell_made.py").write_text(f'x = "{FORBIDDEN}"\n',
+                                           encoding="utf-8")
+    payload = {"hook_event_name": "Stop", "session_id": "sess-ss2",
+               "cwd": str(project)}
+    out = tmp_path / "__out.json"
+    stop_audit.handle_stop(payload, stderr=__import__("io").StringIO(),
+                           stdout=out.open("w", encoding="utf-8"))
+    text = out.read_text(encoding="utf-8")
+    os.unlink(out)
+    wire = json.loads(text)
+    assert wire["decision"] == "block" and "[shell_made.py]" in wire["reason"]
