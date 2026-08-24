@@ -125,8 +125,11 @@ move blocks only when a typed rule's violation was not applied at the
 previous path but applies at the new one (policy meaning changed in the
 restricting direction); legacy rules carry no path dimension and never block
 on a move. Typed UNKNOWN outcomes on either side fail open with visible
-notes. No selector logic is duplicated in the adapter; both evaluations are
-ordinary trusted CLI verdicts.
+notes. Provenance is never guessed: when several vanished paths share the
+same bytes, no source can be proven, so the target is reported as an
+ambiguous, unevaluated delta through Stop feedback, leaving CI as the
+backstop. No selector logic is duplicated in the adapter; both evaluations
+are ordinary trusted CLI verdicts.
 
 Each candidate is checked through the existing enforcement path with its
 real target path, preserving ADR-020 applicability authority end to end.

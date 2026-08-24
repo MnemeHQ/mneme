@@ -177,6 +177,53 @@ class TestAttribution:
         rc, _, out = _run(_stop_event(repo))
         assert json.loads(out)["decision"] == "block"
 
+    def test_ambiguous_duplicate_content_rename_is_unevaluated_not_guessed(
+        self, repo
+    ):
+        """Two identical vanished sources: provenance is unknowable, so the
+        delta must be surfaced as unevaluated rather than paired with
+        whichever identical source was enumerated first."""
+        (repo / "tests_dir").mkdir()
+        (repo / "tests_dir" / "a.py").write_text(
+            "same = 'bytes'\n", encoding="utf-8"
+        )
+        (repo / "src_dir").mkdir()
+        (repo / "src_dir" / "b.py").write_text(
+            "same = 'bytes'\n", encoding="utf-8"
+        )
+        assert _run(_session_start(repo))[0] == 0
+        (repo / "tests_dir" / "a.py").unlink()
+        (repo / "src_dir" / "b.py").unlink()
+        (repo / "src_dir" / "c.py").write_text("same = 'bytes'\n", encoding="utf-8")
+
+        from mneme.integrations.claude_code import session_state as ss
+
+        base = ss.load_snapshot(ss.snapshot_path(repo, "sess-1"), expected_root=repo)
+        d = ss.compute_session_delta(repo, base)
+        assert d.renamed == {}
+        assert "ambiguous rename provenance" in d.skipped.get("src_dir/c.py", "")
+
+        rc, err, out = _run(_stop_event(repo))
+        assert rc == 0
+        emitted = json.loads(out)
+        context = emitted["hookSpecificOutput"]["additionalContext"]
+        assert "c.py" in context and "ambiguous" in context
+        assert "decision" not in emitted
+
+    def test_session_start_storage_failure_is_agent_visible(self, repo, monkeypatch):
+        import mneme.integrations.claude_code.hook as hook
+
+        def boom(path, data):
+            raise OSError("disk full")
+
+        monkeypatch.setattr(hook, "save_snapshot", boom)
+        out = io.StringIO()
+        rc = handle_event(_session_start(repo), stderr=io.StringIO(), stdout=out)
+        assert rc == 0
+        text = out.getvalue()
+        assert "could not be stored" in text
+        assert "disk full" in text
+
 
 class TestLoopSafetyAndDegrade:
     def test_stop_hook_active_still_evaluates_and_blocks(self, repo):

@@ -585,7 +585,13 @@ def session_start_event(
     try:
         save_snapshot(spath, baseline)
     except OSError as e:
-        print(f"mneme-hook: baseline storage failed ({e}).", file=stderr)
+        # Plain-text stdout from SessionStart reaches Claude's context;
+        # stderr would only reach debug logs, hiding a baseline-less session.
+        print(
+            f"mneme-hook: session baseline could not be stored ({e}); "
+            "completion-time attribution is inactive for this session.",
+            file=stdout,
+        )
     return 0
 
 
@@ -918,22 +924,6 @@ def main(
         print(f"mneme-hook: bad envelope: {e}", file=stderr)
         return 0
     return handle_event(envelope, stderr, stdout)
-
-    try:
-        # The gate checks what this edit introduces, not the whole resulting
-        # file -- otherwise a violation already in the file blocks every later
-        # edit to it, including the one that removes it (#259, ADR-018).
-        checked_content = introduced_content(event)
-    except MaterializeError as e:
-        print(f"mneme-hook: cannot materialize content, failing open: {e}", file=stderr)
-        return 0
-
-    if not checked_content.strip():
-        # The edit introduces no non-blank lines (for example, a pure
-        # deletion). Mechanically enforceable typed rules cannot be blank.
-        return 0
-
-    return _run_check(event, checked_content, memory, stderr, stdout)
 
 
 def cli_main() -> None:

@@ -220,17 +220,23 @@ def compute_session_delta(
     after_names = current_files if current_files is not None else (enumerate_repo_files(root) or [])
     after_names = [rel for rel in after_names if not _is_snapshot_artifact(root, rel)]
 
-    # Exact-content move detection: a baseline path that has vanished while its
-    # byte-identical content reappears at a new path is a rename/move of
+    # Exact-content move detection: a baseline path that has vanished while
+    # its byte-identical content reappears at a new path is a rename/move of
     # pre-session content. Attributing the whole target to the session would
     # blame pre-existing lines on this session (the ADR-018 wall at a new
     # boundary). Only exact vanished-source matches qualify; copies from live
     # sources stay fully attributed (conservative direction).
+    #
+    # Provenance is never guessed: when several vanished paths share the same
+    # bytes, no single source can be proven, so the target is reported as an
+    # ambiguous, unevaluated delta instead of being paired with whichever
+    # identical source happened to be enumerated first (the choice would
+    # decide the ADR-020 applicability verdict).
     current_set = set(after_names)
-    vanished_by_sha: Dict[str, str] = {}
+    vanished_by_sha: Dict[str, List[str]] = {}
     for old_rel, entry in before_files.items():
         if old_rel not in current_set and isinstance(entry.get("sha256"), str):
-            vanished_by_sha.setdefault(entry["sha256"], old_rel)
+            vanished_by_sha.setdefault(entry["sha256"], []).append(old_rel)
     renamed: Dict[str, str] = {}
 
     for rel in after_names:
@@ -248,9 +254,17 @@ def compute_session_delta(
         current_sha = hashlib.sha256(data).hexdigest()
 
         if before is None:
-            source_rel = vanished_by_sha.pop(current_sha, None)
-            if source_rel is not None:
-                renamed[rel] = source_rel
+            sources = vanished_by_sha.get(current_sha)
+            if sources and len(sources) == 1:
+                renamed[rel] = sources.pop()
+                continue
+            if sources:
+                delta.skipped[rel] = (
+                    "ambiguous rename provenance: content matches "
+                    f"{len(sources)} identical pre-session artifacts "
+                    f"({', '.join(sorted(sources))}); cannot prove which "
+                    "moved, so the session delta was not evaluated"
+                )
                 continue
             delta.new.append(rel)
             continue
