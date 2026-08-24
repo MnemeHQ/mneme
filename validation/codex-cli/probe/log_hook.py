@@ -87,6 +87,21 @@ def main() -> int:
                 )
             )
         return 0
+    if mode == "deny_bash":
+        if event == "PreToolUse" and tool == "Bash":
+            reason = "M2a probe: deterministic deny of shell command"
+            print(
+                json.dumps(
+                    {
+                        "hookSpecificOutput": {
+                            "hookEventName": "PreToolUse",
+                            "permissionDecision": "deny",
+                            "permissionDecisionReason": reason,
+                        }
+                    }
+                )
+            )
+        return 0
     if mode != "deny_apply_patch":
         return 0
     if event != "PreToolUse" or tool != "apply_patch":

@@ -1,0 +1,41 @@
+$ codex exec Create a file named setcontent.txt in the repo root containing the text HELLO_SETCONTENT by using the PowerShell Set-Content cmdlet. You MUST use a shell command; do NOT use apply_patch.
+
+--- stdout ---
+Created [setcontent.txt](C:\dev\mneme\.worktrees\feat-codex-cli-enforcement\validation\codex-cli\probe\sandbox\repo\setcontent.txt) containing `HELLO_SETCONTENT` using PowerShell `Set-Content`.
+
+
+--- stderr ---
+Reading additional input from stdin...
+OpenAI Codex v0.149.1
+--------
+workdir: C:\dev\mneme\.worktrees\feat-codex-cli-enforcement\validation\codex-cli\probe\sandbox\repo
+model: gpt-5.6-sol
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR]
+reasoning effort: high
+reasoning summaries: none
+session id: 01a03595-3d4f-7612-8c9d-354e094e7f4f
+--------
+user
+Create a file named setcontent.txt in the repo root containing the text HELLO_SETCONTENT by using the PowerShell Set-Content cmdlet. You MUST use a shell command; do NOT use apply_patch.
+codex
+Iâ€™ll create the file with PowerShellâ€™s `Set-Content`, then verify its exact contents.
+hook: PreToolUse
+hook: PreToolUse Completed
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Set-Content -LiteralPath 'setcontent.txt' -Value 'HELLO_SETCONTENT' -NoNewline; Get-Content -Raw -LiteralPath 'setcontent.txt'" in C:\dev\mneme\.worktrees\feat-codex-cli-enforcement\validation\codex-cli\probe\sandbox\repo
+ succeeded in 582ms:
+HELLO_SETCONTENT
+
+hook: PostToolUse
+hook: PostToolUse Completed
+codex
+Created [setcontent.txt](C:\dev\mneme\.worktrees\feat-codex-cli-enforcement\validation\codex-cli\probe\sandbox\repo\setcontent.txt) containing `HELLO_SETCONTENT` using PowerShell `Set-Content`.
+hook: Stop
+hook: Stop Completed
+tokens used
+9,575
+
+
+exit=0

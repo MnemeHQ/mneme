@@ -1,0 +1,45 @@
+$ codex exec Using ONE PowerShell command line, create two files in the repo root: multi1.txt containing MULTI_ONE, and multi2.txt containing MULTI_TWO. You MUST use a single shell command; do NOT use apply_patch.
+
+--- stdout ---
+Created in the repo root:
+
+- `multi1.txt` containing `MULTI_ONE`
+- `multi2.txt` containing `MULTI_TWO`
+
+
+--- stderr ---
+Reading additional input from stdin...
+OpenAI Codex v0.149.1
+--------
+workdir: C:\dev\mneme\.worktrees\feat-codex-cli-enforcement\validation\codex-cli\probe\sandbox\repo
+model: gpt-5.6-sol
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR]
+reasoning effort: high
+reasoning summaries: none
+session id: 01a03597-ac7b-7f61-9c21-60bf7304ade5
+--------
+user
+Using ONE PowerShell command line, create two files in the repo root: multi1.txt containing MULTI_ONE, and multi2.txt containing MULTI_TWO. You MUST use a single shell command; do NOT use apply_patch.
+codex
+Iâ€™ll create both files with one PowerShell command, then report the result.
+hook: PreToolUse
+hook: PreToolUse Completed
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Set-Content -LiteralPath 'multi1.txt' -Value 'MULTI_ONE' -NoNewline; Set-Content -LiteralPath 'multi2.txt' -Value 'MULTI_TWO' -NoNewline" in C:\dev\mneme\.worktrees\feat-codex-cli-enforcement\validation\codex-cli\probe\sandbox\repo
+ succeeded in 290ms:
+hook: PostToolUse
+hook: PostToolUse Completed
+codex
+Created in the repo root:
+
+- `multi1.txt` containing `MULTI_ONE`
+- `multi2.txt` containing `MULTI_TWO`
+hook: Stop
+hook: Stop Completed
+tokens used
+9,561
+
+
+exit=0

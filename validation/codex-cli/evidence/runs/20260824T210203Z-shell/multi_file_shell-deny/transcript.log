@@ -1,0 +1,35 @@
+$ codex exec Using ONE PowerShell command line, create two files in the repo root: multi1.txt containing MULTI_ONE, and multi2.txt containing MULTI_TWO. You MUST use a single shell command; do NOT use apply_patch.
+
+--- stdout ---
+The single PowerShell command was attempted, but the environmentâ€™s pre-execution policy blocked it. No files were created.
+
+
+--- stderr ---
+Reading additional input from stdin...
+OpenAI Codex v0.149.1
+--------
+workdir: C:\dev\mneme\.worktrees\feat-codex-cli-enforcement\validation\codex-cli\probe\sandbox\repo
+model: gpt-5.6-sol
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR]
+reasoning effort: high
+reasoning summaries: none
+session id: 01a03597-ee35-7833-be8a-4bdd8aae2674
+--------
+user
+Using ONE PowerShell command line, create two files in the repo root: multi1.txt containing MULTI_ONE, and multi2.txt containing MULTI_TWO. You MUST use a single shell command; do NOT use apply_patch.
+codex
+Iâ€™ll create both files with one PowerShell command line, then report the result.
+hook: PreToolUse
+2026-08-24T21:05:52.816739Z ERROR codex_core::tools::router: error=Command blocked by PreToolUse hook: M2a probe: deterministic deny of shell command. Command: Set-Content -LiteralPath 'multi1.txt' -Value 'MULTI_ONE' -NoNewline; Set-Content -LiteralPath 'multi2.txt' -Value 'MULTI_TWO' -NoNewline
+hook: PreToolUse Blocked
+codex
+The single PowerShell command was attempted, but the environmentâ€™s pre-execution policy blocked it. No files were created.
+hook: Stop
+hook: Stop Completed
+tokens used
+9,693
+
+
+exit=0
