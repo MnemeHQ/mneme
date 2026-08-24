@@ -3,3 +3,6 @@
 **/__pycache__/
 
 sandbox/
+
+# Root .gitignore excludes *.log globally; codex exec transcripts are primary R0 evidence.
+!**/*.log
