@@ -30,6 +30,7 @@ if __package__ in (None, ""):
     # Direct-script execution (codex hook commands invoke the file path).
     sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
+from mneme.integrations.codex_cli import stop_audit
 from mneme.integrations.codex_cli.gate import (
     DENY,
     FAIL_OPEN,
@@ -81,6 +82,18 @@ def main(
     if not isinstance(payload, dict):
         print("mneme-codex-hook: bad envelope: not a JSON object", file=stderr)
         return 0
+
+    event_name = payload.get("hook_event_name")
+    if event_name == "Stop":
+        return stop_audit.handle_stop(payload, stderr=stderr, stdout=stdout)
+
+    if event_name in ("PreToolUse", "PostToolUse"):
+        # Capture the session baseline on the first mutating-capable event --
+        # PreToolUse fires before that tool executes, so the snapshot is
+        # pre-mutation even for shell writes (M2a). Reads also trigger this,
+        # which only makes the baseline earlier and safer.
+        stop_audit.ensure_session_baseline(payload, stderr=stderr)
+
     # The hooks.json matcher scopes registration to apply_patch; anything else
     # reaching this entrypoint gets no opinion rather than a parse failure.
     if payload.get("tool_name") != "apply_patch":
