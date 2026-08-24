@@ -1,26 +1,34 @@
 """Parser for the frozen Codex CLI 0.149.1 ``apply_patch`` wire contract.
 
-Transport parsing only: this module turns an observed PreToolUse payload into
-``(target_path, introduced_content)`` for the single proven case -- a patch
-containing exactly one ``*** Add File: <path>`` operation. It knows nothing
+Transport parsing only: this module turns observed PreToolUse payloads into
+per-operation ``(target_path, introduced_content)`` results for the proven
+operation set -- ``*** Add File:``, ``*** Update File:`` (validated against a
+caller-supplied current-file snapshot), ``*** Delete File:``, and bundles of
+these in source order (:func:`parse_patch_operations`). It knows nothing
 about Mneme policy, never touches the filesystem, and never spawns
-subprocesses; enforcement decisions belong to the gate slice (M1c) that
-consumes this output.
+subprocesses; enforcement decisions belong to the gate slice that consumes
+this output.
 
-The grammar is the one captured in R0 evidence and frozen by
-``tests/integrations/codex_cli/test_patch_contract.py``::
+Grammars are those captured in R0/M1e-a/M1f-a evidence and frozen by the
+``test_patch_contract*.py`` modules::
 
     *** Begin Patch
-    *** Add File: probe_target.py
+    *** Add File: probe_target.py          <- relative path observed
     +def probe_marker() -> int:
     +    return 42
+    *** Update File: C:\\...\\service.py   <- absolute path also observed
+    @@
+     def existing():
+    -    return 1
+    +    return 42
+    *** Delete File: old.py                <- header-only, relative observed
     *** End Patch
 
 Invariant: any operation or structure this parser does not understand is an
-explicit :class:`CodexPatchParseError`. A payload containing ``Update File``,
-``Delete File``, additional operations, or unrecognized lines must fail the
-parse rather than be partially interpreted -- a partially parsed proposal must
-never be mistaken for a governed one.
+explicit :class:`CodexPatchParseError`. A payload containing unknown
+operations, unrecognized lines, or hunks that cannot be validated must fail
+the parse rather than be partially interpreted -- a partially parsed proposal
+must never be mistaken for a governed one.
 """
 from __future__ import annotations
 
@@ -65,7 +73,10 @@ def _check_path(path: str) -> str:
 
 
 def parse_patch(command: Any) -> Tuple[str, str]:
-    """Parse one Add File-only apply_patch script.
+    """Parse a single-operation Add File script (the frozen M1c path).
+
+    Retained unchanged for the single-Add contract; bundles and Update/Delete
+    go through :func:`parse_patch_operations` / :func:`parse_update_file`.
 
     Returns ``(target_path, introduced_content)`` where introduced content
     preserves line content exactly after removing the single structural

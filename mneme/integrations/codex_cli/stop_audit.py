@@ -7,9 +7,11 @@ providing the backstop for surfaces without structured pre-execution data
 
 Architecture:
 
-- Baseline is integration-local state (the shared session-snapshot store),
-  captured lazily on the **first mutating-capable PreToolUse event** --
-  which fires before that mutation executes. No SessionStart architecture.
+- The session baseline is integration-local state (the shared
+  session-snapshot store). It is captured primarily at **SessionStart** --
+  before any work, covering pure-shell sessions -- and secondarily on the
+  first PreToolUse event as a fallback net. Either way it is captured before
+  the first mutation executes.
 - Stop diffs the repository against that baseline, distinguishing files
   already dirty before Codex (never blamed unless Codex touches them),
   Codex-modified files, newly untracked files, and deletions.
