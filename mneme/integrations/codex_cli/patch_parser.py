@@ -24,13 +24,16 @@ never be mistaken for a governed one.
 """
 from __future__ import annotations
 
+import re
 from pathlib import PureWindowsPath, PurePosixPath
 from typing import Any, Dict, Tuple
 
 BEGIN_MARKER = "*** Begin Patch"
 END_MARKER = "*** End Patch"
 ADD_FILE_HEADER = "*** Add File:"
+UPDATE_FILE_HEADER = "*** Update File:"
 OPERATION_PREFIX = "*** "
+HUNK_SEPARATOR = "@@"
 
 
 class CodexPatchParseError(Exception):
@@ -67,12 +70,41 @@ def parse_patch(command: Any) -> Tuple[str, str]:
     preserves line content exactly after removing the single structural
     leading ``+`` (including interior empty lines), with a trailing newline
     per introduced line.
+
+    Contract note (M1e-b): Add File was observed with a workspace-relative
+    path; Update File (see :func:`parse_update_file`) was observed absolute.
+    Neither form is generalized beyond evidence.
     """
+    _validate_envelope(command)
+    body_lines = _body_lines(command)
+    op_index, op_line = _single_operation(body_lines)
+
+    header, sep, raw_path = op_line.partition(":")
+    if header.strip() != ADD_FILE_HEADER.rstrip(":").strip() or not sep:
+        unsupported = op_line.split(":")[0].strip()
+        raise CodexPatchParseError(
+            f"unsupported patch operation {unsupported!r}; "
+            "only '*** Add File:' is supported by parse_patch"
+        )
+    target_path = _check_path(raw_path.strip())
+
+    content_lines = []
+    for line in body_lines[op_index + 1:]:
+        if not line.startswith("+"):
+            raise CodexPatchParseError(
+                f"malformed Add File body line (expected leading '+'): {line!r}"
+            )
+        content_lines.append(line[1:])
+
+    introduced = "".join(line + "\n" for line in content_lines)
+    return target_path, introduced
+
+
+def _validate_envelope(command: Any) -> None:
     if not isinstance(command, str):
         raise CodexPatchParseError(
             f"apply_patch command must be a string, got {type(command).__name__}"
         )
-
     stripped = command.rstrip("\n")
     if not stripped.startswith(BEGIN_MARKER):
         raise CodexPatchParseError("patch does not start with Begin Patch marker")
@@ -85,11 +117,16 @@ def parse_patch(command: Any) -> Tuple[str, str]:
             f"unexpected content after End Patch marker: {trailing!r}"
         )
 
-    body = stripped[len(BEGIN_MARKER):end_index]
 
+def _body_lines(command: str) -> list:
+    stripped = command.rstrip("\n")
+    end_index = stripped.rfind(END_MARKER)
+    return stripped[len(BEGIN_MARKER):end_index].splitlines()
+
+
+def _single_operation(body_lines: list) -> tuple:
     op_lines = [
-        (i, line)
-        for i, line in enumerate(body.splitlines())
+        (i, line) for i, line in enumerate(body_lines)
         if line.startswith(OPERATION_PREFIX)
     ]
     if not op_lines:
@@ -99,34 +136,133 @@ def parse_patch(command: Any) -> Tuple[str, str]:
         raise CodexPatchParseError(
             f"multi-operation patches are not supported by this parser: {details}"
         )
+    return op_lines[0]
 
-    op_index, op_line = op_lines[0]
+
+def _operation_kind(op_line: str) -> str:
+    return op_line.split(":", 1)[0].strip()
+
+
+def _check_update_path(path: str) -> str:
+    """Update File path validation per the frozen M1e-b contract.
+
+    The observed form is absolute; relative is accepted as a possibility
+    without claiming it was observed. Empty/whitespace paths and upward
+    traversal in relative paths are rejected.
+    """
+    if not path or not path.strip():
+        raise CodexPatchParseError("Update File has an empty target path")
+    if not PureWindowsPath(path).drive and not path.startswith("/"):
+        components = re.split(r"[/\\]", path)
+        if any(part == ".." for part in components):
+            raise CodexPatchParseError(
+                f"Update File target path must not traverse upward: {path!r}"
+            )
+    return path
+
+
+def parse_update_file(command: Any, current_content: Any) -> Tuple[str, str]:
+    """Parse one Update File-only apply_patch script against a snapshot.
+
+    ``current_content`` is the caller-supplied current file content (any EOL
+    style; matching is line-content based). The parser performs no filesystem
+    I/O and makes no claim about the final file's byte representation.
+
+    Returns ``(target_path, introduced_content)`` where introduced content is
+    the exact ``+``-line contents joined with newlines -- blank introduced
+    lines survive untouched. Every hunk's context/removal sequence must match
+    the supplied snapshot uniquely and deterministically; anything else raises
+    :class:`CodexPatchParseError`.
+    """
+    _validate_envelope(command)
+    body_lines = _body_lines(command)
+    op_index, op_line = _single_operation(body_lines)
+
     header, sep, raw_path = op_line.partition(":")
-    if header.strip() != ADD_FILE_HEADER.rstrip(":").strip() or not sep:
-        unsupported = op_line.split(":")[0].strip()
+    if header.strip() != UPDATE_FILE_HEADER.rstrip(":").strip() or not sep:
+        unsupported = _operation_kind(op_line)
         raise CodexPatchParseError(
             f"unsupported patch operation {unsupported!r}; "
-            "only '*** Add File:' is supported"
+            "only '*** Update File:' is supported by parse_update_file"
         )
-    target_path = _check_path(raw_path.strip())
+    target_path = _check_update_path(raw_path.strip())
 
-    content_lines = []
-    for line in body.splitlines()[op_index + 1:]:
-        if not line.startswith("+"):
+    if not isinstance(current_content, str):
+        raise CodexPatchParseError(
+            "Update File parsing requires current file content as a string"
+        )
+
+    hunk_body = body_lines[op_index + 1:]
+    hunks: list[list[str]] = []
+    for line in hunk_body:
+        if line == HUNK_SEPARATOR:
+            hunks.append([])
+        elif hunks:
+            hunks[-1].append(line)
+        else:
             raise CodexPatchParseError(
-                f"malformed Add File body line (expected leading '+'): {line!r}"
+                f"patch content before first hunk separator: {line!r}"
             )
-        content_lines.append(line[1:])
+    if not hunks:
+        raise CodexPatchParseError("Update File patch contains no hunks")
 
-    introduced = "".join(line + "\n" for line in content_lines)
-    return target_path, introduced
+    snapshot = current_content.splitlines()
+    introduced: list[str] = []
+    cursor = 0
+    for hunk_index, hunk in enumerate(hunks):
+        expected_block: list[str] = []
+        added: list[str] = []
+        seen_addition = False
+        for line in hunk:
+            tag, content = line[:1], line[1:]
+            if tag == "+":
+                # Observed grammar: additions form a single trailing block
+                # after their hunk's context/removals; a context or removal
+                # line after an addition would make attribution ambiguous.
+                added.append(content)
+                seen_addition = True
+            else:
+                if seen_addition:
+                    raise CodexPatchParseError(
+                        "malformed hunk: context/removal line after a "
+                        f"'+' line: {line!r}"
+                    )
+                if tag == " ":
+                    expected_block.append(content)
+                elif tag == "-":
+                    expected_block.append(content)
+                else:
+                    raise CodexPatchParseError(
+                        f"malformed hunk line (expected ' ', '-', or '+'): {line!r}"
+                    )
+
+        # Locate the context+removal block in the remaining snapshot. Exactly
+        # one match is acceptable; zero or several are both hard failures.
+        matches = [
+            i for i in range(cursor, len(snapshot) - len(expected_block) + 1)
+            if snapshot[i:i + len(expected_block)] == expected_block
+        ]
+        if not matches:
+            raise CodexPatchParseError(
+                f"hunk {hunk_index}: context/removal sequence not found in "
+                f"current file content: {expected_block!r}"
+            )
+        if len(matches) > 1:
+            raise CodexPatchParseError(
+                f"hunk {hunk_index}: context/removal sequence matches "
+                f"{len(matches)} locations; refusing an ambiguous update"
+            )
+        cursor = matches[0] + len(expected_block)
+        introduced.extend(added)
+
+    return target_path, "\n".join(introduced)
 
 
-def parse_pretooluse_payload(payload: Any) -> Tuple[str, str]:
+def parse_pretooluse_payload(payload: Any, current_content: Any = None) -> Tuple[str, str]:
     """Extract ``(target_path, introduced_content)`` from a PreToolUse event.
 
-    Rejects anything that is not an apply_patch tool call with a string
-    ``tool_input.command``.
+    Add File payloads parse as before. Update File payloads require the
+    caller-supplied ``current_content`` snapshot.
     """
     if not isinstance(payload, dict):
         raise CodexPatchParseError("hook payload must be a JSON object")
@@ -139,4 +275,14 @@ def parse_pretooluse_payload(payload: Any) -> Tuple[str, str]:
         raise CodexPatchParseError("payload has no tool_input object")
     if "command" not in tool_input:
         raise CodexPatchParseError("payload has no tool_input.command")
-    return parse_patch(tool_input["command"])
+
+    command = tool_input["command"]
+    _validate_envelope(command)
+    kind = _operation_kind(_single_operation(_body_lines(command))[1])
+    if kind == UPDATE_FILE_HEADER.rstrip(":"):
+        if current_content is None:
+            raise CodexPatchParseError(
+                "Update File payload requires a current-file snapshot"
+            )
+        return parse_update_file(command, current_content)
+    return parse_patch(command)
