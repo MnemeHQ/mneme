@@ -86,13 +86,15 @@ def test_clean_input_returns_pass():
 
 def test_anti_pattern_match_returns_fail():
     scored = [_scored(STORAGE)]
-    result = check_prompt("We should introduce an ORM for database access.", scored)
+    # Multi-term anti-patterns match as a complete ordered phrase
+    # (ADR-017 amendment); the input carries the rule's own wording.
+    result = check_prompt("We should introduce ORM for database access.", scored)
     assert result.verdict == Severity.FAIL
 
 
 def test_anti_pattern_violation_has_fail_severity():
     scored = [_scored(STORAGE)]
-    result = check_prompt("introduce an ORM layer", scored)
+    result = check_prompt("introduce ORM layer", scored)
     fail_violations = [v for v in result.violations if v.severity == Severity.FAIL]
     assert len(fail_violations) >= 1
 
@@ -112,7 +114,7 @@ def test_constraint_violation_has_warn_severity():
 
 def test_fail_verdict_when_both_anti_pattern_and_constraint_violated():
     scored = [_scored(STORAGE)]
-    result = check_prompt("Use postgres with an ORM layer.", scored)
+    result = check_prompt("Use postgres and introduce ORM.", scored)
     assert result.verdict == Severity.FAIL
 
 
@@ -174,13 +176,16 @@ def test_zero_score_decision_still_enforces_its_literal_rules():
 def test_zero_score_decision_does_not_apply_multi_term_rules():
     """The #150 guardrail: corpus-wide enforcement is literal rules only.
 
-    A multi-term rule explodes into individual tokens, any one of which fires
-    on its own. Applying those to every decision would turn documented
-    false-positive noise into a repo-wide edit block, so they remain gated.
+    Before the 2026-08-24 ADR-017 amendment, a multi-term rule exploded into
+    individual tokens, any one of which fired on its own; applying those to
+    every decision would have turned documented false-positive noise into a
+    repo-wide edit block. Multi-term rules therefore remain retrieval-gated,
+    and that gating is unchanged by the amendment -- a zero-score decision's
+    multi-term rules are still not applied at all.
     """
     scored = [_scored(STORAGE, score=0.0)]
-    # "introduce" alone would trigger the "introduce ORM" anti_pattern under
-    # the pre-#254 disjunctive matcher had the decision been retrieved.
+    # "introduce" alone triggered the "introduce ORM" anti_pattern under the
+    # pre-amendment disjunctive matcher had the decision been retrieved.
     result = check_prompt("Let me introduce the new reporting feature.", scored)
     assert result.verdict == Severity.PASS
 
@@ -204,7 +209,9 @@ def test_top_n_limits_decisions_checked():
 
 def test_case_insensitive_anti_pattern_match():
     scored = [_scored(STORAGE)]
-    result = check_prompt("We will INTRODUCE an ORM framework.", scored)
+    # Phrase matching is case-insensitive; the input carries the rule's
+    # own wording ("introduce ORM") in a different case (ADR-017 amendment).
+    result = check_prompt("We will INTRODUCE ORM frameworks.", scored)
     assert result.verdict == Severity.FAIL
 
 
@@ -429,7 +436,7 @@ def test_check_cmd_pass_exits_zero(tmp_path):
 
 def test_check_cmd_fail_exits_two(tmp_path):
     mem = _memory_file(tmp_path)
-    inp = _input_file(tmp_path, "We should introduce an ORM for our storage layer.")
+    inp = _input_file(tmp_path, "We should introduce ORM for our storage layer.")
     exit_code = main([
         "check",
         "--memory", str(mem),
@@ -461,7 +468,7 @@ def test_check_cmd_prints_verdict(tmp_path, capsys):
 
 def test_check_cmd_prints_fail_verdict(tmp_path, capsys):
     mem = _memory_file(tmp_path)
-    inp = _input_file(tmp_path, "introduce an ORM now.")
+    inp = _input_file(tmp_path, "introduce ORM now.")
     main(["check", "--memory", str(mem), "--input", str(inp), "--query", "storage"])
     out = capsys.readouterr().out
     assert "FAIL" in out
@@ -469,7 +476,7 @@ def test_check_cmd_prints_fail_verdict(tmp_path, capsys):
 
 def test_check_cmd_prints_triggering_decision_id(tmp_path, capsys):
     mem = _memory_file(tmp_path)
-    inp = _input_file(tmp_path, "introduce an ORM for storage.")
+    inp = _input_file(tmp_path, "introduce ORM for storage.")
     main(["check", "--memory", str(mem), "--input", str(inp), "--query", "storage"])
     out = capsys.readouterr().out
     assert "storage_json" in out
@@ -477,7 +484,7 @@ def test_check_cmd_prints_triggering_decision_id(tmp_path, capsys):
 
 def test_check_cmd_prints_triggering_rule(tmp_path, capsys):
     mem = _memory_file(tmp_path)
-    inp = _input_file(tmp_path, "introduce an ORM for storage.")
+    inp = _input_file(tmp_path, "introduce ORM for storage.")
     main(["check", "--memory", str(mem), "--input", str(inp), "--query", "storage"])
     out = capsys.readouterr().out
     assert "introduce ORM" in out or "orm" in out.lower()
@@ -512,7 +519,7 @@ def test_check_cmd_respects_top_flag(tmp_path):
 
 def test_check_cmd_reads_input_from_file(tmp_path):
     mem = _memory_file(tmp_path)
-    inp = _input_file(tmp_path, "introduce an ORM here")
+    inp = _input_file(tmp_path, "introduce ORM here")
     exit_code = main([
         "check",
         "--memory", str(mem),

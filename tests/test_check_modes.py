@@ -49,8 +49,8 @@ def _input(tmp_path: Path, content: str) -> Path:
 _PASS_TEXT = "Store everything as flat JSON files on disk."
 # WARN: mentions a term from a 'no X' constraint, no anti-pattern
 _WARN_TEXT = "Should we use postgres for the storage backend?"
-# FAIL: contains a term from anti_patterns
-_FAIL_TEXT = "Let us introduce an ORM for the storage layer."
+# FAIL: carries the complete ordered phrase of a multi-term anti_pattern
+_FAIL_TEXT = "Let us introduce ORM for the storage layer."
 
 
 # ── strict mode (explicit) ────────────────────────────────────────────────────

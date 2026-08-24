@@ -11,6 +11,8 @@ scope: enforcement.retrieval_separation
 
 **Status:** Accepted
 **Date:** 2026-08-08
+**Amended:** 2026-08-24 — phrase-sequence matching for multi-term legacy
+anti-patterns (see Amendment below)
 **Deciders:** Theo Valmis
 
 ---
@@ -135,6 +137,64 @@ block, and would have made strict mode unusable.
   than silently absorbed.
 - Enforcement remains scoped to the tools the PreToolUse hook covers. This ADR
   does not change which edits reach the checker.
+
+## Amendment (2026-08-24): Phrase-Sequence Matching for Multi-Term Legacy Anti-Patterns
+
+### Context of amendment
+
+Dogfooding reproduced the #150 nuisance inside the retrieval-gated tier this
+ADR deliberately preserved. `check_prompt` decomposed each multi-term
+anti-pattern into individual terms and FAILed on the first whole-word hit, so
+ordinary planning prose containing tokens such as `awin`, `live`,
+`category`, or `slug` failed checks whenever a rule-bearing decision was
+retrieved — including via path-token overlap that pulled the very rule into
+its own gated tier. An agent reacted to one such block by writing through a
+shell surface instead (the shell behavior is governed by ADR-021 and is not
+addressed here). Separately, the `\b` boundary matcher could never match a
+rule's own underscore identifier spelling (`assume_awin_awin_us_same_source`
+contains no standalone term), so such rules had no true-positive form at all.
+
+This ADR settled *where* multi-term rules apply; it did not settle *how they
+match*. The disjunctive within-rule semantics were preserved as containment,
+not endorsed. This amendment settles them.
+
+### Amended decision
+
+7. **Multi-term legacy anti-patterns match as a complete ordered term
+   sequence.** Both rule and input are normalized identically: lowercased
+   alphanumeric runs, with whitespace, underscores, hyphens, and punctuation
+   acting as equivalent separators. Every alphanumeric token of the rule —
+   including short tokens and stopword-like words such as `and` — participates
+   in the template; nothing is dropped. A violation requires that complete
+   sequence to occur together and in order in the checked text.
+
+8. **Single-term rules keep their existing whole-word behavior**, and remain
+   enforced corpus-wide per Decision 3 above.
+
+9. **Nothing else moves.** Retrieval gating for multi-term legacy rules stays
+   exactly as decided above. Constraint matching ("no X" WARN semantics),
+   typed `FORBID_LITERAL` (ADR-019), path applicability (ADR-020),
+   retrieval scoring and cutoffs, `ConflictDetector`, and the ADR-021
+   shell/Stop boundaries are unchanged by this amendment.
+
+### Consequences of the amendment
+
+- Benign prose that merely contains an ordinary token from a rule passes;
+  content carrying the rule's canonical or identifier spelling fails.
+  The dogfood false-positive class is closed, and identifier-form rules gain
+  their first true positives.
+- Accepted limitation, documented rather than hidden: morphological variants
+  ("assumes" vs "assume") and filler words between terms break the match.
+  These strict legacy semantics intentionally trade recall for lower
+  false-positive risk. Whole-file audit and ConflictDetector use separate
+  evaluation paths and are not guaranteed to recover phrase-sequence misses.
+- Tests that pinned the disjunctive gated-tier behavior were updated to the
+  amended contract; failing-first regressions from the incident turn green
+  under it.
+- The frozen enforcement benchmark was re-run unchanged: 7/7 scenarios,
+  Layer 2 pass rate 100%.
+- Issue #150 narrows: this class of within-tier false positive is resolved;
+  code-aware matching remains open there.
 
 ## Related
 
