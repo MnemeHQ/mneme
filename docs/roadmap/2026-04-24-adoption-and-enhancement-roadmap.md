@@ -178,6 +178,23 @@ result = mneme.run("Should I switch to Postgres?")
 
 ---
 
+### Delivered since this checkpoint was written
+
+- **Codex CLI enforcement integration — delivered** (PR #321, merged
+  2026-08-24). PreToolUse gate for native `apply_patch` mutations; Stop
+  whole-file audit covering shell and script-driven writes. Validated 10/10
+  against Codex CLI 0.149.1. See
+  [docs/integrations/codex-cli.md](../integrations/codex-cli.md).
+
+### Deep Agents middleware POC — P1.5
+
+Evaluate pre-mutation blocking, deterministic change reconstruction, opaque
+`execute` writes, resume/background persistence and propagation into
+subagents. Roadmap-only until the POC passes; see
+[docs/integrations/README.md](../integrations/README.md) for current status.
+
+---
+
 ## Checkpoint 6: Adoption test with external users
 
 **Goal:** Validate whether developers understand and use it.

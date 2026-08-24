@@ -27,6 +27,10 @@ These are shipped but not under freeze; they may evolve without a charter amendm
 
 - Cursor rules export.
 - Claude Code hook integration.
+- Claude Agent SDK adapter.
+- Google Antigravity pre-tool adapter.
+- Codex CLI enforcement integration (PreToolUse gate + Stop audit).
+- Paperclip — validated compatibility through both transports, no adapter required.
 - ADR parser/compiler/validator pipeline.
 - Site-level benchmark presentation copy.
 

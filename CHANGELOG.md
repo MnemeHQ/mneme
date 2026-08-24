@@ -3,6 +3,17 @@
 ## Unreleased
 
 ### Added
+- Codex CLI enforcement integration (`mneme.integrations.codex_cli`).
+  A trusted hook bundle: `SessionStart` captures the session baseline,
+  `PreToolUse` (`^apply_patch$`) parses the proposal and checks introduced
+  content only (ADR-018) via `mneme check --json`, denying deterministic
+  violations before execution — including bundled multi-operation patches,
+  where any violation denies the entire call. `Stop` diffs against the
+  baseline and whole-file-audits every changed surviving artifact as the
+  backstop for shell and script-driven writes. Deletions are SKIP-by-design;
+  degraded states fail open with visible UNEVALUATED diagnostics. Validated
+  10/10 against Codex CLI 0.149.1 (Windows, `codex exec`, pinned binary);
+  evidence under `validation/codex-cli/`.
 
 - Claude Agent SDK integration (`mneme.integrations.agent_sdk`). Reuses the
   existing retrieval and enforcement semantics: relevant decisions are
