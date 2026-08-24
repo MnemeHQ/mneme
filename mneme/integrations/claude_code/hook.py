@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional, TextIO
 
 from mneme.integrations.claude_code.session_state import (
+    MAX_FILE_BYTES,
     capture_baseline,
     cleanup_stale,
     compute_session_delta,
@@ -527,7 +528,29 @@ def bash_tool_event(
 _MAX_BLOCKED_ARTIFACTS = 5
 
 
-def session_start_event(envelope: Dict[str, Any], stderr: TextIO) -> int:
+def _emit_stop_feedback(stdout: TextIO, message: str) -> None:
+    """Surface a degraded-but-permit state to the agent.
+
+    Claude never sees stderr from an exit-0 hook (debug log only), so every
+    non-blocking operational state must go out as Stop feedback instead.
+    """
+    json.dump(
+        {
+            "hookSpecificOutput": {
+                "hookEventName": "Stop",
+                "additionalContext": message,
+            }
+        },
+        stdout,
+    )
+    stdout.write("\n")
+
+
+def session_start_event(
+    envelope: Dict[str, Any],
+    stderr: TextIO,
+    stdout: TextIO,
+) -> int:
     """Capture the per-session repository baseline.
 
     Only a fresh ``startup`` refreshes an existing snapshot; resume, clear,
@@ -543,11 +566,101 @@ def session_start_event(envelope: Dict[str, Any], stderr: TextIO) -> int:
     spath = snapshot_path(root, str(envelope.get("session_id") or ""))
     if source != "startup" and load_snapshot(spath, expected_root=root) is not None:
         return 0
+    detail = ""
+    baseline = None
     try:
-        save_snapshot(spath, capture_baseline(root))
+        baseline = capture_baseline(root)
     except OSError as e:
-        print(f"mneme-hook: baseline capture failed ({e}).", file=stderr)
+        detail = str(e)
+    if baseline is None:
+        # Plain-text stdout from SessionStart is added to Claude's context,
+        # so this is genuinely visible (stderr would only reach debug logs).
+        reason = detail or "repository enumeration failed"
+        print(
+            "mneme-hook: session baseline unavailable (" + reason + "); "
+            "completion-time attribution is inactive for this session.",
+            file=stdout,
+        )
+        return 0
+    try:
+        save_snapshot(spath, baseline)
+    except OSError as e:
+        print(f"mneme-hook: baseline storage failed ({e}).", file=stderr)
     return 0
+
+
+def _applicability_outcomes(payload: Dict[str, Any]) -> Dict[tuple, str]:
+    """Map ``(decision_id, rule_type, rule_value)`` to its selector outcome."""
+    out: Dict[tuple, str] = {}
+    for item in payload.get("applicability") or []:
+        if isinstance(item, dict):
+            key = (
+                item.get("decision_id"),
+                item.get("rule_type"),
+                item.get("rule_value"),
+            )
+            out[key] = str(item.get("outcome"))
+    return out
+
+
+def _evaluate_renamed(
+    memory: Path,
+    root: Path,
+    new_rel: str,
+    old_rel: str,
+    stderr: TextIO,
+) -> Optional[tuple[Optional[str], Optional[str]]]:
+    """Check an exact-content move for a policy-identity change.
+
+    Byte identity is not policy identity (ADR-020): the same bytes can be
+    excluded at one path and governed at another. Both evaluations reuse the
+    core check path with real target paths — no selector logic lives here.
+    Returns ``(reason, note)``; ``reason`` set only when the move moved
+    content from an unapplied rule context into an applied one. Legacy rules
+    carry no path dimension, so they cannot change meaning across a move and
+    never block here; typed UNKNOWN outcomes fail open with a note.
+    """
+    abs_path = root / new_rel
+    try:
+        body = abs_path.read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as e:
+        return None, f"unreadable during rename evaluation: {e}"
+    if not body.strip():
+        return None, None
+
+    # Identical query label for both runs so retrieval gating is identical;
+    # only --target-path differs.
+    proc_new = _invoke_check(memory, new_rel, str(root / new_rel), body, stderr=stderr)
+    payload_new = parse_verdict(proc_new.stdout) if proc_new else None
+    if payload_new is None:
+        return None, "rename target could not be evaluated (untrusted checker result)"
+    if payload_new.get("evaluation_complete") is False:
+        print(format_applicability_reason(payload_new), file=stderr)
+        return None, "rename target had incomplete rule-path evaluation"
+
+    proc_old = _invoke_check(memory, new_rel, str(root / old_rel), body, stderr=stderr)
+    payload_old = parse_verdict(proc_old.stdout) if proc_old else None
+    if payload_old is None:
+        return None, (
+            "rename could not be compared against its previous path "
+            "(untrusted checker result)"
+        )
+
+    new_map = _applicability_outcomes(payload_new)
+    old_map = _applicability_outcomes(payload_old)
+    changed = []
+    for v in payload_new.get("violations") or []:
+        if v.get("kind") != "typed_rule":
+            continue
+        key = (v.get("decision_id"), v.get("rule_type"), v.get("rule"))
+        if new_map.get(key) == "APPLIED" and old_map.get(key) != "APPLIED":
+            changed.append(v)
+    if not changed:
+        return None, None
+
+    filtered = dict(payload_new)
+    filtered["violations"] = changed
+    return format_reason(filtered), None
 
 
 def stop_event(
@@ -561,13 +674,15 @@ def stop_event(
     ADR-018 semantics). Blocks via the documented Stop JSON decision on a
     trusted blocking verdict; every degraded path is visible and never a
     fabricated pass.
-    """
-    if envelope.get("stop_hook_active"):
-        # Claude Code is already continuing because of a stop hook; blocking
-        # again risks an unresolvable loop. The harness's own consecutive-block
-        # cap remains the outer guard.
-        return 0
 
+    ``stop_hook_active`` does NOT bypass evaluation. It is true precisely
+    when Claude is continuing because a Stop hook blocked before — i.e.
+    exactly the repair-recheck turn. Skipping it would let an unverified
+    "repair" complete. Loop safety comes from determinism instead: the gate
+    blocks only on trusted verdicts over the session delta, so a real repair
+    passes on re-evaluation, and Claude Code's documented eight-consecutive-
+    block cap bounds any unresolvable case.
+    """
     memory = find_memory(Path(envelope.get("cwd") or "."))
     if memory is None:
         return 0
@@ -576,26 +691,44 @@ def stop_event(
 
     files = enumerate_repo_files(root)
     if files is None:
-        print(
-            "mneme-hook: not inside a git work tree; the session-delta gate "
-            "is inactive for this turn.",
-            file=stderr,
+        _emit_stop_feedback(
+            stdout,
+            "mneme: not inside a git work tree; the session-delta gate is "
+            "inactive for this turn.",
         )
         return 0
 
     spath = snapshot_path(root, str(envelope.get("session_id") or ""))
     baseline = load_snapshot(spath, expected_root=root)
     if baseline is None:
+        detail = ""
         try:
-            save_snapshot(spath, capture_baseline(root))
+            captured = capture_baseline(root)
         except OSError as e:
-            print(f"mneme-hook: late baseline capture failed ({e}).", file=stderr)
+            captured = None
+            detail = str(e)
+        if captured is None:
+            _emit_stop_feedback(
+                stdout,
+                "mneme: no session baseline exists and capture failed "
+                f"({detail or 'repository enumeration failed'}); nothing can "
+                "be attributed to this session this turn.",
+            )
             return 0
-        print(
-            "mneme-hook: no session baseline was found; captured one now. "
+        try:
+            save_snapshot(spath, captured)
+        except OSError as e:
+            _emit_stop_feedback(
+                stdout,
+                f"mneme: no session baseline exists and storing one failed "
+                f"({e}); nothing can be attributed to this session this turn.",
+            )
+            return 0
+        _emit_stop_feedback(
+            stdout,
+            "mneme: no session baseline was found; captured one now. "
             "Repository mutations made before this point cannot be attributed "
             "to this session and were not evaluated.",
-            file=stderr,
         )
         return 0
 
@@ -608,6 +741,20 @@ def stop_event(
     candidates: list[tuple[str, str]] = []
     for rel in delta.new:
         abs_path = root / rel
+        try:
+            size = abs_path.stat().st_size
+        except OSError as e:
+            unevaluated.append((rel, f"unreadable during evaluation: {e}"))
+            continue
+        if size > MAX_FILE_BYTES:
+            unevaluated.append(
+                (
+                    rel,
+                    "new artifact exceeds the evaluation size budget "
+                    f"({size} > {MAX_FILE_BYTES} bytes)",
+                )
+            )
+            continue
         try:
             body = abs_path.read_text(encoding="utf-8")
         except (OSError, UnicodeError) as e:
@@ -643,6 +790,19 @@ def stop_event(
         if payload["verdict"] in _BLOCKING_VERDICTS:
             offenders.append((rel, format_reason(payload)))
 
+    # Exact-content moves are evaluated against BOTH paths: byte identity is
+    # not policy identity (ADR-020). A violation only blocks when its typed
+    # rule was not applied at the previous path but applies at the new one.
+    for new_rel, old_rel in delta.renamed.items():
+        outcome = _evaluate_renamed(memory, root, new_rel, old_rel, stderr)
+        if outcome is None:
+            continue
+        reason, note = outcome
+        if note:
+            unevaluated.append((new_rel, note))
+        if reason:
+            offenders.append((new_rel, reason))
+
     notes: list[str] = []
     if untrusted:
         notes.append(
@@ -655,7 +815,11 @@ def stop_event(
             "evaluation (see applicability diagnostics above)."
         )
     if unevaluated:
-        listing = ", ".join(rel for rel, _ in unevaluated[:10])
+        shown = [
+            f"{rel} ({reason})" if reason else rel
+            for rel, reason in unevaluated[:10]
+        ]
+        listing = "; ".join(shown)
         notes.append(
             "session delta not evaluated for: "
             + listing
@@ -666,22 +830,11 @@ def stop_event(
 
     if not offenders:
         if notes:
-            # Claude never sees stderr from an exit-0 hook (debug log only).
-            # A degraded-but-permit state must still be operationally visible,
-            # so surface it as non-blocking Stop feedback instead.
-            json.dump(
-                {
-                    "hookSpecificOutput": {
-                        "hookEventName": "Stop",
-                        "additionalContext": (
-                            "mneme session-delta gate completed with "
-                            "unevaluated changes: " + " ".join(notes)
-                        ),
-                    }
-                },
+            _emit_stop_feedback(
                 stdout,
+                "mneme session-delta gate completed with unevaluated "
+                "changes: " + " ".join(notes),
             )
-            stdout.write("\n")
         return 0
 
     shown = offenders[:_MAX_BLOCKED_ARTIFACTS]
@@ -697,16 +850,7 @@ def stop_event(
     reason_text = "\n".join(parts)
 
     if mode == "warn":
-        json.dump(
-            {
-                "hookSpecificOutput": {
-                    "hookEventName": "Stop",
-                    "additionalContext": reason_text,
-                }
-            },
-            stdout,
-        )
-        stdout.write("\n")
+        _emit_stop_feedback(stdout, reason_text)
         return 0
 
     json.dump({"decision": "block", "reason": reason_text}, stdout)
@@ -728,7 +872,7 @@ def handle_event(
         return 0
     name = envelope.get("hook_event_name")
     if name == "SessionStart":
-        return session_start_event(envelope, stderr)
+        return session_start_event(envelope, stderr, stdout)
     if name == "Stop":
         return stop_event(envelope, stderr, stdout)
     try:

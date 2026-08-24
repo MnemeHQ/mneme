@@ -103,8 +103,19 @@ def _hash_and_body(path: Path, budget_left: int) -> Dict[str, object]:
     return entry
 
 
-def capture_baseline(root: Path) -> dict:
-    files = enumerate_repo_files(root) or []
+_UNAVAILABLE_SHA = "unavailable"
+
+
+def capture_baseline(root: Path) -> Optional[dict]:
+    """Snapshot the repository, or None when enumeration itself failed.
+
+    A failed enumeration must never persist as a valid (empty) baseline:
+    that would later attribute every real file to whichever session reads
+    it. Callers treat None as "no baseline exists".
+    """
+    files = enumerate_repo_files(root)
+    if files is None:
+        return None
     entries: Dict[str, dict] = {}
     spent = 0
     for rel in files:
@@ -118,7 +129,14 @@ def capture_baseline(root: Path) -> dict:
                 spent += len(content.encode("utf-8"))
             entries[rel] = entry
         except OSError:
-            continue
+            # Never omit an artifact we could not read: record a placeholder
+            # so a later readable state is reported as unevaluated rather
+            # than attributed to the session as new.
+            entries[rel] = {
+                "sha256": _UNAVAILABLE_SHA,
+                "size": -1,
+                "content": None,
+            }
     return {
         "version": SNAPSHOT_VERSION,
         "created_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),

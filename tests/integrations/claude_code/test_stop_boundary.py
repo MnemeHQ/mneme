@@ -179,29 +179,51 @@ class TestAttribution:
 
 
 class TestLoopSafetyAndDegrade:
-    def test_stop_hook_active_short_circuits_even_with_violations(self, repo):
+    def test_stop_hook_active_still_evaluates_and_blocks(self, repo):
+        """The repair-recheck turn (stop_hook_active=true) must be evaluated."""
         assert _run(_session_start(repo))[0] == 0
         (repo / "storage_db.py").write_text("import psycopg2\n", encoding="utf-8")
         rc, _, out = _run(_stop_event(repo, stop_hook_active=True))
         assert rc == 0
-        assert "decision" not in out
+        assert json.loads(out)["decision"] == "block"
+
+    def test_repaired_state_passes_on_stop_hook_active_turn(self, repo):
+        """First Stop blocks; the repair converges on the very next Stop."""
+        assert _run(_session_start(repo))[0] == 0
+        target = repo / "storage_db.py"
+        target.write_text("import psycopg2\n", encoding="utf-8")
+        rc, _, out = _run(_stop_event(repo))
+        assert json.loads(out)["decision"] == "block"
+        target.write_text("import sqlite3\n", encoding="utf-8")
+        rc, _, out = _run(_stop_event(repo, stop_hook_active=True))
+        assert rc == 0
+        assert out.strip() == "", "a verified repair must allow completion"
+
+    def test_unrepaired_violation_blocks_again(self, repo):
+        """No repair -> second Stop blocks again (bounded by harness cap)."""
+        assert _run(_session_start(repo))[0] == 0
+        (repo / "storage_db.py").write_text("import psycopg2\n", encoding="utf-8")
+        assert json.loads(_run(_stop_event(repo))[2])["decision"] == "block"
+        rc, _, out = _run(_stop_event(repo, stop_hook_active=True))
+        assert json.loads(out)["decision"] == "block"
 
     def test_missing_baseline_created_visibly_no_block(self, repo):
         # No SessionStart ran; a violation already sits in the tree.
         (repo / "storage_db.py").write_text("import psycopg2\n", encoding="utf-8")
         rc, err, out = _run(_stop_event(repo))
         assert rc == 0
-        assert out.strip() == "", "without a baseline nothing may be attributed"
-        assert "baseline" in err.lower()
+        emitted = json.loads(out)
+        context = emitted["hookSpecificOutput"]["additionalContext"]
+        assert "baseline" in context.lower()
+        assert "decision" not in emitted
 
     def test_second_stop_after_late_baseline_enforces(self, repo):
-        rc, err, _ = _run(_stop_event(repo))  # creates late baseline
-        assert rc == 0
+        rc, _, _ = _run(_stop_event(repo))  # creates late baseline
         (repo / "storage_db.py").write_text("import psycopg2\n", encoding="utf-8")
         rc, _, out = _run(_stop_event(repo))
         assert json.loads(out)["decision"] == "block"
 
-    def test_non_git_directory_reports_inactive(self, tmp_path, monkeypatch):
+    def test_non_git_directory_reports_inactive_to_agent(self, tmp_path, monkeypatch):
         monkeypatch.setenv("MNEME_SESSION_STATE_DIR", str(tmp_path / "state"))
         (tmp_path / "state").mkdir()
         (tmp_path / ".mneme").mkdir()
@@ -210,8 +232,11 @@ class TestLoopSafetyAndDegrade:
         )
         rc, err, out = _run(_stop_event(tmp_path))
         assert rc == 0
-        assert out.strip() == ""
-        assert "git" in err.lower()
+        emitted = json.loads(out)
+        context = emitted["hookSpecificOutput"]["additionalContext"]
+        assert "git" in context.lower()
+        assert "inactive" in context
+        assert "decision" not in emitted
 
     def test_corrupt_baseline_degrades_visibly(self, repo):
         from mneme.integrations.claude_code import session_state as ss
@@ -221,8 +246,10 @@ class TestLoopSafetyAndDegrade:
         snap_path.write_text("{ corrupt", encoding="utf-8")
         rc, err, out = _run(_stop_event(repo))
         assert rc == 0
-        assert out.strip() == ""
-        assert "baseline" in err.lower()
+        emitted = json.loads(out)
+        context = emitted["hookSpecificOutput"]["additionalContext"]
+        assert "baseline" in context.lower()
+        assert "decision" not in emitted
 
     def test_oversized_changed_artifact_reported_not_passed_silently(self, repo):
         assert _run(_session_start(repo))[0] == 0
@@ -319,3 +346,136 @@ class TestSessionStart:
         monkeypatch.setenv("MNEME_SESSION_STATE_DIR", str(tmp_path / "state"))
         rc, _, _ = _run(_session_start(tmp_path))
         assert rc == 0
+
+
+SCOPED_MEMORY = {
+    "meta": {"name": "scoped", "description": "d", "version": "0", "owner": "t",
+             "created": "2026-08-22"},
+    "items": [],
+    "decisions": [
+        {
+            "id": "scoped_001",
+            "decision": "legacy_client stays out of production code",
+            "rationale": "r",
+            "scope": ["legacy"],
+            "constraints": [],
+            "anti_patterns": [],
+            "rules": [
+                {
+                    "type": "FORBID_LITERAL",
+                    "value": "legacy_client",
+                    "include_paths": ["src/**"],
+                    "exclude_paths": ["tests/**"],
+                }
+            ],
+        }
+    ],
+}
+
+
+class TestRenameApplicability:
+    """ADR-020: byte identity is not policy identity across a move."""
+
+    @pytest.fixture
+    def scoped_repo(self, tmp_path, monkeypatch):
+        work = tmp_path / "work"
+        work.mkdir()
+        monkeypatch.setenv("MNEME_SESSION_STATE_DIR", str(tmp_path / "state"))
+        (tmp_path / "state").mkdir()
+        subprocess.run(["git", "init", "-q"], cwd=work, check=True)
+        subprocess.run(
+            ["git", "-C", str(work), "-c", "user.email=t@t", "-c", "user.name=t",
+             "commit", "-q", "--allow-empty", "-m", "init"],
+            check=True,
+        )
+        (work / ".mneme").mkdir()
+        (work / ".mneme" / "project_memory.json").write_text(
+            json.dumps(SCOPED_MEMORY), encoding="utf-8"
+        )
+        return work
+
+    def test_move_from_excluded_to_included_blocks(self, scoped_repo):
+        fixture = scoped_repo / "tests"
+        fixture.mkdir()
+        (fixture / "fixture.py").write_text(
+            "import legacy_client\n", encoding="utf-8"
+        )
+        (fixture / "fixture.py").parent.mkdir(parents=True, exist_ok=True)
+        assert _run(_session_start(scoped_repo))[0] == 0
+        target_dir = scoped_repo / "src"
+        target_dir.mkdir()
+        (fixture / "fixture.py").rename(target_dir / "production.py")
+        rc, _, out = _run(_stop_event(scoped_repo))
+        reason = json.loads(out)["reason"]
+        assert "production.py" in reason
+        assert "legacy_client" in reason
+
+    def test_move_within_same_applicability_passes(self, scoped_repo):
+        """No applicability change -> no false attribution of old lines."""
+        (scoped_repo / "src").mkdir()
+        (scoped_repo / "src" / "a.py").write_text("x = 1\n", encoding="utf-8")
+        assert _run(_session_start(scoped_repo))[0] == 0
+        (scoped_repo / "src" / "a.py").rename(scoped_repo / "src" / "b.py")
+        rc, _, out = _run(_stop_event(scoped_repo))
+        assert out.strip() == ""
+
+    def test_move_from_included_to_excluded_relaxes(self, scoped_repo):
+        (scoped_repo / "src").mkdir()
+        (scoped_repo / "src" / "bad.py").write_text(
+            "import legacy_client\n", encoding="utf-8"
+        )
+        assert _run(_session_start(scoped_repo))[0] == 0
+        target_dir = scoped_repo / "tests"
+        target_dir.mkdir(exist_ok=True)
+        (scoped_repo / "src" / "bad.py").rename(target_dir / "ok.py")
+        rc, _, out = _run(_stop_event(scoped_repo))
+        assert out.strip() == ""
+
+
+class TestNewFileBudget:
+    def test_oversized_new_artifact_reported_not_evaluated(self, repo):
+        assert _run(_session_start(repo))[0] == 0
+        from mneme.integrations.claude_code import session_state as ss
+
+        big = repo / "huge_generated.txt"
+        big.write_text("import psycopg2\n" * (ss.MAX_FILE_BYTES // 16 + 5),
+                       encoding="utf-8")
+        assert big.stat().st_size > ss.MAX_FILE_BYTES
+        rc, err, out = _run(_stop_event(repo))
+        assert rc == 0
+        emitted = json.loads(out)
+        context = emitted["hookSpecificOutput"]["additionalContext"]
+        assert "huge_generated.txt" in context
+        assert "size budget" in context
+        assert "decision" not in emitted
+
+
+class TestBaselineIntegrity:
+    def test_enumeration_failure_does_not_save_empty_baseline(self, repo, monkeypatch):
+        import mneme.integrations.claude_code.session_state as ss
+
+        monkeypatch.setattr(ss, "enumerate_repo_files", lambda root: None)
+        assert ss.capture_baseline(repo) is None
+
+    def test_unreadable_at_capture_never_attributed_as_new(self, repo, monkeypatch):
+        """A placeholder entry makes the later readable state unevaluated."""
+        import mneme.integrations.claude_code.session_state as ss
+        from pathlib import Path as P
+
+        real_read_bytes = P.read_bytes
+        victim = repo / "shy.txt"
+        victim.write_text("locked at capture time\n", encoding="utf-8")
+
+        def flaky(self):
+            if self == victim:
+                raise PermissionError("transient lock")
+            return real_read_bytes(self)
+
+        monkeypatch.setattr(P, "read_bytes", flaky)
+        base = ss.capture_baseline(repo)
+        assert base["files"]["shy.txt"]["sha256"] == ss._UNAVAILABLE_SHA
+        monkeypatch.setattr(P, "read_bytes", real_read_bytes)
+
+        d = ss.compute_session_delta(repo, base)
+        assert "shy.txt" not in d.new
+        assert "not evaluated" in d.skipped.get("shy.txt", "")

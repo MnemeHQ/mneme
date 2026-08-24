@@ -111,14 +111,25 @@ the baseline, and derives, per changed file, the **introduced lines** using
 the same deterministic diff definition as ADR-018 (insert/replace opcodes,
 baseline as `before`, current as `after`). New files introduce everything;
 deleted files introduce nothing and are never blocked (deletion-only
-remediation must pass). One exact-content exception applies: a baseline path
-that has vanished while byte-identical content reappears at a new path is a
-move of pre-session content, not an introduction — attributing it would blame
-pre-existing lines on the session. Only exact vanished-source matches
-qualify; a copy whose source still exists, or a rename combined with any
-edit, remains fully attributed (conservative direction). Each candidate is
-checked through the existing enforcement path with its real target path,
-preserving ADR-020 applicability authority end to end.
+remediation must pass). New files beyond the per-file content budget are not
+read or evaluated; they are reported as unevaluated instead.
+
+One exact-content exception applies: a baseline path that has vanished while
+byte-identical content reappears at a new path is a move of pre-session
+content. Byte identity is **not policy identity**: ADR-020 makes path part
+of rule applicability, so a move can carry excluded-path bytes into a
+governed path. Such moves are therefore evaluated through the core check
+path twice — with the real new target path and with the previous target
+path, using an identical query label so retrieval gating is identical. The
+move blocks only when a typed rule's violation was not applied at the
+previous path but applies at the new one (policy meaning changed in the
+restricting direction); legacy rules carry no path dimension and never block
+on a move. Typed UNKNOWN outcomes on either side fail open with visible
+notes. No selector logic is duplicated in the adapter; both evaluations are
+ordinary trusted CLI verdicts.
+
+Each candidate is checked through the existing enforcement path with its
+real target path, preserving ADR-020 applicability authority end to end.
 
 **Attribution correctness.** Because the baseline is captured at session
 start, dirty state that existed beforehand is indistinguishable from
@@ -127,20 +138,32 @@ pre-existing violation does not block an unrelated session edit; removing a
 pre-existing violation introduces nothing; a violation added on top of
 pre-existing dirty lines is caught by its own delta.
 
-**Loop safety.** The hook honors `stop_hook_active` and exits immediately
-when it is true; Claude Code's own eight-consecutive-block cap remains the
-outer guard. After a blocked Stop, the baseline is *not* refreshed: the next
-Stop re-evaluates the same session delta, so a repair converges to a pass.
+**Loop safety.** ``stop_hook_active`` is true precisely on the
+repair-recheck turn — the one turn that must be evaluated — so it does **not**
+bypass the gate. Loop safety comes from determinism instead: the boundary
+blocks only on trusted verdicts over the session delta, so a genuine repair
+passes on re-evaluation, and Claude Code's documented eight-consecutive-block
+cap bounds any unresolvable case. The baseline is *not* refreshed after a
+block: the next Stop re-evaluates the same session delta, so repairs converge.
 
 **Explicit operational states.** The gate refuses to fabricate results, and
 because Claude never sees stderr from an exit-0 hook (it goes to the debug
 log only), every degraded-but-permit state is additionally surfaced to the
-agent as non-blocking Stop feedback (`hookSpecificOutput.additionalContext`):
+agent as non-blocking Stop feedback (`hookSpecificOutput.additionalContext`)
+through a single shared emit path:
 
 - No baseline exists (plugin installed mid-session): one is created at Stop,
   a diagnostic records that earlier changes could not be attributed, and the
   turn proceeds. Later Stops in that session enforce normally.
+- Baseline capture failure (repository enumeration failure or storage
+  error): reported explicitly; no snapshot is persisted, so a transient
+  failure can never masquerade as a valid empty baseline and blame the whole
+  tree on the session. The same rule holds at SessionStart, whose plain-text
+  stdout reaches Claude's context.
 - Not a git work tree: the gate reports itself inactive and does not block.
+- An artifact unreadable at capture time records a placeholder entry rather
+  than being omitted, so if it becomes readable later it is reported as *not
+  evaluated* instead of attributed to the session as new.
 - A file whose baseline content is unavailable (oversized or binary) but
   which changed during the session is reported as *not evaluated*; it is
   never silently passed and never blocked on guessed content.
