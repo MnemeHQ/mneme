@@ -24,7 +24,7 @@ at what level, with what evidence. The website's
 | Native integration | Claude Code | [claude-code.md](claude-code.md), [claude-code-hook-spec.md](claude-code-hook-spec.md) |
 | Native integration | Claude Agent SDK | [agent-sdk.md](agent-sdk.md), [PR #293](https://github.com/MnemeHQ/mneme/pull/293) |
 | Native integration | Google Antigravity | [antigravity.md](antigravity.md), [PR #316](https://github.com/MnemeHQ/mneme/pull/316) |
-| Native integration | Codex CLI | [codex-cli.md](codex-cli.md), [PR #321](https://github.com/MnemeHQ/mneme/pull/321), [capability matrix](../validation/codex-cli/capability-matrix.md) |
+| Native integration | Codex CLI | [codex-cli.md](codex-cli.md), [PR #321](https://github.com/MnemeHQ/mneme/pull/321), [capability matrix](../../validation/codex-cli/capability-matrix.md) |
 | Validated compatibility | Paperclip (CLI + ACP) | [paperclip.md](paperclip.md), [PR #315](https://github.com/MnemeHQ/mneme/pull/315) |
 | Rules export | Cursor | [adr-import.md](adr-import.md) (corpus workflows); generator: `mneme cursor generate` |
 | CLI-based CI gates | GitHub Actions, GitLab CI | `mneme check` reference patterns |

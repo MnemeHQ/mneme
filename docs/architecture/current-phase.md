@@ -30,7 +30,7 @@ These are shipped but not under freeze; they may evolve without a charter amendm
 - Claude Agent SDK adapter.
 - Google Antigravity pre-tool adapter.
 - Codex CLI enforcement integration (PreToolUse gate + Stop audit).
-- Paperclip — validated native compatibility through both transports, no adapter.
+- Paperclip — validated compatibility through both transports, no adapter required.
 - ADR parser/compiler/validator pipeline.
 - Site-level benchmark presentation copy.
 

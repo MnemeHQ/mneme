@@ -141,7 +141,6 @@ maintained matrix lives in [docs/integrations/README.md](docs/integrations/READM
 | Validated compatibility | Paperclip — CLI and ACP transports, no adapter required |
 | Rules export | Cursor |
 | CLI-based CI gates | GitHub Actions, GitLab CI |
-| In validation | — (Codex CLI promoted to native on merge of PR #321) |
 | Experimental / planned | OpenCode, Kiro (open PR), Deep Agents middleware POC |
 
 Per-integration documentation: [docs/integrations/](docs/integrations/).
