@@ -1,0 +1,18 @@
+{
+  "probe": "multifile",
+  "arms": [
+    {
+      "arm": "allow",
+      "seed_changed": true,
+      "helper_added": true,
+      "worktree_status": "1 .M N... 100644 100644 100644 c6d6f81e16a2b0a8486f83efde1260eb95d266a9 c6d6f81e16a2b0a8486f83efde1260eb95d266a9 service.py\n? helper.py"
+    },
+    {
+      "arm": "deny",
+      "seed_changed": false,
+      "helper_added": false,
+      "worktree_status": ""
+    }
+  ],
+  "fact_deny_rejects_entire_call": true
+}
