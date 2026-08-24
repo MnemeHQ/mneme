@@ -231,10 +231,11 @@ def _evaluate_bundle(specs, command, cwd, memory, mode, check_runner) -> GateRes
         label = f"operation {n} ({rel_label})"
 
         if op.introduced_content is None:
+            snapshot_error = snapshot_errors.get(
+                raw_path, "snapshot unavailable")
             results.append((label, GateResult(
                 FAIL_OPEN,
-                f"not evaluated: {snapshot_errors.get(raw_path, 'snapshot '
-                                                             'unavailable')}",
+                f"not evaluated: {snapshot_error}",
                 target_path=str(resolved))))
             continue
 
