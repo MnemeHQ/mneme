@@ -48,6 +48,18 @@ On every Edit, Write, or MultiEdit, Claude Code pipes the tool input to
 4. Exits 2 (block) if `mneme check` returns a non-zero verdict in strict
    mode; exits 0 (allow) otherwise.
 
+The same command also serves two more surfaces (ADR-021):
+
+- `PreToolUse` x `Bash`: a shell call is checked **before execution** only
+  when it is deterministically reconstructable — a single simple
+  `cat > path << 'EOF'` / `cat >> path << 'EOF'` with a quoted delimiter.
+  All other shell forms pass through unblocked.
+- `Stop`: after each turn, content this session introduced is evaluated
+  against project memory; violations block completion with actionable
+  reasons. A per-session baseline (captured at session start, stored in the
+  platform temp dir) keeps pre-existing dirty state from being attributed to
+  the session. Requires git; otherwise the boundary reports itself inactive.
+
 **Retrieval note:** `mneme check` uses keyword-based retrieval. The query
 is `"edit to <file_path>"` — tokens from the file name contribute to
 which decisions are retrieved. Decisions whose scope, id, or text share

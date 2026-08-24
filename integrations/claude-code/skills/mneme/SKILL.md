@@ -41,6 +41,11 @@ It reconstructs the full post-edit file content, then calls `mneme check` with t
 query `"edit to <file_path>"`. Decisions whose scope or text share tokens with the
 file name are retrieved and checked.
 
+Shell calls (`Bash`) are checked before execution only when they are simple
+quoted-delimiter heredoc writes (`cat > path << 'EOF' ... EOF`); anything else is
+audited by a `Stop` boundary that evaluates what this session introduced before
+the turn completes (ADR-021).
+
 **Retrieval caveat:** The automatic hook query is derived from the file path, so
 decisions with scope keywords that don't appear in file names may not be retrieved
 automatically. Use `/mneme-context` before large edits to confirm coverage.
