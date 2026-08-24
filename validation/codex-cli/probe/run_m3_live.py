@@ -111,7 +111,7 @@ def main() -> int:
             cmd.extend(env["codex_args_extra"].split())
         cmd.append(prompt)
         proc = subprocess.run(cmd, cwd=REPO, capture_output=True, text=True,
-                              check=False,
+                              check=False, encoding="utf-8", errors="replace",
                               env={**os.environ})
         transcript.write_text(
             f"$ {' '.join(cmd)}\n\n--- stdout ---\n{proc.stdout}\n"

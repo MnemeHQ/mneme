@@ -1,0 +1,26 @@
+{
+  "c1_forbidden_shell": {
+    "returncode": 0,
+    "stop_blocks": 0,
+    "worktree_after": "? shell_made.txt",
+    "dirty_file_changed": false
+  },
+  "c2_compliant_shell": {
+    "returncode": 0,
+    "stop_blocks": 0,
+    "worktree_after": "? shell_clean.txt",
+    "dirty_file_changed": false
+  },
+  "c3_dirty_untouched": {
+    "returncode": 0,
+    "stop_blocks": 0,
+    "worktree_after": "",
+    "dirty_file_changed": false
+  },
+  "c4_dirty_touched": {
+    "returncode": 0,
+    "stop_blocks": 0,
+    "worktree_after": "1 .M N... 100644 100644 100644 b3675f89c1500d1bd13f3dfb20922ce99123fea9 b3675f89c1500d1bd13f3dfb20922ce99123fea9 preexisting.py",
+    "dirty_file_changed": true
+  }
+}

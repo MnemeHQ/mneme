@@ -1,0 +1,32 @@
+{
+  "captured_utc": "2026-08-24T21:53:41Z",
+  "config_projects_section": [
+    "[projects.'c:\\dev\\cannabisdeals-data-platform']",
+    "trust_level = \"trusted\"",
+    "[projects.'c:\\dev\\mneme-growth-ops']",
+    "trust_level = \"trusted\"",
+    "[projects.'c:\\dev\\enquentro']",
+    "trust_level = \"trusted\"",
+    "[projects.'c:\\dev\\amritarajapan']",
+    "trust_level = \"trusted\"",
+    "[projects.'c:\\dev\\theovalmis']",
+    "trust_level = \"trusted\"",
+    "[projects.'c:\\users\\hi\\onedrive\\documents\\mneme']",
+    "trust_level = \"trusted\"",
+    "[projects.'c:\\users\\hi\\onedrive\\documents\\vivaiodays']",
+    "trust_level = \"trusted\"",
+    "[projects.'c:\\users\\hi\\.codex\\.chatgpt-projects\\g-p-69932e8b6e3c81918273812a2059153a']",
+    "trust_level = \"trusted\"",
+    "[projects.'c:\\users\\hi\\onedrive\\documents\\chatgpt\\mnemehq-site']",
+    "trust_level = \"trusted\"",
+    "[projects.'c:\\dev\\mneme\\.worktrees\\feat-codex-cli-enforcement\\validation\\codex-cli\\probe\\sandbox\\repo']",
+    "trust_level = \"trusted\""
+  ],
+  "trust_store_candidates": [
+    {
+      "path": "C:\\Users\\hi\\.codex\\.codex-global-state.json",
+      "sha256": "5fef4ff9efeabefb9c64e1f01004d17b3c974b7d32036b44672a63d514d0741b"
+    }
+  ],
+  "note": "Hook-trust persistence location is itself an R0 finding; whatever exists at run time is hashed here for drift detection."
+}
