@@ -133,6 +133,30 @@ def capture_worktree(sandbox: Path) -> dict:
     return {"git_status": status.stdout, "files": files}
 
 
+def exec_prompt_factory(env: dict, sandbox: Path, run_dir: Path):
+    """Return a prompt runner capturing transcripts into run_dir."""
+    codex_bin = env["codex_bin"]
+    extra = env.get("codex_args_extra", "")
+
+    def exec_prompt(prompt: str, case_env: dict, transcript_name: str) -> int:
+        cmd = [codex_bin, "exec"]
+        if extra:
+            cmd.extend(extra.split())
+        cmd.append(prompt)
+        proc = subprocess.run(
+            cmd, cwd=sandbox, capture_output=True, text=True, check=False,
+            env={**os.environ, **case_env},
+        )
+        (run_dir / transcript_name).write_text(
+            f"$ {' '.join(cmd)}\n\n--- stdout ---\n{proc.stdout}\n"
+            f"\n--- stderr ---\n{proc.stderr}\n\nexit={proc.returncode}\n",
+            encoding="utf-8",
+        )
+        return proc.returncode
+
+    return exec_prompt
+
+
 def main() -> int:
     stamp = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
     run_dir = HERE.parent / "evidence" / "runs" / f"{stamp}-m1db-live"
@@ -144,24 +168,7 @@ def main() -> int:
     reset_case(REPO)
     install_production_hooks(REPO)
 
-    codex_bin = env_base["codex_bin"]
-    extra = env_base.get("codex_args_extra", "")
-
-    def exec_prompt(prompt: str, case_env: dict, transcript_name: str) -> int:
-        cmd = [codex_bin, "exec"]
-        if extra:
-            cmd.extend(extra.split())
-        cmd.append(prompt)
-        proc = subprocess.run(
-            cmd, cwd=REPO, capture_output=True, text=True, check=False,
-            env={**os.environ, **case_env},
-        )
-        (run_dir / transcript_name).write_text(
-            f"$ {' '.join(cmd)}\n\n--- stdout ---\n{proc.stdout}\n"
-            f"\n--- stderr ---\n{proc.stderr}\n\nexit={proc.returncode}\n",
-            encoding="utf-8",
-        )
-        return proc.returncode
+    exec_prompt = exec_prompt_factory(env_base, REPO, run_dir)
 
     # -- Preflight: prove trusted hooks are fresh via a deny ------------------
     write_memory(REPO, broken=False)

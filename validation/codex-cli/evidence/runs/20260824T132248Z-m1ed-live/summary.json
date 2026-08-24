@@ -1,0 +1,28 @@
+{
+  "pin_verified": true,
+  "bypass_flag_used": false,
+  "cases": {
+    "deny_update": {
+      "returncode": 0,
+      "seed_changed": false,
+      "blocked": true,
+      "hook_lines": [
+        "hook: PreToolUse",
+        "hook: PreToolUse Blocked"
+      ],
+      "unexpected_context_hits": {},
+      "verdict": "PASS"
+    },
+    "pass_update": {
+      "returncode": 0,
+      "seed_changed": true,
+      "blocked": false,
+      "hook_lines": [
+        "hook: PreToolUse",
+        "hook: PreToolUse Completed"
+      ],
+      "unexpected_context_hits": {},
+      "verdict": "PASS"
+    }
+  }
+}
