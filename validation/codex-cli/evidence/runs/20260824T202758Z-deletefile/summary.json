@@ -1,0 +1,16 @@
+{
+  "probe": "deletefile",
+  "arms": [
+    {
+      "arm": "allow",
+      "seed_deleted": true,
+      "worktree_status": "1 .D N... 100644 100644 000000 7e06c0dfac403a4109568dbdb1e133379d542a78 7e06c0dfac403a4109568dbdb1e133379d542a78 service.py"
+    },
+    {
+      "arm": "deny",
+      "seed_deleted": false,
+      "worktree_status": ""
+    }
+  ],
+  "fact_deny_keeps_file": true
+}
