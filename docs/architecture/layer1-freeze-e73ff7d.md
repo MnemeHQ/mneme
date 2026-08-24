@@ -145,12 +145,23 @@ Precision and irrelevant-injection-rate are therefore **not** Layer 1 quality si
 
 The freeze does not pretend otherwise.
 
-### Why benchmark expansion is frozen
+### Why benchmark expansion is frozen (amended 2026-08-24)
 
 - Adding scenarios to push a metric is overfitting at this suite size.
 - Adding adversarial or paraphrase scenarios is a charter-level methodology change.
 - Adding scenarios designed to make a known-good decision PASS is the exact failure mode `rule-bench-retrieval-coupling` was written to prevent.
 - The next legitimate benchmark work is data-only: populating `acceptable_decision_ids` on the existing seven scenarios.
+
+**Authorized exception (2026-08-24).** By merged charter [#318](https://github.com/MnemeHQ/mneme/pull/318) ([charter document](../plans/2026-08-24-benchmark-fpr-charter.md)), a **separate enforcement-quality regression suite** is authorized alongside — never inside — the canonical suite, to measure enforcement false negatives and false positives after the observed dogfood defect fixed in #317:
+
+- Scenario metadata `scenario_type: violation | benign` (absent → violation internally; unknown value → MALFORMED).
+- A sixth verdict `FALSE_POSITIVE`, defined for benign scenarios only; it is a failing benchmark condition (exit 1). Violation-scenario verdict logic is unchanged.
+- An exposure contract (`expected_exposed_decision_ids`): a benign PASS counts only when the governing rule was in actual enforcement scope; exposure telemetry is recorded outside Layer 1 objects.
+- Partitioned reporting: violation catch rate vs false-positive rate, rendered separately from legacy aggregates; canonical terminal/Markdown/JSON output remains byte-for-byte unchanged (new fields emit only for scenarios explicitly declaring `scenario_type`).
+- A dedicated frozen fixture memory for the suite; initial set is three violation guards + four benign controls, each incident-traceable.
+- MALFORMED remains exit-0 suite-wide; uncheckable scenarios are counted and rendered, never silently dropped from visibility.
+
+Unchanged by this exception: the canonical seven fixtures (byte-identical), the historical 7/7 headline, retrieval methodology, K=3, Layer 1 metric formulas and aggregation filters. New scenarios beyond incident-traceable regressions or documented governance gaps require their own charter.
 
 ### Why synthetic scenarios are acceptable at this stage
 
@@ -158,7 +169,7 @@ The freeze does not pretend otherwise.
 - Synthetic, hand-authored scenarios make the mechanism falsifiable: every PASS records the retrieved IDs and the triggering rule, and a reviewer can verify the chain end-to-end.
 - Real-world distribution evidence is the job of the next phase (design-partner validation), not the benchmark.
 
-### Categories covered
+### Categories covered (amended 2026-08-24)
 
 - **Architecture** — storage backend boundary.
 - **Scope** — provider boundary, feature boundary, infrastructure boundary.
@@ -166,6 +177,8 @@ The freeze does not pretend otherwise.
 - **Retrieval** — retrieval complexity rules.
 
 These four categories are the Layer 1 surface. Adding a fifth category requires a charter amendment.
+
+The enforcement-quality suite authorized above is **not** a fifth Layer 1 category and does not extend this surface: it partitions Layer 2 enforcement quality (violation catch rate vs false-positive rate) into its own suite with its own fixture memory and opt-in reporting.
 
 ---
 
