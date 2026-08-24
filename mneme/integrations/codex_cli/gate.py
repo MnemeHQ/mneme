@@ -45,10 +45,9 @@ from mneme.integrations.claude_code.hook import (
 from mneme.path_selectors import policy_root
 from mneme.integrations.codex_cli.patch_parser import (
     CodexPatchParseError,
-    operation_kind,
+    parse_patch_operations,
     parse_pretooluse_payload,
-    parse_update_file,
-    update_target_path,
+    patch_operation_specs,
 )
 
 # Internal outcomes. These are integration results, not Codex wire values;
@@ -59,7 +58,6 @@ WARN = "WARN"
 FAIL_OPEN = "FAIL_OPEN"
 SKIP = "SKIP"
 
-_UPDATE_KIND = "*** Update File"
 
 
 @dataclass(frozen=True)
@@ -160,23 +158,135 @@ def evaluate_apply_patch(
 
     command = payload.get("tool_input", {}).get("command")
     try:
-        kind = operation_kind(command)
+        specs = patch_operation_specs(command)
     except CodexPatchParseError as e:
         return GateResult(
             FAIL_OPEN,
             f"proposal not evaluated (apply_patch parse failure): {e}",
         )
 
-    if kind.rstrip(":") == _UPDATE_KIND:
-        return _evaluate_update(
-            payload=payload,
-            command=command,
-            cwd=cwd,
-            memory=memory,
-            mode=mode,
-            check_runner=check_runner,
+    if len(specs) == 1 and specs[0][0] == "add":
+        # Frozen M1c Add File path (relative-path contract, exact invocation).
+        return _evaluate_add(payload, cwd, memory, mode, check_runner)
+    return _evaluate_bundle(specs, command, cwd, memory, mode, check_runner)
+
+
+_AGG_ORDER = {DENY: 0, FAIL_OPEN: 1, WARN: 2, PASS: 3, SKIP: 4}
+
+
+def _evaluate_bundle(specs, command, cwd, memory, mode, check_runner) -> GateResult:
+    """Multi-operation path: evaluate EVERY operation; aggregate afterwards.
+
+    Precedence (settled at M1f-b): DENY > FAIL_OPEN > WARN > PASS/SKIP.
+    A definite violation on any operation denies the whole tool call, and the
+    reason must still disclose every operation that could not be evaluated.
+    """
+    root = policy_root(memory)
+    resolved_entries = []
+    for index, (kind, raw_path) in enumerate(specs, start=1):
+        resolved = _resolve_inside_root(raw_path, cwd, root)
+        if resolved is None:
+            return GateResult(
+                FAIL_OPEN,
+                f"proposal not evaluated: operation {index} target escapes "
+                f"the governed project root: {raw_path!r}",
+            )
+        resolved_entries.append((index, kind, raw_path, resolved))
+
+    snapshots = {}
+    snapshot_errors = {}  # raw_path -> reason (explicit None => unevaluated op)
+    for index, kind, raw_path, resolved in resolved_entries:
+        if kind != "update":
+            continue
+        try:
+            rel_label = str(resolved.relative_to(Path(root).resolve()))
+        except ValueError:  # pragma: no cover - guarded by _resolve_inside_root
+            rel_label = resolved.name
+        snapshot, read_error = _read_snapshot(resolved)
+        if snapshot is None:
+            # Mark unavailable rather than aborting: other operations can
+            # still be evaluated, and the aggregate must disclose this one.
+            snapshot_errors[raw_path] = (
+                f"operation {index} ({rel_label}) {read_error}")
+            snapshots[raw_path] = None
+        else:
+            snapshots[raw_path] = snapshot
+
+    try:
+        operations = parse_patch_operations(command, snapshots=snapshots)
+    except CodexPatchParseError as e:
+        return GateResult(
+            FAIL_OPEN,
+            f"proposal not evaluated (apply_patch parse failure): {e}",
         )
-    return _evaluate_add(payload, cwd, memory, mode, check_runner)
+
+    mode_resolved = mode if mode is not None else resolve_mode()
+    results = []  # (label, GateResult)
+    for n, ((index, _kind, raw_path, resolved), op) in enumerate(
+            zip(resolved_entries, operations), start=1):
+        try:
+            rel_label = str(resolved.relative_to(Path(root).resolve()))
+        except ValueError:  # pragma: no cover
+            rel_label = resolved.name
+        label = f"operation {n} ({rel_label})"
+
+        if op.introduced_content is None:
+            results.append((label, GateResult(
+                FAIL_OPEN,
+                f"not evaluated: {snapshot_errors.get(raw_path, 'snapshot '
+                                                             'unavailable')}",
+                target_path=str(resolved))))
+            continue
+
+        if not op.introduced_content.strip():
+            results.append((label, GateResult(
+                SKIP, "no non-blank introduced content",
+                target_path=str(resolved))))
+            continue
+        result = _finish_check(memory, rel_label, str(resolved),
+                               op.introduced_content, mode_resolved,
+                               check_runner)
+        results.append((label, result))
+
+    worst = min((r.action for _, r in results), key=lambda a: _AGG_ORDER[a])
+    labels = "; ".join(str(r.target_path) or label for label, r in results)
+
+    def _section(action, header):
+        parts = [header]
+        for label, r in results:
+            if r.action == action:
+                parts.append(f"[{label}] {r.reason}".rstrip())
+        return "\n".join(parts)
+
+    if worst == DENY:
+        reason = _section(DENY, "mneme: bundled apply_patch denied -")
+        unevaluated = _section(FAIL_OPEN, "")
+        if unevaluated.strip():
+            reason += ("\n\n[NOT EVALUATED] The call was blocked, but these "
+                       "operations were never checked:\n" + unevaluated)
+        return GateResult(DENY, reason, verdict="FAIL", target_path=labels,
+                          details={"operations": [
+                              {"action": r.action, "target": str(r.target_path)}
+                              for _, r in results]})
+    if worst == FAIL_OPEN:
+        reason = _section(FAIL_OPEN,
+                          "[mneme] UNEVALUATED - failing open, parts of this "
+                          "mutation were NOT evaluated:")
+        warns = _section(WARN, "")
+        if warns.strip():
+            reason += "\n\nAdditionally flagged (warn mode):\n" + warns
+        return GateResult(FAIL_OPEN, reason, target_path=labels)
+    if worst == WARN:
+        return GateResult(WARN,
+                          "mneme: bundled apply_patch flagged -"
+                          + "".join(
+                              f"\n[{label}] {r.reason}" for label, r in results
+                              if r.action == WARN),
+                          target_path=labels)
+    if any(r.action == PASS for _, r in results):
+        return GateResult(PASS, "", target_path=labels)
+    return GateResult(SKIP, "no non-blank introduced content",
+                      target_path=labels)
 
 
 def _resolve_inside_root(target_raw: str, cwd: str, root: Path):
@@ -204,61 +314,6 @@ def _read_snapshot(resolved: Path):
         return resolved.read_text(encoding="utf-8"), None
     except (OSError, UnicodeError, ValueError) as e:
         return None, f"current file could not be read as UTF-8 ({e})"
-
-
-def _evaluate_update(payload, command, cwd, memory, mode, check_runner) -> GateResult:
-    """Update File path: snapshot once, parse against it, check the delta.
-
-    Every degraded outcome is FAIL_OPEN with an explicit NOT-evaluated reason;
-    none can become PASS. No byte/EOL reconstruction is attempted -- the
-    frozen M1e-b contract is line-content enforcement only.
-    """
-    try:
-        target_raw = update_target_path(command)
-    except CodexPatchParseError as e:
-        return GateResult(
-            FAIL_OPEN,
-            f"proposal not evaluated (apply_patch parse failure): {e}",
-        )
-
-    root = policy_root(memory)
-    resolved = _resolve_inside_root(target_raw, cwd, root)
-    if resolved is None:
-        return GateResult(
-            FAIL_OPEN,
-            "proposal not evaluated: Update File target escapes the governed "
-            f"project root: {target_raw!r}",
-        )
-    try:
-        rel_label = str(resolved.relative_to(Path(root).resolve()))
-    except ValueError:  # pragma: no cover - guarded by _resolve_inside_root
-        rel_label = resolved.name
-
-    snapshot, read_error = _read_snapshot(resolved)
-    if snapshot is None:
-        return GateResult(
-            FAIL_OPEN,
-            f"proposal not evaluated: {read_error}",
-            target_path=str(resolved),
-        )
-
-    try:
-        _, introduced = parse_update_file(command, snapshot)
-    except CodexPatchParseError as e:
-        return GateResult(
-            FAIL_OPEN,
-            f"proposal not evaluated (apply_patch parse failure): {e}",
-            target_path=str(resolved),
-        )
-
-    if not introduced.strip():
-        # ADR-018 blank-delta rule: nothing non-blank introduced.
-        return GateResult(SKIP, "no non-blank introduced content",
-                          target_path=str(resolved))
-
-    return _finish_check(memory, rel_label, str(resolved), introduced,
-                         mode if mode is not None else resolve_mode(),
-                         check_runner)
 
 
 def _evaluate_add(payload, cwd, memory, mode, check_runner) -> GateResult:

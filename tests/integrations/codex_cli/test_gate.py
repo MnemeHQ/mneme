@@ -216,7 +216,8 @@ def test_parse_failure_fails_open_as_not_evaluated(tmp_path, monkeypatch):
     )
     result = evaluate_apply_patch(payload, cwd=str(project), check_runner=RecordingRunner())
     assert result.action == FAIL_OPEN
-    assert "proposal not evaluated" in result.reason
+    # M1f-c aggregate wording: the operation is disclosed as not evaluated.
+    assert "not evaluated" in result.reason.lower()
 
 
 # 5. Target path propagation ----------------------------------------------------

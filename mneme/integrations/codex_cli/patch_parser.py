@@ -25,8 +25,9 @@ never be mistaken for a governed one.
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass
 from pathlib import PureWindowsPath, PurePosixPath
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, List, Tuple
 
 BEGIN_MARKER = "*** Begin Patch"
 END_MARKER = "*** End Patch"
@@ -161,38 +162,9 @@ def _check_update_path(path: str) -> str:
     return path
 
 
-def parse_update_file(command: Any, current_content: Any) -> Tuple[str, str]:
-    """Parse one Update File-only apply_patch script against a snapshot.
-
-    ``current_content`` is the caller-supplied current file content (any EOL
-    style; matching is line-content based). The parser performs no filesystem
-    I/O and makes no claim about the final file's byte representation.
-
-    Returns ``(target_path, introduced_content)`` where introduced content is
-    the exact ``+``-line contents joined with newlines -- blank introduced
-    lines survive untouched. Every hunk's context/removal sequence must match
-    the supplied snapshot uniquely and deterministically; anything else raises
-    :class:`CodexPatchParseError`.
-    """
-    _validate_envelope(command)
-    body_lines = _body_lines(command)
-    op_index, op_line = _single_operation(body_lines)
-
-    header, sep, raw_path = op_line.partition(":")
-    if header.strip() != UPDATE_FILE_HEADER.rstrip(":").strip() or not sep:
-        unsupported = _operation_kind(op_line)
-        raise CodexPatchParseError(
-            f"unsupported patch operation {unsupported!r}; "
-            "only '*** Update File:' is supported by parse_update_file"
-        )
-    target_path = _check_update_path(raw_path.strip())
-
-    if not isinstance(current_content, str):
-        raise CodexPatchParseError(
-            "Update File parsing requires current file content as a string"
-        )
-
-    hunk_body = body_lines[op_index + 1:]
+def _update_hunks_introduced(hunk_body: list, snapshot_text: str,
+                             op_path: str) -> str:
+    """Validate Update hunks against one snapshot; return introduced content."""
     hunks: list[list[str]] = []
     for line in hunk_body:
         if line == HUNK_SEPARATOR:
@@ -206,7 +178,7 @@ def parse_update_file(command: Any, current_content: Any) -> Tuple[str, str]:
     if not hunks:
         raise CodexPatchParseError("Update File patch contains no hunks")
 
-    snapshot = current_content.splitlines()
+    snapshot = snapshot_text.splitlines()
     introduced: list[str] = []
     cursor = 0
     for hunk_index, hunk in enumerate(hunks):
@@ -245,17 +217,53 @@ def parse_update_file(command: Any, current_content: Any) -> Tuple[str, str]:
         if not matches:
             raise CodexPatchParseError(
                 f"hunk {hunk_index}: context/removal sequence not found in "
-                f"current file content: {expected_block!r}"
+                f"current file content ({op_path}): {expected_block!r}"
             )
         if len(matches) > 1:
             raise CodexPatchParseError(
                 f"hunk {hunk_index}: context/removal sequence matches "
-                f"{len(matches)} locations; refusing an ambiguous update"
+                f"{len(matches)} locations in {op_path}; refusing an "
+                "ambiguous update"
             )
         cursor = matches[0] + len(expected_block)
         introduced.extend(added)
 
-    return target_path, "\n".join(introduced)
+    return "\n".join(introduced)
+
+
+def parse_update_file(command: Any, current_content: Any) -> Tuple[str, str]:
+    """Parse one Update File-only apply_patch script against a snapshot.
+
+    ``current_content`` is the caller-supplied current file content (any EOL
+    style; matching is line-content based). The parser performs no filesystem
+    I/O and makes no claim about the final file's byte representation.
+
+    Returns ``(target_path, introduced_content)`` where introduced content is
+    the exact ``+``-line contents joined with newlines -- blank introduced
+    lines survive untouched. Every hunk's context/removal sequence must match
+    the supplied snapshot uniquely and deterministically; anything else raises
+    :class:`CodexPatchParseError`.
+    """
+    _validate_envelope(command)
+    body_lines = _body_lines(command)
+    op_index, op_line = _single_operation(body_lines)
+
+    header, sep, raw_path = op_line.partition(":")
+    if header.strip() != UPDATE_FILE_HEADER.rstrip(":").strip() or not sep:
+        unsupported = _operation_kind(op_line)
+        raise CodexPatchParseError(
+            f"unsupported patch operation {unsupported!r}; "
+            "only '*** Update File:' is supported by parse_update_file"
+        )
+    target_path = _check_update_path(raw_path.strip())
+
+    if not isinstance(current_content, str):
+        raise CodexPatchParseError(
+            "Update File parsing requires current file content as a string"
+        )
+
+    return target_path, _update_hunks_introduced(
+        body_lines[op_index + 1:], current_content, target_path)
 
 
 def operation_kind(command: Any) -> str:
@@ -311,3 +319,124 @@ def parse_pretooluse_payload(payload: Any, current_content: Any = None) -> Tuple
             )
         return parse_update_file(command, current_content)
     return parse_patch(command)
+
+
+# ── multi-operation support (M1f-c) ──────────────────────────────────────────
+
+ADD_KIND = "*** Add File"
+UPDATE_KIND = "*** Update File"
+
+
+@dataclass(frozen=True)
+class PatchOperation:
+    """One fully parsed operation from an apply_patch proposal.
+
+    ``introduced_content`` is ``None`` only when the caller explicitly marked
+    the snapshot unavailable (value ``None``): the operation is then
+    *unevaluated*, which the gate must disclose -- distinct from a grammar
+    failure, which makes the whole proposal unevaluable.
+    """
+
+    kind: str  # "add" | "update"
+    target_path: str
+    introduced_content: str | None
+
+
+def _operation_segments(body_lines: list) -> list:
+    """Split body into ``(header_line, content_lines)`` per operation.
+
+    The only delimiter between operations is the next operation header
+    (frozen M1f-b contract); hunk content never starts with ``*** ``.
+    """
+    header_indexes = [
+        i for i, line in enumerate(body_lines)
+        if line.startswith(OPERATION_PREFIX)
+    ]
+    if not header_indexes:
+        raise CodexPatchParseError("patch contains no operation")
+    segments = []
+    for n, start in enumerate(header_indexes):
+        end = header_indexes[n + 1] if n + 1 < len(header_indexes) else len(body_lines)
+        segments.append((body_lines[start], body_lines[start + 1:end]))
+    return segments
+
+
+def patch_operation_specs(command: Any) -> list:
+    """Return ``[(kind, raw_path)]`` in source order, paths validated.
+
+    ``kind`` is ``"add"`` or ``"update"``. Any unknown or malformed operation
+    raises: a proposal that cannot be fully parsed is unevaluable as a whole.
+    """
+    _validate_envelope(command)
+    specs = []
+    for header, _content in _operation_segments(_body_lines(command)):
+        header, sep, raw_path = header.partition(":")
+        kind = header.strip()
+        if not sep:
+            raise CodexPatchParseError(f"malformed operation header: {header!r}")
+        path = raw_path.strip()
+        if kind == ADD_KIND:
+            _check_path(path)
+            specs.append(("add", path))
+        elif kind == UPDATE_KIND:
+            _check_update_path(path)
+            specs.append(("update", path))
+        else:
+            raise CodexPatchParseError(
+                f"unsupported patch operation {kind!r}; supported operations "
+                "are '*** Add File:' and '*** Update File:'"
+            )
+    return specs
+
+
+def parse_patch_operations(command: Any,
+                           snapshots: Any = None) -> List[PatchOperation]:
+    """Parse every operation of an apply_patch proposal, in source order.
+
+    ``snapshots`` maps each Update File's *raw written path* to its current
+    file content (any EOL style). Every operation must be parseable -- there
+    is no partial parse: one malformed or unsupported operation makes the
+    whole proposal unevaluable. Pure: all snapshots arrive via arguments.
+    """
+    _validate_envelope(command)
+    snapshots = snapshots if isinstance(snapshots, dict) else {}
+    operations: list[PatchOperation] = []
+    for header, content in _operation_segments(_body_lines(command)):
+        header, sep, raw_path = header.partition(":")
+        kind = header.strip()
+        path = raw_path.strip()
+        if not sep:
+            raise CodexPatchParseError(f"malformed operation header: {header!r}")
+
+        if kind == ADD_KIND:
+            target = _check_path(path)
+            introduced_lines = []
+            for line in content:
+                if not line.startswith("+"):
+                    raise CodexPatchParseError(
+                        f"malformed Add File body line "
+                        f"(expected leading '+'): {line!r}"
+                    )
+                introduced_lines.append(line[1:])
+            operations.append(PatchOperation(
+                "add", target, "".join(l + "\n" for l in introduced_lines)))
+        elif kind == UPDATE_KIND:
+            target = _check_update_path(path)
+            if path in snapshots and snapshots[path] is None:
+                # Explicitly marked unavailable: unevaluated, not malformed.
+                operations.append(PatchOperation("update", target, None))
+                continue
+            snapshot = snapshots.get(path)
+            if not isinstance(snapshot, str):
+                raise CodexPatchParseError(
+                    f"Update File '{path}' requires a current-file snapshot"
+                )
+            operations.append(PatchOperation(
+                "update", target,
+                _update_hunks_introduced(content, snapshot, target)))
+        else:
+            raise CodexPatchParseError(
+                f"unsupported patch operation {kind!r}; supported operations "
+                "are '*** Add File:' and '*** Update File:'"
+            )
+    return operations
