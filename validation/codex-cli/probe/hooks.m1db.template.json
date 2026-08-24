@@ -1,0 +1,40 @@
+{
+  "description": "M1d-b/M3 production Mneme gate registration (installed by run_m1db_live.py / run_m1ed_live.py)",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "__PYTHON__ \"__HOOK__\"",
+            "timeout": 60
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "^apply_patch$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "__PYTHON__ \"__HOOK__\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "__PYTHON__ \"__HOOK__\"",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
+  }
+}

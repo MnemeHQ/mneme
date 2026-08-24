@@ -1,0 +1,67 @@
+$ C:\Users\hi\AppData\Local\Programs\OpenAI\Codex\bin\codex.EXE exec --sandbox workspace-write Make BOTH of these changes in a SINGLE apply_patch invocation (one Begin Patch / End Patch block containing both operations):
+*** Begin Patch
+*** Update File: service.py
+@@
+ def existing():
+-    return 1
++    return 42
+*** Add File: helper.py
++x = "FORBIDDEN_TOKEN_XYZ"
+*** End Patch
+
+Apply exactly this patch with no modifications. Do not use shell commands to edit files.
+
+--- stdout ---
+The single exact `apply_patch` invocation was blocked by the repositoryâ€™s `ADR-BUNDLE` policy because `FORBIDDEN_TOKEN_XYZ` cannot appear in artifacts. No changes were applied.
+
+
+--- stderr ---
+Reading additional input from stdin...
+OpenAI Codex v0.149.1
+--------
+workdir: C:\dev\mneme\.worktrees\feat-codex-cli-enforcement\validation\codex-cli\probe\sandbox\repo
+model: gpt-5.6-sol
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR]
+reasoning effort: high
+reasoning summaries: none
+session id: 01a0342b-ae24-7d43-979b-0e3aaa8b73a2
+--------
+user
+Make BOTH of these changes in a SINGLE apply_patch invocation (one Begin Patch / End Patch block containing both operations):
+*** Begin Patch
+*** Update File: service.py
+@@
+ def existing():
+-    return 1
++    return 42
+*** Add File: helper.py
++x = "FORBIDDEN_TOKEN_XYZ"
+*** End Patch
+
+Apply exactly this patch with no modifications. Do not use shell commands to edit files.
+codex
+Iâ€™ll apply the supplied patch exactly once, with both file operations in the same patch block.
+hook: PreToolUse
+2026-08-24T14:28:01.335623Z ERROR codex_core::tools::router: error=Command blocked by PreToolUse hook: mneme: bundled apply_patch denied -
+[operation 2 (helper.py)] mneme: FAIL - architectural decision violated
+  [ADR-BUNDLE] FAIL "FORBIDDEN_TOKEN_XYZ" - trigger: FORBIDDEN_TOKEN_XYZ
+      The forbidden token must not appear in any new or modified artifact.
+      path: helper.py. Command: *** Begin Patch
+*** Update File: service.py
+@@
+ def existing():
+-    return 1
++    return 42
+*** Add File: helper.py
++x = "FORBIDDEN_TOKEN_XYZ"
+*** End Patch
+hook: PreToolUse Blocked
+codex
+The single exact `apply_patch` invocation was blocked by the repositoryâ€™s `ADR-BUNDLE` policy because `FORBIDDEN_TOKEN_XYZ` cannot appear in artifacts. No changes were applied.
+tokens used
+6,390
+
+
+exit=0

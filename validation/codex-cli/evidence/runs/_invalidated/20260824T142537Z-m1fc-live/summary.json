@@ -1,0 +1,54 @@
+{
+  "pin_verified": true,
+  "bypass_flag_used": false,
+  "cases": {
+    "case1_compliant_both": {
+      "returncode": 0,
+      "seed_changed": false,
+      "helper_added": false,
+      "blocked": false,
+      "hook_lines": [
+        "hook: PreToolUse",
+        "hook: PreToolUse Completed"
+      ],
+      "expected": {
+        "seed_changed": true,
+        "helper_added": true,
+        "blocked": false
+      },
+      "verdict": "FAIL"
+    },
+    "case2_bad_update": {
+      "returncode": 0,
+      "seed_changed": false,
+      "helper_added": false,
+      "blocked": false,
+      "hook_lines": [
+        "hook: PreToolUse",
+        "hook: PreToolUse Completed"
+      ],
+      "expected": {
+        "seed_changed": false,
+        "helper_added": false,
+        "blocked": true
+      },
+      "verdict": "FAIL"
+    },
+    "case3_bad_add": {
+      "returncode": 0,
+      "seed_changed": false,
+      "helper_added": false,
+      "blocked": false,
+      "hook_lines": [
+        "hook: PreToolUse",
+        "hook: PreToolUse Completed"
+      ],
+      "expected": {
+        "seed_changed": false,
+        "helper_added": false,
+        "blocked": true
+      },
+      "verdict": "FAIL"
+    }
+  }
+}

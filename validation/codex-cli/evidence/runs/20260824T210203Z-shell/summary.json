@@ -1,0 +1,84 @@
+{
+  "pin_note": "binary pinned via pinned-build.json (SHA-256)",
+  "deny_effective_per_scenario": {
+    "redirect": true,
+    "setcontent": true,
+    "script_driven": true,
+    "multi_file_shell": true
+  },
+  "results": {
+    "redirect/allow": {
+      "files_landed": [
+        "redirect.txt"
+      ],
+      "bash_pretooluse_captured": true,
+      "bash_command": "Write-Output 'HELLO_REDIRECT' > .\\redirect.txt\nGet-Content -LiteralPath .\\redirect.txt -Raw",
+      "posttooluse_seen": true,
+      "stop_seen": true,
+      "worktree_status": "? redirect.txt"
+    },
+    "redirect/deny": {
+      "files_landed": [],
+      "bash_pretooluse_captured": true,
+      "bash_command": "Write-Output -NoEnumerate 'HELLO_REDIRECT' > .\\redirect.txt; Get-Content -Raw .\\redirect.txt",
+      "posttooluse_seen": false,
+      "stop_seen": true,
+      "worktree_status": ""
+    },
+    "setcontent/allow": {
+      "files_landed": [
+        "setcontent.txt"
+      ],
+      "bash_pretooluse_captured": true,
+      "bash_command": "Set-Content -LiteralPath 'setcontent.txt' -Value 'HELLO_SETCONTENT' -NoNewline; Get-Content -Raw -LiteralPath 'setcontent.txt'",
+      "posttooluse_seen": true,
+      "stop_seen": true,
+      "worktree_status": "? setcontent.txt"
+    },
+    "setcontent/deny": {
+      "files_landed": [],
+      "bash_pretooluse_captured": true,
+      "bash_command": "Set-Content -LiteralPath '.\\setcontent.txt' -Value 'HELLO_SETCONTENT'; Get-Content -Raw -LiteralPath '.\\setcontent.txt'",
+      "posttooluse_seen": false,
+      "stop_seen": true,
+      "worktree_status": ""
+    },
+    "script_driven/allow": {
+      "files_landed": [
+        "generated.txt"
+      ],
+      "bash_pretooluse_captured": true,
+      "bash_command": "python -c \"open('generated.txt','w').write('GENERATED_BY_PYTHON')\"",
+      "posttooluse_seen": true,
+      "stop_seen": true,
+      "worktree_status": "? generated.txt"
+    },
+    "script_driven/deny": {
+      "files_landed": [],
+      "bash_pretooluse_captured": true,
+      "bash_command": "python -c \"open('generated.txt','w').write('GENERATED_BY_PYTHON')\"; Get-Content -Raw -LiteralPath generated.txt",
+      "posttooluse_seen": false,
+      "stop_seen": true,
+      "worktree_status": ""
+    },
+    "multi_file_shell/allow": {
+      "files_landed": [
+        "multi1.txt",
+        "multi2.txt"
+      ],
+      "bash_pretooluse_captured": true,
+      "bash_command": "Set-Content -LiteralPath 'multi1.txt' -Value 'MULTI_ONE' -NoNewline; Set-Content -LiteralPath 'multi2.txt' -Value 'MULTI_TWO' -NoNewline",
+      "posttooluse_seen": true,
+      "stop_seen": true,
+      "worktree_status": "? multi1.txt\n? multi2.txt"
+    },
+    "multi_file_shell/deny": {
+      "files_landed": [],
+      "bash_pretooluse_captured": true,
+      "bash_command": "Set-Content -LiteralPath 'multi1.txt' -Value 'MULTI_ONE' -NoNewline; Set-Content -LiteralPath 'multi2.txt' -Value 'MULTI_TWO' -NoNewline",
+      "posttooluse_seen": false,
+      "stop_seen": true,
+      "worktree_status": ""
+    }
+  }
+}

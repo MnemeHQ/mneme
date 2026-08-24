@@ -1,0 +1,47 @@
+$ C:\Users\hi\AppData\Local\Programs\OpenAI\Codex\bin\codex.EXE exec --sandbox workspace-write Use apply_patch to create a new file named probe_target.py in the repo root containing exactly these lines and nothing else:
+
+forbidden = "FORBIDDEN_TOKEN_XYZ"
+
+Do not use shell commands to write files. Do not modify any other file.
+
+--- stdout ---
+Blocked: the repositoryâ€™s enforcement hook rejected creation because the requested token is forbidden in new artifacts. No files were modified.
+
+
+--- stderr ---
+Reading additional input from stdin...
+OpenAI Codex v0.149.1
+--------
+workdir: C:\dev\mneme\.worktrees\feat-codex-cli-enforcement\validation\codex-cli\probe\sandbox\repo
+model: gpt-5.6-terra
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR]
+reasoning effort: medium
+reasoning summaries: none
+session id: 01a03381-2ab6-7ae1-8ac6-6b7cff0c290d
+--------
+user
+Use apply_patch to create a new file named probe_target.py in the repo root containing exactly these lines and nothing else:
+
+forbidden = "FORBIDDEN_TOKEN_XYZ"
+
+Do not use shell commands to write files. Do not modify any other file.
+codex
+Iâ€™ll create only `probe_target.py` with the requested single line using a patch.
+hook: PreToolUse
+2026-08-24T11:21:46.036762Z ERROR codex_core::tools::router: error=Command blocked by PreToolUse hook: mneme: FAIL - architectural decision violated
+  [ADR-LIVE] FAIL "FORBIDDEN_TOKEN_XYZ" - trigger: FORBIDDEN_TOKEN_XYZ
+      The forbidden token must not appear in new artifacts.
+      path: probe_target.py. Command: *** Begin Patch
+*** Add File: probe_target.py
++forbidden = "FORBIDDEN_TOKEN_XYZ"
+*** End Patch
+hook: PreToolUse Blocked
+codex
+Blocked: the repositoryâ€™s enforcement hook rejected creation because the requested token is forbidden in new artifacts. No files were modified.
+tokens used
+9,597
+
+
+exit=0

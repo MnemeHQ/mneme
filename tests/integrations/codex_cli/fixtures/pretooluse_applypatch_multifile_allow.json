@@ -1,0 +1,14 @@
+{
+  "session_id": "NORMALIZED_SESSION_ID",
+  "turn_id": "NORMALIZED_TURN_ID",
+  "transcript_path": "NORMALIZED_TRANSCRIPT_PATH",
+  "cwd": "C:\\codex-probe-sandbox",
+  "hook_event_name": "PreToolUse",
+  "model": "gpt-5.6-sol",
+  "permission_mode": "bypassPermissions",
+  "tool_name": "apply_patch",
+  "tool_input": {
+    "command": "*** Begin Patch\n*** Update File: service.py\n@@\n def existing():\n-    return 1\n+    return 42\n*** Add File: helper.py\n+def assist():\n+    return 7\n*** End Patch"
+  },
+  "tool_use_id": "exec-NORMALIZED_TOOL_USE_ID"
+}

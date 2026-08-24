@@ -1,0 +1,57 @@
+{
+  "pin_verified": true,
+  "bypass_flag_used": false,
+  "preflight": {
+    "returncode": 0,
+    "denied": true,
+    "note": ""
+  },
+  "cases": {
+    "pass": {
+      "returncode": 0,
+      "mutation_landed": true,
+      "expectation": "lands",
+      "rollout_context_hits": {},
+      "verdict": "PASS"
+    },
+    "deny": {
+      "returncode": 0,
+      "mutation_landed": false,
+      "expectation": "unchanged",
+      "rollout_context_hits": {},
+      "verdict": "PASS"
+    },
+    "warn": {
+      "returncode": 0,
+      "mutation_landed": true,
+      "expectation": "lands",
+      "rollout_context_hits": {
+        "rollout-2026-08-24T06-25-51-01a03385-0657-7b70-b886-29954637668f.jsonl": {
+          "[mneme] WARN": [
+            "{\"timestamp\":\"2026-08-24T11:25:57.880Z\",\"ordinal\":13,\"type\":\"response_item\",\"payload\":{\"type\":\"message\",\"id\":\"msg_01a03385-20f8-7e21-a67c-67130c4914fe\",\"role\":\"developer\",\"content\":[{\"type\":\"input_text\",\"text\":\"[mneme] WARN - architectural decision flagged (warn mode; not blocked):\\nmneme: FAIL - architectural decision violated\\n  [ADR-LIVE] FAIL \\\"FORBIDDEN_TOKEN_XYZ\\\" - trigger: FORBIDDEN_TOKEN_XYZ\\n      The forbidden token must not appear in new artifacts.\\n      path: probe_target.py\"}],\"internal_chat_message_metadata_passthrough\":{\"turn_id\":\"01a03385-0782-7df3-8209-f68d5372ca1f\",\"create_time\":1787570757.8802211}}}"
+          ],
+          "[mneme]": [
+            "{\"timestamp\":\"2026-08-24T11:25:57.880Z\",\"ordinal\":13,\"type\":\"response_item\",\"payload\":{\"type\":\"message\",\"id\":\"msg_01a03385-20f8-7e21-a67c-67130c4914fe\",\"role\":\"developer\",\"content\":[{\"type\":\"input_text\",\"text\":\"[mneme] WARN - architectural decision flagged (warn mode; not blocked):\\nmneme: FAIL - architectural decision violated\\n  [ADR-LIVE] FAIL \\\"FORBIDDEN_TOKEN_XYZ\\\" - trigger: FORBIDDEN_TOKEN_XYZ\\n      The forbidden token must not appear in new artifacts.\\n      path: probe_target.py\"}],\"internal_chat_message_metadata_passthrough\":{\"turn_id\":\"01a03385-0782-7df3-8209-f68d5372ca1f\",\"create_time\":1787570757.8802211}}}"
+          ]
+        }
+      },
+      "verdict": "PASS"
+    },
+    "fail_open": {
+      "returncode": 0,
+      "mutation_landed": true,
+      "expectation": "lands",
+      "rollout_context_hits": {
+        "rollout-2026-08-24T06-26-03-01a03385-3565-72a2-8cc3-ed2ebdb96ac6.jsonl": {
+          "UNEVALUATED": [
+            "{\"timestamp\":\"2026-08-24T11:26:10.384Z\",\"ordinal\":15,\"type\":\"response_item\",\"payload\":{\"type\":\"message\",\"id\":\"msg_01a03385-51cf-7122-81ea-4e85d190b5aa\",\"role\":\"developer\",\"content\":[{\"type\":\"input_text\",\"text\":\"[mneme] UNEVALUATED - failing open, this mutation was NOT evaluated:\\nno parseable mneme.check/v1 verdict from mneme check (exit 1). Failing open.\"}],\"internal_chat_message_metadata_passthrough\":{\"turn_id\":\"01a03385-3666-7be3-8a75-8c260446b511\",\"create_time\":1787570770.3839707}}}"
+          ],
+          "[mneme]": [
+            "{\"timestamp\":\"2026-08-24T11:26:10.384Z\",\"ordinal\":15,\"type\":\"response_item\",\"payload\":{\"type\":\"message\",\"id\":\"msg_01a03385-51cf-7122-81ea-4e85d190b5aa\",\"role\":\"developer\",\"content\":[{\"type\":\"input_text\",\"text\":\"[mneme] UNEVALUATED - failing open, this mutation was NOT evaluated:\\nno parseable mneme.check/v1 verdict from mneme check (exit 1). Failing open.\"}],\"internal_chat_message_metadata_passthrough\":{\"turn_id\":\"01a03385-3666-7be3-8a75-8c260446b511\",\"create_time\":1787570770.3839707}}}"
+          ]
+        }
+      },
+      "verdict": "PASS"
+    }
+  }
+}

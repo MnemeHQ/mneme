@@ -1,0 +1,2 @@
+{"seq": 0, "file": "0000-PreToolUse-Bash-20260824T210237.json", "hook_event_name": "PreToolUse", "tool_name": "Bash", "sha256": "14b25767e43da175338ed749940f13c7c66ef6fe4210093d527082086eaaa82f", "captured_utc": "20260824T210237"}
+{"seq": 1, "file": "0001-Stop-20260824T210245.json", "hook_event_name": "Stop", "tool_name": "", "sha256": "77a6a8ec28472ea9fd0441a73f9b84e3107acbc912c657e8a868d323b88db1f6", "captured_utc": "20260824T210245"}

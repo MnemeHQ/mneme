@@ -1,0 +1,19 @@
+{
+  "purpose": "Concrete binary pin for the R0 Codex CLI capability probe. 'Pin' means this experiment is tied to this exact binary, not to a version string or dist-tag.",
+  "pinned_utc": "2026-08-23T13:30:00Z",
+  "codex_version": "codex-cli 0.149.1",
+  "install_method": "official standalone Windows installer (irm https://chatgpt.com/codex/install.ps1 | iex); downloads from releases.openai.com",
+  "executable_path": "C:\\Users\\hi\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin\\codex.exe",
+  "executable_sha256": "A395030B56B126F608F2403036DDDB654A9C063213E9C2B5F85D954CF490EBE6",
+  "companion_binaries": {
+    "codex-code-mode-host.exe": {
+      "path": "C:\\Users\\hi\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin\\codex-code-mode-host.exe",
+      "sha256": "8F98CC7AA079B51DBFBB16A8E655A468A9C37C1CD23E22422C10CDFD6CACE543"
+    }
+  },
+  "platform": "Windows 11 x64, PowerShell 5.1.26100.9168",
+  "notes": [
+    "First install attempt was interrupted mid-download (empty bin/); second run completed successfully and reported 'Updating Codex CLI' over the partial state.",
+    "If the binary on disk stops matching executable_sha256 (e.g. auto-update), the pin is broken and the matrix must be re-run under the new binary."
+  ]
+}

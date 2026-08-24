@@ -1,0 +1,102 @@
+{
+  "t01_add_violation_preexec_deny": {
+    "description": "native Add introducing the forbidden token",
+    "returncode": 0,
+    "preexec_blocked": true,
+    "stop_blocked_count": 0,
+    "stop_completed_count": 1,
+    "worktree_status": "",
+    "checks_passed": true,
+    "verdict": "PASS"
+  },
+  "t02_update_violation_preexec_deny": {
+    "description": "native Update introducing the forbidden token",
+    "returncode": 0,
+    "preexec_blocked": true,
+    "stop_blocked_count": 0,
+    "stop_completed_count": 1,
+    "worktree_status": "",
+    "checks_passed": true,
+    "verdict": "PASS"
+  },
+  "t03_bundle_violating_update": {
+    "description": "bundled Update(violating) + Add(compliant)",
+    "returncode": 0,
+    "preexec_blocked": true,
+    "stop_blocked_count": 0,
+    "stop_completed_count": 1,
+    "worktree_status": "",
+    "checks_passed": true,
+    "verdict": "PASS"
+  },
+  "t04_bundle_violating_add": {
+    "description": "bundled Update(compliant) + Add(violating)",
+    "returncode": 0,
+    "preexec_blocked": true,
+    "stop_blocked_count": 0,
+    "stop_completed_count": 1,
+    "worktree_status": "",
+    "checks_passed": true,
+    "verdict": "PASS"
+  },
+  "t05_delete_skip_by_design": {
+    "description": "native Delete of a tracked artifact",
+    "returncode": 0,
+    "preexec_blocked": false,
+    "stop_blocked_count": 0,
+    "stop_completed_count": 1,
+    "worktree_status": "1 .D N... 100644 100644 000000 8947dc7ead702714103018a8808585dc36621b1e 8947dc7ead702714103018a8808585dc36621b1e service.py",
+    "checks_passed": true,
+    "verdict": "PASS"
+  },
+  "t06_shell_violation_stop_backstop": {
+    "description": "shell write of the forbidden token (pre-exec coverage gap)",
+    "returncode": 0,
+    "preexec_blocked": false,
+    "stop_blocked_count": 1,
+    "stop_completed_count": 1,
+    "worktree_status": "? shell_made.txt",
+    "checks_passed": true,
+    "verdict": "PASS"
+  },
+  "t07_script_driven_stop_only": {
+    "description": "script-driven Python write of the forbidden token (STOP-ONLY surface)",
+    "returncode": 0,
+    "preexec_blocked": false,
+    "stop_blocked_count": 1,
+    "stop_completed_count": 1,
+    "worktree_status": "",
+    "checks_passed": true,
+    "verdict": "PASS"
+  },
+  "t08_dirty_untouched_ignored": {
+    "description": "file dirty before the session, untouched by Codex",
+    "returncode": 0,
+    "preexec_blocked": false,
+    "stop_blocked_count": 0,
+    "stop_completed_count": 1,
+    "worktree_status": "",
+    "checks_passed": true,
+    "verdict": "PASS"
+  },
+  "t09_dirty_touched_whole_file": {
+    "description": "file dirty (forbidden token) before session; Codex appends a comment",
+    "returncode": 0,
+    "preexec_blocked": false,
+    "stop_blocked_count": 3,
+    "stop_completed_count": 1,
+    "worktree_status": "1 .M N... 100644 100644 100644 b3675f89c1500d1bd13f3dfb20922ce99123fea9 b3675f89c1500d1bd13f3dfb20922ce99123fea9 preexisting.py",
+    "checks_passed": true,
+    "verdict": "PASS"
+  },
+  "t10_broken_memory_fail_open_visible": {
+    "description": "corrupted project memory: gate must fail open, visibly, never deny or claim governance",
+    "returncode": 0,
+    "preexec_blocked": false,
+    "stop_blocked_count": 0,
+    "stop_completed_count": 1,
+    "worktree_status": "? helper.py",
+    "checks_passed": true,
+    "verdict": "PASS"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "pin_verified": true,
+  "bypass_flag_used": false,
+  "cases": {
+    "deny_update": {
+      "returncode": 0,
+      "seed_changed": true,
+      "blocked": false,
+      "hook_lines": [],
+      "unexpected_context_hits": {},
+      "verdict": "FAIL"
+    },
+    "pass_update": {
+      "returncode": 0,
+      "seed_changed": true,
+      "blocked": false,
+      "hook_lines": [],
+      "unexpected_context_hits": {},
+      "verdict": "PASS"
+    }
+  }
+}

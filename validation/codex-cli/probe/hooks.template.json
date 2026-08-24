@@ -1,0 +1,40 @@
+{
+  "description": "R0 capability probe hooks (installed into sandbox repo by run_applypatch_probe.py)",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "__PYTHON__ \"__HOOK__\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "__PYTHON__ \"__HOOK__\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "__PYTHON__ \"__HOOK__\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

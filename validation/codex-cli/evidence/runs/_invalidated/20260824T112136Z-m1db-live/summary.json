@@ -1,0 +1,39 @@
+{
+  "pin_verified": true,
+  "bypass_flag_used": false,
+  "preflight": {
+    "returncode": 0,
+    "denied": true,
+    "note": ""
+  },
+  "cases": {
+    "pass": {
+      "returncode": 0,
+      "mutation_landed": true,
+      "expectation": "lands",
+      "rollout_context_hits": {},
+      "verdict": "PASS"
+    },
+    "deny": {
+      "returncode": 0,
+      "mutation_landed": true,
+      "expectation": "unchanged",
+      "rollout_context_hits": {},
+      "verdict": "FAIL"
+    },
+    "warn": {
+      "returncode": 0,
+      "mutation_landed": true,
+      "expectation": "lands",
+      "rollout_context_hits": {},
+      "verdict": "CHECK"
+    },
+    "fail_open": {
+      "returncode": 0,
+      "mutation_landed": true,
+      "expectation": "lands",
+      "rollout_context_hits": {},
+      "verdict": "CHECK"
+    }
+  }
+}

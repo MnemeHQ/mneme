@@ -1,0 +1,19 @@
+{
+  "probe": "updatefile",
+  "arms": [
+    {
+      "arm": "allow",
+      "returncode": null,
+      "seed_changed": true,
+      "worktree_status": "1 .M N... 100644 100644 100644 c6d6f81e16a2b0a8486f83efde1260eb95d266a9 c6d6f81e16a2b0a8486f83efde1260eb95d266a9 service.py"
+    },
+    {
+      "arm": "deny",
+      "returncode": null,
+      "seed_changed": false,
+      "worktree_status": ""
+    }
+  ],
+  "fact_deny_byte_identical": true,
+  "next": "manual analysis: exact PreToolUse payload, Update File grammar, deterministic reconstruction vs post-allow bytes"
+}

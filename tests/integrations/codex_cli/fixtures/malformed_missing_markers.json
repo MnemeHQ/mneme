@@ -1,0 +1,14 @@
+{
+  "session_id": "NORMALIZED_SESSION_ID",
+  "turn_id": "NORMALIZED_TURN_ID",
+  "transcript_path": "NORMALIZED_TRANSCRIPT_PATH",
+  "cwd": "NORMALIZED_CWD",
+  "hook_event_name": "PreToolUse",
+  "model": "gpt-5.6-terra",
+  "permission_mode": "bypassPermissions",
+  "tool_name": "apply_patch",
+  "tool_input": {
+    "command": "def probe_marker() -> int:\n    return 42\n"
+  },
+  "tool_use_id": "exec-NORMALIZED_TOOL_USE_ID"
+}

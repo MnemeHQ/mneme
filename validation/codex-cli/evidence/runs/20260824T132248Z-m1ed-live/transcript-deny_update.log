@@ -1,0 +1,41 @@
+$ C:\Users\hi\AppData\Local\Programs\OpenAI\Codex\bin\codex.EXE exec --sandbox workspace-write Use apply_patch to modify service.py in the repo root: change the line '    return 1' to '    return "FORBIDDEN_TOKEN_XYZ"'. Change nothing else. Do not use shell commands to edit files.
+
+--- stdout ---
+The requested edit was blocked by the repositoryâ€™s enforcement hook: `FORBIDDEN_TOKEN_XYZ` is prohibited in new artifacts. `service.py` was not changed.
+
+
+--- stderr ---
+Reading additional input from stdin...
+OpenAI Codex v0.149.1
+--------
+workdir: C:\dev\mneme\.worktrees\feat-codex-cli-enforcement\validation\codex-cli\probe\sandbox\repo
+model: gpt-5.6-sol
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR]
+reasoning effort: high
+reasoning summaries: none
+session id: 01a033f0-1f06-72c1-b0f5-b3de7f77b962
+--------
+user
+Use apply_patch to modify service.py in the repo root: change the line '    return 1' to '    return "FORBIDDEN_TOKEN_XYZ"'. Change nothing else. Do not use shell commands to edit files.
+codex
+Iâ€™ll make exactly that one-line replacement in `service.py`.
+hook: PreToolUse
+2026-08-24T13:22:56.892801Z ERROR codex_core::tools::router: error=Command blocked by PreToolUse hook: mneme: FAIL - architectural decision violated
+  [ADR-LIVE] FAIL "FORBIDDEN_TOKEN_XYZ" - trigger: FORBIDDEN_TOKEN_XYZ
+      The forbidden token must not appear in new artifacts.
+      path: service.py. Command: *** Begin Patch
+*** Update File: service.py
+@@
+-    return 1
++    return "FORBIDDEN_TOKEN_XYZ"
+*** End Patch
+hook: PreToolUse Blocked
+codex
+The requested edit was blocked by the repositoryâ€™s enforcement hook: `FORBIDDEN_TOKEN_XYZ` is prohibited in new artifacts. `service.py` was not changed.
+tokens used
+10,319
+
+
+exit=0

@@ -1,0 +1,3 @@
+{"seq": 0, "file": "0000-PreToolUse-apply_patch-20260824T202806.json", "hook_event_name": "PreToolUse", "tool_name": "apply_patch", "sha256": "58ad629b433ce7dba257373d6a22ad895756bec3f475711c57e9304ff6ca4b91", "captured_utc": "20260824T202806"}
+{"seq": 1, "file": "0001-PostToolUse-apply_patch-20260824T202811.json", "hook_event_name": "PostToolUse", "tool_name": "apply_patch", "sha256": "6408f686ce35379e7cbcbef792069016bca01013fe9f14d5989e019e8045a158", "captured_utc": "20260824T202811"}
+{"seq": 2, "file": "0002-Stop-20260824T202814.json", "hook_event_name": "Stop", "tool_name": "", "sha256": "94815843f24886d4a5c0052866ccd65cae1d0dd2b0bab82e5d21974ed2a0d40e", "captured_utc": "20260824T202814"}

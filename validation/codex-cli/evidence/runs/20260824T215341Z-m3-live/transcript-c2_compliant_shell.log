@@ -1,0 +1,54 @@
+$ C:\Users\hi\AppData\Local\Programs\OpenAI\Codex\bin\codex.EXE exec --sandbox workspace-write Using a shell command (do NOT use apply_patch), create a file named shell_clean.txt containing exactly CLEAN_AND_FINE.
+
+--- stdout ---
+Created [shell_clean.txt](C:\dev\mneme\.worktrees\feat-codex-cli-enforcement\validation\codex-cli\probe\sandbox\repo\shell_clean.txt) containing exactly `CLEAN_AND_FINE`.
+
+
+--- stderr ---
+Reading additional input from stdin...
+OpenAI Codex v0.149.1
+--------
+workdir: C:\dev\mneme\.worktrees\feat-codex-cli-enforcement\validation\codex-cli\probe\sandbox\repo
+model: gpt-5.6-sol
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR]
+reasoning effort: high
+reasoning summaries: none
+session id: 01a035c4-65d9-70c2-82ad-a4203c6b427c
+--------
+user
+Using a shell command (do NOT use apply_patch), create a file named shell_clean.txt containing exactly CLEAN_AND_FINE.
+hook: SessionStart
+hook: SessionStart Completed
+codex
+I’ll create the file with a shell command, then verify its exact bytes.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command "Set-Content -LiteralPath 'shell_clean.txt' -Value 'CLEAN_AND_FINE' -NoNewline -Encoding ascii; "'$bytes = [System.IO.File]::ReadAllBytes((Resolve-Path -LiteralPath '"'shell_clean.txt')); [Convert]::ToHexString("'$bytes)' in C:\dev\mneme\.worktrees\feat-codex-cli-enforcement\validation\codex-cli\probe\sandbox\repo
+ exited 1 in 390ms:
+Method invocation failed because [System.Convert] does not contain a method named 'ToHexString'.
+At line:2 char:184
++ ... Path -LiteralPath 'shell_clean.txt')); [Convert]::ToHexString($bytes)
++                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (:) [], RuntimeException
+    + FullyQualifiedErrorId : MethodNotFound
+ 
+
+codex
+The write succeeded; the installed PowerShell lacks the newer hex helper, so I’m verifying with its compatible byte formatter.
+exec
+"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command '$bytes = [System.IO.File]::ReadAllBytes((Resolve-Path -LiteralPath '"'shell_clean.txt')); [BitConverter]::ToString("'$bytes); [System.Text.Encoding]::ASCII.GetString($bytes); "Length=$($bytes.Length)"' in C:\dev\mneme\.worktrees\feat-codex-cli-enforcement\validation\codex-cli\probe\sandbox\repo
+ succeeded in 309ms:
+43-4C-45-41-4E-5F-41-4E-44-5F-46-49-4E-45
+CLEAN_AND_FINE
+Length=14
+
+codex
+Created [shell_clean.txt](C:\dev\mneme\.worktrees\feat-codex-cli-enforcement\validation\codex-cli\probe\sandbox\repo\shell_clean.txt) containing exactly `CLEAN_AND_FINE`.
+hook: Stop
+hook: Stop Completed
+tokens used
+10,431
+
+
+exit=0
