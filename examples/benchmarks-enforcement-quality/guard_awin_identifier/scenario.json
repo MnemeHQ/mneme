@@ -1,0 +1,9 @@
+{
+  "name": "guard_awin_identifier",
+  "category": "enforcement_quality",
+  "description": "Baseline carries the underscore identifier form of the awin rule; Mneme must FAIL it (separator-equivalent phrase match).",
+  "scenario_type": "violation",
+  "expected_failure_terms": ["assume_awin_awin_us_same_source"],
+  "expected_protected_decision_ids": ["awin-001"],
+  "expected_exposed_decision_ids": ["awin-001"]
+}

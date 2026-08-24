@@ -1,0 +1,9 @@
+{
+  "name": "guard_foo_and_bar_compound",
+  "category": "enforcement_quality",
+  "description": "Baseline enables foo_and_bar (underscore form of the internal-stopword rule); Mneme must FAIL it.",
+  "scenario_type": "violation",
+  "expected_failure_terms": ["foo and bar"],
+  "expected_protected_decision_ids": ["fb-001"],
+  "expected_exposed_decision_ids": ["fb-001"]
+}

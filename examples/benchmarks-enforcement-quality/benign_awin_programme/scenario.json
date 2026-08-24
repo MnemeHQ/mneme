@@ -1,0 +1,7 @@
+{
+  "name": "benign_awin_programme",
+  "category": "benign_control",
+  "description": "#317 regression: benign planning prose mentioning awin must not FAIL against the assume_awin_* rule.",
+  "scenario_type": "benign",
+  "expected_exposed_decision_ids": ["awin-001"]
+}

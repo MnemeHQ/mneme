@@ -1,0 +1,7 @@
+{
+  "name": "benign_governance_docs",
+  "category": "benign_control",
+  "description": "Benign governance documentation containing isolated trigger vocabulary (changes) must not FAIL.",
+  "scenario_type": "benign",
+  "expected_exposed_decision_ids": ["gov-001"]
+}

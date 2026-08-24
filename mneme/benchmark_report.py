@@ -43,21 +43,40 @@ class BenchmarkSummary:
     irrelevant_injection_rate: float = 0.0
     layer1_scored_count: int = 0
     k: int = DEFAULT_MAX_DECISIONS
+    # Enforcement-quality partition (charter 2026-08-24). Legacy fields above
+    # aggregate violation scenarios only; benign controls report separately so
+    # a combined "violations caught" number can never render.
+    benign_total: int = 0
+    benign_passed: int = 0
+    benign_blocked: int = 0
+    benign_uncheckable: int = 0
+    false_positive_rate: float = 0.0
 
 
 def compute_summary(results: list[ScenarioResult]) -> BenchmarkSummary:
-    """Compute aggregate statistics from a list of results."""
-    passed = sum(1 for r in results if r.verdict == ScenarioVerdict.PASS)
-    failed = sum(1 for r in results if r.verdict == ScenarioVerdict.FAIL)
-    weak = sum(1 for r in results if r.verdict == ScenarioVerdict.WEAK)
+    """Compute aggregate statistics from a list of results.
+
+    Violation-scenario metrics (passed / failed / weak / weak_retrieval /
+    pass_rate / by_category) aggregate violation scenarios only. Benign
+    controls are reported through the dedicated enforcement-quality fields so
+    the two partitions can never merge into one headline.
+    """
+    violation_results = [
+        r for r in results if r.scenario_type == "violation"
+    ]
+    benign_results = [r for r in results if r.scenario_type == "benign"]
+
+    passed = sum(1 for r in violation_results if r.verdict == ScenarioVerdict.PASS)
+    failed = sum(1 for r in violation_results if r.verdict == ScenarioVerdict.FAIL)
+    weak = sum(1 for r in violation_results if r.verdict == ScenarioVerdict.WEAK)
     weak_retrieval = sum(
-        1 for r in results if r.verdict == ScenarioVerdict.WEAK_RETRIEVAL
+        1 for r in violation_results if r.verdict == ScenarioVerdict.WEAK_RETRIEVAL
     )
     checkable = passed + failed
     pass_rate = round(passed / checkable, 2) if checkable > 0 else 0.0
 
     by_category: dict[str, dict[str, int]] = {}
-    for r in results:
+    for r in violation_results:
         cat = r.category
         if cat not in by_category:
             by_category[cat] = {"pass": 0, "fail": 0, "total": 0}
@@ -66,6 +85,22 @@ def compute_summary(results: list[ScenarioResult]) -> BenchmarkSummary:
             by_category[cat]["pass"] += 1
         elif r.verdict == ScenarioVerdict.FAIL:
             by_category[cat]["fail"] += 1
+
+    benign_total = len(benign_results)
+    benign_passed = sum(
+        1 for r in benign_results if r.verdict == ScenarioVerdict.PASS
+    )
+    benign_blocked = sum(
+        1 for r in benign_results if r.verdict == ScenarioVerdict.FALSE_POSITIVE
+    )
+    benign_uncheckable = sum(
+        1 for r in benign_results
+        if r.verdict in (ScenarioVerdict.MALFORMED, ScenarioVerdict.WEAK_RETRIEVAL)
+    )
+    benign_checkable = benign_passed + benign_blocked
+    false_positive_rate = (
+        round(benign_blocked / benign_checkable, 4) if benign_checkable > 0 else 0.0
+    )
 
     # Layer 1 aggregates: only scenarios that declare expected protected
     # decisions contribute. Vacuous-true (no expected) cases are excluded
@@ -98,6 +133,11 @@ def compute_summary(results: list[ScenarioResult]) -> BenchmarkSummary:
         irrelevant_injection_rate=round(injection_rate, 3),
         layer1_scored_count=len(governed),
         k=k,
+        benign_total=benign_total,
+        benign_passed=benign_passed,
+        benign_blocked=benign_blocked,
+        benign_uncheckable=benign_uncheckable,
+        false_positive_rate=false_positive_rate,
     )
 
 
@@ -137,6 +177,13 @@ def format_terminal(results: list[ScenarioResult]) -> str:
         )
     )
     lines.append(f"  Pass rate: {s.pass_rate:.0%}")
+    if s.benign_total:
+        lines.append(
+            f"  Benign controls: false positives {s.benign_blocked}/"
+            f"{s.benign_passed + s.benign_blocked} checkable "
+            f"(FPR {s.false_positive_rate:.0%}), "
+            f"uncheckable {s.benign_uncheckable}/{s.benign_total}"
+        )
     if s.layer1_scored_count:
         lines.append("")
         lines.append(
@@ -199,6 +246,14 @@ def format_markdown(results: list[ScenarioResult]) -> str:
             f"_{s.weak} WEAK (baseline too soft), "
             f"{s.weak_retrieval} WEAK_RETRIEVAL (retrieval missed target)._"
         )
+    if s.benign_total:
+        lines.append("")
+        lines.append(
+            f"**Benign controls** — false positives {s.benign_blocked} / "
+            f"checkable {s.benign_passed + s.benign_blocked} "
+            f"(FPR {s.false_positive_rate:.0%}), "
+            f"uncheckable {s.benign_uncheckable} of {s.benign_total}."
+        )
     if s.layer1_scored_count:
         lines.append("")
         lines.append(
@@ -226,8 +281,18 @@ def format_json(results: list[ScenarioResult]) -> str:
     (verdict, baseline_violation_count, enhanced_violation_count, ...) are
     preserved. Layer 1 and Layer 2 are also exposed under namespaced
     `layer1` / `layer2` objects per the v1.1 methodology.
+
+    Enforcement-quality extension (charter 2026-08-24): scenarios that
+    declare `scenario_type` opt in — those result entries gain
+    `scenario_type` / `exposure` keys, and the summary gains an
+    `enforcement_quality` object. Legacy-only runs emit none of these, so
+    canonical output is byte-identical.
     """
     s = compute_summary(results)
+    opted_in = any(
+        r.methodology_opt_in and r.verdict != ScenarioVerdict.MALFORMED
+        for r in results
+    )
     payload = {
         "summary": {
             "total": s.total,
@@ -252,34 +317,50 @@ def format_json(results: list[ScenarioResult]) -> str:
                 "pass_rate": s.pass_rate,
             },
         },
-        "results": [
-            {
-                "name": r.name,
+        "results": [],
+    }
+    if opted_in:
+        payload["summary"]["enforcement_quality"] = {
+            "violation_passed": s.passed,
+            "violation_checkable": s.passed + s.failed,
+            "benign_total": s.benign_total,
+            "benign_blocked": s.benign_blocked,
+            "benign_checkable": s.benign_passed + s.benign_blocked,
+            "false_positive_rate": s.false_positive_rate,
+            "benign_uncheckable": s.benign_uncheckable,
+        }
+    for r in results:
+        entry = {
+            "name": r.name,
+            "verdict": r.verdict.value,
+            "baseline_violation_count": r.baseline_violation_count,
+            "enhanced_violation_count": r.enhanced_violation_count,
+            "baseline_triggers": r.baseline_triggers,
+            "enhanced_triggers": r.enhanced_triggers,
+            "explanation": r.explanation,
+            "layer1": {
+                "k": r.layer1_k,
+                "retrieved_ids": r.layer1_retrieved_ids,
+                "expected_ids": r.layer1_expected_ids,
+                "acceptable_ids": r.layer1_acceptable_ids,
+                "recall_at_k": r.layer1_recall,
+                "precision_at_k": r.layer1_precision,
+                "irrelevant_injection": r.layer1_irrelevant_injection,
+            },
+            "layer2": {
                 "verdict": r.verdict.value,
                 "baseline_violation_count": r.baseline_violation_count,
                 "enhanced_violation_count": r.enhanced_violation_count,
                 "baseline_triggers": r.baseline_triggers,
                 "enhanced_triggers": r.enhanced_triggers,
-                "explanation": r.explanation,
-                "layer1": {
-                    "k": r.layer1_k,
-                    "retrieved_ids": r.layer1_retrieved_ids,
-                    "expected_ids": r.layer1_expected_ids,
-                    "acceptable_ids": r.layer1_acceptable_ids,
-                    "recall_at_k": r.layer1_recall,
-                    "precision_at_k": r.layer1_precision,
-                    "irrelevant_injection": r.layer1_irrelevant_injection,
-                },
-                "layer2": {
-                    "verdict": r.verdict.value,
-                    "baseline_violation_count": r.baseline_violation_count,
-                    "enhanced_violation_count": r.enhanced_violation_count,
-                    "baseline_triggers": r.baseline_triggers,
-                    "enhanced_triggers": r.enhanced_triggers,
-                    "protected_decision_ids_hit": r.protected_decision_ids_hit,
-                },
+                "protected_decision_ids_hit": r.protected_decision_ids_hit,
+            },
+        }
+        if r.methodology_opt_in and r.verdict != ScenarioVerdict.MALFORMED:
+            entry["scenario_type"] = r.scenario_type
+            entry["exposure"] = {
+                "expected_ids": r.expected_exposed_ids,
+                "in_scope": r.exposed_decision_ids_hit,
             }
-            for r in results
-        ],
-    }
+        payload["results"].append(entry)
     return json.dumps(payload, indent=2)

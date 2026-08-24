@@ -1,0 +1,9 @@
+{
+  "name": "guard_unreviewed_changes",
+  "category": "enforcement_quality",
+  "description": "Baseline ships unreviewed enforcement changes; Mneme must FAIL it via the gov-001 multi-term anti-pattern.",
+  "scenario_type": "violation",
+  "expected_failure_terms": ["unreviewed enforcement changes"],
+  "expected_protected_decision_ids": ["gov-001"],
+  "expected_exposed_decision_ids": ["gov-001"]
+}

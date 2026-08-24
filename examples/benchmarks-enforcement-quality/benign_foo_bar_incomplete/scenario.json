@@ -1,0 +1,7 @@
+{
+  "name": "benign_foo_bar_incomplete",
+  "category": "benign_control",
+  "description": "Same tokens without the internal stopword: foo bar must NOT satisfy the foo-and-bar phrase rule.",
+  "scenario_type": "benign",
+  "expected_exposed_decision_ids": ["fb-001"]
+}

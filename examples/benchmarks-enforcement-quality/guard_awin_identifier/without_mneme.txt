@@ -1,0 +1,1 @@
+Integration assumes assume_awin_awin_us_same_source mapping across markets.
