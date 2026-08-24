@@ -1,0 +1,17 @@
+{
+  "description": "M1d-b production Mneme gate registration (installed by run_m1db_live.py)",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^apply_patch$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "__PYTHON__ \"__HOOK__\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
