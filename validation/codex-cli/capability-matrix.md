@@ -19,16 +19,25 @@ Columns:
 
 | # | Mutation surface | Hook fired | Payload captured | Path reconstructable | Content reconstructable | Deny effective | Stop observable | Verdict | Evidence |
 |---|------------------|------------|------------------|----------------------|-------------------------|----------------|-----------------|---------|----------|
-| 1 | native `apply_patch` (single file, tracked) | YES — PreToolUse fired, trusted/no-bypass | YES — byte-exact, sha256-indexed | YES — `*** Add File: <path>` header | YES — `+` lines = introduced content | YES — worktree byte-identical after deny; no PostToolUse | YES — Stop fired both arms, `stop_hook_active:false` | **pre-interceptable** (`codex exec` on pinned 0.149.1; interactive modes untested) | runs `20260824T100726Z` + confirmation `20260824T101801Z`, `analysis.md` / `analysis-confirmation.md` |
-| 2 | native `apply_patch` (multi-file)          | | | | | | | pending | |
-| 3 | native `apply_patch` (new untracked file)  | | | | | | | pending | |
-| 4 | native `apply_patch` (rename/delete)       | | | | | | | pending | |
-| 5 | shell/exec write (`>` redirection)         | | | | | | | pending (M2) | |
-| 6 | shell/exec heredoc/script-driven write     | | | | | | | pending (M2) | |
-| 7 | unified exec (`exec_command`) writes       | | | | | | | pending (M2) | |
-| 8 | MCP tool mutation                          | | | | | | | pending | |
-| 9 | code-mode nested tool call                 | | | | | | | pending | |
-| 10 | native `apply_patch` Update File (single file) | YES — trusted PreToolUse fired (allow + deny arms) | YES — byte-exact, sha256-indexed | YES — path resolvable; **absolute form observed** (vs relative in Add File) | YES at introduced-content level (`@@` hunks: space=context, `-`=removed, `+`=added; bare `@@`, no line numbers); **byte-exact final state NOT reconstructible** (mixed EOL output, see run analysis) | YES — deny arm seed file byte-identical; no PostToolUse | YES — Stop fired both arms | **pre-interceptable (introduced-content level)**; M1e-b fixture freeze required before parser work | run `20260824T113630Z-updatefile`, `analysis-m1ea.md` |
+| 1 | native `apply_patch` Add File (single, tracked) | YES — trusted/no-bypass | YES — byte-exact, sha256-indexed | YES — relative path | YES — `+` lines = introduced content | YES — worktree byte-identical after deny; no PostToolUse | YES — Stop fired both arms | **pre-interceptable; governed end-to-end** | runs `20260824T100726Z` + `20260824T101801Z`; live gate in `20260824T112515Z-m1db-live` |
+| 2 | native `apply_patch` multi-file bundle (Add + Update) | YES — one PreToolUse for the whole call | YES — both ops in one `tool_input.command` | YES per operation (relative observed) | YES per operation | YES — deny blocks the ENTIRE call, neither op lands | YES — both arms | **pre-interceptable; governed end-to-end** (aggregation DENY > FAIL_OPEN > WARN > PASS/SKIP) | run `20260824T133347Z-multifile`; live `20260824T142723Z-m1fc-live`, `analysis-m1fc.md` |
+| 3 | native `apply_patch` Add (new untracked file) | YES | YES | YES — relative path | YES | YES | YES | covered by row 1 (Add creates untracked files) | runs as row 1 |
+| 4a | native `apply_patch` Delete File | YES — trusted | YES — header-only grammar, relative path observed | YES | n/a — no content introduced | YES — file stays byte-identical on deny | YES — both arms | **recognized; SKIP-by-design** (ADR-018: pure deletions introduce nothing; no delete-protection claimed) | run `20260824T202758Z-deletefile`, `analysis-m1ga.md` |
+| 4b | native `apply_patch` rename/move | not probed | | | | | | pending | |
+| 5 | shell write — direct redirection (`>` / `Out-File`) | YES — PreToolUse fires pre-mutation (`tool_name: Bash`) | YES — full command string | NO — embedded in PowerShell text only | NO — requires shell interpretation | YES — generic deny blocks every scenario pre-mutation | YES — all arms | **INTERCEPTABLE-BUT-NOT-RECONSTRUCTABLE** → Stop audit is the backstop | run `20260824T210203Z-shell`, `analysis-m2a.md` |
+| 6 | shell write — cmdlet (`Set-Content`) / heredoc-class | YES | YES | NO | NO | YES | YES | **INTERCEPTABLE-BUT-NOT-RECONSTRUCTABLE** → Stop backstop | same run |
+| 6b | script-driven write (interpreter via shell) | YES | YES — command text only; content computed inside interpreter | NO | NO | YES | YES | **STOP-ONLY** → Stop backstop | same run |
+| 7 | unified exec (`exec_command`) writes | YES — fires as `Bash` | YES | NO | NO | YES | YES | covered by the M2a shell classification | same run |
+| 10 | native `apply_patch` Update File (single file) | YES — trusted PreToolUse fired (allow + deny arms) | YES — byte-exact, sha256-indexed | YES — **absolute AND relative forms observed** | YES at introduced-content level (bare `@@` hunks; mixed-EOL caveat — byte-exact final state NOT reconstructible) | YES — seed file byte-identical after deny; no PostToolUse | YES — Stop fired both arms | **pre-interceptable (introduced-content level); governed end-to-end** | run `20260824T113630Z-updatefile`, `analysis-m1ea.md`; live denial `20260824T132248Z-m1ed-live` |
+| 11 | MCP tool mutation | not probed | | | | | | pending | |
+| 12 | code-mode nested tool call | not probed | | | | | | pending | |
+
+## Final aggregation rule (settled M1f-b, proven live M1f-c)
+
+> Every operation in a bundled proposal is evaluated before the tool call is
+> allowed. Any violation denies the entire call. Aggregation precedence:
+> DENY > FAIL_OPEN > WARN > PASS/SKIP; unevaluated operations are disclosed
+> in the reason and never reported as governed.
 
 ## Open questions carried from planning
 
