@@ -325,6 +325,7 @@ def parse_pretooluse_payload(payload: Any, current_content: Any = None) -> Tuple
 
 ADD_KIND = "*** Add File"
 UPDATE_KIND = "*** Update File"
+DELETE_KIND = "*** Delete File"
 
 
 @dataclass(frozen=True)
@@ -361,6 +362,28 @@ def _operation_segments(body_lines: list) -> list:
     return segments
 
 
+def _check_delete_path(path: str) -> str:
+    """Delete File path validation per the frozen M1g-a contract.
+
+    Observed relative only; absolute Delete is not Codex-observed and is
+    rejected like absolute Add. Header-only operation: any body content is
+    malformed.
+    """
+    if not path or not path.strip():
+        raise CodexPatchParseError("Delete File has an empty target path")
+    if PureWindowsPath(path).drive or path.startswith("/"):
+        raise CodexPatchParseError(
+            f"Delete File target must be workspace-relative "
+            f"(absolute form unobserved): {path!r}"
+        )
+    components = re.split(r"[/\\]", path)
+    if any(part == ".." for part in components):
+        raise CodexPatchParseError(
+            f"Delete File target path must not traverse upward: {path!r}"
+        )
+    return path
+
+
 def patch_operation_specs(command: Any) -> list:
     """Return ``[(kind, raw_path)]`` in source order, paths validated.
 
@@ -381,6 +404,9 @@ def patch_operation_specs(command: Any) -> list:
         elif kind == UPDATE_KIND:
             _check_update_path(path)
             specs.append(("update", path))
+        elif kind == DELETE_KIND:
+            _check_delete_path(path)
+            specs.append(("delete", path))
         else:
             raise CodexPatchParseError(
                 f"unsupported patch operation {kind!r}; supported operations "
@@ -434,6 +460,17 @@ def parse_patch_operations(command: Any,
             operations.append(PatchOperation(
                 "update", target,
                 _update_hunks_introduced(content, snapshot, target)))
+        elif kind == DELETE_KIND:
+            target = _check_delete_path(path)
+            if content:
+                raise CodexPatchParseError(
+                    "malformed Delete File operation: header-only grammar, "
+                    f"unexpected body content: {content!r}"
+                )
+            # A pure deletion introduces no non-blank content (ADR-018);
+            # the gate maps this to SKIP by design. No claim that Mneme
+            # prevents deletion -- that would be new policy semantics.
+            operations.append(PatchOperation("delete", target, ""))
         else:
             raise CodexPatchParseError(
                 f"unsupported patch operation {kind!r}; supported operations "

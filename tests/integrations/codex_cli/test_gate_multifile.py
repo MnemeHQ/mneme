@@ -121,8 +121,8 @@ def test_multifile_fixture_parses_to_two_ordered_operations():
 
 def test_unknown_operation_in_bundle_rejects_whole_proposal():
     command = ("*** Begin Patch\n*** Update File: a.py\n@@\n+x\n"
-               "*** Delete File: b.py\n*** End Patch")
-    with pytest.raises(CodexPatchParseError, match="Delete File"):
+               "*** Move To: b.py\n*** End Patch")
+    with pytest.raises(CodexPatchParseError, match="Move To"):
         patch_operation_specs(command)
 
 
@@ -200,7 +200,7 @@ def test_malformed_second_operation_makes_whole_proposal_unevaluable(
         tmp_path, monkeypatch):
     project = _project(tmp_path, monkeypatch)
     command = ("*** Begin Patch\n*** Add File: ok.py\n+fine\n"
-               "*** Delete File: other.py\n*** End Patch")
+               "*** Rename File: other.py\n*** End Patch")
     result = _evaluate(project, command)
     assert result.action == FAIL_OPEN
     assert "proposal not evaluated" in result.reason
