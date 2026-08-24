@@ -1,0 +1,1 @@
+Each market resolves its own attribution source independently.

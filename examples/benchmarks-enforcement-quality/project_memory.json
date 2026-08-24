@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "name": "enforcement-quality-fixture",
+    "description": "Frozen fixture memory for the enforcement-quality benchmark suite. Rules mirror the #317 dogfood incident regressions and the phrase-matcher contract they pin. Test-only; not canonical governance.",
+    "version": "0.1.0"
+  },
+  "decisions": [
+    {
+      "id": "awin-001",
+      "decision": "Affiliate attribution must resolve to one source per market.",
+      "rationale": "Duplicate tracking pixels caused double attribution.",
+      "scope": ["affiliate", "attribution"],
+      "constraints": [],
+      "anti_patterns": ["assume_awin_awin_us_same_source"]
+    },
+    {
+      "id": "slug-001",
+      "decision": "URL slugs are derived once at publish time.",
+      "rationale": "Mutating routes breaks external links.",
+      "scope": ["publishing"],
+      "constraints": [],
+      "anti_patterns": ["regenerate live category slug on every request"]
+    },
+    {
+      "id": "fb-001",
+      "decision": "Foo and bar must stay together.",
+      "rationale": "Splitting them breaks ordering guarantees.",
+      "scope": ["widgets"],
+      "constraints": [],
+      "anti_patterns": ["foo and bar"]
+    },
+    {
+      "id": "gov-001",
+      "decision": "Governance or architectural changes go through PR review before merging.",
+      "rationale": "Unreviewed governance edits broke the main branch twice.",
+      "scope": ["workflow", "governance"],
+      "constraints": [],
+      "anti_patterns": ["unreviewed enforcement changes", "direct-to-main governance edits"]
+    }
+  ]
+}

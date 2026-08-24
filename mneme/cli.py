@@ -414,7 +414,14 @@ def _cmd_benchmark(args: argparse.Namespace) -> int:
         out.write_text(format_markdown(results), encoding="utf-8")
         print(f"Markdown report written: {args.markdown}")
 
-    has_failures = any(r.verdict == ScenarioVerdict.FAIL for r in results)
+    # FALSE_POSITIVE is a failing benchmark condition (charter 2026-08-24):
+    # blocking benign content exits 1 just like a missed violation. MALFORMED
+    # deliberately remains exit-0 (frozen five-verdict exit semantics); it is
+    # surfaced through report output instead.
+    has_failures = any(
+        r.verdict in (ScenarioVerdict.FAIL, ScenarioVerdict.FALSE_POSITIVE)
+        for r in results
+    )
     return 1 if has_failures else 0
 
 

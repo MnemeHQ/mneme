@@ -1,0 +1,1 @@
+The config enables foo_and_bar mode by default.

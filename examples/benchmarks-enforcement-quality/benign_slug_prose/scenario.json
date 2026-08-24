@@ -1,0 +1,7 @@
+{
+  "name": "benign_slug_prose",
+  "category": "benign_control",
+  "description": "#317 regression: benign prose containing live/category/slug must not FAIL against the slug rule.",
+  "scenario_type": "benign",
+  "expected_exposed_decision_ids": ["slug-001"]
+}
