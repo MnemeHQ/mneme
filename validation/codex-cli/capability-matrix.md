@@ -28,6 +28,7 @@ Columns:
 | 7 | unified exec (`exec_command`) writes       | | | | | | | pending (M2) | |
 | 8 | MCP tool mutation                          | | | | | | | pending | |
 | 9 | code-mode nested tool call                 | | | | | | | pending | |
+| 10 | native `apply_patch` Update File (single file) | YES — trusted PreToolUse fired (allow + deny arms) | YES — byte-exact, sha256-indexed | YES — path resolvable; **absolute form observed** (vs relative in Add File) | YES at introduced-content level (`@@` hunks: space=context, `-`=removed, `+`=added; bare `@@`, no line numbers); **byte-exact final state NOT reconstructible** (mixed EOL output, see run analysis) | YES — deny arm seed file byte-identical; no PostToolUse | YES — Stop fired both arms | **pre-interceptable (introduced-content level)**; M1e-b fixture freeze required before parser work | run `20260824T113630Z-updatefile`, `analysis-m1ea.md` |
 
 ## Open questions carried from planning
 

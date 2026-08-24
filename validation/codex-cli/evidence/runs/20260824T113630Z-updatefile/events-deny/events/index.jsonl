@@ -1,0 +1,4 @@
+{"seq": 0, "file": "0000-PreToolUse-Bash-20260824T113708.json", "hook_event_name": "PreToolUse", "tool_name": "Bash", "sha256": "0ea46da85e426274019e10aeb200d921584446bfd43680bd02940b37e3979baf", "captured_utc": "20260824T113708"}
+{"seq": 1, "file": "0001-PostToolUse-Bash-20260824T113709.json", "hook_event_name": "PostToolUse", "tool_name": "Bash", "sha256": "6c5454eccfe4864f0c5dc7adad62ef55eecad97aaf91e02e26de8682372dc162", "captured_utc": "20260824T113709"}
+{"seq": 2, "file": "0002-PreToolUse-apply_patch-20260824T113713.json", "hook_event_name": "PreToolUse", "tool_name": "apply_patch", "sha256": "25cc07ac3f46c602da57c6cf30e1d9681486ca4d68ca481a6a28a0c9d3050faa", "captured_utc": "20260824T113713"}
+{"seq": 3, "file": "0003-Stop-20260824T113716.json", "hook_event_name": "Stop", "tool_name": "", "sha256": "59be6cde0eae9930fc3f486ea352f5a0acd9ba7c187cc8bc6c1973e5f39f3e72", "captured_utc": "20260824T113716"}
