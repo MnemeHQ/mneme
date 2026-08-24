@@ -1,0 +1,74 @@
+$ C:\Users\hi\AppData\Local\Programs\OpenAI\Codex\bin\codex.EXE exec --sandbox workspace-write Apply exactly this patch with apply_patch, with no modifications:
+*** Begin Patch
+*** Update File: service.py
+@@
+ def existing():
+-    return 1
++    return "FORBIDDEN_TOKEN_XYZ"
+*** Add File: helper.py
++def assist():
++    return 7
+*** End Patch
+
+Do not use shell commands.
+
+--- stdout ---
+The patch was rejected by the repository’s ADR gate because `FORBIDDEN_TOKEN_XYZ` is prohibited in artifacts. No changes were applied.
+
+
+--- stderr ---
+Reading additional input from stdin...
+OpenAI Codex v0.149.1
+--------
+workdir: C:\dev\mneme\.worktrees\feat-codex-cli-enforcement\validation\codex-cli\probe\sandbox\repo
+model: gpt-5.6-sol
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR]
+reasoning effort: high
+reasoning summaries: none
+session id: 01a035d6-9b6b-7811-8c48-c8dcb81f4eb4
+--------
+user
+Apply exactly this patch with apply_patch, with no modifications:
+*** Begin Patch
+*** Update File: service.py
+@@
+ def existing():
+-    return 1
++    return "FORBIDDEN_TOKEN_XYZ"
+*** Add File: helper.py
++def assist():
++    return 7
+*** End Patch
+
+Do not use shell commands.
+hook: SessionStart
+hook: SessionStart Completed
+codex
+I’ll apply the supplied patch verbatim using the patch tool only.
+hook: PreToolUse
+2026-08-24T22:14:20.420497Z ERROR codex_core::tools::router: error=Command blocked by PreToolUse hook: mneme: bundled apply_patch denied -
+[operation 1 (service.py)] mneme: FAIL - architectural decision violated
+  [ADR-GATE] FAIL "FORBIDDEN_TOKEN_XYZ" - trigger: FORBIDDEN_TOKEN_XYZ
+      The token FORBIDDEN_TOKEN_XYZ must not appear in artifacts.
+      path: service.py. Command: *** Begin Patch
+*** Update File: service.py
+@@
+ def existing():
+-    return 1
++    return "FORBIDDEN_TOKEN_XYZ"
+*** Add File: helper.py
++def assist():
++    return 7
+*** End Patch
+hook: PreToolUse Blocked
+codex
+The patch was rejected by the repository’s ADR gate because `FORBIDDEN_TOKEN_XYZ` is prohibited in artifacts. No changes were applied.
+hook: Stop
+hook: Stop Completed
+tokens used
+6,324
+
+
+exit=0
