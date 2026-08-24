@@ -1,0 +1,12 @@
+﻿diff --git a/src/allowed_file.py b/src/allowed_file.py
+index 5d6b3a1..e1ba3b1 100644
+--- a/src/allowed_file.py
++++ b/src/allowed_file.py
+@@ -1 +1,7 @@
+ """Free module: no path-scoped rules apply here."""
++
++import sqlite3
++
++
++def get_connection(db_path: str = "app.db") -> sqlite3.Connection:
++    return sqlite3.connect(db_path)
