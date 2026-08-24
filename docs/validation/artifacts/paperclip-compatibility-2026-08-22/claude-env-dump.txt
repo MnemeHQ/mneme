@@ -1,4 +1,4 @@
-﻿AGENT_HOME=<redacted>
+AGENT_HOME=<redacted>
 AI_AGENT=claude-code_2-1-202_harness
 ALLUSERSPROFILE=<redacted>
 ANTHROPIC_API_KEY=
