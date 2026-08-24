@@ -112,7 +112,9 @@ def test_update_relative_and_absolute_both_observed():
                       absolute_fixture["tool_input"]["command"].splitlines()
                       if l.startswith("*** Update File:"))
     abs_path = abs_header.split(":", 1)[1].strip()
-    assert Path(abs_path).is_absolute()
+    # Observed form is a Windows-absolute path; assert the grammar directly
+    # rather than via platform pathlib semantics (CI runs on Linux too).
+    assert abs_path.startswith("C:") and chr(92) in abs_path
 
 
 def test_add_file_observed_relative_only_across_fixtures():
