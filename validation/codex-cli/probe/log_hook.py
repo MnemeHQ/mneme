@@ -10,6 +10,10 @@ Behavior:
   test -- which shape actually blocks on the pinned build is an R0 finding,
   selectable via MNEME_PROBE_DENY_SHAPE (hookSpecificOutput | legacy | exit2),
   default hookSpecificOutput.
+- MNEME_PROBE_MODE=additional_context (M1d-a): return a non-blocking
+  hookSpecificOutput.additionalContext diagnostic for PreToolUse apply_patch
+  -- no permissionDecision at all -- to prove whether Codex 0.149.1 accepts
+  and delivers hook-specific diagnostics on this surface.
 
 This hook contains no Mneme logic and must never grow any.
 """
@@ -68,6 +72,21 @@ def main() -> int:
     parsed, event, tool = _capture(events_dir, raw)
 
     mode = os.environ.get("MNEME_PROBE_MODE", "log")
+    if mode == "additional_context":
+        if event == "PreToolUse" and tool == "apply_patch":
+            print(
+                json.dumps(
+                    {
+                        "hookSpecificOutput": {
+                            "hookEventName": "PreToolUse",
+                            "additionalContext": (
+                                "[mneme-probe] NONBLOCKING_DIAGNOSTIC_1491"
+                            ),
+                        }
+                    }
+                )
+            )
+        return 0
     if mode != "deny_apply_patch":
         return 0
     if event != "PreToolUse" or tool != "apply_patch":

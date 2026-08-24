@@ -36,6 +36,11 @@ Columns:
   relative-path reconstruction for any surface.
 - Whether `permissionDecision: "ask"` behaves as documented-rejected or has
   changed (upstream: issue #28437). Not needed for M1 gate; record if observed.
+- RESOLVED (M1d-a, run `20260824T110210Z`): non-blocking PreToolUse
+  `hookSpecificOutput.additionalContext` is accepted, non-blocking, and
+  delivered to agent context (developer-role message in session rollout) on
+  pinned 0.149.1 / Windows / `codex exec`. This is the proven channel for
+  WARN and FAIL_OPEN diagnostics.
 
 ## R0 exit checklist (native `apply_patch`, row 1)
 

@@ -54,6 +54,8 @@ PROMPT = (
 PRIMARY_ARMS = [
     ("allow", "log", False),
     ("deny", "deny_apply_patch", False),
+    # M1d-a: non-blocking additionalContext diagnostic transport probe.
+    ("diagctx", "additional_context", False),
 ]
 DIAGNOSTIC_ARMS = [
     ("allow-bypass", "log", True),
