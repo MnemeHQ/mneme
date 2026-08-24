@@ -1,0 +1,82 @@
+{
+  "evidence_hierarchy": "trusted/no-bypass arms are primary product evidence; '-bypass' arms are diagnostic evidence only",
+  "trusted_normal_execution": "hook_not_observed",
+  "fact1_pretooluse_payload": "see events-<arm>/ PreToolUse payloads (primary arms preferred)",
+  "fact2_patch_fully_in_payload": "TBD manual analysis of captured PreToolUse payload",
+  "fact3_paths_deterministic": "TBD manual analysis of captured PreToolUse payload",
+  "fact4_deny_prevents_mutation": true,
+  "fact5_post_and_stop_observed": "compare events-<arm>/index.jsonl PostToolUse/Stop entries across arms",
+  "bypass_diagnostic_ran": true,
+  "arms": {
+    "primary": [
+      {
+        "arm": "allow",
+        "disk_changed_files": [],
+        "worktree_unchanged": true,
+        "cmd": [
+          "C:\\Users\\hi\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin\\codex.EXE",
+          "exec",
+          "--sandbox",
+          "workspace-write",
+          "--ask-for-approval",
+          "never",
+          "Use apply_patch to create a new file named probe_target.py in the repo root containing exactly one function:\n\ndef probe_marker() -> int:\n    return 42\n\nDo not use shell commands to write files. Do not modify any other file."
+        ],
+        "returncode": 2,
+        "hook_events_observed": []
+      },
+      {
+        "arm": "deny",
+        "disk_changed_files": [],
+        "worktree_unchanged": true,
+        "cmd": [
+          "C:\\Users\\hi\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin\\codex.EXE",
+          "exec",
+          "--sandbox",
+          "workspace-write",
+          "--ask-for-approval",
+          "never",
+          "Use apply_patch to create a new file named probe_target.py in the repo root containing exactly one function:\n\ndef probe_marker() -> int:\n    return 42\n\nDo not use shell commands to write files. Do not modify any other file."
+        ],
+        "returncode": 2,
+        "hook_events_observed": []
+      }
+    ],
+    "diagnostic": [
+      {
+        "arm": "allow-bypass",
+        "disk_changed_files": [],
+        "worktree_unchanged": true,
+        "cmd": [
+          "C:\\Users\\hi\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin\\codex.EXE",
+          "exec",
+          "--sandbox",
+          "workspace-write",
+          "--ask-for-approval",
+          "never",
+          "--dangerously-bypass-hook-trust",
+          "Use apply_patch to create a new file named probe_target.py in the repo root containing exactly one function:\n\ndef probe_marker() -> int:\n    return 42\n\nDo not use shell commands to write files. Do not modify any other file."
+        ],
+        "returncode": 2,
+        "hook_events_observed": []
+      },
+      {
+        "arm": "deny-bypass",
+        "disk_changed_files": [],
+        "worktree_unchanged": true,
+        "cmd": [
+          "C:\\Users\\hi\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin\\codex.EXE",
+          "exec",
+          "--sandbox",
+          "workspace-write",
+          "--ask-for-approval",
+          "never",
+          "--dangerously-bypass-hook-trust",
+          "Use apply_patch to create a new file named probe_target.py in the repo root containing exactly one function:\n\ndef probe_marker() -> int:\n    return 42\n\nDo not use shell commands to write files. Do not modify any other file."
+        ],
+        "returncode": 2,
+        "hook_events_observed": []
+      }
+    ]
+  }
+}

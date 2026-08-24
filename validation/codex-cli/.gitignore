@@ -1,0 +1,5 @@
+# Sandbox repos are reproducible; captured evidence is committed.
+**/*-sandbox/repo/.git/
+**/__pycache__/
+
+sandbox/

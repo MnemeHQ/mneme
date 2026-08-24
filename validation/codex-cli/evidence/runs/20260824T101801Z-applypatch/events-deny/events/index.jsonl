@@ -1,0 +1,2 @@
+{"seq": 0, "file": "0000-PreToolUse-apply_patch-20260824T101818.json", "hook_event_name": "PreToolUse", "tool_name": "apply_patch", "sha256": "06be4cc67bf04a52e888724b9bd9623d7334c6f8d77912a141d52bd6a9016b11", "captured_utc": "20260824T101818"}
+{"seq": 1, "file": "0001-Stop-20260824T101821.json", "hook_event_name": "Stop", "tool_name": "", "sha256": "7fa7be2f6d8d0706791a8871a1962e3ea5dbad55809d845d6b60ef19dcd31edf", "captured_utc": "20260824T101821"}
