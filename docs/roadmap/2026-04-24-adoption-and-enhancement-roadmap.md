@@ -193,6 +193,16 @@ Evaluate pre-mutation blocking, deterministic change reconstruction, opaque
 subagents. Roadmap-only until the POC passes; see
 [docs/integrations/README.md](../integrations/README.md) for current status.
 
+### Hermes Agent POC — P1.5 (POC passed)
+
+Completed 2026-08-25. Context injection via `pre_llm_call` and pre-tool
+blocking via `pre_tool_call` reuse the existing retrieval and `mneme check`
+paths unchanged; bypass surfaces (`terminal` non-class-A forms,
+`execute_code`, `process`) are characterized; the frozen 7/7 enforcement
+benchmark is unchanged. Promoted to Experimental — see
+[docs/integrations/hermes.md](../integrations/hermes.md). Production parity
+claims remain blocked on Hermes exposing a blocking Stop-equivalent.
+
 ---
 
 ## Checkpoint 6: Adoption test with external users
