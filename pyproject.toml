@@ -33,7 +33,7 @@ Homepage = "https://mnemehq.com"
 Documentation = "https://mnemehq.com/docs/"
 Repository = "https://github.com/MnemeHQ/mneme"
 Issues = "https://github.com/MnemeHQ/mneme/issues"
-Changelog = "https://mnemehq.com/changelog/"
+Changelog = "https://github.com/MnemeHQ/mneme/releases"
 
 [tool.setuptools.packages.find]
 where = ["."]
