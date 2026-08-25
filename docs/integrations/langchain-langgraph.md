@@ -48,6 +48,19 @@ Governed tools are exactly:
 | `write_file(file_path, content)` | `Write` | full proposed content checked |
 | `edit_file(file_path, old_string, new_string)` | `Edit` | only introduced delta checked |
 
+Classification is by the **documented local-file argument contract**: any
+registered tool whose *name* is `write_file` or `edit_file` is translated
+and governed as if it writes the local filesystem at `file_path`. The bound
+tool/backend behind that name is not inspected. This means:
+
+- Tools conforming to the local-file contract (including a LangChain or
+  Deep Agents `FilesystemBackend` deployment) are governed.
+- The same tool names served over a virtual store, composite backend, or
+  remote sandbox are still *intercepted*, but Mneme's local-path semantics
+  (memory discovery, `--target-path` applicability) may not describe the
+  actual mutation target there. That gap is why Deep Agents over
+  non-filesystem backends remains unvalidated.
+
 Everything else — read-only tools (`read_file`, `ls`, `glob`, `grep`),
 custom tools, shell/`execute` surfaces — receives **no opinion and zero
 checker invocations**. The tool map is deliberately closed; extending it is
@@ -55,8 +68,9 @@ the only way a new tool becomes governed.
 
 Out of scope for this milestone: shell/`execute` governance (ADR-021's
 prevent-catch-verify design does not yet generalize to remote/virtual
-backends), arbitrary custom-tool mapping, and raw `StateGraph`
-instrumentation.
+backends), arbitrary custom-tool mapping, raw `StateGraph`
+instrumentation, and pinned Deep Agents validation (the roadmap POC stays
+open until that validation passes).
 
 ## Usage
 
@@ -68,7 +82,7 @@ mneme = MnemeLangChain(project_dir=".")
 
 agent = create_agent(
     model=model,                      # any LangChain chat model
-    tools=[write_file, edit_file],    # e.g. deep agents filesystem tools
+    tools=[write_file, edit_file],    # local-file contract tools
     middleware=mneme.build_middleware(),
 )
 
@@ -97,9 +111,16 @@ Sync and async loops behave identically: `invoke` uses `wrap_tool_call`,
 |---|---|
 | Trusted PASS | tool handler executes normally |
 | Trusted WARN/FAIL, strict mode | handler is **not called**; rejection feedback returned to the model as the tool result |
-| Trusted WARN/FAIL, warn mode | handler executes; visible `[mneme] WARN ... not blocked` note appended to the tool result |
-| Unparseable verdict / operational failure / incomplete evaluation | fail open — visibly: `[mneme] UNEVALUATED ... NOT checked` note appended to the tool result |
+| Trusted WARN/FAIL, warn mode | handler executes; visible `[mneme] WARN ... not blocked` note carried on the tool result |
+| Unparseable verdict / operational failure / incomplete evaluation | fail open — visibly: `[mneme] UNEVALUATED ... NOT checked` note carried on the tool result |
 | Unlisted / read-only tool | no opinion; zero checker calls |
+
+The visibility guarantee holds for both allowed handler return types:
+plain `ToolMessage` results are annotated in place, and `Command` results
+carry the note on their tool-result message while preserving update/goto
+semantics. If a `Command`'s update shape carries no recognizable
+`ToolMessage`, the command passes through unchanged and the gap is recorded
+on `mneme.trace` — never silently.
 
 An unevaluated mutation is never silently reported as governed: every
 fail-open path is visible in the tool result that returns to the model.

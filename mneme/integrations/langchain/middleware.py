@@ -10,11 +10,13 @@ enforcement paths.
 
 from __future__ import annotations
 
+import dataclasses
 import json
 from typing import Any, List
 
 from langchain.agents.middleware import AgentMiddleware
 from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
+from langgraph.types import Command
 
 from mneme.integrations.langchain.adapter import (
     ACTION_DENY,
@@ -40,8 +42,10 @@ def build_middleware(gate):
     class DecisionContextMiddleware(AgentMiddleware):
         """Inject retrieved decisions into the model request.
 
-        The query is the most recent human message. Injection appends to
-        the system message; graph state semantics are untouched.
+        The query is the most recent human message. Injection replaces only
+        the system message via ``request.override(...)``; every other field
+        of the request -- including ``model_settings`` -- is preserved.
+        Graph state semantics are untouched.
         """
 
         def wrap_model_call(self, request, handler):
@@ -57,20 +61,13 @@ def build_middleware(gate):
             injection = gate.context_for_task(query)
             if not injection.text:
                 return request
-            base = ""
-            if request.system_message is not None and request.system_message.content:
-                base = request.system_message.content + "\n"
-            merged = SystemMessage(content=base + injection.text)
-            return type(request)(
-                model=request.model,
-                messages=request.messages,
-                system_message=merged,
-                tools=request.tools,
-                tool_choice=request.tool_choice,
-                response_format=request.response_format,
-                state=request.state,
-                runtime=request.runtime,
+            merged = SystemMessage(
+                content=_merge_system_content(
+                    getattr(request.system_message, "content", None),
+                    injection.text,
+                )
             )
+            return request.override(system_message=merged)
 
     # ── Tool gate (enforcement path) ────────────────────────────────────────
 
@@ -82,14 +79,14 @@ def build_middleware(gate):
             if result.action == ACTION_DENY:
                 return self._rejection(result, request)
             executed = handler(request)
-            return self._annotate_verdict(executed, result)
+            return self._annotate_verdict(executed, result, request)
 
         async def awrap_tool_call(self, request, handler):
             result = self._evaluate(request)
             if result.action == ACTION_DENY:
                 return self._rejection(result, request)
             executed = await handler(request)
-            return self._annotate_verdict(executed, result)
+            return self._annotate_verdict(executed, result, request)
 
         def _evaluate(self, request):
             tool_call = request.tool_call
@@ -107,20 +104,26 @@ def build_middleware(gate):
                 tool_call_id=str(request.tool_call.get("id", "")),
             )
 
-        def _annotate_verdict(self, message, result):
+        def _annotate_verdict(self, executed, result, request):
             if result.action == ACTION_WARN:
                 return _append_note(
-                    message,
+                    executed,
                     f"{WARN_TAG} - architectural decision flagged "
                     f"(warn mode; not blocked):\n{result.reason}",
+                    gate,
+                    result,
+                    request,
                 )
             if result.action == ACTION_FAIL_OPEN:
                 return _append_note(
-                    message,
+                    executed,
                     f"{UNEVALUATED_TAG} - failing open, this mutation was "
                     f"NOT checked:\n{result.reason}",
+                    gate,
+                    result,
+                    request,
                 )
-            return message
+            return executed
 
     return [DecisionContextMiddleware(), ToolGateMiddleware()]
 
@@ -149,10 +152,95 @@ def _message_text(message: Any) -> str:
     return ""
 
 
-def _append_note(message: Any, note: str) -> Any:
+def _merge_system_content(existing: Any, note: str) -> Any:
+    """Append decision text to a system message's content.
+
+    LangChain system messages may carry plain string content or structured
+    content blocks. Both shapes are preserved; the decision text is added
+    without disturbing existing content.
+    """
+    if existing is None or (isinstance(existing, str) and not existing.strip()):
+        return note
+    if isinstance(existing, str):
+        return f"{existing}\n{note}"
+    if isinstance(existing, list):
+        return list(existing) + [{"type": "text", "text": note}]
+    return f"{existing}\n{note}"
+
+
+def _annotate_command(command: Command, note: str, gate, result, request) -> Command:
+    """Carry a WARN/UNEVALUATED marker through a ``Command`` tool result.
+
+    The handler contract allows returning ``ToolMessage | Command``. A
+    ``Command``'s update semantics must survive annotation untouched, so
+    the note is appended to the tool-result message inside ``update`` and
+    the command is rebuilt via ``dataclasses.replace`` (goto/resume/graph
+    are preserved as-is).
+
+    If the update shape carries no recognizable ``ToolMessage``, the command
+    is returned unchanged but the visibility gap is recorded on the audit
+    trace -- never silent.
+    """
+    update = command.update
+    if not isinstance(update, dict):
+        _record_annotation_gap(gate, result, request, "command-update-not-dict")
+        return command
+
+    messages = update.get("messages")
+    if isinstance(messages, ToolMessage):
+        annotated = _tool_message_with_note(messages, note)
+        new_update = dict(update)
+        new_update["messages"] = annotated
+        return dataclasses.replace(command, update=new_update)
+
+    if isinstance(messages, list) and any(
+        isinstance(m, ToolMessage) for m in messages
+    ):
+        new_messages = list(messages)
+        for index in range(len(new_messages) - 1, -1, -1):
+            if isinstance(new_messages[index], ToolMessage):
+                new_messages[index] = _tool_message_with_note(
+                    new_messages[index], note
+                )
+                break
+        new_update = dict(update)
+        new_update["messages"] = new_messages
+        return dataclasses.replace(command, update=new_update)
+
+    _record_annotation_gap(gate, result, request, "no-tool-message-in-command")
+    return command
+
+
+def _tool_message_with_note(message: ToolMessage, note: str) -> ToolMessage:
+    copy = message.model_copy()
+    content = copy.content
+    text = content if isinstance(content, str) else json.dumps(content)
+    copy.content = f"{text}\n{note}" if text else note
+    return copy
+
+
+def _record_annotation_gap(gate, result, request, detail: str) -> None:
+    """Record an un-annotatable result on the audit trace; never silent."""
+    gate.trace.append(
+        {
+            "kind": "enforcement",
+            "via": "langchain",
+            "annotation": "skipped",
+            "detail": detail,
+            "action": result.action,
+            "tool": str(request.tool_call.get("name", "")),
+            "file_path": "",
+            "verdict": result.verdict,
+            "evaluation_complete": result.evaluation_complete,
+            "reason": result.reason,
+        }
+    )
+
+
+def _append_note(message: Any, note: str, gate=None, result=None, request=None) -> Any:
     """Make a warn/unevaluated outcome visible in the tool result itself."""
     if isinstance(message, ToolMessage):
-        content = message.content
-        text = content if isinstance(content, str) else json.dumps(content)
-        message.content = f"{text}\n{note}" if text else note
+        return _tool_message_with_note(message, note)
+    if isinstance(message, Command):
+        return _annotate_command(message, note, gate, result, request)
     return message

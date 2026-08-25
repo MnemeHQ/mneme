@@ -23,7 +23,12 @@ pytest.importorskip("langgraph")
 
 from langchain.agents import create_agent  # noqa: E402
 from langchain_core.language_models.chat_models import BaseChatModel  # noqa: E402
-from langchain_core.messages import AIMessage, HumanMessage, ToolMessage  # noqa: E402
+from langchain_core.messages import (  # noqa: E402
+    AIMessage,
+    HumanMessage,
+    SystemMessage,
+    ToolMessage,
+)
 from langchain_core.outputs import ChatGeneration, ChatResult  # noqa: E402
 from langchain_core.tools import tool  # noqa: E402
 
@@ -429,3 +434,233 @@ class TestLiveGovernedLoop:
         enforcement = [e for e in mneme.trace if e["kind"] == "enforcement"]
         assert enforcement and all(e["action"] == "skip" for e in enforcement)
         assert not any("[mneme]" in t for t in tool_texts(result))
+
+
+class TestModelRequestPreservation:
+    """Injection must touch only the system message."""
+
+    def _middleware(self, project):
+        mneme = MnemeLangChain(project_dir=project)
+        return mneme.build_middleware()[0]
+
+    def _request(self, system_message, model_settings=None):
+        from langchain.agents.middleware.types import ModelRequest
+
+        return ModelRequest(
+            model=ScriptedChatModel([{"content": "ok"}]),
+            messages=[HumanMessage(content="sqlite storage database decision")],
+            system_message=system_message,
+            model_settings=model_settings,
+        )
+
+    def test_model_settings_survive_injection(self, project):
+        ctx = self._middleware(project)
+        request = self._request(SystemMessage(content="base"), {"temperature": 0.3})
+        out = ctx._with_decisions(request)
+        assert out is not request
+        assert out.model_settings == {"temperature": 0.3}
+        assert isinstance(out.system_message.content, str)
+        assert out.system_message.content.startswith("base\n")
+        assert "[Mneme decisions applied]" in out.system_message.content
+
+    def test_structured_system_content_preserved_as_blocks(self, project):
+        ctx = self._middleware(project)
+        original = [
+            {"type": "text", "text": "rule one"},
+            {"type": "text", "text": "rule two"},
+        ]
+        out = ctx._with_decisions(self._request(SystemMessage(content=original)))
+        content = out.system_message.content
+        assert isinstance(content, list)
+        assert content[:2] == original
+        assert len(content) == 3
+        assert "[Mneme decisions applied]" in content[2]["text"]
+
+    def test_no_injection_returns_request_untouched(self, tmp_path):
+        ctx = MnemeLangChain(project_dir=tmp_path).build_middleware()[0]
+        request = self._request(SystemMessage(content="base"))
+        assert ctx._with_decisions(request) is request
+
+
+class TestCommandResultAnnotation:
+    """WARN/UNEVALUATED must survive the Command half of the handler contract."""
+
+    def _gate_warn(self, project):
+        def runner(command, **kwargs):
+            return FakeCompleted(
+                verdict_json(
+                    "WARN",
+                    violations=[
+                        {
+                            "decision_id": "store_001",
+                            "severity": "WARN",
+                            "rule": "no postgres",
+                            "trigger": "postgres",
+                        }
+                    ],
+                )
+            )
+
+        return MnemeLangChain(project_dir=project, mode="warn", check_runner=runner)
+
+    def _gate_deny(self, project):
+        def runner(command, **kwargs):
+            return FakeCompleted(
+                verdict_json("FAIL", violations=[{"decision_id": "store_001", "severity": "FAIL", "rule": "psycopg2", "trigger": "psycopg2"}])
+            )
+
+        return MnemeLangChain(project_dir=project, check_runner=runner)
+
+    def _request(self, call_id="cx"):
+        from langchain.agents.middleware.types import ToolCallRequest
+
+        return ToolCallRequest(
+            tool_call={
+                "name": "write_file",
+                "args": {"file_path": "db.py", "content": FORBIDDEN},
+                "id": call_id,
+                "type": "tool_call",
+            },
+            tool=None,
+            state={"messages": []},
+            runtime=None,
+        )
+
+    def _command_handler(self, calls):
+        def handler(request):
+            calls.append(request)
+            from langgraph.types import Command
+
+            return Command(
+                update={
+                    "messages": [
+                        ToolMessage(content="wrote db.py", tool_call_id=request.tool_call["id"])
+                    ],
+                    "extra_state": "keep-me",
+                },
+                goto="review_node",
+            )
+
+        return handler
+
+    def _async_command_handler(self, calls):
+        from langgraph.types import Command
+
+        async def handler(request):
+            calls.append(request)
+            return Command(
+                update={
+                    "messages": [
+                        ToolMessage(content="wrote db.py", tool_call_id=request.tool_call["id"])
+                    ],
+                    "extra_state": "keep-me",
+                },
+                goto="review_node",
+            )
+
+        return handler
+
+    def _gate_middleware(self, gate):
+        return gate.build_middleware()[1]
+
+    def test_sync_warn_command_keeps_goto_and_gains_marker(self, project):
+        mw = self._gate_middleware(self._gate_warn(project))
+        calls = []
+        out = mw.wrap_tool_call(self._request(), self._command_handler(calls))
+        assert len(calls) == 1
+        from langgraph.types import Command
+
+        assert isinstance(out, Command)
+        assert out.goto == "review_node"
+        assert out.update["extra_state"] == "keep-me"
+        msg = out.update["messages"][0]
+        assert msg.content.startswith("wrote db.py\n[mneme] WARN")
+
+    def test_sync_fail_open_command_carries_unevaluated(self, project):
+        # Force the fail-open path: checker transport dies before a verdict.
+        def broken(command, **kwargs):
+            raise OSError("spawn failed")
+
+        gate = MnemeLangChain(project_dir=project, check_runner=broken)
+        mw = self._gate_middleware(gate)
+        calls = []
+        out = mw.wrap_tool_call(self._request(), self._command_handler(calls))
+        from langgraph.types import Command
+
+        assert isinstance(out, Command)
+        assert out.goto == "review_node"
+        msg = out.update["messages"][0]
+        assert msg.content.startswith("wrote db.py\n[mneme] UNEVALUATED")
+        assert "NOT checked" in msg.content
+
+    def test_sync_deny_short_circuits_command_handlers_too(self, project):
+        mw = self._gate_middleware(self._gate_deny(project))
+        calls = []
+        out = mw.wrap_tool_call(self._request(), self._command_handler(calls))
+        assert calls == [], "denied call must never reach the handler"
+        from langchain_core.messages import ToolMessage
+
+        assert isinstance(out, ToolMessage)
+        assert "[mneme] DENIED" in out.content
+
+    def test_async_parity_for_command_annotation(self, project):
+        mw = self._gate_middleware(self._gate_warn(project))
+        calls = []
+        out = asyncio.run(
+            mw.awrap_tool_call(self._request(), self._async_command_handler(calls))
+        )
+        from langgraph.types import Command
+
+        assert len(calls) == 1
+        assert isinstance(out, Command)
+        assert out.goto == "review_node"
+        assert "[mneme] WARN" in out.update["messages"][0].content
+
+        def broken(command, **kwargs):
+            raise OSError("spawn failed")
+
+        mw2 = self._gate_middleware(MnemeLangChain(project_dir=project, check_runner=broken))
+        calls2 = []
+        out2 = asyncio.run(
+            mw2.awrap_tool_call(self._request(), self._async_command_handler(calls2))
+        )
+        assert isinstance(out2, Command)
+        assert "[mneme] UNEVALUATED" in out2.update["messages"][0].content
+
+    def test_unrecognized_command_update_recorded_not_silent(self, project):
+        gate = self._gate_warn(project)
+        mw = gate.build_middleware()[1]
+
+        from langgraph.types import Command
+
+        def opaque_handler(request):
+            return Command(update=None, goto="review_node")
+
+        out = mw.wrap_tool_call(self._request(), opaque_handler)
+        assert isinstance(out, Command)
+        assert out.update is None
+        gaps = [e for e in gate.trace if e.get("annotation") == "skipped"]
+        assert gaps and gaps[0]["action"] == "warn"
+
+
+# ── small local helpers ─────────────────────────────────────────────────────
+
+
+def verdict_json(verdict, *, complete=True, violations=None):
+    payload = {
+        "schema": SCHEMA_LIVE,
+        "verdict": verdict,
+        "violations": violations or [],
+        "evaluation_complete": complete,
+    }
+    return json.dumps(payload)
+
+
+SCHEMA_LIVE = "mneme.check/v1"
+
+
+class FakeCompleted:
+    def __init__(self, stdout):
+        self.stdout = stdout
+        self.stderr = ""
+        self.returncode = 0

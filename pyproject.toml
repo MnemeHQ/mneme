@@ -22,7 +22,7 @@ api = [
 ]
 langchain = [
     "langchain>=1.3,<2",
-    "langgraph>=1.2",
+    "langgraph>=1.2,<2",
 ]
 dev = [
     "pytest>=8.0.0",

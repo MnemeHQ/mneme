@@ -32,7 +32,7 @@ at what level, with what evidence. The website's
 | Experimental | OpenCode | plugin-hooks approach under evaluation; compaction experiment returned a NULL verdict |
 | Experimental | Kiro | bounded PreToolUse hook, contract-tested, [open PR #314](https://github.com/MnemeHQ/mneme/pull/314) |
 | Experimental | Hermes Agent | P1.5 POC passed (context injection + pre-tool blocking); no blocking Stop-equivalent, see [hermes.md](hermes.md) |
-| Shipped (was: planned POC) | Deep Agents filesystem tools (`write_file`/`edit_file`) | governed through the [LangChain agents on LangGraph](langchain-langgraph.md) integration; broader Deep Agents surfaces remain unvalidated |
+| Planned | Deep Agents filesystem tools (`write_file`/`edit_file`) | roadmap-only until a pinned Deep Agents validation passes; the [LangChain agents on LangGraph](langchain-langgraph.md) adapter governs local-filesystem-semantic tools by name contract |
 
 ## Known limitations
 
