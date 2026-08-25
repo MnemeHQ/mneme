@@ -49,32 +49,43 @@ Precise claim boundaries:
 
 ## Install
 
-### 1. Install the package
+The Python runtime and the Claude Code plugin are **separate artifacts** — installing
+one does not install the other. The plugin is not yet listed in the Claude Code
+marketplace, so loading it currently requires a checkout of this repository.
+
+### 1. Install the runtime
 
 ```bash
-pip install mneme-hq
+pipx install "mneme-hq>=0.5.1"
 ```
+
+`>=0.5.1` is a real requirement, not a preference: earlier releases do not support
+the machine-readable `--json` verdict the hook relies on.
 
 ### 2. Initialise project memory (if you don't have one yet)
 
 ```bash
-mkdir .mneme
-# Create .mneme/project_memory.json — see examples/project_memory.json for the schema.
+mneme init
 ```
 
-### 3. Run the installer
+`mneme init` creates `.mneme/project_memory.json` — including the `.mneme/`
+directory — with an empty valid decision corpus. It deliberately seeds zero
+decisions: every recorded decision is enforceable, so sample content would create
+phantom rules. It refuses to overwrite an existing corpus unless `--force` is
+supplied.
 
-Project-scoped (recommended — only affects this project):
+### 3. Load the plugin
+
 ```bash
-python scripts/install_claude_code.py
+claude --plugin-dir ./integrations/claude-code-plugin
 ```
 
-User-scoped (applies to all Claude Code sessions):
-```bash
-python scripts/install_claude_code.py --user
-```
+Reload in-session with `/reload-plugins` after changes.
 
-The installer is idempotent — safe to run again after updates.
+A legacy flat installer (`python scripts/install_claude_code.py`, with `--user`
+for user scope) still works from a git clone, but `scripts/` is not shipped in
+the PyPI wheel. It registers the same commands under legacy hyphenated names
+(`/mneme-check`, `/mneme-context`, …); prefer the plugin's namespaced commands.
 
 ### 4. Verify
 
@@ -85,14 +96,17 @@ confirm the hook blocks it and surfaces the decision id.
 
 ## Slash commands
 
-After installing, four slash commands are available in Claude Code:
+The plugin ships four namespaced slash commands:
 
 | Command | Purpose |
 |---------|---------|
-| `/mneme-context` | Retrieve decisions relevant to your current task |
-| `/mneme-check` | Check a file or draft against project memory |
-| `/mneme-record` | Record a new architectural decision |
-| `/mneme-review` | Audit all pending diff changes against decisions |
+| `/mneme:context` | Retrieve decisions relevant to your current task |
+| `/mneme:check` | Check a file or draft against project memory |
+| `/mneme:record` | Record a new architectural decision |
+| `/mneme:review` | Audit all pending diff changes against decisions |
+
+(The legacy flat installer registers the same commands with hyphens instead of
+colons — the two naming schemes are not interchangeable.)
 
 ---
 
@@ -117,13 +131,13 @@ text, and anti-pattern fields.
 **Mitigations:**
 
 1. Choose scope keywords when recording decisions that match file names in your project.
-   Use `/mneme-record` and follow the scope tip in the command.
+   Use `/mneme:record` and follow the scope tip in the command.
 
-2. Run `/mneme-context` before non-trivial edits with a descriptive phrase describing
+2. Run `/mneme:context` before non-trivial edits with a descriptive phrase describing
    the domain (e.g. "storage layer", "auth middleware"). This uses a richer query than
    the hook and surfaces decisions the hook might miss.
 
-3. Run `/mneme-review` after a batch of edits to catch violations the per-edit hook
+3. Run `/mneme:review` after a batch of edits to catch violations the per-edit hook
    missed due to retrieval gaps.
 
 The hook is a first line of defence, not a complete audit. Use the slash commands for
@@ -176,7 +190,7 @@ returned by `mneme check` can cause a block.
 
 **Too many false positives / blocks**
 - Switch to `MNEME_HOOK_MODE=warn` while refining your decisions.
-- Review the triggered anti-patterns with `/mneme-context` to see if they're too broad.
+- Review the triggered anti-patterns with `/mneme:context` to see if they're too broad.
 
 **`mneme check` is slow**
 - The hook has a 10 s timeout and fails open on expiry. Retrieval is fully local and
