@@ -53,13 +53,13 @@ registered tool whose *name* is `write_file` or `edit_file` is translated
 and governed as if it writes the local filesystem at `file_path`. The bound
 tool/backend behind that name is not inspected. This means:
 
-- Tools conforming to the local-file contract (including a LangChain or
-  Deep Agents `FilesystemBackend` deployment) are governed.
+- Tools conforming to this local-file contract are governed.
 - The same tool names served over a virtual store, composite backend, or
   remote sandbox are still *intercepted*, but Mneme's local-path semantics
   (memory discovery, `--target-path` applicability) may not describe the
-  actual mutation target there. That gap is why Deep Agents over
-  non-filesystem backends remains unvalidated.
+  actual mutation target there. Those are unsupported/unvalidated backend
+  semantics, not bypasses. That gap is why pinned Deep Agents validation
+  remains open before any Deep Agents support is claimed.
 
 Everything else — read-only tools (`read_file`, `ls`, `glob`, `grep`),
 custom tools, shell/`execute` surfaces — receives **no opinion and zero
@@ -115,15 +115,20 @@ Sync and async loops behave identically: `invoke` uses `wrap_tool_call`,
 | Unparseable verdict / operational failure / incomplete evaluation | fail open — visibly: `[mneme] UNEVALUATED ... NOT checked` note carried on the tool result |
 | Unlisted / read-only tool | no opinion; zero checker calls |
 
-The visibility guarantee holds for both allowed handler return types:
-plain `ToolMessage` results are annotated in place, and `Command` results
-carry the note on their tool-result message while preserving update/goto
-semantics. If a `Command`'s update shape carries no recognizable
-`ToolMessage`, the command passes through unchanged and the gap is recorded
-on `mneme.trace` — never silently.
+The visibility guarantee is precise about handler return types. WARN and
+UNEVALUATED are **model-visible** for plain `ToolMessage` results (annotated
+in place) and for `Command` results whose update contains a recognizable
+tool-result message (the note rides on that message; update/goto semantics
+are preserved). Opaque `Command` update shapes (`update=None`, non-dict, or
+no recognizable `ToolMessage`) pass through unchanged with **trace-visible
+only** degradation feedback: the gap is recorded on `mneme.trace`
+(`annotation: skipped`), but no model-visible marker is produced.
+Model-visible feedback for opaque command shapes is explicitly unsupported
+in this milestone.
 
 An unevaluated mutation is never silently reported as governed: every
-fail-open path is visible in the tool result that returns to the model.
+fail-open path is at minimum trace-visible, and model-visible wherever the
+handler's result shape supports annotation.
 
 ## Embedded graphs
 

@@ -43,9 +43,11 @@ at what level, with what evidence. The website's
   touched files are whole-file audited at Stop; degraded states fail open
   visibly. See [codex-cli.md](codex-cli.md).
 - **LangChain agents on LangGraph**: validated against langchain 1.3.17 /
-  langgraph 1.2.11 (pinned). Only `write_file` and `edit_file` are governed;
-  shell/`execute`, custom tools, virtual/remote filesystems, and raw
-  `StateGraph` graphs that wire their own tool nodes are bypass surfaces.
+  langgraph 1.2.11 (pinned). Only `write_file` and `edit_file` are governed.
+  Shell/`execute`, custom tools, and raw `StateGraph` graphs that wire their
+  own tool nodes are bypass surfaces. Same-named file tools over virtual or
+  remote backends ARE intercepted but carry unsupported/unvalidated backend
+  semantics (local-path assumptions may not describe the mutation target).
   See [langchain-langgraph.md](langchain-langgraph.md).
 - **Antigravity**: tested against Antigravity IDE 2.8.1; three file-mutation
   tools covered; deny-only response policy. See [antigravity.md](antigravity.md).
