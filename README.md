@@ -154,13 +154,13 @@ Each integration documents its actual blocking boundary, bypass paths, degraded 
 
 Mneme can compile architecture decisions into structured governance records rather than treating ADRs as passive prose.
 
-The repository governance source of truth is `.mneme/project_memory.json`. ADR import and validation preserve provenance so decisions can be inspected and enforced consistently.
+The repository governance source of truth is `.mneme/project_memory.json`. The ADR import path preserves explicit source provenance where available so typed rules can be inspected and enforced consistently.
 
 See:
 
-- [Governance representation](docs/architecture/governance-representation.md)
 - [ADR import](docs/integrations/adr-import.md)
 - [Accepted ADRs](docs/adr/)
+- [Current architecture phase](docs/architecture/current-phase.md)
 
 ## Architecture guarantees
 
