@@ -315,7 +315,7 @@ blocked Write was never created).
 ## 16. Create the GitHub release — only after public validation succeeds
 
 Only now, once the public package validates end to end, publish the GitHub
-release for the `v0.5.0` tag. Run this from the **repository root** (the same
+release for the `v0.5.2` tag. Run this from the **repository root** (the same
 place as the smoke tests), so the notes path is repository-root-relative:
 
 ```powershell
