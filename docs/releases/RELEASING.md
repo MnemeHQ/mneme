@@ -16,7 +16,7 @@ All commands assume:
 
 > **PyPI artifacts are immutable.** Once a version is uploaded to PyPI it can
 > never be replaced — only *yanked*. A yanked release still occupies its version
-> number forever; you cannot re-upload `0.5.0` with different bytes. Do every
+> number forever; you cannot re-upload `0.5.2` with different bytes. Do every
 > verification step below **before** `twine upload`, because upload is the point
 > of no return. If something is wrong after upload, the only remedy is to yank
 > and publish a new patch version.
@@ -45,7 +45,7 @@ Do not add a `.gitignore` rule just for the release environment; keep it out of
 the tree entirely and clean it up explicitly in step 17.
 
 ```powershell
-$releaseVenv = Join-Path $env:TEMP "mneme-hq-release-0.5.0"
+$releaseVenv = Join-Path $env:TEMP "mneme-hq-release-0.5.2"
 
 Remove-Item -Recurse -Force $releaseVenv -ErrorAction SilentlyContinue
 py -3.11 -m venv $releaseVenv
@@ -99,8 +99,8 @@ python -m build
 
 This produces two artifacts under `dist/`:
 
-- `mneme_hq-0.5.0-py3-none-any.whl` (wheel)
-- `mneme_hq-0.5.0.tar.gz` (sdist)
+- `mneme_hq-0.5.2-py3-none-any.whl` (wheel)
+- `mneme_hq-0.5.2.tar.gz` (sdist)
 
 ## 7. Run `twine check`
 
@@ -129,9 +129,9 @@ python -m pytest tests/test_packaging_contract.py -v
 
 It asserts, directly from the artifacts:
 
-- exactly one `mneme_hq-0.5.0-*.whl` and exactly one `mneme_hq-0.5.0.tar.gz`;
+- exactly one `mneme_hq-0.5.2-*.whl` and exactly one `mneme_hq-0.5.2.tar.gz`;
 - the wheel `*.dist-info/METADATA` declares `Name: mneme-hq` and
-  `Version: 0.5.0`;
+  `Version: 0.5.2`;
 - the sdist `PKG-INFO` declares the same name and version;
 - the wheel `entry_points.txt` `[console_scripts]` is *exactly*:
   ```
@@ -142,7 +142,7 @@ It asserts, directly from the artifacts:
 The declared version comes from `pyproject.toml`, so the test also proves the
 artifacts match the version you intend to ship. Do not proceed unless it passes.
 
-> `python -m pip show mneme-hq` (`Name: mneme-hq`, `Version: 0.5.0`) is only a
+> `python -m pip show mneme-hq` (`Name: mneme-hq`, `Version: 0.5.2`) is only a
 > **source-environment sanity check** — it reports whatever is installed in the
 > active venv (the editable source from step 3), **not** the contents of the
 > built artifacts. It is not artifact inspection; the contract test above is.
@@ -152,8 +152,8 @@ artifacts match the version you intend to ship. Do not proceed unless it passes.
 Tag the commit you just built and tested — not a later one.
 
 ```powershell
-git tag -a v0.5.0 -m "mneme-hq 0.5.0"
-git push origin v0.5.0
+git tag -a v0.5.2 -m "mneme-hq 0.5.2"
+git push origin v0.5.2
 ```
 
 ## 11. Upload only the verified wheel and sdist
@@ -166,8 +166,8 @@ the command:
 ```powershell
 python -m twine upload `
   --username __token__ `
-  dist/mneme_hq-0.5.0-py3-none-any.whl `
-  dist/mneme_hq-0.5.0.tar.gz
+  dist/mneme_hq-0.5.2-py3-none-any.whl `
+  dist/mneme_hq-0.5.2.tar.gz
 ```
 
 Upload the two named artifacts explicitly — not `dist/*` — so nothing unexpected
@@ -207,7 +207,7 @@ published version.
 ```powershell
 deactivate
 pipx uninstall mneme-hq
-pipx install "mneme-hq==0.5.0"
+pipx install "mneme-hq==0.5.2"
 
 Get-Command mneme
 Get-Command mneme-hook
@@ -319,9 +319,9 @@ release for the `v0.5.0` tag. Run this from the **repository root** (the same
 place as the smoke tests), so the notes path is repository-root-relative:
 
 ```powershell
-gh release create v0.5.0 `
-  --title "mneme-hq 0.5.0" `
-  --notes-file .\docs\releases\v0.5.0.md
+gh release create v0.5.2 `
+  --title "mneme-hq 0.5.2" `
+  --notes-file .\docs\releases\v0.5.2.md
 ```
 
 ## 17. Remove the temporary release environment
@@ -353,17 +353,17 @@ Run in order. Do not advance past a failing step.
 - [ ] Wheel + sdist built.
 - [ ] `twine check dist/*` → both PASSED.
 - [ ] `dist/` inspected — exactly the two expected artifacts.
-- [ ] **Artifact contract** (`test_packaging_contract.py` with `dist/` present): exactly one `mneme_hq-0.5.0-*.whl` + one `mneme_hq-0.5.0.tar.gz`; wheel METADATA and sdist PKG-INFO both declare `Name: mneme-hq` / `Version: 0.5.0`; wheel `entry_points.txt` is exactly the two console scripts. (`pip show` is only a source-env sanity check, not artifact inspection.)
-- [ ] `v0.5.0` tag pushed on the exact built commit.
+- [ ] **Artifact contract** (`test_packaging_contract.py` with `dist/` present): exactly one `mneme_hq-0.5.2-*.whl` + one `mneme_hq-0.5.2.tar.gz`; wheel METADATA and sdist PKG-INFO both declare `Name: mneme-hq` / `Version: 0.5.2`; wheel `entry_points.txt` is exactly the two console scripts. (`pip show` is only a source-env sanity check, not artifact inspection.)
+- [ ] `v0.5.2` tag pushed on the exact built commit.
 - [ ] Uploaded only the named wheel + sdist; project-scoped token entered **only at Twine's hidden password prompt** (never in a command, `TWINE_PASSWORD`, history, script, repo file, or Twine config).
 - [ ] Same PowerShell session still open (token was never persisted, so nothing to unset).
 - [ ] `deactivate` run exactly once (step 13) before the clean `pipx` validation.
-- [ ] Clean `pipx`: `pipx uninstall mneme-hq` then `pipx install "mneme-hq==0.5.0"`; `Get-Command mneme` and `Get-Command mneme-hook` both resolve into the pipx env; `mneme --help` works (do **not** run `mneme-hook --help`).
+- [ ] Clean `pipx`: `pipx uninstall mneme-hq` then `pipx install "mneme-hq==0.5.2"`; `Get-Command mneme` and `Get-Command mneme-hook` both resolve into the pipx env; `mneme --help` works (do **not** run `mneme-hook --help`).
 - [ ] `claude.cmd plugin validate $pluginPath --strict` passes; `claude.cmd --plugin-dir $pluginPath` loads the plugin (with `MNEME_HOOK_MODE=strict`).
 - [ ] Claude Code smoke tests: compliant Write (`encoding="utf-8"`) succeeds; blocked Write (no `encoding=`) is blocked by the `PreToolUse` hook.
 - [ ] Smoke artifacts removed, `MNEME_HOOK_MODE` cleared, `git status --short` clean.
-- [ ] GitHub release created for `v0.5.0` (`--notes-file .\docs\releases\v0.5.0.md`, from repo root).
+- [ ] GitHub release created for `v0.5.2` (`--notes-file .\docs\releases\v0.5.2.md`, from repo root).
 - [ ] Temporary release venv removed (no second `deactivate`); `git status --short` clean; **then** close the shell.
 - [ ] **Only then:** update the plugin README to drop the install workaround and
-      advertise `pipx install "mneme-hq>=0.5.0"` (a separate, follow-up change —
+      advertise `pipx install "mneme-hq>=0.5.2"` (a separate, follow-up change —
       the README is intentionally left unchanged in the alignment PR).
