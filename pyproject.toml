@@ -5,8 +5,8 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "mneme-hq"
 version = "0.5.2"
-description = "Architectural drift prevention for the AI SDLC. Deterministic ADR guardrails across coding agents and CI."
-keywords = ["architectural-drift-prevention", "ai-coding-agents", "adr", "governance", "ci", "codex", "claude-code"]
+description = "Architectural drift prevention for the agentic AI SDLC. Deterministic ADR guardrails across coding agents and CI."
+keywords = ["architectural-drift-prevention", "architectural-drift", "agentic-ai-sdlc", "agentic-ai", "ai-coding-agents", "adr", "architectural-governance", "ci", "codex", "claude-code"]
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -27,6 +27,13 @@ dev = [
 [project.scripts]
 mneme = "mneme.cli:main"
 mneme-hook = "mneme.integrations.claude_code.hook:cli_main"
+
+[project.urls]
+Homepage = "https://mnemehq.com"
+Documentation = "https://mnemehq.com/docs/"
+Repository = "https://github.com/MnemeHQ/mneme"
+Issues = "https://github.com/MnemeHQ/mneme/issues"
+Changelog = "https://github.com/MnemeHQ/mneme/releases"
 
 [tool.setuptools.packages.find]
 where = ["."]
