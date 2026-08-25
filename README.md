@@ -2,954 +2,212 @@
 
 **Architectural drift prevention for the AI SDLC.**
 
-Mneme turns architectural decisions and ADRs into deterministic guardrails across AI coding agents, generated rules and CI gates.
+Mneme turns architectural decisions and ADRs into deterministic guardrails for the agentic AI SDLC — across coding agents, repository mutations, generated rules, and CI gates.
 
-Mneme HQ is the architectural governance layer for AI-assisted development.
+[![Tests](https://github.com/MnemeHQ/mneme/actions/workflows/tests.yml/badge.svg)](https://github.com/MnemeHQ/mneme/actions/workflows/tests.yml)
+[![PyPI](https://img.shields.io/pypi/v/mneme-hq.svg)](https://pypi.org/project/mneme-hq/)
+[![Python](https://img.shields.io/pypi/pyversions/mneme-hq.svg)](https://pypi.org/project/mneme-hq/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-<a href="https://www.youtube.com/watch?v=LaJqeJrKkgg" target="_blank">
-  <img 
-    src="https://i.ytimg.com/vi/LaJqeJrKkgg/maxresdefault.jpg" 
-    alt="From ADR to CI: Enforcing Architecture in GitHub Actions" 
-    width="100%"
-    style="border-radius: 8px;"
-  />
-</a>
+Mneme is the architectural governance layer behind that drift-prevention mechanism. It keeps recorded engineering decisions active as AI coding systems propose and modify code, instead of leaving ADRs as passive documentation.
 
-<p align="center">
-  ▶ <a href="https://www.youtube.com/watch?v=4Yg43V9amao" target="_blank"><b>Governed Python Agent Demo</b></a>
-  &nbsp;·&nbsp;
-  <a href="https://mnemehq.com/demo/adr-compiler/" target="_blank">ADR Import Demo →</a>
-  &nbsp;·&nbsp;
-  <a href="https://mnemehq.com/pilot/" target="_blank"><b>Request a pilot →</b></a>
-</p>
+> **Current phase:** Layer 1 validation. Retrieval, enforcement, and benchmark semantics are governed by the accepted architecture and freeze record. See [Current Phase](docs/architecture/current-phase.md) before changing core behavior.
 
+## What Mneme does
 
-> **Current phase: Layer 1 — validation.** Mechanism is frozen at commit [`e73ff7d`](https://github.com/TheoV823/mneme/commit/e73ff7d). Local-repo, single-developer, project-scoped governance. Layer 2 (multi-repo, team sync, org policy distribution) is intentionally deferred. See [docs/architecture/current-phase.md](docs/architecture/current-phase.md) and [docs/architecture/layer1-freeze-e73ff7d.md](docs/architecture/layer1-freeze-e73ff7d.md).
+Mneme separates architectural guidance from deterministic enforcement:
 
----
+- **Records architectural decisions** in a structured, auditable decision corpus.
+- **Retrieves relevant decisions** when an agent or model needs architectural guidance.
+- **Enforces governed rules deterministically** under explicit applicability semantics.
+- **Integrates at the earliest reliable boundary** exposed by each coding workflow.
+- **Audits bypassable mutation paths** where pre-change blocking is not technically available.
+- **Runs in CI** as a final deterministic gate before incompatible changes are accepted.
 
-## Current Status
+The same input and governed decision state produce the same enforcement result. Mneme does not depend on an LLM judge for its core allow/warn/fail decisions.
 
-- **Layer 1 frozen at `e73ff7d`** — retrieval mechanics, enforcement semantics, and benchmark methodology are pinned. No behavioral change without an explicit charter amendment.
-- **Benchmark methodology stabilized** — two-layer scoring, deterministic retrieval, structured-fixture path, regression pins. Suite at 7/7 PASS, recall@3 = 1.00, recall@1 = 5/5 = 1.00.
-- **Validating with design partners** — real-world drift prevention and design-partner feedback are the open Layer 1 exit criteria.
-- **Local-repo governance only** — no multi-developer coordination, no remote policy store, no cross-repo synchronization in Layer 1.
-- **Layer 2 intentionally deferred** — team governance, shared policy packs, deeper IDE integrations, CI enforcement evolution, org-wide distribution.
+Mneme is not a general-purpose vector store, conversational memory system, autonomous coding agent, or deployment observability platform.
 
-## What Mneme Is
+## Install
 
-Local-repo, single-developer, project-scoped architectural governance for AI-assisted code generation. Specifically:
+Requires Python 3.11+.
 
-- A way to **encode architectural decisions** as structured records in `project_memory.json`.
-- A **deterministic retriever** that selects relevant decisions for any given prompt or task.
-- A **pre-flight enforcer** that flags violations before the LLM generates output.
-- A **reproducible benchmark** that makes every change to retrieval or enforcement visible.
-
-The wedge is intentionally narrow: explicit recorded decisions, deterministically retrieved, enforced before generation.
-
-## What Mneme Is Not
-
-These are not on Mneme's roadmap. Not "later" — *not Mneme*:
-
-- **Generalized agent memory.** Not a vector store, not a conversational memory system.
-- **Autonomous planning.** No multi-step agent loops, no tool-use orchestration.
-- **Prompt optimization.** Mneme does not rewrite prompts; it blocks ones that violate governance.
-- **Long-term conversational memory.** Not a chat history system.
-- **Enterprise workflow orchestration.** Not a workflow engine.
-- **Deployment governance, runtime observability.** Not an APM, not a release-pipeline policy tool.
-- **Code-generation quality scoring.** Mneme does not rate output quality; it checks whether generation violated a recorded decision.
-- **Auto-fixing code.** Mneme blocks. The human or model fixes.
-
-## Architectural Principles
-
-The freeze is governed by three load-bearing principles. Every feature is judged against them:
-
-- **Deterministic > clever.** Same memory plus same query produces byte-identical retrieval order on every run. A simpler retriever that gives the same answer twice is preferred to a smarter retriever that does not.
-- **Auditable > autonomous.** Every block records which decision matched, which rule triggered, which term in the input fired it. A human can reconstruct any verdict from the artifacts.
-- **Prevention before review.** Mneme runs *before* the LLM generates output, not after. The intervention point is the prompt boundary.
-
-Mneme is built around a broader architectural governance model for AI-assisted development. See the [concepts hub](https://mnemehq.com/concepts/) for definitions including governance before generation, verification contracts, architectural drift, and governance infrastructure.
-
-## Benchmark Philosophy
-
-The benchmark is a **regression and integrity instrument**, not a generalization claim. Its job is to make every change to retrieval or enforcement visible and reproducible — so a regression cannot land silently, a PASS cannot be coincidence, and external numbers cannot drift away from what the code does.
-
-- **Canned LLM responses, fixed retrieval, rule-text matching.** No live model calls in the suite. Run-to-run model variance cannot leak into verdicts.
-- **Two-layer scoring.** Layer 1 (retrieval) and Layer 2 (enforcement) recorded independently per scenario. The `WEAK_RETRIEVAL` verdict explicitly flags coincidental passes.
-- **recall@1 reported, never optimized.** It is the sharpest tuning dial under fixed methodology, deliberately excluded from pass/fail to prevent overfitting to a small suite.
-- **K=3 canonical.** The enforcer reads the top-3 retrieved decisions and only those. K is a property of the system, not a benchmark parameter.
-
-Full methodology philosophy: [/docs/benchmark-methodology/](https://mnemehq.com/docs/benchmark-methodology/). Full methodology spec: [/benchmark/](https://mnemehq.com/benchmark/).
-
-## Current Scope
-
-Contributor guidance: changes to `decision_retriever.py`, `enforcer.py`, `benchmark.py`, or any benchmark fixture are charter-level changes and require the freeze doc's amendment procedure. Docs, tooling, integrations, site, and examples proceed normally with `[memory]` prefix discipline for `project_memory.json` edits.
-
----
-
-## Demo videos
-
-Watch short demos of Mneme running in realistic AI-assisted development workflows:
-
-- [Governed Python Agent Demo](https://www.youtube.com/watch?v=4Yg43V9amao) — the core product loop: violation caught, context injected, agent retries compliant
-- [ADR Import Demo](https://www.youtube.com/watch?v=lMkq-RoKeD4) — compile ADRs into an executable governance corpus
-- [Architectural Drift Demo](https://www.youtube.com/watch?v=xkXJqSnXBJ8) — drift at AI speed, caught before it compounds
-- [GitHub Actions Governance Demo](https://www.youtube.com/watch?v=LaJqeJrKkgg) — enforce architecture in CI from ADR to gate
-- [Dependency Policy Demo](https://www.youtube.com/watch?v=pBJSpN8d9FU) — project memory as enforcement policy
-
-For the full demo library, see [mnemehq.com/demo](https://mnemehq.com/demo/) or the [YouTube channel](https://www.youtube.com/@MnemeHQ).
-
----
-
-## The problem
-
-LLMs start every call from zero. They forget prior architecture choices, reintroduce rejected technologies, and suggest changes that contradict decisions your team already made. This happens whether you are using a direct API completion, an IDE coding assistant, an agent framework, or a managed agent platform.
-
-Mneme helps teams prevent [architectural drift](https://mnemehq.com/concepts/architectural-drift/) by enforcing [governance before generation](https://mnemehq.com/concepts/governance-before-generation/).
-
-Mneme HQ turns those decisions into structured, retrievable constraints that can be injected into LLM calls and checked against generated output.
-
-## What Mneme HQ is
-
-**Mneme HQ** is the architectural governance layer for AI-assisted development.
-
-This repository demonstrates the first core capability: injecting structured architectural decisions into LLM calls so outputs stay consistent with prior engineering decisions.
-
-```python
-from mneme.memory_store import MemoryStore
-from mneme.retriever import Retriever
-from mneme.context_builder import format_context_packet
-from mneme.llm_adapter import LLMAdapter
-
-memory = MemoryStore("examples/project_memory.json").load()
-packet = Retriever(memory).retrieve("Should we rebuild from scratch?")
-response = LLMAdapter().complete(
-    user="Should we rebuild from scratch?",
-    system=format_context_packet(packet),
-)
-print(response.content)
+```bash
+pip install mneme-hq
 ```
 
-## Works with
+Verify the CLI:
 
-One decision corpus, labelled by actual support level. The authoritative,
-maintained matrix lives in [docs/integrations/README.md](docs/integrations/README.md).
+```bash
+mneme --help
+```
 
-| Level | Surfaces |
-| --- | --- |
-| Native integration | Claude Code, Claude Agent SDK, Google Antigravity, Codex CLI |
-| Validated compatibility | Paperclip — CLI and ACP transports, no adapter required |
-| Rules export | Cursor |
-| CLI-based CI gates | GitHub Actions, GitLab CI |
-| Experimental / planned | OpenCode, Kiro (open PR), Deep Agents middleware POC |
+For repository development:
 
-Per-integration documentation: [docs/integrations/](docs/integrations/).
+```bash
+git clone https://github.com/MnemeHQ/mneme.git
+cd mneme
+pip install -e ".[dev]"
+```
+
+## 60-second enforcement example
+
+Initialize a project-local decision corpus:
+
+```bash
+mneme init
+```
+
+Record one architectural decision:
+
+```bash
+mneme add_decision \
+  --memory .mneme/project_memory.json \
+  --id config-format \
+  --decision "Use JSON for configuration files" \
+  --scope config \
+  --constraint "Use JSON only" \
+  --anti-pattern "Do not use YAML"
+```
+
+Create a proposed input that violates it:
+
+```bash
+python -c "import pathlib; pathlib.Path('prompt.txt').write_text('Set up a new YAML config file', encoding='utf-8')"
+```
+
+Run the deterministic check:
+
+```bash
+mneme check \
+  --memory .mneme/project_memory.json \
+  --input prompt.txt \
+  --query configuration
+```
+
+In strict mode, the prohibited YAML proposal returns a `FAIL` verdict and exit code `2`. A compliant JSON proposal returns `PASS` and exit code `0`.
+
+The CLI is the common enforcement surface. Agent integrations translate their native events into the same Mneme decision and enforcement model.
 
 ## How it works
 
-Mneme applies the same decision corpus at the earliest reliable boundary each workflow exposes: before generation through context injection, before supported mutations through agent hooks, after bypassable mutations through working-tree audits, and before merge through CI gates.
-
-The pipeline is:
-
-1. **Decision store** — structured architectural decisions: rules, constraints, anti-patterns, decision records
-2. **Deterministic retrieval** — selects relevant items based on the input task
-3. **Context packet** — builds a compact, structured representation of what the model needs to know
-4. **Injection** — the context packet is passed as the system prompt
-5. **Evaluation** (optional) — outputs are scored against the injected context to check alignment
-
-This is intentionally simple:
-
-* no vector database
-* no long context windows
-* no agent loops
-
-The goal is not to give the model more information. It is to make it **respect prior decisions**.
-
----
-
-## The flagship example
-
-**Task**: "Should we rebuild the retrieval system from scratch with embeddings?"
-
-**WITHOUT Mneme HQ:**
-```
-We could consider rebuilding the system with a vector database and embedding
-model. This would improve semantic matching and scale better long-term.
-Sentence-transformers is a good option for generating embeddings...
+```text
+Architectural decisions / ADRs
+            |
+            v
+   structured decision corpus
+            |
+      +-----+--------------------+
+      |                          |
+      v                          v
+relevant guidance       deterministic enforcement
+   retrieval             + applicability checks
+      |                          |
+      +------------+-------------+
+                   |
+                   v
+       workflow-specific boundary
+                   |
+      +------------+-------------+
+      |            |             |
+ pre-change     post-change      CI
+   hooks          audit          gate
 ```
 
-**WITH Mneme HQ:**
-```
-Do not rebuild from scratch. The project has an explicit rule to extend current
-infrastructure before rebuilding (rule-001). Keyword scoring was chosen
-intentionally -- it is deterministic, has no ML dependencies, and is easy to
-debug. The team already declined adding sentence-transformers in v1. Extend
-the current retriever instead.
-```
-
-**Mneme HQ ALIGNMENT:**
-```
-  [OK]   rule-001: Extend current infrastructure before rebuilding
-  [OK]   rule-002: Keep v1 retrieval deterministic
-  [OK]   anti-001: Do not use langchain
-  [OK]   dec-001: Declined. Kept keyword scoring.
-  alignment_score: 1.00
-```
-
-Same model. Same question. Different answer -- because it has the project's actual decisions.
-
-## What this repo demonstrates
-
-A five-stage pipeline that runs locally in under two minutes:
-
-```
-project_memory.json -> MemoryStore -> Retriever -> ContextBuilder -> LLMAdapter -> Evaluator
-```
-
-1. **Load** structured project memory from a human-editable JSON file
-2. **Retrieve** the rules and examples relevant to the current task
-3. **Build** a context packet and inject it into the system prompt
-4. **Call** the LLM (or dry-run without an API key)
-5. **Evaluate** whether the response followed your rules
-
-The demo runs each task twice -- once without governance (baseline) and once with the decision corpus enforced -- so you can see the delta.
-
-## Why not just RAG?
-
-RAG retrieves **information**. Mneme HQ retrieves **decisions**.
-
-* Not retrieval of documents — retrieval of **decisions your project already made**
-* Not long context — a **structured context packet** with only what is relevant to the query
-* Not autonomy — **consistency enforcement**: the model is told what was decided, not asked to figure it out
-
-| | RAG | Mneme HQ |
-|---|---|---|
-| Input | Documents, chunks, embeddings | Rules, constraints, decision records |
-| Goal | Inform the response | Shape the response |
-| Output effect | Model knows more | Model follows your decisions |
-| Evaluation | "Did it use the right source?" | "Did it respect the constraint?" |
-
-Mneme HQ is not a search engine for your docs. It is a structured rule system that tells the model what your project has already decided and checks whether it listened.
-
-## Architecture
-
-Mneme HQ uses structured project memory as the retrieval mechanism, but its purpose is governance: enforcing architectural decisions and preventing drift during AI-assisted development.
-
-```
-mneme/
-  schemas.py              Dataclasses: MemoryItem, Decision, DecisionExample, ContextPacket
-  memory_store.py         Load project_memory.json; auto-migrate legacy rule/anti_pattern items
-  retriever.py            v1: keyword overlap + tag match + priority weight (unchanged)
-  decision_retriever.py   v2: field-weighted scoring over Decision records
-  context_builder.py      format_context_packet (v1) + format_decisions/top-N (v2)
-  conflict_detector.py    v2: post-response violation scanner
-  pipeline.py             v2: MemoryStore -> DecisionRetriever -> inject -> LLM -> detect
-  adr_schema.py           v0.4: ADR dataclass, status/priority enums, errors
-  adr_parser.py           v0.4: YAML frontmatter parser
-  adr_compiler.py         v0.4: validate_corpus, resolve_precedence, compile_adrs
-  cursor_generator.py     v0.3: Cursor rules generator
-  enforcer.py             v0.3: configurable enforcement modes (strict / warn)
-  llm_adapter.py          Thin Anthropic API wrapper with dry-run mode
-  evaluator.py            v1: deterministic alignment checker (unchanged)
-  cli.py                  v2: add_decision / list_decisions / test_query / check
-examples/
-  project_memory.json     20 items + 5 examples + 3 native decisions for this repo
-  demo_tasks.json         3 decision-oriented tasks for the before/after demo
-demo.py                   CLI runner: baseline vs. Mneme-enhanced, with alignment scoring
-```
-
-### Decision item types
-
-| Type | What it is | Evaluator behavior |
-|------|-----------|-------------------|
-| `rule` | Hard constraint -- must follow | Violation flagged |
-| `anti_pattern` | Explicitly ruled out | Violation flagged |
-| `preference` | Should-follow guideline | Surfaced in context |
-| `fact` | Established truth (language, version, provider) | Surfaced in context |
-| `architecture_decision` | ADR-style choice with rationale | Surfaced in context |
-| `example` | Worked illustration or code snippet | Surfaced in context |
-
-### Decision examples
-
-Separate from items. Each one records a situation, what the project decided, and why:
-
-```json
-{
-  "task": "A contributor proposed adding sentence-transformers for semantic retrieval in v1.",
-  "decision": "Declined. Kept keyword scoring.",
-  "rationale": "Heavy ML dependency that breaks the pip-install-in-30-seconds contract."
-}
-```
+Mneme applies governance at the earliest reliable boundary a workflow exposes:
 
-These are injected as prior decisions so the model learns how your project reasons, not just what it decided.
+1. **Before generation** when architectural context can be injected into the model call.
+2. **Before supported file mutations** when an agent exposes a blocking pre-tool hook.
+3. **After bypassable mutations** through bounded working-tree audits where shell/script writes cannot be inspected safely before execution.
+4. **Before merge** through CLI-based CI gates.
 
-### Retrieval
+These boundaries are complementary. An integration only claims the surfaces that have been implemented and validated for that harness.
 
-Fully deterministic. Same query + same memory file = same output every time.
+### Retrieval is not enforcement
 
-- **Keyword overlap**: +1.0 per query token found in item title/content
-- **Tag match**: +1.5 per query token that exactly matches a tag
-- **Priority scaling**: score multiplied by item weight (high=1.5, medium=1.0, low=0.5)
-- **Rules always surface**: rules and anti-patterns are included regardless of query relevance
-- **Fallback**: if no facts match, top 3 by weight are included so context is never empty
+Decision retrieval answers: **which architectural decisions are useful as guidance for this task?**
 
-No embeddings. No vector store. Determinism is a feature, not a limitation.
+Enforcement answers: **does the proposed change violate a governed rule that applies here?**
 
-### Evaluation
+Those concerns are intentionally separated. See [ADR-017](docs/adr/ADR-017-enforcement-scope-vs-retrieval-scope.md), [ADR-019](docs/adr/ADR-019-typed-literal-rule-contract.md), and [ADR-020](docs/adr/ADR-020-explicit-path-applicability-for-typed-rules.md).
 
-The evaluator checks the response against the rules that were actually injected (the `ContextPacket`), not the full memory file. Two checks:
+## Supported surfaces
 
-1. **Rule check**: extracts forbidden terms from each rule/anti-pattern. A violation fires when a term appears with a positive recommendation signal and no negation nearby.
-2. **Decision check**: for past decisions where the project said "no," checks whether the response recommends the declined subject anyway.
+The authoritative support matrix lives in [docs/integrations/README.md](docs/integrations/README.md). The labels below are evidence levels, not interchangeable marketing terms.
 
-Score = fraction of checks passed. 1.00 = no violations detected.
-
-The evaluator is deterministic, fast, and auditable. The upgrade path to a model-based judge is explicit in the code: replace two functions, keep everything else.
-
-## v2: Decision enforcement layer
-
-Mneme HQ v0.2 added structured `Decision` records, field-weighted retrieval, top-N
-injection, post-response conflict detection, and a CLI, all additive. The v1
-pipeline is unchanged. Legacy `rule` and `anti_pattern` items are auto-migrated
-into `Decision` objects at load time; no changes needed to existing JSON files.
+| Support level | Surface |
+| --- | --- |
+| Native integration | Claude Code |
+| Native integration | Claude Agent SDK |
+| Native integration | Google Antigravity |
+| Native integration | Codex CLI |
+| Validated compatibility | Paperclip — CLI and ACP transports, no adapter required |
+| Rules export | Cursor |
+| CLI-based CI gate | GitHub Actions, GitLab CI |
+| Experimental | OpenCode |
+| Experimental | Kiro |
+| Planned | Deep Agents middleware POC |
 
-### Decision schema
+Each integration documents its actual blocking boundary, bypass paths, degraded behavior, and validation evidence. Start with the [integration matrix](docs/integrations/README.md), not assumptions based on another harness.
 
-```json
-{
-  "id": "mneme_storage_json",
-  "decision": "Use JSON storage only",
-  "rationale": "Avoid infra complexity and keep local-first.",
-  "scope": ["storage", "backend"],
-  "constraints": ["no postgres", "no external database"],
-  "anti_patterns": ["introduce ORM", "add migration layer"],
-  "rules": [
-    {
-      "type": "FORBID_LITERAL",
-      "value": "install legacy-package",
-      "include_paths": ["docs/**", "**/*.md"],
-      "exclude_paths": ["docs/generated/**"]
-    }
-  ]
-}
-```
-
-Omitting `include_paths` keeps a typed rule global. A scoped rule requires a
-non-empty `include_paths`; matching `exclude_paths` take precedence.
-
-Add a top-level `"decisions"` array alongside `"items"` and `"examples"` in
-`project_memory.json`. All seven fields are optional except `id` and `decision`.
-
-### Scoring formula
+## ADRs and project memory
 
-`DecisionRetriever` scores each decision with field-weighted keyword overlap
-(deterministic, no ML, same query always returns the same ranking):
-
-```
-score =
-    overlap(query, decision)      * 1.0
-  + overlap(query, scope)         * 2.0
-  + overlap(query, constraints)   * 1.5
-  + overlap(query, anti_patterns) * 1.5
-  + overlap(query, rationale)     * 0.5
-```
-
-### Top-N injection
-
-Only the top-scoring decisions are injected. The default cap is
-`DEFAULT_MAX_DECISIONS = 3`. Override per call:
-
-```python
-from mneme.pipeline import Pipeline
+Mneme can compile architecture decisions into structured governance records rather than treating ADRs as passive prose.
 
-result = Pipeline("examples/project_memory.json", dry_run=True, max_decisions=5).run(query)
-print(result.system_prompt)   # formatted block injected as system prompt
-print(result.injected_decisions)  # list[Decision] actually sent
-```
+The repository governance source of truth is `.mneme/project_memory.json`. ADR import and validation preserve provenance so decisions can be inspected and enforced consistently.
 
-### Conflict detection
+See:
 
-`ConflictDetector` scans the LLM response for constraint, anti-pattern, and
-typed-rule violations **after** the call. It is a detector, not a blocker:
+- [Governance representation](docs/architecture/governance-representation.md)
+- [ADR import](docs/integrations/adr-import.md)
+- [Accepted ADRs](docs/adr/)
 
-```python
-from mneme.conflict_detector import ConflictDetector
-conflicts = ConflictDetector().detect(
-    response.content,
-    injected_decisions,
-    target_path="docs/guide.md",
-)
-# Conflict(violated_decision_id, reason, snippet) per match
-```
+## Architecture guarantees
 
-A term is only flagged when it appears **without** a negation signal nearby.
-`"Do not use Postgres"` is not a conflict. `"Switch to Postgres"` is.
-Typed `FORBID_LITERAL` rules do not use this heuristic: the exact literal is
-forbidden regardless of surrounding prose. Pass `target_path` when injected
-decisions may contain scoped rules. `evaluate()` returns applicability traces
-and an `evaluation_complete` flag; the compatibility `detect()` helper raises
-when a scoped rule cannot be evaluated without a path.
+Three principles govern the current mechanism:
 
-### CLI
+- **Deterministic > clever.** Enforcement behavior must be reproducible.
+- **Auditable > autonomous.** A verdict should be traceable to the decision, rule, applicability state, and evidence that produced it.
+- **Prevention before review.** When a reliable pre-change boundary exists, use it; when it does not, surface the limitation and audit later rather than pretending the path is blocked.
 
-```bash
-# List all decisions (native + auto-migrated legacy items)
-mneme list_decisions --memory examples/project_memory.json
+The current Layer 1 scope, frozen surfaces, accepted amendments, experimental work, and deferred Layer 2 work are maintained in [docs/architecture/current-phase.md](docs/architecture/current-phase.md).
 
-# Append a new decision (file write only — does not mutate a live Pipeline)
-mneme add_decision --memory examples/project_memory.json \
-    --id adr-042 --decision "No GraphQL in v1" \
-    --scope api --constraint "REST only" --anti-pattern "introduce graphql"
+Do not infer architecture from this README when a linked ADR or architecture document is more specific.
 
-# Score a query and preview the injected block
-mneme test_query --memory examples/project_memory.json \
-    --query "should I add postgres?" --top 3
-```
+## Benchmark and validation
 
----
+Mneme's benchmark is a regression and integrity instrument for retrieval and enforcement behavior. It is not a general model-quality benchmark.
 
-## v0.4: Architectural compiler
+The benchmark keeps retrieval and enforcement scoring distinct so changes cannot silently improve one surface while regressing another.
 
-Mneme HQ v0.4 compiles a versioned corpus of ADR markdown files into a
-deterministic active constraint set. ADRs are the source of truth; the
-compiler is the deterministic rule for turning them into the constraints
-the runtime injects.
+See:
 
-```
-ADR corpus  ->  parse  ->  validate  ->  resolve precedence
-            ->  active constraint set  ->  Decision records  ->  runtime
-```
+- [Benchmark methodology](https://mnemehq.com/docs/benchmark-methodology/)
+- [Public benchmark](https://mnemehq.com/benchmark/)
+- [Current phase and freeze](docs/architecture/current-phase.md)
+- [Release notes](docs/releases/)
 
-### ADR frontmatter
+## Demos
 
-```yaml
----
-id: ADR-001
-title: Use JSON file storage
-status: accepted          # proposed | accepted | deprecated | superseded
-priority: foundational    # foundational | normal | exception
-date: 2026-01-10
-scope: storage            # dotted path; empty string = global
-supersedes: []
----
+- [Governed Python Agent](https://www.youtube.com/watch?v=4Yg43V9amao)
+- [ADR Import](https://www.youtube.com/watch?v=lMkq-RoKeD4)
+- [Architectural Drift](https://www.youtube.com/watch?v=xkXJqSnXBJ8)
+- [GitHub Actions Governance](https://www.youtube.com/watch?v=LaJqeJrKkgg)
+- [Dependency Policy](https://www.youtube.com/watch?v=pBJSpN8d9FU)
 
-Body markdown follows.
-```
+More examples: [mnemehq.com/demo](https://mnemehq.com/demo/)
 
-### Corpus validation
+## Contributing
 
-`validate_corpus` aggregates every detected problem before raising — one
-pass surfaces every error so maintainers fix the corpus once:
+Before changing retrieval, enforcement, applicability, conflict handling, or benchmark semantics, read the architecture and ADRs that govern that surface.
 
-- required fields present
-- ADR id format (`ADR-\d+`) and uniqueness
-- valid `status` / `priority` enums
-- ISO 8601 date
-- scope grammar (lowercase dotted path, no leading/trailing dot)
-- `supersedes` references resolve to known ADRs
-- no supersession cycles (self / 2-node / N-node)
+- [Contributing](CONTRIBUTING.md)
+- [Current architecture phase](docs/architecture/current-phase.md)
+- [Security policy](SECURITY.md)
+- [Changelog](CHANGELOG.md)
 
-### Precedence resolution
-
-Same-scope conflicts resolve via a deterministic hierarchy. The compiler
-never silently picks a winner:
-
-1. Explicit `supersedes` — referenced ADRs are removed (chain-aware)
-2. Same scope, higher priority wins (foundational > normal > exception)
-3. Same scope + priority, newer date wins
-4. Otherwise → `ADRPrecedenceError`
-
-Broader and narrower scopes coexist; output is sorted most-specific-first.
-
-### Usage
-
-```python
-from mneme.adr_compiler import compile_adrs, adrs_to_decisions
-from mneme.decision_retriever import DecisionRetriever
-
-decisions = adrs_to_decisions(compile_adrs("docs/adr"))
-retriever = DecisionRetriever(decisions)
-```
-
-The bridge into the existing `Decision` schema means the runtime pipeline
-(retriever, conflict detector, context builder) consumes ADR-driven
-corpora without code changes.
-
----
-
-## Repo-level enforcement: `.mneme/` and `mneme check`
-
-This repository governs itself with Mneme. The canonical enforcement memory
-lives at `.mneme/project_memory.json` and is the source of truth for repo-level
-governance. Repo-level instructions for contributors and AI assistants live in
-the root `CLAUDE.md`.
-
-`mneme check` is the CLI entry point for running a governance pass over a
-diff or a working tree. It supports two modes:
-
-* `--mode warn`: surfaces violations without failing
-* `--mode strict`: fails on any violation
-
-```bash
-# Run a warn-mode check before opening a PR
-mneme check --mode warn
-```
-
-The PR workflow runs `mneme check --mode warn` automatically, so contributors
-see governance feedback on every pull request without it blocking merges
-during the warn-first rollout.
-
----
-
-## Mneme for Claude Code
-
-Architectural governance for [Claude Code](https://docs.anthropic.com/en/docs/claude-code).
-Enforce ADRs and engineering constraints automatically — before drift reaches your repo.
-
-Two steps — the runtime and the Claude Code integration are separate artifacts:
-
-```bash
-# 1. Install the runtime
-pipx install "mneme-hq>=0.5.1"
-
-# 2. Load the plugin
-claude --plugin-dir ./integrations/claude-code-plugin
-```
-
-This registers a `PreToolUse` hook so `Edit` and `Write` tool calls are checked
-against `.mneme/project_memory.json`, in strict mode by default. Files written
-by shell commands are **not** covered — see the
-[plugin README](integrations/claude-code-plugin/README.md) for the coverage
-boundary, fail-open guarantees, and mode switching.
-
-<details>
-<summary>Legacy: flat installer (source checkout only)</summary>
-
-Before the plugin, the integration was installed by a script that writes
-`.claude/settings.json` and hyphenated commands (`/mneme-check`,
-`/mneme-context`, `/mneme-record`, `/mneme-review`) — distinct from the
-plugin's namespaced `/mneme:check` and friends.
-
-```bash
-python scripts/install_claude_code.py          # project-scoped: writes ./.claude/
-# or: python scripts/install_claude_code.py --user
-```
-
-**This requires a git clone.** `scripts/` is not shipped in the `mneme-hq`
-wheel, so the script does not exist in a `pip`/`pipx` install. Prefer the
-plugin above.
-
-</details>
-
-See [docs/integrations/claude-code.md](docs/integrations/claude-code.md) for
-retrieval behaviour and further detail.
-
----
-
-## Check before agent execution
-
-`mneme check` validates a prompt or AI-generated suggestion against your project
-decisions **before** it reaches a coding agent. It exits non-zero on violations
-so it can gate CI pipelines or pre-commit hooks.
-
-```
-examples/prompt_violation.txt
-       │
-       ▼
-mneme check --memory project_memory.json \
-            --input  examples/prompt_violation.txt \
-            --query  "storage backend"
-       │
-       ├── PASS (exit 0)  → proceed to agent
-       ├── WARN (exit 1)  → constraint mention — review before proceeding
-       └── FAIL (exit 2)  → anti-pattern match — blocked
-```
-
-Normally `--input` is also the artifact path used by scoped typed rules. When
-`--input` is a temporary file containing materialized or introduced content,
-pass the real artifact separately with `--target-path`. If a scoped rule cannot
-resolve that path relative to the policy root, the result is `INCOMPLETE` and
-the command exits 2 in either mode; JSON output sets
-`evaluation_complete: false` and includes the `UNKNOWN` applicability trace.
-
-**Try it with the included examples:**
-
-```bash
-# This prompt introduces sqlalchemy and a migration layer — FAIL (exit 2)
-mneme check \
-  --memory examples/project_memory.json \
-  --input  examples/prompt_violation.txt \
-  --query  "storage backend"
-```
-
-```
-FAIL  [mneme_storage_json] anti_pattern "add migration layer" — trigger: migration
-      Use JSON storage only
-FAIL  [mneme_storage_json] anti_pattern "add sqlalchemy" — trigger: sqlalchemy
-      Use JSON storage only
-
-Result: FAIL
-```
-
-```bash
-# This prompt extends the storage module within the JSON contract — PASS (exit 0)
-mneme check \
-  --memory examples/project_memory.json \
-  --input  examples/prompt_clean.txt \
-  --query  "storage backend"
-```
-
-```
-Result: PASS
-```
-
-**What triggers each level:**
-
-| Verdict | Trigger | `strict` exit | `warn` exit |
-|---------|---------|:---:|:---:|
-| `PASS`  | No violations in top-N decisions | 0 | 0 |
-| `WARN`  | Input mentions a term forbidden by a `"no X"` constraint | 1 | 0 |
-| `FAIL`  | Input contains a term from a decision's `anti_patterns` list | 2 | 0 |
-| `FAIL`  | Input matches a typed `FORBID_LITERAL` rule | 2 | 0 |
-
-Detection is deterministic — no ML, no LLM, no external calls. Same input
-always returns the same verdict.
-
-### Enforcement modes
-
-`--mode strict` *(default)* — designed for CI gates and pre-commit hooks.
-Any violation causes a non-zero exit that stops the pipeline.
-
-```bash
-# Gate a CI step: fail the build if the prompt violates decisions
-mneme check --mode strict \
-  --memory examples/project_memory.json \
-  --input  prompt.txt \
-  --query  "storage backend"
-```
-
-`--mode warn` — designed for observability and gradual adoption.
-Violations are printed with full detail but the process always exits 0,
-so existing scripts are never broken.
-
-```bash
-# Log violations without blocking the agent
-mneme check --mode warn \
-  --memory examples/project_memory.json \
-  --input  prompt.txt \
-  --query  "storage backend"
-```
-
-Both modes print the same structured output. Only the exit code differs.
-
----
-
-## Cursor workflow
-
-Mneme generates a Cursor-compatible `.mdc` rules file from your project decisions.
-The file is injected into Cursor AI's context so every code suggestion it makes
-already knows your constraints.
-
-```
-project_memory.json
-       │
-       ▼
-mneme cursor generate --query "working on storage layer"
-       │
-       ▼
-.cursor/rules/mneme.mdc  ◄── Cursor reads this before generating code
-```
-
-**Command:**
-
-```bash
-mneme cursor generate \
-  --memory examples/project_memory.json \
-  --query "working on storage layer" \
-  --output .cursor/rules/mneme.mdc \
-  --top 3
-```
-
-**Output shape** (`.cursor/rules/mneme.mdc`):
-
-```markdown
----
-description: "Mneme decisions for: working on storage layer"
-globs: "**/*"
-alwaysApply: false
----
-
-# Mneme Project Memory
-
-> ⚠️ Generated by Mneme — do not edit manually.
-> Source: examples/project_memory.json
-> Query: working on storage layer
-> Generated: 2026-04-24T12:00:00Z
-
-## Decisions
-
-### [mneme_storage_json] Use JSON storage only
-
-**Why:** Avoid infra complexity and keep local-first.
-**Scope:** storage, backend, persistence
-**Constraints:**
-- no postgres
-- no external database
-- no ORM
-
-**Avoid:**
-- introduce ORM
-- add migration layer
-- add sqlalchemy
-```
-
-Re-generate after adding or changing decisions. Commit `.cursor/rules/mneme.mdc`
-alongside `project_memory.json` so the whole team gets the same constraints.
-
----
-
-## ADR import
-
-Drop an existing ADR corpus into Mneme's enforceable memory:
-
-```bash
-mneme adr import docs/adr --memory .mneme/project_memory.json --dry-run
-```
-
-The default is dry-run: the preview shows the active set, the projected
-graph status of every ADR, the constraints that would be persisted, and
-any conflicts or retrieval-only ADR warnings. A dry-run returns exit 1 when
-an active ADR has no mechanically enforceable rules. Apply when you're
-satisfied:
-
-```bash
-mneme adr import docs/adr --memory .mneme/project_memory.json --apply
-```
-
-Conflict gates:
-- `--update-existing` -- required to overwrite a decisions[] entry whose id
-  matches an incoming ADR.
-- `--approve-conflicts` -- required to proceed when two accepted ADRs in
-  the corpus share a scope, priority, and date (an "active-active
-  contradiction" the compiler refuses to resolve silently).
-
-Supported ADR format: YAML frontmatter + markdown body. The body may
-include an optional `## Constraints` section with directives:
-
-```markdown
-## Constraints
-- FORBID_LITERAL: install legacy-package
-- FORBID_LITERAL:
-    value: install legacy-client
-    include_paths:
-      - "docs/**"
-      - "**/*.md"
-    exclude_paths:
-      - "docs/generated/**"
-- FORBID_DEPENDENCY: mongodb
-- FORBID_PATH: src/legacy/**
-- REQUIRE_PATH: billing/**
-```
-
-`FORBID_LITERAL` is persisted as a typed rule and produces `FAIL` through
-`mneme check`. Matching is case-sensitive and boundary-aware, so
-`pip install mneme` does not match `pip install mneme-hq`. The rule is checked
-across the decision corpus, independent of retrieval score. Its declaring ADR
-source and canonical memory file are exempt so policy storage can state the
-literal it governs.
-
-The structured form scopes one typed rule to repository-relative paths.
-Selectors use forward slashes and case-sensitive matching: `*` stays within a
-single path segment, while a complete `**` segment spans zero or more segments.
-Absolute paths, backslashes, dot segments, negation, bracket syntax, `?`, and
-embedded `**` are rejected. For canonical `.mneme/project_memory.json`, the
-repository root is the parent of `.mneme`; custom memory files use their own
-parent directory as the policy root.
-
-`FORBID_DEPENDENCY` retains its legacy `WARN` behavior. `FORBID_PATH` and
-`REQUIRE_PATH` persist into Decisions for retrieval visibility but are not yet
-enforced against changed-file paths.
-
-See [docs/integrations/adr-import.md](docs/integrations/adr-import.md)
-for the full reference.
-
----
-
-## Enforcement regression suite
-
-Mneme ships with a deterministic regression suite that exercises the enforcement engine against hand-authored fixture responses.
-
-Current scenario coverage:
-
-- Storage backend drift
-- Retrieval overengineering
-- Framework abstraction creep
-- Infrastructure scope creep
-- Feature boundary violations
-
-Run locally:
-
-```bash
-mneme benchmark examples/benchmarks/ --memory examples/project_memory.json
-```
-
-Reports are generated in:
-
-- `examples/benchmarks/reports/RESULTS.md`
-- `examples/benchmarks/reports/results.json`
-
-### What this is — and what it isn't
-
-This suite is a **regression test for the deterministic enforcer**, not a behavioral evaluation of LLM output. Each scenario consists of two hand-authored fixture responses — one that names a forbidden technology, one that doesn't — and the suite verifies that the enforcer flags the first and not the second. No LLM is invoked anywhere in the harness.
-
-The suite is useful for catching regressions in retrieval and enforcement logic. It does **not** measure whether Mneme changes real model output. A behavioral evaluation harness — running real LLM samples under baseline and Mneme-injected conditions, with violation rates and confidence intervals — is on the roadmap but not yet built. Until it is, do not interpret a green regression suite as evidence that Mneme prevents violations in production.
-
----
-
-## Quick demo
-
-```bash
-python -m mneme.cli list_decisions --memory examples/project_memory.json
-python -m mneme.cli test_query --memory examples/project_memory.json --query "should I use Postgres?" --top 3
-python demo.py --dry-run
-```
-
----
-
-## Quickstart
-
-```bash
-git clone https://github.com/TheoV823/mneme
-cd mneme
-
-# Core only
-pip install -e .
-```
-
-```bash
-# Set your Anthropic API key
-cp .env.example .env
-# Edit .env: ANTHROPIC_API_KEY=sk-ant-...
-```
-
-```bash
-# Run the before/after demo (live API calls)
-python demo.py
-
-# Run without an API key (prints prompts, no API calls)
-python demo.py --dry-run
-
-# Run a single task
-python demo.py --task task-001
-
-# Inspect what Mneme HQ would inject, without calling the LLM
-python demo.py --context-only
-```
-
-### Requirements
-
-- Python 3.11+
-- `anthropic` >= 0.25.0
-- `python-dotenv` >= 1.0.0
-
-That is the entire dependency list.
-
-## Example: project_memory.json
-
-The included example describes this repo itself. Abbreviated:
-
-```json
-{
-  "meta": {
-    "name": "mneme-context-engine",
-    "description": "Enforce architectural decisions on every LLM API call.",
-    "version": "0.1.0"
-  },
-  "items": [
-    {
-      "id": "rule-001",
-      "type": "rule",
-      "title": "Extend current infrastructure before rebuilding",
-      "content": "When adding capability, first ask whether an existing module can be extended.",
-      "tags": ["architecture", "scope"],
-      "priority": "high"
-    },
-    {
-      "id": "anti-001",
-      "type": "anti_pattern",
-      "title": "Do not use langchain",
-      "content": "langchain abstracts away the API surface this library is designed to control.",
-      "tags": ["langchain", "forbidden"],
-      "priority": "high"
-    }
-  ],
-  "examples": [
-    {
-      "task": "A contributor proposed adding sentence-transformers for semantic retrieval in v1.",
-      "decision": "Declined. Kept keyword scoring.",
-      "rationale": "Heavy ML dependency. Breaks pip-install-in-30-seconds contract."
-    }
-  ]
-}
-```
-
-The full file has 20 items and 5 decision examples. Edit it for your own project -- it is plain JSON, no tooling required.
-
-## Demo tasks
-
-| Task | What Mneme HQ catches |
-|------|--------------------|
-| Rebuild from scratch? | rule-001 (extend over rebuild), dec-001 (embeddings declined) |
-| Broaden v1 scope? | anti-002 (no agentic loops), rule-004 (narrow MVP) |
-| Mix project + personal memory? | rule-003 (separate project from personal), dec-002 (per-project only) |
-
-## Why this matters
-
-- **Contradiction prevention.** LLM calls are stateless. Every call starts from zero, so models routinely propose changes that contradict decisions your team already made: reintroducing rejected technologies, rebuilding what was meant to be extended, suggesting patterns the project has explicitly ruled out. Mneme HQ injects the relevant prior decisions on every call so the model's output aligns with established architecture instead of drifting away from it.
-
-- **Architectural continuity at AI velocity.** AI-assisted development has increased code output without increasing review capacity. The bottleneck is not generation; it is keeping generated code consistent with the architecture the team agreed on. Mneme HQ enforces that consistency at generation time, before the diff lands in review, which reduces the review burden and keeps architectural drift from compounding.
-
-- **Measurable enforcement, not vibes.** Injecting context is half the problem. The other half is knowing whether it worked. The evaluator checks each response against the decisions that were actually injected and returns a deterministic alignment score. Anti-patterns and constraint violations are flagged explicitly. This turns "did the AI follow our decisions?" from a subjective judgment into something you can track, score, and regress-test.
-
-## Roadmap
-
-See the [Adoption and Enhancement Roadmap](docs/roadmap/2026-04-24-adoption-and-enhancement-roadmap.md).
-
-| Version | Capability |
-|---------|-----------|
-| **v0.1** ✓ | JSON-backed decision corpus, keyword retrieval, deterministic evaluation, before/after demo |
-| **v0.2** ✓ | Decision enforcement layer: structured `Decision`, field-weighted retrieval, conflict detector, CLI |
-| **v0.3** ✓ | Configurable enforcement modes (`strict` / `warn`); Cursor rules generator; Claude Code hook + slash commands (v0.3.2) |
-| **v0.4** ✓ | Architectural compiler: ADR frontmatter schema, corpus validation, deterministic precedence engine, Decision-bridge integration |
-| **v0.5** ✓ | Repo-level governance: `.mneme/` canonical enforcement memory, `mneme check`, GitHub PR workflow integration (warn mode) |
-| **Layer 1 freeze** ✓ | v1.1 stabilization complete at `e73ff7d`: deterministic retrieval pinned, two-layer benchmark methodology, structured-fixture path, charter discipline. See [docs/architecture/layer1-freeze-e73ff7d.md](docs/architecture/layer1-freeze-e73ff7d.md). |
-| **Layer 1 validation** | Real-world drift prevention, design-partner feedback, governance wedge validation. Open exit criteria. |
-
-### Layer 2 — intentionally deferred
-
-The following are out of scope for Layer 1 and require the Layer 1 exit criteria to be met before they are promoted into the roadmap:
-
-- Multi-project / multi-repo support, cross-project memory, memory versioning across projects.
-- Team governance, shared policy packs, org-wide policy distribution.
-- Strict-mode CI rollout beyond the current single-repo scope.
-- LLM-judge evaluator mode (substitutes deterministic enforcement with a model judge — incompatible with the "deterministic > clever" charter principle in Layer 1).
-- Learned retrieval ranking (incompatible with "no auto-learning").
-- Deeper IDE integrations (LSP, JetBrains).
-
-These are listed so they cannot be re-derived as "missing." The freeze doc's "Intentionally NOT Solved" section enumerates work that is not on Mneme's roadmap at all.
-
-## Status
-
-Mneme is in **Layer 1 — validation phase**. The mechanism is frozen at commit [`e73ff7d`](https://github.com/TheoV823/mneme/commit/e73ff7d): deterministic retrieval, pre-flight enforcement, two-layer benchmark methodology, charter discipline. The freeze artifact is at [docs/architecture/layer1-freeze-e73ff7d.md](docs/architecture/layer1-freeze-e73ff7d.md); the orientation doc is at [docs/architecture/current-phase.md](docs/architecture/current-phase.md).
-
-What remains in Layer 1 is **validation**, not extension. Layer 1 exit criteria are met when the wedge is validated against real repos with design partners; the open criteria are real-world drift prevention, design-partner validation, and governance wedge validation. Layer 2 (multi-repo, team sync, org policy distribution) opens only after exit.
-
-The Mneme positioning is intentional: narrow scope, explicit governance boundaries, reproducible benchmark methodology. Not eval-score inflation. Not a coding-benchmark leaderboard play. Architectural continuity, governance reliability, deterministic enforcement.
-
-## Infrastructure
-
-See [docs/ops/mneme-hq-gcp.md](docs/ops/mneme-hq-gcp.md) for GCP project setup, BigQuery datasets, environment variable conventions, and data export links.
+Core behavioral changes may require the repository's charter-amendment procedure. Documentation, tooling, integrations, and examples do not automatically authorize changes to frozen behavior.
 
 ## License
 
-MIT
+MIT. See [LICENSE](LICENSE).
