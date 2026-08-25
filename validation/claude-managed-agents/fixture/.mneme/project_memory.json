@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "name": "managed-agents-m0-fixture",
+    "description": "Isolated M0 validation fixture: one mechanically enforceable sentinel literal ban"
+  },
+  "items": [],
+  "examples": [],
+  "decisions": [
+    {
+      "id": "ma_m0_sentinel",
+      "decision": "The sentinel literal MANAGED_AGENTS_FORBIDDEN_XYZ is banned in governed artifacts.",
+      "rationale": "Mechanical enforceability probe for the Managed Agents M0 capability gate.",
+      "scope": ["general"],
+      "constraints": [],
+      "anti_patterns": [],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "MANAGED_AGENTS_FORBIDDEN_XYZ"
+        }
+      ]
+    }
+  ]
+}

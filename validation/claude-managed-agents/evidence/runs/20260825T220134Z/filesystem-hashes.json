@@ -1,0 +1,9 @@
+[
+  {
+    "label": "B:/workspace/b_forbidden.txt via coordinator read",
+    "source": "agent-read",
+    "sha256": "b793c11278e4691e20a6f1acdc356f9a874d2261d4c9156df10f1f4bed8e266d",
+    "bytes": 74,
+    "content_preview": "awk: cannot open \"/workspace/b_forbidden.txt\" (No such file or directory)\n"
+  }
+]
