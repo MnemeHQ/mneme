@@ -1,6 +1,6 @@
 # Mneme HQ
 
-**Architectural drift prevention for the AI SDLC.**
+**Architectural drift prevention for the agentic AI SDLC.**
 
 Mneme turns architectural decisions and ADRs into deterministic guardrails for the agentic AI SDLC — across coding agents, repository mutations, generated rules, and CI gates.
 
