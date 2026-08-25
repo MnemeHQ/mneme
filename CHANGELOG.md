@@ -3,6 +3,18 @@
 ## Unreleased
 
 ### Added
+- LangChain agent middleware integration (`mneme.integrations.langchain`).
+  Governs LangChain agents running on LangGraph: relevant decisions are
+  injected into the model request via `wrap_model_call`, and proposed
+  `write_file` / `edit_file` calls are translated to canonical Write/Edit
+  and checked by `mneme check` before execution via `wrap_tool_call`
+  (introduced-delta semantics per ADR-018). Strict violations deny before
+  the tool runs; warn mode executes with a visible flag; degraded states
+  fail open with visible UNEVALUATED markers; all other tools receive no
+  opinion and zero checker calls. Sync and async loops behave identically,
+  and governance survives embedding the agent as a LangGraph subgraph.
+  Validated against pinned langchain 1.3.17 / langgraph 1.2.11; evidence
+  under `validation/langgraph/`.
 - Codex CLI enforcement integration (`mneme.integrations.codex_cli`).
   A trusted hook bundle: `SessionStart` captures the session baseline,
   `PreToolUse` (`^apply_patch$`) parses the proposal and checks introduced
