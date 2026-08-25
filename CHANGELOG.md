@@ -15,6 +15,16 @@
   10/10 against Codex CLI 0.149.1 (Windows, `codex exec`, pinned binary);
   evidence under `validation/codex-cli/`.
 
+---
+
+## v0.5.2 — 2026-08-24
+
+**Enforcement quality benchmark, phrase-sequence matcher fix, Codex CLI integration**
+
+### Added
+
+- Enforcement-quality benchmark suite with partitioned FPR reporting (charter #318, #319, #320). Benchmark scenarios cover legacy anti-patterns, typed literals, and introduced-delta enforcement; false-positive rates tracked per rule class.
+- Codex CLI enforcement integration (PreToolUse gate + Stop session audit) (#321). Reuses `mneme check` semantics; hook evaluates proposed tool calls and audits session deltas.
 - Claude Agent SDK integration (`mneme.integrations.agent_sdk`). Reuses the
   existing retrieval and enforcement semantics: relevant decisions are
   injected before agent work via `UserPromptSubmit`, and proposed
@@ -37,12 +47,14 @@
   scoped applicability is an operational failure in the CLI and an explicit
   fail-open diagnostic in integrations.
 
+### Fixed
+
+- **Phrase-sequence matching for multi-term legacy anti-patterns** (ADR-017 amendment, #317). The legacy matcher previously treated any single term from a descriptive phrase as the whole rule, causing false positives on benign prose (e.g., ADR-003 content containing "governance", "open", "without"). Now matches the full phrase sequence, eliminating the dogfood false-positive on site governance content.
+
 ### Compatibility
 
-- Existing `constraints` and `anti_patterns` retain their current matching and
-  severity behavior. Memory files without `rules` continue to load unchanged.
-- Existing scalar typed rules remain global. Selector fields are additive and
-  the check JSON schema remains `mneme.check/v1` with additive fields.
+- Existing `constraints` and `anti_patterns` retain their current matching and severity behavior. Memory files without `rules` continue to load unchanged.
+- Existing scalar typed rules remain global. Selector fields are additive and the check JSON schema remains `mneme.check/v1` with additive fields.
 
 ---
 
