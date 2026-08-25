@@ -1,0 +1,350 @@
+{
+  "run_id": "20260825T162444Z-m0",
+  "env": {
+    "run_utc": "20260825T162444Z",
+    "python": "3.12.10",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "executable": "C:\\Users\\hi\\AppData\\Local\\Temp\\opencode\\lg-m0-venv\\Scripts\\python.exe",
+    "packages": {
+      "langchain": "1.3.17",
+      "langchain-core": "1.6.0",
+      "langchain-protocol": "0.0.18",
+      "langgraph": "1.2.11",
+      "langgraph-checkpoint": "4.2.0",
+      "langgraph-prebuilt": "1.1.0",
+      "langgraph-sdk": "0.4.3",
+      "langsmith": "0.11.1",
+      "orjson": "3.12.0"
+    },
+    "full_freeze": {
+      "annotated-types": "0.8.0",
+      "anyio": "4.14.2",
+      "certifi": "2026.7.22",
+      "charset-normalizer": "3.5.1",
+      "distro": "1.9.0",
+      "h11": "0.16.0",
+      "httpcore": "1.0.9",
+      "httpx": "0.28.1",
+      "idna": "3.19",
+      "jsonpatch": "1.33",
+      "jsonpointer": "3.1.1",
+      "langchain": "1.3.17",
+      "langchain-core": "1.6.0",
+      "langchain-protocol": "0.0.18",
+      "langgraph": "1.2.11",
+      "langgraph-checkpoint": "4.2.0",
+      "langgraph-prebuilt": "1.1.0",
+      "langgraph-sdk": "0.4.3",
+      "langsmith": "0.11.1",
+      "orjson": "3.12.0",
+      "ormsgpack": "1.12.2",
+      "packaging": "26.3",
+      "pydantic": "2.13.4",
+      "pydantic_core": "2.46.4",
+      "PyYAML": "6.0.3",
+      "requests": "2.34.2",
+      "requests-toolbelt": "1.0.0",
+      "sniffio": "1.3.1",
+      "tenacity": "9.1.4",
+      "typing-inspection": "0.4.4",
+      "typing_extensions": "4.16.0",
+      "urllib3": "2.7.0",
+      "uuid_utils": "0.17.0",
+      "websockets": "16.1.1",
+      "xxhash": "4.0.1",
+      "zstandard": "0.25.0"
+    }
+  },
+  "gate_check_ids": [
+    "C1",
+    "C2",
+    "C3a",
+    "C4",
+    "C5",
+    "C6",
+    "C7"
+  ],
+  "gate_passed": true,
+  "scenario_errors": [],
+  "scenarios": [
+    {
+      "id": "S1",
+      "name": "passthrough allow-path (sync)",
+      "checks": [
+        {
+          "id": "C1",
+          "description": "wrap_tool_call runs before tool execution",
+          "passed": true,
+          "evidence": {
+            "event_kinds": [
+              "mw_enter",
+              "tool_exec"
+            ],
+            "mw_enter_index": 0,
+            "tool_exec_index": 1
+          }
+        },
+        {
+          "id": "C2a",
+          "description": "calling handler executes the tool exactly once (contrast arm)",
+          "passed": true,
+          "evidence": {
+            "exec_count": 1,
+            "before": {},
+            "after": {
+              "scripts/slack_outreach.py": "355fa24302409ef4402a8669f87ba45bc01cc0de4435474004993e2375442a79"
+            }
+          }
+        }
+      ],
+      "events": [
+        {
+          "kind": "mw_enter",
+          "mw": "passthrough",
+          "call": "write_file"
+        },
+        {
+          "kind": "tool_exec",
+          "tool": "write_file",
+          "path": "C:\\dev\\mneme\\.worktrees\\feat-langchain-agent-middleware\\validation\\langgraph\\evidence\\runs\\20260825T162444Z-m0\\mneme-lg-m0-sdk4a38w\\s1\\scripts\\slack_outreach.py"
+        }
+      ]
+    },
+    {
+      "id": "S2",
+      "name": "deny short-circuit (sync)",
+      "checks": [
+        {
+          "id": "C2",
+          "description": "not calling handler prevents execution (sync deny)",
+          "passed": true,
+          "evidence": {
+            "exec_count": 0,
+            "before": {},
+            "after": {}
+          }
+        },
+        {
+          "id": "C4",
+          "description": "ToolCallRequest exposes name, args, state, runtime (sync)",
+          "passed": true,
+          "evidence": {
+            "captured": [
+              {
+                "tool_call": {
+                  "name": "write_file",
+                  "args": {
+                    "file_path": "scripts/slack_outreach.py",
+                    "content": "# internal outreach automation\nimport slack_sdk\n"
+                  },
+                  "id": "call_s2",
+                  "type": "tool_call"
+                },
+                "tool_bound": "StructuredTool",
+                "state_type": "dict",
+                "state_message_count": 2,
+                "runtime_type": "ToolRuntime",
+                "runtime_is_none": false
+              }
+            ]
+          }
+        },
+        {
+          "id": "C6",
+          "description": "denied call returns rejection feedback to the model without executing",
+          "passed": true,
+          "evidence": {
+            "second_model_input_tool_messages": [
+              "[mneme] DENIED - write_file violates decision 'rule-public-boundary': internal tooling must not be committed to this public repo."
+            ]
+          }
+        },
+        {
+          "id": "C7-loop",
+          "description": "agent loop completes normally after denial (sync)",
+          "passed": true,
+          "evidence": {
+            "final_message_present": true
+          }
+        }
+      ],
+      "events": [
+        {
+          "kind": "mw_enter",
+          "mw": "deny",
+          "call": "write_file"
+        },
+        {
+          "kind": "denied_at_mw",
+          "mw": "deny"
+        }
+      ]
+    },
+    {
+      "id": "S3",
+      "name": "middleware ordering: outer deny silences inner",
+      "checks": [
+        {
+          "id": "C5",
+          "description": "later middleware cannot execute a call the outer middleware denied",
+          "passed": true,
+          "evidence": {
+            "inner_mw_entries": 0,
+            "exec_count": 0,
+            "denied_outer": true,
+            "before": {},
+            "after": {}
+          }
+        }
+      ],
+      "events": [
+        {
+          "kind": "mw_enter",
+          "mw": "deny",
+          "call": "write_file"
+        },
+        {
+          "kind": "denied_at_mw",
+          "mw": "deny"
+        }
+      ]
+    },
+    {
+      "id": "S4",
+      "name": "async equivalence (ainvoke + awrap_tool_call)",
+      "checks": [
+        {
+          "id": "C3a",
+          "description": "awrap_tool_call short-circuit matches sync semantics",
+          "passed": true,
+          "evidence": {
+            "exec_count": 0,
+            "before": {},
+            "after": {},
+            "second_model_input_tool_messages": [
+              "[mneme] DENIED - write_file violates decision 'rule-public-boundary': internal tooling must not be committed to this public repo."
+            ]
+          }
+        },
+        {
+          "id": "C4a",
+          "description": "ToolCallRequest exposes name, args, state, runtime (async)",
+          "passed": true,
+          "evidence": {
+            "captured": [
+              {
+                "tool_call": {
+                  "name": "write_file",
+                  "args": {
+                    "file_path": "scripts/slack_outreach.py",
+                    "content": "# internal outreach automation\nimport slack_sdk\n"
+                  },
+                  "id": "call_s4",
+                  "type": "tool_call"
+                },
+                "tool_bound": "StructuredTool",
+                "state_type": "dict",
+                "state_message_count": 2,
+                "runtime_type": "ToolRuntime",
+                "runtime_is_none": false
+              }
+            ]
+          }
+        },
+        {
+          "id": "C3b",
+          "description": "async passthrough executes exactly once (contrast arm)",
+          "passed": true,
+          "evidence": {
+            "exec_count": 1
+          }
+        }
+      ],
+      "events": [
+        {
+          "kind": "mw_enter",
+          "mw": "async-deny",
+          "call": "write_file"
+        },
+        {
+          "kind": "denied_at_mw",
+          "mw": "async-deny"
+        },
+        {
+          "kind": "mw_enter",
+          "mw": "async-passthrough",
+          "call": "write_file"
+        },
+        {
+          "kind": "tool_exec",
+          "tool": "write_file",
+          "path": "C:\\dev\\mneme\\.worktrees\\feat-langchain-agent-middleware\\validation\\langgraph\\evidence\\runs\\20260825T162444Z-m0\\mneme-lg-m0-sdk4a38w\\s4-allow\\scripts\\slack_outreach.py"
+        }
+      ]
+    },
+    {
+      "id": "S5",
+      "name": "compiled agent embedded as LangGraph subgraph/node",
+      "checks": [
+        {
+          "id": "C7",
+          "description": "middleware fires when governed agent is embedded in a larger graph",
+          "passed": true,
+          "evidence": {
+            "embedding_mode": "direct-add-node",
+            "direct_add_node_error": null,
+            "exec_count": 0,
+            "before": {},
+            "after": {},
+            "parent_message_types": [
+              "HumanMessage",
+              "AIMessage",
+              "ToolMessage",
+              "AIMessage"
+            ]
+          }
+        }
+      ],
+      "events": [
+        {
+          "kind": "mw_enter",
+          "mw": "deny",
+          "call": "write_file"
+        },
+        {
+          "kind": "denied_at_mw",
+          "mw": "deny"
+        }
+      ]
+    },
+    {
+      "id": "S6",
+      "name": "decision-context injection via wrap_model_call",
+      "checks": [
+        {
+          "id": "C8",
+          "description": "wrap_model_call injects decision context visible to the model (beyond gate)",
+          "passed": true,
+          "evidence": {
+            "system_messages_seen": [
+              "[mneme] DECISIONS - rule-public-boundary: internal tooling stays out of this public repo.",
+              "[mneme] DECISIONS - rule-public-boundary: internal tooling stays out of this public repo."
+            ]
+          }
+        }
+      ],
+      "events": [
+        {
+          "kind": "mw_enter",
+          "mw": "passthrough",
+          "call": "write_file"
+        },
+        {
+          "kind": "tool_exec",
+          "tool": "write_file",
+          "path": "C:\\dev\\mneme\\.worktrees\\feat-langchain-agent-middleware\\validation\\langgraph\\evidence\\runs\\20260825T162444Z-m0\\mneme-lg-m0-sdk4a38w\\s6\\scripts\\slack_outreach.py"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+{
+  "run_id": "20260825T162423Z-m0",
+  "env": {
+    "run_utc": "20260825T162423Z",
+    "python": "3.12.10",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "executable": "C:\\Users\\hi\\AppData\\Local\\Temp\\opencode\\lg-m0-venv\\Scripts\\python.exe",
+    "packages": {
+      "langchain": "1.3.17",
+      "langchain-core": "1.6.0",
+      "langchain-protocol": "0.0.18",
+      "langgraph": "1.2.11",
+      "langgraph-checkpoint": "4.2.0",
+      "langgraph-prebuilt": "1.1.0",
+      "langgraph-sdk": "0.4.3",
+      "langsmith": "0.11.1",
+      "orjson": "3.12.0"
+    },
+    "full_freeze": {
+      "annotated-types": "0.8.0",
+      "anyio": "4.14.2",
+      "certifi": "2026.7.22",
+      "charset-normalizer": "3.5.1",
+      "distro": "1.9.0",
+      "h11": "0.16.0",
+      "httpcore": "1.0.9",
+      "httpx": "0.28.1",
+      "idna": "3.19",
+      "jsonpatch": "1.33",
+      "jsonpointer": "3.1.1",
+      "langchain": "1.3.17",
+      "langchain-core": "1.6.0",
+      "langchain-protocol": "0.0.18",
+      "langgraph": "1.2.11",
+      "langgraph-checkpoint": "4.2.0",
+      "langgraph-prebuilt": "1.1.0",
+      "langgraph-sdk": "0.4.3",
+      "langsmith": "0.11.1",
+      "orjson": "3.12.0",
+      "ormsgpack": "1.12.2",
+      "packaging": "26.3",
+      "pydantic": "2.13.4",
+      "pydantic_core": "2.46.4",
+      "PyYAML": "6.0.3",
+      "requests": "2.34.2",
+      "requests-toolbelt": "1.0.0",
+      "sniffio": "1.3.1",
+      "tenacity": "9.1.4",
+      "typing-inspection": "0.4.4",
+      "typing_extensions": "4.16.0",
+      "urllib3": "2.7.0",
+      "uuid_utils": "0.17.0",
+      "websockets": "16.1.1",
+      "xxhash": "4.0.1",
+      "zstandard": "0.25.0"
+    }
+  },
+  "gate_check_ids": [
+    "C1",
+    "C2",
+    "C3a",
+    "C4",
+    "C5",
+    "C6",
+    "C7"
+  ],
+  "gate_passed": false,
+  "scenario_errors": [
+    {
+      "scenario": "scenario_s1_passthrough",
+      "error": "ValidationError: 1 validation error for AIMessage\ntool_calls\n  Input should be a valid list [type=list_type, input_value=None, input_type=NoneType]\n    For further information visit https://errors.pydantic.dev/2.13/v/list_type"
+    },
+    {
+      "scenario": "scenario_s2_deny_sync",
+      "error": "ValidationError: 1 validation error for AIMessage\ntool_calls\n  Input should be a valid list [type=list_type, input_value=None, input_type=NoneType]\n    For further information visit https://errors.pydantic.dev/2.13/v/list_type"
+    },
+    {
+      "scenario": "scenario_s3_ordering",
+      "error": "ValidationError: 1 validation error for AIMessage\ntool_calls\n  Input should be a valid list [type=list_type, input_value=None, input_type=NoneType]\n    For further information visit https://errors.pydantic.dev/2.13/v/list_type"
+    },
+    {
+      "scenario": "scenario_s4_async",
+      "error": "ValidationError: 1 validation error for AIMessage\ntool_calls\n  Input should be a valid list [type=list_type, input_value=None, input_type=NoneType]\n    For further information visit https://errors.pydantic.dev/2.13/v/list_type"
+    },
+    {
+      "scenario": "scenario_s5_embedded",
+      "error": "ValidationError: 1 validation error for AIMessage\ntool_calls\n  Input should be a valid list [type=list_type, input_value=None, input_type=NoneType]\n    For further information visit https://errors.pydantic.dev/2.13/v/list_type"
+    },
+    {
+      "scenario": "scenario_s6_model_context",
+      "error": "ValidationError: 1 validation error for AIMessage\ntool_calls\n  Input should be a valid list [type=list_type, input_value=None, input_type=NoneType]\n    For further information visit https://errors.pydantic.dev/2.13/v/list_type"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "scenario_s1_passthrough",
+      "name": "SCENARIO ERROR",
+      "checks": [],
+      "events": [],
+      "error": "ValidationError: 1 validation error for AIMessage\ntool_calls\n  Input should be a valid list [type=list_type, input_value=None, input_type=NoneType]\n    For further information visit https://errors.pydantic.dev/2.13/v/list_type"
+    },
+    {
+      "id": "scenario_s2_deny_sync",
+      "name": "SCENARIO ERROR",
+      "checks": [],
+      "events": [],
+      "error": "ValidationError: 1 validation error for AIMessage\ntool_calls\n  Input should be a valid list [type=list_type, input_value=None, input_type=NoneType]\n    For further information visit https://errors.pydantic.dev/2.13/v/list_type"
+    },
+    {
+      "id": "scenario_s3_ordering",
+      "name": "SCENARIO ERROR",
+      "checks": [],
+      "events": [],
+      "error": "ValidationError: 1 validation error for AIMessage\ntool_calls\n  Input should be a valid list [type=list_type, input_value=None, input_type=NoneType]\n    For further information visit https://errors.pydantic.dev/2.13/v/list_type"
+    },
+    {
+      "id": "scenario_s4_async",
+      "name": "SCENARIO ERROR",
+      "checks": [],
+      "events": [],
+      "error": "ValidationError: 1 validation error for AIMessage\ntool_calls\n  Input should be a valid list [type=list_type, input_value=None, input_type=NoneType]\n    For further information visit https://errors.pydantic.dev/2.13/v/list_type"
+    },
+    {
+      "id": "scenario_s5_embedded",
+      "name": "SCENARIO ERROR",
+      "checks": [],
+      "events": [],
+      "error": "ValidationError: 1 validation error for AIMessage\ntool_calls\n  Input should be a valid list [type=list_type, input_value=None, input_type=NoneType]\n    For further information visit https://errors.pydantic.dev/2.13/v/list_type"
+    },
+    {
+      "id": "scenario_s6_model_context",
+      "name": "SCENARIO ERROR",
+      "checks": [],
+      "events": [],
+      "error": "ValidationError: 1 validation error for AIMessage\ntool_calls\n  Input should be a valid list [type=list_type, input_value=None, input_type=NoneType]\n    For further information visit https://errors.pydantic.dev/2.13/v/list_type"
+    }
+  ]
+}
