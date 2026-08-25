@@ -14,9 +14,17 @@ scope: distribution.external_platforms
 > [issue #139](https://github.com/TheoV823/mneme/issues/139)). The original
 > ADR-010 number now belongs to "Automation-generated artifacts must inherit
 > repository governance conventions"; this ADR's content is unchanged.
+>
+> Amended 2026-08-24 (positioning-only): primary external category moved to
+> "architectural drift prevention for the AI SDLC" (mechanism language —
+> architectural governance / deterministic guardrails — retained but demoted),
+> canonical repository URL updated to `https://github.com/MnemeHQ/mneme`,
+> GitHub description refreshed, and copy variants replaced. No architecture,
+> freeze, or integration-status changes.
 
 **Status:** Accepted  
 **Date:** 2026-05-14  
+**Amended:** 2026-08-24  
 **Deciders:** Theo Valmis
 
 ---
@@ -28,9 +36,15 @@ directories, and developer community sites. Without a canonical record of approv
 future submissions will drift from the positioning established in ADR-001 — either by using
 inconsistent descriptions, wrong category labels, or outdated topic tags.
 
-This ADR locks the canonical GitHub repository metadata and the two approved external copy variants.
+This ADR locks the canonical GitHub repository metadata and the three approved external copy variants.
 Distribution tracking (which lists were submitted, PR status, directory submission log) lives in
 the private `mneme-growth-ops` repo per ADR-002 and is not governed here.
+
+The primary external category claim is **"Architectural drift prevention for
+the AI SDLC."** Architectural governance and deterministic guardrails describe
+the mechanism by which drift prevention works; they are supporting language,
+never the lead claim. External copy must not position Mneme primarily as agent
+governance, AI security, or generic guardrails.
 
 ---
 
@@ -41,7 +55,7 @@ the private `mneme-growth-ops` repo per ADR-002 and is not governed here.
 **Description** (must match exactly):
 
 ```
-Enforce architectural decisions in AI-assisted development.
+Architectural drift prevention for the AI SDLC.
 ```
 
 **Topics** (exactly these 10, in any order):
@@ -66,30 +80,25 @@ emerges in the ecosystem. Changes require updating this ADR.
 
 ### 2. Approved external copy variants
 
-Two variants are approved. Choose based on the list's audience.
+Three variants are approved. Choose based on the list's audience.
 
-**Variant A — Claude Code / Cursor / agent-focused lists:**
+**Variant A — short/general lists:**
 
-> Enforce architectural decisions on every AI coding assistant call. Deterministic retrieval and
-> pre-flight governance for Claude Code, Cursor, and agent workflows.
+> Open-source architectural drift prevention for the AI SDLC. Turns architectural decisions and ADRs into deterministic guardrails for AI-generated code.
 
-**Variant B — Broader AI devtool / vibe coding / general lists:**
+**Variant B — coding-agent lists:**
 
-> Architectural governance layer for AI-assisted development. Injects project decisions into LLM
-> workflows and blocks architectural violations before generation.
+> Architectural drift prevention for AI coding agents. Enforces repository decisions and ADRs through deterministic guardrails before incompatible changes are accepted.
 
 **Variant C — Long-form (issue forms, directory submissions, 2–3 sentences):**
 
-> Architectural governance layer for AI-assisted development. Deterministically retrieves relevant
-> project decisions and injects them into every LLM call before generation; detects constraint and
-> anti-pattern violations in generated output. Works with Claude Code, Cursor, and agent frameworks
-> without requiring a vector store or ML dependencies.
+> AI coding agents start every call with no knowledge of the architectural decisions a team has already made, so they reintroduce rejected technologies and produce changes that contradict the architecture. Mneme prevents this architectural drift: it turns architectural decisions and ADRs into deterministic guardrails applied at the earliest reliable boundary of an AI workflow — before generation, before supported file mutations via agent hooks, after bypassable mutations via working-tree audits, and before merge via CI gates. Enforcement is deterministic: same input, same verdict. Native integrations: Claude Code, Claude Agent SDK, Google Antigravity, Codex CLI. Validated compatibility: Paperclip. Cursor rules export and GitHub Actions/GitLab CI gates are also supported.
 
 Rules:
 - No emojis in list entries.
 - Do not address the reader ("you", "your") in list copy.
 - Do not use promotional language ("powerful", "revolutionary", "best").
-- Always link to the GitHub repo (`https://github.com/TheoV823/mneme`), not the marketing site,
+- Always link to the GitHub repo (`https://github.com/MnemeHQ/mneme`), not the marketing site,
   in awesome-list entries. Use the marketing site for directories that prefer landing pages.
 
 ---
@@ -119,8 +128,9 @@ Rules:
 
 - Locking copy variants prevents positioning drift across submissions (ADR-001 compliance).
 - Locking topics prevents ad-hoc changes that reduce discoverability.
-- The two-variant model matches real list taxonomy: Claude/Cursor lists want agent-focused framing;
-  broader lists want the governance-layer framing.
+- The three-variant model matches real list taxonomy: general lists want the short
+  category-led framing; coding-agent lists want the agent-enforcement framing;
+  long-form forms need the problem-plus-mechanism explanation with support levels.
 - Distribution tracking stays in growth-ops (ADR-002) — this ADR only governs what is said,
   not where it was said.
 
