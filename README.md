@@ -1,10 +1,10 @@
 # Mneme HQ
 
-**Architectural drift prevention for the agentic AI SDLC.**
+**Architectural drift prevention for the AI SDLC.**
 
 Mneme turns architectural decisions and ADRs into deterministic guardrails across AI coding agents, generated rules and CI gates.
 
-Architectural governance is the mechanism: Mneme makes decisions enforceable before incompatible changes reach review.
+Mneme HQ is the architectural governance layer for AI-assisted development.
 
 <a href="https://www.youtube.com/watch?v=LaJqeJrKkgg" target="_blank">
   <img 
@@ -38,7 +38,7 @@ Architectural governance is the mechanism: Mneme makes decisions enforceable bef
 
 ## What Mneme Is
 
-At its current Layer 1 scope, Mneme prevents architectural drift in local-repo, single-developer agentic AI development workflows. It does this through project-scoped architectural governance:
+Local-repo, single-developer, project-scoped architectural governance for AI-assisted code generation. Specifically:
 
 - A way to **encode architectural decisions** as structured records in `project_memory.json`.
 - A **deterministic retriever** that selects relevant decisions for any given prompt or task.
@@ -68,7 +68,7 @@ The freeze is governed by three load-bearing principles. Every feature is judged
 - **Auditable > autonomous.** Every block records which decision matched, which rule triggered, which term in the input fired it. A human can reconstruct any verdict from the artifacts.
 - **Prevention before review.** Mneme runs *before* the LLM generates output, not after. The intervention point is the prompt boundary.
 
-Mneme is built to prevent architectural drift across the agentic AI SDLC. Architectural governance is the mechanism. See the [concepts hub](https://mnemehq.com/concepts/) for definitions including governance before generation, verification contracts, architectural drift, and governance infrastructure.
+Mneme is built around a broader architectural governance model for AI-assisted development. See the [concepts hub](https://mnemehq.com/concepts/) for definitions including governance before generation, verification contracts, architectural drift, and governance infrastructure.
 
 ## Benchmark Philosophy
 
@@ -111,9 +111,7 @@ Mneme HQ turns those decisions into structured, retrievable constraints that can
 
 ## What Mneme HQ is
 
-**Mneme HQ** is open-source architectural drift prevention for the agentic AI SDLC.
-
-It uses architectural governance and deterministic enforcement to keep AI-generated changes aligned with repository architecture and prior decisions.
+**Mneme HQ** is the architectural governance layer for AI-assisted development.
 
 This repository demonstrates the first core capability: injecting structured architectural decisions into LLM calls so outputs stay consistent with prior engineering decisions.
 
