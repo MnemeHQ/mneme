@@ -1,0 +1,5 @@
+__pycache__/
+
+# Ephemeral per-scenario sandboxes are reproducible scratch; their
+# before/after sha256 manifests are captured in each run's report.json.
+evidence/runs/**/mneme-lg-m0-*/

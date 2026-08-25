@@ -25,13 +25,14 @@ at what level, with what evidence. The website's
 | Native integration | Claude Agent SDK | [agent-sdk.md](agent-sdk.md), [PR #293](https://github.com/MnemeHQ/mneme/pull/293) |
 | Native integration | Google Antigravity | [antigravity.md](antigravity.md), [PR #316](https://github.com/MnemeHQ/mneme/pull/316) |
 | Native integration | Codex CLI | [codex-cli.md](codex-cli.md), [PR #321](https://github.com/MnemeHQ/mneme/pull/321), [capability matrix](../../validation/codex-cli/capability-matrix.md) |
+| Native integration | LangChain agents on LangGraph | [langchain-langgraph.md](langchain-langgraph.md), [capability matrix](../../validation/langgraph/capability-matrix.md) |
 | Validated compatibility | Paperclip (CLI + ACP) | [paperclip.md](paperclip.md), [PR #315](https://github.com/MnemeHQ/mneme/pull/315) |
 | Rules export | Cursor | [adr-import.md](adr-import.md) (corpus workflows); generator: `mneme cursor generate` |
 | CLI-based CI gates | GitHub Actions, GitLab CI | `mneme check` reference patterns |
 | Experimental | OpenCode | plugin-hooks approach under evaluation; compaction experiment returned a NULL verdict |
 | Experimental | Kiro | bounded PreToolUse hook, contract-tested, [open PR #314](https://github.com/MnemeHQ/mneme/pull/314) |
 | Experimental | Hermes Agent | P1.5 POC passed (context injection + pre-tool blocking); no blocking Stop-equivalent, see [hermes.md](hermes.md) |
-| Planned | Deep Agents middleware POC | see [roadmap](../roadmap/2026-04-24-adoption-and-enhancement-roadmap.md) |
+| Planned | Deep Agents filesystem tools (`write_file`/`edit_file`) | roadmap-only until a pinned Deep Agents validation passes; the [LangChain agents on LangGraph](langchain-langgraph.md) adapter governs local-filesystem-semantic tools by name contract |
 
 ## Known limitations
 
@@ -41,6 +42,13 @@ at what level, with what evidence. The website's
   SKIP-by-design under ADR-018; dirty untouched files are ignored; dirty
   touched files are whole-file audited at Stop; degraded states fail open
   visibly. See [codex-cli.md](codex-cli.md).
+- **LangChain agents on LangGraph**: validated against langchain 1.3.17 /
+  langgraph 1.2.11 (pinned). Only `write_file` and `edit_file` are governed.
+  Shell/`execute`, custom tools, and raw `StateGraph` graphs that wire their
+  own tool nodes are bypass surfaces. Same-named file tools over virtual or
+  remote backends ARE intercepted but carry unsupported/unvalidated backend
+  semantics (local-path assumptions may not describe the mutation target).
+  See [langchain-langgraph.md](langchain-langgraph.md).
 - **Antigravity**: tested against Antigravity IDE 2.8.1; three file-mutation
   tools covered; deny-only response policy. See [antigravity.md](antigravity.md).
 - **Paperclip**: validated on paperclipai 2026.817.0; version-specific

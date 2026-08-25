@@ -1,0 +1,29 @@
+M0 capability probe - run 20260825T162444Z-m0
+python 3.12.10 on Windows-11-10.0.26200-SP0
+packages: {"langchain": "1.3.17", "langchain-core": "1.6.0", "langchain-protocol": "0.0.18", "langgraph": "1.2.11", "langgraph-checkpoint": "4.2.0", "langgraph-prebuilt": "1.1.0", "langgraph-sdk": "0.4.3", "langsmith": "0.11.1", "orjson": "3.12.0"}
+
+[S1] passthrough allow-path (sync)
+  PASS  C1 - wrap_tool_call runs before tool execution
+  PASS  C2a - calling handler executes the tool exactly once (contrast arm)
+
+[S2] deny short-circuit (sync)
+  PASS  C2 - not calling handler prevents execution (sync deny)
+  PASS  C4 - ToolCallRequest exposes name, args, state, runtime (sync)
+  PASS  C6 - denied call returns rejection feedback to the model without executing
+  PASS  C7-loop - agent loop completes normally after denial (sync)
+
+[S3] middleware ordering: outer deny silences inner
+  PASS  C5 - later middleware cannot execute a call the outer middleware denied
+
+[S4] async equivalence (ainvoke + awrap_tool_call)
+  PASS  C3a - awrap_tool_call short-circuit matches sync semantics
+  PASS  C4a - ToolCallRequest exposes name, args, state, runtime (async)
+  PASS  C3b - async passthrough executes exactly once (contrast arm)
+
+[S5] compiled agent embedded as LangGraph subgraph/node
+  PASS  C7 - middleware fires when governed agent is embedded in a larger graph
+
+[S6] decision-context injection via wrap_model_call
+  PASS  C8 - wrap_model_call injects decision context visible to the model (beyond gate)
+
+GATE: PASS (C1 C2 C3a C4 C5 C6 C7)
