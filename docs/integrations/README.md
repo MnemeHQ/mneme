@@ -30,6 +30,7 @@ at what level, with what evidence. The website's
 | CLI-based CI gates | GitHub Actions, GitLab CI | `mneme check` reference patterns |
 | Experimental | OpenCode | plugin-hooks approach under evaluation; compaction experiment returned a NULL verdict |
 | Experimental | Kiro | bounded PreToolUse hook, contract-tested, [open PR #314](https://github.com/MnemeHQ/mneme/pull/314) |
+| Experimental | Hermes Agent | P1.5 POC passed (context injection + pre-tool blocking); no blocking Stop-equivalent, see [hermes.md](hermes.md) |
 | Planned | Deep Agents middleware POC | see [roadmap](../roadmap/2026-04-24-adoption-and-enhancement-roadmap.md) |
 
 ## Known limitations
@@ -46,6 +47,10 @@ at what level, with what evidence. The website's
   placeholder-`ANTHROPIC_API_KEY` caveat documented in [paperclip.md](paperclip.md).
 - **OpenCode**: no production plugin ships. The completed compaction
   experiment returned a NULL verdict and was closed evidence-only.
+- **Hermes Agent**: POC validated against hermes-agent 0.19.0 at the plugin
+  dispatch-runtime layer; `terminal` non-class-A forms, `execute_code`, and
+  `process` are bypass surfaces, and no blocking Stop-equivalent exists.
+  See [hermes.md](hermes.md).
 
 ## Distinction that matters
 

@@ -1,0 +1,6 @@
+name: mneme
+version: 0.1.0
+description: Mneme architectural governance - decision context injection (pre_llm_call) and deterministic pre-tool mutation enforcement (pre_tool_call) via mneme check. POC.
+provides_hooks:
+  - pre_tool_call
+  - pre_llm_call
