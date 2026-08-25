@@ -21,10 +21,15 @@ scope: distribution.external_platforms
 > canonical repository URL updated to `https://github.com/MnemeHQ/mneme`,
 > GitHub description refreshed, and copy variants replaced. No architecture,
 > freeze, or integration-status changes.
+>
+> Amended 2026-08-25 (positioning-only): primary external category refined to
+> "architectural drift prevention for the agentic AI SDLC" so `agentic` is an
+> explicit category keyword. The mechanism, architecture, support taxonomy,
+> topics, freeze, and integration-status claims are unchanged.
 
 **Status:** Accepted  
 **Date:** 2026-05-14  
-**Amended:** 2026-08-24  
+**Amended:** 2026-08-25  
 **Deciders:** Theo Valmis
 
 ---
@@ -41,7 +46,7 @@ Distribution tracking (which lists were submitted, PR status, directory submissi
 the private `mneme-growth-ops` repo per ADR-002 and is not governed here.
 
 The primary external category claim is **"Architectural drift prevention for
-the AI SDLC."** Architectural governance and deterministic guardrails describe
+the agentic AI SDLC."** Architectural governance and deterministic guardrails describe
 the mechanism by which drift prevention works; they are supporting language,
 never the lead claim. External copy must not position Mneme primarily as agent
 governance, AI security, or generic guardrails.
@@ -55,7 +60,7 @@ governance, AI security, or generic guardrails.
 **Description** (must match exactly):
 
 ```
-Architectural drift prevention for the AI SDLC.
+Architectural drift prevention for the agentic AI SDLC.
 ```
 
 **Topics** (exactly these 10, in any order):
@@ -84,7 +89,7 @@ Three variants are approved. Choose based on the list's audience.
 
 **Variant A — short/general lists:**
 
-> Open-source architectural drift prevention for the AI SDLC. Turns architectural decisions and ADRs into deterministic guardrails for AI-generated code.
+> Open-source architectural drift prevention for the agentic AI SDLC. Turns architectural decisions and ADRs into deterministic guardrails for AI-generated code.
 
 **Variant B — coding-agent lists:**
 
@@ -92,7 +97,7 @@ Three variants are approved. Choose based on the list's audience.
 
 **Variant C — Long-form (issue forms, directory submissions, 2–3 sentences):**
 
-> AI coding agents start every call with no knowledge of the architectural decisions a team has already made, so they reintroduce rejected technologies and produce changes that contradict the architecture. Mneme prevents this architectural drift: it turns architectural decisions and ADRs into deterministic guardrails applied at the earliest reliable boundary of an AI workflow — before generation, before supported file mutations via agent hooks, after bypassable mutations via working-tree audits, and before merge via CI gates. Enforcement is deterministic: same input, same verdict. Native integrations: Claude Code, Claude Agent SDK, Google Antigravity, Codex CLI. Validated compatibility: Paperclip. Cursor rules export and GitHub Actions/GitLab CI gates are also supported.
+> AI coding agents start every call with no knowledge of the architectural decisions a team has already made, so they reintroduce rejected technologies and produce changes that contradict the architecture. Mneme prevents this architectural drift across the agentic AI SDLC: it turns architectural decisions and ADRs into deterministic guardrails applied at the earliest reliable boundary of an AI workflow — before generation, before supported file mutations via agent hooks, after bypassable mutations via working-tree audits, and before merge via CI gates. Enforcement is deterministic: same input, same verdict. Native integrations: Claude Code, Claude Agent SDK, Google Antigravity, Codex CLI. Validated compatibility: Paperclip. Cursor rules export and GitHub Actions/GitLab CI gates are also supported.
 
 Rules:
 - No emojis in list entries.
