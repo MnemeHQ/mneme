@@ -9,7 +9,7 @@ Captured 2026-08-23 from the current official Kiro documentation:
 
 **Live evidence updated 2026-08-26** (CLI 2.19.2 default v2 engine and CLI 3.0 / v3 engine `--v3` manual reproduction):
 
-Status: **contract-tested / experimental.** Live reproduction performed
+Status: **live-verified and supported on Kiro CLI 3.0 / v3 engine.** Live reproduction performed
 on **CLI 2.19.2** under both default (v2 engine) and `--v3` (v3 engine / CLI 3.0). Results:
 
 | Capability | CLI 2.19.2 default (v2 engine) | CLI 2.19.2 `--v3` (v3 engine / CLI 3.0) |
@@ -19,7 +19,7 @@ on **CLI 2.19.2** under both default (v2 engine) and `--v3` (v3 engine / CLI 3.0
 | Verdict generation (exit 2 on FAIL) | PASS | **PASS** |
 | **Pre-execution blocking** | **FAIL** (file written despite exit 2) | **PASS** (tool blocked pre-disk, stderr shown to agent) |
 | Clean allowed write (exit 0 on PASS) | PASS | **PASS** (file written to disk) |
-| Overall enforcement support | **NOT SUPPORTED** | **PASS (contract-verified)** |
+| Overall enforcement support | **NOT SUPPORTED** | **SUPPORTED (live-verified)** |
 
 *Note on registration:* CLI 2.19.2 in default mode ignores `.kiro/hooks/*.json` files (requires agent-config format). In `--v3` mode (v3 engine / CLI 3.0), `.kiro/hooks/*.json` files are automatically discovered and loaded.
 
@@ -38,7 +38,7 @@ The integration has achieved successful live allow/block verification on CLI 3.0
     {
       "name": "mneme-governance-gate",
       "trigger": "PreToolUse",
-      "matcher": "^(fs_write|fsWrite|write)$",
+      "matcher": "^(fs_write|fsWrite|write|fs_append)$",
       "action": { "type": "command", "command": "mneme-kiro-hook" },
       "timeout": 30,
       "enabled": true
@@ -158,7 +158,7 @@ notice reaches agent context). This is enforced by the regression fixture
 - **CLI 3.0 v3 engine (`--v3`):** Mneme returned exit 2, the file write was
   **strictly blocked pre-disk**, and stderr rationale reached the agent.
 
-### Phase A experimental checklist (updated with live evidence)
+### Live validation checklist (updated with live evidence)
 
 1. ✅ Envelope captured from native `write` (create): `text` (v3) / `file_text` (v2).
 2. ✅ Envelope captured from native `append` / edit: `fs_append` with `text` (v3).

@@ -1,4 +1,4 @@
-"""Kiro hook — experimental adapter evaluating proposed writes before disk.
+"""Kiro CLI 3.0 / v3 hook — live-verified enforcement before disk.
 
 Translates the Kiro PreToolUse hook envelope onto the existing Mneme
 mutation-gate path. No retrieval, applicability, conflict, or enforcement
@@ -6,11 +6,12 @@ semantics are implemented here; the pure pieces are imported from
 ``mneme.integrations.claude_code.hook`` (the same precedent as the
 Agent SDK adapter).
 
-Status: experimental adapter. CLI 2.x is unsupported for enforcement
-(verdicts evaluate correctly but the 2.x harness does not block).
-CLI 3.x and IDE 1.x v1 contracts remain pending live validation.
+Status: live-verified on Kiro CLI 3.0 / v3 engine (kiro-cli --v3).
+CLI 2.x is unsupported for enforcement (verdicts evaluate correctly
+but the 2.x harness does not block). IDE 1.x remains pending live
+validation.
 
-Documented contract (Kiro CLI 3.0+, IDE 1.0+; see
+Documented contract (Kiro CLI 3.0+; see
 docs/integrations/kiro-hook-spec.md for documented-versus-observed status):
 
 - Hook files live at ``.kiro/hooks/*.json`` (schema ``version: "v1"``).
@@ -18,8 +19,8 @@ docs/integrations/kiro-hook-spec.md for documented-versus-observed status):
   ``hook_event_name``, ``cwd``, ``session_id``, ``tool_name``, and
   ``tool_input``.
 - The native file-write tool is ``write`` (documented aliases:
-  ``fs_write``, ``fsWrite``) whose input carries ``path`` and the full
-  proposed ``content``.
+  ``fs_write``, ``fsWrite``, ``fs_append``) whose input carries ``path``
+  and the full proposed ``text``.
 - Exit code 0: hook succeeded; stdout is added to agent context.
 - Any non-zero exit from ``PreToolUse`` blocks the tool invocation;
   stderr is sent to the agent.

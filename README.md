@@ -141,11 +141,11 @@ The authoritative support matrix lives in [docs/integrations/README.md](docs/int
 | Native integration | Claude Agent SDK |
 | Native integration | Google Antigravity |
 | Native integration | Codex CLI |
+| Native integration | Kiro CLI 3.0 / v3 |
 | Validated compatibility | Paperclip — CLI and ACP transports, no adapter required |
 | Rules export | Cursor |
 | CLI-based CI gate | GitHub Actions, GitLab CI |
 | Experimental | OpenCode |
-| Experimental | Kiro |
 | Planned | Deep Agents middleware POC |
 
 Each integration documents its actual blocking boundary, bypass paths, degraded behavior, and validation evidence. Start with the [integration matrix](docs/integrations/README.md), not assumptions based on another harness.

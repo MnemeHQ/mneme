@@ -15,7 +15,7 @@ Results:
 | Verdict generation (exit 2 on FAIL) | PASS | **PASS** |
 | **Pre-execution blocking** | **FAIL** (file written despite exit 2) | **PASS** (tool blocked pre-disk, stderr shown to agent) |
 | Clean allowed write (exit 0 on PASS) | PASS | **PASS** (file written to disk) |
-| Overall enforcement support | **NOT SUPPORTED** | **PASS (live-verified)** |
+| Overall enforcement support | **NOT SUPPORTED** | **SUPPORTED (live-verified)** |
 
 *Note on registration:* CLI 2.19.2 in default mode ignores `.kiro/hooks/*.json` files. In `--v3` mode (CLI 3.0 / v3 engine), `.kiro/hooks/*.json` files are automatically discovered and loaded.
 
@@ -88,7 +88,7 @@ returned a blocking exit before the write executed.
 
 Key points:
 
-- Only the native write path on the **Kiro CLI 3.x / IDE 1.x** carries
+- Only the native write path on the **Kiro CLI 3.0 / v3 engine** carries
   enough pre-execution information (target path + full content) to enforce
   before disk. CLI 2.x default mode returns correct verdicts but does not block.
 - Shell redirection and script writes are **explicitly unsupported** for
