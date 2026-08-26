@@ -2,27 +2,24 @@
 test_adr_lifecycle.py — Lifecycle analyzer tests.
 
 Validates finding codes, deterministic ordering, tolerant parsing,
-read-only semantics, and the stale-retrievability regression.
+read-only semantics, the stale-retrievability regression, and per-scope isolation.
 """
 from __future__ import annotations
 
 import hashlib
 import json
-import tempfile
 from pathlib import Path
 
 import pytest
 
 from mneme.adr_lifecycle import (
     analyze_lifecycle,
-    UNEXPLAINED_NUMBERING_GAP,
     DANGLING_SUPERSEDES,
     ORPHAN_SUPERSEDED,
     ACTIVE_CONTRADICTION,
     SILENT_PRECEDENCE_ELIMINATION,
     LEDGER_STATUS_MISMATCH,
 )
-from mneme.adr_freshness import FreshnessIssue
 from mneme.decision_retriever import DecisionRetriever
 from mneme.schemas import Decision
 
@@ -103,14 +100,6 @@ def _make_3_5_stale_entry() -> dict:
 
 
 class TestLifecycleAnalyzer:
-    def test_ordinary_numbering_gap_no_warning(self, tmp_path: Path):
-        """Ordinary numbering gaps (e.g. ADR-002 never created) produce no warning."""
-        _write_adr(tmp_path, "ADR-001", "accepted", "")
-        _write_adr(tmp_path, "ADR-003", "accepted", "")
-        _write_ledger(tmp_path, [])
-        findings = analyze_lifecycle(tmp_path, tmp_path / "project_memory.json")
-        assert not any(f.code == UNEXPLAINED_NUMBERING_GAP for f in findings)
-
     def test_dangling_supersedes(self, tmp_path: Path):
         _write_adr(tmp_path, "ADR-001", "accepted", "", supersedes=["ADR-999"])
         _write_ledger(tmp_path, [])
@@ -176,10 +165,10 @@ class TestLifecycleAnalyzer:
         # Order respects _CODE_ORDER
         codes = [f.code for f in findings1]
         assert codes == sorted(codes, key=lambda c: [
-            UNEXPLAINED_NUMBERING_GAP, DANGLING_SUPERSEDES, ORPHAN_SUPERSEDED,
+            DANGLING_SUPERSEDES, ORPHAN_SUPERSEDED,
             ACTIVE_CONTRADICTION, SILENT_PRECEDENCE_ELIMINATION, LEDGER_STATUS_MISMATCH
         ].index(c) if c in [
-            UNEXPLAINED_NUMBERING_GAP, DANGLING_SUPERSEDES, ORPHAN_SUPERSEDED,
+            DANGLING_SUPERSEDES, ORPHAN_SUPERSEDED,
             ACTIVE_CONTRADICTION, SILENT_PRECEDENCE_ELIMINATION, LEDGER_STATUS_MISMATCH
         ] else 99)
 
@@ -191,8 +180,6 @@ class TestLifecycleAnalyzer:
         findings = analyze_lifecycle(tmp_path, tmp_path / "project_memory.json")
         # Should still process the valid file and report parse error for the bad one
         assert any(f.code == "ADR_UNPARSEABLE" and "ADR-002" in f.adr_id for f in findings)
-        # NUMBERING_GAP only checks successfully parsed ADRs; ADR-001 has no gap
-        assert not any(f.code == UNEXPLAINED_NUMBERING_GAP for f in findings)
 
     def test_read_only_no_mutations(self, tmp_path: Path):
         _write_adr(tmp_path, "ADR-001", "accepted", "")
@@ -239,18 +226,48 @@ class TestLifecycleAnalyzer:
         # And the entry is still retrievable (no enforcement change)
         assert target.decision.id == "ADR-004"
 
+    def test_tied_adr_superseding_other_scope_does_not_resurrect_superseded_adr(self, tmp_path: Path):
+        """
+        Regression: when a tied ADR supersedes an ADR in another scope, the superseded
+        ADR must not re-enter consideration or cause false elimination findings.
+
+        Setup:
+          Scope 'compute':
+            ADR-002: accepted, normal, 2026-01-01, supersedes: [ADR-001]
+            ADR-003: accepted, normal, 2026-01-01 (ties with ADR-002)
+          Scope 'storage':
+            ADR-001: accepted, normal, 2026-01-01 (superseded by ADR-002)
+            ADR-004: accepted, normal, 2026-01-01
+
+        Expected findings:
+          ACTIVE_CONTRADICTION for ADR-002,ADR-003 in scope 'compute'.
+          NO SILENT_PRECEDENCE_ELIMINATION in scope 'storage' (ADR-001 is superseded,
+          so ADR-004 is the sole active decision in 'storage').
+        """
+        _write_adr(tmp_path, "ADR-001", "accepted", "storage", date="2026-01-01")
+        _write_adr(tmp_path, "ADR-002", "accepted", "compute", date="2026-01-01", supersedes=["ADR-001"])
+        _write_adr(tmp_path, "ADR-003", "accepted", "compute", date="2026-01-01")
+        _write_adr(tmp_path, "ADR-004", "accepted", "storage", date="2026-01-01")
+        _write_ledger(tmp_path, [])
+
+        findings = analyze_lifecycle(tmp_path, tmp_path / "project_memory.json")
+        contradictions = [f for f in findings if f.code == ACTIVE_CONTRADICTION]
+        eliminations = [f for f in findings if f.code == SILENT_PRECEDENCE_ELIMINATION]
+
+        assert len(contradictions) == 1
+        assert "ADR-002" in contradictions[0].adr_id and "ADR-003" in contradictions[0].adr_id
+        # ADR-001 must not re-enter to falsely eliminate ADR-004 or be reported as eliminated
+        assert eliminations == [], f"Unexpected eliminations: {eliminations}"
+
 
 class TestFullFixture:
-    """Run the full M0 31-ADR fixture against the analyzer for smoke coverage."""
+    """Run a multi-ADR fixture against the analyzer for smoke coverage."""
     def test_full_fixture(self, tmp_path: Path):
-        # Reuse the M0 fixture generator logic inline (lightweight subset)
-        # Just ensure analyzer runs without exception on a realistic corpus
         corpus = tmp_path / "corpus"
         corpus.mkdir()
         ledger_dir = tmp_path / "ledger"
         ledger_dir.mkdir()
 
-        # Minimal representative set covering all finding types
         adrs = [
             ("ADR-001", "accepted", "", [], "foundational"),
             ("ADR-002", "accepted", "ci", [], "normal"),
@@ -293,7 +310,6 @@ class TestFullFixture:
 
         findings = analyze_lifecycle(corpus, ledger_dir / "project_memory.json")
         codes = {f.code for f in findings}
-        # Fixture has continuous 001-010, no numbering gap expected
         expected = {DANGLING_SUPERSEDES, ORPHAN_SUPERSEDED,
                     ACTIVE_CONTRADICTION, SILENT_PRECEDENCE_ELIMINATION,
                     LEDGER_STATUS_MISMATCH}
@@ -325,7 +341,7 @@ class TestNegativeCases:
         _write_adr(tmp_path, "ADR-003", "accepted", "compute")
         _write_ledger(tmp_path, [])
         findings = analyze_lifecycle(tmp_path, tmp_path / "project_memory.json")
-        assert not any(f.code == UNEXPLAINED_NUMBERING_GAP for f in findings)
+        assert not findings, f"Expected no warnings, got: {[(f.code, f.adr_id) for f in findings]}"
 
     def test_explicit_supersession_produces_no_silent_elimination_warning(self, tmp_path: Path):
         """Two accepted ADRs in same scope, but ADR-002 explicitly supersedes ADR-001."""

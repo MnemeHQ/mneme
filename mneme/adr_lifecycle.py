@@ -9,23 +9,17 @@ introducing a new abstraction. New codes are module-level constants below.
 """
 from __future__ import annotations
 
-import hashlib
 import json
-import os
-import re
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
 
-from mneme.adr_freshness import FreshnessIssue, check_freshness
+from mneme.adr_compiler import PRIORITY_RANK, ADRPrecedenceError, _pick_within_scope
+from mneme.adr_freshness import FreshnessIssue
 from mneme.adr_import import project_decision_graph
-from mneme.adr_parser import parse_adr_file, parse_adr_directory
-from mneme.adr_compiler import resolve_precedence, ADRPrecedenceError, PRIORITY_RANK
-from mneme.adr_schema import ADRParseError
+from mneme.adr_parser import parse_adr_file
+from mneme.adr_schema import ADR, ADRParseError
 
 # ── Finding codes (extend FreshnessIssue.code vocabulary) ─────────────────────
 
-UNEXPLAINED_NUMBERING_GAP = "UNEXPLAINED_NUMBERING_GAP"
 DANGLING_SUPERSEDES = "DANGLING_SUPERSEDES"
 ORPHAN_SUPERSEDED = "ORPHAN_SUPERSEDED"
 ACTIVE_CONTRADICTION = "ACTIVE_CONTRADICTION"
@@ -34,7 +28,6 @@ LEDGER_STATUS_MISMATCH = "LEDGER_STATUS_MISMATCH"
 
 # Deterministic output order
 _CODE_ORDER = [
-    UNEXPLAINED_NUMBERING_GAP,
     DANGLING_SUPERSEDES,
     ORPHAN_SUPERSEDED,
     ACTIVE_CONTRADICTION,
@@ -42,9 +35,6 @@ _CODE_ORDER = [
     LEDGER_STATUS_MISMATCH,
 ]
 
-# ── Internal helpers ──────────────────────────────────────────────────────────
-
-_ADR_ID_PATTERN = re.compile(r"^ADR-(\d+)$")
 _SOURCE_TYPE_ADR = "adr"
 
 
@@ -60,17 +50,13 @@ def _load_raw_decisions(memory_path: Path) -> list[dict]:
     return [d for d in raw if isinstance(d, dict)]
 
 
-def _compute_source_hash(adr_path: Path) -> str:
-    return hashlib.sha256(adr_path.read_bytes()).hexdigest()
-
-
-def _scan_adr_directory_tolerant(adr_dir: Path):
+def _scan_adr_directory_tolerant(adr_dir: Path) -> tuple[list[ADR], list[tuple[Path, str]]]:
     """Parse every ADR-*.md, separating successes from failures.
 
     Returns (parsed_list, parse_errors) where parse_errors is a list of
     (path, message) tuples for files matching the glob that failed to parse.
     """
-    parsed: list = []
+    parsed: list[ADR] = []
     parse_errors: list[tuple[Path, str]] = []
     for path in sorted(adr_dir.glob("ADR-*.md")):
         try:
@@ -80,28 +66,6 @@ def _scan_adr_directory_tolerant(adr_dir: Path):
         except Exception as exc:
             parse_errors.append((path, f"unexpected parse error: {exc}"))
     return parsed, parse_errors
-
-
-def _extract_numbering_gaps(parsed: list) -> list[int]:
-    """Return sorted list of missing integer IDs between min and max present."""
-    nums: list[int] = []
-    for a in parsed:
-        m = _ADR_ID_PATTERN.match(a.id)
-        if m:
-            nums.append(int(m.group(1)))
-    if not nums:
-        return []
-    present = set(nums)
-    full = set(range(min(nums), max(nums) + 1))
-    return sorted(full - present)
-
-
-def _has_ledger_tombstone_for_gap(gap_id: str, raw_decisions: list[dict]) -> bool:
-    """Return True if ledger has a decision for the missing ADR (tombstone)."""
-    for dec in raw_decisions:
-        if dec.get("id") == gap_id:
-            return True
-    return False
 
 
 # ── Public API ────────────────────────────────────────────────────────────────
@@ -115,9 +79,8 @@ def analyze_lifecycle(corpus_dir: str | Path, memory_path: str | Path) -> list[F
         memory_path: Path to project_memory.json.
 
     Returns:
-        List of FreshnessIssue records. May include freshness issues if
-        check_freshness is called first; here we return only lifecycle-specific
-        codes. Order is deterministic by _CODE_ORDER then by adr_id.
+        List of FreshnessIssue records.
+        Order is deterministic by _CODE_ORDER then by adr_id.
     """
     corpus_dir = Path(corpus_dir)
     memory_path = Path(memory_path)
@@ -141,11 +104,6 @@ def analyze_lifecycle(corpus_dir: str | Path, memory_path: str | Path) -> list[F
             path=str(path),
             message=message,
         ))
-
-    # UNEXPLAINED_NUMBERING_GAP: ordinary missing numbers in sequence are common
-    # and not treated as defects. Only suppressed when ledger has a record, and
-    # ordinary gaps without a ledger produce no warning.
-    # (Preserved in code vocabulary for callers that inspect index continuity).
 
     # DANGLING_SUPERSEDES (forward refs to unknown ids)
     for a in parsed:
@@ -178,29 +136,45 @@ def analyze_lifecycle(corpus_dir: str | Path, memory_path: str | Path) -> list[F
                 ),
             ))
 
-    # ACTIVE_CONTRADICTION + SILENT_PRECEDENCE_ELIMINATION
-    # resolve_precedence raises ADRPrecedenceError on the first ambiguous scope.
-    # Iterate to catch multiple scopes: on each raise, record the tie,
-    # remove the tied ids, and retry.
-    # Filter to valid accepted ADRs with known priority before calling.
+    # Independent per-scope resolution over graph-derived active ADRs:
+    # 1. Build the active set from project_decision_graph.
+    # 2. Group active ADRs by scope.
+    # 3. Resolve each scope separately.
+    # 4. Emit ACTIVE_CONTRADICTION for a tied group.
+    # 5. Emit SILENT_PRECEDENCE_ELIMINATION only when that same group has a real winner and active losers.
+    active_ids = {n.id for n in nodes if n.status == "active"}
     valid_priorities = set(PRIORITY_RANK.keys())
-    remaining = [
+    active_adrs = [
         a for a in parsed
-        if a.status == "accepted"
+        if a.id in active_ids
         and a.priority in valid_priorities
-        and a.id
         and a.date
         and a.scope != "None"
     ]
-    tied_ids: set[str] = set()
-    while True:
+
+    by_scope: dict[str, list[ADR]] = {}
+    for a in active_adrs:
+        by_scope.setdefault(a.scope, []).append(a)
+
+    for scope, group in sorted(by_scope.items()):
+        if len(group) < 2:
+            continue
         try:
-            winners = resolve_precedence(remaining)
-            break
+            winner = _pick_within_scope(scope, group)
+            for loser in sorted(group, key=lambda a: a.id):
+                if loser.id != winner.id:
+                    findings.append(FreshnessIssue(
+                        code=SILENT_PRECEDENCE_ELIMINATION,
+                        adr_id=loser.id,
+                        path=str(loser.source_path),
+                        message=(
+                            f"{loser.id} was silently eliminated by precedence in scope "
+                            f"{scope!r} (winner: {winner.id}). Both claim active status with "
+                            f"no explicit supersedes link. Add an explicit supersedes link or "
+                            f"retire one decision."
+                        ),
+                    ))
         except ADRPrecedenceError as exc:
-            for tid in exc.ids:
-                tied_ids.add(tid)
-            # Record contradiction finding
             findings.append(FreshnessIssue(
                 code=ACTIVE_CONTRADICTION,
                 adr_id=",".join(sorted(exc.ids)),
@@ -213,38 +187,6 @@ def analyze_lifecycle(corpus_dir: str | Path, memory_path: str | Path) -> list[F
                     f"explicit supersedes link."
                 ),
             ))
-            # Remove tied ids from consideration for silent-elimination scan
-            remaining = [a for a in remaining if a.id not in tied_ids]
-
-    winner_ids = {w.id for w in winners}
-
-    # SILENT_PRECEDENCE_ELIMINATION: narrow — report ONLY when:
-    # 1. both decisions claim an active status (accepted + unreferenced);
-    # 2. they overlap in scope (same scope);
-    # 3. no explicit supersession relationship exists; and
-    # 4. one disappears solely because precedence selects the other.
-    accepted_unreferenced = {
-        n.id for n in nodes
-        if n.status == "active" and n.superseded_by is None
-    }
-    silent_losers = accepted_unreferenced - winner_ids - tied_ids
-    for loser_id in sorted(silent_losers):
-        adr = next((a for a in parsed if a.id == loser_id), None)
-        src = str(adr.source_path) if adr else "unknown"
-        scope = adr.scope if adr else "unknown"
-        winner = next((w for w in winners if w.scope == scope), None)
-        winner_id = winner.id if winner else "unknown"
-        findings.append(FreshnessIssue(
-            code=SILENT_PRECEDENCE_ELIMINATION,
-            adr_id=loser_id,
-            path=src,
-            message=(
-                f"{loser_id} was silently eliminated by precedence in scope "
-                f"{scope!r} (winner: {winner_id}). Both claim active status with "
-                f"no explicit supersedes link. Add an explicit supersedes link or "
-                f"retire one decision."
-            ),
-        ))
 
     # LEDGER_STATUS_MISMATCH: ledger entries whose source ADR is non-active
     raw_decisions = _load_raw_decisions(memory_path)
@@ -291,7 +233,6 @@ def analyze_lifecycle(corpus_dir: str | Path, memory_path: str | Path) -> list[F
 
 __all__ = [
     "analyze_lifecycle",
-    "UNEXPLAINED_NUMBERING_GAP",
     "DANGLING_SUPERSEDES",
     "ORPHAN_SUPERSEDED",
     "ACTIVE_CONTRADICTION",
