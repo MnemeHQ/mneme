@@ -51,6 +51,7 @@ Agents-capable SDK; it is not added to Mneme's runtime dependencies.
 ```bash
 <venv-python> probe.py identity          # record environment identity
 <venv-python> probe.py a                 # A1 pre-execution write, A2 denied write, A3 edit materialization
+<venv-python> probe.py a2b               # A2b benign overwrite preserving a pre-existing sentinel
 <venv-python> probe.py a4                # A4 bash coverage (heredoc + in-context opaque attempt)
 <venv-python> probe.py a4b               # A4b isolated opaque-write bypass (no prior denial context)
 <venv-python> probe.py b                 # M0-B multi-agent propagation
