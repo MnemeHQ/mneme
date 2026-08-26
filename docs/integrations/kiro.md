@@ -1,33 +1,34 @@
-# Kiro Integration (Experimental)
+# Kiro CLI 3.0 Integration (Native)
 
-Experimental adapter evaluating proposed writes before disk in Kiro, using a
-Kiro `PreToolUse` command hook that runs the same introduced-content
-enforcement path as the Claude Code hook.
+Mneme gates Kiro's native file-write and append tools before they reach disk, using
+Kiro's `PreToolUse` command hook that runs the same introduced-content enforcement
+path as the Claude Code hook.
 
-**Status: contract-tested / experimental.** Live reproduction performed
-on **CLI 2.19.2** (default v2 engine vs `--v3` / CLI 3.0) on 2026-08-26. Results:
+**Status: live-verified on Kiro CLI 3.0 / v3 engine (`--v3`).** Live reproduction
+performed on **Kiro CLI 2.19.2 `--v3` (v3 engine / CLI 3.0)** on 2026-08-26.
+Results:
 
 | Capability | CLI 2.19.2 default (v2 engine) | CLI 2.19.2 `--v3` (v3 engine / CLI 3.0) |
 |------------|--------------------------------|-----------------------------------------|
 | Hook registration | PASS (agent config `hooks` map, camelCase) | **PASS** (`.kiro/hooks/*.json` v1 format automatically discovered) |
-| Envelope capture | PASS (`fs_write`, `command:create`, `file_text`) | **PASS** (`PreToolUse`, `session_id`, `fs_write`, `text`) |
+| Envelope capture | PASS (`fs_write`, `command:create`, `file_text`) | **PASS** (`PreToolUse`, `session_id`, `fs_write`/`fs_append`, `text`) |
 | Verdict generation (exit 2 on FAIL) | PASS | **PASS** |
 | **Pre-execution blocking** | **FAIL** (file written despite exit 2) | **PASS** (tool blocked pre-disk, stderr shown to agent) |
 | Clean allowed write (exit 0 on PASS) | PASS | **PASS** (file written to disk) |
-| Overall enforcement support | **NOT SUPPORTED** | **PASS (contract-verified)** |
+| Overall enforcement support | **NOT SUPPORTED** | **PASS (live-verified)** |
 
-*Note on registration:* CLI 2.19.2 in default mode ignores `.kiro/hooks/*.json` files. In `--v3` mode (CLI 3.0), `.kiro/hooks/*.json` files are automatically discovered and loaded.
+*Note on registration:* CLI 2.19.2 in default mode ignores `.kiro/hooks/*.json` files. In `--v3` mode (CLI 3.0 / v3 engine), `.kiro/hooks/*.json` files are automatically discovered and loaded.
 
-Per the claim gate, this integration remains experimental until IDE 1.x validation is completed and the follow-up promotion PR lands.
+**Support scope:** Kiro CLI 3.0 / v3 engine **only**. CLI 2.x default mode is **NOT SUPPORTED** for enforcement. Kiro IDE 1.x remains **pending separate live validation** and is not claimed as supported.
 
 ## What it does
 
 - Parses the Kiro v1 `PreToolUse` STDIN envelope (`hook_event_name`, `cwd`,
   `session_id`, `tool_name`, `tool_input`).
-- Normalizes native write shapes — tool name `write` / `fs_write` /
-  `fsWrite` with `tool_input.path` + full `tool_input.text` (CLI 3.0) or
-  `tool_input.content` (documented) or `tool_input.file_text` (CLI 2.x create)
-  — onto Mneme's existing mutation representation.
+- Normalizes native write/append shapes — tool names `write` / `fs_write` /
+  `fsWrite` / `fs_append` with `tool_input.path` + full `tool_input.text`
+  (CLI 3.0) or `tool_input.content` (documented) or `tool_input.file_text`
+  (CLI 2.x create) — onto Mneme's existing mutation representation.
 - Reuses the shared gate verbatim: introduced-delta enforcement (ADR-018),
   corpus-wide typed-literal enforcement independent of retrieval rank
   (ADR-017/019), explicit path applicability via `--target-path` (ADR-020),
@@ -58,9 +59,9 @@ foreign hook entry already present and upserts only the
 `{"version": "v1", "hooks": [...]}` file. Global installation is not
 offered.
 
-**Requires Kiro IDE 1.0+ or Kiro CLI 3.0+ / `--v3`** (the standalone
-`.kiro/hooks/*.json` format). CLI 2.x default mode uses agent-config hooks
-instead; the installed file will be ignored by CLI 2.x default mode.
+**Requires Kiro CLI 3.0+ / `--v3`** (the standalone `.kiro/hooks/*.json` format).
+CLI 2.x default mode uses agent-config hooks; the installed file will be
+ignored by CLI 2.x default mode. Kiro IDE 1.x is not yet validated.
 
 ## Enforcement mode
 
