@@ -1,0 +1,16 @@
+[
+  {
+    "label": "A2b setup:/workspace/a2b_preexisting.txt via agent read",
+    "source": "agent-read",
+    "sha256": "8e4e9b6f3bba6a8ffb5e6ddef2f27a1a0b3a1a562347215fb06cb0ada24699d8",
+    "bytes": 52,
+    "content_preview": "1\tSAFE_PROLOGUE_LINE\n2\tMANAGED_AGENTS_FORBIDDEN_XYZ\n"
+  },
+  {
+    "label": "A2b post-decision:/workspace/a2b_preexisting.txt via agent read",
+    "source": "agent-read",
+    "sha256": "bf0e2ab68cc91c916e71d05082de88b1d86062c29826dbe17144fc780050650e",
+    "bytes": 48,
+    "content_preview": "1\tSAFE_PROLOGUE_LINE\n2\tSAFE_APPENDED_NOTES_LINE\n"
+  }
+]

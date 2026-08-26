@@ -1,0 +1,23 @@
+[
+  {
+    "label": "A1:/workspace/a1_safe.txt via agent read",
+    "source": "agent-read",
+    "sha256": "d1f2677874ff4cf1ddb411d31801cc391916b293fa422859db60133ff9e7a8b9",
+    "bytes": 29,
+    "content_preview": "1\tMNEME_M0_A1_SAFE_MARKER_OK\n"
+  },
+  {
+    "label": "A2 post-state: a2_forbidden.txt + a2_clean.txt via agent read",
+    "source": "agent-read",
+    "sha256": "934935e74bed50fa62eb772f69a687d19f88f2464db2601a605d2971e6ccfca4",
+    "bytes": 103,
+    "content_preview": "awk: cannot open \"/workspace/a2_forbidden.txt\" (No such file or directory)\n\n---\n1\tCOMPLIANT_CONTENT_OK\n"
+  },
+  {
+    "label": "A3:/workspace/a3_baseline.py post-edit via agent read",
+    "source": "agent-read",
+    "sha256": "f4e6a5e8a7198c5119d6b7852582a4a43dbcc5c48e6f4cc83b7154d1ad6b9268",
+    "bytes": 122,
+    "content_preview": "1\tLINE_ONE_ANCHOR = 1\n2\tLINE_TWO_ANCHOR = 2\n3\tLINE_THREE_ANCHOR = 3\n4\t# edit-target-anchor\n5\tMANAGED_AGENTS_FORBIDDEN_XYZ\n"
+  }
+]

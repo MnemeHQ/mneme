@@ -1,0 +1,9 @@
+[
+  {
+    "label": "A4b:/workspace/a4_opaque.txt via agent read",
+    "source": "agent-read",
+    "sha256": "455f648d59cef1538ef7b4dc4e30e5eb0120dbc7697b6f124e4d868a5d7d93c1",
+    "bytes": 31,
+    "content_preview": "1\tMANAGED_AGENTS_FORBIDDEN_XYZ\n"
+  }
+]

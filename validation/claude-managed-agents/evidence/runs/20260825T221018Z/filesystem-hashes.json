@@ -1,0 +1,9 @@
+[
+  {
+    "label": "A4 post-state: a4_heredoc.txt + a4_opaque.txt via agent read",
+    "source": "agent-read",
+    "sha256": "f950b118d9af707f7962fed771a2cf53b681944646aff9c6d8fe9fe6b4a14e38",
+    "bytes": 119,
+    "content_preview": "1\t[redacted: banned sentinel literal omitted per policy]\n\n---\n1\t[redacted: banned sentinel literal omitted per policy]\n"
+  }
+]
