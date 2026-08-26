@@ -337,5 +337,5 @@ No engine changes. Shells out to existing `mneme check` v0.3.x.
 ### Tests
 
 - 21 new integration tests under `tests/integrations/claude_code/`.
-- 2 end-to-end tests (skipped when `mneme` is not on `$PATH`).
+- 2 end-to-end tests (skipped when `mneme` not on `$PATH`).
 - Full suite: 170 passed, 2 skipped.
