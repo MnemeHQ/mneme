@@ -130,6 +130,27 @@ def test_non_string_path_and_content_are_tolerated():
     assert event.tool_input["content"] == ""
 
 
+def test_observed_v3_envelope_with_text():
+    """Kiro CLI 3.0 / v3 engine (observed live 2026-08-26) sends tool_input with 'text'
+    alongside 'path', with PascalCase 'PreToolUse' and 'session_id' present."""
+    envelope = {
+        "session_id": "sess_32f5f263-bcf2-4b63-8d69-89fafd057df7",
+        "hook_event_name": "PreToolUse",
+        "cwd": "C:\\Users\\hi\\AppData\\Local\\Temp\\opencode\\kiro-live",
+        "tool_name": "fs_write",
+        "tool_input": {
+            "path": "c:\\Users\\hi\\AppData\\Local\\Temp\\opencode\\kiro-live\\v3_test_block.md",
+            "text": "pip install mneme-hq"
+        }
+    }
+    event, unhandled = normalize_to_tool_event(envelope)
+    assert unhandled is None
+    assert event is not None
+    assert event.tool_name == "Write"
+    assert event.file_path == "c:\\Users\\hi\\AppData\\Local\\Temp\\opencode\\kiro-live\\v3_test_block.md"
+    assert event.tool_input["content"] == "pip install mneme-hq"
+
+
 def test_observed_cli_2_19_2_envelope_with_file_text():
     """CLI 2.19.2 (kiro-cli-chat 2.19.2) sends tool_input with 'file_text' instead
     of 'content' for fs_write create. This regression fixture captures the exact

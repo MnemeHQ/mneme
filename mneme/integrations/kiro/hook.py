@@ -118,6 +118,8 @@ def normalize_to_tool_event(
         tool_input = {}
     path = tool_input.get("path", "")
     content = tool_input.get("content")
+    if content is None and "text" in tool_input:
+        content = tool_input.get("text")
 
     if content is None:
         # Legacy fallback observed exclusively on Kiro CLI 2.19.2 (2026-08-26):
