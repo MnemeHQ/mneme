@@ -259,6 +259,42 @@ class TestLifecycleAnalyzer:
         # ADR-001 must not re-enter to falsely eliminate ADR-004 or be reported as eliminated
         assert eliminations == [], f"Unexpected eliminations: {eliminations}"
 
+    def test_proposed_adr_does_not_retire_accepted_adr_for_contradiction_detection(self, tmp_path: Path):
+        """
+        Regression: a proposed (non-accepted) ADR declaring supersedes=[ADR-001]
+        must NOT retire accepted ADR-001.
+
+        Setup:
+          ADR-001: accepted, normal, 2026-01-01, scope 'storage'
+          ADR-002: proposed, normal, 2026-01-01, scope 'compute', supersedes: [ADR-001]
+          ADR-003: accepted, normal, 2026-01-01, scope 'storage' (ties with ADR-001)
+
+        Expected:
+          ADR-001 remains active (proposed ADR-002 cannot retire it).
+          Scope 'storage' has ADR-001 + ADR-003 tying -> ACTIVE_CONTRADICTION emitted.
+          Ledger decision for ADR-001 is still active -> NO LEDGER_STATUS_MISMATCH.
+        """
+        _write_adr(tmp_path, "ADR-001", "accepted", "storage", date="2026-01-01")
+        _write_adr(tmp_path, "ADR-002", "proposed", "compute", date="2026-01-01", supersedes=["ADR-001"])
+        _write_adr(tmp_path, "ADR-003", "accepted", "storage", date="2026-01-01")
+        _write_ledger(tmp_path, [{
+            "id": "ADR-001",
+            "decision": "Storage choice",
+            "scope": ["storage"],
+            "constraints": [],
+            "anti_patterns": [],
+            "rules": [],
+            "source": {"type": "adr", "path": "ADR-001-test.md", "sha256": "abc"},
+        }])
+
+        findings = analyze_lifecycle(tmp_path, tmp_path / "project_memory.json")
+        contradictions = [f for f in findings if f.code == ACTIVE_CONTRADICTION]
+        mismatches = [f for f in findings if f.code == LEDGER_STATUS_MISMATCH]
+
+        assert len(contradictions) == 1
+        assert "ADR-001" in contradictions[0].adr_id and "ADR-003" in contradictions[0].adr_id
+        assert mismatches == []
+
 
 class TestFullFixture:
     """Run a multi-ADR fixture against the analyzer for smoke coverage."""

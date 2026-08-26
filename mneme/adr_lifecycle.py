@@ -13,7 +13,7 @@ import json
 from pathlib import Path
 
 from mneme.adr_compiler import PRIORITY_RANK, ADRPrecedenceError, _pick_within_scope
-from mneme.adr_freshness import FreshnessIssue
+from mneme.adr_freshness import FreshnessIssue, _id_from_filename
 from mneme.adr_import import project_decision_graph
 from mneme.adr_parser import parse_adr_file
 from mneme.adr_schema import ADR, ADRParseError
@@ -100,7 +100,7 @@ def analyze_lifecycle(corpus_dir: str | Path, memory_path: str | Path) -> list[F
     for path, message in parse_errors:
         findings.append(FreshnessIssue(
             code="ADR_UNPARSEABLE",
-            adr_id=path.stem,
+            adr_id=_id_from_filename(path),
             path=str(path),
             message=message,
         ))

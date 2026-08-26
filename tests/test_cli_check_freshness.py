@@ -319,3 +319,48 @@ def test_check_json_exposes_stable_lifecycle_codes(tmp_path, capsys):
     mismatch = next(i for i in payload["freshness"] if i["code"] == "LEDGER_STATUS_MISMATCH")
     assert mismatch["adr_id"] == "ADR-004"
     assert "deprecated" in mismatch["message"]
+
+
+def test_check_deduplicates_unparseable_diagnostic_between_freshness_and_lifecycle(tmp_path, capsys):
+    """
+    Regression: when an ADR is unparseable (e.g. ADR-002-bad.md), check_freshness and
+    analyze_lifecycle must both identify it with the canonical id ('ADR-002'), and
+    _collect_adr_diagnostics must deduplicate so it is reported exactly once in stdout and JSON.
+    """
+    adr_dir = tmp_path / "docs" / "adr"
+    adr_dir.mkdir(parents=True)
+    (adr_dir / "ADR-002-bad.md").write_text("invalid yaml without header\n", encoding="utf-8")
+
+    mem = _memory(tmp_path)
+    inp = _input(tmp_path, "Clean input")
+
+    code = main([
+        "check",
+        "--memory", str(mem),
+        "--input", str(inp),
+        "--query", "storage",
+        "--mode", "warn",
+        "--adr-dir", str(adr_dir),
+    ])
+
+    out = capsys.readouterr().out
+    assert code == 0
+    # Must appear exactly once in stdout
+    assert out.count("ADR_UNPARSEABLE") == 1
+    assert "ADR-002" in out
+
+    # Must appear exactly once in JSON
+    main([
+        "check",
+        "--memory", str(mem),
+        "--input", str(inp),
+        "--query", "storage",
+        "--mode", "warn",
+        "--json",
+        "--adr-dir", str(adr_dir),
+    ])
+    payload = json.loads(capsys.readouterr().out)
+    unparseable_items = [i for i in payload["freshness"] if i["code"] == "ADR_UNPARSEABLE"]
+    assert len(unparseable_items) == 1
+    assert unparseable_items[0]["adr_id"] == "ADR-002"
+
