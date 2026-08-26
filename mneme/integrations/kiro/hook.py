@@ -71,7 +71,7 @@ from mneme.integrations.claude_code.hook import (
 
 # The native write tool name plus its documented aliases (kiro.dev/docs/
 # reference/built-in-tools/). No undocumented names are accepted.
-_WRITE_TOOL_NAMES = frozenset({"write", "fs_write", "fsWrite"})
+_WRITE_TOOL_NAMES = frozenset({"write", "fs_write", "fsWrite", "fs_append"})
 
 _EVENT_NAME = "pretooluse"
 
@@ -117,31 +117,42 @@ def normalize_to_tool_event(
     if not isinstance(tool_input, dict):
         tool_input = {}
     path = tool_input.get("path", "")
-    content = tool_input.get("content")
-    if content is None and "text" in tool_input:
-        content = tool_input.get("text")
+    cwd = str(payload.get("cwd", "") or "")
 
-    if content is None:
-        # Legacy fallback observed exclusively on Kiro CLI 2.19.2 (2026-08-26):
-        # 'fs_write' with command='create' carries content in 'file_text'.
-        if tool_name == "fs_write" and "file_text" in tool_input:
-            cmd = tool_input.get("command")
-            if cmd == "create":
-                raw_text = tool_input.get("file_text")
-                content = raw_text if isinstance(raw_text, str) else ""
+    if tool_name == "fs_append":
+        append_text = str(tool_input.get("text") or "")
+        resolved = Path(path) if Path(path).is_absolute() else Path(cwd) / path
+        try:
+            current_text = resolved.read_text(encoding="utf-8") if resolved.is_file() else ""
+        except (OSError, UnicodeError):
+            current_text = ""
+        content = current_text + append_text
+    else:
+        content = tool_input.get("content")
+        if content is None and "text" in tool_input:
+            content = tool_input.get("text")
+
+        if content is None:
+            # Legacy fallback observed exclusively on Kiro CLI 2.19.2 (2026-08-26):
+            # 'fs_write' with command='create' carries content in 'file_text'.
+            if tool_name == "fs_write" and "file_text" in tool_input:
+                cmd = tool_input.get("command")
+                if cmd == "create":
+                    raw_text = tool_input.get("file_text")
+                    content = raw_text if isinstance(raw_text, str) else ""
+                else:
+                    return None, f"unsupported legacy write shape: fs_write command={cmd!r} with file_text"
+            elif "file_text" in tool_input:
+                return None, f"unsupported legacy write shape: {tool_name} with file_text"
             else:
-                return None, f"unsupported legacy write shape: fs_write command={cmd!r} with file_text"
-        elif "file_text" in tool_input:
-            return None, f"unsupported legacy write shape: {tool_name} with file_text"
-        else:
-            content = ""
+                content = ""
 
     # Reuse the Claude-Code-shaped materializer verbatim by presenting the
     # event as a whole-content Write.
     event = ToolEvent(
         tool_name="Write",
         file_path=path if isinstance(path, str) else "",
-        cwd=str(payload.get("cwd", "") or ""),
+        cwd=cwd,
         tool_input={
             "file_path": path if isinstance(path, str) else "",
             "content": content if isinstance(content, str) else "",

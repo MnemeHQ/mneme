@@ -62,6 +62,7 @@ def test_write_tool_names():
     assert is_write_tool("write")
     assert is_write_tool("fs_write")
     assert is_write_tool("fsWrite")
+    assert is_write_tool("fs_append")
 
 
 def test_non_write_tools_rejected():
@@ -85,10 +86,34 @@ def test_normalizes_fs_write_to_whole_content_write():
 
 
 def test_all_documented_aliases_normalize():
-    for tool in ("write", "fs_write", "fsWrite"):
+    for tool in ("write", "fs_write", "fsWrite", "fs_append"):
         event, unhandled = normalize_to_tool_event(json.loads(_write_envelope(tool=tool)))
         assert unhandled is None
         assert event is not None, tool
+
+
+def test_observed_v3_fs_append_envelope(tmp_path):
+    """Kiro CLI 3.0 (observed live 2026-08-26) uses 'fs_append' with 'text' when appending
+    to an existing file. The adapter resolves the existing file and materializes current + text."""
+    target_file = tmp_path / "v3_existing.md"
+    target_file.write_text("# Initial Notes\n", encoding="utf-8")
+
+    envelope = {
+        "session_id": "sess_1d2bf653-6d1f-4d2e-b4a7-d108fb094b88",
+        "hook_event_name": "PreToolUse",
+        "cwd": str(tmp_path),
+        "tool_name": "fs_append",
+        "tool_input": {
+            "path": str(target_file),
+            "text": "## Installation\n\nRun: pip install mneme-hq\n"
+        }
+    }
+    event, unhandled = normalize_to_tool_event(envelope)
+    assert unhandled is None
+    assert event is not None
+    assert event.tool_name == "Write"
+    assert event.file_path == str(target_file)
+    assert event.tool_input["content"] == "# Initial Notes\n## Installation\n\nRun: pip install mneme-hq\n"
 
 
 def test_non_pretooluse_events_are_skipped():

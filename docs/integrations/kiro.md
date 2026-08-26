@@ -76,7 +76,7 @@ returned a blocking exit before the write executed.
 | Surface | Kiro hook fired | Proposed content pre-execution | Blocked pre-write | PostFileSave observed | Later audit |
 |---|---|---|---|---|---|
 | Native write (new file) | `PreToolUse(write)` | Yes — full content in `text` (v3), `content` (v1), or `file_text` (CLI 2.x) | **CLI 3.0 / v3: YES** (blocked pre-disk); CLI 2.x: NO | n/a (blocked) or `PostFileCreate` | Yes |
-| Native edit / replace | `PreToolUse(write)` | Yes — full proposed content; gate checks introduced lines only | CLI 3.0: expected; CLI 2.x: unobserved | `PostFileSave` | Yes |
+| Native edit / append | `PreToolUse(write|fs_append)` | Yes — full proposed content or appended lines; gate checks introduced delta | **CLI 3.0 / v3: YES** (blocked pre-disk, file untouched); CLI 2.x: unobserved | `PostFileSave` | Yes |
 | Shell redirection (`echo x > f`) | `PreToolUse(shell)` — command string only | **No** — content is inside an unparsed shell command | **No** (deliberately not parsed) | Documented to fire after agent saves; unverified for shell writes | Yes |
 | Script-generated write | `PreToolUse(shell)` — command string only | **No** | **No** | Unverified | Yes |
 | Rename | No dedicated pre-rename trigger | No | No | No | Yes (git status) |
@@ -104,7 +104,10 @@ Key points:
 - Tests: `python -m pytest tests/integrations/kiro -p no:cacheprovider`
   (envelope parsing, gate policy, applicability, modes, fail-open paths,
   installer idempotency, packaging contract). Includes regression fixtures
-  for both the CLI 3.0 v3 envelope (`test_observed_v3_envelope_with_text`)
+  for both the CLI 3.0 v3 envelope (`test_observed_v3_envelope_with_text`),
+  the v3 append envelope (`test_observed_v3_fs_append_envelope`),
   and the CLI 2.19.2 v2 envelope (`test_observed_cli_2_19_2_envelope_with_file_text`).
 - Live reproduction: verified live on Kiro CLI 2.19.2 `--v3` (v3 engine / CLI 3.0)
-  with strict pre-disk blocking on forbidden writes and clean pass on allowed writes.
+  with strict pre-disk blocking on forbidden new-file writes, strict pre-disk blocking
+  on existing-file appends/edits (file content byte-identical and untouched), and clean
+  pass on allowed writes.

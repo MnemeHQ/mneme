@@ -76,13 +76,16 @@ Documented and verified top-level fields (official examples, hooks/types page, a
 For MCP tools `tool_name` carries the full namespaced form
 (`@server/tool`) and `tool_input` the tool's parameters (official).
 
-### Native write tool
+### Native write & append tools
 
 Official built-in-tools reference: tool name `write`, aliases
-`fs_write` and `fsWrite`, described as "Tool for creating and editing
-files". In CLI 3.0 / v3 engine, `tool_input` carries `path` and `text`.
-The adapter normalizes both `content` (documented) and `text` (observed v3)
-onto Mneme's `ToolEvent`.
+`fs_write`, `fsWrite`, and `fs_append`. In CLI 3.0 / v3 engine:
+- `fs_write`: carries `path` and proposed `text` (whole file or replace).
+- `fs_append`: carries `path` and appended `text` (appended content).
+
+The adapter normalizes `content` (documented), `text` (observed v3 `fs_write`),
+and `fs_append` (materialized against current disk content) onto Mneme's
+`ToolEvent`.
 
 ### Exit-code semantics (official & verified)
 
@@ -91,7 +94,10 @@ onto Mneme's `ToolEvent`.
 | 0 | Success; **stdout is added to agent context** |
 | non-zero | For `PreToolUse`: **tool invocation blocked**; stderr sent to the agent |
 
-Verified live in CLI 3.0 / v3 engine: on exit code 2, Kiro displays "Tool execution failed", blocks the write from reaching disk, and feeds Mneme's decision explanation on stderr to the agent, which responds with compliant remediation suggestions.
+Verified live in CLI 3.0 / v3 engine:
+- New file write (`fs_write`): on exit code 2, Kiro displays "Tool execution failed", blocks the write from reaching disk, and feeds Mneme's decision explanation on stderr to the agent.
+- Existing file edit/append (`fs_append`): on exit code 2, Kiro displays "Tool execution failed", blocks the append, and the file on disk remains byte-identical and untouched.
+- Compliant edit/append: on exit code 0, Kiro cleanly executes the write.
 
 ## Observed contract (CLI 2.19.2 default v2 engine) — LEGACY EVIDENCE
 
@@ -155,11 +161,13 @@ notice reaches agent context). This is enforced by the regression fixture
 ### Phase A experimental checklist (updated with live evidence)
 
 1. ✅ Envelope captured from native `write` (create): `text` (v3) / `file_text` (v2).
-2. ✅ Non-zero exit blocks before the file changes: **PASS** on CLI 3.0 / v3 engine.
-3. ✅ Stderr of a blocked invocation is surfaced to the agent (observed live in TUI).
-4. ✅ Exit-0 stdout reaches agent context (observed in allow tests).
-5. Byte-equivalence of IDE and CLI envelopes — **untested on IDE 1.x**:
+2. ✅ Envelope captured from native `append` / edit: `fs_append` with `text` (v3).
+3. ✅ Non-zero exit blocks before new file creation: **PASS** on CLI 3.0 / v3 engine.
+4. ✅ Non-zero exit blocks before existing file modification: **PASS** on CLI 3.0 / v3 engine (file untouched on disk).
+5. ✅ Stderr of a blocked invocation is surfaced to the agent (observed live in TUI).
+6. ✅ Exit-0 stdout reaches agent context (observed in allow tests).
+7. Byte-equivalence of IDE and CLI envelopes — **untested on IDE 1.x**:
    Historical IDE 0.12 `runCommand` hooks received no STDIN (Kiro issues #7408/#7500);
    IDE 1.x behavior remains to be validated.
-6. `PostFileSave` after shell-mediated write — not tested.
-7. `Stop` envelope — verified that `Stop` hook fires on session termination.
+8. `PostFileSave` after shell-mediated write — not tested.
+9. `Stop` envelope — verified that `Stop` hook fires on session termination.

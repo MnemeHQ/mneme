@@ -21,8 +21,8 @@ def test_template_matches_documented_kiro_schema():
     assert hook["name"] == HOOK_NAME
     assert hook["trigger"] == "PreToolUse"
     # Matcher is a regex over the tool name covering the canonical name and
-    # its documented aliases only.
-    assert hook["matcher"] == "^(fs_write|fsWrite|write)$"
+    # its documented aliases plus append.
+    assert hook["matcher"] == "^(fs_write|fsWrite|write|fs_append)$"
     assert hook["action"]["type"] == "command"
     assert hook["action"]["command"] == "mneme-kiro-hook"
     assert hook["enabled"] is True
