@@ -34,6 +34,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from mneme.adr_freshness import FreshnessIssue, check_freshness
+from mneme.adr_lifecycle import analyze_lifecycle
 from mneme.adr_import import (
     apply_import,
     compile_for_import,
@@ -264,6 +265,23 @@ def _check_payload(
     }
 
 
+def _collect_adr_diagnostics(
+    memory_path: str | Path,
+    adr_dir: str | Path,
+) -> list[FreshnessIssue]:
+    """Collect ADR freshness issues and lifecycle findings (warn-only)."""
+    freshness = check_freshness(memory_path=memory_path, adr_dir=adr_dir)
+    lifecycle = analyze_lifecycle(corpus_dir=adr_dir, memory_path=memory_path)
+    seen: set[tuple[str, str, str]] = set()
+    combined: list[FreshnessIssue] = []
+    for issue in freshness + lifecycle:
+        key = (issue.code, issue.adr_id, issue.path)
+        if key not in seen:
+            seen.add(key)
+            combined.append(issue)
+    return combined
+
+
 def _cmd_check(args: argparse.Namespace) -> int:
     input_path = Path(args.input)
     if not input_path.exists():
@@ -289,8 +307,8 @@ def _cmd_check(args: argparse.Namespace) -> int:
     if getattr(args, "json", False):
         # Machine-readable mode: the payload must be the only thing on stdout,
         # so the human-readable violation and freshness blocks are suppressed.
-        freshness = check_freshness(memory_path=args.memory, adr_dir=args.adr_dir)
-        print(json.dumps(_check_payload(result, freshness, args.mode)))
+        diagnostics = _collect_adr_diagnostics(memory_path=args.memory, adr_dir=args.adr_dir)
+        print(json.dumps(_check_payload(result, diagnostics, args.mode)))
         if not result.evaluation_complete:
             return 2
         return _EXIT_CODES_BY_MODE[args.mode][result.verdict]
@@ -325,13 +343,13 @@ def _cmd_check(args: argparse.Namespace) -> int:
             )
         print()
 
-    # ADR freshness diagnostics are warn-only: they print to stdout but
-    # never influence the exit code. Skipped silently when adr_dir is
-    # absent so existing CLI output is unchanged for projects that do
-    # not use ADRs.
-    freshness = check_freshness(memory_path=args.memory, adr_dir=args.adr_dir)
-    if freshness:
-        for issue in freshness:
+    # ADR freshness and lifecycle diagnostics are warn-only: they print to
+    # stdout but never influence the exit code. Skipped silently when adr_dir
+    # is absent so existing CLI output is unchanged for projects that do not
+    # use ADRs.
+    diagnostics = _collect_adr_diagnostics(memory_path=args.memory, adr_dir=args.adr_dir)
+    if diagnostics:
+        for issue in diagnostics:
             _print_freshness_issue(issue)
         print()
 
@@ -555,8 +573,8 @@ def _build_parser() -> argparse.ArgumentParser:
         "--adr-dir", dest="adr_dir", default="docs/adr",
         help=(
             "Directory containing ADR markdown files to check for freshness "
-            "drift (warn-only; never affects exit code). "
-            "Defaults to docs/adr; freshness is skipped silently if absent."
+            "drift and lifecycle consistency (warn-only; never affects exit code). "
+            "Defaults to docs/adr; diagnostics are skipped silently if absent."
         ),
     )
     p_check.set_defaults(func=_cmd_check)

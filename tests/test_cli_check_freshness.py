@@ -211,3 +211,156 @@ def test_check_ignores_non_adr_markdown_in_adr_dir(tmp_path, capsys):
     out = capsys.readouterr().out
     for code in ("ADR_UNIMPORTED", "ADR_CHANGED", "ADR_MISSING", "ADR_UNPARSEABLE"):
         assert code not in out
+
+
+def test_check_emits_lifecycle_diagnostics(tmp_path, capsys):
+    """Lifecycle findings (like LEDGER_STATUS_MISMATCH) surface under mneme check --adr-dir."""
+    adr_dir = tmp_path / "docs" / "adr"
+    adr_dir.mkdir(parents=True)
+    # Write a deprecated ADR
+    (adr_dir / "ADR-004-sqlite.md").write_text(
+        "---\nid: ADR-004\ntitle: SQLite\nstatus: deprecated\npriority: normal\n"
+        "date: 2026-01-01\nscope: \"storage\"\nsupersedes: []\n---\nBody.\n",
+        encoding="utf-8",
+    )
+
+    mem = tmp_path / ".mneme" / "project_memory.json"
+    mem.parent.mkdir(parents=True, exist_ok=True)
+    mem.write_text(json.dumps({
+        "meta": {"name": "t", "description": "t"},
+        "items": [], "examples": [],
+        "decisions": [
+            {
+                "id": "ADR-004",
+                "decision": "Use SQLite",
+                "scope": ["storage"],
+                "constraints": ["no postgres"],
+                "anti_patterns": [],
+                "rules": [],
+                "source": {
+                    "type": "adr",
+                    "path": "../docs/adr/ADR-004-sqlite.md",
+                    "sha256": "abc",
+                },
+            },
+        ],
+    }), encoding="utf-8")
+    inp = _input(tmp_path, "Clean input")
+
+    code = main([
+        "check",
+        "--memory", str(mem),
+        "--input", str(inp),
+        "--query", "storage",
+        "--mode", "warn",
+        "--adr-dir", str(adr_dir),
+    ])
+
+    out = capsys.readouterr().out
+    assert "LEDGER_STATUS_MISMATCH" in out
+    assert "ADR-004" in out
+    # Warn-only exit code
+    assert code == 0
+
+
+def test_check_json_exposes_stable_lifecycle_codes(tmp_path, capsys):
+    """`mneme check --json` includes lifecycle findings with stable codes in the payload."""
+    adr_dir = tmp_path / "docs" / "adr"
+    adr_dir.mkdir(parents=True)
+    (adr_dir / "ADR-004-sqlite.md").write_text(
+        "---\nid: ADR-004\ntitle: SQLite\nstatus: deprecated\npriority: normal\n"
+        "date: 2026-01-01\nscope: \"storage\"\nsupersedes: []\n---\nBody.\n",
+        encoding="utf-8",
+    )
+    (adr_dir / "ADR-010-dangling.md").write_text(
+        "---\nid: ADR-010\ntitle: Dangling\nstatus: accepted\npriority: normal\n"
+        "date: 2026-01-01\nscope: \"dangling\"\nsupersedes:\n  - ADR-999\n---\nBody.\n",
+        encoding="utf-8",
+    )
+
+    mem = tmp_path / ".mneme" / "project_memory.json"
+    mem.parent.mkdir(parents=True, exist_ok=True)
+    mem.write_text(json.dumps({
+        "meta": {"name": "t", "description": "t"},
+        "items": [], "examples": [],
+        "decisions": [
+            {
+                "id": "ADR-004",
+                "decision": "Use SQLite",
+                "scope": ["storage"],
+                "constraints": ["no postgres"],
+                "anti_patterns": [],
+                "rules": [],
+                "source": {
+                    "type": "adr",
+                    "path": "../docs/adr/ADR-004-sqlite.md",
+                    "sha256": "abc",
+                },
+            },
+        ],
+    }), encoding="utf-8")
+    inp = _input(tmp_path, "Clean input")
+
+    code = main([
+        "check",
+        "--memory", str(mem),
+        "--input", str(inp),
+        "--query", "storage",
+        "--mode", "strict",
+        "--json",
+        "--adr-dir", str(adr_dir),
+    ])
+
+    payload = json.loads(capsys.readouterr().out)
+    assert code == 0  # Warn-only diagnostics do not fail strict mode
+    codes = {i["code"] for i in payload["freshness"]}
+    assert "LEDGER_STATUS_MISMATCH" in codes
+    assert "DANGLING_SUPERSEDES" in codes
+    mismatch = next(i for i in payload["freshness"] if i["code"] == "LEDGER_STATUS_MISMATCH")
+    assert mismatch["adr_id"] == "ADR-004"
+    assert "deprecated" in mismatch["message"]
+
+
+def test_check_deduplicates_unparseable_diagnostic_between_freshness_and_lifecycle(tmp_path, capsys):
+    """
+    Regression: when an ADR is unparseable (e.g. ADR-002-bad.md), check_freshness and
+    analyze_lifecycle must both identify it with the canonical id ('ADR-002'), and
+    _collect_adr_diagnostics must deduplicate so it is reported exactly once in stdout and JSON.
+    """
+    adr_dir = tmp_path / "docs" / "adr"
+    adr_dir.mkdir(parents=True)
+    (adr_dir / "ADR-002-bad.md").write_text("invalid yaml without header\n", encoding="utf-8")
+
+    mem = _memory(tmp_path)
+    inp = _input(tmp_path, "Clean input")
+
+    code = main([
+        "check",
+        "--memory", str(mem),
+        "--input", str(inp),
+        "--query", "storage",
+        "--mode", "warn",
+        "--adr-dir", str(adr_dir),
+    ])
+
+    out = capsys.readouterr().out
+    assert code == 0
+    # Must appear exactly once in stdout
+    assert out.count("ADR_UNPARSEABLE") == 1
+    assert "ADR-002" in out
+
+    # Must appear exactly once in JSON
+    main([
+        "check",
+        "--memory", str(mem),
+        "--input", str(inp),
+        "--query", "storage",
+        "--mode", "warn",
+        "--json",
+        "--adr-dir", str(adr_dir),
+    ])
+    payload = json.loads(capsys.readouterr().out)
+    unparseable_items = [i for i in payload["freshness"] if i["code"] == "ADR_UNPARSEABLE"]
+    assert len(unparseable_items) == 1
+    assert unparseable_items[0]["adr_id"] == "ADR-002"
+

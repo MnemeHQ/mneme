@@ -66,23 +66,24 @@ def project_decision_graph(adrs: list[ADR]) -> list[DecisionNode]:
     """Project a parsed ADR corpus into the minimal graph.
 
     Status mapping:
-      ADR.status == "accepted" AND not in any other ADR's supersedes -> "active"
-      ADR.status == "accepted" AND IS in some other ADR's supersedes -> "superseded"
+      ADR.status == "accepted" AND not in any accepted ADR's supersedes -> "active"
+      ADR.status == "accepted" AND IS in some accepted ADR's supersedes -> "superseded"
       ADR.status == "superseded" (explicit in frontmatter)            -> "superseded"
       ADR.status == "deprecated"                                       -> "deprecated"
       ADR.status == "proposed"                                         -> "inactive"
 
-    ``superseded_by`` is the id of the ADR that explicitly supersedes
-    this one, or None. If multiple ADRs claim to supersede the same
+    ``superseded_by`` is the id of the accepted ADR that explicitly supersedes
+    this one, or None. If multiple accepted ADRs claim to supersede the same
     target, the lexicographically lowest id wins (deterministic; rare
     in practice and validate_corpus catches the cycle case).
     """
     superseded_by_map: dict[str, str] = {}
     for a in adrs:
-        for ref in a.supersedes:
-            existing = superseded_by_map.get(ref)
-            if existing is None or a.id < existing:
-                superseded_by_map[ref] = a.id
+        if a.status == "accepted":
+            for ref in a.supersedes:
+                existing = superseded_by_map.get(ref)
+                if existing is None or a.id < existing:
+                    superseded_by_map[ref] = a.id
 
     out: list[DecisionNode] = []
     for a in adrs:
