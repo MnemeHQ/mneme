@@ -26,11 +26,11 @@ at what level, with what evidence. The website's
 | Native integration | Google Antigravity | [antigravity.md](antigravity.md), [PR #316](https://github.com/MnemeHQ/mneme/pull/316) |
 | Native integration | Codex CLI | [codex-cli.md](codex-cli.md), [PR #321](https://github.com/MnemeHQ/mneme/pull/321), [capability matrix](../../validation/codex-cli/capability-matrix.md) |
 | Native integration | LangChain agents on LangGraph | [langchain-langgraph.md](langchain-langgraph.md), [capability matrix](../../validation/langgraph/capability-matrix.md) |
+| Native integration | Kiro CLI 3.0 / v3 | [kiro.md](kiro.md), [kiro-hook-spec.md](kiro-hook-spec.md) |
 | Validated compatibility | Paperclip (CLI + ACP) | [paperclip.md](paperclip.md), [PR #315](https://github.com/MnemeHQ/mneme/pull/315) |
 | Rules export | Cursor | [adr-import.md](adr-import.md) (corpus workflows); generator: `mneme cursor generate` |
 | CLI-based CI gates | GitHub Actions, GitLab CI | `mneme check` reference patterns |
 | Experimental | OpenCode | plugin-hooks approach under evaluation; compaction experiment returned a NULL verdict |
-| Experimental | Kiro | bounded PreToolUse hook, contract-tested, [open PR #314](https://github.com/MnemeHQ/mneme/pull/314) |
 | Experimental | Hermes Agent | P1.5 POC passed (context injection + pre-tool blocking); no blocking Stop-equivalent, see [hermes.md](hermes.md) |
 | Planned | Deep Agents filesystem tools (`write_file`/`edit_file`) | roadmap-only until a pinned Deep Agents validation passes; the [LangChain agents on LangGraph](langchain-langgraph.md) adapter governs local-filesystem-semantic tools by name contract |
 
@@ -51,6 +51,11 @@ at what level, with what evidence. The website's
   See [langchain-langgraph.md](langchain-langgraph.md).
 - **Antigravity**: tested against Antigravity IDE 2.8.1; three file-mutation
   tools covered; deny-only response policy. See [antigravity.md](antigravity.md).
+- **Kiro CLI 3.0 / v3**: validated live on CLI 2.19.2 `--v3` (v3 engine / CLI 3.0).
+  Pre-disk blocking is PASS for `fs_write` (create) and `fs_append` (edit/append).
+  CLI 2.x default mode (v2 engine) is unsupported for blocking (ignores nonzero hook exit).
+  Kiro IDE 1.x remains pending live validation.
+  Shell commands, script-driven writes, and MCP-mediated write tools are unhandled by the adapter (fail open visibly).
 - **Paperclip**: validated on paperclipai 2026.817.0; version-specific
   placeholder-`ANTHROPIC_API_KEY` caveat documented in [paperclip.md](paperclip.md).
 - **OpenCode**: no production plugin ships. The completed compaction

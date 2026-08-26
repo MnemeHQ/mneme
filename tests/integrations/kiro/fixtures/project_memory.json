@@ -1,0 +1,46 @@
+{
+  "meta": {
+    "name": "kiro-integration-test-project",
+    "description": "Fixture for Kiro integration tests",
+    "version": "0.1.0",
+    "owner": "test",
+    "created": "2026-08-23"
+  },
+  "items": [],
+  "decisions": [
+    {
+      "id": "test_001",
+      "decision": "Use SQLite for local storage and database access",
+      "rationale": "single-file portability",
+      "scope": ["storage", "database"],
+      "constraints": ["no postgres"],
+      "anti_patterns": ["postgres", "Postgres", "psycopg2"]
+    },
+    {
+      "id": "test_002",
+      "decision": "Do not call the legacy client directly from application code",
+      "rationale": "all access must go through the compatibility facade",
+      "scope": ["compatibility"],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "legacy_client.connect("
+        }
+      ]
+    },
+    {
+      "id": "test_003",
+      "decision": "The experimental marker may appear only under src/, never in generated code",
+      "rationale": "generated output is regenerated upstream",
+      "scope": ["generation"],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "EXPERIMENTAL_MARKER_XY",
+          "include_paths": ["src/**"],
+          "exclude_paths": ["src/generated/**"]
+        }
+      ]
+    }
+  ]
+}

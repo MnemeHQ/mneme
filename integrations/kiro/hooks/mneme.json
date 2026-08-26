@@ -1,0 +1,17 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "mneme-governance-gate",
+      "description": "Mneme architectural decision gate: evaluates proposed native file writes against recorded decisions.",
+      "trigger": "PreToolUse",
+      "matcher": "^(fs_write|fsWrite|write|fs_append)$",
+      "action": {
+        "type": "command",
+        "command": "mneme-kiro-hook"
+      },
+      "timeout": 30,
+      "enabled": true
+    }
+  ]
+}
