@@ -14,11 +14,13 @@ on **CLI 2.19.2** (`kiro-cli-chat 2.19.2`). Results:
 
 | Capability | CLI 2.19.2 (agent-config hooks) | Documented CLI 3.0+ / IDE 1.0+ (v1 files) |
 |------------|----------------------------------|-------------------------------------------|
-| Hook registration | PASS (agent config `hooks` map, camelCase) | FAIL (`.kiro/hooks/*.json` ignored) |
-| Envelope capture | PASS (live capture) | NOT TESTED |
+| Hook registration | PASS (agent config `hooks` map, camelCase) | NOT TESTED (documented supported) |
+| Envelope capture | PASS (live capture; `session_id` omitted) | NOT TESTED |
 | Verdict generation (exit 2 on FAIL) | PASS | NOT TESTED |
 | **Pre-execution blocking** | **FAIL** (file written despite exit 2) | **NOT TESTED** |
 | Overall enforcement support | **NOT SUPPORTED** | Pending |
+
+*Note on registration:* CLI 2.19.2 ignores `.kiro/hooks/*.json` files. That registration failure is specific to CLI 2.x and is not projected onto CLI 3.x / IDE 1.x.
 
 The integration remains gated on live reproduction before any "supported"
 claim (see [kiro.md](kiro.md), Claim gate). **CLI 2.x is explicitly NOT
@@ -139,7 +141,6 @@ map-of-arrays form with camelCase triggers:
 {
   "hook_event_name": "preToolUse",
   "cwd": "C:\\Users\\hi\\AppData\\Local\\Temp\\opencode\\kiro-live",
-  "session_id": "abc123-def456-789",
   "tool_name": "fs_write",
   "tool_input": {
     "command": "create",
@@ -187,8 +188,9 @@ The following were confirmed by manual reproduction on CLI 2.19.2:
 2. ❌ Non-zero exit blocks before the file changes — **FAIL** (CLI 2.x harness limitation).
 3. ✅ Stderr of a blocked invocation is surfaced to the agent (observed in agent output).
 4. ✅ Exit-0 stdout reaches agent context (observed in allow tests).
-5. Byte-equivalence of IDE and CLI envelopes — **known to fail**:
-   IDE `runCommand` hooks receive no STDIN (Kiro issues #7408/#7500).
+5. Byte-equivalence of IDE and CLI envelopes — **untested on IDE 1.x**:
+   Historical IDE 0.12 `runCommand` hooks received no STDIN (Kiro issues #7408/#7500);
+   IDE 1.x behavior remains to be validated.
 6. `PostFileSave` after shell-mediated write — not tested.
 7. `Stop` envelope — deferred milestone.
 

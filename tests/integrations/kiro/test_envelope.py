@@ -74,7 +74,8 @@ def test_non_write_tools_rejected():
 # --- normalize_to_tool_event ---
 
 def test_normalizes_fs_write_to_whole_content_write():
-    event = normalize_to_tool_event(json.loads(_write_envelope()))
+    event, unhandled = normalize_to_tool_event(json.loads(_write_envelope()))
+    assert unhandled is None
     assert event is not None
     assert event.tool_name == "Write"
     assert event.file_path == "src/app.py"
@@ -85,14 +86,17 @@ def test_normalizes_fs_write_to_whole_content_write():
 
 def test_all_documented_aliases_normalize():
     for tool in ("write", "fs_write", "fsWrite"):
-        event = normalize_to_tool_event(json.loads(_write_envelope(tool=tool)))
+        event, unhandled = normalize_to_tool_event(json.loads(_write_envelope(tool=tool)))
+        assert unhandled is None
         assert event is not None, tool
 
 
 def test_non_pretooluse_events_are_skipped():
     payload = json.loads(_write_envelope())
     payload["hook_event_name"] = "postToolUse"
-    assert normalize_to_tool_event(payload) is None
+    event, unhandled = normalize_to_tool_event(payload)
+    assert event is None
+    assert unhandled is None
 
 
 def test_shell_tool_is_never_normalized():
@@ -101,13 +105,16 @@ def test_shell_tool_is_never_normalized():
     payload = json.loads(_write_envelope())
     payload["tool_name"] = "shell"
     payload["tool_input"] = {"command": "echo x > file.txt"}
-    assert normalize_to_tool_event(payload) is None
+    event, unhandled = normalize_to_tool_event(payload)
+    assert event is None
+    assert unhandled is None
 
 
 def test_missing_tool_input_degrades_to_empty_strings():
     payload = json.loads(_write_envelope())
     del payload["tool_input"]
-    event = normalize_to_tool_event(payload)
+    event, unhandled = normalize_to_tool_event(payload)
+    assert unhandled is None
     assert event is not None
     assert event.file_path == ""
     assert event.tool_input["content"] == ""
@@ -116,7 +123,8 @@ def test_missing_tool_input_degrades_to_empty_strings():
 def test_non_string_path_and_content_are_tolerated():
     payload = json.loads(_write_envelope())
     payload["tool_input"] = {"path": 42, "content": None}
-    event = normalize_to_tool_event(payload)
+    event, unhandled = normalize_to_tool_event(payload)
+    assert unhandled is None
     assert event is not None
     assert event.file_path == ""
     assert event.tool_input["content"] == ""
@@ -125,11 +133,11 @@ def test_non_string_path_and_content_are_tolerated():
 def test_observed_cli_2_19_2_envelope_with_file_text():
     """CLI 2.19.2 (kiro-cli-chat 2.19.2) sends tool_input with 'file_text' instead
     of 'content' for fs_write create. This regression fixture captures the exact
-    live envelope observed during manual reproduction on 2026-08-26."""
+    live envelope structure observed during manual reproduction on 2026-08-26
+    (note: CLI 2.x omits session_id)."""
     envelope = {
         "hook_event_name": "preToolUse",
         "cwd": "C:\\Users\\hi\\AppData\\Local\\Temp\\opencode\\kiro-live",
-        "session_id": "abc123",
         "tool_name": "fs_write",
         "tool_input": {
             "command": "create",
@@ -137,7 +145,8 @@ def test_observed_cli_2_19_2_envelope_with_file_text():
             "file_text": "pip install mneme-hq"
         }
     }
-    event = normalize_to_tool_event(envelope)
+    event, unhandled = normalize_to_tool_event(envelope)
+    assert unhandled is None
     assert event is not None
     assert event.tool_name == "Write"
     assert event.file_path == "C:\\Users\\hi\\AppData\\Local\\Temp\\opencode\\kiro-live\\test_block.md"
@@ -147,7 +156,7 @@ def test_observed_cli_2_19_2_envelope_with_file_text():
 def test_cli_2_19_2_envelope_requires_create_command():
     """The file_text key is only honored with tool_name='fs_write' and command='create'.
     Other commands (edit, replace) or write tool aliases do not assume file_text,
-    ensuring unsupported legacy operations degrade cleanly without inventing schemas."""
+    ensuring unsupported legacy operations fail open visibly via unhandled reason."""
     envelope = {
         "hook_event_name": "preToolUse",
         "cwd": "/repo",
@@ -158,11 +167,12 @@ def test_cli_2_19_2_envelope_requires_create_command():
             "file_text": "new content"
         }
     }
-    event = normalize_to_tool_event(envelope)
-    assert event is not None
-    assert event.tool_input["content"] == ""
+    event, unhandled = normalize_to_tool_event(envelope)
+    assert event is None
+    assert unhandled is not None
+    assert "unsupported legacy write shape: fs_write command='edit' with file_text" in unhandled
 
-    # Also confirm other aliases like 'write' or 'fsWrite' do not fall back to file_text
+    # Also confirm other aliases like 'write' or 'fsWrite' with file_text fail open visibly
     envelope_alias = {
         "hook_event_name": "preToolUse",
         "cwd": "/repo",
@@ -173,9 +183,32 @@ def test_cli_2_19_2_envelope_requires_create_command():
             "file_text": "new content"
         }
     }
-    event_alias = normalize_to_tool_event(envelope_alias)
-    assert event_alias is not None
-    assert event_alias.tool_input["content"] == ""
+    event_alias, unhandled_alias = normalize_to_tool_event(envelope_alias)
+    assert event_alias is None
+    assert unhandled_alias is not None
+    assert "unsupported legacy write shape: write with file_text" in unhandled_alias
+
+
+# --- main(): malformed envelopes fail open quietly, unsupported shapes fail open visibly ---
+
+def test_main_unsupported_legacy_edit_fails_open_visibly(tmp_path):
+    from unittest.mock import patch
+    envelope = json.dumps({
+        "hook_event_name": "preToolUse",
+        "cwd": str(tmp_path),
+        "tool_name": "fs_write",
+        "tool_input": {
+            "command": "edit",
+            "path": str(tmp_path / "app.py"),
+            "file_text": "import os"
+        }
+    })
+    stdout = io.StringIO()
+    with patch("mneme.integrations.kiro.hook.subprocess.run") as mrun:
+        rc = main(stdin=io.StringIO(envelope), stdout=stdout, stderr=io.StringIO())
+    assert rc == 0
+    mrun.assert_not_called()
+    assert "[mneme] UNEVALUATED - failing open, this mutation was NOT checked: unsupported legacy write shape: fs_write command='edit' with file_text" in stdout.getvalue()
 
 
 # --- main(): malformed envelopes fail open quietly ---

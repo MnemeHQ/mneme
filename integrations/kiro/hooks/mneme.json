@@ -3,7 +3,7 @@
   "hooks": [
     {
       "name": "mneme-governance-gate",
-      "description": "Mneme architectural decision gate: blocks native file writes that introduce violations before they reach disk.",
+      "description": "Mneme architectural decision gate: evaluates proposed native file writes against recorded decisions.",
       "trigger": "PreToolUse",
       "matcher": "^(fs_write|fsWrite|write)$",
       "action": {

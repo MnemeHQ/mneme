@@ -1,6 +1,6 @@
 # Kiro Integration (Experimental)
 
-Mneme gates Kiro's native file-write tool before it reaches disk, using a
+Experimental adapter evaluating proposed writes before disk in Kiro, using a
 Kiro `PreToolUse` command hook that runs the same introduced-content
 enforcement path as the Claude Code hook.
 
@@ -9,11 +9,13 @@ on **CLI 2.19.2** (`kiro-cli-chat 2.19.2`) on 2026-08-26. Results:
 
 | Capability | CLI 2.19.2 (agent-config hooks) | Documented CLI 3.0+ / IDE 1.0+ (v1 files) |
 |------------|----------------------------------|-------------------------------------------|
-| Hook registration | PASS (agent config `hooks` map, camelCase) | FAIL (`.kiro/hooks/*.json` ignored) |
-| Envelope capture | PASS | NOT TESTED |
+| Hook registration | PASS (agent config `hooks` map, camelCase) | NOT TESTED (documented supported) |
+| Envelope capture | PASS (live capture; `session_id` omitted) | NOT TESTED |
 | Verdict generation (exit 2 on FAIL) | PASS | NOT TESTED |
 | **Pre-execution blocking** | **FAIL** (file written despite exit 2) | **NOT TESTED** |
 | Overall enforcement support | **NOT SUPPORTED** | Pending |
+
+*Note on registration:* CLI 2.19.2 ignores `.kiro/hooks/*.json` files. That registration failure is specific to CLI 2.x and is not projected onto CLI 3.x / IDE 1.x.
 
 The integration remains gated on live reproduction before any "supported"
 claim. **CLI 2.x is explicitly NOT supported for enforcement**; the PR
@@ -85,7 +87,7 @@ returned a blocking exit before the write executed.
 | Deletion | `PostFileDelete` only (post, non-blocking) | No | No (nothing introduced; ADR-018 permits deletions) | `PostFileDelete` fires post-hoc | Yes |
 | MCP-mediated write | `PreToolUse(@server/tool)` documented | Server-specific; envelope officially documented, shape per server | Not implemented | `PostToolUse` | Yes |
 | Spec-task mutations (IDE) | `PreTaskExec` (pre-task, IDE-only) | No file-level payload | No | `PostTaskExec` | Yes |
-| Kiro IDE native writes | `PreToolUse` fires per docs, **but `runCommand` hooks currently receive no STDIN payload** (#7408/#7500, reconfirmed 2026-06 on 0.12) | **No** | **No** — fail-open with nothing to inspect | `PostFileSave` | Yes |
+| Kiro IDE native writes | `PreToolUse` fires per docs; historical IDE 0.12 `runCommand` hooks received no STDIN payload (#7408/#7500); IDE 1.x pending validation | **No** (historical) | **No** (historical) — fail-open with nothing to inspect | `PostFileSave` | Yes |
 
 Key points:
 

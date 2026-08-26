@@ -1,10 +1,14 @@
-"""Kiro hook — enforces Mneme decisions before Kiro's native write reaches disk.
+"""Kiro hook — experimental adapter evaluating proposed writes before disk.
 
-Translates the Kiro CLI v1 ``PreToolUse`` hook envelope onto the existing
-Mneme mutation-gate path. No retrieval, applicability, conflict, or
-enforcement semantics are implemented here; the pure pieces are imported
-from ``mneme.integrations.claude_code.hook`` (the same precedent as the
+Translates the Kiro PreToolUse hook envelope onto the existing Mneme
+mutation-gate path. No retrieval, applicability, conflict, or enforcement
+semantics are implemented here; the pure pieces are imported from
+``mneme.integrations.claude_code.hook`` (the same precedent as the
 Agent SDK adapter).
+
+Status: experimental adapter. CLI 2.x is unsupported for enforcement
+(verdicts evaluate correctly but the 2.x harness does not block).
+CLI 3.x and IDE 1.x v1 contracts remain pending live validation.
 
 Documented contract (Kiro CLI 3.0+, IDE 1.0+; see
 docs/integrations/kiro-hook-spec.md for documented-versus-observed status):
@@ -32,7 +36,8 @@ Policy (mirrors the Claude Code hook policy):
   timeout, subprocess failure,
   stale CLI, unparseable
   verdict, incomplete
-  applicability evaluation      -> fail open but visibly: exit 0 with an
+  applicability evaluation,
+  unsupported legacy write shape-> fail open but visibly: exit 0 with an
                                    UNEVALUATED notice on stdout
 - no project memory             -> exit 0 quietly
 
@@ -48,7 +53,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from typing import Dict, Optional, TextIO
+from typing import Dict, Optional, TextIO, Tuple
 
 from mneme.integrations.claude_code.hook import (
     ToolEvent,
@@ -92,38 +97,46 @@ def is_write_tool(tool_name: str) -> bool:
     return tool_name in _WRITE_TOOL_NAMES
 
 
-def normalize_to_tool_event(payload: Dict[str, object]) -> Optional[ToolEvent]:
+def normalize_to_tool_event(
+    payload: Dict[str, object],
+) -> Tuple[Optional[ToolEvent], Optional[str]]:
     """Map the observed native write shape onto Mneme's ToolEvent.
 
-    Returns ``None`` for events this gate does not govern (non-PreToolUse
-    events, non-write tools). Only the observed shape -- ``tool_input``
-    carrying ``path`` and full ``content`` -- is normalized. Missing
-    ``path`` or ``content`` degrade to empty strings so the shared
-    materializer decides how to treat them.
+    Returns ``(ToolEvent, None)`` for supported write events.
+    Returns ``(None, None)`` for events this gate does not govern (non-PreToolUse, non-write tools).
+    Returns ``(None, "unsupported shape description")`` when a write tool was targeted
+    with an unobserved/unsupported payload structure (e.g. legacy edit/replace using file_text),
+    requiring a visible fail-open notice.
     """
     if str(payload.get("hook_event_name", "")).lower() != _EVENT_NAME:
-        return None
+        return None, None
     tool_name = payload.get("tool_name")
     if not isinstance(tool_name, str) or not is_write_tool(tool_name):
-        return None
+        return None, None
     tool_input = payload.get("tool_input") or {}
     if not isinstance(tool_input, dict):
         tool_input = {}
     path = tool_input.get("path", "")
     content = tool_input.get("content")
+
     if content is None:
-        # Constrained legacy fallback for Kiro CLI 2.19.2 (observed on 2026-08-26):
-        # only accept 'file_text' when tool is 'fs_write' and command is 'create'.
-        # Do not infer edit/replace schemas; unhandled forms degrade to empty string
-        # or fail open visibly.
-        if tool_name == "fs_write" and tool_input.get("command") == "create":
-            raw_text = tool_input.get("file_text")
-            content = raw_text if isinstance(raw_text, str) else ""
+        # Legacy fallback observed exclusively on Kiro CLI 2.19.2 (2026-08-26):
+        # 'fs_write' with command='create' carries content in 'file_text'.
+        if tool_name == "fs_write" and "file_text" in tool_input:
+            cmd = tool_input.get("command")
+            if cmd == "create":
+                raw_text = tool_input.get("file_text")
+                content = raw_text if isinstance(raw_text, str) else ""
+            else:
+                return None, f"unsupported legacy write shape: fs_write command={cmd!r} with file_text"
+        elif "file_text" in tool_input:
+            return None, f"unsupported legacy write shape: {tool_name} with file_text"
         else:
             content = ""
+
     # Reuse the Claude-Code-shaped materializer verbatim by presenting the
     # event as a whole-content Write.
-    return ToolEvent(
+    event = ToolEvent(
         tool_name="Write",
         file_path=path if isinstance(path, str) else "",
         cwd=str(payload.get("cwd", "") or ""),
@@ -132,6 +145,7 @@ def normalize_to_tool_event(payload: Dict[str, object]) -> Optional[ToolEvent]:
             "content": content if isinstance(content, str) else "",
         },
     )
+    return event, None
 
 
 def _run_check(
@@ -255,7 +269,10 @@ def main(
         print(f"mneme-kiro-hook: bad envelope: {e}", file=stderr)
         return 0
 
-    event = normalize_to_tool_event(payload)
+    event, unhandled_reason = normalize_to_tool_event(payload)
+    if unhandled_reason is not None:
+        _emit_unevaluated(stdout, unhandled_reason)
+        return 0
     if event is None:
         return 0
 
