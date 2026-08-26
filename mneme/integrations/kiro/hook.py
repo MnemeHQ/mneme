@@ -110,7 +110,17 @@ def normalize_to_tool_event(payload: Dict[str, object]) -> Optional[ToolEvent]:
     if not isinstance(tool_input, dict):
         tool_input = {}
     path = tool_input.get("path", "")
-    content = tool_input.get("content", "")
+    content = tool_input.get("content")
+    if content is None:
+        # Constrained legacy fallback for Kiro CLI 2.19.2 (observed on 2026-08-26):
+        # only accept 'file_text' when tool is 'fs_write' and command is 'create'.
+        # Do not infer edit/replace schemas; unhandled forms degrade to empty string
+        # or fail open visibly.
+        if tool_name == "fs_write" and tool_input.get("command") == "create":
+            raw_text = tool_input.get("file_text")
+            content = raw_text if isinstance(raw_text, str) else ""
+        else:
+            content = ""
     # Reuse the Claude-Code-shaped materializer verbatim by presenting the
     # event as a whole-content Write.
     return ToolEvent(

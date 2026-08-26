@@ -122,6 +122,62 @@ def test_non_string_path_and_content_are_tolerated():
     assert event.tool_input["content"] == ""
 
 
+def test_observed_cli_2_19_2_envelope_with_file_text():
+    """CLI 2.19.2 (kiro-cli-chat 2.19.2) sends tool_input with 'file_text' instead
+    of 'content' for fs_write create. This regression fixture captures the exact
+    live envelope observed during manual reproduction on 2026-08-26."""
+    envelope = {
+        "hook_event_name": "preToolUse",
+        "cwd": "C:\\Users\\hi\\AppData\\Local\\Temp\\opencode\\kiro-live",
+        "session_id": "abc123",
+        "tool_name": "fs_write",
+        "tool_input": {
+            "command": "create",
+            "path": "C:\\Users\\hi\\AppData\\Local\\Temp\\opencode\\kiro-live\\test_block.md",
+            "file_text": "pip install mneme-hq"
+        }
+    }
+    event = normalize_to_tool_event(envelope)
+    assert event is not None
+    assert event.tool_name == "Write"
+    assert event.file_path == "C:\\Users\\hi\\AppData\\Local\\Temp\\opencode\\kiro-live\\test_block.md"
+    assert event.tool_input["content"] == "pip install mneme-hq"
+
+
+def test_cli_2_19_2_envelope_requires_create_command():
+    """The file_text key is only honored with tool_name='fs_write' and command='create'.
+    Other commands (edit, replace) or write tool aliases do not assume file_text,
+    ensuring unsupported legacy operations degrade cleanly without inventing schemas."""
+    envelope = {
+        "hook_event_name": "preToolUse",
+        "cwd": "/repo",
+        "tool_name": "fs_write",
+        "tool_input": {
+            "command": "edit",
+            "path": "/repo/src/app.py",
+            "file_text": "new content"
+        }
+    }
+    event = normalize_to_tool_event(envelope)
+    assert event is not None
+    assert event.tool_input["content"] == ""
+
+    # Also confirm other aliases like 'write' or 'fsWrite' do not fall back to file_text
+    envelope_alias = {
+        "hook_event_name": "preToolUse",
+        "cwd": "/repo",
+        "tool_name": "write",
+        "tool_input": {
+            "command": "create",
+            "path": "/repo/src/app.py",
+            "file_text": "new content"
+        }
+    }
+    event_alias = normalize_to_tool_event(envelope_alias)
+    assert event_alias is not None
+    assert event_alias.tool_input["content"] == ""
+
+
 # --- main(): malformed envelopes fail open quietly ---
 
 def test_main_bad_json_returns_zero_without_checking(tmp_path):

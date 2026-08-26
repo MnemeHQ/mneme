@@ -4,20 +4,32 @@ Mneme gates Kiro's native file-write tool before it reaches disk, using a
 Kiro `PreToolUse` command hook that runs the same introduced-content
 enforcement path as the Claude Code hook.
 
-**Status: contract-tested / experimental.** This integration was built and
-verified against the official Kiro documentation plus converging community
-observations of the CLI hook envelope. No live Kiro CLI/IDE execution was
-available during implementation. Per the claim gate in the PR, it is **not**
-listed under "Explicitly supported integrations" in the README until live
-allow/block reproduction exists on each claimed surface.
+**Status: contract-tested / experimental.** Live reproduction performed
+on **CLI 2.19.2** (`kiro-cli-chat 2.19.2`) on 2026-08-26. Results:
+
+| Capability | CLI 2.19.2 (agent-config hooks) | Documented CLI 3.0+ / IDE 1.0+ (v1 files) |
+|------------|----------------------------------|-------------------------------------------|
+| Hook registration | PASS (agent config `hooks` map, camelCase) | FAIL (`.kiro/hooks/*.json` ignored) |
+| Envelope capture | PASS | NOT TESTED |
+| Verdict generation (exit 2 on FAIL) | PASS | NOT TESTED |
+| **Pre-execution blocking** | **FAIL** (file written despite exit 2) | **NOT TESTED** |
+| Overall enforcement support | **NOT SUPPORTED** | Pending |
+
+The integration remains gated on live reproduction before any "supported"
+claim. **CLI 2.x is explicitly NOT supported for enforcement**; the PR
+documents the observed contract for regression testing only. Per the claim
+gate, it is **not** listed under "Explicitly supported integrations" in the
+README until live allow/block reproduction exists on a CLI 3.x or IDE 1.x
+surface.
 
 ## What it does
 
 - Parses the Kiro v1 `PreToolUse` STDIN envelope (`hook_event_name`, `cwd`,
   `session_id`, `tool_name`, `tool_input`).
 - Normalizes only the native write shape — tool name `write` / `fs_write` /
-  `fsWrite` with `tool_input.path` + full `tool_input.content` — onto
-  Mneme's existing mutation representation.
+  `fsWrite` with `tool_input.path` + full `tool_input.content` (documented)
+  **or** `tool_input.file_text` (CLI 2.19.2 observed for `command: "create"`)
+  — onto Mneme's existing mutation representation.
 - Reuses the shared gate verbatim: introduced-delta enforcement (ADR-018),
   corpus-wide typed-literal enforcement independent of retrieval rank
   (ADR-017/019), explicit path applicability via `--target-path` (ADR-020),
@@ -48,8 +60,9 @@ foreign hook entry already present and upserts only the
 `{"version": "v1", "hooks": [...]}` file. Global installation is not
 offered.
 
-Requires Kiro IDE 1.0+ or Kiro CLI 3.0+ (the standalone `.kiro/hooks/*.json`
-format).
+**Requires Kiro IDE 1.0+ or Kiro CLI 3.0+** (the standalone
+`.kiro/hooks/*.json` format). CLI 2.x uses agent-config hooks instead; the
+installed file will be ignored by CLI 2.x.
 
 ## Enforcement mode
 
@@ -64,8 +77,8 @@ returned a blocking exit before the write executed.
 
 | Surface | Kiro hook fired | Proposed content pre-execution | Blocked pre-write | PostFileSave observed | Later audit |
 |---|---|---|---|---|---|
-| Native write (new file) | `PreToolUse(write)` | Yes — full content in `tool_input.content` | Yes (CLI) | n/a (blocked) or `PostFileCreate` | Yes |
-| Native edit / replace | `PreToolUse(write)` | Yes — full proposed content; gate checks introduced lines only | Yes (CLI) | `PostFileSave` | Yes |
+| Native write (new file) | `PreToolUse(write)` | Yes — full content in `tool_input.content` (v1) or `file_text` (CLI 2.x) | **CLI 2.x: NO** (exit 2 returned but write executed); v1: pending | n/a (blocked) or `PostFileCreate` | Yes |
+| Native edit / replace | `PreToolUse(write)` | Yes — full proposed content; gate checks introduced lines only | CLI 2.x: unobserved; v1: pending | `PostFileSave` | Yes |
 | Shell redirection (`echo x > f`) | `PreToolUse(shell)` — command string only | **No** — content is inside an unparsed shell command | **No** (deliberately not parsed) | Documented to fire after agent saves; unverified for shell writes | Yes |
 | Script-generated write | `PreToolUse(shell)` — command string only | **No** | **No** | Unverified | Yes |
 | Rename | No dedicated pre-rename trigger | No | No | No | Yes (git status) |
@@ -76,25 +89,26 @@ returned a blocking exit before the write executed.
 
 Key points:
 
-- Only the native write path on the **Kiro CLI** carries enough
-  pre-execution information (target path + full content) to enforce before
-  disk. That is the hard Phase A gate this integration passes on paper.
+- Only the native write path on the **Kiro CLI 3.x / IDE 1.x** carries
+  enough pre-execution information (target path + full content) to enforce
+  before disk. CLI 2.x returns correct verdicts but does not block.
 - Shell redirection and script writes are **explicitly unsupported** for
   pre-write enforcement. `PreToolUse(shell)` exposes only the command
   string; Mneme does not parse shell commands (documented architectural
-  boundary). These mutations remain visible to a whole-file audit
-  (`mneme check --input <file>`) after the fact.
+   boundary). These mutations remain visible to a whole-file audit
+   (`mneme check --input <file>`) after the fact.
 - The Stop working-tree audit is deferred to a separate bounded milestone:
-  a correct audit needs a session-start baseline so pre-existing user
-  changes are not attributed to the agent.
+   a correct audit needs a session-start baseline so pre-existing user
+   changes are not attributed to the agent.
 
 ## Verification
 
 - Tests: `python -m pytest tests/integrations/kiro -p no:cacheprovider`
   (envelope parsing, gate policy, applicability, modes, fail-open paths,
-  installer idempotency, packaging contract).
-- Live reproduction (pending): install the hook in a Kiro CLI workspace
-  with a `FORBID_LITERAL` rule, ask the agent to introduce the literal, and
-  observe the block; then repeat a compliant write and observe the allow.
-  Record both transcripts in the follow-up PR that promotes this
+  installer idempotency, packaging contract). Includes regression fixtures
+  for the CLI 2.19.2 observed envelope (`test_observed_cli_2_19_2_envelope_with_file_text`).
+- Live reproduction (pending): install the hook in a **Kiro CLI 3.x or IDE 1.x**
+  workspace with a `FORBID_LITERAL` rule, ask the agent to introduce the
+  literal, and observe the block; then repeat a compliant write and observe
+  the allow. Record both transcripts in the follow-up PR that promotes this
   integration out of experimental.

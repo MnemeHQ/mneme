@@ -7,14 +7,25 @@ Captured 2026-08-23 from the current official Kiro documentation:
 - https://kiro.dev/docs/hooks/actions/
 - https://kiro.dev/docs/reference/built-in-tools/
 
-Status: **contract-tested / experimental.** No Kiro CLI or IDE execution was
-available in the implementation environment, so no live STDIN capture was
-possible. Every field below is taken from official documentation or from
-converging third-party observations; nothing is invented. The integration is
-gated on live reproduction before any "supported" claim (see
-[kiro.md](kiro.md), Claim gate).
+**Live evidence updated 2026-08-26** (CLI 2.19.2 manual reproduction):
 
-## Documented contract
+Status: **contract-tested / experimental.** Live reproduction performed
+on **CLI 2.19.2** (`kiro-cli-chat 2.19.2`). Results:
+
+| Capability | CLI 2.19.2 (agent-config hooks) | Documented CLI 3.0+ / IDE 1.0+ (v1 files) |
+|------------|----------------------------------|-------------------------------------------|
+| Hook registration | PASS (agent config `hooks` map, camelCase) | FAIL (`.kiro/hooks/*.json` ignored) |
+| Envelope capture | PASS (live capture) | NOT TESTED |
+| Verdict generation (exit 2 on FAIL) | PASS | NOT TESTED |
+| **Pre-execution blocking** | **FAIL** (file written despite exit 2) | **NOT TESTED** |
+| Overall enforcement support | **NOT SUPPORTED** | Pending |
+
+The integration remains gated on live reproduction before any "supported"
+claim (see [kiro.md](kiro.md), Claim gate). **CLI 2.x is explicitly NOT
+supported** for enforcement; this record documents the observed contract
+for the regression suite only.
+
+## Documented contract (CLI 3.0+ / IDE 1.0+)
 
 ### Hook file
 
@@ -101,22 +112,86 @@ Note the difference from Claude Code: Kiro does not document a special
 exit code 2; *any* non-zero exit blocks. The Mneme hook exits `2` on a
 blocking verdict (non-zero, therefore blocking) and `0` otherwise.
 
-### Phase A experimental checklist (pending live Kiro)
+## Observed contract (CLI 2.19.2) — LIVE EVIDENCE
 
-The following must be confirmed by a temporary diagnostic hook before any
-support claim; each item is unverified until then:
+### Hook registration
 
-1. Envelope captured from native `write` (create), edit/replace of an
-   existing file, deletion, rename.
-2. Non-zero exit blocks before the file changes (documented; not
-   reproduced).
-3. Where stderr of a blocked invocation is surfaced to the agent.
-4. Whether exit-0 stdout reaches agent context in both surfaces
-   (documented; not reproduced).
-5. Byte-equivalence of IDE and CLI envelopes — **already known to fail**:
-   IDE `runCommand` hooks receive no STDIN payload at all (Kiro issues
-   #7408/#7500; reconfirmed June 2026 on Kiro 0.12). See the coverage
-   matrix in [kiro.md](kiro.md).
-6. Whether `PostFileSave` fires after a shell-mediated write.
-7. `Stop` envelope contents (deferred milestone; no Stop audit in this
-   PR).
+CLI 2.19.2 **does not honor** `.kiro/hooks/*.json` v1 files.
+
+Hooks are registered **only** via the agent config (`.kiro/agents/<name>.json`),
+map-of-arrays form with camelCase triggers:
+
+```json
+{
+  "name": "mneme-gated",
+  "tools": ["*"],
+  "allowedTools": ["read", "write", "fs_write"],
+  "hooks": {
+    "agentSpawn": [{ "command": "..." }],
+    "preToolUse": [{ "matcher": "fs_write", "command": "..." }]
+  }
+}
+```
+
+### Envelope (captured 2026-08-26)
+
+```json
+{
+  "hook_event_name": "preToolUse",
+  "cwd": "C:\\Users\\hi\\AppData\\Local\\Temp\\opencode\\kiro-live",
+  "session_id": "abc123-def456-789",
+  "tool_name": "fs_write",
+  "tool_input": {
+    "command": "create",
+    "path": "C:\\Users\\hi\\AppData\\Local\\Temp\\opencode\\kiro-live\\test_block.md",
+    "file_text": "pip install mneme-hq"
+  }
+}
+```
+
+Key differences from documented contract:
+- `tool_input` carries **`file_text`** instead of `content`
+- `tool_input.command` = `"create"` (edit/replace shapes not observed)
+- No `session_id` in the observed envelope (omitted by CLI 2.x)
+
+### Adapter handling (constrained)
+
+The adapter accepts `file_text` **only** for the observed combination:
+- `tool_name` = `"fs_write"`
+- `tool_input.command` = `"create"`
+
+Edit/replace schemas are not inferred and fail open visibly (UNEVALUATED
+notice reaches agent context). This is enforced by the regression fixture
+`test_observed_cli_2_19_2_envelope_with_file_text` in
+`tests/integrations/kiro/test_envelope.py`.
+
+### Blocking enforcement (CLI 2.19.2)
+
+**Critical finding:** Mneme returned exit 2 (blocking verdict), but the
+file was created anyway. The CLI 2.x harness executes the write before
+or ignores the hook's non-zero exit for agent-config `preToolUse`.
+
+| Outcome | Exit code | File on disk |
+|---------|-----------|--------------|
+| FAIL verdict | 2 | **Created** (blocking ineffective) |
+| PASS verdict | 0 | Created |
+
+Therefore: **CLI 2.x enforcement is INCOMPATIBLE**. Verdicts are correct;
+the harness does not honor them.
+
+### Phase A experimental checklist (updated with live evidence)
+
+The following were confirmed by manual reproduction on CLI 2.19.2:
+
+1. ✅ Envelope captured from native `write` (create) — `file_text` key.
+2. ❌ Non-zero exit blocks before the file changes — **FAIL** (CLI 2.x harness limitation).
+3. ✅ Stderr of a blocked invocation is surfaced to the agent (observed in agent output).
+4. ✅ Exit-0 stdout reaches agent context (observed in allow tests).
+5. Byte-equivalence of IDE and CLI envelopes — **known to fail**:
+   IDE `runCommand` hooks receive no STDIN (Kiro issues #7408/#7500).
+6. `PostFileSave` after shell-mediated write — not tested.
+7. `Stop` envelope — deferred milestone.
+
+The remaining release gate is a live **CLI 3.x or IDE 1.x** block/allow
+reproduction. Until it passes, Kiro remains experimental rather than
+shipped.
