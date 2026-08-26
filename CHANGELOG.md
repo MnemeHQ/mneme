@@ -26,6 +26,12 @@
   degraded states fail open with visible UNEVALUATED diagnostics. Validated
   10/10 against Codex CLI 0.149.1 (Windows, `codex exec`, pinned binary);
   evidence under `validation/codex-cli/`.
+- Read-only ADR lifecycle reconciliation in `mneme check --adr-dir` (#333).
+  Reports `DANGLING_SUPERSEDES`, `ORPHAN_SUPERSEDED`, `ACTIVE_CONTRADICTION`,
+  `SILENT_PRECEDENCE_ELIMINATION`, and `LEDGER_STATUS_MISMATCH`. Findings are
+  warn-only and do not alter retrieval, conflict detection, ranking, or
+  enforcement. Graph supersession now matches compiler semantics: only an
+  accepted ADR can retire another accepted ADR.
 
 ---
 

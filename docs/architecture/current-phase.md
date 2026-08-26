@@ -31,7 +31,7 @@ These are shipped but not under freeze; they may evolve without a charter amendm
 - Google Antigravity pre-tool adapter.
 - Codex CLI enforcement integration (PreToolUse gate + Stop audit).
 - Paperclip — validated compatibility through both transports, no adapter required.
-- ADR parser/compiler/validator pipeline.
+- ADR parser/compiler/validator and read-only lifecycle reconciliation pipeline.
 - Site-level benchmark presentation copy.
 
 The active Layer 1 product surface is the `mneme` Python package, the `mneme` CLI, the enforcement interfaces (`mneme check`, the `mneme-hook` Claude Code hook, Cursor rules export) and the supported integrations. A historical `POST /complete` HTTP wrapper once shipped alongside the legacy benchmark application; it was extracted from core with that application and is no longer part of the product surface. The extraction was structural only — it did not change retrieval, enforcement or benchmark methodology. The `mneme-hq[api]` optional dependency remains declared for compatibility, but it no longer installs an active HTTP layer. Reviving an HTTP surface would require a separate architectural decision.
