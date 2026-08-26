@@ -99,6 +99,8 @@ TOOLS_GOVERNED = [
 
 ACTIVE_WRITERS: List["EvidenceWriter"] = []
 ACTIVE_SESSIONS: List[Tuple[anthropic.Anthropic, str]] = []
+ACTIVE_ENVIRONMENTS: List[Tuple[anthropic.Anthropic, str]] = []
+ACTIVE_AGENTS: List[Tuple[anthropic.Anthropic, str]] = []
 
 
 def utc_now() -> str:
@@ -644,9 +646,17 @@ def pair_reads_by_file(
 
 
 def probe_files_api(client: anthropic.Anthropic, session_id: str, evidence: EvidenceWriter, label: str) -> Dict[str, Any]:
-    outcome: Dict[str, Any] = {"attempted": True, "label": label}
+    """Session-outputs Files API probe.
+
+    Per the Managed Agents files docs: listing requires the beta header via
+    ``betas=[...]`` on the beta surface, and downloads use the top-level
+    ``client.files.download``. The API exposes files written under
+    /mnt/session/outputs only - it is not live access to arbitrary /workspace
+    bytes and cannot materialize introduced deltas at confirmation time.
+    """
+    outcome: Dict[str, Any] = {"attempted": True, "label": label, "exposes": "session outputs (/mnt/session/outputs) only"}
     try:
-        listing = client.beta.files.list(scope_id=session_id)
+        listing = client.beta.files.list(scope_id=session_id, betas=[BETA_HEADER])
         entries = getattr(listing, "data", None) or []
         outcome["files"] = [
             {"id": evidence.scrubber.scrub(getattr(f, "id", "")), "filename": getattr(f, "filename", None)}
@@ -659,7 +669,7 @@ def probe_files_api(client: anthropic.Anthropic, session_id: str, evidence: Evid
             if not fid or not fname.startswith(("a1_", "a2_", "a3_", "a4_", "b_", "/workspace")):
                 continue
             try:
-                blob = client.beta.files.download(fid).read()
+                blob = client.files.download(fid).read()
                 hashed.append({"filename": fname, "sha256": hashlib.sha256(blob).hexdigest(), "bytes": len(blob)})
                 evidence.record_hash(f"files-api:{fname}", "files-api-download", blob.decode("utf-8", errors="replace"))
             except Exception as exc:
@@ -706,7 +716,9 @@ def create_governed_agent(client: anthropic.Anthropic, name: str, system: str, e
     params: Dict[str, Any] = {"name": name, "model": MODEL_ID, "system": system, "tools": TOOLS_GOVERNED}
     if extra:
         params.update(extra)
-    return client.beta.agents.create(**params)
+    agent = client.beta.agents.create(**params)
+    ACTIVE_AGENTS.append((client, agent.id))
+    return agent
 
 
 def new_env_and_session(client: anthropic.Anthropic, agent_id: str) -> Tuple[Any, Any]:
@@ -714,6 +726,7 @@ def new_env_and_session(client: anthropic.Anthropic, agent_id: str) -> Tuple[Any
         name=f"ma-m0-{time.strftime('%H%M%S', time.gmtime())}",
         config={"type": "cloud", "networking": {"type": "unrestricted"}},
     )
+    ACTIVE_ENVIRONMENTS.append((client, environment.id))
     session = client.beta.sessions.create(agent=agent_id, environment_id=environment.id)
     register_session(client, session.id)
     return environment, session
@@ -725,6 +738,37 @@ def cleanup_session(client: anthropic.Anthropic, session_id: str) -> Optional[st
         return "deleted"
     except Exception as exc:
         return f"cleanup-failed:{type(exc).__name__}"
+
+
+def cleanup_environment(client: anthropic.Anthropic, environment_id: str) -> Optional[str]:
+    try:
+        client.beta.environments.delete(environment_id)
+        return "deleted"
+    except Exception as exc:
+        return f"cleanup-failed:{type(exc).__name__}"
+
+
+def cleanup_agent(client: anthropic.Anthropic, agent_id: str) -> Optional[str]:
+    # The SDK exposes archive only; full deletion requires Console removal.
+    try:
+        client.beta.agents.archive(agent_id)
+        return "archived"
+    except Exception as exc:
+        return f"cleanup-failed:{type(exc).__name__}"
+
+
+def run_cleanup_all() -> Dict[str, int]:
+    outcome = {"sessions": 0, "environments": 0, "agents": 0}
+    for cleanup_client, sid in ACTIVE_SESSIONS:
+        cleanup_session(cleanup_client, sid)
+        outcome["sessions"] += 1
+    for cleanup_client, eid in ACTIVE_ENVIRONMENTS:
+        cleanup_environment(cleanup_client, eid)
+        outcome["environments"] += 1
+    for cleanup_client, aid in ACTIVE_AGENTS:
+        cleanup_agent(cleanup_client, aid)
+        outcome["agents"] += 1
+    return outcome
 
 
 def register_session(client: anthropic.Anthropic, session_id: str) -> None:
@@ -1446,11 +1490,9 @@ def main() -> int:
                     )
                 except Exception:
                     pass
-        for cleanup_client, sid in ACTIVE_SESSIONS:
-            cleanup_session(cleanup_client, sid)
+        run_cleanup_all()
         return 2
-    for cleanup_client, sid in ACTIVE_SESSIONS:
-        cleanup_session(cleanup_client, sid)
+    run_cleanup_all()
     return 0
 
 

@@ -17,3 +17,15 @@ Generated: 2026-08-25T22:08:15Z
 - Observed consequence of running evaluate_mutation unchanged against the remote path: violation landed=True.
 
 Wire shapes: raw-events.jsonl. Full detail: results.json.
+
+## Errata (2026-08-26)
+
+The `beta_files_surface` error recorded in
+`approval_client_access_to_current_bytes` was a misconfigured probe: the
+`files.list` call omitted the required `betas=["managed-agents-2026-04-01"]`
+parameter, so the API rejected `scope_id`. That rejection is retracted as
+evidence of unavailability. The Files API exposes session outputs under
+`/mnt/session/outputs/` only and provides no live access to arbitrary
+`/workspace` bytes during confirmation, so the central-gate conclusion of this
+run is unchanged. The harness code has been corrected for future runs.
+

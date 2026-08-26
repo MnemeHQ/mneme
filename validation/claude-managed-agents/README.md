@@ -67,6 +67,14 @@ redacted; session, agent, environment, thread, file, and event IDs are
 shortened consistently within a run (prefix + 6 chars + short hash). Full IDs
 are never written to disk.
 
+## Resource hygiene
+
+On both success and failure the harness deletes its cloud sessions and
+environments and archives its `ma-m0-*` agents. The SDK exposes agent
+archive only — full agent deletion requires manual Console removal. Runs
+killed before Python exit handlers execute may leave `ma-m0-*` sessions,
+environments, or agents behind; remove those manually in the Console.
+
 ## Hard boundaries honored by this directory
 
 * Validation code and evidence only; no production adapter.
