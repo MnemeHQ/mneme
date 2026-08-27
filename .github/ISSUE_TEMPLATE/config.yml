@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/MnemeHQ/mneme/security/advisories/new
+    about: Please report security vulnerabilities privately through GitHub Security Advisories.
+  - name: Contribution guidance
+    url: https://github.com/MnemeHQ/mneme/blob/main/CONTRIBUTING.md
+    about: Read the contribution guide before opening an issue or pull request.

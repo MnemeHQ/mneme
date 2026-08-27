@@ -1,0 +1,65 @@
+name: Bug report
+description: Report a reproducible problem in Mneme.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report a bug. Please search existing issues first.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Clearly describe the observed behaviour and the behaviour you expected.
+      placeholder: Tell us what went wrong and what you expected instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Include the smallest example, command, or configuration that reproduces the problem.
+      placeholder: |
+        1. Run ...
+        2. Configure ...
+        3. Observe ...
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Mneme version
+      placeholder: e.g. 0.5.0
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Include your Python version and operating system.
+      placeholder: e.g. Python 3.12.4 on Ubuntu 24.04
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or traceback
+      description: Paste sanitized logs or a traceback, if available.
+      render: text
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I have searched the existing issues.
+          required: true
+        - label: I have removed secrets and other sensitive information from this report.
+          required: true
