@@ -319,3 +319,128 @@ def check_prompt(
         violations=violations,
         applicability=applicability,
     )
+
+
+# ── Governability Assessment ────────────────────────────────────────────────────────
+
+from dataclasses import dataclass
+from typing import Literal
+
+GovernabilityTier = Literal["enforceable", "partial", "guidance"]
+
+
+@dataclass(frozen=True)
+class GovernabilityAssessment:
+    """
+    Mneme's authoritative assessment of a Decision's governability.
+
+    This is the single source of truth for whether a Decision can be
+    deterministically enforced. Consumers (audit workspace, CLI, etc.)
+    MUST use this function rather than reimplementing Mneme's semantics.
+
+    Enforcement tiers (matching Mneme's check_prompt behavior):
+
+    - enforceable: Decision has at least one mechanically enforceable rule
+      (typed FORBID_LITERAL rule, or single-term anti_pattern).
+      These are always checked regardless of retrieval score.
+
+    - partial: Decision has only multi-term anti_patterns or "no X" constraints.
+      Multi-term anti_patterns are only enforced for top-N retrieved decisions.
+      "no X" constraints produce WARN severity.
+
+    - guidance: Decision has no mechanically enforceable rules at all.
+      It exists for retrieval/context only.
+    """
+    decision_id: str
+    tier: GovernabilityTier
+    has_literal_rules: bool
+    has_single_term_anti_patterns: bool
+    has_multi_term_anti_patterns: bool
+    has_no_constraints: bool
+    applicable_paths: tuple[str, ...]  # paths where typed rules apply
+    confidence: float  # 1.0 = fully enforceable, 0.7 = partial, 0.0 = guidance only
+
+
+def assess_governability(decision: "Decision") -> GovernabilityAssessment:
+    """
+    Assess whether a Decision can be deterministically governed by Mneme.
+
+    This is the authoritative implementation of Mneme's governability semantics.
+    All external consumers (audit workspace, CLI, etc.) MUST call this function
+    rather than reimplementing the logic.
+
+    Args:
+        decision: A Mneme Decision object (from schemas.py)
+
+    Returns:
+        GovernabilityAssessment with Mneme's authoritative verdict.
+    """
+    from mneme.schemas import Decision
+
+    # Check typed FORBID_LITERAL rules (always enforced, FAIL severity)
+    has_literal_rules = any(
+        rule.type == "FORBID_LITERAL"
+        for rule in decision.rules
+    )
+
+    # Check anti-patterns - determine which are single-term (always enforced)
+    single_term_aps = []
+    multi_term_aps = []
+    for ap in decision.anti_patterns:
+        if _is_literal_rule(ap):
+            single_term_aps.append(ap)
+        else:
+            multi_term_aps.append(ap)
+
+    has_single_term_anti_patterns = bool(single_term_aps)
+    has_multi_term_anti_patterns = bool(multi_term_aps)
+
+    # Check "no X" constraints (produce WARN severity)
+    has_no_constraints = any(
+        _rule_terms(c, min_len=3) for c in decision.constraints
+        if re.match(r"^no\s+(.+)$", c.strip(), re.IGNORECASE)
+    )
+
+    # Collect paths from typed rules
+    applicable_paths = set()
+    for rule in decision.rules:
+        if rule.include_paths:
+            applicable_paths.update(rule.include_paths)
+
+    # Determine tier and confidence based on Mneme's enforcement behavior
+    if has_literal_rules or has_single_term_anti_patterns:
+        # These are ALWAYS enforced regardless of retrieval score
+        tier: GovernabilityTier = "enforceable"
+        confidence = 1.0
+    elif has_multi_term_anti_patterns or has_no_constraints:
+        # Multi-term anti-patterns only enforced for top-N retrieved decisions
+        # "no X" constraints produce WARN (not FAIL)
+        tier = "partial"
+        confidence = 0.7
+    else:
+        # No mechanically enforceable rules - retrieval/context only
+        tier = "guidance"
+        confidence = 0.0
+
+    return GovernabilityAssessment(
+        decision_id=decision.id,
+        tier=tier,
+        has_literal_rules=has_literal_rules,
+        has_single_term_anti_patterns=has_single_term_anti_patterns,
+        has_multi_term_anti_patterns=has_multi_term_anti_patterns,
+        has_no_constraints=has_no_constraints,
+        applicable_paths=tuple(sorted(applicable_paths)),
+        confidence=confidence,
+    )
+
+
+# Export for external consumers
+__all__ = [
+    "Severity",
+    "Violation",
+    "EnforcementResult",
+    "check_prompt",
+    "GovernabilityAssessment",
+    "GovernabilityTier",
+    "assess_governability",
+]
