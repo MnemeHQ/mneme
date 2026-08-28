@@ -1,0 +1,86 @@
+{
+  "indexVersion": 1,
+  "source": "local",
+  "commit": "abc123",
+  "resources": [
+    {
+      "type": "adr",
+      "id": "choose-kafka",
+      "name": "Choose Kafka for Event Streaming",
+      "contentPath": "adrs/choose-kafka/index.mdx",
+      "contentHash": "sha256:81de086fe3f2e6ace63e5bda263fdf7aff4494d67c3bfe425dacf0f606d335ee",
+      "owners": ["arch-team"],
+      "status": "accepted",
+      "appliesTo": [
+        { "domain": "orders" },
+        { "service": "payment-service" },
+        { "event": "payment-accepted" }
+      ],
+      "supersedes": []
+    },
+    {
+      "type": "adr",
+      "id": "use-postgres",
+      "name": "Use PostgreSQL for Order Storage",
+      "contentPath": "adrs/use-postgres/index.mdx",
+      "contentHash": "sha256:84edf8641f9c5f6e20bfd0337f0eaf00f58c4d9efa4a08a37e33b4b80330b096",
+      "owners": ["data-team"],
+      "status": "proposed",
+      "appliesTo": [
+        { "domain": "orders" },
+        { "service": "order-service" }
+      ]
+    },
+    {
+      "type": "adr",
+      "id": "use-rabbitmq",
+      "name": "Use RabbitMQ for Messaging",
+      "contentPath": "adrs/use-rabbitmq/index.mdx",
+      "contentHash": "sha256:85a700485cc75315a2f6855e469ee4f5478a0bb8beee9912fae820535d0d0c66",
+      "owners": ["arch-team"],
+      "status": "superseded",
+      "appliesTo": [
+        { "domain": "orders" }
+      ],
+      "supersededBy": "choose-kafka"
+    },
+    {
+      "type": "adr",
+      "id": "accepted-but-superseded",
+      "name": "Accepted but Superseded ADR",
+      "contentPath": "adrs/accepted-but-superseded/index.mdx",
+      "contentHash": "sha256:abcdef1234567890",
+      "owners": ["arch-team"],
+      "status": "accepted",
+      "appliesTo": [
+        { "domain": "orders" }
+      ],
+      "supersededBy": "choose-kafka"
+    },
+    {
+      "type": "domain",
+      "id": "orders",
+      "version": "1.0.0",
+      "name": "Orders",
+      "contentPath": "domains/orders/index.mdx",
+      "contentHash": "sha256:44e1d449baba5cabec3c2888d38acdeab1f353291beeb2c393a7ed3bbb05ce8d"
+    },
+    {
+      "type": "service",
+      "id": "payment-service",
+      "version": "1.0.0",
+      "name": "PaymentService",
+      "contentPath": "services/payment-service/index.mdx",
+      "contentHash": "sha256:89e66e03fa6911120f5d3632581c61cb92acb6fae059324ee8b33dde6b13ca4b"
+    },
+    {
+      "type": "event",
+      "id": "payment-accepted",
+      "version": "1.0.0",
+      "name": "PaymentAccepted",
+      "contentPath": "events/payment-accepted/index.mdx",
+      "contentHash": "sha256:b9d80dac2df21b4a52108236f430c3f086f18074c7da7782684a5a3ec849e074"
+    }
+  ],
+  "assets": []
+}

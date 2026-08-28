@@ -1,0 +1,25 @@
+---
+id: use-postgres
+name: Use PostgreSQL for Order Storage
+status: proposed
+date: "2024-02-01"
+appliesTo:
+  - domain: orders
+  - service: order-service
+owners:
+  - "data-team"
+---
+# ADR: Use PostgreSQL for Order Storage
+
+## Context
+
+We need a database for order persistence.
+
+## Decision
+
+We propose using PostgreSQL.
+
+## Consequences
+
+- ACID compliance
+- Familiar technology
