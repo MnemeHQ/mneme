@@ -16,4 +16,4 @@ Typical usage::
 See demo.py in the repo root for a full end-to-end example.
 """
 
-__version__ = "0.5.2"
+__version__ = "0.6.0"

@@ -2,36 +2,55 @@
 
 ## Unreleased
 
+---
+
+## v0.6.0 — 2026-08-28
+
+**Governability API, Kiro CLI v3, LangChain/LangGraph, and ADR lifecycle analysis**
+
 ### Added
-- LangChain agent middleware integration (`mneme.integrations.langchain`).
-  Governs LangChain agents running on LangGraph: relevant decisions are
-  injected into the model request via `wrap_model_call`, and proposed
-  `write_file` / `edit_file` calls are translated to canonical Write/Edit
-  and checked by `mneme check` before execution via `wrap_tool_call`
-  (introduced-delta semantics per ADR-018). Strict violations deny before
-  the tool runs; warn mode executes with a visible flag; degraded states
-  fail open with visible UNEVALUATED markers; all other tools receive no
-  opinion and zero checker calls. Sync and async loops behave identically,
-  and governance survives embedding the agent as a LangGraph subgraph.
-  Validated against pinned langchain 1.3.17 / langgraph 1.2.11; evidence
-  under `validation/langgraph/`.
-- Codex CLI enforcement integration (`mneme.integrations.codex_cli`).
-  A trusted hook bundle: `SessionStart` captures the session baseline,
-  `PreToolUse` (`^apply_patch$`) parses the proposal and checks introduced
-  content only (ADR-018) via `mneme check --json`, denying deterministic
-  violations before execution — including bundled multi-operation patches,
-  where any violation denies the entire call. `Stop` diffs against the
-  baseline and whole-file-audits every changed surviving artifact as the
-  backstop for shell and script-driven writes. Deletions are SKIP-by-design;
-  degraded states fail open with visible UNEVALUATED diagnostics. Validated
-  10/10 against Codex CLI 0.149.1 (Windows, `codex exec`, pinned binary);
-  evidence under `validation/codex-cli/`.
-- Read-only ADR lifecycle reconciliation in `mneme check --adr-dir` (#333).
-  Reports `DANGLING_SUPERSEDES`, `ORPHAN_SUPERSEDED`, `ACTIVE_CONTRADICTION`,
-  `SILENT_PRECEDENCE_ELIMINATION`, and `LEDGER_STATUS_MISMATCH`. Findings are
-  warn-only and do not alter retrieval, conflict detection, ranking, or
-  enforcement. Graph supersession now matches compiler semantics: only an
-  accepted ADR can retire another accepted ADR.
+- The authoritative `GovernabilityAssessment` and `assess_governability()`
+  core API. It classifies decisions as `enforceable`, `partial`, or
+  `guidance`, providing the canonical governability result for integrations
+  such as the Architecture Audit Workspace.
+- Native Kiro CLI 3.0 / v3 pre-write enforcement. The integration is
+  live-verified against the v3 engine and gates Kiro native file writes before
+  they reach disk.
+- LangChain / LangGraph middleware integration (`mneme.integrations.langchain`)
+  for retrieved-context injection and pre-tool enforcement. Sync, async, and
+  embedded-subgraph paths are validated against pinned LangChain and LangGraph
+  versions.
+- Hermes Agent integration (`mneme.integrations.hermes`) for context injection
+  and pre-tool enforcement on its supported mutation surfaces. This integration
+  remains **Experimental**: Hermes has no blocking Stop-equivalent backstop.
+- Read-only ADR lifecycle reconciliation through `mneme check --adr-dir`.
+  It reports `DANGLING_SUPERSEDES`, `ORPHAN_SUPERSEDED`,
+  `ACTIVE_CONTRADICTION`, `SILENT_PRECEDENCE_ELIMINATION`, and
+  `LEDGER_STATUS_MISMATCH`; findings are warn-only and do not alter retrieval
+  or enforcement behavior.
+
+### Validation / Research
+
+- Claude Managed Agents M0 capability study recorded as **PARTIAL**. Known
+  incompatibilities mean it is evidence only, not a supported integration.
+
+### Packaging / Docs
+
+- Package metadata and README now position Mneme as architectural drift
+  prevention for the agentic AI SDLC.
+- Added the optional `mneme-hq[langchain]` dependency group for the LangChain /
+  LangGraph integration.
+
+### Maintenance
+
+- Added PR execution-provenance checks and refreshed GitHub issue and pull
+  request templates.
+
+### Compatibility
+
+- No intended changes to retrieval ranking, `DecisionRetriever`,
+  `ConflictDetector`, existing typed-rule semantics, or the frozen enforcement
+  benchmark.
 
 ---
 
