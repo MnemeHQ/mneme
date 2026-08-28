@@ -1,0 +1,28 @@
+---
+id: choose-kafka
+name: Choose Kafka for Event Streaming
+status: accepted
+date: "2024-01-15"
+appliesTo:
+  - domain: orders
+  - service: payment-service
+  - event: payment-accepted
+supersedes: []
+owners:
+  - "arch-team"
+---
+# ADR: Choose Kafka for Event Streaming
+
+## Context
+
+We need a reliable event streaming platform for our order processing pipeline.
+
+## Decision
+
+We will use Apache Kafka as our event streaming platform.
+
+## Consequences
+
+- High throughput and durability
+- Requires operational expertise
+- Supports exactly-once semantics

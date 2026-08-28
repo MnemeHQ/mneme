@@ -41,6 +41,12 @@ from mneme.adr_import import (
     detect_collisions,
     format_preview,
 )
+from mneme.integrations.eventcatalog import (
+    apply_import as ec_apply_import,
+    compile_for_import as ec_compile_for_import,
+    detect_collisions as ec_detect_collisions,
+    format_preview as ec_format_preview,
+)
 from mneme.benchmark import BenchmarkRunner, ScenarioVerdict
 from mneme.benchmark_report import format_json, format_markdown, format_terminal
 from mneme.context_builder import DEFAULT_MAX_DECISIONS, format_decisions
@@ -492,6 +498,50 @@ def _cmd_adr_import(args: argparse.Namespace) -> int:
     return 1 if has_diags else 0
 
 
+def _cmd_eventcatalog_import(args: argparse.Namespace) -> int:
+    """Import EventCatalog ADRs from an index into target memory."""
+    import sys
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+
+    index_path = Path(args.index)
+    catalog_root = Path(args.catalog_root)
+    target_path = Path(args.memory)
+
+    if not index_path.exists():
+        print(f"ERROR: index file {index_path} does not exist", file=sys.stderr, flush=True)
+        return 2
+    if not catalog_root.is_dir():
+        print(f"ERROR: catalog root {catalog_root} is not a directory", file=sys.stderr, flush=True)
+        return 2
+    if not target_path.exists():
+        print(f"ERROR: memory file {target_path} does not exist", file=sys.stderr, flush=True)
+        return 2
+
+    report = ec_compile_for_import(index_path, catalog_root)
+    target_memory = json.loads(target_path.read_text(encoding="utf-8"))
+    collisions = ec_detect_collisions(report.nodes, target_memory)
+
+    print(ec_format_preview(report, collisions=collisions))
+
+    if args.apply:
+        try:
+            written = ec_apply_import(
+                report,
+                target_path=target_path,
+                catalog_root=catalog_root,
+                allow_update=args.update_existing,
+            )
+        except RuntimeError as exc:
+            print(f"ERROR: {exc}", file=sys.stderr, flush=True)
+            return 2
+        print(f"Wrote {len(written)} decisions to {target_path}")
+        return 0
+
+    has_diags = bool(report.diagnostics) or bool(collisions)
+    return 1 if has_diags else 0
+
+
 # ── Entry point ──────────────────────────────────────────────────────────────
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -640,6 +690,37 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Proceed with apply even if active-active contradictions exist",
     )
     p_adr_import.set_defaults(func=_cmd_adr_import)
+
+    # eventcatalog (parent for eventcatalog subcommands)
+    p_ec = sub.add_parser("eventcatalog", help="EventCatalog integration commands")
+    ec_sub = p_ec.add_subparsers(dest="ec_cmd", required=True)
+
+    p_ec_import = ec_sub.add_parser(
+        "import", help="Import ADRs from an EventCatalog index into project memory"
+    )
+    p_ec_import.add_argument(
+        "--index", required=True, help="Path to EventCatalog index JSON (from buildIndex)"
+    )
+    p_ec_import.add_argument(
+        "--catalog-root", required=True, help="Root directory of the EventCatalog project"
+    )
+    p_ec_import.add_argument(
+        "--memory", required=True, help="Path to target project_memory.json"
+    )
+    grp = p_ec_import.add_mutually_exclusive_group()
+    grp.add_argument(
+        "--dry-run", action="store_true",
+        help="Print preview without writing (default)",
+    )
+    grp.add_argument(
+        "--apply", action="store_true",
+        help="Write imported decisions to --memory after preview",
+    )
+    p_ec_import.add_argument(
+        "--update-existing", action="store_true",
+        help="Allow same-id overwrite of existing decisions[] entries",
+    )
+    p_ec_import.set_defaults(func=_cmd_eventcatalog_import)
 
     return parser
 
