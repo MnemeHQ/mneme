@@ -682,3 +682,138 @@ def test_scoped_typed_rule_missing_path_reports_unknown():
     assert result.verdict == Severity.PASS
     assert not result.evaluation_complete
     assert result.applicability[0].outcome.value == "UNKNOWN"
+
+
+# ── assess_governability tests ──────────────────────────────────────────────────
+
+from mneme.enforcer import assess_governability, GovernabilityAssessment, GovernabilityTier
+
+
+def test_assess_governability_enforceable_via_literal_rule():
+    """A decision with a FORBID_LITERAL rule is enforceable."""
+    d = Decision(
+        id="ADR-001",
+        decision="Use PostgreSQL",
+        rules=[Rule(type="FORBID_LITERAL", value="sqlite")],
+    )
+    assessment = assess_governability(d)
+    assert isinstance(assessment, GovernabilityAssessment)
+    assert assessment.tier == "enforceable"
+    assert assessment.confidence == 1.0
+    assert assessment.has_literal_rules is True
+    assert assessment.decision_id == "ADR-001"
+
+
+def test_assess_governability_enforceable_via_single_term_anti_pattern():
+    """A single-term anti_pattern is enforceable (always enforced)."""
+    d = Decision(
+        id="ADR-002",
+        decision="No ORM",
+        anti_patterns=["orm"],
+    )
+    assessment = assess_governability(d)
+    assert assessment.tier == "enforceable"
+    assert assessment.confidence == 1.0
+    assert assessment.has_single_term_anti_patterns is True
+    assert assessment.has_multi_term_anti_patterns is False
+
+
+def test_assess_governability_partial_via_multi_term_anti_pattern():
+    """Multi-term anti_pattern is only partial (enforced for top-N only)."""
+    d = Decision(
+        id="ADR-003",
+        decision="No complex dependencies",
+        anti_patterns=["introduce ORM framework"],
+    )
+    assessment = assess_governability(d)
+    assert assessment.tier == "partial"
+    assert assessment.confidence == 0.7
+    assert assessment.has_single_term_anti_patterns is False
+    assert assessment.has_multi_term_anti_patterns is True
+
+
+def test_assess_governability_partial_via_no_constraint():
+    """A 'no X' constraint yields partial (WARN severity only)."""
+    d = Decision(
+        id="ADR-004",
+        decision="No external DB",
+        constraints=["no postgres"],
+    )
+    assessment = assess_governability(d)
+    assert assessment.tier == "partial"
+    assert assessment.confidence == 0.7
+    assert assessment.has_no_constraints is True
+
+
+def test_assess_governability_guidance_only():
+    """A decision with no mechanical rules is guidance only."""
+    d = Decision(
+        id="ADR-005",
+        decision="Services must not import each other",
+        rationale="Service boundaries",
+    )
+    assessment = assess_governability(d)
+    assert assessment.tier == "guidance"
+    assert assessment.confidence == 0.0
+    assert assessment.has_literal_rules is False
+    assert assessment.has_single_term_anti_patterns is False
+    assert assessment.has_multi_term_anti_patterns is False
+    assert assessment.has_no_constraints is False
+
+
+def test_assess_governability_applicable_paths():
+    """Applicable paths are extracted from typed rules."""
+    d = Decision(
+        id="ADR-006",
+        decision="Use PostgreSQL for storage",
+        scope=["storage"],
+        rules=[
+            Rule(type="FORBID_LITERAL", value="sqlite", include_paths=("src/**", "tests/**")),
+            Rule(type="FORBID_LITERAL", value="mysql"),
+        ],
+    )
+    assessment = assess_governability(d)
+    assert assessment.applicable_paths == ("src/**", "tests/**")
+    assert assessment.tier == "enforceable"
+
+
+def test_assess_governability_decision_id_preserved():
+    """The decision ID is preserved in the assessment."""
+    d = Decision(
+        id="ADR-999",
+        decision="Test decision",
+        rules=[Rule(type="FORBID_LITERAL", value="test")],
+    )
+    assessment = assess_governability(d)
+    assert assessment.decision_id == "ADR-999"
+
+
+def test_assess_governability_combined_rules():
+    """A decision with both literal rules and constraints is enforceable."""
+    d = Decision(
+        id="ADR-007",
+        decision="Use PostgreSQL, no ORM",
+        rules=[Rule(type="FORBID_LITERAL", value="sqlite")],
+        constraints=["no ORM"],
+    )
+    assessment = assess_governability(d)
+    assert assessment.tier == "enforceable"
+    assert assessment.confidence == 1.0
+    assert assessment.has_literal_rules is True
+    assert assessment.has_no_constraints is True
+
+
+def test_assess_governability_mixed_enforceable_and_partial():
+    """A decision with multi-term anti-pattern and literal rule is enforceable."""
+    d = Decision(
+        id="ADR-008",
+        decision="Complex decision",
+        rules=[Rule(type="FORBID_LITERAL", value="sqlite")],
+        anti_patterns=["introduce ORM framework"],
+    )
+    assessment = assess_governability(d)
+    # Literal rule makes it enforceable (highest tier wins)
+    assert assessment.tier == "enforceable"
+    assert assessment.confidence == 1.0
+    assert assessment.has_literal_rules is True
+    assert assessment.has_multi_term_anti_patterns is True
