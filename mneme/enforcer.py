@@ -378,7 +378,10 @@ def assess_governability(decision: "Decision") -> GovernabilityAssessment:
     from mneme.schemas import Decision
 
     # Check typed FORBID_LITERAL rules (always enforced, FAIL severity)
-    has_literal_rules = bool(decision.rules)
+    has_literal_rules = any(
+        rule.type == "FORBID_LITERAL"
+        for rule in decision.rules
+    )
 
     # Check anti-patterns - determine which are single-term (always enforced)
     single_term_aps = []
