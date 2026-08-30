@@ -37,6 +37,38 @@ jobs:
       - name: Run test suite
         run: python -m pytest
 
+      # Temporary branch-only validation for PR #327. Remove after the
+      # documented quickstart has been exercised end-to-end.
+      - name: Exercise five-minute quickstart
+        shell: bash
+        run: |
+          set -euo pipefail
+          workdir="$(mktemp -d)"
+          cd "$workdir"
+
+          mneme init
+          mneme add_decision \
+            --memory .mneme/project_memory.json \
+            --id config-format \
+            --decision "Use JSON for configuration files" \
+            --scope config \
+            --constraint "Use JSON only" \
+            --anti-pattern "Do not use YAML"
+
+          python -c "import pathlib; pathlib.Path('prompt_clean.txt').write_text('Add a new JSON config file', encoding='utf-8')"
+          clean_output="$(mneme check --memory .mneme/project_memory.json --input prompt_clean.txt --query configuration)"
+          printf '%s\n' "$clean_output"
+          grep -q "Result: PASS" <<<"$clean_output"
+
+          python -c "import pathlib; pathlib.Path('prompt_violation.txt').write_text('Set up a new YAML config file for this module', encoding='utf-8')"
+          set +e
+          violation_output="$(mneme check --memory .mneme/project_memory.json --input prompt_violation.txt --query configuration 2>&1)"
+          violation_rc=$?
+          set -e
+          printf '%s\n' "$violation_output"
+          test "$violation_rc" -eq 2
+          grep -q "Result: FAIL" <<<"$violation_output"
+
   # The LangChain integration's live governed-loop tests require the
   # optional extra; the canonical job above intentionally runs without it.
   pytest-langchain:
