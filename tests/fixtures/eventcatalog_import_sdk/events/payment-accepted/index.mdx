@@ -1,0 +1,21 @@
+---
+id: payment-accepted
+name: PaymentAccepted
+version: "1.0.0"
+summary: Emitted when a payment is successfully processed
+service: payment-service
+---
+# PaymentAccepted
+
+Event emitted when a payment is successfully processed.
+
+## Payload
+
+```json
+{
+  "orderId": "string",
+  "amount": "number",
+  "currency": "string",
+  "paymentId": "string"
+}
+```

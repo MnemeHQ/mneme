@@ -1,0 +1,78 @@
+{
+  "indexVersion": 1,
+  "source": "local",
+  "commit": "sdk-test-123",
+  "resources": [
+    {
+      "type": "adr",
+      "id": "sdk-adr-1",
+      "name": "SDK Format ADR",
+      "contentPath": "adrs/sdk-adr-1/index.mdx",
+      "contentHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      "owners": ["platform-team"],
+      "status": "accepted",
+      "appliesTo": [
+        { "id": "orders", "type": "domain" },
+        { "id": "payment-service", "type": "service" },
+        { "id": "payment-accepted", "type": "event" }
+      ],
+      "supersedes": []
+    },
+    {
+      "type": "adr",
+      "id": "sdk-adr-2",
+      "name": "Mixed Format ADR",
+      "contentPath": "adrs/sdk-adr-2/index.mdx",
+      "contentHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+      "owners": ["platform-team"],
+      "status": "accepted",
+      "appliesTo": [
+        { "domain": "orders" },
+        { "id": "orders-api", "type": "service" },
+        { "id": "inventory-reserved", "type": "event" }
+      ],
+      "supersedes": []
+    },
+    {
+      "type": "domain",
+      "id": "orders",
+      "version": "1.0.0",
+      "name": "Orders",
+      "contentPath": "domains/orders/index.mdx",
+      "contentHash": "sha256:4eda6bf23a36136d029da00bde4ebbc4e0d63a83a1e363dda544a2bcda074d35"
+    },
+    {
+      "type": "service",
+      "id": "payment-service",
+      "version": "1.0.0",
+      "name": "PaymentService",
+      "contentPath": "services/payment-service/index.mdx",
+      "contentHash": "sha256:bae933351656a9a8b86094af9f216343e3943e7236b437c850785ac9a2c0303b"
+    },
+    {
+      "type": "service",
+      "id": "orders-api",
+      "version": "1.0.0",
+      "name": "OrdersAPI",
+      "contentPath": "services/orders-api/index.mdx",
+      "contentHash": "sha256:56e76977f090104c0eca4a7f8b652f42629301908a0ea5a58b738d09c114a52c"
+    },
+    {
+      "type": "event",
+      "id": "payment-accepted",
+      "version": "1.0.0",
+      "name": "PaymentAccepted",
+      "contentPath": "events/payment-accepted/index.mdx",
+      "contentHash": "sha256:73841bcd538dd8437bf7b555578267ef957d7f08012cf55e8f74dc03c8d4d748"
+    },
+    {
+      "type": "event",
+      "id": "inventory-reserved",
+      "version": "1.0.0",
+      "name": "InventoryReserved",
+      "contentPath": "events/inventory-reserved/index.mdx",
+      "contentHash": "sha256:03417213a027b1645cb700457de369f009e6eecd8d9010599dbabd8eb361786d"
+    }
+  ],
+  "assets": []
+}

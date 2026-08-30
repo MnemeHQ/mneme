@@ -76,14 +76,30 @@ _APPLIES_TO_KEYS = frozenset({"domain", "service", "event", "command", "query", 
 
 
 def _flatten_applies_to(applies_to: list[dict[str, str]]) -> list[str]:
-    """Flatten appliesTo into scope strings like ['orders domain', 'payment-service', 'payment-accepted']."""
+    """Flatten appliesTo into scope strings like ['orders domain', 'payment-service', 'payment-accepted'].
+
+    Accepts two formats:
+    1. EventCatalog SDK format: [{"id": "payment-service", "type": "service"}, ...]
+    2. Legacy fixture format: [{"service": "payment-service"}, ...]
+    """
     scope: list[str] = []
     for entry in applies_to:
-        if not isinstance(entry, dict) or len(entry) != 1:
+        if not isinstance(entry, dict):
             continue
-        for key, value in entry.items():
-            if key in _APPLIES_TO_KEYS:
-                scope.append(f"{value} {key}" if key == "domain" else value)
+
+        # EventCatalog SDK format: {"id": "...", "type": "service"}
+        if "id" in entry and "type" in entry:
+            type_key = entry["type"]
+            value = entry["id"]
+            if type_key in _APPLIES_TO_KEYS:
+                scope.append(f"{value} {type_key}" if type_key == "domain" else value)
+            continue
+
+        # Legacy format: {"service": "payment-service"}
+        if len(entry) == 1:
+            for key, value in entry.items():
+                if key in _APPLIES_TO_KEYS:
+                    scope.append(f"{value} {key}" if key == "domain" else value)
     return scope
 
 
@@ -242,7 +258,7 @@ def compile_for_import(
         scope = _flatten_applies_to(r.get("appliesTo", []))
 
         decision = Decision(
-            id=f"ec-{node_id}",
+            id=f"ec-{node_id}" if not node_id.startswith("ec-") else node_id,
             decision=decision_text or r.get("name", node_id),
             rationale=rationale_text,
             scope=scope,

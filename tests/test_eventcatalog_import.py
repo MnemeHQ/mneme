@@ -246,3 +246,38 @@ def test_missing_catalog_root_raises():
     """Missing catalog root should raise FileNotFoundError."""
     with pytest.raises(FileNotFoundError):
         compile_for_import(FIXTURES / "index.json", FIXTURES / "nonexistent")
+
+
+FIXTURES_SDK = Path(__file__).parent / "fixtures" / "eventcatalog_import_sdk"
+
+
+def test_compile_for_import_sdk_format():
+    """SDK format appliesTo (id/type) should be parsed correctly."""
+    report = compile_for_import(FIXTURES_SDK / "index.json", FIXTURES_SDK)
+
+    active = [n for n in report.nodes if n.status == "active"]
+    active_ids = {n.id for n in active}
+
+    assert active_ids == {"sdk-adr-1", "sdk-adr-2"}
+    assert len(report.decisions) == 2
+
+    # Check sdk-adr-1 scope
+    d1 = next(d for d in report.decisions if d.id == "ec-sdk-adr-1")
+    assert set(d1.scope) == {"orders domain", "payment-service", "payment-accepted"}
+
+    # Check sdk-adr-2 scope (mixed format)
+    d2 = next(d for d in report.decisions if d.id == "ec-sdk-adr-2")
+    assert set(d2.scope) == {"orders domain", "orders-api", "inventory-reserved"}
+
+
+def test_compile_for_import_legacy_format_still_works():
+    """Legacy format (domain: orders) should still work."""
+    report = compile_for_import(FIXTURES / "index.json", FIXTURES)
+
+    active = [n for n in report.nodes if n.status == "active"]
+    active_ids = {n.id for n in active}
+
+    assert active_ids == {"choose-kafka"}
+    assert len(report.decisions) == 1
+    d = report.decisions[0]
+    assert set(d.scope) == {"orders domain", "payment-service", "payment-accepted"}
