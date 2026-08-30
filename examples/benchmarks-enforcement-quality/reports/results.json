@@ -1,0 +1,326 @@
+{
+  "summary": {
+    "total": 7,
+    "passed": 3,
+    "failed": 0,
+    "weak": 0,
+    "weak_retrieval": 0,
+    "pass_rate": 1.0,
+    "by_category": {
+      "enforcement_quality": {
+        "pass": 3,
+        "fail": 0,
+        "total": 3
+      }
+    },
+    "layer1": {
+      "k": 3,
+      "mean_recall_at_k": 1.0,
+      "mean_precision_at_k": 1.0,
+      "irrelevant_injection_rate": 0.0,
+      "scored_count": 3
+    },
+    "layer2": {
+      "passed": 3,
+      "failed": 0,
+      "weak": 0,
+      "weak_retrieval": 0,
+      "pass_rate": 1.0
+    },
+    "enforcement_quality": {
+      "violation_passed": 3,
+      "violation_checkable": 3,
+      "benign_total": 4,
+      "benign_blocked": 0,
+      "benign_checkable": 4,
+      "false_positive_rate": 0.0,
+      "benign_uncheckable": 0
+    }
+  },
+  "results": [
+    {
+      "name": "benign_awin_programme",
+      "verdict": "PASS",
+      "baseline_violation_count": 0,
+      "enhanced_violation_count": 0,
+      "baseline_triggers": [],
+      "enhanced_triggers": [],
+      "explanation": "Benign content passed with governing decision(s) awin-001 in enforcement scope.",
+      "layer1": {
+        "k": 3,
+        "retrieved_ids": [
+          "awin-001",
+          "gov-001"
+        ],
+        "expected_ids": [],
+        "acceptable_ids": [],
+        "recall_at_k": 1.0,
+        "precision_at_k": 0.0,
+        "irrelevant_injection": true
+      },
+      "layer2": {
+        "verdict": "PASS",
+        "baseline_violation_count": 0,
+        "enhanced_violation_count": 0,
+        "baseline_triggers": [],
+        "enhanced_triggers": [],
+        "protected_decision_ids_hit": []
+      },
+      "scenario_type": "benign",
+      "exposure": {
+        "expected_ids": [
+          "awin-001"
+        ],
+        "in_scope": [
+          "awin-001"
+        ]
+      }
+    },
+    {
+      "name": "benign_foo_bar_incomplete",
+      "verdict": "PASS",
+      "baseline_violation_count": 0,
+      "enhanced_violation_count": 0,
+      "baseline_triggers": [],
+      "enhanced_triggers": [],
+      "explanation": "Benign content passed with governing decision(s) fb-001 in enforcement scope.",
+      "layer1": {
+        "k": 3,
+        "retrieved_ids": [
+          "fb-001"
+        ],
+        "expected_ids": [],
+        "acceptable_ids": [],
+        "recall_at_k": 1.0,
+        "precision_at_k": 0.0,
+        "irrelevant_injection": true
+      },
+      "layer2": {
+        "verdict": "PASS",
+        "baseline_violation_count": 0,
+        "enhanced_violation_count": 0,
+        "baseline_triggers": [],
+        "enhanced_triggers": [],
+        "protected_decision_ids_hit": []
+      },
+      "scenario_type": "benign",
+      "exposure": {
+        "expected_ids": [
+          "fb-001"
+        ],
+        "in_scope": [
+          "fb-001"
+        ]
+      }
+    },
+    {
+      "name": "benign_governance_docs",
+      "verdict": "PASS",
+      "baseline_violation_count": 0,
+      "enhanced_violation_count": 0,
+      "baseline_triggers": [],
+      "enhanced_triggers": [],
+      "explanation": "Benign content passed with governing decision(s) gov-001 in enforcement scope.",
+      "layer1": {
+        "k": 3,
+        "retrieved_ids": [
+          "gov-001"
+        ],
+        "expected_ids": [],
+        "acceptable_ids": [],
+        "recall_at_k": 1.0,
+        "precision_at_k": 0.0,
+        "irrelevant_injection": true
+      },
+      "layer2": {
+        "verdict": "PASS",
+        "baseline_violation_count": 0,
+        "enhanced_violation_count": 0,
+        "baseline_triggers": [],
+        "enhanced_triggers": [],
+        "protected_decision_ids_hit": []
+      },
+      "scenario_type": "benign",
+      "exposure": {
+        "expected_ids": [
+          "gov-001"
+        ],
+        "in_scope": [
+          "gov-001"
+        ]
+      }
+    },
+    {
+      "name": "benign_slug_prose",
+      "verdict": "PASS",
+      "baseline_violation_count": 0,
+      "enhanced_violation_count": 0,
+      "baseline_triggers": [],
+      "enhanced_triggers": [],
+      "explanation": "Benign content passed with governing decision(s) slug-001 in enforcement scope.",
+      "layer1": {
+        "k": 3,
+        "retrieved_ids": [
+          "slug-001"
+        ],
+        "expected_ids": [],
+        "acceptable_ids": [],
+        "recall_at_k": 1.0,
+        "precision_at_k": 0.0,
+        "irrelevant_injection": true
+      },
+      "layer2": {
+        "verdict": "PASS",
+        "baseline_violation_count": 0,
+        "enhanced_violation_count": 0,
+        "baseline_triggers": [],
+        "enhanced_triggers": [],
+        "protected_decision_ids_hit": []
+      },
+      "scenario_type": "benign",
+      "exposure": {
+        "expected_ids": [
+          "slug-001"
+        ],
+        "in_scope": [
+          "slug-001"
+        ]
+      }
+    },
+    {
+      "name": "guard_awin_identifier",
+      "verdict": "PASS",
+      "baseline_violation_count": 1,
+      "enhanced_violation_count": 0,
+      "baseline_triggers": [
+        "assume_awin_awin_us_same_source"
+      ],
+      "enhanced_triggers": [],
+      "explanation": "Mneme prevented the violation. Baseline triggered 1 violation(s) (assume_awin_awin_us_same_source); enhanced response had none. Retrieved: awin-001.",
+      "layer1": {
+        "k": 3,
+        "retrieved_ids": [
+          "awin-001"
+        ],
+        "expected_ids": [
+          "awin-001"
+        ],
+        "acceptable_ids": [],
+        "recall_at_k": 1.0,
+        "precision_at_k": 1.0,
+        "irrelevant_injection": false
+      },
+      "layer2": {
+        "verdict": "PASS",
+        "baseline_violation_count": 1,
+        "enhanced_violation_count": 0,
+        "baseline_triggers": [
+          "assume_awin_awin_us_same_source"
+        ],
+        "enhanced_triggers": [],
+        "protected_decision_ids_hit": [
+          "awin-001"
+        ]
+      },
+      "scenario_type": "violation",
+      "exposure": {
+        "expected_ids": [
+          "awin-001"
+        ],
+        "in_scope": [
+          "awin-001"
+        ]
+      }
+    },
+    {
+      "name": "guard_foo_and_bar_compound",
+      "verdict": "PASS",
+      "baseline_violation_count": 1,
+      "enhanced_violation_count": 0,
+      "baseline_triggers": [
+        "foo and bar"
+      ],
+      "enhanced_triggers": [],
+      "explanation": "Mneme prevented the violation. Baseline triggered 1 violation(s) (foo and bar); enhanced response had none. Retrieved: fb-001.",
+      "layer1": {
+        "k": 3,
+        "retrieved_ids": [
+          "fb-001"
+        ],
+        "expected_ids": [
+          "fb-001"
+        ],
+        "acceptable_ids": [],
+        "recall_at_k": 1.0,
+        "precision_at_k": 1.0,
+        "irrelevant_injection": false
+      },
+      "layer2": {
+        "verdict": "PASS",
+        "baseline_violation_count": 1,
+        "enhanced_violation_count": 0,
+        "baseline_triggers": [
+          "foo and bar"
+        ],
+        "enhanced_triggers": [],
+        "protected_decision_ids_hit": [
+          "fb-001"
+        ]
+      },
+      "scenario_type": "violation",
+      "exposure": {
+        "expected_ids": [
+          "fb-001"
+        ],
+        "in_scope": [
+          "fb-001"
+        ]
+      }
+    },
+    {
+      "name": "guard_unreviewed_changes",
+      "verdict": "PASS",
+      "baseline_violation_count": 1,
+      "enhanced_violation_count": 0,
+      "baseline_triggers": [
+        "unreviewed enforcement changes"
+      ],
+      "enhanced_triggers": [],
+      "explanation": "Mneme prevented the violation. Baseline triggered 1 violation(s) (unreviewed enforcement changes); enhanced response had none. Retrieved: gov-001.",
+      "layer1": {
+        "k": 3,
+        "retrieved_ids": [
+          "gov-001"
+        ],
+        "expected_ids": [
+          "gov-001"
+        ],
+        "acceptable_ids": [],
+        "recall_at_k": 1.0,
+        "precision_at_k": 1.0,
+        "irrelevant_injection": false
+      },
+      "layer2": {
+        "verdict": "PASS",
+        "baseline_violation_count": 1,
+        "enhanced_violation_count": 0,
+        "baseline_triggers": [
+          "unreviewed enforcement changes"
+        ],
+        "enhanced_triggers": [],
+        "protected_decision_ids_hit": [
+          "gov-001"
+        ]
+      },
+      "scenario_type": "violation",
+      "exposure": {
+        "expected_ids": [
+          "gov-001"
+        ],
+        "in_scope": [
+          "gov-001"
+        ]
+      }
+    }
+  ]
+}

@@ -35,7 +35,13 @@ pattern in each; the Mneme-enhanced response did not.
 controls were blocked. `benign_uncheckable`: 0/4.
 
 **Layer 1 (retrieval, n=3):** mean Recall@3 = 1.00, mean Precision@3 = 1.00,
-irrelevant injection rate = 0%.
+irrelevant injection rate = 0%. These retrieval figures belong **only to
+this enforcement-quality suite's 3 violation scenarios** — they are a
+different, smaller suite from the canonical 7-scenario benchmark in
+`examples/benchmarks/`, whose own `RESULTS.md` reports mean Precision@3 =
+0.33 on n=5. The two numbers measure the same metric on different scenario
+sets and are not comparable or interchangeable; do not cite one suite's
+figure as if it were the other's.
 
 **By category:**
 
