@@ -37,11 +37,6 @@ jobs:
       - name: Run test suite
         run: python -m pytest
 
-      # Temporary PR #303 validation step. This branch-only step will be
-      # removed after the required frozen benchmark result is captured.
-      - name: Run frozen benchmark for PR 303
-        run: mneme benchmark examples/benchmarks/ --memory examples/project_memory.json
-
   # The LangChain integration's live governed-loop tests require the
   # optional extra; the canonical job above intentionally runs without it.
   pytest-langchain:
