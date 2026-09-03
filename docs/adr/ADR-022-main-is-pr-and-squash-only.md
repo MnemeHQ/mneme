@@ -37,10 +37,10 @@ This is the single source of truth for what reaches `main`. Nothing lands on `ma
 
 File: `scripts/githooks/pre-push` (installed via the existing `git config core.hooksPath scripts/githooks` — no new installer).
 
-Condition: **reject any push whose remote destination is `refs/heads/main`**, regardless of local branch/worktree identity.
+Condition: **reject any push whose remote destination is `refs/heads/main`**, regardless of local branch/worktree identity or whether the remote ref already exists.
 
 - Reads stdin lines: `<local-ref> <local-sha> <remote-ref> <remote-sha>`
-- Blocks when `remote-ref == "refs/heads/main"` and the line represents an actual update (remote-sha not all-zeros; deletes also blocked)
+- Blocks whenever `remote-ref == "refs/heads/main"` — creation, normal update, force-push, and deletion are all rejected locally
 - Does **not** block local commits on `main` — only the *push* is gated
 - Does **not** skip based on absence of `.mneme/task_context.json` (unlike `pre-commit`); the rule keys on destination ref, so it applies uniformly in every worktree including the administrative checkout
 
