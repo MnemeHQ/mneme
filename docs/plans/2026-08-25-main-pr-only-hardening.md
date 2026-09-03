@@ -21,7 +21,7 @@ P0.5 repository hardening. A direct push to `main` occurred during dogfooding de
 |---|---|---|---|
 | 1 | GitHub ruleset: block direct pushes to `main`, require PR; enable squash as the only allowed merge method | ~15–30 min | Yes |
 | 2 | ADR-022: PR + squash-only invariant and enforcement boundaries | ~30–60 min | Yes |
-| 3 | `scripts/githooks/pre-push`: block direct `main → origin/main` updates | ~2–4 hrs incl. tests | Yes |
+| 3 | `scripts/githooks/pre-push`: block any push whose remote destination is `refs/heads/main` | ~2–4 hrs incl. tests | Yes |
 | 4 | Focused adversarial tests | ~1–2 hrs | Yes |
 | 5 | CI provenance/audit check for commits reaching `main` outside PR flow | ~1–2 hrs | **Defer** — revisit only if ruleset audit evidence proves insufficient |
 
@@ -66,12 +66,12 @@ New file: `scripts/githooks/pre-push`
 
 Condition — exactly this, nothing broader:
 
-> Reject a push whose destination is protected `main` when it represents a direct local update rather than the accepted PR path.
+> Reject any push whose destination is protected `main`, regardless of local branch identity or whether the remote ref already exists.
 
 Implementation notes:
 
 - Read stdin lines of the form `<local-ref> <local-sha> <remote-ref> <remote-sha>`.
-- Block when `remote-ref` is `refs/heads/main` and the line represents an actual update (i.e., remote-sha is not all-zeros-and-unchanged; handle deletes `git push origin :main` too — block them).
+- Block whenever `remote-ref` is `refs/heads/main`; this covers creation, normal update, force-push, and deletion.
 - **Do NOT implement** "you may never commit while checked out on main." Local commits on `main` in the administrative checkout are legitimate; only the *push* is gated.
 - No skip via absence of `.mneme/task_context.json` — the rule keys on destination ref, so it applies uniformly in every worktree including the administrative checkout.
 - Failure message must identify the governing decision and remediation, e.g.:
@@ -98,6 +98,7 @@ Minimum cases:
 | feature branch → remote feature branch | PASS |
 | local `main` → `origin/main` (fast-forward) | BLOCK |
 | local `main` → `origin/main` (force/non-fast-forward) | BLOCK |
+| create remote `main` (remote ref absent) | BLOCK |
 | delete remote `main` (`:main`) | BLOCK |
 | normal PR/squash simulation (feature push, then simulated server-side squash) | PASS |
 | `MNEME_ALLOW_MAIN_PUSH=1` on direct main push | PASS with visible override notice |
