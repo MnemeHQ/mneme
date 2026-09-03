@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+"""Pre-push guard: block direct pushes to main.
+
+GitHub ruleset is the authoritative enforcement (ADR-022). This hook provides
+early deterministic feedback at the developer's terminal.
+"""
+from __future__ import annotations
+
+import os
+import sys
+
+
+PROTECTED_REMOTE_REF = "refs/heads/main"
+OVERRIDE_ENV = "MNEME_ALLOW_MAIN_PUSH"
+
+
+def main() -> int:
+    if os.environ.get(OVERRIDE_ENV) == "1":
+        print(f"[push-guard] OVERRIDE: {OVERRIDE_ENV}=1 set - allowing push to main (administrative use only)")
+        return 0
+
+    blocked = False
+    for line in sys.stdin:
+        line = line.strip()
+        if not line:
+            continue
+        parts = line.split()
+        if len(parts) != 4:
+            continue
+        local_ref, local_sha, remote_ref, remote_sha = parts
+
+        if remote_ref != PROTECTED_REMOTE_REF:
+            continue
+
+        # Block ANY push to main (creation, update, force-push, delete)
+        # remote_sha of 40 zeros means ref creation or deletion; non-zero means update/force-push
+        blocked = True
+        break
+
+    if blocked:
+        print("[push-guard] BLOCKED: direct push to main.")
+        print("  Governing decision: ADR-022 (main is PR + squash-only; GitHub ruleset is authoritative).")
+        print("  Fix: commit to a task branch and open a PR (python scripts/new_task_worktree.py <branch>).")
+        print(f"  Administrative/recovery override: {OVERRIDE_ENV}=1 (use deliberately, never routinely).")
+        return 1
+
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
