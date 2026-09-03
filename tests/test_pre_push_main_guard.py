@@ -124,6 +124,16 @@ def test_delete_main_blocked(repo: Path) -> None:
     assert "BLOCKED: direct push to main" in out
 
 
+def test_create_main_blocked(repo: Path) -> None:
+    """create remote main (first push, remote_sha=0): BLOCK"""
+    local_sha = _head_sha(repo)
+    remote_sha = _zero_sha()
+    stdin = f"refs/heads/main {local_sha} refs/heads/main {remote_sha}\n"
+    code, out, err = _run_hook(stdin, repo)
+    assert code == 1, f"expected BLOCK, got {code}: {out} {err}"
+    assert "BLOCKED: direct push to main" in out
+
+
 def test_main_push_allowed_with_explicit_override(repo: Path) -> None:
     """MNEME_ALLOW_MAIN_PUSH=1 allows direct main push (administrative override)"""
     local_sha = _head_sha(repo)

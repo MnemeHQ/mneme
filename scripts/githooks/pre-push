@@ -32,14 +32,10 @@ def main() -> int:
         if remote_ref != PROTECTED_REMOTE_REF:
             continue
 
-        # Block if this is an actual update (remote_sha not all zeros)
-        # remote_sha of 40 zeros means ref creation; non-zero means update/force-push
-        if remote_sha != "0" * 40:
-            blocked = True
-            break
-        # Also block deletion (remote_sha would be 40 zeros for delete, but
-        # the remote_ref would be sent with zeros; handled above)
-        # Git sends deletion as: <local> <sha> <remote> 000...0
+        # Block ANY push to main (creation, update, force-push, delete)
+        # remote_sha of 40 zeros means ref creation or deletion; non-zero means update/force-push
+        blocked = True
+        break
 
     if blocked:
         print("[push-guard] BLOCKED: direct push to main.")
