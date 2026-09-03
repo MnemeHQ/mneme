@@ -32,7 +32,9 @@ Provisioning and the automatic commit gate:
 
 - Create each task worktree with `python scripts/new_task_worktree.py <branch>` — it creates the branch from current `origin/main` and writes `.mneme/task_context.json` inside the worktree.
 - When run without explicit arguments, the checker reads `.mneme/task_context.json`; the versioned pre-commit hook (`scripts/githooks/pre-commit`) runs it before every commit in worktrees that have a context file.
-- One-time setup for the hook: `git config core.hooksPath scripts/githooks`.
+- One-time setup for the hook: `git config core.hooksPath scripts/githooks` (installs both `pre-commit` and `pre-push`).
+
+Pre-push guard (ADR-022): blocks direct pushes to `main` locally with actionable message; administrative override via `MNEME_ALLOW_MAIN_PUSH=1`. GitHub ruleset is authoritative.
 
 ## Worktree Lifecycle
 
