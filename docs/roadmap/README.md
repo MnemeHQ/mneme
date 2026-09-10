@@ -1,6 +1,6 @@
 # Mneme — Current Roadmap
 
-> **Current roadmap — August 2026.**
+> **Current roadmap — September 2026.**
 >
 > The original [April 2026 adoption and enhancement roadmap](./2026-04-24-adoption-and-enhancement-roadmap.md) is retained as historical context. It describes the path from an early working implementation to a usable developer tool. Mneme has moved beyond that stage: the core enforcement mechanism and several native agent integrations now ship. This file is the current operational roadmap.
 
@@ -118,6 +118,79 @@ Revisit only if Anthropic exposes one or more of the missing control surfaces id
 - a filesystem-local confirmation/evaluation handler;
 - a blocking completion/Stop-equivalent boundary.
 
+## FUTURE — enterprise decision recovery
+
+This track is deliberately downstream of the current architectural-enforcement wedge. It should be promoted only when real usage shows value in recovering architectural intent that was never captured as a canonical ADR or Mneme decision.
+
+### P3 — Decision Recovery / Enterprise Decision Mining
+
+Investigate whether Mneme can recover candidate architectural decisions from existing enterprise knowledge without allowing model-extracted text to become policy automatically.
+
+Candidate sources include Confluence, Jira, GitHub, Slack or Teams, Google Workspace, documents, meeting records, and other repositories of engineering history.
+
+The intended boundary is:
+
+```text
+enterprise knowledge
+        ↓
+candidate decision discovery
+        ↓
+provenance + supporting evidence
+        ↓
+human attestation
+        ↓
+canonical Mneme decision
+        ↓
+Guidance / Requires modelling / Mneme-ready / Protected
+        ↓
+rule + scope + lifecycle
+        ↓
+Mneme Protect enforcement
+        ↓
+enforcement evidence + exceptions + supersession
+```
+
+**Authority constraint:** extraction is non-authoritative. A model may identify a candidate decision and assemble evidence, but it must not promote that candidate into an accepted decision, active rule, or protected policy without explicit human attestation.
+
+### P3 — Decision provenance and attestation
+
+Define the minimum provenance required for recovered decisions before they can enter the canonical decision corpus.
+
+At minimum, preserve source references, supporting evidence, extraction time, candidate state, attestation state, and the identity or mechanism that approved promotion. Provenance must remain attached through later rule compilation and enforcement evidence so a protected outcome can be traced back to the authoritative decision and its supporting sources.
+
+Reuse the existing decision lifecycle and precedence model. Conflict or supersession discovery may suggest relationships, but it must not silently rewrite canonical lifecycle state.
+
+### P3 — Recovered-decision conflict and supersession discovery
+
+Evaluate conflict detection over candidate and canonical decisions, including cases where older communications contradict later accepted policy or where multiple sources describe different scopes.
+
+This work must extend the existing lifecycle reconciliation and future conflict-detection path rather than creating an independent policy resolver. Candidate conflicts are evidence for review; deterministic core semantics remain authoritative after promotion.
+
+### P3 — Policy-as-code compilation from verified decisions
+
+After human attestation, assess whether a verified decision can map into the existing governability and typed-rule paths.
+
+The compiler may propose deterministic rules and scope, but protection must still use the same authoritative core rule model, `assess_governability()`, lifecycle semantics, and Mneme Protect activation path. LLM judgment must not become an enforcement verdict.
+
+### P3 — Private-boundary extraction and data minimization
+
+Treat privacy and data-boundary requirements as part of the architecture, not as a later deployment concern.
+
+Research extraction modes where sensitive enterprise corpora remain inside the customer's controlled boundary and Mneme persists only the minimum required verified decision objects, provenance references, attestation metadata, and enforcement evidence.
+
+Do not require centralized retention of raw email, chat, meeting, or document archives merely to support decision enforcement.
+
+### Promotion gates for the enterprise track
+
+Do not promote Decision Recovery into an implementation priority until evidence supports all of the following:
+
+- real repositories contain material architectural constraints that are valuable but absent from the canonical decision corpus;
+- candidate extraction can achieve useful precision while preserving source evidence;
+- human attestation can prevent stale, contradictory, or context-specific statements from becoming policy;
+- recovered decisions can reuse Mneme's existing lifecycle, governability, rule, scope, and enforcement semantics;
+- privacy-preserving deployment can avoid unnecessary replication of enterprise communication archives;
+- the resulting verified decisions improve architecture protection or audit coverage measurably.
+
 ## DEFERRED — wait for evidence or user pull
 
 - EventCatalog graph enrichment beyond the validated retrieval-only boundary, until there is a jointly useful hypothesis.
@@ -158,6 +231,7 @@ For current support claims, always use [the canonical integration support matrix
 3. **External validation outranks integration count.** A real design-partner result is more valuable than another unvalidated adapter.
 4. **Keep retrieval separate from enforcement.** Context, Skills, RAG, and source ingestion can improve what the agent knows; deterministic rules decide what Mneme can mechanically govern.
 5. **No speculative platform expansion.** Hosted/team/org layers wait for user pull and evidence from the current wedge.
+6. **Recovered knowledge is evidence, not authority.** Model-extracted content remains a candidate until explicit human attestation promotes it into the canonical decision lifecycle.
 
 ## Related
 
