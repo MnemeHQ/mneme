@@ -43,6 +43,27 @@ scope: audit.test_evidence
 > figure (60%) is intentionally not preserved; under the corrected passive
 > model it reverts to 0% until trusted verification arrives. Safety is
 > more important than that number.
+>
+> **CI-evidence parsing/matching (2026-09-11, follow-up).** The parsing and
+> matching half of trusted verification is implemented as a library in
+> `mneme/evidence.py`: `parse_ci_evidence_document()` parses and validates a
+> machine-produced evidence document (schema `mneme.test-evidence/v1`
+> carrying `repository_sha`, a `producer` provenance object, and a list of
+> `{selector, outcome}` results), and `match_ci_evidence()` computes which
+> declared selectors a document **claims** to match when its SHA exactly
+> equals the audited repository HEAD, the selector is string-equal to an
+> unambiguous declaration, and the outcome is `passed`.
+>
+> **The document is an evidence carrier, not a trust root.** A matching
+> document yields the `matched_unverified` state (annotated
+> `test:ci-claim:<selector>@<sha>`), never `verified`. Producer metadata
+> contained inside the document is descriptive until Mneme authenticates it
+> against the external CI provider. The `verified` state is reserved for a
+> future authenticated CI-retrieval producer and is unreachable from the raw
+> document parameter, which is UNTRUSTED evidence material. Ordinary
+> `mneme audit` never supplies a document and never auto-discovers or
+> auto-trusts any repository file. The default Audit remains DECLARED-only;
+> no caller input can manufacture Protected.
 
 ## Context
 
