@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+### Fixed
+
+- P1.2 Architecture Audit tier semantics (ADR-023): intent is now judged
+  from the decision text (prescriptive vs advisory language) instead of
+  record shape, so byte-identical decision text no longer changes tier
+  when an unrelated structured constraint is added, and deterministic
+  architectural requirements without structured fields no longer fall to
+  Guidance. `Identified Mneme Potential` is now
+  (Mneme-ready + Requires modelling) / protection-relevant — decisions
+  deterministically enforceable in principle, not only records
+  immediately expressible by existing rule types. `mneme.audit/v1`,
+  CLI, Protect behavior, and enforcement/refusal semantics are unchanged.
+
 ---
 
 ## v0.7.0 — 2026-09-07
