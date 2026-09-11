@@ -845,10 +845,27 @@ def propose_literal_rule(decision: "Decision") -> "Rule | None":
 def assess_protection(
     decision: "Decision",
     repo_root: str | Path | None = None,
-    test_evidence_results: "dict[str, list] | None" = None,
-    ci_evidence_document: str | None = None,
 ) -> ProtectionDecisionReport:
     """Assess one Decision's P1.2 protection state.
+
+    Public entry point. It accepts NO trust-bearing parameter: it classifies
+    from the decision's typed rules, the existing CI-enforcement evidence
+    scan, and the passively validated (declared) test evidence only. No
+    caller can inject a value that reaches the ``verified`` test-evidence
+    state through this API.
+    """
+    return _assess_protection(decision, repo_root, None)
+
+
+def _assess_protection(
+    decision: "Decision",
+    repo_root: str | Path | None,
+    test_evidence_results: "dict[str, list] | None",
+) -> ProtectionDecisionReport:
+    """Internal assessment. ``test_evidence_results`` carries pre-computed
+    corpus-level validation records and must never be exposed publicly: it is
+    the only seam that can carry the ``verified`` state, and only the
+    authenticated GitHub component supplies it.
 
     Tier resolution order (highest wins):
 
@@ -874,14 +891,10 @@ def assess_protection(
     validated inline for this decision when a repository root is given.
     Ordinary Audit never executes repository-controlled code: a merely
     declared entry annotates ``evidence_sources`` as
-    ``test:declared:<selector>`` and never upgrades a tier.
-
-    ``ci_evidence_document``, when supplied, is UNTRUSTED evidence material:
-    it may at most produce a matching CI *claim* (annotated as
-    ``test:ci-claim:<selector>@<sha>``), never the ``verified`` state. Only
-    an authenticated verification producer (not yet present in M0) may
-    produce ``verified`` and thereby upgrade a deterministic decision to
-    Protected; advisory decisions are never upgraded by any channel.
+    ``test:declared:<selector>`` and never upgrades a tier. Only an
+    authenticated verification producer (not yet present in M0) may produce
+    ``verified`` and thereby upgrade a deterministic decision to Protected;
+    advisory decisions are never upgraded by any channel.
     """
     literal_rules = [
         rule for rule in decision.rules if rule.type == "FORBID_LITERAL"
@@ -927,17 +940,14 @@ def assess_protection(
     # Declared test evidence (ADR-024), passively validated once per corpus
     # by the aggregate report; single-decision callers validate inline.
     # PASSIVE-AUDIT INVARIANT: no repository-controlled code is executed —
-    # no pytest, no conftest, no plugins. A caller-supplied
-    # ``ci_evidence_document`` is UNTRUSTED material and yields at most a
-    # matching claim (state "matched_unverified"); only an authenticated
-    # producer (none exists in M0) may carry the "verified" state, which is
-    # the only test-evidence state this function upgrades to protected.
+    # no pytest, no conftest, no plugins. The public path can only produce
+    # "declared"/"matched_unverified"/"authenticated_ci_claim"; only the
+    # authenticated producer (none in M0) may carry "verified", which is the
+    # only test-evidence state upgraded to protected.
     if repo_root is not None and test_evidence_results is None:
         from mneme.evidence import verify_test_evidence
 
-        test_evidence_results = verify_test_evidence(
-            [decision], repo_root, ci_evidence_document=ci_evidence_document,
-        )
+        test_evidence_results = verify_test_evidence([decision], repo_root)
     test_sources: list[str] = []
     verified_by_test = False
     if test_evidence_results:
@@ -984,16 +994,14 @@ def generate_protection_report(
 ) -> ArchitectureProtectionReport:
     """Assess a corpus and aggregate the P1.2 summary.
 
+    Public entry point. It accepts NO trust-bearing parameter: test evidence
+    is passively validated (declared / matched claim only); the ``verified``
+    state is unreachable here. ``ci_evidence_document``, when supplied, is
+    UNTRUSTED material and can at most produce a matching CI claim.
+
     Only active decisions count toward any tier or the protection-relevant
     denominator; superseded and deprecated decisions appear in ``decisions``
     for provenance but are excluded from all counts.
-
-    Declared test evidence (ADR-024) is validated once for the whole corpus
-    — enabling cross-decision ambiguity checks — and passed into every
-    per-decision assessment. ``ci_evidence_document``, when supplied by an
-    explicit caller, is UNTRUSTED evidence material: it yields at most a
-    matching CI claim (never the ``verified`` state), so it can never
-    upgrade a tier. Ordinary ``mneme audit`` never supplies it.
     """
     test_evidence_results = None
     if repo_root is not None:
@@ -1002,12 +1010,22 @@ def generate_protection_report(
         test_evidence_results = verify_test_evidence(
             decisions, repo_root, ci_evidence_document=ci_evidence_document,
         )
+    return _build_report(decisions, repo_root, test_evidence_results)
+
+
+def _build_report(
+    decisions: list["Decision"],
+    repo_root: str | Path | None,
+    test_evidence_results: "dict[str, list] | None",
+) -> ArchitectureProtectionReport:
+    """Internal aggregation over pre-computed verification results.
+
+    ``test_evidence_results`` may carry the ``verified`` state and is only
+    ever supplied by the authenticated GitHub component; it must never be
+    exposed on a public API.
+    """
     reports = [
-        assess_protection(
-            decision,
-            repo_root=repo_root,
-            test_evidence_results=test_evidence_results,
-        )
+        _assess_protection(decision, repo_root, test_evidence_results)
         for decision in decisions
     ]
     active = [r for r in reports if r.status == "active"]

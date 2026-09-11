@@ -64,6 +64,42 @@ scope: audit.test_evidence
 > `mneme audit` never supplies a document and never auto-discovers or
 > auto-trusts any repository file. The default Audit remains DECLARED-only;
 > no caller input can manufacture Protected.
+>
+> **Authenticated GitHub Actions CI claim (2026-09-11, follow-up).** The
+> authenticated retrieval path is implemented in `mneme/github_evidence.py`.
+> `verify_github_run()` authenticates a workflow run and its evidence
+> artifact through the GitHub REST API (trust root = `Authorization: Bearer
+> <GITHUB_TOKEN>`; external to `project_memory.json`, the carrier, repository
+> files, and caller-authored producer metadata).
+>
+> The authenticated chain validates, fail-closed, that (1) a token is
+> present; (2) the audited repository identity resolves from the origin
+> remote; (3) the run exists and belongs to exactly that repository; (4) the
+> run's `head_sha` equals the audited HEAD exactly; (5) a non-expired
+> artifact named `mneme-test-results` exists; (6) the artifact downloads
+> (with the bearer token never forwarded to the signed redirect host), parses
+> as `mneme.test-evidence/v1`, and its `repository_sha` equals the run
+> `head_sha`. Selector results are matched exactly (`outcome == passed`).
+>
+> **Authenticated artifact provenance is not execution proof.** The artifact
+> content is still produced by repository-controlled workflow code, so a
+> workflow could upload `{"outcome": "passed"}` without running the test.
+> Therefore the authenticated result is the `authenticated_ci_claim` state
+> (annotated `test:ci-authenticated:<selector>@<sha>`), NOT `verified`, and it
+> never reaches Protected. `verified` remains reserved for a future trusted
+> producer — a Mneme-controlled verifier pinned to an approved immutable
+> version whose output the repository cannot forge.
+>
+> **Trust boundary.** No public API accepts a trust-bearing parameter:
+> `assess_protection` and `generate_protection_report` take only the
+> declaration/carrier inputs and never construct `verified`. The
+> authenticated result flows only through the internal, private
+> `_verify_test_evidence(..., authenticated_claim=...)` seam, reached solely
+> by `audit_with_github_claim()`, which is the one supported public
+> authenticated operation and stops at `authenticated_ci_claim`. Default
+> `mneme audit` remains offline and never calls GitHub. (Python code in the
+> same process can always monkeypatch internals; the guarantee is that the
+> supported public API cannot self-certify protection.)
 
 ## Context
 

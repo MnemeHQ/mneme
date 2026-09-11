@@ -53,10 +53,19 @@ Evidence states:
                         its CI provenance has NOT been independently
                         authenticated by Mneme. Annotated as
                         ``test:ci-claim:<selector>@<sha>``; never protects.
-    VERIFIED            reserved for evidence whose provenance was
-                        authenticated through a trusted verification source.
-                        No such producer exists in M0, so the raw document
-                        parameter can never produce this state.
+    AUTHENTICATED_CLAIM an ``mneme.test-evidence/v1`` document whose CI run
+                        and artifact Mneme authenticated via the GitHub API,
+                        whose SHA matches the audited HEAD, and whose selector
+                        says ``passed``. The artifact *content* is still
+                        repository-controlled workflow output — authentication
+                        proves the artifact's provenance, not that a trusted
+                        verifier executed the test — so this is a stronger
+                        claim, annotated ``test:ci-authenticated:<selector>@<sha>``,
+                        and never protects on its own.
+    VERIFIED            reserved for evidence produced by a trusted
+                        verification producer (a Mneme-controlled verifier,
+                        pinned and attested). No such producer exists in M0;
+                        nothing reaches this state.
     STALE               the declared SHA pin does not match repository HEAD:
                         ``test:stale:<selector>@<sha>``.
     INVALID             the selector is malformed or its file does not exist:
@@ -66,9 +75,10 @@ Evidence states:
                         — neither decision is protected.
 
 A passing test is evidence only when the provenance of the passing result is
-authenticated; declaring it is not verifying it, and a matching CI document
-is a claim, not a trust root. Authenticated verification arrives with a
-future trusted CI retrieval producer, not this module.
+authenticated *and* the result was produced by a trusted verifier. Declaring
+is not verifying; a matching CI document is a claim; an authenticated CI
+artifact is still a claim whose content is repository-controlled. The
+``verified`` state arrives with a future trusted producer, not this module.
 """
 
 from __future__ import annotations
@@ -98,6 +108,7 @@ CI_EVIDENCE_SCHEMA = "mneme.test-evidence/v1"
 # Evidence states.
 STATE_DECLARED = "declared"
 STATE_MATCHED = "matched_unverified"
+STATE_AUTHENTICATED_CLAIM = "authenticated_ci_claim"
 STATE_VERIFIED = "verified"
 STATE_STALE = "stale"
 STATE_INVALID = "invalid"
@@ -113,7 +124,7 @@ class TestEvidenceVerification:
 
     decision_id: str
     selector: str
-    state: str  # "declared" | "matched_unverified" | "verified" | "stale" | "invalid"
+    state: str  # "declared" | "matched_unverified" | "authenticated_ci_claim" | "verified" | "stale" | "invalid"
     sha: str  # exact repository HEAD SHA the validation ran against ("" if none)
     code: str
     detail: str
@@ -326,29 +337,38 @@ def verify_test_evidence(
 ) -> dict[str, list[TestEvidenceVerification]]:
     """Passively validate every declared test-evidence entry. Fail closed.
 
-    No repository-controlled code is ever executed. For each decision
-    record carrying ``test_evidence`` declarations, every selector is
-    checked in order:
+    Public entry point. It NEVER produces the ``verified`` state: declared
+    linkages reach ``declared``, and an externally supplied document can at
+    most reach ``matched_unverified`` (an unauthenticated claim). See
+    :func:`_verify_test_evidence` for the internal, authenticated path.
+    """
+    return _verify_test_evidence(decisions, repo_root, ci_evidence_document, None)
+
+
+def _verify_test_evidence(
+    decisions: list,
+    repo_root: str | os.PathLike[str] | None,
+    ci_evidence_document: str | None,
+    authenticated_claim: "object | None",
+) -> dict[str, list[TestEvidenceVerification]]:
+    """Passively validate every declared test-evidence entry. Fail closed.
+
+    Internal implementation. ``authenticated_claim`` is a value produced by
+    ``mneme.github_evidence.verify_github_run`` (an authenticated CI run and
+    artifact whose content is still repository-controlled); it may reach the
+    ``authenticated_ci_claim`` state, never ``verified``. This parameter is
+    private and must never be exposed on a public assessment/report API —
+    no caller-supplied value may reach ``verified``/Protected.
+
+    No repository-controlled code is ever executed. For each decision record
+    carrying ``test_evidence`` declarations, every selector is checked in
+    order:
 
     1. well-formed (repository-relative pytest node id);
     2. unambiguous (not declared by any other decision);
-    3. resolvable: the repository HEAD SHA is available, the declared SHA
-       pin (if any) matches HEAD exactly, and the selector's file exists
-       inside the repository.
-
-    A linkage that passes all passive checks reaches ``declared`` and never
-    protects on its own.
-
-    When the caller supplies an external evidence document
-    (``ci_evidence_document``) whose exact SHA matches the audited HEAD and
-    whose results include the exact selector with outcome ``passed``, the
-    linkage is recorded as ``matched_unverified`` — a matching CI *claim*,
-    never ``verified``. The document is UNTRUSTED evidence material: its
-    provenance is recorded, not authenticated, and no such authentication
-    producer exists in M0, so the raw parameter can never reach the
-    ``verified`` state that ``assess_protection`` upgrades to Protected.
-    Ordinary ``mneme audit`` never supplies a document and never
-    auto-discovers or auto-trusts any repository file.
+    3. resolvable: the repository HEAD SHA is available, the declared SHA pin
+       (if any) matches HEAD exactly, and the selector's file exists inside
+       the repository.
     """
     results: dict[str, list[TestEvidenceVerification]] = {}
 
@@ -404,6 +424,16 @@ def verify_test_evidence(
         document, _reason = parse_ci_evidence_document(ci_evidence_document)
         if document is not None:
             matched = match_ci_evidence(decisions, sha, document)
+
+    # Authenticated CI claim (stronger than matched, still a claim): only
+    # from the authenticated GitHub evidence component. Never the verified
+    # state, because the artifact content is repository-controlled.
+    authenticated: dict[str, list[str]] = {}
+    if authenticated_claim is not None and sha is not None:
+        claim_document = getattr(authenticated_claim, "document", None)
+        claim_sha = getattr(authenticated_claim, "head_sha", None)
+        if claim_document is not None and claim_sha == sha:
+            authenticated = match_ci_evidence(decisions, sha, claim_document)
 
     for decision in decisions:
         declared = _declared_entries(decision)
@@ -471,7 +501,21 @@ def verify_test_evidence(
                     detail="declared test file does not exist in the repository",
                 ))
                 continue
-            if selector in matched.get(decision.id, []):
+            if selector in authenticated.get(decision.id, []):
+                entries.append(TestEvidenceVerification(
+                    decision_id=decision.id,
+                    selector=selector,
+                    state=STATE_AUTHENTICATED_CLAIM,
+                    sha=sha,
+                    code=REASON_NO_VERIFICATION,
+                    detail=(
+                        "authenticated CI run/artifact claims the selector "
+                        "passed at this repository SHA; the artifact content "
+                        "is repository-controlled, so this is a claim, not "
+                        "proof of execution"
+                    ),
+                ))
+            elif selector in matched.get(decision.id, []):
                 entries.append(TestEvidenceVerification(
                     decision_id=decision.id,
                     selector=selector,
@@ -507,12 +551,14 @@ def evidence_source_strings(
     """Deterministic evidence-source strings for the audit report.
 
     Declared entries read ``test:declared:<selector>``; a matching but
-    unauthenticated CI claim reads ``test:ci-claim:<selector>@<sha>``;
-    stale entries read ``test:stale:<selector>@<code>``; invalid entries
-    read ``test:invalid:<selector>@<code>``. The reserved authenticated
-    state reads ``test:verified:<selector>@<sha>`` and has no producer in
-    M0. The audit always answers why a declared linkage did not establish
-    protection — with no runner noise and no execution.
+    unauthenticated CI claim reads ``test:ci-claim:<selector>@<sha>``; an
+    authenticated (but still repository-controlled) CI claim reads
+    ``test:ci-authenticated:<selector>@<sha>``; stale entries read
+    ``test:stale:<selector>@<code>``; invalid entries read
+    ``test:invalid:<selector>@<code>``. The reserved authenticated state
+    reads ``test:verified:<selector>@<sha>`` and has no producer in M0. The
+    audit always answers why a declared linkage did not establish protection —
+    with no runner noise and no execution.
     """
     sources: list[str] = []
     for verification in verifications:
@@ -521,6 +567,8 @@ def evidence_source_strings(
             sources.append(f"test:declared:{selector}")
         elif verification.state == STATE_MATCHED:
             sources.append(f"test:ci-claim:{selector}@{verification.sha}")
+        elif verification.state == STATE_AUTHENTICATED_CLAIM:
+            sources.append(f"test:ci-authenticated:{selector}@{verification.sha}")
         elif verification.state == STATE_STALE:
             sources.append(f"test:stale:{selector}@{verification.code}")
         elif verification.state == STATE_VERIFIED:
@@ -542,6 +590,7 @@ __all__ = [
     "CI_EVIDENCE_SCHEMA",
     "STATE_DECLARED",
     "STATE_MATCHED",
+    "STATE_AUTHENTICATED_CLAIM",
     "STATE_VERIFIED",
     "STATE_STALE",
     "STATE_INVALID",
