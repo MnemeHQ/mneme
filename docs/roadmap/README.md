@@ -38,6 +38,16 @@ Extend the existing benchmark discipline toward externally legible comparisons o
 
 Prefer frozen fixtures, deterministic scoring, clear treatment/control boundaries, and explicit separation of functional completion from architectural compliance.
 
+### P0 — Decision Index architecture contract (D0)
+
+Establish a canonical, source-independent Decision Index boundary without changing the validated Layer 1 runtime.
+
+The existing `mneme.schemas.Decision` / `Rule` representation remains the architecture runtime projection. D0 must prove that the current ADR corpus can be represented canonically and projected back with identical retrieval, enforcement, ConflictDetector, Architecture Audit, and benchmark behavior.
+
+This is architecture hardening, not a broad enterprise feature build. It must not displace the external-validation priorities above or introduce new ingestion surfaces, rule types, hosted control-plane behavior, or non-code enforcement.
+
+See proposed [ADR-023](../adr/ADR-023-canonical-decision-index-and-runtime-projection-boundary.md) and the D0 implementation issue.
+
 ## NEXT — strengthen the product surface
 
 ### P1 — Architecture Review Skill
@@ -62,11 +72,54 @@ structured architecture review
 
 Initial work should reuse the shipped `/mneme:context`, `/mneme:check`, `/mneme:record`, and `/mneme:review` surfaces before adding new runtime behavior.
 
-### P1 — Confluence ADR ingestion
+### P1 — Decision-source ingestion: Confluence first, Jira when authoritative
 
-Continue the ADR/source-ingestion track where it gives teams a lower-friction path from existing decision records into Mneme.
+Continue the source-ingestion track where it gives teams a lower-friction path from existing decision records into Mneme.
 
-Keep ingestion separate from enforcement semantics: source adapters import architectural intent; the Mneme core decides how that intent is represented and governed.
+Confluence ADR ingestion remains the first explicit target. Jira may follow where a team genuinely records authoritative architectural decisions there. Do not add a Jira adapter merely because Jira is widely integrated elsewhere.
+
+Keep ingestion separate from enforcement semantics: source adapters import decision evidence and intent; the Mneme core owns decision authority, lifecycle, representation, rule compilation, and governance.
+
+Do not assume another review/context platform's Confluence, Jira, Slack, Notion, or monitoring connections are a reusable Mneme ingestion API unless an explicit supported data contract is validated.
+
+### P1 — Read-only Decision MCP consumer surface
+
+After D0 projection parity is proven, define a narrow MCP surface that lets external tools consume authoritative Mneme decisions without becoming part of the enforcement runtime or the source of decision authority.
+
+Candidate operations include:
+
+```text
+get_applicable_decisions(repo, files, change)
+get_decision(decision_id)
+get_architecture_constraints(scope)
+get_protection_status(decision_id)
+get_enforcement_evidence(change_or_event_id)
+explain_block(event_id)
+```
+
+This is a **read-only consumer projection**, not the generic hosted MCP / HTTP control plane listed under Deferred.
+
+The architectural dependency direction is:
+
+```text
+Mneme Decision Index -> external consumers
+```
+
+not:
+
+```text
+external context platform -> Mneme authority
+```
+
+### P1 — Reference review consumer validation
+
+Validate one external review system against the Decision MCP surface after the surface exists. CodeRabbit is a strong candidate because its current product supports custom MCP context during code review.
+
+The experiment should test whether the consumer can retrieve applicable Mneme decisions and use them as authoritative review context while Mneme continues to own deterministic pre-action enforcement.
+
+This is a compatibility/reference integration, not a dependency. Mneme must continue to operate independently through its existing agent, CLI, hook, and CI surfaces.
+
+Do not add CodeRabbit-specific logic to the Decision Index or enforcement core.
 
 ### P1 — Migration-aware Architecture Audit
 
@@ -124,10 +177,11 @@ Revisit only if Anthropic exposes one or more of the missing control surfaces id
 - Team/org policy synchronization.
 - Cross-repository governance.
 - Shared policy packs.
-- Generic hosted MCP / HTTP control plane.
+- Generic hosted MCP / HTTP control plane. This does **not** include the narrow read-only Decision MCP consumer surface described above.
 - Broad SaaS administration, billing, or account surfaces.
 - Higher-level policy DSL beyond the current typed-rule path.
 - Deeper integrations that do not expose a reliable mutation or verification seam.
+- Broad Slack / Teams / Notion decision ingestion until source evidence or user pull shows that those systems contain authoritative decisions Mneme should ingest.
 
 ## Shipped foundation
 
@@ -157,11 +211,13 @@ For current support claims, always use [the canonical integration support matrix
 2. **Reuse the core.** Integrations translate transport and lifecycle events into existing Mneme semantics; they do not copy retrieval or enforcement logic.
 3. **External validation outranks integration count.** A real design-partner result is more valuable than another unvalidated adapter.
 4. **Keep retrieval separate from enforcement.** Context, Skills, RAG, and source ingestion can improve what the agent knows; deterministic rules decide what Mneme can mechanically govern.
-5. **No speculative platform expansion.** Hosted/team/org layers wait for user pull and evidence from the current wedge.
+5. **Preserve decision authority.** External review/context systems may consume Mneme decisions, but they do not become the authoritative Decision Index or determine lifecycle/enforcement semantics.
+6. **No speculative platform expansion.** Hosted/team/org layers wait for user pull and evidence from the current wedge.
 
 ## Related
 
 - [Current phase](../architecture/current-phase.md)
+- [ADR-023: Canonical Decision Index and Runtime Projection Boundary](../adr/ADR-023-canonical-decision-index-and-runtime-projection-boundary.md)
 - [Canonical integration support matrix](../integrations/README.md)
 - [Historical April 2026 roadmap](./2026-04-24-adoption-and-enhancement-roadmap.md)
 - [Changelog](../../CHANGELOG.md)
