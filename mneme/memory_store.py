@@ -148,6 +148,11 @@ class MemoryStore:
                     _load_rule(rule)
                     for rule in d.get("rules", [])
                 ],
+                test_evidence=[
+                    entry
+                    for entry in (d.get("test_evidence") or [])
+                    if isinstance(entry, dict)
+                ],
                 source_path=_resolve_source_path(
                     self.path,
                     d.get("source"),

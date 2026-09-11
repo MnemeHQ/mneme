@@ -1,5 +1,16 @@
 # P1.2 Architecture Audit Redesign — Design Document
 
+> **Amendment (2026-09-11, ADR-023):** after the first Design Partner
+> diagnostic exposed that tier classification depended on record shape
+> (byte-identical decision text changed tier when a structured constraint
+> was added) and that Identified Mneme Potential counted only records
+> immediately expressible by existing rule types, the tier semantics and
+> the Potential formula were amended. Tier intent is now judged from the
+> decision text (prescriptive vs advisory); Potential =
+> (Mneme-ready + Requires modelling) / protection-relevant. See
+> `docs/adr/ADR-023-audit-tier-semantics-and-mneme-potential.md`. The
+> sections below record the original P1.2 freeze.
+
 ## Executive Summary
 
 The current Architecture Audit reports a single "Coverage" percentage (~5% on Mneme repo) that counts all ADRs, agent instructions, and config evidence in one denominator but only credits directly compilable Mneme rules. This makes well-governed repositories appear almost completely ungoverned.

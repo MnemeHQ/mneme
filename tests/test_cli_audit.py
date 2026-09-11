@@ -657,11 +657,15 @@ jobs:
 
         if pr > 0:
             expected_cp = round(p / pr * 100, 1)
-            expected_imp = round((p + m) / pr * 100, 1)
+            # ADR-023: Potential counts Mneme-ready + Requires modelling
+            # (deterministically enforceable in principle, not yet enforced),
+            # not only decisions immediately expressible by existing rules.
+            expected_imp = round((m + r) / pr * 100, 1)
             expected_gap = round((m + r) / pr * 100, 1)
             assert report.current_protection_pct == expected_cp
             assert report.identified_mneme_potential_pct == expected_imp
             assert report.protection_gap_pct == expected_gap
+            assert report.current_protection_pct + report.identified_mneme_potential_pct == 100.0
 
     def test_mixed_status_decisions(self, tmp_path):
         """Decisions with different statuses handled correctly."""

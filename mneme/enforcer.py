@@ -441,27 +441,70 @@ def assess_governability(decision: "Decision") -> GovernabilityAssessment:
 # enforce this today?"; the P1.2 audit asks "how much of this repository's
 # deterministic architectural intent is already protected, and what remains?".
 #
-# Frozen tier contract (docs/plans/p1-2-architecture-audit-redesign.md):
-#   protected          deterministic intent WITH verified enforcement — a
-#                      typed FORBID_LITERAL rule, or external CI evidence
-#                      whose failure is deterministically linked to
-#                      detecting the forbidden token.
-#   mneme_ready        deterministic intent with a concrete safe Mneme
-#                      guardrail identified today (single-term anti-pattern
-#                      or single-term "no X" constraint).
-#   requires_modelling deterministic intent that exists but has no safe
-#                      concrete guardrail (multi-term anti-patterns, multi-
-#                      term "no X" constraints needing interpretation).
-#   guidance           intent not appropriate for deterministic enforcement.
+# Tier semantics (ADR-023; amends the P1.2 freeze in
+# docs/plans/p1-2-architecture-audit-redesign.md after the first Design
+# Partner diagnostic, sagarika29/ai-system-architect):
+#   protected          a documented architectural decision for which Mneme
+#                      has deterministically linked evidence that the
+#                      decision is currently enforced — a typed
+#                      FORBID_LITERAL rule, or external CI evidence whose
+#                      failure is deterministically linked to detecting the
+#                      forbidden token.
+#   mneme_ready        a documented architectural decision that can be
+#                      represented faithfully by an existing Mneme rule
+#                      type, with sufficient scope/applicability
+#                      information to activate it without inventing missing
+#                      architectural intent (an explicit literal
+#                      prohibition — single-term anti-pattern, single-term
+#                      "no X" constraint, or an equivalently explicit
+#                      quoted term ban stated by the decision text).
+#   requires_modelling a documented architectural decision that appears
+#                      deterministically enforceable in principle, but
+#                      Mneme does not yet have an adequate rule type,
+#                      sufficient structured scope, or another required
+#                      representation mechanism.
+#   guidance           a documented statement that is primarily advisory,
+#                      explanatory, aspirational, preference-based, or
+#                      inherently judgment-dependent and should not
+#                      currently be represented as deterministic
+#                      enforcement.
 #
-# Semantic invariants:
-#   - Guidance is evidence-independent: external enforcement-like evidence
-#     never upgrades a guidance decision.
+# Protection-evidence channels (deterministically linked evidence that the
+# decision is currently enforced):
+#   1. typed FORBID_LITERAL rule on the decision record;
+#   2. verified external CI evidence on a literalizable token
+#      (failure deterministically linked to detecting the token);
+#   3. declared test evidence (ADR-024, PASSIVE): an explicit, human-
+#      authored ``test_evidence`` declaration on the decision record.
+#      Ordinary Audit validates declarations passively — selector
+#      well-formedness, cross-decision ambiguity, SHA-pin staleness, and
+#      test-file existence — and annotates them as
+#      ``test:declared:<selector>``. A merely declared entry NEVER
+#      protects: pytest invocation is arbitrary repository-code execution,
+#      so Audit executes no repository-controlled code. The VERIFIED
+#      state requires a trusted producer (CI-produced exact-SHA +
+#      exact-selector ingestion — the next task).
+#
+# Semantic invariants (ADR-023, extended by ADR-024):
+#   - Structure invariance: adding syntactic structure or a constraint
+#     field MUST NOT, by itself, move a decision out of guidance. Intent is
+#     judged from the decision text (prescriptive vs advisory language);
+#     structured prohibition fields carry documented enforcement material
+#     only for decisions whose text is not advisory.
+#   - Guidance is evidence-independent: no enforcement-like evidence —
+#     CI, test, or otherwise — ever upgrades a guidance decision.
 #   - Guidance decisions never enter the protection-relevant denominator.
 #   - mneme_ready always carries an explicit FORBID_LITERAL guardrail
 #     description; a decision cannot be mneme_ready without one.
 #   - Candidate external evidence (token mentioned in CI without failure
 #     semantics) annotates but never upgrades a tier by itself.
+#   - Test evidence protects only through a trusted verification producer
+#     (ADR-024): declared evidence annotates but never protects, and
+#     ordinary Audit executes no repository-controlled code — no pytest,
+#     no conftest, no plugins, no test bodies (passive-Audit invariant).
+#   - Deterministic output for identical inputs: classification is a pure
+#     function of the decision record, the declared evidence, and
+#     repository files.
 
 AUDIT_SCHEMA = "mneme.audit/v1"
 
@@ -500,6 +543,9 @@ class ArchitectureProtectionReport:
     requires_modelling: int
     guidance: int
     current_protection_pct: float
+    # Compat metric (ADR-023): the unprotected deterministic opportunity —
+    # numerically identical to ``protection_gap_pct`` and the exact
+    # complement of ``current_protection_pct``; not an independent metric.
     identified_mneme_potential_pct: float
     protection_gap_pct: float
 
@@ -592,6 +638,116 @@ def _split_no_constraints(
     return single, multi
 
 
+# ── Semantic intent classification (ADR-023) ─────────────────────────────────
+#
+# The audit tier must track what the documented decision MEANS, not which
+# structured fields happen to be populated (P0 finding #1 of the first
+# Design Partner diagnostic: byte-identical decision text flipped guidance
+# → requires_modelling when an unrelated structured constraint was added).
+#
+# Intent is therefore judged from the decision text itself:
+#   - prescriptive language (obligation, requirement, prohibition — must,
+#     never, reject, fail closed, forbidden, enforce, validate, "No X"
+#     headlines) makes a decision protection-relevant regardless of which
+#     structured fields are populated;
+#   - advisory language (prefer, consider, should, can, where practical,
+#     judgment, tradeoffs) marks the statement guidance, and no structured
+#     field can upgrade it;
+#   - structured prohibition fields (anti_patterns / "no X" constraints)
+#     remain documented enforcement material for decisions whose text is
+#     not advisory, preserving the frozen Mneme-ready guardrail derivation
+#     for every pre-existing record shape.
+#
+# Both classifiers are deliberately conservative: prescriptive markers
+# never fire on advisory wording, and absent markers default to guidance
+# (silent text is never inferred to be deterministic). No repository- or
+# partner-specific vocabulary is special-cased.
+
+_ADVISORY_RE = re.compile(
+    r"\b(?:prefer\w*|consider\w*|recommen\w+|should|ideally|optional|"
+    r"flexible|judg(?:e|ment|ement)\w*|trade[- ]?off\w*|aspirational|"
+    r"where\s+practical|when\s+possible|when\s+appropriate|"
+    r"as\s+appropriate|as\s+needed|in\s+general|generally|typically|"
+    r"usually|nice[- ]to[- ]have|may\b|might\b|can\b|could\b)\b",
+    re.IGNORECASE,
+)
+
+_PRESCRIPTIVE_RE = re.compile(
+    r"\b(?:must(?:\s+not)?|mustn't|shall(?:\s+not)?|required|requires|"
+    r"require\b|mandatory|always|never|reject\w*|forbid\w*|banned|ban\b|"
+    r"enforc\w*|validat\w*|fail\w*\s+closed?|fail-closed|do\s+not|don't|"
+    r"cannot|can't|refuse\w*)\b",
+    re.IGNORECASE,
+)
+
+_NO_HEADLINE_RE = re.compile(r"^\s*no\s+\S", re.IGNORECASE)
+
+_QUOTED_TERM_BAN_RE = re.compile(
+    r"\b(?:must\s+not|must\s+never|never|shall\s+not|do\s+not|don't|"
+    r"forbidden|banned|prohibited|avoid|omit|no)\b"
+    r"[^.;\n]{0,64}?"
+    r"\b(?:terms?|words?|phrases?|literals?|strings?|tokens?|"
+    r"keywords?|identifiers?)\b"
+    r"[^\S\n]*[:\-]?[^\S\n]*"
+    r"[`'\"\u201c\u2018]"
+    r"([A-Za-z][A-Za-z0-9_-]{2,48})"
+    r"[`'\"\u201d\u2019]?",
+    re.IGNORECASE,
+)
+
+
+def _is_advisory_text(text: str) -> bool:
+    """True when the decision text reads as advisory/preference wording."""
+    return bool(_ADVISORY_RE.search(text))
+
+
+def _is_prescriptive_text(text: str) -> bool:
+    """True when the decision text states an obligation or prohibition."""
+    return bool(_PRESCRIPTIVE_RE.search(text)) or bool(_NO_HEADLINE_RE.match(text))
+
+
+def _headline_no_tokens(text: str) -> list[str]:
+    """Tokens proposed by a leading "No <single term>" prohibition headline.
+
+    The same derivation ``_split_no_constraints`` applies to a "no X"
+    constraint, applied to the decision text's headline.
+    """
+    m = _NO_CONSTRAINT_RE.match(text.strip())
+    if not m:
+        return []
+    phrase = m.group(1).strip()
+    if _is_literal_rule(phrase):
+        terms = _rule_terms(phrase)
+        if terms:
+            return [terms[0]]
+    return []
+
+
+def _text_literal_tokens(text: str) -> list[str]:
+    """Literalizable tokens stated by the decision text itself.
+
+    Two conservative, deterministic shapes are recognised:
+
+    1. a leading ``No <single term>`` prohibition headline — exactly the
+       derivation ``_split_no_constraints`` applies to a "no X" constraint;
+    2. an explicitly quoted term prohibition ("must not use the term
+       ``seamless``") — the quotes make the banned literal explicit, so a
+       FORBID_LITERAL guardrail is faithful rather than invented.
+
+    Anything else stays Requires-modelling: prose prohibitions that need
+    interpretation are never literalized from text alone.
+    """
+    tokens: list[str] = []
+    for match in _QUOTED_TERM_BAN_RE.finditer(text):
+        token = match.group(1).lower()
+        if token not in tokens:
+            tokens.append(token)
+    for token in _headline_no_tokens(text):
+        if token not in tokens:
+            tokens.append(token)
+    return tokens
+
+
 def _scan_ci_evidence(
     tokens: list[str],
     repo_root: str | Path | None,
@@ -646,13 +802,19 @@ def _proposed_literal_tokens(decision: "Decision") -> list[str]:
 
     Exactly the derivation ``assess_protection`` uses to classify a decision
     ``mneme_ready``: the terms of each single-term anti-pattern, then the
-    forbidden terms of single-term "no X" constraints. Kept beside the
-    assessment so the proposal below and the classification above are the
-    same computation, not two interpretations of it.
+    forbidden terms of single-term "no X" constraints, then tokens stated by
+    the decision text itself (``_text_literal_tokens``), deduplicated in
+    order. Kept beside the assessment so the proposal below and the
+    classification above are the same computation, not two interpretations
+    of it.
     """
     single_aps = [ap for ap in decision.anti_patterns if _is_literal_rule(ap)]
     single_nos, _ = _split_no_constraints(decision.constraints)
-    return [t for ap in single_aps for t in _rule_terms(ap)] + single_nos
+    tokens = [t for ap in single_aps for t in _rule_terms(ap)] + single_nos
+    for token in _text_literal_tokens(decision.decision):
+        if token not in tokens:
+            tokens.append(token)
+    return tokens
 
 
 def propose_literal_rule(decision: "Decision") -> "Rule | None":
@@ -686,13 +848,53 @@ def assess_protection(
 ) -> ProtectionDecisionReport:
     """Assess one Decision's P1.2 protection state.
 
+    Public entry point. It accepts NO trust-bearing parameter: it classifies
+    from the decision's typed rules, the existing CI-enforcement evidence
+    scan, and the passively validated (declared) test evidence only. No
+    caller can inject a value that reaches the ``verified`` test-evidence
+    state through this API.
+    """
+    return _assess_protection(decision, repo_root, None)
+
+
+def _assess_protection(
+    decision: "Decision",
+    repo_root: str | Path | None,
+    test_evidence_results: "dict[str, list] | None",
+) -> ProtectionDecisionReport:
+    """Internal assessment. ``test_evidence_results`` carries pre-computed
+    corpus-level validation records and must never be exposed publicly: it is
+    the only seam that can carry the ``verified`` state, and only the
+    authenticated GitHub component supplies it.
+
     Tier resolution order (highest wins):
+
       1. typed FORBID_LITERAL rule  -> protected (verified enforcement)
       2. verified external CI evidence on a literalizable token -> protected
-      3. single-term anti-pattern or single-term "no X" constraint
-         -> mneme_ready with an explicit FORBID_LITERAL guardrail
-      4. remaining deterministic intent -> requires_modelling
-      5. no deterministic intent -> guidance (evidence-independent)
+      3. trusted verified test evidence on a deterministic decision
+         -> protected (ADR-024; no trusted verification producer exists
+         in M0, so a merely declared or merely matched claim never protects)
+      4. remaining deterministic intent -> mneme_ready or
+         requires_modelling
+      5. advisory or otherwise non-deterministic statement -> guidance
+         (evidence-independent)
+
+    Intent (deterministic vs guidance) is judged from the decision text
+    (``_is_prescriptive_text`` / ``_is_advisory_text``), never from which
+    structured fields happen to be populated (ADR-023 structure-invariance
+    invariant). Structured prohibition fields still supply the concrete
+    guardrail derivation, and they keep non-advisory decisions
+    protection-relevant exactly as in the frozen P1.2 model.
+
+    Test evidence (ADR-024) arrives passively validated in
+    ``test_evidence_results`` (decision id -> verification records) or is
+    validated inline for this decision when a repository root is given.
+    Ordinary Audit never executes repository-controlled code: a merely
+    declared entry annotates ``evidence_sources`` as
+    ``test:declared:<selector>`` and never upgrades a tier. Only an
+    authenticated verification producer (not yet present in M0) may produce
+    ``verified`` and thereby upgrade a deterministic decision to Protected;
+    advisory decisions are never upgraded by any channel.
     """
     literal_rules = [
         rule for rule in decision.rules if rule.type == "FORBID_LITERAL"
@@ -701,8 +903,26 @@ def assess_protection(
     multi_aps = [ap for ap in decision.anti_patterns if not _is_literal_rule(ap)]
     single_nos, multi_nos = _split_no_constraints(decision.constraints)
 
-    has_deterministic_intent = bool(
-        literal_rules or single_aps or multi_aps or single_nos or multi_nos
+    if literal_rules:
+        return ProtectionDecisionReport(
+            id=decision.id,
+            decision=decision.decision,
+            status=decision.status,
+            intent="deterministic",
+            protection_tier="protected",
+            mneme_guardrail=f"FORBID_LITERAL: {literal_rules[0].value}",
+            evidence_confidence="verified",
+            evidence_sources=[],
+        )
+
+    documented_enforcement = bool(
+        single_aps or multi_aps or single_nos or multi_nos
+    )
+    advisory = _is_advisory_text(decision.decision)
+    prescriptive = _is_prescriptive_text(decision.decision)
+
+    has_deterministic_intent = prescriptive or (
+        documented_enforcement and not advisory
     )
 
     if not has_deterministic_intent:
@@ -717,16 +937,26 @@ def assess_protection(
             evidence_sources=[],
         )
 
-    if literal_rules:
-        return ProtectionDecisionReport(
-            id=decision.id,
-            decision=decision.decision,
-            status=decision.status,
-            intent="deterministic",
-            protection_tier="protected",
-            mneme_guardrail=f"FORBID_LITERAL: {literal_rules[0].value}",
-            evidence_confidence="verified",
-            evidence_sources=[],
+    # Declared test evidence (ADR-024), passively validated once per corpus
+    # by the aggregate report; single-decision callers validate inline.
+    # PASSIVE-AUDIT INVARIANT: no repository-controlled code is executed —
+    # no pytest, no conftest, no plugins. The public path can only produce
+    # "declared"/"matched_unverified"/"authenticated_ci_claim"; only the
+    # authenticated producer (none in M0) may carry "verified", which is the
+    # only test-evidence state upgraded to protected.
+    if repo_root is not None and test_evidence_results is None:
+        from mneme.evidence import verify_test_evidence
+
+        test_evidence_results = verify_test_evidence([decision], repo_root)
+    test_sources: list[str] = []
+    verified_by_test = False
+    if test_evidence_results:
+        from mneme.evidence import evidence_source_strings
+
+        verifications = test_evidence_results.get(decision.id, [])
+        test_sources = evidence_source_strings(verifications)
+        verified_by_test = any(
+            v.state == "verified" for v in verifications
         )
 
     tokens = _proposed_literal_tokens(decision)
@@ -741,6 +971,10 @@ def assess_protection(
         if evidence_confidence == "verified":
             tier = "protected"
 
+    if verified_by_test:
+        tier = "protected"
+        evidence_confidence = "verified"
+
     return ProtectionDecisionReport(
         id=decision.id,
         decision=decision.decision,
@@ -749,22 +983,49 @@ def assess_protection(
         protection_tier=tier,
         mneme_guardrail=proposed_guardrail,
         evidence_confidence=evidence_confidence,
-        evidence_sources=evidence_sources,
+        evidence_sources=[*test_sources, *evidence_sources],
     )
 
 
 def generate_protection_report(
     decisions: list["Decision"],
     repo_root: str | Path | None = None,
+    ci_evidence_document: str | None = None,
 ) -> ArchitectureProtectionReport:
     """Assess a corpus and aggregate the P1.2 summary.
+
+    Public entry point. It accepts NO trust-bearing parameter: test evidence
+    is passively validated (declared / matched claim only); the ``verified``
+    state is unreachable here. ``ci_evidence_document``, when supplied, is
+    UNTRUSTED material and can at most produce a matching CI claim.
 
     Only active decisions count toward any tier or the protection-relevant
     denominator; superseded and deprecated decisions appear in ``decisions``
     for provenance but are excluded from all counts.
     """
+    test_evidence_results = None
+    if repo_root is not None:
+        from mneme.evidence import verify_test_evidence
+
+        test_evidence_results = verify_test_evidence(
+            decisions, repo_root, ci_evidence_document=ci_evidence_document,
+        )
+    return _build_report(decisions, repo_root, test_evidence_results)
+
+
+def _build_report(
+    decisions: list["Decision"],
+    repo_root: str | Path | None,
+    test_evidence_results: "dict[str, list] | None",
+) -> ArchitectureProtectionReport:
+    """Internal aggregation over pre-computed verification results.
+
+    ``test_evidence_results`` may carry the ``verified`` state and is only
+    ever supplied by the authenticated GitHub component; it must never be
+    exposed on a public API.
+    """
     reports = [
-        assess_protection(decision, repo_root=repo_root)
+        _assess_protection(decision, repo_root, test_evidence_results)
         for decision in decisions
     ]
     active = [r for r in reports if r.status == "active"]
@@ -776,9 +1037,32 @@ def generate_protection_report(
     guidance = sum(1 for r in active if r.protection_tier == "guidance")
     protection_relevant = protected + mneme_ready + requires_modelling
 
+    # Metric formulas (ADR-023, exact numerator/denominator):
+    #
+    #   Current Protection          = P / PR × 100
+    #       fraction of protection-relevant decisions with verified
+    #       deterministic enforcement.
+    #   Identified Mneme Potential  = (M + R) / PR × 100
+    #       the UNPROTECTED DETERMINISTIC OPPORTUNITY: fraction of
+    #       protection-relevant decisions whose documented meaning is
+    #       deterministically enforceable in principle and not yet
+    #       enforced — representable by an existing rule type today
+    #       (Mneme-ready) or requiring richer modelling (Requires
+    #       modelling). Guidance never enters the numerator or the
+    #       denominator. This is numerically identical to the Protection
+    #       Gap by construction and is the exact complement of Current
+    #       Protection (Potential = 100 − Current Protection); it is NOT
+    #       an independent second metric and user-facing output must not
+    #       present the two as separate findings. A future, genuinely
+    #       distinct metric may express immediately protectable coverage
+    #       as (P + M) / PR, with Requires-modelling as the product gap.
+    #   Protection Gap              = (M + R) / PR × 100
+    #       the actionable shortfall — numerically identical to Potential
+    #       by construction, framed as what remains rather than what
+    #       Mneme could protect.
     current_protection = round(protected / protection_relevant * 100, 1) if protection_relevant else 0.0
     identified_potential = (
-        round((protected + mneme_ready) / protection_relevant * 100, 1)
+        round((mneme_ready + requires_modelling) / protection_relevant * 100, 1)
         if protection_relevant
         else 0.0
     )
