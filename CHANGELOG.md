@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+### Added
+
+- Declared test-evidence ingestion for the Architecture Audit (ADR-024,
+  passive): a decision record may declare explicit `test_evidence` entries
+  linking it to a test that enforces it. Ordinary `mneme audit` is
+  PASSIVE — it executes no repository-controlled code (no pytest, no
+  conftest, no plugins) — and validates declared linkages passively
+  (well-formed unambiguous pytest selector, exact repository HEAD SHA
+  pin, existing test file). A declared linkage annotates evidence
+  sources as `test:declared:<selector>` but never protects: the VERIFIED
+  state requires a trusted verification producer (CI-produced exact-SHA +
+  exact-selector ingestion — next task). Guidance is never upgraded; every
+  failure mode (missing selector, stale or unavailable SHA, ambiguous
+  mapping, malformed declaration) fails closed with a deterministic
+  diagnostic. `mneme.audit/v1` unchanged.
+
 ### Fixed
 
 - P1.2 Architecture Audit tier semantics (ADR-023): intent is now judged

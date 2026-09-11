@@ -469,21 +469,42 @@ def assess_governability(decision: "Decision") -> GovernabilityAssessment:
 #                      currently be represented as deterministic
 #                      enforcement.
 #
-# Semantic invariants (ADR-023):
+# Protection-evidence channels (deterministically linked evidence that the
+# decision is currently enforced):
+#   1. typed FORBID_LITERAL rule on the decision record;
+#   2. verified external CI evidence on a literalizable token
+#      (failure deterministically linked to detecting the token);
+#   3. declared test evidence (ADR-024, PASSIVE): an explicit, human-
+#      authored ``test_evidence`` declaration on the decision record.
+#      Ordinary Audit validates declarations passively — selector
+#      well-formedness, cross-decision ambiguity, SHA-pin staleness, and
+#      test-file existence — and annotates them as
+#      ``test:declared:<selector>``. A merely declared entry NEVER
+#      protects: pytest invocation is arbitrary repository-code execution,
+#      so Audit executes no repository-controlled code. The VERIFIED
+#      state requires a trusted producer (CI-produced exact-SHA +
+#      exact-selector ingestion — the next task).
+#
+# Semantic invariants (ADR-023, extended by ADR-024):
 #   - Structure invariance: adding syntactic structure or a constraint
 #     field MUST NOT, by itself, move a decision out of guidance. Intent is
 #     judged from the decision text (prescriptive vs advisory language);
 #     structured prohibition fields carry documented enforcement material
 #     only for decisions whose text is not advisory.
-#   - Guidance is evidence-independent: external enforcement-like evidence
-#     never upgrades a guidance decision.
+#   - Guidance is evidence-independent: no enforcement-like evidence —
+#     CI, test, or otherwise — ever upgrades a guidance decision.
 #   - Guidance decisions never enter the protection-relevant denominator.
 #   - mneme_ready always carries an explicit FORBID_LITERAL guardrail
 #     description; a decision cannot be mneme_ready without one.
 #   - Candidate external evidence (token mentioned in CI without failure
 #     semantics) annotates but never upgrades a tier by itself.
+#   - Test evidence protects only through a trusted verification producer
+#     (ADR-024): declared evidence annotates but never protects, and
+#     ordinary Audit executes no repository-controlled code — no pytest,
+#     no conftest, no plugins, no test bodies (passive-Audit invariant).
 #   - Deterministic output for identical inputs: classification is a pure
-#     function of the decision record and repository files.
+#     function of the decision record, the declared evidence, and
+#     repository files.
 
 AUDIT_SCHEMA = "mneme.audit/v1"
 
@@ -824,6 +845,7 @@ def propose_literal_rule(decision: "Decision") -> "Rule | None":
 def assess_protection(
     decision: "Decision",
     repo_root: str | Path | None = None,
+    test_evidence_results: "dict[str, list] | None" = None,
 ) -> ProtectionDecisionReport:
     """Assess one Decision's P1.2 protection state.
 
@@ -831,10 +853,11 @@ def assess_protection(
 
       1. typed FORBID_LITERAL rule  -> protected (verified enforcement)
       2. verified external CI evidence on a literalizable token -> protected
-      3. deterministic intent representable by an existing rule type
-         with sufficient scope -> mneme_ready with an explicit
-         FORBID_LITERAL guardrail
-      4. remaining deterministic intent -> requires_modelling
+      3. trusted verified test evidence on a deterministic decision
+         -> protected (ADR-024; no trusted verification producer exists
+         in M0, so declared evidence annotates only)
+      4. remaining deterministic intent -> mneme_ready or
+         requires_modelling
       5. advisory or otherwise non-deterministic statement -> guidance
          (evidence-independent)
 
@@ -844,6 +867,15 @@ def assess_protection(
     invariant). Structured prohibition fields still supply the concrete
     guardrail derivation, and they keep non-advisory decisions
     protection-relevant exactly as in the frozen P1.2 model.
+
+    Test evidence (ADR-024) arrives passively validated in
+    ``test_evidence_results`` (decision id -> verification records) or is
+    validated inline for this decision when a repository root is given.
+    Ordinary Audit never executes repository-controlled code: a merely
+    declared entry annotates ``evidence_sources`` as
+    ``test:declared:<selector>`` and never upgrades a tier; only a trusted
+    verification producer (CI-produced exact-SHA + exact-selector result)
+    may establish protection, and advisory decisions are never upgraded.
     """
     literal_rules = [
         rule for rule in decision.rules if rule.type == "FORBID_LITERAL"
@@ -886,6 +918,26 @@ def assess_protection(
             evidence_sources=[],
         )
 
+    # Declared test evidence (ADR-024), passively validated once per corpus
+    # by the aggregate report; single-decision callers validate inline.
+    # PASSIVE-AUDIT INVARIANT: no repository-controlled code is executed —
+    # no pytest, no conftest, no plugins. Only a trusted verification
+    # producer (none exists in M0) may carry the VERIFIED state.
+    if repo_root is not None and test_evidence_results is None:
+        from mneme.evidence import verify_test_evidence
+
+        test_evidence_results = verify_test_evidence([decision], repo_root)
+    test_sources: list[str] = []
+    verified_by_test = False
+    if test_evidence_results:
+        from mneme.evidence import evidence_source_strings
+
+        verifications = test_evidence_results.get(decision.id, [])
+        test_sources = evidence_source_strings(verifications)
+        verified_by_test = any(
+            v.state == "verified" for v in verifications
+        )
+
     tokens = _proposed_literal_tokens(decision)
     tier: ProtectionTier = "mneme_ready" if tokens else "requires_modelling"
     proposed_guardrail = f"FORBID_LITERAL: {tokens[0]}" if tokens else None
@@ -898,6 +950,10 @@ def assess_protection(
         if evidence_confidence == "verified":
             tier = "protected"
 
+    if verified_by_test:
+        tier = "protected"
+        evidence_confidence = "verified"
+
     return ProtectionDecisionReport(
         id=decision.id,
         decision=decision.decision,
@@ -906,7 +962,7 @@ def assess_protection(
         protection_tier=tier,
         mneme_guardrail=proposed_guardrail,
         evidence_confidence=evidence_confidence,
-        evidence_sources=evidence_sources,
+        evidence_sources=[*test_sources, *evidence_sources],
     )
 
 
@@ -919,9 +975,22 @@ def generate_protection_report(
     Only active decisions count toward any tier or the protection-relevant
     denominator; superseded and deprecated decisions appear in ``decisions``
     for provenance but are excluded from all counts.
+
+    Declared test evidence (ADR-024) is verified once for the whole corpus
+    — enabling cross-decision ambiguity checks — and passed into every
+    per-decision assessment.
     """
+    test_evidence_results = None
+    if repo_root is not None:
+        from mneme.evidence import verify_test_evidence
+
+        test_evidence_results = verify_test_evidence(decisions, repo_root)
     reports = [
-        assess_protection(decision, repo_root=repo_root)
+        assess_protection(
+            decision,
+            repo_root=repo_root,
+            test_evidence_results=test_evidence_results,
+        )
         for decision in decisions
     ]
     active = [r for r in reports if r.status == "active"]

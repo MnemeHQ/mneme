@@ -221,7 +221,14 @@ class Decision:
         anti_patterns: Explicitly forbidden approaches,
                        e.g. ["introduce ORM", "add migration layer"].
         rules:          Mechanically enforceable typed rules. Unlike legacy
-                       constraint prose, each type has exact semantics.
+                        constraint prose, each type has exact semantics.
+        test_evidence:  Declared test-evidence entries (ADR-024). Each entry
+                        is an explicit, human-authored linkage from this
+                        decision to a test that enforces it:
+                        {"selector": <pytest node id>,
+                         "sha": <optional pinned repository SHA>}.
+                        Optional and additive; absent or malformed entries
+                        contribute no protection evidence (fail closed).
         source_path:    Resolved ADR source path when provenance is available.
                        Runtime-only; persisted under the existing ``source``
                        block rather than as a top-level Decision field.
@@ -244,6 +251,7 @@ class Decision:
     created_at: str = ""
     updated_at: str = ""
     rules: list[Rule] = field(default_factory=list)
+    test_evidence: list[dict[str, str]] = field(default_factory=list)
     source_path: str = ""
     memory_path: str = ""
     status: str = "active"
