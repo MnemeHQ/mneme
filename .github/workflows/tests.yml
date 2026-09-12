@@ -1,11 +1,19 @@
 name: tests
 
-# Runs the canonical pytest suite (pyproject [tool.pytest.ini_options]
-# testpaths = ["tests"]) on every PR to main and on direct pushes to main.
+# Test batteries (single source of truth: scripts/run_test_battery.py;
+# see CONTRIBUTING.md and docs/releases/RELEASING.md):
 #
-# CONTRIBUTING.md requires all tests to pass before a pull request can be
-# merged; this workflow makes that requirement enforceable in CI. The
-# benchmark suite is intentionally not invoked here — it is a separate
+# - pull_request            -> gate     curated critical battery, NOT the full suite
+# - push/merge to main      -> main     complete canonical suite (pyproject
+#                                          [tool.pytest.ini_options] testpaths = ["tests"])
+#                             plus the langchain-extra integration suite
+# - workflow_dispatch       -> explicit run of one battery (gate | main | release);
+#   battery=release is the complete source validation and must be run once on
+#   the exact release-candidate SHA before tagging and publishing (see
+#   docs/releases/RELEASING.md). A successful full-suite result belongs to the
+#   exact SHA; tag/publish alone does not rerun it.
+#
+# The benchmark harness is intentionally not invoked here — it is a separate
 # charter instrument (see CONTRIBUTING.md and the Layer 1 freeze docs).
 #
 # Python 3.11 is the declared minimum (requires-python >= 3.11).
@@ -15,13 +23,25 @@ on:
     branches: [main]
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      battery:
+        description: "Battery to run: gate | main | release"
+        required: true
+        default: gate
+        type: choice
+        options:
+          - gate
+          - main
+          - release
 
 permissions:
   contents: read
 
 jobs:
-  pytest:
-    name: pytest
+  gate:
+    if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.battery == 'gate')
+    name: gate (PR battery)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,12 +54,32 @@ jobs:
       - name: Install package with dev dependencies
         run: python -m pip install -e ".[dev]"
 
-      - name: Run test suite
-        run: python -m pytest
+      - name: Run gate battery
+        run: python scripts/run_test_battery.py gate
+
+  main:
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.battery == 'main')
+    name: main (full canonical suite)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install package with dev dependencies
+        run: python -m pip install -e ".[dev]"
+
+      - name: Run main battery
+        run: python scripts/run_test_battery.py main
 
   # The LangChain integration's live governed-loop tests require the
   # optional extra; the canonical job above intentionally runs without it.
+  # Part of the broader main battery (push to main, or a dispatched main run).
   pytest-langchain:
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.battery == 'main')
     name: pytest (langchain extra)
     runs-on: ubuntu-latest
     steps:
@@ -55,3 +95,27 @@ jobs:
 
       - name: Run LangChain integration tests
         run: python -m pytest tests/integrations/langchain
+
+  # Complete source validation on the exact release-candidate SHA. Never
+  # triggered by tag/publish events; dispatch it explicitly on the RC ref and
+  # record the run URL in the release validation evidence document.
+  release:
+    if: github.event_name == 'workflow_dispatch' && inputs.battery == 'release'
+    name: release (complete source validation)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install package with dev and langchain extras
+        run: python -m pip install -e ".[dev,langchain]"
+
+      - name: Assert the LangChain extra is importable
+        run: python -c "import langchain, langgraph, langchain_core"
+
+      - name: Run release battery
+        run: python scripts/run_test_battery.py release

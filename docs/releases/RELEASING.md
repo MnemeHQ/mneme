@@ -1,27 +1,45 @@
 # Releasing `mneme-hq` to PyPI
 
-The exact, manual procedure for publishing the `mneme-hq` package. It is
-intentionally **not** automated — there is no PyPI GitHub Actions workflow, and
-adding one is out of scope for a release-alignment PR. Every publish is a
-deliberate, operator-run sequence.
+How `mneme-hq` releases are actually published. The build and upload are
+automated: after the release tag exists, publishing the GitHub release for
+that tag triggers the **Publish to PyPI** workflow
+([`.github/workflows/release.yml`](../../.github/workflows/release.yml)),
+which builds both artifacts and uploads them to PyPI through **Trusted
+Publishing** (OIDC, `pypa/gh-action-pypi-publish`, `pypi` environment
+approval). There is no manual `twine upload` step.
+
+What stays deliberately manual is the decision to release: an operator
+validates the release candidate against the exact SHA, tags it, and publishes
+the GitHub release. Publication never bypasses that validation.
 
 All commands assume:
 
-- You are in the **repository root** (this is the build root; `pyproject.toml`
-  lives here).
-- Windows 11 with **PowerShell** is the reference environment (this is where the
-  hook is exercised in CI). Windows-specific steps below are written in
-  PowerShell; the build, `twine`, and `pytest` invocations are cross-platform
-  and run as shown under PowerShell.
+- You are in the **repository root** (the build root; `pyproject.toml` lives
+  here).
+- Windows 11 with **PowerShell** is the reference environment. The
+  `gh`, `git`, and `python` invocations below are cross-platform.
 
 > **PyPI artifacts are immutable.** Once a version is uploaded to PyPI it can
-> never be replaced — only *yanked*. A yanked release still occupies its version
-> number forever; you cannot re-upload `0.5.2` with different bytes. Do every
-> verification step below **before** `twine upload`, because upload is the point
-> of no return. If something is wrong after upload, the only remedy is to yank
-> and publish a new patch version.
+> never be replaced — only *yanked*. A yanked release still occupies its
+> version number forever; you cannot re-upload `0.7.0` with different bytes.
+> Do every validation step below **before** creating the GitHub release,
+> because that is the point of no return. If something is wrong after upload,
+> the only remedy is to yank and publish a new patch version.
 
 ---
+
+## Test batteries used in this procedure
+
+Defined in [`scripts/run_test_battery.py`](../../scripts/run_test_battery.py);
+see [CONTRIBUTING.md](../../CONTRIBUTING.md) for the full table.
+
+| Battery    | What it is |
+| ---------- | ---------- |
+| `gate`     | Critical paths; runs on every pull request. |
+| `main`     | Complete canonical suite; runs on push/merge to `main` (plus the langchain-extra job). |
+| `release`  | Canonical suite **plus** the langchain-extra integration suite — the complete source validation. |
+| `artifact-smoke` | Validates the published package bytes from a clean install (automated after publication). |
+| `benchmark`| Charter instrument for retrieval/enforcement behavioural semantics; separate from all pytest batteries. |
 
 ## 1. Start from a clean `main`
 
@@ -31,313 +49,183 @@ git pull --ff-only
 git status               # must report a clean working tree
 ```
 
-Confirm the release commit is exactly what you intend to ship. Do not build from
-a feature branch, a dirty tree, or a detached checkout.
+## 2. Prepare the release commit (the release-candidate SHA)
 
-## 2. Create an isolated Python environment
+Open a release-prep PR that:
 
-Never build or publish from your day-to-day interpreter. Use a throwaway venv so
-build/publish tooling can never leak into (or be contaminated by) other work.
+- bumps the package version in `pyproject.toml` (`[project].version`) **and**
+  `mneme/__init__.py` (`__version__`);
+- adds the `CHANGELOG.md` entry for the new version;
+- adds the release notes file `docs/releases/vX.Y.Z.md`.
 
-Create it **outside the repository** — a venv inside the working tree is not
-ignored and would make the later clean-tree check (`git status --short`) fail.
-Do not add a `.gitignore` rule just for the release environment; keep it out of
-the tree entirely and clean it up explicitly in step 17.
+Squash-merge it into `main`. The resulting squash commit is the
+**release-candidate SHA** — the exact commit the tag must point at.
+
+Because the prep commit changes package metadata (the version), it requires
+its own complete validation on that exact SHA (step 3) — a full-suite pass on
+an earlier commit does not carry over.
+
+## 3. Run the release battery once on the exact release-candidate SHA
+
+> **Invariant: a successful full release-suite result belongs to an exact Git
+> SHA.** One complete pass per release-candidate SHA is mandatory before
+> tagging and publishing.
+
+Dispatch the release battery on the release-candidate ref:
 
 ```powershell
-$releaseVenv = Join-Path $env:TEMP "mneme-hq-release-0.5.2"
+# If the release candidate is the tip of main (usual case):
+gh workflow run tests.yml --ref main -f battery=release
 
+# If the release candidate is a tag (e.g. an RC tag):
+gh workflow run tests.yml --ref vX.Y.Z -f battery=release
+```
+
+The run must be green (canonical suite plus the langchain-extra suite, in the
+`release (complete source validation)` job). **Acceptable alternative:** the
+push-to-`main` run for that exact SHA (the `main` job plus the
+`pytest (langchain extra)` job) — it is the same content as the release
+battery and equally binds to the SHA.
+
+Record the run URL and the exact SHA in
+`docs/releases/vX.Y.Z-validation.md` (see
+[`v0.7.0-validation.md`](v0.7.0-validation.md) for the established format).
+
+### When a changed SHA invalidates a full-suite result
+
+Re-run the release battery (step 3) on the new SHA if any of the following
+changed since the validated result:
+
+| Change on the SHA                                                       | Full release battery |
+| ----------------------------------------------------------------------- | -------------------- |
+| Runtime/application code (`mneme/`, packaging-affecting repo files)      | **required again**   |
+| Tests                                                                    | **required again**   |
+| Dependencies or package metadata capable of affecting runtime/install    | **required again**   |
+| Docs or release notes only                                               | not required         |
+| Release-workflow-only changes (`.github/workflows/*`)                    | validate the workflow appropriately; the source test suite is **not** rerun unless the shipped package source changed |
+
+## 4. Pre-tag artifact validation (isolated venv)
+
+Run this on the exact release-candidate SHA, from a throwaway venv created
+**outside the repository** (a venv inside the working tree would make the
+clean-tree check fail). Python >= 3.11:
+
+```powershell
+$releaseVenv = Join-Path $env:TEMP "mneme-hq-release-X.Y.Z"
 Remove-Item -Recurse -Force $releaseVenv -ErrorAction SilentlyContinue
 py -3.11 -m venv $releaseVenv
 & "$releaseVenv\Scripts\Activate.ps1"
 
-python --version          # confirm >= 3.11 (the package requires-python)
-```
-
-> If PowerShell blocks the activation script, allow it for this process only:
-> `Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned`.
-
-**Keep this same PowerShell session open through the entire procedure** — it
-holds the `$releaseVenv` variable and the activated venv. The session is
-deactivated exactly once (step 13, before the clean `pipx` validation) and the
-release venv is removed in step 17; only then do you close the shell. Do not
-close the shell after upload.
-
-## 3. Install build, twine, and test dependencies
-
-```powershell
 python -m pip install --upgrade pip
 python -m pip install build twine
-python -m pip install -e ".[dev]"     # pytest + the package itself
+python -m pip install -e ".[dev]"
 ```
 
-## 4. Remove previous build output
-
-Stale `build/`, `dist/`, or egg-info directories can smuggle old artifacts into
-a fresh upload. Delete them first.
+Remove stale build output, then build both artifacts:
 
 ```powershell
 Remove-Item -Recurse -Force build, dist, *.egg-info -ErrorAction SilentlyContinue
-```
-
-## 5. Run the full test suite
-
-```powershell
-python -m pytest
-```
-
-All tests must pass. Because the package is installed (step 3), the
-`mneme` CLI is on `PATH`, so the Claude Code end-to-end tests
-(`tests/integrations/claude_code/test_hook_e2e.py`) run instead of skipping —
-including the compliant-Write / blocked-Write cases.
-
-## 6. Build both wheel and sdist
-
-```powershell
 python -m build
 ```
 
-This produces two artifacts under `dist/`:
-
-- `mneme_hq-0.5.2-py3-none-any.whl` (wheel)
-- `mneme_hq-0.5.2.tar.gz` (sdist)
-
-## 7. Run `twine check`
+Check metadata renders, inspect the artifacts, and run the packaging
+contract — the authoritative pre-publish check of name, version, and entry
+points, read directly from the artifacts:
 
 ```powershell
-python -m twine check dist/*
-```
-
-Both artifacts must report `PASSED` (valid metadata, renderable README).
-
-## 8. Inspect the built artifacts
-
-Confirm exactly the two expected files exist and nothing stale remains:
-
-```powershell
-Get-ChildItem dist
-```
-
-## 9. Verify package name, version, and console scripts from the artifacts
-
-**The packaging contract test is the authoritative check.** With `dist/`
-populated (step 6), run it against the built wheel and sdist:
-
-```powershell
+python -m twine check dist/*      # both artifacts must report PASSED
+Get-ChildItem dist                # exactly the two expected artifacts
 python -m pytest tests/test_packaging_contract.py -v
 ```
 
-It asserts, directly from the artifacts:
+The contract test asserts exactly one `mneme_hq-X.Y.Z-*.whl` and one
+`mneme_hq-X.Y.Z.tar.gz`, the declared name/version in wheel METADATA and
+sdist PKG-INFO, and the exact three console scripts
+(`mneme`, `mneme-hook`, `mneme-kiro-hook`) in the wheel's `entry_points.txt`.
+Do not proceed unless it passes. (`pip show mneme-hq` only reports what is
+installed in the active venv — it is not artifact inspection.)
 
-- exactly one `mneme_hq-0.5.2-*.whl` and exactly one `mneme_hq-0.5.2.tar.gz`;
-- the wheel `*.dist-info/METADATA` declares `Name: mneme-hq` and
-  `Version: 0.5.2`;
-- the sdist `PKG-INFO` declares the same name and version;
-- the wheel `entry_points.txt` `[console_scripts]` is *exactly*:
-  ```
-  mneme = mneme.cli:main
-  mneme-hook = mneme.integrations.claude_code.hook:cli_main
-  ```
+## 5. Tag the exact release-candidate SHA
 
-The declared version comes from `pyproject.toml`, so the test also proves the
-artifacts match the version you intend to ship. Do not proceed unless it passes.
-
-> `python -m pip show mneme-hq` (`Name: mneme-hq`, `Version: 0.5.2`) is only a
-> **source-environment sanity check** — it reports whatever is installed in the
-> active venv (the editable source from step 3), **not** the contents of the
-> built artifacts. It is not artifact inspection; the contract test above is.
-
-## 10. Tag the exact commit used for the build
-
-Tag the commit you just built and tested — not a later one.
+Tag the commit you validated in steps 3–4 — never a different commit:
 
 ```powershell
-git tag -a v0.5.2 -m "mneme-hq 0.5.2"
-git push origin v0.5.2
+git tag -a vX.Y.Z -m "mneme-hq X.Y.Z" <release-candidate-sha>
+git push origin vX.Y.Z
 ```
 
-## 11. Upload only the verified wheel and sdist
+Tags in this repo mark durable milestones only (see `CLAUDE.md`): `v0.x.y`
+product releases — not site deployments or CI housekeeping.
 
-Use a **project-scoped** PyPI API token (scoped to the `mneme-hq` project, not an
-account-wide token). Pass only the username on the command line and let Twine
-prompt for the token at its **hidden password prompt** — do not put the token in
-the command:
+## 6. Publish: create the GitHub release
+
+Only after steps 3–4 pass, publish the GitHub release for the tag — from the
+repository root, so the notes path is repository-root-relative:
 
 ```powershell
-python -m twine upload `
-  --username __token__ `
-  dist/mneme_hq-0.5.2-py3-none-any.whl `
-  dist/mneme_hq-0.5.2.tar.gz
+gh release create vX.Y.Z `
+  --title "mneme-hq X.Y.Z" `
+  --notes-file .\docs\releases\vX.Y.Z.md
 ```
 
-Upload the two named artifacts explicitly — not `dist/*` — so nothing unexpected
-in `dist/` can be published by accident.
+Publishing the release automatically starts the **Publish to PyPI** workflow:
+`build` (`python -m build`, artifact upload) then `publish` (Trusted
+Publishing to PyPI). The `pypi` environment requires a reviewer approval
+before the upload proceeds. Monitor the workflow run to success.
 
-Enter the project-scoped PyPI API token **only at Twine's password prompt**. The
-token must never be placed in:
+There is no token handling for the operator: Trusted Publishing issues
+short-lived OIDC credentials to the workflow. The former manual-upload
+procedure (project-scoped PyPI token at Twine's hidden prompt) is retired —
+do not upload manually.
 
-- a PowerShell command (or any command line);
-- the `TWINE_PASSWORD` environment variable;
-- shell history;
-- a script;
-- a repository file;
-- a Twine config file (e.g. `~/.pypirc`).
+## 7. Post-publication artifact smoke
 
-The password prompt reads the token directly and does not echo it, so it never
-enters your PowerShell history. If the token is ever pasted into a command,
-echoed, or logged anywhere, revoke it in the PyPI project settings and issue a
-new one.
+After a successful **Publish to PyPI** run for a `v*` tag, the
+**release smoke** workflow
+([`.github/workflows/release-smoke.yml`](../../.github/workflows/release-smoke.yml))
+runs automatically:
 
-## 12. Confirm the token was not persisted
+- waits until PyPI serves the published version;
+- installs it with `pipx` (a clean install of the published artifact — never
+  the source checkout);
+- verifies the installed version and CLI surface (`mneme --help` shows
+  `setup` / `audit` / `protect`; `mneme setup --help` shows `--audit-ref`;
+  `mneme protect --help` shows the subcommands);
+- runs a disposable-repo clean-setup check against the installed package
+  (`state: setup`, `enforcement: not_enabled`).
 
-Because the token was typed only at Twine's hidden password prompt, there is
-nothing to unset — it was never assigned to an environment variable, a command,
-a script, a config file, or a repository file. Do **not** close this shell:
-later steps still need the active session and the `$releaseVenv` variable. If the
-token was ever echoed or logged, revoke it in PyPI and issue a new one before
-continuing.
-
-## 13. Validate the public package from a clean `pipx` environment
-
-Verify what PyPI actually serves — from a *fresh*, isolated environment, not the
-build venv (which already has the local source package installed). Uninstall
-first so you cannot accidentally validate a stale install, then pin the exact
-published version.
+This is the `artifact-smoke` battery: it validates the package bytes PyPI
+actually serves and never re-runs the source test suite. To re-verify any
+published version manually:
 
 ```powershell
-deactivate
-pipx uninstall mneme-hq
-pipx install "mneme-hq==0.5.2"
-
-Get-Command mneme
-Get-Command mneme-hook
-mneme --help
+gh workflow run release-smoke.yml -f version=X.Y.Z
 ```
 
 Notes:
 
-- It is fine if `pipx uninstall` reports the package was not installed — the
-  point is to guarantee a clean starting state.
-- Confirm both console scripts resolve with `Get-Command` (they must point into
-  the `pipx` environment, not your source checkout).
-- Only `mneme` has a `--help`. **Do not run `mneme-hook --help`** — `mneme-hook`
-  is the Claude Code hook entrypoint: it reads a hook event from **stdin**, so
-  invoking it interactively (with or without `--help`) blocks waiting for EOF.
-  Its real validation is the Claude Code smoke test in steps 14–15.
+- **Do not run `mneme-hook` interactively.** It is a Claude Code hook
+  entrypoint that reads a hook event from stdin; invoking it with or without
+  `--help` blocks waiting for EOF. Its enforcement path is exercised in the
+  pytest source batteries and through the real plugin path in operator smoke
+  tests.
+- The pytest end-to-end hook tests (`tests/integrations/claude_code/`) are
+  source-level regression coverage inside the canonical suite — not
+  public-package validation. The published package is validated only by the
+  artifact smoke above.
 
-> The pytest end-to-end tests in
-> `tests/integrations/claude_code/test_hook_e2e.py` are **source-level
-> regression tests**, not public-package validation. They import the hook
-> adapter directly from the source checkout, and the adapter launches
-> `[sys.executable, "-m", "mneme", ...]`; run from the repository root that
-> can execute the **local source** package rather than the `pipx`-installed
-> public one. Keep running them (step 5) as regression coverage, but validate
-> the *published* package only through the real plugin path below.
+## 8. Clean up
 
-## 14. Validate the plugin with Claude Code strict validation
-
-This and the next step are the **real** public-package validation: they exercise
-the `pipx`-installed `mneme` / `mneme-hook` commands through the actual Claude
-Code plugin, not through the source checkout.
-
-From the **repository root**, resolve the plugin directory once and run strict
-validation and a plugin-dir load with enforcement forced to `strict`:
-
-```powershell
-$env:MNEME_HOOK_MODE = "strict"
-$pluginPath = (Resolve-Path ".\integrations\claude-code-plugin").Path
-
-claude.cmd plugin validate $pluginPath --strict
-claude.cmd --plugin-dir $pluginPath
-```
-
-`claude.cmd plugin validate ... --strict` must pass (valid manifest, semver
-version `0.1.0`, exec-form hook). `claude.cmd --plugin-dir $pluginPath` loads the
-plugin into a Claude Code session so you can run the smoke tests below.
-
-## 15. Run the compliant-Write and blocked-Write smoke tests through Claude Code
-
-Inside the Claude Code session started in step 14, issue the two prompts below
-verbatim. These drive the real `PreToolUse` hook (published `mneme-hook` →
-published `mneme check`), which is what actually validates the public package.
-
-**Compliant Write — must succeed.** Request this exact prompt:
-
-```text
-This is specifically a PreToolUse hook allow test.
-
-Attempt the Write tool, not Bash or Edit, to create:
-
-scripts/encoding_smoke_clean.py
-
-with exactly this content:
-
-open("out.txt", "w", encoding="utf-8").write("x")
-
-Do not change any other file.
-```
-
-The Write must succeed (the content pins `encoding="utf-8"`, so it does not
-violate ADR-009).
-
-**Blocked Write — must be blocked.** Request this exact prompt:
-
-```text
-This is specifically a PreToolUse hook-blocking test.
-
-Attempt the Write tool, not Bash or Edit, to create:
-
-scripts/encoding_smoke_block.py
-
-with exactly this content:
-
-open("out.txt", "w").write("x")
-
-Do not rewrite the content to comply. The purpose is to attempt this exact Write and verify that the hook blocks it. Do not change any other file.
-```
-
-The Write must be blocked by the `PreToolUse` hook (the content omits
-`encoding=`, violating ADR-009).
-
-**Clean up** the smoke-test artifacts and the forced mode, then confirm a clean
-tree:
-
-```powershell
-Remove-Item .\scripts\encoding_smoke_clean.py -ErrorAction SilentlyContinue
-Remove-Item .\scripts\encoding_smoke_block.py -ErrorAction SilentlyContinue
-Remove-Item Env:MNEME_HOOK_MODE -ErrorAction SilentlyContinue
-git status --short
-```
-
-`git status --short` must report nothing (the clean Write is removed and the
-blocked Write was never created).
-
-## 16. Create the GitHub release — only after public validation succeeds
-
-Only now, once the public package validates end to end, publish the GitHub
-release for the `v0.5.2` tag. Run this from the **repository root** (the same
-place as the smoke tests), so the notes path is repository-root-relative:
-
-```powershell
-gh release create v0.5.2 `
-  --title "mneme-hq 0.5.2" `
-  --notes-file .\docs\releases\v0.5.2.md
-```
-
-## 17. Remove the temporary release environment
-
-Tear down the external release venv created in step 2 and confirm the working
-tree is clean (the venv lived outside the repo, so nothing should remain). The
-venv was already deactivated once in step 13 (before the clean `pipx`
-validation), so do not `deactivate` again here:
+Remove the temporary release venv created in step 4 and confirm a clean
+working tree:
 
 ```powershell
 Remove-Item -Recurse -Force $releaseVenv -ErrorAction SilentlyContinue
 git status --short
 ```
 
-`git status --short` must report nothing. Only now — after cleanup — is it safe
-to close the PowerShell session.
+`git status --short` must report nothing. Only then is it safe to close the
+shell.
 
 ---
 
@@ -345,25 +233,32 @@ to close the PowerShell session.
 
 Run in order. Do not advance past a failing step.
 
-- [ ] `main` is clean and at the release-alignment squash commit.
-- [ ] Isolated release venv created **outside the repo** (`$env:TEMP`); Python >= 3.11 confirmed.
-- [ ] `build`, `twine`, and `.[dev]` installed.
-- [ ] `build/`, `dist/`, `*.egg-info` removed.
-- [ ] Full test suite passes (with the package installed, e2e hook tests run).
-- [ ] Wheel + sdist built.
-- [ ] `twine check dist/*` → both PASSED.
-- [ ] `dist/` inspected — exactly the two expected artifacts.
-- [ ] **Artifact contract** (`test_packaging_contract.py` with `dist/` present): exactly one `mneme_hq-0.5.2-*.whl` + one `mneme_hq-0.5.2.tar.gz`; wheel METADATA and sdist PKG-INFO both declare `Name: mneme-hq` / `Version: 0.5.2`; wheel `entry_points.txt` is exactly the two console scripts. (`pip show` is only a source-env sanity check, not artifact inspection.)
-- [ ] `v0.5.2` tag pushed on the exact built commit.
-- [ ] Uploaded only the named wheel + sdist; project-scoped token entered **only at Twine's hidden password prompt** (never in a command, `TWINE_PASSWORD`, history, script, repo file, or Twine config).
-- [ ] Same PowerShell session still open (token was never persisted, so nothing to unset).
-- [ ] `deactivate` run exactly once (step 13) before the clean `pipx` validation.
-- [ ] Clean `pipx`: `pipx uninstall mneme-hq` then `pipx install "mneme-hq==0.5.2"`; `Get-Command mneme` and `Get-Command mneme-hook` both resolve into the pipx env; `mneme --help` works (do **not** run `mneme-hook --help`).
-- [ ] `claude.cmd plugin validate $pluginPath --strict` passes; `claude.cmd --plugin-dir $pluginPath` loads the plugin (with `MNEME_HOOK_MODE=strict`).
-- [ ] Claude Code smoke tests: compliant Write (`encoding="utf-8"`) succeeds; blocked Write (no `encoding=`) is blocked by the `PreToolUse` hook.
-- [ ] Smoke artifacts removed, `MNEME_HOOK_MODE` cleared, `git status --short` clean.
-- [ ] GitHub release created for `v0.5.2` (`--notes-file .\docs\releases\v0.5.2.md`, from repo root).
-- [ ] Temporary release venv removed (no second `deactivate`); `git status --short` clean; **then** close the shell.
-- [ ] **Only then:** update the plugin README to drop the install workaround and
-      advertise `pipx install "mneme-hq>=0.5.2"` (a separate, follow-up change —
-      the README is intentionally left unchanged in the alignment PR).
+- [ ] `main` is clean and at the release-candidate squash commit.
+- [ ] Release-prep PR squash-merged: version bump in `pyproject.toml` **and**
+      `mneme/__init__.py`, `CHANGELOG.md` entry, `docs/releases/vX.Y.Z.md`.
+- [ ] **Release battery passed once on the exact release-candidate SHA**
+      (`gh workflow run tests.yml --ref <rc-ref> -f battery=release`, or the
+      push-to-`main` run for that exact SHA); run URL + SHA recorded in
+      `docs/releases/vX.Y.Z-validation.md`.
+- [ ] Benchmark battery run if `decision_retriever.py`, `enforcer.py`,
+      `benchmark.py`, or any benchmark fixture changed since the last
+      benchmarked point (see CONTRIBUTING.md).
+- [ ] Isolated release venv created **outside the repo** (`$env:TEMP`);
+      Python >= 3.11 confirmed; `build`, `twine`, and `.[dev]` installed.
+- [ ] `build/`, `dist/`, `*.egg-info` removed; wheel + sdist built.
+- [ ] `twine check dist/*` — both PASSED; `dist/` inspected (exactly the two
+      expected artifacts).
+- [ ] **Artifact contract** (`tests/test_packaging_contract.py -v` with
+      `dist/` present): exactly one wheel + one sdist; METADATA and PKG-INFO
+      declare `Name: mneme-hq` / the intended version; wheel
+      `entry_points.txt` is exactly `mneme`, `mneme-hook`,
+      `mneme-kiro-hook`. (`pip show` is only a source-env sanity check.)
+- [ ] `vX.Y.Z` tag pushed on the exact validated release-candidate SHA.
+- [ ] GitHub release created (`--notes-file .\docs\releases\vX.Y.Z.md`,
+      from repo root); **Publish to PyPI** workflow succeeded (`build` +
+      `publish`); `pypi` environment approval completed.
+- [ ] **Release smoke** (`release-smoke.yml`) passed for the published
+      version: PyPI serves it, clean `pipx` install, CLI surface, and the
+      disposable-repo clean-setup check (`state: setup`,
+      `enforcement: not_enabled`).
+- [ ] Temporary release venv removed; `git status --short` clean.
