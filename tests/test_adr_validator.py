@@ -1,6 +1,9 @@
 """Tests for the ADR corpus validator."""
 from __future__ import annotations
 
+import re
+from pathlib import Path
+
 import pytest
 
 from mneme.adr_compiler import validate_corpus
@@ -125,3 +128,58 @@ def test_validation_error_aggregates_multiple_problems():
         validate_corpus([a, b])
     # Both errors should be reported, not just the first.
     assert len(excinfo.value.errors) >= 2
+
+
+# ── Canonical ADR file identity (frontmatter id uniqueness) ──────────────────
+#
+# Regression: PR #360 landed the Audit-tier ADR as a second ADR-023 after
+# PR #359 had already assigned ADR-023 to the Canonical Decision Index.
+# The Audit-tier ADR was renumbered to ADR-026; this scan fails if two
+# canonical ADR documents ever declare the same frontmatter id again.
+
+ADR_DOCS_DIR = Path(__file__).resolve().parent.parent / "docs" / "adr"
+_FRONTMATTER_ID_RE = re.compile(r"^id:\s*(ADR-\d+)\s*$", re.MULTILINE)
+
+
+def _scan_canonical_adr_ids(directory: Path) -> dict[str, list[str]]:
+    """Map each frontmatter ``id:`` to the canonical ADR files declaring it."""
+    found: dict[str, list[str]] = {}
+    for path in sorted(directory.glob("ADR-*.md")):
+        match = _FRONTMATTER_ID_RE.search(path.read_text(encoding="utf-8"))
+        if match:
+            found.setdefault(match.group(1), []).append(path.name)
+    return found
+
+
+def _find_duplicate_ids(directory: Path) -> dict[str, list[str]]:
+    ids = _scan_canonical_adr_ids(directory)
+    return {adr_id: files for adr_id, files in ids.items() if len(files) > 1}
+
+
+def test_canonical_adr_files_have_unique_frontmatter_ids():
+    duplicates = _find_duplicate_ids(ADR_DOCS_DIR)
+    assert duplicates == {}, (
+        f"ADR id collision: {duplicates}"
+    )
+
+
+def test_duplicate_frontmatter_id_is_detected(tmp_path: Path):
+    (tmp_path / "ADR-001-alpha.md").write_text(
+        "---\nid: ADR-001\ntitle: first\n---\n", encoding="utf-8"
+    )
+    (tmp_path / "ADR-001-beta.md").write_text(
+        "---\nid: ADR-001\ntitle: second\n---\n", encoding="utf-8"
+    )
+    assert _find_duplicate_ids(tmp_path) == {
+        "ADR-001": ["ADR-001-alpha.md", "ADR-001-beta.md"],
+    }
+
+
+def test_canonical_tree_has_exactly_one_adr_023_and_one_adr_026():
+    ids = _scan_canonical_adr_ids(ADR_DOCS_DIR)
+    assert ids.get("ADR-023") == [
+        "ADR-023-canonical-decision-index-and-runtime-projection-boundary.md",
+    ]
+    assert ids.get("ADR-026") == [
+        "ADR-026-audit-tier-semantics-and-mneme-potential.md",
+    ]

@@ -522,6 +522,12 @@ def _cmd_audit(args: argparse.Namespace) -> int:
     repo_root = Path(args.repo_root) if args.repo_root else None
     if repo_root is not None and not repo_root.exists():
         return _error_exit(f"repo root {repo_root} does not exist")
+    # TODO(trust-boundary, ADR-024/025): before any trusted producer accepts
+    # CI-claimed test evidence as "verified", the GitHub inputs (owner, repo,
+    # base_url) must be explicitly pinned — owner/repo to the audited
+    # repository and base_url to trusted hosts — so evidence cannot be
+    # ingested from an attacker-chosen endpoint. Not implemented here; the
+    # public paths never produce "verified" test evidence.
 
     store = MemoryStore(args.memory)
     store.load()
@@ -541,12 +547,19 @@ def _cmd_audit(args: argparse.Namespace) -> int:
         print("=" * 60)
         print(f"Decisions discovered:         {s.total_decisions}")
         print(f"Protection-relevant:          {s.protection_relevant}")
+        print()
+        # ADR-026: Identified Mneme Potential is numerically identical to
+        # the Protection Gap and is NOT an independent second metric, so
+        # the human-facing output presents Current Protection and
+        # Protection Gap only. identified_mneme_potential_pct remains in
+        # the JSON payload (mneme.audit/v1) for compatibility.
+        print(f"Current Protection:           {s.current_protection_pct}%")
+        print(f"Protection Gap:               {s.protection_gap_pct}%")
+        print()
         print(f"Protected today:              {s.protected}")
         print(f"Mneme-ready:                  {s.mneme_ready}")
-        print(f"Requires further modelling:   {s.requires_modelling}")
+        print(f"Requires modelling:           {s.requires_modelling}")
         print(f"Guidance-only:                {s.guidance}")
-        print(f"Current Protection:           {s.current_protection_pct}%")
-        print(f"Identified Mneme Potential:   {s.identified_mneme_potential_pct}%")
         print()
         print("Per-decision breakdown:")
         for d in s.decisions:

@@ -1,5 +1,5 @@
 ---
-id: ADR-023
+id: ADR-026
 title: "Audit Tier Semantics and Mneme Potential"
 status: accepted
 priority: foundational
@@ -7,11 +7,16 @@ date: 2026-09-11
 scope: audit.tier_semantics
 ---
 
-# ADR-023: Audit Tier Semantics and Mneme Potential
+# ADR-026: Audit Tier Semantics and Mneme Potential
 
 **Status:** Accepted
 **Date:** 2026-09-11
 **Deciders:** Theo Valmis
+
+> **Renumbering note:** this ADR originally landed as ADR-023 in PR #360,
+> after ADR-023 had already been assigned to the Canonical Decision Index
+> in PR #359. It was renumbered to ADR-026 to restore unique ADR identity.
+> No architectural semantics changed as part of the renumbering.
 
 ---
 
@@ -81,13 +86,17 @@ enforcement material):
 
 Intent (deterministic vs guidance) is judged from the decision text:
 
+- advisory language (`prefer`, `consider`, `should`, `can`, `where
+  practical`, `judgment`, `tradeoffs`) marks the statement guidance:
+  prescriptive markers are ignored when advisory qualifiers are present,
+  so clearly advisory/qualified wording must not become deterministic
+  merely because it also contains words such as `must`, `never`, or
+  `enforce` ("we should never use SQLite" is Guidance, not a prohibition);
 - prescriptive language (obligation, requirement, prohibition — `must`,
   `never`, `reject`, `fail closed`, `forbidden`, `enforce`, `validate`,
-  leading `No X` headlines) makes a decision protection-relevant
-  regardless of which structured fields are populated;
-- advisory language (`prefer`, `consider`, `should`, `can`, `where
-  practical`, `judgment`, `tradeoffs`) marks the statement guidance, and
-  no structured field can upgrade it;
+  leading `No X` headlines) makes a decision protection-relevant only
+  when the wording is unequivocal (no advisory qualifier);
+- absent clear deterministic intent defaults to Guidance;
 - structured prohibition fields remain documented enforcement material
   for decisions whose text is not advisory, preserving the frozen
   Mneme-ready guardrail derivation for every pre-existing record shape.
@@ -100,6 +109,27 @@ prescriptive markers never fire on advisory wording, absent markers
 default to guidance, and prose prohibitions that need interpretation are
 never literalized from text alone (no repository- or partner-specific
 vocabulary is special-cased).
+
+### Enforcement precedence: installed rules vs advisory prose
+
+Two different kinds of evidence must not be conflated — the distinction
+between "structured metadata exists" and "deterministic enforcement is
+actually installed" is load-bearing:
+
+- **Prose semantics classify unenforced decisions.** For a decision with
+  no installed deterministic enforcement, the decision text determines
+  whether it is deterministic intent or Guidance, per the rules above.
+- **Installed deterministic enforcement is authoritative evidence of
+  protection.** An active supported typed rule (typed `FORBID_LITERAL`)
+  classifies the decision Protected regardless of advisory prose. Audit
+  must not report an actively enforced decision as Guidance merely
+  because the decision text is weakly worded: the installed rule is
+  objective, verifiable enforcement evidence, and it outranks prose
+  intent.
+- **Merely descriptive structure is not enforcement.** Adding structure
+  such as constraints or anti-pattern fields must still NOT, by itself,
+  upgrade Guidance. Descriptive metadata existing on the record never
+  moves a tier; deterministic enforcement actually being installed does.
 
 ### Identified Mneme Potential
 
@@ -120,7 +150,10 @@ numerically identical to the Protection Gap (`(M + R) / PR`) by
 construction, and the exact complement of Current Protection
 (`Potential = 100 − Current Protection`). It is NOT an independent second
 metric, and user-facing output must not present Current Protection and
-Identified Mneme Potential as two separate findings. The
+Identified Mneme Potential as two separate findings: the human-facing
+CLI presents Current Protection and Protection Gap, with the tier counts
+(P protected, M Mneme-ready, R Requires modelling, G Guidance-only)
+alongside. The
 `identified_mneme_potential_pct` field is retained in `mneme.audit/v1`
 for compatibility. A future, genuinely distinct metric may express
 immediately protectable coverage as `(P + M) / PR`, with

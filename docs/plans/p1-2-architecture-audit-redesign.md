@@ -1,14 +1,21 @@
 # P1.2 Architecture Audit Redesign — Design Document
 
-> **Amendment (2026-09-11, ADR-023):** after the first Design Partner
+> **Amendment (2026-09-11, ADR-026):** after the first Design Partner
 > diagnostic exposed that tier classification depended on record shape
 > (byte-identical decision text changed tier when a structured constraint
 > was added) and that Identified Mneme Potential counted only records
 > immediately expressible by existing rule types, the tier semantics and
 > the Potential formula were amended. Tier intent is now judged from the
 > decision text (prescriptive vs advisory); Potential =
-> (Mneme-ready + Requires modelling) / protection-relevant. See
-> `docs/adr/ADR-023-audit-tier-semantics-and-mneme-potential.md`. The
+> (Mneme-ready + Requires modelling) / protection-relevant. Installed
+> deterministic enforcement (a typed FORBID_LITERAL rule) is authoritative
+> evidence of protection and outranks advisory prose, while merely
+> descriptive structure still never upgrades Guidance. User-facing CLI
+> output presents Current Protection and Protection Gap — Identified
+> Mneme Potential is numerically identical to the Protection Gap and is
+> retained in `mneme.audit/v1` for compatibility only, not shown as an
+> independent headline. See
+> `docs/adr/ADR-026-audit-tier-semantics-and-mneme-potential.md`. The
 > sections below record the original P1.2 freeze.
 
 ## Executive Summary

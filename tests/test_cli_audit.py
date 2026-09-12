@@ -496,11 +496,76 @@ jobs:
         assert "Protection-relevant:" in out
         assert "Protected today:" in out
         assert "Mneme-ready:" in out
-        assert "Requires further modelling:" in out
+        assert "Requires modelling:" in out
         assert "Guidance-only:" in out
         assert "Current Protection:" in out
-        assert "Identified Mneme Potential:" in out
         assert "Per-decision breakdown:" in out
+
+    def test_audit_terminal_presents_protection_gap(self, tmp_path, capsys):
+        """ADR-026: the human-facing output shows Current Protection and
+        Protection Gap, and never presents Identified Mneme Potential as an
+        independent headline metric."""
+        decisions = [
+            Decision(
+                id="ADR-001",
+                decision="No sqlite",
+                rules=[Rule(type="FORBID_LITERAL", value="sqlite")],
+            ),
+            Decision(
+                id="ADR-002",
+                decision="No ORM",
+                anti_patterns=["orm"],
+            ),
+            Decision(
+                id="ADR-003",
+                decision="Loose coupling",
+                rationale="Architectural principle",
+            ),
+        ]
+        mem = _create_test_memory(tmp_path, decisions)
+        exit_code = main(["audit", "--memory", str(mem)])
+        out = capsys.readouterr().out
+
+        assert exit_code == 0
+        assert "Current Protection:" in out
+        assert "Protection Gap:" in out
+        assert "Identified Mneme Potential" not in out
+
+        # Gap and Current Protection are complementary (1 protected,
+        # 1 mneme-ready, 1 guidance → PR = 2, gap = 50%).
+        assert "Current Protection:           50.0%" in out
+        assert "Protection Gap:               50.0%" in out
+
+    def test_audit_json_retains_identified_mneme_potential(self, tmp_path):
+        """mneme.audit/v1 keeps identified_mneme_potential_pct for
+        compatibility; only the human presentation changed (no schema bump)."""
+        decisions = [
+            Decision(
+                id="ADR-001",
+                decision="No sqlite",
+                rules=[Rule(type="FORBID_LITERAL", value="sqlite")],
+            ),
+            Decision(
+                id="ADR-002",
+                decision="No ORM",
+                anti_patterns=["orm"],
+            ),
+        ]
+        mem = _create_test_memory(tmp_path, decisions)
+        json_out = tmp_path / "audit.json"
+        exit_code = main(["audit", "--memory", str(mem), "--json", str(json_out)])
+        assert exit_code == 0
+
+        data = json.loads(json_out.read_text(encoding="utf-8"))
+        assert data["schema"] == "mneme.audit/v1"
+        summary = data["summary"]
+        assert "identified_mneme_potential_pct" in summary
+        assert "protection_gap_pct" in summary
+        assert "current_protection_pct" in summary
+        # Compatibility metric is numerically identical to the gap.
+        assert summary["identified_mneme_potential_pct"] == (
+            summary["protection_gap_pct"]
+        )
 
 
 class TestAuditSemanticContract:
@@ -657,7 +722,7 @@ jobs:
 
         if pr > 0:
             expected_cp = round(p / pr * 100, 1)
-            # ADR-023: Potential counts Mneme-ready + Requires modelling
+            # ADR-026: Potential counts Mneme-ready + Requires modelling
             # (deterministically enforceable in principle, not yet enforced),
             # not only decisions immediately expressible by existing rules.
             expected_imp = round((m + r) / pr * 100, 1)
