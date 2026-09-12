@@ -19,6 +19,7 @@ from scripts.run_test_battery import (
     GATE_EXCLUSIONS,
     GATE_PATHS,
     PYTEST,
+    REQUIRED_PR_CHECKS,
     gate_exclusion_reason,
     unclassified_canonical_test_paths,
     validate_battery,
@@ -129,6 +130,26 @@ def test_every_canonical_test_path_is_gate_or_excluded():
 def test_exclusion_registry_matches_filesystem_paths():
     for excluded, _reason in GATE_EXCLUSIONS:
         assert gate_exclusion_reason(excluded) is not None
+
+
+def test_required_pr_check_names_match_workflow_job_names():
+    names = set()
+    for path in (REPO_ROOT / ".github" / "workflows").glob("*.yml"):
+        workflow = yaml.safe_load(path.read_text(encoding="utf-8"))
+        for job_id, job in (workflow.get("jobs") or {}).items():
+            names.add(job.get("name") or job_id)
+    for check in REQUIRED_PR_CHECKS:
+        assert check in names, (
+            f"ruleset-required check {check!r} does not match any job display "
+            "name in .github/workflows/; a required check that never reports "
+            "keeps every PR blocked - update REQUIRED_PR_CHECKS and the "
+            "GitHub main-pr-only ruleset together"
+        )
+
+
+def test_gate_required_check_is_the_gate_job_display_name():
+    workflow = _load_workflow("tests.yml")
+    assert workflow["jobs"]["gate"]["name"] in REQUIRED_PR_CHECKS
 
 
 def test_main_battery_is_the_bare_canonical_invocation():

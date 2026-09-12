@@ -40,6 +40,12 @@ Invariants enforced here (and pinned by ``tests/test_test_policy.py``):
   folded into the gate/main/release pytest batteries.
 - ``artifact-smoke`` validates the package PyPI actually serves, from a
   clean install; it never reruns the source test suite.
+- The GitHub ``main-pr-only`` ruleset requires the status checks named in
+  ``REQUIRED_PR_CHECKS`` (including the ``gate (PR battery)`` job), so no
+  change reaches ``main`` unless the gate completed successfully on the PR
+  head SHA. ``tests/test_test_policy.py`` pins each name to the job display
+  names in ``.github/workflows/`` so a rename cannot silently detach the
+  ruleset from the workflows it enforces.
 
 Usage::
 
@@ -172,6 +178,15 @@ def gate_exclusion_reason(rel_path: str) -> str | None:
         if not path.endswith(".py") and rel_path.startswith(path.rstrip("/") + "/"):
             return reason
     return None
+
+
+REQUIRED_PR_CHECKS: tuple[str, ...] = (
+    "gate (PR battery)",
+    "Scan docs/scripts for mojibake + BOM",
+    "Validate PR execution provenance",
+    "Verify install commands name mneme-hq",
+    "mneme check --mode warn",
+)
 
 
 def unclassified_canonical_test_paths() -> list[str]:

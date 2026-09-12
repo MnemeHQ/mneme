@@ -68,6 +68,26 @@ result belongs to that exact Git SHA.
 See [`docs/releases/RELEASING.md`](docs/releases/RELEASING.md) for the full
 SHA-invalidation policy.
 
+### Required PR checks (ruleset-enforced)
+
+The GitHub `main-pr-only` ruleset requires the following status checks to
+succeed before a PR can be merged, so the `gate` battery is a hard control,
+not an advisory one — no change reaches `main` unless the gate completed
+successfully on the PR head SHA:
+
+- `gate (PR battery)` — the deterministic gate battery (`.github/workflows/tests.yml`)
+- `Scan docs/scripts for mojibake + BOM` — encoding check (ADR-009 / `encoding_001`)
+- `Validate PR execution provenance` — agent provenance block (AGENTS.md)
+- `Verify install commands name mneme-hq` — ADR-005 namespace gate
+- `mneme check --mode warn` — repository self-governance check
+
+These names are pinned in `REQUIRED_PR_CHECKS`
+([`scripts/run_test_battery.py`](scripts/run_test_battery.py)) and guarded by
+`tests/test_test_policy.py`: every required check name must match a job
+display name in `.github/workflows/`. If you rename a job, update the
+workflow, `REQUIRED_PR_CHECKS`, and the GitHub ruleset in the same PR — a
+required check that never reports keeps every PR blocked.
+
 ## Running the Benchmark Suite
 
 The benchmark suite verifies that enforcement behaviour has not changed unexpectedly. It is a separate charter instrument and is **never** part of the `gate`, `main`, or `release` pytest batteries. If you modify `decision_retriever.py`, `enforcer.py`, `benchmark.py`, or any benchmark fixture, you must run the benchmarks:
