@@ -1,4 +1,4 @@
-"""P1.2 Architecture Audit tier semantics (ADR-023 hardening).
+"""P1.2 Architecture Audit tier semantics (ADR-026 hardening).
 
 Regression tests for the two P0 defects found by the first real Design
 Partner diagnostic (sagarika29/ai-system-architect):
@@ -164,6 +164,69 @@ def test_interpretation_needing_prohibition_stays_requires_modelling():
     assert report.intent == "deterministic"
     assert report.protection_tier == "requires_modelling"
     assert report.mneme_guardrail is None
+
+
+# ── Mixed advisory + prescriptive wording (ADR-026 precedence) ───────────────
+
+# Qualified/advisory wording must not become deterministic merely because it
+# also contains words such as `must`, `never`, or `enforce`.
+MIXED_ADVISORY_TEXTS = [
+    "We should never use SQLite.",
+    "Where practical, services must reject invalid input.",
+    "Consider whether this must be enforced.",
+    "We should consider using SQLite.",
+]
+
+# Unequivocal requirements (no advisory qualifier) remain deterministic.
+UNEQUIVOCAL_TEXTS = [
+    "The system must reject invalid input.",
+    "The pipeline never deploys unvalidated changes.",
+]
+
+
+def test_mixed_advisory_wording_does_not_become_deterministic():
+    """Advisory wording outranks prescriptive markers: qualified prose stays
+    Guidance even when it contains `must`, `never`, or `enforce`."""
+    for text in MIXED_ADVISORY_TEXTS:
+        report = assess_protection(Decision(id="d1", decision=text))
+        assert report.intent == "guidance", text
+        assert report.protection_tier == "guidance", text
+        assert report.mneme_guardrail is None, text
+
+
+def test_unequivocal_requirements_remain_deterministic():
+    """Unequivocal `must` requirements and `never` prohibitions (no advisory
+    qualifier) remain deterministic."""
+    for text in UNEQUIVOCAL_TEXTS:
+        report = assess_protection(Decision(id="d1", decision=text))
+        assert report.intent == "deterministic", text
+        assert report.protection_tier == "requires_modelling", text
+
+
+def test_contraction_prohibition_remains_deterministic():
+    """A `can't` prohibition is not neutralized by the advisory `can`
+    marker — the lookahead keeps prohibitions prescriptive."""
+    report = assess_protection(Decision(
+        id="d1",
+        decision="Services can't depend on postgres directly.",
+    ))
+    assert report.intent == "deterministic"
+    assert report.protection_tier == "requires_modelling"
+
+
+def test_advisory_prose_with_installed_typed_rule_is_protected():
+    """Installed deterministic enforcement is authoritative: a decision with
+    an active typed rule is Protected regardless of advisory prose (ADR-026
+    enforcement precedence), while descriptive structure alone never
+    upgrades Guidance."""
+    enforced = Decision(
+        id="d1",
+        decision=ADVISORY_TEXT,
+        rules=[Rule(type="FORBID_LITERAL", value="sqlite")],
+    )
+    report = assess_protection(enforced)
+    assert report.protection_tier == "protected"
+    assert report.evidence_confidence == "verified"
 
 
 # ── Part C.5: Potential calculation ──────────────────────────────────────────
@@ -341,7 +404,7 @@ def _write_repo(tmp_path: Path, decisions: list[dict]) -> tuple[Path, Path]:
     memory = root / MEMORY_REL
     memory.parent.mkdir(parents=True)
     memory.write_text(json.dumps({
-        "meta": {"name": "adr23", "description": "ADR-023 fixture"},
+        "meta": {"name": "adr26", "description": "ADR-026 fixture"},
         "items": [],
         "examples": [],
         "decisions": decisions,

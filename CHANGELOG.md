@@ -20,16 +20,25 @@
 
 ### Fixed
 
-- P1.2 Architecture Audit tier semantics (ADR-023): intent is now judged
+- P1.2 Architecture Audit tier semantics (ADR-026, renumbered from a
+  colliding ADR-023 id): intent is now judged
   from the decision text (prescriptive vs advisory language) instead of
   record shape, so byte-identical decision text no longer changes tier
   when an unrelated structured constraint is added, and deterministic
   architectural requirements without structured fields no longer fall to
-  Guidance. `Identified Mneme Potential` is now
+  Guidance. Advisory wording outranks prescriptive markers, so qualified
+  prose ("we should never use SQLite") stays Guidance even when it also
+  contains `must`, `never`, or `enforce`; an installed typed rule still
+  protects regardless of advisory prose (enforcement precedence).
+  `Identified Mneme Potential` is now
   (Mneme-ready + Requires modelling) / protection-relevant — decisions
   deterministically enforceable in principle, not only records
-  immediately expressible by existing rule types. `mneme.audit/v1`,
-  CLI, Protect behavior, and enforcement/refusal semantics are unchanged.
+  immediately expressible by existing rule types.
+  `mneme.audit/v1`, Protect behavior, and enforcement/refusal semantics
+  are unchanged. Human-facing `mneme audit` output now presents
+  Current Protection and Protection Gap (the compat-identical
+  Identified Mneme Potential metric is no longer shown as an independent
+  headline; the JSON field is retained for compatibility).
 
 ---
 

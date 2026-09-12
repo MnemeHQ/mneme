@@ -115,7 +115,7 @@ question: "which architectural decisions are actually protected in this
 system, regardless of which deterministic mechanism provides that
 protection?"
 
-ADR-023 fixed tier semantics (intent from decision text, not record
+ADR-026 fixed tier semantics (intent from decision text, not record
 shape) but left the protection-evidence channels at exactly two: typed
 `FORBID_LITERAL` rules and verified CI linkage on literalizable tokens.
 
@@ -196,7 +196,7 @@ separately opt-in future capability and is never performed implicitly.
 
 ### Protection semantics
 
-- A **deterministic** decision (ADR-023: prescriptive text, or documented
+- A **deterministic** decision (ADR-026: prescriptive text, or documented
   enforcement fields with non-advisory text) with **trusted verified**
   test evidence is **Protected**: `evidence_confidence: "verified"`,
   evidence sources `test:verified:<selector>@<sha>`. M0 has no trusted
@@ -267,6 +267,6 @@ declared linkage did not establish protection.
 ## Related
 
 - ADR-019: Typed Literal Rule Contract (explicit-directive trust model)
-- ADR-023: Audit Tier Semantics and Mneme Potential
+- ADR-026: Audit Tier Semantics and Mneme Potential
 - Design Partner diagnostic repository (read-only fixture):
   `sagarika29/ai-system-architect`

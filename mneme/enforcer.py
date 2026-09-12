@@ -441,7 +441,7 @@ def assess_governability(decision: "Decision") -> GovernabilityAssessment:
 # enforce this today?"; the P1.2 audit asks "how much of this repository's
 # deterministic architectural intent is already protected, and what remains?".
 #
-# Tier semantics (ADR-023; amends the P1.2 freeze in
+# Tier semantics (ADR-026; amends the P1.2 freeze in
 # docs/plans/p1-2-architecture-audit-redesign.md after the first Design
 # Partner diagnostic, sagarika29/ai-system-architect):
 #   protected          a documented architectural decision for which Mneme
@@ -485,7 +485,7 @@ def assess_governability(decision: "Decision") -> GovernabilityAssessment:
 #      state requires a trusted producer (CI-produced exact-SHA +
 #      exact-selector ingestion — the next task).
 #
-# Semantic invariants (ADR-023, extended by ADR-024):
+# Semantic invariants (ADR-026, extended by ADR-024):
 #   - Structure invariance: adding syntactic structure or a constraint
 #     field MUST NOT, by itself, move a decision out of guidance. Intent is
 #     judged from the decision text (prescriptive vs advisory language);
@@ -543,7 +543,7 @@ class ArchitectureProtectionReport:
     requires_modelling: int
     guidance: int
     current_protection_pct: float
-    # Compat metric (ADR-023): the unprotected deterministic opportunity —
+    # Compat metric (ADR-026): the unprotected deterministic opportunity —
     # numerically identical to ``protection_gap_pct`` and the exact
     # complement of ``current_protection_pct``; not an independent metric.
     identified_mneme_potential_pct: float
@@ -638,7 +638,7 @@ def _split_no_constraints(
     return single, multi
 
 
-# ── Semantic intent classification (ADR-023) ─────────────────────────────────
+# ── Semantic intent classification (ADR-026) ─────────────────────────────────
 #
 # The audit tier must track what the documented decision MEANS, not which
 # structured fields happen to be populated (P0 finding #1 of the first
@@ -646,29 +646,34 @@ def _split_no_constraints(
 # → requires_modelling when an unrelated structured constraint was added).
 #
 # Intent is therefore judged from the decision text itself:
-#   - prescriptive language (obligation, requirement, prohibition — must,
-#     never, reject, fail closed, forbidden, enforce, validate, "No X"
-#     headlines) makes a decision protection-relevant regardless of which
-#     structured fields are populated;
 #   - advisory language (prefer, consider, should, can, where practical,
-#     judgment, tradeoffs) marks the statement guidance, and no structured
-#     field can upgrade it;
+#     judgment, tradeoffs) marks the statement guidance: prescriptive
+#     markers are ignored when advisory qualifiers are present, so
+#     qualified wording ("we should never use SQLite") never becomes
+#     deterministic merely because it also contains `must`, `never`, or
+#     `enforce`;
+#   - unequivocal requirements (no advisory marker) remain deterministic,
+#     and absent clear deterministic intent defaults to guidance;
 #   - structured prohibition fields (anti_patterns / "no X" constraints)
-#     remain documented enforcement material for decisions whose text is
-#     not advisory, preserving the frozen Mneme-ready guardrail derivation
-#     for every pre-existing record shape.
+#     are merely descriptive structure: they remain documented enforcement
+#     material only for decisions whose text is not advisory, never
+#     upgrading Guidance by themselves.
 #
-# Both classifiers are deliberately conservative: prescriptive markers
-# never fire on advisory wording, and absent markers default to guidance
-# (silent text is never inferred to be deterministic). No repository- or
-# partner-specific vocabulary is special-cased.
+# Installed deterministic enforcement is a different, stronger kind of
+# evidence than prose or structure: a typed FORBID_LITERAL rule resolves
+# before prose intent entirely (see _assess_protection), so an actively
+# enforced decision is Protected regardless of advisory wording.
+#
+# Both classifiers are deliberately conservative: absent markers default
+# to guidance (silent text is never inferred to be deterministic). No
+# repository- or partner-specific vocabulary is special-cased.
 
 _ADVISORY_RE = re.compile(
-    r"\b(?:prefer\w*|consider\w*|recommen\w+|should|ideally|optional|"
+    r"\b(?:prefer\w*|consider\w*|recommen(?!dation)\w*|should|ideally|optional|"
     r"flexible|judg(?:e|ment|ement)\w*|trade[- ]?off\w*|aspirational|"
     r"where\s+practical|when\s+possible|when\s+appropriate|"
     r"as\s+appropriate|as\s+needed|in\s+general|generally|typically|"
-    r"usually|nice[- ]to[- ]have|may\b|might\b|can\b|could\b)\b",
+    r"usually|nice[- ]to[- ]have|may\b|might\b|can\b(?!'t)|could\b)\b",
     re.IGNORECASE,
 )
 
@@ -881,8 +886,14 @@ def _assess_protection(
 
     Intent (deterministic vs guidance) is judged from the decision text
     (``_is_prescriptive_text`` / ``_is_advisory_text``), never from which
-    structured fields happen to be populated (ADR-023 structure-invariance
-    invariant). Structured prohibition fields still supply the concrete
+    structured fields happen to be populated (ADR-026 structure-invariance
+    invariant). Advisory wording outranks prescriptive markers, so
+    qualified prose never becomes deterministic merely by containing
+    ``must``/``never``/``enforce``. Installed deterministic enforcement
+    precedes prose intent entirely: the typed FORBID_LITERAL check above
+    resolves before classification, so an actively enforced decision is
+    Protected regardless of advisory prose (ADR-026 enforcement
+    precedence). Structured prohibition fields still supply the concrete
     guardrail derivation, and they keep non-advisory decisions
     protection-relevant exactly as in the frozen P1.2 model.
 
@@ -921,9 +932,14 @@ def _assess_protection(
     advisory = _is_advisory_text(decision.decision)
     prescriptive = _is_prescriptive_text(decision.decision)
 
-    has_deterministic_intent = prescriptive or (
-        documented_enforcement and not advisory
-    )
+    # Precedence (ADR-026): advisory wording outranks prescriptive markers —
+    # a prescriptive term inside qualified/advisory prose does not make the
+    # decision deterministic. Unequivocal requirements (no advisory marker)
+    # remain deterministic; absent clear deterministic intent defaults to
+    # Guidance. Descriptive structure alone is not enforcement.
+    has_deterministic_intent = (
+        prescriptive or documented_enforcement
+    ) and not advisory
 
     if not has_deterministic_intent:
         return ProtectionDecisionReport(
@@ -1037,7 +1053,7 @@ def _build_report(
     guidance = sum(1 for r in active if r.protection_tier == "guidance")
     protection_relevant = protected + mneme_ready + requires_modelling
 
-    # Metric formulas (ADR-023, exact numerator/denominator):
+    # Metric formulas (ADR-026, exact numerator/denominator):
     #
     #   Current Protection          = P / PR × 100
     #       fraction of protection-relevant decisions with verified
