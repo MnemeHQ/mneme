@@ -28,6 +28,10 @@ Invariants enforced here (and pinned by ``tests/test_test_policy.py``):
 - ``gate`` is an explicit path manifest, strictly inside ``tests/`` and a
   subset of the canonical suite. New test files run on ``main``/``release``
   by default and enter ``gate`` only through a deliberate manifest change.
+- Every canonical test module (``test_*.py`` under the testpaths) must be
+  either in the ``gate`` manifest or in ``GATE_EXCLUSIONS`` with a concise
+  reason; ``tests/test_test_policy.py`` fails on unclassified paths, so the
+  manifest cannot silently age.
 - ``main`` is the bare canonical pytest invocation (pyproject
   ``[tool.pytest.ini_options]`` ``testpaths = ["tests"]``); the script fails
   closed if that configuration drifts, because the bare invocation must
@@ -127,23 +131,70 @@ GATE_SHIPPED_PATHS: tuple[str, ...] = (
     "tests/integrations/antigravity",
 )
 
+GATE_AUDIT_EVIDENCE_PATHS: tuple[str, ...] = (
+    "tests/test_audit_tier_semantics.py",
+    "tests/test_audit_test_evidence.py",
+    "tests/test_ci_test_evidence.py",
+    "tests/test_github_evidence.py",
+)
+
 GATE_PATHS: tuple[str, ...] = (
     GATE_CORE_PATHS
     + GATE_CLI_PATHS
     + GATE_ADR_PATHS
     + GATE_GOVERNANCE_PATHS
     + GATE_BENCHMARK_UNIT_PATHS
+    + GATE_AUDIT_EVIDENCE_PATHS
     + GATE_SHIPPED_PATHS
 )
 
-GATE_EXCLUDED_PATH_PREFIXES: tuple[str, ...] = (
-    "tests/test_check_install_command.py",
-    "tests/test_check_worktree_context.py",
-    "tests/test_pre_push_main_guard.py",
-    "tests/test_eventcatalog_import.py",
-    "tests/integrations/hermes",
-    "tests/integrations/langchain",
+GATE_EXCLUSIONS: tuple[tuple[str, str], ...] = (
+    (
+        "tests/test_check_install_command.py",
+        "main-only: repo tooling (dedicated install-command-check.yml workflow)",
+    ),
+    ("tests/test_check_worktree_context.py", "main-only: repo tooling"),
+    ("tests/test_pre_push_main_guard.py", "main-only: repo tooling"),
+    ("tests/test_eventcatalog_import.py", "main-only: experimental integration"),
+    ("tests/integrations/hermes", "main-only: experimental integration"),
+    (
+        "tests/integrations/langchain",
+        "main-only: optional dependency (langchain extra; dedicated CI job on main)",
+    ),
 )
+
+
+def gate_exclusion_reason(rel_path: str) -> str | None:
+    """Return the exclusion reason for a canonical test path, if excluded."""
+    for path, reason in GATE_EXCLUSIONS:
+        if rel_path == path:
+            return reason
+        if not path.endswith(".py") and rel_path.startswith(path.rstrip("/") + "/"):
+            return reason
+    return None
+
+
+def unclassified_canonical_test_paths() -> list[str]:
+    """Canonical test modules accounted for by neither gate nor an exclusion.
+
+    The anti-aging invariant: every test_*.py under the canonical testpaths is
+    either in the gate manifest (directly or under a gate directory) or in
+    GATE_EXCLUSIONS with a reason. Anything else is returned here so
+    tests/test_test_policy.py can fail loudly until it is classified.
+    """
+    canonical = sorted(
+        path.relative_to(REPO_ROOT).as_posix()
+        for path in (REPO_ROOT / "tests").rglob("test_*.py")
+        if "__pycache__" not in path.parts
+    )
+    gate_dirs = [p.rstrip("/") + "/" for p in GATE_PATHS if not p.endswith(".py")]
+    unclassified = []
+    for rel in canonical:
+        in_gate = rel in GATE_PATHS or any(rel.startswith(d) for d in gate_dirs)
+        if in_gate or gate_exclusion_reason(rel) is not None:
+            continue
+        unclassified.append(rel)
+    return unclassified
 
 
 @dataclass(frozen=True)

@@ -16,9 +16,11 @@ import yaml
 
 from scripts.run_test_battery import (
     BATTERIES,
-    GATE_EXCLUDED_PATH_PREFIXES,
+    GATE_EXCLUSIONS,
     GATE_PATHS,
     PYTEST,
+    gate_exclusion_reason,
+    unclassified_canonical_test_paths,
     validate_battery,
 )
 
@@ -37,6 +39,10 @@ REQUIRED_GATE_PATHS: tuple[str, ...] = (
     "tests/test_cli.py",
     "tests/test_cli_audit.py",
     "tests/test_cli_setup.py",
+    "tests/test_audit_tier_semantics.py",
+    "tests/test_audit_test_evidence.py",
+    "tests/test_ci_test_evidence.py",
+    "tests/test_github_evidence.py",
     "tests/test_setup_state.py",
     "tests/test_setup_audit_parity.py",
     "tests/test_protection_activation.py",
@@ -103,9 +109,26 @@ def test_gate_manifest_covers_critical_architecture_paths():
 
 
 def test_gate_manifest_excludes_experimental_and_repo_tooling_tests():
-    for excluded in GATE_EXCLUDED_PATH_PREFIXES:
+    for excluded, reason in GATE_EXCLUSIONS:
         assert (REPO_ROOT / excluded).exists(), f"excluded path no longer exists: {excluded}"
+        assert reason.startswith("main-only:") or reason.startswith(
+            "release-only:"
+        ), f"exclusion reason must be deterministic and scoped: {excluded}: {reason}"
         assert excluded not in GATE_PATHS, f"excluded path is in the gate manifest: {excluded}"
+
+
+def test_every_canonical_test_path_is_gate_or_excluded():
+    unclassified = unclassified_canonical_test_paths()
+    assert not unclassified, (
+        "unclassified canonical test paths - add each to the gate manifest "
+        "in scripts/run_test_battery.py or to GATE_EXCLUSIONS with a reason: "
+        f"{unclassified}"
+    )
+
+
+def test_exclusion_registry_matches_filesystem_paths():
+    for excluded, _reason in GATE_EXCLUSIONS:
+        assert gate_exclusion_reason(excluded) is not None
 
 
 def test_main_battery_is_the_bare_canonical_invocation():
