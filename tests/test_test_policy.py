@@ -183,6 +183,11 @@ def test_tests_workflow_runs_gate_on_prs_and_full_suite_on_main():
     assert release_if == (
         "github.event_name == 'workflow_dispatch' && inputs.battery == 'release'"
     )
+    release_runs = _step_runs(jobs["release"])
+    assert "python -c \"import langchain, langgraph, langchain_core\"" in release_runs, (
+        "the release battery must fail closed if the langchain extra is absent, "
+        "otherwise the live fixture silently skips"
+    )
     assert _battery_steps(jobs["release"]) == ["python scripts/run_test_battery.py release"]
 
 

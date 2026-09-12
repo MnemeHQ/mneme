@@ -114,5 +114,8 @@ jobs:
       - name: Install package with dev and langchain extras
         run: python -m pip install -e ".[dev,langchain]"
 
+      - name: Assert the LangChain extra is importable
+        run: python -c "import langchain, langgraph, langchain_core"
+
       - name: Run release battery
         run: python scripts/run_test_battery.py release
