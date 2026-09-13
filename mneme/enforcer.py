@@ -847,6 +847,69 @@ def propose_literal_rule(decision: "Decision") -> "Rule | None":
     return Rule(type="FORBID_LITERAL", value=tokens[0])
 
 
+# ── Public decision-intent assessment (ADR-028) ──────────────────────────────
+#
+# External consumers (the Architecture Audit backend, integrations) need to
+# ask ADR-026's intent question — "is this decision text prescriptive or
+# advisory?" — without importing the private lexical helpers above
+# (_is_prescriptive_text / _is_advisory_text) or re-deriving the precedence
+# rule themselves. assess_decision_intent is the supported public boundary
+# for that question: the SAME derivation assess_protection applies to the
+# decision text, returning ONLY the authoritative ADR-026 verdict with
+# advisory precedence already applied. Raw lexical-marker details stay
+# private: exposing raw prescriptive/advisory booleans would create a
+# second interpretation surface that could recreate the shape-vs-meaning
+# bug ADR-026 fixed (a consumer checking a raw marker instead of the
+# precedence-aware answer). It is deliberately text-only: the full
+# text+structure intent combination (documented enforcement material) stays
+# internal to _assess_protection, so there remains exactly one canonical
+# implementation of ADR-026 intent semantics. Nothing here executes
+# repository code, performs I/O, mutates state, creates rules, or infers
+# evidence.
+
+DecisionIntent = Literal["prescriptive", "advisory", "neutral"]
+
+
+@dataclass(frozen=True)
+class DecisionIntentAssessment:
+    """ADR-026 intent verdict for one decision statement (public contract).
+
+    ``intent`` is the authoritative answer, with ADR-026 advisory
+    precedence already applied:
+
+    - ``prescriptive`` — unequivocal obligation or prohibition wording;
+    - ``advisory`` — qualified wording, even when it also contains
+      prescriptive words such as ``must`` or ``never`` (ADR-026: advisory
+      wording outranks prescriptive markers for unenforced prose);
+    - ``neutral`` — no intent markers; absent clear deterministic intent
+      defaults to Guidance in ``assess_protection``.
+    """
+
+    intent: DecisionIntent
+
+
+def assess_decision_intent(text: str) -> DecisionIntentAssessment:
+    """Assess one decision statement's ADR-026 intent (public, text-only).
+
+    The supported external boundary for asking whether decision text is
+    deterministic/prescriptive or guidance/advisory. Structured fields
+    (anti_patterns / constraints / typed rules) are never consulted: per
+    ADR-026 structure invariance, structure never upgrades intent, and the
+    text+structure combination stays private to ``assess_protection``.
+    Installed typed-rule enforcement precedence is likewise untouched —
+    this API performs no classification of its own beyond the text verdict.
+
+    Pure function of ``text``: deterministic output for identical input;
+    no repository access, no network or LLM calls, no state mutation, no
+    rule creation, no evidence inference.
+    """
+    if _is_advisory_text(text):
+        return DecisionIntentAssessment(intent="advisory")
+    if _is_prescriptive_text(text):
+        return DecisionIntentAssessment(intent="prescriptive")
+    return DecisionIntentAssessment(intent="neutral")
+
+
 def assess_protection(
     decision: "Decision",
     repo_root: str | Path | None = None,
@@ -1120,4 +1183,7 @@ __all__ = [
     "assess_protection",
     "generate_protection_report",
     "propose_literal_rule",
+    "DecisionIntent",
+    "DecisionIntentAssessment",
+    "assess_decision_intent",
 ]

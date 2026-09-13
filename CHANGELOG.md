@@ -4,6 +4,17 @@
 
 ### Added
 
+- Public decision-intent assessment API (ADR-028):
+  `mneme.enforcer.assess_decision_intent(text)` exposes ADR-026's text
+  intent question as a supported, deterministic, side-effect-free boundary
+  for external consumers such as the Architecture Audit backend, returning
+  only the authoritative precedence-aware verdict (prescriptive /
+  advisory / neutral) — raw lexical-marker details stay private, and
+  unsupported imports of the private `_is_prescriptive_text` /
+  `_is_advisory_text` helpers are no longer needed. Text-only by
+  construction (structure invariance); retrieval, enforcement,
+  `ConflictDetector`, typed rules, benchmark behavior, and
+  `mneme.audit/v1` are unchanged.
 - Declared test-evidence ingestion for the Architecture Audit (ADR-024,
   passive): a decision record may declare explicit `test_evidence` entries
   linking it to a test that enforces it. Ordinary `mneme audit` is
