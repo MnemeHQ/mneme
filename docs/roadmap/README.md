@@ -82,34 +82,55 @@ Keep ingestion separate from enforcement semantics: source adapters import decis
 
 Do not assume another review/context platform's Confluence, Jira, Slack, Notion, or monitoring connections are a reusable Mneme ingestion API unless an explicit supported data contract is validated.
 
-### P1 — Read-only Decision MCP consumer surface
+### P1 — Decision MCP consumer + proposal-ingestion surface
 
-After D0 projection parity is proven, define a narrow MCP surface that lets external tools consume authoritative Mneme decisions without becoming part of the enforcement runtime or the source of decision authority.
+After D0 projection parity is proven, define a narrow Decision MCP surface that supports both:
 
-Candidate operations include:
+1. external consumers retrieving authoritative Mneme decisions; and
+2. external producers submitting candidate architectural decisions as **non-authoritative proposals**.
 
-```text
-get_applicable_decisions(repo, files, change)
-get_decision(decision_id)
-get_architecture_constraints(scope)
-get_protection_status(decision_id)
-get_enforcement_evidence(change_or_event_id)
-explain_block(event_id)
-```
+The MCP sits over the canonical Decision Index; it must not become its own decision store or enforcement engine.
 
-This is a **read-only consumer projection**, not the generic hosted MCP / HTTP control plane listed under Deferred.
-
-The architectural dependency direction is:
+P0 operations are scoped as:
 
 ```text
-Mneme Decision Index -> external consumers
+decision.propose
+decision.propose_batch
+decision.get
+decision.search
+decision.applicable_to
+decision.trace
 ```
 
-not:
+A proposal is never enforceable. Generic MCP producers may provide decision text, rationale, provenance, context, and scope hints, but may not activate enforcement, mark decisions Protected, create verified evidence, create exceptions, supersede Active decisions, or bypass Mneme review/lifecycle controls.
+
+The intended producer flow is:
 
 ```text
-external context platform -> Mneme authority
+external architecture system
+        ↓
+Decision MCP proposal
+        ↓
+human review / Mneme authority step
+        ↓
+canonical Decision Index
+        ↓
+Architecture Audit / modelling
+        ↓
+Rule + applicability
+        ↓
+Enforcement / evidence
 ```
+
+Proposal state is separate from canonical decision lifecycle. P0 supports `proposed -> accepted` or `proposed -> rejected`, but acceptance is a Mneme-owned authority action and is not exposed as a generic producer mutation.
+
+Proposal ingestion must be idempotent by stable producer/source/version identity. Semantic similarity may flag likely duplicates for review but must not auto-merge canonical decisions.
+
+Use `sagarika29/ai-system-architect` as the first producer-workflow compatibility test after the generic contract exists. Do not add Sagarika-specific logic to the Decision Index/MCP core.
+
+This surface remains distinct from the generic hosted MCP / HTTP control plane listed under Deferred. A local OSS implementation may expose proposal ingestion and retrieval over the Decision Index kernel; organization-wide persistence, cross-repo aggregation, source reconciliation, RBAC/SSO, multi-tenant governance, and hosted control-plane behavior remain separate boundaries.
+
+See proposed [ADR-027](../adr/ADR-027-decision-mcp-proposal-ingestion-and-authority-boundary.md) and issue #362.
 
 ### P1 — Reference review consumer validation
 
@@ -177,7 +198,7 @@ Revisit only if Anthropic exposes one or more of the missing control surfaces id
 - Team/org policy synchronization.
 - Cross-repository governance.
 - Shared policy packs.
-- Generic hosted MCP / HTTP control plane. This does **not** include the narrow read-only Decision MCP consumer surface described above.
+- Generic hosted MCP / HTTP control plane. This does **not** include the narrow Decision MCP consumer/proposal surface described above.
 - Broad SaaS administration, billing, or account surfaces.
 - Higher-level policy DSL beyond the current typed-rule path.
 - Deeper integrations that do not expose a reliable mutation or verification seam.
@@ -210,14 +231,15 @@ For current support claims, always use [the canonical integration support matrix
 1. **Evidence before promotion.** A planned or experimental surface does not become supported because an adapter looks feasible.
 2. **Reuse the core.** Integrations translate transport and lifecycle events into existing Mneme semantics; they do not copy retrieval or enforcement logic.
 3. **External validation outranks integration count.** A real design-partner result is more valuable than another unvalidated adapter.
-4. **Keep retrieval separate from enforcement.** Context, Skills, RAG, and source ingestion can improve what the agent knows; deterministic rules decide what Mneme can mechanically govern.
-5. **Preserve decision authority.** External review/context systems may consume Mneme decisions, but they do not become the authoritative Decision Index or determine lifecycle/enforcement semantics.
+4. **Keep retrieval separate from enforcement.** Context, Skills, RAG, source ingestion, and proposal ingestion can improve what the agent/system knows; deterministic rules decide what Mneme can mechanically govern.
+5. **Preserve decision authority.** External systems may consume authoritative Mneme decisions or propose candidate decisions, but they do not become the authoritative Decision Index or determine acceptance, lifecycle, rule compilation, or enforcement semantics.
 6. **No speculative platform expansion.** Hosted/team/org layers wait for user pull and evidence from the current wedge.
 
 ## Related
 
 - [Current phase](../architecture/current-phase.md)
 - [ADR-023: Canonical Decision Index and Runtime Projection Boundary](../adr/ADR-023-canonical-decision-index-and-runtime-projection-boundary.md)
+- [ADR-027: Decision MCP Proposal Ingestion and Authority Boundary](../adr/ADR-027-decision-mcp-proposal-ingestion-and-authority-boundary.md)
 - [Canonical integration support matrix](../integrations/README.md)
 - [Historical April 2026 roadmap](./2026-04-24-adoption-and-enhancement-roadmap.md)
 - [Changelog](../../CHANGELOG.md)
