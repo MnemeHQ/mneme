@@ -1,7 +1,7 @@
 ---
 id: ADR-023
 title: "Canonical Decision Index and Runtime Projection Boundary"
-status: proposed
+status: accepted
 priority: foundational
 date: 2026-09-11
 scope: decision_index.runtime_projection
@@ -9,7 +9,7 @@ scope: decision_index.runtime_projection
 
 # ADR-023: Canonical Decision Index and Runtime Projection Boundary
 
-**Status:** Proposed  
+**Status:** Accepted  
 **Date:** 2026-09-11  
 **Deciders:** Theo Valmis
 
