@@ -23,8 +23,10 @@ from mneme.decision_index import (
 )
 from mneme.decision_index_service import (
     CanonicalDecisionTrace,
+    DecisionIndexIntegrityError,
     DecisionIndexService,
     DecisionSearchResult,
+    DecisionTraceNotFound,
     ProposalTrace,
 )
 from mneme.decision_proposal import (
@@ -398,32 +400,54 @@ def test_canonical_trace_reports_missing_enforcement_explicitly():
     assert not hasattr(trace, "enforcement_points")
 
 
-def test_canonical_trace_without_rules_or_evidence_is_explicit():
+def test_canonical_trace_without_evidence_is_explicit():
     record = CanonicalDecisionRecord(
-        decision_id="ADR-9500",
+        decision_id="ADR-9501",
         statement="Guidance-only decision",
         lifecycle_status="active",
         decided_at="2026-09-01",
     )
     canonical = CanonicalArchitectureIndex(records=(record,))
     service = _service(canonical_index=canonical)
-    trace = service.trace("ADR-9500")
-    assert trace.derived_rules == ()
+    trace = service.trace("ADR-9501")
     assert trace.declared_test_evidence == ()
     joined = "\n".join(trace.missing_links)
-    assert "derived_rules: none recorded" in joined
     assert "declared_test_evidence: none declared" in joined
     assert "enforcement_links: absent" in joined
 
 
-def test_trace_of_unknown_id_fails_closed_deterministically():
+def test_trace_of_unknown_id_returns_not_found_type():
+    """Unknown IDs stay type-unknown: never classified as proposal or
+    canonical, never guessed."""
     service = _service(canonical_index=_canonical_index())
     trace = service.trace("does-not-exist")
-    assert isinstance(trace, ProposalTrace)
-    assert trace.proposal is None
-    assert "proposal: not found" in trace.missing_links
-    again = service.trace("does-not-exist")
-    assert again == trace, "unknown-id trace is deterministic"
+    assert isinstance(trace, DecisionTraceNotFound)
+    assert not isinstance(trace, ProposalTrace), (
+        "an unresolved identifier must not be classified into the "
+        "proposal domain"
+    )
+    assert not isinstance(trace, CanonicalDecisionTrace), (
+        "an unresolved identifier must not be classified into the "
+        "canonical domain"
+    )
+    assert trace.record_id == "does-not-exist"
+    joined = "\n".join(trace.missing_links)
+    assert "neither a proposal id nor a canonical decision id" in joined
+    assert "proposal: not found" in joined
+    assert "canonical_decision: not found" in joined
+    assert "record_type: unknown" in joined
+
+
+def test_trace_of_unknown_id_is_deterministic():
+    service = _service(canonical_index=_canonical_index())
+    first = service.trace("does-not-exist")
+    second = service.trace("does-not-exist")
+    assert first == second
+    assert isinstance(first, DecisionTraceNotFound)
+    # Deterministic across service instances too.
+    assert _service(canonical_index=_canonical_index()).trace(
+        "does-not-exist"
+    ) == first
 
 
 def test_trace_does_not_mutate_canonical_or_proposal_records():
@@ -439,6 +463,122 @@ def test_trace_does_not_mutate_canonical_or_proposal_records():
     assert canonical.records == records_before
     assert canonical.rules == rules_before
     assert service._store.list_proposals() == proposals_before
+
+
+# ── Canonical rule-lineage integrity (fail closed) ──────────────────────────
+
+
+def test_matching_canonical_rule_lineage_traces_normally():
+    canonical = _canonical_index()
+    service = _service(canonical_index=canonical)
+    trace = service.trace("ADR-9001")
+    assert isinstance(trace, CanonicalDecisionTrace)
+    assert [rule.rule_id for rule in trace.derived_rules] == [
+        "ADR-9001:FORBID_LITERAL:0",
+    ]
+    assert trace.canonical_record.derived_rule_ids == (
+        "ADR-9001:FORBID_LITERAL:0",
+    )
+
+
+def test_empty_and_empty_canonical_rule_lineage_remains_valid():
+    record = CanonicalDecisionRecord(
+        decision_id="ADR-9500",
+        statement="Guidance-only decision",
+        lifecycle_status="active",
+        decided_at="2026-09-01",
+    )
+    canonical = CanonicalArchitectureIndex(records=(record,))
+    service = _service(canonical_index=canonical)
+    trace = service.trace("ADR-9500")
+    assert isinstance(trace, CanonicalDecisionTrace)
+    assert trace.derived_rules == ()
+    joined = "\n".join(trace.missing_links)
+    assert "derived_rules: none recorded" in joined
+
+
+def test_declared_ids_without_stored_rules_fail_closed():
+    record = CanonicalDecisionRecord(
+        decision_id="ADR-9601",
+        statement="Declares a rule it does not carry",
+        lifecycle_status="active",
+        decided_at="2026-09-01",
+        derived_rule_ids=("ADR-9601:FORBID_LITERAL:0",),
+    )
+    canonical = CanonicalArchitectureIndex(records=(record,))
+    service = _service(canonical_index=canonical)
+    with pytest.raises(DecisionIndexIntegrityError) as exc:
+        service.trace("ADR-9601")
+    assert "ADR-9601" in str(exc.value)
+    assert "derived_rule_ids" in str(exc.value)
+    assert isinstance(exc.value, ValueError), (
+        "the integrity error is a domain ValueError subclass"
+    )
+
+
+def test_stored_rules_without_declared_ids_fail_closed():
+    record = CanonicalDecisionRecord(
+        decision_id="ADR-9602",
+        statement="Carries rules it does not declare",
+        lifecycle_status="active",
+        decided_at="2026-09-01",
+    )
+    canonical = CanonicalArchitectureIndex(
+        records=(record,), rules=(_canonical_rule("ADR-9602"),)
+    )
+    service = _service(canonical_index=canonical)
+    with pytest.raises(DecisionIndexIntegrityError) as exc:
+        service.trace("ADR-9602")
+    assert "ADR-9602" in str(exc.value)
+    assert "stores rules" in str(exc.value)
+
+
+def test_mismatched_rule_id_ordering_fails_closed():
+    """Ordering is part of the canonical contract (ADR-023 section 10):
+    derived_rule_ids must match the stored derived order exactly."""
+    record = CanonicalDecisionRecord(
+        decision_id="ADR-9603",
+        statement="Declares rules in a different order",
+        lifecycle_status="active",
+        decided_at="2026-09-01",
+        derived_rule_ids=(
+            "ADR-9603:FORBID_LITERAL:1",
+            "ADR-9603:FORBID_LITERAL:0",
+        ),
+    )
+    rules = tuple(
+        CanonicalRuleRecord(
+            rule_id=f"ADR-9603:FORBID_LITERAL:{index}",
+            decision_id="ADR-9603",
+            decision_version="1",
+            rule_type="FORBID_LITERAL",
+            rule_payload={"value": f"forbidden-literal-{index}"},
+        )
+        for index in (0, 1)
+    )
+    canonical = CanonicalArchitectureIndex(records=(record,), rules=rules)
+    service = _service(canonical_index=canonical)
+    with pytest.raises(DecisionIndexIntegrityError) as exc:
+        service.trace("ADR-9603")
+    assert "ADR-9603" in str(exc.value)
+
+
+def test_integrity_error_does_not_return_ambiguous_derived_rules():
+    record = CanonicalDecisionRecord(
+        decision_id="ADR-9604",
+        statement="Declares a rule it does not carry",
+        lifecycle_status="active",
+        decided_at="2026-09-01",
+        derived_rule_ids=("ADR-9604:FORBID_LITERAL:0",),
+    )
+    canonical = CanonicalArchitectureIndex(records=(record,))
+    service = _service(canonical_index=canonical)
+    with pytest.raises(DecisionIndexIntegrityError):
+        service.trace("ADR-9604")
+    # No partial trace escaped: the only way to observe lineage is a
+    # successful trace, which the mismatch prevents.
+    with pytest.raises(DecisionIndexIntegrityError):
+        service.trace("ADR-9604")
 
 
 # ── Capability/authority boundary ───────────────────────────────────────────

@@ -102,6 +102,19 @@ _VALID_PROPOSAL_STATUS_FILTERS = (
 )
 
 
+class DecisionIndexIntegrityError(ValueError):
+    """Internal Decision Index integrity failure (consumer trace boundary).
+
+    Raised when the two canonical representations of rule lineage
+    disagree: the record's declared ``derived_rule_ids`` versus the rules
+    actually stored for that decision. This is an index-integrity failure,
+    not an ordinary partial trace, so the trace fails closed instead of
+    returning ambiguous ``derived_rules``. Neither side is silently
+    repaired. This protects the consumer trace boundary only; it does not
+    change enforcement or projection behavior.
+    """
+
+
 def _default_clock() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -198,6 +211,20 @@ class CanonicalDecisionTrace:
     canonical_record: CanonicalDecisionRecord | None
     derived_rules: tuple[CanonicalRuleRecord, ...]
     declared_test_evidence: tuple[CanonicalTestEvidence, ...]
+    missing_links: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class DecisionTraceNotFound:
+    """Explicit not-found result for an unresolved trace identifier.
+
+    The identifier resolved to neither a proposal nor a canonical
+    decision; its record type is therefore unknown and is never guessed.
+    Both domains are reported explicitly as not found in
+    ``missing_links``.
+    """
+
+    record_id: str
     missing_links: tuple[str, ...]
 
 
@@ -496,14 +523,15 @@ class DecisionIndexService:
 
     def trace(
         self, record_id: str
-    ) -> ProposalTrace | CanonicalDecisionTrace:
+    ) -> ProposalTrace | CanonicalDecisionTrace | DecisionTraceNotFound:
         """Return the deterministic lineage actually known for a record.
 
         The service owns the record-type distinction: it resolves
         ``record_id`` as a proposal id first, then as a canonical decision
-        id; the future transport never determines the type itself. Unknown
-        ids return the explicit not-found proposal trace (fail closed,
-        deterministic).
+        id; the future transport never determines the type itself.
+        Unresolved ids return ``DecisionTraceNotFound`` — the identifier
+        stays type-unknown and is never classified into the proposal or
+        canonical domain (fail closed, deterministic).
 
         Proposal trace chain: proposal -> source provenance -> accepted
         canonical id (if the proposal was accepted by the separate Mneme
@@ -517,6 +545,12 @@ class DecisionIndexService:
         declared only, never trusted/verified per ADR-025). Enforcement
         points are not modelled in the current canonical kernel and are
         reported explicitly as missing. Nothing is fabricated.
+
+        A disagreement between the canonical record's declared
+        ``derived_rule_ids`` and the rules actually stored for that
+        decision is an internal index-integrity failure and raises
+        ``DecisionIndexIntegrityError`` (fail closed) instead of
+        returning ambiguous lineage.
         """
         proposal = self._store.get(record_id)
         if proposal is not None:
@@ -525,26 +559,15 @@ class DecisionIndexService:
             for record in self._canonical.records:
                 if record.decision_id == record_id:
                     return self._trace_canonical(record)
-        return self._trace_proposal_not_found(record_id)
-
-    @staticmethod
-    def _trace_proposal_not_found(record_id: str) -> ProposalTrace:
-        return ProposalTrace(
-            proposal_id=record_id,
-            proposal=None,
-            source_provenance=None,
-            accepted_decision_id=None,
-            canonical_record=None,
-            canonical_derived_rule_ids=(),
+        return DecisionTraceNotFound(
+            record_id=record_id,
             missing_links=(
+                f"record: not found ({record_id!r} is neither a proposal id "
+                "nor a canonical decision id)",
                 "proposal: not found",
-                "source_provenance: absent (proposal not found)",
-                "accepted_decision_id: absent",
-                "canonical_record: absent",
-                "derived_rules: absent",
-                "enforcement_links: absent (proposals are never enforceable)",
-                "trusted_evidence: absent (producer provenance is never "
-                "trusted evidence)",
+                "canonical_decision: not found",
+                "record_type: unknown (no proposal/canonical classification "
+                "is asserted for an unresolved identifier)",
             ),
         )
 
@@ -598,21 +621,23 @@ class DecisionIndexService:
     def _trace_canonical(
         self, record: CanonicalDecisionRecord
     ) -> CanonicalDecisionTrace:
-        missing: list[str] = []
         derived_rules: tuple[CanonicalRuleRecord, ...] = ()
         if self._canonical is not None:
             derived_rules = self._canonical.rules_for_decision(
                 record.decision_id
             )
+        stored_ids = tuple(rule.rule_id for rule in derived_rules)
+        if stored_ids != record.derived_rule_ids:
+            raise DecisionIndexIntegrityError(
+                f"canonical decision {record.decision_id!r} rule lineage "
+                f"integrity failure: record declares derived_rule_ids "
+                f"{list(record.derived_rule_ids)} but the canonical index "
+                f"stores rules {list(stored_ids)}; the two canonical "
+                f"representations must match exactly (ADR-023 section 10)"
+            )
+        missing: list[str] = []
         if not derived_rules:
             missing.append("derived_rules: none recorded for canonical decision")
-        else:
-            stored_ids = tuple(rule.rule_id for rule in derived_rules)
-            if stored_ids != record.derived_rule_ids:
-                missing.append(
-                    "derived_rules: stored rule ids do not match the "
-                    "record's declared derived_rule_ids"
-                )
         declared_evidence = tuple(record.test_evidence)
         if not declared_evidence:
             missing.append(
@@ -639,7 +664,9 @@ class DecisionIndexService:
 
 __all__ = [
     "CanonicalDecisionTrace",
+    "DecisionIndexIntegrityError",
     "DecisionSearchResult",
+    "DecisionTraceNotFound",
     "ProposalScopeHintMatch",
     "ProposalTrace",
     "ProposeResult",

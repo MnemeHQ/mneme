@@ -23,6 +23,7 @@ from mneme.decision_index import (
 from mneme.decision_index_service import (
     DecisionIndexService,
     DecisionSearchResult,
+    DecisionTraceNotFound,
     ProposalScopeHintMatch,
     ProposalTrace,
     ProposeResult,
@@ -353,8 +354,10 @@ def test_trace_of_proposed_proposal_reports_missing_links_explicitly():
 
 def test_trace_of_unknown_proposal_is_explicit():
     trace = _service().trace("dprop-" + "f" * 32)
-    assert trace.proposal is None
+    assert isinstance(trace, DecisionTraceNotFound)
+    assert not isinstance(trace, ProposalTrace)
     assert "proposal: not found" in trace.missing_links
+    assert "canonical_decision: not found" in trace.missing_links
 
 
 def test_trace_of_accepted_fixture_resolves_canonical_lineage():
