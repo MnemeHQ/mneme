@@ -62,13 +62,31 @@ VALID_DECISION_CLASSES: frozenset[str] = frozenset({
 })
 
 # Lifecycle vocabulary reused from the existing graph projection
-# (``adr_import.GraphStatus``). "inactive" mirrors an explicitly ``proposed``
-# ADR: represented, lineage-only, never projected into Layer 1 governance.
+# (``adr_import.GraphStatus``). "inactive" is the non-authoritative,
+# non-projectable bucket of the current vocabulary: in the graph projection
+# it mirrors an explicitly ``proposed`` ADR, and in the corpus-level index it
+# additionally marks an accepted same-scope precedence loser (see
+# ``build_canonical_index``). Retained for lineage, never projected into
+# Layer 1 governance.
 VALID_LIFECYCLE_STATUSES: frozenset[str] = frozenset({
     "active",
     "superseded",
     "deprecated",
     "inactive",
+})
+
+# D0-validated source types. The ADR adapter may claim ``"adr"`` because the
+# compiler path verified its sources. The generic runtime adapter records
+# ``"runtime"``: the runtime ``Decision`` shape does not carry enough
+# information to infer ADR provenance from an arbitrary ``source_path``
+# (non-ADR producers such as the EventCatalog importer also set it), so the
+# kernel must not falsify provenance.
+SOURCE_TYPE_ADR = "adr"
+SOURCE_TYPE_RUNTIME = "runtime"
+
+VALID_SOURCE_TYPES: frozenset[str] = frozenset({
+    SOURCE_TYPE_ADR,
+    SOURCE_TYPE_RUNTIME,
 })
 
 CANONICAL_VERSION = "1"
@@ -79,9 +97,13 @@ class CanonicalSourceEvidence:
     """Source provenance for one canonical decision.
 
     Attributes:
-        source_type:    Validated source class. D0 validates ``"adr"`` only.
+        source_type:    Validated source class. The ADR adapter records
+                        ``"adr"``; the generic runtime adapter records
+                        ``"runtime"`` because a runtime ``Decision`` does not
+                        carry enough information to verify ADR provenance.
         source_locator: Deterministic locator (for ADRs, the source path
-                        recorded by the parser).
+                        recorded by the parser; for runtime records, the
+                        runtime ``source_path``).
     """
 
     source_type: str
@@ -336,7 +358,8 @@ def decisions_to_canonical(
             anti_patterns=tuple(decision.anti_patterns),
             source_evidence=(
                 (CanonicalSourceEvidence(
-                    source_type="adr", source_locator=decision.source_path
+                    source_type=SOURCE_TYPE_RUNTIME,
+                    source_locator=decision.source_path,
                 ),)
                 if decision.source_path
                 else ()
@@ -364,15 +387,20 @@ def build_canonical_index(
 
     ``active_adrs`` is the precedence-resolved active set (the same list
     passed to ``adrs_to_decisions``); those records carry
-    ``lifecycle_status="active"``. Every other parsed ADR is retained for
-    lineage with the lifecycle resolved by the existing graph projection
-    (``superseded`` / ``deprecated`` / ``inactive``).
+    ``lifecycle_status="active"`` — precedence winners are the only runtime
+    active records.
 
-    An ADR that the graph calls ``active`` but that precedence did not pick
-    (a same-scope precedence loser) is excluded from the index: the current
-    compiler produces no runtime record for it, and representing it as
-    active would fabricate governance the compiler never authorized. That
-    representation gap is D1 lifecycle-hardening scope (ADR-023 sequence).
+    Every other parsed ADR is retained as non-authoritative lineage with
+    the lifecycle resolved by the existing graph projection
+    (``superseded`` / ``deprecated`` / ``inactive``). An accepted ADR that
+    the graph calls ``active`` but that precedence did not pick (a
+    same-scope precedence loser, flagged by the lifecycle analyzer as
+    ``SILENT_PRECEDENCE_ELIMINATION``) is represented with
+    ``lifecycle_status="inactive"``: the Decision Index is broader than the
+    active runtime projection, so the losing decision stays canonically
+    representable for lineage while remaining non-projectable (ADR-023
+    section 6: non-authoritative states never project into active Layer 1
+    governance).
     """
     active_ids = {a.id for a in active_adrs}
     graph_status = {
@@ -385,7 +413,9 @@ def build_canonical_index(
             status = "active"
         else:
             status = graph_status.get(adr.id, "")
-            if status not in VALID_LIFECYCLE_STATUSES or status == "active":
+            if status == "active":
+                status = "inactive"
+            if status not in VALID_LIFECYCLE_STATUSES:
                 continue
         record, adr_rules = _record_from_adr(adr, status)
         records.append(record)
@@ -420,6 +450,8 @@ def canonical_from(
 __all__ = [
     "CANONICAL_DECISION_CLASS_ARCHITECTURE",
     "CANONICAL_VERSION",
+    "SOURCE_TYPE_ADR",
+    "SOURCE_TYPE_RUNTIME",
     "CanonicalArchitectureIndex",
     "CanonicalDecisionRecord",
     "CanonicalRuleRecord",
@@ -427,6 +459,7 @@ __all__ = [
     "CanonicalTestEvidence",
     "VALID_DECISION_CLASSES",
     "VALID_LIFECYCLE_STATUSES",
+    "VALID_SOURCE_TYPES",
     "adrs_to_canonical",
     "build_canonical_index",
     "canonical_from",

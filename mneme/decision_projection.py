@@ -38,6 +38,8 @@ from __future__ import annotations
 
 from mneme.decision_index import (
     CANONICAL_DECISION_CLASS_ARCHITECTURE,
+    SOURCE_TYPE_ADR,
+    VALID_SOURCE_TYPES,
     CanonicalArchitectureIndex,
     CanonicalDecisionRecord,
     CanonicalRuleRecord,
@@ -100,12 +102,21 @@ def project_canonical_rule(rule: CanonicalRuleRecord) -> Rule:
 def _source_path_of(record: CanonicalDecisionRecord) -> str:
     """Resolve the runtime ``source_path`` from canonical source evidence.
 
-    The first ADR evidence entry is the provenance the current runtime
-    persists (``adr_import`` writes one ``source`` block per decision).
+    The provenance type is not consulted: the locator round-trips whatever
+    the runtime recorded (an ADR path from the ADR adapter, or an
+    unverified runtime locator from the generic adapter), because
+    ``Decision.source_path`` feeds the ADR-019/ADR-020 policy-source
+    exemptions and must survive the round trip unchanged.
     """
     for evidence in record.source_evidence:
-        if evidence.source_type == "adr":
-            return evidence.source_locator
+        if evidence.source_type not in VALID_SOURCE_TYPES:
+            raise ValueError(
+                f"decision {record.decision_id!r} carries unknown "
+                f"source_type {evidence.source_type!r} "
+                f"(expected one of {sorted(VALID_SOURCE_TYPES)})"
+            )
+    if record.source_evidence:
+        return record.source_evidence[0].source_locator
     return ""
 
 
@@ -156,6 +167,21 @@ def project_canonical_decision(
                 f"version {rule.decision_version!r}, but record "
                 f"{record.decision_id!r} is version {record.version!r}"
             )
+        if rule.lifecycle_status != record.lifecycle_status:
+            raise ValueError(
+                f"canonical rule {rule.rule_id!r} has lifecycle_status "
+                f"{rule.lifecycle_status!r}, incompatible with owning "
+                f"record {record.decision_id!r} at "
+                f"{record.lifecycle_status!r}"
+            )
+    supplied_rule_ids = tuple(rule.rule_id for rule in rules)
+    if supplied_rule_ids != record.derived_rule_ids:
+        raise ValueError(
+            f"decision {record.decision_id!r} declares derived_rule_ids "
+            f"{list(record.derived_rule_ids)} but the supplied rules are "
+            f"{list(supplied_rule_ids)}; canonical decision-to-rule "
+            f"lineage must match exactly (ADR-023 section 10)"
+        )
     return Decision(
         id=record.decision_id,
         decision=record.statement,

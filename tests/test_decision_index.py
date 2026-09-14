@@ -237,9 +237,35 @@ def test_runtime_adapter_preserves_rules_test_evidence_and_lifecycle():
     assert record.test_evidence == (
         CanonicalTestEvidence(selector="tests/test_x.py::test_y", sha="abc123"),
     )
+    assert record.test_evidence[0].sha == "abc123"
     assert record.lifecycle_status == "active"
     assert record.decided_at == "2026-05-12"
     assert record.source_evidence[0].source_locator == decision.source_path
+
+
+def test_runtime_adapter_records_runtime_source_type_not_adr():
+    """Non-ADR runtime provenance must not be labeled ``adr``.
+
+    The runtime ``Decision`` shape does not carry enough information to
+    verify ADR provenance: non-ADR producers (e.g. the EventCatalog
+    importer) also construct runtime Decisions with a ``source_path``. The
+    generic adapter preserves the locator for parity and records the honest
+    ``runtime`` source type.
+    """
+    decision = _runtime_decision()
+    decision.source_path = str(
+        REPO_ROOT / "examples" / "eventcatalog-sample" / "adr-01.mdx"
+    )
+    [record] = decisions_to_canonical([decision]).records
+    assert record.source_evidence[0].source_type == "runtime"
+    assert record.source_evidence[0].source_locator == decision.source_path
+    assert record.source_evidence[0].source_type != "adr"
+
+    [projected] = project_canonical_index(
+        decisions_to_canonical([decision]),
+        memory_path=str(REPO_ROOT / ".mneme" / "project_memory.json"),
+    )
+    assert projected.source_path == decision.source_path
 
 
 def test_runtime_adapter_does_not_carry_memory_path():
@@ -353,6 +379,62 @@ def test_g6_lineage_records_retained_without_runtime_governance(tmp_path):
         "ADR-9103", "ADR-9104", "ADR-9105",
     }
     assert all(r.decision_class == "architecture" for r in lineage)
+
+
+def test_g6_same_scope_precedence_loser_retained_as_non_projectable_lineage(
+    tmp_path,
+):
+    """Two accepted same-scope ADRs: precedence picks one runtime winner.
+
+    Required result: both decisions are canonically represented; only the
+    precedence winner projects to Layer 1; the loser is retained as
+    non-authoritative lineage with the non-projectable ``inactive`` state.
+    """
+    adr_dir = tmp_path / "adr"
+    adr_dir.mkdir()
+    _write_adr_file(
+        adr_dir / "ADR-9201.md",
+        "ADR-9201",
+        "accepted",
+        scope="d0.precedence",
+    )
+    _write_adr_file(
+        adr_dir / "ADR-9202.md",
+        "ADR-9202",
+        "accepted",
+        scope="d0.precedence",
+    )
+    _bump_date(adr_dir / "ADR-9201.md", "2026-09-02")
+
+    memory = tmp_path / "project_memory.json"
+    memory.write_text(
+        '{"meta": {"name": "t", "description": "t"}, "decisions": []}\n',
+        encoding="utf-8",
+    )
+    report = compile_for_import(adr_dir)
+    assert [d.id for d in report.decisions] == ["ADR-9201"], (
+        "the compiler must still choose exactly one runtime active winner"
+    )
+
+    parsed = parse_adr_directory(adr_dir)
+    index = build_canonical_index(parsed, resolve_precedence(parsed))
+    statuses = {r.decision_id: r.lifecycle_status for r in index.records}
+    assert statuses == {"ADR-9201": "active", "ADR-9202": "inactive"}
+
+    projected = project_canonical_index(index)
+    assert [d.id for d in projected] == ["ADR-9201"]
+    assert projected == report.decisions
+
+    loser = index.rules_for_decision("ADR-9202")
+    assert all(rule.lifecycle_status == "inactive" for rule in loser)
+
+
+def _bump_date(path: Path, date: str) -> None:
+    text = path.read_text(encoding="utf-8")
+    path.write_text(
+        text.replace("date: 2026-09-01", f"date: {date}", 1),
+        encoding="utf-8",
+    )
 
 
 def test_g6_retrieval_excludes_non_active_projections(tmp_path):

@@ -25,6 +25,7 @@ from mneme.conflict_detector import ConflictDetector
 from mneme.decision_index import (
     CanonicalDecisionRecord,
     CanonicalRuleRecord,
+    CanonicalSourceEvidence,
     adrs_to_canonical,
     decisions_to_canonical,
 )
@@ -511,6 +512,147 @@ def test_projection_fails_closed_on_rule_ownership_mismatch():
     with pytest.raises(ValueError) as exc:
         project_canonical_decision(canonical, rules=(mismatched,))
     assert "D0-OTHER" in str(exc.value)
+
+
+def test_projection_fails_closed_on_missing_declared_rule():
+    canonical = dataclasses.replace(
+        _record(decision_id="D0-MISSING"),
+        derived_rule_ids=("D0-MISSING:FORBID_LITERAL:0",),
+    )
+    with pytest.raises(ValueError) as exc:
+        project_canonical_decision(canonical, rules=())
+    assert "derived_rule_ids" in str(exc.value)
+
+
+def test_projection_fails_closed_on_extra_undeclared_rule():
+    canonical = _record(decision_id="D0-EXTRA")
+    undeclared = CanonicalRuleRecord(
+        rule_id="D0-EXTRA:FORBID_LITERAL:0",
+        decision_id="D0-EXTRA",
+        decision_version="1",
+        rule_type="FORBID_LITERAL",
+        rule_payload={"value": "forbidden-literal-demo"},
+    )
+    with pytest.raises(ValueError) as exc:
+        project_canonical_decision(canonical, rules=(undeclared,))
+    assert "derived_rule_ids" in str(exc.value)
+
+
+def test_projection_fails_closed_on_reordered_declared_rule_ids():
+    canonical = dataclasses.replace(
+        _record(decision_id="D0-ORDER"),
+        derived_rule_ids=(
+            "D0-ORDER:FORBID_LITERAL:0",
+            "D0-ORDER:FORBID_LITERAL:1",
+        ),
+    )
+    rules = tuple(
+        CanonicalRuleRecord(
+            rule_id=rule_id,
+            decision_id="D0-ORDER",
+            decision_version="1",
+            rule_type="FORBID_LITERAL",
+            rule_payload={"value": f"forbidden-literal-{n}"},
+        )
+        for rule_id, n in (
+            ("D0-ORDER:FORBID_LITERAL:1", 1),
+            ("D0-ORDER:FORBID_LITERAL:0", 0),
+        )
+    )
+    with pytest.raises(ValueError) as exc:
+        project_canonical_decision(canonical, rules=rules)
+    assert "derived_rule_ids" in str(exc.value)
+
+
+def test_projection_fails_closed_on_rule_lifecycle_mismatch():
+    canonical = dataclasses.replace(
+        _record(decision_id="D0-LIFECYCLE"),
+        derived_rule_ids=("D0-LIFECYCLE:FORBID_LITERAL:0",),
+    )
+    incompatible = CanonicalRuleRecord(
+        rule_id="D0-LIFECYCLE:FORBID_LITERAL:0",
+        decision_id="D0-LIFECYCLE",
+        decision_version="1",
+        rule_type="FORBID_LITERAL",
+        rule_payload={"value": "forbidden-literal-demo"},
+        lifecycle_status="superseded",
+    )
+    with pytest.raises(ValueError) as exc:
+        project_canonical_decision(canonical, rules=(incompatible,))
+    assert "lifecycle_status" in str(exc.value)
+
+
+def test_projection_fails_closed_on_unknown_source_type():
+    canonical = dataclasses.replace(
+        _record(decision_id="D0-SRC"),
+        source_evidence=(CanonicalSourceEvidence(
+            source_type="confluence", source_locator="https://example.test/x"
+        ),),
+    )
+    with pytest.raises(ValueError) as exc:
+        project_canonical_decision(canonical)
+    assert "source_type" in str(exc.value)
+
+
+def test_g8_runtime_provenance_round_trips_without_claiming_adr(tmp_path):
+    """EventCatalog-style runtime provenance: locator preserved, type honest.
+
+    The source path also feeds the ADR-019/ADR-020 policy-source exemptions
+    (policy_paths), so the projected decision must keep the identical
+    exemption behavior without the kernel claiming ADR provenance.
+    """
+    project = tmp_path / "catalog-project"
+    (project / ".mneme").mkdir(parents=True)
+    memory = project / ".mneme" / "project_memory.json"
+    memory.write_text(
+        '{"meta": {"name": "t", "description": "t"}, "decisions": []}\n',
+        encoding="utf-8",
+    )
+    event_source = str(
+        project / "catalog" / "domains" / "payments" / "decisions" / "adr-01.mdx"
+    )
+    current = Decision(
+        id="ec-payment-adr-01",
+        decision="Payments use the posted event schema",
+        rationale="EventCatalog ADR",
+        scope=["payments"],
+        rules=[
+            Rule(
+                type="FORBID_LITERAL",
+                value="legacy-event-schema",
+                include_paths=("src/payments/**",),
+            )
+        ],
+        source_path=event_source,
+        memory_path=str(memory.resolve()),
+    )
+    [projected] = project_canonical_index(
+        decisions_to_canonical([current]), memory_path=str(memory.resolve())
+    )
+    assert projected.source_path == current.source_path
+
+    index = decisions_to_canonical([current])
+    assert index.records[0].source_evidence[0].source_type == "runtime"
+
+    text = "uses legacy-event-schema in the handler"
+    for target in (event_source, "src/payments/handler.py"):
+        scored_current = DecisionRetriever([current]).retrieve(target)
+        scored_projected = DecisionRetriever([projected]).retrieve(target)
+        current_result = check_prompt(
+            text, scored_current, input_path=target
+        )
+        projected_result = check_prompt(
+            text, scored_projected, input_path=target
+        )
+        assert current_result.verdict == projected_result.verdict
+        assert current_result.applicability == projected_result.applicability
+        assert [
+            (v.decision_id, v.rule, v.trigger, v.kind)
+            for v in current_result.violations
+        ] == [
+            (v.decision_id, v.rule, v.trigger, v.kind)
+            for v in projected_result.violations
+        ]
 
 
 def _record(
