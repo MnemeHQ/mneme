@@ -14,6 +14,8 @@ Subcommands
   protect           M1.4 per-decision protection activation:
                     list | status | validate | activate.
                     See docs/protect-activation.md.
+  decision-mcp      Serve the Decision Index MCP tools over local stdio
+                    (D2B, ADR-027). Six non-authoritative tools only.
 
 Usage::
 
@@ -949,6 +951,59 @@ def _cmd_eventcatalog_import(args: argparse.Namespace) -> int:
     return 1 if has_diags else 0
 
 
+# ── Subcommand: decision-mcp (D2B local MCP transport) ───────────────────────
+
+DEFAULT_PROPOSALS_PATH = ".mneme/decision_proposals.json"
+
+
+def _cmd_decision_mcp(args: argparse.Namespace) -> int:
+    """Launch the local Decision Index MCP server over stdio (D2B, #362).
+
+    The command launches the local MCP transport and nothing more: no
+    acceptance UI, no authority mutation surface (D2C is separate). The
+    proposal store is the dedicated D2A store — never
+    ``.mneme/project_memory.json``. Canonical ADR loading is optional:
+    by default the server serves the proposal store with no canonical
+    directory; with ``--adr-dir`` the corpus must pass the strict Mneme
+    ADR compiler path (parse -> validate -> precedence resolve) before
+    the server starts — an invalid or ambiguous corpus prevents startup
+    rather than degrading canonical authority.
+    """
+    try:
+        from mneme.decision_mcp import serve_stdio
+    except ImportError as exc:
+        print(
+            "ERROR: the Decision MCP server requires the mcp extra: "
+            "pip install 'mneme-hq[mcp]'",
+            file=sys.stderr,
+            flush=True,
+        )
+        return 2
+
+    proposals_arg: str | None
+    if args.proposals is None:
+        proposals_arg = DEFAULT_PROPOSALS_PATH
+    elif args.proposals == "":
+        proposals_arg = None  # explicit in-memory store
+    else:
+        proposals_arg = args.proposals
+
+    adr_dir: str | None = None
+    if args.adr_dir is not None:
+        if args.adr_dir == "":
+            return _error_exit(
+                "--adr-dir requires a directory path; omit the option to "
+                "start without a canonical ADR directory"
+            )
+        if not Path(args.adr_dir).is_dir():
+            return _error_exit(f"ADR directory {args.adr_dir} does not exist")
+        adr_dir = args.adr_dir
+
+    # serve_stdio blocks for the life of the stdio server.
+    serve_stdio(proposal_store_path=proposals_arg, adr_dir=adr_dir)
+    return 0
+
+
 # ── Entry point ──────────────────────────────────────────────────────────────
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -1234,6 +1289,42 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Allow same-id overwrite of existing decisions[] entries",
     )
     p_ec_import.set_defaults(func=_cmd_eventcatalog_import)
+
+    # decision-mcp (D2B local MCP transport over the Decision Index service)
+    p_mcp = sub.add_parser(
+        "decision-mcp",
+        help=(
+            "Serve the Decision Index MCP tools over local stdio "
+            "(decision.propose / propose_batch / get / search / "
+            "applicable_to / trace). Non-authoritative proposals only; "
+            "acceptance is a separate Mneme authority surface."
+        ),
+    )
+    p_mcp.add_argument(
+        "--proposals",
+        default=None,
+        help=(
+            "Path to the decision-proposals JSON file; defaults to "
+            ".mneme/decision_proposals.json when absent, in-memory store "
+            "when the argument is an empty string"
+        ),
+    )
+    p_mcp.add_argument(
+        "--adr-dir",
+        dest="adr_dir",
+        default=None,
+        help=(
+            "Directory containing ADR markdown files compiled into the "
+            "canonical decision index. Optional: by default the server "
+            "starts with proposal-store access only and no canonical ADR "
+            "directory. When supplied, the corpus must pass the strict "
+            "Mneme ADR compiler path (parse -> validate -> precedence "
+            "resolve) before the server starts; an invalid or ambiguous "
+            "corpus prevents startup rather than degrading canonical "
+            "authority"
+        ),
+    )
+    p_mcp.set_defaults(func=_cmd_decision_mcp)
 
     return parser
 
