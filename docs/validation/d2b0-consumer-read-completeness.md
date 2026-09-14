@@ -17,8 +17,11 @@ retrieval/enforcement/benchmark semantic change.
   `feat/d2b0-consumer-read-completeness` (worktree
   `.worktrees/feat-d2b0-consumer-read-completeness`, context-verified with
   `scripts/check_worktree_context.py` before work and before every commit).
-  The PR head adds this validation artifact only; no runtime/test bytes
-  differ from the tested implementation commit.
+  Architecture-review fix commits (type-unknown `DecisionTraceNotFound`,
+  fail-closed `DecisionIndexIntegrityError`) are included in the tested
+  state; the exact fix commit SHA is recorded in the PR head history. The
+  PR head adds this validation artifact and its docs-only updates only;
+  no runtime/test bytes differ from the tested implementation commits.
 
 ## Exact commands
 
@@ -35,11 +38,33 @@ python -m mneme.cli check --memory .mneme/project_memory.json --input scripts/ru
 
 | Check | Result |
 |---|---|
-| Focused consumer-read + D2A tests (`test_decision_index_consumer_reads.py`, `test_decision_index_service.py`, `test_decision_proposal.py`) | 74 passed |
+| Focused consumer-read + D2A tests (`test_decision_index_consumer_reads.py`, `test_decision_index_service.py`, `test_decision_proposal.py`) | 81 passed (74 original + 7 review-fix regressions) |
 | D0 kernel/projection regression (`test_decision_index.py`, `test_decision_projection.py`) | 46 passed |
-| Gate battery (`scripts/run_test_battery.py gate`, new test file registered in the manifest) | 1349 passed, 5 skipped (pre-existing, unrelated) |
-| `mneme check --mode warn` on changed governed files | 2/2 PASS |
+| Gate battery (`scripts/run_test_battery.py gate`, new test file registered in the manifest) | 1356 passed, 5 skipped (pre-existing, unrelated) |
+| `mneme check --mode warn` on changed governed files | PASS |
 | Frozen enforcement benchmark | NOT triggered: this PR is a Decision Index read-surface change only; no retrieval, enforcement, conflict-detection, matcher, applicability, or benchmark semantics were touched (test-policy trigger not met) |
+
+## Review-fix regressions (architecture review of #372)
+
+- `test_trace_of_unknown_id_returns_not_found_type`,
+  `test_trace_of_unknown_id_is_deterministic`,
+  `test_trace_of_unknown_proposal_is_explicit` (D2A file) — unresolved
+  trace identifiers return the new frozen `DecisionTraceNotFound`
+  (`record_id`, explicit "neither a proposal id nor a canonical decision
+  id", `record_type: unknown`); they are never classified as
+  `ProposalTrace` or `CanonicalDecisionTrace`, and the result is
+  deterministic across calls and service instances.
+- `test_matching_canonical_rule_lineage_traces_normally`,
+  `test_empty_and_empty_canonical_rule_lineage_remains_valid`,
+  `test_declared_ids_without_stored_rules_fail_closed`,
+  `test_stored_rules_without_declared_ids_fail_closed`,
+  `test_mismatched_rule_id_ordering_fails_closed`,
+  `test_integrity_error_does_not_return_ambiguous_derived_rules` —
+  canonical rule-lineage integrity: declared `derived_rule_ids` vs stored
+  rules must match exactly (ids and order, ADR-023 section 10);
+  empty/empty remains a valid trace; any mismatch raises
+  `DecisionIndexIntegrityError(ValueError)` with the decision id and both
+  id lists, and no ambiguous `derived_rules` escape.
 
 ## Search semantics
 
@@ -74,8 +99,9 @@ DecisionSearchResult`.
 ## Trace semantics
 
 `DecisionIndexService.trace(record_id) -> ProposalTrace |
-CanonicalDecisionTrace` (union return; the service owns the record-type
-distinction — the future transport never guesses).
+CanonicalDecisionTrace | DecisionTraceNotFound` (union return; the
+service owns the record-type distinction — the future transport never
+guesses).
 
 - Proposal id → `ProposalTrace` with unchanged D2A behavior: proposal,
   source provenance, accepted canonical id (only where an authority
@@ -90,8 +116,21 @@ distinction — the future transport never guesses).
   ADR-025). Enforcement points are not modelled in the current canonical
   kernel and are reported explicitly as
   `enforcement_links: absent`; nothing is fabricated.
-- Unknown id → the explicit not-found `ProposalTrace` (deterministic,
-  fail closed).
+- Unresolved id → frozen `DecisionTraceNotFound(record_id,
+  missing_links)` stating explicitly that the identifier is neither a
+  proposal id nor a canonical decision id and that its record type is
+  unknown. Unresolved identifiers carry no proposal/canonical
+  classification and are never guessed. Deterministic.
+- Canonical rule-lineage integrity (fail closed): the record's declared
+  `derived_rule_ids` and the rules stored for that decision must match
+  exactly — same ids, same order (ADR-023 section 10). Empty/empty is
+  valid and traces with `derived_rules: none recorded`. Any mismatch
+  (declared but absent, stored but undeclared, ordering difference)
+  raises `DecisionIndexIntegrityError` (a `ValueError` subclass) naming
+  the decision id and both id lists; no ambiguous `derived_rules` are
+  returned and neither side is silently repaired. This protects the
+  consumer trace boundary only; enforcement and projection behavior are
+  unchanged.
 - Trace reads never mutate canonical or proposal records.
 
 ## Lifecycle separation statement
