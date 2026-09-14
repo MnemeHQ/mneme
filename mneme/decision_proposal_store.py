@@ -16,24 +16,37 @@ the repository's existing file-backed conventions.
 
 Semantics:
 
-* ``add_if_new`` is the only write operation. It appends a proposal when
-  its id is unknown and returns the existing record unchanged otherwise
-  (append-preserving history; no silent overwrite, no update, no delete).
-* ``get`` and ``list_proposals`` are read-only. There are deliberately no
-  authority mutation methods (accept/reject/activate/supersede) — those
-  belong to the separate Mneme authority action (D2C), not to a producer
-  convenience API (ADR-027 section 7).
+* ``add_if_new`` is the only producer-facing write operation. It appends a
+  proposal when its id is unknown and returns the existing record unchanged
+  otherwise (append-preserving history; no silent overwrite, no update, no
+  delete).
+* ``get`` and ``list_proposals`` are read-only.
+* ``transition_if_proposed`` (D2C1) is the single Core persistence primitive
+  for the Mneme authority action (ADR-027 "Accepted-proposal authority
+  path"). It is deliberately NOT a producer capability: no producer path
+  reaches it. It transitions ``proposed`` to exactly one target status —
+  ``accepted`` (which requires a non-empty ``accepted_decision_id``) or
+  ``rejected`` (which must not carry one) — never rewrites candidate
+  content, producer key, fingerprint, or ``proposed_at``, never touches a
+  record already at the target status (returned unchanged, ``transitioned=
+  False``), and fails closed on any other terminal state, on unknown ids,
+  and on invalid arguments. Proposal candidate content is immutable: the
+  transition replaces only the status/link fields.
 * Records keep insertion order; reload reproduces ids, history, and order
   deterministically.
 """
 from __future__ import annotations
 
+import dataclasses
 import json
 import os
 from pathlib import Path
 from typing import Protocol
 
 from mneme.decision_proposal import (
+    PROPOSAL_STATUS_ACCEPTED,
+    PROPOSAL_STATUS_PROPOSED,
+    PROPOSAL_STATUS_REJECTED,
     DecisionProposal,
     proposal_from_dict,
     proposal_to_dict,
@@ -42,8 +55,29 @@ from mneme.decision_proposal import (
 SCHEMA = "mneme.decision-proposals/v1"
 
 
+def _validate_transition_args(
+    target_status: str, accepted_decision_id: str | None
+) -> None:
+    """Fail closed on invalid authority-transition arguments."""
+    if target_status not in (PROPOSAL_STATUS_ACCEPTED, PROPOSAL_STATUS_REJECTED):
+        raise ValueError(
+            f"target_status {target_status!r} is not a legal authority "
+            "transition target (accepted/rejected)"
+        )
+    if target_status == PROPOSAL_STATUS_ACCEPTED:
+        if not (isinstance(accepted_decision_id, str) and accepted_decision_id):
+            raise ValueError(
+                "transitioning to accepted requires a non-empty "
+                "accepted_decision_id"
+            )
+    elif accepted_decision_id is not None:
+        raise ValueError(
+            "transitioning to rejected must not carry an accepted_decision_id"
+        )
+
+
 class DecisionProposalStore(Protocol):
-    """Minimal persistence contract required by D2A."""
+    """Minimal persistence contract required by D2A + D2C1."""
 
     def add_if_new(
         self, proposal: DecisionProposal
@@ -62,6 +96,30 @@ class DecisionProposalStore(Protocol):
 
     def list_proposals(self) -> tuple[DecisionProposal, ...]:
         """Return all proposals in insertion order."""
+        ...
+
+    def transition_if_proposed(
+        self,
+        proposal_id: str,
+        target_status: str,
+        accepted_decision_id: str | None = None,
+    ) -> tuple[DecisionProposal, bool]:
+        """Core authority primitive (D2C1, ADR-027 authority path).
+
+        Transition ``proposal_id`` from ``proposed`` to ``target_status``
+        (``accepted`` requires a non-empty ``accepted_decision_id``;
+        ``rejected`` must not carry one). Returns
+        ``(proposal_after_call, transitioned)``:
+
+        * ``proposed``  -> target status, persisted atomically,
+          ``transitioned=True``; candidate content, ``producer_key``,
+          ``content_fingerprint``, and ``proposed_at`` are unchanged;
+        * already at ``target_status`` -> existing record returned
+          unchanged with ``transitioned=False`` (idempotent retry);
+        * any other status (accepted→rejected, rejected→accepted), an
+          unknown id, or an invalid argument -> ``ValueError`` (fail
+          closed; callers map to their own authority error types).
+        """
         ...
 
 
@@ -87,6 +145,30 @@ class InMemoryDecisionProposalStore:
 
     def list_proposals(self) -> tuple[DecisionProposal, ...]:
         return tuple(self._by_id[pid] for pid in self._order)
+
+    def transition_if_proposed(
+        self,
+        proposal_id: str,
+        target_status: str,
+        accepted_decision_id: str | None = None,
+    ) -> tuple[DecisionProposal, bool]:
+        _validate_transition_args(target_status, accepted_decision_id)
+        existing = self._by_id.get(proposal_id)
+        if existing is None:
+            raise ValueError(f"proposal {proposal_id!r} not found")
+        if existing.status == target_status:
+            return existing, False
+        if existing.status != PROPOSAL_STATUS_PROPOSED:
+            raise ValueError(
+                f"proposal {proposal_id!r} has status {existing.status!r}; "
+                f"only a proposed proposal may transition to "
+                f"{target_status!r}"
+            )
+        transitioned = dataclasses.replace(
+            existing, status=target_status, accepted_decision_id=accepted_decision_id
+        )
+        self._by_id[proposal_id] = transitioned
+        return transitioned, True
 
 
 class JsonFileDecisionProposalStore:
@@ -155,6 +237,84 @@ class JsonFileDecisionProposalStore:
         self._order.append(proposal.proposal_id)
         self._persist()
         return proposal, True
+
+    def transition_if_proposed(
+        self,
+        proposal_id: str,
+        target_status: str,
+        accepted_decision_id: str | None = None,
+    ) -> tuple[DecisionProposal, bool]:
+        """Authority transition (D2C1).
+
+        Writes only the one record's status/link fields: the document is
+        rebuilt with every other record serialized exactly as stored
+        (identical content, identical order) and replaced atomically via
+        the same temp-file + ``os.replace`` convention as ``_persist``.
+        After the write the file is reloaded and the persisted entry is
+        verified to carry the transitioned state; the in-memory state is
+        updated only after that verification succeeds, so a failed write
+        or verification leaves the store's memory of the record unchanged.
+        """
+        _validate_transition_args(target_status, accepted_decision_id)
+        existing = self._by_id.get(proposal_id)
+        if existing is None:
+            raise ValueError(f"proposal {proposal_id!r} not found")
+        if existing.status == target_status:
+            return existing, False
+        if existing.status != PROPOSAL_STATUS_PROPOSED:
+            raise ValueError(
+                f"proposal {proposal_id!r} has status {existing.status!r}; "
+                f"only a proposed proposal may transition to "
+                f"{target_status!r}"
+            )
+        transitioned = dataclasses.replace(
+            existing, status=target_status, accepted_decision_id=accepted_decision_id
+        )
+        document = {
+            "schema": SCHEMA,
+            "proposals": [
+                proposal_to_dict(
+                    transitioned if pid == proposal_id else self._by_id[pid]
+                )
+                for pid in self._order
+            ],
+        }
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        tmp_path = self.path.with_suffix(self.path.suffix + ".tmp")
+        with open(tmp_path, "w", encoding="utf-8", newline="\n") as handle:
+            json.dump(document, handle, indent=2, ensure_ascii=False)
+            handle.write("\n")
+        os.replace(tmp_path, self.path)
+        # Reload the persisted document and verify the transition survived.
+        with open(self.path, encoding="utf-8") as handle:
+            persisted = json.load(handle)
+        persisted_entries = persisted.get("proposals")
+        if not isinstance(persisted_entries, list):
+            raise ValueError(
+                f"{self.path} does not contain a proposals list after "
+                f"transitioning {proposal_id!r}"
+            )
+        persisted_entry = next(
+            (
+                entry
+                for entry in persisted_entries
+                if isinstance(entry, dict)
+                and entry.get("proposal_id") == proposal_id
+            ),
+            None,
+        )
+        if (
+            persisted_entry is None
+            or persisted_entry.get("status") != target_status
+            or persisted_entry.get("accepted_decision_id")
+            != accepted_decision_id
+        ):
+            raise ValueError(
+                f"{self.path} does not carry the {proposal_id!r} transition "
+                f"to {target_status!r} after write; failing closed"
+            )
+        self._by_id[proposal_id] = transitioned
+        return transitioned, True
 
     def get(self, proposal_id: str) -> DecisionProposal | None:
         return self._by_id.get(proposal_id)
