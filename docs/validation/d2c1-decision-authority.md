@@ -7,14 +7,78 @@ materialization, recovery/idempotency, dual-representation verification,
 and fail-closed behavior. No MCP, CLI, Audit, protection, retrieval, or
 enforcement change; no D2C2 CLI authority surface; D2D/Sagarika not started.
 
+## Architecture-review revision (same PR)
+
+Three bounded correctness fixes on top of the original implementation:
+
+1. **Downstream-enrichment-tolerant acceptance retry.** An
+   already-accepted proposal's retry previously required the stored
+   decision to remain identical to the original bare D2C
+   materialization (`rules == []`, `test_evidence == []`, canonical
+   `derived_rule_ids == ()`), which wrongly treated legitimate
+   downstream enrichment — e.g. protection activation installing typed
+   rules, declared test-evidence linkage, or a later `updated_at` — as
+   an ID collision. Verification is now split into two cases:
+   - **Case A — fresh materialization / crash recovery (D2C writes the
+     decision in this call):** the exact initial D2C shape is proven
+     (`decision/rationale/scope` mapping, empty
+     `constraints`/`anti_patterns`/`rules`/`test_evidence`,
+     `status == "active"`, both timestamps equal to the authority clock
+     value; canonical `derived_rule_ids == ()` and
+     `test_evidence == ()`). This proves D2C itself fabricated nothing.
+   - **Case B — already-accepted proposal with an existing decision:**
+     verify only the fields whose identity/content D2C owns — id,
+     decision/statement, rationale, scope/context_scope, D2C-owned
+     emptiness of `constraints`/`anti_patterns` (no currently approved
+     downstream path modifies them post-acceptance), a legal lifecycle
+     status (`VALID_LIFECYCLE_STATUSES`), and an existing
+     `created_at`. Downstream-owned/enrichable fields — `rules`,
+     canonical `derived_rule_ids`, `test_evidence`, `updated_at` — are
+     NOT required to remain empty. Downstream enrichment is never
+     deleted, normalized, overwritten, or mutated.
+   Regression: accept → install legitimate protection through the
+   existing protection write primitive (`mneme.protection._install_rule`,
+   the exact primitive protection activation uses) → retry
+   `DecisionAuthorityService.accept(proposal_id)` → success with
+   `already_accepted=True, materialized=False`, the existing rule
+   intact, no memory rewrite/duplicate, `accepted_decision_id`
+   unchanged, and the canonical record keeping the downstream-derived
+   rule linkage D2C did not create. A second regression proves declared
+   test evidence added after acceptance is neither claimed nor removed
+   by a retry.
+2. **Proposal-ID namespace enforcement.** An explicit `decision_id`
+   beginning with the reserved `dprop-` prefix is rejected
+   (`DecisionIdNamespaceError`) even when no proposal with that exact
+   id exists; equality with an actual proposal id remains rejected.
+   Explicit human-assigned ids are not required to begin `ddec-` (e.g.
+   `arch-storage-standard` is accepted); the default id remains
+   `ddec-…`.
+3. **Store-level accepted-ID conflict semantics.**
+   `transition_if_proposed` is idempotent at the target status ONLY
+   when the requested link matches: for `accepted`, a requested
+   `accepted_decision_id` equal to the stored one returns
+   `(existing, False)` while a different requested id raises
+   `ValueError` (fail closed — the stored `accepted_decision_id` can
+   never be replaced); for `rejected`, a repeated rejection with no
+   id remains `(existing, False)`. Terminal accepted↔rejected failures
+   are preserved. Parity is proven for BOTH
+   `InMemoryDecisionProposalStore` and `JsonFileDecisionProposalStore`;
+   `DecisionAuthorityService` continues translating store failures
+   through `ProposalStoreCorruptError` (its own pre-checks still raise
+   `AcceptedProposalIdConflictError` before any store call).
+
 ## Exact SHA evidence
 
 - Exact base SHA (canonical `origin/main`): `c019aecba485ffa67ea47f0b3a7af1024aece36b`
-- Exact tested implementation SHA (all focused, regression, gate, and
+- Original implementation SHA:
+  `db658d274a7a55d62aa1c5084574684018c6f89a` (original focused counts:
+  66 passed, gate 1495 passed, 5 skipped)
+- Exact tested implementation SHA (architecture-review revision; all
+  focused, regression, protection-regression, gate, and
   self-governance figures below executed on this exact source state):
-  `db658d274a7a55d62aa1c5084574684018c6f89a`
-- The next commit adds this validation artifact only (docs-only; no runtime
-  or test bytes differ from the tested SHA).
+  `0a00c2b8a04abfccf1d12d82baf6ded3c8546ceb`
+- The next commit updates this validation artifact only (docs-only; no
+  runtime or test bytes differ from the tested SHA).
 - Branch `feat/d2c1-decision-authority`, worktree
   `.worktrees/feat-d2c1-decision-authority`, context-verified with
   `scripts/check_worktree_context.py` before work and before every commit.
@@ -23,10 +87,11 @@ enforcement change; no D2C2 CLI authority surface; D2D/Sagarika not started.
 
 | File | Change |
 |---|---|
-| `mneme/decision_authority.py` | NEW — authority service, result/error types, pinned id algorithm, materialization, verification |
-| `mneme/decision_proposal_store.py` | adds the Core authority transition primitive `transition_if_proposed` (both stores); producer semantics untouched |
-| `tests/test_decision_authority.py` | NEW — 66 focused tests (registered in the gate manifest) |
+| `mneme/decision_authority.py` | NEW — authority service, result/error types, pinned id algorithm, materialization, verification; review fix: two-case verification (A exact initial shape / B D2C-owned identity only) and reserved-namespace rejection |
+| `mneme/decision_proposal_store.py` | adds the Core authority transition primitive `transition_if_proposed` (both stores); review fix: conflicting `accepted_decision_id` at target status fails closed; producer semantics untouched |
+| `tests/test_decision_authority.py` | NEW — 72 focused tests incl. 6 review-fix regressions (registered in the gate manifest) |
 | `scripts/run_test_battery.py` | gate manifest: `tests/test_decision_authority.py` added to `GATE_CORE_PATHS` |
+
 
 Unchanged: `decision_mcp.py`, `decision_index.py`, `decision_projection.py`,
 `decision_index_service.py`, `decision_proposal.py`, `memory_store.py`,
@@ -114,8 +179,10 @@ Properties (test-pinned, including the golden vector
   `ddec-`; a canonical decision id never equals a proposal id;
 - no random UUID identity;
 - an explicit human-authority-assigned `decision_id` is supported: it must
-  be a non-empty string and must not collide with any proposal id
-  (`DecisionIdNamespaceError` otherwise); once the proposal records an
+  be a non-empty string, must NOT begin with the reserved `dprop-` prefix
+  (rejected even without an exact id collision), and must not equal any
+  actual proposal id (`DecisionIdNamespaceError` otherwise); it is NOT
+  required to begin `ddec-`; once the proposal records an
   `accepted_decision_id`, retries reuse the stored id and any different
   requested id fails closed (`AcceptedProposalIdConflictError`).
 
@@ -170,32 +237,56 @@ Recovery/idempotency matrix (all test-proven):
 
 | State | Retry behavior |
 |---|---|
-| proposed + memory missing decision | normal path: transition, materialize, verify, success |
-| accepted + memory missing decision (crash after step 2) | reuse stored id, materialize, verify; `already_accepted=True, recovered=True`; no new id |
-| accepted + memory holds the exact expected decision | no duplicate, no write, verify; idempotent `already_accepted=True` |
+| proposed + memory missing decision | normal path: transition, materialize, verify (exact initial shape), success |
+| accepted + memory missing decision (crash after step 2) | reuse stored id, materialize, verify (exact initial shape); `already_accepted=True, recovered=True`; no new id |
+| accepted + memory holds the exact bare decision | no duplicate, no write, verify; idempotent `already_accepted=True` |
+| accepted + memory holds the decision enriched downstream (protection rules, declared evidence, later `updated_at`) | idempotent success, `already_accepted=True, materialized=False`; only D2C-owned identity fields verified; enrichment tolerated, never deleted/rewritten |
 | proposed + memory already holds the would-be decision | `ReverseHalfStateError` — acceptance is never inferred, proposal never auto-transitioned, no mutation |
-| same id, content ≠ exact expected materialization | `DecisionIdCollisionError` — never overwritten, never merged (this includes a decision protection later added rules to) |
+| accepted + same id, D2C-owned identity fields mismatch (different statement/rationale/scope/constraints/anti-patterns or illegal status) | `DecisionIdCollisionError` — never overwritten, never merged |
+| accepted + retry with a different requested `accepted_decision_id` | `AcceptedProposalIdConflictError` (service) / `ValueError` (store, both implementations) — the stored id can never be replaced |
 | reload/derive/verify failure after writes | typed verification error; no success ever reported; retry completes idempotently |
 
 ## Canonical verification (both representations)
 
-After materialization the service:
+Verification is split into the same two cases as the retry contract:
+
+**Case A — D2C writes the decision in this call (fresh materialization or
+crash recovery).** After the write the service:
 
 1. reloads through `MemoryStore`;
 2. finds the runtime `Decision` by the accepted decision id;
-3. asserts `decision/rationale/scope` map exactly to
-   `statement/rationale/scope_hints`, `constraints/anti_patterns/rules/
-   test_evidence` are empty, `status == "active"`, and the timestamps
-   equal the authority clock value used for the write (or, on a
-   recovered/already-materialized entry, are non-empty strings owned by
-   the first acceptance attempt);
-4. runs the existing `decisions_to_canonical()` over the reloaded
-   decisions;
+3. asserts the exact initial D2C shape: `decision/rationale/scope` map
+   exactly to `statement/rationale/scope_hints`, `constraints`,
+   `anti_patterns`, `rules`, and `test_evidence` are empty,
+   `status == "active"`, and `created_at`/`updated_at` both equal the
+   authority clock value used for the write;
+4. runs the existing `decisions_to_canonical()` adapter (D0 adapter,
+   unchanged) over the reloaded decisions;
 5. finds the canonical record by the same id and asserts
    `version == CANONICAL_VERSION ("1")`, `lifecycle_status == "active"`,
    `statement`, `rationale`, `context_scope == tuple(scope_hints)`,
-   `constraints == ()`, `anti_patterns == ()`, `derived_rule_ids == ()`,
+   `constraints == ()`, `anti_patterns == ()`, and the D2C
+   no-fabrication invariants `derived_rule_ids == ()` and
    `test_evidence == ()`.
+
+**Case B — already-accepted proposal with an existing decision.** The
+service verifies only the fields whose identity/content D2C owns and
+that establish this is the same accepted decision:
+
+- runtime: `id` (lookup), `decision == statement`, `rationale`,
+  `scope == scope_hints`, `constraints == []`, `anti_patterns == []`,
+  `status` in `VALID_LIFECYCLE_STATUSES`, `created_at` exists;
+- canonical: `version == "1"`, `lifecycle_status` legal and equal to the
+  runtime status, `statement`, `rationale`,
+  `context_scope == tuple(scope_hints)`, `constraints == ()`,
+  `anti_patterns == ()`.
+
+It does NOT require `rules`, canonical `derived_rule_ids`,
+`test_evidence`, or `updated_at` to remain empty: downstream-owned/
+enrichable fields are tolerated exactly as stored, and downstream
+enrichment is never deleted, normalized, overwritten, or mutated. At
+minimum, legitimate protection activation survives a later acceptance
+retry (regression-pinned via the existing protection write primitive).
 
 No Audit tier is assigned or asserted in D2C1 (the narrow regression only
 proves the materialized decision loads through the existing `MemoryStore`).
@@ -231,6 +322,7 @@ exists anywhere (regression-pinned). The MCP never imports
 python scripts/new_task_worktree.py feat/d2c1-decision-authority
 python -m pytest tests/test_decision_authority.py -q
 python -m pytest tests/test_decision_proposal.py tests/test_decision_index_service.py tests/test_decision_index_consumer_reads.py tests/test_decision_mcp.py tests/test_decision_index.py tests/test_decision_projection.py -q
+python -m pytest tests/test_protection_activation.py -q
 python -m pytest tests/test_test_policy.py -q
 python scripts/run_test_battery.py gate
 python -m mneme.cli check --memory .mneme/project_memory.json --input mneme/decision_authority.py --query "feat: add decision authority service mneme/decision_authority.py" --mode warn
@@ -239,16 +331,20 @@ python -m mneme.cli check --memory .mneme/project_memory.json --input scripts/ru
 python scripts/check_encoding.py
 ```
 
+All commands were run on the exact tested implementation SHA on both the
+original implementation state and the architecture-review revision state.
+
 ## Results
 
 | Check | Result |
 |---|---|
-| Focused D2C1 tests (`tests/test_decision_authority.py`, registered in the gate manifest) | 66 passed |
+| Focused D2C1 tests (`tests/test_decision_authority.py`, registered in the gate manifest) | 72 passed (66 original + 6 review-fix regressions; all 66 preserved) |
 | D2A/D2B0/D2B/D0 targeted regressions (`test_decision_proposal.py`, `test_decision_index_service.py`, `test_decision_index_consumer_reads.py`, `test_decision_mcp.py`, `test_decision_index.py`, `test_decision_projection.py`) | 200 passed |
+| Protection regression (`tests/test_protection_activation.py`) | 27 passed (protection semantics unchanged; the downstream-enrichment retry test exercises its write primitive without behavior change) |
 | Test-policy manifest check (`test_test_policy.py`) | 19 passed |
-| Gate battery (`scripts/run_test_battery.py gate`) | 1495 passed, 5 skipped (pre-existing, unrelated; baseline 1429+5 + 66 new) |
+| Gate battery (`scripts/run_test_battery.py gate`) | 1501 passed, 5 skipped (pre-existing, unrelated; baseline 1495+5 + 6 new review-fix tests) |
 | `mneme check --mode warn` on changed governed files (`mneme/decision_authority.py`, `mneme/decision_proposal_store.py`, `scripts/run_test_battery.py`) | 3/3 PASS (warnings pre-existing) |
-| `scripts/check_encoding.py` (mojibake + BOM) | OK (1629 files) |
+| `scripts/check_encoding.py` (mojibake + BOM) | OK (1630 files) |
 
 ## Authority matrix (D2C1)
 
@@ -288,8 +384,13 @@ enforcement benchmark was not re-run.
   `decision_proposal.py` / `memory_store.py` / `protection.py` /
   `setup_state.py` / `cli.py` modified? NO (untouched)
 - `decision_proposal_store.py` producer semantics changed? NO
-  (`add_if_new`/`get`/`list_proposals` untouched; only the new Core
-  authority primitive `transition_if_proposed` was added)
+  (`add_if_new`/`get`/`list_proposals` untouched; only the Core authority
+  primitive `transition_if_proposed` was added, and the review fix
+  changed only its already-at-target conflict behavior)
+- `protection.py` behavior changed? NO (untouched; the downstream-
+  enrichment retry test invokes the existing `_install_rule` write
+  primitive on tmp_path fixtures only — D2C tolerates, never calls,
+  protection activation itself)
 - MCP six-tool inventory changed? NO (regression-pinned)
 - Audit tier semantics changed? NO
 - benchmark fixtures changed? NO
