@@ -18,6 +18,7 @@ Proves the MCP boundary is a thin capability adapter over
 from __future__ import annotations
 
 import asyncio
+import inspect
 import json
 import re
 import subprocess
@@ -26,6 +27,7 @@ from pathlib import Path
 
 import pytest
 from mcp import Client, MCPError, StdioServerParameters
+from mcp.server import MCPServer
 from mcp.types import ToolAnnotations
 
 from mneme.decision_index import (
@@ -1214,6 +1216,347 @@ def test_tool_descriptions_state_the_authority_boundary():
     assert "never mutates" in descriptions[TOOL_SEARCH]
     assert "NOT typed-rule applicability" in descriptions[TOOL_APPLICABLE_TO]
     assert "fail closed" in descriptions[TOOL_TRACE]
+
+
+# ── Strict ADR compiler composition (architecture review of D2B) ────────────
+
+_VALID_ADR_BODY = """---
+id: ADR-9001
+title: "Use deterministic storage for the test corpus"
+status: accepted
+priority: normal
+date: 2026-09-01
+scope: storage
+---
+
+# ADR-9001: Storage policy fixture
+
+## Constraints
+
+- FORBID_LITERAL: install legacy-package
+"""
+
+_INACTIVE_ADR_BODY = """---
+id: ADR-9002
+title: "Cache policy fixture"
+status: proposed
+priority: normal
+date: 2026-09-02
+scope: cache
+---
+
+# ADR-9002: Cache policy fixture
+"""
+
+
+def _write_adr(
+    directory: Path,
+    filename: str,
+    body: str,
+) -> Path:
+    path = directory / filename
+    path.write_text(body, encoding="utf-8")
+    return path
+
+
+def _valid_adr_dir(tmp_path: Path) -> Path:
+    adr_dir = tmp_path / "valid-adr"
+    adr_dir.mkdir()
+    _write_adr(adr_dir, "ADR-9001-storage-policy.md", _VALID_ADR_BODY)
+    _write_adr(adr_dir, "ADR-9002-cache-policy.md", _INACTIVE_ADR_BODY)
+    return adr_dir
+
+
+def _invalid_priority_adr_dir(tmp_path: Path) -> Path:
+    adr_dir = tmp_path / "invalid-enum-adr"
+    adr_dir.mkdir()
+    body = _VALID_ADR_BODY.replace("priority: normal", "priority: high")
+    _write_adr(adr_dir, "ADR-9001-storage-policy.md", body)
+    return adr_dir
+
+
+def _ambiguous_adr_dir(tmp_path: Path) -> Path:
+    adr_dir = tmp_path / "ambiguous-adr"
+    adr_dir.mkdir()
+    first = _VALID_ADR_BODY.replace("ADR-9001", "ADR-9101")
+    second = _VALID_ADR_BODY.replace("ADR-9001", "ADR-9102")
+    _write_adr(adr_dir, "ADR-9101-storage-policy.md", first)
+    _write_adr(adr_dir, "ADR-9102-storage-policy.md", second)
+    return adr_dir
+
+
+def _malformed_adr_dir(tmp_path: Path) -> Path:
+    adr_dir = tmp_path / "malformed-adr"
+    adr_dir.mkdir()
+    _write_adr(
+        adr_dir,
+        "ADR-9001-storage-policy.md",
+        "no frontmatter at all\n",
+    )
+    return adr_dir
+
+
+def test_load_canonical_index_strict_valid_corpus_is_validated_and_loaded(
+    tmp_path: Path,
+):
+    from mneme.decision_mcp import load_canonical_index_from_adr_dir
+
+    index = load_canonical_index_from_adr_dir(_valid_adr_dir(tmp_path))
+    by_id = {r.decision_id: r for r in index.records}
+    assert set(by_id) == {"ADR-9001", "ADR-9002"}
+    # Precedence winner is active; the proposed ADR is retained as
+    # non-authoritative lineage, not dropped.
+    assert by_id["ADR-9001"].lifecycle_status == "active"
+    assert by_id["ADR-9002"].lifecycle_status == "inactive"
+    assert [r.rule_id for r in index.rules] == [
+        "ADR-9001:FORBID_LITERAL:0",
+    ]
+
+
+def test_load_canonical_index_rejects_invalid_adr_enum(tmp_path: Path):
+    from mneme.adr_schema import ADRValidationError
+    from mneme.decision_mcp import load_canonical_index_from_adr_dir
+
+    with pytest.raises(ADRValidationError):
+        load_canonical_index_from_adr_dir(_invalid_priority_adr_dir(tmp_path))
+
+
+def test_load_canonical_index_rejects_precedence_ambiguity(tmp_path: Path):
+    from mneme.adr_schema import ADRPrecedenceError
+    from mneme.decision_mcp import load_canonical_index_from_adr_dir
+
+    with pytest.raises(ADRPrecedenceError):
+        load_canonical_index_from_adr_dir(_ambiguous_adr_dir(tmp_path))
+
+
+def test_load_canonical_index_rejects_malformed_adr(tmp_path: Path):
+    from mneme.adr_schema import ADRParseError
+    from mneme.decision_mcp import load_canonical_index_from_adr_dir
+
+    with pytest.raises(ADRParseError):
+        load_canonical_index_from_adr_dir(_malformed_adr_dir(tmp_path))
+
+
+def test_no_active_zero_degradation_fallback_exists():
+    """The strict compiler sequence is used; ambiguity fails hard."""
+    source = MCP_MODULE_SOURCE
+    # The strict sequence is present, in order.
+    load_source = re.search(
+        r"def load_canonical_index_from_adr_dir.*?(?=\ndef |\Z)",
+        source,
+        re.DOTALL,
+    ).group(0)
+    sequence = [
+        "parse_adr_directory(adr_dir)",
+        "validate_corpus(parsed)",
+        "resolve_precedence(parsed)",
+        "build_canonical_index(parsed, active)",
+    ]
+    position = -1
+    for step in sequence:
+        found = load_source.find(step)
+        assert found != -1, step
+        assert found > position, f"out of order: {step}"
+        position = found
+    # No ADRPrecedenceError catch, no active=[] degradation.
+    assert "except ADRPrecedenceError" not in source
+    assert "active = []" not in source
+
+
+class _RecordingServer(MCPServer):
+    run_calls: list[bool] = []
+
+    def run(self, *args: object, **kwargs: object) -> object:
+        type(self).run_calls.append(True)
+        return None
+
+
+def _serve_stdio_with_recording_run(monkeypatch: pytest.MonkeyPatch):
+    from mneme import decision_mcp
+
+    _RecordingServer.run_calls = []
+    monkeypatch.setattr(decision_mcp, "MCPServer", _RecordingServer)
+    return _RecordingServer
+
+
+def test_serve_stdio_strict_composes_and_starts_on_valid_corpus(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+):
+    RecordingServer = _serve_stdio_with_recording_run(monkeypatch)
+    serve_stdio(proposal_store_path=None, adr_dir=_valid_adr_dir(tmp_path))
+    assert RecordingServer.run_calls == [True]
+
+
+def test_serve_stdio_fails_closed_on_invalid_adr_enum(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+):
+    from mneme.adr_schema import ADRValidationError
+
+    RecordingServer = _serve_stdio_with_recording_run(monkeypatch)
+    with pytest.raises(ADRValidationError):
+        serve_stdio(
+            proposal_store_path=None,
+            adr_dir=_invalid_priority_adr_dir(tmp_path),
+        )
+    assert RecordingServer.run_calls == []
+
+
+def test_serve_stdio_fails_closed_on_ambiguous_precedence(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+):
+    from mneme.adr_schema import ADRPrecedenceError
+
+    RecordingServer = _serve_stdio_with_recording_run(monkeypatch)
+    with pytest.raises(ADRPrecedenceError):
+        serve_stdio(
+            proposal_store_path=None,
+            adr_dir=_ambiguous_adr_dir(tmp_path),
+        )
+    assert RecordingServer.run_calls == []
+
+
+def test_cli_default_starts_without_canonical_adr_dir(monkeypatch):
+    from mneme import cli as cli_module
+    from mneme import decision_mcp
+
+    calls: list[tuple] = []
+
+    def recorder(*args: object, **kwargs: object) -> None:
+        calls.append((args, kwargs))
+
+    monkeypatch.setattr(decision_mcp, "serve_stdio", recorder)
+    exit_code = cli_module.main(["decision-mcp", "--proposals", ""])
+    assert exit_code == 0
+    assert len(calls) == 1
+    _, kwargs = calls[0]
+    assert kwargs["adr_dir"] is None
+    assert kwargs["proposal_store_path"] is None  # explicit in-memory store
+
+
+def test_cli_explicit_adr_dir_passes_strict_canonical_loading(
+    tmp_path: Path, monkeypatch,
+):
+    from mneme import cli as cli_module
+    from mneme import decision_mcp
+
+    calls: list[tuple] = []
+
+    def recorder(*args: object, **kwargs: object) -> None:
+        calls.append((args, kwargs))
+
+    monkeypatch.setattr(decision_mcp, "serve_stdio", recorder)
+    adr_dir = _valid_adr_dir(tmp_path)
+    exit_code = cli_module.main([
+        "decision-mcp", "--proposals", "", "--adr-dir", str(adr_dir),
+    ])
+    assert exit_code == 0
+    _, kwargs = calls[0]
+    assert kwargs["adr_dir"] == str(adr_dir)
+
+
+def test_cli_rejects_missing_adr_dir_path(tmp_path: Path):
+    from mneme import cli as cli_module
+
+    exit_code = cli_module.main([
+        "decision-mcp", "--proposals", "",
+        "--adr-dir", str(tmp_path / "nope"),
+    ])
+    assert exit_code == 2
+
+
+def test_cli_rejects_empty_adr_dir_value():
+    from mneme import cli as cli_module
+
+    exit_code = cli_module.main(["decision-mcp", "--proposals", "", "--adr-dir", ""])
+    assert exit_code == 2
+
+
+def test_cli_help_states_adr_dir_is_optional():
+    from mneme import cli as cli_module
+    parser = cli_module._build_parser()
+    for action in parser._subparsers._group_actions[0].choices[
+        "decision-mcp"
+    ]._actions:
+        if getattr(action, "dest", None) == "adr_dir":
+            assert "Optional" in action.help
+            assert action.default is None
+            break
+    else:
+        raise AssertionError("decision-mcp --adr-dir action not found")
+
+
+# ── Typed trace union dispatch ──────────────────────────────────────────────
+
+
+def test_trace_to_transport_fails_closed_on_unexpected_type():
+    with pytest.raises(BaseException) as excinfo:
+        trace_to_transport(object())
+    errors = _mcp_errors_in(excinfo.value)
+    assert len(errors) == 1
+    assert isinstance(errors[0], MCPError)
+    assert "unexpected trace result" in str(errors[0])
+
+
+def test_trace_dispatch_uses_isinstance_not_class_name_strings():
+    fn_source = inspect.getsource(trace_to_transport)
+    # No string-based dispatch on the union member names.
+    assert re.search(r'type\(trace\)\.__name__\s*==', fn_source) is None
+    assert re.search(r'trace\.result_type\s*==', fn_source) is None
+    assert "isinstance(trace, ProposalTrace)" in fn_source
+    assert "isinstance(trace, CanonicalDecisionTrace)" in fn_source
+    assert "isinstance(trace, DecisionTraceNotFound)" in fn_source
+
+
+# ── MCP stays optional for ordinary package runtime ─────────────────────────
+
+
+def test_mcp_stays_out_of_core_runtime_dependencies():
+    pyproject = (REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    core = re.search(r"^dependencies = \[(.*?)^\]", pyproject, re.DOTALL | re.MULTILINE)
+    assert core is not None
+    assert "mcp" not in core.group(1)
+    # The optional extra is the only place the dependency is declared.
+    extra = re.search(r"^mcp = \[(.*?)\]", pyproject, re.MULTILINE | re.DOTALL)
+    assert extra is not None
+    assert "mcp" in extra.group(1)
+
+
+def test_importing_core_domain_modules_does_not_load_mcp():
+    script = (
+        "import sys; import mneme.decision_index, mneme.memory_store,"
+        " mneme.decision_index_service, mneme.decision_proposal;"
+        " assert not [m for m in sys.modules if m == 'mcp' or"
+        " m.startswith(('mcp.', 'pydantic'))]; print('OK')"
+    )
+    proc = subprocess.run(
+        [sys.executable, "-c", script],
+        capture_output=True,
+        text=True,
+        cwd=str(REPO_ROOT),
+        check=True,
+    )
+    assert proc.stdout.strip().endswith("OK")
+
+
+def test_workflow_provisioning_includes_mcp_where_mcp_tests_run():
+    workflow = (
+        REPO_ROOT / ".github" / "workflows" / "tests.yml"
+    ).read_text(encoding="utf-8")
+    gate = re.search(r"gate:\n.*?Run gate battery", workflow, re.DOTALL).group(0)
+    main = re.search(r"\n  main:\n.*?Run main battery", workflow, re.DOTALL).group(0)
+    release = re.search(
+        r"\n  release:\n.*?Run release battery", workflow, re.DOTALL
+    ).group(0)
+    langchain_job = re.search(
+        r"pytest-langchain:\n.*?Run LangChain integration tests",
+        workflow,
+        re.DOTALL,
+    ).group(0)
+    assert 'pip install -e ".[dev,mcp]"' in gate
+    assert 'pip install -e ".[dev,mcp]"' in main
+    assert 'pip install -e ".[dev,mcp,langchain]"' in release
+    # The dedicated LangChain job only runs LangChain integration tests.
+    assert 'pip install -e ".[dev,langchain]"' in langchain_job
 
 
 # ── Module source cache (used by architecture-boundary tests) ───────────────

@@ -52,7 +52,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install package with dev dependencies
-        run: python -m pip install -e ".[dev]"
+        run: python -m pip install -e ".[dev,mcp]"
 
       - name: Run gate battery
         run: python scripts/run_test_battery.py gate
@@ -70,14 +70,16 @@ jobs:
           python-version: '3.11'
 
       - name: Install package with dev dependencies
-        run: python -m pip install -e ".[dev]"
+        run: python -m pip install -e ".[dev,mcp]"
 
       - name: Run main battery
         run: python scripts/run_test_battery.py main
 
   # The LangChain integration's live governed-loop tests require the
-  # optional extra; the canonical job above intentionally runs without it.
-  # Part of the broader main battery (push to main, or a dispatched main run).
+  # optional extra; the canonical main job intentionally runs without it
+  # (it does include the mcp extra because the canonical tests contain
+  # first-class MCP tests). Part of the broader main battery (push to
+  # main, or a dispatched main run).
   pytest-langchain:
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.battery == 'main')
     name: pytest (langchain extra)
@@ -111,8 +113,8 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install package with dev and langchain extras
-        run: python -m pip install -e ".[dev,langchain]"
+      - name: Install package with dev, mcp and langchain extras
+        run: python -m pip install -e ".[dev,mcp,langchain]"
 
       - name: Assert the LangChain extra is importable
         run: python -c "import langchain, langgraph, langchain_core"

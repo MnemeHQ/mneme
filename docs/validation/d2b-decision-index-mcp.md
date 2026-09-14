@@ -9,16 +9,62 @@ boundary. No acceptance/rejection authority, no second persistence
 model, no hosted/organizational dependency, and no observable change
 to any frozen runtime surface.
 
+## Architecture-review revision (same PR #373)
+
+The first D2B implementation was revised in response to the PR
+architecture review. Three changes on top of the original
+implementation commit:
+
+1. **CI dependency provisioning** — the canonical gate/main/release
+   jobs now install the optional MCP extra because the canonical test
+   battery contains first-class MCP tests: gate and main run
+   `pip install -e ".[dev,mcp]"`, release runs
+   `".[dev,mcp,langchain]"`. The dedicated LangChain job stays
+   `".[dev,langchain]"` (it runs only the LangChain integration tests).
+   `mcp` remains an optional extra, not a core runtime dependency.
+   Battery definitions in `scripts/run_test_battery.py` are unchanged.
+2. **Strict ADR compiler boundary restored.**
+   `load_canonical_index_from_adr_dir` now runs the established Mneme
+   compiler sequence exactly — `parse -> validate_corpus ->
+   resolve_precedence -> build_canonical_index` — with no error
+   suppression: an earlier tolerant variant caught
+   `ADRPrecedenceError` and degraded to `active=[]`; that is removed.
+   ADR parse failure, schema/validation failure, or precedence
+   ambiguity now prevents server startup. The MCP can never serve a
+   degraded canonical authority view when Mneme cannot determine the
+   authoritative active set. ADR-027's own frontmatter metadata is
+   deliberately NOT touched in this PR (its intended precedence tier
+   is a separate architecture decision), which is why the canonical
+   ADR directory is now optional at the CLI (below).
+3. **Canonical ADR loading is optional at the CLI.** `mneme
+   decision-mcp` starts with the proposal store enabled and no
+   canonical ADR directory. `mneme decision-mcp --adr-dir <path>`
+   strictly parses, validates, and precedence-resolves that corpus
+   before starting; `--adr-dir` has no default (it does not default to
+   `docs/adr`), and an empty `--adr-dir` value is a usage error. No
+   invalid/ambiguous corpus can start the server, and no ADR is
+   silently skipped.
+
+Additional review fixes in the same revision: `trace_to_transport`
+now dispatches the D2B0 union through direct `isinstance` checks on
+`ProposalTrace` / `CanonicalDecisionTrace` / `DecisionTraceNotFound`
+(no class-name string comparisons; unexpected types still fail
+closed), and the module error-contract documentation now matches
+actual behavior: `decision.get` unknown -> successful typed
+`not_found`; `decision.trace` unknown -> successful
+`trace_not_found`; invalid/malformed caller input -> `ToolError`;
+canonical integrity failure -> protocol-level `MCPError`.
+
 ## Exact SHA evidence
 
 - Exact base SHA (canonical `origin/main` after D2B0):
   `63ce383f29df247b46255b3ad36daf22eb0640c6`
-- Exact tested implementation SHA:
-  `219c8c95376d69f1b31228d02f40c3bd098f868d` — all test, gate, and
-  self-governance figures below were executed on this exact source
-  state. The next commit is documentation-only (this artifact and PR
-  metadata): no runtime or test bytes differ from the implementation
-  SHA.
+- Original implementation SHA:
+  `219c8c95376d69f1b31228d02f40c3bd098f868d`
+- Exact tested implementation SHA (architecture-review revision, all
+  test/gate/self-governance figures below executed on this exact
+  source state):
+  `REVIEW_FIX_SHA_PLACEHOLDER`
 - Branch `feat/d2b-decision-index-mcp`, worktree
   `.worktrees/feat-d2b-decision-index-mcp`, context-verified with
   `scripts/check_worktree_context.py` before work and before every
@@ -28,6 +74,7 @@ to any frozen runtime surface.
 
 ```text
 python scripts/new_task_worktree.py feat/d2b-decision-index-mcp
+python -m pip install -e ".[dev,mcp]"
 python -m pytest tests/test_decision_mcp.py -q
 python -m pytest tests/test_decision_index_service.py tests/test_decision_proposal.py tests/test_decision_index_consumer_reads.py tests/test_decision_index.py tests/test_decision_projection.py -q
 python scripts/run_test_battery.py gate
@@ -41,11 +88,11 @@ python scripts/check_encoding.py
 
 | Check | Result |
 |---|---|
-| Focused D2B tests (`tests/test_decision_mcp.py`, registered in the gate manifest) | 55 passed |
+| Focused D2B tests (`tests/test_decision_mcp.py`, registered in the gate manifest) | 73 passed (55 original + 18 architecture-review regressions; all 55 preserved) |
 | D2A/D2B0/D0 targeted regressions (`test_decision_index_service.py`, `test_decision_proposal.py`, `test_decision_index_consumer_reads.py`, `test_decision_index.py`, `test_decision_projection.py`) | 127 passed |
-| Gate battery (`scripts/run_test_battery.py gate`) | 1411 passed, 5 skipped (pre-existing, unrelated; baseline 1356+5 + 55 new) |
+| Gate battery (`scripts/run_test_battery.py gate` from a `pip install -e ".[dev,mcp]"`-equivalent environment) | 1429 passed, 5 skipped (pre-existing, unrelated; baseline 1356+5 + 73 new) |
 | `mneme check --mode warn` on changed governed files (`mneme/decision_mcp.py`, `mneme/cli.py`, `scripts/run_test_battery.py`) | 3/3 PASS |
-| `scripts/check_encoding.py` (mojibake + BOM, the CI encoding job locally) | OK (1627 files) |
+| `scripts/check_encoding.py` (mojibake + BOM, the CI encoding job locally) | OK (1628 files) |
 
 ## MCP SDK / package / version
 
@@ -84,6 +131,27 @@ Launched by `mneme decision-mcp`. No HTTP, SSE, or hosted endpoint; no
 auth/RBAC/tenancy. Tests use the in-memory `Client(server)` (same
 protocol layer, no transport) plus one real stdio subprocess
 end-to-end test.
+
+## Composition contract (strict)
+
+```text
+proposal store   : always composed (open_proposal_store)
+canonical source : optional
+    none        -> server serves the proposal store only (CLI default)
+    --adr-dir P : strict Mneme ADR compiler sequence
+                  parse -> validate_corpus -> resolve_precedence
+                  -> build_canonical_index
+                  ADRParseError / ADRValidationError /
+                  ADRPrecedenceError propagate and prevent server
+                  startup; no degraded or ambiguous canonical view
+                  is ever served; no ADR is silently skipped
+```
+
+`--adr-dir` has no default (it does not default to `docs/adr`); an
+empty `--adr-dir` value is a usage error (exit 2). ADR-027's
+frontmatter is deliberately not modified by this PR, so the repo's
+current `docs/adr` corpus does not pass strict validation — the
+server must be pointed at a schema-valid corpus explicitly.
 
 ## Tool inventory (exact, frozen)
 
@@ -171,11 +239,16 @@ plain JSON-safe dicts with stable key order and preserved list order:
 
 ## Error contract
 
-- Malformed candidate input, unknown record (via serializers),
-  invalid lifecycle filters, invalid origin classification, missing
-  proposal provenance → `ToolError` (`is_error=True`; the model can
-  correct input). Filter value errors pass through the service's own
-  `ValueError`s, so the vocabularies stay service-owned.
+- `decision.get` with an unknown record id → a successful typed
+  `not_found` result; `decision.trace` with an unknown id → a
+  successful typed `trace_not_found` result (identifier stays
+  type-unknown). Not-found is data, never an error.
+- Invalid or malformed caller input (unknown/extra arguments,
+  forbidden authority fields, empty `record_id`, invalid lifecycle
+  filter, invalid origin classification, malformed candidates, missing
+  proposal provenance) → `ToolError` (`is_error=True`; the model can
+  correct input). Filter-vocabulary errors pass through the service's
+  own `ValueError`s, so the vocabularies stay service-owned.
 - Canonical rule-lineage integrity failure
   (`DecisionIndexIntegrityError`) → fail-closed protocol error:
   re-raised as `_FailClosedProtocolError` (an `MCPError` subclass)
@@ -184,8 +257,9 @@ plain JSON-safe dicts with stable key order and preserved list order:
   JSON-RPC error. No successful, partial, or ambiguous trace is ever
   produced; the failure stays protocol-distinguishable from ordinary
   not-found (which is a successful `trace_not_found` result).
-- Corrupt proposal stores / malformed canonical sources are
-  composition failures at server construction (before serving).
+- Corrupt proposal stores / invalid canonical sources (ADR parse,
+  schema/validation failure, precedence ambiguity) are composition
+  failures at server construction (before serving).
 - No stack traces in tool result payloads (SDK contract; the
   transport never serializes exception internals into results).
 
@@ -206,13 +280,11 @@ receive only the injected `DecisionIndexService`. Composition
 transport-side DI over the existing store/index/service; no second
 authoritative persistence model exists and
 `.mneme/project_memory.json` is never touched. Canonical loading uses
-the existing D0 adapters only
+the existing D0 adapters through the strict compiler sequence only
 (`load_canonical_index_from_adr_dir` →
-`decision_index.build_canonical_index` over
-`adr_parser.parse_adr_directory` + `adr_compiler.resolve_precedence`;
-same-scope precedence ties degrade the active runtime projection, not
-the canonical record set, exactly as `build_canonical_index` handles
-them).
+`adr_parser.parse_adr_directory` + `adr_compiler.validate_corpus` +
+`adr_compiler.resolve_precedence` + `decision_index.build_canonical_index`,
+with no error suppression; see "Composition contract" above).
 
 ## Authority / capability matrix
 
@@ -281,11 +353,47 @@ precedence, batch-without-provenance fail-closed, read-only/idempotent
 tool annotations, and authority-boundary wording in tool descriptions
 (human inspectability).
 
+## Architecture-review regression tests (same PR, items 1-9)
+
+1. valid explicit ADR directory is validated and loaded —
+   `test_load_canonical_index_strict_valid_corpus_is_validated_and_loaded`
+2. invalid ADR enum/schema fails server composition —
+   `test_load_canonical_index_rejects_invalid_adr_enum`,
+   `test_serve_stdio_fails_closed_on_invalid_adr_enum`
+3. unresolved precedence fails server composition —
+   `test_load_canonical_index_rejects_precedence_ambiguity`,
+   `test_serve_stdio_fails_closed_on_ambiguous_precedence`
+4. no `active=[]` degradation occurs —
+   `test_no_active_zero_degradation_fallback_exists` (strict sequence
+   asserted in source order; `except ADRPrecedenceError` and
+   `active = []` must not exist)
+5. CLI default launches with no canonical ADR directory —
+   `test_cli_default_starts_without_canonical_adr_dir`
+6. explicit `--adr-dir` invokes strict canonical loading —
+   `test_cli_explicit_adr_dir_passes_strict_canonical_loading`;
+   invalid/missing/empty `--adr-dir` rejected —
+   `test_cli_rejects_missing_adr_dir_path`,
+   `test_cli_rejects_empty_adr_dir_value`; help states optionality —
+   `test_cli_help_states_adr_dir_is_optional`
+7. trace serialization uses actual union types and preserves all
+   three result variants —
+   `test_trace_dispatch_uses_isinstance_not_class_name_strings`,
+   `test_trace_to_transport_fails_closed_on_unexpected_type`,
+   `test_trace_serializers_preserve_union_types`
+8. MCP remains optional for ordinary package runtime —
+   `test_mcp_stays_out_of_core_runtime_dependencies`,
+   `test_importing_core_domain_modules_does_not_load_mcp`
+9. gate/main/release workflow provisioning includes MCP where the
+   complete MCP tests run —
+   `test_workflow_provisioning_includes_mcp_where_mcp_tests_run`
+
+All 55 original focused tests are preserved unchanged.
+
 ## Benchmark trigger decision
 
 **NOT triggered.** D2B is transport-only: it adds a new module
-(`mneme/decision_mcp.py`) and CLI/entrypoint/package wiring; it does
-not modify `decision_retriever.py`, `enforcer.py`,
+(`mneme/decision_mcp.py`) and CLI/entrypoint/package/workflow-provisioning
+wiring; it does not modify `decision_retriever.py`, `enforcer.py`,
 `conflict_detector.py`, `benchmark.py`, `rule_matcher.py`,
 `path_selectors.py`, audit tier semantics, ADR-020 typed-rule
 applicability, canonical projection behavior, proposal
@@ -316,4 +424,9 @@ unchanged, so the enforcement benchmark rerun trigger is not met.
 `mcp` is an **optional** extra (`pip install 'mneme-hq[mcp]'`); the
 core package dependencies are unchanged, and `mneme decision-mcp`
 fails with an actionable install message when the extra is absent.
-Gate battery remains green without any new mandatory dependency.
+CI provisioning: the canonical gate/main jobs install
+`".[dev,mcp]"` and the release job `".[dev,mcp,langchain]"` because
+their test batteries contain first-class MCP tests; the dedicated
+LangChain job keeps `".[dev,langchain]"`. Battery definitions were
+not changed. Gate battery remains green with no new mandatory
+runtime dependency.

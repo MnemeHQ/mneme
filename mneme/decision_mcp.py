@@ -37,10 +37,20 @@ Authority boundary (ADR-027 sections 2, 3, 7; D2B capability matrix):
 
 Error contract:
 
-* Domain validation failures (malformed candidates, unknown record ids,
-  invalid lifecycle filters, invalid origin classification) raise
-  ``ToolError``: the call returns ``is_error=True`` and the model can
-  correct its input.
+Error contract:
+
+* ``decision.get`` with an unknown record id -> a successful typed
+  ``not_found`` result (``record_type: "not_found"``); ``decision.trace``
+  with an unknown id -> a successful typed ``trace_not_found`` result
+  (``result_type: "trace_not_found"``, identifier stays type-unknown).
+  Not-found is data, never an error.
+* Invalid or malformed caller input (unknown/extra arguments, forbidden
+  authority fields, empty ``record_id``, invalid lifecycle filter or
+  origin classification, malformed candidates) -> ``ToolError``: the
+  call returns ``is_error=True`` and the model can correct its input.
+  Filter-vocabulary validation is service-owned (the handler converts
+  the service's ``ValueError``); argument-shape validation is enforced
+  by the SDK's input schema before the handler runs.
 * ``DecisionIndexIntegrityError`` (canonical rule-lineage mismatch) is
   fail closed: it is re-raised as a protocol-level ``MCPError`` (via
   ``_FailClosedProtocolError``, which the SDK passes through its tool
@@ -48,11 +58,11 @@ Error contract:
   request fails as a JSON-RPC error. No successful, partial, or
   ambiguous result is ever produced for an integrity failure, and the
   protocol error is distinguishable from an ordinary not-found.
-* Corrupt proposal stores and unavailable/malformed canonical sources are
-  loading/composition failures (``ValueError``/``json.JSONDecodeError``
-  from the existing stores/adapters) and surface at composition time —
-  before the server starts. ``serve_stdio`` fails closed: a degraded
-  index never serves.
+* Corrupt proposal stores and invalid canonical sources (ADR parse
+  failure, schema/validation failure, or precedence ambiguity from the
+  strict compiler path) are composition failures that surface at
+  server construction — before the server starts. The server never
+  serves a degraded or ambiguous canonical authority view.
 * No stack traces appear in tool result payloads.
 
 Transport: stdio only (``build_server(...).run()``). No HTTP transport
@@ -62,11 +72,13 @@ Composition: ``build_server`` accepts the already-constructed
 ``DecisionIndexService`` (dependency injection for tests) or the raw
 pieces (proposal store, canonical index). This module never creates a
 second authoritative persistence model and never mutates
-``.mneme/project_memory.json``. For canonical sources, callers use the
-existing D0 adapters (``mneme.decision_index.adrs_to_canonical`` /
-``build_canonical_index`` / ``decisions_to_canonical``) or supply an
-already-built ``CanonicalArchitectureIndex``; there is no MCP-specific
-canonical loading path.
+``.mneme/project_memory.json``. For canonical ADR sources,
+``load_canonical_index_from_adr_dir`` runs the established strict
+Mneme compiler sequence (``parse -> validate_corpus ->
+resolve_precedence -> build_canonical_index``) with no error
+suppression: ambiguity and invalid metadata prevent server startup.
+Other callers use the existing D0 adapters or supply an already-built
+``CanonicalArchitectureIndex``.
 """
 from __future__ import annotations
 
@@ -79,8 +91,7 @@ from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import INTERNAL_ERROR, ToolAnnotations
 from pydantic import BaseModel, ConfigDict, Field
 
-from mneme.adr_compiler import resolve_precedence
-from mneme.adr_import import ADRPrecedenceError
+from mneme.adr_compiler import resolve_precedence, validate_corpus
 from mneme.adr_parser import parse_adr_directory
 from mneme.decision_index import (
     CanonicalDecisionRecord,
@@ -89,8 +100,10 @@ from mneme.decision_index import (
     build_canonical_index,
 )
 from mneme.decision_index_service import (
+    CanonicalDecisionTrace,
     DecisionIndexIntegrityError,
     DecisionIndexService,
+    DecisionTraceNotFound,
     ProposalTrace,
 )
 from mneme.decision_proposal import (
@@ -693,22 +706,24 @@ def _register_tools(server: MCPServer, service: DecisionIndexService) -> None:
 def trace_to_transport(trace: Any) -> dict[str, Any]:
     """Serialize any trace union member deterministically.
 
-    The service owns the union (ProposalTrace | CanonicalDecisionTrace |
-    DecisionTraceNotFound); the transport preserves the member explicitly
-    via ``result_type``. Integrity failures never reach this function as
-    results: the handler fails closed before serialization (see
+    The service owns the D2B0 union (``ProposalTrace`` |
+    ``CanonicalDecisionTrace`` | ``DecisionTraceNotFound``); the
+    transport preserves the member explicitly via ``result_type`` and
+    dispatches on the actual types (``isinstance``), never on guessed
+    shapes. Integrity failures never reach this function as results:
+    the handler fails closed before serialization (see
     ``decision_trace``), and an unexpected union member is a protocol
     error rather than a guessed shape.
     """
-    type_name = type(trace).__name__
     if isinstance(trace, ProposalTrace):
         return proposal_trace_to_transport(trace)
-    if type_name == "CanonicalDecisionTrace":
+    if isinstance(trace, CanonicalDecisionTrace):
         return canonical_trace_to_transport(trace)
-    if type_name == "DecisionTraceNotFound":
+    if isinstance(trace, DecisionTraceNotFound):
         return trace_not_found_to_transport(trace)
     raise _protocol_error(
-        f"decision index internal failure: unexpected trace result {type_name}"
+        "decision index internal failure: unexpected trace result "
+        f"{type(trace).__name__}"
     )
 
 
@@ -725,6 +740,10 @@ class _FailClosedProtocolError(MCPError):
 
 
 _FAIL_CLOSED_WRAPPER: type[MCPError] = _FailClosedProtocolError
+
+
+def _protocol_error(message: str) -> MCPError:
+    return _FailClosedProtocolError(code=INTERNAL_ERROR, message=message)
 
 
 def build_server(service: DecisionIndexService) -> MCPServer:
@@ -767,26 +786,27 @@ def open_proposal_store(path: str | Path | None) -> DecisionProposalStore:
 
 
 def load_canonical_index_from_adr_dir(adr_dir: str | Path) -> Any:
-    """Build the canonical index from an ADR directory via the D0 path.
+    """Build the canonical index from an ADR directory — strict compiler path.
 
-    The existing D0 adapters are the canonical composition seam
-    (``decision_index.build_canonical_index`` over the ADR corpus); this
-    helper adds no new canonical model. Tolerant like the import flow:
-    the corpus is parsed per file, and a malformed ADR raises
-    ``ADRParseError`` (fail closed -> ``MCPError`` at the tool boundary)
-    while schema-invalid *frontmatter values* that the strict validator
-    rejects do not block the index build — the D0 canonical adapter itself
-    performs no enum validation, and no consumer runtime behavior depends
-    on it. Precedence ties fall back to the graph-projected non-active
-    statuses exactly as ``build_canonical_index`` handles them, so a
-    same-scope tie degrades the *active runtime projection*, not the
-    canonical record set.
+    The established Mneme compiler contract is followed exactly; no
+    tolerance, no degradation, no ``active=[]`` fallback:
+
+    ```text
+    parse -> validate_corpus -> resolve_precedence -> canonical index
+    ```
+
+    A parse failure (``ADRParseError``), a schema/validation failure
+    (``ADRValidationError``), or precedence ambiguity
+    (``ADRPrecedenceError``) propagates and prevents server startup.
+    The MCP must never serve a degraded canonical authority view when
+    Mneme cannot determine the authoritative active set. Note that the
+    strict validator is a step up from the D0 adapter's own (looser)
+    input handling — ambiguity and invalid metadata fail hard here by
+    contract.
     """
     parsed = parse_adr_directory(adr_dir)
-    try:
-        active = resolve_precedence(parsed)
-    except ADRPrecedenceError:
-        active = []
+    validate_corpus(parsed)
+    active = resolve_precedence(parsed)
     return build_canonical_index(parsed, active)
 
 
@@ -796,11 +816,14 @@ def serve_stdio(
 ) -> None:
     """Compose the service and serve it over the local stdio transport.
 
-    The only launch surface (``mneme decision-mcp``). Uses the smallest
-    protocol-independent composition justified by existing architecture:
-    ``open_proposal_store`` + (optionally) the D0 ADR adapter, then
-    ``build_server(...).run()``. It launches the local MCP transport and
-    nothing more.
+    The only launch surface (``mneme decision-mcp``). The proposal store
+    is always composed (``open_proposal_store``). Canonical ADR loading
+    is optional: ``adr_dir=None`` starts the server with proposal-store
+    access only, while an explicit directory must pass the strict Mneme
+    ADR compiler path (parse -> validate -> precedence resolve) before
+    the server starts — an invalid or ambiguous corpus prevents startup
+    rather than degrading canonical authority. It launches the local
+    MCP transport and nothing more.
     """
     canonical_index = (
         load_canonical_index_from_adr_dir(adr_dir) if adr_dir is not None else None
