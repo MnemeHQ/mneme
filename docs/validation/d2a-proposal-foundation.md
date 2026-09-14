@@ -9,12 +9,30 @@ and no observable change to any frozen runtime surface.
 ## Exact tested SHA
 
 - Base (canonical `origin/main`): `e54a5f48b11c84ee71db17c0c8c730e0c985f636`
-- Implementation commit tested: `ea7695af` (branch
-  `feat/d2a-proposal-foundation`, worktree
-  `.worktrees/feat-d2a-proposal-foundation`, context-verified with
-  `scripts/check_worktree_context.py` before work and before each commit).
+- Implementation commit: `ea7695af`; architecture-review fix commit
+  `2fb72ec8` (service-owned `proposed_at`, fail-closed proposal
+  lifecycle invariants) on branch `feat/d2a-proposal-foundation`,
+  worktree `.worktrees/feat-d2a-proposal-foundation`, context-verified
+  with `scripts/check_worktree_context.py` before work and before each
+  commit.
 - The PR head adds this validation artifact only; no runtime bytes differ
-  from the tested commit.
+  from the tested commits.
+
+## Review-fix regressions (architecture review of #371)
+
+- `test_proposed_at_is_not_producer_callable` — `propose`/`propose_batch`
+  no longer accept a `proposed_at` argument (TypeError); creation time
+  comes only from the service's injected clock.
+- `test_identical_resend_is_idempotent_with_original_timestamp` — rewritten
+  against a mutable injected clock: first proposal gets the clock time, a
+  later resend returns the original record with the original `proposed_at`,
+  and identity still excludes the timestamp.
+- `test_accepted_without_accepted_decision_id_fails_closed`,
+  `test_accepted_with_empty_accepted_decision_id_fails_closed`,
+  `test_proposed_with_accepted_decision_id_fails_closed`,
+  `test_rejected_with_accepted_decision_id_fails_closed` — proposal
+  lifecycle/link invariants fail closed; no acceptance/rejection mutation
+  API was added (D2C still owns the transition).
 
 ## Exact commands
 
@@ -31,7 +49,7 @@ python -m mneme.cli check --memory .mneme/project_memory.json --input <changed m
 
 | Check | Result |
 |---|---|
-| Focused D2A tests (`test_decision_proposal.py`, `test_decision_index_service.py`) | 44 passed |
+| Focused D2A tests (`test_decision_proposal.py`, `test_decision_index_service.py`) | 49 passed (44 original + 5 review-fix regressions) |
 | D0 kernel/projection regression (`test_decision_index.py`, `test_decision_projection.py`) | 46 passed |
 | Gate battery (`scripts/run_test_battery.py gate`, includes both new files registered in the manifest) | 1319 passed, 5 skipped (pre-existing, unrelated) |
 | Frozen enforcement benchmark instrument | 7/7 scenarios, Layer 2 pass rate 100% (fixtures unchanged) |
@@ -121,7 +139,10 @@ is injected in tests; the default clock (UTC ISO-8601) affects only
   any proposal→canonical promotion (D2C): the proposal model can represent
   `accepted`/`rejected` and `accepted_decision_id`, but no D2A code path
   produces those transitions; trace resolves them only when a fixture/authority
-  action has set them.
+  action has set them. `accepted` additionally requires a non-empty
+  `accepted_decision_id`, and `proposed`/`rejected` must not carry one
+  (fail-closed domain invariants); the D2C persistence transition for
+  flipping an existing proposal's status is deliberately not solved here.
 - Semantic-duplicate flagging: not implemented, not even as a stub
   interface (no dependency is justified yet; ADR-027 permits later
   addition without boundary change).
