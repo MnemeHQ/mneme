@@ -9,14 +9,21 @@ and no observable change to any frozen runtime surface.
 ## Exact tested SHA
 
 - Base (canonical `origin/main`): `e54a5f48b11c84ee71db17c0c8c730e0c985f636`
-- Implementation commit: `ea7695af`; architecture-review fix commit
-  `2fb72ec8` (service-owned `proposed_at`, fail-closed proposal
-  lifecycle invariants) on branch `feat/d2a-proposal-foundation`,
-  worktree `.worktrees/feat-d2a-proposal-foundation`, context-verified
-  with `scripts/check_worktree_context.py` before work and before each
-  commit.
-- The PR head adds this validation artifact only; no runtime bytes differ
-  from the tested commits.
+- Review-fix implementation commit:
+  `2fb72ec8b6c917212fe3fcccd2c619e9d23afe89` (service-owned
+  `proposed_at`, fail-closed proposal lifecycle invariants). The
+  original implementation commit `ea7695af` is included in the same
+  branch history.
+- Validated PR head before this docs-only cleanup:
+  `417776106c34a4d5d3d26a527825ab80579a9ba7` — all test, gate, and
+  benchmark figures below were executed on that exact source state.
+- The final docs-only commit changes this validation artifact (and PR
+  metadata) only: no runtime or test bytes differ from
+  `417776106c34a4d5d3d26a527825ab80579a9ba7`.
+
+Branch `feat/d2a-proposal-foundation`, worktree
+`.worktrees/feat-d2a-proposal-foundation`, context-verified with
+`scripts/check_worktree_context.py` before work and before every commit.
 
 ## Review-fix regressions (architecture review of #371)
 
@@ -51,9 +58,9 @@ python -m mneme.cli check --memory .mneme/project_memory.json --input <changed m
 |---|---|
 | Focused D2A tests (`test_decision_proposal.py`, `test_decision_index_service.py`) | 49 passed (44 original + 5 review-fix regressions) |
 | D0 kernel/projection regression (`test_decision_index.py`, `test_decision_projection.py`) | 46 passed |
-| Gate battery (`scripts/run_test_battery.py gate`, includes both new files registered in the manifest) | 1319 passed, 5 skipped (pre-existing, unrelated) |
+| Gate battery (`scripts/run_test_battery.py gate`, includes both new files registered in the manifest) | 1324 passed, 5 skipped (pre-existing, unrelated) |
 | Frozen enforcement benchmark instrument | 7/7 scenarios, Layer 2 pass rate 100% (fixtures unchanged) |
-| `mneme check --mode warn` on changed `mneme/*` + `scripts/*` files | 4/4 PASS |
+| `mneme check --mode warn` on changed `mneme/*` + `scripts/*` files | 4/4 PASS (PR-wide self-governance check over `mneme/decision_index_service.py`, `mneme/decision_proposal.py`, `mneme/decision_proposal_store.py`, `scripts/run_test_battery.py`) |
 
 ## Required-test coverage map (issue #365)
 
