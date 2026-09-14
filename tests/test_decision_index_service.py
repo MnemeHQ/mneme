@@ -22,6 +22,7 @@ from mneme.decision_index import (
 )
 from mneme.decision_index_service import (
     DecisionIndexService,
+    DecisionSearchResult,
     ProposalScopeHintMatch,
     ProposalTrace,
     ProposeResult,
@@ -272,19 +273,22 @@ def test_search_is_deterministic_text_and_metadata_filtering():
         )
     )
     hits = service.search("legacy_client")
-    assert len(hits) == 1
-    assert hits[0].candidate.statement.startswith("New code")
-    assert service.search() == service._store.list_proposals()
-    assert service.search(status=PROPOSAL_STATUS_PROPOSED) == (
+    assert len(hits.proposals) == 1
+    assert hits.proposals[0].candidate.statement.startswith("New code")
+    assert hits.canonical_decisions == ()
+    assert service.search().proposals == service._store.list_proposals()
+    assert service.search(
+        proposal_status=PROPOSAL_STATUS_PROPOSED
+    ).proposals == service._store.list_proposals()
+    assert service.search(proposal_status=PROPOSAL_STATUS_ACCEPTED) == (
+        DecisionSearchResult()
+    )
+    assert service.search(producer_name="arch-agent").proposals == (
         service._store.list_proposals()
     )
-    assert service.search(status=PROPOSAL_STATUS_ACCEPTED) == ()
-    assert service.search(producer_name="arch-agent") == (
-        service._store.list_proposals()
-    )
-    assert service.search(producer_name="other") == ()
+    assert service.search(producer_name="other") == DecisionSearchResult()
     with pytest.raises(ValueError):
-        service.search(status="bogus")
+        service.search(proposal_status="bogus")
 
 
 def test_applicable_to_returns_retrieval_hints_only():
