@@ -133,7 +133,14 @@ def test_proposal_model_represents_all_adr027_statuses():
         PROPOSAL_STATUS_ACCEPTED,
         PROPOSAL_STATUS_REJECTED,
     }
-    for status in sorted(VALID_PROPOSAL_STATUSES):
+    # accepted requires a canonical decision id; proposed/rejected must
+    # not carry one (domain invariant, fail closed).
+    statuses_and_ids = (
+        (PROPOSAL_STATUS_ACCEPTED, "ADR-9001"),
+        (PROPOSAL_STATUS_PROPOSED, None),
+        (PROPOSAL_STATUS_REJECTED, None),
+    )
+    for status, accepted_id in statuses_and_ids:
         proposal = DecisionProposal(
             proposal_id="dprop-" + "0" * 32,
             status=status,
@@ -141,6 +148,7 @@ def test_proposal_model_represents_all_adr027_statuses():
             producer_key=producer_key_of(_provenance()),
             content_fingerprint=content_fingerprint_of(_candidate()),
             proposed_at="2026-09-14T00:00:00Z",
+            accepted_decision_id=accepted_id,
         )
         assert proposal.status == status
     with pytest.raises(ValueError):
@@ -148,6 +156,58 @@ def test_proposal_model_represents_all_adr027_statuses():
             proposal_id="x", status="active", candidate=_candidate(),
             producer_key="k", content_fingerprint="c",
             proposed_at="2026-09-14T00:00:00Z",
+        )
+
+
+def test_accepted_without_accepted_decision_id_fails_closed():
+    with pytest.raises(ValueError) as exc:
+        DecisionProposal(
+            proposal_id="dprop-" + "1" * 32,
+            status=PROPOSAL_STATUS_ACCEPTED,
+            candidate=_candidate(),
+            producer_key="k",
+            content_fingerprint="c",
+            proposed_at="2026-09-14T00:00:00Z",
+        )
+    assert "accepted_decision_id" in str(exc.value)
+
+
+def test_accepted_with_empty_accepted_decision_id_fails_closed():
+    with pytest.raises(ValueError):
+        DecisionProposal(
+            proposal_id="dprop-" + "1" * 32,
+            status=PROPOSAL_STATUS_ACCEPTED,
+            candidate=_candidate(),
+            producer_key="k",
+            content_fingerprint="c",
+            proposed_at="2026-09-14T00:00:00Z",
+            accepted_decision_id="",
+        )
+
+
+def test_proposed_with_accepted_decision_id_fails_closed():
+    with pytest.raises(ValueError):
+        DecisionProposal(
+            proposal_id="dprop-" + "1" * 32,
+            status=PROPOSAL_STATUS_PROPOSED,
+            candidate=_candidate(),
+            producer_key="k",
+            content_fingerprint="c",
+            proposed_at="2026-09-14T00:00:00Z",
+            accepted_decision_id="ADR-9001",
+        )
+
+
+def test_rejected_with_accepted_decision_id_fails_closed():
+    with pytest.raises(ValueError):
+        DecisionProposal(
+            proposal_id="dprop-" + "1" * 32,
+            status=PROPOSAL_STATUS_REJECTED,
+            candidate=_candidate(),
+            producer_key="k",
+            content_fingerprint="c",
+            proposed_at="2026-09-14T00:00:00Z",
+            accepted_decision_id="ADR-9001",
         )
 
 

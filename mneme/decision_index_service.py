@@ -181,7 +181,6 @@ class DecisionIndexService:
         self,
         candidate: DecisionProposalCandidate,
         shared_provenance: DecisionProposalSourceProvenance | None = None,
-        proposed_at: str | None = None,
     ) -> ProposeResult:
         """Create or idempotently return a proposal.
 
@@ -189,6 +188,11 @@ class DecisionIndexService:
         candidate's own provenance with ``shared_provenance`` (candidate
         components win). Every producer-created proposal enters as
         ``proposed``: there is no input path to any other status.
+
+        ``proposed_at`` is owned by the service: it comes only from the
+        injected clock (``_default_clock`` in production), never from a
+        caller argument, so a producer/transport caller cannot assert
+        Mneme's proposal creation timestamp.
 
         Identical source/version/content resends return the existing
         proposal unchanged (with its original ``proposed_at`` and current
@@ -207,9 +211,7 @@ class DecisionIndexService:
             candidate=effective,
             producer_key=producer_key_of(effective.provenance),
             content_fingerprint=content_fingerprint_of(effective),
-            proposed_at=(
-                proposed_at if proposed_at is not None else self._clock()
-            ),
+            proposed_at=self._clock(),
         )
         stored, created = self._store.add_if_new(proposal)
         return ProposeResult(proposal=stored, created=created)
@@ -218,7 +220,6 @@ class DecisionIndexService:
         self,
         candidates: Sequence[DecisionProposalCandidate],
         shared_provenance: DecisionProposalSourceProvenance | None = None,
-        proposed_at: str | None = None,
     ) -> tuple[ProposeResult, ...]:
         """Submit multiple candidates with per-candidate independence.
 
@@ -227,10 +228,11 @@ class DecisionIndexService:
         provenance is normalized deterministically
         (``merge_provenance``). There are no batch acceptance semantics:
         every result is an ordinary, independently reviewable,
-        non-enforceable proposal.
+        non-enforceable proposal. ``proposed_at`` is service-owned via
+        the injected clock, exactly as in ``propose``.
         """
         return tuple(
-            self.propose(candidate, shared_provenance, proposed_at)
+            self.propose(candidate, shared_provenance)
             for candidate in candidates
         )
 

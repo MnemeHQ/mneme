@@ -142,15 +142,37 @@ def test_propose_requires_provenance_fail_closed():
 
 
 def test_identical_resend_is_idempotent_with_original_timestamp():
-    service = _service()
-    first = service.propose(_candidate(), proposed_at=FIXED_TIME)
-    # Clock advances (later injected time) but identity excludes proposed_at.
-    second = service.propose(_candidate(), proposed_at=LATER_TIME)
+    # Mutable injected clock: time advances between the two submissions,
+    # proving that identity excludes proposed_at and that the resend
+    # returns the original record with its original service-owned
+    # proposed_at (the argument itself is not producer-callable).
+    clock_times = iter([FIXED_TIME, LATER_TIME, LATER_TIME])
+    service = DecisionIndexService(
+        InMemoryDecisionProposalStore(),
+        clock=lambda: next(clock_times),
+    )
+    first = service.propose(_candidate())
+    assert first.proposal.proposed_at == FIXED_TIME
+    second = service.propose(_candidate())
     assert second.created is False
     assert second.proposal.proposal_id == first.proposal.proposal_id
     assert second.proposal.proposed_at == first.proposal.proposed_at == FIXED_TIME
     assert second.proposal.status == PROPOSAL_STATUS_PROPOSED
     assert len(service._store.list_proposals()) == 1
+
+
+def test_proposed_at_is_not_producer_callable():
+    """The service clock owns proposal creation time, not the caller."""
+    service = _service()
+    with pytest.raises(TypeError):
+        service.propose(_candidate(), proposed_at=FIXED_TIME)  # type: ignore[call-arg]
+    with pytest.raises(TypeError):
+        service.propose_batch(  # type: ignore[call-arg]
+            (_candidate(),), proposed_at=FIXED_TIME
+        )
+    # The only timestamp source is the injected/default clock.
+    result = service.propose(_candidate())
+    assert result.proposal.proposed_at == FIXED_TIME
 
 
 def test_changed_content_preserves_previous_and_creates_new_candidate():
@@ -420,18 +442,34 @@ def test_producer_evidence_never_becomes_trusted_evidence():
 
 
 def test_rejected_and_non_authoritative_fixtures_cannot_project_to_governance():
-    """Rejected/accepted proposal states exist but never reach governance."""
+    """Rejected/accepted proposal states exist but never reach governance.
+
+    Fixtures respect the lifecycle invariants: accepted carries the
+    canonical id the authority action would have assigned; rejected
+    carries none. Neither can be produced through the producer API.
+    """
     service = _service()
     result = service.propose(_candidate())
-    for status in (PROPOSAL_STATUS_REJECTED, PROPOSAL_STATUS_ACCEPTED):
-        fixture = DecisionProposal(
-            proposal_id=result.proposal.proposal_id,
-            status=status,
+    fixtures = (
+        DecisionProposal(
+            proposal_id="dprop-" + "d" * 32,
+            status=PROPOSAL_STATUS_REJECTED,
             candidate=result.proposal.candidate,
             producer_key=result.proposal.producer_key,
             content_fingerprint=result.proposal.content_fingerprint,
             proposed_at=result.proposal.proposed_at,
-        )
+        ),
+        DecisionProposal(
+            proposal_id="dprop-" + "e" * 32,
+            status=PROPOSAL_STATUS_ACCEPTED,
+            candidate=result.proposal.candidate,
+            producer_key=result.proposal.producer_key,
+            content_fingerprint=result.proposal.content_fingerprint,
+            proposed_at=result.proposal.proposed_at,
+            accepted_decision_id="ADR-9001",
+        ),
+    )
+    for fixture in fixtures:
         service._store.add_if_new(fixture)
         # No projection path exists for a proposal: the projector requires
         # a CanonicalDecisionRecord and fails closed on anything else.

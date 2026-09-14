@@ -208,6 +208,25 @@ class DecisionProposal:
                 f"proposal status {self.status!r} is not one of "
                 f"{sorted(VALID_PROPOSAL_STATUSES)}"
             )
+        # Lifecycle/link invariants (fail closed). ``accepted`` requires the
+        # canonical decision id assigned by the separate Mneme authority
+        # action; ``proposed``/``rejected`` must not carry one. This is
+        # domain validation only: D2C still owns the authority transition,
+        # and no producer path can reach these states through D2A.
+        if self.status == PROPOSAL_STATUS_ACCEPTED:
+            if not (
+                isinstance(self.accepted_decision_id, str)
+                and self.accepted_decision_id
+            ):
+                raise ValueError(
+                    "an accepted proposal requires a non-empty "
+                    "accepted_decision_id"
+                )
+        elif self.accepted_decision_id is not None:
+            raise ValueError(
+                f"a {self.status!r} proposal must not carry "
+                "accepted_decision_id"
+            )
 
 
 def _canonical_json(payload: Any) -> str:
