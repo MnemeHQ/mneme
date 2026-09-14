@@ -249,12 +249,19 @@ def test_store_transition_already_at_target_is_idempotent(tmp_path: Path) -> Non
     store.transition_if_proposed(
         proposal.proposal_id, PROPOSAL_STATUS_ACCEPTED, "ddec-x"
     )
+    # Same accepted_decision_id -> valid idempotent retry.
     again, transitioned_ok = store.transition_if_proposed(
-        proposal.proposal_id, PROPOSAL_STATUS_ACCEPTED, "ddec-other"
+        proposal.proposal_id, PROPOSAL_STATUS_ACCEPTED, "ddec-x"
     )
     assert transitioned_ok is False
     assert again.status == PROPOSAL_STATUS_ACCEPTED
     assert again.accepted_decision_id == "ddec-x"
+
+    # Different accepted_decision_id -> NOT idempotent: fail closed.
+    with pytest.raises(ValueError):
+        store.transition_if_proposed(
+            proposal.proposal_id, PROPOSAL_STATUS_ACCEPTED, "ddec-other"
+        )
 
     rejected = _propose(
         store, _candidate(statement="Rejected candidate statement.")
@@ -268,6 +275,37 @@ def test_store_transition_already_at_target_is_idempotent(tmp_path: Path) -> Non
     assert rejected_ok is False
     assert re_rejected.status == PROPOSAL_STATUS_REJECTED
     assert re_rejected.accepted_decision_id is None
+
+
+def test_store_transition_accepted_id_conflict_is_not_idempotent(
+    tmp_path: Path,
+) -> None:
+    """Parity: both store implementations fail closed on a conflicting
+    accepted_decision_id for an already-accepted proposal."""
+    for make_store in (
+        lambda path: JsonFileDecisionProposalStore(path),
+        lambda path: InMemoryDecisionProposalStore(),
+    ):
+        store = make_store(tmp_path / "in-memory-or-file.json")
+        proposal = _propose(store)
+        stored, created = store.add_if_new(proposal)
+        assert created or stored.status == PROPOSAL_STATUS_PROPOSED
+        store.transition_if_proposed(
+            proposal.proposal_id, PROPOSAL_STATUS_ACCEPTED, "ddec-original"
+        )
+        with pytest.raises(ValueError):
+            store.transition_if_proposed(
+                proposal.proposal_id, PROPOSAL_STATUS_ACCEPTED, "ddec-other"
+            )
+        # The stored id is unchanged after the failed conflict.
+        assert store.get(proposal.proposal_id).accepted_decision_id == (
+            "ddec-original"
+        )
+        # Terminal accepted->rejected and rejected->accepted still fail.
+        with pytest.raises(ValueError):
+            store.transition_if_proposed(
+                proposal.proposal_id, PROPOSAL_STATUS_REJECTED
+            )
 
 
 def test_store_transition_from_terminal_status_fails(tmp_path: Path) -> None:
@@ -395,11 +433,17 @@ def test_in_memory_store_transition_matches_file_store(tmp_path: Path) -> None:
     assert transitioned_ok is True
     assert transitioned.status == PROPOSAL_STATUS_ACCEPTED
     assert transitioned.accepted_decision_id == "ddec-x"
+
+    # Same accepted_decision_id -> idempotent; different -> fail closed.
     again, idempotent = store.transition_if_proposed(
-        proposal.proposal_id, PROPOSAL_STATUS_ACCEPTED, "ddec-other"
+        proposal.proposal_id, PROPOSAL_STATUS_ACCEPTED, "ddec-x"
     )
     assert idempotent is False
     assert again.accepted_decision_id == "ddec-x"
+    with pytest.raises(ValueError):
+        store.transition_if_proposed(
+            proposal.proposal_id, PROPOSAL_STATUS_ACCEPTED, "ddec-other"
+        )
 
 
 # ── Acceptance: normal successful path ───────────────────────────────────────
@@ -694,6 +738,139 @@ def test_explicit_decision_id_colliding_with_proposal_namespace_fails(
             second.proposal_id,
             decision_id=first.proposal_id,
         )
+
+
+def test_explicit_decision_id_with_reserved_prefix_rejected(
+    tmp_path: Path,
+) -> None:
+    """A canonical decision id must never inhabit the reserved dprop-
+    proposal namespace, even when no proposal with that exact id exists."""
+    path = tmp_path / "p.json"
+    proposal = _propose(JsonFileDecisionProposalStore(path))
+    memory = _write_memory(tmp_path)
+    with pytest.raises(DecisionIdNamespaceError):
+        _accept(
+            JsonFileDecisionProposalStore(path),
+            memory,
+            proposal.proposal_id,
+            decision_id="dprop-arbitrary",
+        )
+    stored = JsonFileDecisionProposalStore(path).get(proposal.proposal_id)
+    assert stored is not None
+    assert stored.status == PROPOSAL_STATUS_PROPOSED
+
+
+def test_explicit_non_ddec_human_id_is_allowed(tmp_path: Path) -> None:
+    path = tmp_path / "p.json"
+    proposal = _propose(JsonFileDecisionProposalStore(path))
+    memory = _write_memory(tmp_path)
+    result = _accept(
+        JsonFileDecisionProposalStore(path),
+        memory,
+        proposal.proposal_id,
+        decision_id="arch-storage-standard",
+    )
+    assert result.decision_id == "arch-storage-standard"
+    assert _entry_for(memory, "arch-storage-standard")["decision"] == (
+        proposal.candidate.statement
+    )
+
+
+def test_default_id_remains_ddec_namespace(tmp_path: Path) -> None:
+    path = tmp_path / "p.json"
+    proposal = _propose(JsonFileDecisionProposalStore(path))
+    assert default_decision_id_of(proposal).startswith("ddec-")
+    memory = _write_memory(tmp_path)
+    result = _accept(JsonFileDecisionProposalStore(path), memory, proposal.proposal_id)
+    assert result.decision_id == default_decision_id_of(proposal)
+    assert result.decision_id.startswith("ddec-")
+
+
+def test_accept_retry_tolerates_downstream_protection_enrichment(
+    tmp_path: Path,
+) -> None:
+    """Legitimate downstream enrichment must survive an acceptance retry.
+
+    The rule here is created by the existing protection subsystem's write
+    primitive AFTER acceptance; D2C did not create it. The retry must not
+    treat the enrichment as an ID collision, must not delete or rewrite
+    it, and must still return the idempotent already-accepted result.
+    """
+    from mneme.protection import _install_rule
+    from mneme.schemas import Rule
+
+    path = tmp_path / "p.json"
+    proposal = _propose(JsonFileDecisionProposalStore(path))
+    memory = _write_memory(tmp_path)
+    result = _accept(JsonFileDecisionProposalStore(path), memory, proposal.proposal_id)
+    decision_id = result.decision_id
+
+    # At acceptance time the decision is bare: D2C created no rule.
+    bare_entry = _entry_for(memory, decision_id)
+    assert bare_entry["rules"] == []
+    assert _canonical_index(memory).rules_for_decision(decision_id) == ()
+
+    # Legitimate downstream protection via the existing protection write
+    # primitive (the exact primitive protection activation uses).
+    rule = Rule(type="FORBID_LITERAL", value="legacy_client")
+    assert _install_rule(memory, decision_id, rule) is True
+    enriched_entry = _entry_for(memory, decision_id)
+    assert enriched_entry["rules"] == [
+        {"type": "FORBID_LITERAL", "value": "legacy_client"}
+    ]
+    snapshot = _memory_bytes(memory)
+
+    # Retry acceptance: idempotent success, no rewrite, rule intact.
+    retry = _accept(JsonFileDecisionProposalStore(path), memory, proposal.proposal_id)
+    assert retry.proposal_id == proposal.proposal_id
+    assert retry.decision_id == decision_id
+    assert retry.already_accepted is True
+    assert retry.materialized is False
+    assert retry.recovered is False
+    assert retry.verified is True
+    assert _memory_bytes(memory) == snapshot
+    after_entry = _entry_for(memory, decision_id)
+    assert after_entry["rules"] == enriched_entry["rules"]
+    stored = JsonFileDecisionProposalStore(path).get(proposal.proposal_id)
+    assert stored is not None
+    assert stored.accepted_decision_id == decision_id
+
+    # The canonical record keeps the downstream-derived rule linkage that
+    # D2C itself did not create.
+    record = next(
+        r for r in _canonical_index(memory).records
+        if r.decision_id == decision_id
+    )
+    assert record.derived_rule_ids == (f"{decision_id}:FORBID_LITERAL:0",)
+
+
+def test_accept_retry_tolerates_declared_test_evidence_linkage(
+    tmp_path: Path,
+) -> None:
+    """Declared test evidence added after acceptance is downstream
+    enrichment: a retry must neither claim nor remove it."""
+    path = tmp_path / "p.json"
+    proposal = _propose(JsonFileDecisionProposalStore(path))
+    memory = _write_memory(tmp_path)
+    result = _accept(JsonFileDecisionProposalStore(path), memory, proposal.proposal_id)
+    decision_id = result.decision_id
+    with open(memory, encoding="utf-8") as handle:
+        raw = json.load(handle)
+    entry = next(e for e in raw["decisions"] if e.get("id") == decision_id)
+    entry["test_evidence"] = [
+        {"selector": "tests/test_downstream.py::test_rule", "sha": ""}
+    ]
+    memory.write_text(json.dumps(raw, indent=2) + "\n", encoding="utf-8")
+    snapshot = _memory_bytes(memory)
+
+    retry = _accept(JsonFileDecisionProposalStore(path), memory, proposal.proposal_id)
+    assert retry.already_accepted is True
+    assert retry.materialized is False
+    assert retry.verified is True
+    assert _memory_bytes(memory) == snapshot
+    assert _entry_for(memory, decision_id)["test_evidence"] == [
+        {"selector": "tests/test_downstream.py::test_rule", "sha": ""}
+    ]
 
 
 def test_explicit_decision_id_empty_fails(tmp_path: Path) -> None:

@@ -79,9 +79,16 @@ Recovery (explicit, fail-closed):
 * dangerous reverse half-state (proposal still ``proposed`` while the
   requested decision id already exists in memory): fail closed —
   acceptance is never inferred and the proposal is never auto-transitioned;
-* collision (same decision id, content differing from the exact expected
-  D2C materialization): fail closed — never overwritten, never merged;
-  no partial success is ever reported as success.
+* collision (same decision id whose D2C-owned identity fields differ from
+  the accepted decision): fail closed — never overwritten, never merged;
+* an already-accepted proposal requested with a different decision id:
+  fail closed — the stored ``accepted_decision_id`` can never be replaced;
+* downstream enrichment tolerance: an acceptance retry verifies only the
+  D2C-owned identity fields of an already-materialized decision and
+  never treats legitimate downstream enrichment — e.g. typed rules
+  installed later by protection activation, declared test-evidence
+  linkage, or a later ``updated_at`` — as a collision; no partial
+  success is ever reported as success.
 
 Provenance boundary (ADR-027). Full producer provenance stays durably
 preserved in the retained proposal; the durable proposal ↔ decision link
@@ -103,6 +110,7 @@ from typing import Callable
 
 from mneme.decision_index import (
     CANONICAL_VERSION,
+    VALID_LIFECYCLE_STATUSES,
     CanonicalArchitectureIndex,
     CanonicalDecisionRecord,
     decisions_to_canonical,
@@ -119,6 +127,10 @@ from mneme.setup_state import atomic_write_json
 
 _DECISION_ID_PREFIX = "ddec-"
 _DECISION_ID_HEX_LENGTH = 32
+
+# Reserved proposal-id namespace (mneme.decision_proposal): a canonical
+# decision id must never inhabit it.
+_PROPOSAL_ID_PREFIX = "dprop-"
 
 # Field separator for hashed id material (unit separator; never valid input).
 _ID_SEPARATOR = "\x1f"
@@ -308,39 +320,50 @@ def expected_materialization_entry(
     }
 
 
-def _materialization_mismatch(
+def _accepted_identity_mismatch(
     entry: dict[str, object],
     proposal: DecisionProposal,
     decision_id: str,
 ) -> str | None:
-    """Return a mismatch reason, or ``None`` when the entry is exactly the
-    expected D2C materialization of ``proposal`` under ``decision_id``.
+    """Return a mismatch reason, or ``None`` when an already-materialized
+    entry is still the SAME accepted decision for ``proposal`` under
+    ``decision_id`` (case B: already-accepted retry).
 
-    Deterministic content fields must match exactly (present and equal).
-    Timestamps were owned by the first acceptance attempt's clock, so a
-    recovered verification requires only that they are non-empty strings;
-    every other deviation — including a decision that protection later
-    gave rules — is a mismatch (fail closed, never overwritten).
+    Verifies only the fields whose identity/content D2C owns and that
+    establish the entry is this accepted decision: statement, rationale,
+    scope, the D2C-owned emptiness of ``constraints``/``anti_patterns``
+    (no currently approved downstream path modifies them after
+    acceptance), a legal lifecycle status, and an existing ``created_at``.
+
+    Deliberately NOT verified — downstream-owned/enrichable fields that
+    later legitimate Mneme processes (e.g. protection activation,
+    declared-evidence linkage) may add after acceptance:
+    ``rules``, ``test_evidence``, and ``updated_at``. A retry never
+    deletes, normalizes, overwrites, or mutates such enrichment, and never
+    treats it as an ID collision. The strict initial-shape proof for a
+    decision D2C itself materialized lives in ``_verify`` (case A).
     """
-    expected_fields: tuple[tuple[str, object], ...] = (
+    identity_fields: tuple[tuple[str, object], ...] = (
         ("decision", proposal.candidate.statement),
         ("rationale", proposal.candidate.rationale),
         ("scope", list(proposal.candidate.scope_hints)),
         ("constraints", []),
         ("anti_patterns", []),
-        ("rules", []),
-        ("test_evidence", []),
-        ("status", "active"),
     )
-    for field, expected_value in expected_fields:
+    for field, expected_value in identity_fields:
         if field not in entry:
             return f"field {field!r} missing"
         if entry[field] != expected_value:
-            return f"field {field!r} differs from the expected materialization"
-    for timestamp_field in ("created_at", "updated_at"):
-        value = entry.get(timestamp_field)
-        if not isinstance(value, str) or not value:
-            return f"field {timestamp_field!r} must be a non-empty string"
+            return f"field {field!r} differs from the accepted decision's"
+    status = entry.get("status")
+    if status not in VALID_LIFECYCLE_STATUSES:
+        return (
+            f"field 'status' is {status!r}, not a legal lifecycle status "
+            f"(expected one of {sorted(VALID_LIFECYCLE_STATUSES)})"
+        )
+    created_at = entry.get("created_at")
+    if not isinstance(created_at, str) or not created_at:
+        return "field 'created_at' must be a non-empty string"
     if entry.get("id") != decision_id:
         return "id mismatch"
     return None
@@ -401,9 +424,12 @@ class DecisionAuthorityService:
         Idempotency/recovery: an already-accepted proposal retries with
         its stored ``accepted_decision_id`` (a different requested id
         fails closed); a missing decision is materialized and verified
-        (``recovered=True``); an exact expected decision present means
-        success with no write; a proposed proposal whose requested id
-        already exists fails closed as a reverse half-state.
+        (``recovered=True``); an already-materialized decision is verified
+        on its D2C-owned identity fields only (downstream enrichment such
+        as protection-installed rules, declared test evidence, or a later
+        ``updated_at`` is tolerated, never deleted or rewritten); a
+        proposed proposal whose requested id already exists fails closed
+        as a reverse half-state.
 
         Does NOT: assign an Audit tier, activate protection, create
         rules/applicability/evidence, or touch anything else in memory.
@@ -418,6 +444,13 @@ class DecisionAuthorityService:
             if not (isinstance(decision_id, str) and decision_id):
                 raise DecisionIdNamespaceError(
                     "an explicit decision_id must be a non-empty string"
+                )
+            if decision_id.startswith(_PROPOSAL_ID_PREFIX):
+                raise DecisionIdNamespaceError(
+                    f"explicit decision_id {decision_id!r} occupies the "
+                    f"reserved proposal-id namespace "
+                    f"({_PROPOSAL_ID_PREFIX}*); a canonical decision id "
+                    "must never inhabit the proposal-id namespace"
                 )
             proposal_ids = {p.proposal_id for p in self._list_proposals()}
             if decision_id in proposal_ids:
@@ -462,13 +495,13 @@ class DecisionAuthorityService:
                 "fail closed)"
             )
         if existing_entry is not None:
-            mismatch = _materialization_mismatch(
+            mismatch = _accepted_identity_mismatch(
                 existing_entry, proposal, effective_id
             )
             if mismatch is not None:
                 raise DecisionIdCollisionError(
                     f"decision id {effective_id!r} already exists in "
-                    f"{self._memory_path} with different content "
+                    f"{self._memory_path} but is not this accepted decision "
                     f"({mismatch}); the existing decision is never "
                     "overwritten or merged"
                 )
@@ -650,12 +683,31 @@ class DecisionAuthorityService:
 
         1. reload through ``MemoryStore``;
         2. find the runtime ``Decision`` by ``accepted_decision_id``;
-        3. assert its fields equal the expected D2C materialization;
+        3. assert its fields per the verification case (below);
         4. derive canonical records through the existing
            ``decisions_to_canonical``;
-        5. find the canonical record by the same id and assert identity,
-           version, lifecycle, statement, rationale, scope, and the
-           no-rules/no-evidence invariants.
+        5. find the canonical record by the same id and assert its fields
+           per the same case.
+
+        Case A (``expected_timestamp`` set — D2C wrote the decision in
+        this call, fresh or crash recovery): prove the exact initial D2C
+        shape, proving D2C itself fabricated nothing — statement,
+        rationale, scope, empty ``constraints``/``anti_patterns``/``rules``
+        /``test_evidence``, ``status == "active"``, both timestamps equal
+        to the authority clock value; canonical
+        ``derived_rule_ids == ()`` and ``test_evidence == ()``.
+
+        Case B (``expected_timestamp is None`` — the decision was already
+        materialized): verify only the fields whose identity/content D2C
+        owns — id, statement, rationale, scope, the D2C-owned emptiness
+        of ``constraints``/``anti_patterns`` (no currently approved
+        downstream path modifies them post-acceptance), a legal lifecycle
+        status under current D2C1 assumptions, and an existing
+        ``created_at``. Downstream-owned/enrichable fields — ``rules``,
+        canonical ``derived_rule_ids``, ``test_evidence``, and
+        ``updated_at`` — are NOT required to remain empty: legitimate
+        downstream processes (protection activation, declared-evidence
+        linkage) must survive a later acceptance retry.
         """
         store = MemoryStore(self._memory_path)
         try:
@@ -672,23 +724,17 @@ class DecisionAuthorityService:
                 f"decision {decision_id!r} missing from reloaded memory"
             )
         candidate = proposal.candidate
-        runtime_expectations: tuple[tuple[str, object, object], ...] = (
-            ("decision", decision.decision, candidate.statement),
-            ("rationale", decision.rationale, candidate.rationale),
-            ("scope", list(decision.scope), list(candidate.scope_hints)),
-            ("constraints", decision.constraints, []),
-            ("anti_patterns", decision.anti_patterns, []),
-            ("rules", decision.rules, []),
-            ("test_evidence", decision.test_evidence, []),
-            ("status", decision.status, "active"),
-        )
-        for field, actual, expected in runtime_expectations:
-            if actual != expected:
-                raise MaterializationVerificationError(
-                    f"materialized decision {decision_id!r} field "
-                    f"{field!r} is {actual!r}, expected {expected!r}"
-                )
         if expected_timestamp is not None:
+            runtime_expectations: tuple[tuple[str, object, object], ...] = (
+                ("decision", decision.decision, candidate.statement),
+                ("rationale", decision.rationale, candidate.rationale),
+                ("scope", list(decision.scope), list(candidate.scope_hints)),
+                ("constraints", decision.constraints, []),
+                ("anti_patterns", decision.anti_patterns, []),
+                ("rules", decision.rules, []),
+                ("test_evidence", decision.test_evidence, []),
+                ("status", decision.status, "active"),
+            )
             for timestamp_field, value in (
                 ("created_at", decision.created_at),
                 ("updated_at", decision.updated_at),
@@ -700,15 +746,30 @@ class DecisionAuthorityService:
                         f"authority clock value {expected_timestamp!r}"
                     )
         else:
-            for timestamp_field, value in (
-                ("created_at", decision.created_at),
-                ("updated_at", decision.updated_at),
-            ):
-                if not (isinstance(value, str) and value):
-                    raise MaterializationVerificationError(
-                        f"materialized decision {decision_id!r} field "
-                        f"{timestamp_field!r} is missing"
-                    )
+            runtime_expectations = (
+                ("decision", decision.decision, candidate.statement),
+                ("rationale", decision.rationale, candidate.rationale),
+                ("scope", list(decision.scope), list(candidate.scope_hints)),
+                ("constraints", decision.constraints, []),
+                ("anti_patterns", decision.anti_patterns, []),
+            )
+            if not (isinstance(decision.created_at, str) and decision.created_at):
+                raise MaterializationVerificationError(
+                    f"accepted decision {decision_id!r} has no "
+                    "created_at"
+                )
+            if decision.status not in VALID_LIFECYCLE_STATUSES:
+                raise MaterializationVerificationError(
+                    f"accepted decision {decision_id!r} has status "
+                    f"{decision.status!r}, not a legal lifecycle status "
+                    f"(expected one of {sorted(VALID_LIFECYCLE_STATUSES)})"
+                )
+        for field, actual, expected in runtime_expectations:
+            if actual != expected:
+                raise MaterializationVerificationError(
+                    f"materialized decision {decision_id!r} field "
+                    f"{field!r} is {actual!r}, expected {expected!r}"
+                )
         index: CanonicalArchitectureIndex = decisions_to_canonical(
             store.decisions()
         )
@@ -720,17 +781,28 @@ class DecisionAuthorityService:
                 f"canonical record {decision_id!r} missing after "
                 "decisions_to_canonical"
             )
-        canonical_expectations: tuple[tuple[str, object, object], ...] = (
-            ("version", record.version, CANONICAL_VERSION),
-            ("lifecycle_status", record.lifecycle_status, "active"),
-            ("statement", record.statement, candidate.statement),
-            ("rationale", record.rationale, candidate.rationale),
-            ("context_scope", record.context_scope, tuple(candidate.scope_hints)),
-            ("constraints", record.constraints, ()),
-            ("anti_patterns", record.anti_patterns, ()),
-            ("derived_rule_ids", record.derived_rule_ids, ()),
-            ("test_evidence", record.test_evidence, ()),
-        )
+        if expected_timestamp is not None:
+            canonical_expectations: tuple[tuple[str, object, object], ...] = (
+                ("version", record.version, CANONICAL_VERSION),
+                ("lifecycle_status", record.lifecycle_status, "active"),
+                ("statement", record.statement, candidate.statement),
+                ("rationale", record.rationale, candidate.rationale),
+                ("context_scope", record.context_scope, tuple(candidate.scope_hints)),
+                ("constraints", record.constraints, ()),
+                ("anti_patterns", record.anti_patterns, ()),
+                ("derived_rule_ids", record.derived_rule_ids, ()),
+                ("test_evidence", record.test_evidence, ()),
+            )
+        else:
+            canonical_expectations = (
+                ("version", record.version, CANONICAL_VERSION),
+                ("lifecycle_status", record.lifecycle_status, decision.status),
+                ("statement", record.statement, candidate.statement),
+                ("rationale", record.rationale, candidate.rationale),
+                ("context_scope", record.context_scope, tuple(candidate.scope_hints)),
+                ("constraints", record.constraints, ()),
+                ("anti_patterns", record.anti_patterns, ()),
+            )
         for field, actual, expected in canonical_expectations:
             if actual != expected:
                 raise CanonicalVerificationError(

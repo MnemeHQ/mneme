@@ -114,8 +114,15 @@ class DecisionProposalStore(Protocol):
         * ``proposed``  -> target status, persisted atomically,
           ``transitioned=True``; candidate content, ``producer_key``,
           ``content_fingerprint``, and ``proposed_at`` are unchanged;
-        * already at ``target_status`` -> existing record returned
-          unchanged with ``transitioned=False`` (idempotent retry);
+        * already at ``target_status`` -> the existing record is returned
+          unchanged with ``transitioned=False`` ONLY when the requested
+          link matches: for ``accepted`` the requested
+          ``accepted_decision_id`` must equal the stored one, and for
+          ``rejected`` no ``accepted_decision_id`` may be requested. An
+          already-accepted proposal requested with a different decision
+          id is NOT an idempotent retry and raises ``ValueError`` (fail
+          closed; the stored ``accepted_decision_id`` can never be
+          replaced);
         * any other status (accepted→rejected, rejected→accepted), an
           unknown id, or an invalid argument -> ``ValueError`` (fail
           closed; callers map to their own authority error types).
@@ -157,6 +164,16 @@ class InMemoryDecisionProposalStore:
         if existing is None:
             raise ValueError(f"proposal {proposal_id!r} not found")
         if existing.status == target_status:
+            if target_status == PROPOSAL_STATUS_ACCEPTED and (
+                accepted_decision_id != existing.accepted_decision_id
+            ):
+                raise ValueError(
+                    f"proposal {proposal_id!r} is already accepted with "
+                    f"decision id {existing.accepted_decision_id!r}; a retry "
+                    f"requesting {accepted_decision_id!r} is not idempotent "
+                    "and the stored accepted_decision_id can never be "
+                    "replaced"
+                )
             return existing, False
         if existing.status != PROPOSAL_STATUS_PROPOSED:
             raise ValueError(
@@ -254,12 +271,27 @@ class JsonFileDecisionProposalStore:
         verified to carry the transitioned state; the in-memory state is
         updated only after that verification succeeds, so a failed write
         or verification leaves the store's memory of the record unchanged.
+
+        Already-at-target is idempotent only when the requested link
+        matches the stored one; an already-accepted proposal requested
+        with a different ``accepted_decision_id`` fails closed before any
+        write.
         """
         _validate_transition_args(target_status, accepted_decision_id)
         existing = self._by_id.get(proposal_id)
         if existing is None:
             raise ValueError(f"proposal {proposal_id!r} not found")
         if existing.status == target_status:
+            if target_status == PROPOSAL_STATUS_ACCEPTED and (
+                accepted_decision_id != existing.accepted_decision_id
+            ):
+                raise ValueError(
+                    f"proposal {proposal_id!r} is already accepted with "
+                    f"decision id {existing.accepted_decision_id!r}; a retry "
+                    f"requesting {accepted_decision_id!r} is not idempotent "
+                    "and the stored accepted_decision_id can never be "
+                    "replaced"
+                )
             return existing, False
         if existing.status != PROPOSAL_STATUS_PROPOSED:
             raise ValueError(
