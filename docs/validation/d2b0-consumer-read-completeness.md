@@ -12,16 +12,23 @@ retrieval/enforcement/benchmark semantic change.
 
 - Exact base SHA (canonical `origin/main` after D2A merge):
   `989cd53078623a27df7b91570dfe0b993c3b438a`
-- Exact tested implementation SHA:
-  `95c3df0229bbf2f84f7068aad2065014db11c319` on branch
-  `feat/d2b0-consumer-read-completeness` (worktree
-  `.worktrees/feat-d2b0-consumer-read-completeness`, context-verified with
-  `scripts/check_worktree_context.py` before work and before every commit).
-  Architecture-review fix commits (type-unknown `DecisionTraceNotFound`,
-  fail-closed `DecisionIndexIntegrityError`) are included in the tested
-  state; the exact fix commit SHA is recorded in the PR head history. The
-  PR head adds this validation artifact and its docs-only updates only;
-  no runtime/test bytes differ from the tested implementation commits.
+- Original D2B0 implementation commit:
+  `95c3df0229bbf2f84f7068aad2065014db11c319`
+- Architecture-review implementation/fix SHA:
+  `2ae899734fa1ea72de0b9e5d55525b224c893bdc` (type-unknown
+  `DecisionTraceNotFound`, fail-closed `DecisionIndexIntegrityError`) —
+  the final exact tested implementation SHA; all test, gate, and
+  self-check figures below were executed on that exact source state.
+- Current pre-cleanup PR head:
+  `3a6e7c44d5106d33095ed54575b86c0ddeaaa4d0` (adds the validation
+  artifact and its docs-only updates).
+- Branch `feat/d2b0-consumer-read-completeness`, worktree
+  `.worktrees/feat-d2b0-consumer-read-completeness`, context-verified
+  with `scripts/check_worktree_context.py` before work and before every
+  commit.
+- The next commit is documentation-only: it changes this validation
+  artifact (and PR metadata) only — no runtime or test bytes differ from
+  `2ae899734fa1ea72de0b9e5d55525b224c893bdc`.
 
 ## Exact commands
 
@@ -61,8 +68,10 @@ python -m mneme.cli check --memory .mneme/project_memory.json --input scripts/ru
   `test_mismatched_rule_id_ordering_fails_closed`,
   `test_integrity_error_does_not_return_ambiguous_derived_rules` —
   canonical rule-lineage integrity: declared `derived_rule_ids` vs stored
-  rules must match exactly (ids and order, ADR-023 section 10);
-  empty/empty remains a valid trace; any mismatch raises
+  rules must match exactly (ids and order); the current canonical index
+  contract preserves ordered `derived_rule_ids` and ordered canonical
+  rules, and disagreement in ids or ordering is treated as an integrity
+  failure. empty/empty remains a valid trace; any mismatch raises
   `DecisionIndexIntegrityError(ValueError)` with the decision id and both
   id lists, and no ambiguous `derived_rules` escape.
 
@@ -123,7 +132,10 @@ guesses).
   classification and are never guessed. Deterministic.
 - Canonical rule-lineage integrity (fail closed): the record's declared
   `derived_rule_ids` and the rules stored for that decision must match
-  exactly — same ids, same order (ADR-023 section 10). Empty/empty is
+  exactly — same ids, same order. The current canonical index contract
+  preserves ordered `derived_rule_ids` and ordered canonical rules;
+  disagreement in ids or ordering is treated as an integrity failure.
+  Empty/empty is
   valid and traces with `derived_rules: none recorded`. Any mismatch
   (declared but absent, stored but undeclared, ordering difference)
   raises `DecisionIndexIntegrityError` (a `ValueError` subclass) naming
