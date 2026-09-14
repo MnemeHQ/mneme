@@ -1,6 +1,17 @@
 # Changelog
 
-## Unreleased
+## v0.8.0 — 2026-09-13
+
+**Decision Index boundary, semantic Audit tiers, declared test evidence, and the first public intent API**
+
+This release contains all Core work since v0.7.0: the Canonical Decision
+Index boundary (ADR-023), declared test-evidence ingestion (ADR-024),
+trusted-execution-attestation design (ADR-025), semantic Audit tier
+semantics (ADR-026), the Decision MCP proposal-ingestion boundary
+(ADR-027, documentation), and the public decision-intent assessment API
+(ADR-028, `assess_decision_intent()`). Retrieval ranking, `ConflictDetector`,
+typed-rule enforcement semantics, and the frozen benchmark behavior are
+unchanged.
 
 ### Added
 
@@ -12,9 +23,8 @@
   advisory / neutral) — raw lexical-marker details stay private, and
   unsupported imports of the private `_is_prescriptive_text` /
   `_is_advisory_text` helpers are no longer needed. Text-only by
-  construction (structure invariance); retrieval, enforcement,
-  `ConflictDetector`, typed rules, benchmark behavior, and
-  `mneme.audit/v1` are unchanged.
+  construction (structure invariance); installed typed-rule enforcement
+  precedence is untouched.
 - Declared test-evidence ingestion for the Architecture Audit (ADR-024,
   passive): a decision record may declare explicit `test_evidence` entries
   linking it to a test that enforces it. Ordinary `mneme audit` is
@@ -28,6 +38,10 @@
   failure mode (missing selector, stale or unavailable SHA, ambiguous
   mapping, malformed declaration) fails closed with a deterministic
   diagnostic. `mneme.audit/v1` unchanged.
+- Published-package release smoke workflow (artifact-smoke battery):
+  after every successful Publish-to-PyPI run for a `v*` tag, the published
+  bytes are validated from a clean pipx install — never a source checkout.
+- Published-package smoke evidence for v0.7.0 recorded in-repo.
 
 ### Fixed
 
@@ -50,6 +64,27 @@
   Current Protection and Protection Gap (the compat-identical
   Identified Mneme Potential metric is no longer shown as an independent
   headline; the JSON field is retained for compatibility).
+
+### Documentation
+
+- ADR-023: Canonical Decision Index and runtime-projection boundary —
+  repository documentation is a first-class decision source, with the
+  runtime decision index as a Layer-1 projection (parity-pinned).
+- ADR-025: Trusted test-execution attestation — the design for the
+  trusted CI verification producer that upgrades declared test evidence
+  (design only; not implemented in this release).
+- ADR-027: Decision MCP proposal-ingestion and authority boundary —
+  defines how Decision MCP proposals may be ingested and where authority
+  lies (documentation only; no MCP implementation in this release).
+- ADR-028: Public decision-intent assessment API (above).
+- README Architecture Audit callout highlighted in the intro.
+
+### Maintenance
+
+- Test battery policy formalized (`scripts/run_test_battery.py`):
+  `gate` / `main` / `release` / `artifact-smoke` / `benchmark` with an
+  anti-aging manifest invariant, wired into CI workflows and the
+  protected-main ruleset.
 
 ---
 
