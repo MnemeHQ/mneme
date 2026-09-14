@@ -1,11 +1,11 @@
 """
-decision_index_service.py — Protocol-independent Decision Index service (D2A).
+decision_index_service.py — Protocol-independent Decision Index service.
 
 Core/application service for non-authoritative decision proposal ingestion
-and retrieval (ADR-027 sections 4-6, issue #365 PR A). This module is
-independent of MCP: no MCP package, MCP types, HTTP, hosted APIs, or
-transport schemas are imported or referenced. A future MCP server is a thin
-transport adapter over this service (D2B, out of scope here).
+and consumer retrieval (ADR-027 sections 4-6, issues #365/#362). This
+module is independent of MCP: no MCP package, MCP types, HTTP, hosted
+APIs, or transport schemas are imported or referenced. A future MCP server
+is a thin transport adapter over this service (D2B, out of scope here).
 
 Authority boundary:
 
@@ -32,17 +32,27 @@ always enter as ``proposed``; proposal states may represent accepted/
 rejected because ADR-027 defines them, but no method here causes those
 transitions.
 
-Retrieval semantics:
+Retrieval semantics (D2B0 consumer-read completeness):
 
-* ``search`` is deterministic text/exact-metadata filtering. No vectors,
-  embeddings, LLM search, or generic semantic infrastructure.
+* ``search`` is deterministic text/exact-metadata filtering over BOTH
+  proposals and canonical decisions. No vectors, embeddings, LLM search,
+  or generic semantic infrastructure. Proposal lifecycle status and
+  canonical lifecycle status are separate filter domains
+  (``proposal_status`` vs ``canonical_lifecycle_status``) and are never
+  collapsed into one vocabulary. Result ordering follows existing
+  store/index order; search rank has zero enforcement meaning.
 * ``applicable_to`` returns retrieval/context hints only. Proposal
   ``scope_hints`` are never ADR-020 ``Rule.include_paths``/``exclude_paths``,
   never Layer 1 rule applicability, and never enforcement authority. Paths
   supplied to ``applicable_to`` are treated as opaque context strings, not
   glob-evaluated against ADR-020 selectors.
-* ``trace`` returns only lineage actually known. Missing links are reported
-  explicitly in ``missing_links`` and are never fabricated.
+* ``trace`` resolves proposal ids AND canonical decision ids (the service
+  owns the record-type distinction; the future transport never guesses).
+  It returns only lineage actually known. Missing links are reported
+  explicitly and are never fabricated: enforcement points are not modelled
+  in the current canonical kernel and are reported absent; declared test
+  evidence (ADR-024) is returned as declared and is never upgraded to
+  trusted/verified (ADR-025).
 * Canonical reads go through the existing ``CanonicalArchitectureIndex``
   and never mutate canonical records. No second canonical decision store
   is created.
@@ -55,8 +65,11 @@ from datetime import datetime, timezone
 from typing import Callable, Sequence
 
 from mneme.decision_index import (
+    VALID_LIFECYCLE_STATUSES,
     CanonicalArchitectureIndex,
     CanonicalDecisionRecord,
+    CanonicalRuleRecord,
+    CanonicalTestEvidence,
 )
 from mneme.decision_proposal import (
     ORIGIN_AI_GENERATED,
@@ -80,11 +93,26 @@ _VALID_ORIGIN_CLASSIFICATIONS = (
     ORIGIN_HUMAN_AUTHORED,
     ORIGIN_IMPORTED_UNKNOWN,
 )
-_VALID_STATUS_FILTERS = (
+# Proposal lifecycle vocabulary (ADR-027) — distinct from the canonical
+# decision lifecycle vocabulary (ADR-023). Never interchangeable.
+_VALID_PROPOSAL_STATUS_FILTERS = (
     PROPOSAL_STATUS_PROPOSED,
     PROPOSAL_STATUS_ACCEPTED,
     PROPOSAL_STATUS_REJECTED,
 )
+
+
+class DecisionIndexIntegrityError(ValueError):
+    """Internal Decision Index integrity failure (consumer trace boundary).
+
+    Raised when the two canonical representations of rule lineage
+    disagree: the record's declared ``derived_rule_ids`` versus the rules
+    actually stored for that decision. This is an index-integrity failure,
+    not an ordinary partial trace, so the trace fails closed instead of
+    returning ambiguous ``derived_rules``. Neither side is silently
+    repaired. This protects the consumer trace boundary only; it does not
+    change enforcement or projection behavior.
+    """
 
 
 def _default_clock() -> str:
@@ -101,6 +129,23 @@ class ProposeResult:
 
     proposal: DecisionProposal
     created: bool
+
+
+@dataclass(frozen=True)
+class DecisionSearchResult:
+    """Deterministic search result with explicit lifecycle separation.
+
+    ``proposals`` are non-authoritative proposal records (proposal
+    lifecycle vocabulary: proposed/accepted/rejected). ``canonical_decisions``
+    are canonical Decision Index records (canonical lifecycle vocabulary:
+    active/superseded/deprecated/inactive). The two lists are never merged
+    and never share a status field; each keeps its own domain vocabulary.
+    Ordering follows existing store insertion order and canonical record
+    order respectively. Search rank has zero enforcement meaning.
+    """
+
+    proposals: tuple[DecisionProposal, ...] = ()
+    canonical_decisions: tuple[CanonicalDecisionRecord, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -147,6 +192,39 @@ class ProposalTrace:
     accepted_decision_id: str | None
     canonical_record: CanonicalDecisionRecord | None
     canonical_derived_rule_ids: tuple[str, ...]
+    missing_links: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class CanonicalDecisionTrace:
+    """Deterministic lineage actually known for one canonical decision.
+
+    Exposes only what the canonical kernel actually carries: the record,
+    its derived canonical rules (with ADR-020 applicability exactly as
+    stored), and its declared test-evidence linkage (ADR-024) exactly as
+    stored. Enforcement points are not modelled in the current canonical
+    kernel and are reported explicitly as missing; declared evidence is
+    never upgraded to trusted/verified (ADR-025). Nothing is fabricated.
+    """
+
+    canonical_decision_id: str
+    canonical_record: CanonicalDecisionRecord | None
+    derived_rules: tuple[CanonicalRuleRecord, ...]
+    declared_test_evidence: tuple[CanonicalTestEvidence, ...]
+    missing_links: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class DecisionTraceNotFound:
+    """Explicit not-found result for an unresolved trace identifier.
+
+    The identifier resolved to neither a proposal nor a canonical
+    decision; its record type is therefore unknown and is never guessed.
+    Both domains are reported explicitly as not found in
+    ``missing_links``.
+    """
+
+    record_id: str
     missing_links: tuple[str, ...]
 
 
@@ -273,22 +351,49 @@ class DecisionIndexService:
     def search(
         self,
         query: str = "",
-        status: str | None = None,
+        proposal_status: str | None = None,
+        canonical_lifecycle_status: str | None = None,
         producer_name: str | None = None,
         source_reference: str | None = None,
         origin_classification: str | None = None,
-    ) -> tuple[DecisionProposal, ...]:
-        """Deterministic text/exact-metadata search over proposals.
+    ) -> DecisionSearchResult:
+        """Deterministic text/exact-metadata search over both domains.
 
-        ``query`` is a case-insensitive substring match across title,
-        statement, and rationale (empty query matches all). The remaining
-        filters are exact matches. Results follow store insertion order.
-        No vectors, embeddings, LLM search, or semantic infrastructure.
+        ``query`` is a case-insensitive substring match. For proposals it
+        covers title, statement, rationale, source reference, repository
+        locator, scope hints, and related decision ids. For canonical
+        decisions it covers decision id, statement, rationale, context
+        scope, targets, constraints, anti-patterns, and source-evidence
+        locators. No new canonical data is invented. An empty query
+        matches everything.
+
+        Filters are exact matches. ``proposal_status`` validates against
+        the proposal lifecycle vocabulary (proposed/accepted/rejected);
+        ``canonical_lifecycle_status`` validates against the canonical
+        lifecycle vocabulary (active/superseded/deprecated/inactive). The
+        two vocabularies are distinct domains and never interchangeable.
+
+        Results follow existing store insertion order and canonical record
+        order respectively. Deterministic, dependency-free: no vectors,
+        embeddings, LLM search, or semantic infrastructure. Search rank
+        has zero enforcement meaning.
         """
-        if status is not None and status not in _VALID_STATUS_FILTERS:
+        if proposal_status is not None and (
+            proposal_status not in _VALID_PROPOSAL_STATUS_FILTERS
+        ):
             raise ValueError(
-                f"status filter {status!r} is not one of "
-                f"{sorted(_VALID_STATUS_FILTERS)}"
+                f"proposal_status filter {proposal_status!r} is not one of "
+                f"{sorted(_VALID_PROPOSAL_STATUS_FILTERS)} (proposal "
+                f"lifecycle vocabulary)"
+            )
+        if canonical_lifecycle_status is not None and (
+            canonical_lifecycle_status not in VALID_LIFECYCLE_STATUSES
+        ):
+            raise ValueError(
+                f"canonical_lifecycle_status filter "
+                f"{canonical_lifecycle_status!r} is not one of "
+                f"{sorted(VALID_LIFECYCLE_STATUSES)} (canonical lifecycle "
+                f"vocabulary)"
             )
         if (
             origin_classification is not None
@@ -299,9 +404,11 @@ class DecisionIndexService:
                 f"is not one of {sorted(_VALID_ORIGIN_CLASSIFICATIONS)}"
             )
         needle = query.lower()
-        results: list[DecisionProposal] = []
+        proposals: list[DecisionProposal] = []
         for proposal in self._store.list_proposals():
-            if status is not None and proposal.status != status:
+            if proposal_status is not None and (
+                proposal.status != proposal_status
+            ):
                 continue
             candidate = proposal.candidate
             assert candidate.provenance is not None
@@ -318,14 +425,52 @@ class DecisionIndexService:
                 != origin_classification
             ):
                 continue
-            if needle:
-                haystack = " ".join(
-                    (candidate.title, candidate.statement, candidate.rationale)
-                ).lower()
-                if needle not in haystack:
+            if needle and needle not in self._proposal_haystack(proposal):
+                continue
+            proposals.append(proposal)
+        canonical_decisions: list[CanonicalDecisionRecord] = []
+        if self._canonical is not None:
+            for record in self._canonical.records:
+                if canonical_lifecycle_status is not None and (
+                    record.lifecycle_status != canonical_lifecycle_status
+                ):
                     continue
-            results.append(proposal)
-        return tuple(results)
+                if needle and needle not in self._canonical_haystack(record):
+                    continue
+                canonical_decisions.append(record)
+        return DecisionSearchResult(
+            proposals=tuple(proposals),
+            canonical_decisions=tuple(canonical_decisions),
+        )
+
+    @staticmethod
+    def _proposal_haystack(proposal: DecisionProposal) -> str:
+        candidate = proposal.candidate
+        assert candidate.provenance is not None
+        parts = [
+            candidate.title,
+            candidate.statement,
+            candidate.rationale,
+            candidate.provenance.source_reference,
+            candidate.provenance.repository_locator,
+            *candidate.scope_hints,
+            *candidate.related_decision_ids,
+        ]
+        return " ".join(parts).lower()
+
+    @staticmethod
+    def _canonical_haystack(record: CanonicalDecisionRecord) -> str:
+        parts = [
+            record.decision_id,
+            record.statement,
+            record.rationale,
+            *record.context_scope,
+            *record.targets,
+            *record.constraints,
+            *record.anti_patterns,
+            *(evidence.source_locator for evidence in record.source_evidence),
+        ]
+        return " ".join(parts).lower()
 
     def applicable_to(
         self,
@@ -376,36 +521,57 @@ class DecisionIndexService:
         lowered = hint.lower()
         return any(lowered in item for item in context_items)
 
-    def trace(self, proposal_id: str) -> ProposalTrace:
-        """Return the deterministic lineage actually known for a proposal.
+    def trace(
+        self, record_id: str
+    ) -> ProposalTrace | CanonicalDecisionTrace | DecisionTraceNotFound:
+        """Return the deterministic lineage actually known for a record.
 
-        Known chain: proposal -> source provenance -> accepted canonical
-        id (if the proposal was accepted by the separate Mneme authority
-        action) -> canonical record -> canonical derived rule ids (if they
-        exist). Everything else is reported explicitly as absent in
-        ``missing_links``; a partial trace is never completed by
-        fabrication.
+        The service owns the record-type distinction: it resolves
+        ``record_id`` as a proposal id first, then as a canonical decision
+        id; the future transport never determines the type itself.
+        Unresolved ids return ``DecisionTraceNotFound`` — the identifier
+        stays type-unknown and is never classified into the proposal or
+        canonical domain (fail closed, deterministic).
+
+        Proposal trace chain: proposal -> source provenance -> accepted
+        canonical id (if the proposal was accepted by the separate Mneme
+        authority action) -> canonical record -> canonical derived rule
+        ids (if they exist). Unaccepted proposals explicitly show missing
+        canonical/rule/enforcement links.
+
+        Canonical trace chain: canonical decision -> derived canonical
+        rules -> rule applicability exactly as stored (ADR-020 data) ->
+        declared test-evidence linkage exactly as stored (ADR-024,
+        declared only, never trusted/verified per ADR-025). Enforcement
+        points are not modelled in the current canonical kernel and are
+        reported explicitly as missing. Nothing is fabricated.
+
+        A disagreement between the canonical record's declared
+        ``derived_rule_ids`` and the rules actually stored for that
+        decision is an internal index-integrity failure and raises
+        ``DecisionIndexIntegrityError`` (fail closed) instead of
+        returning ambiguous lineage.
         """
-        proposal = self._store.get(proposal_id)
-        if proposal is None:
-            return ProposalTrace(
-                proposal_id=proposal_id,
-                proposal=None,
-                source_provenance=None,
-                accepted_decision_id=None,
-                canonical_record=None,
-                canonical_derived_rule_ids=(),
-                missing_links=(
-                    "proposal: not found",
-                    "source_provenance: absent (proposal not found)",
-                    "accepted_decision_id: absent",
-                    "canonical_record: absent",
-                    "derived_rules: absent",
-                    "enforcement_links: absent (proposals are never enforceable)",
-                    "trusted_evidence: absent (producer provenance is never "
-                    "trusted evidence)",
-                ),
-            )
+        proposal = self._store.get(record_id)
+        if proposal is not None:
+            return self._trace_proposal(proposal)
+        if self._canonical is not None:
+            for record in self._canonical.records:
+                if record.decision_id == record_id:
+                    return self._trace_canonical(record)
+        return DecisionTraceNotFound(
+            record_id=record_id,
+            missing_links=(
+                f"record: not found ({record_id!r} is neither a proposal id "
+                "nor a canonical decision id)",
+                "proposal: not found",
+                "canonical_decision: not found",
+                "record_type: unknown (no proposal/canonical classification "
+                "is asserted for an unresolved identifier)",
+            ),
+        )
+
+    def _trace_proposal(self, proposal: DecisionProposal) -> ProposalTrace:
         missing: list[str] = []
         accepted_id = proposal.accepted_decision_id
         canonical_record: CanonicalDecisionRecord | None = None
@@ -443,7 +609,7 @@ class DecisionIndexService:
             "trusted evidence)"
         )
         return ProposalTrace(
-            proposal_id=proposal_id,
+            proposal_id=proposal.proposal_id,
             proposal=proposal,
             source_provenance=proposal.candidate.provenance,
             accepted_decision_id=accepted_id,
@@ -452,8 +618,55 @@ class DecisionIndexService:
             missing_links=tuple(missing),
         )
 
+    def _trace_canonical(
+        self, record: CanonicalDecisionRecord
+    ) -> CanonicalDecisionTrace:
+        derived_rules: tuple[CanonicalRuleRecord, ...] = ()
+        if self._canonical is not None:
+            derived_rules = self._canonical.rules_for_decision(
+                record.decision_id
+            )
+        stored_ids = tuple(rule.rule_id for rule in derived_rules)
+        if stored_ids != record.derived_rule_ids:
+            raise DecisionIndexIntegrityError(
+                f"canonical decision {record.decision_id!r} rule lineage "
+                f"integrity failure: record declares derived_rule_ids "
+                f"{list(record.derived_rule_ids)} but the canonical index "
+                f"stores rules {list(stored_ids)}; the two canonical "
+                f"representations must match exactly (ADR-023 section 10)"
+            )
+        missing: list[str] = []
+        if not derived_rules:
+            missing.append("derived_rules: none recorded for canonical decision")
+        declared_evidence = tuple(record.test_evidence)
+        if not declared_evidence:
+            missing.append(
+                "declared_test_evidence: none declared for canonical decision"
+            )
+        else:
+            missing.append(
+                "test_evidence_state: declared only (ADR-024); trusted/"
+                "verified execution evidence is a separate ADR-025 concern "
+                "and is never inferred from declarations"
+            )
+        missing.append(
+            "enforcement_links: absent (enforcement points are not modelled "
+            "in the current canonical kernel)"
+        )
+        return CanonicalDecisionTrace(
+            canonical_decision_id=record.decision_id,
+            canonical_record=record,
+            derived_rules=derived_rules,
+            declared_test_evidence=declared_evidence,
+            missing_links=tuple(missing),
+        )
+
 
 __all__ = [
+    "CanonicalDecisionTrace",
+    "DecisionIndexIntegrityError",
+    "DecisionSearchResult",
+    "DecisionTraceNotFound",
     "ProposalScopeHintMatch",
     "ProposalTrace",
     "ProposeResult",

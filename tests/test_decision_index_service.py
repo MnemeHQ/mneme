@@ -22,6 +22,8 @@ from mneme.decision_index import (
 )
 from mneme.decision_index_service import (
     DecisionIndexService,
+    DecisionSearchResult,
+    DecisionTraceNotFound,
     ProposalScopeHintMatch,
     ProposalTrace,
     ProposeResult,
@@ -272,19 +274,22 @@ def test_search_is_deterministic_text_and_metadata_filtering():
         )
     )
     hits = service.search("legacy_client")
-    assert len(hits) == 1
-    assert hits[0].candidate.statement.startswith("New code")
-    assert service.search() == service._store.list_proposals()
-    assert service.search(status=PROPOSAL_STATUS_PROPOSED) == (
+    assert len(hits.proposals) == 1
+    assert hits.proposals[0].candidate.statement.startswith("New code")
+    assert hits.canonical_decisions == ()
+    assert service.search().proposals == service._store.list_proposals()
+    assert service.search(
+        proposal_status=PROPOSAL_STATUS_PROPOSED
+    ).proposals == service._store.list_proposals()
+    assert service.search(proposal_status=PROPOSAL_STATUS_ACCEPTED) == (
+        DecisionSearchResult()
+    )
+    assert service.search(producer_name="arch-agent").proposals == (
         service._store.list_proposals()
     )
-    assert service.search(status=PROPOSAL_STATUS_ACCEPTED) == ()
-    assert service.search(producer_name="arch-agent") == (
-        service._store.list_proposals()
-    )
-    assert service.search(producer_name="other") == ()
+    assert service.search(producer_name="other") == DecisionSearchResult()
     with pytest.raises(ValueError):
-        service.search(status="bogus")
+        service.search(proposal_status="bogus")
 
 
 def test_applicable_to_returns_retrieval_hints_only():
@@ -349,8 +354,10 @@ def test_trace_of_proposed_proposal_reports_missing_links_explicitly():
 
 def test_trace_of_unknown_proposal_is_explicit():
     trace = _service().trace("dprop-" + "f" * 32)
-    assert trace.proposal is None
+    assert isinstance(trace, DecisionTraceNotFound)
+    assert not isinstance(trace, ProposalTrace)
     assert "proposal: not found" in trace.missing_links
+    assert "canonical_decision: not found" in trace.missing_links
 
 
 def test_trace_of_accepted_fixture_resolves_canonical_lineage():
