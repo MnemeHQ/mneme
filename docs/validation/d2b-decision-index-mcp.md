@@ -64,7 +64,7 @@ canonical integrity failure -> protocol-level `MCPError`.
 - Exact tested implementation SHA (architecture-review revision, all
   test/gate/self-governance figures below executed on this exact
   source state):
-  `REVIEW_FIX_SHA_PLACEHOLDER`
+  `8a2dc1f3747a52e3d27a416c0bee905770d01cc8`
 - Branch `feat/d2b-decision-index-mcp`, worktree
   `.worktrees/feat-d2b-decision-index-mcp`, context-verified with
   `scripts/check_worktree_context.py` before work and before every
