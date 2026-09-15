@@ -1,5 +1,56 @@
 # Changelog
 
+## v0.9.0 — 2026-09-15
+
+**Decision MCP transport, decision authority CLI, and the first published decision proposal surface**
+
+This release publishes the MCP and decision workflow work since v0.8.0: the
+OSS Decision Index kernel parity boundary (ADR-023 D0 proof), the decision
+proposal foundation, the Decision Index MCP transport (ADR-027 D2B), the
+decision authority service, and the decision authority CLI. Retrieval
+ranking, `ConflictDetector`, typed-rule enforcement semantics, and the
+frozen benchmark behavior are unchanged; `mneme.audit/v1` is unchanged.
+
+### Added
+
+- **`mneme decision-mcp`** — local stdio MCP server exposing the frozen
+  six-tool decision surface (`decision.propose`, `decision.propose_batch`,
+  `decision.get`, `decision.search`, `decision.applicable_to`,
+  `decision.trace`). Non-authoritative proposals only; acceptance is a
+  separate Mneme authority surface. Install the `mcp` extra
+  (`pip install "mneme-hq[mcp]"`) to use it.
+- **`mneme decision`** — decision proposal inspection and human authority
+  actions (`proposals | show | accept | reject`), a thin adapter over the
+  Core `DecisionAuthorityService`; `accept`/`reject` are explicit human
+  authority actions, never producer/MCP capabilities.
+- **Decision proposal foundation** — proposal records, stores, and
+  provenance; proposals are non-authoritative until accepted through the
+  human authority CLI.
+- **OSS Decision Index kernel parity boundary** (ADR-023 D0 proof) —
+  canonical decision index and consumer reads.
+
+### Documentation
+
+- ADR-027 accepted: Decision MCP proposal-ingestion and authority
+  boundary.
+- ADR-023 accepted after the D0 parity proof.
+
+### Compatibility
+
+- No changes to retrieval ranking, `DecisionRetriever`, `ConflictDetector`,
+  existing typed-rule semantics, or the frozen enforcement benchmark.
+- `mneme.audit/v1` unchanged.
+- New optional dependency group `mcp` (`mcp>=2.2.0,<3`) — required only
+  for `mneme decision-mcp`; all other CLI surfaces are unaffected.
+
+## Install
+
+```bash
+pipx install "mneme-hq==0.9.0"
+```
+
+---
+
 ## v0.8.0 — 2026-09-13
 
 **Decision Index boundary, semantic Audit tiers, declared test evidence, and the first public intent API**
