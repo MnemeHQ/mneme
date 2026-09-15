@@ -103,6 +103,7 @@ GATE_CLI_PATHS: tuple[str, ...] = (
     "tests/test_cli_check_freshness.py",
     "tests/test_cli_audit.py",
     "tests/test_cli_adr_import.py",
+    "tests/test_decision_authority_cli.py",
 )
 
 GATE_ADR_PATHS: tuple[str, ...] = (

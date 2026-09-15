@@ -16,6 +16,9 @@ Subcommands
                     See docs/protect-activation.md.
   decision-mcp      Serve the Decision Index MCP tools over local stdio
                     (D2B, ADR-027). Six non-authoritative tools only.
+  decision          Decision proposal inspection and human authority:
+                    proposals | show | accept | reject (D2C2, ADR-027).
+                    A thin adapter over the Core DecisionAuthorityService.
 
 Usage::
 
@@ -59,6 +62,8 @@ from mneme.benchmark import BenchmarkRunner, ScenarioVerdict
 from mneme.benchmark_report import format_json, format_markdown, format_terminal
 from mneme.context_builder import DEFAULT_MAX_DECISIONS, format_decisions
 from mneme.cursor_generator import generate_mdc
+from mneme.decision_authority import DecisionAuthorityError, DecisionAuthorityService
+from mneme.decision_proposal_store import JsonFileDecisionProposalStore
 from mneme.decision_retriever import DecisionRetriever
 from mneme.enforcer import (
     EnforcementResult,
@@ -1004,6 +1009,214 @@ def _cmd_decision_mcp(args: argparse.Namespace) -> int:
     return 0
 
 
+# ── Subcommand: decision (D2C2 human authority surface, ADR-027) ─────────────
+#
+# A thin adapter over the Core authority layer: read-only inspection uses
+# the durable JsonFileDecisionProposalStore read surface; accept/reject
+# delegate to DecisionAuthorityService. Exit-code contract (presentation
+# only; Core semantics untouched): 0 = success (fresh, idempotent, or
+# recovered); 1 = Core authority refusal / fail-closed authority error
+# (reported deterministically, no stack trace); 2 = CLI input error
+# (missing/empty/corrupt proposal store, unknown id on a read-only
+# command), following the existing _error_exit convention. Authority
+# commands act only on an existing durable proposal store: they never
+# switch to an in-memory store and never create the proposal file.
+
+def _require_proposal_store(
+    proposals: str | None,
+) -> JsonFileDecisionProposalStore | None:
+    """Open the durable proposal store for a decision CLI command.
+
+    Fail-closed input validation only: the path must be a non-empty
+    string pointing at an existing, readable decision-proposals
+    document. Nothing is created implicitly and no in-memory fallback
+    exists — human authority must act on an existing durable record.
+    """
+    if not proposals:
+        _error_exit(
+            "--proposals requires a path to an existing "
+            f"decision-proposals file (default: {DEFAULT_PROPOSALS_PATH}); "
+            "an authority command never switches to an in-memory store"
+        )
+        return None
+    path = Path(proposals)
+    if not path.exists():
+        _error_exit(f"proposal store {path} does not exist")
+        return None
+    try:
+        return JsonFileDecisionProposalStore(path)
+    except (OSError, ValueError) as exc:
+        _error_exit(f"proposal store {path} is unreadable or corrupt: {exc}")
+        return None
+
+
+def _authority_error_exit(exc: Exception) -> int:
+    """Report a Core authority failure deterministically (exit 1).
+
+    The Core error boundary (``DecisionAuthorityError``) is rendered
+    verbatim with the existing ``ERROR:`` convention and no stack trace;
+    a failed authority operation is never reported as success.
+    """
+    print(f"ERROR: {exc}", file=sys.stderr, flush=True)
+    return 1
+
+
+def _cmd_decision_proposals(args: argparse.Namespace) -> int:
+    """List all proposals in deterministic store order (read-only).
+
+    Pure inspection: no mutation, no authority service, no ranking,
+    filtering, inference, classification, or Audit tier. Statuses are
+    shown as stored (proposed/accepted/rejected).
+    """
+    store = _require_proposal_store(args.proposals)
+    if store is None:
+        return 2
+    proposals = store.list_proposals()
+    if not proposals:
+        print("(no proposals)")
+        return 0
+    for proposal in proposals:
+        print(
+            f"[{proposal.status}] {proposal.proposal_id}  "
+            f"{proposal.candidate.title}"
+        )
+        provenance = proposal.candidate.provenance
+        if provenance is not None:
+            print(
+                f"    producer: {provenance.producer_name} "
+                f"({provenance.producer_type})"
+            )
+            print(f"    source: {provenance.source_reference}")
+        if proposal.accepted_decision_id is not None:
+            print(f"    decision: {proposal.accepted_decision_id}")
+    return 0
+
+
+def _cmd_decision_show(args: argparse.Namespace) -> int:
+    """Show one proposal's stored details for human review (read-only).
+
+    Renders exactly what the store holds — including the full producer
+    provenance, which stays informational and is never presented as
+    trusted or verified evidence. No mutation, no inference.
+    """
+    store = _require_proposal_store(args.proposals)
+    if store is None:
+        return 2
+    proposal = store.get(args.proposal_id)
+    if proposal is None:
+        return _error_exit(f"proposal {args.proposal_id!r} not found")
+    candidate = proposal.candidate
+    print(f"Proposal {proposal.proposal_id}")
+    print(f"  status: {proposal.status}")
+    print(f"  title: {candidate.title}")
+    print(f"  statement: {candidate.statement}")
+    print(f"  rationale: {candidate.rationale or '(none)'}")
+    print(
+        "  scope hints: "
+        + (", ".join(candidate.scope_hints) if candidate.scope_hints else "(none)")
+    )
+    if candidate.architecture_context:
+        print("  architecture context:")
+        for key, value in candidate.architecture_context.items():
+            print(f"    {key}: {value}")
+    else:
+        print("  architecture context: (none)")
+    print(
+        "  related decision ids: "
+        + (
+            ", ".join(candidate.related_decision_ids)
+            if candidate.related_decision_ids
+            else "(none)"
+        )
+    )
+    print(f"  proposed at: {proposal.proposed_at}")
+    provenance = candidate.provenance
+    if provenance is None:
+        print("  producer provenance: (not supplied)")
+    else:
+        print("  producer provenance (informational, as submitted):")
+        print(f"    producer name: {provenance.producer_name}")
+        print(f"    producer type: {provenance.producer_type}")
+        print(f"    source reference: {provenance.source_reference}")
+        print(
+            f"    external source id: "
+            f"{provenance.external_source_id or '(not supplied)'}"
+        )
+        print(
+            f"    source version: "
+            f"{provenance.source_version or '(not supplied)'}"
+        )
+        print(
+            f"    repository locator: "
+            f"{provenance.repository_locator or '(not supplied)'}"
+        )
+        print(f"    origin classification: {provenance.origin_classification}")
+    if proposal.accepted_decision_id is not None:
+        print(f"  accepted decision: {proposal.accepted_decision_id}")
+    return 0
+
+
+def _cmd_decision_accept(args: argparse.Namespace) -> int:
+    """Accept a proposal through the Core authority service (D2C2).
+
+    Thin adapter: construct the durable store, construct
+    ``DecisionAuthorityService(store, memory_path)``, call ``accept``,
+    and render the returned ``AcceptResult``. All lifecycle, identity,
+    collision, materialization, recovery, and verification semantics
+    live in Core; the CLI implements none of them and activates no
+    protection and runs no Audit.
+    """
+    store = _require_proposal_store(args.proposals)
+    if store is None:
+        return 2
+    service = DecisionAuthorityService(store, args.memory)
+    try:
+        result = service.accept(
+            args.proposal_id, decision_id=args.decision_id
+        )
+    except DecisionAuthorityError as exc:
+        return _authority_error_exit(exc)
+    if result.recovered:
+        print(f"Recovered accepted proposal: {result.proposal_id}")
+    elif result.already_accepted:
+        print(f"Already accepted: {result.proposal_id}")
+    else:
+        print(f"Accepted proposal {result.proposal_id}")
+    print(f"Decision: {result.decision_id}")
+    print(f"Materialized: {'yes' if result.materialized else 'no'}")
+    print(f"Verified: {'yes' if result.verified else 'no'}")
+    print()
+    print(
+        "Note: acceptance materializes an active decision; it does not "
+        "activate protection or assign an Audit tier."
+    )
+    return 0
+
+
+def _cmd_decision_reject(args: argparse.Namespace) -> int:
+    """Reject a proposal through the Core authority service (D2C2).
+
+    Thin adapter over ``reject``: Core owns transition legality. The
+    configured memory path is passed to the existing Core constructor,
+    which requires it; Core rejection performs no memory access, so no
+    CLI memory precheck exists and no memory file is created or
+    modified. Exit codes follow the decision-command contract.
+    """
+    store = _require_proposal_store(args.proposals)
+    if store is None:
+        return 2
+    service = DecisionAuthorityService(store, args.memory)
+    try:
+        result = service.reject(args.proposal_id)
+    except DecisionAuthorityError as exc:
+        return _authority_error_exit(exc)
+    if result.already_rejected:
+        print(f"Already rejected: {result.proposal_id}")
+    else:
+        print(f"Rejected proposal {result.proposal_id}")
+    return 0
+
+
 # ── Entry point ──────────────────────────────────────────────────────────────
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -1325,6 +1538,109 @@ def _build_parser() -> argparse.ArgumentParser:
         ),
     )
     p_mcp.set_defaults(func=_cmd_decision_mcp)
+
+    # decision (D2C2 human authority surface over DecisionAuthorityService)
+    p_decision = sub.add_parser(
+        "decision",
+        help=(
+            "Decision proposal inspection and human authority actions "
+            "(proposals | show | accept | reject). A thin adapter over the "
+            "Core DecisionAuthorityService; accept/reject are explicit "
+            "human authority actions, never producer/MCP capabilities."
+        ),
+    )
+    decision_sub = p_decision.add_subparsers(dest="decision_cmd", required=True)
+
+    p_decision_proposals = decision_sub.add_parser(
+        "proposals",
+        help="List all decision proposals in store order (read-only)",
+    )
+    p_decision_proposals.add_argument(
+        "--proposals",
+        default=DEFAULT_PROPOSALS_PATH,
+        help=(
+            "Path to the decision-proposals JSON file "
+            f"(default: {DEFAULT_PROPOSALS_PATH}); must already exist"
+        ),
+    )
+    p_decision_proposals.set_defaults(func=_cmd_decision_proposals)
+
+    p_decision_show = decision_sub.add_parser(
+        "show",
+        help="Show one proposal's stored details for review (read-only)",
+    )
+    p_decision_show.add_argument("proposal_id", help="Proposal id, e.g. dprop-…")
+    p_decision_show.add_argument(
+        "--proposals",
+        default=DEFAULT_PROPOSALS_PATH,
+        help=(
+            "Path to the decision-proposals JSON file "
+            f"(default: {DEFAULT_PROPOSALS_PATH}); must already exist"
+        ),
+    )
+    p_decision_show.set_defaults(func=_cmd_decision_show)
+
+    p_decision_accept = decision_sub.add_parser(
+        "accept",
+        help=(
+            "Accept a proposal through the Core authority service and "
+            "materialize its canonical decision (explicit human authority "
+            "action; does not activate protection or run the Audit)"
+        ),
+    )
+    p_decision_accept.add_argument("proposal_id", help="Proposal id, e.g. dprop-…")
+    p_decision_accept.add_argument(
+        "--proposals",
+        default=DEFAULT_PROPOSALS_PATH,
+        help=(
+            "Path to the decision-proposals JSON file "
+            f"(default: {DEFAULT_PROPOSALS_PATH}); must already exist"
+        ),
+    )
+    p_decision_accept.add_argument(
+        "--memory",
+        default=DEFAULT_MEMORY_PATH,
+        help=f"Path to project_memory.json (default: {DEFAULT_MEMORY_PATH})",
+    )
+    p_decision_accept.add_argument(
+        "--decision-id",
+        dest="decision_id",
+        default=None,
+        help=(
+            "Explicit canonical decision id to assign (optional; by "
+            "default the Core service derives it deterministically from "
+            "the proposal identity)"
+        ),
+    )
+    p_decision_accept.set_defaults(func=_cmd_decision_accept)
+
+    p_decision_reject = decision_sub.add_parser(
+        "reject",
+        help=(
+            "Reject a proposal through the Core authority service "
+            "(explicit human authority action; never touches "
+            "project_memory.json)"
+        ),
+    )
+    p_decision_reject.add_argument("proposal_id", help="Proposal id, e.g. dprop-…")
+    p_decision_reject.add_argument(
+        "--proposals",
+        default=DEFAULT_PROPOSALS_PATH,
+        help=(
+            "Path to the decision-proposals JSON file "
+            f"(default: {DEFAULT_PROPOSALS_PATH}); must already exist"
+        ),
+    )
+    p_decision_reject.add_argument(
+        "--memory",
+        default=DEFAULT_MEMORY_PATH,
+        help=(
+            f"Path to project_memory.json (default: {DEFAULT_MEMORY_PATH}); "
+            "passed to the Core service constructor, which requires it, "
+            "but Core rejection performs no memory access"
+        ),
+    )
+    p_decision_reject.set_defaults(func=_cmd_decision_reject)
 
     return parser
 

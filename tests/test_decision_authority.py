@@ -1421,12 +1421,25 @@ def test_no_authority_tool_aliases_exist() -> None:
         assert forbidden.replace("decision.", "") not in exposed
 
 
-def test_cli_has_no_authority_surface() -> None:
+def test_cli_imports_only_the_authority_surface() -> None:
+    """D2C2 amendment: the CLI may now be a thin authority adapter, but it
+    must reach the Core authority layer ONLY through
+    ``DecisionAuthorityService`` / ``DecisionAuthorityError`` and must not
+    touch authority primitives directly."""
     source = CLI_MODULE.read_text(encoding="utf-8")
-    assert "decision_authority" not in source
-    assert "DecisionAuthorityService" not in source
-    assert ".accept(" not in source
-    assert ".reject(" not in source
+    for line in source.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("from mneme.decision_authority"):
+            assert "DecisionAuthorityService" in stripped
+            assert "DecisionAuthorityError" in stripped
+    for forbidden in (
+        "transition_if_proposed",
+        "atomic_write_json",
+        "default_decision_id_of",
+        "expected_materialization_entry",
+        "decisions_to_canonical",
+    ):
+        assert forbidden not in source
 
 
 def test_authority_error_taxonomy_is_narrow() -> None:
