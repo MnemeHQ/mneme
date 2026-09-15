@@ -151,6 +151,7 @@ GATE_AUDIT_EVIDENCE_PATHS: tuple[str, ...] = (
     "tests/test_ci_test_evidence.py",
     "tests/test_github_evidence.py",
     "tests/test_decision_intent.py",
+    "tests/test_decision_authority_audit_e2e.py",
 )
 
 GATE_PATHS: tuple[str, ...] = (
