@@ -1,0 +1,23 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.MnemeHQ/mneme",
+  "title": "Mneme Decision MCP",
+  "description": "Local MCP server for querying architectural decisions, inspecting traceability, and submitting non-authoritative decision proposals without granting decision or enforcement authority.",
+  "websiteUrl": "https://mnemehq.com/integrations/mcp/",
+  "repository": {
+    "url": "https://github.com/MnemeHQ/mneme",
+    "source": "github"
+  },
+  "version": "0.9.0",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "registryBaseUrl": "https://pypi.org",
+      "identifier": "mneme-hq",
+      "version": "0.9.0",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}
