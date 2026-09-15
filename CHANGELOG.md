@@ -1,5 +1,32 @@
 # Changelog
 
+## v0.9.1 — 2026-09-15
+
+**MCP Registry discovery metadata for the Decision MCP server**
+
+This patch release adds the public package metadata required to register Mneme's local Decision MCP server with the official MCP Registry. It does not change the six MCP tools, authority semantics, retrieval, enforcement, or the Architecture Audit contract.
+
+### Added
+
+- Root `server.json` describing `io.github.MnemeHQ/mneme`, the `mneme-hq` PyPI distribution, local stdio transport, and the `uvx` launch path for the optional `mcp` extra.
+- MCP Registry PyPI ownership marker in the package README.
+- Contract tests that keep Registry identity, package identity, launch metadata, and version synchronized with `pyproject.toml`.
+
+### Compatibility
+
+- No runtime or protocol behavior changes.
+- The six frozen Decision MCP tools are unchanged.
+- Proposal acceptance, rejection, activation, supersession, enforcement, and trusted evidence remain outside the MCP authority boundary.
+- `mneme.audit/v1` is unchanged.
+
+## Install
+
+```bash
+pip install "mneme-hq[mcp]==0.9.1"
+```
+
+---
+
 ## v0.9.0 — 2026-09-15
 
 **Decision MCP transport, decision authority CLI, and the first published decision proposal surface**
