@@ -1,0 +1,149 @@
+{
+  "schema": "mneme.d2d-producer-fixture/v1",
+  "purpose": "Deterministic source-backed candidate set for the D2D generic MCP producer E2E. Extracted from one pinned public architecture-producing repository at one exact commit; every candidate is anchored to exact source passages recorded below. This is a validation fixture only: no runtime code parses it and no producer-specific logic exists outside tests.",
+  "reference": {
+    "repository": "sagarika29/ai-system-architect",
+    "commit_sha": "0797e2736a1b288ae136b8f093644e3cc2406f6f",
+    "pin_verified_against_remote_head": "2026-09-15: remote main HEAD equals the pinned commit SHA at preflight",
+    "sources": [
+      {
+        "path": "docs/architecture-boundaries-base.md",
+        "blob_sha": "b26f5a0d28ccfb24c12f9c36d1c2a722d39a326f"
+      },
+      {
+        "path": "docs/architecture-guide.md",
+        "blob_sha": "7928712da2b01bb1e3747395550c5f6a7873dc63"
+      },
+      {
+        "path": "src/ai_system_architect/core/validation.py",
+        "blob_sha": "c04dc3640de754bd0b407692521ceff4d1d4664c"
+      },
+      {
+        "path": "src/ai_system_architect/services/architecture.py",
+        "blob_sha": "977ff3b78c928bdf9247d820c6a6f7122d7ace39"
+      },
+      {
+        "path": "docs/sample_output/customer_support_chatbot.md",
+        "blob_sha": "6acd84d0d23045024c02f9941abf0dd2a211e4df"
+      }
+    ]
+  },
+  "shared_provenance": {
+    "producer_name": "ai-system-architect",
+    "producer_type": "architecture agent",
+    "source_reference": "docs/architecture-boundaries-base.md",
+    "source_version": "0797e2736a1b288ae136b8f093644e3cc2406f6f",
+    "repository_locator": "sagarika29/ai-system-architect",
+    "origin_classification": "ai_generated"
+  },
+  "candidates": [
+    {
+      "key": "fail_closed_output_contract",
+      "authority_intent": "accept",
+      "title": "Fail closed on a broken architecture output contract",
+      "statement": "Generated architecture output must fail closed when required sections are missing.",
+      "rationale": "If the contract is broken, the app fails closed instead of showing partial output as complete.",
+      "scope_hints": ["architecture-generation", "output-validation"],
+      "architecture_context": {
+        "component": "output-validator",
+        "boundary": "deterministic"
+      },
+      "related_decision_ids": [],
+      "source": [
+        {
+          "path": "docs/architecture-boundaries-base.md",
+          "excerpt": "Fail closed if the output is missing required sections."
+        },
+        {
+          "path": "docs/architecture-guide.md",
+          "excerpt": "If the contract is broken, the app fails closed instead of showing partial output as complete."
+        },
+        {
+          "path": "src/ai_system_architect/core/validation.py",
+          "excerpt": "Generated markdown is missing required sections"
+        }
+      ],
+      "anchored_terms": ["fail closed", "missing required sections"]
+    },
+    {
+      "key": "reject_empty_input",
+      "authority_intent": "accept",
+      "title": "Reject empty use case descriptions",
+      "statement": "The architecture generator must reject empty use case descriptions.",
+      "rationale": "Use case description must not be empty.",
+      "scope_hints": ["architecture-generation", "input-validation"],
+      "architecture_context": {
+        "component": "request-normalization",
+        "boundary": "deterministic"
+      },
+      "related_decision_ids": [],
+      "source": [
+        {
+          "path": "docs/architecture-boundaries-base.md",
+          "excerpt": "Empty input rejection"
+        },
+        {
+          "path": "src/ai_system_architect/services/architecture.py",
+          "excerpt": "Use case description must not be empty."
+        }
+      ],
+      "anchored_terms": ["empty", "reject"]
+    },
+    {
+      "key": "testable_decisions_stay_deterministic",
+      "authority_intent": "accept",
+      "title": "Unit-testable decisions stay deterministic",
+      "statement": "If a decision can be unit tested, it should be deterministic; judgment-dependent decisions can stay probabilistic.",
+      "rationale": "The goal is to narrow its job to places where judgment is useful and variability is acceptable.",
+      "scope_hints": ["architecture-boundaries"],
+      "architecture_context": {
+        "component": "boundary-split",
+        "layer": "deterministic-vs-probabilistic"
+      },
+      "related_decision_ids": [],
+      "source": [
+        {
+          "path": "docs/architecture-boundaries-base.md",
+          "excerpt": "If a decision can be unit tested, it should be deterministic."
+        },
+        {
+          "path": "docs/architecture-boundaries-base.md",
+          "excerpt": "If a decision depends on domain judgment, tradeoffs, or incomplete context, it can stay probabilistic."
+        },
+        {
+          "path": "docs/architecture-boundaries-base.md",
+          "excerpt": "The goal is to narrow its job to places where judgment is useful and variability is acceptable."
+        }
+      ],
+      "anchored_terms": ["can be unit tested", "stay probabilistic"]
+    },
+    {
+      "key": "no_sensitive_data_beyond_session",
+      "authority_intent": "reject",
+      "title": "Keep sensitive data within the session window",
+      "statement": "No sensitive data is retained beyond session duration.",
+      "rationale": "Assumed Internal - if wrong, it may require additional compliance measures.",
+      "scope_hints": ["memory-strategy", "data-retention"],
+      "architecture_context": {
+        "component": "memory-strategy",
+        "layer": "generated-draft"
+      },
+      "related_decision_ids": [],
+      "provenance": {
+        "producer_name": "ai-system-architect",
+        "producer_type": "architecture agent",
+        "source_reference": "docs/sample_output/customer_support_chatbot.md",
+        "source_version": "0797e2736a1b288ae136b8f093644e3cc2406f6f",
+        "repository_locator": "sagarika29/ai-system-architect",
+        "origin_classification": "ai_generated"
+      },
+      "source": [
+        {
+          "path": "docs/sample_output/customer_support_chatbot.md",
+          "excerpt": "No sensitive data is retained beyond session duration."
+        }
+      ],
+      "anchored_terms": ["sensitive data", "session duration"]
+    }
+  ]
+}
