@@ -52,6 +52,43 @@ cd mneme
 pip install -e ".[dev]"
 ```
 
+## Decision MCP
+
+Mneme exposes the Decision Index over a local MCP server so MCP-capable clients can propose candidate architectural decisions and query decision state without gaining authority to change that state.
+
+Install the optional MCP dependency:
+
+```bash
+pip install "mneme-hq[mcp]"
+```
+
+Start the local stdio server with the proposal store enabled:
+
+```bash
+mneme decision-mcp
+```
+
+Optionally add a canonical ADR corpus. Mneme validates and precedence-resolves the corpus before the server starts; invalid or ambiguous ADR state fails closed rather than serving a degraded authority view.
+
+```bash
+mneme decision-mcp --adr-dir path/to/adrs
+```
+
+The MCP surface is intentionally frozen to six tools:
+
+- `decision.propose`
+- `decision.propose_batch`
+- `decision.get`
+- `decision.search`
+- `decision.applicable_to`
+- `decision.trace`
+
+Proposal tools create non-authoritative proposals only. Read tools query proposal and canonical decision state. MCP deliberately exposes no accept, reject, activate, supersede, exception, bypass, or trusted-evidence authority.
+
+Human authority remains explicit through `mneme decision proposals | show | accept | reject`. Accepting a proposal materializes a canonical decision; it does not activate protection or run the Architecture Audit.
+
+See [ADR-027](docs/adr/ADR-027-decision-mcp-proposal-ingestion-and-authority-boundary.md) and the [v0.9.0 release notes](docs/releases/v0.9.0.md) for the authority boundary and release contract.
+
 ## Architecture Audit
 
 See where your architecture is actually protected — and where it still depends on people remembering the rules.
