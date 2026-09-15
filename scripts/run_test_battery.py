@@ -124,6 +124,7 @@ GATE_GOVERNANCE_PATHS: tuple[str, ...] = (
     "tests/test_setup_audit_parity.py",
     "tests/test_protection_activation.py",
     "tests/test_packaging_contract.py",
+    "tests/test_mcp_registry_metadata.py",
     "tests/test_example_memory.py",
     "tests/test_test_policy.py",
 )
