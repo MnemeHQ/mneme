@@ -50,18 +50,24 @@ jobs:
           echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
           echo "Smoke-testing published mneme-hq==${VERSION}"
 
-      - name: Wait for the version to be served by PyPI
+      - name: Wait for the version to be installable from PyPI
         run: |
           set -euo pipefail
+          probe_dir=$(mktemp -d)
           for _ in $(seq 1 36); do
-            code=$(curl -s -o /dev/null -w '%{http_code}' "https://pypi.org/pypi/mneme-hq/${VERSION}/json")
-            if [ "$code" = "200" ]; then
-              echo "mneme-hq==${VERSION} is live on PyPI"
+            rm -rf "${probe_dir:?}"/*
+            if python3 -m pip download \
+              --disable-pip-version-check \
+              --no-cache-dir \
+              --no-deps \
+              --dest "$probe_dir" \
+              "mneme-hq==${VERSION}" >/dev/null 2>&1; then
+              echo "mneme-hq==${VERSION} is installable from the PyPI package index"
               exit 0
             fi
             sleep 5
           done
-          echo "::error::PyPI never served mneme-hq==${VERSION} within 3 minutes"
+          echo "::error::PyPI package index never served mneme-hq==${VERSION} within 3 minutes"
           exit 1
 
       - name: Install the published package with pipx (G1)
