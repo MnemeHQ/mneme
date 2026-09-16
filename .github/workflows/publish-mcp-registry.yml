@@ -1,0 +1,51 @@
+name: Publish MCP Registry
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Release smoke (published package)"]
+    types: [completed]
+  # Bootstrap only: creating this workflow on the branch publishes the already
+  # validated v0.9.1 metadata once. This trigger is removed before merge.
+  push:
+    branches: ["chore/mcp-registry-publish"]
+    paths:
+      - ".github/workflows/publish-mcp-registry.yml"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'push' ||
+      (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.head_repository.full_name == github.repository
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout validated source
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Install MCP Registry publisher
+        run: |
+          set -euo pipefail
+          curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
+          chmod +x mcp-publisher
+          ./mcp-publisher --help
+
+      - name: Validate Registry manifest
+        run: ./mcp-publisher validate server.json
+
+      - name: Authenticate to official MCP Registry
+        run: ./mcp-publisher login github-oidc
+
+      - name: Publish Mneme Decision MCP
+        run: ./mcp-publisher publish server.json
