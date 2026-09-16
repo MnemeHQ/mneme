@@ -1,0 +1,23 @@
+name: Submit Mneme to mcp.so
+
+on:
+  push:
+    branches: ["chore/mcp-so-submit"]
+    paths:
+      - ".github/workflows/submit-mcp-so.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Submit project
+        run: |
+          set -euo pipefail
+          curl --fail-with-body --show-error --silent \
+            -X POST "https://mcp.so/api/submit-project" \
+            -H "Content-Type: application/json" \
+            --data '{"url":"https://github.com/MnemeHQ/mneme","avatar_url":"https://avatars.githubusercontent.com/u/296709996?v=4"}'
