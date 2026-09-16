@@ -1,16 +1,13 @@
 name: Publish MCP Registry
 
+# Publish only after the package that users will install has passed the
+# published-package smoke. GitHub OIDC grants the repository its official
+# io.github.MnemeHQ namespace without storing a long-lived registry secret.
 on:
   workflow_dispatch:
   workflow_run:
     workflows: ["Release smoke (published package)"]
     types: [completed]
-  # Bootstrap only: creating this workflow on the branch publishes the already
-  # validated v0.9.1 metadata once. This trigger is removed before merge.
-  push:
-    branches: ["chore/mcp-registry-publish"]
-    paths:
-      - ".github/workflows/publish-mcp-registry.yml"
 
 permissions:
   contents: read
@@ -20,7 +17,6 @@ jobs:
   publish:
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      github.event_name == 'push' ||
       (
         github.event.workflow_run.conclusion == 'success' &&
         github.event.workflow_run.head_repository.full_name == github.repository
