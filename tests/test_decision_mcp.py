@@ -1216,6 +1216,62 @@ def test_tool_descriptions_state_the_authority_boundary():
     assert "never mutates" in descriptions[TOOL_SEARCH]
     assert "NOT typed-rule applicability" in descriptions[TOOL_APPLICABLE_TO]
     assert "fail closed" in descriptions[TOOL_TRACE]
+    assert "decision.propose_batch" in descriptions[TOOL_PROPOSE]
+    assert "decision.propose" in descriptions[TOOL_PROPOSE_BATCH]
+    assert "decision.search" in descriptions[TOOL_GET]
+    assert "decision.get" in descriptions[TOOL_SEARCH]
+    assert "AND semantics" in descriptions[TOOL_SEARCH]
+    assert "omitted or empty" in descriptions[TOOL_APPLICABLE_TO]
+    assert "Use decision.get" in descriptions[TOOL_TRACE]
+
+
+def test_tool_input_schema_properties_document_routing_and_semantics():
+    async def _run():
+        async with Client(_server()) as client:
+            result = await client.list_tools()
+            return {t.name: t.input_schema for t in result.tools}
+
+    schemas = asyncio.run(_run())
+    for schema in schemas.values():
+        for prop in schema.get("properties", {}).values():
+            assert prop.get("description")
+        for definition in schema.get("$defs", {}).values():
+            for prop in definition.get("properties", {}).values():
+                assert prop.get("description")
+
+    search_properties = schemas[TOOL_SEARCH]["properties"]
+    assert set(search_properties) == {
+        "query",
+        "proposal_status",
+        "canonical_lifecycle_status",
+        "producer_name",
+        "source_reference",
+        "origin_classification",
+    }
+    assert "Case-insensitive substring" in search_properties["query"]["description"]
+    assert "proposals result list" in (
+        search_properties["proposal_status"]["description"]
+    )
+    assert "canonical_decisions result list" in (
+        search_properties["canonical_lifecycle_status"]["description"]
+    )
+
+    batch_properties = schemas[TOOL_PROPOSE_BATCH]["properties"]
+    assert "preserve this input order" in batch_properties["candidates"]["description"]
+    assert "Candidate provenance takes precedence" in (
+        batch_properties["shared_provenance"]["description"]
+    )
+
+    applicable_properties = schemas[TOOL_APPLICABLE_TO]["properties"]
+    assert "opaque context strings" in applicable_properties["context"]["description"]
+    assert "no glob" in applicable_properties["paths"]["description"]
+
+    assert "proposal id or canonical decision id" in (
+        schemas[TOOL_GET]["properties"]["record_id"]["description"]
+    )
+    assert "proposal id or canonical decision id" in (
+        schemas[TOOL_TRACE]["properties"]["record_id"]["description"]
+    )
 
 
 # ── Strict ADR compiler composition (architecture review of D2B) ────────────

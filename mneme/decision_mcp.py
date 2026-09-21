@@ -83,7 +83,7 @@ Other callers use the existing D0 adapters or supply an already-built
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Literal, Sequence
+from typing import Annotated, Any, Literal, Sequence
 
 from mcp import MCPError
 from mcp.server import MCPServer
@@ -175,15 +175,36 @@ class SourceProvenanceInput(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    producer_name: str = Field(min_length=1)
-    producer_type: str = Field(min_length=1)
-    source_reference: str = Field(min_length=1)
-    external_source_id: str = ""
-    source_version: str = ""
-    repository_locator: str = ""
+    producer_name: str = Field(
+        min_length=1,
+        description="Name of the agent, integration, or system proposing the decision.",
+    )
+    producer_type: str = Field(
+        min_length=1,
+        description="Type of producer, such as agent, integration, or import.",
+    )
+    source_reference: str = Field(
+        min_length=1,
+        description="Human-readable reference to the source output or artifact.",
+    )
+    external_source_id: str = Field(
+        default="",
+        description="Optional stable identifier assigned by the source system.",
+    )
+    source_version: str = Field(
+        default="",
+        description="Optional source revision or version used for idempotent identity.",
+    )
+    repository_locator: str = Field(
+        default="",
+        description="Optional repository path or locator associated with the source.",
+    )
     origin_classification: Literal[
         ORIGIN_AI_GENERATED, ORIGIN_HUMAN_AUTHORED, ORIGIN_IMPORTED_UNKNOWN
-    ] = ORIGIN_IMPORTED_UNKNOWN
+    ] = Field(
+        default=ORIGIN_IMPORTED_UNKNOWN,
+        description="Declared origin of the proposed content.",
+    )
 
 
 class CandidateInput(BaseModel):
@@ -198,13 +219,40 @@ class CandidateInput(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    title: str = Field(min_length=1)
-    statement: str = Field(min_length=1)
-    rationale: str = ""
-    provenance: SourceProvenanceInput | None = None
-    scope_hints: list[str] = Field(default_factory=list)
-    architecture_context: dict[str, str] = Field(default_factory=dict)
-    related_decision_ids: list[str] = Field(default_factory=list)
+    title: str = Field(
+        min_length=1,
+        description="Non-empty concise title for the candidate decision.",
+    )
+    statement: str = Field(
+        min_length=1,
+        description="Non-empty statement of the architectural decision being proposed.",
+    )
+    rationale: str = Field(
+        default="",
+        description="Optional explanation of why the decision is being proposed.",
+    )
+    provenance: SourceProvenanceInput | None = Field(
+        default=None,
+        description=(
+            "Source provenance for this candidate. Required by decision.propose; in "
+            "decision.propose_batch it may be omitted when shared_provenance is supplied."
+        ),
+    )
+    scope_hints: list[str] = Field(
+        default_factory=list,
+        description=(
+            "Optional opaque retrieval hints for contexts or paths; these are not "
+            "typed-rule applicability selectors."
+        ),
+    )
+    architecture_context: dict[str, str] = Field(
+        default_factory=dict,
+        description="Optional string key/value context captured with the proposal.",
+    )
+    related_decision_ids: list[str] = Field(
+        default_factory=list,
+        description="Optional stable ids of related proposals or canonical decisions.",
+    )
 
 
 class BatchInput(BaseModel):
@@ -212,8 +260,21 @@ class BatchInput(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    candidates: list[CandidateInput] = Field(min_length=1)
-    shared_provenance: SourceProvenanceInput | None = None
+    candidates: list[CandidateInput] = Field(
+        min_length=1,
+        description=(
+            "One or more candidate decisions. Each creates or reuses an independent "
+            "proposal, and results preserve this input order."
+        ),
+    )
+    shared_provenance: SourceProvenanceInput | None = Field(
+        default=None,
+        description=(
+            "Optional fallback provenance for every candidate. A candidate's own "
+            "non-empty provenance fields and origin classification take precedence; "
+            "omitted optional fields are filled from this value."
+        ),
+    )
 
 
 # ── Explicit deterministic serialization (module contract) ─────────────────
@@ -521,11 +582,22 @@ def _register_tools(server: MCPServer, service: DecisionIndexService) -> None:
             "the proposal is never enforceable and can only become "
             "canonical through separate Mneme human authority (D2C), "
             "which this MCP does not expose. Repeated identical "
-            "source/version/content submissions are idempotent."
+            "source/version/content submissions are idempotent. Use "
+            "decision.propose_batch when submitting multiple candidates."
         ),
         annotations=_PROPOSE_ANNOTATIONS,
     )
-    def decision_propose(candidate: CandidateInput) -> dict[str, Any]:
+    def decision_propose(
+        candidate: Annotated[
+            CandidateInput,
+            Field(
+                description=(
+                    "One candidate with a non-empty title and statement plus source "
+                    "provenance; authoritative fields are rejected."
+                )
+            ),
+        ],
+    ) -> dict[str, Any]:
         """Capability: append/reuse one non-authoritative proposal.
 
         Changes: at most one new proposal record (status 'proposed').
@@ -548,13 +620,31 @@ def _register_tools(server: MCPServer, service: DecisionIndexService) -> None:
             "proposal identity and enters as a non-authoritative proposal "
             "with status 'proposed'. There are no batch acceptance "
             "semantics: batch submission grants NO authority, and every "
-            "proposal remains independently reviewable."
+            "proposal remains independently reviewable. Use decision.propose "
+            "for a single candidate."
         ),
         annotations=_PROPOSE_ANNOTATIONS,
     )
     def decision_propose_batch(
-        candidates: list[CandidateInput],
-        shared_provenance: SourceProvenanceInput | None = None,
+        candidates: Annotated[
+            list[CandidateInput],
+            Field(
+                description=(
+                    "Candidate decisions to submit independently; output results "
+                    "preserve this input order."
+                )
+            ),
+        ],
+        shared_provenance: Annotated[
+            SourceProvenanceInput | None,
+            Field(
+                description=(
+                    "Optional fallback provenance applied to every candidate. Candidate "
+                    "provenance takes precedence, and each candidate must have effective "
+                    "provenance from one or both inputs."
+                )
+            ),
+        ] = None,
     ) -> dict[str, Any]:
         """Capability: append/reuse N non-authoritative proposals.
 
@@ -581,11 +671,21 @@ def _register_tools(server: MCPServer, service: DecisionIndexService) -> None:
         description=(
             "Read one record by stable id. Returns record_type "
             "'proposal', 'canonical_decision', or 'not_found'. Read only: "
-            "this tool never mutates any state."
+            "this tool never mutates any state. Use decision.search when "
+            "you do not already have a stable id."
         ),
         annotations=_READ_ANNOTATIONS,
     )
-    def decision_get(record_id: str) -> dict[str, Any]:
+    def decision_get(
+        record_id: Annotated[
+            str,
+            Field(
+                description=(
+                    "Stable proposal id or canonical decision id to retrieve exactly."
+                )
+            ),
+        ],
+    ) -> dict[str, Any]:
         """Capability: read one record; no state change of any kind."""
         record = service.get(record_id)
         if record is None:
@@ -604,24 +704,78 @@ def _register_tools(server: MCPServer, service: DecisionIndexService) -> None:
             "decisions (lifecycle active/superseded/deprecated/inactive) "
             "are returned in separate lists and never merged. Read only: "
             "this tool never mutates any state. Search rank has no "
-            "enforcement meaning."
+            "enforcement meaning. Use decision.get when you already have a "
+            "stable id. Within each record domain, all applicable filters "
+            "combine with AND semantics; proposal-only filters do not exclude "
+            "canonical results, and vice versa."
         ),
         annotations=_READ_ANNOTATIONS,
     )
     def decision_search(
-        query: str = "",
-        proposal_status: (
-            Literal[PROPOSAL_STATUS_PROPOSED, PROPOSAL_STATUS_ACCEPTED, PROPOSAL_STATUS_REJECTED]
-            | None
-        ) = None,
-        canonical_lifecycle_status: (
-            Literal["active", "superseded", "deprecated", "inactive"] | None
-        ) = None,
-        producer_name: str | None = None,
-        source_reference: str | None = None,
-        origin_classification: (
-            Literal[ORIGIN_AI_GENERATED, ORIGIN_HUMAN_AUTHORED, ORIGIN_IMPORTED_UNKNOWN] | None
-        ) = None,
+        query: Annotated[
+            str,
+            Field(
+                description=(
+                    "Case-insensitive substring matched against supported proposal and "
+                    "canonical text fields. Empty matches all records."
+                )
+            ),
+        ] = "",
+        proposal_status: Annotated[
+            Literal[
+                PROPOSAL_STATUS_PROPOSED,
+                PROPOSAL_STATUS_ACCEPTED,
+                PROPOSAL_STATUS_REJECTED,
+            ]
+            | None,
+            Field(
+                description=(
+                    "Optional exact proposal lifecycle filter; applies only to the "
+                    "proposals result list."
+                )
+            ),
+        ] = None,
+        canonical_lifecycle_status: Annotated[
+            Literal["active", "superseded", "deprecated", "inactive"] | None,
+            Field(
+                description=(
+                    "Optional exact canonical lifecycle filter; applies only to the "
+                    "canonical_decisions result list."
+                )
+            ),
+        ] = None,
+        producer_name: Annotated[
+            str | None,
+            Field(
+                description=(
+                    "Optional exact producer-name filter on proposal provenance; "
+                    "does not filter canonical decisions."
+                )
+            ),
+        ] = None,
+        source_reference: Annotated[
+            str | None,
+            Field(
+                description=(
+                    "Optional exact source-reference filter on proposal provenance; "
+                    "does not filter canonical decisions."
+                )
+            ),
+        ] = None,
+        origin_classification: Annotated[
+            Literal[
+                ORIGIN_AI_GENERATED,
+                ORIGIN_HUMAN_AUTHORED,
+                ORIGIN_IMPORTED_UNKNOWN,
+            ]
+            | None,
+            Field(
+                description=(
+                    "Optional exact origin-classification filter on proposal provenance; "
+                    "does not filter canonical decisions."
+                )
+            ),
+        ] = None,
     ) -> dict[str, Any]:
         """Capability: read/search; no state change of any kind."""
         try:
@@ -646,13 +800,30 @@ def _register_tools(server: MCPServer, service: DecisionIndexService) -> None:
             "retrieval/context applicability only: proposal scope hints "
             "are NOT typed-rule applicability (ADR-020) and paths are "
             "never glob-evaluated. Read only: this tool never mutates any "
-            "state and returns no rules or enforcement data."
+            "state and returns no rules or enforcement data. When both "
+            "inputs are omitted or empty, both match lists are empty."
         ),
         annotations=_READ_ANNOTATIONS,
     )
     def decision_applicable_to(
-        context: list[str] | None = None,
-        paths: list[str] | None = None,
+        context: Annotated[
+            list[str] | None,
+            Field(
+                description=(
+                    "Optional opaque context strings. A scope hint matches when it is a "
+                    "case-insensitive substring of any supplied context or path."
+                )
+            ),
+        ] = None,
+        paths: Annotated[
+            list[str] | None,
+            Field(
+                description=(
+                    "Optional path strings treated as opaque retrieval context; no glob "
+                    "or typed-rule selector evaluation is performed."
+                )
+            ),
+        ] = None,
     ) -> dict[str, Any]:
         """Capability: retrieval context; no state change of any kind."""
         result = service.applicable_to(
@@ -671,11 +842,23 @@ def _register_tools(server: MCPServer, service: DecisionIndexService) -> None:
             "unresolved ids stay type-unknown. Read only: this tool never "
             "mutates any state. Canonical rule-lineage integrity failures "
             "fail closed as protocol errors and are never returned as "
-            "partial traces."
+            "partial traces. Use decision.get for the record alone; use "
+            "decision.trace when you need provenance, acceptance, rule, or "
+            "declared-evidence lineage."
         ),
         annotations=_READ_ANNOTATIONS,
     )
-    def decision_trace(record_id: str) -> dict[str, Any]:
+    def decision_trace(
+        record_id: Annotated[
+            str,
+            Field(
+                description=(
+                    "Stable proposal id or canonical decision id whose known lineage "
+                    "should be returned; unknown ids produce trace_not_found."
+                )
+            ),
+        ],
+    ) -> dict[str, Any]:
         """Capability: read lineage; no state change of any kind."""
         try:
             trace = service.trace(record_id)
