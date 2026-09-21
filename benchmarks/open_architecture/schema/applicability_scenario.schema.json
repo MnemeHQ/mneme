@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "O1A Applicability Scenario",
+  "type": "object",
+  "required": [
+    "scenario_id",
+    "repository",
+    "description",
+    "change_context",
+    "expected_governing_decision_ids",
+    "validation_state"
+  ],
+  "properties": {
+    "scenario_id": { "type": "string" },
+    "repository": { "type": "string" },
+    "description": { "type": "string" },
+    "change_context": {
+      "type": "object",
+      "properties": {
+        "path": { "type": ["string", "null"] },
+        "component": { "type": ["string", "null"] },
+        "change_type": { "type": ["string", "null"] },
+        "dependencies": { "type": "array", "items": { "type": "string" } },
+        "api": { "type": ["string", "null"] },
+        "technology": { "type": ["string", "null"] },
+        "other_context": { "type": ["string", "null"] }
+      }
+    },
+    "expected_governing_decision_ids": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "mneme_governing_decision_ids": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "human_notes": { "type": ["string", "null"] },
+    "validation_state": {
+      "enum": ["unreviewed", "reviewed", "ambiguous"]
+    }
+  }
+}

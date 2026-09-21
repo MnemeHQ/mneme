@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "O1A Decision Candidate",
+  "type": "object",
+  "required": [
+    "candidate_id",
+    "repository",
+    "source_file",
+    "normalized_decision",
+    "classification",
+    "decision_domains",
+    "decision_purposes",
+    "authority_status",
+    "lifecycle_status",
+    "human_validation_status"
+  ],
+  "properties": {
+    "candidate_id": { "type": "string" },
+    "repository": { "type": "string" },
+    "source_file": { "type": "string" },
+    "source_location": { "type": ["string", "null"] },
+    "raw_statement": { "type": ["string", "null"] },
+    "normalized_decision": { "type": "string" },
+    "classification": {
+      "enum": ["prescriptive", "advisory", "descriptive", "historical", "ambiguous"]
+    },
+    "decision_domains": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "architecture_structure",
+          "dependency_technology",
+          "api_interface",
+          "data_contract",
+          "integration_eventing",
+          "persistence",
+          "security_privacy",
+          "deployment_infrastructure",
+          "reliability_observability",
+          "performance_scalability",
+          "testing_quality",
+          "compatibility_versioning",
+          "migration_evolution",
+          "ownership_boundary",
+          "developer_workflow",
+          "compliance",
+          "cost_resource",
+          "other"
+        ]
+      }
+    },
+    "decision_purposes": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "constrain",
+          "standardize",
+          "select",
+          "prohibit",
+          "require",
+          "allocate_ownership",
+          "define_boundary",
+          "preserve_compatibility",
+          "manage_risk",
+          "enable_migration",
+          "deprecate",
+          "freeze",
+          "create_exception",
+          "require_evidence",
+          "optimize_quality_attribute",
+          "document_tradeoff",
+          "other"
+        ]
+      }
+    },
+    "authority_status": {
+      "enum": ["candidate", "explicitly_accepted", "superseded", "rejected", "unknown"]
+    },
+    "authority_evidence": { "type": ["string", "null"] },
+    "scopes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["scope_type"],
+        "properties": {
+          "scope_type": {
+            "enum": ["repository", "service", "package", "directory", "file_pattern", "component", "api", "dependency", "other"]
+          },
+          "scope_expression": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "lifecycle_status": {
+      "enum": ["active", "superseded", "deprecated", "temporary", "unknown"]
+    },
+    "relationships": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "enforcement_potential": {
+      "enum": ["deterministic_rule", "contextual_guidance", "warning", "block", "not_mechanically_enforceable", "unknown"]
+    },
+    "candidate_rule": { "type": ["string", "null"] },
+    "confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "human_validation_status": {
+      "enum": ["unreviewed", "correct", "partially_correct", "incorrect", "ambiguous"]
+    },
+    "human_corrections": { "type": ["object", "null"] }
+  }
+}

@@ -1,0 +1,51 @@
+schema_version: "0.1"
+batch_id: "o1a-batch-01"
+status: planned
+
+targets:
+  decisions_total: 100
+  scenarios_total: 50
+  decisions_per_repository: 20
+  scenarios_per_repository: 10
+
+repositories:
+  - id: adrkit
+    github: "mbeacom/adrkit"
+    commit_sha: null
+    primary_test: "applicability_and_decision_relationships"
+    validation_status: unreviewed
+
+  - id: gsa_agentic_coding_quickstart
+    github: "GSA-TTS/agentic-coding-quickstart"
+    commit_sha: null
+    primary_test: "prescriptive_intent_and_authority"
+    validation_status: unreviewed
+
+  - id: helix
+    github: "AZX-PBC-OSS/helix"
+    commit_sha: null
+    primary_test: "authority_conflict_and_document_purpose"
+    validation_status: unreviewed
+
+  - id: archlint
+    github: "muhammetsafak/archlint"
+    commit_sha: null
+    primary_test: "decision_to_enforceable_rule"
+    validation_status: unreviewed
+
+  - id: modonome
+    github: "enumind/modonome"
+    commit_sha: null
+    primary_test: "governance_ownership_and_enforcement"
+    validation_status: unreviewed
+
+sampling:
+  per_repository:
+    clear_explicit: 5
+    scoped: 5
+    lifecycle_or_supersession: 3
+    ambiguous_or_conflicting: 3
+    enforcement_potential: 2
+    unusual_or_difficult: 2
+
+headline_metric: governing_decision_set_f1

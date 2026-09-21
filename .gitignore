@@ -13,6 +13,7 @@ build/
 !.env.example
 
 # Database
+*.sqlite
 *.db
 *.sqlite3
 instance/
