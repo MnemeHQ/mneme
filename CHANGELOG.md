@@ -1,5 +1,48 @@
 # Changelog
 
+## v0.9.2 — 2026-09-21
+
+**Complete Decision MCP input-schema documentation**
+
+This patch release improves agent reliability by documenting every exposed
+Decision MCP input parameter and nested candidate/provenance field. It does
+not change the six-tool capability surface, authority boundaries, proposal
+semantics, retrieval behavior, enforcement, or the Architecture Audit
+contract.
+
+### Improved
+
+- Added JSON Schema descriptions for every parameter on
+  `decision.propose`, `decision.propose_batch`, `decision.get`,
+  `decision.search`, `decision.applicable_to`, and `decision.trace`.
+- Documented candidate fields and batch `shared_provenance` precedence,
+  including when to use the single-candidate or batch proposal tool.
+- Documented `decision.search` query behavior, exact metadata filters,
+  record-domain scoping, and AND combination semantics.
+- Added routing guidance among `decision.get`, `decision.search`, and
+  `decision.trace`.
+- Clarified that `decision.applicable_to` returns empty match lists when both
+  context inputs are omitted or empty.
+- Added live `tools/list` schema assertions that prevent parameter-description
+  coverage from regressing.
+
+### Compatibility
+
+- No runtime or protocol behavior changes.
+- The six frozen Decision MCP tools and their authority annotations are
+  unchanged.
+- Proposal acceptance, rejection, activation, supersession, enforcement, and
+  trusted evidence remain outside the MCP authority boundary.
+- `mneme.audit/v1` is unchanged.
+
+## Install
+
+```bash
+pip install "mneme-hq[mcp]==0.9.2"
+```
+
+---
+
 ## v0.9.1 — 2026-09-15
 
 **MCP Registry discovery metadata for the Decision MCP server**
