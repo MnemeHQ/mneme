@@ -1,0 +1,52 @@
+name: MCP directory maintenance
+
+# Audit the canonical Registry after publication and re-check downstream
+# discovery quarterly. Confirmed metadata drift fails the audit; transient
+# third-party HTTP failures are warnings so directory outages do not create
+# false release failures.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Released mneme-hq version to audit (defaults to PyPI latest)"
+        required: false
+  workflow_run:
+    workflows: ["Publish MCP Registry"]
+    types: [completed]
+  schedule:
+    - cron: "17 9 1 */3 *"
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.head_repository.full_name == github.repository
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout audited source
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Audit MCP listings
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          args=(--summary "$GITHUB_STEP_SUMMARY")
+          if [ -n "${REQUESTED_VERSION}" ]; then
+            args+=(--version "${REQUESTED_VERSION}")
+          fi
+          python scripts/check_mcp_directory_listings.py "${args[@]}"
