@@ -1,7 +1,9 @@
-# Protection and evidence semantics: two traceable cases
+# Protection and evidence semantics: one traceable case and one capability gap
 
 This packet is for external technical review of Mneme's current evidence
-semantics. It is pinned to repository state
+semantics. It contains one live traceable case and one finding that the
+requested comparison case cannot yet be represented truthfully. It is pinned
+to repository state
 [`6a82ba47`](https://github.com/MnemeHQ/mneme/commit/6a82ba47) and uses only
 artifacts already present in this repository or its git history.
 
@@ -51,6 +53,13 @@ rule. The audit therefore reports exactly one Protected decision: ADR-005.
 The selection is backed by the real ADR, live memory, implementation, committed
 regression tests, and the commits that introduced and adopted the rule.
 
+At this packet's verification point, `mneme protect status ADR-005` reports the
+rule installed and the decision `protected`; `mneme check` on this document
+reports the rule `APPLIED`, an aggregate `PASS`, and no violations. Mneme can
+therefore prove that ADR-005 is configured, applicable to this artifact, and
+currently passes. Those current facts do not prove a historical observation
+about any earlier production change.
+
 ```text
 Decision
 ↓
@@ -73,6 +82,10 @@ This is a repository-backed **review trace**, not one persisted event chain.
 The repository proves each transition needed to validate the configured
 control, but it does not store an ADR-029 observation binding a production
 subject, control configuration, rule identity, and outcome in one record.
+In this diagram, `Matched` means the exact forbidden literal matched and a
+`Violation` was created; `APPLIED` alone means only that the rule was applicable.
+`Verified evidence` means the Audit label for configured-and-validated typed
+protection, not verified observation of the production change.
 
 ### Trace
 
@@ -196,25 +209,29 @@ sense: the configured deterministic protection is mechanically verified. It
 must not be presented as a verified claim that PR #327, or any other production
 change, was observed by this exact control.
 
-## Case 2 — Configured but not yet verified
+## Case 2 — A live configured-but-never-exercised control is not currently representable
 
-### Repository finding
+### Product capability finding
 
-The live `.mneme/project_memory.json` contains **no** `test_evidence`
-declaration. Consequently, the repository does not currently contain a
-legitimate deployed decision/control instance that is declared and configured
-in ADR-024's test-evidence channel but has not yet matched a relevant result.
-Manufacturing one for this packet would cross the trust boundary ADR-024 is
-designed to protect.
+Michael's requested distinction is valid, but it is not a distinction the
+current product can yet report. There is **no genuine Case 2 in the current
+repository**. The canonical
+[`.mneme/project_memory.json`](../../../.mneme/project_memory.json) contains one
+typed rule and no `test_evidence` declarations. That one rule belongs to
+ADR-005 and is already Case 1. The active workflows contain other repository
+checks, but Audit does not bind them to a second live decision/control pair.
 
-The closest real repository-backed state is the committed fixture in
-[`tests/test_audit_test_evidence.py`](../../../tests/test_audit_test_evidence.py):
-`dp-empty-input` declares
-`tests/test_boundary.py::test_empty_input_rejected`, and
-`test_declared_selector_alone_does_not_protect` proves that the passive audit
-records the declaration but does not execute it or grant protection. This is a
-test-created temporary git repository, not Mneme's live project memory and not
-a standalone ADR in `docs/adr`; that limitation is material.
+More fundamentally, current Mneme cannot prove the requested negative fact.
+ADR-029 defines configured-and-validated protection, execution observed, and
+relevant enforcement observed as independent dimensions, but explicitly ships
+no persistence, evidence store, decision log, public evidence schema, or CLI
+representation for the latter two dimensions. The runtime
+[`RuleEvaluation`](../../../mneme/path_selectors.py),
+[`Violation`](../../../mneme/enforcer.py), and `EnforcementResult` objects exist
+only for the current evaluation.
+
+The requested lifecycle is therefore a target state, not a state instantiated
+by a live repository control:
 
 ```text
 Decision
@@ -223,82 +240,125 @@ Rule
 ↓
 Declared control
 ↓
-No relevant match observed yet
+No relevant match observed yet   ← cannot currently be proved or reported
 ↓
-No verification evidence yet
+No verification evidence yet     ← absence is not represented as history
 ```
 
-### Trace of the closest fixture state
+### Why Audit cannot supply Case 2
 
-1. **Architectural decision.** The committed fixture decision is
-   `dp-empty-input`: “Reject empty input before calling the model.” It represents
-   a deterministic boundary from the Design Partner diagnostic described in
-   ADR-024, but in this repository it exists only as test data.
+The exact per-decision `mneme.audit/v1` representation contains only `id`,
+decision metadata, `intent`, `protection_tier`, `mneme_guardrail`,
+`evidence_confidence`, and `evidence_sources`; see
+[`_audit_payload`](../../../mneme/cli.py). It has no activation time, execution
+count, last-evaluated subject, relevant-match count, or observation-completeness
+field.
 
-2. **Rule.** The requirement is deterministic, but it has no installed Mneme
-   typed rule. Its declared enforcement mechanism is a test selector rather
-   than a `Rule` object.
+For a typed rule, [`assess_protection`](../../../mneme/enforcer.py) immediately
+returns `protection_tier: "protected"` and
+`evidence_confidence: "verified"` from the installed rule, with
+`evidence_sources: []`. That empty list does **not** mean “never exercised.” It
+means this protection channel does not attach an observation source. Likewise,
+a current passing repository scan proves only that no violation was found in
+that scan; it says nothing about whether the control governed an earlier
+relevant change.
 
-3. **Configured control.** The fixture decision carries:
+Consequently, these histories are indistinguishable in current Audit output:
 
-   ```json
-   {
-     "test_evidence": [
-       {"selector": "tests/test_boundary.py::test_empty_input_rejected"}
-     ]
-   }
-   ```
+- a rule was activated and no relevant change ever entered its scope;
+- the control evaluated relevant allowed changes, but no history was retained;
+- the control rejected relevant changes, but no history was retained;
+- the control never ran in an integration, even though the rule was configured.
 
-   The fixture creates the selector file and a real temporary git commit so
-   passive validation can resolve the repository HEAD and file. This makes the
-   declaration usable, not verified.
+### Why adding a small live rule would still be misleading
 
-4. **Current evidence state.** [`verify_test_evidence`](../../../mneme/evidence.py)
-   returns `declared`, and Audit renders
-   `test:declared:tests/test_boundary.py::test_empty_input_rejected`. The test
-   pins `protection_tier: "requires_modelling"`,
-   `evidence_confidence: "none"`, `protected == 0`, and 0% current protection.
+Adding another decision and typed rule could create another real configured
+control, but it would not establish “never exercised.” It would also change
+repository enforcement behavior and require a real architectural decision and
+explicit activation; those artifacts cannot be invented merely to complete an
+example. Even immediately after activation, Mneme would record configured
+protection, not a trustworthy historical negative. Activation's mechanical
+validation executions are intentionally different from a real relevant change.
 
-5. **Evidence absent.** There is no exact-SHA CI result matched to the exact
-   selector, no authenticated CI claim, and no trusted execution attestation.
-   Ordinary Audit executes only the passive `git rev-parse HEAD` check; an
-   execution-sentinel test proves it does not invoke pytest or import the
-   fixture's `conftest.py`.
+No new control is added by this packet.
 
-6. **Why configuration is not protection.** The decision record asserts only
-   that this selector is intended to enforce the decision. It does not prove
-   the test ran, passed, ran at this SHA, tested the claimed boundary, or was
-   reported by a producer the repository could not forge. ADR-024 therefore
-   permits annotation but forbids an upgrade to `Protected`.
+### Minimum product capability needed
 
-7. **Event needed to advance.** A supplied `mneme.test-evidence/v1` document
-   with the exact HEAD SHA, exact uniquely declared selector, and exact
-   `outcome: "passed"` would move the entry only to `matched_unverified`,
-   rendered as `test:ci-claim:<selector>@<sha>`. The committed
-   [`test_valid_ci_evidence_does_not_protect`](../../../tests/test_ci_test_evidence.py)
-   pins that transition and confirms it still does not protect. An
-   authenticated GitHub run/artifact can reach `authenticated_ci_claim`, also
-   not protection. Moving to `verified` would require the cryptographically
-   trusted Mneme-controlled producer described—and explicitly deferred—in
-   ADR-025. No event available in the current implementation can do that.
+The minimum truthful representation is an append-only or otherwise durable
+enforcement-observation carrier implementing ADR-029's six bindings for every
+recorded evaluation:
 
-The fixture's test body is deliberately minimal (`assert True`), so it proves
-the evidence-state boundary, not that empty-input rejection is genuinely
-implemented. That is another reason this fixture cannot be promoted as a real
-deployed Case 2.
+1. control and provenance, including Mneme version;
+2. exact subject/action identity;
+3. canonical decision identity and version;
+4. stable rule/control identity and configuration;
+5. applicability (`APPLIED`, `EXCLUDED`, or `UNKNOWN`);
+6. attributable allow/reject outcome.
+
+The report would also need an explicit observation-completeness boundary—for
+example, the activation/configuration identity and time from which all relevant
+enforcement surfaces are known to report. Without that completeness guarantee,
+zero stored relevant observations still means only “none recorded,” not “none
+occurred.” Audit must expose these dimensions separately from the existing
+`Protected` tier and fail closed when any binding or coverage guarantee is
+missing.
+
+This belongs primarily under accepted
+[ADR-029](../../adr/ADR-029-enforcement-evidence-binding-semantics.md), which
+already defines the runtime-observation semantics and defers their carrier,
+schema, and persistence. Proposed
+[ADR-030](../../adr/ADR-030-canonical-decision-persistence-version-identity-and-stable-rule-lineage.md)
+must land first or alongside it to supply stable decision-version and rule
+identity. It does **not** belong under ADR-025 unless the control is specifically
+test evidence requiring a trusted execution-attestation producer; ADR-025 does
+not solve general runtime observation or completeness. A new ADR is appropriate
+for the concrete observation schema, retention/completeness contract, and Audit
+projection because ADR-029 deliberately left those choices open.
+
+### Implementation implication
+
+Durable observation work should follow the canonical persistence and stable
+identity work in ADR-030. Once those identities exist, a separately reviewed
+implementation can add the ADR-029 observation carrier, persistence, and Audit
+projection, followed by an explicit completeness contract for which active
+enforcement surfaces have reported since a configuration became effective.
+ADR-025 remains separate: it is needed only when test evidence must cross the
+trusted execution-attestation boundary. This packet defines no new ADR and
+changes no runtime behavior.
+
+### Mechanics appendix — synthetic ADR-024 fixture, not Case 2
+
+The committed fixture in
+[`tests/test_audit_test_evidence.py`](../../../tests/test_audit_test_evidence.py)
+remains useful only for explaining the test-evidence state machine. Its
+`dp-empty-input` test record declares
+`tests/test_boundary.py::test_empty_input_rejected`. Passive Audit returns
+`declared`, renders
+`test:declared:tests/test_boundary.py::test_empty_input_rejected`, and does not
+execute pytest or grant protection.
+
+An exact-SHA, exact-selector, `passed` result would reach only
+`matched_unverified`; the committed
+[`test_valid_ci_evidence_does_not_protect`](../../../tests/test_ci_test_evidence.py)
+pins that boundary. An authenticated GitHub claim still cannot reach
+`verified`; ADR-025 defers the trusted producer required for that transition.
+
+This fixture is synthetic test data in a temporary repository, has a minimal
+`assert True` body, and is neither a live ADR nor an active repository control.
+It must not be shown to Michael as the requested Case 2.
 
 ## Comparison
 
-| Question | Case 1 — ADR-005 typed rule | Case 2 — closest ADR-024 fixture |
+| Question | Case 1 — ADR-005 typed rule | Requested Case 2 — live unexercised control |
 |---|---|---|
-| Decision exists | Yes: accepted ADR-005 and live decision record | Yes as committed test data only; no repository ADR/live record |
-| Rule declared | Yes: exact `FORBID_LITERAL` directive | Deterministic requirement plus declared selector; no typed `Rule` |
-| Control configured | Yes: live canonical memory | Yes inside the temporary-repository fixture only |
-| Relevant change observed | No ADR-029-grade stored observation; real changes and committed exact-input executions are independently traceable | No |
-| Rule matched | Yes: forbidden input yields `APPLIED` plus exact literal match | No result carrier was supplied, so state remains `declared` |
-| Evaluation executed | Yes: `check_prompt` asserts FAIL and PASS arms | No repository test execution; passive validation only |
-| Verified evidence exists | Yes for configured/validated typed protection; **no** ADR-029-grade persisted event evidence | No; test-evidence `verified` is unreachable today |
-| Appropriate audit interpretation | `Protected`; do not infer a particular production action was observed | `Requires modelling` with declared annotation; not Protected |
+| Decision exists | Yes: accepted ADR-005 and live decision record | No qualifying second live decision/control pair |
+| Rule declared | Yes: exact `FORBID_LITERAL` directive | No qualifying live rule |
+| Control configured | Yes: live canonical memory | No qualifying second control |
+| Relevant change observed | No ADR-029-grade stored observation; real changes and committed exact-input executions are independently traceable | Cannot be established; current Mneme retains no observation history |
+| Rule matched | Yes in committed mechanics tests; `APPLIED` plus exact literal match creates a `Violation` | Cannot be established or negated historically |
+| Evaluation executed | Yes in committed tests and the ADR-specific gate history; not persisted as one ADR-029-bound event | Cannot be established or negated historically |
+| Verified evidence exists | Yes for configured/validated typed protection; **no** ADR-029-grade persisted event evidence | No representable live instance |
+| Appropriate audit interpretation | `Protected`; do not infer a particular production action was observed | Do not manufacture a Case 2; report the observation/persistence gap |
 
 ## Semantic ambiguities exposed
 
@@ -316,13 +376,16 @@ deployed Case 2.
 4. The current runtime trace is useful but is not a durable ADR-029 evidence
    record. It lacks the complete, stable binding needed to assert relevant
    enforcement observation after the run.
-5. The live repository has no ADR-024 declaration, so a deployed
-   “configured-but-unverified test control” example does not yet exist. The
-   closest fixture proves the semantics but must not be described as project
-   evidence.
+5. The live repository has no second typed rule or ADR-024 declaration, and
+   even a newly activated control could not truthfully be classified as “never
+   exercised” without observation persistence plus a completeness boundary.
+6. The activation workflow uses `verified` for a fresh canonical re-assessment
+   of installed protection. That verifies configuration, not historical
+   enforcement observation, despite phrases such as “independently observes
+   real enforcement evidence” in activation documentation and code comments.
 
 ## External review questions
 
 1. Can you tell exactly why Case 1 earns its protection status?
-2. Is it unmistakable that Case 2 has a configured control but lacks verification evidence?
+2. Is it unmistakable why a truthful Case 2 cannot yet be produced from current evidence?
 3. Is any terminology likely to make a reader confuse configured protection with demonstrated protection?
