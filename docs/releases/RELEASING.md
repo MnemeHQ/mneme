@@ -202,6 +202,20 @@ published version manually:
 gh workflow run release-smoke.yml -f version=X.Y.Z
 ```
 
+After the artifact smoke succeeds, **Publish MCP Registry** validates and
+publishes `server.json` through GitHub OIDC. A successful Registry publish
+then starts **MCP directory maintenance**
+([`.github/workflows/mcp-directory-maintenance.yml`](../../.github/workflows/mcp-directory-maintenance.yml)).
+That audit verifies the canonical Registry launch contract and checks Glama,
+mcpservers.org, TensorBlock, punkpeye's curated list, and MCPhq. Confirmed
+metadata drift fails the audit; transient third-party HTTP failures are
+warnings. The same audit runs quarterly and can be dispatched manually for a
+specific released version:
+
+```powershell
+gh workflow run mcp-directory-maintenance.yml -f version=X.Y.Z
+```
+
 Notes:
 
 - **Do not run `mneme-hook` interactively.** It is a Claude Code hook
@@ -261,4 +275,7 @@ Run in order. Do not advance past a failing step.
       version: PyPI serves it, clean `pipx` install, CLI surface, and the
       disposable-repo clean-setup check (`state: setup`,
       `enforcement: not_enabled`).
+- [ ] **Publish MCP Registry** passed, followed by **MCP directory
+      maintenance**; any confirmed stale static listing has an owner or
+      correction PR, and transient external warnings have been reviewed.
 - [ ] Temporary release venv removed; `git status --short` clean.
