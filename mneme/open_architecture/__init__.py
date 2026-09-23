@@ -120,6 +120,34 @@ from mneme.open_architecture.discovery import (
     discover_sources,
 )
 
+from mneme.open_architecture.candidates import (
+    LineSpan,
+    ExtractedCandidate,
+    CandidateExtractor,
+    HeuristicExtractor,
+    build_decision_candidate,
+)
+
+from mneme.open_architecture.classification import (
+    ClassifierTaskType,
+    VALID_TASK_TYPES,
+    ClassifierTask,
+    ClassifierResult,
+    SemanticClassifier,
+    NormalizationError,
+    normalize_classification,
+    normalize_domains,
+    normalize_purposes,
+    normalize_authority,
+    normalize_scopes,
+    normalize_lifecycle,
+    normalize_relationships,
+    normalize_enforcement_potential,
+    StaticClassifier,
+    build_source_context,
+    execute_classifier_batch,
+)
+
 __all__ = [
     # manifest
     "Manifest",
@@ -193,4 +221,28 @@ __all__ = [
     "SourceDiscoveryDiagnostic",
     "DiscoveryResult",
     "discover_sources",
+    # candidates
+    "LineSpan",
+    "ExtractedCandidate",
+    "CandidateExtractor",
+    "HeuristicExtractor",
+    "build_decision_candidate",
+    # classification
+    "ClassifierTaskType",
+    "VALID_TASK_TYPES",
+    "ClassifierTask",
+    "ClassifierResult",
+    "SemanticClassifier",
+    "NormalizationError",
+    "normalize_classification",
+    "normalize_domains",
+    "normalize_purposes",
+    "normalize_authority",
+    "normalize_scopes",
+    "normalize_lifecycle",
+    "normalize_relationships",
+    "normalize_enforcement_potential",
+    "StaticClassifier",
+    "build_source_context",
+    "execute_classifier_batch",
 ]
