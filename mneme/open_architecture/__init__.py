@@ -96,6 +96,21 @@ from mneme.open_architecture.errors import (
     get_error_description,
 )
 
+from mneme.open_architecture.execution import (
+    RepositoryCheckout,
+    materialize_repository,
+    RepositoryExecutionError,
+    MissingCommitShaError,
+    MalformedCommitShaError,
+    GitUnavailableError,
+    RepositoryCloneError,
+    CommitUnavailableError,
+    CheckoutError,
+    ResolvedShaMismatchError,
+    DirtyWorkingTreeError,
+    RepositoryOriginMismatchError,
+)
+
 __all__ = [
     # manifest
     "Manifest",
@@ -149,4 +164,17 @@ __all__ = [
     "ERROR_CATEGORY_DESCRIPTIONS",
     "validate_error_category",
     "get_error_description",
+    # execution
+    "RepositoryCheckout",
+    "materialize_repository",
+    "RepositoryExecutionError",
+    "MissingCommitShaError",
+    "MalformedCommitShaError",
+    "GitUnavailableError",
+    "RepositoryCloneError",
+    "CommitUnavailableError",
+    "CheckoutError",
+    "ResolvedShaMismatchError",
+    "DirtyWorkingTreeError",
+    "RepositoryOriginMismatchError",
 ]
