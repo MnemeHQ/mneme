@@ -148,6 +148,19 @@ from mneme.open_architecture.classification import (
     execute_classifier_batch,
 )
 
+from mneme.open_architecture.projection import (
+    project_candidate_to_decision,
+    project_candidates_to_decisions,
+)
+
+from mneme.open_architecture.gds_evaluation import (
+    render_scenario_query,
+    GoverningDecisionSetResult,
+    evaluate_governing_decisions,
+    evaluate_governing_decisions_batch,
+    compute_suite_gds_metrics,
+)
+
 __all__ = [
     # manifest
     "Manifest",
@@ -245,4 +258,13 @@ __all__ = [
     "StaticClassifier",
     "build_source_context",
     "execute_classifier_batch",
+    # projection
+    "project_candidate_to_decision",
+    "project_candidates_to_decisions",
+    # gds_evaluation
+    "render_scenario_query",
+    "GoverningDecisionSetResult",
+    "evaluate_governing_decisions",
+    "evaluate_governing_decisions_batch",
+    "compute_suite_gds_metrics",
 ]
