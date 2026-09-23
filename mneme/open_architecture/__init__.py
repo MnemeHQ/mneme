@@ -111,6 +111,15 @@ from mneme.open_architecture.execution import (
     RepositoryOriginMismatchError,
 )
 
+from mneme.open_architecture.discovery import (
+    DOCUMENTATION_EXTENSIONS,
+    DEFAULT_MAX_DOCUMENT_BYTES,
+    DiscoveredSourceDocument,
+    SourceDiscoveryDiagnostic,
+    DiscoveryResult,
+    discover_sources,
+)
+
 __all__ = [
     # manifest
     "Manifest",
@@ -177,4 +186,11 @@ __all__ = [
     "ResolvedShaMismatchError",
     "DirtyWorkingTreeError",
     "RepositoryOriginMismatchError",
+    # discovery
+    "DOCUMENTATION_EXTENSIONS",
+    "DEFAULT_MAX_DOCUMENT_BYTES",
+    "DiscoveredSourceDocument",
+    "SourceDiscoveryDiagnostic",
+    "DiscoveryResult",
+    "discover_sources",
 ]
