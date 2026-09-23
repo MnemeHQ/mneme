@@ -4,20 +4,22 @@ mneme.open_architecture.orchestrator — Research run orchestration.
 Coordinates the full O1A pipeline:
 1. Pinned repository validation
 2. Run metadata generation with deterministic configuration hashing
-3. Isolated repository materialization (materialize_repository)
-4. Deterministic source discovery (discover_sources)
-5. Candidate evidence extraction (CandidateExtractor)
-6. Explicit semantic classification (SemanticClassifier)
-7. Fail-closed vocabulary normalization
-8. Research DecisionCandidate composition
-9. Governing Decision Set retrieval evaluation (frozen DecisionRetriever)
-10. ResearchStore persistence (merged PR #389 schema)
+3. Preflight check if dry_run=True (PreflightResult)
+4. Isolated repository materialization (materialize_repository)
+5. Deterministic source discovery (discover_sources)
+6. Candidate evidence extraction (CandidateExtractor)
+7. Explicit semantic classification (SemanticClassifier)
+8. Fail-closed vocabulary normalization
+9. Research DecisionCandidate composition
+10. Governing Decision Set retrieval evaluation (frozen DecisionRetriever)
+11. ResearchStore persistence (merged PR #389 schema)
 
 Critical Architecture Rules:
 - Research only: never writes to canonical MemoryStore, DecisionIndex, or DecisionProposal.
 - No default model provider: extractor and classifier must be explicitly injected.
 - Incomplete classification fails closed without inventing labels or dropping candidates.
 - Historical runs are append-preserving: completed runs cannot be overwritten.
+- Expected scenario labels are immutable reference truth; misses are retained and measurable.
 """
 
 from __future__ import annotations
@@ -98,7 +100,44 @@ from mneme.open_architecture.store import (
 )
 
 
-# ── Run Result Model ───────────────────────────────────────────────────────────
+# ── Run Result & Preflight Models ──────────────────────────────────────────────
+
+
+@dataclass(frozen=True)
+class PreflightResult:
+    """Immutable result of an O1A execution preflight check.
+
+    Validates configuration, manifest, repository pinning, and input descriptors
+    without performing git clone, semantic classification, or claiming analysis completed.
+    """
+
+    repository_config: RepositoryConfig
+    manifest_config_hash: str
+    execution_config_hash: str
+    classifier_backend: str
+    classifier_version: str
+    classifier_model: str | None
+    extractor_id: str
+    extractor_version: str
+    scenario_count: int
+    scenario_content_hash: str
+    status: str = "preflight_ok"
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "status": self.status,
+            "repository": self.repository_config.github,
+            "commit_sha": self.repository_config.commit_sha,
+            "manifest_config_hash": self.manifest_config_hash,
+            "execution_config_hash": self.execution_config_hash,
+            "classifier_backend": self.classifier_backend,
+            "classifier_version": self.classifier_version,
+            "classifier_model": self.classifier_model,
+            "extractor_id": self.extractor_id,
+            "extractor_version": self.extractor_version,
+            "scenario_count": self.scenario_count,
+            "scenario_content_hash": self.scenario_content_hash,
+        }
 
 
 @dataclass(frozen=True)
@@ -132,6 +171,7 @@ class OpenArchitectureRunResult:
     composed_candidates: tuple[DecisionCandidate, ...]
     incomplete_candidates: tuple[IncompleteCandidateRecord, ...]
     classifier_results: tuple[ClassifierResult, ...]
+    scenarios: tuple[ApplicabilityScenario, ...]
     gds_results: tuple[GoverningDecisionSetResult, ...]
     suite_metrics: dict[str, float]
     diagnostics: tuple[Any, ...]
@@ -151,9 +191,102 @@ class OpenArchitectureRunResult:
             "extracted_candidates_count": len(self.extracted_candidates),
             "composed_candidates_count": len(self.composed_candidates),
             "incomplete_candidates_count": len(self.incomplete_candidates),
-            "scenarios_count": len(self.gds_results),
+            "scenarios_count": len(self.scenarios),
             "suite_metrics": dict(self.suite_metrics),
         }
+
+
+# ── Scenario Content Hashing Helper ───────────────────────────────────────────
+
+
+def _compute_scenario_content_hash(scenarios: list[ApplicabilityScenario]) -> str:
+    """Compute deterministic hash of the entire scenario corpus.
+
+    Binds full scenario semantics: description, path, component, change_type,
+    dependencies, api, technology, other_context, expected_governing_decision_ids,
+    and validation_state.
+    """
+    if not scenarios:
+        return "none"
+    canonical_list = []
+    for s in sorted(scenarios, key=lambda sc: sc.scenario_id):
+        canonical_list.append(
+            {
+                "api": s.change_context.api,
+                "change_type": s.change_context.change_type,
+                "component": s.change_context.component,
+                "dependencies": sorted(list(s.change_context.dependencies)),
+                "description": s.description,
+                "expected_governing_decision_ids": sorted(list(s.expected_governing_decision_ids)),
+                "other_context": s.change_context.other_context,
+                "path": s.change_context.path,
+                "repository": s.repository,
+                "scenario_id": s.scenario_id,
+                "technology": s.change_context.technology,
+                "validation_state": s.validation_state,
+            }
+        )
+    canonical_json = json.dumps(canonical_list, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical_json.encode("utf-8")).hexdigest()[:32]
+
+
+# ── Preflight / Validation Function ───────────────────────────────────────────
+
+
+def preflight_open_architecture_analysis(
+    *,
+    repository_config: RepositoryConfig,
+    manifest: Manifest,
+    extractor: CandidateExtractor,
+    classifier: SemanticClassifier,
+    scenarios: list[ApplicabilityScenario] | None = None,
+    taxonomy_version: str = "0.1",
+    benchmark_schema_version: str = "0.1",
+) -> PreflightResult:
+    """Execute preflight validation without git clone or classification."""
+    if extractor is None:
+        raise ValueError("extractor must be explicitly provided (no hidden default)")
+    if classifier is None:
+        raise ValueError("classifier must be explicitly provided (no hidden default)")
+
+    if repository_config.commit_sha is None or not repository_config.commit_sha.strip():
+        raise ValueError(
+            f"Repository '{repository_config.id}' ({repository_config.github}) must have a pinned commit_sha"
+        )
+
+    scenarios_list = list(scenarios or [])
+    scenario_content_hash = _compute_scenario_content_hash(scenarios_list)
+    extractor_id = getattr(extractor, "extractor_id", type(extractor).__name__)
+    extractor_version = getattr(extractor, "extractor_version", "0.1")
+
+    run_meta = RunMetadata.create(
+        batch_id=manifest.batch_id,
+        repo_id=repository_config.id,
+        repo_commit_sha=repository_config.commit_sha,
+        benchmark_schema_version=benchmark_schema_version,
+        taxonomy_version=taxonomy_version,
+        classifier_version=classifier.classifier_version,
+        classifier_backend=classifier.backend_id,
+        classifier_model=classifier.model_identifier,
+        extractor_id=extractor_id,
+        extractor_version=extractor_version,
+        scenario_content_hash=scenario_content_hash,
+        retrieval_policy="score_gt_zero",
+        manifest_config_hash=manifest.configuration_hash(),
+    )
+
+    return PreflightResult(
+        repository_config=repository_config,
+        manifest_config_hash=manifest.configuration_hash(),
+        execution_config_hash=run_meta.configuration_hash,
+        classifier_backend=classifier.backend_id,
+        classifier_version=classifier.classifier_version,
+        classifier_model=classifier.model_identifier,
+        extractor_id=extractor_id,
+        extractor_version=extractor_version,
+        scenario_count=len(scenarios_list),
+        scenario_content_hash=scenario_content_hash,
+    )
 
 
 # ── Orchestrator Implementation ────────────────────────────────────────────────
@@ -173,7 +306,7 @@ def run_open_architecture_analysis(
     benchmark_schema_version: str = "0.1",
     timeout: float = 60.0,
     dry_run: bool = False,
-) -> OpenArchitectureRunResult:
+) -> OpenArchitectureRunResult | PreflightResult:
     """Execute an Open Architecture research run over a pinned repository.
 
     Coordinates all stages using dependency-injected components.
@@ -194,7 +327,7 @@ def run_open_architecture_analysis(
         dry_run: If True, validate preflight without executing git clone or classification.
 
     Returns:
-        OpenArchitectureRunResult containing all research outputs and metrics.
+        OpenArchitectureRunResult on full execution, or PreflightResult on dry_run.
 
     Raises:
         RepositoryExecutionError: If repository materialization fails.
@@ -205,13 +338,31 @@ def run_open_architecture_analysis(
     if classifier is None:
         raise ValueError("classifier must be explicitly provided (no hidden default)")
 
+    scenarios_list = list(scenarios or [])
+
+    # Preflight / Dry Run check
+    if dry_run:
+        return preflight_open_architecture_analysis(
+            repository_config=repository_config,
+            manifest=manifest,
+            extractor=extractor,
+            classifier=classifier,
+            scenarios=scenarios_list,
+            taxonomy_version=taxonomy_version,
+            benchmark_schema_version=benchmark_schema_version,
+        )
+
     # 1. Validate pinned commit SHA
     if repository_config.commit_sha is None or not repository_config.commit_sha.strip():
         raise ValueError(
             f"Repository '{repository_config.id}' ({repository_config.github}) must have a pinned commit_sha"
         )
 
-    # 2. Create RunMetadata
+    # 2. Create RunMetadata with complete execution configuration identity
+    scenario_content_hash = _compute_scenario_content_hash(scenarios_list)
+    extractor_id = getattr(extractor, "extractor_id", type(extractor).__name__)
+    extractor_version = getattr(extractor, "extractor_version", "0.1")
+
     run_meta = RunMetadata.create(
         batch_id=manifest.batch_id,
         repo_id=repository_config.id,
@@ -219,25 +370,14 @@ def run_open_architecture_analysis(
         benchmark_schema_version=benchmark_schema_version,
         taxonomy_version=taxonomy_version,
         classifier_version=classifier.classifier_version,
+        classifier_backend=classifier.backend_id,
+        classifier_model=classifier.model_identifier,
+        extractor_id=extractor_id,
+        extractor_version=extractor_version,
+        scenario_content_hash=scenario_content_hash,
+        retrieval_policy="score_gt_zero",
         manifest_config_hash=manifest.configuration_hash(),
     )
-
-    scenarios_list = list(scenarios or [])
-
-    # Preflight / Dry Run check
-    if dry_run:
-        return OpenArchitectureRunResult(
-            run_metadata=run_meta.with_completion("completed"),
-            repository_config=repository_config,
-            discovered_documents=(),
-            extracted_candidates=(),
-            composed_candidates=(),
-            incomplete_candidates=(),
-            classifier_results=(),
-            gds_results=(),
-            suite_metrics={"macro_precision": 0.0, "macro_recall": 0.0, "macro_f1": 0.0},
-            diagnostics=(),
-        )
 
     # 3. Initialize ResearchStore run if provided
     if research_store is not None:
@@ -373,7 +513,7 @@ def run_open_architecture_analysis(
                     else cand.raw_statement
                 )
 
-                # Required semantic dimensions
+                # Required semantic dimensions (exactly 8, no duplicates)
                 tasks = [
                     ClassifierTask.from_extracted_candidate(cand, ClassifierTaskType.DECISION_CLASSIFICATION, context),
                     ClassifierTask.from_extracted_candidate(cand, ClassifierTaskType.DOMAINS, context),
@@ -494,7 +634,7 @@ def run_open_architecture_analysis(
                 if research_store is not None:
                     if norm_class:
                         for cls_val in norm_class:
-                            classification_id = f"cls-{hashlib.sha256(f'{cand.candidate_id}:{cls_val}'.encode()).hexdigest()[:32]}"
+                            classification_id = f"cls-{hashlib.sha256(f'{run_meta.run_id}:{cand.candidate_id}:{cls_val}'.encode()).hexdigest()[:32]}"
                             research_store.insert_candidate_classification(
                                 CandidateClassificationRecord(
                                     classification_id=classification_id,
@@ -542,7 +682,7 @@ def run_open_architecture_analysis(
                         )
                     if norm_scopes:
                         for sc in norm_scopes:
-                            scope_id = f"sc-{hashlib.sha256(f'{cand.candidate_id}:{sc.scope_type}:{sc.scope_expression}'.encode()).hexdigest()[:32]}"
+                            scope_id = f"sc-{hashlib.sha256(f'{run_meta.run_id}:{cand.candidate_id}:{sc.scope_type}:{sc.scope_expression}'.encode()).hexdigest()[:32]}"
                             research_store.insert_candidate_scope(
                                 CandidateScopeRecord(
                                     scope_id=scope_id,
@@ -569,7 +709,7 @@ def run_open_architecture_analysis(
                         )
                     if norm_relationships:
                         for rel in norm_relationships:
-                            rel_id = f"rel-{hashlib.sha256(f'{cand.candidate_id}:{rel.relationship_type}:{rel.target_candidate_id}'.encode()).hexdigest()[:32]}"
+                            rel_id = f"rel-{hashlib.sha256(f'{run_meta.run_id}:{cand.candidate_id}:{rel.relationship_type}:{rel.target_candidate_id}'.encode()).hexdigest()[:32]}"
                             research_store.insert_candidate_relationship(
                                 CandidateRelationshipRecord(
                                     relationship_id=rel_id,
@@ -629,7 +769,6 @@ def run_open_architecture_analysis(
 
             # 9. Evaluate Governing Decision Set across supplied applicability scenarios
             gds_results: list[GoverningDecisionSetResult] = []
-            extracted_cand_ids = {c.candidate_id for c in extracted_candidates}
 
             if scenarios_list:
                 for scenario in scenarios_list:
@@ -650,15 +789,14 @@ def run_open_architecture_analysis(
                                 validation_state=scenario.validation_state,
                             )
                         )
-                        # Persist expected decisions if they exist in extracted candidates
+                        # Persist expected decisions UNCONDITIONALLY (reference labels must survive machine misses)
                         for exp_id in scenario.expected_governing_decision_ids:
-                            if exp_id in extracted_cand_ids:
-                                research_store.insert_scenario_expected_decision(
-                                    ScenarioExpectedDecisionRecord(
-                                        scenario_id=scenario.scenario_id,
-                                        candidate_id=exp_id,
-                                    )
+                            research_store.insert_scenario_expected_decision(
+                                ScenarioExpectedDecisionRecord(
+                                    scenario_id=scenario.scenario_id,
+                                    candidate_id=exp_id,
                                 )
+                            )
 
                 # Run GDS evaluation
                 raw_gds = evaluate_governing_decisions_batch(composed_candidates, scenarios_list)
@@ -683,13 +821,12 @@ def run_open_architecture_analysis(
                             )
                         )
                         for pred_id in gds_res.predicted_governing_decision_ids:
-                            if pred_id in extracted_cand_ids:
-                                research_store.insert_scenario_result_decision(
-                                    ScenarioResultDecisionRecord(
-                                        result_id=result_id,
-                                        candidate_id=pred_id,
-                                    )
+                            research_store.insert_scenario_result_decision(
+                                ScenarioResultDecisionRecord(
+                                    result_id=result_id,
+                                    candidate_id=pred_id,
                                 )
+                            )
 
             suite_metrics = (
                 compute_suite_gds_metrics(gds_results)
@@ -715,6 +852,7 @@ def run_open_architecture_analysis(
                 composed_candidates=tuple(composed_candidates),
                 incomplete_candidates=tuple(incomplete_candidates),
                 classifier_results=tuple(all_classifier_results),
+                scenarios=tuple(scenarios_list),
                 gds_results=tuple(gds_results),
                 suite_metrics=suite_metrics,
                 diagnostics=tuple(all_diagnostics),
@@ -735,7 +873,9 @@ def run_open_architecture_analysis(
 
 
 __all__ = [
+    "PreflightResult",
     "IncompleteCandidateRecord",
     "OpenArchitectureRunResult",
+    "preflight_open_architecture_analysis",
     "run_open_architecture_analysis",
 ]

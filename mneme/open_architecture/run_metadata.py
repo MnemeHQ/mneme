@@ -42,6 +42,12 @@ class RunMetadata:
     started_at: str
     completed_at: str | None
     status: str
+    classifier_backend: str = "static"
+    classifier_model: str | None = None
+    extractor_id: str = "heuristic"
+    extractor_version: str = "0.1"
+    scenario_content_hash: str = "none"
+    retrieval_policy: str = "score_gt_zero"
 
     VALID_STATUSES = frozenset({"running", "completed", "failed", "cancelled"})
 
@@ -60,6 +66,12 @@ class RunMetadata:
         benchmark_schema_version: str = "0.1",
         taxonomy_version: str = "0.1",
         classifier_version: str = "0.1",
+        classifier_backend: str = "static",
+        classifier_model: str | None = None,
+        extractor_id: str = "heuristic",
+        extractor_version: str = "0.1",
+        scenario_content_hash: str = "none",
+        retrieval_policy: str = "score_gt_zero",
         manifest_config_hash: str | None = None,
     ) -> RunMetadata:
         """Create a new run metadata with deterministic configuration hash."""
@@ -72,20 +84,24 @@ class RunMetadata:
         if mneme_commit_sha is None:
             mneme_commit_sha = _get_git_commit_sha()
 
-        # Configuration hash: if manifest provides one, use it; otherwise compute from args
-        if manifest_config_hash is not None:
-            configuration_hash = manifest_config_hash
-        else:
-            configuration_hash = cls._compute_config_hash(
-                batch_id=batch_id,
-                repo_id=repo_id,
-                repo_commit_sha=repo_commit_sha,
-                mneme_version=mneme_version,
-                mneme_commit_sha=mneme_commit_sha,
-                benchmark_schema_version=benchmark_schema_version,
-                taxonomy_version=taxonomy_version,
-                classifier_version=classifier_version,
-            )
+        # Compute complete execution configuration hash binding all semantic inputs
+        configuration_hash = cls._compute_config_hash(
+            batch_id=batch_id,
+            repo_id=repo_id,
+            repo_commit_sha=repo_commit_sha,
+            mneme_version=mneme_version,
+            mneme_commit_sha=mneme_commit_sha,
+            benchmark_schema_version=benchmark_schema_version,
+            taxonomy_version=taxonomy_version,
+            classifier_version=classifier_version,
+            classifier_backend=classifier_backend,
+            classifier_model=classifier_model,
+            extractor_id=extractor_id,
+            extractor_version=extractor_version,
+            scenario_content_hash=scenario_content_hash,
+            retrieval_policy=retrieval_policy,
+            manifest_config_hash=manifest_config_hash,
+        )
 
         return cls(
             run_id=run_id,
@@ -97,8 +113,14 @@ class RunMetadata:
             benchmark_schema_version=benchmark_schema_version,
             taxonomy_version=taxonomy_version,
             classifier_version=classifier_version,
+            classifier_backend=classifier_backend,
+            classifier_model=classifier_model,
+            extractor_id=extractor_id,
+            extractor_version=extractor_version,
+            scenario_content_hash=scenario_content_hash,
+            retrieval_policy=retrieval_policy,
             configuration_hash=configuration_hash,
-            started_at=started_at,
+            started_at=datetime.utcnow().isoformat() + "Z",
             completed_at=None,
             status="running",
         )
@@ -113,6 +135,13 @@ class RunMetadata:
         benchmark_schema_version: str,
         taxonomy_version: str,
         classifier_version: str,
+        classifier_backend: str,
+        classifier_model: str | None,
+        extractor_id: str,
+        extractor_version: str,
+        scenario_content_hash: str,
+        retrieval_policy: str,
+        manifest_config_hash: str | None = None,
     ) -> str:
         """Compute deterministic configuration hash.
 
@@ -128,6 +157,13 @@ class RunMetadata:
             "benchmark_schema_version": benchmark_schema_version,
             "taxonomy_version": taxonomy_version,
             "classifier_version": classifier_version,
+            "classifier_backend": classifier_backend,
+            "classifier_model": classifier_model,
+            "extractor_id": extractor_id,
+            "extractor_version": extractor_version,
+            "scenario_content_hash": scenario_content_hash,
+            "retrieval_policy": retrieval_policy,
+            "manifest_config_hash": manifest_config_hash,
         }
         canonical = json.dumps(config, sort_keys=True, separators=(",", ":"))
         return hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:32]
@@ -146,6 +182,12 @@ class RunMetadata:
             benchmark_schema_version=self.benchmark_schema_version,
             taxonomy_version=self.taxonomy_version,
             classifier_version=self.classifier_version,
+            classifier_backend=self.classifier_backend,
+            classifier_model=self.classifier_model,
+            extractor_id=self.extractor_id,
+            extractor_version=self.extractor_version,
+            scenario_content_hash=self.scenario_content_hash,
+            retrieval_policy=self.retrieval_policy,
             configuration_hash=self.configuration_hash,
             started_at=self.started_at,
             completed_at=completed_at,
@@ -163,6 +205,12 @@ class RunMetadata:
             "benchmark_schema_version": self.benchmark_schema_version,
             "taxonomy_version": self.taxonomy_version,
             "classifier_version": self.classifier_version,
+            "classifier_backend": self.classifier_backend,
+            "classifier_model": self.classifier_model,
+            "extractor_id": self.extractor_id,
+            "extractor_version": self.extractor_version,
+            "scenario_content_hash": self.scenario_content_hash,
+            "retrieval_policy": self.retrieval_policy,
             "configuration_hash": self.configuration_hash,
             "started_at": self.started_at,
             "completed_at": self.completed_at,
@@ -181,6 +229,12 @@ class RunMetadata:
             benchmark_schema_version=str(data["benchmark_schema_version"]),
             taxonomy_version=str(data["taxonomy_version"]),
             classifier_version=str(data["classifier_version"]),
+            classifier_backend=str(data.get("classifier_backend", "static")),
+            classifier_model=data.get("classifier_model"),
+            extractor_id=str(data.get("extractor_id", "heuristic")),
+            extractor_version=str(data.get("extractor_version", "0.1")),
+            scenario_content_hash=str(data.get("scenario_content_hash", "none")),
+            retrieval_policy=str(data.get("retrieval_policy", "score_gt_zero")),
             configuration_hash=str(data["configuration_hash"]),
             started_at=str(data["started_at"]),
             completed_at=data.get("completed_at"),

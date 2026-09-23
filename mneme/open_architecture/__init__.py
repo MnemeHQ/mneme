@@ -162,8 +162,10 @@ from mneme.open_architecture.gds_evaluation import (
 )
 
 from mneme.open_architecture.orchestrator import (
+    PreflightResult,
     IncompleteCandidateRecord,
     OpenArchitectureRunResult,
+    preflight_open_architecture_analysis,
     run_open_architecture_analysis,
 )
 
@@ -288,8 +290,10 @@ __all__ = [
     "evaluate_governing_decisions_batch",
     "compute_suite_gds_metrics",
     # orchestrator
+    "PreflightResult",
     "IncompleteCandidateRecord",
     "OpenArchitectureRunResult",
+    "preflight_open_architecture_analysis",
     "run_open_architecture_analysis",
     # export
     "export_candidates_jsonl",

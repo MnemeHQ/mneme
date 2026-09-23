@@ -102,6 +102,7 @@ def _make_dummy_result() -> OpenArchitectureRunResult:
         composed_candidates=(composed,),
         incomplete_candidates=(incomplete,),
         classifier_results=(),
+        scenarios=(),
         gds_results=(gds,),
         suite_metrics={"macro_precision": 1.0, "macro_recall": 1.0, "macro_f1": 1.0},
         diagnostics=(),

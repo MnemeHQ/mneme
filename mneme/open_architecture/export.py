@@ -205,6 +205,49 @@ def compute_bundle_content_hash(result: OpenArchitectureRunResult) -> str:
             }
             for g in sorted(result.gds_results, key=lambda g: g.scenario_id)
         ],
+        # Sorted full scenarios (binds complete scenario semantics)
+        "scenarios": [
+            {
+                "api": s.change_context.api,
+                "change_type": s.change_context.change_type,
+                "component": s.change_context.component,
+                "dependencies": sorted(list(s.change_context.dependencies)),
+                "description": s.description,
+                "expected_governing_decision_ids": sorted(list(s.expected_governing_decision_ids)),
+                "other_context": s.change_context.other_context,
+                "path": s.change_context.path,
+                "repository": s.repository,
+                "scenario_id": s.scenario_id,
+                "technology": s.change_context.technology,
+                "validation_state": s.validation_state,
+            }
+            for s in sorted(result.scenarios, key=lambda sc: sc.scenario_id)
+        ],
+        # Sorted semantic classifier outcomes
+        "classifier_outcomes": [
+            {
+                "backend": r.backend_id,
+                "candidate_id": r.candidate_id,
+                "classifier_version": r.classifier_version,
+                "confidence": r.confidence,
+                "escalated": r.escalated,
+                "model_identifier": r.model_identifier,
+                "output": r.output,
+                "task_type": r.task_type.value,
+            }
+            for r in sorted(result.classifier_results, key=lambda res: (res.candidate_id, res.task_type.value))
+        ],
+        # Sorted incomplete candidate outcomes
+        "incomplete_candidates": [
+            {
+                "candidate_id": inc.candidate_id,
+                "errors": dict(sorted(inc.errors.items())),
+                "missing_or_failed_dimensions": sorted(list(inc.missing_or_failed_dimensions)),
+                "raw_statement": inc.raw_statement,
+                "source_path": inc.source_path,
+            }
+            for inc in sorted(result.incomplete_candidates, key=lambda i: i.candidate_id)
+        ],
         # Suite metrics
         "suite_metrics": dict(result.suite_metrics),
     }
@@ -292,12 +335,15 @@ def export_bundle(
         for exec_res in sorted_executions:
             fh.write(exec_res.to_json() + "\n")
 
-    # 5. gds-results.jsonl
+    # 5. scenarios.jsonl
+    export_scenarios_jsonl(result.scenarios, bundle_path / "scenarios.jsonl")
+
+    # 6. gds-results.jsonl
     with (bundle_path / "gds-results.jsonl").open("w", encoding="utf-8", newline="\n") as fh:
         for gds_res in sorted(result.gds_results, key=lambda g: g.scenario_id):
             fh.write(json.dumps(gds_res.to_dict(), sort_keys=True, separators=(",", ":")) + "\n")
 
-    # 6. report.json & report.md
+    # 7. report.json & report.md
     report_dict = generate_report(result)
     (bundle_path / "report.json").write_text(
         json.dumps(report_dict, indent=2, sort_keys=True) + "\n",

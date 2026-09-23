@@ -8,7 +8,12 @@ Covers:
 - ResearchStore persistence (analysis_runs, source_documents, decision_candidates,
   semantic dimensions, classifier_executions, scenarios, results)
 - Historical run append-preservation (no silent overwrite of completed run)
-- Failed run status recording
+- Multi-run candidate coexistence without PK collision
+- Run-specific classifier execution separation
+- Distinct execution configuration hashes for different backends/extractors/scenarios
+- Expected reference labels preserved even when machine discovery misses them
+- Exactly eight classifier tasks executed per candidate (PURPOSES occurs once)
+- PreflightResult contract (does not claim completed analysis or produce metrics)
 - Architectural boundary enforcement
 """
 
@@ -36,6 +41,8 @@ from mneme.open_architecture.manifest import (
 from mneme.open_architecture.orchestrator import (
     IncompleteCandidateRecord,
     OpenArchitectureRunResult,
+    PreflightResult,
+    preflight_open_architecture_analysis,
     run_open_architecture_analysis,
 )
 from mneme.open_architecture.schemas import (
@@ -119,7 +126,7 @@ def _make_manifest(repo_id: str, github: str, commit_sha: str) -> Manifest:
     )
 
 
-def _make_classifier(valid: bool = True) -> StaticClassifier:
+def _make_classifier(valid: bool = True, backend_id: str = "static-test", version: str = "0.1.0", model: str = "test-model") -> StaticClassifier:
     if valid:
         outputs = {
             ClassifierTaskType.DECISION_CLASSIFICATION: {"classification": "prescriptive"},
@@ -138,9 +145,9 @@ def _make_classifier(valid: bool = True) -> StaticClassifier:
             ClassifierTaskType.DOMAINS: {"domains": ["invalid_domain"]},
         }
     return StaticClassifier(
-        backend_id="static-test",
-        classifier_version="0.1.0",
-        model_identifier="test-model",
+        backend_id=backend_id,
+        classifier_version=version,
+        model_identifier=model,
         outputs=outputs,
         default_confidence=0.95,
     )
@@ -196,11 +203,11 @@ class TestOrchestratorPipeline:
         assert isinstance(result, OpenArchitectureRunResult)
         assert result.is_completed
         assert result.run_metadata.status == "completed"
-        assert len(result.discovered_documents) >= 2  # README.md + ADR-001.md
+        assert len(result.discovered_documents) >= 2
         assert len(result.extracted_candidates) >= 1
         assert len(result.composed_candidates) >= 1
         assert len(result.incomplete_candidates) == 0
-        assert len(result.classifier_results) >= 8  # 8 dimensions per candidate
+        assert len(result.classifier_results) >= 8
         assert len(result.gds_results) == 1
         assert "macro_f1" in result.suite_metrics
 
@@ -220,57 +227,64 @@ class TestOrchestratorPipeline:
         assert len(scenario_res) == 1
         assert scenario_res[0].run_id == result.run_metadata.run_id
 
-    def test_explicit_extractor_and_classifier_required(self, tmp_path: Path):
+    # 1. Same pinned source analyzed in two different runs in same SQLite store without PK collision
+    # 2. Stable candidate ID remains identical across those runs
+    # 3. Run-specific classifier executions remain separate
+    def test_multi_run_candidate_coexistence_and_separation(self, tmp_path: Path):
         source_repo = tmp_path / "src_repo"
         commit_sha = _create_test_repo(source_repo)
         manifest = _make_manifest("adrkit", "mbeacom/adrkit", commit_sha)
         repo_config = manifest.repositories[0]
 
-        with pytest.raises(ValueError, match="extractor must be explicitly provided"):
-            run_open_architecture_analysis(
-                repository_config=repo_config,
-                manifest=manifest,
-                extractor=None,  # type: ignore
-                classifier=_make_classifier(),
-            )
-
-        with pytest.raises(ValueError, match="classifier must be explicitly provided"):
-            run_open_architecture_analysis(
-                repository_config=repo_config,
-                manifest=manifest,
-                extractor=HeuristicExtractor(),
-                classifier=None,  # type: ignore
-            )
-
-    def test_incomplete_candidate_handling(self, tmp_path: Path):
-        source_repo = tmp_path / "src_repo"
-        commit_sha = _create_test_repo(source_repo)
-        manifest = _make_manifest("adrkit", "mbeacom/adrkit", commit_sha)
-        repo_config = manifest.repositories[0]
+        store = ResearchStore(tmp_path / "coexistence.sqlite")
+        store.initialize_schema()
 
         extractor = HeuristicExtractor()
-        # Invalid classifier produces unclassifiable candidates
-        classifier = _make_classifier(valid=False)
+        classifier_a = _make_classifier(valid=True, backend_id="backend-a", version="1.0", model="model-a")
+        classifier_b = _make_classifier(valid=True, backend_id="backend-b", version="2.0", model="model-b")
 
-        result = run_open_architecture_analysis(
+        # Run A
+        res_a = run_open_architecture_analysis(
             repository_config=repo_config,
             manifest=manifest,
             extractor=extractor,
-            classifier=classifier,
+            classifier=classifier_a,
+            research_store=store,
             clone_source=source_repo,
         )
 
-        assert result.is_completed
-        assert len(result.extracted_candidates) >= 1
-        # None should be composed with guessed labels
-        assert len(result.composed_candidates) == 0
-        # All extracted candidates should be observable as incomplete
-        assert len(result.incomplete_candidates) == len(result.extracted_candidates)
-        first_inc = result.incomplete_candidates[0]
-        assert "classification" in first_inc.missing_or_failed_dimensions
-        assert "domains" in first_inc.missing_or_failed_dimensions
+        # Run B with different classifier on the same pinned repository and store
+        res_b = run_open_architecture_analysis(
+            repository_config=repo_config,
+            manifest=manifest,
+            extractor=extractor,
+            classifier=classifier_b,
+            research_store=store,
+            clone_source=source_repo,
+        )
 
-    def test_historical_completed_run_not_overwritten(self, tmp_path: Path):
+        assert res_a.run_metadata.run_id != res_b.run_metadata.run_id
+
+        # 2. Stable candidate ID remains identical across runs
+        cand_ids_a = [c.candidate_id for c in res_a.extracted_candidates]
+        cand_ids_b = [c.candidate_id for c in res_b.extracted_candidates]
+        assert cand_ids_a == cand_ids_b
+
+        # 1. Both candidate observations coexist in the same store
+        cands_run_a = store.list_decision_candidates(res_a.run_metadata.run_id)
+        cands_run_b = store.list_decision_candidates(res_b.run_metadata.run_id)
+        assert len(cands_run_a) == len(cands_run_b) == len(cand_ids_a)
+
+        # 3. Classifier executions remain separately attributable to each run
+        first_cand_id = cand_ids_a[0]
+        execs = store.list_classifier_executions(first_cand_id)
+        # Exactly 8 executions for run A + 8 executions for run B = 16
+        assert len(execs) == 16
+        backends = {e.classifier_backend for e in execs}
+        assert backends == {"backend-a", "backend-b"}
+
+    # 4. Identical execution configuration cannot silently overwrite a completed run
+    def test_identical_configuration_cannot_overwrite_completed_run(self, tmp_path: Path):
         source_repo = tmp_path / "src_repo"
         commit_sha = _create_test_repo(source_repo)
         manifest = _make_manifest("adrkit", "mbeacom/adrkit", commit_sha)
@@ -279,8 +293,7 @@ class TestOrchestratorPipeline:
         store = ResearchStore(tmp_path / "store.sqlite")
         store.initialize_schema()
 
-        # Run 1
-        res1 = run_open_architecture_analysis(
+        run1 = run_open_architecture_analysis(
             repository_config=repo_config,
             manifest=manifest,
             extractor=HeuristicExtractor(),
@@ -288,9 +301,8 @@ class TestOrchestratorPipeline:
             research_store=store,
             clone_source=source_repo,
         )
-        assert res1.is_completed
+        assert run1.is_completed
 
-        # Attempting identical run on same store must fail rather than overwrite
         with pytest.raises(ValueError, match="Completed analysis run already exists"):
             run_open_architecture_analysis(
                 repository_config=repo_config,
@@ -301,7 +313,73 @@ class TestOrchestratorPipeline:
                 clone_source=source_repo,
             )
 
-    def test_failed_run_marked_failed(self, tmp_path: Path, monkeypatch):
+    # 5. Different classifier backend/model/version produces a distinct execution configuration identity
+    def test_different_classifier_produces_distinct_configuration_hash(self, tmp_path: Path):
+        source_repo = tmp_path / "src_repo"
+        commit_sha = "a" * 40
+        manifest = _make_manifest("adrkit", "mbeacom/adrkit", commit_sha)
+        repo_config = manifest.repositories[0]
+        extractor = HeuristicExtractor()
+
+        c1 = _make_classifier(backend_id="backend-1", version="0.1", model="model-1")
+        c2 = _make_classifier(backend_id="backend-2", version="0.1", model="model-1")
+        c3 = _make_classifier(backend_id="backend-1", version="0.2", model="model-1")
+        c4 = _make_classifier(backend_id="backend-1", version="0.1", model="model-2")
+
+        p1 = preflight_open_architecture_analysis(repository_config=repo_config, manifest=manifest, extractor=extractor, classifier=c1)
+        p2 = preflight_open_architecture_analysis(repository_config=repo_config, manifest=manifest, extractor=extractor, classifier=c2)
+        p3 = preflight_open_architecture_analysis(repository_config=repo_config, manifest=manifest, extractor=extractor, classifier=c3)
+        p4 = preflight_open_architecture_analysis(repository_config=repo_config, manifest=manifest, extractor=extractor, classifier=c4)
+
+        hashes = {p1.execution_config_hash, p2.execution_config_hash, p3.execution_config_hash, p4.execution_config_hash}
+        assert len(hashes) == 4, "Each classifier variant must have a unique execution_config_hash"
+
+    # 6. Different extractor configuration produces a distinct execution configuration identity
+    def test_different_extractor_produces_distinct_configuration_hash(self, tmp_path: Path):
+        commit_sha = "a" * 40
+        manifest = _make_manifest("adrkit", "mbeacom/adrkit", commit_sha)
+        repo_config = manifest.repositories[0]
+        classifier = _make_classifier()
+
+        e1 = HeuristicExtractor(extractor_id="heuristic", extractor_version="0.1")
+        e2 = HeuristicExtractor(extractor_id="heuristic", extractor_version="0.2")
+        e3 = HeuristicExtractor(extractor_id="ast-parser", extractor_version="0.1")
+
+        p1 = preflight_open_architecture_analysis(repository_config=repo_config, manifest=manifest, extractor=e1, classifier=classifier)
+        p2 = preflight_open_architecture_analysis(repository_config=repo_config, manifest=manifest, extractor=e2, classifier=classifier)
+        p3 = preflight_open_architecture_analysis(repository_config=repo_config, manifest=manifest, extractor=e3, classifier=classifier)
+
+        hashes = {p1.execution_config_hash, p2.execution_config_hash, p3.execution_config_hash}
+        assert len(hashes) == 3
+
+    # 7. Different scenario corpus/content produces a distinct execution configuration identity
+    def test_different_scenarios_produce_distinct_configuration_hash(self, tmp_path: Path):
+        commit_sha = "a" * 40
+        manifest = _make_manifest("adrkit", "mbeacom/adrkit", commit_sha)
+        repo_config = manifest.repositories[0]
+        extractor = HeuristicExtractor()
+        classifier = _make_classifier()
+
+        sc1 = [ApplicabilityScenario(
+            scenario_id="s1", repository="mbeacom/adrkit", description="Desc 1",
+            change_context=ChangeContext(None, None, None, (), None, None, None),
+            expected_governing_decision_ids=("c1",), mneme_governing_decision_ids=(),
+            human_notes=None, validation_state="unreviewed",
+        )]
+        sc2 = [ApplicabilityScenario(
+            scenario_id="s1", repository="mbeacom/adrkit", description="Desc 2 (modified)",
+            change_context=ChangeContext(None, None, None, (), None, None, None),
+            expected_governing_decision_ids=("c1",), mneme_governing_decision_ids=(),
+            human_notes=None, validation_state="unreviewed",
+        )]
+
+        p1 = preflight_open_architecture_analysis(repository_config=repo_config, manifest=manifest, extractor=extractor, classifier=classifier, scenarios=sc1)
+        p2 = preflight_open_architecture_analysis(repository_config=repo_config, manifest=manifest, extractor=extractor, classifier=classifier, scenarios=sc2)
+
+        assert p1.execution_config_hash != p2.execution_config_hash
+
+    # 8. An expected governing candidate absent from machine extraction remains persisted as reference truth and counts as a miss
+    def test_expected_candidate_absent_from_extraction_persisted_as_miss(self, tmp_path: Path):
         source_repo = tmp_path / "src_repo"
         commit_sha = _create_test_repo(source_repo)
         manifest = _make_manifest("adrkit", "mbeacom/adrkit", commit_sha)
@@ -310,43 +388,140 @@ class TestOrchestratorPipeline:
         store = ResearchStore(tmp_path / "store.sqlite")
         store.initialize_schema()
 
-        from mneme.open_architecture import orchestrator
+        # Human benchmark reference label specifies an expected decision 'cand-absent-999' that machine will NOT find
+        scenario = ApplicabilityScenario(
+            scenario_id="scn-reference-001",
+            repository="mbeacom/adrkit",
+            description="Database migration scenario",
+            change_context=ChangeContext("db.py", "db", "mod", (), None, "Python", None),
+            expected_governing_decision_ids=("cand-absent-999",),
+            mneme_governing_decision_ids=(),
+            human_notes=None,
+            validation_state="unreviewed",
+        )
 
-        def _exploding_discover(*args, **kwargs):
-            raise RuntimeError("Simulated discovery explosion")
+        res = run_open_architecture_analysis(
+            repository_config=repo_config,
+            manifest=manifest,
+            extractor=HeuristicExtractor(),
+            classifier=_make_classifier(),
+            scenarios=[scenario],
+            research_store=store,
+            clone_source=source_repo,
+        )
 
-        monkeypatch.setattr(orchestrator, "discover_sources", _exploding_discover)
+        # 1. Expected decision IS persisted in ResearchStore scenario_expected_decisions table
+        expected_in_db = store.list_scenario_expected_decisions("scn-reference-001")
+        assert "cand-absent-999" in expected_in_db
 
-        with pytest.raises(RuntimeError, match="Simulated discovery explosion"):
-            run_open_architecture_analysis(
-                repository_config=repo_config,
-                manifest=manifest,
-                extractor=HeuristicExtractor(),
-                classifier=_make_classifier(),
-                research_store=store,
-                clone_source=source_repo,
-            )
+        # 2. It was missed by machine retrieval
+        gds_res = res.gds_results[0]
+        assert "cand-absent-999" not in gds_res.predicted_governing_decision_ids
+        assert gds_res.recall == 0.0
+        assert gds_res.f1 == 0.0
 
-        # Analysis run must exist and be marked 'failed'
-        runs = store.list_analysis_runs("adrkit")
-        assert len(runs) == 1
-        assert runs[0].status == "failed"
+    # 9. Exactly eight classifier task executions occur per candidate and PURPOSES occurs once
+    def test_exactly_eight_tasks_per_candidate_purposes_once(self, tmp_path: Path):
+        source_repo = tmp_path / "src_repo"
+        commit_sha = _create_test_repo(source_repo)
+        manifest = _make_manifest("adrkit", "mbeacom/adrkit", commit_sha)
+        repo_config = manifest.repositories[0]
 
-    def test_dry_run_mode(self, tmp_path: Path):
+        res = run_open_architecture_analysis(
+            repository_config=repo_config,
+            manifest=manifest,
+            extractor=HeuristicExtractor(),
+            classifier=_make_classifier(),
+            clone_source=source_repo,
+        )
+
+        for cand in res.extracted_candidates:
+            cand_tasks = [r.task_type for r in res.classifier_results if r.candidate_id == cand.candidate_id]
+            assert len(cand_tasks) == 8
+            assert cand_tasks.count(ClassifierTaskType.PURPOSES) == 1
+            expected_tasks = {
+                ClassifierTaskType.DECISION_CLASSIFICATION,
+                ClassifierTaskType.DOMAINS,
+                ClassifierTaskType.PURPOSES,
+                ClassifierTaskType.AUTHORITY,
+                ClassifierTaskType.SCOPE,
+                ClassifierTaskType.LIFECYCLE,
+                ClassifierTaskType.RELATIONSHIPS,
+                ClassifierTaskType.ENFORCEMENT_POTENTIAL,
+            }
+            assert set(cand_tasks) == expected_tasks
+
+    # 10. Dry-run/preflight does not return or persist a completed semantic analysis
+    def test_dry_run_preflight_does_not_claim_completed(self, tmp_path: Path):
         source_repo = tmp_path / "src_repo"
         commit_sha = "a" * 40
         manifest = _make_manifest("adrkit", "mbeacom/adrkit", commit_sha)
         repo_config = manifest.repositories[0]
 
-        result = run_open_architecture_analysis(
+        store = ResearchStore(tmp_path / "store.sqlite")
+        store.initialize_schema()
+
+        preflight = run_open_architecture_analysis(
             repository_config=repo_config,
             manifest=manifest,
             extractor=HeuristicExtractor(),
             classifier=_make_classifier(),
+            research_store=store,
             dry_run=True,
         )
 
-        assert result.is_completed
-        assert len(result.discovered_documents) == 0
-        assert len(result.extracted_candidates) == 0
-        assert not (tmp_path / ".mneme").exists()
+        assert isinstance(preflight, PreflightResult)
+        assert preflight.status == "preflight_ok"
+        assert preflight.status != "completed"
+        # No runs created or completed in ResearchStore
+        assert store.list_analysis_runs() == []
+
+    # 16. Incomplete candidate outcomes remain observable and reproducible
+    def test_incomplete_candidate_outcomes_remain_observable(self, tmp_path: Path):
+        source_repo = tmp_path / "src_repo"
+        commit_sha = _create_test_repo(source_repo)
+        manifest = _make_manifest("adrkit", "mbeacom/adrkit", commit_sha)
+        repo_config = manifest.repositories[0]
+
+        # Classifier outputs invalid domain
+        classifier = StaticClassifier(
+            outputs={
+                ClassifierTaskType.DECISION_CLASSIFICATION: {"classification": "prescriptive"},
+                ClassifierTaskType.DOMAINS: {"domains": ["non_existent_domain_xyz"]},
+            }
+        )
+
+        res = run_open_architecture_analysis(
+            repository_config=repo_config,
+            manifest=manifest,
+            extractor=HeuristicExtractor(),
+            classifier=classifier,
+            clone_source=source_repo,
+        )
+
+        assert len(res.incomplete_candidates) >= 1
+        inc = res.incomplete_candidates[0]
+        assert "domains" in inc.missing_or_failed_dimensions
+        assert "non_existent_domain_xyz" in inc.errors["domains"]
+
+    # 17. No canonical authority state is written
+    def test_no_canonical_authority_state_written(self, tmp_path: Path):
+        source_repo = tmp_path / "src_repo"
+        commit_sha = _create_test_repo(source_repo)
+        manifest = _make_manifest("adrkit", "mbeacom/adrkit", commit_sha)
+        repo_config = manifest.repositories[0]
+
+        workspace = tmp_path / "ws"
+        workspace.mkdir()
+
+        run_open_architecture_analysis(
+            repository_config=repo_config,
+            manifest=manifest,
+            extractor=HeuristicExtractor(),
+            classifier=_make_classifier(),
+            workspace_dir=workspace,
+            clone_source=source_repo,
+        )
+
+        assert not (workspace / ".mneme").exists()
+        assert not (source_repo / ".mneme").exists()

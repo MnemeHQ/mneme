@@ -225,6 +225,16 @@ class CandidateExtractor(Protocol):
     model-assisted, hybrid, human-supplied) for comparison.
     """
 
+    @property
+    def extractor_id(self) -> str:
+        """Stable extractor identifier (e.g., 'heuristic')."""
+        ...
+
+    @property
+    def extractor_version(self) -> str:
+        """Semantic version of this extractor implementation (e.g., '0.1')."""
+        ...
+
     def extract(
         self,
         document: DiscoveredSourceDocument,
@@ -267,10 +277,22 @@ class HeuristicExtractor:
         min_lines: int = 2,
         max_lines: int = 50,
         confidence: float = 0.5,
+        extractor_id: str = "heuristic",
+        extractor_version: str = "0.1",
     ) -> None:
         self.min_lines = min_lines
         self.max_lines = max_lines
         self.confidence = confidence
+        self._extractor_id = extractor_id
+        self._extractor_version = extractor_version
+
+    @property
+    def extractor_id(self) -> str:
+        return self._extractor_id
+
+    @property
+    def extractor_version(self) -> str:
+        return self._extractor_version
 
     def extract(
         self,

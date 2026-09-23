@@ -99,6 +99,8 @@ def _make_run_result(
     latency_ms: float = 12.5,
     cost_amount: float | None = 0.005,
     decision_text: str = "Use SQLite",
+    scenario_desc: str = "Test scenario",
+    classifier_output: dict | None = None,
 ) -> OpenArchitectureRunResult:
     cand_id = "cand-" + "a" * 32
     meta = RunMetadata(
@@ -111,6 +113,12 @@ def _make_run_result(
         benchmark_schema_version="0.1",
         taxonomy_version="0.1",
         classifier_version="0.1.0",
+        classifier_backend="static",
+        classifier_model="static/test",
+        extractor_id="heuristic",
+        extractor_version="0.1",
+        scenario_content_hash="scenariohash123",
+        retrieval_policy="score_gt_zero",
         configuration_hash="confighash123",
         started_at=started_at,
         completed_at=completed_at,
@@ -148,13 +156,25 @@ def _make_run_result(
         model_identifier="static/test",
         taxonomy_version="0.1",
         candidate_id=cand_id,
-        output={"classification": "prescriptive"},
+        output=classifier_output or {"classification": "prescriptive"},
         confidence=0.9,
         latency_ms=latency_ms,
         cost_amount=cost_amount,
         cost_currency="USD",
         executed_at=executed_at,
     )
+    scenario = _make_scenario(scenario_id="scn-001")
+    if scenario_desc != "Test scenario":
+        scenario = ApplicabilityScenario(
+            scenario_id="scn-001",
+            repository="mbeacom/adrkit",
+            description=scenario_desc,
+            change_context=scenario.change_context,
+            expected_governing_decision_ids=scenario.expected_governing_decision_ids,
+            mneme_governing_decision_ids=(),
+            human_notes=None,
+            validation_state="unreviewed",
+        )
     gds = GoverningDecisionSetResult(
         scenario_id="scn-001",
         query="query",
@@ -177,6 +197,7 @@ def _make_run_result(
         composed_candidates=(composed,),
         incomplete_candidates=(),
         classifier_results=(classifier_res,),
+        scenarios=(scenario,),
         gds_results=(gds,),
         suite_metrics={"macro_precision": 1.0, "macro_recall": 1.0, "macro_f1": 1.0},
         diagnostics=(),
@@ -283,6 +304,26 @@ class TestBundleContentHashing:
 
         assert h1 != h2
 
+    def test_bundle_content_hash_changes_on_scenario_difference(self):
+        """Changing scenario content changes the bundle content hash."""
+        run1 = _make_run_result(scenario_desc="Original description")
+        run2 = _make_run_result(scenario_desc="Modified description")
+
+        h1 = compute_bundle_content_hash(run1)
+        h2 = compute_bundle_content_hash(run2)
+
+        assert h1 != h2
+
+    def test_bundle_content_hash_changes_on_classifier_output_difference(self):
+        """Changing classifier semantic output changes the bundle content hash."""
+        run1 = _make_run_result(classifier_output={"classification": "prescriptive"})
+        run2 = _make_run_result(classifier_output={"classification": "advisory"})
+
+        h1 = compute_bundle_content_hash(run1)
+        h2 = compute_bundle_content_hash(run2)
+
+        assert h1 != h2
+
 
 # ── Complete Export Bundle Tests ──────────────────────────────────────────────
 
@@ -300,6 +341,7 @@ class TestExportBundle:
             "sources.jsonl",
             "candidates.jsonl",
             "classifier-executions.jsonl",
+            "scenarios.jsonl",
             "gds-results.jsonl",
             "report.json",
             "report.md",
@@ -318,3 +360,8 @@ class TestExportBundle:
         cand_lines = (bundle_dir / "candidates.jsonl").read_text(encoding="utf-8").strip().splitlines()
         assert len(cand_lines) == 1
         assert json.loads(cand_lines[0])["candidate_id"] == "cand-" + "a" * 32
+
+        # Verify scenarios.jsonl
+        scn_lines = (bundle_dir / "scenarios.jsonl").read_text(encoding="utf-8").strip().splitlines()
+        assert len(scn_lines) == 1
+        assert json.loads(scn_lines[0])["scenario_id"] == "scn-001"

@@ -482,6 +482,13 @@ class ResearchStore:
                 raw_evidence_reference, normalized_decision,
                 discovery_confidence, discovery_metadata_json
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(candidate_id, run_id) DO UPDATE SET
+                source_id = excluded.source_id,
+                source_location = excluded.source_location,
+                raw_evidence_reference = excluded.raw_evidence_reference,
+                normalized_decision = excluded.normalized_decision,
+                discovery_confidence = excluded.discovery_confidence,
+                discovery_metadata_json = excluded.discovery_metadata_json
             """,
             (
                 cand.candidate_id, cand.run_id, cand.source_id, cand.source_location,
@@ -491,9 +498,12 @@ class ResearchStore:
         )
         conn.commit()
 
-    def get_decision_candidate(self, candidate_id: str) -> DecisionCandidateRecord | None:
+    def get_decision_candidate(self, candidate_id: str, run_id: str | None = None) -> DecisionCandidateRecord | None:
         conn = self.connect()
-        row = conn.execute("SELECT * FROM decision_candidates WHERE candidate_id = ?", (candidate_id,)).fetchone()
+        if run_id is not None:
+            row = conn.execute("SELECT * FROM decision_candidates WHERE candidate_id = ? AND run_id = ?", (candidate_id, run_id)).fetchone()
+        else:
+            row = conn.execute("SELECT * FROM decision_candidates WHERE candidate_id = ? ORDER BY rowid DESC LIMIT 1", (candidate_id,)).fetchone()
         if row is None:
             return None
         return DecisionCandidateRecord(**dict(row))
@@ -864,23 +874,23 @@ class ResearchStore:
         conn.execute(
             """
             INSERT INTO classifier_disagreements (
-                disagreement_id, candidate_id, task_type, execution_a_id, execution_b_id,
+                disagreement_id, candidate_id, run_id, task_type, execution_a_id, execution_b_id,
                 disagreement_json, resolved_by_review_id, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
-                cd.disagreement_id, cd.candidate_id, cd.task_type,
+                cd.disagreement_id, cd.candidate_id, cd.run_id, cd.task_type,
                 cd.execution_a_id, cd.execution_b_id, cd.disagreement_json,
                 cd.resolved_by_review_id, cd.created_at,
             ),
         )
         conn.commit()
 
-    def list_classifier_disagreements(self, candidate_id: str) -> list[ClassifierDisagreementRecord]:
+    def list_classifier_disagreements(self, candidate_id: str, run_id: str) -> list[ClassifierDisagreementRecord]:
         conn = self.connect()
         rows = conn.execute(
-            "SELECT * FROM classifier_disagreements WHERE candidate_id = ? ORDER BY created_at",
-            (candidate_id,)
+            "SELECT * FROM classifier_disagreements WHERE candidate_id = ? AND run_id = ? ORDER BY created_at",
+            (candidate_id, run_id)
         ).fetchall()
         return [ClassifierDisagreementRecord(**dict(row)) for row in rows]
 
