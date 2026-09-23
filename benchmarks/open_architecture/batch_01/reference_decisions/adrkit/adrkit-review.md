@@ -119,7 +119,7 @@ For each record, please:
 
 ## Draft Corpus Hash
 
-**Content Hash:** `sha256:3104966e79f708ba5bf843a014fb8e4275561c6f34c54da829b89af46cca0fc5`
+**Content Hash:** `sha256:efdc8c33da235930fb2dbea155ef4bbe02e5ae874aae787c155d3ffa3adda60e`
 
 ---
 
