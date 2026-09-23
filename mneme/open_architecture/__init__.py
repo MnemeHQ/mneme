@@ -161,6 +161,26 @@ from mneme.open_architecture.gds_evaluation import (
     compute_suite_gds_metrics,
 )
 
+from mneme.open_architecture.orchestrator import (
+    IncompleteCandidateRecord,
+    OpenArchitectureRunResult,
+    run_open_architecture_analysis,
+)
+
+from mneme.open_architecture.export import (
+    export_candidates_jsonl,
+    import_candidates_jsonl,
+    export_scenarios_jsonl,
+    import_scenarios_jsonl,
+    compute_bundle_content_hash,
+    export_bundle,
+)
+
+from mneme.open_architecture.reporting import (
+    generate_report,
+    render_markdown_report,
+)
+
 __all__ = [
     # manifest
     "Manifest",
@@ -267,4 +287,18 @@ __all__ = [
     "evaluate_governing_decisions",
     "evaluate_governing_decisions_batch",
     "compute_suite_gds_metrics",
+    # orchestrator
+    "IncompleteCandidateRecord",
+    "OpenArchitectureRunResult",
+    "run_open_architecture_analysis",
+    # export
+    "export_candidates_jsonl",
+    "import_candidates_jsonl",
+    "export_scenarios_jsonl",
+    "import_scenarios_jsonl",
+    "compute_bundle_content_hash",
+    "export_bundle",
+    # reporting
+    "generate_report",
+    "render_markdown_report",
 ]
