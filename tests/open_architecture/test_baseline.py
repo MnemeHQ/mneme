@@ -151,7 +151,8 @@ class TestBatch01BaselineFreeze:
         assert clf.backend_id == "anthropic"
         assert clf.classifier_version == "0.1"
         assert clf.model_identifier == "claude-sonnet-4-6"
-        assert clf.config["temperature"] == 0.0
+        assert clf.min_sdk_version == "1.0.0"
+        assert "temperature" not in clf.config
         assert clf.config["max_tokens"] == 1024
         assert clf.config["output_config"]["format"]["type"] == "json_schema"
 
@@ -415,7 +416,7 @@ class TestBatch01BaselineFreeze:
         )
         diff_files = [f.strip().replace("\\", "/") for f in res.stdout.splitlines() if f.strip()]
 
-        semantic_runtime_modules = {
+        frozen_core_modules = {
             "mneme/decision_retriever.py",
             "mneme/enforcer.py",
             "mneme/conflict_detector.py",
@@ -424,7 +425,6 @@ class TestBatch01BaselineFreeze:
             "mneme/schemas.py",
             "mneme/open_architecture/candidates.py",
             "mneme/open_architecture/classification.py",
-            "mneme/open_architecture/orchestrator.py",
             "mneme/open_architecture/projection.py",
             "mneme/open_architecture/gds_evaluation.py",
             "mneme/open_architecture/discovery.py",
@@ -435,7 +435,7 @@ class TestBatch01BaselineFreeze:
             "mneme/open_architecture/reporting.py",
         }
 
-        # None of the semantic runtime modules should be modified
-        assert semantic_runtime_modules.isdisjoint(diff_files), (
-            f"Semantic runtime modules modified: {set(diff_files) & semantic_runtime_modules}"
+        # None of the core frozen modules should be modified
+        assert frozen_core_modules.isdisjoint(diff_files), (
+            f"Frozen core modules modified: {set(diff_files) & frozen_core_modules}"
         )

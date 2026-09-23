@@ -84,8 +84,8 @@ classifier:
   backend_id: "anthropic"
   classifier_version: "0.1"
   model_identifier: "claude-sonnet-4-6"
+  min_sdk_version: "1.0.0"
   config:
-    temperature: 0.0
     max_tokens: 1024
     output_config:
       format:

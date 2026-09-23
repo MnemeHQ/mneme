@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import time
 from dataclasses import dataclass
 from typing import Any
@@ -39,7 +40,21 @@ from mneme.open_architecture.schemas import (
 )
 
 
-MIN_ANTHROPIC_SDK_VERSION = "0.25.0"
+MIN_ANTHROPIC_SDK_VERSION = "1.0.0"
+
+
+def _is_version_less(v1: str, v2: str) -> bool:
+    """Compare semver strings for minimum version check."""
+    try:
+        parts1 = [int(p) for p in re.split(r"[^\d]+", v1)[:3]]
+        parts2 = [int(p) for p in re.split(r"[^\d]+", v2)[:3]]
+        while len(parts1) < 3:
+            parts1.append(0)
+        while len(parts2) < 3:
+            parts2.append(0)
+        return parts1 < parts2
+    except Exception:
+        return False
 
 
 class AnthropicClassifierError(Exception):
@@ -173,14 +188,22 @@ TASK_SCHEMAS: dict[ClassifierTaskType, dict[str, Any]] = {
             },
             "supersedes": {
                 "type": ["string", "null"],
-                "description": "Decision or document superseded by this candidate",
+                "description": "Decision or document superseded by this candidate, or null if absent",
             },
             "superseded_by": {
                 "type": ["string", "null"],
-                "description": "Decision or document superseding this candidate",
+                "description": "Decision or document superseding this candidate, or null if absent",
+            },
+            "effective_date": {
+                "type": ["string", "null"],
+                "description": "Effective date of the decision if explicitly recorded in source, or null if absent",
+            },
+            "expiration_if_any": {
+                "type": ["string", "null"],
+                "description": "Expiration date or condition if explicitly recorded in source, or null if absent",
             },
         },
-        "required": ["lifecycle"],
+        "required": ["lifecycle", "supersedes", "superseded_by", "effective_date", "expiration_if_any"],
         "additionalProperties": False,
     },
     ClassifierTaskType.RELATIONSHIPS: {
@@ -257,7 +280,6 @@ class AnthropicClassifier:
         classifier_version: str = "0.1",
         api_key: str | None = None,
         max_tokens: int = 1024,
-        temperature: float = 0.0,
         timeout: float = 60.0,
         max_retries: int = 2,
         client: Any | None = None,
@@ -267,7 +289,6 @@ class AnthropicClassifier:
         self._model_identifier = model_identifier
         self._api_key = api_key
         self._max_tokens = max_tokens
-        self._temperature = temperature
         self._timeout = timeout
         self._max_retries = max_retries
         self._client = client
@@ -300,6 +321,7 @@ class AnthropicClassifier:
             "- Classify the supplied repository evidence objectively based ONLY on what the document content and surrounding context state.\n"
             "- Do NOT decide what should be enforced or promote any candidate into project authority.\n"
             "- 'explicitly_accepted' means the source repository evidence indicates the project maintainers accepted this decision. It does NOT grant canonical Mneme authority.\n"
+            "- For lifecycle: establish 'lifecycle' status. If the evidence explicitly mentions superseded decisions, superseding decisions, effective date, or expiration date, populate those fields; otherwise return null for each of them. Never invent dates or lineage not explicitly stated in the evidence.\n"
             "- Output MUST conform strictly to the requested JSON schema.\n"
             "- Do NOT include chain-of-thought, reasoning steps, or conversational commentary."
         )
@@ -323,17 +345,14 @@ class AnthropicClassifier:
         return {
             "model": self._model_identifier,
             "max_tokens": self._max_tokens,
-            "temperature": self._temperature,
             "system": self.build_system_prompt(task),
             "messages": [
                 {"role": "user", "content": self.build_user_prompt(task)},
             ],
-            "extra_body": {
-                "output_config": {
-                    "format": {
-                        "type": "json_schema",
-                        "schema": schema,
-                    }
+            "output_config": {
+                "format": {
+                    "type": "json_schema",
+                    "schema": schema,
                 }
             },
         }
@@ -354,6 +373,14 @@ class AnthropicClassifier:
         if not api_key or not api_key.strip():
             raise AnthropicAuthenticationError(
                 "ANTHROPIC_API_KEY environment variable is not set and no api_key was provided"
+            )
+
+        sdk_version = getattr(anthropic, "__version__", "0.0.0")
+        if _is_version_less(sdk_version, MIN_ANTHROPIC_SDK_VERSION):
+            raise AnthropicClassifierError(
+                f"AnthropicClassifier requires anthropic>={MIN_ANTHROPIC_SDK_VERSION} for native "
+                f"output_config structured-output support, found {sdk_version}. "
+                f"Upgrade anthropic before executing Batch 01."
             )
 
         self._client = anthropic.Anthropic(
@@ -423,14 +450,6 @@ class AnthropicClassifier:
             raise AnthropicMalformedResponseError(
                 f"Anthropic response failed schema validation for {task.task_type.value}: {exc.message}"
             ) from exc
-
-        # Preserve token usage in output metadata if available
-        if hasattr(response, "usage") and response.usage is not None:
-            usage = response.usage
-            structured_output["_usage"] = {
-                "input_tokens": getattr(usage, "input_tokens", None),
-                "output_tokens": getattr(usage, "output_tokens", None),
-            }
 
         return ClassifierResult(
             task_type=task.task_type,

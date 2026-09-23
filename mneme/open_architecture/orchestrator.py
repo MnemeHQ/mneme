@@ -695,15 +695,16 @@ def run_open_architecture_analysis(
                                 )
                             )
                     if norm_lifecycle:
+                        l_data = res_by_type[ClassifierTaskType.LIFECYCLE].output
                         research_store.upsert_candidate_lifecycle(
                             CandidateLifecycleRecord(
                                 candidate_id=cand.candidate_id,
                                 run_id=run_meta.run_id,
                                 lifecycle_status=norm_lifecycle,
-                                supersedes=None,
-                                superseded_by=None,
-                                effective_date=None,
-                                expiration_if_any=None,
+                                supersedes=l_data.get("supersedes"),
+                                superseded_by=l_data.get("superseded_by"),
+                                effective_date=l_data.get("effective_date"),
+                                expiration_if_any=l_data.get("expiration_if_any"),
                                 confidence=res_by_type[ClassifierTaskType.LIFECYCLE].confidence,
                             )
                         )

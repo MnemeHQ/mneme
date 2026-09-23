@@ -130,6 +130,7 @@ class BaselineClassifier:
     backend_id: str
     classifier_version: str
     model_identifier: str | None
+    min_sdk_version: str = "1.0.0"
     config: dict[str, Any] = field(default_factory=dict)
 
     @classmethod
@@ -138,6 +139,7 @@ class BaselineClassifier:
             backend_id=str(data["backend_id"]),
             classifier_version=str(data["classifier_version"]),
             model_identifier=data.get("model_identifier"),
+            min_sdk_version=str(data.get("min_sdk_version", "1.0.0")),
             config=dict(data.get("config", {})),
         )
 
@@ -146,6 +148,7 @@ class BaselineClassifier:
             "backend_id": self.backend_id,
             "classifier_version": self.classifier_version,
             "model_identifier": self.model_identifier,
+            "min_sdk_version": self.min_sdk_version,
             "config": self.config,
         }
 
@@ -314,6 +317,7 @@ class BaselineConfig:
                 "backend_id": self.classifier.backend_id,
                 "classifier_version": self.classifier.classifier_version,
                 "model_identifier": self.classifier.model_identifier,
+                "min_sdk_version": self.classifier.min_sdk_version,
                 "config": self.classifier.config,
             },
             "semantic_tasks": sorted(list(self.semantic_tasks)),

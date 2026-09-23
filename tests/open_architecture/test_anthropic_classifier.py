@@ -40,10 +40,12 @@ from typing import Any
 
 import pytest
 
+from mneme.open_architecture.candidates import ExtractedCandidate, LineSpan
 from mneme.open_architecture.classification import (
     ClassifierResult,
     ClassifierTask,
     ClassifierTaskType,
+    NormalizationError,
     SemanticClassifier,
     normalize_authority,
     normalize_classification,
@@ -62,6 +64,13 @@ from mneme.open_architecture.classifiers.anthropic import (
     AnthropicMalformedResponseError,
     AnthropicRateLimitError,
 )
+from mneme.open_architecture.discovery import DiscoveredSourceDocument
+from mneme.open_architecture.export import compute_bundle_content_hash
+from mneme.open_architecture.manifest import RepositoryConfig
+from mneme.open_architecture.orchestrator import OpenArchitectureRunResult
+from mneme.open_architecture.run_metadata import RunMetadata
+from mneme.open_architecture.schemas import DecisionCandidate, Scope
+from mneme.open_architecture.store import CandidateLifecycleRecord, ResearchStore
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -252,7 +261,13 @@ class TestAnthropicClassifier:
     def test_11_valid_lifecycle_output(self):
         mock_client = MockAnthropicClient(
             lambda **kw: MockMessageResponse(
-                json.dumps({"lifecycle": "active", "supersedes": "ADR-0000", "superseded_by": None})
+                json.dumps({
+                    "lifecycle": "active",
+                    "supersedes": "ADR-0000",
+                    "superseded_by": None,
+                    "effective_date": "2026-01-01",
+                    "expiration_if_any": None,
+                })
             )
         )
         adapter = AnthropicClassifier(client=mock_client)
@@ -261,6 +276,9 @@ class TestAnthropicClassifier:
 
         assert res.output["lifecycle"] == "active"
         assert res.output["supersedes"] == "ADR-0000"
+        assert res.output["superseded_by"] is None
+        assert res.output["effective_date"] == "2026-01-01"
+        assert res.output["expiration_if_any"] is None
 
     # 12. valid relationships output
     def test_12_valid_relationships_output(self):
@@ -474,7 +492,393 @@ class TestAnthropicClassifier:
         assert "tool_choice" not in payload
         assert "thinking" not in payload
         assert "stream" not in payload
-        assert payload["temperature"] == 0.0
+        assert "temperature" not in payload
+        assert "extra_body" not in payload
         assert payload["max_tokens"] == 1024
-        assert "output_config" in payload["extra_body"]
-        assert payload["extra_body"]["output_config"]["format"]["type"] == "json_schema"
+        assert "output_config" in payload
+        assert payload["output_config"]["format"]["type"] == "json_schema"
+
+    # 29. token usage never enters semantic ClassifierResult.output
+    def test_29_token_usage_never_enters_semantic_classifier_output(self):
+        mock_client = MockAnthropicClient(
+            lambda **kw: MockMessageResponse(
+                json.dumps({"classification": "prescriptive", "rationale": "Normative MUST"}),
+                input_tokens=250,
+                output_tokens=75,
+            )
+        )
+        adapter = AnthropicClassifier(client=mock_client)
+        task = _make_sample_task(ClassifierTaskType.DECISION_CLASSIFICATION)
+        res = adapter.execute(task)
+
+        assert "_usage" not in res.output
+        assert "input_tokens" not in res.output
+        assert "output_tokens" not in res.output
+        assert res.output == {"classification": "prescriptive", "rationale": "Normative MUST"}
+
+    # 30. bundle hash is unchanged when only API token usage differs
+    def test_30_bundle_hash_unchanged_when_only_token_usage_differs(self):
+        cand_id = "cand-" + "a" * 32
+        meta = RunMetadata(
+            run_id="run-001",
+            batch_id="batch-01",
+            repo_id="adrkit",
+            repo_commit_sha="a" * 40,
+            mneme_version="0.9.2",
+            mneme_commit_sha="b" * 40,
+            benchmark_schema_version="0.1",
+            taxonomy_version="0.1",
+            classifier_version="0.1",
+            classifier_backend="anthropic",
+            classifier_model="claude-sonnet-4-6",
+            extractor_id="heuristic",
+            extractor_version="0.1",
+            scenario_content_hash="scenariohash123",
+            retrieval_policy="score_gt_zero",
+            configuration_hash="confighash123",
+            started_at="2026-01-01T00:00:00Z",
+            completed_at="2026-01-01T00:05:00Z",
+            status="completed",
+        )
+        config = RepositoryConfig(
+            id="adrkit",
+            github="mbeacom/adrkit",
+            commit_sha="a" * 40,
+            primary_test="test",
+            validation_status="reviewed",
+        )
+        res_output = {"classification": "prescriptive", "rationale": "Normative MUST"}
+
+        c_res_1 = ClassifierResult(
+            task_type=ClassifierTaskType.DECISION_CLASSIFICATION,
+            backend_id="anthropic",
+            classifier_version="0.1",
+            model_identifier="claude-sonnet-4-6",
+            taxonomy_version="0.1",
+            candidate_id=cand_id,
+            output=res_output,
+            confidence=None,
+            latency_ms=100.0,
+            cost_amount=None,
+            cost_currency=None,
+        )
+
+        c_res_2 = ClassifierResult(
+            task_type=ClassifierTaskType.DECISION_CLASSIFICATION,
+            backend_id="anthropic",
+            classifier_version="0.1",
+            model_identifier="claude-sonnet-4-6",
+            taxonomy_version="0.1",
+            candidate_id=cand_id,
+            output=res_output,
+            confidence=None,
+            latency_ms=250.0,  # Latency differs
+            cost_amount=None,
+            cost_currency=None,
+        )
+
+        run1 = OpenArchitectureRunResult(
+            run_metadata=meta,
+            repository_config=config,
+            discovered_documents=(),
+            extracted_candidates=(),
+            composed_candidates=(),
+            incomplete_candidates=(),
+            classifier_results=(c_res_1,),
+            scenarios=(),
+            gds_results=(),
+            suite_metrics={},
+            diagnostics=(),
+        )
+
+        run2 = OpenArchitectureRunResult(
+            run_metadata=meta,
+            repository_config=config,
+            discovered_documents=(),
+            extracted_candidates=(),
+            composed_candidates=(),
+            incomplete_candidates=(),
+            classifier_results=(c_res_2,),
+            scenarios=(),
+            gds_results=(),
+            suite_metrics={},
+            diagnostics=(),
+        )
+
+        hash1 = compute_bundle_content_hash(run1)
+        hash2 = compute_bundle_content_hash(run2)
+        assert hash1 == hash2
+
+    # 31. bundle hash still changes when semantic output differs
+    def test_31_bundle_hash_changes_when_semantic_output_differs(self):
+        cand_id = "cand-" + "a" * 32
+        meta = RunMetadata(
+            run_id="run-001",
+            batch_id="batch-01",
+            repo_id="adrkit",
+            repo_commit_sha="a" * 40,
+            mneme_version="0.9.2",
+            mneme_commit_sha="b" * 40,
+            benchmark_schema_version="0.1",
+            taxonomy_version="0.1",
+            classifier_version="0.1",
+            classifier_backend="anthropic",
+            classifier_model="claude-sonnet-4-6",
+            extractor_id="heuristic",
+            extractor_version="0.1",
+            scenario_content_hash="scenariohash123",
+            retrieval_policy="score_gt_zero",
+            configuration_hash="confighash123",
+            started_at="2026-01-01T00:00:00Z",
+            completed_at="2026-01-01T00:05:00Z",
+            status="completed",
+        )
+        config = RepositoryConfig(
+            id="adrkit",
+            github="mbeacom/adrkit",
+            commit_sha="a" * 40,
+            primary_test="test",
+            validation_status="reviewed",
+        )
+
+        c_res_prescriptive = ClassifierResult(
+            task_type=ClassifierTaskType.DECISION_CLASSIFICATION,
+            backend_id="anthropic",
+            classifier_version="0.1",
+            model_identifier="claude-sonnet-4-6",
+            taxonomy_version="0.1",
+            candidate_id=cand_id,
+            output={"classification": "prescriptive", "rationale": "Must"},
+            confidence=None,
+            latency_ms=100.0,
+            cost_amount=None,
+            cost_currency=None,
+        )
+
+        c_res_advisory = ClassifierResult(
+            task_type=ClassifierTaskType.DECISION_CLASSIFICATION,
+            backend_id="anthropic",
+            classifier_version="0.1",
+            model_identifier="claude-sonnet-4-6",
+            taxonomy_version="0.1",
+            candidate_id=cand_id,
+            output={"classification": "advisory", "rationale": "Should"},
+            confidence=None,
+            latency_ms=100.0,
+            cost_amount=None,
+            cost_currency=None,
+        )
+
+        run_p = OpenArchitectureRunResult(
+            run_metadata=meta,
+            repository_config=config,
+            discovered_documents=(),
+            extracted_candidates=(),
+            composed_candidates=(),
+            incomplete_candidates=(),
+            classifier_results=(c_res_prescriptive,),
+            scenarios=(),
+            gds_results=(),
+            suite_metrics={},
+            diagnostics=(),
+        )
+
+        run_a = OpenArchitectureRunResult(
+            run_metadata=meta,
+            repository_config=config,
+            discovered_documents=(),
+            extracted_candidates=(),
+            composed_candidates=(),
+            incomplete_candidates=(),
+            classifier_results=(c_res_advisory,),
+            scenarios=(),
+            gds_results=(),
+            suite_metrics={},
+            diagnostics=(),
+        )
+
+        assert compute_bundle_content_hash(run_p) != compute_bundle_content_hash(run_a)
+
+    # 32. Anthropic request uses native output_config
+    def test_32_anthropic_request_uses_native_output_config(self):
+        adapter = AnthropicClassifier()
+        task = _make_sample_task(ClassifierTaskType.DOMAINS)
+        payload = adapter.build_request_payload(task)
+
+        assert "output_config" in payload
+        assert "format" in payload["output_config"]
+        assert payload["output_config"]["format"]["type"] == "json_schema"
+
+    # 33. no extra_body compatibility path for structured output
+    def test_33_no_extra_body_compatibility_path(self):
+        adapter = AnthropicClassifier()
+        task = _make_sample_task(ClassifierTaskType.PURPOSES)
+        payload = adapter.build_request_payload(task)
+
+        assert "extra_body" not in payload
+
+    # 34. no temperature sent
+    def test_34_no_temperature_sent(self):
+        adapter = AnthropicClassifier()
+        task = _make_sample_task(ClassifierTaskType.AUTHORITY)
+        payload = adapter.build_request_payload(task)
+
+        assert "temperature" not in payload
+
+    # 35. lifecycle schema supports all four optional metadata fields
+    def test_35_lifecycle_schema_supports_four_optional_metadata_fields(self):
+        schema = TASK_SCHEMAS[ClassifierTaskType.LIFECYCLE]
+        props = schema["properties"]
+        assert "lifecycle" in props
+        assert "supersedes" in props
+        assert "superseded_by" in props
+        assert "effective_date" in props
+        assert "expiration_if_any" in props
+        assert schema["required"] == ["lifecycle", "supersedes", "superseded_by", "effective_date", "expiration_if_any"]
+
+    # 36. absent lifecycle evidence produces nulls
+    def test_36_absent_lifecycle_evidence_produces_nulls(self):
+        mock_client = MockAnthropicClient(
+            lambda **kw: MockMessageResponse(
+                json.dumps({
+                    "lifecycle": "active",
+                    "supersedes": None,
+                    "superseded_by": None,
+                    "effective_date": None,
+                    "expiration_if_any": None,
+                })
+            )
+        )
+        adapter = AnthropicClassifier(client=mock_client)
+        task = _make_sample_task(ClassifierTaskType.LIFECYCLE)
+        res = adapter.execute(task)
+
+        assert res.output["lifecycle"] == "active"
+        assert res.output["supersedes"] is None
+        assert res.output["superseded_by"] is None
+        assert res.output["effective_date"] is None
+        assert res.output["expiration_if_any"] is None
+
+    # 37. lifecycle metadata is persisted to CandidateLifecycleRecord
+    def test_37_lifecycle_metadata_persisted_to_candidate_lifecycle_record(self, tmp_path):
+        from mneme.open_architecture.store import (
+            AnalysisRunRecord,
+            CandidateLifecycleRecord,
+            ClassifierVersionRecord,
+            DecisionCandidateRecord,
+            RepositoryRecord,
+            ResearchStore,
+            TaxonomyVersionRecord,
+        )
+
+        db_path = tmp_path / "test_lifecycle.sqlite"
+        store = ResearchStore(db_path)
+        store.initialize_schema()
+
+        cand_id = "cand-0123456789abcdef0123456789abcdef"
+        run_id = "run-001"
+
+        store.upsert_repository(RepositoryRecord("adrkit", "https://github.com/mbeacom/adrkit.git", "mbeacom/adrkit", "main"))
+        store.upsert_taxonomy_version(TaxonomyVersionRecord("0.1", "2026-01-01T00:00:00Z", "notes"))
+        store.upsert_classifier_version(ClassifierVersionRecord("0.1", "2026-01-01T00:00:00Z", "notes"))
+        store.create_analysis_run(
+            AnalysisRunRecord(
+                run_id=run_id,
+                repo_id="adrkit",
+                repo_commit_sha="a" * 40,
+                mneme_version="0.9.2",
+                mneme_commit_sha="b" * 40,
+                taxonomy_version="0.1",
+                classifier_version="0.1",
+                benchmark_schema_version="0.1",
+                configuration_hash="conf123",
+                started_at="2026-01-01T00:00:00Z",
+                completed_at=None,
+                status="running",
+            )
+        )
+        store.insert_decision_candidate(
+            DecisionCandidateRecord(
+                candidate_id=cand_id,
+                run_id=run_id,
+                source_id=None,
+                source_location="L1-L5",
+                raw_evidence_reference="Use ADR",
+                normalized_decision="Use ADR",
+                discovery_confidence=0.9,
+                discovery_metadata_json="{}",
+            )
+        )
+
+        # Simulate orchestrator persistence logic
+        clf_output = {
+            "lifecycle": "superseded",
+            "supersedes": "ADR-001",
+            "superseded_by": "ADR-005",
+            "effective_date": "2026-01-15",
+            "expiration_if_any": "2026-12-31",
+        }
+
+        # Verify CandidateLifecycleRecord receives all metadata fields
+        record = CandidateLifecycleRecord(
+            candidate_id=cand_id,
+            run_id=run_id,
+            lifecycle_status=clf_output["lifecycle"],
+            supersedes=clf_output["supersedes"],
+            superseded_by=clf_output["superseded_by"],
+            effective_date=clf_output["effective_date"],
+            expiration_if_any=clf_output["expiration_if_any"],
+            confidence=0.95,
+        )
+
+        assert record.supersedes == "ADR-001"
+        assert record.superseded_by == "ADR-005"
+        assert record.effective_date == "2026-01-15"
+        assert record.expiration_if_any == "2026-12-31"
+
+        store.upsert_candidate_lifecycle(record)
+        conn = store.connect()
+        row = conn.execute(
+            "SELECT lifecycle_status, supersedes, superseded_by, effective_date, expiration_if_any FROM candidate_lifecycle WHERE candidate_id = ?",
+            (cand_id,),
+        ).fetchone()
+        assert row is not None
+        assert row[0] == "superseded"
+        assert row[1] == "ADR-001"
+        assert row[2] == "ADR-005"
+        assert row[3] == "2026-01-15"
+        assert row[4] == "2026-12-31"
+
+    # 38. malformed lifecycle enum still fails
+    def test_38_malformed_lifecycle_enum_fails_closed(self):
+        mock_client = MockAnthropicClient(
+            lambda **kw: MockMessageResponse(
+                json.dumps({
+                    "lifecycle": "invalid_status",
+                    "supersedes": None,
+                    "superseded_by": None,
+                    "effective_date": None,
+                    "expiration_if_any": None,
+                })
+            )
+        )
+        adapter = AnthropicClassifier(client=mock_client)
+        task = _make_sample_task(ClassifierTaskType.LIFECYCLE)
+        with pytest.raises(AnthropicMalformedResponseError, match="failed schema validation"):
+            adapter.execute(task)
+
+        # Fail-closed vocabulary normalizer check
+        with pytest.raises(NormalizationError, match="Invalid lifecycle"):
+            normalize_lifecycle("invalid_status")
+
+    # 39. SDK version check fails on old SDK
+    def test_39_sdk_version_check_fails_on_old_sdk(self, monkeypatch):
+        import anthropic
+        monkeypatch.setattr(anthropic, "__version__", "0.52.0")
+        monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key-12345")
+
+        adapter = AnthropicClassifier()
+        task = _make_sample_task(ClassifierTaskType.DECISION_CLASSIFICATION)
+
+        with pytest.raises(AnthropicClassifierError, match="AnthropicClassifier requires anthropic>=1.0.0"):
+            adapter.execute(task)
