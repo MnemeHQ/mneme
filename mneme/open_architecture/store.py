@@ -281,13 +281,22 @@ class ClassifierDisagreementRecord:
     created_at: str
 
 
+# ── Store Version and Errors ──────────────────────────────────────────────────
+
+RESEARCH_STORE_SCHEMA_VERSION = 2
+
+
+class ResearchStoreSchemaCompatibilityError(Exception):
+    """Raised when an existing research database uses an incompatible development schema."""
+
+
 # ── Store Implementation ────────────────────────────────────────────────────────
 
 class ResearchStore:
     """SQLite-backed research store for O1A benchmark data.
 
     Wraps the merged research_store.sql from PR #389. All connections enforce foreign keys.
-    Schema is initialized from the merged DDL.
+    Schema is initialized from the merged DDL with explicit O1A schema compatibility checks.
     """
 
     def __init__(self, db_path: str | Path) -> None:
@@ -295,11 +304,18 @@ class ResearchStore:
         self._conn: sqlite3.Connection | None = None
 
     def connect(self) -> sqlite3.Connection:
-        """Get or create database connection with foreign keys enabled."""
+        """Get or create database connection with foreign keys enabled and schema verified."""
         if self._conn is None:
-            self._conn = sqlite3.connect(self.db_path)
-            self._conn.row_factory = sqlite3.Row
-            self._conn.execute("PRAGMA foreign_keys = ON")
+            conn = sqlite3.connect(self.db_path)
+            conn.row_factory = sqlite3.Row
+            conn.execute("PRAGMA foreign_keys = ON")
+            self._conn = conn
+            try:
+                self.verify_schema_compatibility()
+            except Exception:
+                self._conn.close()
+                self._conn = None
+                raise
         return self._conn
 
     def close(self) -> None:
@@ -327,11 +343,75 @@ class ResearchStore:
             conn.rollback()
             raise
 
+    def verify_schema_compatibility(self) -> None:
+        """Verify that any existing SQLite tables match the expected O1A2 schema shape.
+
+        Fails closed with ResearchStoreSchemaCompatibilityError if an incompatible
+        pre-O1A2 development schema (e.g. single-column candidate_id PK) is detected.
+        """
+        if self._conn is None:
+            return
+
+        # Check if decision_candidates table exists
+        row = self._conn.execute(
+            "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='decision_candidates'"
+        ).fetchone()
+        if row[0] == 0:
+            # Uninitialized / fresh database: no existing tables to conflict
+            return
+
+        # Check user_version if set
+        uv_row = self._conn.execute("PRAGMA user_version").fetchone()
+        user_ver = uv_row[0] if uv_row else 0
+        if 0 < user_ver < RESEARCH_STORE_SCHEMA_VERSION:
+            raise ResearchStoreSchemaCompatibilityError(
+                f"Existing research database '{self.db_path}' uses schema version {user_ver} "
+                f"which predates the required O1A2 schema version {RESEARCH_STORE_SCHEMA_VERSION}.\n"
+                f"Pre-O1A3 research databases created against earlier development schemas are not migration-supported. "
+                f"Recreate the local research database before baseline execution if the schema compatibility check fails:\n"
+                f"    Remove '{self.db_path}' and re-initialize."
+            )
+
+        # Inspect decision_candidates primary key columns
+        table_info = self._conn.execute("PRAGMA table_info(decision_candidates)").fetchall()
+        pk_cols = [r["name"] for r in sorted([r for r in table_info if r["pk"] > 0], key=lambda r: r["pk"])]
+        expected_pk = {"candidate_id", "run_id"}
+
+        if set(pk_cols) != expected_pk:
+            raise ResearchStoreSchemaCompatibilityError(
+                f"Existing research database '{self.db_path}' uses an incompatible pre-O1A2 development schema: "
+                f"table 'decision_candidates' has primary key {pk_cols!r} instead of required composite "
+                f"primary key ('candidate_id', 'run_id').\n"
+                f"Pre-O1A3 research databases created against earlier development schemas are not migration-supported. "
+                f"Recreate the local research database before baseline execution if the schema compatibility check fails:\n"
+                f"    Remove '{self.db_path}' and re-initialize."
+            )
+
+        # Inspect candidate_classifications composite foreign key if table exists
+        cc_row = self._conn.execute(
+            "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='candidate_classifications'"
+        ).fetchone()
+        if cc_row[0] > 0:
+            fk_list = self._conn.execute("PRAGMA foreign_key_list(candidate_classifications)").fetchall()
+            cand_fks = [fk for fk in fk_list if fk["table"] == "decision_candidates"]
+            fk_from_cols = {fk["from"] for fk in cand_fks}
+            if cand_fks and not expected_pk.issubset(fk_from_cols):
+                raise ResearchStoreSchemaCompatibilityError(
+                    f"Existing research database '{self.db_path}' uses an incompatible pre-O1A2 development schema: "
+                    f"table 'candidate_classifications' has foreign key columns {fk_from_cols!r} instead of "
+                    f"composite foreign key referencing ('candidate_id', 'run_id').\n"
+                    f"Pre-O1A3 research databases created against earlier development schemas are not migration-supported. "
+                    f"Recreate the local research database before baseline execution if the schema compatibility check fails:\n"
+                    f"    Remove '{self.db_path}' and re-initialize."
+                )
+
     def initialize_schema(self) -> None:
-        """Initialize the database schema from merged DDL."""
+        """Initialize the database schema from merged DDL with schema compatibility verification."""
         conn = self.connect()
         conn.executescript(_load_schema_ddl())
+        conn.execute(f"PRAGMA user_version = {RESEARCH_STORE_SCHEMA_VERSION}")
         conn.commit()
+        self.verify_schema_compatibility()
 
     # ── Repositories ────────────────────────────────────────────────────────
 
@@ -482,6 +562,13 @@ class ResearchStore:
                 raw_evidence_reference, normalized_decision,
                 discovery_confidence, discovery_metadata_json
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(candidate_id, run_id) DO UPDATE SET
+                source_id = excluded.source_id,
+                source_location = excluded.source_location,
+                raw_evidence_reference = excluded.raw_evidence_reference,
+                normalized_decision = excluded.normalized_decision,
+                discovery_confidence = excluded.discovery_confidence,
+                discovery_metadata_json = excluded.discovery_metadata_json
             """,
             (
                 cand.candidate_id, cand.run_id, cand.source_id, cand.source_location,
@@ -491,9 +578,12 @@ class ResearchStore:
         )
         conn.commit()
 
-    def get_decision_candidate(self, candidate_id: str) -> DecisionCandidateRecord | None:
+    def get_decision_candidate(self, candidate_id: str, run_id: str | None = None) -> DecisionCandidateRecord | None:
         conn = self.connect()
-        row = conn.execute("SELECT * FROM decision_candidates WHERE candidate_id = ?", (candidate_id,)).fetchone()
+        if run_id is not None:
+            row = conn.execute("SELECT * FROM decision_candidates WHERE candidate_id = ? AND run_id = ?", (candidate_id, run_id)).fetchone()
+        else:
+            row = conn.execute("SELECT * FROM decision_candidates WHERE candidate_id = ? ORDER BY rowid DESC LIMIT 1", (candidate_id,)).fetchone()
         if row is None:
             return None
         return DecisionCandidateRecord(**dict(row))
@@ -864,23 +954,23 @@ class ResearchStore:
         conn.execute(
             """
             INSERT INTO classifier_disagreements (
-                disagreement_id, candidate_id, task_type, execution_a_id, execution_b_id,
+                disagreement_id, candidate_id, run_id, task_type, execution_a_id, execution_b_id,
                 disagreement_json, resolved_by_review_id, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
-                cd.disagreement_id, cd.candidate_id, cd.task_type,
+                cd.disagreement_id, cd.candidate_id, cd.run_id, cd.task_type,
                 cd.execution_a_id, cd.execution_b_id, cd.disagreement_json,
                 cd.resolved_by_review_id, cd.created_at,
             ),
         )
         conn.commit()
 
-    def list_classifier_disagreements(self, candidate_id: str) -> list[ClassifierDisagreementRecord]:
+    def list_classifier_disagreements(self, candidate_id: str, run_id: str) -> list[ClassifierDisagreementRecord]:
         conn = self.connect()
         rows = conn.execute(
-            "SELECT * FROM classifier_disagreements WHERE candidate_id = ? ORDER BY created_at",
-            (candidate_id,)
+            "SELECT * FROM classifier_disagreements WHERE candidate_id = ? AND run_id = ? ORDER BY created_at",
+            (candidate_id, run_id)
         ).fetchall()
         return [ClassifierDisagreementRecord(**dict(row)) for row in rows]
 

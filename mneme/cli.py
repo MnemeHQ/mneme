@@ -1217,6 +1217,124 @@ def _cmd_decision_reject(args: argparse.Namespace) -> int:
     return 0
 
 
+# ── Subcommand: research open-architecture ───────────────────────────────────
+
+def _cmd_research_o1a_validate(args: argparse.Namespace) -> int:
+    from mneme.open_architecture.manifest import Manifest
+    path = Path(args.manifest)
+    if not path.is_file():
+        return _error_exit(f"manifest file '{path}' does not exist")
+    try:
+        manifest = Manifest.load(path)
+        manifest.validate_target_consistency()
+        manifest.validate_no_duplicates()
+    except Exception as exc:
+        return _error_exit(f"manifest validation failed: {exc}")
+
+    config_hash = manifest.configuration_hash()
+    print("O1A Manifest Validation: OK")
+    print(f"  Batch ID:           {manifest.batch_id}")
+    print(f"  Status:             {manifest.status}")
+    print(f"  Configuration Hash: {config_hash}")
+    print(f"  Repositories:       {len(manifest.repositories)}")
+    print(f"  Decisions Total:    {manifest.targets.decisions_total}")
+    print(f"  Scenarios Total:    {manifest.targets.scenarios_total}")
+    for repo in manifest.repositories:
+        pinned = repo.commit_sha or "(unpinned - planned)"
+        print(f"    - [{repo.id}] {repo.github} @ {pinned}")
+    return 0
+
+
+def _cmd_research_o1a_report(args: argparse.Namespace) -> int:
+    bundle_dir = Path(args.bundle_dir)
+    if not bundle_dir.is_dir():
+        return _error_exit(f"bundle directory '{bundle_dir}' does not exist")
+
+    report_json_path = bundle_dir / "report.json"
+    report_md_path = bundle_dir / "report.md"
+
+    if args.as_json:
+        if report_json_path.is_file():
+            print(report_json_path.read_text(encoding="utf-8").strip())
+            return 0
+        return _error_exit(f"report.json not found in {bundle_dir}")
+
+    if report_md_path.is_file():
+        print(report_md_path.read_text(encoding="utf-8").strip())
+        return 0
+    elif report_json_path.is_file():
+        data = json.loads(report_json_path.read_text(encoding="utf-8"))
+        print(json.dumps(data, indent=2))
+        return 0
+    return _error_exit(f"no report found in {bundle_dir}")
+
+
+def _cmd_research_o1a_export(args: argparse.Namespace) -> int:
+    bundle_dir = Path(args.bundle_dir)
+    if not bundle_dir.is_dir():
+        return _error_exit(f"bundle directory '{bundle_dir}' does not exist")
+    bundle_json = bundle_dir / "bundle.json"
+    if not bundle_json.is_file():
+        return _error_exit(f"bundle.json not found in '{bundle_dir}'")
+    data = json.loads(bundle_json.read_text(encoding="utf-8"))
+    print("O1A Research Bundle:")
+    print(f"  Bundle Content SHA256: {data.get('bundle_content_sha256')}")
+    print(f"  Repository:            {data.get('repository_identifier')}")
+    print(f"  Run Status:            {data.get('status')}")
+    print(f"  Configuration Hash:    {data.get('configuration_hash')}")
+    return 0
+
+
+def _cmd_research_o1a_run(args: argparse.Namespace) -> int:
+    from mneme.open_architecture.manifest import Manifest
+    path = Path(args.manifest)
+    if not path.is_file():
+        return _error_exit(f"manifest file '{path}' does not exist")
+    try:
+        manifest = Manifest.load(path)
+    except Exception as exc:
+        return _error_exit(f"manifest load failed: {exc}")
+
+    repo = next((r for r in manifest.repositories if r.id == args.repo_id), None)
+    if repo is None:
+        return _error_exit(f"repository '{args.repo_id}' not found in manifest")
+
+    if args.dry_run:
+        print(f"O1A Run Preflight: OK for repo '{repo.id}' ({repo.github})")
+        print(f"  Commit SHA:         {repo.commit_sha or '(not set)'}")
+        print(f"  Configuration Hash: {manifest.configuration_hash()}")
+        print("  Dry run complete: no execution performed, no canonical state written.")
+        return 0
+
+    if not args.backend:
+        print(
+            "ERROR: No semantic classifier backend configured. "
+            "O1A2 provides the execution framework; real model providers will be "
+            "configured and frozen in O1A3. Pass --dry-run for preflight validation.",
+            file=sys.stderr,
+            flush=True,
+        )
+        return 2
+
+    if args.backend == "reference":
+        from mneme.open_architecture.candidates import HeuristicExtractor
+        from mneme.open_architecture.classification import StaticClassifier
+        from mneme.open_architecture.orchestrator import run_open_architecture_analysis
+        result = run_open_architecture_analysis(
+            repository_config=repo,
+            manifest=manifest,
+            extractor=HeuristicExtractor(),
+            classifier=StaticClassifier(backend_id="reference-static"),
+        )
+        print(f"O1A Run Completed: {result.run_metadata.run_id}")
+        print(f"  Discovered Documents: {len(result.discovered_documents)}")
+        print(f"  Extracted Candidates: {len(result.extracted_candidates)}")
+        print(f"  Composed Candidates:  {len(result.composed_candidates)}")
+        return 0
+
+    return _error_exit(f"unsupported classifier backend '{args.backend}'")
+
+
 # ── Entry point ──────────────────────────────────────────────────────────────
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -1641,6 +1759,56 @@ def _build_parser() -> argparse.ArgumentParser:
         ),
     )
     p_decision_reject.set_defaults(func=_cmd_decision_reject)
+
+    # research
+    p_research = sub.add_parser(
+        "research",
+        help="Mneme research harnesses and experimental evaluations",
+    )
+    research_sub = p_research.add_subparsers(dest="research_cmd", required=True)
+
+    # research open-architecture
+    p_o1a = research_sub.add_parser(
+        "open-architecture",
+        help="Open Architecture (O1A) research benchmark harness",
+    )
+    o1a_sub = p_o1a.add_subparsers(dest="o1a_cmd", required=True)
+
+    # research open-architecture validate
+    p_o1a_validate = o1a_sub.add_parser(
+        "validate",
+        help="Validate an O1A batch manifest and preflight configuration",
+    )
+    p_o1a_validate.add_argument("--manifest", required=True, help="Path to manifest.yaml")
+    p_o1a_validate.set_defaults(func=_cmd_research_o1a_validate)
+
+    # research open-architecture run
+    p_o1a_run = o1a_sub.add_parser(
+        "run",
+        help="Execute an O1A research analysis run over a repository",
+    )
+    p_o1a_run.add_argument("--manifest", required=True, help="Path to manifest.yaml")
+    p_o1a_run.add_argument("--repo-id", required=True, help="Repository ID from manifest")
+    p_o1a_run.add_argument("--dry-run", action="store_true", help="Perform preflight checks without execution")
+    p_o1a_run.add_argument("--backend", default=None, help="Explicit classifier backend (e.g. 'reference')")
+    p_o1a_run.set_defaults(func=_cmd_research_o1a_run)
+
+    # research open-architecture export
+    p_o1a_export = o1a_sub.add_parser(
+        "export",
+        help="Export a deterministic research bundle from ResearchStore",
+    )
+    p_o1a_export.add_argument("--bundle-dir", required=True, help="Output directory for bundle export")
+    p_o1a_export.set_defaults(func=_cmd_research_o1a_export)
+
+    # research open-architecture report
+    p_o1a_report = o1a_sub.add_parser(
+        "report",
+        help="Generate or display an O1A research report",
+    )
+    p_o1a_report.add_argument("--bundle-dir", required=True, help="Path to research bundle directory")
+    p_o1a_report.add_argument("--json", dest="as_json", action="store_true", help="Output report as JSON")
+    p_o1a_report.set_defaults(func=_cmd_research_o1a_report)
 
     return parser
 

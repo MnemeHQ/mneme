@@ -38,6 +38,8 @@ Portable JSON or JSONL may be emitted for fixtures, CI, review, and reproducibil
 
 SQLite is the working research store.
 
+> Pre-O1A3 research databases created against earlier development schemas are not migration-supported. Recreate the local research database before baseline execution if the schema compatibility check fails.
+
 ## Future progression
 
 ### Current

@@ -35,13 +35,20 @@ class TestRunMetadata:
         assert len(metadata.configuration_hash) == 32
 
     def test_create_with_manifest_config_hash(self):
-        metadata = RunMetadata.create(
+        metadata_with = RunMetadata.create(
             batch_id="o1a-batch-01",
             repo_id="adrkit",
             repo_commit_sha="a" * 40,
             manifest_config_hash="provided_hash_123",
         )
-        assert metadata.configuration_hash == "provided_hash_123"
+        metadata_without = RunMetadata.create(
+            batch_id="o1a-batch-01",
+            repo_id="adrkit",
+            repo_commit_sha="a" * 40,
+            manifest_config_hash=None,
+        )
+        assert len(metadata_with.configuration_hash) == 32
+        assert metadata_with.configuration_hash != metadata_without.configuration_hash
 
     def test_deterministic_config_hash(self):
         metadata1 = RunMetadata.create(
