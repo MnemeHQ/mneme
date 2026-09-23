@@ -11,31 +11,31 @@ targets:
 repositories:
   - id: adrkit
     github: "mbeacom/adrkit"
-    commit_sha: null
+    commit_sha: "471457da29638ecca6119b35180c2845bf989cac"
     primary_test: "applicability_and_decision_relationships"
     validation_status: unreviewed
 
   - id: gsa_agentic_coding_quickstart
     github: "GSA-TTS/agentic-coding-quickstart"
-    commit_sha: null
+    commit_sha: "8e6160c63acc35bd48d0a3844e133ea3ad52a464"
     primary_test: "prescriptive_intent_and_authority"
     validation_status: unreviewed
 
   - id: helix
     github: "AZX-PBC-OSS/helix"
-    commit_sha: null
+    commit_sha: "37d994370deba2512588b5c4efb7f03483e7308b"
     primary_test: "authority_conflict_and_document_purpose"
     validation_status: unreviewed
 
   - id: archlint
     github: "muhammetsafak/archlint"
-    commit_sha: null
+    commit_sha: "185837e93565718d8e1ea653236cd70ca0a89e3a"
     primary_test: "decision_to_enforceable_rule"
     validation_status: unreviewed
 
   - id: modonome
     github: "enumind/modonome"
-    commit_sha: null
+    commit_sha: "7a4d5244dcb6879b6aa646105b39297aa6d0a5a2"
     primary_test: "governance_ownership_and_enforcement"
     validation_status: unreviewed
 

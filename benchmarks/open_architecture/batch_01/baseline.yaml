@@ -1,0 +1,134 @@
+schema_version: "0.1"
+baseline_id: "o1a-batch-01-baseline"
+status: planned
+
+semantic_mneme_sha: "3673c36855fb1e30d46942ce826c50be4888df5e"
+mneme_version: "0.9.2"
+benchmark_schema_version: "0.1"
+taxonomy_version: "0.1"
+
+manifest:
+  path: "manifest.yaml"
+  batch_id: "o1a-batch-01"
+  configuration_hash: "6dbc40b1c9449468f415404ea56c78f8"
+
+repositories:
+  - id: adrkit
+    github: "mbeacom/adrkit"
+    commit_sha: "471457da29638ecca6119b35180c2845bf989cac"
+    default_branch: "main"
+    primary_test: "applicability_and_decision_relationships"
+
+  - id: gsa_agentic_coding_quickstart
+    github: "GSA-TTS/agentic-coding-quickstart"
+    commit_sha: "8e6160c63acc35bd48d0a3844e133ea3ad52a464"
+    default_branch: "main"
+    primary_test: "prescriptive_intent_and_authority"
+
+  - id: helix
+    github: "AZX-PBC-OSS/helix"
+    commit_sha: "37d994370deba2512588b5c4efb7f03483e7308b"
+    default_branch: "main"
+    primary_test: "authority_conflict_and_document_purpose"
+
+  - id: archlint
+    github: "muhammetsafak/archlint"
+    commit_sha: "185837e93565718d8e1ea653236cd70ca0a89e3a"
+    default_branch: "main"
+    primary_test: "decision_to_enforceable_rule"
+
+  - id: modonome
+    github: "enumind/modonome"
+    commit_sha: "7a4d5244dcb6879b6aa646105b39297aa6d0a5a2"
+    default_branch: "main"
+    primary_test: "governance_ownership_and_enforcement"
+
+extractor:
+  id: "heuristic"
+  version: "0.1"
+  config:
+    min_lines: 2
+    max_lines: 50
+    confidence: 0.5
+    keywords:
+      - "adopt"
+      - "adopted"
+      - "always"
+      - "avoid"
+      - "decide"
+      - "decided"
+      - "decision"
+      - "forbid"
+      - "forbidden"
+      - "mandate"
+      - "mandated"
+      - "must"
+      - "never"
+      - "prefer"
+      - "preferred"
+      - "prohibit"
+      - "prohibited"
+      - "require"
+      - "required"
+      - "shall"
+      - "should not"
+      - "standard"
+      - "standardise"
+      - "standardised"
+      - "standardize"
+      - "use"
+      - "using"
+
+classifier:
+  backend_id: "anthropic"
+  classifier_version: "0.1"
+  model_identifier: "claude-sonnet-4-6"
+  config:
+    temperature: 0.0
+    max_tokens: 1024
+    response_format: "json"
+
+semantic_tasks:
+  - "decision_classification"
+  - "domains"
+  - "purposes"
+  - "authority"
+  - "scope"
+  - "lifecycle"
+  - "relationships"
+  - "enforcement_potential"
+
+retrieval_policy:
+  policy_id: "score_gt_zero"
+  version: "0.1"
+  projection: "temporary Decision projection (DecisionCandidate -> Decision)"
+  retriever: "frozen DecisionRetriever"
+  selection: "all decisions with score > 0"
+  output: "predicted Governing Decision Set"
+
+scenario_renderer:
+  renderer_id: "eight_field_v1"
+  version: "0.1"
+  field_order:
+    - "description"
+    - "path"
+    - "component"
+    - "change_type"
+    - "dependencies"
+    - "api"
+    - "technology"
+    - "other_context"
+
+scenario_corpus:
+  status: "missing"
+  total_required: 50
+  per_repository_required: 10
+  content_hash: "none"
+  location: "scenarios/"
+
+reference_corpus:
+  status: "missing"
+  total_required: 100
+  per_repository_required: 20
+  content_hash: "none"
+  location: "reference_decisions/"

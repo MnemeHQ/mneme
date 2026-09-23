@@ -185,6 +185,22 @@ from mneme.open_architecture.reporting import (
     render_markdown_report,
 )
 
+from mneme.open_architecture.baseline import (
+    APPROVED_BATCH_01_REPOSITORIES,
+    EXPECTED_SEMANTIC_TASKS,
+    EXPECTED_RENDERER_FIELD_ORDER,
+    FROZEN_SEMANTIC_MNEME_SHA,
+    BaselineFreezeError,
+    BaselineRepository,
+    BaselineExtractor,
+    BaselineClassifier,
+    BaselineRetrievalPolicy,
+    BaselineScenarioRenderer,
+    BaselineCorpusStatus,
+    BaselineConfig,
+    validate_baseline_freeze,
+)
+
 __all__ = [
     # manifest
     "Manifest",
@@ -309,4 +325,18 @@ __all__ = [
     # reporting
     "generate_report",
     "render_markdown_report",
+    # baseline
+    "APPROVED_BATCH_01_REPOSITORIES",
+    "EXPECTED_SEMANTIC_TASKS",
+    "EXPECTED_RENDERER_FIELD_ORDER",
+    "FROZEN_SEMANTIC_MNEME_SHA",
+    "BaselineFreezeError",
+    "BaselineRepository",
+    "BaselineExtractor",
+    "BaselineClassifier",
+    "BaselineRetrievalPolicy",
+    "BaselineScenarioRenderer",
+    "BaselineCorpusStatus",
+    "BaselineConfig",
+    "validate_baseline_freeze",
 ]
