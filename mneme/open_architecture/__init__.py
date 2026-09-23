@@ -50,6 +50,8 @@ from mneme.open_architecture.schemas import (
 )
 
 from mneme.open_architecture.store import (
+    RESEARCH_STORE_SCHEMA_VERSION,
+    ResearchStoreSchemaCompatibilityError,
     ResearchStore,
     RepositoryRecord,
     TaxonomyVersionRecord,
@@ -198,6 +200,8 @@ __all__ = [
     "validate_candidate",
     "validate_scenario",
     # store
+    "RESEARCH_STORE_SCHEMA_VERSION",
+    "ResearchStoreSchemaCompatibilityError",
     "ResearchStore",
     "RepositoryRecord",
     "TaxonomyVersionRecord",
