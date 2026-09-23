@@ -201,6 +201,15 @@ from mneme.open_architecture.baseline import (
     validate_baseline_freeze,
 )
 
+from mneme.open_architecture.classifiers import (
+    AnthropicClassifier,
+    AnthropicClassifierError,
+    AnthropicAuthenticationError,
+    AnthropicRateLimitError,
+    AnthropicMalformedResponseError,
+    TASK_SCHEMAS,
+)
+
 __all__ = [
     # manifest
     "Manifest",
@@ -339,4 +348,11 @@ __all__ = [
     "BaselineCorpusStatus",
     "BaselineConfig",
     "validate_baseline_freeze",
+    # classifiers
+    "AnthropicClassifier",
+    "AnthropicClassifierError",
+    "AnthropicAuthenticationError",
+    "AnthropicRateLimitError",
+    "AnthropicMalformedResponseError",
+    "TASK_SCHEMAS",
 ]

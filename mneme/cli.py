@@ -1331,6 +1331,21 @@ def _cmd_research_o1a_run(args: argparse.Namespace) -> int:
         print(f"  Extracted Candidates: {len(result.extracted_candidates)}")
         print(f"  Composed Candidates:  {len(result.composed_candidates)}")
         return 0
+    elif args.backend == "anthropic":
+        from mneme.open_architecture.candidates import HeuristicExtractor
+        from mneme.open_architecture.classifiers.anthropic import AnthropicClassifier
+        from mneme.open_architecture.orchestrator import run_open_architecture_analysis
+        result = run_open_architecture_analysis(
+            repository_config=repo,
+            manifest=manifest,
+            extractor=HeuristicExtractor(),
+            classifier=AnthropicClassifier(),
+        )
+        print(f"O1A Run Completed: {result.run_metadata.run_id}")
+        print(f"  Discovered Documents: {len(result.discovered_documents)}")
+        print(f"  Extracted Candidates: {len(result.extracted_candidates)}")
+        print(f"  Composed Candidates:  {len(result.composed_candidates)}")
+        return 0
 
     return _error_exit(f"unsupported classifier backend '{args.backend}'")
 

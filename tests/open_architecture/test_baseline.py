@@ -153,7 +153,7 @@ class TestBatch01BaselineFreeze:
         assert clf.model_identifier == "claude-sonnet-4-6"
         assert clf.config["temperature"] == 0.0
         assert clf.config["max_tokens"] == 1024
-        assert clf.config["response_format"] == "json"
+        assert clf.config["output_config"]["format"]["type"] == "json_schema"
 
     # 8. exactly eight semantic tasks are frozen
     def test_8_exactly_eight_semantic_tasks_frozen(self, baseline: BaselineConfig):
