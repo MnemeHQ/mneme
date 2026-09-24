@@ -1,5 +1,7 @@
 # Mneme HQ architecture diagrams
 
+> For the repository architecture entry point, including the ASCII map, C4 context/container/component views, and curated ADR map, start with [docs/architecture/README.md](./architecture/README.md).
+
 Mermaid sources for the Mneme HQ architecture set. GitHub renders these inline,
 they version with the code, and they export to SVG for the site, decks, and
 analyst briefings. The on-site (mnemehq.com) versions are hand-authored inline
