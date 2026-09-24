@@ -66,7 +66,7 @@ It deliberately links to ADRs rather than restating their full contracts.
    | Repository governance   |       | Repository mutation  |
    |-------------------------|       | / validation surfaces|
    | docs/adr/*.md           |       |----------------------|
-   | .mneme/project_memory   |       | working tree         |
+   | .mneme/project_memory.json |       | working tree         |
    | source provenance       |       | hooks / stop audit   |
    +-------------------------+       | CI gate              |
                                      +----------------------+
@@ -187,8 +187,8 @@ flowchart TB
     MCP <--> Proposals
     CLI <--> Proposals
 
+    Memory --> Audit
     Core --> Audit
-    Audit --> Memory
     Core --> Hooks
     Core --> CLI
     Core --> MCP
