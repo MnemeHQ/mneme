@@ -248,6 +248,7 @@ The repository governance source of truth is `.mneme/project_memory.json`. The A
 
 See:
 
+- [Architecture overview: ASCII + C4 + ADR map](docs/architecture/README.md)
 - [ADR import](docs/integrations/adr-import.md)
 - [Accepted ADRs](docs/adr/)
 - [Current architecture phase](docs/architecture/current-phase.md)
