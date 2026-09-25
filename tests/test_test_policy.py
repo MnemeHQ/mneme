@@ -48,6 +48,7 @@ REQUIRED_GATE_PATHS: tuple[str, ...] = (
     "tests/test_setup_audit_parity.py",
     "tests/test_protection_activation.py",
     "tests/test_packaging_contract.py",
+    "tests/test_architecture_docs.py",
     "tests/test_benchmark.py",
     "tests/test_enforcement_quality_benchmark.py",
     "tests/integrations/claude_code",
@@ -210,6 +211,22 @@ def test_tests_workflow_runs_gate_on_prs_and_full_suite_on_main():
         "otherwise the live fixture silently skips"
     )
     assert _battery_steps(jobs["release"]) == ["python scripts/run_test_battery.py release"]
+
+
+def test_architecture_docs_workflow_runs_deterministic_checker():
+    workflow = _load_workflow("architecture-docs-check.yml")
+    jobs = workflow["jobs"]
+    assert set(jobs) == {"architecture-docs"}
+    job = jobs["architecture-docs"]
+    assert job["name"] == "Validate architecture documentation"
+
+    triggers = workflow[True]
+    assert set(triggers) == {"pull_request", "push"}
+    assert triggers["pull_request"]["branches"] == ["main"]
+    assert triggers["push"]["branches"] == ["main"]
+
+    runs = _step_runs(job)
+    assert "python scripts/check_architecture_docs.py" in runs
 
 
 def test_release_workflow_publishes_without_running_tests():
