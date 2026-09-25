@@ -190,6 +190,10 @@ GATE_EXCLUSIONS: tuple[tuple[str, str], ...] = (
         "tests/test_check_install_command.py",
         "main-only: repo tooling (dedicated install-command-check.yml workflow)",
     ),
+    (
+        "tests/test_check_pr_provenance.py",
+        "main-only: repo tooling (dedicated provenance-check.yml workflow)",
+    ),
     ("tests/test_check_worktree_context.py", "main-only: repo tooling"),
     ("tests/test_pre_push_main_guard.py", "main-only: repo tooling"),
     ("tests/test_eventcatalog_import.py", "main-only: experimental integration"),
