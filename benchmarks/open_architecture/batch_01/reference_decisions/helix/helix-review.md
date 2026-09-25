@@ -3,8 +3,8 @@
 **Repository:** AZX-PBC-OSS/helix
 **Pinned Commit:** 37d994370deba2512588b5c4efb7f03483e7308b
 **Total Records (Planned):** 20
-**Currently Drafted:** 5 (records 001–005)
-**Records 006–020:** Not yet created
+**Currently Drafted:** 10 (records 001–010)
+**Records 011–020:** Not yet created
 **Status:** Drafted; pending human review
 
 ---
@@ -14,16 +14,16 @@
 | Category | Quota | Proposed | Drafted |
 |---|---:|---:|---:|
 | clear_explicit | 5 | 5 | 5 ✓ |
-| scoped | 5 | 5 | 0 |
+| scoped | 5 | 5 | 5 ✓ |
 | lifecycle_or_supersession | 3 | 3 | 0 |
 | ambiguous_or_conflicting | 3 | 3 | 0 |
 | enforcement_potential | 2 | 2 | 0 |
 | unusual_or_difficult | 2 | 2 | 0 |
-| **Total** | **20** | **20** | **5** |
+| **Total** | **20** | **20** | **10** |
 
 ---
 
-## Records for Review (001–005)
+## Records for Review (001–010)
 
 ### clear_explicit (5)
 
@@ -35,16 +35,18 @@
 | ref-helix-004 | 0014 | Same-origin `/_api/*` gateway as single choke point | prescriptive | explicitly_accepted | Gateway at `/_api/*` on app origin; no CORS; session cookie authenticates |
 | ref-helix-005 | 0003 | Dependency-minimal edge, hand-written SQL, no ORM | prescriptive | accepted | Dependency-minimal edge; no ORM; hand-written SQL; hand-rolled undici |
 
+### scoped (5)
+| ID | ADR | Title | Classification | Authority | Key Decision |
+|---|---|---|---|---|---|
+| ref-helix-006 | 0019 | Subdomain-per-app isolation with host-scoped cookies | prescriptive | explicitly_accepted | Each app on own subdomain with `__Host-` cookies; browser same-origin policy is isolation primitive |
+| ref-helix-007 | 0017 | Edge registry projection over Postgres LISTEN/NOTIFY | prescriptive | explicitly_accepted | In-memory projection refreshed via LISTEN/NOTIFY (~100ms) + full reconcile (~60s); fail-closed/fail-static |
+| ref-helix-008 | 0006 | SecretStore custody seam (dev envelope / prod Key Vault) | prescriptive | explicitly_accepted | Single `seal`/`open`/`destroy` seam; dev AES-GCM envelope; prod Key Vault; portal writes, egress reads |
+| ref-helix-009 | 0016 | Capability manifest + approval classifier | prescriptive | explicitly_accepted | Manifest changes classified by `classifyChange`: baseline auto-commit vs elevated requiring platform-admin approval |
+| ref-helix-010 | 0008 | LLM vendor key resolved by egress (legacy fallback removed) | prescriptive | explicitly_accepted | LLM keys resolved only by egress at call time; edge holds no key; unconfigured egress = 503 closed |
+
 ---
 
-## Remaining Candidates (006–020) — Not Yet Drafted
-
-### scoped (5)
-- ref-helix-006 — ADR-0019: Subdomain-per-app isolation with host-scoped cookies
-- ref-helix-007 — ADR-0017: Edge registry projection over Postgres LISTEN/NOTIFY
-- ref-helix-008 — ADR-0006: SecretStore custody seam (dev envelope / prod Key Vault)
-- ref-helix-009 — ADR-0016: Capability manifest + approval classifier
-- ref-helix-010 — ADR-0008: LLM vendor key resolved by egress
+## Remaining Candidates (011–020) — Not Yet Drafted
 
 ### lifecycle_or_supersession (3)
 - ref-helix-011 — ADR-0011: In-memory rate-limiting superseded by shared Postgres counter
@@ -63,6 +65,16 @@
 ### unusual_or_difficult (2)
 - ref-helix-019 — ADR-0035: Platform-owned service worker for offline capability
 - ref-helix-020 — ADR-0028: Single-tenant customer-deployed model parameterizing 6 prior decisions
+
+---
+
+## Review Status
+
+| Range | Status |
+|---|---|
+| 001–005 | **reviewed** |
+| 006–010 | **pending** (drafted) |
+| 011–020 | **not yet created** |
 
 ---
 
@@ -89,9 +101,9 @@ For each record (once all 20 are drafted), please:
 ### Special Cases to Note
 
 1. **ref-helix-005 (ADR-0003)**: ONTOLOGY_GAP recorded — source explicitly states discipline enforced in review with no automated gate. Scalar `enforcement_potential` cannot represent both mechanical enforcement and review discipline.
-2. **ref-helix-006–010, 016–020**: Not yet drafted. Source ADRs exist at pinned commit.
+2. **ref-helix-006–010**: Drafted as Nemotron drafts, all `human_review_status: pending`.
 3. **ADR-0026/0030/0031**: ADR-0030 (Proposed) explicitly states ADR-0026 is NOT superseded; gates remain if hosted builds revisited. ADR-0031 (Proposed) has amendment narrowing scope after `hmac-timestamp` shipped.
-4. **All records**: Must remain `human_review_status: pending` until Theo explicitly approves.
+3. **All records 006–010**: Must remain `human_review_status: pending` until Theo explicitly approves.
 
 ---
 
@@ -101,7 +113,7 @@ For each record (once all 20 are drafted), please:
 - [ ] All source locations point to valid lines in pinned commit `37d994370deba2512588b5c4efb7f03483e7308b`
 - [ ] All taxonomy fields use exact O1A vocabulary
 - [ ] No `cand-*` IDs used as reference IDs
-- [ ] All `human_review_status` = "pending" (for drafted records)
+- [ ] All `human_review_status` = "pending" for 006–010; "reviewed" for 001–005
 - [ ] Sampling quota: 5/5/3/3/2/2 = 20 ✓
 - [ ] No machine prediction fields present
 - [ ] Corpus hash computed (after all 20 drafted)
@@ -117,13 +129,18 @@ No scenarios, repository 3 classifier experiments, ontology redesign, or D1B wor
 
 ---
 
-## Files Created (001–005)
+## Files Created (001–010)
 
 - `benchmarks/open_architecture/batch_01/reference_decisions/helix/ref-helix-001.jsonl` — ADR-0020 (static-only apps)
 - `benchmarks/open_architecture/batch_01/reference_decisions/helix/ref-helix-002.jsonl` — ADR-0015 (app-data three scopes)
 - `benchmarks/open_architecture/batch_01/reference_decisions/helix/ref-helix-003.jsonl` — ADR-0018 (deploy model)
 - `benchmarks/open_architecture/batch_01/reference_decisions/helix/ref-helix-004.jsonl` — ADR-0014 (same-origin gateway)
 - `benchmarks/open_architecture/batch_01/reference_decisions/helix/ref-helix-005.jsonl` — ADR-0003 (dependency-minimal edge)
+- `benchmarks/open_architecture/batch_01/reference_decisions/helix/ref-helix-006.jsonl` — ADR-0019 (subdomain isolation)
+- `benchmarks/open_architecture/batch_01/reference_decisions/helix/ref-helix-007.jsonl` — ADR-0017 (registry projection)
+- `benchmarks/open_architecture/batch_01/reference_decisions/helix/ref-helix-008.jsonl` — ADR-0006 (SecretStore custody seam)
+- `benchmarks/open_architecture/batch_01/reference_decisions/helix/ref-helix-009.jsonl` — ADR-0016 (capability manifest approval classifier)
+- `benchmarks/open_architecture/batch_01/reference_decisions/helix/ref-helix-010.jsonl` — ADR-0008 (LLM key via egress)
 
 ---
 
@@ -138,4 +155,4 @@ The frozen `lifecycle_status` and `supersedes` fields model whole-ADR supersessi
 
 ---
 
-**Please review and return with your decisions for records 001–005.**
+**Please review and return with your decisions for records 006–010.**
