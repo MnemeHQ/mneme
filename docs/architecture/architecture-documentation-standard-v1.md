@@ -196,6 +196,22 @@ For an architecture-affecting change, done means:
 - links between diagrams and governing ADRs remain valid;
 - reviewers can trace the changed responsibility back to its decision context.
 
+## Deterministic integrity checks
+
+Where practical, automate facts that do not require architectural judgment.
+Useful checks include:
+
+- architecture entry-point sections exist;
+- local documentation links resolve;
+- ADR identifiers are unique;
+- ADR-map identifiers and statuses match ADR frontmatter;
+- proposed ADRs represented in the architecture map are explicitly marked as
+  proposed/target/deferred.
+
+These checks complement review. They do not prove that a C4 diagram is
+semantically correct or that implementation matches every documented
+responsibility.
+
 ## Release hygiene
 
 Before a release candidate is tagged, verify that the architecture entry point
