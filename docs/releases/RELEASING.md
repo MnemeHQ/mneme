@@ -65,6 +65,27 @@ Because the prep commit changes package metadata (the version), it requires
 its own complete validation on that exact SHA (step 3) — a full-suite pass on
 an earlier commit does not carry over.
 
+### Architecture verification on the release-candidate state
+
+Before proceeding to the release battery, verify the architecture documentation
+against the exact release-candidate state using
+[`docs/architecture/documentation-governance.md`](../architecture/documentation-governance.md).
+
+At minimum confirm that:
+
+- `docs/architecture/README.md` still describes the shipped system;
+- shipped architectural capabilities are not still labelled deferred or
+  unimplemented;
+- proposed ADRs are not presented as shipped;
+- ADR status shown in the architecture map matches current frontmatter;
+- material changes to authority, persistence, lifecycle, enforcement,
+  evidence, integrations, or research boundaries are represented.
+
+If this verification requires a docs correction, make it through a PR before
+tagging. A docs-only correction does not by itself require the full source
+battery to be rerun under the SHA-invalidation policy below, but the tag must
+still point to the final intended release-candidate SHA.
+
 ## 3. Run the release battery once on the exact release-candidate SHA
 
 > **Invariant: a successful full release-suite result belongs to an exact Git
@@ -250,6 +271,9 @@ Run in order. Do not advance past a failing step.
 - [ ] `main` is clean and at the release-candidate squash commit.
 - [ ] Release-prep PR squash-merged: version bump in `pyproject.toml` **and**
       `mneme/__init__.py`, `CHANGELOG.md` entry, `docs/releases/vX.Y.Z.md`.
+- [ ] Architecture documentation verified against the release-candidate state:
+      current vs target is accurate, ADR statuses are current, and shipped
+      architectural boundaries are represented.
 - [ ] **Release battery passed once on the exact release-candidate SHA**
       (`gh workflow run tests.yml --ref <rc-ref> -f battery=release`, or the
       push-to-`main` run for that exact SHA); run URL + SHA recorded in
