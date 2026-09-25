@@ -71,7 +71,13 @@ Before proceeding to the release battery, verify the architecture documentation
 against the exact release-candidate state using
 [`docs/architecture/documentation-governance.md`](../architecture/documentation-governance.md).
 
-At minimum confirm that:
+Run the deterministic integrity check first:
+
+```powershell
+python scripts/check_architecture_docs.py
+```
+
+Then perform the semantic review. At minimum confirm that:
 
 - `docs/architecture/README.md` still describes the shipped system;
 - shipped architectural capabilities are not still labelled deferred or
