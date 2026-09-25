@@ -56,7 +56,16 @@ Terminology is fixed:
 - Mneme enforces prior engineering and architectural decisions before model generation, during supported file changes, and in CI.
 - Mneme prevents architectural drift and context loss in AI-assisted development workflows.
 - Mneme does not replace coding agents, CI systems, policy engines, or code review. It supplies the approved decisions that supported agents and CI gates check changes against.
-- Every use of the category line must sit next to a concrete shipped primitive (decision identity, applicability, lifecycle, precedence, deterministic enforcement, MCP access, decision-linked verdicts). "Control plane" is not used as standalone category language.
+
+## Claim Levels
+
+Marketing may use broader category and outcome language where it accurately represents Mneme's direction and demonstrated primitives. Exact implementation scope is required only for specific feature, integration, compatibility, enforcement, and support claims.
+
+- **Category and vision claims** may lead slightly ahead of implementation. "The decision and control layer for agentic software development", "makes engineering decisions operational", and "carries decisions across agents and workflows" are acceptable.
+- **Capability claims** may generalize reasonably from what works today. Copy does not need to qualify every sentence as "supported architectural decisions on supported integrations"; naming architecture as the first shipped domain nearby is sufficient qualification.
+- **Concrete factual claims** stay literal. Named integrations and their support level, security or compliance support, deployment controls, evidence stores, enterprise features, and similar specifics are never stated as shipped when they are not.
+
+ADRs set strategic boundaries for messaging; they are not a sentence-level compliance review of marketing copy.
 
 ## Approved Supporting Phrasing
 

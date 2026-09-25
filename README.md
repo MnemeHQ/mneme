@@ -2,7 +2,7 @@
 
 <!-- mcp-name: io.github.MnemeHQ/mneme -->
 
-**Mneme is an open decision and control layer for AI-assisted software development.**
+**Mneme is an open decision and control layer for agentic software development.**
 
 It turns durable engineering decisions into agent context, deterministic enforcement, and inspectable enforcement results across AI coding agents, repositories, and CI workflows. Architecture is the first supported decision domain: **Mneme prevents architectural drift** by turning architectural decisions and ADRs into deterministic guardrails across coding agents, repository mutations, generated rules, and CI gates.
 
