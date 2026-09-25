@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
-"""Validate the pull request Execution provenance block."""
+"""Validate the pull request Execution provenance block.
+
+With no arguments the PR body is read from the GitHub event payload
+(GITHUB_EVENT_PATH), as in CI. For local validation before opening a PR,
+pass ``--body-file PATH`` or ``--body -`` to read the body from stdin.
+"""
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import re
@@ -93,9 +99,29 @@ def validate(body: str) -> list[str]:
     return errors
 
 
-def main() -> int:
+def _parse_args(argv: list[str] | None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    source = parser.add_mutually_exclusive_group()
+    source.add_argument("--body-file", metavar="PATH", help="read the PR body from a file")
+    source.add_argument("--body", metavar="-", help="pass '-' to read the PR body from stdin")
+    args = parser.parse_args(argv)
+    if args.body is not None and args.body != "-":
+        parser.error("--body only accepts '-' (stdin); use --body-file for files")
+    return args
+
+
+def _read_body(args: argparse.Namespace) -> str:
+    if args.body_file is not None:
+        return Path(args.body_file).read_text(encoding="utf-8")
+    if args.body == "-":
+        return sys.stdin.buffer.read().decode("utf-8")
+    return _event_body()
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = _parse_args(argv)
     try:
-        body = _event_body()
+        body = _read_body(args)
     except Exception as exc:
         print(f"provenance-check: ERROR: {exc}", file=sys.stderr)
         return 2
