@@ -2,9 +2,9 @@
 
 <!-- mcp-name: io.github.MnemeHQ/mneme -->
 
-**Architectural drift prevention for the agentic AI SDLC.**
+**Mneme is an open decision and control layer for AI-assisted software development.**
 
-Mneme turns architectural decisions and ADRs into deterministic guardrails for the agentic AI SDLC — across coding agents, repository mutations, generated rules, and CI gates.
+It turns durable engineering decisions into agent context, deterministic enforcement, and inspectable enforcement results across AI coding agents, repositories, and CI workflows. Architecture is the first supported decision domain: **Mneme prevents architectural drift** by turning architectural decisions and ADRs into deterministic guardrails across coding agents, repository mutations, generated rules, and CI gates.
 
 [![Tests](https://github.com/MnemeHQ/mneme/actions/workflows/tests.yml/badge.svg)](https://github.com/MnemeHQ/mneme/actions/workflows/tests.yml)
 [![PyPI](https://img.shields.io/pypi/v/mneme-hq.svg)](https://pypi.org/project/mneme-hq/)
@@ -13,7 +13,7 @@ Mneme turns architectural decisions and ADRs into deterministic guardrails for t
 
 > **Where is your architecture actually enforced?** Run the [Architecture Audit](#architecture-audit) to see which decisions are protected, which can become deterministic guardrails, and which still depend on someone remembering the rules. [Try it →](https://mnemehq.com/audit/)
 
-Mneme is the architectural governance layer behind that drift-prevention mechanism. It keeps recorded engineering decisions active as AI coding systems propose and modify code, instead of leaving ADRs as passive documentation.
+Mneme is the decision layer behind that drift-prevention mechanism. It keeps recorded engineering decisions active as AI coding systems propose and modify code, instead of leaving ADRs as passive documentation.
 
 > **Current phase:** Layer 1 validation. Retrieval, enforcement, and benchmark semantics are governed by the accepted architecture and freeze record. See [Current Phase](docs/architecture/current-phase.md) before changing core behavior.
 

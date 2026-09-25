@@ -15,9 +15,17 @@ scope: positioning.harness_vocab
 > ADR-011 number now belongs to "Knowledge-graph content architecture";
 > this ADR's content is unchanged except for cross-references to the renumbered
 > external-platform-presence ADR (now ADR-013).
+>
+> Amended 2026-09-25 (positioning-only): aligned with ADR-001's category change
+> to "the decision and control layer for agentic software development." The
+> five runtime-stack layer names are unchanged and still used verbatim; layer 4
+> now describes Mneme as the decision and control layer that provides governance
+> infrastructure, rather than naming governance as Mneme's identity. The
+> harness-complementary framing and every §3 prohibition are unchanged.
 
 **Status:** Accepted
 **Date:** 2026-05-16
+**Amended:** 2026-09-25
 **Deciders:** Theo Valmis
 
 ---
@@ -63,8 +71,14 @@ and their order are:
    lifecycle.
 3. **Execution systems** — long-running loops, sessions, memory, continuity
    infrastructure.
-4. **Governance infrastructure** — decision graph, precedence, pre-generation
-   enforcement, propagation across surfaces. **This is Mneme's layer.**
+4. **Governance infrastructure** — decision graph, applicability, precedence,
+   pre-generation enforcement, propagation across surfaces. **Mneme operates
+   here as the decision and control layer for agentic software development:**
+   it carries approved engineering decisions across harnesses and execution
+   systems, determines which apply to a change, and enforces what can be
+   enforced deterministically. "Governance infrastructure" is the layer's
+   canonical name and the capability it delivers; it is not Mneme's category
+   name (ADR-001).
 5. **Verification / enforcement** — tests, builds, deploy-time checks,
    deterministic verdicts.
 
@@ -79,6 +93,11 @@ of:
 
 > Harnesses coordinate execution. Mneme enforces architectural intent. They
 > run side by side.
+
+A category-led variant is also canonical:
+
+> Harnesses coordinate execution. Mneme is the decision and control layer
+> that carries the same approved decisions across them.
 
 Adapt wording to fit the surrounding voice; do not copy the sentence verbatim
 across pages. Integration pages must read as "we work alongside this harness,"
@@ -103,7 +122,9 @@ integration pages, marketing copy, external platform copy):
   Claude Code, Cursor, Copilot, or any other harness; it is a separate layer
   every harness can query.
 - Positioning Mneme as an **agent context layer** — context injection is one
-  surface Mneme operates on, not what Mneme is.
+  surface Mneme operates on, not what Mneme is. Saying Mneme turns decisions
+  *into* agent context (alongside deterministic enforcement and decision-linked
+  results) is permitted; naming context as Mneme's category is not.
 
 ### 4. Compliance rule
 
@@ -137,7 +158,9 @@ the canonical references. When in doubt, copy phrasing from there.
 
 - **ADR-001** — Mneme HQ Positioning and Messaging Rules. This ADR is the
   vocabulary lock that operationalises ADR-001 for the post-Wave-1 surface
-  set; it does not supersede ADR-001.
+  set; it does not supersede ADR-001. As amended 2026-09-25, ADR-001 defines
+  the category (decision and control layer); this ADR defines where that
+  layer sits in the runtime stack.
 - **ADR-004** — Brand Name (Mneme HQ). Brand-level naming is governed there;
   this ADR governs how the product is *positioned*, not what it is *called*.
 - **ADR-006** — Insights Article SEO Requirements. New insights articles

@@ -26,10 +26,19 @@ scope: distribution.external_platforms
 > "architectural drift prevention for the agentic AI SDLC" so `agentic` is an
 > explicit category keyword. The mechanism, architecture, support taxonomy,
 > topics, freeze, and integration-status claims are unchanged.
+>
+> Amended 2026-09-25 (positioning-only): ADR-001 now names Mneme's
+> company-level category as "the decision and control layer for agentic
+> software development." "Architectural drift prevention for the agentic AI
+> SDLC" is **retained unchanged** as the GitHub description and as the lead
+> claim for external platform copy, reclassified as Mneme's architecture-led
+> distribution and acquisition claim rather than its company-level category.
+> Variants A-C remain valid; an optional category-led Variant D is added.
+> Topics, freeze, and integration-status claims are unchanged.
 
 **Status:** Accepted  
 **Date:** 2026-05-14  
-**Amended:** 2026-08-25  
+**Amended:** 2026-09-25  
 **Deciders:** Theo Valmis
 
 ---
@@ -45,10 +54,15 @@ This ADR locks the canonical GitHub repository metadata and the three approved e
 Distribution tracking (which lists were submitted, PR status, directory submission log) lives in
 the private `mneme-growth-ops` repo per ADR-002 and is not governed here.
 
-The primary external category claim is **"Architectural drift prevention for
-the agentic AI SDLC."** Architectural governance and deterministic guardrails describe
-the mechanism by which drift prevention works; they are supporting language,
-never the lead claim. External copy must not position Mneme primarily as agent
+The lead external platform claim is **"Architectural drift prevention for
+the agentic AI SDLC."** Since the 2026-09-25 amendment this is Mneme's
+architecture-led distribution and acquisition claim: the first concrete use case
+of the company-level category defined in ADR-001 ("the decision and control
+layer for agentic software development"). It is not a competing category, and
+external copy may name the category alongside it (Variant D). Architectural
+governance and deterministic guardrails describe the mechanism by which drift
+prevention works; they are supporting language, never the lead claim, and
+"governance layer" is never used as the category name. External copy must not position Mneme primarily as agent
 governance, AI security, or generic guardrails.
 
 ---
@@ -85,7 +99,10 @@ emerges in the ecosystem. Changes require updating this ADR.
 
 ### 2. Approved external copy variants
 
-Three variants are approved. Choose based on the list's audience.
+Four variants are approved. Choose based on the list's audience. A-C are
+architecture-led and remain the default for awesome-lists and coding-agent
+directories; D is category-led for company profiles and directories that
+describe the company rather than the tool.
 
 **Variant A — short/general lists:**
 
@@ -99,7 +116,12 @@ Three variants are approved. Choose based on the list's audience.
 
 > AI coding agents start every call with no knowledge of the architectural decisions a team has already made, so they reintroduce rejected technologies and produce changes that contradict the architecture. Mneme prevents this architectural drift across the agentic AI SDLC: it turns architectural decisions and ADRs into deterministic guardrails applied at the earliest reliable boundary of an AI workflow — before generation, before supported file mutations via agent hooks, after bypassable mutations via working-tree audits, and before merge via CI gates. Enforcement is deterministic: same input, same verdict. Native integrations: Claude Code, Claude Agent SDK, Google Antigravity, Codex CLI. Validated compatibility: Paperclip. Cursor rules export and GitHub Actions/GitLab CI gates are also supported.
 
+**Variant D — category-led (company profiles, startup and AI directories):**
+
+> Open-source decision and control layer for agentic software development. Starts with architecture: turns ADRs and engineering standards into agent context and deterministic guardrails across AI coding agents, repositories, and CI workflows, preventing architectural drift before AI-generated code ships.
+
 Rules:
+- Variant D must not present security, compliance, platform, or operational-policy decisions as shipped domains (ADR-001).
 - No emojis in list entries.
 - Do not address the reader ("you", "your") in list copy.
 - Do not use promotional language ("powerful", "revolutionary", "best").
@@ -133,7 +155,7 @@ Rules:
 
 - Locking copy variants prevents positioning drift across submissions (ADR-001 compliance).
 - Locking topics prevents ad-hoc changes that reduce discoverability.
-- The three-variant model matches real list taxonomy: general lists want the short
+- The variant model matches real list taxonomy: general lists want the short
   category-led framing; coding-agent lists want the agent-enforcement framing;
   long-form forms need the problem-plus-mechanism explanation with support levels.
 - Distribution tracking stays in growth-ops (ADR-002) — this ADR only governs what is said,
@@ -143,7 +165,7 @@ Rules:
 
 ## Consequences
 
-- Any new awesome-list or directory submission must use one of the three approved copy variants.
+- Any new awesome-list or directory submission must use one of the four approved copy variants.
 - GitHub topic changes require amending this ADR.
 - The marketing site description and og:description are governed separately by ADR-001 and ADR-003;
   this ADR governs only external third-party platform copy.

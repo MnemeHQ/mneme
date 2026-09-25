@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "mneme-hq"
 version = "0.9.2"
-description = "Architectural drift prevention for the agentic AI SDLC. Deterministic ADR guardrails across coding agents and CI."
+description = "Decision and control layer for agentic software development. Starts with architectural drift prevention: deterministic ADR guardrails across coding agents and CI."
 keywords = ["architectural-drift-prevention", "architectural-drift", "agentic-ai-sdlc", "agentic-ai", "ai-coding-agents", "adr", "architectural-governance", "ci", "codex", "claude-code"]
 readme = "README.md"
 requires-python = ">=3.11"
