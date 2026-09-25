@@ -13,6 +13,8 @@ import pytest
 PLUGIN_ROOT = (
     Path(__file__).resolve().parents[3] / "integrations" / "claude-code-plugin"
 )
+REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
+MARKETPLACE_MANIFEST = REPOSITORY_ROOT / ".claude-plugin" / "marketplace.json"
 
 
 def _load(rel):
@@ -21,6 +23,24 @@ def _load(rel):
 
 def test_plugin_dir_exists():
     assert PLUGIN_ROOT.is_dir(), f"plugin dir missing at {PLUGIN_ROOT}"
+
+
+def test_marketplace_points_to_current_plugin():
+    marketplace = json.loads(MARKETPLACE_MANIFEST.read_text(encoding="utf-8"))
+    assert marketplace["name"] == "mneme"
+    assert marketplace["owner"]["name"] == "Mneme HQ"
+    assert len(marketplace["plugins"]) == 1
+
+    entry = marketplace["plugins"][0]
+    assert entry["name"] == "mneme"
+    assert entry["source"] == "./integrations/claude-code-plugin"
+
+    source = (REPOSITORY_ROOT / entry["source"]).resolve()
+    assert source == PLUGIN_ROOT.resolve()
+    assert source.is_dir()
+
+    plugin = _load(".claude-plugin/plugin.json")
+    assert entry["name"] == plugin["name"]
 
 
 def test_manifest_is_valid_and_declares_mode_option():
@@ -63,6 +83,19 @@ def test_hook_uses_exec_form_direct_invocation():
     # Exec form: command is the bare console script, args present (empty vector).
     assert hook["command"] == "mneme-hook"
     assert hook["args"] == []
+
+
+def test_plugin_preserves_prevent_catch_verify_boundaries():
+    hooks = _load("hooks/hooks.json")["hooks"]
+    assert set(hooks) == {"PreToolUse", "SessionStart", "Stop"}
+    assert hooks["PreToolUse"][0]["matcher"] == "Edit|Write|MultiEdit|Bash"
+
+    for event in ("PreToolUse", "SessionStart", "Stop"):
+        event_hooks = hooks[event][0]["hooks"]
+        assert len(event_hooks) == 1
+        assert event_hooks[0]["type"] == "command"
+        assert event_hooks[0]["command"] == "mneme-hook"
+        assert event_hooks[0]["args"] == []
 
 
 def test_hook_command_has_no_shell_dependency():
