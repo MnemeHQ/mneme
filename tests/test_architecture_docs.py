@@ -4,6 +4,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from scripts.check_architecture_docs import (
+    ARCHIVAL_LINK_CHECK_EXCLUSIONS,
     REQUIRED_ARCHITECTURE_HEADINGS,
     validate_architecture_docs,
 )
@@ -82,6 +83,14 @@ def _fixture_repo(
 
 def test_repository_architecture_docs_are_consistent():
     assert validate_architecture_docs(REPO_ROOT) == []
+
+
+def test_archival_freeze_artifact_is_explicitly_excluded_from_live_link_checks():
+    assert ARCHIVAL_LINK_CHECK_EXCLUSIONS == (
+        Path("docs/architecture/layer1-freeze-e73ff7d.md"),
+    )
+    for rel in ARCHIVAL_LINK_CHECK_EXCLUSIONS:
+        assert (REPO_ROOT / rel).is_file()
 
 
 def test_detects_broken_relative_link(tmp_path):
