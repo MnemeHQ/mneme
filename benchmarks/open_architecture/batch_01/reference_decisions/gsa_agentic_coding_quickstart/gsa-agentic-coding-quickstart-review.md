@@ -3,23 +3,36 @@
 **Repository:** GSA-TTS/agentic-coding-quickstart  
 **Pinned Commit:** 8e6160c63acc35bd48d0a3844e133ea3ad52a464  
 **Total Records:** 20  
-**Status:** Drafted; pending human review
+**Status:** 20/20 human-reviewed
 
 ---
 
 ## Summary by Sampling Category
 
-| Category | Quota | Selected |
-|---|---:|---:|
-| clear_explicit | 5 | 5 |
-| scoped | 5 | 5 |
-| lifecycle_or_supersession | 3 | 3 |
-| ambiguous_or_conflicting | 3 | 3 |
-| enforcement_potential | 2 | 2 |
-| unusual_or_difficult | 2 | 2 |
-| **Total** | **20** | **20** |
+| Category | Quota | Selected | Reviewed |
+|---|---:|---:|---:|
+| clear_explicit | 5 | 5 | 5 |
+| scoped | 5 | 5 | 5 |
+| lifecycle_or_supersession | 3 | 3 | 3 |
+| ambiguous_or_conflicting | 3 | 3 | 3 |
+| enforcement_potential | 2 | 2 | 2 |
+| unusual_or_difficult | 2 | 2 | 2 |
+| **Total** | **20** | **20** | **20** |
 
-## Records for Review
+## Human-review outcome
+
+Six draft records required taxonomy corrections after independent source review:
+
+- **001 / ADR-0002:** removed `deployment_infrastructure`; the decision governs versioning and release workflow/evidence, not deployment infrastructure.
+- **002 / ADR-0006:** added `dependency_technology` and purpose `select`; the ADR explicitly chooses and applies the git-ssh-sign kit.
+- **010 / ADR-0029:** removed `testing_quality` and `require_evidence`; test seams support the path-form decision but are not its governed domain or purpose.
+- **011 / ADR-0003:** replaced `require_evidence` with `require`; the source requires PR review of generated updates rather than an evidence artifact.
+- **013 / ADR-0005:** added purpose `select`; the ADR explicitly chooses pinned remote kits as the replacement delivery model.
+- **014 / ADR-0001:** added `api_interface`; the accepted decision explicitly includes the OpenAI-compatible USAi endpoint/authentication interface.
+
+All remaining records were source-validated without taxonomy changes.
+
+## Records
 
 ### clear_explicit
 
@@ -71,31 +84,34 @@
 | ref-gsa-agentic-coding-quickstart-019 | 0020 | Rootless podman OCI compatibility layer |
 | ref-gsa-agentic-coding-quickstart-020 | 0021 | Host ssh-agent forwarding through vsock |
 
-## Review Rules
+## Preserved ontology gaps
 
-For each record:
+- **ADR-0005:** deterministic SHA/fail-safe controls coexist with agent rules/skills explicitly described as advisory context rather than a security boundary.
+- **ADR-0006:** deterministic fail-closed signing coexists with an advisory pre-attach warning.
+- **ADR-0013:** deterministic credential-storage/permission constraints coexist with a warn-not-block adoption gate.
+- **ADR-0017:** later Update sections correct the original mechanism inside the same still-active ADR.
+- **ADR-0018 / ADR-0019:** later notes replace individual clauses without whole-ADR supersession.
+- **ADR-0020 / ADR-0021:** deterministic sub-controls coexist with fail-soft optional-capability behavior.
 
-1. Verify the source location and raw evidence against the pinned commit.
-2. Check normalized intent without replacing source-native meaning.
-3. Use only frozen O1A taxonomy version 0.1.
-4. Do not invent relationships that the source does not support.
-5. Preserve accepted/superseded authority exactly as the repository establishes it.
-6. Preserve current-state update/addendum semantics while retaining historical text.
-7. Keep ontology limitations visible as `ONTOLOGY_GAP` notes rather than redesigning the ontology during Batch 01.
-8. Mark the record `reviewed` only after human approval/correction.
+## Authority case preserved
 
-## Cases Requiring Particular Attention
+ADR-0001 remains `accepted` and says all agents execute in SBX. Later accepted ADR-0010 introduces pluggable backends and ADR-0011 adds msb, but neither explicitly supersedes ADR-0001. The reference corpus therefore preserves ADR-0001 as active/explicitly accepted and records the conflict in human notes rather than inventing a supersession or `conflicts_with` relationship.
 
-- **ADR-0001:** remains `accepted` and states all agents run in SBX, while later accepted ADR-0010/0011 establish multi-backend architecture. No explicit supersession is invented.
-- **ADR-0005:** mixes deterministic SHA-pinning controls with a deliberate statement that agent rules/skills are advisory context, exposing the limitation of one scalar enforcement label.
-- **ADR-0013:** the GitHub-token governance decision is prescriptive, but its adoption gate is explicitly warn-not-block.
-- **ADR-0017:** later Update sections correct the original Decision Outcome in the same accepted ADR; the frozen lifecycle vocabulary has no clause-level amendment state.
-- **ADR-0018 / ADR-0019:** later updates replace individual network-policy clauses while the ADRs remain active.
-- **ADR-0020 / ADR-0021:** deterministic sub-controls coexist with fail-soft capability behavior; raw evidence and ontology-gap notes retain that distinction.
+## Verification checklist
 
-## Boundary Confirmation
+- [x] 20 unique repo-2 reference IDs
+- [x] pinned repository SHA matches Batch 01 manifest/baseline
+- [x] source evidence verified against pinned source
+- [x] exact frozen O1A vocabulary only
+- [x] sampling quota 5/5/3/3/2/2
+- [x] authority and lifecycle preserved from source
+- [x] unsupported relationships not invented
+- [x] current-state in-record updates preserved
+- [x] ontology gaps recorded rather than redesigned
+- [x] all `human_review_status` values are `reviewed`
+- [x] no machine prediction fields added
+- [x] no scenarios, repo 3, classifier experiments, ontology redesign, D1B, or semantic execution changes
 
-This corpus is research data only. It does not create canonical decisions, accepted proposals, rules, or enforcement evidence.
+## Boundary confirmation
 
-No frozen semantic execution code is part of this draft.
-No scenarios, repository 3 work, classifier experiments, ontology redesign, or D1B work is included.
+This corpus remains research-only benchmark data. It creates no canonical Decision Index authority, accepted proposals, rules, or enforcement evidence.
