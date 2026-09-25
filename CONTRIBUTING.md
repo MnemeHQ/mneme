@@ -114,6 +114,28 @@ Behavioural changes to frozen retrieval, enforcement, or benchmark semantics req
 - Keep PRs narrowly scoped. Do not mix unrelated refactoring with new features.
 - Ensure your changes do not unexpectedly alter the retrieval scoring algorithm or violation checking logic.
 
+## Architecture Documentation Governance
+
+Every pull request must classify its architecture impact using the PR template:
+
+- **None**
+- **Representation only**
+- **Architecture change**
+- **Target architecture**
+
+The classification is based on whether the change alters architectural
+responsibilities or contracts, not on whether a particular file type changed.
+
+Architecture-impacting changes normally update the affected architecture view
+in the same PR. New or changed architectural decisions must be checked against
+the governing ADR set; proposed target architecture must remain visibly
+separate from current shipped architecture.
+
+The full process contract is
+[`docs/architecture/documentation-governance.md`](docs/architecture/documentation-governance.md).
+The reusable practice taught to adopting teams is
+[`Mneme Architecture Documentation Standard v1`](docs/architecture/architecture-documentation-standard-v1.md).
+
 ## Modifying Project Memory
 
 If you need to change `.mneme/project_memory.json` (the repository's own governance memory), prepend `[memory]` to your commit message and PR title.
@@ -122,3 +144,7 @@ If you need to change `.mneme/project_memory.json` (the repository's own governa
 
 - If you add a new command or modify an existing one, update `README.md` or the relevant `docs/` file.
 - Changes to API boundaries should be documented.
+- If the change affects system boundaries, responsibilities, authority,
+  persistence, lifecycle, data flow, enforcement/evidence semantics,
+  integration contracts, or research/product isolation, apply the
+  architecture-documentation governance process in the same PR.
