@@ -365,20 +365,28 @@ merely because retrieval ranking is low.
 
 # Maintenance rules
 
+Architecture documentation is governed by
+[`documentation-governance.md`](./documentation-governance.md). Every PR
+classifies architecture impact, and architecture-affecting changes update the
+relevant views in the same PR.
+
 When changing this document:
 
-1. Check the implementation first.
+1. Check the implementation and the governing accepted ADRs together.
 2. Check ADR frontmatter status; do not describe `proposed` as governing.
 3. Do not copy detailed ADR contracts into this overview. Link to them.
 4. Keep the O1A research boundary visibly separate from canonical product
    authority.
 5. Update the C4 views when a responsibility or authority boundary changes,
    not for every new module or helper function.
-6. If a diagram and an ADR disagree, the accepted ADR wins until the
-   implementation or ADR is explicitly changed.
+6. If implementation and an accepted ADR disagree, surface the discrepancy;
+   do not silently choose one representation or hide the drift.
+7. Keep current and target architecture visibly distinct.
 
 ## Related architecture documentation
 
+- [Architecture documentation governance](./documentation-governance.md)
+- [Mneme Architecture Documentation Standard v1](./architecture-documentation-standard-v1.md)
 - [Current phase](./current-phase.md)
 - [Governance representation](./governance-representation.md)
 - [Layer 1 freeze](./layer1-freeze-e73ff7d.md)
