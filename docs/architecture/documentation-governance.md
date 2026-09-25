@@ -180,20 +180,33 @@ deliberately the same practice the product teaches: understand the system,
 record decisions, represent boundaries, update them with change, and keep
 current and target architecture distinguishable.
 
-## Future automation boundary
+## Deterministic automation boundary
 
-The first architecture-documentation automation should be deterministic and
-narrow. Suitable checks include:
+The repository implements a narrow deterministic checker at
+`scripts/check_architecture_docs.py`. It validates:
 
-- linked ADRs exist;
-- documented ADR statuses match frontmatter;
-- required architecture sections exist;
-- internal architecture links resolve;
-- current/target labels follow a declared convention.
+- required sections in the architecture entry point;
+- relative-link integrity across `docs/architecture/*.md`;
+- unique ADR frontmatter identity;
+- ADR-map link, identity, and status consistency;
+- explicit proposed/target/deferred treatment for proposed ADRs shown in the
+  architecture map.
 
-It should **not** ask an LLM to decide whether a C4 diagram is semantically
-correct or whether a code change "looks architectural." Those judgments are not
-yet deterministic enough to become a repository gate.
+Run it locally with:
 
-Automation belongs in a separate implementation change after this process
-contract is stable.
+```bash
+python scripts/check_architecture_docs.py
+```
+
+The `Validate architecture documentation` workflow runs the same checker on
+pull requests and pushes to `main`.
+
+The checker does **not** ask an LLM to decide whether a C4 diagram is
+semantically correct, infer whether arbitrary source code "looks
+architectural," or certify that implementation matches every diagram arrow.
+Those remain review responsibilities unless a future deterministic contract
+can establish them reliably.
+
+The workflow begins as an observable CI signal rather than an immediate
+branch-protection requirement. Promotion to a required check should happen only
+after the checker has demonstrated stable, low-noise behavior.
