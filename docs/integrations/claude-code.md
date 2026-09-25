@@ -79,9 +79,13 @@ supplied.
 Register the Mneme marketplace and install the plugin:
 
 ```bash
-claude plugin marketplace add MnemeHQ/mneme
+claude plugin marketplace add https://github.com/MnemeHQ/mneme.git --sparse .claude-plugin integrations/claude-code-plugin
 claude plugin install mneme@mneme
 ```
+
+The explicit HTTPS URL avoids requiring GitHub SSH credentials. Sparse checkout
+keeps unrelated monorepo artifacts out of the marketplace clone and avoids
+Windows path-length failures.
 
 For local development from a checkout, load the plugin directory directly instead:
 
