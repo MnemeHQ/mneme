@@ -1,0 +1,29 @@
+name: architecture documentation check
+
+# Deterministic repository-integrity checks for the architecture bundle.
+# This validates only mechanically provable facts: required sections, local
+# links, ADR identity/status consistency, and explicit treatment of proposed
+# ADRs. It does not use an LLM or judge semantic diagram correctness.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  architecture-docs:
+    name: Validate architecture documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run architecture documentation check
+        run: python scripts/check_architecture_docs.py
