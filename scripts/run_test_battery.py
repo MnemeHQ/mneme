@@ -128,6 +128,7 @@ GATE_GOVERNANCE_PATHS: tuple[str, ...] = (
     "tests/test_check_mcp_directory_listings.py",
     "tests/test_example_memory.py",
     "tests/test_test_policy.py",
+    "tests/test_architecture_docs.py",
 )
 
 GATE_BENCHMARK_UNIT_PATHS: tuple[str, ...] = (

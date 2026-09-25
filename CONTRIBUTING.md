@@ -136,6 +136,18 @@ The full process contract is
 The reusable practice taught to adopting teams is
 [`Mneme Architecture Documentation Standard v1`](docs/architecture/architecture-documentation-standard-v1.md).
 
+Run the deterministic architecture-documentation integrity check locally with:
+
+```bash
+python scripts/check_architecture_docs.py
+```
+
+The dedicated `Validate architecture documentation` workflow runs the same
+checker on pull requests and pushes to `main`. The checker validates
+mechanically provable consistency only; semantic C4 correctness remains a
+review responsibility. During its initial observation period this workflow is
+visible in CI but is not yet a `main-pr-only` branch-protection requirement.
+
 ## Modifying Project Memory
 
 If you need to change `.mneme/project_memory.json` (the repository's own governance memory), prepend `[memory]` to your commit message and PR title.
