@@ -186,7 +186,9 @@ The repository implements a narrow deterministic checker at
 `scripts/check_architecture_docs.py`. It validates:
 
 - required sections in the architecture entry point;
-- relative-link integrity across `docs/architecture/*.md`;
+- relative-link integrity across maintained `docs/architecture/*.md` documents;
+- explicit archival exemptions for pinned historical freeze artifacts whose
+  historical path vocabulary must not be silently rewritten;
 - unique ADR frontmatter identity;
 - ADR-map link, identity, and status consistency;
 - explicit proposed/target/deferred treatment for proposed ADRs shown in the
