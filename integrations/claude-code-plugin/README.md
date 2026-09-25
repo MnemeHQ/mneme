@@ -47,14 +47,15 @@ After changes, reload in-session with `/reload-plugins`.
 **From the Mneme marketplace:**
 
 ```bash
-claude plugin marketplace add MnemeHQ/mneme
+claude plugin marketplace add https://github.com/MnemeHQ/mneme.git --sparse .claude-plugin integrations/claude-code-plugin
 claude plugin install mneme@mneme
 ```
 
 The first command registers the marketplace published by **Mneme HQ** from
-this repository; the second installs the `mneme` plugin. Enabling it from
-Claude Code's plugin UI prompts for the **enforcement mode** (`strict` or
-`warn`).
+this repository over HTTPS. The sparse checkout downloads only the marketplace
+manifest and plugin, avoiding unrelated monorepo paths and Windows path-length
+limits. The second command installs the `mneme` plugin. Enabling it from Claude
+Code's plugin UI prompts for the **enforcement mode** (`strict` or `warn`).
 
 ## How enforcement works
 
