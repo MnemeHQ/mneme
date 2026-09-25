@@ -3,8 +3,8 @@
 **Repository:** AZX-PBC-OSS/helix
 **Pinned Commit:** 37d994370deba2512588b5c4efb7f03483e7308b
 **Total Records (Planned):** 20
-**Currently Drafted:** 10 (records 001–010)
-**Records 011–020:** Not yet created
+**Currently Drafted:** 15 (records 001–015)
+**Records 016–020:** Not yet created
 **Status:** Drafted; pending human review
 
 ---
@@ -15,15 +15,15 @@
 |---|---:|---:|---:|
 | clear_explicit | 5 | 5 | 5 ✓ |
 | scoped | 5 | 5 | 5 ✓ |
-| lifecycle_or_supersession | 3 | 3 | 0 |
-| ambiguous_or_conflicting | 3 | 3 | 0 |
+| lifecycle_or_supersession | 3 | 3 | 3 ✓ |
+| ambiguous_or_conflicting | 3 | 3 | 3 ✓ |
 | enforcement_potential | 2 | 2 | 0 |
 | unusual_or_difficult | 2 | 2 | 0 |
-| **Total** | **20** | **20** | **10** |
+| **Total** | **20** | **20** | **15** |
 
 ---
 
-## Records for Review (001–010)
+## Records for Review (001–015)
 
 ### clear_explicit (5)
 
@@ -44,19 +44,22 @@
 | ref-helix-009 | 0016 | Capability manifest + approval classifier | prescriptive | explicitly_accepted | Manifest changes classified by `classifyChange`: baseline auto-commit vs elevated requiring platform-admin approval |
 | ref-helix-010 | 0008 | LLM vendor key resolved by egress (legacy fallback removed) | prescriptive | explicitly_accepted | LLM keys resolved only by egress at call time; edge holds no key; unconfigured egress = 503 closed |
 
----
-
-## Remaining Candidates (011–020) — Not Yet Drafted
-
 ### lifecycle_or_supersession (3)
-- ref-helix-011 — ADR-0011: In-memory rate-limiting superseded by shared Postgres counter
-- ref-helix-012 — ADR-0030: Repo-backed apps pull CI-built attested artifacts (Proposed)
-- ref-helix-013 — ADR-0031: MCP-first delegated auth (Proposed)
+| ID | ADR | Title | Classification | Authority | Key Decision |
+|---|---|---|---|---|---|
+| ref-helix-011 | 0011 | In-memory rate-limiting superseded by shared Postgres counter | prescriptive | superseded | Per-process in-memory counters superseded by shared Postgres CounterStore with atomic upserts |
+| ref-helix-012 | 0030 | Repo-backed apps pull CI-built attested artifacts (Proposed) | prescriptive | candidate | Pull CI-built attested artifacts from GHCR; no hosted build; Sigstore attestation; polling floor + poke |
+| ref-helix-013 | 0031 | MCP-first delegated auth (Proposed) | prescriptive | candidate | Provider catalog with three kinds; MCP-first where available; per-user credentials via SecretStore |
 
 ### ambiguous_or_conflicting (3)
-- ref-helix-014 — ADR-0007: Portal authz v0 (authenticated == authorized) with BOLA gap
-- ref-helix-015 — ADR-0009: Relaxed CSP (revisit — supply-chain hardening)
-- ref-helix-016 — ADR-0010: Anonymous writes to shared keys on public apps (revisit)
+| ID | ADR | Title | Classification | Authority | Key Decision |
+|---|---|---|---|---|---|
+| ref-helix-014 | 0007 | Portal authz v0 (authenticated == authorized) with BOLA gap | prescriptive | explicitly_accepted | v0 model closed by ownsApp gate; amendment extends to sensitive reads; full RBAC v1 item |
+| ref-helix-015 | 0009 | Relaxed CSP (revisit — supply-chain hardening) | prescriptive | explicitly_accepted | CSP permits unsafe-inline/eval; CDN allowlist without SRI; stored-XSS gap on shared writes |
+
+---
+
+## Remaining Candidates (016–020) — Not Yet Drafted
 
 ### enforcement_potential (2)
 - ref-helix-017 — ADR-0013: Egress trust model (harden instruction seam; phased resolution)
@@ -72,9 +75,9 @@
 
 | Range | Status |
 |---|---|
-| 001–005 | **reviewed** |
-| 006–010 | **pending** (drafted) |
-| 011–020 | **not yet created** |
+| 001–010 | **reviewed** |
+| 011–015 | **pending** (drafted) |
+| 016–020 | **not yet created** |
 
 ---
 
@@ -101,9 +104,12 @@ For each record (once all 20 are drafted), please:
 ### Special Cases to Note
 
 1. **ref-helix-005 (ADR-0003)**: ONTOLOGY_GAP recorded — source explicitly states discipline enforced in review with no automated gate. Scalar `enforcement_potential` cannot represent both mechanical enforcement and review discipline.
-2. **ref-helix-006–010**: Drafted as Nemotron drafts, all `human_review_status: pending`.
-3. **ADR-0026/0030/0031**: ADR-0030 (Proposed) explicitly states ADR-0026 is NOT superseded; gates remain if hosted builds revisited. ADR-0031 (Proposed) has amendment narrowing scope after `hmac-timestamp` shipped.
-3. **All records 006–010**: Must remain `human_review_status: pending` until Theo explicitly approves.
+2. **ref-helix-011**: `lifecycle_status: superseded` with `expiration_if_any: 2026-07-21`; later amendment (2026-09) changes `trustProxy` mechanism but does not re-supersede.
+3. **ref-helix-012**: Proposed; explicitly states ADR-0026 NOT superseded; displaces design doc; ADR-0026 gates remain if hosted builds revisited.
+4. **ref-helix-013**: Proposed; amendment (2026-08-04) narrows scope after `hmac-timestamp` shipped; does not supersede design doc deferral.
+5. **ref-helix-014**: Accepted; v0 model closed by `ownsApp` gate; 2026-08-10 amendment extends to reads; full RBAC v1 item.
+6. **ref-helix-015**: Accepted with revisit; Challenge outcome identifies stored-XSS gap on public shared-write apps; CDN allowlist without SRI is supply-chain trust dependency.
+7. **All records 011–015**: Must remain `human_review_status: pending` until Theo explicitly approves.
 
 ---
 
@@ -113,7 +119,7 @@ For each record (once all 20 are drafted), please:
 - [ ] All source locations point to valid lines in pinned commit `37d994370deba2512588b5c4efb7f03483e7308b`
 - [ ] All taxonomy fields use exact O1A vocabulary
 - [ ] No `cand-*` IDs used as reference IDs
-- [ ] All `human_review_status` = "pending" for 006–010; "reviewed" for 001–005
+- [ ] All `human_review_status` = "pending" for 011–015; "reviewed" for 001–010
 - [ ] Sampling quota: 5/5/3/3/2/2 = 20 ✓
 - [ ] No machine prediction fields present
 - [ ] Corpus hash computed (after all 20 drafted)
@@ -129,7 +135,7 @@ No scenarios, repository 3 classifier experiments, ontology redesign, or D1B wor
 
 ---
 
-## Files Created (001–010)
+## Files Created (001–015)
 
 - `benchmarks/open_architecture/batch_01/reference_decisions/helix/ref-helix-001.jsonl` — ADR-0020 (static-only apps)
 - `benchmarks/open_architecture/batch_01/reference_decisions/helix/ref-helix-002.jsonl` — ADR-0015 (app-data three scopes)
@@ -141,6 +147,11 @@ No scenarios, repository 3 classifier experiments, ontology redesign, or D1B wor
 - `benchmarks/open_architecture/batch_01/reference_decisions/helix/ref-helix-008.jsonl` — ADR-0006 (SecretStore custody seam)
 - `benchmarks/open_architecture/batch_01/reference_decisions/helix/ref-helix-009.jsonl` — ADR-0016 (capability manifest approval classifier)
 - `benchmarks/open_architecture/batch_01/reference_decisions/helix/ref-helix-010.jsonl` — ADR-0008 (LLM key via egress)
+- `benchmarks/open_architecture/batch_01/reference_decisions/helix/ref-helix-011.jsonl` — ADR-0011 (in-memory rate-limiting superseded)
+- `benchmarks/open_architecture/batch_01/reference_decisions/helix/ref-helix-012.jsonl` — ADR-0030 (repo-backed apps pull attested artifacts)
+- `benchmarks/open_architecture/batch_01/reference_decisions/helix/ref-helix-013.jsonl` — ADR-0031 (MCP-first delegated auth)
+- `benchmarks/open_architecture/batch_01/reference_decisions/helix/ref-helix-014.jsonl` — ADR-0007 (portal authz v0)
+- `benchmarks/open_architecture/batch_01/reference_decisions/helix/ref-helix-015.jsonl` — ADR-0009 (relaxed CSP)
 
 ---
 
@@ -155,4 +166,4 @@ The frozen `lifecycle_status` and `supersedes` fields model whole-ADR supersessi
 
 ---
 
-**Please review and return with your decisions for records 006–010.**
+**Please review and return with your decisions for records 011–015.**
