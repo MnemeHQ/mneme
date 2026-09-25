@@ -25,6 +25,14 @@ ARCHITECTURE_DIR = Path("docs/architecture")
 ARCHITECTURE_INDEX = ARCHITECTURE_DIR / "README.md"
 ADR_DIR = Path("docs/adr")
 
+# Historical freeze artifacts preserve the repository/path vocabulary of the
+# exact architecture state they froze. Their old relative links are archival
+# evidence, not maintained navigation, so they are explicitly excluded from
+# current-link integrity checks rather than silently rewritten.
+ARCHIVAL_LINK_CHECK_EXCLUSIONS: tuple[Path, ...] = (
+    Path("docs/architecture/layer1-freeze-e73ff7d.md"),
+)
+
 REQUIRED_ARCHITECTURE_HEADINGS: tuple[str, ...] = (
     "## Current architecture at a glance",
     "## Important current-versus-target boundary",
@@ -146,8 +154,16 @@ def validate_architecture_docs(repo_root: Path = REPO_ROOT) -> list[str]:
                 f"{ARCHITECTURE_INDEX.as_posix()}: missing required heading: {heading}"
             )
 
+    for excluded in ARCHIVAL_LINK_CHECK_EXCLUSIONS:
+        if not (repo_root / excluded).is_file():
+            errors.append(
+                f"stale archival link-check exclusion: {excluded.as_posix()}"
+            )
+
     for path in sorted(architecture_dir.glob("*.md")):
         rel_source = path.relative_to(repo_root)
+        if rel_source in ARCHIVAL_LINK_CHECK_EXCLUSIONS:
+            continue
         prose = _strip_fenced_code(_read(path))
         for match in _LINK_RE.finditer(prose):
             target = match.group(1)
