@@ -1,0 +1,14 @@
+{
+  "name": "mneme",
+  "description": "Claude Code plugins from Mneme HQ for architectural governance and engineering guardrails.",
+  "owner": {
+    "name": "Mneme HQ"
+  },
+  "plugins": [
+    {
+      "name": "mneme",
+      "source": "./integrations/claude-code-plugin",
+      "description": "Prevent, catch, and verify architectural violations while Claude Code works."
+    }
+  ]
+}

@@ -50,8 +50,8 @@ Precise claim boundaries:
 ## Install
 
 The Python runtime and the Claude Code plugin are **separate artifacts** — installing
-one does not install the other. The plugin is not yet listed in the Claude Code
-marketplace, so loading it currently requires a checkout of this repository.
+one does not install the other. Mneme HQ publishes the plugin from this repository's
+Claude Code marketplace; a community marketplace listing is a separate submission.
 
 ### 1. Install the runtime
 
@@ -74,7 +74,16 @@ decisions: every recorded decision is enforceable, so sample content would creat
 phantom rules. It refuses to overwrite an existing corpus unless `--force` is
 supplied.
 
-### 3. Load the plugin
+### 3. Install the plugin
+
+Register the Mneme marketplace and install the plugin:
+
+```bash
+claude plugin marketplace add MnemeHQ/mneme
+claude plugin install mneme@mneme
+```
+
+For local development from a checkout, load the plugin directory directly instead:
 
 ```bash
 claude --plugin-dir ./integrations/claude-code-plugin
