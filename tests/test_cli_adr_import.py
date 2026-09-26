@@ -147,3 +147,30 @@ def test_adr_import_dry_run_returns_nonzero_on_diagnostics(tmp_path):
     ])
     # 1 = warn (matches existing `mneme check --mode strict` warn convention)
     assert rc == 1
+
+
+def test_adr_import_apply_with_approve_conflicts_imports_clean_scopes(tmp_path, capsys):
+    adr_dir = tmp_path / "adrs"
+    adr_dir.mkdir()
+    for adr_id, scope in [("ADR-501", "api"), ("ADR-502", "api"), ("ADR-510", "storage")]:
+        (adr_dir / f"{adr_id}.md").write_text(
+            f"---\nid: {adr_id}\ntitle: {adr_id} title\nstatus: accepted\n"
+            f"priority: normal\ndate: 2026-04-15\nscope: {scope}\n---\n\n"
+            "## Constraints\n\n- FORBID_LITERAL: mongodb\n",
+            encoding="utf-8",
+        )
+    target = tmp_path / "project_memory.json"
+    _seed_empty_memory(target)
+
+    rc = main([
+        "adr", "import", str(adr_dir),
+        "--memory", str(target),
+        "--apply", "--approve-conflicts",
+    ])
+
+    assert rc == 0
+    out = capsys.readouterr().out
+    assert "Wrote 1 decisions" in out
+    assert "Skipped conflicting scope 'api': ADR-501, ADR-502" in out
+    persisted = json.loads(target.read_text(encoding="utf-8"))
+    assert [d["id"] for d in persisted["decisions"]] == ["ADR-510"]

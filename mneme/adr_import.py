@@ -23,10 +23,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal
 
-from mneme.adr_schema import ADR, ADRPrecedenceError
+from mneme.adr_schema import ADR
 from mneme.adr_compiler import (
     adrs_to_decisions,
-    resolve_precedence,
+    resolve_precedence_partial,
     validate_corpus,
 )
 from mneme.adr_parser import parse_adr_directory
@@ -133,6 +133,10 @@ class ImportReport:
     ``apply_import`` can persist a provenance block (path + sha256) on
     each written decision. Decisions that lack a matching entry get no
     ``source`` block (e.g. legacy callers constructing reports by hand).
+
+    ``skipped_scopes`` maps each scope excluded by an unresolvable
+    active-active tie to the sorted ids that tied there. No ADR from a
+    skipped scope appears in ``active_nodes`` or ``decisions``.
     """
 
     active_nodes: list[DecisionNode]
@@ -140,6 +144,7 @@ class ImportReport:
     decisions: list[Decision]
     diagnostics: list[ImportDiagnostic]
     adr_sources_by_id: dict[str, str] = field(default_factory=dict)
+    skipped_scopes: dict[str, list[str]] = field(default_factory=dict)
 
 
 def _has_mechanically_enforceable_rule(decision: Decision) -> bool:
@@ -156,10 +161,13 @@ def compile_for_import(adr_dir: str | Path) -> ImportReport:
     """Run parse -> validate -> precedence over a directory and produce an ImportReport.
 
     Unlike ``adr_compiler.compile_adrs``, this function does NOT raise on
-    precedence ambiguity — the import flow surfaces it as a diagnostic so
-    the user can review and re-run with ``--approve-conflicts``. Schema
-    validation errors still raise (a malformed corpus is not importable
-    in any mode).
+    precedence ambiguity — the import flow surfaces each ambiguous scope as
+    a diagnostic so the user can review and re-run with
+    ``--approve-conflicts``. Precedence is resolved per scope: every ADR in
+    an ambiguous scope is excluded from the active set, and every other
+    scope still resolves normally. ``apply_import`` refuses to write the
+    partial set unless conflicts are approved. Schema validation errors
+    still raise (a malformed corpus is not importable in any mode).
     """
     adrs = parse_adr_directory(adr_dir)
     validate_corpus(adrs)  # still raises; the corpus must be schema-valid
@@ -167,22 +175,23 @@ def compile_for_import(adr_dir: str | Path) -> ImportReport:
     all_nodes = project_decision_graph(adrs)
 
     diagnostics: list[ImportDiagnostic] = []
-    try:
-        active_adrs = resolve_precedence(adrs)
-    except ADRPrecedenceError as exc:
+    active_adrs, ambiguities = resolve_precedence_partial(adrs)
+    skipped_scopes: dict[str, list[str]] = {}
+    for exc in sorted(ambiguities, key=lambda e: e.scope):
+        tied = sorted(exc.ids)
+        skipped_scopes[exc.scope] = tied
         diagnostics.append(ImportDiagnostic(
             kind="active_active_contradiction",
-            adr_id=",".join(sorted(exc.ids)),
+            adr_id=",".join(tied),
             existing_in="",
             message=(
                 f"Active-active contradiction at scope {exc.scope!r} "
-                f"between: {', '.join(sorted(exc.ids))}. Resolve by editing "
+                f"between: {', '.join(tied)}. Resolve by editing "
                 f"the ADRs (mark one superseded, change priority, or change "
                 f"date) or pass --approve-conflicts to import the rest of "
                 f"the corpus and skip this scope."
             ),
         ))
-        active_adrs = []
 
     active_ids = {a.id for a in active_adrs}
     active_nodes = [n for n in all_nodes if n.id in active_ids]
@@ -208,6 +217,7 @@ def compile_for_import(adr_dir: str | Path) -> ImportReport:
         decisions=decisions,
         diagnostics=diagnostics,
         adr_sources_by_id=adr_sources_by_id,
+        skipped_scopes=skipped_scopes,
     )
 
 
@@ -316,8 +326,8 @@ def format_preview(
             lines.append(f"  - {d.message}")
         lines.append("")
         lines.append(
-            "  To proceed despite the contradiction, re-run with "
-            "--approve-conflicts."
+            "  To import the active set above and skip the conflicting "
+            "scope(s), re-run with --approve-conflicts."
         )
         lines.append("")
 
@@ -361,7 +371,9 @@ def apply_import(
 
     Active-active contradictions: if the report carries an unresolved
     contradiction diagnostic and ``approve_conflicts`` is False, raises
-    RuntimeError.
+    RuntimeError. With ``approve_conflicts`` True, the report's decisions
+    (every non-conflicting scope) are written and the conflicting scopes
+    in ``report.skipped_scopes`` are left out.
 
     Atomic: writes to a sibling tempfile and os.replace()s into place.
 
@@ -378,7 +390,8 @@ def apply_import(
         raise RuntimeError(
             "ADR import refused: active-active contradiction in corpus. "
             "Pass approve_conflicts=True (or --approve-conflicts on the CLI) "
-            "to proceed, or fix the contradicting ADRs."
+            "to import the non-conflicting scopes and skip the conflicting "
+            "ones, or fix the contradicting ADRs."
         )
 
     raw = _json.loads(target_path.read_text(encoding="utf-8"))

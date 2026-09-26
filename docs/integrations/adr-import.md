@@ -107,7 +107,7 @@ mneme adr import docs/adr --memory .mneme/project_memory.json --apply
 # Allow same-id overwrite of existing decisions[] entries
 mneme adr import docs/adr --memory .mneme/project_memory.json --apply --update-existing
 
-# Proceed even if the corpus has an active-active contradiction
+# Import every non-conflicting scope and skip each active-active contradiction
 mneme adr import docs/adr --memory .mneme/project_memory.json --apply --approve-conflicts
 ```
 
@@ -181,8 +181,11 @@ diagnostic and either:
 - Exits with code 1 in dry-run (shows the problem).
 - Refuses `--apply` unless `--approve-conflicts` is also passed.
 
-`--approve-conflicts` imports the rest of the corpus and skips the
-contradicting scope. It does not silently pick a winner.
+`--approve-conflicts` imports the rest of the corpus and skips every
+contradicting scope. Precedence is resolved per scope, so each tied scope
+is reported and left out (including any lower-precedence ADRs in it) while
+all other scopes import normally. The apply output lists each skipped
+scope. It does not silently pick a winner.
 
 **Fix path:** Edit the contradicting ADRs -- mark one superseded, give one a
 higher priority, or give one a newer date.

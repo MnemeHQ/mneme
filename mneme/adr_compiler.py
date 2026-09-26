@@ -271,6 +271,29 @@ def resolve_precedence(adrs: list[ADR]) -> list[ADR]:
         ADRPrecedenceError: If two accepted ADRs share a scope and tie on
                             both priority and date.
     """
+    winners, ambiguities = resolve_precedence_partial(adrs)
+    if ambiguities:
+        raise ambiguities[0]
+    return winners
+
+
+def resolve_precedence_partial(
+    adrs: list[ADR],
+) -> tuple[list[ADR], list[ADRPrecedenceError]]:
+    """Resolve precedence per scope, excluding scopes that cannot be resolved.
+
+    Same hierarchy as ``resolve_precedence``, but an ambiguous same-scope
+    tie does not abort resolution: every ADR in that scope is left out of
+    the active set and the ambiguity is returned instead of raised. Used by
+    the import flow so ``--approve-conflicts`` can import every clean scope
+    while each conflicting scope is reported and skipped. No winner is ever
+    picked for an ambiguous scope.
+
+    Returns:
+        ``(winners, ambiguities)``: the active set for resolvable scopes,
+        ordered as in ``resolve_precedence``, and one ``ADRPrecedenceError``
+        per ambiguous scope, in corpus order.
+    """
     # 1. Status filter.
     accepted = [a for a in adrs if a.status == "accepted"]
 
@@ -287,14 +310,18 @@ def resolve_precedence(adrs: list[ADR]) -> list[ADR]:
         by_scope.setdefault(a.scope, []).append(a)
 
     winners: list[ADR] = []
+    ambiguities: list[ADRPrecedenceError] = []
     for scope, group in by_scope.items():
-        winners.append(_pick_within_scope(scope, group))
+        try:
+            winners.append(_pick_within_scope(scope, group))
+        except ADRPrecedenceError as exc:
+            ambiguities.append(exc)
 
     # 5. Stable, deterministic output ordering.
     winners.sort(
         key=lambda a: (-_specificity(a.scope), -PRIORITY_RANK[a.priority], a.id)
     )
-    return winners
+    return winners, ambiguities
 
 
 def _pick_within_scope(scope: str, group: list[ADR]) -> ADR:
@@ -404,6 +431,7 @@ def adrs_to_decisions(adrs: list[ADR]) -> list[Decision]:
 __all__ = [
     "validate_corpus",
     "resolve_precedence",
+    "resolve_precedence_partial",
     "compile_adrs",
     "adrs_to_decisions",
     "ADRPrecedenceError",

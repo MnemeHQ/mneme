@@ -906,6 +906,8 @@ def _cmd_adr_import(args: argparse.Namespace) -> int:
             print(f"ERROR: {exc}", file=sys.stderr, flush=True)
             return 2
         print(f"Wrote {len(written)} decisions to {target_path}")
+        for scope, ids in report.skipped_scopes.items():
+            print(f"Skipped conflicting scope {scope!r}: {', '.join(ids)}")
         return 0
 
     has_diags = bool(report.diagnostics) or bool(collisions)
@@ -1586,7 +1588,10 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p_adr_import.add_argument(
         "--approve-conflicts", action="store_true",
-        help="Proceed with apply even if active-active contradictions exist",
+        help=(
+            "Proceed with apply despite active-active contradictions: import "
+            "every non-conflicting scope and skip each conflicting scope"
+        ),
     )
     p_adr_import.set_defaults(func=_cmd_adr_import)
 

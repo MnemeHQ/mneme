@@ -102,8 +102,8 @@ def test_compile_for_import_surfaces_precedence_ambiguity_as_diagnostic():
     report = compile_for_import(FIXTURES / "adrs_import_with_conflicts")
     # The compile completes (no raise), but a diagnostic is recorded.
     assert any(d.kind == "active_active_contradiction" for d in report.diagnostics)
-    # Active-set should be empty because precedence couldn't pick — we don't
-    # silently pick a winner.
+    # The fixture has only the conflicting scope, so the active set is
+    # empty: the tied scope is skipped and we don't silently pick a winner.
     assert report.active_nodes == []
 
 
@@ -340,3 +340,132 @@ def test_apply_import_refuses_when_unresolved_active_active(tmp_path):
     report = compile_for_import(FIXTURES / "adrs_import_with_conflicts")
     with pytest.raises(RuntimeError, match="active-active"):
         apply_import(report, target_path=target, allow_update=False, approve_conflicts=False)
+
+
+# ── Partial import under --approve-conflicts ────────────────────────────────
+
+
+def _write_adr(
+    adr_dir: Path,
+    adr_id: str,
+    scope: str,
+    *,
+    date: str = "2026-04-15",
+    priority: str = "normal",
+    body: str = "## Constraints\n\n- FORBID_LITERAL: mongodb\n",
+) -> None:
+    (adr_dir / f"{adr_id}.md").write_text(
+        "---\n"
+        f"id: {adr_id}\n"
+        f"title: {adr_id} title\n"
+        "status: accepted\n"
+        f"priority: {priority}\n"
+        f"date: {date}\n"
+        f"scope: {json.dumps(scope)}\n"
+        "---\n\n"
+        f"{body}",
+        encoding="utf-8",
+    )
+
+
+def _seed_empty_memory(path: Path) -> None:
+    path.write_text(json.dumps({
+        "meta": {"name": "x", "description": "x", "version": "1.0.0", "owner": "x", "created": "2026-01-01"},
+        "items": [], "examples": [], "decisions": [],
+    }), encoding="utf-8")
+
+
+def _one_conflict_one_clean(tmp_path: Path) -> Path:
+    adr_dir = tmp_path / "adrs"
+    adr_dir.mkdir()
+    _write_adr(adr_dir, "ADR-301", "api")
+    _write_adr(adr_dir, "ADR-302", "api")
+    # Loser in the conflicting scope: lower priority. The whole scope is
+    # skipped, so it must not leak into the active set either.
+    _write_adr(adr_dir, "ADR-303", "api", priority="exception")
+    _write_adr(adr_dir, "ADR-310", "storage")
+    return adr_dir
+
+
+def test_compile_for_import_keeps_clean_scopes_when_one_scope_conflicts(tmp_path):
+    from mneme.adr_import import compile_for_import
+
+    report = compile_for_import(_one_conflict_one_clean(tmp_path))
+
+    contradictions = [
+        d for d in report.diagnostics if d.kind == "active_active_contradiction"
+    ]
+    assert [d.adr_id for d in contradictions] == ["ADR-301,ADR-302"]
+    assert {n.id for n in report.active_nodes} == {"ADR-310"}
+    assert [d.id for d in report.decisions] == ["ADR-310"]
+    assert set(report.adr_sources_by_id) == {"ADR-310"}
+
+
+def test_apply_import_with_approval_writes_only_clean_scope(tmp_path):
+    from mneme.adr_import import apply_import, compile_for_import
+
+    target = tmp_path / "project_memory.json"
+    _seed_empty_memory(target)
+    report = compile_for_import(_one_conflict_one_clean(tmp_path))
+
+    written = apply_import(report, target_path=target, approve_conflicts=True)
+
+    assert written == ["ADR-310"]
+    persisted = json.loads(target.read_text(encoding="utf-8"))
+    assert [d["id"] for d in persisted["decisions"]] == ["ADR-310"]
+
+
+def test_apply_import_without_approval_still_refuses_partial_corpus(tmp_path):
+    from mneme.adr_import import apply_import, compile_for_import
+
+    target = tmp_path / "project_memory.json"
+    _seed_empty_memory(target)
+    before = target.read_text(encoding="utf-8")
+    report = compile_for_import(_one_conflict_one_clean(tmp_path))
+
+    with pytest.raises(RuntimeError, match="active-active"):
+        apply_import(report, target_path=target, approve_conflicts=False)
+    assert target.read_text(encoding="utf-8") == before
+
+
+def test_compile_for_import_reports_and_skips_every_conflicting_scope(tmp_path):
+    from mneme.adr_import import apply_import, compile_for_import
+
+    adr_dir = tmp_path / "adrs"
+    adr_dir.mkdir()
+    _write_adr(adr_dir, "ADR-401", "api")
+    _write_adr(adr_dir, "ADR-402", "api")
+    _write_adr(adr_dir, "ADR-411", "storage.cache")
+    _write_adr(adr_dir, "ADR-412", "storage.cache")
+    _write_adr(adr_dir, "ADR-413", "storage.cache")
+    _write_adr(adr_dir, "ADR-420", "billing")
+    _write_adr(adr_dir, "ADR-430", "")
+
+    report = compile_for_import(adr_dir)
+
+    contradictions = [
+        d for d in report.diagnostics if d.kind == "active_active_contradiction"
+    ]
+    assert sorted(d.adr_id for d in contradictions) == [
+        "ADR-401,ADR-402",
+        "ADR-411,ADR-412,ADR-413",
+    ]
+    assert any("'api'" in d.message for d in contradictions)
+    assert any("'storage.cache'" in d.message for d in contradictions)
+    assert {n.id for n in report.active_nodes} == {"ADR-420", "ADR-430"}
+
+    target = tmp_path / "project_memory.json"
+    _seed_empty_memory(target)
+    written = apply_import(report, target_path=target, approve_conflicts=True)
+    assert sorted(written) == ["ADR-420", "ADR-430"]
+
+
+def test_resolve_precedence_still_raises_on_first_ambiguous_scope(tmp_path):
+    """compile_adrs / resolve_precedence stay strict; only import is partial."""
+    from mneme.adr_compiler import resolve_precedence
+    from mneme.adr_schema import ADRPrecedenceError
+
+    adrs = parse_adr_directory(_one_conflict_one_clean(tmp_path))
+    with pytest.raises(ADRPrecedenceError) as excinfo:
+        resolve_precedence(adrs)
+    assert excinfo.value.scope == "api"
