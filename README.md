@@ -15,6 +15,10 @@ It turns durable engineering decisions into agent context, deterministic enforce
 
 Mneme is the decision layer behind that drift-prevention mechanism. It keeps recorded engineering decisions active as AI coding systems propose and modify code, instead of leaving ADRs as passive documentation.
 
+![Where the decision layer sits: engineering intent (ADRs, standards, review policies) flows into the Mneme decision layer, which reaches AI coding agents, editors and the CLI, and GitHub CI, each returning a guide, warn, or block verdict traced to its source decision. Deployment platforms and policy engines are shown dashed as planned.](https://mnemehq.com/assets/images/decision-layer-diagram-v1.png)
+
+<sub>Solid surfaces ship today; dashed surfaces are planned. Support levels per integration: [integrations matrix](https://mnemehq.com/integrations/).</sub>
+
 > **Current phase:** Layer 1 validation. Retrieval, enforcement, and benchmark semantics are governed by the accepted architecture and freeze record. See [Current Phase](docs/architecture/current-phase.md) before changing core behavior.
 
 ## What Mneme does
