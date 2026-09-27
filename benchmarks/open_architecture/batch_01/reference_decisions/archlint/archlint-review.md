@@ -40,8 +40,8 @@ These 10 candidates were selected from the approved 20-candidate sample (see can
 | ref-archlint-003 | `internal/config/config.go` | `LayerOf()` |
 | ref-archlint-004 | `internal/adr/adr.go` | `parseFile()` |
 | ref-archlint-005 | `README.md` | Coupling metrics & Conway/DDD analysis |
-| ref-archlint-006 | `internal/adr/adr.go` | `Ruleset.add()`, `Ruleset.MergeInto()` conflict check |
-| ref-archlint-007 | `internal/lang/lang.go`, `golang.go`, `typescript.go`, `python.go` | `init()`, `Imports()`, `Resolve()` per language |
+| ref-archlint-006 | `internal/adr/adr.go` | `Ruleset.MergeInto()` conflict check |
+| ref-archlint-007 | `internal/lang/golang.go`, `typescript.go`, `python.go` | `Imports()`, `Resolve()` per language |
 | ref-archlint-008 | `internal/config/config.go` | `Allows()` |
 | ref-archlint-009 | `cmd/archlint/main.go` | `emitGitHub()`, `emitMetricsGitHub()`, `resolveFormat()` |
 | ref-archlint-010 | `internal/metrics/contexts.go` | `ContextSet.Detect()` |
@@ -55,8 +55,8 @@ All source locations verified against pinned commit `185837e93565718d8e1ea653236
 | Field | Value |
 |-------|-------|
 | **classification** | `prescriptive` (all 10) |
-| **decision_domains** | `architecture_structure` (001–010); + `developer_workflow` (004, 009); + `dependency_technology` (006, 007) |
-| **decision_purposes** | `constrain`, `standardize`, `define_boundary` (core); + `optimize_quality_attribute` (005) |
+| **decision_domains** | `architecture_structure` (001–010); + `developer_workflow` (004, 009); + `dependency_technology` (007) |
+| **decision_purposes** | `constrain`, `standardize`, `define_boundary` (core); + `optimize_quality_attribute` (005); + `select` (007) |
 | **authority_status** | `explicitly_accepted` (all 10) |
 | **lifecycle_status** | `active` (all 10) |
 | **enforcement_potential** | `deterministic_rule` (all 10) |
@@ -72,11 +72,11 @@ All source locations verified against pinned commit `185837e93565718d8e1ea653236
 | ref-archlint-003 | reviewed |
 | ref-archlint-004 | reviewed |
 | ref-archlint-005 | reviewed |
-| ref-archlint-006 | unreviewed |
-| ref-archlint-007 | unreviewed |
-| ref-archlint-008 | unreviewed |
-| ref-archlint-009 | unreviewed |
-| ref-archlint-010 | unreviewed |
+| ref-archlint-006 | reviewed |
+| ref-archlint-007 | reviewed |
+| ref-archlint-008 | reviewed |
+| ref-archlint-009 | reviewed |
+| ref-archlint-010 | reviewed |
 
 ---
 
@@ -95,7 +95,7 @@ All source locations verified against pinned commit `185837e93565718d8e1ea653236
 | ref-archlint-009 | `[]` |
 | ref-archlint-010 | `[]` |
 
-No `supersedes` / `superseded_by` relationships in this batch. Relationships for 006–010 will be evaluated during their semantic review.
+No `supersedes` / `superseded_by` relationships in this batch.
 
 ---
 
@@ -108,11 +108,11 @@ No `supersedes` / `superseded_by` relationships in this batch. Relationships for
 | ref-archlint-003 | 0.95 | reviewed |
 | ref-archlint-004 | 0.95 | reviewed |
 | ref-archlint-005 | 0.90 | reviewed |
-| ref-archlint-006 | 0.95 | unreviewed |
-| ref-archlint-007 | 0.95 | unreviewed |
-| ref-archlint-008 | 0.95 | unreviewed |
-| ref-archlint-009 | 0.95 | unreviewed |
-| ref-archlint-010 | 0.95 | unreviewed |
+| ref-archlint-006 | 0.95 | reviewed |
+| ref-archlint-007 | 0.95 | reviewed |
+| ref-archlint-008 | 0.95 | reviewed |
+| ref-archlint-009 | 0.95 | reviewed |
+| ref-archlint-010 | 0.95 | reviewed |
 
 Confidence reflects direct source grounding; 005 slightly lower due to multi-flag gating semantics.
 
@@ -124,23 +124,43 @@ Confidence reflects direct source grounding; 005 slightly lower due to multi-fla
 
 ---
 
-## Records amended
+## Original Nemotron semantic exact-pass for 006–010
 
-**5** (ref-archlint-001 through ref-archlint-005)
+**0/5 (0%)** — All five records required semantic corrections per Theo's approved review.
+
+---
+
+## Cumulative original exact-pass for Archlint 001–010
+
+**0/10 (0%)** — All ten records required semantic corrections.
+
+---
+
+## Records amended in second batch
+
+**5** (ref-archlint-006 through ref-archlint-010)
+
+---
+
+## Cumulative records amended
+
+**10** (ref-archlint-001 through ref-archlint-010)
 
 ---
 
 ## Recurring correction themes
 
-1. **Adjacent-decision over-bundling** — Records 001–005 originally included semantics belonging to other decisions (rules entry in 001, same-layer behavior in 002, merge/conflict detail in 004, bounded-context in 005).
+1. **Adjacent-decision over-bundling** — Records 001–010 originally included semantics belonging to adjacent decisions (rules entry in 001, same-layer behavior in 002, merge/conflict detail in 004, bounded-context in 005, ADR self-contradiction in 006, cross-language consequence in 007, Rules-list semantics in 008, gating terminology in 009, non-frozen relationship in 010).
 
-2. **Unsupported/overbroad domains and purposes** — `dependency_technology`, `reliability_observability`, `developer_workflow` (005), `enable_migration`, `document_tradeoff`, `require_evidence` removed where not directly source-supported.
+2. **Unsupported/overbroad domains and purposes** — `dependency_technology`, `reliability_observability`, `developer_workflow` (005), `deployment_infrastructure` (009), `enable_migration`, `document_tradeoff`, `require_evidence` removed where not directly source-supported.
 
-3. **Non-frozen relationship type** — `uses_same_graph_as` removed from 005 (not in frozen O1A taxonomy v0.1).
+3. **Invented/non-frozen relationship types** — `uses_same_graph_as` removed from 005; `part_of` removed from 006 and 008; `orthogonal_to` removed from 010 (none in frozen O1A taxonomy v0.1).
 
-4. **Enforcement scalar correction** — 005 changed from `contextual_guidance` to `deterministic_rule` (best scalar representation for mixed observational + gated behavior).
+4. **Imprecise scope typing** — Scopes changed from `repository` to `file_pattern`/`directory` for `architecture.json`, `docs/adr`, `contexts.json`; 007 now uses explicit `file_pattern` per supported extension.
 
-5. **Evidence/scope precision** — Scopes changed from `repository` to `file_pattern` for `architecture.json`; ADR directory scope clarified as configurable; README evidence trimmed to direct source support.
+5. **Evidence/provenance precision** — 005 evidence moved to primary README source; 006 trimmed to ADR/config merge; 007 Python regex fixed to exact pinned source; 009 gating terminology removed from normalized_decision/candidate_rule (source comment retained in raw_evidence); 010 non-frozen relationship removed.
+
+6. **Raw evidence transcription error in 007** — Python regexes corrected to exact pinned source (`pyFrom`, `pyImport` from `internal/lang/python.go`); TypeScript capture groups preserved.
 
 ---
 
