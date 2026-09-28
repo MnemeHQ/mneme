@@ -2,8 +2,8 @@
 
 **Repository:** enumind/modonome
 **Pinned Commit:** 7a4d5244dcb6879b6aa646105b39297aa6d0a5a2
-**Total Records:** 20 (5 drafted in Batch 1)
-**Status:** 5 reviewed; 15 remaining
+**Total Records:** 20 (10 reviewed)
+**Status:** 10 reviewed; 10 remaining
 
 ---
 
@@ -12,16 +12,16 @@
 | Category | Quota | Selected |
 |---|---:|---:|
 | clear_explicit | 5 | 5 |
-| scoped | 5 | 0 |
+| scoped | 5 | 5 |
 | lifecycle_or_supersession | 3 | 0 |
 | ambiguous_or_conflicting | 3 | 0 |
 | enforcement_potential | 2 | 0 |
 | unusual_or_difficult | 2 | 0 |
-| **Total** | **20** | **5** |
+| **Total** | **20** | **10** |
 
 ---
 
-## Batch 1 Records (Drafted)
+## Batch 1 Records (Reviewed)
 
 | Reference | Source ADR | Title |
 |---|---|---|
@@ -33,7 +33,21 @@
 
 ---
 
+## Batch 2 Records (Reviewed)
+
+| Reference | Source ADR | Title |
+|---|---|---|
+| ref-modonome-006 | ADR-006 | Checker context independence |
+| ref-modonome-007 | ADR-006 | Rework cap |
+| ref-modonome-008 | ADR-007 | Claim atomicity (one lease per turn) |
+| ref-modonome-009 | ADR-008 | Human CODEOWNERS approval |
+| ref-modonome-010 | ADR-010 | Owner promotion gate |
+
+---
+
 ## Original Draft Preservation
+
+### Batch 1 Draft Preservation
 
 **Draft Corpus Hash (SHA256):** `71c75a1bed42aad6b380a9984b1145703ecbcaf863e80c114832ca63b8608f05`
 
@@ -46,11 +60,28 @@ This hash is computed over the concatenated original draft JSONL files:
 
 The hash was computed before any corrections were applied. This preserves the exact original draft state for first-pass scoring.
 
+### Batch 2 Draft Preservation
+
+**Batch 2 Draft Corpus Hash (SHA256):** `f1bd282b9d43e8803b636968cd77c803666d96c44f1b15c62c475c31e293e7a2`
+
+Individual original draft hashes (recorded before correction):
+- `ref-modonome-006.jsonl`: `80f8cf3bca8cbc55d1fc33464ea7e0c436ddc56ab706bd3e410e32961891049a`
+- `ref-modonome-007.jsonl`: `de6b8b6a4e4e1d38c4a89cb6467bf87a8e00554f86addf745b4040832e7e152d`
+- `ref-modonome-008.jsonl`: `de94e5b84e8de54ff996e713fee354650d28df2206ce8a9adf90b1a0a7f6dce6`
+- `ref-modonome-009.jsonl`: `520f2a5fdb53c47eee5712bfb66ad9f42c202f2989390eb76f003b536e5cda43`
+- `ref-modonome-010.jsonl`: `714dd1e6ba3ff8f5058e22300f2d1db479614409ddcb804fa98c0b6ceffd0b2d`
+
 ---
 
 ## Original Nemotron Semantic Exact-Pass for Batch 1
 
 **0/5 (0%)** — All five records required semantic corrections per Theo's approved review.
+
+---
+
+## Original Nemotron Semantic Exact-Pass for Batch 2
+
+**1/5 (20%)** — ref-modonome-006 passed; ref-modonome-007 through ref-modonome-010 required semantic corrections per approved review.
 
 ---
 
@@ -121,14 +152,20 @@ For each record, please:
 | ref-modonome-003 | reviewed |
 | ref-modonome-004 | reviewed |
 | ref-modonome-005 | reviewed |
+| ref-modonome-006 | reviewed |
+| ref-modonome-007 | reviewed |
+| ref-modonome-008 | reviewed |
+| ref-modonome-009 | reviewed |
+| ref-modonome-010 | reviewed |
 
 ---
 
 ## Original First-Pass Score
 
-**MODONOME BATCH 1 ORIGINAL SEMANTIC EXACT-PASS: 0/5**
+- **MODONOME BATCH 1 ORIGINAL SEMANTIC EXACT-PASS: 0/5**
+- **MODONOME BATCH 2 ORIGINAL SEMANTIC EXACT-PASS: 1/5**
 
-This score applies to the ORIGINAL drafts before correction and must not be recalculated from corrected records.
+These scores apply to the ORIGINAL drafts before correction and must not be recalculated from corrected records.
 
 ---
 
@@ -142,18 +179,29 @@ This score applies to the ORIGINAL drafts before correction and must not be reca
 
 ---
 
+## Files Changed (Batch 2)
+
+- `benchmarks/open_architecture/batch_01/reference_decisions/modonome/ref-modonome-006.jsonl`
+- `benchmarks/open_architecture/batch_01/reference_decisions/modonome/ref-modonome-007.jsonl`
+- `benchmarks/open_architecture/batch_01/reference_decisions/modonome/ref-modonome-008.jsonl`
+- `benchmarks/open_architecture/batch_01/reference_decisions/modonome/ref-modonome-009.jsonl`
+- `benchmarks/open_architecture/batch_01/reference_decisions/modonome/ref-modonome-010.jsonl`
+
+---
+
 ## Verification Checklist
 
-- [x] All 5 records present with unique `ref-modonome-XXX` IDs
+- [x] All 10 records present with unique `ref-modonome-XXX` IDs
 - [x] All source locations point to valid lines in pinned commit `7a4d5244dcb6879b6aa646105b39297aa6d0a5a2`
 - [x] All taxonomy fields use exact O1A vocabulary
-- [x] All `human_review_status` = "reviewed"
-- [x] Sampling category: `clear_explicit` = 5 ✓
+- [x] All `human_review_status` = "reviewed" for 001–010
+- [x] Sampling quota progress: `clear_explicit` = 5/5 ✓, `scoped` = 5/5 ✓
 - [x] No machine prediction fields present
-- [x] Corpus hash computed and recorded above
-- [x] Original first-pass score recorded: 0/5
-- [x] Draft corpus hash recorded: `71c75a1bed42aad6b380a9984b1145703ecbcaf863e80c114832ca63b8608f05`
-- [x] All corrections applied per approved list above
+- [x] Original first-pass scores recorded: Batch 1: 0/5, Batch 2: 1/5
+- [x] Draft corpus hashes recorded:
+  - Batch 1: `71c75a1bed42aad6b380a9984b1145703ecbcaf863e80c114832ca63b8608f05`
+  - Batch 2: `f1bd282b9d43e8803b636968cd77c803666d96c44f1b15c62c475c31e293e7a2`
+- [x] All corrections applied per approved review
 - [x] No relationships added (all remain `[]`)
 - [x] Architecture isolation maintained
 
