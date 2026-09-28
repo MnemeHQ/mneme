@@ -2,8 +2,8 @@
 
 **Repository:** enumind/modonome
 **Pinned Commit:** 7a4d5244dcb6879b6aa646105b39297aa6d0a5a2
-**Total Records:** 20 (10 reviewed)
-**Status:** 10 reviewed; 10 remaining
+**Total Records:** 20 (15 reviewed in Batches 1-3; 5 remaining in Batch 4)
+**Status:** 15 reviewed; 5 remaining
 
 ---
 
@@ -13,11 +13,11 @@
 |---|---:|---:|
 | clear_explicit | 5 | 5 |
 | scoped | 5 | 5 |
-| lifecycle_or_supersession | 3 | 0 |
-| ambiguous_or_conflicting | 3 | 0 |
+| lifecycle_or_supersession | 3 | 3 |
+| ambiguous_or_conflicting | 3 | 2 |
 | enforcement_potential | 2 | 0 |
 | unusual_or_difficult | 2 | 0 |
-| **Total** | **20** | **10** |
+| **Total** | **20** | **15** |
 
 ---
 
@@ -42,6 +42,18 @@
 | ref-modonome-008 | ADR-007 | Claim atomicity (one lease per turn) |
 | ref-modonome-009 | ADR-008 | Human CODEOWNERS approval |
 | ref-modonome-010 | ADR-010 | Owner promotion gate |
+
+---
+
+## Batch 3 Records (Reviewed)
+
+| Reference | Source ADR | Title |
+|---|---|---|
+| ref-modonome-011 | ADR-013 | Breaking config removals/renames require cumulative migration |
+| ref-modonome-012 | ADR-024 | Three-state capability promotion lifecycle |
+| ref-modonome-013 | ADR-013 | Config downgrade refusal at engine startup |
+| ref-modonome-014 | ADR-003 | Terminology contradiction resolved to defined taxonomy |
+| ref-modonome-015 | ADR-045 / ADR-046 | Partial supersession of launch feature deferral |
 
 ---
 
@@ -71,6 +83,17 @@ Individual original draft hashes (recorded before correction):
 - `ref-modonome-009.jsonl`: `520f2a5fdb53c47eee5712bfb66ad9f42c202f2989390eb76f003b536e5cda43`
 - `ref-modonome-010.jsonl`: `714dd1e6ba3ff8f5058e22300f2d1db479614409ddcb804fa98c0b6ceffd0b2d`
 
+### Batch 3 Draft Preservation
+
+**Batch 3 Draft Corpus Hash (SHA256):** `99cb8ec9227c8682304145696467a661e1f384cc532372f290b1898143cf50b7`
+
+Individual original draft hashes (recorded before correction):
+- `ref-modonome-011.jsonl`: `3b0d25212865b18c4e8e6d84dde5a0c7990660e88af9d5fb485fe9d765096eec`
+- `ref-modonome-012.jsonl`: `44ed25abb6c645448537afceccb2a98025817290235a2f95b1d5b354a5cfaec2`
+- `ref-modonome-013.jsonl`: `edadf6e9e291a176154a97fa80cb699705af205b35443f31893945d454ac9237`
+- `ref-modonome-014.jsonl`: `c30c7458e1a2da553464ede967b3513b79415bacdfe55db2a5905e2f34741a5c`
+- `ref-modonome-015.jsonl`: `b498f44a3609d61e8b2fbd89ddc81c5b1ba1a16767886f8a8f2e8f3f519810f9`
+
 ---
 
 ## Original Nemotron Semantic Exact-Pass for Batch 1
@@ -82,6 +105,12 @@ Individual original draft hashes (recorded before correction):
 ## Original Nemotron Semantic Exact-Pass for Batch 2
 
 **1/5 (20%)** — ref-modonome-006 passed; ref-modonome-007 through ref-modonome-010 required semantic corrections per approved review.
+
+---
+
+## Original Nemotron Semantic Exact-Pass for Batch 3
+
+**1/5 (20%)** — ref-modonome-013 passed; ref-modonome-011, ref-modonome-012, ref-modonome-014, and ref-modonome-015 required semantic corrections per approved review.
 
 ---
 
@@ -141,6 +170,34 @@ For each record, please:
 - Verify `.modonome/metrics.jsonl` path is in exact source; do not strengthen provenance
 - Keep isolated from per-run logging
 
+### ref-modonome-011 (ADR-013)
+- effective_date must be null
+- Narrow domains to `["migration_evolution"]`
+- Narrow purposes to `["enable_migration"]`
+- Keep scope `scripts/migrate-config.mjs`
+
+### ref-modonome-012 (ADR-024)
+- effective_date must be null
+- Update purposes to `["standardize", "require_evidence"]`
+- Keep scope `capability promotion` (component)
+- Enforcement: `contextual_guidance`
+
+### ref-modonome-013 (ADR-013)
+- effective_date must be null
+- Original exact pass; no semantic corrections
+
+### ref-modonome-014 (ADR-003)
+- effective_date must be null
+- Multi-source evidence establishing contradiction (ADR-003 L17-L20), prescribed correction (ADR-003 L29-L30), and implementation resolution across all three taxonomy states (HARDENED, PARTIAL, UNHARDENED) in runner.mjs (L144-L162)
+- Scopes: `agentproof/runner.mjs`, `agentproof/README.md`
+- Enforcement: `deterministic_rule`
+
+### ref-modonome-015 (ADR-045)
+- effective_date must be null
+- Scope updated to named components `["adapter-verify", "Break the Ratchet", "CheckerProof"]`
+- Enforcement: `contextual_guidance`
+- ONTOLOGY_GAP: taxonomy v0.1 cannot represent partial supersession without incorrectly implying whole-decision supersession; ADR-045 remains active while the three named deferrals are reversed and points 2-4 remain in force
+
 ---
 
 ## Human Review Status
@@ -157,6 +214,11 @@ For each record, please:
 | ref-modonome-008 | reviewed |
 | ref-modonome-009 | reviewed |
 | ref-modonome-010 | reviewed |
+| ref-modonome-011 | reviewed |
+| ref-modonome-012 | reviewed |
+| ref-modonome-013 | reviewed |
+| ref-modonome-014 | reviewed |
+| ref-modonome-015 | reviewed |
 
 ---
 
@@ -164,6 +226,7 @@ For each record, please:
 
 - **MODONOME BATCH 1 ORIGINAL SEMANTIC EXACT-PASS: 0/5**
 - **MODONOME BATCH 2 ORIGINAL SEMANTIC EXACT-PASS: 1/5**
+- **MODONOME BATCH 3 ORIGINAL SEMANTIC EXACT-PASS: 1/5**
 
 These scores apply to the ORIGINAL drafts before correction and must not be recalculated from corrected records.
 
@@ -189,18 +252,29 @@ These scores apply to the ORIGINAL drafts before correction and must not be reca
 
 ---
 
+## Files Changed (Batch 3)
+
+- `benchmarks/open_architecture/batch_01/reference_decisions/modonome/ref-modonome-011.jsonl`
+- `benchmarks/open_architecture/batch_01/reference_decisions/modonome/ref-modonome-012.jsonl`
+- `benchmarks/open_architecture/batch_01/reference_decisions/modonome/ref-modonome-013.jsonl`
+- `benchmarks/open_architecture/batch_01/reference_decisions/modonome/ref-modonome-014.jsonl`
+- `benchmarks/open_architecture/batch_01/reference_decisions/modonome/ref-modonome-015.jsonl`
+
+---
+
 ## Verification Checklist
 
-- [x] All 10 records present with unique `ref-modonome-XXX` IDs
+- [x] All 15 records reviewed with unique `ref-modonome-XXX` IDs
 - [x] All source locations point to valid lines in pinned commit `7a4d5244dcb6879b6aa646105b39297aa6d0a5a2`
 - [x] All taxonomy fields use exact O1A vocabulary
-- [x] All `human_review_status` = "reviewed" for 001–010
-- [x] Sampling quota progress: `clear_explicit` = 5/5 ✓, `scoped` = 5/5 ✓
+- [x] All `human_review_status` = "reviewed" for 001–015
+- [x] Sampling quota progress: `clear_explicit` = 5/5 ✓, `scoped` = 5/5 ✓, `lifecycle_or_supersession` = 3/3 ✓, `ambiguous_or_conflicting` = 2/3 (1 remaining)
 - [x] No machine prediction fields present
-- [x] Original first-pass scores recorded: Batch 1: 0/5, Batch 2: 1/5
+- [x] Original first-pass scores recorded: Batch 1: 0/5, Batch 2: 1/5, Batch 3: 1/5
 - [x] Draft corpus hashes recorded:
   - Batch 1: `71c75a1bed42aad6b380a9984b1145703ecbcaf863e80c114832ca63b8608f05`
   - Batch 2: `f1bd282b9d43e8803b636968cd77c803666d96c44f1b15c62c475c31e293e7a2`
+  - Batch 3: `99cb8ec9227c8682304145696467a661e1f384cc532372f290b1898143cf50b7`
 - [x] All corrections applied per approved review
 - [x] No relationships added (all remain `[]`)
 - [x] Architecture isolation maintained
