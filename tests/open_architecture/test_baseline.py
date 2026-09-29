@@ -348,41 +348,23 @@ class TestBatch01BaselineFreeze:
 
         assert mutated_config.configuration_hash() != original_hash
 
-    # 16. status: frozen is rejected unless all required freeze prerequisites exist
+    # 16. status: frozen is validated on live baseline and rejected when prerequisites are missing
     def test_16_status_frozen_rejected_unless_prerequisites_exist(self, baseline: BaselineConfig, manifest: Manifest):
-        # Current state: corpora are missing, so freeze must be rejected
-        blockers = baseline.check_freeze_prerequisites()
-        assert len(blockers) >= 2
-        assert any("scenario" in b.lower() for b in blockers)
-        assert any("reference" in b.lower() for b in blockers)
+        # Live baseline fixture is now frozen and satisfies all freeze prerequisites
+        assert baseline.status == "frozen"
+        assert baseline.check_freeze_prerequisites() == []
+        baseline.validate_freeze(manifest=manifest)
 
-        with pytest.raises(BaselineFreezeError, match="Baseline cannot be marked 'frozen'"):
-            baseline.validate_freeze()
-
-        # If a manifest with status='frozen' is passed, it must also be rejected
-        manifest_dict = manifest.to_dict()
-        manifest_dict["status"] = "frozen"
-        frozen_manifest = Manifest.from_dict(manifest_dict)
-
-        with pytest.raises(BaselineFreezeError, match="cannot be marked 'frozen'"):
-            validate_baseline_freeze(baseline, manifest=frozen_manifest)
-
-        # Baseline with all prerequisites satisfied CAN validate successfully
-        complete_scenarios = BaselineCorpusStatus(
-            status="complete",
+        # Retain fail-closed negative coverage: incomplete baseline configurations must be rejected
+        # Case A: Missing scenario corpus
+        incomplete_scenarios = BaselineCorpusStatus(
+            status="missing",
             total_required=50,
             per_repository_required=10,
-            content_hash="sha256:11112222333344445555666677778888",
+            content_hash="none",
             location="scenarios/",
         )
-        complete_reference = BaselineCorpusStatus(
-            status="complete",
-            total_required=100,
-            per_repository_required=20,
-            content_hash="sha256:88887777666655554444333322221111",
-            location="reference_decisions/",
-        )
-        fully_satisfied_baseline = BaselineConfig(
+        bad_scenarios_baseline = BaselineConfig(
             schema_version=baseline.schema_version,
             baseline_id=baseline.baseline_id,
             status="frozen",
@@ -397,12 +379,50 @@ class TestBatch01BaselineFreeze:
             semantic_tasks=baseline.semantic_tasks,
             retrieval_policy=baseline.retrieval_policy,
             scenario_renderer=baseline.scenario_renderer,
-            scenario_corpus=complete_scenarios,
-            reference_corpus=complete_reference,
+            scenario_corpus=incomplete_scenarios,
+            reference_corpus=baseline.reference_corpus,
         )
+        blockers = bad_scenarios_baseline.check_freeze_prerequisites()
+        assert len(blockers) >= 1
+        assert any("scenario" in b.lower() for b in blockers)
+        with pytest.raises(BaselineFreezeError, match="Baseline cannot be marked 'frozen'"):
+            bad_scenarios_baseline.validate_freeze()
+        with pytest.raises(BaselineFreezeError, match="cannot be marked 'frozen'"):
+            validate_baseline_freeze(bad_scenarios_baseline, manifest=manifest)
 
-        assert fully_satisfied_baseline.check_freeze_prerequisites() == []
-        fully_satisfied_baseline.validate_freeze()  # Should not raise
+        # Case B: Missing reference corpus
+        incomplete_reference = BaselineCorpusStatus(
+            status="missing",
+            total_required=100,
+            per_repository_required=20,
+            content_hash="none",
+            location="reference_decisions/",
+        )
+        bad_reference_baseline = BaselineConfig(
+            schema_version=baseline.schema_version,
+            baseline_id=baseline.baseline_id,
+            status="frozen",
+            semantic_mneme_sha=baseline.semantic_mneme_sha,
+            mneme_version=baseline.mneme_version,
+            benchmark_schema_version=baseline.benchmark_schema_version,
+            taxonomy_version=baseline.taxonomy_version,
+            manifest_ref=baseline.manifest_ref,
+            repositories=baseline.repositories,
+            extractor=baseline.extractor,
+            classifier=baseline.classifier,
+            semantic_tasks=baseline.semantic_tasks,
+            retrieval_policy=baseline.retrieval_policy,
+            scenario_renderer=baseline.scenario_renderer,
+            scenario_corpus=baseline.scenario_corpus,
+            reference_corpus=incomplete_reference,
+        )
+        blockers_ref = bad_reference_baseline.check_freeze_prerequisites()
+        assert len(blockers_ref) >= 1
+        assert any("reference" in b.lower() for b in blockers_ref)
+        with pytest.raises(BaselineFreezeError, match="Baseline cannot be marked 'frozen'"):
+            bad_reference_baseline.validate_freeze()
+        with pytest.raises(BaselineFreezeError, match="cannot be marked 'frozen'"):
+            validate_baseline_freeze(bad_reference_baseline, manifest=manifest)
 
     # 16b. baseline and manifest binding validation
     def test_16b_baseline_manifest_binding_contract(self, baseline: BaselineConfig, manifest: Manifest):
@@ -540,8 +560,62 @@ class TestBatch01BaselineFreeze:
             mismatched_batch_baseline.validate_freeze(manifest=valid_frozen_manifest)
 
         # 5. Incomplete baseline prerequisites still fail even with valid manifest
+        incomplete_baseline = BaselineConfig(
+            schema_version=satisfied_baseline.schema_version,
+            baseline_id=satisfied_baseline.baseline_id,
+            status="frozen",
+            semantic_mneme_sha=satisfied_baseline.semantic_mneme_sha,
+            mneme_version=satisfied_baseline.mneme_version,
+            benchmark_schema_version=satisfied_baseline.benchmark_schema_version,
+            taxonomy_version=satisfied_baseline.taxonomy_version,
+            manifest_ref={
+                "path": "manifest.yaml",
+                "batch_id": valid_frozen_manifest.batch_id,
+                "configuration_hash": matching_hash,
+            },
+            repositories=satisfied_baseline.repositories,
+            extractor=satisfied_baseline.extractor,
+            classifier=satisfied_baseline.classifier,
+            semantic_tasks=satisfied_baseline.semantic_tasks,
+            retrieval_policy=satisfied_baseline.retrieval_policy,
+            scenario_renderer=satisfied_baseline.scenario_renderer,
+            scenario_corpus=BaselineCorpusStatus(
+                status="missing",
+                total_required=50,
+                per_repository_required=10,
+                content_hash="none",
+                location="scenarios/",
+            ),
+            reference_corpus=complete_reference,
+        )
         with pytest.raises(BaselineFreezeError, match="cannot be marked 'frozen'"):
-            baseline.validate_freeze(manifest=valid_frozen_manifest)
+            incomplete_baseline.validate_freeze(manifest=valid_frozen_manifest)
+
+    # 16c. live baseline artifact-to-metadata integrity
+    def test_16c_live_baseline_corpus_integrity(self, baseline: BaselineConfig):
+        from mneme.open_architecture import compute_reference_corpus_content_hash
+        from mneme.open_architecture.export import import_scenarios_jsonl
+        from mneme.open_architecture.orchestrator import _compute_scenario_content_hash
+
+        # Scenario corpus integrity
+        scenarios_path = REPO_ROOT / "benchmarks" / "open_architecture" / "batch_01" / "scenarios" / "scenarios.jsonl"
+        assert scenarios_path.is_file()
+        scenarios = import_scenarios_jsonl(scenarios_path)
+        assert len(scenarios) == 50
+        assert len(scenarios) == baseline.scenario_corpus.total_required
+        actual_scn_hash = _compute_scenario_content_hash(scenarios)
+        assert baseline.scenario_corpus.content_hash == actual_scn_hash
+        assert actual_scn_hash == "2ff8751955fd64a33316aca6692dc803"
+
+        # Reference corpus integrity
+        ref_dir = REPO_ROOT / "benchmarks" / "open_architecture" / "batch_01" / "reference_decisions"
+        assert ref_dir.is_dir()
+        ref_files = list(ref_dir.glob("*/ref-*.jsonl"))
+        assert len(ref_files) == 100
+        assert len(ref_files) == baseline.reference_corpus.total_required
+        actual_ref_hash = compute_reference_corpus_content_hash(ref_dir)
+        assert baseline.reference_corpus.content_hash == actual_ref_hash
+        assert actual_ref_hash == "0455bd66aae52551c35b37a63c2d185f"
 
     # 17. no semantic runtime module is modified
     def test_17_no_semantic_runtime_module_modified(self):

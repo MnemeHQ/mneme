@@ -187,12 +187,20 @@ class TestManifest:
     def test_load_merged_batch_01_manifest(self):
         m = Manifest.load("benchmarks/open_architecture/batch_01/manifest.yaml")
         assert m.batch_id == "o1a-batch-01"
-        assert m.status == "planned"
+        assert m.status == "frozen"
         assert len(m.repositories) == 5
+        for r in m.repositories:
+            assert r.validation_status == "reviewed"
         assert m.targets.decisions_total == 100
         assert m.targets.scenarios_total == 50
         assert m.targets.decisions_per_repository == 20
         assert m.targets.scenarios_per_repository == 10
+
+        m.validate_no_duplicates()
+        m.validate_target_consistency()
+        m.validate_frozen_executable()
+
+        assert m.configuration_hash() == "4af7e5794011b43d39682cdfeac9f54e"
 
     def test_invalid_schema_version(self):
         data = self._base_manifest()
