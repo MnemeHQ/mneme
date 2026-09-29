@@ -176,6 +176,7 @@ from mneme.open_architecture.export import (
     import_candidates_jsonl,
     export_scenarios_jsonl,
     import_scenarios_jsonl,
+    compute_reference_corpus_content_hash,
     compute_bundle_content_hash,
     export_bundle,
 )
@@ -329,6 +330,7 @@ __all__ = [
     "import_candidates_jsonl",
     "export_scenarios_jsonl",
     "import_scenarios_jsonl",
+    "compute_reference_corpus_content_hash",
     "compute_bundle_content_hash",
     "export_bundle",
     # reporting

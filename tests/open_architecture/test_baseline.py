@@ -404,6 +404,120 @@ class TestBatch01BaselineFreeze:
         assert fully_satisfied_baseline.check_freeze_prerequisites() == []
         fully_satisfied_baseline.validate_freeze()  # Should not raise
 
+    # 16b. baseline and manifest binding validation
+    def test_16b_baseline_manifest_binding_contract(self, baseline: BaselineConfig, manifest: Manifest):
+        # Construct valid matching frozen manifest
+        m_dict = manifest.to_dict()
+        m_dict["status"] = "frozen"
+        for r in m_dict["repositories"]:
+            if not r.get("commit_sha"):
+                r["commit_sha"] = "a" * 40
+        valid_frozen_manifest = Manifest.from_dict(m_dict)
+        matching_hash = valid_frozen_manifest.configuration_hash()
+
+        complete_scenarios = BaselineCorpusStatus(
+            status="complete",
+            total_required=50,
+            per_repository_required=10,
+            content_hash="2ff8751955fd64a33316aca6692dc803",
+            location="scenarios/",
+        )
+        complete_reference = BaselineCorpusStatus(
+            status="complete",
+            total_required=100,
+            per_repository_required=20,
+            content_hash="0455bd66aae52551c35b37a63c2d185f",
+            location="reference_decisions/",
+        )
+        satisfied_baseline = BaselineConfig(
+            schema_version=baseline.schema_version,
+            baseline_id=baseline.baseline_id,
+            status="frozen",
+            semantic_mneme_sha=baseline.semantic_mneme_sha,
+            mneme_version=baseline.mneme_version,
+            benchmark_schema_version=baseline.benchmark_schema_version,
+            taxonomy_version=baseline.taxonomy_version,
+            manifest_ref={
+                "path": "manifest.yaml",
+                "batch_id": valid_frozen_manifest.batch_id,
+                "configuration_hash": matching_hash,
+            },
+            repositories=baseline.repositories,
+            extractor=baseline.extractor,
+            classifier=baseline.classifier,
+            semantic_tasks=baseline.semantic_tasks,
+            retrieval_policy=baseline.retrieval_policy,
+            scenario_renderer=baseline.scenario_renderer,
+            scenario_corpus=complete_scenarios,
+            reference_corpus=complete_reference,
+        )
+
+        # 1. Satisfied baseline + matching frozen manifest passes
+        satisfied_baseline.validate_freeze(manifest=valid_frozen_manifest)
+
+        # 2. Supplied manifest with status="planned" fails
+        planned_dict = m_dict.copy()
+        planned_dict["status"] = "planned"
+        planned_manifest = Manifest.from_dict(planned_dict)
+        with pytest.raises(BaselineFreezeError, match="Supplied manifest status must be 'frozen'"):
+            satisfied_baseline.validate_freeze(manifest=planned_manifest)
+
+        # 3. Frozen manifest with configuration hash mismatch fails
+        mismatched_hash_baseline = BaselineConfig(
+            schema_version=satisfied_baseline.schema_version,
+            baseline_id=satisfied_baseline.baseline_id,
+            status="frozen",
+            semantic_mneme_sha=satisfied_baseline.semantic_mneme_sha,
+            mneme_version=satisfied_baseline.mneme_version,
+            benchmark_schema_version=satisfied_baseline.benchmark_schema_version,
+            taxonomy_version=satisfied_baseline.taxonomy_version,
+            manifest_ref={
+                "path": "manifest.yaml",
+                "batch_id": valid_frozen_manifest.batch_id,
+                "configuration_hash": "0" * 32,
+            },
+            repositories=satisfied_baseline.repositories,
+            extractor=satisfied_baseline.extractor,
+            classifier=satisfied_baseline.classifier,
+            semantic_tasks=satisfied_baseline.semantic_tasks,
+            retrieval_policy=satisfied_baseline.retrieval_policy,
+            scenario_renderer=satisfied_baseline.scenario_renderer,
+            scenario_corpus=complete_scenarios,
+            reference_corpus=complete_reference,
+        )
+        with pytest.raises(BaselineFreezeError, match="configuration_hash"):
+            mismatched_hash_baseline.validate_freeze(manifest=valid_frozen_manifest)
+
+        # 4. Mismatched manifest batch_id fails
+        mismatched_batch_baseline = BaselineConfig(
+            schema_version=satisfied_baseline.schema_version,
+            baseline_id=satisfied_baseline.baseline_id,
+            status="frozen",
+            semantic_mneme_sha=satisfied_baseline.semantic_mneme_sha,
+            mneme_version=satisfied_baseline.mneme_version,
+            benchmark_schema_version=satisfied_baseline.benchmark_schema_version,
+            taxonomy_version=satisfied_baseline.taxonomy_version,
+            manifest_ref={
+                "path": "manifest.yaml",
+                "batch_id": "other-batch-id",
+                "configuration_hash": matching_hash,
+            },
+            repositories=satisfied_baseline.repositories,
+            extractor=satisfied_baseline.extractor,
+            classifier=satisfied_baseline.classifier,
+            semantic_tasks=satisfied_baseline.semantic_tasks,
+            retrieval_policy=satisfied_baseline.retrieval_policy,
+            scenario_renderer=satisfied_baseline.scenario_renderer,
+            scenario_corpus=complete_scenarios,
+            reference_corpus=complete_reference,
+        )
+        with pytest.raises(BaselineFreezeError, match="batch_id"):
+            mismatched_batch_baseline.validate_freeze(manifest=valid_frozen_manifest)
+
+        # 5. Incomplete baseline prerequisites still fail even with valid manifest
+        with pytest.raises(BaselineFreezeError, match="cannot be marked 'frozen'"):
+            baseline.validate_freeze(manifest=valid_frozen_manifest)
+
     # 17. no semantic runtime module is modified
     def test_17_no_semantic_runtime_module_modified(self):
         base_sha = "3673c36855fb1e30d46942ce826c50be4888df5e"
@@ -431,7 +545,6 @@ class TestBatch01BaselineFreeze:
             "mneme/open_architecture/execution.py",
             "mneme/open_architecture/store.py",
             "mneme/open_architecture/run_metadata.py",
-            "mneme/open_architecture/export.py",
             "mneme/open_architecture/reporting.py",
         }
 

@@ -423,7 +423,8 @@ class BaselineConfig:
         """Validate that all freeze prerequisites are met.
 
         Raises:
-            BaselineFreezeError: If any prerequisite is missing or if manifest claims 'frozen' prematurely.
+            BaselineFreezeError: If any prerequisite is missing or if manifest claims 'frozen' prematurely,
+                or if the supplied manifest fails frozen validation or binding.
         """
         blockers = self.check_freeze_prerequisites()
         if blockers:
@@ -431,17 +432,51 @@ class BaselineConfig:
                 f"Baseline cannot be marked 'frozen':\n  - " + "\n  - ".join(blockers)
             )
 
-        if manifest is not None and manifest.status == "frozen" and blockers:
-            raise BaselineFreezeError(
-                f"Manifest claims status 'frozen' but baseline prerequisites are unsatisfied:\n  - "
-                + "\n  - ".join(blockers)
-            )
-
         if self.status == "frozen" and blockers:
             raise BaselineFreezeError(
                 f"Baseline status is 'frozen' but prerequisites are unsatisfied:\n  - "
                 + "\n  - ".join(blockers)
             )
+
+        if manifest is not None:
+            if manifest.status != "frozen":
+                raise BaselineFreezeError(
+                    f"Supplied manifest status must be 'frozen', got {manifest.status!r}"
+                )
+
+            try:
+                manifest.validate_frozen_executable()
+            except ValueError as exc:
+                raise BaselineFreezeError(
+                    f"Manifest failed frozen-executable validation: {exc}"
+                ) from exc
+
+            try:
+                manifest.validate_target_consistency()
+            except ValueError as exc:
+                raise BaselineFreezeError(
+                    f"Manifest failed target consistency validation: {exc}"
+                ) from exc
+
+            try:
+                manifest.validate_no_duplicates()
+            except ValueError as exc:
+                raise BaselineFreezeError(
+                    f"Manifest failed uniqueness validation: {exc}"
+                ) from exc
+
+            manifest_batch_id = self.manifest_ref.get("batch_id")
+            if manifest_batch_id != manifest.batch_id:
+                raise BaselineFreezeError(
+                    f"Baseline manifest_ref.batch_id {manifest_batch_id!r} does not match manifest.batch_id {manifest.batch_id!r}"
+                )
+
+            manifest_config_hash = self.manifest_ref.get("configuration_hash")
+            expected_hash = manifest.configuration_hash()
+            if manifest_config_hash != expected_hash:
+                raise BaselineFreezeError(
+                    f"Baseline manifest_ref.configuration_hash {manifest_config_hash!r} does not match manifest configuration_hash {expected_hash!r}"
+                )
 
 
 def validate_baseline_freeze(

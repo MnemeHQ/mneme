@@ -15,6 +15,7 @@ Covers:
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -24,6 +25,7 @@ from mneme.open_architecture.classification import ClassifierResult, ClassifierT
 from mneme.open_architecture.discovery import DiscoveredSourceDocument
 from mneme.open_architecture.export import (
     compute_bundle_content_hash,
+    compute_reference_corpus_content_hash,
     export_bundle,
     export_candidates_jsonl,
     export_scenarios_jsonl,
@@ -365,3 +367,193 @@ class TestExportBundle:
         scn_lines = (bundle_dir / "scenarios.jsonl").read_text(encoding="utf-8").strip().splitlines()
         assert len(scn_lines) == 1
         assert json.loads(scn_lines[0])["scenario_id"] == "scn-001"
+
+
+# ── Reference Decision Corpus Content Hash Tests ─────────────────────────────
+
+
+class TestReferenceCorpusContentHash:
+    def _create_sample_record(self, ref_id: str, title: str = "Test Decision") -> dict[str, Any]:
+        return {
+            "reference_decision_id": ref_id,
+            "repository": "test/repo",
+            "repository_commit_sha": "a" * 40,
+            "source_file": "docs/adr/0001.md",
+            "source_location": "L1-L10",
+            "raw_evidence": "Evidence text",
+            "normalized_decision": title,
+            "classification": "prescriptive",
+            "decision_domains": ["architecture_structure"],
+            "decision_purposes": ["standardize"],
+            "authority_status": "explicitly_accepted",
+            "authority_evidence": None,
+            "scopes": [{"scope_type": "component", "scope_expression": "core"}],
+            "lifecycle_status": "active",
+            "supersedes": None,
+            "superseded_by": None,
+            "effective_date": "2026-01-01",
+            "expiration_if_any": None,
+            "relationships": [],
+            "enforcement_potential": "deterministic_rule",
+            "candidate_rule": "Rule text",
+            "sampling_category": "clear_explicit",
+            "human_review_status": "reviewed",
+            "human_notes": "Review note",
+        }
+
+    def test_deterministic_key_order(self, tmp_path: Path):
+        dir1 = tmp_path / "corpus1" / "repo"
+        dir2 = tmp_path / "corpus2" / "repo"
+        dir1.mkdir(parents=True)
+        dir2.mkdir(parents=True)
+
+        rec = self._create_sample_record("ref-001")
+        # Write dir1 with default order
+        (dir1 / "ref-001.jsonl").write_text(json.dumps(rec) + "\n", encoding="utf-8")
+
+        # Write dir2 with reversed key order
+        reversed_rec = dict(reversed(list(rec.items())))
+        (dir2 / "ref-001.jsonl").write_text(json.dumps(reversed_rec) + "\n", encoding="utf-8")
+
+        h1 = compute_reference_corpus_content_hash(tmp_path / "corpus1")
+        h2 = compute_reference_corpus_content_hash(tmp_path / "corpus2")
+        assert h1 == h2
+
+    def test_deterministic_whitespace_formatting(self, tmp_path: Path):
+        dir1 = tmp_path / "corpus1" / "repo"
+        dir2 = tmp_path / "corpus2" / "repo"
+        dir1.mkdir(parents=True)
+        dir2.mkdir(parents=True)
+
+        rec = self._create_sample_record("ref-001")
+        (dir1 / "ref-001.jsonl").write_text(json.dumps(rec, separators=(",", ":")) + "\n", encoding="utf-8")
+        # Write dir2 with extra whitespace inside JSON line and extra blank lines
+        (dir2 / "ref-001.jsonl").write_text("\n\n   \n" + json.dumps(rec, separators=(",  ", " :  ")) + "   \n\n", encoding="utf-8")
+
+        h1 = compute_reference_corpus_content_hash(tmp_path / "corpus1")
+        h2 = compute_reference_corpus_content_hash(tmp_path / "corpus2")
+        assert h1 == h2
+
+    def test_lexicographic_ordering_filesystem_independent(self, tmp_path: Path):
+        dir1 = tmp_path / "corpus1"
+        dir2 = tmp_path / "corpus2"
+        dir1.mkdir()
+        dir2.mkdir()
+
+        rec1 = self._create_sample_record("ref-001")
+        rec2 = self._create_sample_record("ref-002")
+
+        # In dir1, put ref-001 in subA, ref-002 in subB
+        (dir1 / "subA").mkdir()
+        (dir1 / "subB").mkdir()
+        (dir1 / "subA" / "ref-001.jsonl").write_text(json.dumps(rec1) + "\n", encoding="utf-8")
+        (dir1 / "subB" / "ref-002.jsonl").write_text(json.dumps(rec2) + "\n", encoding="utf-8")
+
+        # In dir2, put ref-002 in subA, ref-001 in subB
+        (dir2 / "subA").mkdir()
+        (dir2 / "subB").mkdir()
+        (dir2 / "subA" / "ref-002.jsonl").write_text(json.dumps(rec2) + "\n", encoding="utf-8")
+        (dir2 / "subB" / "ref-001.jsonl").write_text(json.dumps(rec1) + "\n", encoding="utf-8")
+
+        h1 = compute_reference_corpus_content_hash(dir1)
+        h2 = compute_reference_corpus_content_hash(dir2)
+        assert h1 == h2
+
+    def test_review_markdown_excluded(self, tmp_path: Path):
+        corpus_dir = tmp_path / "corpus"
+        repo_dir = corpus_dir / "repo"
+        repo_dir.mkdir(parents=True)
+
+        rec = self._create_sample_record("ref-001")
+        (repo_dir / "ref-001.jsonl").write_text(json.dumps(rec) + "\n", encoding="utf-8")
+
+        h_before = compute_reference_corpus_content_hash(corpus_dir)
+
+        # Add review markdown and scratch files
+        (repo_dir / "repo-review.md").write_text("# Review notes\nSome notes", encoding="utf-8")
+        (repo_dir / ".gitkeep").write_text("", encoding="utf-8")
+        (repo_dir / "notes.txt").write_text("scratch", encoding="utf-8")
+
+        h_after = compute_reference_corpus_content_hash(corpus_dir)
+        assert h_before == h_after
+
+    def test_nested_subdirectories_and_root_strays_excluded(self, tmp_path: Path):
+        corpus_dir = tmp_path / "corpus"
+        repo_dir = corpus_dir / "repo-a"
+        repo_dir.mkdir(parents=True)
+
+        rec1 = self._create_sample_record("ref-001")
+        (repo_dir / "ref-001.jsonl").write_text(json.dumps(rec1) + "\n", encoding="utf-8")
+
+        h_baseline = compute_reference_corpus_content_hash(corpus_dir)
+
+        # 1. Add deeper nested files (archive/, scratch/)
+        archive_dir = repo_dir / "archive"
+        scratch_dir = repo_dir / "scratch"
+        archive_dir.mkdir()
+        scratch_dir.mkdir()
+
+        rec_old = self._create_sample_record("ref-old")
+        rec_copy = self._create_sample_record("ref-copy")
+        (archive_dir / "ref-old.jsonl").write_text(json.dumps(rec_old) + "\n", encoding="utf-8")
+        (scratch_dir / "ref-copy.jsonl").write_text(json.dumps(rec_copy) + "\n", encoding="utf-8")
+
+        # 2. Add root-level stray file
+        rec_stray = self._create_sample_record("ref-stray")
+        (corpus_dir / "ref-stray.jsonl").write_text(json.dumps(rec_stray) + "\n", encoding="utf-8")
+
+        # Hash must remain unchanged because only corpus/*/ref-*.jsonl are selected
+        h_with_strays = compute_reference_corpus_content_hash(corpus_dir)
+        assert h_with_strays == h_baseline
+
+    def test_changing_record_changes_hash(self, tmp_path: Path):
+        corpus_dir = tmp_path / "corpus"
+        repo_dir = corpus_dir / "repo"
+        repo_dir.mkdir(parents=True)
+
+        rec = self._create_sample_record("ref-001", title="Original Title")
+        (repo_dir / "ref-001.jsonl").write_text(json.dumps(rec) + "\n", encoding="utf-8")
+
+        h1 = compute_reference_corpus_content_hash(corpus_dir)
+
+        # Modify record content
+        rec["normalized_decision"] = "Mutated Title"
+        (repo_dir / "ref-001.jsonl").write_text(json.dumps(rec) + "\n", encoding="utf-8")
+
+        h2 = compute_reference_corpus_content_hash(corpus_dir)
+        assert h1 != h2
+
+    def test_duplicate_reference_decision_id_fails_closed(self, tmp_path: Path):
+        corpus_dir = tmp_path / "corpus"
+        (corpus_dir / "subA").mkdir(parents=True)
+        (corpus_dir / "subB").mkdir(parents=True)
+
+        rec = self._create_sample_record("ref-001")
+        (corpus_dir / "subA" / "ref-001.jsonl").write_text(json.dumps(rec) + "\n", encoding="utf-8")
+        (corpus_dir / "subB" / "ref-001-dup.jsonl").write_text(json.dumps(rec) + "\n", encoding="utf-8")
+
+        with pytest.raises(ValueError, match="Duplicate reference_decision_id"):
+            compute_reference_corpus_content_hash(corpus_dir)
+
+    def test_output_format_32_lowercase_hex(self, tmp_path: Path):
+        corpus_dir = tmp_path / "corpus"
+        repo_dir = corpus_dir / "repo"
+        repo_dir.mkdir(parents=True)
+
+        rec = self._create_sample_record("ref-001")
+        (repo_dir / "ref-001.jsonl").write_text(json.dumps(rec) + "\n", encoding="utf-8")
+
+        h = compute_reference_corpus_content_hash(corpus_dir)
+        assert len(h) == 32
+        assert re.match(r"^[0-9a-f]{32}$", h)
+
+    def test_real_batch_01_reference_corpus_stable(self):
+        ref_dir = Path(__file__).resolve().parent.parent.parent / "benchmarks" / "open_architecture" / "batch_01" / "reference_decisions"
+        assert ref_dir.is_dir()
+
+        h = compute_reference_corpus_content_hash(ref_dir)
+        assert h == "0455bd66aae52551c35b37a63c2d185f"
+
+    def test_package_facade_export(self):
+        from mneme.open_architecture import compute_reference_corpus_content_hash as pkg_fn
+        assert pkg_fn is compute_reference_corpus_content_hash
