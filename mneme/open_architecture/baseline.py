@@ -432,10 +432,9 @@ class BaselineConfig:
                 f"Baseline cannot be marked 'frozen':\n  - " + "\n  - ".join(blockers)
             )
 
-        if self.status == "frozen" and blockers:
+        if self.status != "frozen":
             raise BaselineFreezeError(
-                f"Baseline status is 'frozen' but prerequisites are unsatisfied:\n  - "
-                + "\n  - ".join(blockers)
+                f"Baseline status must be 'frozen', got {self.status!r}"
             )
 
         if manifest is not None:

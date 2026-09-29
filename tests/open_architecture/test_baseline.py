@@ -455,6 +455,31 @@ class TestBatch01BaselineFreeze:
         # 1. Satisfied baseline + matching frozen manifest passes
         satisfied_baseline.validate_freeze(manifest=valid_frozen_manifest)
 
+        # 1b. Identical baseline except status="planned" fails freeze validation
+        planned_status_baseline = BaselineConfig(
+            schema_version=satisfied_baseline.schema_version,
+            baseline_id=satisfied_baseline.baseline_id,
+            status="planned",
+            semantic_mneme_sha=satisfied_baseline.semantic_mneme_sha,
+            mneme_version=satisfied_baseline.mneme_version,
+            benchmark_schema_version=satisfied_baseline.benchmark_schema_version,
+            taxonomy_version=satisfied_baseline.taxonomy_version,
+            manifest_ref=satisfied_baseline.manifest_ref,
+            repositories=satisfied_baseline.repositories,
+            extractor=satisfied_baseline.extractor,
+            classifier=satisfied_baseline.classifier,
+            semantic_tasks=satisfied_baseline.semantic_tasks,
+            retrieval_policy=satisfied_baseline.retrieval_policy,
+            scenario_renderer=satisfied_baseline.scenario_renderer,
+            scenario_corpus=complete_scenarios,
+            reference_corpus=complete_reference,
+        )
+        assert planned_status_baseline.check_freeze_prerequisites() == []
+        with pytest.raises(BaselineFreezeError, match="Baseline status must be 'frozen'"):
+            planned_status_baseline.validate_freeze(manifest=valid_frozen_manifest)
+        with pytest.raises(BaselineFreezeError, match="Baseline status must be 'frozen'"):
+            planned_status_baseline.validate_freeze()
+
         # 2. Supplied manifest with status="planned" fails
         planned_dict = m_dict.copy()
         planned_dict["status"] = "planned"
