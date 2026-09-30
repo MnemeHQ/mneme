@@ -145,6 +145,19 @@ class TestBatch01BaselineFreeze:
         assert "adopt" in ext.config["keywords"]
         assert "require" in ext.config["keywords"]
 
+    # 6b. extractor baseline configuration exactly matches executable frozen HeuristicExtractor contract
+    def test_6b_extractor_config_matches_runtime_heuristic_extractor_contract(self, baseline: BaselineConfig):
+        from mneme.open_architecture.candidates import HeuristicExtractor
+
+        runtime_extractor = HeuristicExtractor()
+        assert baseline.extractor.id == runtime_extractor.extractor_id
+        assert baseline.extractor.version == runtime_extractor.extractor_version
+        assert baseline.extractor.config["min_lines"] == runtime_extractor.min_lines
+        assert baseline.extractor.config["max_lines"] == runtime_extractor.max_lines
+        assert baseline.extractor.config["confidence"] == runtime_extractor.confidence
+        assert set(baseline.extractor.config["keywords"]) == set(HeuristicExtractor.DECISION_KEYWORDS)
+        assert len(baseline.extractor.config["keywords"]) == 26
+
     # 7. classifier identity/configuration is explicit when freeze is complete
     def test_7_classifier_identity_and_config_explicit(self, baseline: BaselineConfig):
         clf = baseline.classifier
