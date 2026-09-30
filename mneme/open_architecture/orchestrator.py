@@ -556,79 +556,119 @@ def run_open_architecture_analysis(
 
                 # 8. Normalize semantic outputs (fail-closed on required dimensions)
                 failed_dims: list[str] = []
-                dim_errors: dict[str, str] = []
+                dim_errors: dict[str, str] = {}
 
                 # classification
                 norm_class: tuple[str, ...] | None = None
                 try:
-                    c_out = res_by_type[ClassifierTaskType.DECISION_CLASSIFICATION].output.get("classification")
+                    c_res = res_by_type.get(ClassifierTaskType.DECISION_CLASSIFICATION)
+                    if c_res is None:
+                        raise NormalizationError("Missing classifier result for classification")
+                    if "error" in c_res.output:
+                        raise NormalizationError(c_res.output["error"])
+                    c_out = c_res.output.get("classification")
                     norm_class = normalize_classification(c_out)
                 except Exception as exc:
                     failed_dims.append("classification")
-                    dim_errors.append(f"classification: {exc}")
+                    dim_errors["classification"] = str(exc)
 
                 # domains
                 norm_domains: tuple[str, ...] | None = None
                 try:
-                    d_out = res_by_type[ClassifierTaskType.DOMAINS].output.get("domains")
+                    d_res = res_by_type.get(ClassifierTaskType.DOMAINS)
+                    if d_res is None:
+                        raise NormalizationError("Missing classifier result for domains")
+                    if "error" in d_res.output:
+                        raise NormalizationError(d_res.output["error"])
+                    d_out = d_res.output.get("domains")
                     norm_domains = normalize_domains(d_out)
                 except Exception as exc:
                     failed_dims.append("domains")
-                    dim_errors.append(f"domains: {exc}")
+                    dim_errors["domains"] = str(exc)
 
                 # purposes
                 norm_purposes: tuple[str, ...] | None = None
                 try:
-                    p_out = res_by_type[ClassifierTaskType.PURPOSES].output.get("purposes")
+                    p_res = res_by_type.get(ClassifierTaskType.PURPOSES)
+                    if p_res is None:
+                        raise NormalizationError("Missing classifier result for purposes")
+                    if "error" in p_res.output:
+                        raise NormalizationError(p_res.output["error"])
+                    p_out = p_res.output.get("purposes")
                     norm_purposes = normalize_purposes(p_out)
                 except Exception as exc:
                     failed_dims.append("purposes")
-                    dim_errors.append(f"purposes: {exc}")
+                    dim_errors["purposes"] = str(exc)
 
                 # authority
                 norm_authority: str | None = None
                 try:
-                    a_out = res_by_type[ClassifierTaskType.AUTHORITY].output.get("authority")
+                    a_res = res_by_type.get(ClassifierTaskType.AUTHORITY)
+                    if a_res is None:
+                        raise NormalizationError("Missing classifier result for authority")
+                    if "error" in a_res.output:
+                        raise NormalizationError(a_res.output["error"])
+                    a_out = a_res.output.get("authority")
                     norm_authority = normalize_authority(a_out)
                 except Exception as exc:
                     failed_dims.append("authority")
-                    dim_errors.append(f"authority: {exc}")
+                    dim_errors["authority"] = str(exc)
 
                 # scopes
                 norm_scopes: tuple = ()
                 try:
-                    s_out = res_by_type[ClassifierTaskType.SCOPE].output.get("scopes", [])
+                    s_res = res_by_type.get(ClassifierTaskType.SCOPE)
+                    if s_res is None:
+                        raise NormalizationError("Missing classifier result for scopes")
+                    if "error" in s_res.output:
+                        raise NormalizationError(s_res.output["error"])
+                    s_out = s_res.output.get("scopes", [])
                     norm_scopes = normalize_scopes(s_out)
                 except Exception as exc:
                     failed_dims.append("scopes")
-                    dim_errors.append(f"scopes: {exc}")
+                    dim_errors["scopes"] = str(exc)
 
                 # lifecycle
                 norm_lifecycle: str | None = None
                 try:
-                    l_out = res_by_type[ClassifierTaskType.LIFECYCLE].output.get("lifecycle")
+                    l_res = res_by_type.get(ClassifierTaskType.LIFECYCLE)
+                    if l_res is None:
+                        raise NormalizationError("Missing classifier result for lifecycle")
+                    if "error" in l_res.output:
+                        raise NormalizationError(l_res.output["error"])
+                    l_out = l_res.output.get("lifecycle")
                     norm_lifecycle = normalize_lifecycle(l_out)
                 except Exception as exc:
                     failed_dims.append("lifecycle")
-                    dim_errors.append(f"lifecycle: {exc}")
+                    dim_errors["lifecycle"] = str(exc)
 
                 # relationships
                 norm_relationships: tuple = ()
                 try:
-                    r_out = res_by_type[ClassifierTaskType.RELATIONSHIPS].output.get("relationships", [])
+                    r_res = res_by_type.get(ClassifierTaskType.RELATIONSHIPS)
+                    if r_res is None:
+                        raise NormalizationError("Missing classifier result for relationships")
+                    if "error" in r_res.output:
+                        raise NormalizationError(r_res.output["error"])
+                    r_out = r_res.output.get("relationships", [])
                     norm_relationships = normalize_relationships(r_out)
                 except Exception as exc:
                     failed_dims.append("relationships")
-                    dim_errors.append(f"relationships: {exc}")
+                    dim_errors["relationships"] = str(exc)
 
                 # enforcement
                 norm_enforcement: str | None = None
                 try:
-                    e_out = res_by_type[ClassifierTaskType.ENFORCEMENT_POTENTIAL].output.get("enforcement_potential")
+                    e_res = res_by_type.get(ClassifierTaskType.ENFORCEMENT_POTENTIAL)
+                    if e_res is None:
+                        raise NormalizationError("Missing classifier result for enforcement_potential")
+                    if "error" in e_res.output:
+                        raise NormalizationError(e_res.output["error"])
+                    e_out = e_res.output.get("enforcement_potential")
                     norm_enforcement = normalize_enforcement_potential(e_out)
                 except Exception as exc:
                     failed_dims.append("enforcement_potential")
-                    dim_errors.append(f"enforcement_potential: {exc}")
+                    dim_errors["enforcement_potential"] = str(exc)
 
                 # Persist validated dimensions to ResearchStore where available
                 if research_store is not None:
@@ -736,7 +776,8 @@ def run_open_architecture_analysis(
 
                 # Check if all required dimensions succeeded
                 if (
-                    norm_class is not None
+                    not failed_dims
+                    and norm_class is not None
                     and norm_domains is not None
                     and norm_purposes is not None
                     and norm_authority is not None
@@ -764,7 +805,7 @@ def run_open_architecture_analysis(
                             source_path=cand.source_path,
                             raw_statement=cand.raw_statement,
                             missing_or_failed_dimensions=tuple(failed_dims),
-                            errors={dim: err for dim, err in zip(failed_dims, dim_errors)},
+                            errors={dim: dim_errors[dim] for dim in failed_dims},
                         )
                     )
 

@@ -29,6 +29,7 @@ import pytest
 from mneme.open_architecture.candidates import HeuristicExtractor
 from mneme.open_architecture.classification import (
     ClassifierResult,
+    ClassifierTask,
     ClassifierTaskType,
     StaticClassifier,
 )
@@ -525,3 +526,131 @@ class TestOrchestratorPipeline:
 
         assert not (workspace / ".mneme").exists()
         assert not (source_repo / ".mneme").exists()
+
+    # 18. Classifier execution exception does not abort O1A run and preserves incomplete candidate telemetry
+    def test_classifier_exception_produces_incomplete_candidate_with_preserved_error(self, tmp_path: Path):
+        source_repo = tmp_path / "src_repo"
+        commit_sha = _create_test_repo(source_repo)
+        manifest = _make_manifest("adrkit", "mbeacom/adrkit", commit_sha)
+        repo_config = manifest.repositories[0]
+
+        simulated_error_msg = "Anthropic API rate limit exceeded (HTTP 429)"
+
+        class FailingAuthorityClassifier(StaticClassifier):
+            def execute(self, task: ClassifierTask) -> ClassifierResult:
+                if task.task_type == ClassifierTaskType.AUTHORITY:
+                    raise RuntimeError(simulated_error_msg)
+                return super().execute(task)
+
+        base_clf = _make_classifier(valid=True)
+        classifier = FailingAuthorityClassifier(
+            backend_id=base_clf.backend_id,
+            classifier_version=base_clf.classifier_version,
+            model_identifier=base_clf.model_identifier,
+            outputs=base_clf._outputs,
+        )
+
+        db_path = tmp_path / "research.db"
+        store = ResearchStore(db_path)
+        store.initialize_schema()
+
+        # 1. Proves classifier execution exception does not abort the O1A run
+        res = run_open_architecture_analysis(
+            repository_config=repo_config,
+            manifest=manifest,
+            extractor=HeuristicExtractor(),
+            classifier=classifier,
+            research_store=store,
+            clone_source=source_repo,
+        )
+
+        assert isinstance(res, OpenArchitectureRunResult)
+        assert res.run_metadata.status == "completed"
+
+        # 2. Proves affected candidate becomes incomplete
+        assert len(res.incomplete_candidates) >= 1
+        assert len(res.composed_candidates) == 0
+        inc = res.incomplete_candidates[0]
+
+        # 3. Proves failed dimension is recorded
+        assert inc.missing_or_failed_dimensions == ("authority",)
+
+        # 4. Proves error text is preserved
+        assert "authority" in inc.errors
+        assert simulated_error_msg in inc.errors["authority"]
+
+        # 5. Proves successful dimensions remain unaffected
+        unaffected_dims = [
+            "classification",
+            "domains",
+            "purposes",
+            "scopes",
+            "lifecycle",
+            "relationships",
+            "enforcement_potential",
+        ]
+        for dim in unaffected_dims:
+            assert dim not in inc.missing_or_failed_dimensions
+            assert dim not in inc.errors
+
+        # Verified in store: successful dimensions persisted, failed dimension escalated
+        conn = store.connect()
+        cls_rows = conn.execute(
+            "SELECT classification FROM candidate_classifications WHERE candidate_id = ?",
+            (inc.candidate_id,),
+        ).fetchall()
+        assert len(cls_rows) >= 1
+        assert cls_rows[0][0] == "prescriptive"
+
+        dom_rows = conn.execute(
+            "SELECT domain FROM candidate_domains WHERE candidate_id = ?",
+            (inc.candidate_id,),
+        ).fetchall()
+        assert len(dom_rows) >= 1
+        assert dom_rows[0][0] == "persistence"
+
+        exec_rows = conn.execute(
+            "SELECT task_type, escalated, output_json FROM classifier_executions WHERE candidate_id = ?",
+            (inc.candidate_id,),
+        ).fetchall()
+        auth_exec = next(r for r in exec_rows if r[0] == ClassifierTaskType.AUTHORITY.value)
+        assert auth_exec[1] == 1
+        assert simulated_error_msg in auth_exec[2]
+
+    # 19. Classifier exception on scopes fails closed rather than defaulting to empty scopes
+    def test_classifier_exception_on_scopes_marks_candidate_incomplete(self, tmp_path: Path):
+        source_repo = tmp_path / "src_repo"
+        commit_sha = _create_test_repo(source_repo)
+        manifest = _make_manifest("adrkit", "mbeacom/adrkit", commit_sha)
+        repo_config = manifest.repositories[0]
+
+        simulated_error_msg = "Anthropic invalid scope schema response"
+
+        class FailingScopeClassifier(StaticClassifier):
+            def execute(self, task: ClassifierTask) -> ClassifierResult:
+                if task.task_type == ClassifierTaskType.SCOPE:
+                    raise RuntimeError(simulated_error_msg)
+                return super().execute(task)
+
+        base_clf = _make_classifier(valid=True)
+        classifier = FailingScopeClassifier(
+            backend_id=base_clf.backend_id,
+            classifier_version=base_clf.classifier_version,
+            model_identifier=base_clf.model_identifier,
+            outputs=base_clf._outputs,
+        )
+
+        res = run_open_architecture_analysis(
+            repository_config=repo_config,
+            manifest=manifest,
+            extractor=HeuristicExtractor(),
+            classifier=classifier,
+            clone_source=source_repo,
+        )
+
+        assert isinstance(res, OpenArchitectureRunResult)
+        assert len(res.incomplete_candidates) >= 1
+        assert len(res.composed_candidates) == 0
+        inc = res.incomplete_candidates[0]
+        assert inc.missing_or_failed_dimensions == ("scopes",)
+        assert simulated_error_msg in inc.errors["scopes"]
