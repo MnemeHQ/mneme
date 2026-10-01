@@ -23,6 +23,7 @@ Verifies all 17 requirements of O1A3.1 freeze specification:
 
 from __future__ import annotations
 
+import hashlib
 import re
 import subprocess
 from pathlib import Path
@@ -52,6 +53,24 @@ from mneme.open_architecture.manifest import Manifest
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 MANIFEST_PATH = REPO_ROOT / "benchmarks" / "open_architecture" / "batch_01" / "manifest.yaml"
 BASELINE_PATH = REPO_ROOT / "benchmarks" / "open_architecture" / "batch_01" / "baseline.yaml"
+
+FROZEN_SEMANTIC_MODULE_HASHES: dict[str, str] = {
+    "mneme/decision_retriever.py": "033f5be47fb3db8859c8bfe645c6cedf07c339d3f123b5441b5ee4510ebf0089",
+    "mneme/enforcer.py": "253563f149f14486707ba1bac9e3a37a7e0feb62da067f9d522766ce6d9231bc",
+    "mneme/conflict_detector.py": "a0200c26a4b02ffae85e5189efe8500ce86a1f9d99d932b23ec59e9851bae4b0",
+    "mneme/memory_store.py": "39f287b7d7cb6177e5311a8d7ee0fe2ce95512af6325031e64635ae9666d6c2c",
+    "mneme/decision_index.py": "1451e99bcea52414ccf2256510dfdad1dc4bc3e1c40a66e845f167b82c197e24",
+    "mneme/schemas.py": "9d61016a481f6c19bdc98f869628d4a613b1a974a63b32a962999ac45b28373b",
+    "mneme/open_architecture/candidates.py": "ad8b582946adec37f3a7e59c6d647a6e6e6af1a6a12db5c18dbfb485b14d51a0",
+    "mneme/open_architecture/classification.py": "1a634d34b84e296d4b16cc02b015851e68a4a04c90a5ab2a1e532396f2cebe1c",
+    "mneme/open_architecture/projection.py": "5eb7e42889b48cda43b2552e067c9cfeac800559afcb68641d7e8176c0573c68",
+    "mneme/open_architecture/gds_evaluation.py": "5ab1e707bda1ab6a7686dc48eaf23cf7bedbee2fbbcedf2cad3550acde38af6a",
+    "mneme/open_architecture/discovery.py": "dd11a6c068e1b9bae83ad31a1180b32b133ca6485674f826bdd48d652299aaae",
+    "mneme/open_architecture/execution.py": "8d08e088c874a25c3e983ca09dc1e7e8d2fca9d7f08e99d95b6de331eb4630ab",
+    "mneme/open_architecture/store.py": "50ba623636a5033c9fb2152c43cd31186765b53b7f09900f72f76eb0077f5ead",
+    "mneme/open_architecture/run_metadata.py": "67edd59dfb7bb53c73121ad954efcddd4d112ef790cb3495fce59a8588b47a19",
+    "mneme/open_architecture/reporting.py": "69a4761fccccdf000c999f71eb59b0c9955cb2cba57bd34185440093cfe48baf",
+}
 
 
 @pytest.fixture
@@ -630,37 +649,22 @@ class TestBatch01BaselineFreeze:
         assert baseline.reference_corpus.content_hash == actual_ref_hash
         assert actual_ref_hash == "0455bd66aae52551c35b37a63c2d185f"
 
-    # 17. no semantic runtime module is modified
+    # 17. no semantic runtime module is modified (hermetic content-integrity)
     def test_17_no_semantic_runtime_module_modified(self):
-        base_sha = "3673c36855fb1e30d46942ce826c50be4888df5e"
-        res = subprocess.run(
-            ["git", "diff", "--name-only", base_sha],
-            capture_output=True,
-            text=True,
-            check=True,
-            cwd=REPO_ROOT,
-        )
-        diff_files = [f.strip().replace("\\", "/") for f in res.stdout.splitlines() if f.strip()]
+        assert FROZEN_SEMANTIC_MNEME_SHA == "3673c36855fb1e30d46942ce826c50be4888df5e"
 
-        frozen_core_modules = {
-            "mneme/decision_retriever.py",
-            "mneme/enforcer.py",
-            "mneme/conflict_detector.py",
-            "mneme/memory_store.py",
-            "mneme/decision_index.py",
-            "mneme/schemas.py",
-            "mneme/open_architecture/candidates.py",
-            "mneme/open_architecture/classification.py",
-            "mneme/open_architecture/projection.py",
-            "mneme/open_architecture/gds_evaluation.py",
-            "mneme/open_architecture/discovery.py",
-            "mneme/open_architecture/execution.py",
-            "mneme/open_architecture/store.py",
-            "mneme/open_architecture/run_metadata.py",
-            "mneme/open_architecture/reporting.py",
-        }
+        mismatches: list[str] = []
+        for rel_path, expected_hash in FROZEN_SEMANTIC_MODULE_HASHES.items():
+            mod_path = REPO_ROOT / rel_path
+            assert mod_path.is_file(), f"Frozen module missing: {rel_path}"
+            raw_bytes = mod_path.read_bytes().replace(b"\r\n", b"\n")
+            actual_hash = hashlib.sha256(raw_bytes).hexdigest()
+            if actual_hash != expected_hash:
+                mismatches.append(
+                    f"{rel_path}: expected {expected_hash}, got {actual_hash}"
+                )
 
-        # None of the core frozen modules should be modified
-        assert frozen_core_modules.isdisjoint(diff_files), (
-            f"Frozen core modules modified: {set(diff_files) & frozen_core_modules}"
+        assert not mismatches, (
+            "Frozen semantic runtime modules modified from frozen commit "
+            f"{FROZEN_SEMANTIC_MNEME_SHA}:\n  - " + "\n  - ".join(mismatches)
         )

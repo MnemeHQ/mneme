@@ -986,31 +986,18 @@ class TestO1AHarness:
 
     # 23. existing frozen semantic-module boundary remains green
     def test_23_frozen_semantic_module_boundary_remains_green(self):
-        import subprocess
-        res = subprocess.run(
-            ["git", "diff", "--name-only", "3673c36855fb1e30d46942ce826c50be4888df5e"],
-            capture_output=True,
-            text=True,
-            check=True,
-            cwd=REPO_ROOT,
-        )
-        diff_files = [f.strip().replace("\\", "/") for f in res.stdout.splitlines() if f.strip()]
+        import hashlib
+        from tests.open_architecture.test_baseline import FROZEN_SEMANTIC_MODULE_HASHES
 
-        frozen_core_modules = {
-            "mneme/decision_retriever.py",
-            "mneme/enforcer.py",
-            "mneme/conflict_detector.py",
-            "mneme/memory_store.py",
-            "mneme/decision_index.py",
-            "mneme/schemas.py",
-            "mneme/open_architecture/candidates.py",
-            "mneme/open_architecture/classification.py",
-            "mneme/open_architecture/projection.py",
-            "mneme/open_architecture/gds_evaluation.py",
-            "mneme/open_architecture/discovery.py",
-            "mneme/open_architecture/execution.py",
-            "mneme/open_architecture/store.py",
-            "mneme/open_architecture/run_metadata.py",
-            "mneme/open_architecture/reporting.py",
-        }
-        assert frozen_core_modules.isdisjoint(diff_files)
+        mismatches: list[str] = []
+        for rel_path, expected_hash in FROZEN_SEMANTIC_MODULE_HASHES.items():
+            mod_path = REPO_ROOT / rel_path
+            assert mod_path.is_file(), f"Frozen module missing: {rel_path}"
+            raw_bytes = mod_path.read_bytes().replace(b"\r\n", b"\n")
+            actual_hash = hashlib.sha256(raw_bytes).hexdigest()
+            if actual_hash != expected_hash:
+                mismatches.append(f"{rel_path}: expected {expected_hash}, got {actual_hash}")
+
+        assert not mismatches, (
+            f"Frozen core modules modified:\n" + "\n".join(mismatches)
+        )
