@@ -34,6 +34,10 @@ langchain = [
 dev = [
     "pytest>=8.0.0",
 ]
+benchmark = [
+    "anthropic>=1.0.0",
+    "jsonschema>=4.20.0",
+]
 
 [project.scripts]
 mneme = "mneme.cli:main"

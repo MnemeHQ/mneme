@@ -1352,6 +1352,109 @@ def _cmd_research_o1a_run(args: argparse.Namespace) -> int:
     return _error_exit(f"unsupported classifier backend '{args.backend}'")
 
 
+def _cmd_research_o1a_run_batch(args: argparse.Namespace) -> int:
+    from mneme.open_architecture.harness import preflight_batch_01, run_frozen_batch_01
+    from mneme.open_architecture.store import ResearchStore
+
+    baseline_path = Path(args.baseline)
+    manifest_path = Path(args.manifest)
+    reference_corpus_dir = Path(args.reference_dir)
+    scenarios_path = Path(args.scenarios)
+
+    if not baseline_path.is_file():
+        return _error_exit(f"baseline file '{baseline_path}' does not exist")
+    if not manifest_path.is_file():
+        return _error_exit(f"manifest file '{manifest_path}' does not exist")
+    if not reference_corpus_dir.is_dir():
+        return _error_exit(f"reference corpus directory '{reference_corpus_dir}' does not exist")
+    if not scenarios_path.is_file():
+        return _error_exit(f"scenarios file '{scenarios_path}' does not exist")
+
+    stages_list = [s.strip().upper() for s in args.stages.split(",") if s.strip()]
+
+    if args.dry_run:
+        try:
+            preflight = preflight_batch_01(
+                baseline_path=baseline_path,
+                manifest_path=manifest_path,
+                reference_corpus_dir=reference_corpus_dir,
+                scenarios_path=scenarios_path,
+            )
+            print("O1A Frozen Batch 01 Preflight: OK")
+            print(f"  Baseline ID:              {preflight.baseline_id}")
+            print(f"  Baseline Config Hash:     {preflight.baseline_configuration_hash}")
+            print(f"  Manifest Config Hash:     {preflight.manifest_configuration_hash}")
+            print(f"  Reference Corpus Hash:    {preflight.reference_corpus_hash}")
+            print(f"  Scenario Corpus Hash:     {preflight.scenario_corpus_hash}")
+            print(f"  Semantic Mneme SHA:       {preflight.semantic_mneme_sha}")
+            print(f"  Repositories Verified:    {len(preflight.repositories_verified)}")
+            print(f"  Selected Stages:          {stages_list}")
+            print("  Dry run complete: no execution performed, no canonical state written.")
+            return 0
+        except Exception as exc:
+            return _error_exit(f"preflight failed: {exc}")
+
+    classifier = None
+    if "B" in stages_list:
+        if not args.backend:
+            return _error_exit("Stage B selected but no --backend specified (e.g. 'reference', 'anthropic')")
+        if args.backend == "reference":
+            from mneme.open_architecture.classification import StaticClassifier
+            classifier = StaticClassifier(
+                backend_id="anthropic",
+                classifier_version="0.1",
+                model_identifier="claude-sonnet-4-6",
+            )
+        elif args.backend == "anthropic":
+            from mneme.open_architecture.classifiers.anthropic import AnthropicClassifier
+            classifier = AnthropicClassifier()
+        else:
+            return _error_exit(f"unsupported classifier backend '{args.backend}'")
+
+    if not args.store:
+        return _error_exit("--store <path-to-sqlite-db> is required for non-dry-run Batch 01 execution")
+    if not args.output_dir:
+        return _error_exit("--output-dir <path> is required for non-dry-run Batch 01 execution")
+
+    store = ResearchStore(args.store)
+
+    try:
+        res = run_frozen_batch_01(
+            baseline_path=baseline_path,
+            manifest_path=manifest_path,
+            reference_corpus_dir=reference_corpus_dir,
+            scenarios_path=scenarios_path,
+            stages=stages_list,
+            classifier=classifier,
+            research_store=store,
+            output_dir=args.output_dir,
+            workspace_dir=args.workspace_dir,
+        )
+        print(f"O1A Batch 01 Execution Completed: {res.batch_id}")
+        print(f"  Stages Executed:  {list(res.stages)}")
+        print(f"  Repositories:     {len(res.envelope.runs)}")
+        if res.stage_a_results:
+            a_recs = [r.recall for r in res.stage_a_results.values()]
+            a_macro_rec = sum(a_recs) / len(a_recs)
+            print(f"  Stage A Macro Recall: {a_macro_rec:.4f}")
+        if res.stage_b_results:
+            b_tasks = sum(r.task_count for r in res.stage_b_results.values())
+            print(f"  Stage B Tasks:        {b_tasks}")
+        if res.stage_c_results:
+            all_c = []
+            for r in res.stage_c_results.values():
+                all_c.extend(r.scenario_results)
+            from mneme.open_architecture.gds_evaluation import compute_suite_gds_metrics
+            c_suite = compute_suite_gds_metrics(all_c)
+            print(f"  Stage C Macro Recall: {c_suite.get('macro_recall', 0.0):.4f}")
+            print(f"  Stage C Macro F1:     {c_suite.get('macro_f1', 0.0):.4f}")
+        if res.output_dir:
+            print(f"  Artifacts Written:    {res.output_dir}")
+        return 0
+    except Exception as exc:
+        return _error_exit(f"batch execution failed: {exc}")
+
+
 # ── Entry point ──────────────────────────────────────────────────────────────
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -1812,6 +1915,63 @@ def _build_parser() -> argparse.ArgumentParser:
     p_o1a_run.add_argument("--dry-run", action="store_true", help="Perform preflight checks without execution")
     p_o1a_run.add_argument("--backend", default=None, help="Explicit classifier backend (e.g. 'reference')")
     p_o1a_run.set_defaults(func=_cmd_research_o1a_run)
+
+    # research open-architecture run-batch
+    p_o1a_batch = o1a_sub.add_parser(
+        "run-batch",
+        help="Execute the frozen O1A Batch 01 staged benchmark runner",
+    )
+    p_o1a_batch.add_argument(
+        "--baseline",
+        default="benchmarks/open_architecture/batch_01/baseline.yaml",
+        help="Path to baseline.yaml",
+    )
+    p_o1a_batch.add_argument(
+        "--manifest",
+        default="benchmarks/open_architecture/batch_01/manifest.yaml",
+        help="Path to manifest.yaml",
+    )
+    p_o1a_batch.add_argument(
+        "--reference-dir",
+        default="benchmarks/open_architecture/batch_01/reference_decisions",
+        help="Path to reference decisions directory",
+    )
+    p_o1a_batch.add_argument(
+        "--scenarios",
+        default="benchmarks/open_architecture/batch_01/scenarios/scenarios.jsonl",
+        help="Path to scenarios.jsonl",
+    )
+    p_o1a_batch.add_argument(
+        "--stages",
+        default="A,C",
+        help="Comma-separated stages to execute (e.g. 'A,C' or 'A,B,C')",
+    )
+    p_o1a_batch.add_argument(
+        "--backend",
+        default=None,
+        help="Classifier backend for Stage B (e.g. 'reference', 'anthropic')",
+    )
+    p_o1a_batch.add_argument(
+        "--store",
+        default=None,
+        help="Optional SQLite database path for ResearchStore",
+    )
+    p_o1a_batch.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for deterministic benchmark artifacts",
+    )
+    p_o1a_batch.add_argument(
+        "--workspace-dir",
+        default=None,
+        help="Optional checkout workspace directory",
+    )
+    p_o1a_batch.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Execute preflight only without running stages",
+    )
+    p_o1a_batch.set_defaults(func=_cmd_research_o1a_run_batch)
 
     # research open-architecture export
     p_o1a_export = o1a_sub.add_parser(

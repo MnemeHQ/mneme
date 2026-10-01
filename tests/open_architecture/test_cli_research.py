@@ -119,3 +119,22 @@ class TestResearchCli:
         out = capsys.readouterr().out
         assert "sha256:1234567890abcdef" in out
         assert "mbeacom/adrkit" in out
+
+    def test_run_batch_dry_run(self, capsys):
+        rc = main(["research", "open-architecture", "run-batch", "--dry-run"])
+        assert rc == 0
+        out = capsys.readouterr().out
+        assert "O1A Frozen Batch 01 Preflight: OK" in out
+        assert "31e18dc1e2bd9ad30bec86dce1a9295a" in out
+        assert "Selected Stages:          ['A', 'C']" in out
+
+    def test_run_batch_requires_store_and_output_dir_for_real_run(self, capsys):
+        rc1 = main(["research", "open-architecture", "run-batch", "--stages", "A,C"])
+        assert rc1 == 2
+        err1 = capsys.readouterr().err
+        assert "--store" in err1
+
+        rc2 = main(["research", "open-architecture", "run-batch", "--stages", "A,C", "--store", "dummy.db"])
+        assert rc2 == 2
+        err2 = capsys.readouterr().err
+        assert "--output-dir" in err2

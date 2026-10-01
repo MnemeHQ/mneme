@@ -16,6 +16,7 @@ Covers all 10 Stage A/B/C and preflight requirements:
 
 from __future__ import annotations
 
+import hashlib
 import inspect
 import json
 from pathlib import Path
@@ -48,8 +49,11 @@ from mneme.open_architecture.harness import (
     FROZEN_SCENARIO_CORPUS_HASH,
     BatchPreflightResult,
     BatchProvenanceEnvelope,
+    BatchExecutionProfile,
+    Batch01RunResult,
     FrozenReferenceDecision,
     HarnessPreflightError,
+    HarnessRunError,
     SEMANTIC_TASK_TYPES,
     build_stage_b_tasks,
     evaluate_discovery_matches,
@@ -59,6 +63,9 @@ from mneme.open_architecture.harness import (
     load_reference_corpus,
     parse_reference_intervals,
     preflight_batch_01,
+    run_batch_01,
+    run_frozen_batch_01,
+    StageADiscoveryResult,
 )
 from mneme.open_architecture.manifest import Manifest, RepositoryConfig
 from mneme.open_architecture.orchestrator import _compute_scenario_content_hash
@@ -71,9 +78,11 @@ from mneme.open_architecture.schemas import (
 )
 from mneme.open_architecture.store import (
     AnalysisRunRecord,
+    ApplicabilityScenarioRecord,
     ClassifierVersionRecord,
     RepositoryRecord,
     ResearchStore,
+    ScenarioExpectedDecisionRecord,
     TaxonomyVersionRecord,
 )
 
@@ -1001,3 +1010,785 @@ class TestO1AHarness:
         assert not mismatches, (
             f"Frozen core modules modified:\n" + "\n".join(mismatches)
         )
+
+    # 24. preflight failure performs zero materializations, zero classifier calls, zero execution
+    def test_24_runner_preflight_failure_stops_before_execution(self, tmp_path: Path, monkeypatch):
+        bad_baseline = tmp_path / "bad_baseline.yaml"
+        bad_baseline.write_text(BASELINE_PATH.read_text(encoding="utf-8").replace("status: frozen", "status: planned"), encoding="utf-8")
+
+        stage_a_called = False
+        def fake_stage_a(*args, **kwargs):
+            nonlocal stage_a_called
+            stage_a_called = True
+        monkeypatch.setattr("mneme.open_architecture.harness.evaluate_stage_a_discovery", fake_stage_a)
+
+        store = ResearchStore(tmp_path / "store.db")
+        tracking_clf = MockTrackingClassifier()
+        with pytest.raises(HarnessPreflightError):
+            run_frozen_batch_01(
+                baseline_path=bad_baseline,
+                manifest_path=MANIFEST_PATH,
+                reference_corpus_dir=REF_DIR,
+                scenarios_path=SCENARIOS_PATH,
+                stages=("A", "B", "C"),
+                classifier=tracking_clf,
+                research_store=store,
+                output_dir=tmp_path / "out",
+            )
+        assert not stage_a_called
+        assert tracking_clf.call_count == 0
+
+    # 25. A + C mode: covers 5 repos, 100 refs in Stage A, 50 scenarios in Stage C, zero model calls
+    def test_25_runner_a_plus_c_mode(self, tmp_path: Path, monkeypatch):
+        stage_a_repos = []
+        def fake_stage_a(repository_config, references, **kwargs):
+            stage_a_repos.append(repository_config.id)
+            return StageADiscoveryResult(
+                repo_id=repository_config.id,
+                discovered_documents_count=5,
+                extracted_candidates_count=len(references),
+                reference_decisions_count=len(references),
+                matched_reference_count=len(references),
+                matched_candidate_count=len(references),
+                recall=1.0,
+                precision=1.0,
+                f1=1.0,
+                cand_to_ref_matches={},
+                ref_to_cand_matches={},
+                unmatched_reference_ids=[],
+                unmatched_candidate_ids=[],
+                missed_source_reference_ids=[],
+                diagnostic_ior_ioc={},
+            )
+        monkeypatch.setattr("mneme.open_architecture.harness.evaluate_stage_a_discovery", fake_stage_a)
+
+        store = ResearchStore(tmp_path / "store.db")
+        out_dir = tmp_path / "out"
+        res = run_frozen_batch_01(
+            baseline_path=BASELINE_PATH,
+            manifest_path=MANIFEST_PATH,
+            reference_corpus_dir=REF_DIR,
+            scenarios_path=SCENARIOS_PATH,
+            stages=("A", "C"),
+            classifier=None,
+            research_store=store,
+            output_dir=out_dir,
+        )
+        assert len(stage_a_repos) == 5
+        assert len(res.stage_a_results) == 5
+        assert sum(r.reference_decisions_count for r in res.stage_a_results.values()) == 100
+        assert len(res.stage_c_results) == 5
+        assert sum(r.scenario_count for r in res.stage_c_results.values()) == 50
+        assert len(res.stage_b_results) == 0
+        assert len(res.envelope.runs) == 5
+        for meta in res.envelope.runs.values():
+            assert meta.configuration_hash is not None
+        assert res.envelope.execution_profile.execution_stages == ("A", "C")
+        assert res.envelope.execution_profile.execution_scope == "staged_validation"
+        assert res.envelope.to_dict()["execution_stages"] == ["A", "C"]
+        assert res.envelope.to_dict()["execution_scope"] == "staged_validation"
+
+    # 26. complete A + B + C mode: 100 refs, exactly 800 tasks, 50 scenarios
+    def test_26_runner_complete_a_b_c_mode(self, tmp_path: Path, monkeypatch):
+        def fake_stage_a(repository_config, references, **kwargs):
+            return StageADiscoveryResult(
+                repo_id=repository_config.id,
+                discovered_documents_count=5,
+                extracted_candidates_count=20,
+                reference_decisions_count=len(references),
+                matched_reference_count=len(references),
+                matched_candidate_count=20,
+                recall=1.0,
+                precision=1.0,
+                f1=1.0,
+                cand_to_ref_matches={},
+                ref_to_cand_matches={},
+                unmatched_reference_ids=[],
+                unmatched_candidate_ids=[],
+                missed_source_reference_ids=[],
+                diagnostic_ior_ioc={},
+            )
+        monkeypatch.setattr("mneme.open_architecture.harness.evaluate_stage_a_discovery", fake_stage_a)
+
+        store = ResearchStore(tmp_path / "store.db")
+        out_dir = tmp_path / "out"
+        tracking_clf = MockTrackingClassifier()
+        res = run_frozen_batch_01(
+            baseline_path=BASELINE_PATH,
+            manifest_path=MANIFEST_PATH,
+            reference_corpus_dir=REF_DIR,
+            scenarios_path=SCENARIOS_PATH,
+            stages=("A", "B", "C"),
+            classifier=tracking_clf,
+            research_store=store,
+            output_dir=out_dir,
+        )
+        assert len(res.stage_a_results) == 5
+        assert len(res.stage_b_results) == 5
+        assert len(res.stage_c_results) == 5
+        assert sum(r.reference_count for r in res.stage_b_results.values()) == 100
+        assert sum(r.task_count for r in res.stage_b_results.values()) == 800
+        assert tracking_clf.call_count == 800
+        assert sum(r.scenario_count for r in res.stage_c_results.values()) == 50
+        for meta in res.envelope.runs.values():
+            assert meta.configuration_hash is not None
+        assert res.envelope.execution_profile.execution_stages == ("A", "B", "C")
+        assert res.envelope.execution_profile.execution_scope == "full_baseline"
+        assert res.envelope.to_dict()["execution_stages"] == ["A", "B", "C"]
+        assert res.envelope.to_dict()["execution_scope"] == "full_baseline"
+
+    # 27. Stage C uses frozen human references independently of Stage B output
+    def test_27_stage_c_independent_of_stage_b(self, tmp_path: Path, monkeypatch):
+        def fake_stage_a(repository_config, references, **kwargs):
+            return StageADiscoveryResult(
+                repo_id=repository_config.id,
+                discovered_documents_count=1,
+                extracted_candidates_count=1,
+                reference_decisions_count=len(references),
+                matched_reference_count=1,
+                matched_candidate_count=1,
+                recall=1.0,
+                precision=1.0,
+                f1=1.0,
+                cand_to_ref_matches={},
+                ref_to_cand_matches={},
+                unmatched_reference_ids=[],
+                unmatched_candidate_ids=[],
+                missed_source_reference_ids=[],
+                diagnostic_ior_ioc={},
+            )
+        monkeypatch.setattr("mneme.open_architecture.harness.evaluate_stage_a_discovery", fake_stage_a)
+
+        store_ac = ResearchStore(tmp_path / "store_ac.db")
+        out_ac = tmp_path / "out_ac"
+        res_ac = run_frozen_batch_01(
+            baseline_path=BASELINE_PATH,
+            manifest_path=MANIFEST_PATH,
+            reference_corpus_dir=REF_DIR,
+            scenarios_path=SCENARIOS_PATH,
+            stages=("A", "C"),
+            research_store=store_ac,
+            output_dir=out_ac,
+        )
+        failing_clf = MockFailingClassifier(
+            failing_task_type=ClassifierTaskType.DECISION_CLASSIFICATION,
+            error_message="Total classification failure",
+        )
+        store_abc = ResearchStore(tmp_path / "store_abc.db")
+        out_abc = tmp_path / "out_abc"
+        res_abc = run_frozen_batch_01(
+            baseline_path=BASELINE_PATH,
+            manifest_path=MANIFEST_PATH,
+            reference_corpus_dir=REF_DIR,
+            scenarios_path=SCENARIOS_PATH,
+            stages=("A", "B", "C"),
+            classifier=failing_clf,
+            research_store=store_abc,
+            output_dir=out_abc,
+        )
+        for repo_id in res_ac.stage_c_results:
+            ac_metrics = res_ac.stage_c_results[repo_id].suite_metrics
+            abc_metrics = res_abc.stage_c_results[repo_id].suite_metrics
+            assert ac_metrics == abc_metrics
+
+    # 28. BatchProvenanceEnvelope preserves all 5 repo runs and frozen hashes
+    def test_28_batch_provenance_envelope_preserves_identities(self, tmp_path: Path, monkeypatch):
+        monkeypatch.setattr(
+            "mneme.open_architecture.harness.evaluate_stage_a_discovery",
+            lambda repository_config, references, **kwargs: StageADiscoveryResult(
+                repo_id=repository_config.id,
+                discovered_documents_count=1,
+                extracted_candidates_count=1,
+                reference_decisions_count=len(references),
+                matched_reference_count=1,
+                matched_candidate_count=1,
+                recall=1.0,
+                precision=1.0,
+                f1=1.0,
+                cand_to_ref_matches={},
+                ref_to_cand_matches={},
+                unmatched_reference_ids=[],
+                unmatched_candidate_ids=[],
+                missed_source_reference_ids=[],
+                diagnostic_ior_ioc={},
+            ),
+        )
+        store = ResearchStore(tmp_path / "store.db")
+        out_dir = tmp_path / "out"
+        res = run_frozen_batch_01(
+            baseline_path=BASELINE_PATH,
+            manifest_path=MANIFEST_PATH,
+            reference_corpus_dir=REF_DIR,
+            scenarios_path=SCENARIOS_PATH,
+            stages=("A", "C"),
+            research_store=store,
+            output_dir=out_dir,
+        )
+        env = res.envelope
+        assert len(env.runs) == 5
+        assert set(env.runs.keys()) == {"adrkit", "gsa_agentic_coding_quickstart", "helix", "archlint", "modonome"}
+        assert env.baseline_configuration_hash == FROZEN_BASELINE_CONFIG_HASH
+        assert env.manifest_configuration_hash == FROZEN_MANIFEST_CONFIG_HASH
+        assert env.reference_corpus_hash == FROZEN_REFERENCE_CORPUS_HASH
+        assert env.scenario_corpus_hash == FROZEN_SCENARIO_CORPUS_HASH
+        assert env.semantic_mneme_sha == FROZEN_SEMANTIC_MNEME_SHA
+
+    # 29. deterministic output ordering and serialization
+    def test_29_deterministic_artifact_emission(self, tmp_path: Path, monkeypatch):
+        monkeypatch.setattr(
+            "mneme.open_architecture.harness.evaluate_stage_a_discovery",
+            lambda repository_config, references, **kwargs: StageADiscoveryResult(
+                repo_id=repository_config.id,
+                discovered_documents_count=1,
+                extracted_candidates_count=1,
+                reference_decisions_count=len(references),
+                matched_reference_count=1,
+                matched_candidate_count=1,
+                recall=1.0,
+                precision=1.0,
+                f1=1.0,
+                cand_to_ref_matches={},
+                ref_to_cand_matches={},
+                unmatched_reference_ids=[],
+                unmatched_candidate_ids=[],
+                missed_source_reference_ids=[],
+                diagnostic_ior_ioc={},
+            ),
+        )
+        store = ResearchStore(tmp_path / "store.db")
+        out_dir = tmp_path / "artifacts"
+        res = run_frozen_batch_01(
+            baseline_path=BASELINE_PATH,
+            manifest_path=MANIFEST_PATH,
+            reference_corpus_dir=REF_DIR,
+            scenarios_path=SCENARIOS_PATH,
+            stages=("A", "C"),
+            research_store=store,
+            output_dir=out_dir,
+        )
+        assert (out_dir / "provenance_envelope.json").is_file()
+        assert (out_dir / "preflight.json").is_file()
+        assert (out_dir / "stage_a_summary.json").is_file()
+        assert (out_dir / "stage_c_summary.json").is_file()
+        assert (out_dir / "summary.json").is_file()
+        assert not (out_dir / "stage_b_summary.json").exists()
+
+        summary = json.loads((out_dir / "summary.json").read_text(encoding="utf-8"))
+        assert summary["status"] == "completed"
+        assert summary["execution_scope"] == "staged_validation"
+        assert summary["execution_stages"] == ["A", "C"]
+        assert summary["repositories"] == ["adrkit", "archlint", "gsa_agentic_coding_quickstart", "helix", "modonome"]
+
+    # 30. repeated executions into same ResearchStore are append-preserving
+    def test_30_repeated_executions_into_same_store_appends_distinct_runs(self, tmp_path: Path, monkeypatch):
+        monkeypatch.setattr(
+            "mneme.open_architecture.harness.evaluate_stage_a_discovery",
+            lambda repository_config, references, **kwargs: StageADiscoveryResult(
+                repo_id=repository_config.id,
+                discovered_documents_count=1,
+                extracted_candidates_count=1,
+                reference_decisions_count=len(references),
+                matched_reference_count=1,
+                matched_candidate_count=1,
+                recall=1.0,
+                precision=1.0,
+                f1=1.0,
+                cand_to_ref_matches={},
+                ref_to_cand_matches={},
+                unmatched_reference_ids=[],
+                unmatched_candidate_ids=[],
+                missed_source_reference_ids=[],
+                diagnostic_ior_ioc={},
+            ),
+        )
+        store = ResearchStore(tmp_path / "research.db")
+        out1 = tmp_path / "out1"
+        out2 = tmp_path / "out2"
+        res1 = run_frozen_batch_01(
+            baseline_path=BASELINE_PATH,
+            manifest_path=MANIFEST_PATH,
+            reference_corpus_dir=REF_DIR,
+            scenarios_path=SCENARIOS_PATH,
+            stages=("A", "C"),
+            research_store=store,
+            output_dir=out1,
+        )
+        res2 = run_frozen_batch_01(
+            baseline_path=BASELINE_path if False else BASELINE_PATH,
+            manifest_path=MANIFEST_PATH,
+            reference_corpus_dir=REF_DIR,
+            scenarios_path=SCENARIOS_PATH,
+            stages=("A", "C"),
+            research_store=store,
+            output_dir=out2,
+        )
+        run_ids1 = {m.run_id for m in res1.envelope.runs.values()}
+        run_ids2 = {m.run_id for m in res2.envelope.runs.values()}
+        assert run_ids1.isdisjoint(run_ids2)
+        all_runs = store.list_analysis_runs()
+        assert len(all_runs) == 10
+
+    # 31. failed execution records failed run status where run already created
+    def test_31_failed_execution_records_failed_status(self, tmp_path: Path, monkeypatch):
+        def failing_stage_c(*args, **kwargs):
+            raise RuntimeError("Simulated stage C crash")
+        monkeypatch.setattr("mneme.open_architecture.harness.execute_stage_c_gds", failing_stage_c)
+
+        store = ResearchStore(tmp_path / "research_failed.db")
+        out_dir = tmp_path / "out"
+        with pytest.raises(RuntimeError, match="Simulated stage C crash"):
+            run_frozen_batch_01(
+                baseline_path=BASELINE_PATH,
+                manifest_path=MANIFEST_PATH,
+                reference_corpus_dir=REF_DIR,
+                scenarios_path=SCENARIOS_PATH,
+                stages=("C",),
+                research_store=store,
+                output_dir=out_dir,
+            )
+
+        runs = store.list_analysis_runs()
+        assert len(runs) >= 1
+        assert runs[0].status == "failed"
+
+    # 32. invalid stage combinations fail closed
+    def test_32_invalid_stages_fail_closed(self, tmp_path: Path):
+        store = ResearchStore(tmp_path / "store.db")
+        out = tmp_path / "out"
+        with pytest.raises(ValueError, match="Stage selection must not be empty"):
+            run_frozen_batch_01(
+                baseline_path=BASELINE_PATH,
+                manifest_path=MANIFEST_PATH,
+                reference_corpus_dir=REF_DIR,
+                scenarios_path=SCENARIOS_PATH,
+                stages=(),
+                research_store=store,
+                output_dir=out,
+            )
+
+        with pytest.raises(ValueError, match="Invalid stage"):
+            run_frozen_batch_01(
+                baseline_path=BASELINE_PATH,
+                manifest_path=MANIFEST_PATH,
+                reference_corpus_dir=REF_DIR,
+                scenarios_path=SCENARIOS_PATH,
+                stages=("A", "X"),
+                research_store=store,
+                output_dir=out,
+            )
+
+        with pytest.raises(ValueError, match="Stage B requires an explicit SemanticClassifier"):
+            run_frozen_batch_01(
+                baseline_path=BASELINE_PATH,
+                manifest_path=MANIFEST_PATH,
+                reference_corpus_dir=REF_DIR,
+                scenarios_path=SCENARIOS_PATH,
+                stages=("A", "B", "C"),
+                classifier=None,
+                research_store=store,
+                output_dir=out,
+            )
+
+    # 33. research-only store isolation - no canonical Mneme state written
+    def test_33_runner_no_canonical_mneme_writes(self, tmp_path: Path, monkeypatch):
+        monkeypatch.setattr(
+            "mneme.open_architecture.harness.evaluate_stage_a_discovery",
+            lambda repository_config, references, **kwargs: StageADiscoveryResult(
+                repo_id=repository_config.id,
+                discovered_documents_count=1,
+                extracted_candidates_count=1,
+                reference_decisions_count=len(references),
+                matched_reference_count=1,
+                matched_candidate_count=1,
+                recall=1.0,
+                precision=1.0,
+                f1=1.0,
+                cand_to_ref_matches={},
+                ref_to_cand_matches={},
+                unmatched_reference_ids=[],
+                unmatched_candidate_ids=[],
+                missed_source_reference_ids=[],
+                diagnostic_ior_ioc={},
+            ),
+        )
+        store_path = tmp_path / "research_isolated.db"
+        store = ResearchStore(store_path)
+        out_dir = tmp_path / "artifacts"
+
+        tracking_clf = MockTrackingClassifier()
+        run_frozen_batch_01(
+            baseline_path=BASELINE_PATH,
+            manifest_path=MANIFEST_PATH,
+            reference_corpus_dir=REF_DIR,
+            scenarios_path=SCENARIOS_PATH,
+            stages=("A", "B", "C"),
+            classifier=tracking_clf,
+            research_store=store,
+            output_dir=out_dir,
+        )
+
+        conn = store.connect()
+        tables = {r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()}
+        assert "decisions" not in tables
+        assert "decision_index" not in tables
+        assert "memory_store" not in tables
+        assert "project_memory" not in tables
+
+    # 34. RunMetadata matches exact frozen semantic module hash
+    def test_34_run_metadata_matches_frozen_semantic_hash(self):
+        mod_path = REPO_ROOT / "mneme" / "open_architecture" / "run_metadata.py"
+        raw_bytes = mod_path.read_bytes().replace(b"\r\n", b"\n")
+        actual_hash = hashlib.sha256(raw_bytes).hexdigest()
+        assert actual_hash == "67edd59dfb7bb53c73121ad954efcddd4d112ef790cb3495fce59a8588b47a19"
+
+    # 35. A+C and A+B+C have identical RunMetadata config identity but distinct BatchExecutionProfile hashes
+    def test_35_ac_and_abc_identical_run_metadata_config_hash_different_profile_hash(self):
+        meta1 = RunMetadata.create(
+            batch_id="o1a-batch-01",
+            repo_id="adrkit",
+            repo_commit_sha="471457da29638ecca6119b35180c2845bf989cac",
+        )
+        meta2 = RunMetadata.create(
+            batch_id="o1a-batch-01",
+            repo_id="adrkit",
+            repo_commit_sha="471457da29638ecca6119b35180c2845bf989cac",
+        )
+        assert meta1.configuration_hash == meta2.configuration_hash
+
+        prof_ac = BatchExecutionProfile.create(stages=("A", "C"))
+        prof_abc = BatchExecutionProfile.create(stages=("A", "B", "C"))
+        assert prof_ac.execution_profile_hash != prof_abc.execution_profile_hash
+        assert prof_ac.execution_scope == "staged_validation"
+        assert prof_abc.execution_scope == "full_baseline"
+
+    # 36. equivalent normalized stage sets produce equivalent execution_profile_hash
+    def test_36_batch_execution_profile_order_insensitive_hash(self):
+        prof_ac1 = BatchExecutionProfile.create(stages=("A", "C"))
+        prof_ac2 = BatchExecutionProfile.create(stages=("C", "A"))
+        assert prof_ac1.execution_profile_hash == prof_ac2.execution_profile_hash
+        assert prof_ac1.execution_stages == ("A", "C")
+
+    # 37. BatchProvenanceEnvelope explicitly records execution profile fields
+    def test_37_envelope_records_execution_profile_fields(self):
+        prof = BatchExecutionProfile.create(stages=("A", "C"))
+        env = BatchProvenanceEnvelope(execution_profile=prof)
+        d = env.to_dict()
+        assert d["execution_stages"] == ["A", "C"]
+        assert d["execution_scope"] == "staged_validation"
+        assert d["execution_profile_hash"] == prof.execution_profile_hash
+        assert d["execution_profile"] == prof.to_dict()
+
+    # 38. A+C followed by A+B+C in same ResearchStore succeeds without collision and reuses scenarios safely
+    def test_38_ac_followed_by_abc_in_same_store_succeeds_without_collision(self, tmp_path: Path, monkeypatch):
+        monkeypatch.setattr(
+            "mneme.open_architecture.harness.evaluate_stage_a_discovery",
+            lambda repository_config, references, **kwargs: StageADiscoveryResult(
+                repo_id=repository_config.id,
+                discovered_documents_count=1,
+                extracted_candidates_count=1,
+                reference_decisions_count=len(references),
+                matched_reference_count=1,
+                matched_candidate_count=1,
+                recall=1.0,
+                precision=1.0,
+                f1=1.0,
+                cand_to_ref_matches={},
+                ref_to_cand_matches={},
+                unmatched_reference_ids=[],
+                unmatched_candidate_ids=[],
+                missed_source_reference_ids=[],
+                diagnostic_ior_ioc={},
+            ),
+        )
+        store = ResearchStore(tmp_path / "shared_store.db")
+        out_ac = tmp_path / "out_ac"
+        out_abc = tmp_path / "out_abc"
+
+        res_ac = run_frozen_batch_01(
+            baseline_path=BASELINE_PATH,
+            manifest_path=MANIFEST_PATH,
+            reference_corpus_dir=REF_DIR,
+            scenarios_path=SCENARIOS_PATH,
+            stages=("A", "C"),
+            research_store=store,
+            output_dir=out_ac,
+        )
+        summary_ac = json.loads((out_ac / "summary.json").read_text(encoding="utf-8"))
+        assert summary_ac["execution_scope"] == "staged_validation"
+        assert summary_ac["execution_stages"] == ["A", "C"]
+
+        tracking_clf = MockTrackingClassifier()
+        res_abc = run_frozen_batch_01(
+            baseline_path=BASELINE_PATH,
+            manifest_path=MANIFEST_PATH,
+            reference_corpus_dir=REF_DIR,
+            scenarios_path=SCENARIOS_PATH,
+            stages=("A", "B", "C"),
+            classifier=tracking_clf,
+            research_store=store,
+            output_dir=out_abc,
+        )
+        summary_abc = json.loads((out_abc / "summary.json").read_text(encoding="utf-8"))
+        assert summary_abc["execution_scope"] == "full_baseline"
+        assert summary_abc["execution_stages"] == ["A", "B", "C"]
+
+        all_runs = store.list_analysis_runs()
+        assert len(all_runs) == 10
+        conn = store.connect()
+        scenarios_count = conn.execute("SELECT count(*) FROM applicability_scenarios").fetchone()[0]
+        assert scenarios_count == 50
+
+    # 39. missing research_store fails before materialization or execution
+    def test_39_runner_missing_store_fails_before_execution(self, tmp_path: Path):
+        with pytest.raises(ValueError, match="research_store must be explicitly provided"):
+            run_frozen_batch_01(
+                baseline_path=BASELINE_PATH,
+                manifest_path=MANIFEST_PATH,
+                reference_corpus_dir=REF_DIR,
+                scenarios_path=SCENARIOS_PATH,
+                stages=("A", "C"),
+                research_store=None,
+                output_dir=tmp_path / "out",
+            )
+
+    # 40. missing output_dir fails before materialization or execution
+    def test_40_runner_missing_output_dir_fails_before_execution(self, tmp_path: Path):
+        store = ResearchStore(tmp_path / "store.db")
+        with pytest.raises(ValueError, match="output_dir must be explicitly provided"):
+            run_frozen_batch_01(
+                baseline_path=BASELINE_PATH,
+                manifest_path=MANIFEST_PATH,
+                reference_corpus_dir=REF_DIR,
+                scenarios_path=SCENARIOS_PATH,
+                stages=("A", "C"),
+                research_store=store,
+                output_dir=None,
+            )
+
+    # 41. existing non-empty output_dir fails closed without modifying contents
+    def test_41_runner_non_empty_output_dir_fails_closed(self, tmp_path: Path):
+        store = ResearchStore(tmp_path / "store.db")
+        out_dir = tmp_path / "existing_artifacts"
+        out_dir.mkdir()
+        canary = out_dir / "canary.txt"
+        canary.write_text("prior content", encoding="utf-8")
+
+        with pytest.raises(HarnessRunError, match="already exists and is not empty"):
+            run_frozen_batch_01(
+                baseline_path=BASELINE_PATH,
+                manifest_path=MANIFEST_PATH,
+                reference_corpus_dir=REF_DIR,
+                scenarios_path=SCENARIOS_PATH,
+                stages=("A", "C"),
+                research_store=store,
+                output_dir=out_dir,
+            )
+        assert canary.read_text(encoding="utf-8") == "prior content"
+
+    # 42. existing empty output directory succeeds
+    def test_42_runner_empty_output_dir_succeeds(self, tmp_path: Path, monkeypatch):
+        monkeypatch.setattr(
+            "mneme.open_architecture.harness.evaluate_stage_a_discovery",
+            lambda repository_config, references, **kwargs: StageADiscoveryResult(
+                repo_id=repository_config.id,
+                discovered_documents_count=1,
+                extracted_candidates_count=1,
+                reference_decisions_count=len(references),
+                matched_reference_count=1,
+                matched_candidate_count=1,
+                recall=1.0,
+                precision=1.0,
+                f1=1.0,
+                cand_to_ref_matches={},
+                ref_to_cand_matches={},
+                unmatched_reference_ids=[],
+                unmatched_candidate_ids=[],
+                missed_source_reference_ids=[],
+                diagnostic_ior_ioc={},
+            ),
+        )
+        store = ResearchStore(tmp_path / "store.db")
+        out_dir = tmp_path / "empty_dir"
+        out_dir.mkdir()
+        res = run_frozen_batch_01(
+            baseline_path=BASELINE_PATH,
+            manifest_path=MANIFEST_PATH,
+            reference_corpus_dir=REF_DIR,
+            scenarios_path=SCENARIOS_PATH,
+            stages=("A", "C"),
+            research_store=store,
+            output_dir=out_dir,
+        )
+        assert (out_dir / "summary.json").is_file()
+
+    # 43. persisted scenario mismatch in ResearchStore fails closed
+    def test_43_stage_c_persisted_scenario_mismatch_fails_closed(self, tmp_path: Path):
+        store = ResearchStore(tmp_path / "mismatch.db")
+        store.initialize_schema()
+        store.upsert_repository(
+            RepositoryRecord(
+                repo_id="adrkit",
+                repository_url="https://github.com/mbeacom/adrkit",
+                repository_identifier="mbeacom/adrkit",
+                default_branch="main",
+            )
+        )
+        store.insert_applicability_scenario(
+            ApplicabilityScenarioRecord(
+                scenario_id="scn-adrkit-001",
+                repo_id="adrkit",
+                description="Mutated description that contradicts frozen scenario",
+                path="some/path",
+                component="comp",
+                change_type="add",
+                dependencies_json="[]",
+                api_context=None,
+                technology_context=None,
+                other_context=None,
+                validation_state="reviewed",
+            )
+        )
+        ref = load_reference_corpus(REF_DIR, repo_id="adrkit")[0]
+        config = RepositoryConfig("adrkit", "mbeacom/adrkit", "471457da29638ecca6119b35180c2845bf989cac", "test", "reviewed")
+        all_scenarios = import_scenarios_jsonl(SCENARIOS_PATH)
+        adrkit_scenarios = [s for s in all_scenarios if s.repository == "mbeacom/adrkit"]
+
+        with pytest.raises(HarnessRunError, match="does not match the frozen scenario"):
+            execute_stage_c_gds(
+                repository_config=config,
+                references=[ref],
+                scenarios=adrkit_scenarios,
+                research_store=store,
+                run_id="run-test",
+            )
+
+    # 44. persisted expected decisions mismatch in ResearchStore fails closed
+    def test_44_stage_c_persisted_expected_decisions_mismatch_fails_closed(self, tmp_path: Path):
+        store = ResearchStore(tmp_path / "mismatch_exp.db")
+        store.initialize_schema()
+        store.upsert_repository(
+            RepositoryRecord(
+                repo_id="adrkit",
+                repository_url="https://github.com/mbeacom/adrkit",
+                repository_identifier="mbeacom/adrkit",
+                default_branch="main",
+            )
+        )
+        all_scenarios = import_scenarios_jsonl(SCENARIOS_PATH)
+        target_scn = next(s for s in all_scenarios if s.scenario_id == "scn-adrkit-001")
+        store.insert_applicability_scenario(
+            ApplicabilityScenarioRecord(
+                scenario_id=target_scn.scenario_id,
+                repo_id="adrkit",
+                description=target_scn.description,
+                path=target_scn.change_context.path,
+                component=target_scn.change_context.component,
+                change_type=target_scn.change_context.change_type,
+                dependencies_json=json.dumps(list(target_scn.change_context.dependencies)),
+                api_context=target_scn.change_context.api,
+                technology_context=target_scn.change_context.technology,
+                other_context=target_scn.change_context.other_context,
+                validation_state=target_scn.validation_state,
+            )
+        )
+        store.insert_scenario_expected_decision(
+            ScenarioExpectedDecisionRecord(
+                scenario_id=target_scn.scenario_id,
+                candidate_id="ref-wrong-candidate",
+            )
+        )
+        ref = load_reference_corpus(REF_DIR, repo_id="adrkit")[0]
+        config = RepositoryConfig("adrkit", "mbeacom/adrkit", "471457da29638ecca6119b35180c2845bf989cac", "test", "reviewed")
+
+        with pytest.raises(HarnessRunError, match="differ from the frozen expected set"):
+            execute_stage_c_gds(
+                repository_config=config,
+                references=[ref],
+                scenarios=[target_scn],
+                research_store=store,
+                run_id="run-test",
+            )
+
+    # 45. Stage B execution with Anthropic SDK below 1.0.0 fails before task execution
+    def test_45_stage_b_sdk_below_1_0_fails_before_task_execution(self, tmp_path: Path, monkeypatch):
+        import anthropic
+        monkeypatch.setattr(anthropic, "__version__", "0.52.0")
+
+        store = ResearchStore(tmp_path / "blocked.db")
+        out_dir = tmp_path / "out"
+        tracking_clf = MockTrackingClassifier()
+
+        with pytest.raises(HarnessPreflightError, match="Stage B requires anthropic>=1.0.0.*found 0.52.0"):
+            run_frozen_batch_01(
+                baseline_path=BASELINE_PATH,
+                manifest_path=MANIFEST_PATH,
+                reference_corpus_dir=REF_DIR,
+                scenarios_path=SCENARIOS_PATH,
+                stages=("A", "B", "C"),
+                classifier=tracking_clf,
+                research_store=store,
+                output_dir=out_dir,
+            )
+
+        assert tracking_clf.call_count == 0
+        conn = store.connect()
+        tables = {r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()}
+        assert "classifier_executions" not in tables
+        assert not (out_dir / "summary.json").exists()
+
+    # 46. A+C mode executes successfully even with Anthropic SDK below 1.0.0
+    def test_46_ac_mode_succeeds_even_with_sdk_below_1_0(self, tmp_path: Path, monkeypatch):
+        import anthropic
+        monkeypatch.setattr(anthropic, "__version__", "0.52.0")
+
+        monkeypatch.setattr(
+            "mneme.open_architecture.harness.evaluate_stage_a_discovery",
+            lambda repository_config, references, **kwargs: StageADiscoveryResult(
+                repo_id=repository_config.id,
+                discovered_documents_count=1,
+                extracted_candidates_count=1,
+                reference_decisions_count=len(references),
+                matched_reference_count=1,
+                matched_candidate_count=1,
+                recall=1.0,
+                precision=1.0,
+                f1=1.0,
+                cand_to_ref_matches={},
+                ref_to_cand_matches={},
+                unmatched_reference_ids=[],
+                unmatched_candidate_ids=[],
+                missed_source_reference_ids=[],
+                diagnostic_ior_ioc={},
+            ),
+        )
+
+        store = ResearchStore(tmp_path / "ac_old_sdk.db")
+        out_dir = tmp_path / "out"
+        res = run_frozen_batch_01(
+            baseline_path=BASELINE_PATH,
+            manifest_path=MANIFEST_PATH,
+            reference_corpus_dir=REF_DIR,
+            scenarios_path=SCENARIOS_PATH,
+            stages=("A", "C"),
+            classifier=None,
+            research_store=store,
+            output_dir=out_dir,
+        )
+        assert res.execution_profile.execution_scope == "staged_validation"
+        assert res.execution_profile.execution_stages == ("A", "C")
+        assert (out_dir / "summary.json").is_file()
+
+    # 47. valid Anthropic SDK >= 1.0.0 passes the environment prerequisite
+    def test_47_valid_sdk_passes_prerequisite(self, monkeypatch):
+        import anthropic
+        monkeypatch.setattr(anthropic, "__version__", "1.0.0")
+
+        tracking_clf = MockTrackingClassifier()
+        preflight = preflight_batch_01(
+            baseline_path=BASELINE_PATH,
+            manifest_path=MANIFEST_PATH,
+            reference_corpus_dir=REF_DIR,
+            scenarios_path=SCENARIOS_PATH,
+            classifier=tracking_clf,
+        )
+        assert preflight.status == "preflight_ok"
