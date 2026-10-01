@@ -1929,3 +1929,473 @@ class TestO1AHarness:
                 research_store=store,
                 output_dir=out_dir,
             )
+
+    # 54. duplicate relationship output does not crash persistence
+    def test_54_duplicate_relationship_output_does_not_crash_persistence(self, tmp_path: Path, valid_preflight: BatchPreflightResult):
+        sample_ref = load_reference_corpus(REF_DIR, repo_id="adrkit")[0]
+        config = RepositoryConfig("adrkit", "mbeacom/adrkit", "471457da29638ecca6119b35180c2845bf989cac", "test", "reviewed")
+        store = ResearchStore(tmp_path / "store.db")
+        store.initialize_schema()
+        run_id = "run-rel-dedup-test"
+        store.upsert_repository(RepositoryRecord(config.id, config.github, config.id, "main"))
+        store.upsert_taxonomy_version(TaxonomyVersionRecord("0.1", "2026-09-30", "test"))
+        store.upsert_classifier_version(ClassifierVersionRecord("0.1", "2026-09-30", "test"))
+        store.create_analysis_run(AnalysisRunRecord(
+            run_id=run_id,
+            repo_id=config.id,
+            repo_commit_sha=config.commit_sha,
+            mneme_version="0.9.2",
+            mneme_commit_sha="0"*40,
+            taxonomy_version="0.1",
+            classifier_version="0.1",
+            benchmark_schema_version="0.1",
+            configuration_hash="conf",
+            started_at="2026-09-30T00:00:00Z",
+            completed_at=None,
+            status="completed",
+        ))
+
+        dup_relationships = [
+            {"relationship_type": "requires", "target_reference": "ADR-0001", "confidence": 0.95},
+            {"relationship_type": "requires", "target_reference": "ADR-0001", "confidence": 0.85},
+        ]
+        clf = MockTrackingClassifier(
+            outputs={
+                ClassifierTaskType.DECISION_CLASSIFICATION: {"classification": sample_ref.classification},
+                ClassifierTaskType.DOMAINS: {"domains": list(sample_ref.decision_domains)},
+                ClassifierTaskType.PURPOSES: {"purposes": list(sample_ref.decision_purposes)},
+                ClassifierTaskType.AUTHORITY: {"authority": sample_ref.authority_status},
+                ClassifierTaskType.SCOPE: {"scopes": list(sample_ref.scopes)},
+                ClassifierTaskType.LIFECYCLE: {"lifecycle": sample_ref.lifecycle_status},
+                ClassifierTaskType.RELATIONSHIPS: {"relationships": dup_relationships},
+                ClassifierTaskType.ENFORCEMENT_POTENTIAL: {"enforcement_potential": sample_ref.enforcement_potential},
+            }
+        )
+
+        res = execute_stage_b_classification(
+            repository_config=config,
+            references=[sample_ref],
+            classifier=clf,
+            preflight=valid_preflight,
+            research_store=store,
+            run_id=run_id,
+        )
+
+        conn = store.connect()
+        # 1. Raw classifier execution preserves both entries
+        exec_row = conn.execute(
+            "SELECT output_json FROM classifier_executions WHERE candidate_id = ? AND task_type = 'relationships'",
+            (sample_ref.reference_decision_id,),
+        ).fetchone()
+        assert exec_row is not None
+        raw_output = json.loads(exec_row[0])
+        assert len(raw_output["relationships"]) == 2
+        assert raw_output["relationships"] == dup_relationships
+
+        # 2. Normalized candidate_relationships contains exactly one semantic record
+        rel_rows = conn.execute(
+            "SELECT relationship_id, relationship_type, target_reference, confidence FROM candidate_relationships WHERE source_candidate_id = ?",
+            (sample_ref.reference_decision_id,),
+        ).fetchall()
+        assert len(rel_rows) == 1
+        assert rel_rows[0][1] == "requires"
+        assert rel_rows[0][2] == "ADR-0001"
+        assert rel_rows[0][3] == 0.95
+
+        # 3. Stage B relationship score unchanged from existing set semantics
+        expected_set = {(r["relationship_type"], r.get("target_reference")) for r in sample_ref.relationships}
+        expected_acc = 1.0 if {("requires", "ADR-0001")} == expected_set else 0.0
+        assert res.metrics["relationship_accuracy"] == expected_acc
+
+    # 55. duplicate scope output does not crash persistence
+    def test_55_duplicate_scope_output_does_not_crash_persistence(self, tmp_path: Path, valid_preflight: BatchPreflightResult):
+        sample_ref = load_reference_corpus(REF_DIR, repo_id="adrkit")[0]
+        config = RepositoryConfig("adrkit", "mbeacom/adrkit", "471457da29638ecca6119b35180c2845bf989cac", "test", "reviewed")
+        store = ResearchStore(tmp_path / "store.db")
+        store.initialize_schema()
+        run_id = "run-scope-dedup-test"
+        store.upsert_repository(RepositoryRecord(config.id, config.github, config.id, "main"))
+        store.upsert_taxonomy_version(TaxonomyVersionRecord("0.1", "2026-09-30", "test"))
+        store.upsert_classifier_version(ClassifierVersionRecord("0.1", "2026-09-30", "test"))
+        store.create_analysis_run(AnalysisRunRecord(
+            run_id=run_id,
+            repo_id=config.id,
+            repo_commit_sha=config.commit_sha,
+            mneme_version="0.9.2",
+            mneme_commit_sha="0"*40,
+            taxonomy_version="0.1",
+            classifier_version="0.1",
+            benchmark_schema_version="0.1",
+            configuration_hash="conf",
+            started_at="2026-09-30T00:00:00Z",
+            completed_at=None,
+            status="completed",
+        ))
+
+        dup_scopes = [
+            {"scope_type": "directory", "scope_expression": "packages/index"},
+            {"scope_type": "directory", "scope_expression": "packages/index"},
+        ]
+        clf = MockTrackingClassifier(
+            outputs={
+                ClassifierTaskType.DECISION_CLASSIFICATION: {"classification": sample_ref.classification},
+                ClassifierTaskType.DOMAINS: {"domains": list(sample_ref.decision_domains)},
+                ClassifierTaskType.PURPOSES: {"purposes": list(sample_ref.decision_purposes)},
+                ClassifierTaskType.AUTHORITY: {"authority": sample_ref.authority_status},
+                ClassifierTaskType.SCOPE: {"scopes": dup_scopes},
+                ClassifierTaskType.LIFECYCLE: {"lifecycle": sample_ref.lifecycle_status},
+                ClassifierTaskType.RELATIONSHIPS: {"relationships": list(sample_ref.relationships)},
+                ClassifierTaskType.ENFORCEMENT_POTENTIAL: {"enforcement_potential": sample_ref.enforcement_potential},
+            }
+        )
+
+        res = execute_stage_b_classification(
+            repository_config=config,
+            references=[sample_ref],
+            classifier=clf,
+            preflight=valid_preflight,
+            research_store=store,
+            run_id=run_id,
+        )
+
+        conn = store.connect()
+        # 1. Raw classifier execution preserves both entries
+        exec_row = conn.execute(
+            "SELECT output_json FROM classifier_executions WHERE candidate_id = ? AND task_type = 'scope'",
+            (sample_ref.reference_decision_id,),
+        ).fetchone()
+        assert exec_row is not None
+        raw_output = json.loads(exec_row[0])
+        assert len(raw_output["scopes"]) == 2
+        assert raw_output["scopes"] == dup_scopes
+
+        # 2. Normalized candidate_scopes contains exactly one semantic record
+        sc_rows = conn.execute(
+            "SELECT scope_id, scope_type, scope_expression FROM candidate_scopes WHERE candidate_id = ?",
+            (sample_ref.reference_decision_id,),
+        ).fetchall()
+        assert len(sc_rows) == 1
+        assert sc_rows[0][1] == "directory"
+        assert sc_rows[0][2] == "packages/index"
+
+        # 3. Stage B scope score unchanged
+        expected_set = {(s["scope_type"], s.get("scope_expression")) for s in sample_ref.scopes}
+        expected_acc = 1.0 if {("directory", "packages/index")} == expected_set else 0.0
+        assert res.metrics["scope_accuracy"] == expected_acc
+
+    # 56. distinct relationships remain separately persisted
+    def test_56_distinct_relationships_remain_separately_persisted(self, tmp_path: Path, valid_preflight: BatchPreflightResult):
+        sample_ref = load_reference_corpus(REF_DIR, repo_id="adrkit")[0]
+        config = RepositoryConfig("adrkit", "mbeacom/adrkit", "471457da29638ecca6119b35180c2845bf989cac", "test", "reviewed")
+        store = ResearchStore(tmp_path / "store.db")
+        store.initialize_schema()
+        run_id = "run-distinct-rel-test"
+        store.upsert_repository(RepositoryRecord(config.id, config.github, config.id, "main"))
+        store.upsert_taxonomy_version(TaxonomyVersionRecord("0.1", "2026-09-30", "test"))
+        store.upsert_classifier_version(ClassifierVersionRecord("0.1", "2026-09-30", "test"))
+        store.create_analysis_run(AnalysisRunRecord(
+            run_id=run_id,
+            repo_id=config.id,
+            repo_commit_sha=config.commit_sha,
+            mneme_version="0.9.2",
+            mneme_commit_sha="0"*40,
+            taxonomy_version="0.1",
+            classifier_version="0.1",
+            benchmark_schema_version="0.1",
+            configuration_hash="conf",
+            started_at="2026-09-30T00:00:00Z",
+            completed_at=None,
+            status="completed",
+        ))
+
+        distinct_rels = [
+            {"relationship_type": "requires", "target_reference": "ADR-0001"},
+            {"relationship_type": "refines", "target_reference": "ADR-0002"},
+        ]
+        clf = MockTrackingClassifier(
+            outputs={
+                ClassifierTaskType.DECISION_CLASSIFICATION: {"classification": sample_ref.classification},
+                ClassifierTaskType.DOMAINS: {"domains": list(sample_ref.decision_domains)},
+                ClassifierTaskType.PURPOSES: {"purposes": list(sample_ref.decision_purposes)},
+                ClassifierTaskType.AUTHORITY: {"authority": sample_ref.authority_status},
+                ClassifierTaskType.SCOPE: {"scopes": list(sample_ref.scopes)},
+                ClassifierTaskType.LIFECYCLE: {"lifecycle": sample_ref.lifecycle_status},
+                ClassifierTaskType.RELATIONSHIPS: {"relationships": distinct_rels},
+                ClassifierTaskType.ENFORCEMENT_POTENTIAL: {"enforcement_potential": sample_ref.enforcement_potential},
+            }
+        )
+
+        execute_stage_b_classification(
+            repository_config=config,
+            references=[sample_ref],
+            classifier=clf,
+            preflight=valid_preflight,
+            research_store=store,
+            run_id=run_id,
+        )
+
+        conn = store.connect()
+        rel_rows = conn.execute(
+            "SELECT relationship_type, target_reference FROM candidate_relationships WHERE source_candidate_id = ? ORDER BY relationship_type",
+            (sample_ref.reference_decision_id,),
+        ).fetchall()
+        assert len(rel_rows) == 2
+        assert rel_rows[0][0] == "refines"
+        assert rel_rows[0][1] == "ADR-0002"
+        assert rel_rows[1][0] == "requires"
+        assert rel_rows[1][1] == "ADR-0001"
+
+    # 57. distinct scopes remain separately persisted
+    def test_57_distinct_scopes_remain_separately_persisted(self, tmp_path: Path, valid_preflight: BatchPreflightResult):
+        sample_ref = load_reference_corpus(REF_DIR, repo_id="adrkit")[0]
+        config = RepositoryConfig("adrkit", "mbeacom/adrkit", "471457da29638ecca6119b35180c2845bf989cac", "test", "reviewed")
+        store = ResearchStore(tmp_path / "store.db")
+        store.initialize_schema()
+        run_id = "run-distinct-scope-test"
+        store.upsert_repository(RepositoryRecord(config.id, config.github, config.id, "main"))
+        store.upsert_taxonomy_version(TaxonomyVersionRecord("0.1", "2026-09-30", "test"))
+        store.upsert_classifier_version(ClassifierVersionRecord("0.1", "2026-09-30", "test"))
+        store.create_analysis_run(AnalysisRunRecord(
+            run_id=run_id,
+            repo_id=config.id,
+            repo_commit_sha=config.commit_sha,
+            mneme_version="0.9.2",
+            mneme_commit_sha="0"*40,
+            taxonomy_version="0.1",
+            classifier_version="0.1",
+            benchmark_schema_version="0.1",
+            configuration_hash="conf",
+            started_at="2026-09-30T00:00:00Z",
+            completed_at=None,
+            status="completed",
+        ))
+
+        distinct_scopes = [
+            {"scope_type": "directory", "scope_expression": "packages/index"},
+            {"scope_type": "package", "scope_expression": "@prisma/client"},
+        ]
+        clf = MockTrackingClassifier(
+            outputs={
+                ClassifierTaskType.DECISION_CLASSIFICATION: {"classification": sample_ref.classification},
+                ClassifierTaskType.DOMAINS: {"domains": list(sample_ref.decision_domains)},
+                ClassifierTaskType.PURPOSES: {"purposes": list(sample_ref.decision_purposes)},
+                ClassifierTaskType.AUTHORITY: {"authority": sample_ref.authority_status},
+                ClassifierTaskType.SCOPE: {"scopes": distinct_scopes},
+                ClassifierTaskType.LIFECYCLE: {"lifecycle": sample_ref.lifecycle_status},
+                ClassifierTaskType.RELATIONSHIPS: {"relationships": list(sample_ref.relationships)},
+                ClassifierTaskType.ENFORCEMENT_POTENTIAL: {"enforcement_potential": sample_ref.enforcement_potential},
+            }
+        )
+
+        execute_stage_b_classification(
+            repository_config=config,
+            references=[sample_ref],
+            classifier=clf,
+            preflight=valid_preflight,
+            research_store=store,
+            run_id=run_id,
+        )
+
+        conn = store.connect()
+        sc_rows = conn.execute(
+            "SELECT scope_type, scope_expression FROM candidate_scopes WHERE candidate_id = ? ORDER BY scope_type",
+            (sample_ref.reference_decision_id,),
+        ).fetchall()
+        assert len(sc_rows) == 2
+        assert sc_rows[0][0] == "directory"
+        assert sc_rows[0][1] == "packages/index"
+        assert sc_rows[1][0] == "package"
+        assert sc_rows[1][1] == "@prisma/client"
+
+    # 58. deterministic persisted IDs remain stable
+    def test_58_deterministic_persisted_ids_remain_stable(self, tmp_path: Path, valid_preflight: BatchPreflightResult):
+        sample_ref = load_reference_corpus(REF_DIR, repo_id="adrkit")[0]
+        config = RepositoryConfig("adrkit", "mbeacom/adrkit", "471457da29638ecca6119b35180c2845bf989cac", "test", "reviewed")
+        store = ResearchStore(tmp_path / "store.db")
+        store.initialize_schema()
+        run_id = "run-deterministic-id-test"
+        store.upsert_repository(RepositoryRecord(config.id, config.github, config.id, "main"))
+        store.upsert_taxonomy_version(TaxonomyVersionRecord("0.1", "2026-09-30", "test"))
+        store.upsert_classifier_version(ClassifierVersionRecord("0.1", "2026-09-30", "test"))
+        store.create_analysis_run(AnalysisRunRecord(
+            run_id=run_id,
+            repo_id=config.id,
+            repo_commit_sha=config.commit_sha,
+            mneme_version="0.9.2",
+            mneme_commit_sha="0"*40,
+            taxonomy_version="0.1",
+            classifier_version="0.1",
+            benchmark_schema_version="0.1",
+            configuration_hash="conf",
+            started_at="2026-09-30T00:00:00Z",
+            completed_at=None,
+            status="completed",
+        ))
+
+        rel_type = "requires"
+        rel_target = "ADR-0001"
+        sc_type = "directory"
+        sc_expr = "packages/index"
+
+        clf = MockTrackingClassifier(
+            outputs={
+                ClassifierTaskType.DECISION_CLASSIFICATION: {"classification": sample_ref.classification},
+                ClassifierTaskType.DOMAINS: {"domains": list(sample_ref.decision_domains)},
+                ClassifierTaskType.PURPOSES: {"purposes": list(sample_ref.decision_purposes)},
+                ClassifierTaskType.AUTHORITY: {"authority": sample_ref.authority_status},
+                ClassifierTaskType.SCOPE: {"scopes": [{"scope_type": sc_type, "scope_expression": sc_expr}]},
+                ClassifierTaskType.LIFECYCLE: {"lifecycle": sample_ref.lifecycle_status},
+                ClassifierTaskType.RELATIONSHIPS: {"relationships": [{"relationship_type": rel_type, "target_reference": rel_target}]},
+                ClassifierTaskType.ENFORCEMENT_POTENTIAL: {"enforcement_potential": sample_ref.enforcement_potential},
+            }
+        )
+
+        execute_stage_b_classification(
+            repository_config=config,
+            references=[sample_ref],
+            classifier=clf,
+            preflight=valid_preflight,
+            research_store=store,
+            run_id=run_id,
+        )
+
+        ref_id = sample_ref.reference_decision_id
+        expected_rel_id = f"rel-{hashlib.sha256(f'{run_id}:{ref_id}:{rel_type}:{rel_target}'.encode()).hexdigest()[:32]}"
+        expected_sc_id = f"sc-{hashlib.sha256(f'{run_id}:{ref_id}:{sc_type}:{sc_expr}'.encode()).hexdigest()[:32]}"
+
+        conn = store.connect()
+        rel_id = conn.execute("SELECT relationship_id FROM candidate_relationships WHERE source_candidate_id = ?", (ref_id,)).fetchone()[0]
+        sc_id = conn.execute("SELECT scope_id FROM candidate_scopes WHERE candidate_id = ?", (ref_id,)).fetchone()[0]
+
+        assert rel_id == expected_rel_id
+        assert sc_id == expected_sc_id
+
+    # 59. B0 Stage B path uses the same fixed helper and remains semantically unchanged
+    def test_59_b0_stage_b_path_handles_duplicates(self, tmp_path: Path, valid_preflight: BatchPreflightResult):
+        sample_ref = load_reference_corpus(REF_DIR, repo_id="adrkit")[0]
+        config = RepositoryConfig("adrkit", "mbeacom/adrkit", "471457da29638ecca6119b35180c2845bf989cac", "test", "reviewed")
+        store = ResearchStore(tmp_path / "store.db")
+        store.initialize_schema()
+        run_id = "run-b0-helper-test"
+        store.upsert_repository(RepositoryRecord(config.id, config.github, config.id, "main"))
+        store.upsert_taxonomy_version(TaxonomyVersionRecord("0.1", "2026-09-30", "test"))
+        store.upsert_classifier_version(ClassifierVersionRecord("0.1", "2026-09-30", "test"))
+        store.create_analysis_run(AnalysisRunRecord(
+            run_id=run_id,
+            repo_id=config.id,
+            repo_commit_sha=config.commit_sha,
+            mneme_version="0.9.2",
+            mneme_commit_sha="0"*40,
+            taxonomy_version="0.1",
+            classifier_version="0.1",
+            benchmark_schema_version="0.1",
+            configuration_hash="conf",
+            started_at="2026-09-30T00:00:00Z",
+            completed_at=None,
+            status="completed",
+        ))
+
+        clf = MockTrackingClassifier(
+            outputs={
+                ClassifierTaskType.DECISION_CLASSIFICATION: {"classification": sample_ref.classification},
+                ClassifierTaskType.DOMAINS: {"domains": list(sample_ref.decision_domains)},
+                ClassifierTaskType.PURPOSES: {"purposes": list(sample_ref.decision_purposes)},
+                ClassifierTaskType.AUTHORITY: {"authority": sample_ref.authority_status},
+                ClassifierTaskType.SCOPE: {
+                    "scopes": [
+                        {"scope_type": "directory", "scope_expression": "packages/index"},
+                        {"scope_type": "directory", "scope_expression": "packages/index"},
+                    ]
+                },
+                ClassifierTaskType.LIFECYCLE: {"lifecycle": sample_ref.lifecycle_status},
+                ClassifierTaskType.RELATIONSHIPS: {
+                    "relationships": [
+                        {"relationship_type": "requires", "target_reference": "ADR-0001"},
+                        {"relationship_type": "requires", "target_reference": "ADR-0001"},
+                    ]
+                },
+                ClassifierTaskType.ENFORCEMENT_POTENTIAL: {"enforcement_potential": sample_ref.enforcement_potential},
+            }
+        )
+
+        res = execute_stage_b_classification(
+            repository_config=config,
+            references=[sample_ref],
+            classifier=clf,
+            preflight=valid_preflight,
+            research_store=store,
+            run_id=run_id,
+        )
+        assert res.reference_count == 1
+
+    # 60. M1 experiment path uses the same fixed helper and handles duplicates
+    def test_60_m1_experiment_path_handles_duplicates(self, tmp_path: Path):
+        profile = ClassifierExperimentProfile.create(
+            experiment_id="o1a-batch-01-m1-sonnet-5-5",
+            comparator_model_identifier="claude-sonnet-5-5",
+        )
+        clf = MockTrackingClassifier(
+            model_identifier="claude-sonnet-5-5",
+            outputs={
+                ClassifierTaskType.DECISION_CLASSIFICATION: {"classification": "prescriptive"},
+                ClassifierTaskType.DOMAINS: {"domains": ["architecture_structure"]},
+                ClassifierTaskType.PURPOSES: {"purposes": ["constrain"]},
+                ClassifierTaskType.AUTHORITY: {"authority": "explicitly_accepted"},
+                ClassifierTaskType.SCOPE: {
+                    "scopes": [
+                        {"scope_type": "directory", "scope_expression": "packages/index"},
+                        {"scope_type": "directory", "scope_expression": "packages/index"},
+                    ]
+                },
+                ClassifierTaskType.LIFECYCLE: {"lifecycle": "active"},
+                ClassifierTaskType.RELATIONSHIPS: {
+                    "relationships": [
+                        {"relationship_type": "requires", "target_reference": "ADR-0001"},
+                        {"relationship_type": "requires", "target_reference": "ADR-0001"},
+                    ]
+                },
+                ClassifierTaskType.ENFORCEMENT_POTENTIAL: {"enforcement_potential": "deterministic_rule"},
+            }
+        )
+        store = ResearchStore(tmp_path / "m1_store.db")
+        out_dir = tmp_path / "m1_artifacts"
+
+        res = execute_classifier_experiment(
+            experiment_profile=profile,
+            baseline_path=BASELINE_PATH,
+            manifest_path=MANIFEST_PATH,
+            reference_corpus_dir=REF_DIR,
+            classifier=clf,
+            research_store=store,
+            output_dir=out_dir,
+        )
+        assert len(res.results_by_repo) == 5
+        assert clf.call_count == 800
+        conn = store.connect()
+        scope_count = conn.execute("SELECT COUNT(*) FROM candidate_scopes").fetchone()[0]
+        rel_count = conn.execute("SELECT COUNT(*) FROM candidate_relationships").fetchone()[0]
+        assert scope_count == 100
+        assert rel_count == 100
+
+    # 61. classification.py frozen hash unchanged
+    def test_61_classification_frozen_hash_unchanged(self):
+        from tests.open_architecture.test_baseline import FROZEN_SEMANTIC_MODULE_HASHES
+        class_file = REPO_ROOT / "mneme" / "open_architecture" / "classification.py"
+        raw_bytes = class_file.read_bytes().replace(b"\r\n", b"\n")
+        actual_hash = hashlib.sha256(raw_bytes).hexdigest()
+        assert actual_hash == FROZEN_SEMANTIC_MODULE_HASHES["mneme/open_architecture/classification.py"]
+
+    # 62. ResearchStore schema unchanged
+    def test_62_research_store_schema_unchanged(self, tmp_path: Path):
+        store = ResearchStore(tmp_path / "test_store.db")
+        store.initialize_schema()
+        conn = store.connect()
+        scope_cols = {col[1]: col[2] for col in conn.execute("PRAGMA table_info(candidate_scopes)").fetchall()}
+        assert set(scope_cols.keys()) == {
+            "scope_id", "candidate_id", "run_id", "scope_type", "scope_expression", "confidence", "evidence_reference"
+        }
+        rel_cols = {col[1]: col[2] for col in conn.execute("PRAGMA table_info(candidate_relationships)").fetchall()}
+        assert set(rel_cols.keys()) == {
+            "relationship_id", "run_id", "source_candidate_id", "relationship_type", "target_candidate_id",
+            "target_reference", "confidence", "evidence_reference"
+        }
