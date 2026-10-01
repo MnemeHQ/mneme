@@ -877,6 +877,24 @@ def execute_stage_b_classification(
                 f"model '{classifier.model_identifier}'), but found {installed_sdk}."
             )
 
+    return _execute_stage_b_tasks_and_scoring(
+        repository_config=repository_config,
+        references=references,
+        classifier=classifier,
+        research_store=research_store,
+        run_id=run_id,
+    )
+
+
+def _execute_stage_b_tasks_and_scoring(
+    *,
+    repository_config: RepositoryConfig,
+    references: list[FrozenReferenceDecision],
+    classifier: SemanticClassifier,
+    research_store: ResearchStore | None = None,
+    run_id: str | None = None,
+) -> StageBClassificationResult:
+    """Core Stage B task construction, batch execution, fail-closed normalization, and scoring."""
     tasks = build_stage_b_tasks(references)
     raw_results = execute_classifier_batch(classifier, tasks)
 
@@ -1904,6 +1922,331 @@ def run_frozen_batch_01(
 run_batch_01 = run_frozen_batch_01
 
 
+# ── H. Model Comparison Experiments (Stage B Only) ──────────────────────────────
+
+
+@dataclass(frozen=True)
+class ClassifierExperimentProfile:
+    """Immutable research experiment profile for model comparison experiments."""
+
+    experiment_id: str
+    baseline_id: str
+    comparator_backend: str
+    comparator_classifier_version: str
+    comparator_model_identifier: str
+    reference_corpus_hash: str
+    taxonomy_version: str
+    semantic_tasks: tuple[str, ...]
+    max_tokens: int
+    experiment_profile_hash: str
+
+    @classmethod
+    def create(
+        cls,
+        *,
+        experiment_id: str,
+        comparator_model_identifier: str,
+        comparator_backend: str = "anthropic",
+        comparator_classifier_version: str = "0.1",
+        baseline_id: str = FROZEN_BASELINE_ID,
+        reference_corpus_hash: str = FROZEN_REFERENCE_CORPUS_HASH,
+        taxonomy_version: str = "0.1",
+        semantic_tasks: tuple[str, ...] = tuple(t.value for t in SEMANTIC_TASK_TYPES),
+        max_tokens: int = 1024,
+    ) -> ClassifierExperimentProfile:
+        payload = {
+            "experiment_id": experiment_id,
+            "baseline_id": baseline_id,
+            "comparator_backend": comparator_backend,
+            "comparator_classifier_version": comparator_classifier_version,
+            "comparator_model_identifier": comparator_model_identifier,
+            "reference_corpus_hash": reference_corpus_hash,
+            "taxonomy_version": taxonomy_version,
+            "semantic_tasks": list(semantic_tasks),
+            "max_tokens": max_tokens,
+        }
+        canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+        profile_hash = hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:32]
+
+        return cls(
+            experiment_id=experiment_id,
+            baseline_id=baseline_id,
+            comparator_backend=comparator_backend,
+            comparator_classifier_version=comparator_classifier_version,
+            comparator_model_identifier=comparator_model_identifier,
+            reference_corpus_hash=reference_corpus_hash,
+            taxonomy_version=taxonomy_version,
+            semantic_tasks=semantic_tasks,
+            max_tokens=max_tokens,
+            experiment_profile_hash=profile_hash,
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "experiment_id": self.experiment_id,
+            "baseline_id": self.baseline_id,
+            "comparator_backend": self.comparator_backend,
+            "comparator_classifier_version": self.comparator_classifier_version,
+            "comparator_model_identifier": self.comparator_model_identifier,
+            "reference_corpus_hash": self.reference_corpus_hash,
+            "taxonomy_version": self.taxonomy_version,
+            "semantic_tasks": list(self.semantic_tasks),
+            "max_tokens": self.max_tokens,
+            "experiment_profile_hash": self.experiment_profile_hash,
+        }
+
+
+@dataclass(frozen=True)
+class ClassifierExperimentResult:
+    """Immutable result of a model comparison experiment."""
+
+    experiment_id: str
+    profile: ClassifierExperimentProfile
+    harness_commit_sha: str
+    results_by_repo: dict[str, StageBClassificationResult]
+    runs: dict[str, RunMetadata]
+    output_dir: Path | None = None
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "experiment_id": self.experiment_id,
+            "profile": self.profile.to_dict(),
+            "harness_commit_sha": self.harness_commit_sha,
+            "results_by_repo": {
+                repo_id: res.to_summary_dict()
+                for repo_id, res in sorted(self.results_by_repo.items())
+            },
+            "runs": {repo_id: meta.to_dict() for repo_id, meta in sorted(self.runs.items())},
+            "output_dir": str(self.output_dir) if self.output_dir else None,
+        }
+
+
+def execute_classifier_experiment(
+    *,
+    experiment_profile: ClassifierExperimentProfile,
+    baseline_path: str | Path,
+    manifest_path: str | Path,
+    reference_corpus_dir: str | Path,
+    classifier: SemanticClassifier,
+    research_store: ResearchStore,
+    output_dir: str | Path,
+) -> ClassifierExperimentResult:
+    """Execute a research-only model comparison experiment over the 100 frozen reference decisions.
+
+    Enforces:
+    1. Reference corpus hash matches experiment_profile.reference_corpus_hash and frozen baseline.
+    2. Classifier matches experiment_profile comparator backend, version, and model.
+    3. Mandatory research_store and output_dir.
+    4. Non-empty output_dir fails closed.
+    5. Reuses exact existing build_stage_b_tasks, execute_classifier_batch, normalization, and scoring.
+    6. Appends distinct analysis_runs per repository without modifying prior B0 runs.
+    7. Emits deterministic experiment artifacts into output_dir.
+    """
+    if research_store is None:
+        raise ValueError("research_store must be explicitly provided for model comparison experiment")
+    if output_dir is None:
+        raise ValueError("output_dir must be explicitly provided for model comparison experiment")
+
+    out_path = Path(output_dir)
+    if out_path.is_dir():
+        if any(out_path.iterdir()):
+            raise HarnessRunError(
+                f"output_dir '{out_path}' already exists and is not empty. Overwrite prevented."
+            )
+    elif out_path.exists():
+        raise HarnessRunError(f"output_dir '{out_path}' exists and is not a directory.")
+    else:
+        out_path.mkdir(parents=True, exist_ok=True)
+
+    research_store.initialize_schema()
+
+    baseline = BaselineConfig.load(baseline_path)
+    manifest = Manifest.load(manifest_path)
+    if baseline.status != "frozen":
+        raise HarnessPreflightError(f"Baseline status must be 'frozen', got {baseline.status!r}")
+    if manifest.status != "frozen":
+        raise HarnessPreflightError(f"Manifest status must be 'frozen', got {manifest.status!r}")
+    validate_baseline_freeze(baseline, manifest=manifest)
+
+    computed_ref_hash = compute_reference_corpus_content_hash(reference_corpus_dir)
+    if computed_ref_hash != experiment_profile.reference_corpus_hash:
+        raise HarnessPreflightError(
+            f"Reference corpus hash mismatch: expected {experiment_profile.reference_corpus_hash!r}, "
+            f"computed {computed_ref_hash!r}"
+        )
+
+    if classifier.backend_id != experiment_profile.comparator_backend:
+        raise HarnessPreflightError(
+            f"Classifier backend mismatch: expected {experiment_profile.comparator_backend!r}, "
+            f"got {classifier.backend_id!r}"
+        )
+    if classifier.classifier_version != experiment_profile.comparator_classifier_version:
+        raise HarnessPreflightError(
+            f"Classifier version mismatch: expected {experiment_profile.comparator_classifier_version!r}, "
+            f"got {classifier.classifier_version!r}"
+        )
+    if classifier.model_identifier != experiment_profile.comparator_model_identifier:
+        raise HarnessPreflightError(
+            f"Classifier model mismatch: expected {experiment_profile.comparator_model_identifier!r}, "
+            f"got {classifier.model_identifier!r}"
+        )
+
+    if classifier.backend_id == "anthropic":
+        try:
+            import anthropic
+            installed_sdk = getattr(anthropic, "__version__", "0.0.0")
+        except ImportError:
+            installed_sdk = "not installed"
+        min_sdk = "1.0.0"
+        if installed_sdk == "not installed" or _is_version_less(installed_sdk, min_sdk):
+            raise HarnessPreflightError(
+                f"Anthropic SDK>={min_sdk} required, found {installed_sdk}."
+            )
+
+    all_references = load_reference_corpus(reference_corpus_dir)
+    if len(all_references) != 100:
+        raise HarnessRunError(f"Expected 100 reference decisions, found {len(all_references)}")
+
+    results_by_repo: dict[str, StageBClassificationResult] = {}
+    runs_dict: dict[str, RunMetadata] = {}
+
+    for repo in sorted(manifest.repositories, key=lambda r: r.id):
+        repo_refs = [r for r in all_references if r.repository == repo.github]
+        if len(repo_refs) != 20:
+            raise HarnessRunError(
+                f"Repository '{repo.id}' ({repo.github}) requires exactly 20 references, found {len(repo_refs)}"
+            )
+
+        run_meta = RunMetadata.create(
+            batch_id=manifest.batch_id,
+            repo_id=repo.id,
+            repo_commit_sha=repo.commit_sha,
+            benchmark_schema_version="0.1",
+            taxonomy_version=experiment_profile.taxonomy_version,
+            classifier_version=experiment_profile.comparator_classifier_version,
+            classifier_backend=experiment_profile.comparator_backend,
+            classifier_model=experiment_profile.comparator_model_identifier,
+            extractor_id="HeuristicExtractor",
+            extractor_version="0.1",
+            scenario_content_hash="none",
+            retrieval_policy="score_gt_zero",
+            manifest_config_hash=manifest.configuration_hash(),
+        )
+
+        research_store.upsert_repository(
+            RepositoryRecord(
+                repo_id=repo.id,
+                repository_url=f"https://github.com/{repo.github}",
+                repository_identifier=repo.github,
+                default_branch=getattr(repo, "default_branch", "main"),
+            )
+        )
+        research_store.upsert_taxonomy_version(
+            TaxonomyVersionRecord(
+                taxonomy_version=experiment_profile.taxonomy_version,
+                created_at=now_iso(),
+                notes=f"O1A research taxonomy v{experiment_profile.taxonomy_version}",
+            )
+        )
+        research_store.upsert_classifier_version(
+            ClassifierVersionRecord(
+                classifier_version=experiment_profile.comparator_classifier_version,
+                created_at=now_iso(),
+                notes=f"Comparator classifier ({experiment_profile.comparator_model_identifier})",
+            )
+        )
+        research_store.create_analysis_run(
+            AnalysisRunRecord(
+                run_id=run_meta.run_id,
+                repo_id=repo.id,
+                repo_commit_sha=repo.commit_sha,
+                mneme_version=run_meta.mneme_version,
+                mneme_commit_sha=run_meta.mneme_commit_sha,
+                taxonomy_version=run_meta.taxonomy_version,
+                classifier_version=run_meta.classifier_version,
+                benchmark_schema_version=run_meta.benchmark_schema_version,
+                configuration_hash=run_meta.configuration_hash,
+                started_at=run_meta.started_at,
+                completed_at=None,
+                status="running",
+            )
+        )
+
+        try:
+            b_res = _execute_stage_b_tasks_and_scoring(
+                repository_config=repo,
+                references=repo_refs,
+                classifier=classifier,
+                research_store=research_store,
+                run_id=run_meta.run_id,
+            )
+            results_by_repo[repo.id] = b_res
+            completed_meta = run_meta.with_completion(status="completed")
+            runs_dict[repo.id] = completed_meta
+            research_store.update_analysis_run_status(
+                run_meta.run_id,
+                status="completed",
+                completed_at=completed_meta.completed_at,
+            )
+        except Exception:
+            failed_meta = run_meta.with_completion(status="failed")
+            runs_dict[repo.id] = failed_meta
+            research_store.update_analysis_run_status(
+                run_meta.run_id,
+                status="failed",
+                completed_at=failed_meta.completed_at,
+            )
+            raise
+
+    # Write output artifacts
+    (out_path / "experiment_profile.json").write_text(
+        json.dumps(experiment_profile.to_dict(), indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    b_summary = {
+        "experiment_id": experiment_profile.experiment_id,
+        "comparator_model": experiment_profile.comparator_model_identifier,
+        "classifier": {
+            "backend_id": experiment_profile.comparator_backend,
+            "classifier_version": experiment_profile.comparator_classifier_version,
+            "model_identifier": experiment_profile.comparator_model_identifier,
+        },
+        "repositories": {repo_id: res.to_summary_dict() for repo_id, res in sorted(results_by_repo.items())},
+        "aggregate": {
+            "total_references": sum(r.reference_count for r in results_by_repo.values()),
+            "total_tasks": sum(r.task_count for r in results_by_repo.values()),
+        },
+    }
+    (out_path / "stage_b_summary.json").write_text(
+        json.dumps(b_summary, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    summary_data = {
+        "experiment_id": experiment_profile.experiment_id,
+        "baseline_id": experiment_profile.baseline_id,
+        "comparator_model": experiment_profile.comparator_model_identifier,
+        "execution_profile_hash": experiment_profile.experiment_profile_hash,
+        "status": "completed",
+        "repositories": sorted(runs_dict.keys()),
+        "runs": {repo_id: meta.to_dict() for repo_id, meta in sorted(runs_dict.items())},
+    }
+    (out_path / "summary.json").write_text(
+        json.dumps(summary_data, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    return ClassifierExperimentResult(
+        experiment_id=experiment_profile.experiment_id,
+        profile=experiment_profile,
+        harness_commit_sha=_get_git_commit_sha(),
+        results_by_repo=results_by_repo,
+        runs=runs_dict,
+        output_dir=out_path,
+    )
+
+
 __all__ = [
     "FROZEN_BATCH_ID",
     "FROZEN_BASELINE_ID",
@@ -1932,4 +2275,7 @@ __all__ = [
     "Batch01RunResult",
     "run_frozen_batch_01",
     "run_batch_01",
+    "ClassifierExperimentProfile",
+    "ClassifierExperimentResult",
+    "execute_classifier_experiment",
 ]

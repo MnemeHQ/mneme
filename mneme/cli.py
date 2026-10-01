@@ -1455,6 +1455,69 @@ def _cmd_research_o1a_run_batch(args: argparse.Namespace) -> int:
         return _error_exit(f"batch execution failed: {exc}")
 
 
+def _cmd_research_o1a_run_experiment(args: argparse.Namespace) -> int:
+    from mneme.open_architecture.harness import (
+        ClassifierExperimentProfile,
+        execute_classifier_experiment,
+    )
+    from mneme.open_architecture.store import ResearchStore
+
+    baseline_path = Path(args.baseline)
+    manifest_path = Path(args.manifest)
+    reference_corpus_dir = Path(args.reference_dir)
+
+    if not baseline_path.is_file():
+        return _error_exit(f"baseline file '{baseline_path}' does not exist")
+    if not manifest_path.is_file():
+        return _error_exit(f"manifest file '{manifest_path}' does not exist")
+    if not reference_corpus_dir.is_dir():
+        return _error_exit(f"reference corpus directory '{reference_corpus_dir}' does not exist")
+
+    profile = ClassifierExperimentProfile.create(
+        experiment_id=args.experiment_id,
+        comparator_model_identifier=args.model,
+    )
+
+    if args.dry_run:
+        print("O1A Model Comparison Experiment Dry Run: OK")
+        print(f"  Experiment ID:          {profile.experiment_id}")
+        print(f"  Comparator Model:       {profile.comparator_model_identifier}")
+        print(f"  Baseline ID:            {profile.baseline_id}")
+        print(f"  Experiment Profile Hash:{profile.experiment_profile_hash}")
+        print("  Dry run complete: no execution performed, no canonical state written.")
+        return 0
+
+    if not args.store:
+        return _error_exit("--store <path-to-sqlite-db> is required for model comparison experiment")
+    if not args.output_dir:
+        return _error_exit("--output-dir <path> is required for model comparison experiment")
+
+    from mneme.open_architecture.classifiers.anthropic import AnthropicClassifier
+    classifier = AnthropicClassifier(model_identifier=args.model)
+    store = ResearchStore(args.store)
+
+    try:
+        res = execute_classifier_experiment(
+            experiment_profile=profile,
+            baseline_path=baseline_path,
+            manifest_path=manifest_path,
+            reference_corpus_dir=reference_corpus_dir,
+            classifier=classifier,
+            research_store=store,
+            output_dir=args.output_dir,
+        )
+        print(f"O1A Experiment Completed: {res.experiment_id}")
+        print(f"  Model:                {res.profile.comparator_model_identifier}")
+        print(f"  Repositories:         {len(res.runs)}")
+        tot_tasks = sum(r.task_count for r in res.results_by_repo.values())
+        print(f"  Stage B Tasks:        {tot_tasks}")
+        if res.output_dir:
+            print(f"  Artifacts Written:    {res.output_dir}")
+        return 0
+    except Exception as exc:
+        return _error_exit(f"experiment execution failed: {exc}")
+
+
 # ── Entry point ──────────────────────────────────────────────────────────────
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -1972,6 +2035,53 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Execute preflight only without running stages",
     )
     p_o1a_batch.set_defaults(func=_cmd_research_o1a_run_batch)
+
+    # research open-architecture run-experiment
+    p_o1a_exp = o1a_sub.add_parser(
+        "run-experiment",
+        help="Execute a research model-comparison experiment (Stage B only)",
+    )
+    p_o1a_exp.add_argument(
+        "--experiment-id",
+        default="o1a-batch-01-m1-sonnet-5-5",
+        help="Experiment identifier (default: o1a-batch-01-m1-sonnet-5-5)",
+    )
+    p_o1a_exp.add_argument(
+        "--model",
+        default="claude-sonnet-5-5",
+        help="Comparator model identifier (default: claude-sonnet-5-5)",
+    )
+    p_o1a_exp.add_argument(
+        "--baseline",
+        default="benchmarks/open_architecture/batch_01/baseline.yaml",
+        help="Path to baseline.yaml",
+    )
+    p_o1a_exp.add_argument(
+        "--manifest",
+        default="benchmarks/open_architecture/batch_01/manifest.yaml",
+        help="Path to manifest.yaml",
+    )
+    p_o1a_exp.add_argument(
+        "--reference-dir",
+        default="benchmarks/open_architecture/batch_01/reference_decisions",
+        help="Path to reference decisions directory",
+    )
+    p_o1a_exp.add_argument(
+        "--store",
+        default=None,
+        help="Path to SQLite database for ResearchStore",
+    )
+    p_o1a_exp.add_argument(
+        "--output-dir",
+        default=None,
+        help="Output directory for experiment artifacts",
+    )
+    p_o1a_exp.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Validate configuration without executing tasks",
+    )
+    p_o1a_exp.set_defaults(func=_cmd_research_o1a_run_experiment)
 
     # research open-architecture export
     p_o1a_export = o1a_sub.add_parser(

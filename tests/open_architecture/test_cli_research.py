@@ -138,3 +138,22 @@ class TestResearchCli:
         assert rc2 == 2
         err2 = capsys.readouterr().err
         assert "--output-dir" in err2
+
+    def test_run_experiment_dry_run(self, capsys):
+        rc = main(["research", "open-architecture", "run-experiment", "--dry-run"])
+        assert rc == 0
+        out = capsys.readouterr().out
+        assert "O1A Model Comparison Experiment Dry Run: OK" in out
+        assert "claude-sonnet-5-5" in out
+        assert "o1a-batch-01-m1-sonnet-5-5" in out
+
+    def test_run_experiment_requires_store_and_output_dir(self, capsys):
+        rc1 = main(["research", "open-architecture", "run-experiment"])
+        assert rc1 == 2
+        err1 = capsys.readouterr().err
+        assert "--store" in err1
+
+        rc2 = main(["research", "open-architecture", "run-experiment", "--store", "dummy.db"])
+        assert rc2 == 2
+        err2 = capsys.readouterr().err
+        assert "--output-dir" in err2
