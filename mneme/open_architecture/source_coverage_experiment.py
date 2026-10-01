@@ -53,10 +53,10 @@ B0_STAGE_C_APPLICABILITY_SCORE: float = 0.103728
 
 # Frozen B0 Stage A totals across the four non-Archlint repositories:
 # adrkit, gsa_agentic_coding_quickstart, helix, modonome.
-# In B0, Archlint contributed: 16 candidates, 3 matched candidates, 6 matched refs.
+# In B0, Archlint contributed: 16 candidates, 6 matched candidates, 6 matched refs.
 # Global B0 had: 5,459 candidates, 256 matched candidates, 85 matched refs, 100 refs total.
 B0_OTHER_REPOS_CANDIDATES: int = 5459 - 16  # 5,443
-B0_OTHER_REPOS_MATCHED_CANDIDATES: int = 256 - 3  # 253
+B0_OTHER_REPOS_MATCHED_CANDIDATES: int = 256 - 6  # 250
 B0_OTHER_REPOS_MATCHED_REFERENCES: int = 85 - 6  # 79
 B0_OTHER_REPOS_TOTAL_REFERENCES: int = 80
 B0_OTHER_REPOS_SOURCE_COVERED_REFERENCES: int = 80
