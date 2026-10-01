@@ -389,7 +389,17 @@ class TestArchlintPinnedCorpusExecution:
         assert summary["archlint"]["unmatched_reference_ids"] == expected_unmatched
         assert summary["aggregate"]["matched_references"] == 96
         assert summary["aggregate"]["total_candidates"] == 5507
-        assert summary["aggregate"]["matched_candidates"] == 275
+        assert summary["aggregate"]["matched_candidates"] == 272
+        expected_precision = 272 / 5507
+        expected_recall = 96 / 100
+        expected_f1 = (
+            2 * expected_precision * expected_recall / (expected_precision + expected_recall)
+        )
+        expected_overall_o1 = (expected_f1 + 0.517188 + 0.103728) / 3.0
+        assert summary["aggregate"]["discovery_precision"] == pytest.approx(expected_precision)
+        assert summary["aggregate"]["stage_a_recall"] == pytest.approx(expected_recall)
+        assert summary["aggregate"]["stage_a_micro_f1"] == pytest.approx(expected_f1)
+        assert summary["aggregate"]["t1_overall_o1_score"] == pytest.approx(expected_overall_o1)
 
         # Verify candidate_matches.jsonl
         lines = [l for l in (out_dir / "candidate_matches.jsonl").read_text(encoding="utf-8").splitlines() if l.strip()]
