@@ -119,6 +119,17 @@ FROZEN_REFERENCE_CORPUS_HASH = "0455bd66aae52551c35b37a63c2d185f"
 FROZEN_SCENARIO_CORPUS_HASH = "2ff8751955fd64a33316aca6692dc803"
 
 
+def _is_version_less(v1_str: str, v2_str: str) -> bool:
+    """Compare semver strings. Returns True if v1 < v2."""
+    v1 = [int(p) for p in re.findall(r"\d+", v1_str)[:3]]
+    v2 = [int(p) for p in re.findall(r"\d+", v2_str)[:3]]
+    while len(v1) < 3:
+        v1.append(0)
+    while len(v2) < 3:
+        v2.append(0)
+    return tuple(v1) < tuple(v2)
+
+
 # ── A. Frozen Preflight ─────────────────────────────────────────────────────────
 
 
@@ -283,6 +294,21 @@ def preflight_batch_01(
                 f"Classifier model mismatch: expected {baseline.classifier.model_identifier!r}, "
                 f"got {classifier.model_identifier!r}"
             )
+
+        if classifier.backend_id == "anthropic":
+            try:
+                import anthropic
+                installed_sdk = getattr(anthropic, "__version__", "0.0.0")
+            except ImportError:
+                installed_sdk = "not installed"
+
+            min_sdk = baseline.classifier.min_sdk_version
+            if installed_sdk == "not installed" or _is_version_less(installed_sdk, min_sdk):
+                raise HarnessPreflightError(
+                    f"Stage B requires anthropic>={min_sdk} for frozen classifier "
+                    f"'{baseline.classifier.backend_id}' (version '{baseline.classifier.classifier_version}', "
+                    f"model '{baseline.classifier.model_identifier}'), but found {installed_sdk}."
+                )
 
     # Always verify runtime HeuristicExtractor against frozen baseline contract
     runtime_extractor = HeuristicExtractor()
@@ -836,6 +862,21 @@ def execute_stage_b_classification(
             f"got {classifier.model_identifier!r}"
         )
 
+    if classifier.backend_id == "anthropic":
+        try:
+            import anthropic
+            installed_sdk = getattr(anthropic, "__version__", "0.0.0")
+        except ImportError:
+            installed_sdk = "not installed"
+
+        min_sdk = "1.0.0"
+        if installed_sdk == "not installed" or _is_version_less(installed_sdk, min_sdk):
+            raise HarnessPreflightError(
+                f"Stage B requires anthropic>={min_sdk} for frozen classifier "
+                f"'{classifier.backend_id}' (version '{classifier.classifier_version}', "
+                f"model '{classifier.model_identifier}'), but found {installed_sdk}."
+            )
+
     tasks = build_stage_b_tasks(references)
     raw_results = execute_classifier_batch(classifier, tasks)
 
@@ -1314,28 +1355,60 @@ def execute_stage_c_gds(
     # 4. Persist to ResearchStore if provided
     if research_store is not None and run_id is not None:
         for s in scenarios:
-            research_store.insert_applicability_scenario(
-                ApplicabilityScenarioRecord(
-                    scenario_id=s.scenario_id,
-                    repo_id=repository_config.id,
-                    description=s.description,
-                    path=s.change_context.path,
-                    component=s.change_context.component,
-                    change_type=s.change_context.change_type,
-                    dependencies_json=json.dumps(list(s.change_context.dependencies)),
-                    api_context=s.change_context.api,
-                    technology_context=s.change_context.technology,
-                    other_context=s.change_context.other_context,
-                    validation_state=s.validation_state,
-                )
-            )
-            for exp_id in s.expected_governing_decision_ids:
-                research_store.insert_scenario_expected_decision(
-                    ScenarioExpectedDecisionRecord(
+            existing_scn = research_store.get_applicability_scenario(s.scenario_id)
+            if existing_scn is None:
+                research_store.insert_applicability_scenario(
+                    ApplicabilityScenarioRecord(
                         scenario_id=s.scenario_id,
-                        candidate_id=exp_id,
+                        repo_id=repository_config.id,
+                        description=s.description,
+                        path=s.change_context.path,
+                        component=s.change_context.component,
+                        change_type=s.change_context.change_type,
+                        dependencies_json=json.dumps(list(s.change_context.dependencies)),
+                        api_context=s.change_context.api,
+                        technology_context=s.change_context.technology,
+                        other_context=s.change_context.other_context,
+                        validation_state=s.validation_state,
                     )
                 )
+            else:
+                if (
+                    existing_scn.repo_id != repository_config.id
+                    or existing_scn.description != s.description
+                    or existing_scn.path != s.change_context.path
+                    or existing_scn.component != s.change_context.component
+                    or existing_scn.change_type != s.change_context.change_type
+                    or existing_scn.validation_state != s.validation_state
+                ):
+                    raise HarnessRunError(
+                        f"Persisted scenario '{s.scenario_id}' in ResearchStore does not match "
+                        f"the frozen scenario being evaluated. Store data mismatch."
+                    )
+
+            conn = research_store.connect()
+            rows = conn.execute(
+                "SELECT candidate_id FROM scenario_expected_decisions WHERE scenario_id = ? ORDER BY candidate_id",
+                (s.scenario_id,),
+            ).fetchall()
+            existing_exp_ids = {row[0] for row in rows}
+            frozen_exp_ids = set(s.expected_governing_decision_ids)
+
+            if not existing_exp_ids:
+                for exp_id in sorted(frozen_exp_ids):
+                    research_store.insert_scenario_expected_decision(
+                        ScenarioExpectedDecisionRecord(
+                            scenario_id=s.scenario_id,
+                            candidate_id=exp_id,
+                        )
+                    )
+            else:
+                if existing_exp_ids != frozen_exp_ids:
+                    raise HarnessRunError(
+                        f"Persisted expected decisions for scenario '{s.scenario_id}' in ResearchStore "
+                        f"differ from the frozen expected set. Expected {sorted(frozen_exp_ids)}, "
+                        f"found {sorted(existing_exp_ids)} in store."
+                    )
 
         for gds_res in results:
             result_id = f"res-{hashlib.sha256(f'{run_id}:{gds_res.scenario_id}'.encode()).hexdigest()[:32]}"
@@ -1374,6 +1447,60 @@ def execute_stage_c_gds(
 
 
 @dataclass(frozen=True)
+class BatchExecutionProfile:
+    """Immutable research execution profile for an O1A Batch 01 benchmark invocation."""
+
+    execution_stages: tuple[str, ...]
+    execution_scope: str
+    execution_profile_hash: str
+
+    @classmethod
+    def create(
+        cls,
+        stages: Iterable[str],
+        *,
+        batch_id: str = FROZEN_BATCH_ID,
+        baseline_configuration_hash: str = FROZEN_BASELINE_CONFIG_HASH,
+        manifest_configuration_hash: str = FROZEN_MANIFEST_CONFIG_HASH,
+        reference_corpus_hash: str = FROZEN_REFERENCE_CORPUS_HASH,
+        scenario_corpus_hash: str = FROZEN_SCENARIO_CORPUS_HASH,
+    ) -> BatchExecutionProfile:
+        norm_stages = tuple(sorted({s.upper().strip() for s in stages}))
+        if not norm_stages:
+            raise ValueError("Stage selection must not be empty. Valid stages are 'A', 'B', 'C'.")
+        valid_stages = {"A", "B", "C"}
+        invalid = set(norm_stages) - valid_stages
+        if invalid:
+            raise ValueError(f"Invalid stage(s) {sorted(invalid)}. Valid stages are {sorted(valid_stages)}.")
+
+        execution_scope = "full_baseline" if norm_stages == ("A", "B", "C") else "staged_validation"
+
+        profile_dict = {
+            "batch_id": batch_id,
+            "baseline_configuration_hash": baseline_configuration_hash,
+            "manifest_configuration_hash": manifest_configuration_hash,
+            "reference_corpus_hash": reference_corpus_hash,
+            "scenario_corpus_hash": scenario_corpus_hash,
+            "execution_stages": list(norm_stages),
+        }
+        canonical_json = json.dumps(profile_dict, sort_keys=True, separators=(",", ":"))
+        execution_profile_hash = hashlib.sha256(canonical_json.encode("utf-8")).hexdigest()[:32]
+
+        return cls(
+            execution_stages=norm_stages,
+            execution_scope=execution_scope,
+            execution_profile_hash=execution_profile_hash,
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "execution_stages": list(self.execution_stages),
+            "execution_scope": self.execution_scope,
+            "execution_profile_hash": self.execution_profile_hash,
+        }
+
+
+@dataclass(frozen=True)
 class BatchProvenanceEnvelope:
     """Immutable research batch provenance envelope preserving global corpus identity."""
 
@@ -1386,10 +1513,11 @@ class BatchProvenanceEnvelope:
     scenario_corpus_hash: str = FROZEN_SCENARIO_CORPUS_HASH
     semantic_mneme_sha: str = FROZEN_SEMANTIC_MNEME_SHA
     harness_commit_sha: str = field(default_factory=_get_git_commit_sha)
+    execution_profile: BatchExecutionProfile | None = None
     runs: dict[str, RunMetadata] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        d = {
             "schema_version": self.schema_version,
             "batch_id": self.batch_id,
             "baseline_id": self.baseline_id,
@@ -1401,6 +1529,379 @@ class BatchProvenanceEnvelope:
             "harness_commit_sha": self.harness_commit_sha,
             "runs": {repo_id: meta.to_dict() for repo_id, meta in sorted(self.runs.items())},
         }
+        if self.execution_profile is not None:
+            d["execution_profile"] = self.execution_profile.to_dict()
+            d["execution_stages"] = list(self.execution_profile.execution_stages)
+            d["execution_scope"] = self.execution_profile.execution_scope
+            d["execution_profile_hash"] = self.execution_profile.execution_profile_hash
+        return d
+
+
+# ── G. Frozen Batch 01 Runner ───────────────────────────────────────────────────
+
+
+class HarnessRunError(RuntimeError):
+    """Raised when an error occurs during frozen batch runner execution."""
+
+
+@dataclass(frozen=True)
+class Batch01RunResult:
+    """Immutable result of a frozen O1A Batch 01 benchmark run."""
+
+    batch_id: str
+    stages: tuple[str, ...]
+    preflight: BatchPreflightResult
+    envelope: BatchProvenanceEnvelope
+    execution_profile: BatchExecutionProfile
+    stage_a_results: dict[str, StageADiscoveryResult] = field(default_factory=dict)
+    stage_b_results: dict[str, StageBClassificationResult] = field(default_factory=dict)
+    stage_c_results: dict[str, StageCGdsResult] = field(default_factory=dict)
+    output_dir: Path | None = None
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "batch_id": self.batch_id,
+            "stages": list(self.stages),
+            "execution_profile": self.execution_profile.to_dict(),
+            "preflight": self.preflight.to_dict(),
+            "provenance_envelope": self.envelope.to_dict(),
+            "stage_a_results": {repo_id: r.to_dict() for repo_id, r in sorted(self.stage_a_results.items())},
+            "stage_b_results": {repo_id: r.to_summary_dict() for repo_id, r in sorted(self.stage_b_results.items())},
+            "stage_c_results": {repo_id: r.to_summary_dict() for repo_id, r in sorted(self.stage_c_results.items())},
+            "output_dir": str(self.output_dir) if self.output_dir else None,
+        }
+
+
+def run_frozen_batch_01(
+    *,
+    baseline_path: str | Path,
+    manifest_path: str | Path,
+    reference_corpus_dir: str | Path,
+    scenarios_path: str | Path,
+    stages: Iterable[str] = ("A", "C"),
+    classifier: SemanticClassifier | None = None,
+    research_store: ResearchStore | None = None,
+    output_dir: str | Path | None = None,
+    workspace_dir: str | Path | None = None,
+    clone_sources: dict[str, str | Path] | None = None,
+) -> Batch01RunResult:
+    """Execute the frozen O1A Batch 01 benchmark runner across all five approved repositories.
+
+    Enforces:
+    1. Preflight validation of frozen baseline, manifest, and corpora identities fail-closed.
+    2. Strict stage selection (non-empty subset of 'A', 'B', 'C').
+    3. Exactly 100 reference decisions (20/repo) and 50 scenarios (10/repo).
+    4. Per-repository RunMetadata and ResearchStore lifecycle management (append-preserving).
+    5. Construction of the global BatchProvenanceEnvelope over all 5 repository runs with BatchExecutionProfile.
+    6. Emission of deterministic research-only artifacts (JSON) into a fresh output_dir.
+    """
+    # 1. Validate stage selection and build execution profile
+    execution_profile = BatchExecutionProfile.create(stages=stages)
+    norm_stages = execution_profile.execution_stages
+
+    if "B" in norm_stages and classifier is None:
+        raise ValueError("Stage B requires an explicit SemanticClassifier instance matching the frozen baseline.")
+
+    if research_store is None:
+        raise ValueError("research_store must be explicitly provided for Batch 01 execution")
+    if output_dir is None:
+        raise ValueError("output_dir must be explicitly provided for Batch 01 execution")
+
+    out_path = Path(output_dir)
+    if out_path.is_dir():
+        if any(out_path.iterdir()):
+            raise HarnessRunError(
+                f"output_dir '{out_path}' already exists and is not empty. Overwrite prevented."
+            )
+    elif out_path.exists():
+        raise HarnessRunError(
+            f"output_dir '{out_path}' exists and is not a directory."
+        )
+    else:
+        out_path.mkdir(parents=True, exist_ok=True)
+
+    # 2. Preflight validation (fail-closed before any checkout or model call)
+    preflight = preflight_batch_01(
+        baseline_path=baseline_path,
+        manifest_path=manifest_path,
+        reference_corpus_dir=reference_corpus_dir,
+        scenarios_path=scenarios_path,
+        classifier=classifier if "B" in norm_stages else None,
+    )
+
+    # 3. Load manifest, reference decisions, and scenarios
+    manifest = Manifest.load(manifest_path)
+    all_references = load_reference_corpus(reference_corpus_dir)
+    all_scenarios = import_scenarios_jsonl(scenarios_path)
+
+    if len(all_references) != 100:
+        raise HarnessRunError(
+            f"Expected exactly 100 reference decisions in corpus, found {len(all_references)}"
+        )
+    if len(all_scenarios) != 50:
+        raise HarnessRunError(
+            f"Expected exactly 50 applicability scenarios in corpus, found {len(all_scenarios)}"
+        )
+
+    manifest_repo_ids = {r.id for r in manifest.repositories}
+    if manifest_repo_ids != APPROVED_BATCH_01_REPOSITORIES:
+        raise HarnessRunError(
+            f"Manifest repositories {sorted(manifest_repo_ids)} do not match approved set {sorted(APPROVED_BATCH_01_REPOSITORIES)}"
+        )
+
+    # 4. Initialize ResearchStore (schema verification)
+    research_store.initialize_schema()
+
+    stage_a_results: dict[str, StageADiscoveryResult] = {}
+    stage_b_results: dict[str, StageBClassificationResult] = {}
+    stage_c_results: dict[str, StageCGdsResult] = {}
+    runs_dict: dict[str, RunMetadata] = {}
+
+    # 5. Execute repositories in deterministic order
+    for repo in sorted(manifest.repositories, key=lambda r: r.id):
+        repo_refs = [r for r in all_references if r.repository == repo.github]
+        if len(repo_refs) != 20:
+            raise HarnessRunError(
+                f"Repository '{repo.id}' ({repo.github}) requires exactly 20 reference decisions, found {len(repo_refs)}"
+            )
+
+        repo_scenarios = [s for s in all_scenarios if s.repository == repo.github]
+        if len(repo_scenarios) != 10:
+            raise HarnessRunError(
+                f"Repository '{repo.id}' ({repo.github}) requires exactly 10 applicability scenarios, found {len(repo_scenarios)}"
+            )
+
+        repo_scn_hash = _compute_scenario_content_hash(repo_scenarios)
+
+        run_meta = RunMetadata.create(
+            batch_id=manifest.batch_id,
+            repo_id=repo.id,
+            repo_commit_sha=repo.commit_sha,
+            benchmark_schema_version="0.1",
+            taxonomy_version="0.1",
+            classifier_version=preflight.classifier_version,
+            classifier_backend=preflight.classifier_backend_id,
+            classifier_model=preflight.classifier_model_identifier,
+            extractor_id="HeuristicExtractor",
+            extractor_version="0.1",
+            scenario_content_hash=repo_scn_hash,
+            retrieval_policy="score_gt_zero",
+            manifest_config_hash=preflight.manifest_configuration_hash,
+        )
+
+        research_store.upsert_repository(
+            RepositoryRecord(
+                repo_id=repo.id,
+                repository_url=f"https://github.com/{repo.github}",
+                repository_identifier=repo.github,
+                default_branch=getattr(repo, "default_branch", "main"),
+            )
+        )
+        research_store.upsert_taxonomy_version(
+            TaxonomyVersionRecord(
+                taxonomy_version="0.1",
+                created_at=now_iso(),
+                notes="O1A research taxonomy v0.1",
+            )
+        )
+        research_store.upsert_classifier_version(
+            ClassifierVersionRecord(
+                classifier_version=preflight.classifier_version,
+                created_at=now_iso(),
+                notes=f"Frozen baseline classifier ({preflight.classifier_backend_id})",
+            )
+        )
+        research_store.create_analysis_run(
+            AnalysisRunRecord(
+                run_id=run_meta.run_id,
+                repo_id=repo.id,
+                repo_commit_sha=repo.commit_sha,
+                mneme_version=run_meta.mneme_version,
+                mneme_commit_sha=run_meta.mneme_commit_sha,
+                taxonomy_version=run_meta.taxonomy_version,
+                classifier_version=run_meta.classifier_version,
+                benchmark_schema_version=run_meta.benchmark_schema_version,
+                configuration_hash=run_meta.configuration_hash,
+                started_at=run_meta.started_at,
+                completed_at=None,
+                status="running",
+            )
+        )
+
+        try:
+            # Stage A: Discovery
+            if "A" in norm_stages:
+                repo_clone_source = (clone_sources.get(repo.id) if clone_sources else None)
+                a_res = evaluate_stage_a_discovery(
+                    repository_config=repo,
+                    references=repo_refs,
+                    clone_source=repo_clone_source,
+                    workspace_dir=workspace_dir,
+                )
+                stage_a_results[repo.id] = a_res
+
+            # Stage B: Semantic Classification
+            if "B" in norm_stages:
+                assert classifier is not None
+                b_res = execute_stage_b_classification(
+                    repository_config=repo,
+                    references=repo_refs,
+                    classifier=classifier,
+                    preflight=preflight,
+                    research_store=research_store,
+                    run_id=run_meta.run_id,
+                )
+                stage_b_results[repo.id] = b_res
+
+            # Stage C: Governing Decision Set (isolated human references)
+            if "C" in norm_stages:
+                c_res = execute_stage_c_gds(
+                    repository_config=repo,
+                    references=repo_refs,
+                    scenarios=repo_scenarios,
+                    research_store=research_store,
+                    run_id=run_meta.run_id,
+                    classifier_version=preflight.classifier_version,
+                )
+                stage_c_results[repo.id] = c_res
+
+            completed_meta = run_meta.with_completion(status="completed")
+            runs_dict[repo.id] = completed_meta
+            research_store.update_analysis_run_status(
+                run_meta.run_id,
+                status="completed",
+                completed_at=completed_meta.completed_at,
+            )
+        except Exception:
+            failed_meta = run_meta.with_completion(status="failed")
+            runs_dict[repo.id] = failed_meta
+            research_store.update_analysis_run_status(
+                run_meta.run_id,
+                status="failed",
+                completed_at=failed_meta.completed_at,
+            )
+            raise
+
+    # 6. Global BatchProvenanceEnvelope with BatchExecutionProfile
+    envelope = BatchProvenanceEnvelope(
+        schema_version="0.1",
+        batch_id=FROZEN_BATCH_ID,
+        baseline_id=preflight.baseline_id,
+        baseline_configuration_hash=preflight.baseline_configuration_hash,
+        manifest_configuration_hash=preflight.manifest_configuration_hash,
+        reference_corpus_hash=preflight.reference_corpus_hash,
+        scenario_corpus_hash=preflight.scenario_corpus_hash,
+        semantic_mneme_sha=preflight.semantic_mneme_sha,
+        execution_profile=execution_profile,
+        runs=runs_dict,
+    )
+
+    # 7. Write deterministic output artifacts
+    (out_path / "provenance_envelope.json").write_text(
+        json.dumps(envelope.to_dict(), indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    (out_path / "preflight.json").write_text(
+        json.dumps(preflight.to_dict(), indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    if "A" in norm_stages:
+        total_disc = sum(r.discovered_documents_count for r in stage_a_results.values())
+        total_ext = sum(r.extracted_candidates_count for r in stage_a_results.values())
+        total_ref = sum(r.reference_decisions_count for r in stage_a_results.values())
+        total_matched_ref = sum(r.matched_reference_count for r in stage_a_results.values())
+        total_matched_cand = sum(r.matched_candidate_count for r in stage_a_results.values())
+        macro_rec = sum(r.recall for r in stage_a_results.values()) / len(stage_a_results) if stage_a_results else 0.0
+        macro_prec = sum(r.precision for r in stage_a_results.values()) / len(stage_a_results) if stage_a_results else 0.0
+        macro_f1 = sum(r.f1 for r in stage_a_results.values()) / len(stage_a_results) if stage_a_results else 0.0
+        a_summary = {
+            "stages": list(norm_stages),
+            "repositories": {repo_id: res.to_dict() for repo_id, res in sorted(stage_a_results.items())},
+            "aggregate": {
+                "total_discovered_documents": total_disc,
+                "total_extracted_candidates": total_ext,
+                "total_reference_decisions": total_ref,
+                "total_matched_references": total_matched_ref,
+                "total_matched_candidates": total_matched_cand,
+                "macro_recall": macro_rec,
+                "macro_precision": macro_prec,
+                "macro_f1": macro_f1,
+            },
+        }
+        (out_path / "stage_a_summary.json").write_text(
+            json.dumps(a_summary, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+
+    if "B" in norm_stages:
+        b_summary = {
+            "stages": list(norm_stages),
+            "classifier": {
+                "backend_id": preflight.classifier_backend_id,
+                "classifier_version": preflight.classifier_version,
+                "model_identifier": preflight.classifier_model_identifier,
+            },
+            "repositories": {repo_id: res.to_summary_dict() for repo_id, res in sorted(stage_b_results.items())},
+            "aggregate": {
+                "total_references": sum(r.reference_count for r in stage_b_results.values()),
+                "total_tasks": sum(r.task_count for r in stage_b_results.values()),
+            },
+        }
+        (out_path / "stage_b_summary.json").write_text(
+            json.dumps(b_summary, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+
+    if "C" in norm_stages:
+        all_c_results = []
+        for r in stage_c_results.values():
+            all_c_results.extend(r.scenario_results)
+        c_suite = compute_suite_gds_metrics(all_c_results)
+        c_summary = {
+            "stages": list(norm_stages),
+            "repositories": {repo_id: res.to_summary_dict() for repo_id, res in sorted(stage_c_results.items())},
+            "aggregate": {
+                "total_scenarios": len(all_c_results),
+                "suite_metrics": c_suite,
+            },
+        }
+        (out_path / "stage_c_summary.json").write_text(
+            json.dumps(c_summary, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+
+    summary_data = {
+        "batch_id": FROZEN_BATCH_ID,
+        "baseline_id": preflight.baseline_id,
+        "stages": list(execution_profile.execution_stages),
+        "execution_stages": list(execution_profile.execution_stages),
+        "execution_scope": execution_profile.execution_scope,
+        "execution_profile_hash": execution_profile.execution_profile_hash,
+        "status": "completed",
+        "repositories": sorted(runs_dict.keys()),
+        "preflight_status": preflight.status,
+        "provenance_envelope": envelope.to_dict(),
+    }
+    (out_path / "summary.json").write_text(
+        json.dumps(summary_data, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    return Batch01RunResult(
+        batch_id=FROZEN_BATCH_ID,
+        stages=norm_stages,
+        preflight=preflight,
+        envelope=envelope,
+        execution_profile=execution_profile,
+        stage_a_results=stage_a_results,
+        stage_b_results=stage_b_results,
+        stage_c_results=stage_c_results,
+        output_dir=out_path,
+    )
+
+
+run_batch_01 = run_frozen_batch_01
 
 
 __all__ = [
@@ -1411,6 +1912,7 @@ __all__ = [
     "FROZEN_REFERENCE_CORPUS_HASH",
     "FROZEN_SCENARIO_CORPUS_HASH",
     "HarnessPreflightError",
+    "HarnessRunError",
     "BatchPreflightResult",
     "preflight_batch_01",
     "FrozenReferenceDecision",
@@ -1426,4 +1928,8 @@ __all__ = [
     "StageCGdsResult",
     "execute_stage_c_gds",
     "BatchProvenanceEnvelope",
+    "BatchExecutionProfile",
+    "Batch01RunResult",
+    "run_frozen_batch_01",
+    "run_batch_01",
 ]
