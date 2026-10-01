@@ -176,6 +176,7 @@ from mneme.open_architecture.export import (
     import_candidates_jsonl,
     export_scenarios_jsonl,
     import_scenarios_jsonl,
+    compute_reference_corpus_content_hash,
     compute_bundle_content_hash,
     export_bundle,
 )
@@ -183,6 +184,31 @@ from mneme.open_architecture.export import (
 from mneme.open_architecture.reporting import (
     generate_report,
     render_markdown_report,
+)
+
+from mneme.open_architecture.baseline import (
+    APPROVED_BATCH_01_REPOSITORIES,
+    EXPECTED_SEMANTIC_TASKS,
+    EXPECTED_RENDERER_FIELD_ORDER,
+    FROZEN_SEMANTIC_MNEME_SHA,
+    BaselineFreezeError,
+    BaselineRepository,
+    BaselineExtractor,
+    BaselineClassifier,
+    BaselineRetrievalPolicy,
+    BaselineScenarioRenderer,
+    BaselineCorpusStatus,
+    BaselineConfig,
+    validate_baseline_freeze,
+)
+
+from mneme.open_architecture.classifiers import (
+    AnthropicClassifier,
+    AnthropicClassifierError,
+    AnthropicAuthenticationError,
+    AnthropicRateLimitError,
+    AnthropicMalformedResponseError,
+    TASK_SCHEMAS,
 )
 
 __all__ = [
@@ -304,9 +330,31 @@ __all__ = [
     "import_candidates_jsonl",
     "export_scenarios_jsonl",
     "import_scenarios_jsonl",
+    "compute_reference_corpus_content_hash",
     "compute_bundle_content_hash",
     "export_bundle",
     # reporting
     "generate_report",
     "render_markdown_report",
+    # baseline
+    "APPROVED_BATCH_01_REPOSITORIES",
+    "EXPECTED_SEMANTIC_TASKS",
+    "EXPECTED_RENDERER_FIELD_ORDER",
+    "FROZEN_SEMANTIC_MNEME_SHA",
+    "BaselineFreezeError",
+    "BaselineRepository",
+    "BaselineExtractor",
+    "BaselineClassifier",
+    "BaselineRetrievalPolicy",
+    "BaselineScenarioRenderer",
+    "BaselineCorpusStatus",
+    "BaselineConfig",
+    "validate_baseline_freeze",
+    # classifiers
+    "AnthropicClassifier",
+    "AnthropicClassifierError",
+    "AnthropicAuthenticationError",
+    "AnthropicRateLimitError",
+    "AnthropicMalformedResponseError",
+    "TASK_SCHEMAS",
 ]

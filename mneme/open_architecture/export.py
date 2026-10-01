@@ -127,6 +127,70 @@ def import_scenarios_jsonl(input_path: str | Path) -> list[ApplicabilityScenario
     return scenarios
 
 
+# ── Reference Decision Corpus Content Hashing ────────────────────────────────
+
+
+def compute_reference_corpus_content_hash(root_path: str | Path) -> str:
+    """Compute deterministic content hash for a human reference decision corpus.
+
+    Scans root_path for authoritative reference decision JSONL files matching
+    pattern '*/ref-*.jsonl' (exactly one repository directory below root). Excludes
+    nested files, root-level strays, review markdown (*-review.md), scratch files,
+    and non-reference files.
+
+    Each reference record is parsed as JSON, validated to contain a non-empty
+    'reference_decision_id', checked for uniqueness, sorted lexicographically by
+    reference_decision_id, and serialized as a canonical JSON list with sorted keys
+    and compact separators.
+
+    Returns:
+        First 32 lowercase hex characters of SHA256 (no 'sha256:' prefix).
+    """
+    root = Path(root_path)
+    if not root.is_dir():
+        raise ValueError(f"Reference corpus directory does not exist: {root}")
+
+    ref_files = [
+        p
+        for p in root.glob("*/ref-*.jsonl")
+        if p.is_file() and p.name.startswith("ref-") and p.name.endswith(".jsonl")
+    ]
+
+    records: list[dict[str, Any]] = []
+    seen_ids: set[str] = set()
+
+    for f in ref_files:
+        with f.open("r", encoding="utf-8") as fh:
+            for line_no, line in enumerate(fh, start=1):
+                line_str = line.strip()
+                if not line_str:
+                    continue
+                try:
+                    data = json.loads(line_str)
+                except Exception as exc:
+                    raise ValueError(
+                        f"Malformed JSON on line {line_no} of {f.name}: {exc}"
+                    ) from exc
+
+                ref_id = data.get("reference_decision_id")
+                if not ref_id or not isinstance(ref_id, str):
+                    raise ValueError(
+                        f"Reference record in {f.name} missing 'reference_decision_id'"
+                    )
+
+                if ref_id in seen_ids:
+                    raise ValueError(f"Duplicate reference_decision_id: {ref_id!r}")
+                seen_ids.add(ref_id)
+                records.append(data)
+
+    if not records:
+        return "none"
+
+    records.sort(key=lambda r: str(r["reference_decision_id"]))
+    canonical_json = json.dumps(records, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical_json.encode("utf-8")).hexdigest()[:32]
+
+
 # ── Deterministic Bundle Content Hashing ──────────────────────────────────────
 
 
@@ -362,6 +426,7 @@ __all__ = [
     "import_candidates_jsonl",
     "export_scenarios_jsonl",
     "import_scenarios_jsonl",
+    "compute_reference_corpus_content_hash",
     "compute_bundle_content_hash",
     "export_bundle",
 ]
