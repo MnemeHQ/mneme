@@ -65,6 +65,9 @@ from mneme.open_architecture.harness import (
     preflight_batch_01,
     run_batch_01,
     run_frozen_batch_01,
+    ClassifierExperimentProfile,
+    ClassifierExperimentResult,
+    execute_classifier_experiment,
     StageADiscoveryResult,
 )
 from mneme.open_architecture.manifest import Manifest, RepositoryConfig
@@ -1792,3 +1795,137 @@ class TestO1AHarness:
             classifier=tracking_clf,
         )
         assert preflight.status == "preflight_ok"
+
+    # 48. frozen B0 runner rejects Sonnet 5.5 and accepts only Sonnet 4.6
+    def test_48_frozen_b0_runner_rejects_sonnet_5_5_and_accepts_sonnet_4_6(self, tmp_path: Path):
+        store = ResearchStore(tmp_path / "store.db")
+        out = tmp_path / "out"
+        sonnet_55_clf = MockTrackingClassifier(model_identifier="claude-sonnet-5-5")
+
+        with pytest.raises(HarnessPreflightError, match="Classifier model mismatch: expected 'claude-sonnet-4-6', got 'claude-sonnet-5-5'"):
+            run_frozen_batch_01(
+                baseline_path=BASELINE_PATH,
+                manifest_path=MANIFEST_PATH,
+                reference_corpus_dir=REF_DIR,
+                scenarios_path=SCENARIOS_PATH,
+                stages=("A", "B", "C"),
+                classifier=sonnet_55_clf,
+                research_store=store,
+                output_dir=out,
+            )
+
+        sonnet_46_clf = MockTrackingClassifier(model_identifier="claude-sonnet-4-6")
+        preflight = preflight_batch_01(
+            baseline_path=BASELINE_PATH,
+            manifest_path=MANIFEST_PATH,
+            reference_corpus_dir=REF_DIR,
+            scenarios_path=SCENARIOS_PATH,
+            classifier=sonnet_46_clf,
+        )
+        assert preflight.status == "preflight_ok"
+
+    # 49. M1 experimental path accepts explicit Sonnet 5.5
+    def test_49_m1_experimental_path_accepts_sonnet_5_5(self, tmp_path: Path):
+        profile = ClassifierExperimentProfile.create(
+            experiment_id="o1a-batch-01-m1-sonnet-5-5",
+            comparator_model_identifier="claude-sonnet-5-5",
+        )
+        clf = MockTrackingClassifier(model_identifier="claude-sonnet-5-5")
+        store = ResearchStore(tmp_path / "m1_store.db")
+        out_dir = tmp_path / "m1_artifacts"
+
+        res = execute_classifier_experiment(
+            experiment_profile=profile,
+            baseline_path=BASELINE_PATH,
+            manifest_path=MANIFEST_PATH,
+            reference_corpus_dir=REF_DIR,
+            classifier=clf,
+            research_store=store,
+            output_dir=out_dir,
+        )
+        assert res.experiment_id == "o1a-batch-01-m1-sonnet-5-5"
+        assert res.profile.comparator_model_identifier == "claude-sonnet-5-5"
+        assert len(res.results_by_repo) == 5
+        assert clf.call_count == 800
+        assert (out_dir / "experiment_profile.json").is_file()
+        assert (out_dir / "stage_b_summary.json").is_file()
+        assert (out_dir / "summary.json").is_file()
+
+    # 50. experiment profile hash changes with model and is deterministic
+    def test_50_experiment_profile_hash_changes_with_model_and_is_deterministic(self):
+        prof_55_a = ClassifierExperimentProfile.create(
+            experiment_id="o1a-batch-01-m1-sonnet-5-5",
+            comparator_model_identifier="claude-sonnet-5-5",
+        )
+        prof_55_b = ClassifierExperimentProfile.create(
+            experiment_id="o1a-batch-01-m1-sonnet-5-5",
+            comparator_model_identifier="claude-sonnet-5-5",
+        )
+        prof_46 = ClassifierExperimentProfile.create(
+            experiment_id="o1a-batch-01-m1-sonnet-5-5",
+            comparator_model_identifier="claude-sonnet-4-6",
+        )
+        assert prof_55_a.experiment_profile_hash == prof_55_b.experiment_profile_hash
+        assert prof_55_a.experiment_profile_hash != prof_46.experiment_profile_hash
+
+    # 51. M1 cannot modify reference corpus or semantic task set
+    def test_51_m1_cannot_modify_reference_corpus_or_semantic_task_set(self, tmp_path: Path):
+        bad_ref_dir = tmp_path / "bad_ref"
+        bad_ref_dir.mkdir()
+        profile = ClassifierExperimentProfile.create(
+            experiment_id="o1a-batch-01-m1-sonnet-5-5",
+            comparator_model_identifier="claude-sonnet-5-5",
+        )
+        clf = MockTrackingClassifier(model_identifier="claude-sonnet-5-5")
+        store = ResearchStore(tmp_path / "store.db")
+        out = tmp_path / "out"
+
+        with pytest.raises(HarnessPreflightError, match="Reference corpus hash mismatch"):
+            execute_classifier_experiment(
+                experiment_profile=profile,
+                baseline_path=BASELINE_PATH,
+                manifest_path=MANIFEST_PATH,
+                reference_corpus_dir=bad_ref_dir,
+                classifier=clf,
+                research_store=store,
+                output_dir=out,
+            )
+
+        assert len(profile.semantic_tasks) == 8
+        assert set(profile.semantic_tasks) == {t.value for t in SEMANTIC_TASK_TYPES}
+        assert profile.max_tokens == 1024
+
+    # 52. M1 uses existing task builder and task schemas
+    def test_52_m1_uses_existing_task_builder_and_schemas(self):
+        refs = load_reference_corpus(REF_DIR, repo_id="adrkit")
+        tasks = build_stage_b_tasks(refs)
+        assert len(tasks) == 160
+        from mneme.open_architecture.classifiers.anthropic import AnthropicClassifier
+        clf = AnthropicClassifier(model_identifier="claude-sonnet-5-5")
+        for t in tasks[:8]:
+            schema = clf.get_task_schema(t.task_type)
+            assert "type" in schema
+            assert schema["type"] == "object"
+
+    # 53. M1 output directory overwrite protection
+    def test_53_m1_output_dir_overwrite_protection(self, tmp_path: Path):
+        profile = ClassifierExperimentProfile.create(
+            experiment_id="o1a-batch-01-m1-sonnet-5-5",
+            comparator_model_identifier="claude-sonnet-5-5",
+        )
+        clf = MockTrackingClassifier(model_identifier="claude-sonnet-5-5")
+        store = ResearchStore(tmp_path / "store.db")
+        out_dir = tmp_path / "occupied"
+        out_dir.mkdir()
+        (out_dir / "existing.txt").write_text("prior data", encoding="utf-8")
+
+        with pytest.raises(HarnessRunError, match="already exists and is not empty"):
+            execute_classifier_experiment(
+                experiment_profile=profile,
+                baseline_path=BASELINE_PATH,
+                manifest_path=MANIFEST_PATH,
+                reference_corpus_dir=REF_DIR,
+                classifier=clf,
+                research_store=store,
+                output_dir=out_dir,
+            )
