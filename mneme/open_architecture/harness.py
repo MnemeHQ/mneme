@@ -1182,7 +1182,12 @@ def _execute_stage_b_tasks_and_scoring(
                 )
 
             if norm_scopes is not None:
+                seen_scope_keys: set[tuple[str, str | None]] = set()
                 for sc in norm_scopes:
+                    scope_key = (sc.scope_type, sc.scope_expression)
+                    if scope_key in seen_scope_keys:
+                        continue
+                    seen_scope_keys.add(scope_key)
                     sc_id = f"sc-{hashlib.sha256(f'{run_id}:{ref_id}:{sc.scope_type}:{sc.scope_expression}'.encode()).hexdigest()[:32]}"
                     research_store.insert_candidate_scope(
                         CandidateScopeRecord(
@@ -1212,7 +1217,12 @@ def _execute_stage_b_tasks_and_scoring(
                 )
 
             if norm_rels is not None:
+                seen_rel_keys: set[tuple[str, str | None]] = set()
                 for rel in norm_rels:
+                    rel_key = (rel.relationship_type, rel.target_reference)
+                    if rel_key in seen_rel_keys:
+                        continue
+                    seen_rel_keys.add(rel_key)
                     rel_id = f"rel-{hashlib.sha256(f'{run_id}:{ref_id}:{rel.relationship_type}:{rel.target_reference}'.encode()).hexdigest()[:32]}"
                     research_store.insert_candidate_relationship(
                         CandidateRelationshipRecord(
