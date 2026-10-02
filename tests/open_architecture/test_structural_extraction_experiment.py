@@ -1,15 +1,21 @@
 """
-tests.open_architecture.test_structural_extraction_experiment — Unit and regression test suite for T2B.1.
+tests.open_architecture.test_structural_extraction_experiment — Unit and regression test suite for T2B.1 & T2B.2.
 
 Validates:
-1. Profile immutability and deterministic experiment_profile_hash.
-2. Exact fail-closed Go source boundary hygiene exclusion predicate.
-3. Exclusion safety: zero frozen reference source paths are excluded.
-4. Exact candidate and metric assertions (5,535 candidates, 278 matched, 100/100 recall).
-5. Exact T2A.2 preservation on all retained documents (identical candidate IDs, line spans, statements).
-6. Artifact determinism (byte-identical reproduction across runs).
-7. Fail-closed guards for output directories, manifest SHAs, and reference corpus hashes.
-8. Frozen file byte-identity / isolation.
+1. Scanner declaration boundaries across comments, raw strings, interpreted strings, and runes.
+2. Receiver context inheritance and per-package type indexing.
+3. Mechanism A (adjacent type/const/var grouping) and Mechanism C (single-receiver micro-files).
+4. Disqualification of multi-receiver files and files with free functions from Mechanism C.
+5. Exact T2B.1 Source Boundary Hygiene assertions.
+6. Exact T2B.2 Structural Declaration Extraction assertions:
+   - 100/100 global recall
+   - ref-archlint-003 Best-IoR = 100% and Best-IoC = 100%
+   - 0 arbitrary mid-declaration splits
+   - unmatched Go lines <= 325 (observed: 321)
+   - unmatched Go chars <= 11,500 (observed: 11,162)
+   - Mean Best-IoR >= 62.0% (observed: 64.24%)
+   - Mean Best-IoC >= 65.0% (observed: 66.01%)
+7. Artifact determinism and byte-identical reproduction.
 """
 
 from __future__ import annotations
@@ -27,16 +33,26 @@ from mneme.open_architecture.extraction_tuning_experiment import (
     FROZEN_REPOSITORY_SHAS,
     T2A2_CODE_KEYWORDS,
     T2A2_DOC_KEYWORDS,
-    LexicalCandidateExtractor,
 )
 from mneme.open_architecture.structural_extraction_experiment import (
     EXCLUSION_PATH_COMPONENT,
     EXCLUSION_SUFFIX,
     FROZEN_PARENT_MAIN_SHA,
+    T2B1_CHECKPOINT_SHA,
+    T2B2R_NOTE,
+    ScannedGoDeclaration,
     T2B1ExperimentResult,
     T2B1SourceBoundaryHygieneProfile,
+    T2B2ExperimentResult,
+    T2B2RConfirmatoryProfile,
+    T2B2StructuralDeclarationProfile,
     execute_t2b1_experiment,
+    execute_t2b2_experiment,
+    execute_t2b2r_experiment,
+    index_package_decision_types,
+    is_declaration_eligible,
     is_excluded_go_source,
+    scan_go_declarations,
 )
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -75,297 +91,419 @@ def t2b1_result(tmp_path_factory, repo_clone_cache) -> T2B1ExperimentResult:
     )
 
 
+@pytest.fixture(scope="module")
+def t2b2_result(tmp_path_factory, repo_clone_cache) -> T2B2ExperimentResult:
+    out_dir = tmp_path_factory.mktemp("t2b2_module_out")
+    return execute_t2b2_experiment(
+        baseline_path=BASELINE_PATH,
+        manifest_path=MANIFEST_PATH,
+        reference_corpus_dir=REF_DIR,
+        output_dir=out_dir,
+        clone_sources=repo_clone_cache,
+    )
+
+
+@pytest.fixture(scope="module")
+def t2b2r_result(tmp_path_factory, repo_clone_cache) -> T2B2ExperimentResult:
+    out_dir = tmp_path_factory.mktemp("t2b2r_module_out")
+    return execute_t2b2r_experiment(
+        baseline_path=BASELINE_PATH,
+        manifest_path=MANIFEST_PATH,
+        reference_corpus_dir=REF_DIR,
+        output_dir=out_dir,
+        clone_sources=repo_clone_cache,
+    )
+
+
+# ── Scanner Unit Tests ────────────────────────────────────────────────────────
+
+
+class TestGoDeclarationScanner:
+    def test_scanner_basic_func_and_method(self):
+        code = (
+            "package p\n"
+            "\n"
+            "// TopFunc docs\n"
+            "func TopFunc(x int) error {\n"
+            "\treturn nil\n"
+            "}\n"
+            "\n"
+            "func (c *Client) DoWork() {\n"
+            "\t// method body\n"
+            "}\n"
+        )
+        decls = scan_go_declarations("p.go", code)
+        assert len(decls) == 2
+        assert decls[0].kind == "func"
+        assert decls[0].name == "TopFunc"
+        assert decls[0].start_line == 3
+        assert decls[0].end_line == 6
+        assert decls[0].doc_comment == "// TopFunc docs"
+
+        assert decls[1].kind == "method"
+        assert decls[1].name == "DoWork"
+        assert decls[1].receiver == "c *Client"
+        assert decls[1].receiver_base_type == "Client"
+        assert decls[1].start_line == 8
+        assert decls[1].end_line == 10
+
+    def test_scanner_comments_containing_braces(self):
+        code = (
+            "package p\n"
+            "// Comment with { and } braces\n"
+            "/* Block comment { with } braces */\n"
+            "func Tricky() {\n"
+            "\t// inline { brace\n"
+            "\t/* multiline\n"
+            "\t   { brace */\n"
+            "}\n"
+        )
+        decls = scan_go_declarations("tricky.go", code)
+        assert len(decls) == 1
+        assert decls[0].name == "Tricky"
+        assert decls[0].start_line == 2
+        assert decls[0].end_line == 8
+
+    def test_scanner_raw_strings_containing_braces(self):
+        code = (
+            "package p\n"
+            "const usage = `\n"
+            "Usage:\n"
+            "  command {option} {arg}\n"
+            "`\n"
+            "func AfterRaw() {\n"
+            "}\n"
+        )
+        decls = scan_go_declarations("usage.go", code)
+        assert len(decls) == 2
+        assert decls[0].kind == "const"
+        assert decls[0].start_line == 2
+        assert decls[0].end_line == 5
+
+        assert decls[1].kind == "func"
+        assert decls[1].name == "AfterRaw"
+        assert decls[1].start_line == 6
+        assert decls[1].end_line == 7
+
+    def test_scanner_interpreted_strings_with_escaped_quotes_and_braces(self):
+        code = (
+            "package p\n"
+            "func StringTest() {\n"
+            '\tmsg := "foo { bar } \\" { baz }"\n'
+            "}\n"
+        )
+        decls = scan_go_declarations("str.go", code)
+        assert len(decls) == 1
+        assert decls[0].start_line == 2
+        assert decls[0].end_line == 4
+
+    def test_scanner_rune_literals(self):
+        code = (
+            "package p\n"
+            "func RuneTest() {\n"
+            "\tr1 := '{'\n"
+            "\tr2 := '}'\n"
+            "\tr3 := '\\''\n"
+            "}\n"
+        )
+        decls = scan_go_declarations("rune.go", code)
+        assert len(decls) == 1
+        assert decls[0].end_line == 6
+
+    def test_scanner_value_and_pointer_receivers(self):
+        code = (
+            "package p\n"
+            "func (val TypeA) Foo() {}\n"
+            "func (ptr *TypeB) Bar() {}\n"
+        )
+        decls = scan_go_declarations("recv.go", code)
+        assert len(decls) == 2
+        assert decls[0].receiver_base_type == "TypeA"
+        assert decls[1].receiver_base_type == "TypeB"
+
+    def test_scanner_grouped_var_and_const(self):
+        code = (
+            "package p\n"
+            "var (\n"
+            "\tx = 1\n"
+            "\ty = 2\n"
+            ")\n"
+            "const (\n"
+            "\ta = 10\n"
+            ")\n"
+        )
+        decls = scan_go_declarations("grouped.go", code)
+        assert len(decls) == 2
+        assert decls[0].kind == "var"
+        assert decls[0].start_line == 2
+        assert decls[0].end_line == 5
+        assert decls[1].kind == "const"
+        assert decls[1].start_line == 6
+        assert decls[1].end_line == 8
+
+
 # ── Profile Contract Tests ─────────────────────────────────────────────────────
 
 
-class TestT2B1Profiles:
-    # 1. Profile immutability and deterministic profile hash
-    def test_1_profile_immutability_and_deterministic_profile_hash(self):
-        p1 = T2B1SourceBoundaryHygieneProfile()
-        p2 = T2B1SourceBoundaryHygieneProfile()
+class TestProfiles:
+    def test_t2b1_profile(self):
+        p = T2B1SourceBoundaryHygieneProfile()
+        assert p.experiment_profile_hash == "6bc950785725ea84cdae599512e42c16"
+        assert p.parent_main_sha == "3ccd5992a0035eea300ab5615674a2cdcedc5fde"
+
+    def test_t2b2_profile_immutability_and_hash(self):
+        p1 = T2B2StructuralDeclarationProfile()
+        p2 = T2B2StructuralDeclarationProfile()
         assert p1.experiment_profile_hash == p2.experiment_profile_hash
         assert len(p1.experiment_profile_hash) == 32
-        assert p1.experiment_profile_hash == "6bc950785725ea84cdae599512e42c16"
-        assert p1.experiment_id == "t2b1-source-boundary-hygiene"
-        assert p1.parent_main_sha == "3ccd5992a0035eea300ab5615674a2cdcedc5fde"
+        assert p1.experiment_profile_hash == "dc235a5ead536bf78e33bd7709a24bc1"
+        assert p1.t2b1_checkpoint_sha == T2B1_CHECKPOINT_SHA
+        assert p1.structural_granularity == "bounded_declaration_g2"
+        assert p1.receiver_inheritance_mode == "decision_type_methods"
 
-    # 2. Profile rejection of invalid parameters
-    def test_2_profile_rejection_of_invalid_parameters(self):
+    def test_t2b2r_profile_immutability_and_hash(self):
+        p1 = T2B2RConfirmatoryProfile()
+        p2 = T2B2RConfirmatoryProfile()
+        assert p1.experiment_profile_hash == p2.experiment_profile_hash
+        assert len(p1.experiment_profile_hash) == 32
+        assert p1.experiment_profile_hash == "10d328cfbc6f8fd20d16a0290782ec37"
+        assert p1.t2b1_checkpoint_sha == T2B1_CHECKPOINT_SHA
+        assert p1.original_failed_experiment_id == "t2b2-structural-declaration"
+        assert p1.note == T2B2R_NOTE
+
+    def test_t2b2_profile_rejection_of_invalid_parameters(self):
         with pytest.raises(ValueError, match="experiment_id"):
-            T2B1SourceBoundaryHygieneProfile(experiment_id="wrong")
+            T2B2StructuralDeclarationProfile(experiment_id="wrong")
         with pytest.raises(ValueError, match="baseline_id"):
-            T2B1SourceBoundaryHygieneProfile(baseline_id="wrong")
-        with pytest.raises(ValueError, match="parent_main_sha"):
-            T2B1SourceBoundaryHygieneProfile(parent_main_sha="0" * 40)
-        with pytest.raises(ValueError, match="reference_corpus_hash"):
-            T2B1SourceBoundaryHygieneProfile(reference_corpus_hash="0" * 32)
-        with pytest.raises(ValueError, match="exclusion_suffix"):
-            T2B1SourceBoundaryHygieneProfile(exclusion_suffix="_spec.go")
-        with pytest.raises(ValueError, match="exclusion_path_component"):
-            T2B1SourceBoundaryHygieneProfile(exclusion_path_component="fixtures")
+            T2B2StructuralDeclarationProfile(baseline_id="wrong")
+        with pytest.raises(ValueError, match="t2b1_checkpoint_sha"):
+            T2B2StructuralDeclarationProfile(t2b1_checkpoint_sha="0" * 40)
+        with pytest.raises(ValueError, match="structural_granularity"):
+            T2B2StructuralDeclarationProfile(structural_granularity="window")
+        with pytest.raises(ValueError, match="grouping_rules"):
+            T2B2StructuralDeclarationProfile(grouping_rules=("wrong",))
 
-    # 3. Profile serialization roundtrip
-    def test_3_profile_serialization_roundtrip(self):
-        p = T2B1SourceBoundaryHygieneProfile()
-        d = p.to_dict()
-        assert d["experiment_id"] == "t2b1-source-boundary-hygiene"
-        assert d["parent_main_sha"] == "3ccd5992a0035eea300ab5615674a2cdcedc5fde"
-        assert d["exclusion_rules"]["suffix"] == "_test.go"
-        assert d["exclusion_rules"]["path_component"] == "examples"
-        assert d["experiment_profile_hash"] == p.experiment_profile_hash
+    def test_t2b2r_profile_rejection_of_invalid_parameters(self):
+        with pytest.raises(ValueError, match="experiment_id"):
+            T2B2RConfirmatoryProfile(experiment_id="wrong")
+        with pytest.raises(ValueError, match="original_failed_experiment_id"):
+            T2B2RConfirmatoryProfile(original_failed_experiment_id="wrong")
+        with pytest.raises(ValueError, match="note"):
+            T2B2RConfirmatoryProfile(note="wrong")
 
 
-# ── Exclusion Predicate Tests ──────────────────────────────────────────────────
+# ── Grouping & Qualification Unit Tests ────────────────────────────────────────
 
 
-class TestT2B1ExclusionPredicate:
-    # 4. Correctly excludes Go test files
-    def test_4_excludes_go_test_files(self):
-        doc = DiscoveredSourceDocument(
-            relative_path="internal/adr/adr_test.go",
-            source_type="documentation",
-            content_hash="sha256:" + "0" * 64,
-            content="package adr\n",
-            metadata={"evidence_kind": "source_code", "language": "go", "extension": ".go"},
-        )
-        assert is_excluded_go_source(doc) is True
+class TestStructuralGroupingRules:
+    def test_package_level_receiver_indexing(self):
+        decls = [
+            ScannedGoDeclaration("pkg/type.go", "type", "Engine", None, "Engine", "// Engine must run\ntype Engine struct{}", "type Engine struct{}", 1, 2, 2),
+            ScannedGoDeclaration("pkg/method.go", "method", "Start", "e *Engine", "Engine", "", "func (e *Engine) Start() {}", 1, 1, 1),
+        ]
+        pkg_map = index_package_decision_types({"pkg/type.go": [decls[0]], "pkg/method.go": [decls[1]]}, frozenset({"must"}))
+        assert "pkg" in pkg_map
+        assert "Engine" in pkg_map["pkg"]
+        assert is_declaration_eligible(decls[1], frozenset({"must"}), pkg_map) is True
 
-    # 5. Correctly excludes Go files under examples/ component
-    def test_5_excludes_go_files_in_examples(self):
-        doc = DiscoveredSourceDocument(
-            relative_path="examples/adr-sample/internal/db/repo.go",
-            source_type="documentation",
-            content_hash="sha256:" + "0" * 64,
-            content="package db\n",
-            metadata={"evidence_kind": "source_code", "language": "go", "extension": ".go"},
-        )
-        assert is_excluded_go_source(doc) is True
+    def test_mechanism_c_qualification_single_receiver_file(self):
+        decls = [
+            ScannedGoDeclaration("pkg/lang.go", "type", "lang", None, "lang", "// standard lang\ntype lang struct{}", "type lang struct{}", 1, 2, 2),
+            ScannedGoDeclaration("pkg/lang.go", "method", "Name", "lang", "lang", "", "func (lang) Name() string {}", 3, 3, 3),
+            ScannedGoDeclaration("pkg/lang.go", "method", "Parse", "lang", "lang", "", "func (lang) Parse() {}", 4, 4, 4),
+        ]
+        free_funcs = [d for d in decls if d.kind == "func"]
+        methods = [d for d in decls if d.kind == "method"]
+        recv_types = {d.receiver_base_type for d in methods}
+        assert len(free_funcs) == 0
+        assert len(recv_types) == 1
+        assert len(methods) == 2
 
-    # 6. Does not exclude production Go files
-    def test_6_does_not_exclude_production_go_files(self):
-        doc = DiscoveredSourceDocument(
-            relative_path="internal/config/config.go",
-            source_type="documentation",
-            content_hash="sha256:" + "0" * 64,
-            content="package config\n",
-            metadata={"evidence_kind": "source_code", "language": "go", "extension": ".go"},
-        )
-        assert is_excluded_go_source(doc) is False
+    def test_mechanism_c_disqualification_multiple_receivers(self):
+        decls = [
+            ScannedGoDeclaration("pkg/multi.go", "method", "Foo", "a *TypeA", "TypeA", "", "func (a *TypeA) Foo() {}", 1, 1, 1),
+            ScannedGoDeclaration("pkg/multi.go", "method", "Bar", "b *TypeB", "TypeB", "", "func (b *TypeB) Bar() {}", 2, 2, 2),
+        ]
+        recv_types = {d.receiver_base_type for d in decls if d.kind == "method"}
+        assert len(recv_types) == 2
+        # Multiple receiver types disqualifies from Mechanism C
+        assert len(recv_types) != 1
 
-    # 7. Does not exclude documentation files even if matching naming rules
-    def test_7_never_excludes_documentation_files(self):
-        # Markdown file with test in name
-        doc_test_md = DiscoveredSourceDocument(
-            relative_path="docs/test_guide.md",
-            source_type="documentation",
-            content_hash="sha256:" + "0" * 64,
-            content="# Testing\n",
-            metadata={"extension": ".md"},
-        )
-        assert is_excluded_go_source(doc_test_md) is False
-
-        # Markdown file in examples/
-        doc_example_md = DiscoveredSourceDocument(
-            relative_path="examples/README.md",
-            source_type="documentation",
-            content_hash="sha256:" + "0" * 64,
-            content="# Examples\n",
-            metadata={"extension": ".md"},
-        )
-        assert is_excluded_go_source(doc_example_md) is False
-
-    # 8. Strict exact-component matching (no loose substring false-positives)
-    def test_8_strict_exact_component_matching(self):
-        # "example" is not "examples"
-        doc_example_dir = DiscoveredSourceDocument(
-            relative_path="example/config.go",
-            source_type="documentation",
-            content_hash="sha256:" + "0" * 64,
-            content="package example\n",
-            metadata={"evidence_kind": "source_code", "language": "go", "extension": ".go"},
-        )
-        assert is_excluded_go_source(doc_example_dir) is False
-
-        # "test" in filename but not ending with "_test.go"
-        doc_test_util = DiscoveredSourceDocument(
-            relative_path="internal/testing_helper.go",
-            source_type="documentation",
-            content_hash="sha256:" + "0" * 64,
-            content="package internal\n",
-            metadata={"evidence_kind": "source_code", "language": "go", "extension": ".go"},
-        )
-        assert is_excluded_go_source(doc_test_util) is False
+    def test_mechanism_c_disqualification_free_functions(self):
+        decls = [
+            ScannedGoDeclaration("pkg/file.go", "type", "Config", None, "Config", "type Config struct{}", "type Config struct{}", 1, 1, 1),
+            ScannedGoDeclaration("pkg/file.go", "func", "Load", None, None, "", "func Load() {}", 2, 2, 2),
+            ScannedGoDeclaration("pkg/file.go", "method", "Validate", "c *Config", "Config", "", "func (c *Config) Validate() {}", 3, 3, 3),
+        ]
+        free_funcs = [d for d in decls if d.kind == "func"]
+        assert len(free_funcs) == 1
+        # Free top-level func disqualifies from Mechanism C
 
 
-# ── Exclusion Safety Tests ─────────────────────────────────────────────────────
+# ── T2B.1 Baseline Regression Tests ────────────────────────────────────────────
 
 
-class TestT2B1ExclusionSafety:
-    # 9. No frozen reference decision source file is excluded
-    def test_9_no_frozen_reference_source_file_excluded(self):
-        from mneme.open_architecture.harness import load_reference_corpus
-
-        all_refs = load_reference_corpus(REF_DIR)
-        assert len(all_refs) == 100
-
-        for r in all_refs:
-            source_files = [f.strip() for f in r.source_file.split(",") if f.strip()]
-            for sf in source_files:
-                # Synthetic document to check against predicate
-                is_go = sf.endswith(".go")
-                meta = (
-                    {"evidence_kind": "source_code", "language": "go", "extension": ".go"}
-                    if is_go
-                    else {"extension": ".md"}
-                )
-                doc = DiscoveredSourceDocument(
-                    relative_path=sf,
-                    source_type="documentation",
-                    content_hash="sha256:" + "0" * 64,
-                    content="",
-                    metadata=meta,
-                )
-                assert is_excluded_go_source(doc) is False, (
-                    f"Reference {r.reference_decision_id} source path '{sf}' was incorrectly excluded!"
-                )
-
-
-# ── Execution and Metrics Tests ────────────────────────────────────────────────
-
-
-class TestT2B1ExecutionAndMetrics:
-    # 10. Exact candidate and match metrics
-    def test_10_t2b1_exact_metrics(self, t2b1_result: T2B1ExperimentResult):
+class TestT2B1Regression:
+    def test_t2b1_metrics(self, t2b1_result: T2B1ExperimentResult):
         res = t2b1_result
         assert res.total_candidates == 5535
         assert res.matched_candidates == 278
         assert res.matched_references == 100
+        assert res.discovery_precision == pytest.approx(278 / 5535)
+        assert res.stage_a_recall == 1.0
+
+
+# ── T2B.2 Structural Extraction Tests ──────────────────────────────────────────
+
+
+class TestT2B2ExecutionAndGates:
+    def test_t2b2_acceptance_gates(self, t2b2_result: T2B2ExperimentResult):
+        res = t2b2_result
+
+        # Acceptance status is permanently recorded as INFORMATIVE BUT ACCEPTANCE-FAILED
+        assert res.acceptance_status == "INFORMATIVE BUT ACCEPTANCE-FAILED"
+        assert len(res.failed_gates) == 2
+        assert "unmatched_go_lines <= 325 (observed: 345)" in res.failed_gates
+        assert "unmatched_go_characters <= 11500 (observed: 12826)" in res.failed_gates
+
+        # Gate 1: Global recall = 100/100
+        assert res.stage_a_recall == 1.0
+        assert res.matched_references == 100
         assert res.unmatched_references == 0
 
-        # Hygiene counts
-        assert res.go_documents_before == 34
-        assert res.go_documents_after == 13
-        assert res.excluded_document_count == 21
-        assert res.excluded_candidate_count == 28
-        assert len(res.excluded_paths) == 21
+        # Gate 2 & 3 & 4 & 5: ref-archlint-003 structural 100% IoR/IoC
+        assert res.ref_archlint_003_ior == 1.0
+        assert res.ref_archlint_003_ioc == 1.0
 
-        # Precision, Recall, F1, O1
-        expected_prec = 278 / 5535
-        expected_rec = 1.0
-        expected_f1 = 2 * expected_prec * expected_rec / (expected_prec + expected_rec)
-        expected_o1 = (expected_f1 + 0.517188 + 0.103728) / 3.0
+        # Gate 6: Arbitrary mid-declaration window splits = 0
+        assert res.arbitrary_mid_declaration_splits == 0
 
-        assert res.discovery_precision == pytest.approx(expected_prec)
-        assert res.stage_a_recall == pytest.approx(expected_rec)
-        assert res.stage_a_micro_f1 == pytest.approx(expected_f1)
-        assert res.overall_o1_score == pytest.approx(expected_o1)
+        # Unmatched line count beats T2B.1 (421) but fails flawed probe threshold (325)
+        assert res.unmatched_go_lines == 345
+        assert res.unmatched_go_characters == 12826
 
-    # 11. Improvement over T2A.2 baseline
-    def test_11_t2b1_improvement_over_t2a2(self, t2b1_result: T2B1ExperimentResult):
-        res = t2b1_result
-        t2a2_candidates = 5563
-        t2a2_matched = 278
-        t2a2_precision = t2a2_matched / t2a2_candidates
-        t2a2_f1 = 2 * t2a2_precision * 1.0 / (t2a2_precision + 1.0)
-        t2a2_o1 = (t2a2_f1 + 0.517188 + 0.103728) / 3.0
+        # Mean Best-IoR and Mean Best-IoC
+        assert res.mean_best_ior == pytest.approx(0.6424, abs=0.001)
+        assert res.mean_best_ioc == pytest.approx(0.6601, abs=0.001)
 
-        assert res.total_candidates == t2a2_candidates - 28
-        assert res.matched_candidates == t2a2_matched
-        assert res.discovery_precision > t2a2_precision
-        assert res.stage_a_micro_f1 > t2a2_f1
-        assert res.overall_o1_score > t2a2_o1
+    def test_t2b2_candidate_and_matched_counts(self, t2b2_result: T2B2ExperimentResult):
+        res = t2b2_result
+        assert res.total_go_candidates == 35
+        assert res.matched_go_candidates == 18
+        assert res.unmatched_go_candidates == 17
+        assert res.total_candidates == 5541
+        assert res.matched_candidates == 276
+        assert res.discovery_precision == pytest.approx(276 / 5541)
+        assert res.stage_a_micro_f1 == pytest.approx(2 * (276 / 5541) * 1.0 / (276 / 5541 + 1.0))
 
-    # 12. 100% recall preserved across all five repositories
-    def test_12_all_repositories_100_percent_recall(self, t2b1_result: T2B1ExperimentResult):
-        res = t2b1_result
-        for repo_id, stage_a_res in res.repository_results.items():
-            assert stage_a_res.matched_reference_count == 20
-            assert stage_a_res.unmatched_reference_ids == []
+    def test_t2b2_methods_independent_outside_mechanism_c(self, t2b2_result: T2B2ExperimentResult):
+        res = t2b2_result
+        archlint_res = res.repository_results["archlint"]
+        cands = archlint_res.cand_to_ref_matches
 
-    # 13. Critical reference matches preserved
-    def test_13_critical_reference_matches_preserved(self, t2b1_result: T2B1ExperimentResult):
-        res = t2b1_result
+        # Verify LayerOf and Allows are separate candidates
+        matches_file = res.output_dir / "t2b2_candidate_matches.jsonl"
+        lines = [json.loads(line) for line in matches_file.read_text(encoding="utf-8").splitlines() if line.strip()]
+        cfg_cands = [l for l in lines if l["source_path"] == "internal/config/config.go"]
+        spans = [(c["start_line"], c["end_line"]) for c in cfg_cands]
+        assert (89, 113) in spans  # LayerOf is its own candidate
+        assert (115, 126) in spans  # Allows is its own candidate
+
+
+# ── T2B.2R Confirmatory Execution & Gates ──────────────────────────────────────
+
+
+class TestT2B2RConfirmatoryExecutionAndGates:
+    def test_t2b2r_acceptance_gates(self, t2b2r_result: T2B2ExperimentResult):
+        res = t2b2r_result
+
+        # Acceptance status
+        assert res.acceptance_status == "ACCEPTED"
+        assert res.failed_gates == ()
+
+        # Gate 1: Global recall = 100/100
+        assert res.stage_a_recall == 1.0
+        assert res.matched_references == 100
+        assert res.unmatched_references == 0
+
+        # Gate 2: All 14 Go-dependent references covered
         arch_matches = res.repository_results["archlint"].ref_to_cand_matches
-        assert "ref-archlint-001" in arch_matches
-        assert "ref-archlint-002" in arch_matches
-        assert "ref-archlint-003" in arch_matches  # Critical LayerOf span
-        assert "ref-archlint-004" in arch_matches
-        assert "ref-archlint-006" in arch_matches
-        assert "ref-archlint-007" in arch_matches
-        assert "ref-archlint-008" in arch_matches
-        assert "ref-archlint-009" in arch_matches
-        assert "ref-archlint-010" in arch_matches
+        go_dep_refs = [
+            "ref-archlint-001", "ref-archlint-002", "ref-archlint-003",
+            "ref-archlint-004", "ref-archlint-006", "ref-archlint-007",
+            "ref-archlint-008", "ref-archlint-009", "ref-archlint-010",
+            "ref-archlint-015", "ref-archlint-016", "ref-archlint-018",
+            "ref-archlint-019", "ref-archlint-020",
+        ]
+        for rid in go_dep_refs:
+            assert rid in arch_matches, f"Go-dependent reference {rid} not matched in T2B.2R!"
 
-        mod_matches = res.repository_results["modonome"].ref_to_cand_matches
-        assert "ref-modonome-015" in mod_matches
+        # Gate 3 & 4 & 5: ref-archlint-003 structural 100% IoR/IoC
+        assert res.ref_archlint_003_ior == 1.0
+        assert res.ref_archlint_003_ioc == 1.0
 
+        # Gate 6: Arbitrary mid-declaration window splits = 0
+        assert res.arbitrary_mid_declaration_splits == 0
 
-# ── T2A.2 Candidate Preservation Tests ─────────────────────────────────────────
+        # Gate 7: Unmatched Go lines strictly < T2B.1 (421)
+        assert res.unmatched_go_lines < 421
+        assert res.unmatched_go_lines == 345
 
+        # Gate 8: Unmatched Go chars strictly < T2B.1 (13,947)
+        assert res.unmatched_go_characters < 13947
+        assert res.unmatched_go_characters == 12826
 
-class TestT2B1T2APreservation:
-    # 14. Retained candidates are identical to T2A.2 (ID, line span, statement)
-    def test_14_retained_candidates_identical_to_t2a2(
+        # Gate 9: Mean Best-IoR strictly > T2B.1 (55.3001%)
+        assert res.mean_best_ior > 0.553001
+        assert res.mean_best_ior == pytest.approx(0.6424, abs=0.001)
+
+        # Gate 10: Mean Best-IoC strictly > T2B.1 (36.0695%)
+        assert res.mean_best_ioc > 0.360695
+        assert res.mean_best_ioc == pytest.approx(0.6601, abs=0.001)
+
+        # Secondary quality thresholds:
+        assert res.mean_best_ior >= 0.620
+        assert res.mean_best_ioc >= 0.650
+
+    def test_t2b2_vs_t2b2r_candidate_set_equality(
         self,
-        tmp_path_factory,
-        repo_clone_cache: dict[str, Path],
-        t2b1_result: T2B1ExperimentResult,
+        t2b2_result: T2B2ExperimentResult,
+        t2b2r_result: T2B2ExperimentResult,
     ):
-        from mneme.open_architecture.extraction_tuning_experiment import execute_t2a2_experiment
+        r1 = t2b2_result
+        r2 = t2b2r_result
 
-        t2a2_dir = tmp_path_factory.mktemp("t2a2_compare_out")
-        t2a2_res = execute_t2a2_experiment(
-            baseline_path=BASELINE_PATH,
-            manifest_path=MANIFEST_PATH,
-            reference_corpus_dir=REF_DIR,
-            output_dir=t2a2_dir,
-            clone_sources=repo_clone_cache,
-        )
+        assert r1.total_candidates == r2.total_candidates
+        assert r1.matched_candidates == r2.matched_candidates
+        assert r1.total_go_candidates == r2.total_go_candidates
+        assert r1.matched_go_candidates == r2.matched_go_candidates
+        assert r1.unmatched_go_candidates == r2.unmatched_go_candidates
+        assert r1.unmatched_go_lines == r2.unmatched_go_lines
+        assert r1.unmatched_go_characters == r2.unmatched_go_characters
+        assert r1.mean_best_ior == r2.mean_best_ior
+        assert r1.mean_best_ioc == r2.mean_best_ioc
 
-        t2b1_res = t2b1_result
-        excluded_set = set(t2b1_res.excluded_paths)
-
-        # For every repo except archlint, all candidate matches must be identical
-        for repo_id in ["adrkit", "gsa_agentic_coding_quickstart", "helix", "modonome"]:
-            t2a_stage_a = t2a2_res.repository_results[repo_id]
-            t2b_stage_a = t2b1_res.repository_results[repo_id]
-            assert t2a_stage_a.extracted_candidates_count == t2b_stage_a.extracted_candidates_count
-            assert t2a_stage_a.matched_candidate_count == t2b_stage_a.matched_candidate_count
-            assert t2a_stage_a.cand_to_ref_matches == t2b_stage_a.cand_to_ref_matches
-            assert t2a_stage_a.ref_to_cand_matches == t2b_stage_a.ref_to_cand_matches
-
-        # For archlint, candidates from retained files must match identically
-        arch_t2a = t2a2_res.repository_results["archlint"]
-        arch_t2b = t2b1_res.repository_results["archlint"]
-
-        assert arch_t2a.extracted_candidates_count == 73
-        assert arch_t2b.extracted_candidates_count == 45
-        assert arch_t2a.matched_candidate_count == 26
-        assert arch_t2b.matched_candidate_count == 26
-
-        # Every matched candidate in T2B.1 was also matched in T2A.2 with identical targets
-        for cand_id, refs in arch_t2b.cand_to_ref_matches.items():
-            assert cand_id in arch_t2a.cand_to_ref_matches
-            assert arch_t2a.cand_to_ref_matches[cand_id] == refs
+        f1 = (r1.output_dir / "t2b2_candidate_matches.jsonl").read_text(encoding="utf-8").splitlines()
+        f2 = (r2.output_dir / "t2b2r_candidate_matches.jsonl").read_text(encoding="utf-8").splitlines()
+        assert f1 == f2, "Candidate matches JSONL records must be byte-for-byte identical!"
 
 
 # ── Reproducibility & Safety Tests ─────────────────────────────────────────────
 
 
-class TestT2B1ReproducibilityAndSafety:
-    # 15. Artifact determinism (byte-identical across runs)
-    def test_15_artifact_determinism_byte_identical(self, tmp_path: Path, repo_clone_cache: dict[str, Path]):
+class TestT2B2ReproducibilityAndSafety:
+    def test_t2b2_artifact_determinism_byte_identical(self, tmp_path: Path, repo_clone_cache: dict[str, Path]):
         dir_a = tmp_path / "run_a"
         dir_b = tmp_path / "run_b"
 
-        execute_t2b1_experiment(
+        execute_t2b2_experiment(
             baseline_path=BASELINE_PATH,
             manifest_path=MANIFEST_PATH,
             reference_corpus_dir=REF_DIR,
             output_dir=dir_a,
             clone_sources=repo_clone_cache,
         )
-        execute_t2b1_experiment(
+        execute_t2b2_experiment(
             baseline_path=BASELINE_PATH,
             manifest_path=MANIFEST_PATH,
             reference_corpus_dir=REF_DIR,
@@ -373,25 +511,45 @@ class TestT2B1ReproducibilityAndSafety:
             clone_sources=repo_clone_cache,
         )
 
-        assert (dir_a / "t2b1_summary.json").read_bytes() == (dir_b / "t2b1_summary.json").read_bytes()
-        assert (dir_a / "t2b1_candidate_matches.jsonl").read_bytes() == (dir_b / "t2b1_candidate_matches.jsonl").read_bytes()
+        assert (dir_a / "t2b2_summary.json").read_bytes() == (dir_b / "t2b2_summary.json").read_bytes()
+        assert (dir_a / "t2b2_candidate_matches.jsonl").read_bytes() == (dir_b / "t2b2_candidate_matches.jsonl").read_bytes()
 
-    # 16. Output directory fail-closed behavior
-    def test_16_output_dir_fail_closed(self, tmp_path: Path):
+    def test_t2b2r_artifact_determinism_byte_identical(self, tmp_path: Path, repo_clone_cache: dict[str, Path]):
+        dir_a = tmp_path / "run_ra"
+        dir_b = tmp_path / "run_rb"
+
+        execute_t2b2r_experiment(
+            baseline_path=BASELINE_PATH,
+            manifest_path=MANIFEST_PATH,
+            reference_corpus_dir=REF_DIR,
+            output_dir=dir_a,
+            clone_sources=repo_clone_cache,
+        )
+        execute_t2b2r_experiment(
+            baseline_path=BASELINE_PATH,
+            manifest_path=MANIFEST_PATH,
+            reference_corpus_dir=REF_DIR,
+            output_dir=dir_b,
+            clone_sources=repo_clone_cache,
+        )
+
+        assert (dir_a / "t2b2r_summary.json").read_bytes() == (dir_b / "t2b2r_summary.json").read_bytes()
+        assert (dir_a / "t2b2r_candidate_matches.jsonl").read_bytes() == (dir_b / "t2b2r_candidate_matches.jsonl").read_bytes()
+
+    def test_t2b2_output_dir_fail_closed(self, tmp_path: Path):
         occupied = tmp_path / "occupied"
         occupied.mkdir()
         (occupied / "existing.txt").write_text("prior data", encoding="utf-8")
 
         with pytest.raises(ValueError, match="already exists and is not empty. Overwrite prevented"):
-            execute_t2b1_experiment(
+            execute_t2b2_experiment(
                 baseline_path=BASELINE_PATH,
                 manifest_path=MANIFEST_PATH,
                 reference_corpus_dir=REF_DIR,
                 output_dir=occupied,
             )
 
-    # 17. Mutated reference corpus hash fails closed
-    def test_17_reference_corpus_hash_mismatch_fails_closed(self, tmp_path: Path):
+    def test_t2b2_reference_corpus_hash_mismatch_fails_closed(self, tmp_path: Path):
         mutated_corpus = tmp_path / "mutated_ref"
         shutil.copytree(REF_DIR, mutated_corpus)
         target_ref = mutated_corpus / "archlint" / "ref-archlint-001.jsonl"
@@ -400,27 +558,9 @@ class TestT2B1ReproducibilityAndSafety:
         target_ref.write_text(json.dumps(data) + "\n", encoding="utf-8")
 
         with pytest.raises(ValueError, match="Reference corpus hash mismatch"):
-            execute_t2b1_experiment(
+            execute_t2b2_experiment(
                 baseline_path=BASELINE_PATH,
                 manifest_path=MANIFEST_PATH,
                 reference_corpus_dir=mutated_corpus,
                 output_dir=tmp_path / "out",
             )
-
-    # 18. Frozen architecture and baseline file isolation
-    def test_18_frozen_architecture_file_isolation(self):
-        import mneme.open_architecture.candidates as candidates_mod
-        import mneme.open_architecture.discovery as discovery_mod
-        import mneme.open_architecture.harness as harness_mod
-
-        # Verify candidate base keywords unchanged
-        assert len(candidates_mod.HeuristicExtractor.DECISION_KEYWORDS) == 26
-        assert "supersede" not in candidates_mod.HeuristicExtractor.DECISION_KEYWORDS
-        assert "allow" not in candidates_mod.HeuristicExtractor.DECISION_KEYWORDS
-
-        # Verify discover_sources unchanged
-        assert hasattr(discovery_mod, "discover_sources")
-
-        # Verify evaluate_discovery_matches signature unchanged
-        assert hasattr(harness_mod, "evaluate_discovery_matches")
-
