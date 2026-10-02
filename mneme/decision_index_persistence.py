@@ -754,6 +754,10 @@ def load_persisted_decision_index(
             raw.get("rule_payload"),
             f"rules[{index}].rule_payload",
         )
+        if set(payload) != {"value"}:
+            raise DecisionIndexPersistenceError(
+                f"rule {rule_id!r} payload contains unsupported fields"
+            )
         value = _require_str(
             payload.get("value"),
             f"rules[{index}].rule_payload.value",
@@ -763,26 +767,40 @@ def load_persisted_decision_index(
             raw.get("applicability", {}),
             f"rules[{index}].applicability",
         )
-        _ = Rule(
-            type=rule_type,
-            value=value,
-            include_paths=(
-                tuple(
-                    _str_list(
-                        applicability["include_paths"],
-                        "include_paths",
+        unknown_applicability = set(applicability) - {
+            "include_paths",
+            "exclude_paths",
+        }
+        if unknown_applicability:
+            raise DecisionIndexPersistenceError(
+                f"rule {rule_id!r} applicability contains unsupported fields "
+                f"{sorted(unknown_applicability)}"
+            )
+        try:
+            _ = Rule(
+                type=rule_type,
+                value=value,
+                include_paths=(
+                    tuple(
+                        _str_list(
+                            applicability["include_paths"],
+                            "include_paths",
+                        )
                     )
-                )
-                if "include_paths" in applicability
-                else None
-            ),
-            exclude_paths=tuple(
-                _str_list(
-                    applicability.get("exclude_paths", []),
-                    "exclude_paths",
-                )
-            ),
-        )
+                    if "include_paths" in applicability
+                    else None
+                ),
+                exclude_paths=tuple(
+                    _str_list(
+                        applicability.get("exclude_paths", []),
+                        "exclude_paths",
+                    )
+                ),
+            )
+        except (TypeError, ValueError) as exc:
+            raise DecisionIndexPersistenceError(
+                f"rule {rule_id!r} is invalid: {exc}"
+            ) from exc
         expected_rule_id = rule_id_of(
             decision_id,
             rule_type,
