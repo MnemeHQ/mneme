@@ -680,13 +680,14 @@ def load_persisted_decision_index(
             raise DecisionIndexPersistenceError(
                 f"version {version_id!r} identity mismatch"
             )
-        raw["_validated_revision"] = revision
-        raw["_validated_statement"] = statement
-        raw["_validated_rationale"] = rationale
-        raw["_validated_scope"] = context_scope
-        raw["_validated_constraints"] = constraints
-        raw["_validated_anti_patterns"] = anti_patterns
-        versions_by_id[version_id] = raw
+        validated = dict(raw)
+        validated["_validated_revision"] = revision
+        validated["_validated_statement"] = statement
+        validated["_validated_rationale"] = rationale
+        validated["_validated_scope"] = context_scope
+        validated["_validated_constraints"] = constraints
+        validated["_validated_anti_patterns"] = anti_patterns
+        versions_by_id[version_id] = validated
 
     rules_by_version: dict[str, list[CanonicalRuleRecord]] = {}
     sequence_by_version: dict[str, set[int]] = {}
