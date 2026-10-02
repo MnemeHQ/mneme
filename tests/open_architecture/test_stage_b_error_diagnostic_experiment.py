@@ -97,7 +97,31 @@ class TestBT1AExperimentExecution:
         assert experiment_result.parent_main_sha == FROZEN_PARENT_MAIN_SHA
         assert experiment_result.reference_corpus_hash == FROZEN_REFERENCE_CORPUS_HASH
         assert experiment_result.semantic_content_hash == FROZEN_STAGE_B_SEMANTIC_CONTENT_HASH
-        assert experiment_result.experiment_profile_hash == "eb4c8470cfb1563aa1df3ef5dc14701a"
+        assert experiment_result.experiment_profile_hash == "8aa524b37dcd5ff946f6d1b001fe7edc"
+
+    def test_profile_hash_sensitivity_to_diagnostic_rules(self, experiment_result: BT1AExperimentResult):
+        import copy
+        from mneme.open_architecture.stage_b_error_diagnostic_experiment import (
+            B_T1A_DIAGNOSTIC_PROFILE,
+            compute_b_t1a_profile_hash,
+        )
+
+        # 1. Deterministic repeated computation
+        h1 = compute_b_t1a_profile_hash()
+        h2 = compute_b_t1a_profile_hash()
+        assert h1 == h2 == experiment_result.experiment_profile_hash
+
+        # 2. Mutating scope canonicalization changes the profile hash
+        mut_scope = copy.deepcopy(B_T1A_DIAGNOSTIC_PROFILE)
+        mut_scope["scope"]["canonicalization"].append("strip_whitespace")
+        h_mut_scope = compute_b_t1a_profile_hash(diagnostic_profile=mut_scope)
+        assert h_mut_scope != experiment_result.experiment_profile_hash
+
+        # 3. Mutating relationship target decomposition changes the profile hash
+        mut_rel = copy.deepcopy(B_T1A_DIAGNOSTIC_PROFILE)
+        mut_rel["relationships"]["target_decomposition"] = "altered_rule"
+        h_mut_rel = compute_b_t1a_profile_hash(diagnostic_profile=mut_rel)
+        assert h_mut_rel != experiment_result.experiment_profile_hash
 
     def test_target_decomposition_invariant_holds(self, experiment_result: BT1AExperimentResult):
         g_rel = experiment_result.global_relationship_diagnostics

@@ -52,6 +52,32 @@ from mneme.open_architecture.stage_b_baseline import (
 EXPERIMENT_ID: str = "b-t1a-error-decomposition"
 FROZEN_PARENT_MAIN_SHA: str = "0cf3bf852213563284bf01a65b87cacdbdc0df9f"
 
+# Explicit immutable diagnostic rules determining B-T1A outcomes
+B_T1A_DIAGNOSTIC_PROFILE: dict[str, Any] = {
+    "relationships": {
+        "exact_comparison": "set_of_relationship_type_and_target_reference",
+        "fuzzy_matching": False,
+        "target_canonicalization": False,
+        "target_decomposition": (
+            "for_each_expected_tuple:"
+            "exact_tuple_match_else_relationship_type_present_else_missing_type"
+        ),
+        "type_only_comparison": "set_of_relationship_type",
+    },
+    "scope": {
+        "canonicalization": [
+            "backslash_to_forward_slash",
+            "collapse_repeated_slashes",
+            "remove_leading_dot_slash",
+            "remove_trailing_slash_except_root",
+        ],
+        "exact_comparison": "set_of_scope_type_and_scope_expression",
+        "fuzzy_matching": False,
+        "strip_whitespace": False,
+        "type_only_comparison": "set_of_scope_type",
+    },
+}
+
 
 # ── Conservative Scope Expression Canonicalization (Diagnostic Only) ───────────
 
@@ -297,6 +323,9 @@ class BT1AExperimentResult:
     per_sampling_category_relationship: dict[str, RelationshipAggregateDiagnostics]
     reference_scope_diagnostics: list[ReferenceScopeDiagnostic]
     reference_relationship_diagnostics: list[ReferenceRelationshipDiagnostic]
+    diagnostic_profile: dict[str, Any] = field(
+        default_factory=lambda: dict(B_T1A_DIAGNOSTIC_PROFILE)
+    )
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -307,6 +336,7 @@ class BT1AExperimentResult:
             "reference_corpus_hash": self.reference_corpus_hash,
             "semantic_content_hash": self.semantic_content_hash,
             "experiment_profile_hash": self.experiment_profile_hash,
+            "diagnostic_profile": self.diagnostic_profile,
             "global_scope_diagnostics": self.global_scope_diagnostics.to_dict(),
             "global_relationship_diagnostics": self.global_relationship_diagnostics.to_dict(),
             "per_repository_scope": {
@@ -335,12 +365,14 @@ def compute_b_t1a_profile_hash(
     baseline_configuration_hash: str = FROZEN_BASELINE_CONFIG_HASH,
     reference_corpus_hash: str = FROZEN_REFERENCE_CORPUS_HASH,
     semantic_content_hash: str = FROZEN_STAGE_B_SEMANTIC_CONTENT_HASH,
+    diagnostic_profile: dict[str, Any] | None = None,
 ) -> str:
     """Compute deterministic SHA-256 digest binding experiment inputs and rules."""
+    profile = diagnostic_profile if diagnostic_profile is not None else B_T1A_DIAGNOSTIC_PROFILE
     payload = {
         "baseline_configuration_hash": baseline_configuration_hash,
         "baseline_id": baseline_id,
-        "canonicalizer": "conservative_path_only",
+        "diagnostic_profile": profile,
         "experiment_id": experiment_id,
         "parent_main_sha": parent_main_sha,
         "reference_corpus_hash": reference_corpus_hash,
