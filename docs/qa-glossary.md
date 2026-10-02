@@ -59,11 +59,11 @@ No. Mneme HQ is local-first. Your `.mneme/project_memory.json`, your ADRs, your 
 
 It means a decision reaches the agent before the code exists, instead of a reviewer finding the conflict afterwards. Mneme HQ applies it at two points. Before generation, the relevant decisions are retrieved and placed in the model's context, as a context packet or as generated Cursor rules. Before a change lands, the Claude Code hook checks the proposed mutation and can block it before it is written.
 
-Code review is too late for this job. By the time generated code reaches a pull request, the diff exists, the reviewer's attention is finite, and the rejected pattern is already in the conversation history, where a later model call can read it as accepted. The full argument is on the [governance before generation](https://mnemehq.com/concepts/governance-before-generation/) concept page.
+Code review comes too late for this. By the time generated code reaches a pull request, the diff exists, the reviewer's attention is finite, and the rejected pattern is already in the conversation history, where a later model call can read it as accepted. The full argument is on the [governance before generation](https://mnemehq.com/concepts/governance-before-generation/) concept page.
 
 #### 6. What is architectural drift?
 
-The gradual erosion of architectural decisions as code is added without enforcement. Drift is invisible in any single change but compounds over time. AI-assisted development accelerates drift because code output increases without a corresponding increase in review capacity. A team that catches 95% of architectural violations in review still ships compounding drift if AI is generating five times more code than humans are reviewing carefully.
+The gradual erosion of architectural decisions as code is added without enforcement. Drift is invisible in any single change but compounds over time. AI-assisted development accelerates drift because code output increases without a corresponding increase in review capacity. A team that catches 95% of architectural violations in review still ships compounding drift if AI generates five times more code than humans review.
 
 #### 7. What kinds of teams should adopt Mneme HQ?
 
@@ -73,11 +73,11 @@ Enforcement is scoped to one repository at a time, so adoption starts with a sin
 
 #### 8. What kinds of teams should not adopt Mneme HQ?
 
-Teams without explicit architectural decisions to enforce. Mneme HQ enforces what you've already decided; it doesn't generate decisions for you. A team that has never written down its architectural choices won't benefit until it does. The right first step for such a team is to write five to ten ADRs.
+Teams without explicit architectural decisions to enforce. Mneme HQ enforces decisions you have already written down and does not write them for you. A team that has never written down its architectural choices won't benefit until it does. The right first step for such a team is to write five to ten ADRs.
 
 #### 9. How does Mneme HQ relate to AI safety?
 
-It's a narrow slice of AI safety: governance of AI-generated code at the project level. It's not AI alignment, not model safety, not RLHF. It's the boring, auditable, deterministic kind of safety that matters when AI is actually shipping code into production. The relevant safety claim is reproducibility: every verdict is reconstructable, no black box, no model in the verdict loop.
+Mneme HQ covers one narrow slice of AI safety: keeping AI-generated code inside the decisions a project has recorded. It does nothing for alignment, model safety or training. The safety claim it makes is reproducibility: you can reconstruct any verdict from the decision record and the input, and no model takes part in reaching it.
 
 #### 10. Can I use Mneme HQ for non-code governance (docs, configs, prompts)?
 
@@ -97,7 +97,7 @@ Yes, MIT licensed. The repository is at [github.com/MnemeHQ/mneme](https://githu
 
 Mneme HQ ships a Claude Code plugin whose hooks run at three points in a session.
 
-`PreToolUse` covers `Edit`, `Write`, `MultiEdit` and `Bash`. For the three file tools, the hook reconstructs the file as it would be after the edit and runs `mneme check` on the lines the edit introduces, before the proposed mutation is written. In strict mode, the default, a violation blocks the write; in warn mode it is reported and the write proceeds. Bash coverage is intentionally narrower: only shell mutations that can be reconstructed deterministically (today, a quoted here-document redirected to a file) are checked before the command runs. Other shell commands are not blocked in advance.
+`PreToolUse` covers `Edit`, `Write`, `MultiEdit` and `Bash`. For the three file tools, the hook reconstructs the file as it would be after the edit and runs `mneme check` on the lines the edit introduces, before the proposed mutation is written. In strict mode, the default, a violation blocks the write; in warn mode it is reported and the write proceeds. Bash coverage is narrower by design: only shell mutations that can be reconstructed deterministically (today, a quoted here-document redirected to a file) are checked before the command runs. Other shell commands are not blocked in advance.
 
 `SessionStart` records a baseline of the repository, and `Stop` checks everything that changed during the session against it. That session-delta check is what catches mutations that escaped the pre-execution gate, such as files written by an arbitrary shell command.
 
@@ -117,7 +117,7 @@ The output goes to `.cursor/rules/mneme.mdc` by default. Cursor reads the file a
 
 #### 15. Does Mneme HQ work with GitHub Copilot?
 
-Not through a dedicated integration. Copilot does not expose a pre-tool-use hook comparable to Claude Code's, and Mneme HQ does not currently generate Copilot instruction files. Two things do work today. `mneme check` in CI evaluates a change the same way whichever tool wrote it, so Copilot-authored code that contradicts a recorded decision is caught there. And the decision corpus is plain JSON that you own, so you can adapt it by hand into Copilot's custom instructions. The [Copilot integration page](https://mnemehq.com/integrations/copilot/) tracks the current status.
+Not through a dedicated integration. Copilot does not expose a pre-tool-use hook comparable to Claude Code's, and Mneme HQ does not generate Copilot instruction files today. Two things do work today. `mneme check` in CI evaluates a change the same way whichever tool wrote it, so Copilot-authored code that contradicts a recorded decision is caught there. And the decision corpus is plain JSON that you own, so you can adapt it by hand into Copilot's custom instructions. The [Copilot integration page](https://mnemehq.com/integrations/copilot/) tracks the current status.
 
 #### 16. Does Mneme HQ work with agent frameworks like LangChain, CrewAI, AutoGen?
 
@@ -165,7 +165,7 @@ The top N decisions by score are injected (default `DEFAULT_MAX_DECISIONS = 3`).
 
 #### 21. Why no embeddings?
 
-Three reasons. First, determinism: same query plus same memory must produce identical output, run to run. Embeddings drift with model updates. Second, debuggability: a keyword match is reconstructable; a vector similarity is not. Third, scope: governance corpora are small (tens to low hundreds of decisions). Embeddings solve a problem you don't have at this scale and cost reproducibility you can't afford to lose.
+Three reasons. First, determinism: same query plus same memory must produce identical output, run to run. Embeddings drift with model updates. Second, debuggability: a keyword match is reconstructable; a vector similarity is not. Third, scope: governance corpora are small (tens to low hundreds of decisions). At that size keyword scoring finds the right decision, and embeddings would cost the reproducibility the benchmark depends on.
 
 #### 22. What is an ADR in Mneme HQ?
 
@@ -189,7 +189,7 @@ Body markdown follows.
 
 #### 23. How does ADR precedence resolution work?
 
-When two ADRs cover the same scope, the compiler resolves them in a strict order: first, explicit `supersedes` references remove ADRs from consideration (chain-aware, including N-node chains). Second, within the same scope, higher priority wins (`foundational` > `normal` > `exception`). Third, same scope and same priority, newer `date` wins. If still ambiguous, the compiler raises `ADRPrecedenceError` rather than silently picking a winner. Broader and narrower scopes coexist; output is sorted most-specific-first.
+When two ADRs cover the same scope, the compiler resolves them in a strict order: first, explicit `supersedes` references remove ADRs from consideration (chain-aware, including N-node chains). Second, within the same scope, higher priority wins (`foundational` > `normal` > `exception`). Third, same scope and same priority, newer `date` wins. If still ambiguous, the compiler raises `ADRPrecedenceError` instead of picking a winner. Broader and narrower scopes coexist; output is sorted most-specific-first.
 
 #### 24. What does corpus validation check?
 
@@ -213,7 +213,7 @@ In the Decision schema, both are flagged by the conflict detector. The distincti
 
 `strict` and `warn`. `strict` is the default for both `mneme check` and the Claude Code hook: a WARN verdict exits 1, a FAIL verdict exits 2, and the hook blocks the proposed write. In `warn` mode every verdict exits 0 and violations are reported without blocking, which is useful when you adopt Mneme HQ on an existing repository and want visibility before you turn enforcement on. Set the CLI's mode with `--mode` and the hook's with the `MNEME_HOOK_MODE` environment variable.
 
-#### 29. What does `mneme check` actually do?
+#### 29. What does `mneme check` do?
 
 It checks one input file against your decision corpus. You give it the memory file, the file to check (a prompt, a draft, a generated file or a diff) and a query that describes the work:
 
@@ -233,15 +233,15 @@ It retrieves the decisions relevant to the query, runs the enforcer over the inp
 
 #### 31. Is there a model in the verdict loop?
 
-No. The retrieval, the injection, the conflict detection and the verdict are all deterministic. The model is in the *generation* loop (it's the thing being governed), but the verdict itself is reconstructable without any model call. This is intentional: deterministic over clever is one of the project's charter principles. The upgrade path to a model-based judge is explicit in the code (replace two functions) and remains opt-in.
+No. The retrieval, the injection, the conflict detection and the verdict are all deterministic. The model is in the *generation* loop (it's the thing being governed), but the verdict itself is reconstructable without any model call. The project's charter puts deterministic over clever. The upgrade path to a model-based judge is explicit in the code (replace two functions) and remains opt-in.
 
 #### 32. Can Mneme HQ auto-fix violations?
 
-No. Mneme HQ blocks. The human or model fixes. Auto-fixing is explicitly out of scope: a deterministic governance layer cannot also be the thing that decides how to comply, or it becomes the same kind of opinionated agent it's meant to govern.
+No. Mneme HQ blocks the change, and the human or the model fixes it. If the tool that enforces a decision also chose how to comply, it would become another opinionated agent that needs governing.
 
 #### 33. How do I handle a violation in strict mode?
 
-The Claude Code hook blocks the write and names the decision that was violated. There are two legitimate responses. If the decision still stands, change the request so the output complies. If the decision itself should change, update the record first (write a new ADR that supersedes the old one), then retry. When you are part-way through an intentional architectural change that the corpus has not caught up with, you can set `MNEME_HOOK_MODE=warn` temporarily. There is no per-verdict override: strict mode is meant to make you stop and think, not to be bypassed as a habit.
+The Claude Code hook blocks the write and names the decision that was violated. There are two legitimate responses. If the decision still stands, change the request so the output complies. If the decision itself should change, update the record first (write a new ADR that supersedes the old one), then retry. When you are part-way through an intentional architectural change that the corpus has not caught up with, you can set `MNEME_HOOK_MODE=warn` temporarily. There is no per-verdict override.
 
 #### 34. Does Mneme HQ slow down my AI coding agent?
 
@@ -255,7 +255,7 @@ The core mechanism (retrieval mechanics, enforcement semantics, benchmark method
 
 #### 36. What is Layer 2 and why is it deferred?
 
-Layer 2 covers multi-repo governance, team policy synchronization, shared policy packs, org-wide policy distribution, and deeper IDE integrations (LSP, JetBrains). All of it is out of scope for Layer 1. Layer 2 opens only after the Layer 1 exit criteria are met: evidence that Mneme HQ prevents drift on real repositories, feedback from design partners, and confirmation that the narrow starting scope is the right one. The discipline is deliberate. Layer 1 is a narrow starting point, not a platform.
+Layer 2 covers multi-repo governance, team policy synchronization, shared policy packs, org-wide policy distribution, and deeper IDE integrations (LSP, JetBrains). All of it is out of scope for Layer 1. Layer 2 opens only after the Layer 1 exit criteria are met: evidence that Mneme HQ prevents drift on real repositories, feedback from design partners, and confirmation that the narrow starting scope is the right one. Layer 1 stays narrow on purpose.
 
 #### 37. What is the benchmark suite?
 
@@ -263,9 +263,9 @@ A regression and integrity instrument, not a generalization claim. It uses canne
 
 The benchmark code and the [methodology page](https://mnemehq.com/docs/benchmark-methodology/) label the two scoring stages Layer 1 and Layer 2. That numbering is unrelated to the product phases of the same name.
 
-#### 38. What does recall@3 = 1.00 actually mean?
+#### 38. What does recall@3 mean?
 
-For every scenario in the benchmark fixture set, the relevant decision appears in the top three retrieved decisions. K=3 is the canonical retrieval cutoff: the top three decisions are the ones injected and the ones whose multi-term rules are applied. Unambiguous literal rules are enforced across the whole corpus regardless of the cutoff. Recall@3 = 1.00 means no scenario in the suite has its critical decision pushed below the cutoff by the retriever.
+It is the share of benchmark scenarios in which the relevant decision appears among the top three retrieved decisions. Three is the canonical retrieval cutoff (K): Mneme HQ injects the top three decisions and applies their multi-term rules. Unambiguous literal rules are enforced across the whole corpus regardless of the cutoff. A score below the maximum means the retriever pushed at least one scenario's critical decision below the cutoff.
 
 #### 39. Why is recall@1 reported but not optimized?
 
@@ -275,19 +275,19 @@ Recall@1 is the metric that responds most to tuning. Optimizing for it on a smal
 
 #### 40. What problem does Mneme HQ solve that Cursor Rules and CLAUDE.md don't?
 
-Cursor Rules and CLAUDE.md are unstructured text pasted into the prompt. They have no precedence semantics, no validation, no conflict detection and no enforcement. When two rules contradict each other, the model picks one, usually whichever appears later or sounds more confident. There is no audit trail of what was injected, no way to verify it ran, and no scoring of whether the output followed the rules. Mneme HQ replaces this with a typed schema (Decisions and ADRs), deterministic retrieval, deterministic precedence resolution, a check on each proposed change before it is written, and conflict detection on model output. Every step is reconstructable from artifacts.
+Cursor Rules and CLAUDE.md are unstructured text pasted into the prompt. They have no precedence semantics, validation, conflict detection or enforcement. When two rules contradict each other, the model picks one, usually whichever appears later or sounds more confident, and nothing records what was injected or whether the output followed it. Mneme HQ replaces this with a typed schema (Decisions and ADRs), deterministic retrieval, deterministic precedence resolution, a check on each proposed change before it is written, and conflict detection on model output. You can reconstruct each step from artifacts.
 
 #### 41. How is this different from RAG?
 
-RAG retrieves information. Mneme HQ retrieves decisions. RAG's goal is to inform the response; Mneme HQ's goal is to shape the response. RAG asks "did the model use the right source?"; Mneme HQ asks "did the model respect the constraint?" RAG is fuzzy by design (vector similarity, top-k chunks); Mneme HQ is deterministic by design (same query plus same memory always returns the same ranking).
+RAG retrieves information so the model can answer from the right source. Mneme HQ retrieves decisions so the output stays inside a constraint, then checks that it did. RAG ranks chunks by vector similarity, so results shift with the embedding model. Mneme HQ ranks by keyword overlap, so the same query and the same memory file return the same ranking.
 
 #### 42. How is this different from a linter?
 
-A linter checks syntax, style and known bug patterns in source code. Mneme HQ checks a proposed change against the architectural decisions your team recorded, before the change is written. Linters operate on syntax; Mneme HQ operates on recorded decisions. A linter has no rule for "we decided not to rebuild retrieval on embeddings" unless someone writes one. Mneme HQ matches the constraint and anti-pattern terms listed in the decision record itself.
+A linter checks syntax, style and known bug patterns in source code. Mneme HQ checks a proposed change against the architectural decisions your team recorded, before the change is written. A linter has no rule for "we decided not to rebuild retrieval on embeddings" unless someone writes one. Mneme HQ matches the constraint and anti-pattern terms listed in the decision record itself.
 
 #### 43. How is this different from an LLM-as-judge evaluation framework?
 
-LLM-as-judge introduces a second model to evaluate the first model's output. It's powerful but nondeterministic: the judge's verdict varies run to run and shifts with model updates. Mneme HQ's evaluator is deterministic by design. The upgrade path to a model judge is explicit in the code (replace two functions) but is opt-in and not the default. In Layer 1, the deterministic evaluator is canonical.
+LLM-as-judge introduces a second model to evaluate the first model's output. The judge's verdict varies run to run and shifts with model updates. Mneme HQ's evaluator is deterministic. The upgrade path to a model judge is explicit in the code (replace two functions) but is opt-in and not the default. In Layer 1, the deterministic evaluator is canonical.
 
 ---
 
@@ -359,7 +359,7 @@ What Mneme HQ is: the decision and control layer for agentic software developmen
 
 ### Decision example
 
-A record of a past decision with three fields: `task` (the situation that prompted the decision), `decision` (what was decided) and `rationale` (why). Injected as prior decisions so the model learns how the project reasons, not just what it decided.
+A record of a past decision with three fields: `task` (the situation that prompted the decision), `decision` (what was decided) and `rationale` (why). Injected as prior decisions so the model sees how the project reasons as well as what it decided.
 
 ### Decision retriever
 
@@ -423,7 +423,7 @@ Checking a proposed change before it is written or applied, rather than after. T
 
 ### Precedence resolution
 
-The deterministic procedure for resolving conflicts between ADRs covering the same scope: explicit `supersedes` references first (chain-aware), then priority (foundational > normal > exception), then date (newer wins). If the result is still ambiguous, it raises `ADRPrecedenceError`. It never silently picks a winner.
+The deterministic procedure for resolving conflicts between ADRs covering the same scope: explicit `supersedes` references first (chain-aware), then priority (foundational > normal > exception), then date (newer wins). If the result is still ambiguous, it raises `ADRPrecedenceError` instead of picking a winner.
 
 ### `PreToolUse` hook
 
@@ -431,7 +431,7 @@ The Claude Code hook surface that runs before a tool call. Mneme HQ registers it
 
 ### Prevention before review
 
-A Mneme HQ charter principle: intervene before a change lands, not in code review. Prevention is cheaper than detection, and both are cheaper than rollback.
+A Mneme HQ charter principle: intervene before a change lands, instead of waiting for code review.
 
 ### Priority (ADR)
 
@@ -479,7 +479,7 @@ An enforcement mode in which violations are reported but do not fail the check o
 
 ### Wedge
 
-The narrow, intentional starting scope of Mneme HQ: explicit recorded decisions, deterministically retrieved, and checked before a change is written. The wedge is defined as much by what it leaves out (autonomous agents, vector stores, long context, model-based judges in Layer 1) as by what it includes.
+The narrow, intentional starting scope of Mneme HQ: explicit recorded decisions, deterministically retrieved, and checked before a change is written. It leaves out autonomous agents, vector stores, long context and, in Layer 1, model-based judges.
 
 ---
 
