@@ -271,8 +271,6 @@ def compute_stage_b_semantic_content_hash(
 
 def load_stage_b_outcomes(
     outcomes_path: str | Path | None = None,
-    *,
-    expected_content_hash: str = FROZEN_STAGE_B_SEMANTIC_CONTENT_HASH,
 ) -> list[FrozenClassifierOutcome]:
     """Load and strictly validate the frozen Stage B B0 classifier outcomes from JSONL.
 
@@ -283,7 +281,7 @@ def load_stage_b_outcomes(
     - Tasks per reference != 8
     - Duplicate (candidate_id, task_type) keys exist
     - Classifier backend, version, model, or taxonomy version mismatch
-    - Semantic content hash does not match expected_content_hash
+    - Semantic content hash does not match FROZEN_STAGE_B_SEMANTIC_CONTENT_HASH
     """
     repo_root = Path(__file__).resolve().parent.parent.parent
     path = (
@@ -342,11 +340,11 @@ def load_stage_b_outcomes(
 
     outcomes.sort(key=lambda o: (o.candidate_id, o.task_type.value))
 
-    # Enforce semantic content hash fail-closed
+    # Enforce semantic content hash fail-closed against frozen benchmark authority
     computed_hash = compute_stage_b_semantic_content_hash(outcomes)
-    if computed_hash != expected_content_hash:
+    if computed_hash != FROZEN_STAGE_B_SEMANTIC_CONTENT_HASH:
         raise ValueError(
-            f"Stage B semantic content hash mismatch: expected {expected_content_hash!r}, "
+            f"Stage B semantic content hash mismatch: expected {FROZEN_STAGE_B_SEMANTIC_CONTENT_HASH!r}, "
             f"computed {computed_hash!r}"
         )
 

@@ -134,6 +134,14 @@ class TestStageBHashValidation:
         with pytest.raises(ValueError, match="Taxonomy version mismatch"):
             load_stage_b_outcomes(mutated_file)
 
+    def test_load_stage_b_outcomes_signature_has_no_hash_override(self):
+        import inspect
+        sig = inspect.signature(load_stage_b_outcomes)
+        assert "expected_content_hash" not in sig.parameters
+        assert list(sig.parameters.keys()) == ["outcomes_path"]
+        with pytest.raises(TypeError, match="unexpected keyword argument 'expected_content_hash'"):
+            load_stage_b_outcomes(OUTCOMES_PATH, expected_content_hash="caller_supplied_override")
+
     def test_provenance_summary_json_integrity(self):
         assert PROVENANCE_PATH.is_file()
         data = json.loads(PROVENANCE_PATH.read_text(encoding="utf-8"))
