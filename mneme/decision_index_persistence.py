@@ -956,6 +956,14 @@ def verify_compatibility_snapshot(
         memory_path=str(memory_path.resolve()),
     )
     snapshot = compatibility_snapshot_decisions(document, memory_path)
+    legacy_item_ids = {
+        record.decision_id
+        for record in index.records
+        if record.occurrence_source_identity[:1] == ("legacy-items",)
+    }
+    for decision in snapshot:
+        if decision.id in legacy_item_ids:
+            decision.memory_path = ""
     if snapshot != projected:
         raise DecisionIndexPersistenceError(
             "persisted decisions[] compatibility snapshot diverges from "
