@@ -65,7 +65,12 @@ class TestScopeCanonicalizerContract:
     def test_none_and_empty_preserved(self):
         assert canonicalize_scope_expression(None) is None
         assert canonicalize_scope_expression("") == ""
-        assert canonicalize_scope_expression("   ") == ""
+
+    def test_whitespace_preserved_not_stripped(self):
+        # Leading and trailing whitespace must NOT be stripped by narrow canonicalizer
+        assert canonicalize_scope_expression("  docs/adr  ") == "  docs/adr  "
+        assert canonicalize_scope_expression(" packages/core ") == " packages/core "
+        assert canonicalize_scope_expression("   ") == "   "
 
     def test_no_fuzzy_or_glob_expansion(self):
         # Glob patterns and filenames must be preserved verbatim without expansion
@@ -85,12 +90,71 @@ def experiment_result() -> BT1AExperimentResult:
 
 class TestBT1AExperimentExecution:
     def test_1_frozen_evidence_hash_bound_and_matches(self, experiment_result: BT1AExperimentResult):
+        from mneme.open_architecture.harness import FROZEN_BASELINE_CONFIG_HASH
         assert experiment_result.experiment_id == EXPERIMENT_ID
         assert experiment_result.baseline_id == FROZEN_BASELINE_ID
+        assert experiment_result.baseline_configuration_hash == FROZEN_BASELINE_CONFIG_HASH
         assert experiment_result.parent_main_sha == FROZEN_PARENT_MAIN_SHA
         assert experiment_result.reference_corpus_hash == FROZEN_REFERENCE_CORPUS_HASH
         assert experiment_result.semantic_content_hash == FROZEN_STAGE_B_SEMANTIC_CONTENT_HASH
-        assert len(experiment_result.experiment_profile_hash) == 32
+        assert experiment_result.experiment_profile_hash == "eb4c8470cfb1563aa1df3ef5dc14701a"
+
+    def test_target_decomposition_invariant_holds(self, experiment_result: BT1AExperimentResult):
+        g_rel = experiment_result.global_relationship_diagnostics
+        assert g_rel.expected_relationship_tuples == 19
+        assert g_rel.expected_tuples_with_type_present == 18
+        assert g_rel.exact_tuple_matches == 0
+        assert g_rel.correct_type_wrong_target_tuples == 18
+        assert g_rel.missing_relationship_type_tuples == 1
+
+        # Global invariant: expected == exact + wrong_target + missing_type
+        assert (
+            g_rel.expected_relationship_tuples
+            == g_rel.exact_tuple_matches + g_rel.correct_type_wrong_target_tuples + g_rel.missing_relationship_type_tuples
+        )
+        assert (
+            g_rel.expected_tuples_with_type_present
+            == g_rel.exact_tuple_matches + g_rel.correct_type_wrong_target_tuples
+        )
+
+        # Per-repository invariant
+        for repo_id, r in experiment_result.per_repository_relationship.items():
+            assert (
+                r.expected_relationship_tuples
+                == r.exact_tuple_matches + r.correct_type_wrong_target_tuples + r.missing_relationship_type_tuples
+            )
+            assert (
+                r.expected_tuples_with_type_present
+                == r.exact_tuple_matches + r.correct_type_wrong_target_tuples
+            )
+
+        # Per-reference invariant
+        for d in experiment_result.reference_relationship_diagnostics:
+            assert (
+                d.expected_relationship_tuples
+                == d.exact_tuple_matches + d.correct_type_wrong_target_tuples + d.missing_relationship_type_tuples
+            )
+            assert (
+                d.expected_tuples_with_type_present
+                == d.exact_tuple_matches + d.correct_type_wrong_target_tuples
+            )
+
+    def test_reference_corpus_hash_mutation_fails_closed(self, tmp_path: Path):
+        import shutil
+
+        # Copy reference corpus to temp dir
+        mutated_ref_dir = tmp_path / "mutated_reference_decisions"
+        shutil.copytree(REF_DIR, mutated_ref_dir)
+
+        # Mutate one reference decision
+        target_file = mutated_ref_dir / "adrkit" / "ref-adrkit-001.jsonl"
+        lines = target_file.read_text(encoding="utf-8").splitlines()
+        first_rec = json.loads(lines[0])
+        first_rec["normalized_decision"] = "Corrupted semantic decision text"
+        target_file.write_text(json.dumps(first_rec) + "\n", encoding="utf-8")
+
+        with pytest.raises(ValueError, match="Reference corpus hash mismatch"):
+            execute_b_t1a_experiment(reference_corpus_dir=mutated_ref_dir)
 
     def test_2_and_3_exactly_100_references_diagnosed_with_both_dimensions(
         self, experiment_result: BT1AExperimentResult

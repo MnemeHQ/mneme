@@ -34,6 +34,7 @@ from mneme.open_architecture.classification import (
     normalize_relationships,
     normalize_scopes,
 )
+from mneme.open_architecture.export import compute_reference_corpus_content_hash
 from mneme.open_architecture.harness import (
     FROZEN_BASELINE_CONFIG_HASH,
     FROZEN_BASELINE_ID,
@@ -64,15 +65,14 @@ def canonicalize_scope_expression(expr: str | None) -> str | None:
     - Strip leading './'
     - Strip trailing '/' except root '/'
 
-    Does NOT expand globs, infer directories, rewrite filenames, resolve '..',
-    or use fuzzy matching.
+    Does NOT strip whitespace, expand globs, infer directories, rewrite filenames,
+    resolve '..', or use fuzzy matching.
     """
     if expr is None:
         return None
-    s = expr.strip()
-    if not s:
+    if not expr:
         return ""
-    s = s.replace("\\", "/")
+    s = expr.replace("\\", "/")
     s = re.sub(r"/+", "/", s)
     if s.startswith("./") and len(s) > 2:
         s = s[2:]
@@ -156,6 +156,11 @@ class ReferenceRelationshipDiagnostic:
     predicted_empty: bool
     is_fp_on_empty: bool
     normalization_failure: bool
+    expected_relationship_tuples: int
+    expected_tuples_with_type_present: int
+    exact_tuple_matches: int
+    correct_type_wrong_target_tuples: int
+    missing_relationship_type_tuples: int
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -179,6 +184,11 @@ class ReferenceRelationshipDiagnostic:
             "predicted_empty": self.predicted_empty,
             "is_fp_on_empty": self.is_fp_on_empty,
             "normalization_failure": self.normalization_failure,
+            "expected_relationship_tuples": self.expected_relationship_tuples,
+            "expected_tuples_with_type_present": self.expected_tuples_with_type_present,
+            "exact_tuple_matches": self.exact_tuple_matches,
+            "correct_type_wrong_target_tuples": self.correct_type_wrong_target_tuples,
+            "missing_relationship_type_tuples": self.missing_relationship_type_tuples,
         }
 
 
@@ -237,6 +247,11 @@ class RelationshipAggregateDiagnostics:
     missing_on_non_empty: int
     correct_type_wrong_target_count: int
     mismatch_category_counts: dict[str, int]
+    expected_relationship_tuples: int
+    expected_tuples_with_type_present: int
+    exact_tuple_matches: int
+    correct_type_wrong_target_tuples: int
+    missing_relationship_type_tuples: int
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -255,6 +270,11 @@ class RelationshipAggregateDiagnostics:
             "missing_on_non_empty": self.missing_on_non_empty,
             "correct_type_wrong_target_count": self.correct_type_wrong_target_count,
             "mismatch_category_counts": self.mismatch_category_counts,
+            "expected_relationship_tuples": self.expected_relationship_tuples,
+            "expected_tuples_with_type_present": self.expected_tuples_with_type_present,
+            "exact_tuple_matches": self.exact_tuple_matches,
+            "correct_type_wrong_target_tuples": self.correct_type_wrong_target_tuples,
+            "missing_relationship_type_tuples": self.missing_relationship_type_tuples,
         }
 
 
@@ -264,6 +284,7 @@ class BT1AExperimentResult:
 
     experiment_id: str
     baseline_id: str
+    baseline_configuration_hash: str
     parent_main_sha: str
     reference_corpus_hash: str
     semantic_content_hash: str
@@ -281,6 +302,7 @@ class BT1AExperimentResult:
         return {
             "experiment_id": self.experiment_id,
             "baseline_id": self.baseline_id,
+            "baseline_configuration_hash": self.baseline_configuration_hash,
             "parent_main_sha": self.parent_main_sha,
             "reference_corpus_hash": self.reference_corpus_hash,
             "semantic_content_hash": self.semantic_content_hash,
@@ -310,11 +332,13 @@ def compute_b_t1a_profile_hash(
     experiment_id: str = EXPERIMENT_ID,
     baseline_id: str = FROZEN_BASELINE_ID,
     parent_main_sha: str = FROZEN_PARENT_MAIN_SHA,
+    baseline_configuration_hash: str = FROZEN_BASELINE_CONFIG_HASH,
     reference_corpus_hash: str = FROZEN_REFERENCE_CORPUS_HASH,
     semantic_content_hash: str = FROZEN_STAGE_B_SEMANTIC_CONTENT_HASH,
 ) -> str:
     """Compute deterministic SHA-256 digest binding experiment inputs and rules."""
     payload = {
+        "baseline_configuration_hash": baseline_configuration_hash,
         "baseline_id": baseline_id,
         "canonicalizer": "conservative_path_only",
         "experiment_id": experiment_id,
@@ -442,6 +466,26 @@ def diagnose_reference_relationship(
             pred_set = set()
             pred_types = set()
 
+    exp_tuples = [(rel["relationship_type"], rel.get("target_reference")) for rel in ref.relationships]
+    expected_rel_tuples = len(exp_tuples)
+    exact_tuple_matches = 0
+    tuples_with_type_present = 0
+    correct_type_wrong_target_tuples = 0
+    missing_type_tuples = 0
+
+    if not norm_failure:
+        for exp_t, exp_targ in exp_tuples:
+            if (exp_t, exp_targ) in pred_set:
+                exact_tuple_matches += 1
+                tuples_with_type_present += 1
+            elif exp_t in pred_types:
+                correct_type_wrong_target_tuples += 1
+                tuples_with_type_present += 1
+            else:
+                missing_type_tuples += 1
+    else:
+        missing_type_tuples = expected_rel_tuples
+
     exact_match = (not norm_failure and pred_set == exp_set)
     exp_empty = (len(exp_set) == 0)
     pred_empty = (not norm_failure and len(pred_set) == 0)
@@ -501,6 +545,11 @@ def diagnose_reference_relationship(
         predicted_empty=pred_empty,
         is_fp_on_empty=is_fp_on_empty,
         normalization_failure=norm_failure,
+        expected_relationship_tuples=expected_rel_tuples,
+        expected_tuples_with_type_present=tuples_with_type_present,
+        exact_tuple_matches=exact_tuple_matches,
+        correct_type_wrong_target_tuples=correct_type_wrong_target_tuples,
+        missing_relationship_type_tuples=missing_type_tuples,
     )
 
 
@@ -604,6 +653,11 @@ def aggregate_relationship_diagnostics(
             missing_on_non_empty=0,
             correct_type_wrong_target_count=0,
             mismatch_category_counts={},
+            expected_relationship_tuples=0,
+            expected_tuples_with_type_present=0,
+            exact_tuple_matches=0,
+            correct_type_wrong_target_tuples=0,
+            missing_relationship_type_tuples=0,
         )
 
     exact_matches = sum(1 for d in diag_list if d.exact_set_match)
@@ -633,6 +687,13 @@ def aggregate_relationship_diagnostics(
     missing_non_empty = sum(1 for d in diag_list if not d.expected_empty and d.predicted_empty)
     correct_type_wrong_targ = sum(1 for d in diag_list if d.mismatch_category == "correct_type_wrong_target")
 
+    # Target-level decomposition counts
+    tot_exp_rel_tuples = sum(d.expected_relationship_tuples for d in diag_list)
+    tot_type_pres_tuples = sum(d.expected_tuples_with_type_present for d in diag_list)
+    tot_exact_matches = sum(d.exact_tuple_matches for d in diag_list)
+    tot_wrong_target_tuples = sum(d.correct_type_wrong_target_tuples for d in diag_list)
+    tot_missing_type_tuples = sum(d.missing_relationship_type_tuples for d in diag_list)
+
     cat_counts: dict[str, int] = {}
     for d in diag_list:
         cat_counts[d.mismatch_category] = cat_counts.get(d.mismatch_category, 0) + 1
@@ -653,6 +714,11 @@ def aggregate_relationship_diagnostics(
         missing_on_non_empty=missing_non_empty,
         correct_type_wrong_target_count=correct_type_wrong_targ,
         mismatch_category_counts=dict(sorted(cat_counts.items())),
+        expected_relationship_tuples=tot_exp_rel_tuples,
+        expected_tuples_with_type_present=tot_type_pres_tuples,
+        exact_tuple_matches=tot_exact_matches,
+        correct_type_wrong_target_tuples=tot_wrong_target_tuples,
+        missing_relationship_type_tuples=tot_missing_type_tuples,
     )
 
 
@@ -700,7 +766,15 @@ def execute_b_t1a_experiment(
             raise ValueError(f"Output directory '{out_dir_path}' exists and is non-empty")
         out_dir_path.mkdir(parents=True, exist_ok=True)
 
-    # 1. Load and hash-verify committed frozen outcomes fail-closed
+    # 1. Enforce frozen reference corpus hash fail-closed
+    computed_ref_hash = compute_reference_corpus_content_hash(ref_dir)
+    if computed_ref_hash != FROZEN_REFERENCE_CORPUS_HASH:
+        raise ValueError(
+            f"Reference corpus hash mismatch: expected {FROZEN_REFERENCE_CORPUS_HASH!r}, "
+            f"computed {computed_ref_hash!r}"
+        )
+
+    # 2. Load and hash-verify committed frozen outcomes fail-closed
     outcomes = load_stage_b_outcomes(out_p)
     manifest = Manifest.load(man_p)
     all_refs = load_reference_corpus(ref_dir)
@@ -751,6 +825,7 @@ def execute_b_t1a_experiment(
     result = BT1AExperimentResult(
         experiment_id=EXPERIMENT_ID,
         baseline_id=FROZEN_BASELINE_ID,
+        baseline_configuration_hash=FROZEN_BASELINE_CONFIG_HASH,
         parent_main_sha=FROZEN_PARENT_MAIN_SHA,
         reference_corpus_hash=FROZEN_REFERENCE_CORPUS_HASH,
         semantic_content_hash=FROZEN_STAGE_B_SEMANTIC_CONTENT_HASH,
