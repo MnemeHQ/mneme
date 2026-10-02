@@ -268,18 +268,28 @@ def _source_snapshot(
     if raw_decision is not None:
         raw_source = raw_decision.get("source")
         if isinstance(raw_source, dict) and raw_source.get("type") == "adr":
-            locator = raw_source.get("path", "")
+            locator = _resolved_adr_source_path(
+                None,
+                raw_source,
+                raw_decision["id"],
+            )
             revision = raw_source.get("sha256", "")
-            if isinstance(locator, str) and locator and isinstance(revision, str) and revision:
+            if locator:
+                evidence = [{
+                    "source_type": "adr",
+                    "source_locator": locator,
+                    "source_revision": revision if isinstance(revision, str) else "",
+                    "observed_at": "",
+                    "verification_status": "",
+                }]
+                if isinstance(revision, str) and revision:
+                    return (
+                        evidence,
+                        [raw_decision["id"], revision, "adr-import"],
+                    )
                 return (
-                    [{
-                        "source_type": "adr",
-                        "source_locator": locator,
-                        "source_revision": revision,
-                        "observed_at": "",
-                        "verification_status": "",
-                    }],
-                    [raw_decision["id"], revision, "adr-import"],
+                    evidence,
+                    ["legacy-decisions", raw_decision["id"]],
                 )
     decision_id = raw_decision["id"] if raw_decision is not None else ""
     return (
@@ -496,9 +506,15 @@ def migrate_memory_document(document: dict[str, Any]) -> dict[str, Any]:
 
     migrated = copy.deepcopy(document)
     migrated["decision_index"] = section
-    migrated["decisions"] = copy.deepcopy(raw_decisions)
+    migrated["decisions"] = [
+        copy.deepcopy(raw)
+        for decision, raw in native
+        if decision.status == "active"
+    ]
     migrated["decisions"].extend(
-        _snapshot_record_from_decision(decision) for decision in migrated_items
+        _snapshot_record_from_decision(decision)
+        for decision in migrated_items
+        if decision.status == "active"
     )
     return migrated
 
@@ -688,6 +704,16 @@ def load_persisted_decision_index(
         validated["_validated_constraints"] = constraints
         validated["_validated_anti_patterns"] = anti_patterns
         versions_by_id[version_id] = validated
+
+    for version_id, version in versions_by_id.items():
+        predecessor = version.get("supersedes_version_id")
+        if predecessor is None:
+            continue
+        prior = versions_by_id.get(predecessor)
+        if prior is None or prior.get("decision_id") != version.get("decision_id"):
+            raise DecisionIndexPersistenceError(
+                f"version {version_id!r} has invalid predecessor {predecessor!r}"
+            )
 
     rules_by_version: dict[str, list[CanonicalRuleRecord]] = {}
     sequence_by_version: dict[str, set[int]] = {}
