@@ -173,6 +173,7 @@ class CanonicalDecisionRecord:
     version: str = CANONICAL_VERSION
     version_id: str = ""
     content_digest: str = ""
+    occurrence_source_identity: tuple[Any, ...] = ()
     decision_class: str = CANONICAL_DECISION_CLASS_ARCHITECTURE
     statement: str = ""
     rationale: str = ""
