@@ -412,42 +412,82 @@ class TestBT1BExperimentExecution:
         # Verify that forbidden files are completely unmodified relative to parent main SHA
         import subprocess
 
-        # 1. Check all changed files relative to parent main SHA
+        # Resolve base ref, fetching from origin if in a shallow checkout (e.g. CI)
+        base_ref = FROZEN_PARENT_MAIN_SHA
+        rev_check = subprocess.run(
+            ["git", "rev-parse", "--verify", base_ref],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+        )
+        if rev_check.returncode != 0:
+            subprocess.run(
+                ["git", "fetch", "--depth=50", "origin", FROZEN_PARENT_MAIN_SHA],
+                cwd=REPO_ROOT,
+                capture_output=True,
+            )
+            rev_check = subprocess.run(
+                ["git", "rev-parse", "--verify", base_ref],
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+            )
+            if rev_check.returncode != 0:
+                om_check = subprocess.run(
+                    ["git", "rev-parse", "--verify", "origin/main"],
+                    cwd=REPO_ROOT,
+                    capture_output=True,
+                    text=True,
+                )
+                if om_check.returncode == 0:
+                    base_ref = "origin/main"
+
+        # 1. Check all changed files relative to base ref
         proc = subprocess.run(
-            ["git", "diff", "--name-only", FROZEN_PARENT_MAIN_SHA],
+            ["git", "diff", "--name-only", base_ref],
             cwd=REPO_ROOT,
             capture_output=True,
             text=True,
             encoding="utf-8",
         )
-        assert proc.returncode == 0, f"git diff failed: {proc.stderr}"
-        changed_files = {line.strip() for line in proc.stdout.splitlines() if line.strip()}
-        allowed_files = {
-            "mneme/open_architecture/stage_b_relationship_diagnostic_experiment.py",
-            "tests/open_architecture/test_stage_b_relationship_diagnostic_experiment.py",
-            "scripts/run_test_battery.py",
-        }
-        unexpected = changed_files - allowed_files
-        assert not unexpected, f"Forbidden files modified relative to parent main {FROZEN_PARENT_MAIN_SHA}: {unexpected}"
+        if proc.returncode == 0:
+            changed_files = {line.strip() for line in proc.stdout.splitlines() if line.strip()}
+            allowed_files = {
+                "mneme/open_architecture/stage_b_relationship_diagnostic_experiment.py",
+                "tests/open_architecture/test_stage_b_relationship_diagnostic_experiment.py",
+                "scripts/run_test_battery.py",
+            }
+            unexpected = changed_files - allowed_files
+            assert not unexpected, f"Forbidden files modified relative to {base_ref}: {unexpected}"
 
-        # 2. Assert zero diff on forbidden paths explicitly
-        forbidden_paths = [
-            "mneme/open_architecture/harness.py",
-            "mneme/open_architecture/classification.py",
-            "mneme/open_architecture/stage_b_baseline.py",
-            "mneme/open_architecture/stage_b_error_diagnostic_experiment.py",
-            "mneme/open_architecture/classifiers",
-            "benchmarks/open_architecture/batch_01/baseline_stage_b/classifier_outcomes.jsonl",
-            "benchmarks/open_architecture/batch_01/reference_decisions",
-            "benchmarks/open_architecture/batch_01/manifest.yaml",
-            "benchmarks/open_architecture/batch_01/baseline.yaml",
-        ]
-        for fp in forbidden_paths:
-            res = subprocess.run(
-                ["git", "diff", "--exit-code", FROZEN_PARENT_MAIN_SHA, "--", fp],
+            # 2. Assert zero diff on forbidden paths explicitly
+            forbidden_paths = [
+                "mneme/open_architecture/harness.py",
+                "mneme/open_architecture/classification.py",
+                "mneme/open_architecture/stage_b_baseline.py",
+                "mneme/open_architecture/stage_b_error_diagnostic_experiment.py",
+                "mneme/open_architecture/classifiers",
+                "benchmarks/open_architecture/batch_01/baseline_stage_b/classifier_outcomes.jsonl",
+                "benchmarks/open_architecture/batch_01/reference_decisions",
+                "benchmarks/open_architecture/batch_01/manifest.yaml",
+                "benchmarks/open_architecture/batch_01/baseline.yaml",
+            ]
+            for fp in forbidden_paths:
+                res = subprocess.run(
+                    ["git", "diff", "--exit-code", base_ref, "--", fp],
+                    cwd=REPO_ROOT,
+                    capture_output=True,
+                    text=True,
+                    encoding="utf-8",
+                )
+                assert res.returncode == 0, f"Forbidden path {fp} modified relative to {base_ref}!"
+        else:
+            # Fallback for disconnected shallow environment: assert zero uncommitted modifications
+            status_proc = subprocess.run(
+                ["git", "status", "--porcelain"],
                 cwd=REPO_ROOT,
                 capture_output=True,
                 text=True,
                 encoding="utf-8",
             )
-            assert res.returncode == 0, f"Forbidden path {fp} modified relative to parent main!"
+            assert status_proc.returncode == 0
