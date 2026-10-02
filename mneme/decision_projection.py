@@ -225,7 +225,11 @@ def project_canonical_decision(
             _test_evidence_entry(evidence) for evidence in record.test_evidence
         ],
         source_path=_source_path_of(record, memory_path),
-        memory_path=memory_path,
+        memory_path=(
+            ""
+            if record.occurrence_source_identity[:1] == ("legacy-items",)
+            else memory_path
+        ),
         status=record.lifecycle_status,
     )
 
