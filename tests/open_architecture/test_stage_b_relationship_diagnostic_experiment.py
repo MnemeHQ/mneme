@@ -439,9 +439,9 @@ class TestBT1BExperimentExecution:
             f"Failed to resolve exact frozen parent commit {FROZEN_PARENT_MAIN_SHA}: {rev_check.stderr}"
         )
 
-        # 5. Run exact committed-range comparison against FROZEN_PARENT_MAIN_SHA
+        # 5. Run exact committed comparison against FROZEN_PARENT_MAIN_SHA
         proc = subprocess.run(
-            ["git", "diff", "--name-only", f"{FROZEN_PARENT_MAIN_SHA}...HEAD"],
+            ["git", "diff", "--name-only", FROZEN_PARENT_MAIN_SHA, "HEAD"],
             cwd=REPO_ROOT,
             capture_output=True,
             text=True,
@@ -476,7 +476,7 @@ class TestBT1BExperimentExecution:
         ]
         for fp in forbidden_paths:
             res = subprocess.run(
-                ["git", "diff", "--exit-code", f"{FROZEN_PARENT_MAIN_SHA}...HEAD", "--", fp],
+                ["git", "diff", "--exit-code", FROZEN_PARENT_MAIN_SHA, "HEAD", "--", fp],
                 cwd=REPO_ROOT,
                 capture_output=True,
                 text=True,
