@@ -108,6 +108,9 @@ class CanonicalSourceEvidence:
 
     source_type: str
     source_locator: str
+    source_revision: str = ""
+    observed_at: str = ""
+    verification_status: str = ""
 
 
 @dataclass(frozen=True)
@@ -146,6 +149,8 @@ class CanonicalRuleRecord:
     decision_version: str
     rule_type: str
     rule_payload: dict[str, Any]
+    decision_version_id: str = ""
+    sequence: int | None = None
     applicability: dict[str, Any] = field(default_factory=dict)
     lifecycle_status: str = "active"
 
@@ -166,6 +171,8 @@ class CanonicalDecisionRecord:
 
     decision_id: str
     version: str = CANONICAL_VERSION
+    version_id: str = ""
+    content_digest: str = ""
     decision_class: str = CANONICAL_DECISION_CLASS_ARCHITECTURE
     statement: str = ""
     rationale: str = ""
