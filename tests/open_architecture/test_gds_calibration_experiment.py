@@ -46,7 +46,6 @@ from mneme.open_architecture.gds_calibration_experiment import (
     FROZEN_MANIFEST_CONFIG_HASH,
     FROZEN_PARENT_MAIN_SHA,
     FROZEN_REFERENCE_CORPUS_HASH,
-    FROZEN_REPOSITORY_SHAS,
     FROZEN_SCENARIO_CORPUS_HASH,
     FROZEN_STRUCTURAL_PREFIXES,
     POLICY_RELATIVE_80,
@@ -62,6 +61,10 @@ from mneme.open_architecture.gds_calibration_experiment import (
     select_decisions_for_policy,
     suppress_structural_labels,
     transform_query_for_b3,
+)
+from mneme.open_architecture.harness import (
+    APPROVED_BATCH_01_REPOSITORIES,
+    HarnessPreflightError,
 )
 from mneme.schemas import Decision
 
@@ -340,7 +343,20 @@ class TestGDSCalibrationExperimentGates:
         for profile_name in EVALUATED_PROFILES:
             prof = experiment_result.profiles[profile_name]
             assert len(prof.per_repository) == 5
-            for repo_id in FROZEN_REPOSITORY_SHAS:
+            for repo_id in APPROVED_BATCH_01_REPOSITORIES:
                 assert repo_id in prof.per_repository
                 repo_sum = prof.per_repository[repo_id]
                 assert repo_sum.total_scenarios == 10
+
+    def test_gate_9_preflight_rejection_fails_closed(self, tmp_path: Path):
+        # Create an invalid baseline file (status not frozen) that fails preflight
+        repo_root = Path(__file__).resolve().parent.parent.parent
+        valid_baseline = repo_root / "benchmarks" / "open_architecture" / "batch_01" / "baseline.yaml"
+        content = valid_baseline.read_text(encoding="utf-8")
+        bad_content = content.replace("status: frozen", "status: draft")
+
+        bad_baseline = tmp_path / "bad_baseline.yaml"
+        bad_baseline.write_text(bad_content, encoding="utf-8")
+
+        with pytest.raises(HarnessPreflightError, match="Baseline status must be 'frozen'"):
+            execute_gds_calibration_experiment(baseline_path=bad_baseline)

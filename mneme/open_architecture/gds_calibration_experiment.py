@@ -32,30 +32,26 @@ from pathlib import Path
 from typing import Any
 
 from mneme.decision_retriever import DecisionRetriever, ScoredDecision
-from mneme.open_architecture.baseline import (
-    BaselineConfig,
-    validate_baseline_freeze,
-)
-from mneme.open_architecture.export import compute_reference_corpus_content_hash
 from mneme.open_architecture.gds_evaluation import render_scenario_query
 from mneme.open_architecture.harness import (
+    FROZEN_BASELINE_CONFIG_HASH,
+    FROZEN_BASELINE_ID,
+    FROZEN_MANIFEST_CONFIG_HASH,
+    FROZEN_REFERENCE_CORPUS_HASH,
+    FROZEN_SCENARIO_CORPUS_HASH,
     FrozenReferenceDecision,
+    HarnessPreflightError,
     import_scenarios_jsonl,
     load_reference_corpus,
+    preflight_batch_01,
 )
 from mneme.open_architecture.manifest import Manifest, RepositoryConfig
 from mneme.open_architecture.metrics import GoverningDecisionSetMetrics, compute_suite_metrics
-from mneme.open_architecture.orchestrator import _compute_scenario_content_hash
 from mneme.open_architecture.projection import project_candidates_to_decisions
 from mneme.open_architecture.schemas import ApplicabilityScenario
 
 EXPERIMENT_ID: str = "o1a-c-gds-calibration"
-FROZEN_BASELINE_ID: str = "o1a-batch-01-baseline"
 FROZEN_PARENT_MAIN_SHA: str = "134fbae5675697396ac50beb3728d66d1f1c463f"
-FROZEN_REFERENCE_CORPUS_HASH: str = "0455bd66aae52551c35b37a63c2d185f"
-FROZEN_SCENARIO_CORPUS_HASH: str = "2ff8751955fd64a33316aca6692dc803"
-FROZEN_MANIFEST_CONFIG_HASH: str = "4af7e5794011b43d39682cdfeac9f54e"
-FROZEN_BASELINE_CONFIG_HASH: str = "31e18dc1e2bd9ad30bec86dce1a9295a"
 
 # Frozen selection policies and constants
 POLICY_SCORE_GT_ZERO: str = "score_gt_zero"
@@ -96,15 +92,6 @@ FROZEN_FUNCTION_WORDS: frozenset[str] = frozenset({
     "with",
     "without",
 })
-
-# Frozen approved Batch 01 repositories and commit SHAs
-FROZEN_REPOSITORY_SHAS: dict[str, str] = {
-    "adrkit": "471457da29638ecca6119b35180c2845bf989cac",
-    "gsa_agentic_coding_quickstart": "8e6160c63acc35bd48d0a3844e133ea3ad52a464",
-    "helix": "37d994370deba2512588b5c4efb7f03483e7308b",
-    "archlint": "185837e93565718d8e1ea653236cd70ca0a89e3a",
-    "modonome": "7a4d5244dcb6879b6aa646105b39297aa6d0a5a2",
-}
 
 
 # ── Decision Selection Logic ───────────────────────────────────────────────────
@@ -452,35 +439,21 @@ def execute_gds_calibration_experiment(
             raise ValueError(f"Output directory '{out_path}' exists and is non-empty")
         out_path.mkdir(parents=True, exist_ok=True)
 
-    # 1. Validate baseline freeze and manifest
-    baseline_cfg = BaselineConfig.load(baseline_p)
+    # 1. Authoritative frozen preflight verification
+    preflight_batch_01(
+        baseline_path=baseline_p,
+        manifest_path=manifest_p,
+        reference_corpus_dir=ref_dir,
+        scenarios_path=scen_p,
+    )
+
     manifest = Manifest.load(manifest_p)
-    validate_baseline_freeze(baseline_cfg, manifest)
-
-    if baseline_cfg.baseline_id != FROZEN_BASELINE_ID:
-        raise ValueError(
-            f"Baseline ID mismatch: got '{baseline_cfg.baseline_id}', expected '{FROZEN_BASELINE_ID}'"
-        )
-
-    # 2. Validate reference and scenario corpus hashes fail-closed
-    ref_hash = compute_reference_corpus_content_hash(ref_dir)
-    if ref_hash != FROZEN_REFERENCE_CORPUS_HASH:
-        raise ValueError(
-            f"Reference corpus hash mismatch: got '{ref_hash}', expected '{FROZEN_REFERENCE_CORPUS_HASH}'"
-        )
-
     all_refs = load_reference_corpus(ref_dir)
     all_scenarios = import_scenarios_jsonl(scen_p)
 
-    scen_hash = _compute_scenario_content_hash(all_scenarios)
-    if scen_hash != FROZEN_SCENARIO_CORPUS_HASH:
-        raise ValueError(
-            f"Scenario corpus hash mismatch: got '{scen_hash}', expected '{FROZEN_SCENARIO_CORPUS_HASH}'"
-        )
-
     profile_hash = compute_experiment_profile_hash()
 
-    # 3. Evaluate each repository across the 50 scenarios for each profile
+    # 2. Evaluate each repository across the 50 scenarios for each profile
     scenario_evaluations: list[ScenarioCalibrationResult] = []
     profile_results: dict[str, list[ScenarioCalibrationResult]] = {
         p: [] for p in EVALUATED_PROFILES
@@ -490,12 +463,6 @@ def execute_gds_calibration_experiment(
     }
 
     for repo_cfg in manifest.repositories:
-        expected_sha = FROZEN_REPOSITORY_SHAS.get(repo_cfg.id)
-        if expected_sha is None or repo_cfg.commit_sha != expected_sha:
-            raise ValueError(
-                f"Repository '{repo_cfg.id}' SHA {repo_cfg.commit_sha} does not match expected {expected_sha}"
-            )
-
         repo_refs = [r for r in all_refs if r.repository == repo_cfg.github]
         if len(repo_refs) != 20:
             raise ValueError(f"Expected 20 references for '{repo_cfg.id}', got {len(repo_refs)}")
