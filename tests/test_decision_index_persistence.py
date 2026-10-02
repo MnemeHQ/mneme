@@ -288,6 +288,26 @@ def test_rule_identity_corruption_fails_closed() -> None:
         load_persisted_decision_index(section)
 
 
+def test_unknown_persisted_rule_payload_field_fails_closed() -> None:
+    section = migrate_memory_document(_document())["decision_index"]
+    section["rules"][0]["rule_payload"]["future"] = "unsupported"
+    with pytest.raises(
+        DecisionIndexPersistenceError,
+        match="payload contains unsupported fields",
+    ):
+        load_persisted_decision_index(section)
+
+
+def test_unknown_persisted_applicability_field_fails_closed() -> None:
+    section = migrate_memory_document(_document())["decision_index"]
+    section["rules"][0]["applicability"]["component"] = "api"
+    with pytest.raises(
+        DecisionIndexPersistenceError,
+        match="applicability contains unsupported fields",
+    ):
+        load_persisted_decision_index(section)
+
+
 def test_compatibility_snapshot_divergence_fails_closed(tmp_path: Path) -> None:
     path = tmp_path / "project_memory.json"
     _write(path, _document())
