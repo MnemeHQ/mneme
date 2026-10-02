@@ -409,19 +409,45 @@ class TestBT1BExperimentExecution:
         assert res.global_volume.reference_count == 100
 
     def test_26_frozen_canonical_modules_unmodified(self):
-        # Verify that canonical files exist and are not modified in git working copy
+        # Verify that forbidden files are completely unmodified relative to parent main SHA
         import subprocess
+
+        # 1. Check all changed files relative to parent main SHA
         proc = subprocess.run(
-            ["git", "status", "--porcelain"],
+            ["git", "diff", "--name-only", FROZEN_PARENT_MAIN_SHA],
             cwd=REPO_ROOT,
             capture_output=True,
             text=True,
             encoding="utf-8",
         )
-        assert proc.returncode == 0
-        changed_files = [line.strip().split()[-1] for line in proc.stdout.splitlines() if line.strip()]
-        for cf in changed_files:
-            # Only allowed additions/modifications
-            assert cf.startswith("mneme/open_architecture/stage_b_relationship_diagnostic_experiment.py") or \
-                   cf.startswith("tests/open_architecture/test_stage_b_relationship_diagnostic_experiment.py") or \
-                   cf.startswith("scripts/run_test_battery.py"), f"Forbidden file modified: {cf}"
+        assert proc.returncode == 0, f"git diff failed: {proc.stderr}"
+        changed_files = {line.strip() for line in proc.stdout.splitlines() if line.strip()}
+        allowed_files = {
+            "mneme/open_architecture/stage_b_relationship_diagnostic_experiment.py",
+            "tests/open_architecture/test_stage_b_relationship_diagnostic_experiment.py",
+            "scripts/run_test_battery.py",
+        }
+        unexpected = changed_files - allowed_files
+        assert not unexpected, f"Forbidden files modified relative to parent main {FROZEN_PARENT_MAIN_SHA}: {unexpected}"
+
+        # 2. Assert zero diff on forbidden paths explicitly
+        forbidden_paths = [
+            "mneme/open_architecture/harness.py",
+            "mneme/open_architecture/classification.py",
+            "mneme/open_architecture/stage_b_baseline.py",
+            "mneme/open_architecture/stage_b_error_diagnostic_experiment.py",
+            "mneme/open_architecture/classifiers",
+            "benchmarks/open_architecture/batch_01/baseline_stage_b/classifier_outcomes.jsonl",
+            "benchmarks/open_architecture/batch_01/reference_decisions",
+            "benchmarks/open_architecture/batch_01/manifest.yaml",
+            "benchmarks/open_architecture/batch_01/baseline.yaml",
+        ]
+        for fp in forbidden_paths:
+            res = subprocess.run(
+                ["git", "diff", "--exit-code", FROZEN_PARENT_MAIN_SHA, "--", fp],
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+            )
+            assert res.returncode == 0, f"Forbidden path {fp} modified relative to parent main!"
