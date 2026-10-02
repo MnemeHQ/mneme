@@ -36,6 +36,8 @@ other class fails closed.
 """
 from __future__ import annotations
 
+from pathlib import Path
+
 from mneme.decision_index import (
     CANONICAL_DECISION_CLASS_ARCHITECTURE,
     SOURCE_TYPE_ADR,
@@ -99,7 +101,10 @@ def project_canonical_rule(rule: CanonicalRuleRecord) -> Rule:
     )
 
 
-def _source_path_of(record: CanonicalDecisionRecord) -> str:
+def _source_path_of(
+    record: CanonicalDecisionRecord,
+    memory_path: str = "",
+) -> str:
     """Resolve the runtime ``source_path`` from canonical source evidence.
 
     The provenance type is not consulted: the locator round-trips whatever
@@ -116,7 +121,16 @@ def _source_path_of(record: CanonicalDecisionRecord) -> str:
                 f"(expected one of {sorted(VALID_SOURCE_TYPES)})"
             )
     if record.source_evidence:
-        return record.source_evidence[0].source_locator
+        evidence = record.source_evidence[0]
+        locator = evidence.source_locator
+        if (
+            evidence.source_type == SOURCE_TYPE_ADR
+            and locator
+            and memory_path
+            and not Path(locator).is_absolute()
+        ):
+            return str((Path(memory_path).parent / locator).resolve())
+        return locator
     return ""
 
 
@@ -167,6 +181,17 @@ def project_canonical_decision(
                 f"version {rule.decision_version!r}, but record "
                 f"{record.decision_id!r} is version {record.version!r}"
             )
+        if record.version_id or rule.decision_version_id:
+            if (
+                not record.version_id
+                or not rule.decision_version_id
+                or rule.decision_version_id != record.version_id
+            ):
+                raise ValueError(
+                    f"canonical rule {rule.rule_id!r} is bound to version id "
+                    f"{rule.decision_version_id!r}, but record "
+                    f"{record.decision_id!r} resolves {record.version_id!r}"
+                )
         if rule.lifecycle_status != record.lifecycle_status:
             raise ValueError(
                 f"canonical rule {rule.rule_id!r} has lifecycle_status "
@@ -199,7 +224,7 @@ def project_canonical_decision(
         test_evidence=[
             _test_evidence_entry(evidence) for evidence in record.test_evidence
         ],
-        source_path=_source_path_of(record),
+        source_path=_source_path_of(record, memory_path),
         memory_path=memory_path,
         status=record.lifecycle_status,
     )
