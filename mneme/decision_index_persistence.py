@@ -883,6 +883,9 @@ def load_persisted_decision_index(
             version=version["_validated_revision"],
             version_id=active_version_id,
             content_digest=version["content_digest"],
+            occurrence_source_identity=tuple(
+                version["occurrence_source_identity"]
+            ),
             decision_class=decision_class,
             statement=version["_validated_statement"],
             rationale=version["_validated_rationale"],
