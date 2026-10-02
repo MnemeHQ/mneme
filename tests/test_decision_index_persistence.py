@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+from mneme.benchmark import BenchmarkRunner
 from mneme.decision_index_persistence import (
     DECISION_INDEX_SCHEMA,
     DecisionIndexPersistenceError,
@@ -17,7 +18,19 @@ from mneme.decision_index_persistence import (
     rule_id_of,
     version_id_of,
 )
+from mneme.decision_projection import project_canonical_index
 from mneme.memory_store import MemoryStore
+
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+
+
+class _DecisionSource:
+    def __init__(self, decisions):
+        self._decisions = list(decisions)
+
+    def decisions(self):
+        return list(self._decisions)
 
 
 def _document(*, two_rules: bool = False) -> dict:
@@ -77,6 +90,50 @@ def _write(path: Path, document: dict) -> None:
         json.dumps(document, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
+
+
+@pytest.mark.parametrize(
+    "relative_path",
+    [
+        ".mneme/project_memory.json",
+        "examples/project_memory.json",
+    ],
+)
+def test_real_memory_migration_projects_exact_runtime_decisions(
+    relative_path: str,
+) -> None:
+    memory_path = REPO_ROOT / relative_path
+    document = json.loads(memory_path.read_text(encoding="utf-8"))
+    baseline = MemoryStore(memory_path).load().decisions
+    migrated = migrate_memory_document(document)
+    index = load_persisted_decision_index(migrated["decision_index"])
+    projected = project_canonical_index(
+        index,
+        memory_path=str(memory_path.resolve()),
+    )
+    assert projected == baseline
+
+
+def test_real_migrated_projection_preserves_frozen_benchmark_results() -> None:
+    memory_path = REPO_ROOT / "examples" / "project_memory.json"
+    document = json.loads(memory_path.read_text(encoding="utf-8"))
+    baseline_store = MemoryStore(memory_path)
+    baseline_store.load()
+    baseline = BenchmarkRunner(baseline_store).run_suite(
+        REPO_ROOT / "examples" / "benchmarks"
+    )
+
+    migrated = migrate_memory_document(document)
+    index = load_persisted_decision_index(migrated["decision_index"])
+    projected = project_canonical_index(
+        index,
+        memory_path=str(memory_path.resolve()),
+    )
+    migrated_results = BenchmarkRunner(
+        _DecisionSource(projected)
+    ).run_suite(REPO_ROOT / "examples" / "benchmarks")
+
+    assert migrated_results == baseline
 
 
 def test_identity_golden_vectors() -> None:
