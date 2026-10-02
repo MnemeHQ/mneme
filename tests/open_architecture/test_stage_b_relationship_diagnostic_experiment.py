@@ -412,9 +412,9 @@ class TestBT1BExperimentExecution:
         # Verify that forbidden files are completely unmodified relative to exact parent main SHA
         import subprocess
 
-        # 1. Try to resolve the exact FROZEN_PARENT_MAIN_SHA
+        # 1. Try to resolve the exact FROZEN_PARENT_MAIN_SHA commit object
         rev_check = subprocess.run(
-            ["git", "rev-parse", "--verify", FROZEN_PARENT_MAIN_SHA],
+            ["git", "cat-file", "-e", f"{FROZEN_PARENT_MAIN_SHA}^{{commit}}"],
             cwd=REPO_ROOT,
             capture_output=True,
             text=True,
@@ -422,13 +422,18 @@ class TestBT1BExperimentExecution:
         # 2. If unavailable in a shallow checkout, fetch the exact parent from origin
         if rev_check.returncode != 0:
             subprocess.run(
-                ["git", "fetch", "--depth=50", "origin", FROZEN_PARENT_MAIN_SHA],
+                ["git", "fetch", "origin", FROZEN_PARENT_MAIN_SHA],
                 cwd=REPO_ROOT,
                 capture_output=True,
             )
-            # 3. Re-check the exact SHA
+            subprocess.run(
+                ["git", "fetch", "origin", "main"],
+                cwd=REPO_ROOT,
+                capture_output=True,
+            )
+            # 3. Re-check the exact SHA commit object
             rev_check = subprocess.run(
-                ["git", "rev-parse", "--verify", FROZEN_PARENT_MAIN_SHA],
+                ["git", "cat-file", "-e", f"{FROZEN_PARENT_MAIN_SHA}^{{commit}}"],
                 cwd=REPO_ROOT,
                 capture_output=True,
                 text=True,
