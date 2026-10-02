@@ -123,21 +123,24 @@ def _str_list(value: object, label: str) -> list[str]:
 
 
 def _rule_from_memory_record(record: object) -> Rule:
-    raw = _require_dict(record, "rule record")
+    """Pre-D1 rule loader semantics, preserved byte-for-byte in behavior."""
+    if not isinstance(record, dict):
+        raise ValueError("rule record must be an object")
     include_paths: tuple[str, ...] | None = None
-    if "include_paths" in raw:
-        include = _str_list(raw["include_paths"], "rule include_paths")
-        include_paths = tuple(include)
-    exclude = _str_list(raw.get("exclude_paths", []), "rule exclude_paths")
-    try:
-        return Rule(
-            type=raw["type"],
-            value=raw["value"],
-            include_paths=include_paths,
-            exclude_paths=tuple(exclude),
-        )
-    except (KeyError, TypeError, ValueError) as exc:
-        raise DecisionIndexPersistenceError(f"invalid rule record: {exc}") from exc
+    if "include_paths" in record:
+        raw_include = record["include_paths"]
+        if not isinstance(raw_include, list):
+            raise ValueError("rule include_paths must be a list")
+        include_paths = tuple(raw_include)
+    raw_exclude = record.get("exclude_paths", [])
+    if not isinstance(raw_exclude, list):
+        raise ValueError("rule exclude_paths must be a list")
+    return Rule(
+        type=record["type"],
+        value=record["value"],
+        include_paths=include_paths,
+        exclude_paths=tuple(raw_exclude),
+    )
 
 
 def _resolved_adr_source_path(
@@ -166,53 +169,34 @@ def runtime_decision_from_memory_record(
     record: object,
     memory_path: Path | None = None,
 ) -> Decision:
-    """Load one pre-D1 ``decisions[]`` entry with the existing semantics."""
-    raw = _require_dict(record, "decision record")
-    try:
-        decision_id = raw["id"]
-        statement = raw["decision"]
-    except KeyError as exc:
-        raise DecisionIndexPersistenceError(
-            f"decision record is missing required field {exc.args[0]!r}"
-        ) from exc
-    _require_str(decision_id, "decision id", non_empty=True)
-    _require_str(statement, f"decision {decision_id!r} statement")
-    rules = [_rule_from_memory_record(row) for row in raw.get("rules", [])]
-    test_evidence_raw = raw.get("test_evidence") or []
-    _require_list(test_evidence_raw, f"decision {decision_id!r} test_evidence")
+    """Load one pre-D1 ``decisions[]`` entry with the exact old semantics."""
+    if not isinstance(record, dict):
+        raise TypeError("decision record must be an object")
     return Decision(
-        id=decision_id,
-        decision=statement,
-        rationale=_require_str(
-            raw.get("rationale", ""), f"decision {decision_id!r} rationale"
-        ),
-        scope=_str_list(raw.get("scope", []), f"decision {decision_id!r} scope"),
-        constraints=_str_list(
-            raw.get("constraints", []), f"decision {decision_id!r} constraints"
-        ),
-        anti_patterns=_str_list(
-            raw.get("anti_patterns", []),
-            f"decision {decision_id!r} anti_patterns",
-        ),
-        rules=rules,
+        id=record["id"],
+        decision=record["decision"],
+        rationale=record.get("rationale", ""),
+        scope=list(record.get("scope", [])),
+        constraints=list(record.get("constraints", [])),
+        anti_patterns=list(record.get("anti_patterns", [])),
+        rules=[
+            _rule_from_memory_record(rule)
+            for rule in record.get("rules", [])
+        ],
         test_evidence=[
-            entry for entry in test_evidence_raw if isinstance(entry, dict)
+            entry
+            for entry in (record.get("test_evidence") or [])
+            if isinstance(entry, dict)
         ],
         source_path=_resolved_adr_source_path(
             memory_path,
-            raw.get("source"),
-            decision_id,
+            record.get("source"),
+            record["id"],
         ),
         memory_path=str(memory_path.resolve()) if memory_path is not None else "",
-        created_at=_require_str(
-            raw.get("created_at", ""), f"decision {decision_id!r} created_at"
-        ),
-        updated_at=_require_str(
-            raw.get("updated_at", ""), f"decision {decision_id!r} updated_at"
-        ),
-        status=_require_str(
-            raw.get("status", "active"), f"decision {decision_id!r} status"
-        ),
+        created_at=record.get("created_at", ""),
+        updated_at=record.get("updated_at", ""),
+        status=record.get("status", "active"),
     )
 
 
