@@ -1,0 +1,45 @@
+{
+  "artifact_type": "stage_b_baseline_provenance",
+  "baseline_configuration_hash": "31e18dc1e2bd9ad30bec86dce1a9295a",
+  "baseline_id": "o1a-batch-01-baseline",
+  "classifier": {
+    "backend_id": "anthropic",
+    "classifier_version": "0.1",
+    "model_identifier": "claude-sonnet-4-6",
+    "taxonomy_version": "0.1"
+  },
+  "dataset": {
+    "outcomes_file": "classifier_outcomes.jsonl",
+    "tasks_per_reference": 8,
+    "total_outcomes": 800,
+    "total_references": 100
+  },
+  "reference_corpus_hash": "0455bd66aae52551c35b37a63c2d185f",
+  "repository_composites": {
+    "adrkit": 0.5143057222889156,
+    "archlint": 0.39479166666666665,
+    "gsa_agentic_coding_quickstart": 0.639712525326336,
+    "helix": 0.5664556962025317,
+    "modonome": 0.4706410256410256
+  },
+  "scoring_contract": {
+    "aggregation": "macro_average_across_repositories",
+    "description": "Unweighted arithmetic mean of 8 per-repository semantic task metrics with equal weighting across repositories and tasks.",
+    "formula": "mean_across_repos(mean(decision_classification_accuracy, domain_micro_f1, purpose_micro_f1, authority_accuracy, scope_accuracy, lifecycle_accuracy, relationship_accuracy, enforcement_classification_accuracy))",
+    "legacy_historical_literal": 0.517188,
+    "legacy_literal_explanation": "Introduced in PR #413 (source_coverage_experiment.py) as an approximate rounded literal; differs from exact composite by approximately +6.67e-6.",
+    "recomputed_exact_composite": 0.5171813272250951,
+    "tasks": [
+      "decision_classification_accuracy",
+      "domain_micro_f1",
+      "purpose_micro_f1",
+      "authority_accuracy",
+      "scope_accuracy",
+      "lifecycle_accuracy",
+      "relationship_accuracy",
+      "enforcement_classification_accuracy"
+    ]
+  },
+  "semantic_content_hash": "sha256:3c215db23a7fae8b8ac98852e65985b1efded354850fd9be65c24bfd1c90682d",
+  "stage_b_semantic_score": 0.5171813272250951
+}
