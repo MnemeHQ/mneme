@@ -409,85 +409,79 @@ class TestBT1BExperimentExecution:
         assert res.global_volume.reference_count == 100
 
     def test_26_frozen_canonical_modules_unmodified(self):
-        # Verify that forbidden files are completely unmodified relative to parent main SHA
+        # Verify that forbidden files are completely unmodified relative to exact parent main SHA
         import subprocess
 
-        # Resolve base ref, fetching from origin if in a shallow checkout (e.g. CI)
-        base_ref = FROZEN_PARENT_MAIN_SHA
+        # 1. Try to resolve the exact FROZEN_PARENT_MAIN_SHA
         rev_check = subprocess.run(
-            ["git", "rev-parse", "--verify", base_ref],
+            ["git", "rev-parse", "--verify", FROZEN_PARENT_MAIN_SHA],
             cwd=REPO_ROOT,
             capture_output=True,
             text=True,
         )
+        # 2. If unavailable in a shallow checkout, fetch the exact parent from origin
         if rev_check.returncode != 0:
             subprocess.run(
                 ["git", "fetch", "--depth=50", "origin", FROZEN_PARENT_MAIN_SHA],
                 cwd=REPO_ROOT,
                 capture_output=True,
             )
+            # 3. Re-check the exact SHA
             rev_check = subprocess.run(
-                ["git", "rev-parse", "--verify", base_ref],
+                ["git", "rev-parse", "--verify", FROZEN_PARENT_MAIN_SHA],
                 cwd=REPO_ROOT,
                 capture_output=True,
                 text=True,
             )
-            if rev_check.returncode != 0:
-                om_check = subprocess.run(
-                    ["git", "rev-parse", "--verify", "origin/main"],
-                    cwd=REPO_ROOT,
-                    capture_output=True,
-                    text=True,
-                )
-                if om_check.returncode == 0:
-                    base_ref = "origin/main"
 
-        # 1. Check all changed files relative to base ref
+        # 4. Fail closed if the exact parent cannot be resolved
+        assert rev_check.returncode == 0, (
+            f"Failed to resolve exact frozen parent commit {FROZEN_PARENT_MAIN_SHA}: {rev_check.stderr}"
+        )
+
+        # 5. Run exact committed-range comparison against FROZEN_PARENT_MAIN_SHA
         proc = subprocess.run(
-            ["git", "diff", "--name-only", base_ref],
+            ["git", "diff", "--name-only", f"{FROZEN_PARENT_MAIN_SHA}...HEAD"],
             cwd=REPO_ROOT,
             capture_output=True,
             text=True,
             encoding="utf-8",
         )
-        if proc.returncode == 0:
-            changed_files = {line.strip() for line in proc.stdout.splitlines() if line.strip()}
-            allowed_files = {
-                "mneme/open_architecture/stage_b_relationship_diagnostic_experiment.py",
-                "tests/open_architecture/test_stage_b_relationship_diagnostic_experiment.py",
-                "scripts/run_test_battery.py",
-            }
-            unexpected = changed_files - allowed_files
-            assert not unexpected, f"Forbidden files modified relative to {base_ref}: {unexpected}"
+        assert proc.returncode == 0, f"git diff failed: {proc.stderr}"
+        changed_files = {line.strip() for line in proc.stdout.splitlines() if line.strip()}
+        allowed_files = {
+            "mneme/open_architecture/stage_b_relationship_diagnostic_experiment.py",
+            "tests/open_architecture/test_stage_b_relationship_diagnostic_experiment.py",
+            "scripts/run_test_battery.py",
+        }
+        unexpected = changed_files - allowed_files
+        assert not unexpected, (
+            f"Forbidden files modified relative to frozen parent {FROZEN_PARENT_MAIN_SHA}: {unexpected}"
+        )
+        assert changed_files == allowed_files, (
+            f"Expected exactly {allowed_files}, but observed {changed_files}"
+        )
 
-            # 2. Assert zero diff on forbidden paths explicitly
-            forbidden_paths = [
-                "mneme/open_architecture/harness.py",
-                "mneme/open_architecture/classification.py",
-                "mneme/open_architecture/stage_b_baseline.py",
-                "mneme/open_architecture/stage_b_error_diagnostic_experiment.py",
-                "mneme/open_architecture/classifiers",
-                "benchmarks/open_architecture/batch_01/baseline_stage_b/classifier_outcomes.jsonl",
-                "benchmarks/open_architecture/batch_01/reference_decisions",
-                "benchmarks/open_architecture/batch_01/manifest.yaml",
-                "benchmarks/open_architecture/batch_01/baseline.yaml",
-            ]
-            for fp in forbidden_paths:
-                res = subprocess.run(
-                    ["git", "diff", "--exit-code", base_ref, "--", fp],
-                    cwd=REPO_ROOT,
-                    capture_output=True,
-                    text=True,
-                    encoding="utf-8",
-                )
-                assert res.returncode == 0, f"Forbidden path {fp} modified relative to {base_ref}!"
-        else:
-            # Fallback for disconnected shallow environment: assert zero uncommitted modifications
-            status_proc = subprocess.run(
-                ["git", "status", "--porcelain"],
+        # 6. Assert zero diff on forbidden paths explicitly against exact parent
+        forbidden_paths = [
+            "mneme/open_architecture/harness.py",
+            "mneme/open_architecture/classification.py",
+            "mneme/open_architecture/stage_b_baseline.py",
+            "mneme/open_architecture/stage_b_error_diagnostic_experiment.py",
+            "mneme/open_architecture/classifiers",
+            "benchmarks/open_architecture/batch_01/baseline_stage_b/classifier_outcomes.jsonl",
+            "benchmarks/open_architecture/batch_01/reference_decisions",
+            "benchmarks/open_architecture/batch_01/manifest.yaml",
+            "benchmarks/open_architecture/batch_01/baseline.yaml",
+        ]
+        for fp in forbidden_paths:
+            res = subprocess.run(
+                ["git", "diff", "--exit-code", f"{FROZEN_PARENT_MAIN_SHA}...HEAD", "--", fp],
                 cwd=REPO_ROOT,
                 capture_output=True,
                 text=True,
                 encoding="utf-8",
             )
-            assert status_proc.returncode == 0
+            assert res.returncode == 0, (
+                f"Forbidden path {fp} modified relative to exact frozen parent {FROZEN_PARENT_MAIN_SHA}!"
+            )
