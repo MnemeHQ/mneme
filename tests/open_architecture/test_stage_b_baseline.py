@@ -109,16 +109,30 @@ class TestStageBHashValidation:
         computed_hash = compute_stage_b_semantic_content_hash(outcomes)
         assert computed_hash == FROZEN_STAGE_B_SEMANTIC_CONTENT_HASH
 
-    def test_hash_fails_closed_on_mutation(self):
+    def test_hash_fails_closed_on_mutation(self, tmp_path: Path):
+        # Load valid 800 outcomes, mutate one semantic output, write complete 800-row file
         outcomes = load_stage_b_outcomes(OUTCOMES_PATH)
-        # Mutate first outcome output
-        mutated_data = outcomes[0].to_dict()
-        mutated_data["output"] = {"classification": "corrupted_verdict"}
-        mutated_outcome = FrozenClassifierOutcome.from_dict(mutated_data)
+        mutated_dicts = [o.to_dict() for o in outcomes]
+        mutated_dicts[0]["output"] = {"classification": "corrupted_verdict"}
 
-        mutated_list = [mutated_outcome] + outcomes[1:]
-        mutated_hash = compute_stage_b_semantic_content_hash(mutated_list)
-        assert mutated_hash != FROZEN_STAGE_B_SEMANTIC_CONTENT_HASH
+        mutated_file = tmp_path / "mutated_outcomes.jsonl"
+        lines = [json.dumps(d, sort_keys=True, separators=(",", ":")) for d in mutated_dicts]
+        mutated_file.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+        with pytest.raises(ValueError, match="Stage B semantic content hash mismatch"):
+            load_stage_b_outcomes(mutated_file)
+
+    def test_taxonomy_version_mutation_fails_closed(self, tmp_path: Path):
+        outcomes = load_stage_b_outcomes(OUTCOMES_PATH)
+        mutated_dicts = [o.to_dict() for o in outcomes]
+        mutated_dicts[0]["taxonomy_version"] = "9.9"
+
+        mutated_file = tmp_path / "bad_taxonomy.jsonl"
+        lines = [json.dumps(d, sort_keys=True, separators=(",", ":")) for d in mutated_dicts]
+        mutated_file.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+        with pytest.raises(ValueError, match="Taxonomy version mismatch"):
+            load_stage_b_outcomes(mutated_file)
 
     def test_provenance_summary_json_integrity(self):
         assert PROVENANCE_PATH.is_file()
@@ -230,6 +244,25 @@ class TestStageBOfflineScoring:
         res = score_stage_b_outcomes(outcomes, all_refs, manifest)
         assert abs(res.stage_b_semantic_score - EXACT_STAGE_B_COMPOSITE) < 1e-12
         assert res.stage_b_semantic_score == pytest.approx(0.5171813272250951, abs=1e-12)
+
+    def test_harness_is_single_scoring_authority(self, monkeypatch):
+        import mneme.open_architecture.stage_b_baseline as stage_b_mod
+        harness_calls = []
+        original_fn = stage_b_mod._execute_stage_b_tasks_and_scoring
+
+        def _spy(*args, **kwargs):
+            harness_calls.append(kwargs.get("repository_config"))
+            return original_fn(*args, **kwargs)
+
+        monkeypatch.setattr(stage_b_mod, "_execute_stage_b_tasks_and_scoring", _spy)
+
+        outcomes = load_stage_b_outcomes(OUTCOMES_PATH)
+        manifest = Manifest.load(MANIFEST_PATH)
+        all_refs = load_reference_corpus(REF_DIR)
+        res = score_stage_b_outcomes(outcomes, all_refs, manifest)
+
+        assert len(harness_calls) == 5
+        assert abs(res.stage_b_semantic_score - EXACT_STAGE_B_COMPOSITE) < 1e-12
 
 
 # ── 6: No Network / Model Calls Occur ──────────────────────────────────────────
