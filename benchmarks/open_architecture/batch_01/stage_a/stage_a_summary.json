@@ -1,0 +1,175 @@
+{
+  "aggregate": {
+    "macro_f1": 0.16232962158801395,
+    "macro_precision": 0.1276030877012214,
+    "macro_recall": 0.85,
+    "total_discovered_documents": 688,
+    "total_extracted_candidates": 5459,
+    "total_matched_candidates": 256,
+    "total_matched_references": 85,
+    "total_reference_decisions": 100
+  },
+  "baseline_configuration_hash": "31e18dc1e2bd9ad30bec86dce1a9295a",
+  "baseline_id": "o1a-batch-01-baseline",
+  "extractor": {
+    "config": {
+      "confidence": 0.5,
+      "keywords": [
+        "adopt",
+        "adopted",
+        "always",
+        "avoid",
+        "decide",
+        "decided",
+        "decision",
+        "forbid",
+        "forbidden",
+        "mandate",
+        "mandated",
+        "must",
+        "never",
+        "prefer",
+        "preferred",
+        "prohibit",
+        "prohibited",
+        "require",
+        "required",
+        "shall",
+        "should not",
+        "standard",
+        "standardised",
+        "standardize",
+        "use",
+        "using"
+      ],
+      "max_lines": 50,
+      "min_lines": 2
+    },
+    "id": "heuristic",
+    "version": "0.1"
+  },
+  "manifest_configuration_hash": "4af7e5794011b43d39682cdfeac9f54e",
+  "matching_contract": {
+    "contract_id": "deterministic_source_path_and_line_interval_overlap",
+    "description": "Deterministic line-interval intersection on matching repository-relative source file components.",
+    "version": "0.1"
+  },
+  "mneme_execution_sha": "dda0342606fb388bd6de3355ada260c59b13ac0e",
+  "reference_corpus_hash": "0455bd66aae52551c35b37a63c2d185f",
+  "repositories": {
+    "adrkit": {
+      "discovered_documents_count": 345,
+      "extracted_candidates_count": 2956,
+      "f1": 0.03195739014647137,
+      "matched_candidate_count": 48,
+      "matched_reference_count": 20,
+      "missed_source_reference_ids": [],
+      "precision": 0.016238159675236806,
+      "recall": 1.0,
+      "reference_decisions_count": 20,
+      "repo_id": "adrkit",
+      "unmatched_reference_ids": []
+    },
+    "archlint": {
+      "discovered_documents_count": 2,
+      "extracted_candidates_count": 16,
+      "f1": 0.33333333333333326,
+      "matched_candidate_count": 6,
+      "matched_reference_count": 6,
+      "missed_source_reference_ids": [
+        "ref-archlint-001",
+        "ref-archlint-002",
+        "ref-archlint-003",
+        "ref-archlint-004",
+        "ref-archlint-006",
+        "ref-archlint-007",
+        "ref-archlint-008",
+        "ref-archlint-009",
+        "ref-archlint-010",
+        "ref-archlint-015",
+        "ref-archlint-016",
+        "ref-archlint-018",
+        "ref-archlint-019",
+        "ref-archlint-020"
+      ],
+      "precision": 0.375,
+      "recall": 0.3,
+      "reference_decisions_count": 20,
+      "repo_id": "archlint",
+      "unmatched_reference_ids": [
+        "ref-archlint-001",
+        "ref-archlint-002",
+        "ref-archlint-003",
+        "ref-archlint-004",
+        "ref-archlint-006",
+        "ref-archlint-007",
+        "ref-archlint-008",
+        "ref-archlint-009",
+        "ref-archlint-010",
+        "ref-archlint-015",
+        "ref-archlint-016",
+        "ref-archlint-018",
+        "ref-archlint-019",
+        "ref-archlint-020"
+      ]
+    },
+    "gsa_agentic_coding_quickstart": {
+      "discovered_documents_count": 50,
+      "extracted_candidates_count": 689,
+      "f1": 0.22193548387096776,
+      "matched_candidate_count": 86,
+      "matched_reference_count": 20,
+      "missed_source_reference_ids": [],
+      "precision": 0.12481857764876633,
+      "recall": 1.0,
+      "reference_decisions_count": 20,
+      "repo_id": "gsa_agentic_coding_quickstart",
+      "unmatched_reference_ids": []
+    },
+    "helix": {
+      "discovered_documents_count": 140,
+      "extracted_candidates_count": 978,
+      "f1": 0.18384401114206125,
+      "matched_candidate_count": 99,
+      "matched_reference_count": 20,
+      "missed_source_reference_ids": [],
+      "precision": 0.10122699386503067,
+      "recall": 1.0,
+      "reference_decisions_count": 20,
+      "repo_id": "helix",
+      "unmatched_reference_ids": []
+    },
+    "modonome": {
+      "discovered_documents_count": 151,
+      "extracted_candidates_count": 820,
+      "f1": 0.040577889447236185,
+      "matched_candidate_count": 17,
+      "matched_reference_count": 19,
+      "missed_source_reference_ids": [],
+      "precision": 0.020731707317073172,
+      "recall": 0.95,
+      "reference_decisions_count": 20,
+      "repo_id": "modonome",
+      "unmatched_reference_ids": [
+        "ref-modonome-015"
+      ]
+    }
+  },
+  "repository_ids": [
+    "adrkit",
+    "archlint",
+    "gsa_agentic_coding_quickstart",
+    "helix",
+    "modonome"
+  ],
+  "repository_pinned_shas": {
+    "adrkit": "471457da29638ecca6119b35180c2845bf989cac",
+    "archlint": "185837e93565718d8e1ea653236cd70ca0a89e3a",
+    "gsa_agentic_coding_quickstart": "8e6160c63acc35bd48d0a3844e133ea3ad52a464",
+    "helix": "37d994370deba2512588b5c4efb7f03483e7308b",
+    "modonome": "7a4d5244dcb6879b6aa646105b39297aa6d0a5a2"
+  },
+  "stages": [
+    "A"
+  ]
+}

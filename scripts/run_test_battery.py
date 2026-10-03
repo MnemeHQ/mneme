@@ -162,6 +162,7 @@ GATE_BENCHMARK_UNIT_PATHS: tuple[str, ...] = (
     "tests/open_architecture/test_extraction_tuning_experiment.py",
     "tests/open_architecture/test_structural_extraction_experiment.py",
     "tests/open_architecture/test_gds_calibration_experiment.py",
+    "tests/open_architecture/test_stage_a_baseline.py",
     "tests/open_architecture/test_stage_b_baseline.py",
     "tests/open_architecture/test_stage_b_error_diagnostic_experiment.py",
     "tests/open_architecture/test_stage_b_relationship_diagnostic_experiment.py",
