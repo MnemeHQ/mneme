@@ -849,13 +849,34 @@ class TestBT1CTreatmentScaffold:
         refs = load_reference_corpus(REF_DIR)
         manifest = Manifest.load(MANIFEST_PATH)
 
-        # 1. Exact frozen references pass validation and match file-based authority
+        # 1. Exact frozen v0.1 references pass validation and match file-based authority
         computed_hash = validate_frozen_reference_corpus(refs)
         dir_hash = compute_reference_corpus_content_hash(REF_DIR)
-        assert computed_hash == FROZEN_REFERENCE_CORPUS_HASH
-        assert computed_hash == "0455bd66aae52551c35b37a63c2d185f"
+        assert computed_hash == FROZEN_REFERENCE_CORPUS_HASH == "0455bd66aae52551c35b37a63c2d185f"
         assert computed_hash == dir_hash
         assert compute_reference_corpus_hash_from_references(refs) == dir_hash
+
+        # 1b. The committed v0.2 revision directory must exist and be strictly rejected by the frozen treatment validator
+        v02_ref_dir = (
+            REPO_ROOT
+            / "benchmarks"
+            / "open_architecture"
+            / "batch_01"
+            / "revisions"
+            / "batch_01_v0.2-grounding"
+            / "reference_decisions"
+        )
+        assert v02_ref_dir.is_dir(), f"Committed v0.2 reference corpus directory missing: {v02_ref_dir}"
+        v02_hash = compute_reference_corpus_content_hash(v02_ref_dir)
+        assert v02_hash == "700a569e24bf90707ba14ff65eea2ab5"
+        v02_refs = load_reference_corpus(v02_ref_dir)
+        assert len(v02_refs) == 100
+        with pytest.raises(ValueError, match="Reference corpus content hash mismatch"):
+            validate_frozen_reference_corpus(v02_refs)
+
+        # 1c. Treatment profile hashes remain strictly unchanged
+        assert B_T1C_PROFILE_A_HASH == "7ff00c50f0a9718721e8defe188f62b8"
+        assert B_T1C_PROFILE_B_HASH == "e4b6bad47ebcc290924782172fb96d8d"
 
         # 2. 99 references fail before classifier execution; 0 calls, 0 artifacts
         mock_client_99 = MagicMock()

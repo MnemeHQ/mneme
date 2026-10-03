@@ -1,0 +1,1603 @@
+{
+  "arm_b_profile_hash": "e4b6bad47ebcc290924782172fb96d8d",
+  "arm_id": "treatment_b",
+  "empty_failure_count": 32,
+  "empty_failures": [
+    {
+      "classification_reason": "Mentions layout and dependency rules established by ADR-0007, model infers depends_on",
+      "emitted_tuple_count": 1,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "the extension lives at `packages/adapters/spec-kit/` under the layout and dependency rules ADR-0007 establishes \u2014 it is an adapter like any other, not a privileged one.",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0007"
+        }
+      ],
+      "error_category": "implicit dependency inferred",
+      "reference_id": "ref-adrkit-003",
+      "repository": "mbeacom/adrkit"
+    },
+    {
+      "classification_reason": "Mentions workspace toolchain is decided separately in ADR-0010",
+      "emitted_tuple_count": 1,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "The workspace toolchain is decided separately in ADR-0010.",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0010"
+        }
+      ],
+      "error_category": "ordinary ADR mention mistaken for relationship",
+      "reference_id": "ref-adrkit-005",
+      "repository": "mbeacom/adrkit"
+    },
+    {
+      "classification_reason": "Explicit history note: Amended by ADR-0013",
+      "emitted_tuple_count": 1,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "Amended by ADR-0013. For the catalog surface specifically, composition uses no dynamic runtime adapter/plugin loader: a catalog adapter is a standalone offline snapshot generator emitting a validated interchange file. This narrows, and does not repeal, the general \"discovery is by configuration\" rule.",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0013"
+        }
+      ],
+      "error_category": "lifecycle/history mention mistaken for relationship",
+      "reference_id": "ref-adrkit-006",
+      "repository": "mbeacom/adrkit"
+    },
+    {
+      "classification_reason": "Mentions ADR-0004's git-truth rule applies to machine writes",
+      "emitted_tuple_count": 1,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "Every re-import produces a pull request, never a direct mutation \u2014 ADR-0004's git-truth rule applies to machine writes as much as to human ones.",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "requires",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0004"
+        }
+      ],
+      "error_category": "ordinary ADR mention mistaken for relationship",
+      "reference_id": "ref-adrkit-007",
+      "repository": "mbeacom/adrkit"
+    },
+    {
+      "classification_reason": "Contains history notes: Amended by ADR-0013 and refined by ADR-0012",
+      "emitted_tuple_count": 3,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "the ADR-0007 clean-clone requirement applied to matching. Adapters implement it, under `packages/adapters/catalog-*` per ADR-0007.",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0007"
+        },
+        {
+          "evidence_quote": "Amended by ADR-0013",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "supersedes",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0013"
+        },
+        {
+          "evidence_quote": "refined by ADR-0012. The per-adapter mapping is pinned by ADR-0012's explicit `adrkit.io/owned-paths` contract.",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0012"
+        }
+      ],
+      "error_category": "lifecycle/history mention mistaken for relationship",
+      "reference_id": "ref-adrkit-008",
+      "repository": "mbeacom/adrkit"
+    },
+    {
+      "classification_reason": "Prose asserts without it ADR-0007's dependency assertion is theatre",
+      "emitted_tuple_count": 1,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "Without it, ADR-0007's dependency assertion is theatre. This is the condition that makes the whole choice acceptable.",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "requires",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0007"
+        }
+      ],
+      "error_category": "implicit dependency inferred",
+      "reference_id": "ref-adrkit-009",
+      "repository": "mbeacom/adrkit"
+    },
+    {
+      "classification_reason": "Passing mention: an eventual org transfer (ADR-0006) does not force a change",
+      "emitted_tuple_count": 1,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "an eventual org transfer (ADR-0006) does not force a change",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0006"
+        }
+      ],
+      "error_category": "ordinary ADR mention mistaken for relationship",
+      "reference_id": "ref-adrkit-010",
+      "repository": "mbeacom/adrkit"
+    },
+    {
+      "classification_reason": "History/lifecycle note: retire ADR-0017 consumer-advisory acceptance",
+      "emitted_tuple_count": 2,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "A degraded tool catalog that still returns 0 is exactly the fail-quiet shape ADR-0016 rejects, so the declared range excludes the versions that take that path rather than relying on the resolved version happening to be new enough.",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0016"
+        },
+        {
+          "evidence_quote": "We will also retire the ADR-0017 consumer-advisory acceptance and the root overrides it stood behind, because this migration satisfies that acceptance's own recorded resolvesWhen clause",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "supersedes",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0017"
+        }
+      ],
+      "error_category": "lifecycle/history mention mistaken for relationship",
+      "reference_id": "ref-adrkit-019",
+      "repository": "mbeacom/adrkit"
+    },
+    {
+      "classification_reason": "Mentions Per ADR-0014 lands on rung 1 and ADR-0016 fail-quiet rejection",
+      "emitted_tuple_count": 2,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "These constraints are enforced by tests, not by convention. Each was observed failing under a deliberately introduced defect before being trusted (ADR-0016).",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0016"
+        },
+        {
+          "evidence_quote": "Per ADR-0014, this lands the extension on rung 1 only \u2014 unit and contract evidence. It is not reference-verified and not externally validated.",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0014"
+        }
+      ],
+      "error_category": "implicit dependency inferred",
+      "reference_id": "ref-adrkit-020",
+      "repository": "mbeacom/adrkit"
+    },
+    {
+      "classification_reason": "Mentions Contract addition ([ADR-0012]): acq_backend_rotate_key",
+      "emitted_tuple_count": 1,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "Contract addition ([ADR-0012](0012-backend-neutral-key-rotation.md)): `acq_backend_rotate_key` \u2014 rotate the USAi API key using the backend's native secret mechanism and validate the new key. Added so key rotation stays backend-neutral (the core dispatch no longer shells out to `sbx` directly).",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0012"
+        }
+      ],
+      "error_category": "ordinary ADR mention mistaken for relationship",
+      "reference_id": "ref-gsa-agentic-coding-quickstart-003",
+      "repository": "GSA-TTS/agentic-coding-quickstart"
+    },
+    {
+      "classification_reason": "Cites ADR-0011 so an image that is portable by sbx rule works on msb",
+      "emitted_tuple_count": 1,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "[ADR-0011](0011-msb-backend-and-neutral-kits.md). So an image that is portable by the sbx rule above always works on msb; an image that works only on msb (e.g. `agent` at a non-1000 UID, or no `agent` user at all) is **not** guaranteed on sbx.",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0011"
+        }
+      ],
+      "error_category": "implicit dependency inferred",
+      "reference_id": "ref-gsa-agentic-coding-quickstart-008",
+      "repository": "GSA-TTS/agentic-coding-quickstart"
+    },
+    {
+      "classification_reason": "Incidental mention of acq rm and scratch behavior referring to ADR-0023",
+      "emitted_tuple_count": 1,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "`acq rm` warns when the scratch holds commits absent from the host's object store, then deletes the scratch and removes the remote (same gone-after-remove-attempt rule as derived volumes, ADR-0023).",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0023"
+        }
+      ],
+      "error_category": "ordinary ADR mention mistaken for relationship",
+      "reference_id": "ref-gsa-agentic-coding-quickstart-009",
+      "repository": "GSA-TTS/agentic-coding-quickstart"
+    },
+    {
+      "classification_reason": "Mentions ADR-0011 design note identified as clean contained win",
+      "emitted_tuple_count": 1,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "the exact create-time-only, re-runnable-script case that the ADR-0011 design note identified as the clean, contained win for `--script-path`",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0011"
+        }
+      ],
+      "error_category": "ordinary ADR mention mistaken for relationship",
+      "reference_id": "ref-gsa-agentic-coding-quickstart-015",
+      "repository": "GSA-TTS/agentic-coding-quickstart"
+    },
+    {
+      "classification_reason": "Explicit header: Update (ADR-0019): deny-default described below scoped to egress only",
+      "emitted_tuple_count": 1,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "**Update (ADR-0019):** the deny-default described below is scoped to **egress only** \u2014 the emitter uses `--net-default-egress deny`, not the symmetric `--net-default deny` this ADR originally specified. ... See [ADR-0019](0019-msb-balanced-egress-is-egress-only.md).",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0019"
+        }
+      ],
+      "error_category": "lifecycle/history mention mistaken for relationship",
+      "reference_id": "ref-gsa-agentic-coding-quickstart-018",
+      "repository": "GSA-TTS/agentic-coding-quickstart"
+    },
+    {
+      "classification_reason": "Operational cadence mention: Re-run it on the ADR-0011 periodic-validation cadence",
+      "emitted_tuple_count": 1,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "Re-run it on the ADR-0011 periodic-validation cadence.",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0011"
+        }
+      ],
+      "error_category": "ordinary ADR mention mistaken for relationship",
+      "reference_id": "ref-gsa-agentic-coding-quickstart-020",
+      "repository": "GSA-TTS/agentic-coding-quickstart"
+    },
+    {
+      "classification_reason": "Four background ADR citations (0017, 0026, 0020, 0001) all mapped to depends_on",
+      "emitted_tuple_count": 4,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "the edge picks it up sub-second via its registry projection (ADR [0017](0017-registry-listen-notify-projection.md))",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0017"
+        },
+        {
+          "evidence_quote": "the deferred v2 ",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0026"
+        },
+        {
+          "evidence_quote": "Keeping git out of the server path is *why* the platform never executes app code/deps today (ADR [0020](0020-static-only-apps-v1.md))",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0020"
+        },
+        {
+          "evidence_quote": "No build provenance in v1 (the platform trusts the uploaded artifact; containment is per-app, ADR-0001)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0001"
+        }
+      ],
+      "error_category": "depends_on catch-all",
+      "reference_id": "ref-helix-003",
+      "repository": "AZX-PBC-OSS/helix"
+    },
+    {
+      "classification_reason": "ADR 0004 and 0009 cited as choices auth model builds on, mapped to depends_on",
+      "emitted_tuple_count": 2,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "ADR [0004](0004-auth-model.md) ... This is the load-bearing choice the auth model and relaxed CSP both build on.",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0004"
+        },
+        {
+          "evidence_quote": "ADR [0009](0009-relaxed-csp.md) ... This is the load-bearing choice the auth model and relaxed CSP both build on.",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0009"
+        }
+      ],
+      "error_category": "depends_on catch-all",
+      "reference_id": "ref-helix-004",
+      "repository": "AZX-PBC-OSS/helix"
+    },
+    {
+      "classification_reason": "Explicit Related: ADR 0001 cross-reference section in document header",
+      "emitted_tuple_count": 1,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "**Related:** ADR [0001](0001-three-runtime-split.md)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0001"
+        }
+      ],
+      "error_category": "contextual/cross-reference mention",
+      "reference_id": "ref-helix-005",
+      "repository": "AZX-PBC-OSS/helix"
+    },
+    {
+      "classification_reason": "ADR 0001 and 0002 listed in Related / Context cross-reference",
+      "emitted_tuple_count": 2,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "ADR [0001](0001-three-runtime-split.md)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0001"
+        },
+        {
+          "evidence_quote": "ADR [0002](0002-postgres-role-split-rls.md)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0002"
+        }
+      ],
+      "error_category": "contextual/cross-reference mention",
+      "reference_id": "ref-helix-007",
+      "repository": "AZX-PBC-OSS/helix"
+    },
+    {
+      "classification_reason": "Passing mention: Who may approve is ADR-0007",
+      "emitted_tuple_count": 1,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "Who *may* approve is ADR-0007 (v0: any authenticated principal; \u2192 owner/admin gate); this ADR is the *classification* model, independent of that.",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0007"
+        }
+      ],
+      "error_category": "ordinary ADR mention mistaken for relationship",
+      "reference_id": "ref-helix-009",
+      "repository": "AZX-PBC-OSS/helix"
+    },
+    {
+      "classification_reason": "Explicit architectural refinement: refines ADR 0005 (ssrf) and ADR 0013 (egress trust), ground truth is empty",
+      "emitted_tuple_count": 3,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "ADR [0005](0005-ssrf-egress-controls.md)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0005"
+        },
+        {
+          "evidence_quote": "ADR [0013](0013-egress-trust-model.md)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0013"
+        },
+        {
+          "evidence_quote": "the edge must never hold a secret (ADR [0001](0001-three-runtime-split.md))",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "requires",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0001"
+        }
+      ],
+      "error_category": "ground-truth concern",
+      "reference_id": "ref-helix-010",
+      "repository": "AZX-PBC-OSS/helix"
+    },
+    {
+      "classification_reason": "Three contextual ADR mentions (0004, 0013, 0028) mapped to depends_on",
+      "emitted_tuple_count": 3,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "with ADR [0004](0004-auth-model.md)'s scrypt cost) is the economic defense for shared-password apps",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0004"
+        },
+        {
+          "evidence_quote": "the same reasoning ADR [0013](0013-egress-trust-model.md)'s resolution applies to the egress burn",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0013"
+        },
+        {
+          "evidence_quote": "Under ADR [0028](0028-deployment-model-customer-deployed.md) each deployment applies its own IaC, so putting a CDN, WAF, or second proxy in front of the edge changes the hop count",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0028"
+        }
+      ],
+      "error_category": "depends_on catch-all",
+      "reference_id": "ref-helix-011",
+      "repository": "AZX-PBC-OSS/helix"
+    },
+    {
+      "classification_reason": "11 background ADR citations in comprehensive security/deployment synthesis mapped to depends_on",
+      "emitted_tuple_count": 11,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "ADR [0026](0026-hosted-build-isolation-prerequisites.md) (hosted-build isolation prerequisites \u2014 the alternative this displaces)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0026"
+        },
+        {
+          "evidence_quote": "ADR [0018](0018-deploy-model-immutable-versions.md) (upload-only, immutable versions \u2014 the path this rejoins)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0018"
+        },
+        {
+          "evidence_quote": "ADR [0020](0020-static-only-apps-v1.md) (static-only apps)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0020"
+        },
+        {
+          "evidence_quote": "ADR [0028](0028-deployment-model-customer-deployed.md) (single-tenant, customer-deployed \u2014 the constraint that shapes credentials and reachability)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0028"
+        },
+        {
+          "evidence_quote": "ADR [0006](0006-secret-custody-seam.md) (`SecretStore`)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0006"
+        },
+        {
+          "evidence_quote": "ADR [0024](0024-portal-cli-bearer-jwt-jwks.md) (bearer JWT / JWKS verifier chain)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0024"
+        },
+        {
+          "evidence_quote": "ADR [0011](0011-in-memory-rate-limiting.md) (superseded \u2014 the `CounterStore` / `rate_counters` primitive this reuses)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0011"
+        },
+        {
+          "evidence_quote": "its defense remains CSP + the gateway (ADR [0009](0009-relaxed-csp.md)/[0014](0014-same-origin-api-gateway.md))",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0009"
+        },
+        {
+          "evidence_quote": "its defense remains CSP + the gateway (ADR [0009](0009-relaxed-csp.md)/[0014](0014-same-origin-api-gateway.md))",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0014"
+        },
+        {
+          "evidence_quote": "Slugs are already public as subdomains (ADR [0019](0019-subdomain-per-app-isolation.md))",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0019"
+        },
+        {
+          "evidence_quote": "serve it from the already-public edge, which would require a narrow write grant that pokes a hole in the ADR [0002](0002-postgres-role-split-rls.md) role split",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0002"
+        }
+      ],
+      "error_category": "depends_on catch-all",
+      "reference_id": "ref-helix-012",
+      "repository": "AZX-PBC-OSS/helix"
+    },
+    {
+      "classification_reason": "Document explicitly claims to extend ADR 0006, 0005, 0013 with 13 citations, ground truth is empty",
+      "emitted_tuple_count": 13,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "ADR [0006](0006-secret-custody-seam.md) (`SecretStore` custody \u2014 the seam per-user tokens reuse)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0006"
+        },
+        {
+          "evidence_quote": "ADR [0005](0005-ssrf-egress-controls.md) (SSRF + secret injection \u2014 the outbound mechanism)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0005"
+        },
+        {
+          "evidence_quote": "ADR [0013](0013-egress-trust-model.md) (egress trust model \u2014 the attested instruction this extends)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0013"
+        },
+        {
+          "evidence_quote": "ADR [0002](0002-postgres-role-split-rls.md) (role split \u2014 why `helix_edge` still cannot read a token)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0002"
+        },
+        {
+          "evidence_quote": "ADR [0007](0007-portal-authz-v0.md) (portal authz v0 \u2014 **blocks** the group-policy half); ADR [0007](0007-portal-authz-v0.md) must be resolved before decision 12",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0007"
+        },
+        {
+          "evidence_quote": "Catalog edits ride the approval write-gate (`classifyChange`, ADR [0016](0016-capability-manifest-approval-classifier.md))",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0016"
+        },
+        {
+          "evidence_quote": "Catalog invalidation over LISTEN/NOTIFY (ADR [0017](0017-registry-listen-notify-projection.md) pattern)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0017"
+        },
+        {
+          "evidence_quote": "ADR [0028](0028-deployment-model-customer-deployed.md) (customer-deployed \u2014 why registration is per-deployment)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0028"
+        },
+        {
+          "evidence_quote": "ADR [0021](0021-metering-ledger.md) (metering \u2014 where 'who used what' is already answered)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0021"
+        },
+        {
+          "evidence_quote": "OAuth client code has no business in the dependency-minimal trusted path (ADR [0003](0003-dependency-minimal-edge.md))",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0003"
+        },
+        {
+          "evidence_quote": "Same argument as ADR [0030](0030-repo-backed-apps-pull-attested-artifacts.md) decision 9: under ADR [0028] a Helix-owned OAuth client would require shipping its `client_secret` into every customer deployment",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0030"
+        },
+        {
+          "evidence_quote": "Stale catalog serves a revoked provider indefinitely \u2014 LISTEN/NOTIFY invalidation; inherit ADR [0025](0025-registry-projection-hardening.md)'s staleness observability",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0025"
+        },
+        {
+          "evidence_quote": "ADR [0001](0001-three-runtime-split.md)'s split was drawn on trust boundaries \u2014 is 'speaks a chatty session protocol to the internet' a different enough zone to matter?",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0001"
+        }
+      ],
+      "error_category": "ground-truth concern",
+      "reference_id": "ref-helix-013",
+      "repository": "AZX-PBC-OSS/helix"
+    },
+    {
+      "classification_reason": "Amended 2026-09-22 by ADR-0048 and collection scope (ADR 0015)",
+      "emitted_tuple_count": 3,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "Under ADR [0028](0028-deployment-model-customer-deployed.md) the customer runs the portal themselves \u2014 it is the control plane and the azx-cli target",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0028"
+        },
+        {
+          "evidence_quote": "Collection items are the clearest case: the whole point of the collection scope (ADR [0015](0015-app-data-three-scope-model.md)) is that the writer and the reader are different principals",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0015"
+        },
+        {
+          "evidence_quote": "amended 2026-09-22 by ADR-0048 to app.ownerId === actor.oid, the Entra oid claim",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0048"
+        }
+      ],
+      "error_category": "lifecycle/history mention mistaken for relationship",
+      "reference_id": "ref-helix-014",
+      "repository": "AZX-PBC-OSS/helix"
+    },
+    {
+      "classification_reason": "Passing mention: load-bearing since ADR-0035 and shared-writes (ADR-0010)",
+      "emitted_tuple_count": 2,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "'unsafe-inline' is load-bearing for the platform too, since ADR-0035.",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0035"
+        },
+        {
+          "evidence_quote": "anonymous third-party content written via shared-writes (ADR-0010, putShared runs for anonymous callers) is rendered by the app, so relaxed CSP voids real stored-XSS protection for end users",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0010"
+        }
+      ],
+      "error_category": "ordinary ADR mention mistaken for relationship",
+      "reference_id": "ref-helix-015",
+      "repository": "AZX-PBC-OSS/helix"
+    },
+    {
+      "classification_reason": "Explicit Related: ADR 0001, 0005, 0006 cross-reference header in metadata",
+      "emitted_tuple_count": 5,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "**Related:** ADR [0001](0001-three-runtime-split.md), [0005](0005-ssrf-egress-controls.md), [0006](0006-secret-custody-seam.md)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0001"
+        },
+        {
+          "evidence_quote": "**Related:** ADR [0001](0001-three-runtime-split.md), [0005](0005-ssrf-egress-controls.md), [0006](0006-secret-custody-seam.md)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0005"
+        },
+        {
+          "evidence_quote": "**Related:** ADR [0001](0001-three-runtime-split.md), [0005](0005-ssrf-egress-controls.md), [0006](0006-secret-custody-seam.md)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0006"
+        },
+        {
+          "evidence_quote": "same 'keep the mechanism plane's shared state in Postgres, not Redis' reasoning as ADR [0011](0011-in-memory-rate-limiting.md)'s resolution",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0011"
+        },
+        {
+          "evidence_quote": "which is the same machinery as [ADR-0031](0031-connection-providers-delegated-auth.md) decision 12, and should be built once rather than twice",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0031"
+        }
+      ],
+      "error_category": "contextual/cross-reference mention",
+      "reference_id": "ref-helix-017",
+      "repository": "AZX-PBC-OSS/helix"
+    },
+    {
+      "classification_reason": "Explicit Related: ADR 0001, 0013 cross-reference header in metadata",
+      "emitted_tuple_count": 2,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "**Related:** ADR [0001](0001-three-runtime-split.md), [0013](0013-egress-trust-model.md)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0001"
+        },
+        {
+          "evidence_quote": "**Related:** ADR [0001](0001-three-runtime-split.md), [0013](0013-egress-trust-model.md)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0013"
+        }
+      ],
+      "error_category": "contextual/cross-reference mention",
+      "reference_id": "ref-helix-018",
+      "repository": "AZX-PBC-OSS/helix"
+    },
+    {
+      "classification_reason": "Emits exception_to -> null plus Related citations mapped to depends_on",
+      "emitted_tuple_count": 6,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "Reverses the platform-wide service-worker ban recorded in `docs/platform-architecture.md` \u00a74.4 and Appendix A.3, replacing it with a narrow, approval-gated exception. ... The ban remains the default and this is a named exception to it.",
+          "explicitly_in_evidence": false,
+          "is_adr_identifier": false,
+          "relationship_type": "exception_to",
+          "target_form": "null_target",
+          "target_reference": null
+        },
+        {
+          "evidence_quote": "Relates to [ADR-0004](0004-auth-model.md) (the handoff token the ban protects)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0004"
+        },
+        {
+          "evidence_quote": "Relates to [ADR-0009](0009-relaxed-csp.md) ... `'unsafe-inline'` becomes load-bearing for the platform, not only for apps (ADR-0009).",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0009"
+        },
+        {
+          "evidence_quote": "Relates to [ADR-0016](0016-capability-manifest-approval-classifier.md)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0016"
+        },
+        {
+          "evidence_quote": "Relates to [ADR-0018](0018-deploy-model-immutable-versions.md) (the pointer flip this must not break) ... Network-first documents are what preserve the ADR-0018 pointer-flip contract",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0018"
+        },
+        {
+          "evidence_quote": "Relates to [ADR-0020](0020-static-only-apps-v1.md)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0020"
+        }
+      ],
+      "error_category": "target/entity error",
+      "reference_id": "ref-helix-019",
+      "repository": "AZX-PBC-OSS/helix"
+    },
+    {
+      "classification_reason": "Explicitly states parameterizes decision 11 and reframes ADR-0019, refines 0022/0002/0005/0013, ground truth is empty",
+      "emitted_tuple_count": 7,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "parameterizes architecture decision 11 and reframes ADR-0019 / issue #16; The apps \u2194 control-plane site split (ADR-0019 / #16) becomes a per-deployment topology.",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0019"
+        },
+        {
+          "evidence_quote": "ADR-0022 chose a self-hosted, portable data plane precisely 'because customers may run the platform on their own clouds' \u2014 this ADR's parent; This ADR elevates that from an aside to the deployment model",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0022"
+        },
+        {
+          "evidence_quote": "ADR 0002 (role split \u2014 per instance)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0002"
+        },
+        {
+          "evidence_quote": "The ADR-0005/0013 blocks \u2014 private/loopback/IMDS denial, validated-IP rebind pin, no redirect-follow \u2014 protect the customer's metadata endpoint and internal network. This raises the stakes on those controls; they are not weakened by the deployment shift.",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0005"
+        },
+        {
+          "evidence_quote": "The ADR-0005/0013 blocks \u2014 private/loopback/IMDS denial, validated-IP rebind pin, no redirect-follow \u2014 protect the customer's metadata endpoint and internal network.",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0013"
+        },
+        {
+          "evidence_quote": "Their Key Vault + KEK (the ADR-0006 seam, instantiated per deployment)",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0006"
+        },
+        {
+          "evidence_quote": "Tenancy stays per-app within an instance (ADR-0023). Each customer = one instance, so cross-customer isolation is the cloud boundary itself.",
+          "explicitly_in_evidence": true,
+          "is_adr_identifier": true,
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0023"
+        }
+      ],
+      "error_category": "ground-truth concern",
+      "reference_id": "ref-helix-020",
+      "repository": "AZX-PBC-OSS/helix"
+    },
+    {
+      "classification_reason": "Explicit history: Partially superseded: ADR-046-ship-the-deferred-features.md",
+      "emitted_tuple_count": 1,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "Partially superseded: ADR-046-ship-the-deferred-features.md reverses the deferral of adapter-verify, Break the Ratchet, and CheckerProof (point 5 below) on direct owner instruction, while holding every safety and scope constraint this ADR attached to them.",
+          "explicitly_in_evidence": false,
+          "is_adr_identifier": true,
+          "relationship_type": "supersedes",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0046"
+        }
+      ],
+      "error_category": "lifecycle/history mention mistaken for relationship",
+      "reference_id": "ref-modonome-015",
+      "repository": "enumind/modonome"
+    },
+    {
+      "classification_reason": "Operational readiness note: assumes WI-011 (ADR-002) has shipped",
+      "emitted_tuple_count": 1,
+      "emitted_tuples": [
+        {
+          "evidence_quote": "This rung assumes WI-011 (ADR-002) has shipped; until then, treat it as a planned step, not a current one",
+          "explicitly_in_evidence": false,
+          "is_adr_identifier": true,
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0002"
+        }
+      ],
+      "error_category": "ordinary ADR mention mistaken for relationship",
+      "reference_id": "ref-modonome-016",
+      "repository": "enumind/modonome"
+    }
+  ],
+  "experiment_id": "b-t1c-relationship-treatment",
+  "non_empty_failure_count": 10,
+  "non_empty_failures": [
+    {
+      "arm_a_predicted_tuples": [
+        [
+          "supersedes",
+          "0005"
+        ],
+        [
+          "depends_on",
+          "0014"
+        ],
+        [
+          "depends_on",
+          "0016"
+        ]
+      ],
+      "arm_b_predicted_tuples": [
+        [
+          "supersedes",
+          "0005"
+        ],
+        [
+          "depends_on",
+          "0014"
+        ],
+        [
+          "depends_on",
+          "0016"
+        ]
+      ],
+      "classification_reason": "Target 0005 recovered with exact type supersedes; 2 extra depends_on tuples (0014, 0016) emitted from relatesTo frontmatter.",
+      "error_category": "extra hallucinated relationship",
+      "exact_matches": [
+        [
+          "supersedes",
+          "0005"
+        ]
+      ],
+      "expected_tuples": [
+        [
+          "supersedes",
+          "0005"
+        ]
+      ],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0014"
+        ],
+        [
+          "depends_on",
+          "0016"
+        ]
+      ],
+      "min_deterministic_change": "Suppress non-superseding relatesTo cross-references (drop depends_on 0014, 0016).",
+      "missing_tuples": [],
+      "recovered_target_entities": [
+        "0005"
+      ],
+      "reference_id": "ref-adrkit-013",
+      "repository": "mbeacom/adrkit"
+    },
+    {
+      "arm_a_predicted_tuples": [
+        [
+          "refines",
+          "ADR-0007"
+        ],
+        [
+          "refines",
+          "ADR-0009"
+        ],
+        [
+          "depends_on",
+          "ADR-0012"
+        ]
+      ],
+      "arm_b_predicted_tuples": [
+        [
+          "refines",
+          "0007"
+        ],
+        [
+          "refines",
+          "0009"
+        ],
+        [
+          "depends_on",
+          "0012"
+        ]
+      ],
+      "classification_reason": "Both expected targets (refines 0007, refines 0009) recovered with exact type; 1 extra tuple (depends_on 0012) emitted.",
+      "error_category": "extra hallucinated relationship",
+      "exact_matches": [
+        [
+          "refines",
+          "0007"
+        ],
+        [
+          "refines",
+          "0009"
+        ]
+      ],
+      "expected_tuples": [
+        [
+          "refines",
+          "0007"
+        ],
+        [
+          "refines",
+          "0009"
+        ]
+      ],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0012"
+        ]
+      ],
+      "min_deterministic_change": "Drop incidental dependency tuple depends_on 0012.",
+      "missing_tuples": [],
+      "recovered_target_entities": [
+        "0007",
+        "0009"
+      ],
+      "reference_id": "ref-adrkit-014",
+      "repository": "mbeacom/adrkit"
+    },
+    {
+      "arm_a_predicted_tuples": [
+        [
+          "depends_on",
+          "ADR-0012"
+        ],
+        [
+          "requires",
+          "entity-identity.md"
+        ]
+      ],
+      "arm_b_predicted_tuples": [
+        [
+          "depends_on",
+          "0012"
+        ],
+        [
+          "refines",
+          "entity-identity.md"
+        ]
+      ],
+      "classification_reason": "Target 0012 recovered but typed as depends_on instead of refines; extra non-ADR path entity-identity.md emitted.",
+      "error_category": "mixed missing + extra",
+      "exact_matches": [],
+      "expected_tuples": [
+        [
+          "refines",
+          "0012"
+        ]
+      ],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0012"
+        ],
+        [
+          "refines",
+          "entity-identity.md"
+        ]
+      ],
+      "min_deterministic_change": "Remap depends_on 0012 to refines 0012 and filter out non-ADR path entity-identity.md.",
+      "missing_tuples": [
+        [
+          "refines",
+          "0012"
+        ]
+      ],
+      "recovered_target_entities": [
+        "0012"
+      ],
+      "reference_id": "ref-adrkit-015",
+      "repository": "mbeacom/adrkit"
+    },
+    {
+      "arm_a_predicted_tuples": [
+        [
+          "refines",
+          "ADR-0012"
+        ],
+        [
+          "requires",
+          "ADR-0015"
+        ],
+        [
+          "requires",
+          "ADR-0013"
+        ],
+        [
+          "requires",
+          "ADR-0007"
+        ],
+        [
+          "requires",
+          "ADR-0016"
+        ]
+      ],
+      "arm_b_predicted_tuples": [
+        [
+          "refines",
+          "0012"
+        ],
+        [
+          "requires",
+          "0012"
+        ],
+        [
+          "requires",
+          "0015"
+        ],
+        [
+          "requires",
+          "0013"
+        ],
+        [
+          "requires",
+          "0007"
+        ],
+        [
+          "requires",
+          "0016"
+        ],
+        [
+          "requires",
+          "0014"
+        ]
+      ],
+      "classification_reason": "All 5 expected targets recovered with exact type requires; 2 extra tuples (refines 0012, requires 0014) emitted.",
+      "error_category": "extra hallucinated relationship",
+      "exact_matches": [
+        [
+          "requires",
+          "0007"
+        ],
+        [
+          "requires",
+          "0012"
+        ],
+        [
+          "requires",
+          "0013"
+        ],
+        [
+          "requires",
+          "0015"
+        ],
+        [
+          "requires",
+          "0016"
+        ]
+      ],
+      "expected_tuples": [
+        [
+          "requires",
+          "0012"
+        ],
+        [
+          "requires",
+          "0015"
+        ],
+        [
+          "requires",
+          "0013"
+        ],
+        [
+          "requires",
+          "0007"
+        ],
+        [
+          "requires",
+          "0016"
+        ]
+      ],
+      "extra_tuples": [
+        [
+          "refines",
+          "0012"
+        ],
+        [
+          "requires",
+          "0014"
+        ]
+      ],
+      "min_deterministic_change": "Drop duplicate refines 0012 and ungrounded requires 0014.",
+      "missing_tuples": [],
+      "recovered_target_entities": [
+        "0012",
+        "0015",
+        "0013",
+        "0007",
+        "0016"
+      ],
+      "reference_id": "ref-adrkit-016",
+      "repository": "mbeacom/adrkit"
+    },
+    {
+      "arm_a_predicted_tuples": [
+        [
+          "refines",
+          "ADR-0005"
+        ]
+      ],
+      "arm_b_predicted_tuples": [
+        [
+          "refines",
+          "0005"
+        ]
+      ],
+      "classification_reason": "Target 0005 recovered exactly, but typed as refines instead of requires.",
+      "error_category": "wrong relationship type",
+      "exact_matches": [],
+      "expected_tuples": [
+        [
+          "requires",
+          "0005"
+        ]
+      ],
+      "extra_tuples": [
+        [
+          "refines",
+          "0005"
+        ]
+      ],
+      "min_deterministic_change": "Remap refines 0005 to requires 0005.",
+      "missing_tuples": [
+        [
+          "requires",
+          "0005"
+        ]
+      ],
+      "recovered_target_entities": [
+        "0005"
+      ],
+      "reference_id": "ref-gsa-agentic-coding-quickstart-002",
+      "repository": "GSA-TTS/agentic-coding-quickstart"
+    },
+    {
+      "arm_a_predicted_tuples": [],
+      "arm_b_predicted_tuples": [],
+      "classification_reason": "Expected target 0026 is completely absent from classifier-visible evidence text.",
+      "error_category": "reference/ground-truth concern",
+      "exact_matches": [],
+      "expected_tuples": [
+        [
+          "refines",
+          "0026"
+        ]
+      ],
+      "extra_tuples": [],
+      "min_deterministic_change": "Correct reference ground truth label to remove ungrounded target 0026.",
+      "missing_tuples": [
+        [
+          "refines",
+          "0026"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-gsa-agentic-coding-quickstart-005",
+      "repository": "GSA-TTS/agentic-coding-quickstart"
+    },
+    {
+      "arm_a_predicted_tuples": [
+        [
+          "depends_on",
+          "0001-three-runtime-split.md"
+        ],
+        [
+          "depends_on",
+          "0014-same-origin-api-gateway.md"
+        ]
+      ],
+      "arm_b_predicted_tuples": [
+        [
+          "depends_on",
+          "0001"
+        ],
+        [
+          "depends_on",
+          "0014"
+        ]
+      ],
+      "classification_reason": "Expected target 0014 typed as depends_on instead of requires; extra depends_on 0001 emitted from Related header.",
+      "error_category": "mixed missing + extra",
+      "exact_matches": [],
+      "expected_tuples": [
+        [
+          "requires",
+          "0014"
+        ]
+      ],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0001"
+        ],
+        [
+          "depends_on",
+          "0014"
+        ]
+      ],
+      "min_deterministic_change": "Remap depends_on 0014 to requires 0014 and drop depends_on 0001.",
+      "missing_tuples": [
+        [
+          "requires",
+          "0014"
+        ]
+      ],
+      "recovered_target_entities": [
+        "0014"
+      ],
+      "reference_id": "ref-helix-001",
+      "repository": "AZX-PBC-OSS/helix"
+    },
+    {
+      "arm_a_predicted_tuples": [
+        [
+          "depends_on",
+          "0002-postgres-role-split-rls.md"
+        ]
+      ],
+      "arm_b_predicted_tuples": [
+        [
+          "depends_on",
+          "0002"
+        ]
+      ],
+      "classification_reason": "Expected target 0002 recovered exactly, but typed as depends_on instead of requires.",
+      "error_category": "wrong relationship type",
+      "exact_matches": [],
+      "expected_tuples": [
+        [
+          "requires",
+          "0002"
+        ]
+      ],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0002"
+        ]
+      ],
+      "min_deterministic_change": "Remap depends_on 0002 to requires 0002.",
+      "missing_tuples": [
+        [
+          "requires",
+          "0002"
+        ]
+      ],
+      "recovered_target_entities": [
+        "0002"
+      ],
+      "reference_id": "ref-helix-002",
+      "repository": "AZX-PBC-OSS/helix"
+    },
+    {
+      "arm_a_predicted_tuples": [
+        [
+          "requires",
+          "ADR-0004 (0004-auth-model.md)"
+        ],
+        [
+          "conflicts_with",
+          "ADR-0014 (0014-same-origin-api-gateway.md)"
+        ],
+        [
+          "depends_on",
+          "ADR-0028"
+        ],
+        [
+          "depends_on",
+          "ADR-0020"
+        ]
+      ],
+      "arm_b_predicted_tuples": [
+        [
+          "depends_on",
+          "0004"
+        ],
+        [
+          "depends_on",
+          "0014"
+        ],
+        [
+          "depends_on",
+          "0028"
+        ],
+        [
+          "depends_on",
+          "0020"
+        ]
+      ],
+      "classification_reason": "Expected target 0004 typed as depends_on instead of requires; 3 extra depends_on tuples (0014, 0020, 0028) emitted.",
+      "error_category": "mixed missing + extra",
+      "exact_matches": [],
+      "expected_tuples": [
+        [
+          "requires",
+          "0004"
+        ]
+      ],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0004"
+        ],
+        [
+          "depends_on",
+          "0014"
+        ],
+        [
+          "depends_on",
+          "0020"
+        ],
+        [
+          "depends_on",
+          "0028"
+        ]
+      ],
+      "min_deterministic_change": "Remap depends_on 0004 to requires 0004 and drop extra tuples (0014, 0020, 0028).",
+      "missing_tuples": [
+        [
+          "requires",
+          "0004"
+        ]
+      ],
+      "recovered_target_entities": [
+        "0004"
+      ],
+      "reference_id": "ref-helix-006",
+      "repository": "AZX-PBC-OSS/helix"
+    },
+    {
+      "arm_a_predicted_tuples": [
+        [
+          "refines",
+          "ADR 0002 (0002-postgres-role-split-rls.md)"
+        ],
+        [
+          "depends_on",
+          "ADR 0013 (0013-egress-trust-model.md)"
+        ],
+        [
+          "depends_on",
+          "ADR 0031 (0031-connection-providers-delegated-auth.md)"
+        ],
+        [
+          "depends_on",
+          "ADR 0027 (0027-blob-auth-managed-identity.md)"
+        ]
+      ],
+      "arm_b_predicted_tuples": [
+        [
+          "refines",
+          "0002"
+        ],
+        [
+          "refines",
+          "0013"
+        ],
+        [
+          "depends_on",
+          "0031"
+        ],
+        [
+          "refines",
+          "0027"
+        ]
+      ],
+      "classification_reason": "Expected target 0002 typed as refines instead of requires; 3 extra tuples (refines 0013, 0027, depends_on 0031) emitted.",
+      "error_category": "mixed missing + extra",
+      "exact_matches": [],
+      "expected_tuples": [
+        [
+          "requires",
+          "0002"
+        ]
+      ],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0031"
+        ],
+        [
+          "refines",
+          "0002"
+        ],
+        [
+          "refines",
+          "0013"
+        ],
+        [
+          "refines",
+          "0027"
+        ]
+      ],
+      "min_deterministic_change": "Remap refines 0002 to requires 0002 and drop extra tuples (0013, 0027, 0031).",
+      "missing_tuples": [
+        [
+          "requires",
+          "0002"
+        ]
+      ],
+      "recovered_target_entities": [
+        "0002"
+      ],
+      "reference_id": "ref-helix-008",
+      "repository": "AZX-PBC-OSS/helix"
+    }
+  ],
+  "reference_corpus_hash": "0455bd66aae52551c35b37a63c2d185f",
+  "total_failing_references": 42
+}

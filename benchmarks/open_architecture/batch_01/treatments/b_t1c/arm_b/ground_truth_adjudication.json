@@ -1,0 +1,116 @@
+{
+  "architecture_constraints": {
+    "adr_023_relationship_semantics": [
+      "ADR-023 defines relationships as explicit decision-graph records.",
+      "Its current/validated canonical semantics are narrower (D0 requires compatibility with supersedes and derived_from).",
+      "ADR-023 explicitly anticipates future relationship types including depends_on, conflicts_with, refines, and implements, but they gain no operational semantics merely by being representable.",
+      "O1A Taxonomy 0.1 independently studies: requires, prohibits, depends_on, refines, conflicts_with, supersedes, exception_to.",
+      "Inclusion in the O1A research taxonomy does not itself grant a type production operational semantics."
+    ],
+    "adr_030_section_11_attribution": [
+      "ADR-030 \u00a711 establishes that D1 must not invent related_to or promote producer related_decision_ids into authoritative relationships; they remain proposal history.",
+      "ADR-030 does not explicitly mention Markdown '**Related:**' headers or repository 'relatesTo' metadata.",
+      "Treating generic 'Related:' / 'relatesTo' metadata as contextual rather than normative is an O1A annotation policy, consistent with ADR-030's authority boundary and existing human-reviewed Batch 01 annotations."
+    ],
+    "ground_truth_epistemology": "Batch 01 reference labels represent versioned human reference ground truth, frozen within an experiment. Corrections require explicit evidence, human adjudication, a new corpus version/hash, and must not be motivated by improving model scores."
+  },
+  "arm_b_profile_hash": "e4b6bad47ebcc290924782172fb96d8d",
+  "arm_id": "treatment_b",
+  "case_adjudication_verdicts": {
+    "ref-adrkit-015": {
+      "current_label": [
+        [
+          "refines",
+          "0012"
+        ]
+      ],
+      "proposed_label": [
+        [
+          "refines",
+          "0012"
+        ]
+      ],
+      "rationale": "Existing human review explicitly retained refines -> 0012 as directly supported. Re-labeling from refines to requires is a semantic re-interpretation rather than an objective defect correction; label churn across subjective boundaries is prohibited.",
+      "source_status": "Evidence states descriptor admissibility is evaluated against Backstage validators at the commit ADR-0012 pins.",
+      "verdict": "RETAIN PENDING SEMANTIC ADJUDICATION"
+    },
+    "ref-gsa-agentic-coding-quickstart-005": {
+      "current_label": [
+        [
+          "refines",
+          "0026"
+        ]
+      ],
+      "proposed_label": [],
+      "rationale": "Objective grounding defect. Target was added by reviewer from external repository knowledge; absent from candidate input text.",
+      "source_status": "Target '0026' occurs 0 times in classifier-visible raw_evidence.",
+      "verdict": "ACCEPT AS OBJECTIVE CORRECTION"
+    },
+    "ref-helix-013": {
+      "current_label": [],
+      "proposed_label": [],
+      "rationale": "Existing human review explicitly retained relationships: []. Promoting text inside a generic '**Related:**' header into a formal relationship contradicts the O1A non-normative metadata policy. Must not infer relationships merely to improve benchmark scores.",
+      "source_status": "The phrase 'the attested instruction this extends' appears inside the '**Related:**' metadata block.",
+      "verdict": "REJECT"
+    },
+    "ref-helix-020": {
+      "current_label": [],
+      "proposed_label": [],
+      "rationale": "Existing human review explicitly recorded ONTOLOGY_GAP for missing 'parameterizes' type and retained relationships: []. 'parameterizes', 'reframes', and 'parent' (derived_from) are distinct from 'refines' and must not be conflated unless Taxonomy 0.1 explicitly equates them.",
+      "source_status": "Document declares parentage ('ADR-0022... this ADR's parent') and parameterization ('parameterizes architecture decision 11 and reframes ADR-0019').",
+      "verdict": "ONTOLOGY GAP"
+    }
+  },
+  "corrected_corpus_counts": {
+    "arm_b_exact_type_exact_target_matches": 12,
+    "arm_b_expected_empty_exact_matches": 56,
+    "arm_b_expected_empty_false_positives": 32,
+    "arm_b_non_empty_exact_matches": 3,
+    "arm_b_target_entity_recovery_rate": "18 / 18 (100.00%)",
+    "arm_b_wrong_type_target_matches": 6,
+    "classifier_visible_expected_targets": 18,
+    "expected_empty_references": 88,
+    "expected_non_empty_references": 12,
+    "total_expected_relationship_tuples": 18,
+    "total_references": 100
+  },
+  "counterfactual_scoring": {
+    "accepted_corrections_count": 1,
+    "basis": "Persisted Arm B outcomes without model calls",
+    "counterfactual_arm_b_strict_accuracy": "59 / 100 (0.5900)",
+    "current_arm_b_strict_accuracy": "58 / 100 (0.5800)",
+    "new_exact_matches": [
+      "ref-gsa-agentic-coding-quickstart-005"
+    ]
+  },
+  "depends_on_position": {
+    "rationale": [
+      "ADR-023 explicitly anticipates depends_on as a possible canonical decision relationship.",
+      "In Batch 01, depends_on is unobserved / unvalidated in the human-reviewed reference labels (0 instances).",
+      "Classifier overuse of depends_on (72 instances in Arm B) is a probabilistic model calibration issue, distinct from whether depends_on is a valid architectural concept.",
+      "depends_on remains an active, valid type in Taxonomy 0.1 and must not be deprecated without independent architectural evidence."
+    ],
+    "status": "VALID_IN_TAXONOMY_0_1_AND_UNOBSERVED_IN_BATCH_01"
+  },
+  "execution_head": "346825435b4c0fde96de66d15c3f964b5f6af423",
+  "experiment_id": "b-t1c-relationship-treatment",
+  "minimal_proposed_corpus_revision": {
+    "corpus_files_modified_in_this_step": false,
+    "corpus_version": "batch_01_v0.2-grounding",
+    "modifications": [
+      {
+        "current_value": [
+          {
+            "relationship_type": "refines",
+            "target_reference": "0026"
+          }
+        ],
+        "defect_type": "GROUNDING_DEFECT",
+        "field": "relationships",
+        "proposed_value": [],
+        "reference_id": "ref-gsa-agentic-coding-quickstart-005"
+      }
+    ]
+  },
+  "reference_corpus_hash": "0455bd66aae52551c35b37a63c2d185f"
+}

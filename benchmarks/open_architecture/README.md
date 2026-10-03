@@ -71,7 +71,8 @@ Two scenario identities are kept strictly distinct:
 ## Frozen Baseline Identities
 
 - `semantic_mneme_sha`: `3673c36855fb1e30d46942ce826c50be4888df5e`
-- `reference_corpus` hash: `0455bd66aae52551c35b37a63c2d185f` (100 decisions, 20/repo)
+- `reference_corpus` hash (Batch 01 v0.1): `0455bd66aae52551c35b37a63c2d185f` (100 decisions, 20/repo). Historical baseline executions (B0, Arm A, Arm B) remain bound to this exact hash.
+- `reference_corpus` hash (Batch 01 v0.2-grounding): `700a569e24bf90707ba14ff65eea2ab5` (100 decisions, 20/repo). Applies the grounding correction for `ref-gsa-agentic-coding-quickstart-005` (`relationships: []`).
 - `scenario_corpus` hash: `2ff8751955fd64a33316aca6692dc803` (50 scenarios, 10/repo)
 
 ## Core rule

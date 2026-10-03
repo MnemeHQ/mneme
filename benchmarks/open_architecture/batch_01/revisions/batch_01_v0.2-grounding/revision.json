@@ -1,0 +1,31 @@
+{
+  "base_corpus_hash": "0455bd66aae52551c35b37a63c2d185f",
+  "base_corpus_version": "batch_01_v0.1",
+  "corpus_counts": {
+    "expected_empty_references": 88,
+    "expected_non_empty_references": 12,
+    "total_expected_relationship_tuples": 18,
+    "total_references": 100
+  },
+  "description": "Applies approved relationship-grounding correction for ref-gsa-agentic-coding-quickstart-005.",
+  "model_execution_performed": false,
+  "modifications": [
+    {
+      "defect_type": "GROUNDING_DEFECT",
+      "field": "relationships",
+      "file": "gsa_agentic_coding_quickstart/ref-gsa-agentic-coding-quickstart-005.jsonl",
+      "new_value": [],
+      "old_value": [
+        {
+          "evidence_reference": "ADR-0026 states supported Windows path needs Windows-native secret backend; ADR-0028 explicitly unblocks that secret-storage caveat",
+          "relationship_type": "refines",
+          "target_reference": "0026"
+        }
+      ],
+      "rationale": "Target ADR 0026 occurs 0 times in candidate raw_evidence. The existing label imported external repository knowledge.",
+      "reference_id": "ref-gsa-agentic-coding-quickstart-005"
+    }
+  ],
+  "new_corpus_hash": "700a569e24bf90707ba14ff65eea2ab5",
+  "revision_id": "batch_01_v0.2-grounding"
+}
