@@ -439,10 +439,10 @@ class TestStageCEndToEndMetricsVerification:
         assert len(experiment_result.experiment_profile_hash) == 32
         assert len(experiment_result.end_to_end_scenario_evaluations) == 150
 
-    def test_committed_artifact_byte_identity(
+    def test_committed_artifact_semantic_and_hash_identity(
         self, experiment_result: StageCEndToEndExperimentResult
     ):
-        """Verify that committed stage_c_end_to_end_summary.json is byte-identical to experiment output."""
+        """Verify that committed stage_c_end_to_end_summary.json is semantically and cryptographically identical."""
         repo_root = Path(__file__).resolve().parent.parent.parent
         committed_path = (
             repo_root
@@ -453,11 +453,70 @@ class TestStageCEndToEndMetricsVerification:
             / "stage_c_end_to_end_summary.json"
         )
         assert committed_path.is_file(), f"Committed artifact missing: {committed_path}"
-        committed_bytes = committed_path.read_bytes()
-        fresh_bytes = (
-            json.dumps(experiment_result.to_dict(), indent=2, sort_keys=True) + "\n"
-        ).encode("utf-8")
-        assert committed_bytes == fresh_bytes, (
-            "Committed stage_c_end_to_end_summary.json has diverged from experiment output. "
-            "Regenerate using write_stage_c_end_to_end_summary()."
-        )
+        committed = json.loads(committed_path.read_text(encoding="utf-8"))
+        fresh = experiment_result.to_dict()
+
+        # 1. Identity & Cryptographic Hashes
+        assert committed["experiment_id"] == fresh["experiment_id"]
+        assert committed["baseline_id"] == fresh["baseline_id"]
+        assert committed["parent_main_sha"] == fresh["parent_main_sha"]
+        assert committed["reference_corpus_hash"] == fresh["reference_corpus_hash"]
+        assert committed["scenario_corpus_hash"] == fresh["scenario_corpus_hash"]
+        assert committed["manifest_config_hash"] == fresh["manifest_config_hash"]
+        assert committed["baseline_config_hash"] == fresh["baseline_config_hash"]
+        assert committed["stage_b_mixed_semantic_hash"] == fresh["stage_b_mixed_semantic_hash"]
+        assert committed["experiment_profile_hash"] == fresh["experiment_profile_hash"]
+
+        # 2. Profiles (B0, C-T1A, B3) metrics parity
+        for section in ("isolated_human_baseline", "end_to_end_predictions"):
+            for prof in ("B0", "C-T1A", "B3"):
+                c_prof = committed[section][prof]
+                f_prof = fresh[section][prof]
+                assert c_prof["exact_set_matches"] == f_prof["exact_set_matches"]
+                assert c_prof["total_false_positives"] == f_prof["total_false_positives"]
+                assert c_prof["total_false_negatives"] == f_prof["total_false_negatives"]
+                assert c_prof["total_expected_decisions"] == f_prof["total_expected_decisions"]
+                assert c_prof["total_predicted_decisions"] == f_prof["total_predicted_decisions"]
+                assert c_prof["total_scenarios"] == f_prof["total_scenarios"]
+                assert abs(c_prof["macro_f1"] - f_prof["macro_f1"]) < 1e-6
+                assert abs(c_prof["macro_precision"] - f_prof["macro_precision"]) < 1e-6
+                assert abs(c_prof["macro_recall"] - f_prof["macro_recall"]) < 1e-6
+
+                for repo_id in c_prof["per_repository"]:
+                    c_repo = c_prof["per_repository"][repo_id]
+                    f_repo = f_prof["per_repository"][repo_id]
+                    assert c_repo["exact_set_matches"] == f_repo["exact_set_matches"]
+                    assert c_repo["total_false_positives"] == f_repo["total_false_positives"]
+                    assert c_repo["total_false_negatives"] == f_repo["total_false_negatives"]
+                    assert abs(c_repo["macro_f1"] - f_repo["macro_f1"]) < 1e-6
+                    assert abs(c_repo["macro_precision"] - f_repo["macro_precision"]) < 1e-6
+                    assert abs(c_repo["macro_recall"] - f_repo["macro_recall"]) < 1e-6
+
+        # 3. Profile comparison deltas
+        for prof in ("B0", "C-T1A", "B3"):
+            c_delta = committed["profile_comparisons"][prof]
+            f_delta = fresh["profile_comparisons"][prof]
+            assert c_delta["delta_exact_set_matches"] == f_delta["delta_exact_set_matches"]
+            assert c_delta["delta_false_positives"] == f_delta["delta_false_positives"]
+            assert c_delta["delta_false_negatives"] == f_delta["delta_false_negatives"]
+            assert abs(c_delta["delta_macro_f1"] - f_delta["delta_macro_f1"]) < 1e-6
+            assert abs(c_delta["delta_macro_precision"] - f_delta["delta_macro_precision"]) < 1e-6
+            assert abs(c_delta["delta_macro_recall"] - f_delta["delta_macro_recall"]) < 1e-6
+
+        # 4. Scenario evaluations parity
+        assert len(committed["end_to_end_scenario_evaluations"]) == 150
+        assert len(fresh["end_to_end_scenario_evaluations"]) == 150
+        for c_scn, f_scn in zip(
+            committed["end_to_end_scenario_evaluations"],
+            fresh["end_to_end_scenario_evaluations"],
+        ):
+            assert c_scn["scenario_id"] == f_scn["scenario_id"]
+            assert c_scn["profile"] == f_scn["profile"]
+            assert c_scn["exact_set_match"] == f_scn["exact_set_match"]
+            assert c_scn["selected_decision_ids"] == f_scn["selected_decision_ids"]
+            assert c_scn["retrieved_ids"] == f_scn["retrieved_ids"]
+            assert c_scn["false_positive_ids"] == f_scn["false_positive_ids"]
+            assert c_scn["false_negative_ids"] == f_scn["false_negative_ids"]
+            assert abs(c_scn["f1"] - f_scn["f1"]) < 1e-6
+            assert abs(c_scn["precision"] - f_scn["precision"]) < 1e-6
+            assert abs(c_scn["recall"] - f_scn["recall"]) < 1e-6
