@@ -271,6 +271,8 @@ def build_stage_b_closure(
                 ),
                 "target_entity_recovery": "Maintained 18/18 (100%) target entity recovery.",
             },
+            "preservation_conditions": diag_data.get("preservation_conditions", []),
+            "primary_hypotheses": diag_data.get("primary_hypotheses", []),
             "summary": (
                 "B-T1D Arm D achieved the highest validated semantic composite and relationship accuracy "
                 "in Batch 01 while passing all preservation conditions."

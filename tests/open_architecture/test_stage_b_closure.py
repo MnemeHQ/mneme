@@ -184,6 +184,29 @@ class TestStageBClosureArtifact:
         assert "61/100" in kf["strict_relationship_accuracy"]
         assert "Reduced" in kf["extra_tuples_reduction"]
 
+        # Exact Preservation Conditions (P1-P5)
+        pcs = {c["condition_id"]: c for c in rat["preservation_conditions"]}
+        assert len(pcs) == 5
+        assert pcs["P1"]["metric"] == "target_entity_recovery"
+        assert pcs["P1"]["observed_value"] == 18
+        assert pcs["P1"]["passed"] is True
+
+        assert pcs["P2"]["metric"] == "exact_type_exact_target_recovery"
+        assert pcs["P2"]["observed_value"] == 13
+        assert pcs["P2"]["passed"] is True
+
+        assert pcs["P3"]["metric"] == "missing_target_entities"
+        assert pcs["P3"]["observed_value"] == 0
+        assert pcs["P3"]["passed"] is True
+
+        assert pcs["P4"]["metric"] == "non_empty_strict_exact_matches"
+        assert pcs["P4"]["observed_value"] == 5
+        assert pcs["P4"]["passed"] is True
+
+        assert pcs["P5"]["metric"] == "target_boundary_anomalies"
+        assert pcs["P5"]["observed_value"] == 1
+        assert pcs["P5"]["passed"] is True
+
 
 class TestStageBClosureEvidenceGuard:
     def test_fresh_reconstruction_matches_committed_artifact(self):

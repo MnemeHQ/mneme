@@ -58,6 +58,90 @@
       "strict_relationship_accuracy": "Improved from B0 (0.00) and Arm B (0.59) to 61/100 (0.6100000000000001).",
       "target_entity_recovery": "Maintained 18/18 (100%) target entity recovery."
     },
+    "preservation_conditions": [
+      {
+        "comparator": "==",
+        "condition_id": "P1",
+        "control_threshold": 18,
+        "metric": "target_entity_recovery",
+        "observed_value": 18,
+        "passed": true
+      },
+      {
+        "comparator": ">=",
+        "condition_id": "P2",
+        "control_threshold": 12,
+        "metric": "exact_type_exact_target_recovery",
+        "observed_value": 13,
+        "passed": true
+      },
+      {
+        "comparator": "==",
+        "condition_id": "P3",
+        "control_threshold": 0,
+        "metric": "missing_target_entities",
+        "observed_value": 0,
+        "passed": true
+      },
+      {
+        "comparator": ">=",
+        "condition_id": "P4",
+        "control_threshold": 3,
+        "metric": "non_empty_strict_exact_matches",
+        "observed_value": 5,
+        "passed": true
+      },
+      {
+        "comparator": "<=",
+        "condition_id": "P5",
+        "control_threshold": 2,
+        "metric": "target_boundary_anomalies",
+        "observed_value": 1,
+        "passed": true
+      }
+    ],
+    "primary_hypotheses": [
+      {
+        "comparator": ">",
+        "control_arm_b_baseline": 0.59,
+        "hypothesis_id": "H1",
+        "metric": "strict_relationship_accuracy",
+        "observed_value": 0.61,
+        "passed": true
+      },
+      {
+        "comparator": ">",
+        "control_arm_b_baseline": 56,
+        "hypothesis_id": "H2",
+        "metric": "expected_empty_exact_matches",
+        "observed_value": 56,
+        "passed": false
+      },
+      {
+        "comparator": "<",
+        "control_arm_b_baseline": 32,
+        "hypothesis_id": "H3",
+        "metric": "expected_empty_false_positive_references",
+        "observed_value": 32,
+        "passed": false
+      },
+      {
+        "comparator": "<",
+        "control_arm_b_baseline": 86,
+        "hypothesis_id": "H4",
+        "metric": "expected_empty_extra_tuples",
+        "observed_value": 75,
+        "passed": true
+      },
+      {
+        "comparator": "<",
+        "control_arm_b_baseline": 105,
+        "hypothesis_id": "H5",
+        "metric": "total_extra_relationship_tuples",
+        "observed_value": 86,
+        "passed": true
+      }
+    ],
     "summary": "B-T1D Arm D achieved the highest validated semantic composite and relationship accuracy in Batch 01 while passing all preservation conditions."
   },
   "endpoint_scorecard": {
