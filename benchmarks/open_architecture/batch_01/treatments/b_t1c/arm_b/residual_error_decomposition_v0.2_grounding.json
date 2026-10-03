@@ -1,14 +1,13 @@
 {
-  "adjudicated_ontology_gap_count": 7,
   "adjudicated_ontology_gap_references": 1,
   "arm_b_profile_hash": "e4b6bad47ebcc290924782172fb96d8d",
   "arm_id": "treatment_b",
   "artifact_type": "b_t1c_arm_b_residual_error_decomposition_v0.2_grounding",
   "evidence_context_aggregate_counts": {
-    "contextual_related_metadata": 35,
-    "lifecycle_revision_history": 8,
-    "narrative_body": 70,
-    "unresolved": 0
+    "contextual_related_metadata": 31,
+    "lifecycle_revision_history": 6,
+    "narrative_body": 65,
+    "unresolved": 11
   },
   "execution_reference_corpus_hash": "0455bd66aae52551c35b37a63c2d185f",
   "experiment_id": "b-t1c-relationship-treatment",
@@ -28,14 +27,13 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
             "depends_on_overproduction"
           ],
           "evidence_context_tag": "narrative_body",
-          "evidence_location": "narrative_body_line_12",
+          "evidence_location": "narrative_body_line_13",
           "evidence_reference": "the extension lives at `packages/adapters/spec-kit/` under the layout and dependency rules ADR-0007 establishes \u2014 it is an adapter like any other, not a privileged one.",
           "parsed_adr_alias": "0007",
           "prediction_behaviour_tags": [
@@ -90,7 +88,6 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -152,7 +149,6 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "lifecycle_revision_history",
             "extra_relationship"
@@ -211,7 +207,6 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship"
@@ -278,14 +273,13 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
-            "narrative_body",
+            "unresolved",
             "extra_relationship",
             "depends_on_overproduction"
           ],
-          "evidence_context_tag": "narrative_body",
-          "evidence_location": "narrative_body_line_39",
+          "evidence_context_tag": "unresolved",
+          "evidence_location": "ambiguous_target_context_match",
           "evidence_reference": "the ADR-0007 clean-clone requirement applied to matching. Adapters implement it, under `packages/adapters/catalog-*` per ADR-0007.",
           "parsed_adr_alias": "0007",
           "prediction_behaviour_tags": [
@@ -298,7 +292,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "lifecycle_revision_history",
             "extra_relationship"
@@ -316,7 +309,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "lifecycle_revision_history",
             "extra_relationship"
@@ -356,7 +348,7 @@
         "conflicting_type_extra_count": 0,
         "evidence_context_counts": {
           "lifecycle_revision_history": 2,
-          "narrative_body": 1
+          "unresolved": 1
         },
         "exact_tuple_count": 0,
         "extra_tuple_count": 3,
@@ -385,7 +377,6 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship"
@@ -444,7 +435,6 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -520,12 +510,11 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
-            "narrative_body"
+            "unresolved"
           ],
-          "evidence_context_tag": "narrative_body",
-          "evidence_location": "narrative_body_line_11",
+          "evidence_context_tag": "unresolved",
+          "evidence_location": "ambiguous_clause_match",
           "evidence_reference": "supersedes: [\"0005\"] / **Supersede ADR-0005. Ratify the deterministic layer as it stands** / [x] Supersede ADR-0005; set its `status` and `supersededBy` reciprocally",
           "parsed_adr_alias": "0005",
           "prediction_behaviour_tags": [],
@@ -535,7 +524,6 @@
           "tuple_role": "exact_match"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship",
@@ -555,7 +543,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship",
@@ -599,7 +586,7 @@
         "conflicting_type_extra_count": 0,
         "evidence_context_counts": {
           "contextual_related_metadata": 2,
-          "narrative_body": 1
+          "unresolved": 1
         },
         "exact_tuple_count": 1,
         "extra_tuple_count": 2,
@@ -646,7 +633,6 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body"
           ],
@@ -661,7 +647,6 @@
           "tuple_role": "exact_match"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body"
           ],
@@ -676,7 +661,6 @@
           "tuple_role": "exact_match"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -763,7 +747,6 @@
       ],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -785,7 +768,6 @@
           "tuple_role": "wrong_type_target"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -913,7 +895,6 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -933,7 +914,6 @@
           "tuple_role": "conflicting_type_extra"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body"
           ],
@@ -948,7 +928,6 @@
           "tuple_role": "exact_match"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body"
           ],
@@ -963,7 +942,6 @@
           "tuple_role": "exact_match"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body"
           ],
@@ -978,7 +956,6 @@
           "tuple_role": "exact_match"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body"
           ],
@@ -993,7 +970,6 @@
           "tuple_role": "exact_match"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body"
           ],
@@ -1008,7 +984,6 @@
           "tuple_role": "exact_match"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship"
@@ -1102,7 +1077,6 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "lifecycle_revision_history",
             "extra_relationship"
@@ -1120,7 +1094,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "lifecycle_revision_history",
             "extra_relationship"
@@ -1187,7 +1160,6 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -1207,7 +1179,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -1283,14 +1254,13 @@
       ],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
             "wrong_type_recovery"
           ],
           "evidence_context_tag": "narrative_body",
-          "evidence_location": "narrative_body_line_21",
+          "evidence_location": "narrative_body_line_20",
           "evidence_reference": "Pinning by full SHA continues to defeat content substitution through the ZScaler TLS-inspecting proxy (SA-12, SI-7), per ADR-0005.",
           "parsed_adr_alias": "0005",
           "prediction_behaviour_tags": [
@@ -1353,7 +1323,6 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -1415,13 +1384,12 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship"
           ],
           "evidence_context_tag": "narrative_body",
-          "evidence_location": "narrative_body_line_103",
+          "evidence_location": "narrative_body_line_102",
           "evidence_reference": "[ADR-0011](0011-msb-backend-and-neutral-kits.md). So an image that is portable by the sbx rule above always works on msb; an image that works only on msb (e.g. `agent` at a non-1000 UID, or no `agent` user at all) is **not** guaranteed on sbx.",
           "parsed_adr_alias": "0011",
           "prediction_behaviour_tags": [
@@ -1474,14 +1442,13 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
             "depends_on_overproduction"
           ],
           "evidence_context_tag": "narrative_body",
-          "evidence_location": "narrative_body_line_46",
+          "evidence_location": "narrative_body_line_45",
           "evidence_reference": "`acq rm` warns when the scratch holds commits absent from the host's object store, then deletes the scratch and removes the remote (same gone-after-remove-attempt rule as derived volumes, ADR-0023).",
           "parsed_adr_alias": "0023",
           "prediction_behaviour_tags": [
@@ -1536,7 +1503,6 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship"
@@ -1595,13 +1561,12 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
-            "lifecycle_revision_history",
+            "unresolved",
             "extra_relationship"
           ],
-          "evidence_context_tag": "lifecycle_revision_history",
-          "evidence_location": "lifecycle_marker_line_24",
+          "evidence_context_tag": "unresolved",
+          "evidence_location": "ambiguous_target_context_match",
           "evidence_reference": "**Update (ADR-0019):** the deny-default described below is scoped to **egress only** \u2014 the emitter uses `--net-default-egress deny`, not the symmetric `--net-default deny` this ADR originally specified. ... See [ADR-0019](0019-msb-balanced-egress-is-egress-only.md).",
           "parsed_adr_alias": "0019",
           "prediction_behaviour_tags": [
@@ -1626,7 +1591,7 @@
       "summary_counts": {
         "conflicting_type_extra_count": 0,
         "evidence_context_counts": {
-          "lifecycle_revision_history": 1
+          "unresolved": 1
         },
         "exact_tuple_count": 0,
         "extra_tuple_count": 1,
@@ -1654,7 +1619,6 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -1730,7 +1694,6 @@
       ],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship",
@@ -1750,15 +1713,14 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
-            "narrative_body",
+            "unresolved",
             "extra_relationship",
             "depends_on_overproduction",
             "wrong_type_recovery"
           ],
-          "evidence_context_tag": "narrative_body",
-          "evidence_location": "narrative_body_line_11",
+          "evidence_context_tag": "unresolved",
+          "evidence_location": "ambiguous_target_context_match",
           "evidence_reference": "All dynamic capability \u2014 LLM, storage, third-party HTTP \u2014 flows through the platform's `/_api/*` gateway (ADR-0014). ADR [0014](0014-same-origin-api-gateway.md)",
           "parsed_adr_alias": "0014",
           "prediction_behaviour_tags": [
@@ -1792,7 +1754,7 @@
         "conflicting_type_extra_count": 0,
         "evidence_context_counts": {
           "contextual_related_metadata": 1,
-          "narrative_body": 1
+          "unresolved": 1
         },
         "exact_tuple_count": 0,
         "extra_tuple_count": 2,
@@ -1838,7 +1800,6 @@
       ],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -1923,7 +1884,6 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -1943,7 +1903,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -1963,7 +1922,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -1983,7 +1941,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -2061,14 +2018,13 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
-            "contextual_related_metadata",
+            "unresolved",
             "extra_relationship",
             "depends_on_overproduction"
           ],
-          "evidence_context_tag": "contextual_related_metadata",
-          "evidence_location": "related_metadata_line_3",
+          "evidence_context_tag": "unresolved",
+          "evidence_location": "ambiguous_clause_match",
           "evidence_reference": "ADR [0004](0004-auth-model.md) ... This is the load-bearing choice the auth model and relaxed CSP both build on.",
           "parsed_adr_alias": "0004",
           "prediction_behaviour_tags": [
@@ -2081,14 +2037,13 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
-            "contextual_related_metadata",
+            "unresolved",
             "extra_relationship",
             "depends_on_overproduction"
           ],
-          "evidence_context_tag": "contextual_related_metadata",
-          "evidence_location": "related_metadata_line_3",
+          "evidence_context_tag": "unresolved",
+          "evidence_location": "ambiguous_clause_match",
           "evidence_reference": "ADR [0009](0009-relaxed-csp.md) ... This is the load-bearing choice the auth model and relaxed CSP both build on.",
           "parsed_adr_alias": "0009",
           "prediction_behaviour_tags": [
@@ -2118,7 +2073,7 @@
       "summary_counts": {
         "conflicting_type_extra_count": 0,
         "evidence_context_counts": {
-          "contextual_related_metadata": 2
+          "unresolved": 2
         },
         "exact_tuple_count": 0,
         "extra_tuple_count": 2,
@@ -2147,7 +2102,6 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship",
@@ -2231,7 +2185,6 @@
       ],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -2253,7 +2206,6 @@
           "tuple_role": "wrong_type_target"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -2273,7 +2225,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -2293,7 +2244,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -2380,7 +2330,6 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship",
@@ -2400,7 +2349,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship",
@@ -2488,7 +2436,6 @@
       ],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -2508,7 +2455,6 @@
           "tuple_role": "wrong_type_target"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship"
@@ -2526,7 +2472,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -2546,7 +2491,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship"
@@ -2627,7 +2571,6 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -2697,7 +2640,6 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship"
@@ -2715,7 +2657,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship"
@@ -2733,7 +2674,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship"
@@ -2809,7 +2749,6 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -2829,7 +2768,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -2849,7 +2787,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -2959,7 +2896,6 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship",
@@ -2979,7 +2915,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship",
@@ -2999,7 +2934,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship",
@@ -3019,7 +2953,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship",
@@ -3039,7 +2972,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship",
@@ -3059,7 +2991,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship",
@@ -3079,7 +3010,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship",
@@ -3099,7 +3029,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -3119,7 +3048,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -3139,7 +3067,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -3159,7 +3086,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -3310,7 +3236,6 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship"
@@ -3328,7 +3253,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship"
@@ -3346,7 +3270,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship"
@@ -3364,7 +3287,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship",
@@ -3384,7 +3306,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship",
@@ -3404,7 +3325,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -3424,7 +3344,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -3444,7 +3363,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship",
@@ -3464,14 +3382,13 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
-            "contextual_related_metadata",
+            "unresolved",
             "extra_relationship",
             "depends_on_overproduction"
           ],
-          "evidence_context_tag": "contextual_related_metadata",
-          "evidence_location": "related_metadata_line_3",
+          "evidence_context_tag": "unresolved",
+          "evidence_location": "ambiguous_target_context_match",
           "evidence_reference": "ADR [0021](0021-metering-ledger.md) (metering \u2014 where 'who used what' is already answered)",
           "parsed_adr_alias": "0021",
           "prediction_behaviour_tags": [
@@ -3484,7 +3401,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -3504,7 +3420,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -3524,7 +3439,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -3544,7 +3458,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -3625,8 +3538,9 @@
       "summary_counts": {
         "conflicting_type_extra_count": 0,
         "evidence_context_counts": {
-          "contextual_related_metadata": 7,
-          "narrative_body": 6
+          "contextual_related_metadata": 6,
+          "narrative_body": 6,
+          "unresolved": 1
         },
         "exact_tuple_count": 0,
         "extra_tuple_count": 13,
@@ -3663,7 +3577,6 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -3683,13 +3596,12 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship"
           ],
           "evidence_context_tag": "narrative_body",
-          "evidence_location": "narrative_body_line_66",
+          "evidence_location": "narrative_body_line_65",
           "evidence_reference": "Collection items are the clearest case: the whole point of the collection scope (ADR [0015](0015-app-data-three-scope-model.md)) is that the writer and the reader are different principals",
           "parsed_adr_alias": "0015",
           "prediction_behaviour_tags": [
@@ -3701,7 +3613,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -3775,7 +3686,6 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -3795,7 +3705,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -3877,7 +3786,6 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship",
@@ -3897,7 +3805,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship",
@@ -3917,7 +3824,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship",
@@ -3937,7 +3843,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -3957,7 +3862,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",
@@ -4040,7 +3944,6 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship",
@@ -4060,7 +3963,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship",
@@ -4146,14 +4048,13 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
-            "lifecycle_revision_history",
+            "unresolved",
             "extra_relationship",
             "target_boundary_anomaly"
           ],
-          "evidence_context_tag": "lifecycle_revision_history",
-          "evidence_location": "lifecycle_marker_paragraph_4",
+          "evidence_context_tag": "unresolved",
+          "evidence_location": "unresolved",
           "evidence_reference": "Reverses the platform-wide service-worker ban recorded in `docs/platform-architecture.md` \u00a74.4 and Appendix A.3, replacing it with a narrow, approval-gated exception. ... The ban remains the default and this is a named exception to it.",
           "parsed_adr_alias": null,
           "prediction_behaviour_tags": [
@@ -4166,7 +4067,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship",
@@ -4186,7 +4086,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship",
@@ -4206,7 +4105,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship",
@@ -4226,14 +4124,13 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
-            "contextual_related_metadata",
+            "unresolved",
             "extra_relationship",
             "depends_on_overproduction"
           ],
-          "evidence_context_tag": "contextual_related_metadata",
-          "evidence_location": "related_metadata_paragraph_4",
+          "evidence_context_tag": "unresolved",
+          "evidence_location": "ambiguous_target_context_match",
           "evidence_reference": "Relates to [ADR-0018](0018-deploy-model-immutable-versions.md) (the pointer flip this must not break) ... Network-first documents are what preserve the ADR-0018 pointer-flip contract",
           "parsed_adr_alias": "0018",
           "prediction_behaviour_tags": [
@@ -4246,7 +4143,6 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "contextual_related_metadata",
             "extra_relationship",
@@ -4299,8 +4195,8 @@
       "summary_counts": {
         "conflicting_type_extra_count": 0,
         "evidence_context_counts": {
-          "contextual_related_metadata": 5,
-          "lifecycle_revision_history": 1
+          "contextual_related_metadata": 4,
+          "unresolved": 2
         },
         "exact_tuple_count": 0,
         "extra_tuple_count": 6,
@@ -4354,14 +4250,12 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": true,
           "causal_tags": [
-            "narrative_body",
-            "extra_relationship",
-            "adjudicated_ontology_gap"
+            "unresolved",
+            "extra_relationship"
           ],
-          "evidence_context_tag": "narrative_body",
-          "evidence_location": "narrative_body_line_2",
+          "evidence_context_tag": "unresolved",
+          "evidence_location": "ambiguous_clause_match",
           "evidence_reference": "parameterizes architecture decision 11 and reframes ADR-0019 / issue #16; The apps \u2194 control-plane site split (ADR-0019 / #16) becomes a per-deployment topology.",
           "parsed_adr_alias": "0019",
           "prediction_behaviour_tags": [
@@ -4373,14 +4267,12 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": true,
           "causal_tags": [
-            "narrative_body",
-            "extra_relationship",
-            "adjudicated_ontology_gap"
+            "unresolved",
+            "extra_relationship"
           ],
-          "evidence_context_tag": "narrative_body",
-          "evidence_location": "narrative_body_line_11",
+          "evidence_context_tag": "unresolved",
+          "evidence_location": "ambiguous_target_context_match",
           "evidence_reference": "ADR-0022 chose a self-hosted, portable data plane precisely 'because customers may run the platform on their own clouds' \u2014 this ADR's parent; This ADR elevates that from an aside to the deployment model",
           "parsed_adr_alias": "0022",
           "prediction_behaviour_tags": [
@@ -4392,11 +4284,9 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": true,
           "causal_tags": [
             "contextual_related_metadata",
-            "extra_relationship",
-            "adjudicated_ontology_gap"
+            "extra_relationship"
           ],
           "evidence_context_tag": "contextual_related_metadata",
           "evidence_location": "related_metadata_line_3",
@@ -4411,11 +4301,9 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": true,
           "causal_tags": [
             "narrative_body",
-            "extra_relationship",
-            "adjudicated_ontology_gap"
+            "extra_relationship"
           ],
           "evidence_context_tag": "narrative_body",
           "evidence_location": "narrative_body_line_25",
@@ -4430,11 +4318,9 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": true,
           "causal_tags": [
             "narrative_body",
-            "extra_relationship",
-            "adjudicated_ontology_gap"
+            "extra_relationship"
           ],
           "evidence_context_tag": "narrative_body",
           "evidence_location": "narrative_body_line_25",
@@ -4449,11 +4335,9 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": true,
           "causal_tags": [
             "narrative_body",
-            "extra_relationship",
-            "adjudicated_ontology_gap"
+            "extra_relationship"
           ],
           "evidence_context_tag": "narrative_body",
           "evidence_location": "narrative_body_line_23",
@@ -4468,11 +4352,9 @@
           "tuple_role": "extra_tuple"
         },
         {
-          "adjudicated_ontology_gap": true,
           "causal_tags": [
             "narrative_body",
-            "extra_relationship",
-            "adjudicated_ontology_gap"
+            "extra_relationship"
           ],
           "evidence_context_tag": "narrative_body",
           "evidence_location": "narrative_body_line_29",
@@ -4525,7 +4407,8 @@
         "conflicting_type_extra_count": 0,
         "evidence_context_counts": {
           "contextual_related_metadata": 1,
-          "narrative_body": 6
+          "narrative_body": 4,
+          "unresolved": 2
         },
         "exact_tuple_count": 0,
         "extra_tuple_count": 7,
@@ -4553,13 +4436,12 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "lifecycle_revision_history",
             "extra_relationship"
           ],
           "evidence_context_tag": "lifecycle_revision_history",
-          "evidence_location": "lifecycle_marker_line_1",
+          "evidence_location": "lifecycle_marker_line_0",
           "evidence_reference": "Partially superseded: ADR-046-ship-the-deferred-features.md reverses the deferral of adapter-verify, Break the Ratchet, and CheckerProof (point 5 below) on direct owner instruction, while holding every safety and scope constraint this ADR attached to them.",
           "parsed_adr_alias": "0046",
           "prediction_behaviour_tags": [
@@ -4612,7 +4494,6 @@
       "missing_tuples": [],
       "per_tuple_diagnostics": [
         {
-          "adjudicated_ontology_gap": false,
           "causal_tags": [
             "narrative_body",
             "extra_relationship",

@@ -209,17 +209,18 @@ class TestStageBRelationshipResidualAnalysis:
         assert c12.get(CTX_CONTEXTUAL_RELATED_METADATA, 0) == 7
         assert c12.get(CTX_NARRATIVE_BODY, 0) == 4
 
-        # ref-helix-013: 7 related metadata + 6 narrative body
+        # ref-helix-013: 6 related metadata + 6 narrative body + 1 ambiguous/unresolved
         f13 = fail_map["ref-helix-013"]
         c13 = f13["summary_counts"]["evidence_context_counts"]
-        assert c13.get(CTX_CONTEXTUAL_RELATED_METADATA, 0) == 7
+        assert c13.get(CTX_CONTEXTUAL_RELATED_METADATA, 0) == 6
         assert c13.get(CTX_NARRATIVE_BODY, 0) == 6
+        assert c13.get(CTX_UNRESOLVED, 0) == 1
 
-        # ref-helix-019: 1 lifecycle marker + 5 related metadata
+        # ref-helix-019: 4 related metadata + 2 ambiguous/unresolved
         f19 = fail_map["ref-helix-019"]
         c19 = f19["summary_counts"]["evidence_context_counts"]
-        assert c19.get(CTX_LIFECYCLE_REVISION_HISTORY, 0) == 1
-        assert c19.get(CTX_CONTEXTUAL_RELATED_METADATA, 0) == 5
+        assert c19.get(CTX_CONTEXTUAL_RELATED_METADATA, 0) == 4
+        assert c19.get(CTX_UNRESOLVED, 0) == 2
 
     def test_06_target_boundary_anomalies(self):
         """6. Target boundary anomalies (null and non-canonical path) are tagged correctly."""
@@ -300,24 +301,67 @@ class TestStageBRelationshipResidualAnalysis:
         assert matrix["supersedes"]["supersedes"] == 3  # gsa-013 (2 tuples), adrkit-013 (1 tuple)
 
     def test_08_unresolved_evidence_handling(self):
-        """8. Unresolved evidence fallback fails safe without guessing or crashing."""
-        raw_text = "Some candidate evidence mentioning ADR-0005 in passing."
+        """8. Unresolved and ambiguous evidence fallback fails closed without guessing or first-match-wins."""
+        # 1. Single unique match resolves normally
+        raw_unique = "Header line\n**Related:** ADR-0005 unique occurrence here\nFooter line"
+        ctx1, loc1 = detect_evidence_context("ref-test", "0005", "unique occurrence here", raw_unique)
+        assert ctx1 == CTX_CONTEXTUAL_RELATED_METADATA
+        assert loc1 == "related_metadata_line_1"
 
-        # Missing or empty evidence
-        ctx1, loc1 = detect_evidence_context("ref-test", "0005", None, raw_text)
-        assert ctx1 == CTX_UNRESOLVED
-        assert loc1 == "missing_evidence"
+        # 2. Missing or empty evidence fails closed
+        ctx_m1, loc_m1 = detect_evidence_context("ref-test", "0005", None, raw_unique)
+        assert ctx_m1 == CTX_UNRESOLVED
+        assert loc_m1 == "missing_evidence"
 
-        ctx2, loc2 = detect_evidence_context("ref-test", "0005", "   ", raw_text)
-        assert ctx2 == CTX_UNRESOLVED
-        assert loc2 == "missing_evidence"
+        ctx_m2, loc_m2 = detect_evidence_context("ref-test", "0005", "   ", raw_unique)
+        assert ctx_m2 == CTX_UNRESOLVED
+        assert loc_m2 == "missing_evidence"
 
-        # Completely unlocated evidence
-        ctx3, loc3 = detect_evidence_context(
-            "ref-test", "0005", "Completely unreferenced phrase not found in candidate", raw_text
+        # 3. Completely unreferenced phrase fails closed (zero matches)
+        ctx_zero, loc_zero = detect_evidence_context(
+            "ref-test", "0005", "Completely unreferenced phrase not found in candidate", raw_unique
         )
-        assert ctx3 == CTX_UNRESOLVED
-        assert loc3 == "unresolved"
+        assert ctx_zero == CTX_UNRESOLVED
+        assert loc_zero == "unresolved"
+
+        # 4. Duplicated exact line match fails closed (ambiguous_normalized_line_match)
+        raw_dup_line = (
+            "Line 0: preamble\n"
+            "Line 1: Identical evidence quote for testing ambiguity.\n"
+            "Line 2: intermediate text\n"
+            "Line 3: Identical evidence quote for testing ambiguity.\n"
+        )
+        ctx_dup1, loc_dup1 = detect_evidence_context(
+            "ref-test", "0005", "Identical evidence quote for testing ambiguity.", raw_dup_line
+        )
+        assert ctx_dup1 == CTX_UNRESOLVED
+        assert loc_dup1 == "ambiguous_normalized_line_match"
+
+        # 5. Duplicated clause match fails closed (ambiguous_clause_match)
+        raw_dup_clause = (
+            "Line 0: preamble\n"
+            "Line 1: ADR [0005](0005.md) repeated clause phrase\n"
+            "Line 2: intermediate text\n"
+            "Line 3: ADR [0005](0005.md) repeated clause phrase\n"
+        )
+        ctx_dup2, loc_dup2 = detect_evidence_context(
+            "ref-test", "0005", "ADR [0005](0005.md) repeated clause phrase ... secondary clause", raw_dup_clause
+        )
+        assert ctx_dup2 == CTX_UNRESOLVED
+        assert loc_dup2 == "ambiguous_clause_match"
+
+        # 6. Duplicated target context fallback match fails closed (ambiguous_target_context_match)
+        raw_dup_ctx = (
+            "Line 0: preamble\n"
+            "Line 1: ADR-0005 is deployed with custom parameter configurations for the service.\n"
+            "Line 2: middle text\n"
+            "Line 3: ADR-0005 was verified with custom parameter configurations in staging.\n"
+        )
+        ctx_dup3, loc_dup3 = detect_evidence_context(
+            "ref-test", "0005", "ADR-0005 has custom parameter configurations elsewhere", raw_dup_ctx
+        )
+        assert ctx_dup3 == CTX_UNRESOLVED
+        assert loc_dup3 == "ambiguous_target_context_match"
 
     def test_09_zero_network_and_architecture_boundaries(self):
         """9. Zero network/model calls and canonical runtime modules remain unimported."""
@@ -374,7 +418,7 @@ class TestStageBRelationshipResidualAnalysis:
         assert committed_text == re_generated_text
 
     def test_11_adjudicated_ontology_gap_separation(self):
-        """11. Ontology gap is separated from evidence context and properly tagged."""
+        """11. Ontology gap is separated from evidence context and properly tagged at reference level."""
         v02_refs = load_reference_corpus(V02_REF_DIR)
         outcomes = load_treatment_outcomes(ARM_B_OUTCOMES_PATH)
         analysis = run_residual_error_analysis(v02_refs, outcomes)
@@ -385,17 +429,19 @@ class TestStageBRelationshipResidualAnalysis:
         assert list(analysis["evidence_context_aggregate_counts"].keys()) == sorted(list(ORDERED_EVIDENCE_CONTEXT_TAGS))
         assert sum(analysis["evidence_context_aggregate_counts"].values()) == 113
 
-        # Orthogonal ontology gap counts
-        assert analysis["adjudicated_ontology_gap_count"] == 7
+        # Reference-level ontology gap counts (tuple count is not reported)
         assert analysis["adjudicated_ontology_gap_references"] == 1
+        assert "adjudicated_ontology_gap_count" not in analysis
 
-        # ref-helix-020 is tagged with adjudicated_ontology_gap
+        # ref-helix-020 is tagged with adjudicated_ontology_gap at reference level
         f20 = fail_map["ref-helix-020"]
         assert f20["adjudicated_ontology_gap"] is True
+
+        # Tuples from ref-helix-020 have mechanically observed context and no tuple-level ontology gap tag
         for t in f20["per_tuple_diagnostics"]:
-            assert t["adjudicated_ontology_gap"] is True
-            assert ADJUDICATION_ONTOLOGY_GAP in t["causal_tags"]
-            assert t["evidence_context_tag"] in [CTX_NARRATIVE_BODY, CTX_CONTEXTUAL_RELATED_METADATA]
+            assert "adjudicated_ontology_gap" not in t
+            assert ADJUDICATION_ONTOLOGY_GAP not in t["causal_tags"]
+            assert t["evidence_context_tag"] in [CTX_NARRATIVE_BODY, CTX_CONTEXTUAL_RELATED_METADATA, CTX_LIFECYCLE_REVISION_HISTORY, CTX_UNRESOLVED]
 
         # Other failing references have adjudicated_ontology_gap == False
         for ref_id, f in fail_map.items():

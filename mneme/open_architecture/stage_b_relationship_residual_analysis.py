@@ -190,57 +190,77 @@ def detect_evidence_context(
     target_line_idx = -1
     ev_norm = normalize_whitespace(evidence_ref)
 
-    # 1. Exact or whitespace-normalized line search
-    for idx, line in enumerate(raw_lines):
-        line_norm = normalize_whitespace(line)
-        if ev_norm in line_norm or (len(line_norm) > 15 and line_norm in ev_norm):
-            target_line_idx = idx
-            break
+    # 1. Exact or whitespace-normalized line search (fail-closed on multiple matches)
+    s1_candidates = [
+        idx for idx, line in enumerate(raw_lines)
+        if ev_norm in normalize_whitespace(line)
+    ]
+    if len(s1_candidates) == 1:
+        target_line_idx = s1_candidates[0]
+    elif len(s1_candidates) > 1:
+        return CTX_UNRESOLVED, "ambiguous_normalized_line_match"
 
-    # 2. Search for clauses / parts
+    # 2. Search for clauses / parts across lines (fail-closed on multiple matches)
     if target_line_idx == -1:
         clauses = [
             normalize_whitespace(c)
             for c in re.split(r"\s*(?:\.\.\.|\s/\s|;)\s*", ev_norm)
             if len(normalize_whitespace(c)) >= 10
         ]
-        for c in clauses:
-            c_find = c[4:] if c.startswith("ADR [") else (c[11:] if c.startswith("Relates to [") else c)
-            for idx, line in enumerate(raw_lines):
-                line_norm = normalize_whitespace(line)
-                if c_find in line_norm:
-                    target_line_idx = idx
+        if clauses:
+            s2_candidates = set()
+            clause_ambiguous = False
+            for c in clauses:
+                c_find = (
+                    c[4:]
+                    if c.startswith("ADR [")
+                    else (c[11:] if c.startswith("Relates to [") else c)
+                )
+                c_matches = [
+                    idx for idx, line in enumerate(raw_lines)
+                    if c_find in normalize_whitespace(line)
+                ]
+                if len(c_matches) > 1:
+                    clause_ambiguous = True
                     break
-            if target_line_idx != -1:
-                break
+                elif len(c_matches) == 1:
+                    s2_candidates.add(c_matches[0])
+            if clause_ambiguous or len(s2_candidates) > 1:
+                return CTX_UNRESOLVED, "ambiguous_clause_match"
+            if len(s2_candidates) == 1:
+                target_line_idx = next(iter(s2_candidates))
 
-    # 3. Clean markdown line search
+    # 3. Clean markdown line search (fail-closed on multiple matches)
     if target_line_idx == -1:
         clean_ev = strip_markdown_decorations(evidence_ref)
-        for idx, line in enumerate(raw_lines):
-            clean_line = strip_markdown_decorations(line)
-            if (
-                clean_ev in clean_line
-                or (len(clean_line) > 15 and clean_line in clean_ev)
-                or (len(clean_ev) > 15 and clean_ev[:30] in clean_line)
-            ):
-                target_line_idx = idx
-                break
+        s3_candidates = [
+            idx for idx, line in enumerate(raw_lines)
+            if clean_ev in strip_markdown_decorations(line)
+        ]
+        if len(s3_candidates) == 1:
+            target_line_idx = s3_candidates[0]
+        elif len(s3_candidates) > 1:
+            return CTX_UNRESOLVED, "ambiguous_clean_line_match"
 
-    # 4. Multi-line search across raw_evidence
+    # 4. Multi-line search across raw_evidence (fail-closed on multiple matches)
     if target_line_idx == -1:
         clean_raw = strip_markdown_decorations(raw_evidence)
         clean_ev = strip_markdown_decorations(evidence_ref)
-        pos = clean_raw.find(clean_ev)
-        if pos != -1:
-            first_words = [w for w in clean_ev.split()[:4] if len(w) > 3]
-            for idx, line in enumerate(raw_lines):
-                clean_l = strip_markdown_decorations(line)
-                if any(w in clean_l for w in first_words):
-                    target_line_idx = idx
-                    break
+        pos_matches = [m.start() for m in re.finditer(re.escape(clean_ev), clean_raw)]
+        if len(pos_matches) == 1:
+            first_phrase = " ".join(clean_ev.split()[:3])
+            s4_candidates = [
+                idx for idx, line in enumerate(raw_lines)
+                if first_phrase in strip_markdown_decorations(line)
+            ]
+            if len(s4_candidates) == 1:
+                target_line_idx = s4_candidates[0]
+            elif len(s4_candidates) > 1:
+                return CTX_UNRESOLVED, "ambiguous_multiline_match"
+        elif len(pos_matches) > 1:
+            return CTX_UNRESOLVED, "ambiguous_multiline_match"
 
-    # 5. Search by target reference in line with supporting context words
+    # 5. Search by target reference in line with supporting context words (fail-closed on multiple matches)
     if target_line_idx == -1 and target_ref is not None:
         target_str = str(target_ref)
         stopwords = {
@@ -261,13 +281,17 @@ def detect_evidence_context(
             if w.lower() not in stopwords
         ]
         if ev_words:
+            s5_candidates = []
             for idx, line in enumerate(raw_lines):
                 if target_str in line:
                     line_lower = line.lower()
                     matching_words = [w for w in ev_words if w in line_lower]
                     if len(matching_words) >= 2:
-                        target_line_idx = idx
-                        break
+                        s5_candidates.append(idx)
+            if len(s5_candidates) == 1:
+                target_line_idx = s5_candidates[0]
+            elif len(s5_candidates) > 1:
+                return CTX_UNRESOLVED, "ambiguous_target_context_match"
 
     # Unresolved if not located
     if target_line_idx == -1:
@@ -314,7 +338,6 @@ def diagnose_predicted_tuple(
     tuple_key = (rel_type, target_ref)
     target_form = classify_target_form(target_ref)
     parsed_alias = parse_adr_alias(target_ref)
-    is_ontology_gap = reference_id in ADJUDICATED_ONTOLOGY_GAP_REFERENCE_IDS
 
     # Prediction behaviour tagging and role resolution
     behaviour_tags: list[str] = []
@@ -350,14 +373,9 @@ def diagnose_predicted_tuple(
         reference_id, target_ref, evidence_ref, raw_evidence
     )
 
-    causal_tags = (
-        [ev_context_tag]
-        + behaviour_tags
-        + ([ADJUDICATION_ONTOLOGY_GAP] if is_ontology_gap else [])
-    )
+    causal_tags = [ev_context_tag] + behaviour_tags
 
     return {
-        "adjudicated_ontology_gap": is_ontology_gap,
         "causal_tags": causal_tags,
         "evidence_context_tag": ev_context_tag,
         "evidence_location": ev_location,
@@ -398,7 +416,6 @@ def run_residual_error_analysis(
     exact_type_exact_target_count = 0
     wrong_type_target_count = 0
 
-    ontology_gap_tuple_count = 0
     ontology_gap_ref_count = 0
 
     # Evaluate all 100 reference decisions
@@ -494,7 +511,6 @@ def run_residual_error_analysis(
         is_ontology_gap = ref_id in ADJUDICATED_ONTOLOGY_GAP_REFERENCE_IDS
         if is_ontology_gap:
             ontology_gap_ref_count += 1
-            ontology_gap_tuple_count += len(norm_rels)
 
         for r in norm_rels:
             predicted_type_counts[r.relationship_type] = (
@@ -576,10 +592,8 @@ def run_residual_error_analysis(
     assert prediction_behaviour_counts[BEHAVIOUR_DEPENDS_ON_OVERPRODUCTION] == 72
     assert prediction_behaviour_counts[BEHAVIOUR_TARGET_BOUNDARY_ANOMALY] == 2
     assert ontology_gap_ref_count == 1
-    assert ontology_gap_tuple_count == 7
 
     return {
-        "adjudicated_ontology_gap_count": ontology_gap_tuple_count,
         "adjudicated_ontology_gap_references": ontology_gap_ref_count,
         "arm_b_profile_hash": FROZEN_ARM_B_PROFILE_HASH,
         "arm_id": ARM_ID,
@@ -684,8 +698,6 @@ def write_residual_error_decomposition_v0_2(
     )
 
     out_file.parent.mkdir(parents=True, exist_ok=True)
-    out_file.write_text(
-        json.dumps(result_dict, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
+    serialized = json.dumps(result_dict, indent=2, sort_keys=True) + "\n"
+    out_file.write_bytes(serialized.encode("utf-8"))
     return out_file
