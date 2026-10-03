@@ -1,0 +1,4592 @@
+{
+  "adjudicated_ontology_gap_references": 1,
+  "arm_b_profile_hash": "e4b6bad47ebcc290924782172fb96d8d",
+  "arm_id": "treatment_b",
+  "artifact_type": "b_t1c_arm_b_residual_error_decomposition_v0.2_grounding",
+  "evidence_context_aggregate_counts": {
+    "contextual_related_metadata": 31,
+    "lifecycle_revision_history": 6,
+    "narrative_body": 65,
+    "unresolved": 11
+  },
+  "execution_reference_corpus_hash": "0455bd66aae52551c35b37a63c2d185f",
+  "experiment_id": "b-t1c-relationship-treatment",
+  "failing_references": 41,
+  "failures": [
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0007"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_13",
+          "evidence_reference": "the extension lives at `packages/adapters/spec-kit/` under the layout and dependency rules ADR-0007 establishes \u2014 it is an adapter like any other, not a privileged one.",
+          "parsed_adr_alias": "0007",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0007",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0007"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-adrkit-003",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "mbeacom/adrkit",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "narrative_body": 1
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 1,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": false,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 1,
+          "extra_relationship": 1
+        },
+        "total_predicted_tuples": 1,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0010"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_7",
+          "evidence_reference": "The workspace toolchain is decided separately in ADR-0010.",
+          "parsed_adr_alias": "0010",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0010",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0010"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-adrkit-005",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "mbeacom/adrkit",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "narrative_body": 1
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 1,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": false,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 1,
+          "extra_relationship": 1
+        },
+        "total_predicted_tuples": 1,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "refines",
+          "0013"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "lifecycle_revision_history",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "lifecycle_revision_history",
+          "evidence_location": "lifecycle_marker_line_12",
+          "evidence_reference": "Amended by ADR-0013. For the catalog surface specifically, composition uses no dynamic runtime adapter/plugin loader: a catalog adapter is a standalone offline snapshot generator emitting a validated interchange file. This narrows, and does not repeal, the general \"discovery is by configuration\" rule.",
+          "parsed_adr_alias": "0013",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0013",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "refines",
+          "0013"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-adrkit-006",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "mbeacom/adrkit",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "lifecycle_revision_history": 1
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 1,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": false,
+        "prediction_behaviour_counts": {
+          "extra_relationship": 1
+        },
+        "total_predicted_tuples": 1,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "requires",
+          "0004"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_42",
+          "evidence_reference": "Every re-import produces a pull request, never a direct mutation \u2014 ADR-0004's git-truth rule applies to machine writes as much as to human ones.",
+          "parsed_adr_alias": "0004",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "requires",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0004",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "requires",
+          "0004"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-adrkit-007",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "mbeacom/adrkit",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "narrative_body": 1
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 1,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": false,
+        "prediction_behaviour_counts": {
+          "extra_relationship": 1
+        },
+        "total_predicted_tuples": 1,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0007"
+        ],
+        [
+          "refines",
+          "0012"
+        ],
+        [
+          "supersedes",
+          "0013"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "unresolved",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "unresolved",
+          "evidence_location": "ambiguous_target_context_match",
+          "evidence_reference": "the ADR-0007 clean-clone requirement applied to matching. Adapters implement it, under `packages/adapters/catalog-*` per ADR-0007.",
+          "parsed_adr_alias": "0007",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0007",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "lifecycle_revision_history",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "lifecycle_revision_history",
+          "evidence_location": "lifecycle_marker_line_64",
+          "evidence_reference": "Amended by ADR-0013",
+          "parsed_adr_alias": "0013",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "supersedes",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0013",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "lifecycle_revision_history",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "lifecycle_revision_history",
+          "evidence_location": "lifecycle_marker_line_64",
+          "evidence_reference": "refined by ADR-0012. The per-adapter mapping is pinned by ADR-0012's explicit `adrkit.io/owned-paths` contract.",
+          "parsed_adr_alias": "0012",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0012",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0007"
+        ],
+        [
+          "refines",
+          "0012"
+        ],
+        [
+          "supersedes",
+          "0013"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-adrkit-008",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "mbeacom/adrkit",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "lifecycle_revision_history": 2,
+          "unresolved": 1
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 3,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": true,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 1,
+          "extra_relationship": 3
+        },
+        "total_predicted_tuples": 3,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "requires",
+          "0007"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_8",
+          "evidence_reference": "Without it, ADR-0007's dependency assertion is theatre. This is the condition that makes the whole choice acceptable.",
+          "parsed_adr_alias": "0007",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "requires",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0007",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "requires",
+          "0007"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-adrkit-009",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "mbeacom/adrkit",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "narrative_body": 1
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 1,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": false,
+        "prediction_behaviour_counts": {
+          "extra_relationship": 1
+        },
+        "total_predicted_tuples": 1,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0006"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_6",
+          "evidence_reference": "an eventual org transfer (ADR-0006) does not force a change",
+          "parsed_adr_alias": "0006",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0006",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0006"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-adrkit-010",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "mbeacom/adrkit",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "narrative_body": 1
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 1,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": false,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 1,
+          "extra_relationship": 1
+        },
+        "total_predicted_tuples": 1,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [
+        [
+          "supersedes",
+          "0005"
+        ]
+      ],
+      "expected_tuples": [
+        [
+          "supersedes",
+          "0005"
+        ]
+      ],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0014"
+        ],
+        [
+          "depends_on",
+          "0016"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "unresolved"
+          ],
+          "evidence_context_tag": "unresolved",
+          "evidence_location": "ambiguous_clause_match",
+          "evidence_reference": "supersedes: [\"0005\"] / **Supersede ADR-0005. Ratify the deterministic layer as it stands** / [x] Supersede ADR-0005; set its `status` and `supersededBy` reciprocally",
+          "parsed_adr_alias": "0005",
+          "prediction_behaviour_tags": [],
+          "relationship_type": "supersedes",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0005",
+          "tuple_role": "exact_match"
+        },
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_12",
+          "evidence_reference": "relatesTo: [\"0002\", \"0003\", \"0014\", \"0016\"] / ADR-0014 already solved the general form of this problem for phase landing / Per ADR-0014's binding state vocabulary the probabilistic layer is **scoped**",
+          "parsed_adr_alias": "0014",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0014",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_12",
+          "evidence_reference": "relatesTo: [\"0002\", \"0003\", \"0014\", \"0016\"] / Per ADR-0016, none of the above counts as coverage until observed failing. The holdout-precondition gate must be observed rejecting a probabilistic pass that lacks a frozen holdout before it may be trusted.",
+          "parsed_adr_alias": "0016",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0016",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0014"
+        ],
+        [
+          "depends_on",
+          "0016"
+        ],
+        [
+          "supersedes",
+          "0005"
+        ]
+      ],
+      "recovered_target_entities": [
+        "0005"
+      ],
+      "reference_id": "ref-adrkit-013",
+      "reference_structural_class": "EXACT_EXPECTED_PLUS_EXTRAS",
+      "repository": "mbeacom/adrkit",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "contextual_related_metadata": 2,
+          "unresolved": 1
+        },
+        "exact_tuple_count": 1,
+        "extra_tuple_count": 2,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": true,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 2,
+          "extra_relationship": 2
+        },
+        "total_predicted_tuples": 3,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [
+        [
+          "refines",
+          "0007"
+        ],
+        [
+          "refines",
+          "0009"
+        ]
+      ],
+      "expected_tuples": [
+        [
+          "refines",
+          "0007"
+        ],
+        [
+          "refines",
+          "0009"
+        ]
+      ],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0012"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "narrative_body"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_0",
+          "evidence_reference": "This narrows, and does not repeal, ADR-0007's general 'discovery is by configuration' rule \u2014 configuration still selects composition, but for catalogs the composition is offline generation, not runtime loading.",
+          "parsed_adr_alias": "0007",
+          "prediction_behaviour_tags": [],
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0007",
+          "tuple_role": "exact_match"
+        },
+        {
+          "causal_tags": [
+            "narrative_body"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_0",
+          "evidence_reference": "ADR-0009's 'serializable so it can be committed or cached' is narrowed: the in-memory CatalogSnapshot shape is an internal type, not a wire format, and any persisted snapshot requires a versioned interchange envelope before production.",
+          "parsed_adr_alias": "0009",
+          "prediction_behaviour_tags": [],
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0009",
+          "tuple_role": "exact_match"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_0",
+          "evidence_reference": "The native-to-normalized entity mapping ADR-0009 delegated to adapters is now pinned by ADR-0012 (the explicit adrkit.io/owned-paths contract).",
+          "parsed_adr_alias": "0012",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0012",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0012"
+        ],
+        [
+          "refines",
+          "0007"
+        ],
+        [
+          "refines",
+          "0009"
+        ]
+      ],
+      "recovered_target_entities": [
+        "0007",
+        "0009"
+      ],
+      "reference_id": "ref-adrkit-014",
+      "reference_structural_class": "EXACT_EXPECTED_PLUS_EXTRAS",
+      "repository": "mbeacom/adrkit",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "narrative_body": 3
+        },
+        "exact_tuple_count": 2,
+        "extra_tuple_count": 1,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": false,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 1,
+          "extra_relationship": 1
+        },
+        "total_predicted_tuples": 3,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [
+        [
+          "refines",
+          "0012"
+        ]
+      ],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0012"
+        ],
+        [
+          "refines",
+          "entity-identity.md"
+        ]
+      ],
+      "missing_tuples": [
+        [
+          "refines",
+          "0012"
+        ]
+      ],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction",
+            "wrong_type_recovery"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_0",
+          "evidence_reference": "Admissibility is evaluated against Backstage's own field-format validators at the commit ADR-0012 pins",
+          "parsed_adr_alias": "0012",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction",
+            "wrong_type_recovery"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0012",
+          "tuple_role": "wrong_type_target"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "target_boundary_anomaly"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_0",
+          "evidence_reference": "it is evaluated *before* entity-identity.md section 1 runs... Admissibility is a precondition of section 1, not a step inside it. Section 1's two steps and its worked casing/namespace examples are untouched, and section 3's duplicate-collision table is untouched.",
+          "parsed_adr_alias": null,
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "target_boundary_anomaly"
+          ],
+          "relationship_type": "refines",
+          "target_form": "file_or_code_path_like",
+          "target_reference": "entity-identity.md",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0012"
+        ],
+        [
+          "refines",
+          "entity-identity.md"
+        ]
+      ],
+      "recovered_target_entities": [
+        "0012"
+      ],
+      "reference_id": "ref-adrkit-015",
+      "reference_structural_class": "TYPE_CONFUSION_PLUS_EXTRAS",
+      "repository": "mbeacom/adrkit",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "narrative_body": 2
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 2,
+        "missing_tuple_count": 1,
+        "multi_relationship_overgeneration": true,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 1,
+          "extra_relationship": 2,
+          "target_boundary_anomaly": 1,
+          "wrong_type_recovery": 1
+        },
+        "total_predicted_tuples": 2,
+        "wrong_type_target_count": 1
+      },
+      "wrong_type_target_mappings": [
+        {
+          "expected_type": "refines",
+          "predicted_type": "depends_on",
+          "target_reference": "0012"
+        }
+      ]
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [
+        {
+          "conflicting_predicted_type": "refines",
+          "expected_type": "requires",
+          "target_reference": "0012"
+        }
+      ],
+      "exact_tuples": [
+        [
+          "requires",
+          "0007"
+        ],
+        [
+          "requires",
+          "0012"
+        ],
+        [
+          "requires",
+          "0013"
+        ],
+        [
+          "requires",
+          "0015"
+        ],
+        [
+          "requires",
+          "0016"
+        ]
+      ],
+      "expected_tuples": [
+        [
+          "requires",
+          "0007"
+        ],
+        [
+          "requires",
+          "0012"
+        ],
+        [
+          "requires",
+          "0013"
+        ],
+        [
+          "requires",
+          "0015"
+        ],
+        [
+          "requires",
+          "0016"
+        ]
+      ],
+      "extra_tuples": [
+        [
+          "refines",
+          "0012"
+        ],
+        [
+          "requires",
+          "0014"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "conflicting_type_extra"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_0",
+          "evidence_reference": "Rescope SC-010, and authorize the implementation work required to clear ADR-0012's remaining production gates.",
+          "parsed_adr_alias": "0012",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "conflicting_type_extra"
+          ],
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0012",
+          "tuple_role": "conflicting_type_extra"
+        },
+        {
+          "causal_tags": [
+            "narrative_body"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_0",
+          "evidence_reference": "The work inherits, as requirements rather than as guidance: ADR-0012 (adrkit.io/owned-paths contract, restricted glob dialect, whole-operation atomic fail-closed semantics, single-repository boundary, versioned envelope)",
+          "parsed_adr_alias": "0012",
+          "prediction_behaviour_tags": [],
+          "relationship_type": "requires",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0012",
+          "tuple_role": "exact_match"
+        },
+        {
+          "causal_tags": [
+            "narrative_body"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_0",
+          "evidence_reference": "The work inherits, as requirements rather than as guidance: ADR-0015 (admissibility before canonicalization, with inadmissible-descriptor as fatal whole-operation trigger)",
+          "parsed_adr_alias": "0015",
+          "prediction_behaviour_tags": [],
+          "relationship_type": "requires",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0015",
+          "tuple_role": "exact_match"
+        },
+        {
+          "causal_tags": [
+            "narrative_body"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_0",
+          "evidence_reference": "The work inherits, as requirements rather than as guidance: ADR-0013 (standalone offline generator; no dynamic runtime adapter/plugin loader)",
+          "parsed_adr_alias": "0013",
+          "prediction_behaviour_tags": [],
+          "relationship_type": "requires",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0013",
+          "tuple_role": "exact_match"
+        },
+        {
+          "causal_tags": [
+            "narrative_body"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_0",
+          "evidence_reference": "The work inherits, as requirements rather than as guidance: ADR-0007 (adapter isolation)",
+          "parsed_adr_alias": "0007",
+          "prediction_behaviour_tags": [],
+          "relationship_type": "requires",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0007",
+          "tuple_role": "exact_match"
+        },
+        {
+          "causal_tags": [
+            "narrative_body"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_0",
+          "evidence_reference": "Clause 5 gets an executable gate, observed failing first (ADR-0016).",
+          "parsed_adr_alias": "0016",
+          "prediction_behaviour_tags": [],
+          "relationship_type": "requires",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0016",
+          "tuple_role": "exact_match"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_0",
+          "evidence_reference": "Before the adapter is released, and before any ADR-0014 rung-2 claim, it must have produced a populated, digest-verified envelope from a real corpus",
+          "parsed_adr_alias": "0014",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "requires",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0014",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "refines",
+          "0012"
+        ],
+        [
+          "requires",
+          "0007"
+        ],
+        [
+          "requires",
+          "0012"
+        ],
+        [
+          "requires",
+          "0013"
+        ],
+        [
+          "requires",
+          "0014"
+        ],
+        [
+          "requires",
+          "0015"
+        ],
+        [
+          "requires",
+          "0016"
+        ]
+      ],
+      "recovered_target_entities": [
+        "0007",
+        "0012",
+        "0013",
+        "0015",
+        "0016"
+      ],
+      "reference_id": "ref-adrkit-016",
+      "reference_structural_class": "EXACT_EXPECTED_PLUS_EXTRAS",
+      "repository": "mbeacom/adrkit",
+      "summary_counts": {
+        "conflicting_type_extra_count": 1,
+        "evidence_context_counts": {
+          "narrative_body": 7
+        },
+        "exact_tuple_count": 5,
+        "extra_tuple_count": 2,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": true,
+        "prediction_behaviour_counts": {
+          "conflicting_type_extra": 1,
+          "extra_relationship": 2
+        },
+        "total_predicted_tuples": 7,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "refines",
+          "0016"
+        ],
+        [
+          "supersedes",
+          "0017"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "lifecycle_revision_history",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "lifecycle_revision_history",
+          "evidence_location": "lifecycle_marker_line_0",
+          "evidence_reference": "A degraded tool catalog that still returns 0 is exactly the fail-quiet shape ADR-0016 rejects, so the declared range excludes the versions that take that path rather than relying on the resolved version happening to be new enough.",
+          "parsed_adr_alias": "0016",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0016",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "lifecycle_revision_history",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "lifecycle_revision_history",
+          "evidence_location": "lifecycle_marker_line_0",
+          "evidence_reference": "We will also retire the ADR-0017 consumer-advisory acceptance and the root overrides it stood behind, because this migration satisfies that acceptance's own recorded resolvesWhen clause",
+          "parsed_adr_alias": "0017",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "supersedes",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0017",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "refines",
+          "0016"
+        ],
+        [
+          "supersedes",
+          "0017"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-adrkit-019",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "mbeacom/adrkit",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "lifecycle_revision_history": 2
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 2,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": true,
+        "prediction_behaviour_counts": {
+          "extra_relationship": 2
+        },
+        "total_predicted_tuples": 2,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0014"
+        ],
+        [
+          "depends_on",
+          "0016"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_0",
+          "evidence_reference": "These constraints are enforced by tests, not by convention. Each was observed failing under a deliberately introduced defect before being trusted (ADR-0016).",
+          "parsed_adr_alias": "0016",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0016",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_0",
+          "evidence_reference": "Per ADR-0014, this lands the extension on rung 1 only \u2014 unit and contract evidence. It is not reference-verified and not externally validated.",
+          "parsed_adr_alias": "0014",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0014",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0014"
+        ],
+        [
+          "depends_on",
+          "0016"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-adrkit-020",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "mbeacom/adrkit",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "narrative_body": 2
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 2,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": true,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 2,
+          "extra_relationship": 2
+        },
+        "total_predicted_tuples": 2,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [
+        [
+          "requires",
+          "0005"
+        ]
+      ],
+      "extra_tuples": [
+        [
+          "refines",
+          "0005"
+        ]
+      ],
+      "missing_tuples": [
+        [
+          "requires",
+          "0005"
+        ]
+      ],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "wrong_type_recovery"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_20",
+          "evidence_reference": "Pinning by full SHA continues to defeat content substitution through the ZScaler TLS-inspecting proxy (SA-12, SI-7), per ADR-0005.",
+          "parsed_adr_alias": "0005",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "wrong_type_recovery"
+          ],
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0005",
+          "tuple_role": "wrong_type_target"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "refines",
+          "0005"
+        ]
+      ],
+      "recovered_target_entities": [
+        "0005"
+      ],
+      "reference_id": "ref-gsa-agentic-coding-quickstart-002",
+      "reference_structural_class": "PURE_TYPE_CONFUSION",
+      "repository": "GSA-TTS/agentic-coding-quickstart",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "narrative_body": 1
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 1,
+        "missing_tuple_count": 1,
+        "multi_relationship_overgeneration": false,
+        "prediction_behaviour_counts": {
+          "extra_relationship": 1,
+          "wrong_type_recovery": 1
+        },
+        "total_predicted_tuples": 1,
+        "wrong_type_target_count": 1
+      },
+      "wrong_type_target_mappings": [
+        {
+          "expected_type": "requires",
+          "predicted_type": "refines",
+          "target_reference": "0005"
+        }
+      ]
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0012"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_48",
+          "evidence_reference": "Contract addition ([ADR-0012](0012-backend-neutral-key-rotation.md)): `acq_backend_rotate_key` \u2014 rotate the USAi API key using the backend's native secret mechanism and validate the new key. Added so key rotation stays backend-neutral (the core dispatch no longer shells out to `sbx` directly).",
+          "parsed_adr_alias": "0012",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0012",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0012"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-gsa-agentic-coding-quickstart-003",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "GSA-TTS/agentic-coding-quickstart",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "narrative_body": 1
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 1,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": false,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 1,
+          "extra_relationship": 1
+        },
+        "total_predicted_tuples": 1,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "refines",
+          "0011"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_102",
+          "evidence_reference": "[ADR-0011](0011-msb-backend-and-neutral-kits.md). So an image that is portable by the sbx rule above always works on msb; an image that works only on msb (e.g. `agent` at a non-1000 UID, or no `agent` user at all) is **not** guaranteed on sbx.",
+          "parsed_adr_alias": "0011",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0011",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "refines",
+          "0011"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-gsa-agentic-coding-quickstart-008",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "GSA-TTS/agentic-coding-quickstart",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "narrative_body": 1
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 1,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": false,
+        "prediction_behaviour_counts": {
+          "extra_relationship": 1
+        },
+        "total_predicted_tuples": 1,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0023"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_45",
+          "evidence_reference": "`acq rm` warns when the scratch holds commits absent from the host's object store, then deletes the scratch and removes the remote (same gone-after-remove-attempt rule as derived volumes, ADR-0023).",
+          "parsed_adr_alias": "0023",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0023",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0023"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-gsa-agentic-coding-quickstart-009",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "GSA-TTS/agentic-coding-quickstart",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "narrative_body": 1
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 1,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": false,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 1,
+          "extra_relationship": 1
+        },
+        "total_predicted_tuples": 1,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "refines",
+          "0011"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_150",
+          "evidence_reference": "the exact create-time-only, re-runnable-script case that the ADR-0011 design note identified as the clean, contained win for `--script-path`",
+          "parsed_adr_alias": "0011",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0011",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "refines",
+          "0011"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-gsa-agentic-coding-quickstart-015",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "GSA-TTS/agentic-coding-quickstart",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "narrative_body": 1
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 1,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": false,
+        "prediction_behaviour_counts": {
+          "extra_relationship": 1
+        },
+        "total_predicted_tuples": 1,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "refines",
+          "0019"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "unresolved",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "unresolved",
+          "evidence_location": "ambiguous_target_context_match",
+          "evidence_reference": "**Update (ADR-0019):** the deny-default described below is scoped to **egress only** \u2014 the emitter uses `--net-default-egress deny`, not the symmetric `--net-default deny` this ADR originally specified. ... See [ADR-0019](0019-msb-balanced-egress-is-egress-only.md).",
+          "parsed_adr_alias": "0019",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0019",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "refines",
+          "0019"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-gsa-agentic-coding-quickstart-018",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "GSA-TTS/agentic-coding-quickstart",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "unresolved": 1
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 1,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": false,
+        "prediction_behaviour_counts": {
+          "extra_relationship": 1
+        },
+        "total_predicted_tuples": 1,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0011"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_182",
+          "evidence_reference": "Re-run it on the ADR-0011 periodic-validation cadence.",
+          "parsed_adr_alias": "0011",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0011",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0011"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-gsa-agentic-coding-quickstart-020",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "GSA-TTS/agentic-coding-quickstart",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "narrative_body": 1
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 1,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": false,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 1,
+          "extra_relationship": 1
+        },
+        "total_predicted_tuples": 1,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [
+        [
+          "requires",
+          "0014"
+        ]
+      ],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0001"
+        ],
+        [
+          "depends_on",
+          "0014"
+        ]
+      ],
+      "missing_tuples": [
+        [
+          "requires",
+          "0014"
+        ]
+      ],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_3",
+          "evidence_reference": "ADR [0001](0001-three-runtime-split.md)",
+          "parsed_adr_alias": "0001",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0001",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "unresolved",
+            "extra_relationship",
+            "depends_on_overproduction",
+            "wrong_type_recovery"
+          ],
+          "evidence_context_tag": "unresolved",
+          "evidence_location": "ambiguous_target_context_match",
+          "evidence_reference": "All dynamic capability \u2014 LLM, storage, third-party HTTP \u2014 flows through the platform's `/_api/*` gateway (ADR-0014). ADR [0014](0014-same-origin-api-gateway.md)",
+          "parsed_adr_alias": "0014",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction",
+            "wrong_type_recovery"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0014",
+          "tuple_role": "wrong_type_target"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0001"
+        ],
+        [
+          "depends_on",
+          "0014"
+        ]
+      ],
+      "recovered_target_entities": [
+        "0014"
+      ],
+      "reference_id": "ref-helix-001",
+      "reference_structural_class": "TYPE_CONFUSION_PLUS_EXTRAS",
+      "repository": "AZX-PBC-OSS/helix",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "contextual_related_metadata": 1,
+          "unresolved": 1
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 2,
+        "missing_tuple_count": 1,
+        "multi_relationship_overgeneration": true,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 2,
+          "extra_relationship": 2,
+          "wrong_type_recovery": 1
+        },
+        "total_predicted_tuples": 2,
+        "wrong_type_target_count": 1
+      },
+      "wrong_type_target_mappings": [
+        {
+          "expected_type": "requires",
+          "predicted_type": "depends_on",
+          "target_reference": "0014"
+        }
+      ]
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [
+        [
+          "requires",
+          "0002"
+        ]
+      ],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0002"
+        ]
+      ],
+      "missing_tuples": [
+        [
+          "requires",
+          "0002"
+        ]
+      ],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction",
+            "wrong_type_recovery"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_22",
+          "evidence_reference": "Cross-user isolation rests on RLS + session-derived GUCs (ADR-0002); the INSERT-only grant is the structural enforcement, not application code.",
+          "parsed_adr_alias": "0002",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction",
+            "wrong_type_recovery"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0002",
+          "tuple_role": "wrong_type_target"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0002"
+        ]
+      ],
+      "recovered_target_entities": [
+        "0002"
+      ],
+      "reference_id": "ref-helix-002",
+      "reference_structural_class": "PURE_TYPE_CONFUSION",
+      "repository": "AZX-PBC-OSS/helix",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "narrative_body": 1
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 1,
+        "missing_tuple_count": 1,
+        "multi_relationship_overgeneration": false,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 1,
+          "extra_relationship": 1,
+          "wrong_type_recovery": 1
+        },
+        "total_predicted_tuples": 1,
+        "wrong_type_target_count": 1
+      },
+      "wrong_type_target_mappings": [
+        {
+          "expected_type": "requires",
+          "predicted_type": "depends_on",
+          "target_reference": "0002"
+        }
+      ]
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0001"
+        ],
+        [
+          "depends_on",
+          "0017"
+        ],
+        [
+          "depends_on",
+          "0020"
+        ],
+        [
+          "depends_on",
+          "0026"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_29",
+          "evidence_reference": "the edge picks it up sub-second via its registry projection (ADR [0017](0017-registry-listen-notify-projection.md))",
+          "parsed_adr_alias": "0017",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0017",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_31",
+          "evidence_reference": "the deferred v2 ",
+          "parsed_adr_alias": "0026",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0026",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_31",
+          "evidence_reference": "Keeping git out of the server path is *why* the platform never executes app code/deps today (ADR [0020](0020-static-only-apps-v1.md))",
+          "parsed_adr_alias": "0020",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0020",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_20",
+          "evidence_reference": "No build provenance in v1 (the platform trusts the uploaded artifact; containment is per-app, ADR-0001)",
+          "parsed_adr_alias": "0001",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0001",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0001"
+        ],
+        [
+          "depends_on",
+          "0017"
+        ],
+        [
+          "depends_on",
+          "0020"
+        ],
+        [
+          "depends_on",
+          "0026"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-helix-003",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "AZX-PBC-OSS/helix",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "narrative_body": 4
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 4,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": true,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 4,
+          "extra_relationship": 4
+        },
+        "total_predicted_tuples": 4,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0004"
+        ],
+        [
+          "depends_on",
+          "0009"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "unresolved",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "unresolved",
+          "evidence_location": "ambiguous_clause_match",
+          "evidence_reference": "ADR [0004](0004-auth-model.md) ... This is the load-bearing choice the auth model and relaxed CSP both build on.",
+          "parsed_adr_alias": "0004",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0004",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "unresolved",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "unresolved",
+          "evidence_location": "ambiguous_clause_match",
+          "evidence_reference": "ADR [0009](0009-relaxed-csp.md) ... This is the load-bearing choice the auth model and relaxed CSP both build on.",
+          "parsed_adr_alias": "0009",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0009",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0004"
+        ],
+        [
+          "depends_on",
+          "0009"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-helix-004",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "AZX-PBC-OSS/helix",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "unresolved": 2
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 2,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": true,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 2,
+          "extra_relationship": 2
+        },
+        "total_predicted_tuples": 2,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0001"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_3",
+          "evidence_reference": "**Related:** ADR [0001](0001-three-runtime-split.md)",
+          "parsed_adr_alias": "0001",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0001",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0001"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-helix-005",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "AZX-PBC-OSS/helix",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "contextual_related_metadata": 1
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 1,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": false,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 1,
+          "extra_relationship": 1
+        },
+        "total_predicted_tuples": 1,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [
+        [
+          "requires",
+          "0004"
+        ]
+      ],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0004"
+        ],
+        [
+          "depends_on",
+          "0014"
+        ],
+        [
+          "depends_on",
+          "0020"
+        ],
+        [
+          "depends_on",
+          "0028"
+        ]
+      ],
+      "missing_tuples": [
+        [
+          "requires",
+          "0004"
+        ]
+      ],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction",
+            "wrong_type_recovery"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_16",
+          "evidence_reference": "crossing the boundary (login) needs an explicit signed carrier, the OIDC handoff (ADR-0004)",
+          "parsed_adr_alias": "0004",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction",
+            "wrong_type_recovery"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0004",
+          "tuple_role": "wrong_type_target"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_33",
+          "evidence_reference": "it breaks ADR-0014 (the load-bearing capability choke point)",
+          "parsed_adr_alias": "0014",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0014",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_28",
+          "evidence_reference": "Amendment (2026-07-22, ADR-0028): the deployment model is now single-tenant, customer-deployed (ADR-0028)",
+          "parsed_adr_alias": "0028",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0028",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_35",
+          "evidence_reference": "ADR-0020 (no server-side untrusted execution)",
+          "parsed_adr_alias": "0020",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0020",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0004"
+        ],
+        [
+          "depends_on",
+          "0014"
+        ],
+        [
+          "depends_on",
+          "0020"
+        ],
+        [
+          "depends_on",
+          "0028"
+        ]
+      ],
+      "recovered_target_entities": [
+        "0004"
+      ],
+      "reference_id": "ref-helix-006",
+      "reference_structural_class": "TYPE_CONFUSION_PLUS_EXTRAS",
+      "repository": "AZX-PBC-OSS/helix",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "narrative_body": 4
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 4,
+        "missing_tuple_count": 1,
+        "multi_relationship_overgeneration": true,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 4,
+          "extra_relationship": 4,
+          "wrong_type_recovery": 1
+        },
+        "total_predicted_tuples": 4,
+        "wrong_type_target_count": 1
+      },
+      "wrong_type_target_mappings": [
+        {
+          "expected_type": "requires",
+          "predicted_type": "depends_on",
+          "target_reference": "0004"
+        }
+      ]
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0001"
+        ],
+        [
+          "depends_on",
+          "0002"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_3",
+          "evidence_reference": "ADR [0001](0001-three-runtime-split.md)",
+          "parsed_adr_alias": "0001",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0001",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_3",
+          "evidence_reference": "ADR [0002](0002-postgres-role-split-rls.md)",
+          "parsed_adr_alias": "0002",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0002",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0001"
+        ],
+        [
+          "depends_on",
+          "0002"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-helix-007",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "AZX-PBC-OSS/helix",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "contextual_related_metadata": 2
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 2,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": true,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 2,
+          "extra_relationship": 2
+        },
+        "total_predicted_tuples": 2,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [
+        [
+          "requires",
+          "0002"
+        ]
+      ],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0031"
+        ],
+        [
+          "refines",
+          "0002"
+        ],
+        [
+          "refines",
+          "0013"
+        ],
+        [
+          "refines",
+          "0027"
+        ]
+      ],
+      "missing_tuples": [
+        [
+          "requires",
+          "0002"
+        ]
+      ],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "wrong_type_recovery"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_16",
+          "evidence_reference": "helix_edge has no grant on app_secrets (ADR [0002](0002-postgres-role-split-rls.md))",
+          "parsed_adr_alias": "0002",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "wrong_type_recovery"
+          ],
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0002",
+          "tuple_role": "wrong_type_target"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_26",
+          "evidence_reference": "egress will resolve whatever connection name the edge attests, because the instruction is signature-verified but not authorization-checked \u2014 see ADR [0013](0013-egress-trust-model.md)",
+          "parsed_adr_alias": "0013",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0013",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_34",
+          "evidence_reference": "ADR [0031](0031-connection-providers-delegated-auth.md) \u00a716 made this a hard prerequisite rather than a follow-up: per-user OAuth refresh tokens are standing access, stored N users \u00d7 M providers, and the dev envelope is hygiene.",
+          "parsed_adr_alias": "0031",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0031",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_59",
+          "evidence_reference": "the portal injects DefaultAzureCredential, which it already depends on for Blob (ADR [0027](0027-blob-auth-managed-identity.md))",
+          "parsed_adr_alias": "0027",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0027",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0031"
+        ],
+        [
+          "refines",
+          "0002"
+        ],
+        [
+          "refines",
+          "0013"
+        ],
+        [
+          "refines",
+          "0027"
+        ]
+      ],
+      "recovered_target_entities": [
+        "0002"
+      ],
+      "reference_id": "ref-helix-008",
+      "reference_structural_class": "TYPE_CONFUSION_PLUS_EXTRAS",
+      "repository": "AZX-PBC-OSS/helix",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "narrative_body": 4
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 4,
+        "missing_tuple_count": 1,
+        "multi_relationship_overgeneration": true,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 1,
+          "extra_relationship": 4,
+          "wrong_type_recovery": 1
+        },
+        "total_predicted_tuples": 4,
+        "wrong_type_target_count": 1
+      },
+      "wrong_type_target_mappings": [
+        {
+          "expected_type": "requires",
+          "predicted_type": "refines",
+          "target_reference": "0002"
+        }
+      ]
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0007"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_22",
+          "evidence_reference": "Who *may* approve is ADR-0007 (v0: any authenticated principal; \u2192 owner/admin gate); this ADR is the *classification* model, independent of that.",
+          "parsed_adr_alias": "0007",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0007",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0007"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-helix-009",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "AZX-PBC-OSS/helix",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "narrative_body": 1
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 1,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": false,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 1,
+          "extra_relationship": 1
+        },
+        "total_predicted_tuples": 1,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "refines",
+          "0005"
+        ],
+        [
+          "refines",
+          "0013"
+        ],
+        [
+          "requires",
+          "0001"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_3",
+          "evidence_reference": "ADR [0005](0005-ssrf-egress-controls.md)",
+          "parsed_adr_alias": "0005",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0005",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_3",
+          "evidence_reference": "ADR [0013](0013-egress-trust-model.md)",
+          "parsed_adr_alias": "0013",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0013",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_7",
+          "evidence_reference": "the edge must never hold a secret (ADR [0001](0001-three-runtime-split.md))",
+          "parsed_adr_alias": "0001",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "requires",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0001",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "refines",
+          "0005"
+        ],
+        [
+          "refines",
+          "0013"
+        ],
+        [
+          "requires",
+          "0001"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-helix-010",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "AZX-PBC-OSS/helix",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "contextual_related_metadata": 2,
+          "narrative_body": 1
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 3,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": true,
+        "prediction_behaviour_counts": {
+          "extra_relationship": 3
+        },
+        "total_predicted_tuples": 3,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0004"
+        ],
+        [
+          "depends_on",
+          "0013"
+        ],
+        [
+          "depends_on",
+          "0028"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_16",
+          "evidence_reference": "with ADR [0004](0004-auth-model.md)'s scrypt cost) is the economic defense for shared-password apps",
+          "parsed_adr_alias": "0004",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0004",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_35",
+          "evidence_reference": "the same reasoning ADR [0013](0013-egress-trust-model.md)'s resolution applies to the egress burn",
+          "parsed_adr_alias": "0013",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0013",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_39",
+          "evidence_reference": "Under ADR [0028](0028-deployment-model-customer-deployed.md) each deployment applies its own IaC, so putting a CDN, WAF, or second proxy in front of the edge changes the hop count",
+          "parsed_adr_alias": "0028",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0028",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0004"
+        ],
+        [
+          "depends_on",
+          "0013"
+        ],
+        [
+          "depends_on",
+          "0028"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-helix-011",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "AZX-PBC-OSS/helix",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "narrative_body": 3
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 3,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": true,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 3,
+          "extra_relationship": 3
+        },
+        "total_predicted_tuples": 3,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0002"
+        ],
+        [
+          "depends_on",
+          "0006"
+        ],
+        [
+          "depends_on",
+          "0009"
+        ],
+        [
+          "depends_on",
+          "0011"
+        ],
+        [
+          "depends_on",
+          "0014"
+        ],
+        [
+          "depends_on",
+          "0018"
+        ],
+        [
+          "depends_on",
+          "0019"
+        ],
+        [
+          "depends_on",
+          "0020"
+        ],
+        [
+          "depends_on",
+          "0024"
+        ],
+        [
+          "depends_on",
+          "0026"
+        ],
+        [
+          "depends_on",
+          "0028"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_3",
+          "evidence_reference": "ADR [0026](0026-hosted-build-isolation-prerequisites.md) (hosted-build isolation prerequisites \u2014 the alternative this displaces)",
+          "parsed_adr_alias": "0026",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0026",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_3",
+          "evidence_reference": "ADR [0018](0018-deploy-model-immutable-versions.md) (upload-only, immutable versions \u2014 the path this rejoins)",
+          "parsed_adr_alias": "0018",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0018",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_3",
+          "evidence_reference": "ADR [0020](0020-static-only-apps-v1.md) (static-only apps)",
+          "parsed_adr_alias": "0020",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0020",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_3",
+          "evidence_reference": "ADR [0028](0028-deployment-model-customer-deployed.md) (single-tenant, customer-deployed \u2014 the constraint that shapes credentials and reachability)",
+          "parsed_adr_alias": "0028",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0028",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_3",
+          "evidence_reference": "ADR [0006](0006-secret-custody-seam.md) (`SecretStore`)",
+          "parsed_adr_alias": "0006",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0006",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_3",
+          "evidence_reference": "ADR [0024](0024-portal-cli-bearer-jwt-jwks.md) (bearer JWT / JWKS verifier chain)",
+          "parsed_adr_alias": "0024",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0024",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_3",
+          "evidence_reference": "ADR [0011](0011-in-memory-rate-limiting.md) (superseded \u2014 the `CounterStore` / `rate_counters` primitive this reuses)",
+          "parsed_adr_alias": "0011",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0011",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_17",
+          "evidence_reference": "its defense remains CSP + the gateway (ADR [0009](0009-relaxed-csp.md)/[0014](0014-same-origin-api-gateway.md))",
+          "parsed_adr_alias": "0009",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0009",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_17",
+          "evidence_reference": "its defense remains CSP + the gateway (ADR [0009](0009-relaxed-csp.md)/[0014](0014-same-origin-api-gateway.md))",
+          "parsed_adr_alias": "0014",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0014",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_36",
+          "evidence_reference": "Slugs are already public as subdomains (ADR [0019](0019-subdomain-per-app-isolation.md))",
+          "parsed_adr_alias": "0019",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0019",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_92",
+          "evidence_reference": "serve it from the already-public edge, which would require a narrow write grant that pokes a hole in the ADR [0002](0002-postgres-role-split-rls.md) role split",
+          "parsed_adr_alias": "0002",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0002",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0002"
+        ],
+        [
+          "depends_on",
+          "0006"
+        ],
+        [
+          "depends_on",
+          "0009"
+        ],
+        [
+          "depends_on",
+          "0011"
+        ],
+        [
+          "depends_on",
+          "0014"
+        ],
+        [
+          "depends_on",
+          "0018"
+        ],
+        [
+          "depends_on",
+          "0019"
+        ],
+        [
+          "depends_on",
+          "0020"
+        ],
+        [
+          "depends_on",
+          "0024"
+        ],
+        [
+          "depends_on",
+          "0026"
+        ],
+        [
+          "depends_on",
+          "0028"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-helix-012",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "AZX-PBC-OSS/helix",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "contextual_related_metadata": 7,
+          "narrative_body": 4
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 11,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": true,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 11,
+          "extra_relationship": 11
+        },
+        "total_predicted_tuples": 11,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0001"
+        ],
+        [
+          "depends_on",
+          "0002"
+        ],
+        [
+          "depends_on",
+          "0003"
+        ],
+        [
+          "depends_on",
+          "0007"
+        ],
+        [
+          "depends_on",
+          "0016"
+        ],
+        [
+          "depends_on",
+          "0017"
+        ],
+        [
+          "depends_on",
+          "0021"
+        ],
+        [
+          "depends_on",
+          "0025"
+        ],
+        [
+          "depends_on",
+          "0028"
+        ],
+        [
+          "depends_on",
+          "0030"
+        ],
+        [
+          "refines",
+          "0005"
+        ],
+        [
+          "refines",
+          "0006"
+        ],
+        [
+          "refines",
+          "0013"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_3",
+          "evidence_reference": "ADR [0006](0006-secret-custody-seam.md) (`SecretStore` custody \u2014 the seam per-user tokens reuse)",
+          "parsed_adr_alias": "0006",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0006",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_3",
+          "evidence_reference": "ADR [0005](0005-ssrf-egress-controls.md) (SSRF + secret injection \u2014 the outbound mechanism)",
+          "parsed_adr_alias": "0005",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0005",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_3",
+          "evidence_reference": "ADR [0013](0013-egress-trust-model.md) (egress trust model \u2014 the attested instruction this extends)",
+          "parsed_adr_alias": "0013",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0013",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_3",
+          "evidence_reference": "ADR [0002](0002-postgres-role-split-rls.md) (role split \u2014 why `helix_edge` still cannot read a token)",
+          "parsed_adr_alias": "0002",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0002",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_3",
+          "evidence_reference": "ADR [0007](0007-portal-authz-v0.md) (portal authz v0 \u2014 **blocks** the group-policy half); ADR [0007](0007-portal-authz-v0.md) must be resolved before decision 12",
+          "parsed_adr_alias": "0007",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0007",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_58",
+          "evidence_reference": "Catalog edits ride the approval write-gate (`classifyChange`, ADR [0016](0016-capability-manifest-approval-classifier.md))",
+          "parsed_adr_alias": "0016",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0016",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_60",
+          "evidence_reference": "Catalog invalidation over LISTEN/NOTIFY (ADR [0017](0017-registry-listen-notify-projection.md) pattern)",
+          "parsed_adr_alias": "0017",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0017",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_3",
+          "evidence_reference": "ADR [0028](0028-deployment-model-customer-deployed.md) (customer-deployed \u2014 why registration is per-deployment)",
+          "parsed_adr_alias": "0028",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0028",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "unresolved",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "unresolved",
+          "evidence_location": "ambiguous_target_context_match",
+          "evidence_reference": "ADR [0021](0021-metering-ledger.md) (metering \u2014 where 'who used what' is already answered)",
+          "parsed_adr_alias": "0021",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0021",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_68",
+          "evidence_reference": "OAuth client code has no business in the dependency-minimal trusted path (ADR [0003](0003-dependency-minimal-edge.md))",
+          "parsed_adr_alias": "0003",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0003",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_70",
+          "evidence_reference": "Same argument as ADR [0030](0030-repo-backed-apps-pull-attested-artifacts.md) decision 9: under ADR [0028] a Helix-owned OAuth client would require shipping its `client_secret` into every customer deployment",
+          "parsed_adr_alias": "0030",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0030",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_116",
+          "evidence_reference": "Stale catalog serves a revoked provider indefinitely \u2014 LISTEN/NOTIFY invalidation; inherit ADR [0025](0025-registry-projection-hardening.md)'s staleness observability",
+          "parsed_adr_alias": "0025",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0025",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_134",
+          "evidence_reference": "ADR [0001](0001-three-runtime-split.md)'s split was drawn on trust boundaries \u2014 is 'speaks a chatty session protocol to the internet' a different enough zone to matter?",
+          "parsed_adr_alias": "0001",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0001",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0001"
+        ],
+        [
+          "depends_on",
+          "0002"
+        ],
+        [
+          "depends_on",
+          "0003"
+        ],
+        [
+          "depends_on",
+          "0007"
+        ],
+        [
+          "depends_on",
+          "0016"
+        ],
+        [
+          "depends_on",
+          "0017"
+        ],
+        [
+          "depends_on",
+          "0021"
+        ],
+        [
+          "depends_on",
+          "0025"
+        ],
+        [
+          "depends_on",
+          "0028"
+        ],
+        [
+          "depends_on",
+          "0030"
+        ],
+        [
+          "refines",
+          "0005"
+        ],
+        [
+          "refines",
+          "0006"
+        ],
+        [
+          "refines",
+          "0013"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-helix-013",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "AZX-PBC-OSS/helix",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "contextual_related_metadata": 6,
+          "narrative_body": 6,
+          "unresolved": 1
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 13,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": true,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 10,
+          "extra_relationship": 13
+        },
+        "total_predicted_tuples": 13,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0028"
+        ],
+        [
+          "depends_on",
+          "0048"
+        ],
+        [
+          "refines",
+          "0015"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_79",
+          "evidence_reference": "Under ADR [0028](0028-deployment-model-customer-deployed.md) the customer runs the portal themselves \u2014 it is the control plane and the azx-cli target",
+          "parsed_adr_alias": "0028",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0028",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_65",
+          "evidence_reference": "Collection items are the clearest case: the whole point of the collection scope (ADR [0015](0015-app-data-three-scope-model.md)) is that the writer and the reader are different principals",
+          "parsed_adr_alias": "0015",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0015",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_36",
+          "evidence_reference": "amended 2026-09-22 by ADR-0048 to app.ownerId === actor.oid, the Entra oid claim",
+          "parsed_adr_alias": "0048",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0048",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0028"
+        ],
+        [
+          "depends_on",
+          "0048"
+        ],
+        [
+          "refines",
+          "0015"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-helix-014",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "AZX-PBC-OSS/helix",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "narrative_body": 3
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 3,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": true,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 2,
+          "extra_relationship": 3
+        },
+        "total_predicted_tuples": 3,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0010"
+        ],
+        [
+          "depends_on",
+          "0035"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_16",
+          "evidence_reference": "'unsafe-inline' is load-bearing for the platform too, since ADR-0035.",
+          "parsed_adr_alias": "0035",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0035",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_30",
+          "evidence_reference": "anonymous third-party content written via shared-writes (ADR-0010, putShared runs for anonymous callers) is rendered by the app, so relaxed CSP voids real stored-XSS protection for end users",
+          "parsed_adr_alias": "0010",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0010",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0010"
+        ],
+        [
+          "depends_on",
+          "0035"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-helix-015",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "AZX-PBC-OSS/helix",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "narrative_body": 2
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 2,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": true,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 2,
+          "extra_relationship": 2
+        },
+        "total_predicted_tuples": 2,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0001"
+        ],
+        [
+          "depends_on",
+          "0005"
+        ],
+        [
+          "depends_on",
+          "0006"
+        ],
+        [
+          "depends_on",
+          "0011"
+        ],
+        [
+          "depends_on",
+          "0031"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_3",
+          "evidence_reference": "**Related:** ADR [0001](0001-three-runtime-split.md), [0005](0005-ssrf-egress-controls.md), [0006](0006-secret-custody-seam.md)",
+          "parsed_adr_alias": "0001",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0001",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_3",
+          "evidence_reference": "**Related:** ADR [0001](0001-three-runtime-split.md), [0005](0005-ssrf-egress-controls.md), [0006](0006-secret-custody-seam.md)",
+          "parsed_adr_alias": "0005",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0005",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_3",
+          "evidence_reference": "**Related:** ADR [0001](0001-three-runtime-split.md), [0005](0005-ssrf-egress-controls.md), [0006](0006-secret-custody-seam.md)",
+          "parsed_adr_alias": "0006",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0006",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_52",
+          "evidence_reference": "same 'keep the mechanism plane's shared state in Postgres, not Redis' reasoning as ADR [0011](0011-in-memory-rate-limiting.md)'s resolution",
+          "parsed_adr_alias": "0011",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0011",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_58",
+          "evidence_reference": "which is the same machinery as [ADR-0031](0031-connection-providers-delegated-auth.md) decision 12, and should be built once rather than twice",
+          "parsed_adr_alias": "0031",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0031",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0001"
+        ],
+        [
+          "depends_on",
+          "0005"
+        ],
+        [
+          "depends_on",
+          "0006"
+        ],
+        [
+          "depends_on",
+          "0011"
+        ],
+        [
+          "depends_on",
+          "0031"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-helix-017",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "AZX-PBC-OSS/helix",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "contextual_related_metadata": 3,
+          "narrative_body": 2
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 5,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": true,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 5,
+          "extra_relationship": 5
+        },
+        "total_predicted_tuples": 5,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0001"
+        ],
+        [
+          "depends_on",
+          "0013"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_3",
+          "evidence_reference": "**Related:** ADR [0001](0001-three-runtime-split.md), [0013](0013-egress-trust-model.md)",
+          "parsed_adr_alias": "0001",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0001",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_3",
+          "evidence_reference": "**Related:** ADR [0001](0001-three-runtime-split.md), [0013](0013-egress-trust-model.md)",
+          "parsed_adr_alias": "0013",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0013",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0001"
+        ],
+        [
+          "depends_on",
+          "0013"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-helix-018",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "AZX-PBC-OSS/helix",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "contextual_related_metadata": 2
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 2,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": true,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 2,
+          "extra_relationship": 2
+        },
+        "total_predicted_tuples": 2,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0004"
+        ],
+        [
+          "depends_on",
+          "0009"
+        ],
+        [
+          "depends_on",
+          "0016"
+        ],
+        [
+          "depends_on",
+          "0018"
+        ],
+        [
+          "depends_on",
+          "0020"
+        ],
+        [
+          "exception_to",
+          null
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "unresolved",
+            "extra_relationship",
+            "target_boundary_anomaly"
+          ],
+          "evidence_context_tag": "unresolved",
+          "evidence_location": "unresolved",
+          "evidence_reference": "Reverses the platform-wide service-worker ban recorded in `docs/platform-architecture.md` \u00a74.4 and Appendix A.3, replacing it with a narrow, approval-gated exception. ... The ban remains the default and this is a named exception to it.",
+          "parsed_adr_alias": null,
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "target_boundary_anomaly"
+          ],
+          "relationship_type": "exception_to",
+          "target_form": "null_target",
+          "target_reference": null,
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_10",
+          "evidence_reference": "Relates to [ADR-0004](0004-auth-model.md) (the handoff token the ban protects)",
+          "parsed_adr_alias": "0004",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0004",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_paragraph_4",
+          "evidence_reference": "Relates to [ADR-0009](0009-relaxed-csp.md) ... `'unsafe-inline'` becomes load-bearing for the platform, not only for apps (ADR-0009).",
+          "parsed_adr_alias": "0009",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0009",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_paragraph_4",
+          "evidence_reference": "Relates to [ADR-0016](0016-capability-manifest-approval-classifier.md)",
+          "parsed_adr_alias": "0016",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0016",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "unresolved",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "unresolved",
+          "evidence_location": "ambiguous_target_context_match",
+          "evidence_reference": "Relates to [ADR-0018](0018-deploy-model-immutable-versions.md) (the pointer flip this must not break) ... Network-first documents are what preserve the ADR-0018 pointer-flip contract",
+          "parsed_adr_alias": "0018",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0018",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_paragraph_4",
+          "evidence_reference": "Relates to [ADR-0020](0020-static-only-apps-v1.md)",
+          "parsed_adr_alias": "0020",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0020",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0004"
+        ],
+        [
+          "depends_on",
+          "0009"
+        ],
+        [
+          "depends_on",
+          "0016"
+        ],
+        [
+          "depends_on",
+          "0018"
+        ],
+        [
+          "depends_on",
+          "0020"
+        ],
+        [
+          "exception_to",
+          null
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-helix-019",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "AZX-PBC-OSS/helix",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "contextual_related_metadata": 4,
+          "unresolved": 2
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 6,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": true,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 5,
+          "extra_relationship": 6,
+          "target_boundary_anomaly": 1
+        },
+        "total_predicted_tuples": 6,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": true,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "refines",
+          "0002"
+        ],
+        [
+          "refines",
+          "0005"
+        ],
+        [
+          "refines",
+          "0006"
+        ],
+        [
+          "refines",
+          "0013"
+        ],
+        [
+          "refines",
+          "0019"
+        ],
+        [
+          "refines",
+          "0022"
+        ],
+        [
+          "refines",
+          "0023"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "unresolved",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "unresolved",
+          "evidence_location": "ambiguous_clause_match",
+          "evidence_reference": "parameterizes architecture decision 11 and reframes ADR-0019 / issue #16; The apps \u2194 control-plane site split (ADR-0019 / #16) becomes a per-deployment topology.",
+          "parsed_adr_alias": "0019",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0019",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "unresolved",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "unresolved",
+          "evidence_location": "ambiguous_target_context_match",
+          "evidence_reference": "ADR-0022 chose a self-hosted, portable data plane precisely 'because customers may run the platform on their own clouds' \u2014 this ADR's parent; This ADR elevates that from an aside to the deployment model",
+          "parsed_adr_alias": "0022",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0022",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "contextual_related_metadata",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "contextual_related_metadata",
+          "evidence_location": "related_metadata_line_3",
+          "evidence_reference": "ADR 0002 (role split \u2014 per instance)",
+          "parsed_adr_alias": "0002",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0002",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_25",
+          "evidence_reference": "The ADR-0005/0013 blocks \u2014 private/loopback/IMDS denial, validated-IP rebind pin, no redirect-follow \u2014 protect the customer's metadata endpoint and internal network. This raises the stakes on those controls; they are not weakened by the deployment shift.",
+          "parsed_adr_alias": "0005",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0005",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_25",
+          "evidence_reference": "The ADR-0005/0013 blocks \u2014 private/loopback/IMDS denial, validated-IP rebind pin, no redirect-follow \u2014 protect the customer's metadata endpoint and internal network.",
+          "parsed_adr_alias": "0013",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0013",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_23",
+          "evidence_reference": "Their Key Vault + KEK (the ADR-0006 seam, instantiated per deployment)",
+          "parsed_adr_alias": "0006",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0006",
+          "tuple_role": "extra_tuple"
+        },
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_29",
+          "evidence_reference": "Tenancy stays per-app within an instance (ADR-0023). Each customer = one instance, so cross-customer isolation is the cloud boundary itself.",
+          "parsed_adr_alias": "0023",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "refines",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0023",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "refines",
+          "0002"
+        ],
+        [
+          "refines",
+          "0005"
+        ],
+        [
+          "refines",
+          "0006"
+        ],
+        [
+          "refines",
+          "0013"
+        ],
+        [
+          "refines",
+          "0019"
+        ],
+        [
+          "refines",
+          "0022"
+        ],
+        [
+          "refines",
+          "0023"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-helix-020",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "AZX-PBC-OSS/helix",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "contextual_related_metadata": 1,
+          "narrative_body": 4,
+          "unresolved": 2
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 7,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": true,
+        "prediction_behaviour_counts": {
+          "extra_relationship": 7
+        },
+        "total_predicted_tuples": 7,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "supersedes",
+          "0046"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "lifecycle_revision_history",
+            "extra_relationship"
+          ],
+          "evidence_context_tag": "lifecycle_revision_history",
+          "evidence_location": "lifecycle_marker_line_0",
+          "evidence_reference": "Partially superseded: ADR-046-ship-the-deferred-features.md reverses the deferral of adapter-verify, Break the Ratchet, and CheckerProof (point 5 below) on direct owner instruction, while holding every safety and scope constraint this ADR attached to them.",
+          "parsed_adr_alias": "0046",
+          "prediction_behaviour_tags": [
+            "extra_relationship"
+          ],
+          "relationship_type": "supersedes",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0046",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "supersedes",
+          "0046"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-modonome-015",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "enumind/modonome",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "lifecycle_revision_history": 1
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 1,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": false,
+        "prediction_behaviour_counts": {
+          "extra_relationship": 1
+        },
+        "total_predicted_tuples": 1,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    },
+    {
+      "adjudicated_ontology_gap": false,
+      "conflicting_type_extra_mappings": [],
+      "exact_tuples": [],
+      "expected_tuples": [],
+      "extra_tuples": [
+        [
+          "depends_on",
+          "0002"
+        ]
+      ],
+      "missing_tuples": [],
+      "per_tuple_diagnostics": [
+        {
+          "causal_tags": [
+            "narrative_body",
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "evidence_context_tag": "narrative_body",
+          "evidence_location": "narrative_body_line_2",
+          "evidence_reference": "This rung assumes WI-011 (ADR-002) has shipped; until then, treat it as a planned step, not a current one",
+          "parsed_adr_alias": "0002",
+          "prediction_behaviour_tags": [
+            "extra_relationship",
+            "depends_on_overproduction"
+          ],
+          "relationship_type": "depends_on",
+          "target_form": "adr_identifier_like",
+          "target_reference": "0002",
+          "tuple_role": "extra_tuple"
+        }
+      ],
+      "predicted_tuples": [
+        [
+          "depends_on",
+          "0002"
+        ]
+      ],
+      "recovered_target_entities": [],
+      "reference_id": "ref-modonome-016",
+      "reference_structural_class": "EXPECTED_EMPTY_FALSE_POSITIVE",
+      "repository": "enumind/modonome",
+      "summary_counts": {
+        "conflicting_type_extra_count": 0,
+        "evidence_context_counts": {
+          "narrative_body": 1
+        },
+        "exact_tuple_count": 0,
+        "extra_tuple_count": 1,
+        "missing_tuple_count": 0,
+        "multi_relationship_overgeneration": false,
+        "prediction_behaviour_counts": {
+          "depends_on_overproduction": 1,
+          "extra_relationship": 1
+        },
+        "total_predicted_tuples": 1,
+        "wrong_type_target_count": 0
+      },
+      "wrong_type_target_mappings": []
+    }
+  ],
+  "model_calls": 0,
+  "note": "Deterministic offline residual-error decomposition re-scoring frozen Arm B outcomes against Batch 01 v0.2-grounding. This is a counterfactual diagnostic, not a new Arm B execution.",
+  "passing_references": 59,
+  "prediction_behaviour_aggregate_counts": {
+    "conflicting_type_extra": 1,
+    "depends_on_overproduction": 72,
+    "extra_relationship": 105,
+    "target_boundary_anomaly": 2,
+    "wrong_type_recovery": 6
+  },
+  "scoring_reference_corpus_hash": "700a569e24bf90707ba14ff65eea2ab5",
+  "source_outcomes_semantic_hash": "sha256:778f05574d0e835fca893c216c4e240c15e0f30a11893812089dc691b3376092",
+  "structural_class_counts": {
+    "EXACT_EXPECTED_PLUS_EXTRAS": 3,
+    "EXPECTED_EMPTY_FALSE_POSITIVE": 32,
+    "PURE_TYPE_CONFUSION": 2,
+    "TYPE_CONFUSION_PLUS_EXTRAS": 4
+  },
+  "target_attribution_totals": {
+    "conflicting_type_extra": 1,
+    "exact_type_exact_target": 12,
+    "target_entity_recovered_any_type": 18,
+    "total_expected_tuples": 18,
+    "wrong_type_recovery": 6
+  },
+  "target_type_confusion_matrix": {
+    "refines": {
+      "depends_on": 1,
+      "refines": 4
+    },
+    "requires": {
+      "depends_on": 3,
+      "refines": 2,
+      "requires": 5
+    },
+    "supersedes": {
+      "supersedes": 3
+    }
+  },
+  "total_references": 100,
+  "tuple_level_predicted_type_counts": {
+    "depends_on": 72,
+    "exception_to": 1,
+    "refines": 27,
+    "requires": 9,
+    "supersedes": 4
+  }
+}
