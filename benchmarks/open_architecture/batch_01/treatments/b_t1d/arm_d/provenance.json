@@ -1,0 +1,24 @@
+{
+  "actual_outcome_count": 100,
+  "arm_id": "treatment_d",
+  "classifier_backend": "anthropic",
+  "classifier_version": "0.1",
+  "control_arm_b_profile_hash": "e4b6bad47ebcc290924782172fb96d8d",
+  "control_arm_b_semantic_hash": "sha256:778f05574d0e835fca893c216c4e240c15e0f30a11893812089dc691b3376092",
+  "execution_mneme_commit_sha": "dcca4d7b2ca9674cd12b55a717f741dbe90da420",
+  "execution_reference_corpus_hash": "700a569e24bf90707ba14ff65eea2ab5",
+  "experiment_id": "b-t1d-relationship-selectivity",
+  "model_identifier": "claude-sonnet-4-6",
+  "parent_main_sha": "90534104a1c517a33088c6139b98df4734672679",
+  "request_parameters": {
+    "explicit_temperature": null,
+    "max_retries": 2,
+    "max_tokens": 1024,
+    "timeout": 60.0
+  },
+  "scoring_reference_corpus_hash": "700a569e24bf90707ba14ff65eea2ab5",
+  "task_count": 100,
+  "taxonomy_version": "0.1",
+  "treatment_profile_hash": "d66bb19c9e4c64e835a6191293a95570",
+  "treatment_semantic_content_hash": "sha256:ae1fbd24f6b36099d3c58006886503f6ba14bf5fd7cfa9bfb93c4befaabbedc0"
+}

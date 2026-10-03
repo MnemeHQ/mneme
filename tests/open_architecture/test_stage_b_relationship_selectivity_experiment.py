@@ -519,13 +519,26 @@ class TestBT1DSelectivityScaffold:
         assert res.output == {"relationships": []}
         assert mock_client.messages.create.call_count == 1
 
-    def test_23_no_execution_artifacts_created_during_scaffold(self):
-        """23. Scaffold and pre-execution tests create zero execution artifacts."""
+    def test_23_execution_artifacts_lifecycle_guard(self):
+        """23. Validate committed execution artifacts if present; ensure no post-hoc artifacts."""
         treatment_dir = REPO_ROOT / "benchmarks" / "open_architecture" / "batch_01" / "treatments" / "b_t1d"
-        assert not (treatment_dir / "arm_d" / "outcomes.jsonl").exists()
-        assert not (treatment_dir / "arm_d" / "provenance.json").exists()
-        assert not (treatment_dir / "arm_d" / "stage_b_score.json").exists()
-        assert not (treatment_dir / "arm_d" / "diagnostics.json").exists()
+        outcomes_file = treatment_dir / "arm_d" / "outcomes.jsonl"
+        provenance_file = treatment_dir / "arm_d" / "provenance.json"
+
+        if outcomes_file.exists():
+            assert provenance_file.exists()
+            v02_refs = load_reference_corpus(V02_REF_DIR)
+            expected_ids = {r.reference_decision_id for r in v02_refs}
+            outcomes, sidecar = load_treatment_run(treatment_dir / "arm_d", expected_ids)
+            assert len(outcomes) == 100
+            assert sidecar.treatment_profile_hash == B_T1D_PROFILE_D_HASH
+            # Ensure post-hoc / scoring artifacts have not been created yet in this capture phase
+            assert not (treatment_dir / "arm_d" / "stage_b_score.json").exists()
+            assert not (treatment_dir / "arm_d" / "diagnostics.json").exists()
+        else:
+            assert not provenance_file.exists()
+            assert not (treatment_dir / "arm_d" / "stage_b_score.json").exists()
+            assert not (treatment_dir / "arm_d" / "diagnostics.json").exists()
 
     def test_24_no_assert_statements_in_experiment_module(self):
         """24. B-T1D experiment module contains zero ast.Assert statements in production code."""
