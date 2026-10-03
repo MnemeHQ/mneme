@@ -188,7 +188,7 @@ def build_stage_b_closure(
     macro_task_averages: dict[str, float] = {}
     for m in all_metric_keys:
         vals = [repo_scores[r]["metrics"][m] for r in all_repo_keys]
-        macro_task_averages[m] = sum(vals) / len(vals)
+        macro_task_averages[m] = round(sum(vals) / len(vals), 12)
 
     # Build comprehensive closure dictionary
     return {
