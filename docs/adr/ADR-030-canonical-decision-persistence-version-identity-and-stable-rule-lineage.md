@@ -160,9 +160,14 @@ version_id = "dver-" + SHA-256(canonical_json([
 - `occurrence_source_identity` is deterministic per authority path and uses
   no timestamps: for proposal acceptance, the already-pinned D2C1 identity
   inputs `[proposal_id, producer_key, content_fingerprint]`; for ADR import,
-  `[decision_id, source_revision, "adr-import"]`; for legacy migration,
-  `["legacy-items", decision_id]`.
-- The first version uses a fixed no-predecessor sentinel (pinned literal).
+  `[decision_id, source_revision, "adr-import"]`; for legacy `items[]`
+  migration, `["legacy-items", decision_id]`; and for pre-D1 native
+  `decisions[]` records that carry neither verified ADR provenance nor an
+  accepted-proposal occurrence identity,
+  `["legacy-decisions", decision_id]`. The last form is migration identity
+  only: it does not fabricate source provenance or grant new authority.
+- The first version uses the fixed no-predecessor sentinel `"-"`. The literal
+  is part of the version-identity contract and is golden-vector pinned.
 - The explicit `active_version_id` on the logical decision is the **only**
   mechanism for resolving the active version. Timestamps, source modification
   times, source dates, and revision ordering may never resolve authority.
