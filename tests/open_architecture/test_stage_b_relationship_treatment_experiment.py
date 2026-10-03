@@ -49,6 +49,7 @@ from mneme.open_architecture.classifiers.anthropic import (
     AnthropicClassifier,
     AnthropicMalformedResponseError,
 )
+from mneme.open_architecture.export import compute_reference_corpus_content_hash
 from mneme.open_architecture.harness import (
     FROZEN_BASELINE_CONFIG_HASH,
     FROZEN_BASELINE_ID,
@@ -97,6 +98,7 @@ from mneme.open_architecture.stage_b_relationship_treatment_experiment import (
     capture_treatment_run,
     classify_target_form,
     compute_b_t1c_profile_hash,
+    compute_reference_corpus_hash_from_references,
     compute_treatment_semantic_content_hash,
     evaluate_treatment_diagnostics,
     load_treatment_outcomes,
@@ -847,10 +849,13 @@ class TestBT1CTreatmentScaffold:
         refs = load_reference_corpus(REF_DIR)
         manifest = Manifest.load(MANIFEST_PATH)
 
-        # 1. Exact frozen references pass validation and return FROZEN_REFERENCE_CORPUS_HASH
+        # 1. Exact frozen references pass validation and match file-based authority
         computed_hash = validate_frozen_reference_corpus(refs)
+        dir_hash = compute_reference_corpus_content_hash(REF_DIR)
         assert computed_hash == FROZEN_REFERENCE_CORPUS_HASH
         assert computed_hash == "0455bd66aae52551c35b37a63c2d185f"
+        assert computed_hash == dir_hash
+        assert compute_reference_corpus_hash_from_references(refs) == dir_hash
 
         # 2. 99 references fail before classifier execution; 0 calls, 0 artifacts
         mock_client_99 = MagicMock()

@@ -26,6 +26,7 @@ from mneme.open_architecture.discovery import DiscoveredSourceDocument
 from mneme.open_architecture.export import (
     compute_bundle_content_hash,
     compute_reference_corpus_content_hash,
+    compute_reference_corpus_records_hash,
     export_bundle,
     export_candidates_jsonl,
     export_scenarios_jsonl,
@@ -557,3 +558,35 @@ class TestReferenceCorpusContentHash:
     def test_package_facade_export(self):
         from mneme.open_architecture import compute_reference_corpus_content_hash as pkg_fn
         assert pkg_fn is compute_reference_corpus_content_hash
+
+    def test_records_hash_authority_and_parity(self):
+        """Test compute_reference_corpus_records_hash contract and parity with directory authority."""
+        # 1. Empty records returns 'none'
+        assert compute_reference_corpus_records_hash([]) == "none"
+
+        # 2. Missing reference_decision_id raises ValueError
+        with pytest.raises(ValueError, match="missing 'reference_decision_id'"):
+            compute_reference_corpus_records_hash([{"title": "No ID"}])
+
+        # 3. Duplicate reference_decision_id raises ValueError
+        with pytest.raises(ValueError, match="Duplicate reference_decision_id"):
+            compute_reference_corpus_records_hash([
+                {"reference_decision_id": "ref-001", "data": "a"},
+                {"reference_decision_id": "ref-001", "data": "b"},
+            ])
+
+        # 4. Parity with compute_reference_corpus_content_hash over Batch 01
+        ref_dir = Path(__file__).resolve().parent.parent.parent / "benchmarks" / "open_architecture" / "batch_01" / "reference_decisions"
+        dir_hash = compute_reference_corpus_content_hash(ref_dir)
+        assert dir_hash == "0455bd66aae52551c35b37a63c2d185f"
+
+        records: list[dict[str, Any]] = []
+        for p in ref_dir.glob("*/ref-*.jsonl"):
+            for line in p.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if line:
+                    records.append(json.loads(line))
+
+        records_hash = compute_reference_corpus_records_hash(records)
+        assert records_hash == dir_hash
+        assert records_hash == "0455bd66aae52551c35b37a63c2d185f"

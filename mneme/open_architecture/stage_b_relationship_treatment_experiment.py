@@ -70,7 +70,10 @@ from mneme.open_architecture.classifiers.anthropic import (
     AnthropicClassifierError,
     AnthropicMalformedResponseError,
 )
-from mneme.open_architecture.export import compute_reference_corpus_content_hash
+from mneme.open_architecture.export import (
+    compute_reference_corpus_content_hash,
+    compute_reference_corpus_records_hash,
+)
 from mneme.open_architecture.harness import (
     FROZEN_BASELINE_CONFIG_HASH,
     FROZEN_BASELINE_ID,
@@ -505,13 +508,10 @@ def reference_decision_to_record_dict(ref: FrozenReferenceDecision) -> dict[str,
 def compute_reference_corpus_hash_from_references(
     references: Iterable[FrozenReferenceDecision],
 ) -> str:
-    """Compute the deterministic reference-corpus content hash across supplied reference decisions."""
-    records = [reference_decision_to_record_dict(r) for r in references]
-    if not records:
-        return "none"
-    records.sort(key=lambda r: str(r["reference_decision_id"]))
-    canonical_json = json.dumps(records, sort_keys=True, separators=(",", ":"))
-    return hashlib.sha256(canonical_json.encode("utf-8")).hexdigest()[:32]
+    """Compute the deterministic reference-corpus content hash using the shared export authority."""
+    return compute_reference_corpus_records_hash(
+        reference_decision_to_record_dict(r) for r in references
+    )
 
 
 def validate_frozen_reference_corpus(
