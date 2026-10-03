@@ -117,6 +117,7 @@ FROZEN_BASELINE_CONFIG_HASH = "31e18dc1e2bd9ad30bec86dce1a9295a"
 FROZEN_MANIFEST_CONFIG_HASH = "4af7e5794011b43d39682cdfeac9f54e"
 FROZEN_REFERENCE_CORPUS_HASH = "0455bd66aae52551c35b37a63c2d185f"
 FROZEN_SCENARIO_CORPUS_HASH = "2ff8751955fd64a33316aca6692dc803"
+FROZEN_STAGE_A_MNEME_SHA = "dda0342606fb388bd6de3355ada260c59b13ac0e"
 
 
 def _is_version_less(v1_str: str, v2_str: str) -> bool:
@@ -721,6 +722,149 @@ def evaluate_stage_a_discovery(
         repo_id=repository_config.id,
         discovered_documents_count=len(discovery.documents),
     )
+
+
+def build_stage_a_summary(
+    *,
+    stage_a_results: dict[str, StageADiscoveryResult],
+    manifest: Manifest,
+    baseline_id: str = FROZEN_BASELINE_ID,
+    baseline_configuration_hash: str = FROZEN_BASELINE_CONFIG_HASH,
+    reference_corpus_hash: str = FROZEN_REFERENCE_CORPUS_HASH,
+    mneme_execution_sha: str = FROZEN_STAGE_A_MNEME_SHA,
+    stages: Iterable[str] = ("A",),
+) -> dict[str, Any]:
+    """Construct deterministic Stage A summary artifact binding required baseline identities and metrics."""
+    total_disc = sum(r.discovered_documents_count for r in stage_a_results.values())
+    total_ext = sum(r.extracted_candidates_count for r in stage_a_results.values())
+    total_ref = sum(r.reference_decisions_count for r in stage_a_results.values())
+    total_matched_ref = sum(r.matched_reference_count for r in stage_a_results.values())
+    total_matched_cand = sum(r.matched_candidate_count for r in stage_a_results.values())
+    macro_rec = sum(r.recall for r in stage_a_results.values()) / len(stage_a_results) if stage_a_results else 0.0
+    macro_prec = sum(r.precision for r in stage_a_results.values()) / len(stage_a_results) if stage_a_results else 0.0
+    macro_f1 = sum(r.f1 for r in stage_a_results.values()) / len(stage_a_results) if stage_a_results else 0.0
+
+    return {
+        "aggregate": {
+            "macro_f1": macro_f1,
+            "macro_precision": macro_prec,
+            "macro_recall": macro_rec,
+            "total_discovered_documents": total_disc,
+            "total_extracted_candidates": total_ext,
+            "total_matched_candidates": total_matched_cand,
+            "total_matched_references": total_matched_ref,
+            "total_reference_decisions": total_ref,
+        },
+        "baseline_configuration_hash": baseline_configuration_hash,
+        "baseline_id": baseline_id,
+        "extractor": {
+            "config": {
+                "confidence": 0.5,
+                "keywords": sorted(HeuristicExtractor.DECISION_KEYWORDS),
+                "max_lines": 50,
+                "min_lines": 2,
+            },
+            "id": "heuristic",
+            "version": "0.1",
+        },
+        "manifest_configuration_hash": manifest.configuration_hash(),
+        "matching_contract": {
+            "contract_id": "deterministic_source_path_and_line_interval_overlap",
+            "description": "Deterministic line-interval intersection on matching repository-relative source file components.",
+            "version": "0.1",
+        },
+        "mneme_execution_sha": mneme_execution_sha,
+        "reference_corpus_hash": reference_corpus_hash,
+        "repositories": {repo_id: res.to_dict() for repo_id, res in sorted(stage_a_results.items())},
+        "repository_ids": sorted(stage_a_results.keys()),
+        "repository_pinned_shas": {r.id: r.commit_sha for r in sorted(manifest.repositories, key=lambda r: r.id)},
+        "stages": list(stages),
+    }
+
+
+def execute_stage_a_baseline(
+    *,
+    baseline_path: str | Path | None = None,
+    manifest_path: str | Path | None = None,
+    reference_corpus_dir: str | Path | None = None,
+    clone_sources: dict[str, str | Path] | None = None,
+    workspace_dir: str | Path | None = None,
+    mneme_execution_sha: str = FROZEN_STAGE_A_MNEME_SHA,
+) -> dict[str, Any]:
+    """Execute Stage A discovery evaluation across all 5 pinned repositories and build summary dict."""
+    repo_root = Path(__file__).resolve().parent.parent.parent
+    b_path = (
+        Path(baseline_path)
+        if baseline_path is not None
+        else repo_root / "benchmarks" / "open_architecture" / "batch_01" / "baseline.yaml"
+    )
+    m_path = (
+        Path(manifest_path)
+        if manifest_path is not None
+        else repo_root / "benchmarks" / "open_architecture" / "batch_01" / "manifest.yaml"
+    )
+    ref_dir = (
+        Path(reference_corpus_dir)
+        if reference_corpus_dir is not None
+        else repo_root / "benchmarks" / "open_architecture" / "batch_01" / "reference_decisions"
+    )
+
+    manifest = Manifest.load(m_path)
+    all_refs = load_reference_corpus(ref_dir)
+
+    stage_a_results: dict[str, StageADiscoveryResult] = {}
+    for repo in sorted(manifest.repositories, key=lambda r: r.id):
+        repo_refs = [r for r in all_refs if r.repository == repo.github]
+        if len(repo_refs) != 20:
+            raise ValueError(f"Repository '{repo.id}' requires exactly 20 reference decisions, found {len(repo_refs)}")
+        repo_clone_source = (clone_sources.get(repo.id) if clone_sources else None)
+        a_res = evaluate_stage_a_discovery(
+            repository_config=repo,
+            references=repo_refs,
+            clone_source=repo_clone_source,
+            workspace_dir=workspace_dir,
+        )
+        stage_a_results[repo.id] = a_res
+
+    return build_stage_a_summary(
+        stage_a_results=stage_a_results,
+        manifest=manifest,
+        baseline_id=FROZEN_BASELINE_ID,
+        baseline_configuration_hash=FROZEN_BASELINE_CONFIG_HASH,
+        reference_corpus_hash=FROZEN_REFERENCE_CORPUS_HASH,
+        mneme_execution_sha=mneme_execution_sha,
+        stages=("A",),
+    )
+
+
+def write_stage_a_summary(
+    target_path: Path | str | None = None,
+    *,
+    clone_sources: dict[str, str | Path] | None = None,
+    workspace_dir: str | Path | None = None,
+    mneme_execution_sha: str = FROZEN_STAGE_A_MNEME_SHA,
+) -> Path:
+    """Generate and write the authoritative stage_a_summary.json artifact."""
+    repo_root = Path(__file__).resolve().parent.parent.parent
+    dest = (
+        Path(target_path)
+        if target_path is not None
+        else repo_root
+        / "benchmarks"
+        / "open_architecture"
+        / "batch_01"
+        / "stage_a"
+        / "stage_a_summary.json"
+    )
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    summary_data = execute_stage_a_baseline(
+        clone_sources=clone_sources,
+        workspace_dir=workspace_dir,
+        mneme_execution_sha=mneme_execution_sha,
+    )
+    serialized = json.dumps(summary_data, indent=2, sort_keys=True) + "\n"
+    dest.write_text(serialized, encoding="utf-8", newline="\n")
+    return dest
 
 
 # ── D. Stage B: Semantic Classification ─────────────────────────────────────────
@@ -1835,28 +1979,15 @@ def run_frozen_batch_01(
     )
 
     if "A" in norm_stages:
-        total_disc = sum(r.discovered_documents_count for r in stage_a_results.values())
-        total_ext = sum(r.extracted_candidates_count for r in stage_a_results.values())
-        total_ref = sum(r.reference_decisions_count for r in stage_a_results.values())
-        total_matched_ref = sum(r.matched_reference_count for r in stage_a_results.values())
-        total_matched_cand = sum(r.matched_candidate_count for r in stage_a_results.values())
-        macro_rec = sum(r.recall for r in stage_a_results.values()) / len(stage_a_results) if stage_a_results else 0.0
-        macro_prec = sum(r.precision for r in stage_a_results.values()) / len(stage_a_results) if stage_a_results else 0.0
-        macro_f1 = sum(r.f1 for r in stage_a_results.values()) / len(stage_a_results) if stage_a_results else 0.0
-        a_summary = {
-            "stages": list(norm_stages),
-            "repositories": {repo_id: res.to_dict() for repo_id, res in sorted(stage_a_results.items())},
-            "aggregate": {
-                "total_discovered_documents": total_disc,
-                "total_extracted_candidates": total_ext,
-                "total_reference_decisions": total_ref,
-                "total_matched_references": total_matched_ref,
-                "total_matched_candidates": total_matched_cand,
-                "macro_recall": macro_rec,
-                "macro_precision": macro_prec,
-                "macro_f1": macro_f1,
-            },
-        }
+        a_summary = build_stage_a_summary(
+            stage_a_results=stage_a_results,
+            manifest=manifest,
+            baseline_id=preflight.baseline_id,
+            baseline_configuration_hash=preflight.baseline_configuration_hash,
+            reference_corpus_hash=preflight.reference_corpus_hash,
+            mneme_execution_sha=FROZEN_STAGE_A_MNEME_SHA,
+            stages=norm_stages,
+        )
         (out_path / "stage_a_summary.json").write_text(
             json.dumps(a_summary, indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
@@ -2264,6 +2395,7 @@ __all__ = [
     "FROZEN_MANIFEST_CONFIG_HASH",
     "FROZEN_REFERENCE_CORPUS_HASH",
     "FROZEN_SCENARIO_CORPUS_HASH",
+    "FROZEN_STAGE_A_MNEME_SHA",
     "HarnessPreflightError",
     "HarnessRunError",
     "BatchPreflightResult",
@@ -2274,6 +2406,9 @@ __all__ = [
     "StageADiscoveryResult",
     "evaluate_discovery_matches",
     "evaluate_stage_a_discovery",
+    "build_stage_a_summary",
+    "execute_stage_a_baseline",
+    "write_stage_a_summary",
     "SEMANTIC_TASK_TYPES",
     "build_stage_b_tasks",
     "StageBClassificationResult",
