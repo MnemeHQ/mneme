@@ -31,6 +31,7 @@ Validates the pre-execution apparatus for B-T1C against all preregistered invari
 from __future__ import annotations
 
 import copy
+import dataclasses
 import json
 import subprocess
 from pathlib import Path
@@ -102,6 +103,7 @@ from mneme.open_architecture.stage_b_relationship_treatment_experiment import (
     load_treatment_run,
     parse_adr_alias,
     score_treatment_replay,
+    validate_frozen_reference_corpus,
     validate_treatment_provenance,
 )
 
@@ -839,3 +841,83 @@ class TestBT1CTreatmentScaffold:
         # Refuse overwrite into existing non-empty directory
         with pytest.raises(FileExistsError, match="refusing overwrite"):
             capture_treatment_run(run_dir, ARM_A_ID, adapter, refs)
+
+    def test_29_reference_corpus_validation_and_tampering_rejection(self, tmp_path: Path):
+        """29. Reference corpus validation enforces exact count, candidate IDs, and content hash fail-closed."""
+        refs = load_reference_corpus(REF_DIR)
+        manifest = Manifest.load(MANIFEST_PATH)
+
+        # 1. Exact frozen references pass validation and return FROZEN_REFERENCE_CORPUS_HASH
+        computed_hash = validate_frozen_reference_corpus(refs)
+        assert computed_hash == FROZEN_REFERENCE_CORPUS_HASH
+        assert computed_hash == "0455bd66aae52551c35b37a63c2d185f"
+
+        # 2. 99 references fail before classifier execution; 0 calls, 0 artifacts
+        mock_client_99 = MagicMock()
+        adapter_99 = TreatmentClassifierAdapter(ARM_A_ID, client=mock_client_99, live=False)
+        dir_99 = tmp_path / "run_99"
+        with pytest.raises(ValueError, match="Reference corpus count mismatch"):
+            capture_treatment_run(dir_99, ARM_A_ID, adapter_99, refs[:99])
+        assert mock_client_99.messages.create.call_count == 0
+        assert not (dir_99 / "outcomes.jsonl").exists()
+        assert not (dir_99 / "provenance.json").exists()
+
+        # 3. 100 references with one mutated semantic field fail before classifier execution; 0 calls, 0 artifacts
+        mutated_semantic_refs = list(refs)
+        mutated_semantic_refs[0] = dataclasses.replace(
+            mutated_semantic_refs[0],
+            normalized_decision="Tampered decision statement for testing fail-closed hash validation.",
+        )
+        mock_client_mutated = MagicMock()
+        adapter_mutated = TreatmentClassifierAdapter(ARM_A_ID, client=mock_client_mutated, live=False)
+        dir_mutated = tmp_path / "run_mutated"
+        with pytest.raises(ValueError, match="Reference corpus content hash mismatch"):
+            capture_treatment_run(dir_mutated, ARM_A_ID, adapter_mutated, mutated_semantic_refs)
+        assert mock_client_mutated.messages.create.call_count == 0
+        assert not (dir_mutated / "outcomes.jsonl").exists()
+        assert not (dir_mutated / "provenance.json").exists()
+
+        # 4. 100 references with candidate-set mismatch fail before classifier execution
+        bad_id_refs = list(refs)
+        bad_id_refs[0] = dataclasses.replace(
+            bad_id_refs[0],
+            reference_decision_id="ref-unrecognized-999",
+        )
+        mock_client_bad_id = MagicMock()
+        adapter_bad_id = TreatmentClassifierAdapter(ARM_A_ID, client=mock_client_bad_id, live=False)
+        dir_bad_id = tmp_path / "run_bad_id"
+        with pytest.raises(ValueError, match="Reference decisions candidate set mismatch"):
+            capture_treatment_run(dir_bad_id, ARM_A_ID, adapter_bad_id, bad_id_refs)
+        assert mock_client_bad_id.messages.create.call_count == 0
+        assert not (dir_bad_id / "outcomes.jsonl").exists()
+        assert not (dir_bad_id / "provenance.json").exists()
+
+        # 5. Treatment evaluation also rejects a mutated reference corpus
+        dummy_treatment = [
+            FrozenClassifierOutcome(
+                candidate_id=r.reference_decision_id,
+                task_type=ClassifierTaskType.RELATIONSHIPS,
+                backend_id="anthropic",
+                classifier_version="0.1",
+                model_identifier="claude-sonnet-4-6",
+                taxonomy_version="0.1",
+                run_id="treatment-dummy",
+                execution_id=f"exec-{r.reference_decision_id}",
+                output={"relationships": []},
+                confidence=None,
+                latency_ms=None,
+                cost_amount=None,
+                cost_currency=None,
+                escalated=False,
+                created_at="2026-10-02T20:00:00Z",
+            )
+            for r in refs
+        ]
+        b0_outcomes = load_stage_b_outcomes(FROZEN_B0_PATH)
+        mixed = build_mixed_stage_b_outcomes(b0_outcomes, dummy_treatment)
+
+        with pytest.raises(ValueError, match="Reference corpus content hash mismatch"):
+            evaluate_treatment_diagnostics(dummy_treatment, mutated_semantic_refs, manifest, arm=ARM_A_ID)
+
+        with pytest.raises(ValueError, match="Reference corpus content hash mismatch"):
+            score_treatment_replay(mixed, mutated_semantic_refs, manifest)

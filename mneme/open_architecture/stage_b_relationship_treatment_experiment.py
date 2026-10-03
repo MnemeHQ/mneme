@@ -70,6 +70,7 @@ from mneme.open_architecture.classifiers.anthropic import (
     AnthropicClassifierError,
     AnthropicMalformedResponseError,
 )
+from mneme.open_architecture.export import compute_reference_corpus_content_hash
 from mneme.open_architecture.harness import (
     FROZEN_BASELINE_CONFIG_HASH,
     FROZEN_BASELINE_ID,
@@ -440,6 +441,121 @@ def build_treatment_request_payload(
             }
         },
     }
+
+
+# ── Frozen Reference Corpus Validation Authority ─────────────────────────────
+
+FROZEN_BATCH_01_REFERENCE_IDS: frozenset[str] = frozenset({
+    "ref-adrkit-001", "ref-adrkit-002", "ref-adrkit-003", "ref-adrkit-004", "ref-adrkit-005",
+    "ref-adrkit-006", "ref-adrkit-007", "ref-adrkit-008", "ref-adrkit-009", "ref-adrkit-010",
+    "ref-adrkit-011", "ref-adrkit-012", "ref-adrkit-013", "ref-adrkit-014", "ref-adrkit-015",
+    "ref-adrkit-016", "ref-adrkit-017", "ref-adrkit-018", "ref-adrkit-019", "ref-adrkit-020",
+    "ref-archlint-001", "ref-archlint-002", "ref-archlint-003", "ref-archlint-004", "ref-archlint-005",
+    "ref-archlint-006", "ref-archlint-007", "ref-archlint-008", "ref-archlint-009", "ref-archlint-010",
+    "ref-archlint-011", "ref-archlint-012", "ref-archlint-013", "ref-archlint-014", "ref-archlint-015",
+    "ref-archlint-016", "ref-archlint-017", "ref-archlint-018", "ref-archlint-019", "ref-archlint-020",
+    "ref-gsa-agentic-coding-quickstart-001", "ref-gsa-agentic-coding-quickstart-002", "ref-gsa-agentic-coding-quickstart-003",
+    "ref-gsa-agentic-coding-quickstart-004", "ref-gsa-agentic-coding-quickstart-005", "ref-gsa-agentic-coding-quickstart-006",
+    "ref-gsa-agentic-coding-quickstart-007", "ref-gsa-agentic-coding-quickstart-008", "ref-gsa-agentic-coding-quickstart-009",
+    "ref-gsa-agentic-coding-quickstart-010", "ref-gsa-agentic-coding-quickstart-011", "ref-gsa-agentic-coding-quickstart-012",
+    "ref-gsa-agentic-coding-quickstart-013", "ref-gsa-agentic-coding-quickstart-014", "ref-gsa-agentic-coding-quickstart-015",
+    "ref-gsa-agentic-coding-quickstart-016", "ref-gsa-agentic-coding-quickstart-017", "ref-gsa-agentic-coding-quickstart-018",
+    "ref-gsa-agentic-coding-quickstart-019", "ref-gsa-agentic-coding-quickstart-020",
+    "ref-helix-001", "ref-helix-002", "ref-helix-003", "ref-helix-004", "ref-helix-005",
+    "ref-helix-006", "ref-helix-007", "ref-helix-008", "ref-helix-009", "ref-helix-010",
+    "ref-helix-011", "ref-helix-012", "ref-helix-013", "ref-helix-014", "ref-helix-015",
+    "ref-helix-016", "ref-helix-017", "ref-helix-018", "ref-helix-019", "ref-helix-020",
+    "ref-modonome-001", "ref-modonome-002", "ref-modonome-003", "ref-modonome-004", "ref-modonome-005",
+    "ref-modonome-006", "ref-modonome-007", "ref-modonome-008", "ref-modonome-009", "ref-modonome-010",
+    "ref-modonome-011", "ref-modonome-012", "ref-modonome-013", "ref-modonome-014", "ref-modonome-015",
+    "ref-modonome-016", "ref-modonome-017", "ref-modonome-018", "ref-modonome-019", "ref-modonome-020",
+})
+
+
+def reference_decision_to_record_dict(ref: FrozenReferenceDecision) -> dict[str, Any]:
+    """Convert FrozenReferenceDecision to the exact dictionary format used by reference corpus hashing."""
+    d = dict(ref.raw_record)
+    d["reference_decision_id"] = ref.reference_decision_id
+    d["repository"] = ref.repository
+    d["repository_commit_sha"] = ref.repository_commit_sha
+    d["source_file"] = ref.source_file
+    d["source_location"] = ref.source_location
+    d["raw_evidence"] = ref.raw_evidence
+    d["normalized_decision"] = ref.normalized_decision
+    d["classification"] = ref.classification
+    d["decision_domains"] = list(ref.decision_domains)
+    d["decision_purposes"] = list(ref.decision_purposes)
+    d["authority_status"] = ref.authority_status
+    d["authority_evidence"] = ref.authority_evidence
+    d["scopes"] = [dict(s) for s in ref.scopes]
+    d["lifecycle_status"] = ref.lifecycle_status
+    d["supersedes"] = ref.supersedes
+    d["superseded_by"] = ref.superseded_by
+    d["effective_date"] = ref.effective_date
+    d["expiration_if_any"] = ref.expiration_if_any
+    d["relationships"] = [dict(rel) for rel in ref.relationships]
+    d["enforcement_potential"] = ref.enforcement_potential
+    d["candidate_rule"] = ref.candidate_rule
+    d["sampling_category"] = ref.sampling_category
+    d["human_review_status"] = ref.human_review_status
+    d["human_notes"] = ref.human_notes
+    return d
+
+
+def compute_reference_corpus_hash_from_references(
+    references: Iterable[FrozenReferenceDecision],
+) -> str:
+    """Compute the deterministic reference-corpus content hash across supplied reference decisions."""
+    records = [reference_decision_to_record_dict(r) for r in references]
+    if not records:
+        return "none"
+    records.sort(key=lambda r: str(r["reference_decision_id"]))
+    canonical_json = json.dumps(records, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical_json.encode("utf-8")).hexdigest()[:32]
+
+
+def validate_frozen_reference_corpus(
+    references: list[FrozenReferenceDecision],
+) -> str:
+    """Validate that supplied reference decisions strictly match the frozen Batch 01 corpus fail-closed.
+
+    Enforces:
+    1. Exactly 100 reference decisions.
+    2. Candidate IDs exactly match the frozen 100 Batch 01 candidate ID set.
+    3. Content hash over the reference records exactly equals FROZEN_REFERENCE_CORPUS_HASH (0455bd66aae52551c35b37a63c2d185f).
+
+    Returns:
+        The verified reference corpus content hash.
+    """
+    if len(references) != 100:
+        raise ValueError(
+            f"Reference corpus count mismatch: expected exactly 100 reference decisions, got {len(references)}"
+        )
+
+    observed_ids = {r.reference_decision_id for r in references}
+    if len(observed_ids) != 100:
+        raise ValueError(
+            f"Reference decisions contain duplicates; expected 100 unique IDs, got {len(observed_ids)}"
+        )
+
+    if observed_ids != FROZEN_BATCH_01_REFERENCE_IDS:
+        missing = FROZEN_BATCH_01_REFERENCE_IDS - observed_ids
+        extra = observed_ids - FROZEN_BATCH_01_REFERENCE_IDS
+        errs = []
+        if missing:
+            errs.append(f"missing references: {sorted(missing)}")
+        if extra:
+            errs.append(f"unexpected references: {sorted(extra)}")
+        raise ValueError(f"Reference decisions candidate set mismatch: {'; '.join(errs)}")
+
+    computed_hash = compute_reference_corpus_hash_from_references(references)
+    if computed_hash != FROZEN_REFERENCE_CORPUS_HASH:
+        raise ValueError(
+            f"Reference corpus content hash mismatch: expected {FROZEN_REFERENCE_CORPUS_HASH!r}, "
+            f"computed {computed_hash!r}"
+        )
+
+    return computed_hash
 
 
 # ── Task Building & Validation ────────────────────────────────────────────────
@@ -824,7 +940,7 @@ def capture_treatment_run(
     """Execute treatment arm tasks and persist outcomes and provenance sidecar fail-closed.
 
     Invariants:
-    - Verifies reference corpus (len == 100).
+    - Strictly validates reference corpus before any task execution or file creation.
     - Refuses overwrite if output_dir contains existing outcomes.jsonl or provenance.json.
     - Executes exactly 100 relationship tasks in deterministic sorted order.
     - Captures valid results or explicit error/escalated results (never omits a task).
@@ -832,8 +948,9 @@ def capture_treatment_run(
     - Persists outcomes.jsonl and provenance.json.
     - Validates persisted provenance before returning.
     """
-    if len(references) != 100:
-        raise ValueError(f"Expected exactly 100 reference decisions, got {len(references)}")
+    # 1. Strictly validate the supplied reference corpus fail-closed before any execution or file creation
+    validate_frozen_reference_corpus(references)
+
     if arm not in (ARM_A_ID, ARM_B_ID):
         raise ValueError(f"Invalid treatment arm: {arm!r}. Must be {ARM_A_ID!r} or {ARM_B_ID!r}")
     if classifier.arm != arm:
@@ -842,7 +959,6 @@ def capture_treatment_run(
         )
 
     out_path = Path(output_dir)
-    out_path.mkdir(parents=True, exist_ok=True)
     outcomes_file = out_path / "outcomes.jsonl"
     provenance_file = out_path / "provenance.json"
 
@@ -850,6 +966,8 @@ def capture_treatment_run(
         raise FileExistsError(
             f"Treatment run directory already contains artifacts; refusing overwrite: {out_path}"
         )
+
+    out_path.mkdir(parents=True, exist_ok=True)
 
     effective_run_id = run_id or f"b-t1c-{arm}-{uuid.uuid4().hex[:12]}"
     tasks = build_batch_01_relationship_tasks(references)
@@ -1012,6 +1130,7 @@ def score_treatment_replay(
     the harness scoring authority, computing the B-T1C treatment composite score without
     altering frozen B0 constants.
     """
+    validate_frozen_reference_corpus(references)
     return score_stage_b_outcomes(mixed_outcomes, references, manifest)
 
 
@@ -1083,6 +1202,7 @@ def evaluate_treatment_diagnostics(
     arm: str = ARM_A_ID,
 ) -> TreatmentDiagnosticEvaluationResult:
     """Evaluate diagnostic metrics over treatment relationship outcomes reusing B-T1B authorities."""
+    validate_frozen_reference_corpus(references)
     if len(treatment_outcomes) != 100:
         raise ValueError(f"Expected 100 treatment outcomes, got {len(treatment_outcomes)}")
     if len(references) != 100:
