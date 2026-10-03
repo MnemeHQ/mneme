@@ -584,33 +584,85 @@ class TestBT1DSelectivityScaffold:
         with pytest.raises(FileExistsError, match="refusing overwrite"):
             capture_treatment_run(run_dir, adapter, v02_refs)
 
-    def test_27_capture_treatment_run_preserves_executed_at(self, tmp_path: Path):
-        """27. capture_treatment_run preserves executed_at timestamp from ClassifierResult."""
-        mock_client = MagicMock()
-        mock_block = MagicMock()
-        mock_block.text = json.dumps({"relationships": []})
-        mock_response = MagicMock()
-        mock_response.content = [mock_block]
-        mock_client.messages.create.return_value = mock_response
-
-        # Use mock client with custom executed_at via subclass for testing
+    def test_27_capture_treatment_run_preserves_executed_at(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+        """27. capture_treatment_run executes capture pipeline, preserving executed_at and provenance."""
+        run_dir = tmp_path / "treatment_d_test_run"
+        v02_refs = load_reference_corpus(V02_REF_DIR)
         test_timestamp = "2026-10-04T11:22:33Z"
-        adapter = TreatmentDClassifierAdapter(client=mock_client, live=False)
-        task = ClassifierTask(
-            candidate_id="cand-001",
-            task_type=ClassifierTaskType.RELATIONSHIPS,
-            raw_statement="statement",
-            source_context="context",
-            source_path="path.md",
-            source_location="L1",
-            repository_identifier="org/repo",
-            repository_commit_sha="abcd" * 10,
-            taxonomy_version="0.1",
+        mock_sha = "1234567890abcdef1234567890abcdef12345678"
+
+        # Monkeypatch git commit resolver to return a deterministic valid 40-char SHA
+        monkeypatch.setattr(
+            "mneme.open_architecture.stage_b_relationship_selectivity_experiment._get_git_commit_sha",
+            lambda: mock_sha,
         )
-        res = adapter.execute(task)
-        # Verify executed_at field exists on ClassifierResult
-        assert hasattr(res, "executed_at")
-        assert res.executed_at is not None
+
+        # Adapter configured for live capture without pre-supplied client
+        adapter = TreatmentDClassifierAdapter(live=True)
+        assert adapter._client is None
+
+        # Build deterministic mock results for all 100 references with known executed_at
+        mock_results = [
+            ClassifierResult(
+                candidate_id=ref.reference_decision_id,
+                task_type=ClassifierTaskType.RELATIONSHIPS,
+                backend_id=FROZEN_CLASSIFIER_BACKEND,
+                classifier_version=FROZEN_CLASSIFIER_VERSION,
+                model_identifier=FROZEN_MODEL_IDENTIFIER,
+                taxonomy_version=FROZEN_TAXONOMY_VERSION,
+                output={"relationships": []},
+                confidence=None,
+                latency_ms=123.45,
+                cost_amount=None,
+                cost_currency=None,
+                escalated=False,
+                executed_at=test_timestamp,
+                execution_id=f"exec-{ref.reference_decision_id}",
+            )
+            for ref in v02_refs
+        ]
+
+        # Monkeypatch adapter.execute_batch to return the 100 mock results without network calls
+        execute_batch_called = False
+
+        def mock_execute_batch(tasks):
+            nonlocal execute_batch_called
+            execute_batch_called = True
+            assert len(tasks) == 100
+            return mock_results
+
+        monkeypatch.setattr(adapter, "execute_batch", mock_execute_batch)
+
+        # Execute full capture pipeline
+        outcomes, sidecar = capture_treatment_run(run_dir, adapter, v02_refs)
+
+        # 1. Exactly 100 outcomes returned
+        assert len(outcomes) == 100
+        # 2. execute_batch was called and no real Anthropic/network call occurred
+        assert execute_batch_called is True
+        assert adapter._client is None
+
+        # 3. Each outcome created_at matches the supplied executed_at
+        for outcome in outcomes:
+            assert outcome.created_at == test_timestamp
+
+        # 4. Persisted artifacts reloaded through load_treatment_run
+        expected_ids = {r.reference_decision_id for r in v02_refs}
+        reloaded_outcomes, reloaded_sidecar = load_treatment_run(run_dir, expected_ids)
+
+        # 5. Reloaded timestamps still match
+        assert len(reloaded_outcomes) == 100
+        for r_outcome in reloaded_outcomes:
+            assert r_outcome.created_at == test_timestamp
+
+        # 6. Provenance validates
+        assert reloaded_sidecar.treatment_profile_hash == B_T1D_PROFILE_D_HASH
+        assert reloaded_sidecar.parent_main_sha == FROZEN_PARENT_MAIN_SHA
+        assert reloaded_sidecar.scoring_reference_corpus_hash == FROZEN_SCORING_REFERENCE_CORPUS_HASH
+
+        # 7. execution_mneme_commit_sha equals the mocked SHA
+        assert sidecar.execution_mneme_commit_sha == mock_sha
+        assert reloaded_sidecar.execution_mneme_commit_sha == mock_sha
 
     def test_28_execution_mneme_commit_sha_provenance(self):
         """28. Execution commit SHA is resolved, 40-character hex, and validated fail-closed."""
