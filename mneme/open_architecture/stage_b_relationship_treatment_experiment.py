@@ -51,7 +51,10 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import time
+import uuid
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -61,6 +64,11 @@ from mneme.open_architecture.classification import (
     ClassifierTaskType,
     SemanticClassifier,
     normalize_relationships,
+)
+from mneme.open_architecture.classifiers.anthropic import (
+    AnthropicClassifier,
+    AnthropicClassifierError,
+    AnthropicMalformedResponseError,
 )
 from mneme.open_architecture.harness import (
     FROZEN_BASELINE_CONFIG_HASH,
@@ -513,14 +521,20 @@ def compute_treatment_semantic_content_hash(
 
 def load_treatment_outcomes(
     path: Path | str,
+    expected_reference_ids: set[str] | list[str] | None = None,
 ) -> list[FrozenClassifierOutcome]:
     """Load and strictly validate treatment relationship outcomes from JSONL.
-    
+
     Fails closed if:
     - File does not exist.
     - Outcome count != 100.
     - Any outcome has task_type != ClassifierTaskType.RELATIONSHIPS.
+    - Any outcome has backend_id != 'anthropic'.
+    - Any outcome has classifier_version != '0.1'.
+    - Any outcome has model_identifier != 'claude-sonnet-4-6'.
+    - Any outcome has taxonomy_version != '0.1'.
     - Duplicate candidate_ids exist.
+    - Candidate IDs do not match expected_reference_ids (when provided).
     """
     p = Path(path)
     if not p.is_file():
@@ -539,6 +553,27 @@ def load_treatment_outcomes(
             raise ValueError(
                 f"Line {line_num}: Expected task_type 'relationships', got {t_type.value!r}"
             )
+        b_id = str(data.get("backend_id"))
+        if b_id != FROZEN_CLASSIFIER_BACKEND:
+            raise ValueError(
+                f"Line {line_num}: Expected backend_id {FROZEN_CLASSIFIER_BACKEND!r}, got {b_id!r}"
+            )
+        c_ver = str(data.get("classifier_version"))
+        if c_ver != FROZEN_CLASSIFIER_VERSION:
+            raise ValueError(
+                f"Line {line_num}: Expected classifier_version {FROZEN_CLASSIFIER_VERSION!r}, got {c_ver!r}"
+            )
+        m_id = str(data.get("model_identifier"))
+        if m_id != FROZEN_MODEL_IDENTIFIER:
+            raise ValueError(
+                f"Line {line_num}: Expected model_identifier {FROZEN_MODEL_IDENTIFIER!r}, got {m_id!r}"
+            )
+        tax_ver = str(data.get("taxonomy_version"))
+        if tax_ver != FROZEN_TAXONOMY_VERSION:
+            raise ValueError(
+                f"Line {line_num}: Expected taxonomy_version {FROZEN_TAXONOMY_VERSION!r}, got {tax_ver!r}"
+            )
+
         cand_id = str(data["candidate_id"])
         if cand_id in seen_ids:
             raise ValueError(f"Line {line_num}: Duplicate candidate_id {cand_id!r}")
@@ -550,8 +585,338 @@ def load_treatment_outcomes(
     if len(outcomes) != 100:
         raise ValueError(f"Expected exactly 100 treatment outcomes, got {len(outcomes)}")
 
+    if expected_reference_ids is not None:
+        expected_set = set(expected_reference_ids)
+        if seen_ids != expected_set:
+            missing = expected_set - seen_ids
+            extra = seen_ids - expected_set
+            errs = []
+            if missing:
+                errs.append(f"missing candidates: {sorted(missing)}")
+            if extra:
+                errs.append(f"unexpected candidates: {sorted(extra)}")
+            raise ValueError(f"Treatment outcome candidate set mismatch: {'; '.join(errs)}")
+
     outcomes.sort(key=lambda o: o.candidate_id)
     return outcomes
+
+
+# ── Provenance Sidecar & Validation ───────────────────────────────────────────
+
+@dataclass(frozen=True)
+class TreatmentProvenanceSidecar:
+    """Durable provenance sidecar bound to captured treatment outcomes."""
+
+    experiment_id: str
+    arm_id: str
+    treatment_profile_hash: str
+    parent_main_sha: str
+    baseline_id: str
+    baseline_configuration_hash: str
+    reference_corpus_hash: str
+    frozen_b0_semantic_hash: str
+    model_identifier: str
+    classifier_backend: str
+    classifier_version: str
+    taxonomy_version: str
+    max_tokens: int
+    timeout: float
+    max_retries: int
+    explicit_temperature: Any | None
+    expected_logical_task_count: int
+    actual_outcome_count: int
+    treatment_semantic_content_hash: str
+    created_at: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "actual_outcome_count": self.actual_outcome_count,
+            "arm_id": self.arm_id,
+            "baseline_configuration_hash": self.baseline_configuration_hash,
+            "baseline_id": self.baseline_id,
+            "classifier_backend": self.classifier_backend,
+            "classifier_version": self.classifier_version,
+            "created_at": self.created_at,
+            "expected_logical_task_count": self.expected_logical_task_count,
+            "experiment_id": self.experiment_id,
+            "explicit_temperature": self.explicit_temperature,
+            "frozen_b0_semantic_hash": self.frozen_b0_semantic_hash,
+            "max_retries": self.max_retries,
+            "max_tokens": self.max_tokens,
+            "model_identifier": self.model_identifier,
+            "parent_main_sha": self.parent_main_sha,
+            "reference_corpus_hash": self.reference_corpus_hash,
+            "taxonomy_version": self.taxonomy_version,
+            "timeout": self.timeout,
+            "treatment_profile_hash": self.treatment_profile_hash,
+            "treatment_semantic_content_hash": self.treatment_semantic_content_hash,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> TreatmentProvenanceSidecar:
+        return cls(
+            actual_outcome_count=int(data["actual_outcome_count"]),
+            arm_id=str(data["arm_id"]),
+            baseline_configuration_hash=str(data["baseline_configuration_hash"]),
+            baseline_id=str(data["baseline_id"]),
+            classifier_backend=str(data["classifier_backend"]),
+            classifier_version=str(data["classifier_version"]),
+            created_at=str(data["created_at"]),
+            expected_logical_task_count=int(data["expected_logical_task_count"]),
+            experiment_id=str(data["experiment_id"]),
+            explicit_temperature=data.get("explicit_temperature"),
+            frozen_b0_semantic_hash=str(data["frozen_b0_semantic_hash"]),
+            max_retries=int(data["max_retries"]),
+            max_tokens=int(data["max_tokens"]),
+            model_identifier=str(data["model_identifier"]),
+            parent_main_sha=str(data["parent_main_sha"]),
+            reference_corpus_hash=str(data["reference_corpus_hash"]),
+            taxonomy_version=str(data["taxonomy_version"]),
+            timeout=float(data["timeout"]),
+            treatment_profile_hash=str(data["treatment_profile_hash"]),
+            treatment_semantic_content_hash=str(data["treatment_semantic_content_hash"]),
+        )
+
+
+def validate_treatment_provenance(
+    sidecar: TreatmentProvenanceSidecar,
+    outcomes: list[FrozenClassifierOutcome],
+    expected_arm: str,
+    expected_reference_ids: set[str],
+) -> None:
+    """Validate treatment provenance sidecar against outcomes and frozen authorities fail-closed."""
+    if sidecar.experiment_id != EXPERIMENT_ID:
+        raise ValueError(
+            f"Provenance experiment_id mismatch: expected {EXPERIMENT_ID!r}, got {sidecar.experiment_id!r}"
+        )
+    if sidecar.arm_id != expected_arm:
+        raise ValueError(
+            f"Provenance arm_id mismatch: expected {expected_arm!r}, got {sidecar.arm_id!r}"
+        )
+    expected_profile_hash = (
+        B_T1C_PROFILE_A_HASH if expected_arm == ARM_A_ID else B_T1C_PROFILE_B_HASH
+    )
+    if sidecar.treatment_profile_hash != expected_profile_hash:
+        raise ValueError(
+            f"Provenance profile hash mismatch: expected {expected_profile_hash!r}, "
+            f"got {sidecar.treatment_profile_hash!r}"
+        )
+    if sidecar.parent_main_sha != FROZEN_PARENT_MAIN_SHA:
+        raise ValueError(
+            f"Provenance parent SHA mismatch: expected {FROZEN_PARENT_MAIN_SHA!r}, "
+            f"got {sidecar.parent_main_sha!r}"
+        )
+    if sidecar.baseline_id != FROZEN_BASELINE_ID:
+        raise ValueError(
+            f"Provenance baseline_id mismatch: expected {FROZEN_BASELINE_ID!r}, "
+            f"got {sidecar.baseline_id!r}"
+        )
+    if sidecar.baseline_configuration_hash != FROZEN_BASELINE_CONFIG_HASH:
+        raise ValueError(
+            f"Provenance baseline_config_hash mismatch: expected {FROZEN_BASELINE_CONFIG_HASH!r}, "
+            f"got {sidecar.baseline_configuration_hash!r}"
+        )
+    if sidecar.reference_corpus_hash != FROZEN_REFERENCE_CORPUS_HASH:
+        raise ValueError(
+            f"Provenance reference_corpus_hash mismatch: expected {FROZEN_REFERENCE_CORPUS_HASH!r}, "
+            f"got {sidecar.reference_corpus_hash!r}"
+        )
+    if sidecar.frozen_b0_semantic_hash != FROZEN_STAGE_B_SEMANTIC_CONTENT_HASH:
+        raise ValueError(
+            f"Provenance frozen_b0_semantic_hash mismatch: expected {FROZEN_STAGE_B_SEMANTIC_CONTENT_HASH!r}, "
+            f"got {sidecar.frozen_b0_semantic_hash!r}"
+        )
+    if sidecar.model_identifier != FROZEN_MODEL_IDENTIFIER:
+        raise ValueError(
+            f"Provenance model_identifier mismatch: expected {FROZEN_MODEL_IDENTIFIER!r}, "
+            f"got {sidecar.model_identifier!r}"
+        )
+    if sidecar.classifier_backend != FROZEN_CLASSIFIER_BACKEND:
+        raise ValueError(
+            f"Provenance classifier_backend mismatch: expected {FROZEN_CLASSIFIER_BACKEND!r}, "
+            f"got {sidecar.classifier_backend!r}"
+        )
+    if sidecar.classifier_version != FROZEN_CLASSIFIER_VERSION:
+        raise ValueError(
+            f"Provenance classifier_version mismatch: expected {FROZEN_CLASSIFIER_VERSION!r}, "
+            f"got {sidecar.classifier_version!r}"
+        )
+    if sidecar.taxonomy_version != FROZEN_TAXONOMY_VERSION:
+        raise ValueError(
+            f"Provenance taxonomy_version mismatch: expected {FROZEN_TAXONOMY_VERSION!r}, "
+            f"got {sidecar.taxonomy_version!r}"
+        )
+    if sidecar.max_tokens != FROZEN_MAX_TOKENS:
+        raise ValueError(
+            f"Provenance max_tokens mismatch: expected {FROZEN_MAX_TOKENS}, got {sidecar.max_tokens}"
+        )
+    if sidecar.timeout != FROZEN_TIMEOUT_SECONDS:
+        raise ValueError(
+            f"Provenance timeout mismatch: expected {FROZEN_TIMEOUT_SECONDS}, got {sidecar.timeout}"
+        )
+    if sidecar.max_retries != FROZEN_MAX_RETRIES:
+        raise ValueError(
+            f"Provenance max_retries mismatch: expected {FROZEN_MAX_RETRIES}, got {sidecar.max_retries}"
+        )
+    if sidecar.explicit_temperature is not None:
+        raise ValueError(
+            f"Provenance explicit_temperature must be None, got {sidecar.explicit_temperature!r}"
+        )
+    if sidecar.expected_logical_task_count != 100:
+        raise ValueError(
+            f"Provenance expected_logical_task_count mismatch: expected 100, got {sidecar.expected_logical_task_count}"
+        )
+    if sidecar.actual_outcome_count != len(outcomes) or len(outcomes) != 100:
+        raise ValueError(
+            f"Provenance outcome count mismatch: expected 100, got {sidecar.actual_outcome_count} (outcomes: {len(outcomes)})"
+        )
+    computed_hash = compute_treatment_semantic_content_hash(outcomes)
+    if sidecar.treatment_semantic_content_hash != computed_hash:
+        raise ValueError(
+            f"Provenance semantic content hash mismatch: expected {sidecar.treatment_semantic_content_hash!r}, "
+            f"computed {computed_hash!r}"
+        )
+    observed_ids = {o.candidate_id for o in outcomes}
+    if observed_ids != expected_reference_ids:
+        missing = expected_reference_ids - observed_ids
+        extra = observed_ids - expected_reference_ids
+        errs = []
+        if missing:
+            errs.append(f"missing candidates: {sorted(missing)}")
+        if extra:
+            errs.append(f"unexpected candidates: {sorted(extra)}")
+        raise ValueError(f"Provenance candidate set mismatch: {'; '.join(errs)}")
+
+
+def load_treatment_run(
+    run_dir: Path | str,
+    expected_arm: str,
+    expected_reference_ids: set[str] | list[str],
+) -> tuple[list[FrozenClassifierOutcome], TreatmentProvenanceSidecar]:
+    """Load and validate captured treatment outcomes and provenance sidecar from run directory."""
+    rd = Path(run_dir)
+    outcomes_file = rd / "outcomes.jsonl"
+    provenance_file = rd / "provenance.json"
+
+    if not outcomes_file.is_file():
+        raise FileNotFoundError(f"Outcomes file not found in run directory: {outcomes_file}")
+    if not provenance_file.is_file():
+        raise FileNotFoundError(f"Provenance file not found in run directory: {provenance_file}")
+
+    expected_set = set(expected_reference_ids)
+    outcomes = load_treatment_outcomes(outcomes_file, expected_reference_ids=expected_set)
+    sidecar_data = json.loads(provenance_file.read_text(encoding="utf-8"))
+    sidecar = TreatmentProvenanceSidecar.from_dict(sidecar_data)
+    validate_treatment_provenance(sidecar, outcomes, expected_arm, expected_set)
+    return outcomes, sidecar
+
+
+# ── Live Capture Scaffold (Pre-execution Authority) ───────────────────────────
+
+def capture_treatment_run(
+    output_dir: Path | str,
+    arm: str,
+    classifier: TreatmentClassifierAdapter,
+    references: list[FrozenReferenceDecision],
+    *,
+    run_id: str | None = None,
+) -> tuple[list[FrozenClassifierOutcome], TreatmentProvenanceSidecar]:
+    """Execute treatment arm tasks and persist outcomes and provenance sidecar fail-closed.
+
+    Invariants:
+    - Verifies reference corpus (len == 100).
+    - Refuses overwrite if output_dir contains existing outcomes.jsonl or provenance.json.
+    - Executes exactly 100 relationship tasks in deterministic sorted order.
+    - Captures valid results or explicit error/escalated results (never omits a task).
+    - Preserves actual runtime execution metadata (latency, timestamp, execution_id).
+    - Persists outcomes.jsonl and provenance.json.
+    - Validates persisted provenance before returning.
+    """
+    if len(references) != 100:
+        raise ValueError(f"Expected exactly 100 reference decisions, got {len(references)}")
+    if arm not in (ARM_A_ID, ARM_B_ID):
+        raise ValueError(f"Invalid treatment arm: {arm!r}. Must be {ARM_A_ID!r} or {ARM_B_ID!r}")
+    if classifier.arm != arm:
+        raise ValueError(
+            f"Classifier arm mismatch: classifier configured for {classifier.arm!r}, capture requested {arm!r}"
+        )
+
+    out_path = Path(output_dir)
+    out_path.mkdir(parents=True, exist_ok=True)
+    outcomes_file = out_path / "outcomes.jsonl"
+    provenance_file = out_path / "provenance.json"
+
+    if outcomes_file.exists() or provenance_file.exists():
+        raise FileExistsError(
+            f"Treatment run directory already contains artifacts; refusing overwrite: {out_path}"
+        )
+
+    effective_run_id = run_id or f"b-t1c-{arm}-{uuid.uuid4().hex[:12]}"
+    tasks = build_batch_01_relationship_tasks(references)
+    tasks.sort(key=lambda t: t.candidate_id)
+
+    results = classifier.execute_batch(tasks)
+    if len(results) != 100:
+        raise RuntimeError(f"Expected 100 execution results, got {len(results)}")
+
+    outcomes: list[FrozenClassifierOutcome] = []
+    for r in results:
+        outcome = FrozenClassifierOutcome(
+            candidate_id=r.candidate_id,
+            task_type=r.task_type,
+            backend_id=r.backend_id,
+            classifier_version=r.classifier_version,
+            model_identifier=r.model_identifier,
+            taxonomy_version=r.taxonomy_version,
+            run_id=effective_run_id,
+            execution_id=r.execution_id or f"exec-{uuid.uuid4().hex[:12]}",
+            output=r.output,
+            confidence=r.confidence,
+            latency_ms=r.latency_ms,
+            cost_amount=r.cost_amount,
+            cost_currency=r.cost_currency,
+            escalated=r.escalated,
+            created_at=r.executed_at or datetime.now(timezone.utc).isoformat(),
+        )
+        outcomes.append(outcome)
+
+    semantic_hash = compute_treatment_semantic_content_hash(outcomes)
+    profile_hash = B_T1C_PROFILE_A_HASH if arm == ARM_A_ID else B_T1C_PROFILE_B_HASH
+
+    sidecar = TreatmentProvenanceSidecar(
+        actual_outcome_count=len(outcomes),
+        arm_id=arm,
+        baseline_configuration_hash=FROZEN_BASELINE_CONFIG_HASH,
+        baseline_id=FROZEN_BASELINE_ID,
+        classifier_backend=FROZEN_CLASSIFIER_BACKEND,
+        classifier_version=FROZEN_CLASSIFIER_VERSION,
+        created_at=datetime.now(timezone.utc).isoformat(),
+        expected_logical_task_count=100,
+        experiment_id=EXPERIMENT_ID,
+        explicit_temperature=None,
+        frozen_b0_semantic_hash=FROZEN_STAGE_B_SEMANTIC_CONTENT_HASH,
+        max_retries=FROZEN_MAX_RETRIES,
+        max_tokens=FROZEN_MAX_TOKENS,
+        model_identifier=FROZEN_MODEL_IDENTIFIER,
+        parent_main_sha=FROZEN_PARENT_MAIN_SHA,
+        reference_corpus_hash=FROZEN_REFERENCE_CORPUS_HASH,
+        taxonomy_version=FROZEN_TAXONOMY_VERSION,
+        timeout=FROZEN_TIMEOUT_SECONDS,
+        treatment_profile_hash=profile_hash,
+        treatment_semantic_content_hash=semantic_hash,
+    )
+
+    lines = [json.dumps(o.to_dict(), sort_keys=True) for o in outcomes]
+    outcomes_file.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    provenance_file.write_text(
+        json.dumps(sidecar.to_dict(), indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    ref_ids = {r.reference_decision_id for r in references}
+    validate_treatment_provenance(sidecar, outcomes, arm, ref_ids)
+    return outcomes, sidecar
 
 
 # ── Mixed 800-Outcome Replay & Scoring Authority Delegation ───────────────────
@@ -560,15 +925,41 @@ def build_mixed_stage_b_outcomes(
     frozen_b0_outcomes: list[FrozenClassifierOutcome],
     treatment_outcomes: list[FrozenClassifierOutcome],
 ) -> list[FrozenClassifierOutcome]:
-    """Combine 700 frozen B0 outcomes for tasks 1-6 & 8 with 100 treatment outcomes for task 7."""
+    """Combine 700 frozen B0 outcomes for tasks 1-6 & 8 with 100 treatment outcomes for task 7.
+
+    Guarantees exact 1:1 replacement over the 100 candidate IDs:
+    - Frozen B0 must contain exactly 100 relationship outcomes and 700 non-relationship outcomes.
+    - Treatment outcomes must contain exactly 100 relationship outcomes.
+    - Treatment candidate IDs must match the B0 relationship candidate IDs exactly (no missing, no extra).
+    - Result contains exactly 800 outcomes.
+    """
+    if len(frozen_b0_outcomes) != 800:
+        raise ValueError(f"Expected exactly 800 frozen B0 outcomes, got {len(frozen_b0_outcomes)}")
+
     untouched_b0 = [
         o for o in frozen_b0_outcomes
         if o.task_type != ClassifierTaskType.RELATIONSHIPS
     ]
+    b0_relationships = [
+        o for o in frozen_b0_outcomes
+        if o.task_type == ClassifierTaskType.RELATIONSHIPS
+    ]
+
     if len(untouched_b0) != 700:
         raise ValueError(
             f"Expected exactly 700 untouched B0 outcomes for non-relationship tasks, "
             f"got {len(untouched_b0)}"
+        )
+    if len(b0_relationships) != 100:
+        raise ValueError(
+            f"Expected exactly 100 B0 relationship outcomes to be replaced, "
+            f"got {len(b0_relationships)}"
+        )
+
+    b0_rel_candidates = {o.candidate_id for o in b0_relationships}
+    if len(b0_rel_candidates) != 100:
+        raise ValueError(
+            f"Expected 100 unique candidate IDs in B0 relationships, got {len(b0_rel_candidates)}"
         )
 
     if len(treatment_outcomes) != 100:
@@ -577,11 +968,30 @@ def build_mixed_stage_b_outcomes(
             f"got {len(treatment_outcomes)}"
         )
 
+    treatment_candidates: set[str] = set()
     for o in treatment_outcomes:
         if o.task_type != ClassifierTaskType.RELATIONSHIPS:
             raise ValueError(
                 f"Treatment outcome {o.candidate_id} has invalid task_type {o.task_type.value!r}"
             )
+        treatment_candidates.add(o.candidate_id)
+
+    if len(treatment_candidates) != 100:
+        raise ValueError(
+            f"Treatment outcomes contain duplicate candidate IDs; expected 100 unique, got {len(treatment_candidates)}"
+        )
+
+    missing = b0_rel_candidates - treatment_candidates
+    extra = treatment_candidates - b0_rel_candidates
+    if missing or extra:
+        errs = []
+        if missing:
+            errs.append(f"missing candidates: {sorted(missing)}")
+        if extra:
+            errs.append(f"extra candidates: {sorted(extra)}")
+        raise ValueError(
+            f"Treatment candidate IDs do not match B0 relationship candidates: {'; '.join(errs)}"
+        )
 
     mixed = untouched_b0 + treatment_outcomes
     if len(mixed) != 800:
@@ -898,19 +1308,21 @@ def evaluate_treatment_diagnostics(
 
 # ── Treatment Classifier Adapter ──────────────────────────────────────────────
 
-class TreatmentClassifierAdapter:
-    """Research adapter for executing B-T1C treatment tasks without mutating frozen B0.
-    
-    Guarantees:
-    - Fails closed if invoked with any task other than ClassifierTaskType.RELATIONSHIPS.
-    - Zero live model calls unless explicitly authorized with a real client and live execution flag.
+class TreatmentClassifierAdapter(AnthropicClassifier):
+    """Research adapter for executing B-T1C treatment tasks, subclassing AnthropicClassifier.
+
+    Inherits all validated Anthropic client construction, API-key handling, timeout, retry,
+    response text extraction, JSON parsing, JSON Schema validation, and latency timing from
+    AnthropicClassifier without duplicating them.
+
+    Overrides:
+    - Task guard: relationship-only tasks.
+    - System prompt: treatment system prompt.
+    - Request payload: treatment request payload with treatment schema.
+    - get_task_schema: returns treatment schema.
+    - Disabled by default (live=False) unless explicit live authorization is provided.
     - Accepts fake/static client for test verification.
     """
-
-    backend_id: str = FROZEN_CLASSIFIER_BACKEND
-    classifier_version: str = FROZEN_CLASSIFIER_VERSION
-    model_identifier: str | None = FROZEN_MODEL_IDENTIFIER
-    taxonomy_version: str = FROZEN_TAXONOMY_VERSION
 
     def __init__(
         self,
@@ -924,18 +1336,44 @@ class TreatmentClassifierAdapter:
     ) -> None:
         if arm not in (ARM_A_ID, ARM_B_ID):
             raise ValueError(f"Invalid treatment arm: {arm!r}. Must be {ARM_A_ID!r} or {ARM_B_ID!r}")
+        super().__init__(
+            model_identifier=FROZEN_MODEL_IDENTIFIER,
+            classifier_version=FROZEN_CLASSIFIER_VERSION,
+            api_key=api_key,
+            max_tokens=FROZEN_MAX_TOKENS,
+            timeout=timeout,
+            max_retries=max_retries,
+            client=client,
+        )
         self._arm = arm
-        self._api_key = api_key
-        self._timeout = timeout
-        self._max_retries = max_retries
-        self._client = client
         self._live = live
 
     @property
     def arm(self) -> str:
         return self._arm
 
-    def build_payload(self, task: ClassifierTask) -> dict[str, Any]:
+    def get_task_schema(self, task_type: ClassifierTaskType) -> dict[str, Any]:
+        if task_type != ClassifierTaskType.RELATIONSHIPS:
+            raise ValueError(
+                f"Treatment classifier only permits ClassifierTaskType.RELATIONSHIPS, "
+                f"got {task_type.value!r}"
+            )
+        return ARM_A_RELATIONSHIPS_SCHEMA if self._arm == ARM_A_ID else ARM_B_RELATIONSHIPS_SCHEMA
+
+    def build_system_prompt(self, task: ClassifierTask) -> str:
+        if task.task_type != ClassifierTaskType.RELATIONSHIPS:
+            raise ValueError(
+                f"Treatment classifier only permits ClassifierTaskType.RELATIONSHIPS, "
+                f"got {task.task_type.value!r}"
+            )
+        return build_treatment_system_prompt(task, self._arm)
+
+    def build_request_payload(self, task: ClassifierTask) -> dict[str, Any]:
+        if task.task_type != ClassifierTaskType.RELATIONSHIPS:
+            raise ValueError(
+                f"Treatment classifier only permits ClassifierTaskType.RELATIONSHIPS, "
+                f"got {task.task_type.value!r}"
+            )
         return build_treatment_request_payload(task, self._arm)
 
     def execute(self, task: ClassifierTask) -> ClassifierResult:
@@ -951,36 +1389,28 @@ class TreatmentClassifierAdapter:
                 "Live model/API calls are strictly prohibited in this phase."
             )
 
-        payload = self.build_payload(task)
-
-        # Delegate to injected client (mock in tests, Anthropic Messages API in future live runs)
-        response = self._client.messages.create(**payload)
-        output = getattr(response, "parsed_output", None)
-        if output is None:
-            if hasattr(response, "content") and response.content:
-                text = response.content[0].text
-                output = json.loads(text)
-            elif isinstance(response, dict) and "output" in response:
-                output = response["output"]
-            else:
-                output = {"relationships": []}
-
-        return ClassifierResult(
-            task_type=task.task_type,
-            backend_id=self.backend_id,
-            classifier_version=self.classifier_version,
-            model_identifier=self.model_identifier,
-            taxonomy_version=self.taxonomy_version,
-            candidate_id=task.candidate_id,
-            output=output,
-            confidence=None,
-            latency_ms=None,
-            cost_amount=None,
-            cost_currency=None,
-            escalated=False,
-            executed_at="treatment-execution",
-            execution_id=f"exec-{task.candidate_id}",
-        )
+        return super().execute(task)
 
     def execute_batch(self, tasks: list[ClassifierTask]) -> list[ClassifierResult]:
-        return [self.execute(t) for t in tasks]
+        results: list[ClassifierResult] = []
+        for task in tasks:
+            start = time.perf_counter()
+            try:
+                result = self.execute(task)
+            except Exception as exc:
+                result = ClassifierResult(
+                    task_type=task.task_type,
+                    backend_id=self.backend_id,
+                    classifier_version=self.classifier_version,
+                    model_identifier=self.model_identifier,
+                    taxonomy_version=task.taxonomy_version,
+                    candidate_id=task.candidate_id,
+                    output={"error": str(exc)},
+                    confidence=0.0,
+                    latency_ms=(time.perf_counter() - start) * 1000.0,
+                    cost_amount=None,
+                    cost_currency=None,
+                    escalated=True,
+                )
+            results.append(result)
+        return results

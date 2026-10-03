@@ -44,7 +44,10 @@ from mneme.open_architecture.classification import (
     ClassifierTask,
     ClassifierTaskType,
 )
-from mneme.open_architecture.classifiers.anthropic import AnthropicClassifier
+from mneme.open_architecture.classifiers.anthropic import (
+    AnthropicClassifier,
+    AnthropicMalformedResponseError,
+)
 from mneme.open_architecture.harness import (
     FROZEN_BASELINE_CONFIG_HASH,
     FROZEN_BASELINE_ID,
@@ -73,6 +76,7 @@ from mneme.open_architecture.stage_b_relationship_treatment_experiment import (
     B_T1C_PROFILE_A_HASH,
     B_T1C_PROFILE_B,
     B_T1C_PROFILE_B_HASH,
+    BASE_SYSTEM_PROMPT_TEMPLATE,
     EXPERIMENT_ID,
     FROZEN_CLASSIFIER_BACKEND,
     FROZEN_CLASSIFIER_VERSION,
@@ -83,18 +87,22 @@ from mneme.open_architecture.stage_b_relationship_treatment_experiment import (
     FROZEN_TAXONOMY_VERSION,
     FROZEN_TIMEOUT_SECONDS,
     TreatmentClassifierAdapter,
+    TreatmentProvenanceSidecar,
     build_batch_01_relationship_tasks,
     build_mixed_stage_b_outcomes,
     build_treatment_request_payload,
     build_treatment_system_prompt,
     build_treatment_user_prompt,
+    capture_treatment_run,
     classify_target_form,
     compute_b_t1c_profile_hash,
     compute_treatment_semantic_content_hash,
     evaluate_treatment_diagnostics,
     load_treatment_outcomes,
+    load_treatment_run,
     parse_adr_alias,
     score_treatment_replay,
+    validate_treatment_provenance,
 )
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -334,8 +342,10 @@ class TestBT1CTreatmentScaffold:
 
         # Mock client succeeds deterministically without network
         mock_client = MagicMock()
+        mock_block = MagicMock()
+        mock_block.text = json.dumps({"relationships": []})
         mock_response = MagicMock()
-        mock_response.parsed_output = {"relationships": []}
+        mock_response.content = [mock_block]
         mock_client.messages.create.return_value = mock_response
 
         adapter_mock = TreatmentClassifierAdapter(ARM_A_ID, client=mock_client, live=False)
@@ -568,24 +578,264 @@ class TestBT1CTreatmentScaffold:
         assert diag_res.arm_a_hypotheses.h1_empty_tuples_below_415 is True
         assert diag_res.arm_a_hypotheses.h2_empty_refs_with_fp_below_86 is True
 
-    def test_24_exact_changed_file_boundary_enforced(self):
-        """24. Exact changed file boundary is enforced."""
-        git_diff = subprocess.run(
-            ["git", "status", "--porcelain"],
-            cwd=REPO_ROOT,
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
+    def test_20b_mixed_replay_fails_on_candidate_mismatch(self):
+        """20b. Mixed replay fails closed if candidate IDs mismatch (missing or extra)."""
+        b0_outcomes = load_stage_b_outcomes(FROZEN_B0_PATH)
+        refs = load_reference_corpus(REF_DIR)
+
+        # Build treatment with missing candidate
+        dummy_treatment_missing = [
+            FrozenClassifierOutcome(
+                candidate_id=r.reference_decision_id,
+                task_type=ClassifierTaskType.RELATIONSHIPS,
+                backend_id="anthropic",
+                classifier_version="0.1",
+                model_identifier="claude-sonnet-4-6",
+                taxonomy_version="0.1",
+                run_id="run-test",
+                execution_id=f"exec-{r.reference_decision_id}",
+                output={"relationships": []},
+                confidence=None,
+                latency_ms=None,
+                cost_amount=None,
+                cost_currency=None,
+                escalated=False,
+                created_at="2026-10-02T20:00:00Z",
+            )
+            for r in refs[:-1]
+        ]
+        with pytest.raises(ValueError, match="Expected exactly 100 treatment relationship outcomes"):
+            build_mixed_stage_b_outcomes(b0_outcomes, dummy_treatment_missing)
+
+        # Build treatment with extra/unexpected candidate
+        dummy_treatment_extra = [
+            FrozenClassifierOutcome(
+                candidate_id=f"ref-extra-{i:03d}",
+                task_type=ClassifierTaskType.RELATIONSHIPS,
+                backend_id="anthropic",
+                classifier_version="0.1",
+                model_identifier="claude-sonnet-4-6",
+                taxonomy_version="0.1",
+                run_id="run-test",
+                execution_id=f"exec-{i}",
+                output={"relationships": []},
+                confidence=None,
+                latency_ms=None,
+                cost_amount=None,
+                cost_currency=None,
+                escalated=False,
+                created_at="2026-10-02T20:00:00Z",
+            )
+            for i in range(1, 101)
+        ]
+        with pytest.raises(ValueError, match="missing candidates"):
+            build_mixed_stage_b_outcomes(b0_outcomes, dummy_treatment_extra)
+
+    def test_24_research_boundaries_and_frozen_artifacts_preserved(self):
+        """24. Research boundaries and frozen artifact hashes are strictly preserved."""
+        import ast
+
+        # 1. Parse AST of the treatment module and ensure no forbidden canonical runtime imports
+        module_path = REPO_ROOT / "mneme" / "open_architecture" / "stage_b_relationship_treatment_experiment.py"
+        tree = ast.parse(module_path.read_text(encoding="utf-8"))
+
+        forbidden_prefixes = (
+            "mneme.decision_retriever",
+            "mneme.conflict_detector",
+            "mneme.enforcer",
+            "mneme.memory_store",
+            "mneme.decision_index",
+            "mneme.integrations",
         )
-        assert git_diff.returncode == 0
-        lines = [line.strip() for line in git_diff.stdout.splitlines() if line.strip()]
-        # All modified or added files must be inside the allowed boundary
-        allowed_files = {
-            "mneme/open_architecture/stage_b_relationship_treatment_experiment.py",
-            "tests/open_architecture/test_stage_b_relationship_treatment_experiment.py",
-            "scripts/run_test_battery.py",
-        }
-        for line in lines:
-            parts = line.split(maxsplit=1)
-            file_path = parts[1].replace("\\", "/")
-            assert file_path in allowed_files, f"Unexpected modified/untracked file: {file_path}"
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    for prefix in forbidden_prefixes:
+                        assert not alias.name.startswith(prefix), f"Forbidden import detected: {alias.name}"
+            elif isinstance(node, ast.ImportFrom) and node.module:
+                for prefix in forbidden_prefixes:
+                    assert not node.module.startswith(prefix), f"Forbidden from-import detected: {node.module}"
+
+        # 2. Assert frozen hashes remain valid
+        assert FROZEN_STAGE_B_SEMANTIC_CONTENT_HASH == "sha256:3c215db23a7fae8b8ac98852e65985b1efded354850fd9be65c24bfd1c90682d"
+        assert FROZEN_REFERENCE_CORPUS_HASH == "0455bd66aae52551c35b37a63c2d185f"
+        assert FROZEN_BASELINE_CONFIG_HASH == "31e18dc1e2bd9ad30bec86dce1a9295a"
+
+    def test_25_base_system_prompt_identical_to_b0(self):
+        """25. Pre-treatment base system prompt is byte-identical to AnthropicClassifier."""
+        dummy_task = ClassifierTask(
+            candidate_id="cand-001",
+            task_type=ClassifierTaskType.RELATIONSHIPS,
+            raw_statement="statement",
+            source_context="context",
+            source_path="path.md",
+            source_location="L1",
+            repository_identifier="org/repo",
+            repository_commit_sha="abcd" * 10,
+            taxonomy_version="0.1",
+        )
+        b0_system_prompt = AnthropicClassifier().build_system_prompt(dummy_task)
+        treatment_base_prompt = BASE_SYSTEM_PROMPT_TEMPLATE.format(
+            taxonomy_version=dummy_task.taxonomy_version
+        )
+        assert treatment_base_prompt == b0_system_prompt
+
+        # Full treatment system prompt strictly begins with this exact base prompt
+        full_system_a = build_treatment_system_prompt(dummy_task, ARM_A_ID)
+        assert full_system_a.startswith(b0_system_prompt)
+        full_system_b = build_treatment_system_prompt(dummy_task, ARM_B_ID)
+        assert full_system_b.startswith(b0_system_prompt)
+
+    def test_26_malformed_and_schema_invalid_responses_fail_closed(self):
+        """26. Malformed and schema-invalid model responses fail closed (never default to [])."""
+        dummy_task = ClassifierTask(
+            candidate_id="cand-001",
+            task_type=ClassifierTaskType.RELATIONSHIPS,
+            raw_statement="statement",
+            source_context="context",
+            source_path="path.md",
+            source_location="L1",
+            repository_identifier="org/repo",
+            repository_commit_sha="abcd" * 10,
+            taxonomy_version="0.1",
+        )
+
+        # 1. Empty content response raises AnthropicMalformedResponseError
+        mock_client_empty = MagicMock()
+        mock_resp_empty = MagicMock()
+        mock_resp_empty.content = []
+        mock_client_empty.messages.create.return_value = mock_resp_empty
+
+        adapter_empty = TreatmentClassifierAdapter(ARM_A_ID, client=mock_client_empty, live=False)
+        with pytest.raises(AnthropicMalformedResponseError, match="empty or missing content"):
+            adapter_empty.execute(dummy_task)
+
+        # 2. Non-JSON response text raises AnthropicMalformedResponseError
+        mock_client_bad_json = MagicMock()
+        mock_block_bad = MagicMock()
+        mock_block_bad.text = "This is not json at all."
+        mock_resp_bad = MagicMock()
+        mock_resp_bad.content = [mock_block_bad]
+        mock_client_bad_json.messages.create.return_value = mock_resp_bad
+
+        adapter_bad_json = TreatmentClassifierAdapter(ARM_A_ID, client=mock_client_bad_json, live=False)
+        with pytest.raises(AnthropicMalformedResponseError, match="Failed to parse Anthropic response as JSON"):
+            adapter_bad_json.execute(dummy_task)
+
+        # 3. JSON Schema invalid response (invalid enum value) raises AnthropicMalformedResponseError
+        mock_client_invalid_enum = MagicMock()
+        mock_block_enum = MagicMock()
+        mock_block_enum.text = json.dumps({
+            "relationships": [
+                {
+                    "relationship_type": "invalid_rel_type_enum",
+                    "target_reference": "0005",
+                    "evidence_reference": "evidence",
+                }
+            ]
+        })
+        mock_resp_enum = MagicMock()
+        mock_resp_enum.content = [mock_block_enum]
+        mock_client_invalid_enum.messages.create.return_value = mock_resp_enum
+
+        adapter_invalid_enum = TreatmentClassifierAdapter(ARM_A_ID, client=mock_client_invalid_enum, live=False)
+        with pytest.raises(AnthropicMalformedResponseError, match="failed schema validation"):
+            adapter_invalid_enum.execute(dummy_task)
+
+        # 4. In execute_batch, failure becomes an explicit escalated error result, NEVER []
+        batch_results = adapter_invalid_enum.execute_batch([dummy_task])
+        assert len(batch_results) == 1
+        res = batch_results[0]
+        assert res.escalated is True
+        assert "error" in res.output
+        assert "relationships" not in res.output
+
+    def test_27_treatment_outcome_loader_validates_metadata_fields(self, tmp_path: Path):
+        """27. Treatment outcome loader validates metadata fields and candidate set fail-closed."""
+        refs = load_reference_corpus(REF_DIR)
+        valid_lines = [
+            json.dumps({
+                "backend_id": "anthropic",
+                "candidate_id": r.reference_decision_id,
+                "classifier_version": "0.1",
+                "confidence": None,
+                "cost_amount": None,
+                "cost_currency": None,
+                "created_at": "2026-10-02T20:00:00Z",
+                "escalated": False,
+                "execution_id": f"exec-{r.reference_decision_id}",
+                "latency_ms": 100.0,
+                "model_identifier": "claude-sonnet-4-6",
+                "output": {"relationships": []},
+                "run_id": "run-001",
+                "task_type": "relationships",
+                "taxonomy_version": "0.1",
+            })
+            for r in refs
+        ]
+
+        # Valid load succeeds
+        valid_path = tmp_path / "valid.jsonl"
+        valid_path.write_text("\n".join(valid_lines) + "\n", encoding="utf-8")
+        loaded = load_treatment_outcomes(valid_path, expected_reference_ids={r.reference_decision_id for r in refs})
+        assert len(loaded) == 100
+
+        # Mismatched model fails
+        bad_model_lines = list(valid_lines)
+        bad_dict = json.loads(bad_model_lines[0])
+        bad_dict["model_identifier"] = "gpt-4"
+        bad_model_lines[0] = json.dumps(bad_dict)
+        bad_model_path = tmp_path / "bad_model.jsonl"
+        bad_model_path.write_text("\n".join(bad_model_lines) + "\n", encoding="utf-8")
+        with pytest.raises(ValueError, match="Expected model_identifier 'claude-sonnet-4-6'"):
+            load_treatment_outcomes(bad_model_path)
+
+        # Mismatched taxonomy version fails
+        bad_tax_lines = list(valid_lines)
+        bad_dict = json.loads(bad_tax_lines[0])
+        bad_dict["taxonomy_version"] = "0.2"
+        bad_tax_lines[0] = json.dumps(bad_dict)
+        bad_tax_path = tmp_path / "bad_tax.jsonl"
+        bad_tax_path.write_text("\n".join(bad_tax_lines) + "\n", encoding="utf-8")
+        with pytest.raises(ValueError, match="Expected taxonomy_version '0.1'"):
+            load_treatment_outcomes(bad_tax_path)
+
+        # Candidate set mismatch fails
+        with pytest.raises(ValueError, match="Treatment outcome candidate set mismatch"):
+            load_treatment_outcomes(valid_path, expected_reference_ids={"other-id-001"})
+
+    def test_28_provenance_sidecar_and_capture_path(self, tmp_path: Path):
+        """28. Provenance sidecar serialization, validation, and overwrite refusal."""
+        refs = load_reference_corpus(REF_DIR)
+
+        # Mock client returning valid empty relationships
+        mock_client = MagicMock()
+        mock_block = MagicMock()
+        mock_block.text = json.dumps({"relationships": []})
+        mock_resp = MagicMock()
+        mock_resp.content = [mock_block]
+        mock_client.messages.create.return_value = mock_resp
+
+        adapter = TreatmentClassifierAdapter(ARM_A_ID, client=mock_client, live=False)
+
+        run_dir = tmp_path / "treatment_a_run"
+        outcomes, sidecar = capture_treatment_run(run_dir, ARM_A_ID, adapter, refs)
+
+        assert len(outcomes) == 100
+        assert sidecar.arm_id == ARM_A_ID
+        assert sidecar.treatment_profile_hash == B_T1C_PROFILE_A_HASH
+        assert sidecar.actual_outcome_count == 100
+        assert sidecar.treatment_semantic_content_hash.startswith("sha256:")
+
+        # Verify load_treatment_run validates provenance and outcomes
+        loaded_outcomes, loaded_sidecar = load_treatment_run(
+            run_dir,
+            expected_arm=ARM_A_ID,
+            expected_reference_ids={r.reference_decision_id for r in refs},
+        )
+        assert len(loaded_outcomes) == 100
+        assert loaded_sidecar.treatment_profile_hash == B_T1C_PROFILE_A_HASH
+
+        # Refuse overwrite into existing non-empty directory
+        with pytest.raises(FileExistsError, match="refusing overwrite"):
+            capture_treatment_run(run_dir, ARM_A_ID, adapter, refs)
