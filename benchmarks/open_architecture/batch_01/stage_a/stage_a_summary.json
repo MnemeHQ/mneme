@@ -3,7 +3,7 @@
     "macro_f1": 0.16232962158801395,
     "macro_precision": 0.1276030877012214,
     "macro_recall": 0.85,
-    "total_discovered_documents": 688,
+    "total_discovered_documents": 687,
     "total_extracted_candidates": 5459,
     "total_matched_candidates": 256,
     "total_matched_references": 85,
@@ -127,7 +127,7 @@
       "unmatched_reference_ids": []
     },
     "helix": {
-      "discovered_documents_count": 140,
+      "discovered_documents_count": 139,
       "extracted_candidates_count": 978,
       "f1": 0.18384401114206125,
       "matched_candidate_count": 99,
