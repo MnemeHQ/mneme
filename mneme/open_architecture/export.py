@@ -130,6 +130,37 @@ def import_scenarios_jsonl(input_path: str | Path) -> list[ApplicabilityScenario
 # ── Reference Decision Corpus Content Hashing ────────────────────────────────
 
 
+def compute_reference_corpus_records_hash(records: Iterable[dict[str, Any]]) -> str:
+    """Compute deterministic content hash for an iterable of reference decision records.
+
+    Enforces:
+    - Valid non-empty 'reference_decision_id' on every record
+    - Uniqueness of 'reference_decision_id' across all records
+    - Lexicographical sort by reference_decision_id
+    - Canonical JSON serialization with sorted keys and compact separators
+    - SHA-256 first 32 lowercase hex characters (no 'sha256:' prefix)
+    - Returns 'none' for an empty record collection
+    """
+    record_list: list[dict[str, Any]] = []
+    seen_ids: set[str] = set()
+
+    for item in records:
+        ref_id = item.get("reference_decision_id")
+        if not ref_id or not isinstance(ref_id, str):
+            raise ValueError("Reference record missing 'reference_decision_id'")
+        if ref_id in seen_ids:
+            raise ValueError(f"Duplicate reference_decision_id: {ref_id!r}")
+        seen_ids.add(ref_id)
+        record_list.append(item)
+
+    if not record_list:
+        return "none"
+
+    record_list.sort(key=lambda r: str(r["reference_decision_id"]))
+    canonical_json = json.dumps(record_list, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical_json.encode("utf-8")).hexdigest()[:32]
+
+
 def compute_reference_corpus_content_hash(root_path: str | Path) -> str:
     """Compute deterministic content hash for a human reference decision corpus.
 
@@ -138,10 +169,8 @@ def compute_reference_corpus_content_hash(root_path: str | Path) -> str:
     nested files, root-level strays, review markdown (*-review.md), scratch files,
     and non-reference files.
 
-    Each reference record is parsed as JSON, validated to contain a non-empty
-    'reference_decision_id', checked for uniqueness, sorted lexicographically by
-    reference_decision_id, and serialized as a canonical JSON list with sorted keys
-    and compact separators.
+    Each reference record is parsed as JSON, validated, and delegated to
+    compute_reference_corpus_records_hash().
 
     Returns:
         First 32 lowercase hex characters of SHA256 (no 'sha256:' prefix).
@@ -157,7 +186,6 @@ def compute_reference_corpus_content_hash(root_path: str | Path) -> str:
     ]
 
     records: list[dict[str, Any]] = []
-    seen_ids: set[str] = set()
 
     for f in ref_files:
         with f.open("r", encoding="utf-8") as fh:
@@ -177,18 +205,9 @@ def compute_reference_corpus_content_hash(root_path: str | Path) -> str:
                     raise ValueError(
                         f"Reference record in {f.name} missing 'reference_decision_id'"
                     )
-
-                if ref_id in seen_ids:
-                    raise ValueError(f"Duplicate reference_decision_id: {ref_id!r}")
-                seen_ids.add(ref_id)
                 records.append(data)
 
-    if not records:
-        return "none"
-
-    records.sort(key=lambda r: str(r["reference_decision_id"]))
-    canonical_json = json.dumps(records, sort_keys=True, separators=(",", ":"))
-    return hashlib.sha256(canonical_json.encode("utf-8")).hexdigest()[:32]
+    return compute_reference_corpus_records_hash(records)
 
 
 # ── Deterministic Bundle Content Hashing ──────────────────────────────────────
@@ -426,6 +445,7 @@ __all__ = [
     "import_candidates_jsonl",
     "export_scenarios_jsonl",
     "import_scenarios_jsonl",
+    "compute_reference_corpus_records_hash",
     "compute_reference_corpus_content_hash",
     "compute_bundle_content_hash",
     "export_bundle",

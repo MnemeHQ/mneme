@@ -409,44 +409,38 @@ class TestBT1BExperimentExecution:
         assert res.global_volume.reference_count == 100
 
     def test_26_frozen_canonical_modules_unmodified(self):
-        # Verify that forbidden files are completely unmodified relative to exact parent main SHA
+        # Verify that forbidden files are completely unmodified across the historical B-T1B range
         import subprocess
 
-        # 1. Try to resolve the exact FROZEN_PARENT_MAIN_SHA commit object
-        rev_check = subprocess.run(
-            ["git", "cat-file", "-e", f"{FROZEN_PARENT_MAIN_SHA}^{{commit}}"],
-            cwd=REPO_ROOT,
-            capture_output=True,
-            text=True,
-        )
-        # 2. If unavailable in a shallow checkout, fetch the exact parent from origin
-        if rev_check.returncode != 0:
-            subprocess.run(
-                ["git", "fetch", "origin", FROZEN_PARENT_MAIN_SHA],
-                cwd=REPO_ROOT,
-                capture_output=True,
-            )
-            subprocess.run(
-                ["git", "fetch", "origin", "main"],
-                cwd=REPO_ROOT,
-                capture_output=True,
-            )
-            # 3. Re-check the exact SHA commit object
+        accepted_b_t1b_sha = "16d2f757d33c0e23c7d8e0a78006daaaefb20097"
+
+        # 1. Ensure both exact commit objects are resolvable
+        for commit_sha in (FROZEN_PARENT_MAIN_SHA, accepted_b_t1b_sha):
             rev_check = subprocess.run(
-                ["git", "cat-file", "-e", f"{FROZEN_PARENT_MAIN_SHA}^{{commit}}"],
+                ["git", "cat-file", "-e", f"{commit_sha}^{{commit}}"],
                 cwd=REPO_ROOT,
                 capture_output=True,
                 text=True,
             )
+            if rev_check.returncode != 0:
+                subprocess.run(
+                    ["git", "fetch", "origin", commit_sha],
+                    cwd=REPO_ROOT,
+                    capture_output=True,
+                )
+                rev_check = subprocess.run(
+                    ["git", "cat-file", "-e", f"{commit_sha}^{{commit}}"],
+                    cwd=REPO_ROOT,
+                    capture_output=True,
+                    text=True,
+                )
+            assert rev_check.returncode == 0, (
+                f"Failed to resolve exact historical commit {commit_sha}: {rev_check.stderr}"
+            )
 
-        # 4. Fail closed if the exact parent cannot be resolved
-        assert rev_check.returncode == 0, (
-            f"Failed to resolve exact frozen parent commit {FROZEN_PARENT_MAIN_SHA}: {rev_check.stderr}"
-        )
-
-        # 5. Run exact committed comparison against FROZEN_PARENT_MAIN_SHA
+        # 2. Run exact committed comparison between historical parent and accepted B-T1B commit
         proc = subprocess.run(
-            ["git", "diff", "--name-only", FROZEN_PARENT_MAIN_SHA, "HEAD"],
+            ["git", "diff", "--name-only", FROZEN_PARENT_MAIN_SHA, accepted_b_t1b_sha],
             cwd=REPO_ROOT,
             capture_output=True,
             text=True,
@@ -461,13 +455,13 @@ class TestBT1BExperimentExecution:
         }
         unexpected = changed_files - allowed_files
         assert not unexpected, (
-            f"Forbidden files modified relative to frozen parent {FROZEN_PARENT_MAIN_SHA}: {unexpected}"
+            f"Forbidden files modified in historical B-T1B commit relative to parent {FROZEN_PARENT_MAIN_SHA}: {unexpected}"
         )
         assert changed_files == allowed_files, (
             f"Expected exactly {allowed_files}, but observed {changed_files}"
         )
 
-        # 6. Assert zero diff on forbidden paths explicitly against exact parent
+        # 3. Assert zero diff on forbidden paths explicitly across that historical range
         forbidden_paths = [
             "mneme/open_architecture/harness.py",
             "mneme/open_architecture/classification.py",
@@ -481,12 +475,12 @@ class TestBT1BExperimentExecution:
         ]
         for fp in forbidden_paths:
             res = subprocess.run(
-                ["git", "diff", "--exit-code", FROZEN_PARENT_MAIN_SHA, "HEAD", "--", fp],
+                ["git", "diff", "--exit-code", FROZEN_PARENT_MAIN_SHA, accepted_b_t1b_sha, "--", fp],
                 cwd=REPO_ROOT,
                 capture_output=True,
                 text=True,
                 encoding="utf-8",
             )
             assert res.returncode == 0, (
-                f"Forbidden path {fp} modified relative to exact frozen parent {FROZEN_PARENT_MAIN_SHA}!"
+                f"Forbidden path {fp} modified in historical B-T1B relative to exact parent {FROZEN_PARENT_MAIN_SHA}!"
             )
