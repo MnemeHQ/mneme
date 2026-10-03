@@ -690,9 +690,37 @@ def execute_stage_c_end_to_end_experiment(
         summary_path.write_text(
             json.dumps(result.to_dict(), indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
+            newline="\n",
         )
 
     return result
+
+
+def write_stage_c_end_to_end_summary(
+    target_path: Path | str | None = None,
+) -> Path:
+    """Generate and write the authoritative stage_c_end_to_end_summary.json.
+
+    Executes the experiment over the frozen reference corpus and accepted Stage B outcomes,
+    and writes the deterministic JSON summary to the specified path or default
+    benchmarks/open_architecture/batch_01/stage_c/stage_c_end_to_end_summary.json.
+    """
+    repo_root = Path(__file__).resolve().parent.parent.parent
+    dest = (
+        Path(target_path)
+        if target_path is not None
+        else repo_root
+        / "benchmarks"
+        / "open_architecture"
+        / "batch_01"
+        / "stage_c"
+        / "stage_c_end_to_end_summary.json"
+    )
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    result = execute_stage_c_end_to_end_experiment()
+    serialized = json.dumps(result.to_dict(), indent=2, sort_keys=True) + "\n"
+    dest.write_text(serialized, encoding="utf-8", newline="\n")
+    return dest
 
 
 __all__ = [
@@ -706,4 +734,5 @@ __all__ = [
     "StageCEndToEndExperimentResult",
     "compute_end_to_end_profile_hash",
     "execute_stage_c_end_to_end_experiment",
+    "write_stage_c_end_to_end_summary",
 ]

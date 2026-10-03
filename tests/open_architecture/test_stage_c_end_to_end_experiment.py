@@ -438,3 +438,26 @@ class TestStageCEndToEndMetricsVerification:
         )
         assert len(experiment_result.experiment_profile_hash) == 32
         assert len(experiment_result.end_to_end_scenario_evaluations) == 150
+
+    def test_committed_artifact_byte_identity(
+        self, experiment_result: StageCEndToEndExperimentResult
+    ):
+        """Verify that committed stage_c_end_to_end_summary.json is byte-identical to experiment output."""
+        repo_root = Path(__file__).resolve().parent.parent.parent
+        committed_path = (
+            repo_root
+            / "benchmarks"
+            / "open_architecture"
+            / "batch_01"
+            / "stage_c"
+            / "stage_c_end_to_end_summary.json"
+        )
+        assert committed_path.is_file(), f"Committed artifact missing: {committed_path}"
+        committed_bytes = committed_path.read_bytes()
+        fresh_bytes = (
+            json.dumps(experiment_result.to_dict(), indent=2, sort_keys=True) + "\n"
+        ).encode("utf-8")
+        assert committed_bytes == fresh_bytes, (
+            "Committed stage_c_end_to_end_summary.json has diverged from experiment output. "
+            "Regenerate using write_stage_c_end_to_end_summary()."
+        )
