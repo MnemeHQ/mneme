@@ -169,6 +169,7 @@ GATE_BENCHMARK_UNIT_PATHS: tuple[str, ...] = (
     "tests/open_architecture/test_stage_b_relationship_residual_analysis.py",
     "tests/open_architecture/test_stage_b_relationship_selectivity_experiment.py",
     "tests/open_architecture/test_stage_b_relationship_selectivity_diagnostics.py",
+    "tests/open_architecture/test_stage_c_end_to_end_experiment.py",
 )
 
 GATE_SHIPPED_PATHS: tuple[str, ...] = (
