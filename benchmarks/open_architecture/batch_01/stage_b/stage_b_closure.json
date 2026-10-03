@@ -1,0 +1,248 @@
+{
+  "artifact_type": "stage_b_batch_01_closure",
+  "artifact_version": "0.1",
+  "batch_id": "o1a-batch-01",
+  "classifier": {
+    "backend_id": "anthropic",
+    "classifier_version": "0.1",
+    "model_identifier": "claude-sonnet-4-6",
+    "taxonomy_version": "0.1"
+  },
+  "closure_declaration": {
+    "accepted_endpoint": "B-T1D / Arm D",
+    "closure_scope": "Batch 01 Stage B semantic classification endpoint is frozen. No later Batch 01 Stage B treatment is accepted. Any future Stage B research must occur under a new benchmark version, new batch, or explicitly reopened programme rather than mutating Batch 01.",
+    "production_readiness": "Research endpoint only; not declared a solved, optimal, or production-ready classifier.",
+    "status": "CLOSED / FROZEN"
+  },
+  "closure_status": "closed_frozen",
+  "corpora": {
+    "corpus_revision_rationale": "Revision batch_01_v0.2-grounding corrected an external-knowledge grounding defect in ref-gsa-agentic-coding-quickstart-005 relationships. Stage A baseline evaluated on v0.1; final Stage B scoring evaluated on v0.2-grounding.",
+    "historical_baseline_corpus_version": "batch_01_v0.1",
+    "historical_baseline_reference_corpus_hash": "0455bd66aae52551c35b37a63c2d185f",
+    "scoring_corpus_version": "batch_01_v0.2-grounding",
+    "scoring_reference_corpus_hash": "700a569e24bf90707ba14ff65eea2ab5"
+  },
+  "cryptographic_hashes": {
+    "accepted_mixed_semantic_hash": "sha256:662de96721513ab1fd0d6e2d55eb7c037dedcb04c75b441b610aa3a57e236b8a",
+    "arm_d_outcomes_semantic_hash": "sha256:ae1fbd24f6b36099d3c58006886503f6ba14bf5fd7cfa9bfb93c4befaabbedc0",
+    "arm_d_treatment_profile_hash": "d66bb19c9e4c64e835a6191293a95570",
+    "control_arm_b_profile_hash": "e4b6bad47ebcc290924782172fb96d8d",
+    "control_arm_b_semantic_hash": "sha256:778f05574d0e835fca893c216c4e240c15e0f30a11893812089dc691b3376092"
+  },
+  "dataset": {
+    "composition": {
+      "arm_d_relationship_outcomes": 100,
+      "b0_non_relationship_outcomes": 700,
+      "total_assembled_outcomes": 800
+    },
+    "tasks_per_reference": 8,
+    "total_outcomes": 800,
+    "total_references": 100
+  },
+  "endpoint_identity": {
+    "arm_id": "treatment_d",
+    "endpoint_name": "B-T1D / Arm D",
+    "experiment_id": "b-t1d-relationship-selectivity",
+    "purpose": "relationship_selectivity"
+  },
+  "endpoint_rationale": {
+    "all_preservation_conditions_passed": true,
+    "all_primary_hypotheses_passed": false,
+    "causal_inference_limitation": "The preregistered H1-H5 comparisons are evaluated against the frozen historical Arm B outcomes. Arm D was executed later than Arm B using the same model identifier and frozen request/evidence contract, but the experiment did not include a contemporaneous fresh Arm B execution. Therefore, directional preregistered Arm-B-relative comparisons can be evaluated exactly, but the observed differences must not be described as definitive causal proof that the selectivity prompt alone produced the change; temporal provider/model-serving drift remains a possible confound.",
+    "key_findings": {
+      "expected_empty_exact_matches": "Maintained 56/88 expected-empty exact matches.",
+      "expected_empty_false_positives": "Maintained 32 expected-empty false-positive references.",
+      "extra_tuples_reduction": "Reduced expected-empty extra tuples from 86 to 75, and total extra tuples from 105 to 86.",
+      "preservation_conditions": "All 5 preregistered preservation conditions (P1-P5) passed.",
+      "primary_hypotheses": "Not all preregistered primary hypotheses passed (H1, H4, H5 passed; H2, H3 failed).",
+      "strict_relationship_accuracy": "Improved from B0 (0.00) and Arm B (0.59) to 61/100 (0.6100000000000001).",
+      "target_entity_recovery": "Maintained 18/18 (100%) target entity recovery."
+    },
+    "summary": "B-T1D Arm D achieved the highest validated semantic composite and relationship accuracy in Batch 01 while passing all preservation conditions."
+  },
+  "endpoint_scorecard": {
+    "macro_task_averages": {
+      "authority_accuracy": 0.5700000000000001,
+      "decision_classification_accuracy": 0.76,
+      "domain_macro_f1": 0.5745689865689866,
+      "domain_macro_precision": 0.4548095238095238,
+      "domain_macro_recall": 0.8691666666666666,
+      "domain_micro_f1": 0.5602841568107706,
+      "domain_micro_precision": 0.4213474690329493,
+      "domain_micro_recall": 0.8690773377565831,
+      "enforcement_classification_accuracy": 0.78,
+      "lifecycle_accuracy": 0.9400000000000001,
+      "prescriptive_intent_f1": 0.8172766067502909,
+      "prescriptive_intent_precision": 0.9388888888888889,
+      "prescriptive_intent_recall": 0.772280701754386,
+      "purpose_macro_f1": 0.5234839604839605,
+      "purpose_macro_precision": 0.44894841269841274,
+      "purpose_macro_recall": 0.6771666666666667,
+      "purpose_micro_f1": 0.5271664609899903,
+      "purpose_micro_precision": 0.4347901535592902,
+      "purpose_micro_recall": 0.6967113542594765,
+      "relationship_accuracy": 0.6100000000000001,
+      "scope_accuracy": 0.0
+    },
+    "per_repository": {
+      "adrkit": {
+        "composite_score": 0.5705557222889156,
+        "metrics": {
+          "authority_accuracy": 0.4,
+          "decision_classification_accuracy": 1.0,
+          "domain_macro_f1": 0.596468253968254,
+          "domain_macro_precision": 0.4966666666666667,
+          "domain_macro_recall": 0.8083333333333333,
+          "domain_micro_f1": 0.5850340136054423,
+          "domain_micro_precision": 0.4574468085106383,
+          "domain_micro_recall": 0.8113207547169812,
+          "enforcement_classification_accuracy": 0.7,
+          "lifecycle_accuracy": 0.9,
+          "prescriptive_intent_f1": 1.0,
+          "prescriptive_intent_precision": 1.0,
+          "prescriptive_intent_recall": 1.0,
+          "purpose_macro_f1": 0.5322113997113997,
+          "purpose_macro_precision": 0.503452380952381,
+          "purpose_macro_recall": 0.5883333333333333,
+          "purpose_micro_f1": 0.5294117647058824,
+          "purpose_micro_precision": 0.4787234042553192,
+          "purpose_micro_recall": 0.5921052631578947,
+          "relationship_accuracy": 0.45,
+          "scope_accuracy": 0.0
+        },
+        "reference_count": 20,
+        "repo_id": "adrkit",
+        "task_count": 160
+      },
+      "archlint": {
+        "composite_score": 0.5197916666666667,
+        "metrics": {
+          "authority_accuracy": 0.2,
+          "decision_classification_accuracy": 0.15,
+          "domain_macro_f1": 0.5900000000000001,
+          "domain_macro_precision": 0.45583333333333337,
+          "domain_macro_recall": 1.0,
+          "domain_micro_f1": 0.5499999999999999,
+          "domain_micro_precision": 0.3793103448275862,
+          "domain_micro_recall": 1.0,
+          "enforcement_classification_accuracy": 0.85,
+          "lifecycle_accuracy": 0.95,
+          "prescriptive_intent_f1": 0.27272727272727276,
+          "prescriptive_intent_precision": 0.75,
+          "prescriptive_intent_recall": 0.16666666666666666,
+          "purpose_macro_f1": 0.45607142857142857,
+          "purpose_macro_precision": 0.3875,
+          "purpose_macro_recall": 0.5833333333333333,
+          "purpose_micro_f1": 0.4583333333333333,
+          "purpose_micro_precision": 0.3548387096774194,
+          "purpose_micro_recall": 0.6470588235294118,
+          "relationship_accuracy": 1.0,
+          "scope_accuracy": 0.0
+        },
+        "reference_count": 20,
+        "repo_id": "archlint",
+        "task_count": 160
+      },
+      "gsa_agentic_coding_quickstart": {
+        "composite_score": 0.7209625253263361,
+        "metrics": {
+          "authority_accuracy": 1.0,
+          "decision_classification_accuracy": 0.9,
+          "domain_macro_f1": 0.7153174603174602,
+          "domain_macro_precision": 0.6174999999999999,
+          "domain_macro_recall": 0.8791666666666667,
+          "domain_micro_f1": 0.7080745341614907,
+          "domain_micro_precision": 0.59375,
+          "domain_micro_recall": 0.8769230769230769,
+          "enforcement_classification_accuracy": 0.9,
+          "lifecycle_accuracy": 1.0,
+          "prescriptive_intent_f1": 0.9473684210526316,
+          "prescriptive_intent_precision": 1.0,
+          "prescriptive_intent_recall": 0.9,
+          "purpose_macro_f1": 0.6134199134199134,
+          "purpose_macro_precision": 0.5666666666666667,
+          "purpose_macro_recall": 0.6841666666666667,
+          "purpose_micro_f1": 0.6096256684491979,
+          "purpose_micro_precision": 0.5533980582524272,
+          "purpose_micro_recall": 0.6785714285714286,
+          "relationship_accuracy": 0.65,
+          "scope_accuracy": 0.0
+        },
+        "reference_count": 20,
+        "repo_id": "gsa_agentic_coding_quickstart",
+        "task_count": 160
+      },
+      "helix": {
+        "composite_score": 0.5727056962025316,
+        "metrics": {
+          "authority_accuracy": 1.0,
+          "decision_classification_accuracy": 0.9,
+          "domain_macro_f1": 0.5460592185592186,
+          "domain_macro_precision": 0.4123809523809524,
+          "domain_macro_recall": 0.8583333333333334,
+          "domain_micro_f1": 0.5316455696202532,
+          "domain_micro_precision": 0.3853211009174312,
+          "domain_micro_recall": 0.8571428571428571,
+          "enforcement_classification_accuracy": 0.6,
+          "lifecycle_accuracy": 1.0,
+          "prescriptive_intent_f1": 0.9473684210526316,
+          "prescriptive_intent_precision": 1.0,
+          "prescriptive_intent_recall": 0.9,
+          "purpose_macro_f1": 0.48238372738372737,
+          "purpose_macro_precision": 0.3954563492063492,
+          "purpose_macro_recall": 0.63,
+          "purpose_micro_f1": 0.4999999999999999,
+          "purpose_micro_precision": 0.4051724137931034,
+          "purpose_micro_recall": 0.6527777777777778,
+          "relationship_accuracy": 0.05,
+          "scope_accuracy": 0.0
+        },
+        "reference_count": 20,
+        "repo_id": "helix",
+        "task_count": 160
+      },
+      "modonome": {
+        "composite_score": 0.5831410256410257,
+        "metrics": {
+          "authority_accuracy": 0.25,
+          "decision_classification_accuracy": 0.85,
+          "domain_macro_f1": 0.425,
+          "domain_macro_precision": 0.29166666666666663,
+          "domain_macro_recall": 0.8,
+          "domain_micro_f1": 0.4266666666666667,
+          "domain_micro_precision": 0.2909090909090909,
+          "domain_micro_recall": 0.8,
+          "enforcement_classification_accuracy": 0.85,
+          "lifecycle_accuracy": 0.85,
+          "prescriptive_intent_f1": 0.918918918918919,
+          "prescriptive_intent_precision": 0.9444444444444444,
+          "prescriptive_intent_recall": 0.8947368421052632,
+          "purpose_macro_f1": 0.5333333333333333,
+          "purpose_macro_precision": 0.39166666666666666,
+          "purpose_macro_recall": 0.9,
+          "purpose_micro_f1": 0.5384615384615384,
+          "purpose_micro_precision": 0.38181818181818183,
+          "purpose_micro_recall": 0.9130434782608695,
+          "relationship_accuracy": 0.9,
+          "scope_accuracy": 0.0
+        },
+        "reference_count": 20,
+        "repo_id": "modonome",
+        "task_count": 160
+      }
+    },
+    "relationship_exact_matches": 61,
+    "stage_b_semantic_score": 0.5934313272250952,
+    "strict_relationship_accuracy": 0.6100000000000001
+  },
+  "mneme_execution_sha": "7e17fb1640a0144468d47d6ece2791c44b1bfbc2",
+  "provenance_sources": {
+    "arm_d_diagnostics": "benchmarks/open_architecture/batch_01/treatments/b_t1d/arm_d/diagnostics.json",
+    "arm_d_outcomes": "benchmarks/open_architecture/batch_01/treatments/b_t1d/arm_d/outcomes.jsonl",
+    "arm_d_provenance": "benchmarks/open_architecture/batch_01/treatments/b_t1d/arm_d/provenance.json",
+    "arm_d_score": "benchmarks/open_architecture/batch_01/treatments/b_t1d/arm_d/stage_b_score.json",
+    "baseline_b0_outcomes": "benchmarks/open_architecture/batch_01/baseline_stage_b/classifier_outcomes.jsonl",
+    "baseline_b0_provenance": "benchmarks/open_architecture/batch_01/baseline_stage_b/stage_b_provenance.json",
+    "v0_2_grounding_revision": "benchmarks/open_architecture/batch_01/revisions/batch_01_v0.2-grounding/revision.json"
+  }
+}
