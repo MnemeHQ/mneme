@@ -159,45 +159,67 @@ class TestBT1DSelectivityDiagnostics:
         assert pop["total_expected_tuples"] == 18
 
     def test_05_strict_exact_count_agrees_with_score_artifact(self):
-        """5. Derived strict exact count (61) matches the committed Stage B score artifact."""
+        """5. Derived strict exact count reconciles against score artifact rather than literal constants."""
         diag_data = json.loads(DIAGNOSTICS_PATH.read_text(encoding="utf-8"))
         score_data = json.loads(SCORE_PATH.read_text(encoding="utf-8"))
 
-        assert diag_data["observed_metrics"]["strict_exact_references"] == 61
+        m = diag_data["observed_metrics"]
+        assert m["strict_exact_references"] == 61
         assert diag_data["passing_references"] == 61
         assert diag_data["failing_references"] == 39
-        assert score_data["strict_relationship_accuracy"] == 0.6100000000000001
+        assert m["strict_exact_references"] / 100.0 == pytest.approx(score_data["strict_relationship_accuracy"])
         assert score_data["stage_b_semantic_score"] == FROZEN_ARM_D_STAGE_B_COMPOSITE
 
+        # Tampering with score strict accuracy fails closed in run_stage_b_relationship_selectivity_diagnostics
+        refs = load_reference_corpus(V02_REF_DIR)
+        expected_ids = {r.reference_decision_id for r in refs}
+        outcomes, _ = load_treatment_run(ARM_D_RUN_DIR, expected_ids)
+        arm_b_outcomes = load_treatment_outcomes(ARM_B_OUTCOMES_PATH, expected_reference_ids=expected_ids)
+        arm_b_metrics = recompute_arm_b_v02_control_metrics(refs, arm_b_outcomes, ARM_B_RESIDUAL_PATH)
+
+        bad_score_acc = {**score_data, "strict_relationship_accuracy": 0.50}
+        with pytest.raises(ValueError, match="Strict relationship accuracy mismatch"):
+            run_stage_b_relationship_selectivity_diagnostics(refs, outcomes, arm_b_metrics, bad_score_acc)
+
     def test_06_residual_structural_classes_sum_correctly(self):
-        """6. Residual structural class counts sum exactly to 39 (100 - 61)."""
+        """6. Residual structural class counts sum exactly to total_references - strict_exact."""
         diag_data = json.loads(DIAGNOSTICS_PATH.read_text(encoding="utf-8"))
         sc = diag_data["structural_residual_counts"]
 
+        total_refs = diag_data["population_counts"]["total_references"]
+        strict_exact = diag_data["observed_metrics"]["strict_exact_references"]
+        expected_failures = total_refs - strict_exact
+
+        assert expected_failures == 39
+        assert diag_data["failing_references"] == expected_failures
         assert sc[STRUCTURAL_EXPECTED_EMPTY_FALSE_POSITIVE] == 32
         assert sc[STRUCTURAL_PURE_TYPE_CONFUSION] == 3
         assert sc[STRUCTURAL_EXACT_EXPECTED_PLUS_EXTRAS] == 2
         assert sc[STRUCTURAL_TYPE_CONFUSION_PLUS_EXTRAS] == 2
-        assert sum(sc.values()) == 39
-        assert len(diag_data["failing_records"]) == 39
+        assert sum(sc.values()) == expected_failures
+        assert len(diag_data["failing_records"]) == expected_failures
 
     def test_07_tuple_counts_reconcile(self):
-        """7. Tuple counts reconcile: exact + missing == 18; predicted == exact + extra == 99."""
+        """7. Tuple counts reconcile: exact + extra == predicted; exact + missing == expected."""
         diag_data = json.loads(DIAGNOSTICS_PATH.read_text(encoding="utf-8"))
         m = diag_data["observed_metrics"]
 
-        exact_tuples = m["exact_type_exact_target"]
+        exact_tuples = m["total_exact_tuples"]
+        missing_tuples = m["total_missing_tuples"]
         extra_tuples = m["total_extra_tuples"]
         predicted_tuples = m["total_predicted_tuples"]
+        expected_tuples = diag_data["population_counts"]["total_expected_tuples"]
 
+        # Exact derived values for frozen Arm D execution
         assert exact_tuples == 13
+        assert missing_tuples == 5
         assert extra_tuples == 86
         assert predicted_tuples == 99
-        assert exact_tuples + extra_tuples == predicted_tuples
+        assert expected_tuples == 18
 
-        # Expected tuples: 13 exact + 5 wrong type == 18
-        assert exact_tuples + m["wrong_type_recovery"] == 18
-        assert m["missing_target_entities"] == 0
+        # Invariant identities
+        assert exact_tuples + extra_tuples == predicted_tuples
+        assert exact_tuples + missing_tuples == expected_tuples
 
     def test_08_expected_empty_reconciliation(self):
         """8. Expected-empty FP count (32) and exact count (56) reconcile to 88."""
@@ -393,3 +415,65 @@ class TestBT1DSelectivityDiagnostics:
         assert committed_data["artifact_type"] == "b_t1d_arm_d_residual_diagnostics"
         assert committed_data["arm_id"] == "treatment_d"
         assert committed_data["causal_inference_limitation"] == CAUSAL_INFERENCE_LIMITATION
+
+    def test_18_score_provenance_tampering_fails_closed(self):
+        """18. Input validation raises explicit ValueError if any score provenance field is tampered."""
+        refs = load_reference_corpus(V02_REF_DIR)
+        expected_ids = {r.reference_decision_id for r in refs}
+        outcomes, sidecar = load_treatment_run(ARM_D_RUN_DIR, expected_ids)
+        score_data = json.loads(SCORE_PATH.read_text(encoding="utf-8"))
+
+        # Valid inputs pass
+        validate_arm_d_diagnostic_inputs(refs, outcomes, sidecar, score_data)
+
+        # 1. Tampered source outcomes hash fails
+        bad_outcomes_hash = {**score_data, "source_outcomes_semantic_hash": "sha256:tampered_hash"}
+        with pytest.raises(ValueError, match="source_outcomes_semantic_hash mismatch"):
+            validate_arm_d_diagnostic_inputs(refs, outcomes, sidecar, bad_outcomes_hash)
+
+        # 2. Tampered treatment profile hash fails
+        bad_profile_hash = {**score_data, "treatment_profile_hash": "tampered_profile_hash"}
+        with pytest.raises(ValueError, match="treatment_profile_hash mismatch"):
+            validate_arm_d_diagnostic_inputs(refs, outcomes, sidecar, bad_profile_hash)
+
+        # 3. Tampered scoring corpus hash fails
+        bad_corpus_hash = {**score_data, "scoring_reference_corpus_hash": "tampered_corpus_hash"}
+        with pytest.raises(ValueError, match="scoring_reference_corpus_hash mismatch"):
+            validate_arm_d_diagnostic_inputs(refs, outcomes, sidecar, bad_corpus_hash)
+
+        # 4. Tampered execution commit SHA fails
+        bad_exec_sha = {**score_data, "source_execution_commit_sha": "tampered_exec_sha"}
+        with pytest.raises(ValueError, match="source_execution_commit_sha mismatch"):
+            validate_arm_d_diagnostic_inputs(refs, outcomes, sidecar, bad_exec_sha)
+
+        # 5. Tampered scorer authority fails
+        bad_authority = {**score_data, "scorer_authority": "tampered_scorer"}
+        with pytest.raises(ValueError, match="scorer_authority mismatch"):
+            validate_arm_d_diagnostic_inputs(refs, outcomes, sidecar, bad_authority)
+
+        # 6. Tampered total references fails
+        bad_refs_count = {**score_data, "total_references": 99}
+        with pytest.raises(ValueError, match="total_references mismatch"):
+            validate_arm_d_diagnostic_inputs(refs, outcomes, sidecar, bad_refs_count)
+
+        # 7. Tampered total outcomes fails
+        bad_outcomes_count = {**score_data, "total_outcomes": 799}
+        with pytest.raises(ValueError, match="total_outcomes mismatch"):
+            validate_arm_d_diagnostic_inputs(refs, outcomes, sidecar, bad_outcomes_count)
+
+        # 8. Tampered model calls fails
+        bad_calls = {**score_data, "model_calls": 1}
+        with pytest.raises(ValueError, match="model_calls mismatch"):
+            validate_arm_d_diagnostic_inputs(refs, outcomes, sidecar, bad_calls)
+
+    def test_19_no_causal_claims_in_diagnostic_module(self):
+        """19. Diagnostic module avoids definitive causal claims regarding Arm D."""
+        module_path = (
+            REPO_ROOT
+            / "mneme"
+            / "open_architecture"
+            / "stage_b_relationship_selectivity_diagnostics.py"
+        )
+        content = module_path.read_text(encoding="utf-8")
+        assert "causally reduced" not in content.lower()
+        assert "causally reduce" not in content.lower()

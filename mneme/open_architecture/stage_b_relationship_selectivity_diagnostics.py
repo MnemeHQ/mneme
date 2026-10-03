@@ -5,9 +5,10 @@ Implements the deterministic residual-error diagnosis and preregistered hypothes
 evaluation for O1A B-T1D Arm D evaluated against Batch 01 v0.2-grounding.
 
 Diagnostic Purpose:
-Evaluates whether relationship emission selectivity (Arm D) causally reduced
-unsupported over-generation relative to frozen Arm B without compromising target
-entity recall or type discrimination on genuinely non-empty references.
+Evaluates whether relationship emission selectivity (Arm D) reduced unsupported
+over-generation relative to the frozen historical Arm B outcomes without
+compromising target entity recall or type discrimination on genuinely non-empty
+references.
 
 Architecture & Boundary Invariants:
 - Research-only diagnostic: does NOT alter benchmark scoring formulas or contracts.
@@ -127,6 +128,51 @@ def validate_arm_d_diagnostic_inputs(
             f"got {sidecar.scoring_reference_corpus_hash!r}"
         )
 
+    if score_data.get("source_outcomes_semantic_hash") != FROZEN_ARM_D_OUTCOMES_SEMANTIC_HASH:
+        raise ValueError(
+            f"Arm D score source_outcomes_semantic_hash mismatch: expected {FROZEN_ARM_D_OUTCOMES_SEMANTIC_HASH!r}, "
+            f"got {score_data.get('source_outcomes_semantic_hash')!r}"
+        )
+
+    if score_data.get("treatment_profile_hash") != B_T1D_PROFILE_D_HASH:
+        raise ValueError(
+            f"Arm D score treatment_profile_hash mismatch: expected {B_T1D_PROFILE_D_HASH!r}, "
+            f"got {score_data.get('treatment_profile_hash')!r}"
+        )
+
+    if score_data.get("scoring_reference_corpus_hash") != FROZEN_SCORING_REFERENCE_CORPUS_HASH:
+        raise ValueError(
+            f"Arm D score scoring_reference_corpus_hash mismatch: expected {FROZEN_SCORING_REFERENCE_CORPUS_HASH!r}, "
+            f"got {score_data.get('scoring_reference_corpus_hash')!r}"
+        )
+
+    if score_data.get("source_execution_commit_sha") != FROZEN_EXECUTION_COMMIT_SHA:
+        raise ValueError(
+            f"Arm D score source_execution_commit_sha mismatch: expected {FROZEN_EXECUTION_COMMIT_SHA!r}, "
+            f"got {score_data.get('source_execution_commit_sha')!r}"
+        )
+
+    if score_data.get("total_references") != 100:
+        raise ValueError(
+            f"Arm D score total_references mismatch: expected 100, got {score_data.get('total_references')}"
+        )
+
+    if score_data.get("total_outcomes") != 800:
+        raise ValueError(
+            f"Arm D score total_outcomes mismatch: expected 800, got {score_data.get('total_outcomes')}"
+        )
+
+    if score_data.get("model_calls") != 0:
+        raise ValueError(
+            f"Arm D score model_calls mismatch: expected 0, got {score_data.get('model_calls')}"
+        )
+
+    if score_data.get("scorer_authority") != "harness._execute_stage_b_tasks_and_scoring":
+        raise ValueError(
+            f"Arm D score scorer_authority mismatch: expected 'harness._execute_stage_b_tasks_and_scoring', "
+            f"got {score_data.get('scorer_authority')!r}"
+        )
+
     if score_data.get("strict_relationship_accuracy") != FROZEN_ARM_D_STRICT_RELATIONSHIP_ACCURACY:
         raise ValueError(
             f"Arm D score strict accuracy mismatch: expected {FROZEN_ARM_D_STRICT_RELATIONSHIP_ACCURACY}, "
@@ -163,10 +209,10 @@ def run_stage_b_relationship_selectivity_diagnostics(
     exact_type_exact_target = 0
     wrong_type_recovery = 0
 
-    predicted_tuple_count = 0
-    exact_tuple_count = 0
-    missing_tuple_count = 0
-    extra_tuple_count = 0
+    total_predicted_tuple_count = 0
+    total_exact_tuple_count = 0
+    total_missing_tuple_count = 0
+    total_extra_tuple_count = 0
     expected_empty_extra_count = 0
 
     extra_depends_on = 0
@@ -198,11 +244,20 @@ def run_stage_b_relationship_selectivity_diagnostics(
             if r.target_reference is not None
         }
 
-        predicted_tuple_count += len(norm_rels)
+        # Mechanical tuple derivation for all references before skipping exact
+        exact_tuples_ref = exp_set & pred_set
+        missing_tuples_ref = exp_set - pred_set
+        extra_tuples_ref = pred_set - exp_set
+
+        total_predicted_tuple_count += len(norm_rels)
+        total_exact_tuple_count += len(exact_tuples_ref)
+        total_missing_tuple_count += len(missing_tuples_ref)
+        total_extra_tuple_count += len(extra_tuples_ref)
 
         is_empty = len(exp_set) == 0
         if is_empty:
             expected_empty_ref_ids.append(rid)
+            expected_empty_extra_count += len(extra_tuples_ref)
         else:
             expected_non_empty_ref_ids.append(rid)
 
@@ -242,15 +297,9 @@ def run_stage_b_relationship_selectivity_diagnostics(
         sc = classify_reference_structure(exp_set, pred_set)
         structural_counts[sc] += 1
 
-        exact_tuples = sorted(list(exp_set & pred_set))
-        missing_tuples = sorted(list(exp_set - pred_set))
-        extra_tuples = sorted(list(pred_set - exp_set))
-
-        exact_tuple_count += len(exact_tuples)
-        missing_tuple_count += len(missing_tuples)
-        extra_tuple_count += len(extra_tuples)
-        if is_empty:
-            expected_empty_extra_count += len(extra_tuples)
+        exact_tuples = sorted(list(exact_tuples_ref))
+        missing_tuples = sorted(list(missing_tuples_ref))
+        extra_tuples = sorted(list(extra_tuples_ref))
 
         recovered_targets = sorted(list(set(exp_targets_dict.keys()) & set(pred_targets_dict.keys())))
 
@@ -347,22 +396,44 @@ def run_stage_b_relationship_selectivity_diagnostics(
     non_empty_exact_count = len(set(passing_references) & set(expected_non_empty_ref_ids))
     missing_target_entities = total_expected_targets - recovered_target_entities
 
-    # Validate against frozen score
-    if strict_exact_count != 61:
-        raise ValueError(f"Derived strict exact count mismatch: expected 61, got {strict_exact_count}")
-    if len(failing_records) != 39:
-        raise ValueError(f"Derived failing reference count mismatch: expected 39, got {len(failing_records)}")
-    if sum(structural_counts.values()) != 39:
-        raise ValueError(f"Structural class counts must sum to 39, got {sum(structural_counts.values())}")
+    total_references = len(refs_map)
+    strict_accuracy = strict_exact_count / total_references
+    expected_score_acc = score_data.get("strict_relationship_accuracy")
+    if expected_score_acc is None or abs(strict_accuracy - expected_score_acc) > 1e-9:
+        raise ValueError(
+            f"Strict relationship accuracy mismatch: derived {strict_accuracy}, expected {expected_score_acc}"
+        )
+
+    expected_failing_count = total_references - strict_exact_count
+    if len(failing_records) != expected_failing_count:
+        raise ValueError(
+            f"Derived failing reference count mismatch: expected {expected_failing_count}, got {len(failing_records)}"
+        )
+    if sum(structural_counts.values()) != len(failing_records):
+        raise ValueError(
+            f"Structural class counts must sum to {len(failing_records)}, got {sum(structural_counts.values())}"
+        )
     if total_expected_targets != 18:
         raise ValueError(f"Total expected targets mismatch: expected 18, got {total_expected_targets}")
 
+    # Tuple identities reconciliation across all 100 references
+    if total_exact_tuple_count + total_extra_tuple_count != total_predicted_tuple_count:
+        raise ValueError(
+            f"Tuple identity violated: exact ({total_exact_tuple_count}) + extra ({total_extra_tuple_count}) "
+            f"!= predicted ({total_predicted_tuple_count})"
+        )
+    if total_exact_tuple_count + total_missing_tuple_count != total_expected_targets:
+        raise ValueError(
+            f"Tuple identity violated: exact ({total_exact_tuple_count}) + missing ({total_missing_tuple_count}) "
+            f"!= expected ({total_expected_targets})"
+        )
+
     # Primary Hypotheses Evaluation (H1-H5)
-    h1_pass = (strict_exact_count / 100.0) > (arm_b_control_metrics["strict_exact_references"] / 100.0)
+    h1_pass = strict_accuracy > (arm_b_control_metrics["strict_exact_references"] / 100.0)
     h2_pass = expected_empty_exact_count > arm_b_control_metrics["expected_empty_exact"]
     h3_pass = expected_empty_fp_count < arm_b_control_metrics["expected_empty_fp_references"]
     h4_pass = expected_empty_extra_count < arm_b_control_metrics["expected_empty_extra_tuples"]
-    h5_pass = extra_tuple_count < arm_b_control_metrics["total_extra_tuples"]
+    h5_pass = total_extra_tuple_count < arm_b_control_metrics["total_extra_tuples"]
 
     primary_hypotheses: list[dict[str, Any]] = [
         {
@@ -370,7 +441,7 @@ def run_stage_b_relationship_selectivity_diagnostics(
             "control_arm_b_baseline": arm_b_control_metrics["strict_exact_references"] / 100.0,
             "hypothesis_id": "H1",
             "metric": "strict_relationship_accuracy",
-            "observed_value": strict_exact_count / 100.0,
+            "observed_value": strict_accuracy,
             "passed": h1_pass,
         },
         {
@@ -402,7 +473,7 @@ def run_stage_b_relationship_selectivity_diagnostics(
             "control_arm_b_baseline": arm_b_control_metrics["total_extra_tuples"],
             "hypothesis_id": "H5",
             "metric": "total_extra_relationship_tuples",
-            "observed_value": extra_tuple_count,
+            "observed_value": total_extra_tuple_count,
             "passed": h5_pass,
         },
     ]
@@ -507,8 +578,10 @@ def run_stage_b_relationship_selectivity_diagnostics(
             "strict_exact_references": strict_exact_count,
             "target_boundary_anomalies": target_boundary_anomalies,
             "target_entities_recovered": recovered_target_entities,
-            "total_extra_tuples": extra_tuple_count,
-            "total_predicted_tuples": predicted_tuple_count,
+            "total_exact_tuples": total_exact_tuple_count,
+            "total_extra_tuples": total_extra_tuple_count,
+            "total_missing_tuples": total_missing_tuple_count,
+            "total_predicted_tuples": total_predicted_tuple_count,
             "wrong_type_recovery": wrong_type_recovery,
         },
         "passing_references": len(passing_references),

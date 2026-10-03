@@ -3801,7 +3801,9 @@
     "strict_exact_references": 61,
     "target_boundary_anomalies": 1,
     "target_entities_recovered": 18,
+    "total_exact_tuples": 13,
     "total_extra_tuples": 86,
+    "total_missing_tuples": 5,
     "total_predicted_tuples": 99,
     "wrong_type_recovery": 5
   },
