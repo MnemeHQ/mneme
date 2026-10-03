@@ -29,6 +29,7 @@ import hashlib
 import json
 import time
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -54,6 +55,7 @@ from mneme.open_architecture.harness import (
     load_reference_corpus,
 )
 from mneme.open_architecture.manifest import Manifest
+from mneme.open_architecture.run_metadata import _get_git_commit_sha
 from mneme.open_architecture.stage_b_baseline import (
     FROZEN_STAGE_B_SEMANTIC_CONTENT_HASH,
     FrozenClassifierOutcome,
@@ -192,6 +194,7 @@ class BT1DProvenanceSidecar:
     scoring_reference_corpus_hash: str
     control_arm_b_profile_hash: str
     control_arm_b_semantic_hash: str
+    execution_mneme_commit_sha: str
     classifier_backend: str
     classifier_version: str
     model_identifier: str
@@ -203,6 +206,10 @@ class BT1DProvenanceSidecar:
 
     def to_dict(self) -> dict[str, Any]:
         return dataclasses.asdict(self)
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> BT1DProvenanceSidecar:
+        return cls(**data)
 
 
 # ── Reference Corpus Validation ───────────────────────────────────────────────
@@ -279,44 +286,80 @@ def validate_v01_v02_input_invariance(
         r2 = m2[rid]
 
         # Identical repository identifiers and commit SHAs
-        assert r1.repository == r2.repository, f"Repository mismatch on {rid}"
-        assert r1.repository_commit_sha == r2.repository_commit_sha, f"Commit SHA mismatch on {rid}"
+        if r1.repository != r2.repository:
+            raise ValueError(f"Repository mismatch on {rid}: {r1.repository!r} != {r2.repository!r}")
+        if r1.repository_commit_sha != r2.repository_commit_sha:
+            raise ValueError(
+                f"Commit SHA mismatch on {rid}: {r1.repository_commit_sha!r} != {r2.repository_commit_sha!r}"
+            )
 
         # Byte-identical raw evidence and source location
-        assert r1.raw_evidence == r2.raw_evidence, f"raw_evidence mismatch on {rid}"
-        assert r1.source_file == r2.source_file, f"source_file mismatch on {rid}"
-        assert r1.source_location == r2.source_location, f"source_location mismatch on {rid}"
+        if r1.raw_evidence != r2.raw_evidence:
+            raise ValueError(f"raw_evidence mismatch on {rid}")
+        if r1.source_file != r2.source_file:
+            raise ValueError(f"source_file mismatch on {rid}: {r1.source_file!r} != {r2.source_file!r}")
+        if r1.source_location != r2.source_location:
+            raise ValueError(
+                f"source_location mismatch on {rid}: {r1.source_location!r} != {r2.source_location!r}"
+            )
 
         # Non-relationship ground truth fields identical
-        assert r1.normalized_decision == r2.normalized_decision, f"normalized_decision mismatch on {rid}"
-        assert r1.classification == r2.classification, f"classification mismatch on {rid}"
-        assert r1.authority_status == r2.authority_status, f"authority_status mismatch on {rid}"
-        assert r1.authority_evidence == r2.authority_evidence, f"authority_evidence mismatch on {rid}"
-        assert r1.effective_date == r2.effective_date, f"effective_date mismatch on {rid}"
-        assert r1.expiration_if_any == r2.expiration_if_any, f"expiration_if_any mismatch on {rid}"
-        assert r1.lifecycle_status == r2.lifecycle_status, f"lifecycle_status mismatch on {rid}"
-        assert r1.supersedes == r2.supersedes, f"supersedes mismatch on {rid}"
-        assert r1.superseded_by == r2.superseded_by, f"superseded_by mismatch on {rid}"
-        assert r1.decision_domains == r2.decision_domains, f"decision_domains mismatch on {rid}"
-        assert r1.decision_purposes == r2.decision_purposes, f"decision_purposes mismatch on {rid}"
-        assert r1.enforcement_potential == r2.enforcement_potential, f"enforcement_potential mismatch on {rid}"
-        assert r1.candidate_rule == r2.candidate_rule, f"candidate_rule mismatch on {rid}"
-        assert r1.scopes == r2.scopes, f"scopes mismatch on {rid}"
-        assert r1.sampling_category == r2.sampling_category, f"sampling_category mismatch on {rid}"
+        if r1.normalized_decision != r2.normalized_decision:
+            raise ValueError(f"normalized_decision mismatch on {rid}")
+        if r1.classification != r2.classification:
+            raise ValueError(f"classification mismatch on {rid}")
+        if r1.authority_status != r2.authority_status:
+            raise ValueError(f"authority_status mismatch on {rid}")
+        if r1.authority_evidence != r2.authority_evidence:
+            raise ValueError(f"authority_evidence mismatch on {rid}")
+        if r1.effective_date != r2.effective_date:
+            raise ValueError(f"effective_date mismatch on {rid}")
+        if r1.expiration_if_any != r2.expiration_if_any:
+            raise ValueError(f"expiration_if_any mismatch on {rid}")
+        if r1.lifecycle_status != r2.lifecycle_status:
+            raise ValueError(f"lifecycle_status mismatch on {rid}")
+        if r1.supersedes != r2.supersedes:
+            raise ValueError(f"supersedes mismatch on {rid}")
+        if r1.superseded_by != r2.superseded_by:
+            raise ValueError(f"superseded_by mismatch on {rid}")
+        if r1.decision_domains != r2.decision_domains:
+            raise ValueError(f"decision_domains mismatch on {rid}")
+        if r1.decision_purposes != r2.decision_purposes:
+            raise ValueError(f"decision_purposes mismatch on {rid}")
+        if r1.enforcement_potential != r2.enforcement_potential:
+            raise ValueError(f"enforcement_potential mismatch on {rid}")
+        if r1.candidate_rule != r2.candidate_rule:
+            raise ValueError(f"candidate_rule mismatch on {rid}")
+        if r1.scopes != r2.scopes:
+            raise ValueError(f"scopes mismatch on {rid}")
+        if r1.sampling_category != r2.sampling_category:
+            raise ValueError(f"sampling_category mismatch on {rid}")
 
         # Classifier task inputs equivalence
         t1 = reference_to_task_input_dict(r1)
         t2 = reference_to_task_input_dict(r2)
-        assert t1 == t2, f"Classifier task input mismatch on {rid}"
+        if t1 != t2:
+            raise ValueError(f"Classifier task input mismatch on {rid}")
 
         # Exactly one approved label change
         if rid == approved_diff_id:
-            assert len(r1.relationships) == 1, f"Expected 1 relationship in v0.1 for {approved_diff_id}"
-            assert r1.relationships[0]["relationship_type"] == "refines"
-            assert r1.relationships[0]["target_reference"] == "0026"
-            assert len(r2.relationships) == 0, f"Expected 0 relationships in v0.2 for {approved_diff_id}"
+            if (
+                len(r1.relationships) != 1
+                or r1.relationships[0]["relationship_type"] != "refines"
+                or r1.relationships[0]["target_reference"] != "0026"
+            ):
+                raise ValueError(
+                    f"Expected 1 relationship (refines -> 0026) in v0.1 for {approved_diff_id}, got {r1.relationships}"
+                )
+            if len(r2.relationships) != 0:
+                raise ValueError(
+                    f"Expected 0 relationships in v0.2 for {approved_diff_id}, got {r2.relationships}"
+                )
         else:
-            assert r1.relationships == r2.relationships, f"Unexpected relationship difference on {rid}"
+            if r1.relationships != r2.relationships:
+                raise ValueError(
+                    f"Unexpected relationship difference on {rid}: {r1.relationships} != {r2.relationships}"
+                )
 
 
 # ── Task Building & Prompt Construction ───────────────────────────────────────
@@ -428,6 +471,18 @@ class TreatmentDClassifierAdapter(AnthropicClassifier):
     @property
     def live(self) -> bool:
         return self._live
+
+    @property
+    def max_tokens(self) -> int:
+        return self._max_tokens
+
+    @property
+    def timeout(self) -> float:
+        return self._timeout
+
+    @property
+    def max_retries(self) -> int:
+        return self._max_retries
 
     def get_task_schema(self, task_type: ClassifierTaskType) -> dict[str, Any]:
         if task_type != ClassifierTaskType.RELATIONSHIPS:
@@ -688,6 +743,16 @@ def validate_treatment_provenance(
             f"Provenance control_arm_b_semantic_hash mismatch: expected {CONTROL_ARM_B_OUTCOMES_SEMANTIC_HASH!r}, "
             f"got {sidecar.control_arm_b_semantic_hash!r}"
         )
+    if (
+        not sidecar.execution_mneme_commit_sha
+        or sidecar.execution_mneme_commit_sha == "unknown"
+        or len(sidecar.execution_mneme_commit_sha) != 40
+        or not all(c in "0123456789abcdefABCDEF" for c in sidecar.execution_mneme_commit_sha)
+    ):
+        raise ValueError(
+            f"Provenance execution_mneme_commit_sha must be a valid 40-character commit SHA, "
+            f"got {sidecar.execution_mneme_commit_sha!r}"
+        )
     if sidecar.model_identifier != FROZEN_MODEL_IDENTIFIER:
         raise ValueError(
             f"Provenance model_identifier mismatch: expected {FROZEN_MODEL_IDENTIFIER!r}, "
@@ -716,6 +781,25 @@ def validate_treatment_provenance(
         raise ValueError(
             f"Provenance outcome count mismatch: expected 100, got {sidecar.actual_outcome_count} (outcomes: {len(outcomes)})"
         )
+    req_params = sidecar.request_parameters
+    if not isinstance(req_params, dict):
+        raise ValueError(f"Provenance request_parameters must be a dict, got {req_params!r}")
+    if req_params.get("max_tokens") != FROZEN_MAX_TOKENS:
+        raise ValueError(
+            f"Provenance max_tokens mismatch: expected {FROZEN_MAX_TOKENS}, got {req_params.get('max_tokens')}"
+        )
+    if req_params.get("timeout") != FROZEN_TIMEOUT_SECONDS:
+        raise ValueError(
+            f"Provenance timeout mismatch: expected {FROZEN_TIMEOUT_SECONDS}, got {req_params.get('timeout')}"
+        )
+    if req_params.get("max_retries") != FROZEN_MAX_RETRIES:
+        raise ValueError(
+            f"Provenance max_retries mismatch: expected {FROZEN_MAX_RETRIES}, got {req_params.get('max_retries')}"
+        )
+    if req_params.get("explicit_temperature") is not None:
+        raise ValueError(
+            f"Provenance explicit_temperature must be None, got {req_params.get('explicit_temperature')!r}"
+        )
     computed_hash = compute_treatment_semantic_content_hash(outcomes)
     if sidecar.treatment_semantic_content_hash != computed_hash:
         raise ValueError(
@@ -738,23 +822,83 @@ def capture_treatment_run(
     run_dir: Path | str,
     adapter: TreatmentDClassifierAdapter,
     references: list[FrozenReferenceDecision],
-    force: bool = False,
 ) -> tuple[list[FrozenClassifierOutcome], BT1DProvenanceSidecar]:
     """Capture live treatment run with fail-closed safety and durable provenance sidecar."""
     rd = Path(run_dir)
-    if rd.exists() and any(rd.iterdir()) and not force:
+    if rd.exists() and any(rd.iterdir()):
         raise FileExistsError(
             f"Treatment run directory {rd} exists and is non-empty; refusing overwrite."
         )
 
-    # Validate reference corpus before any execution
+    # 1. Validate reference corpus before any execution
     validate_b_t1d_reference_corpus(references)
 
+    # 2. Validate live adapter configuration before model calls
+    if not adapter.live:
+        raise RuntimeError(
+            "capture_treatment_run requires adapter.live=True for live execution."
+        )
+    if adapter._client is not None:
+        raise ValueError(
+            "Canonical live capture requires uninitialized client (adapter._client is None) "
+            "so Anthropic client is lazily created with frozen parameters."
+        )
+    if adapter.backend_id != FROZEN_CLASSIFIER_BACKEND:
+        raise ValueError(
+            f"Adapter backend mismatch: expected {FROZEN_CLASSIFIER_BACKEND!r}, got {adapter.backend_id!r}"
+        )
+    if adapter.model_identifier != FROZEN_MODEL_IDENTIFIER:
+        raise ValueError(
+            f"Adapter model mismatch: expected {FROZEN_MODEL_IDENTIFIER!r}, got {adapter.model_identifier!r}"
+        )
+    if adapter.classifier_version != FROZEN_CLASSIFIER_VERSION:
+        raise ValueError(
+            f"Adapter classifier_version mismatch: expected {FROZEN_CLASSIFIER_VERSION!r}, got {adapter.classifier_version!r}"
+        )
+    if adapter.max_tokens != FROZEN_MAX_TOKENS:
+        raise ValueError(
+            f"Adapter max_tokens mismatch: expected {FROZEN_MAX_TOKENS}, got {adapter.max_tokens}"
+        )
+    if adapter.timeout != FROZEN_TIMEOUT_SECONDS:
+        raise ValueError(
+            f"Adapter timeout mismatch: expected {FROZEN_TIMEOUT_SECONDS}, got {adapter.timeout}"
+        )
+    if adapter.max_retries != FROZEN_MAX_RETRIES:
+        raise ValueError(
+            f"Adapter max_retries mismatch: expected {FROZEN_MAX_RETRIES}, got {adapter.max_retries}"
+        )
+    if adapter.arm_id != ARM_D_ID:
+        raise ValueError(
+            f"Adapter arm_id mismatch: expected {ARM_D_ID!r}, got {adapter.arm_id!r}"
+        )
+
+    # 3. Resolve execution Git commit SHA
+    execution_sha = _get_git_commit_sha()
+    if (
+        not execution_sha
+        or execution_sha == "unknown"
+        or len(execution_sha) != 40
+        or not all(c in "0123456789abcdefABCDEF" for c in execution_sha)
+    ):
+        raise ValueError(
+            f"Failed to resolve valid 40-character git commit SHA for execution provenance: got {execution_sha!r}"
+        )
+
+    # 4. Construct tasks and execute
     tasks = build_batch_01_relationship_tasks(references)
+    if len(tasks) != 100:
+        raise ValueError(f"Expected exactly 100 tasks, got {len(tasks)}")
+
     raw_results = adapter.execute_batch(tasks)
 
+    # 5. Build outcomes preserving executed_at
     outcomes: list[FrozenClassifierOutcome] = []
     for res in raw_results:
+        created_at = (
+            res.executed_at
+            if getattr(res, "executed_at", None)
+            else datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        )
         outcome = FrozenClassifierOutcome(
             backend_id=res.backend_id,
             candidate_id=res.candidate_id,
@@ -762,7 +906,7 @@ def capture_treatment_run(
             confidence=res.confidence,
             cost_amount=res.cost_amount,
             cost_currency=res.cost_currency,
-            created_at=getattr(res, "created_at", "2026-10-03T18:00:00Z"),
+            created_at=created_at,
             escalated=res.escalated,
             execution_id=res.execution_id,
             latency_ms=res.latency_ms,
@@ -776,6 +920,7 @@ def capture_treatment_run(
 
     semantic_hash = compute_treatment_semantic_content_hash(outcomes)
 
+    # 6. Build provenance sidecar
     sidecar = BT1DProvenanceSidecar(
         experiment_id=EXPERIMENT_ID,
         arm_id=ARM_D_ID,
@@ -785,6 +930,7 @@ def capture_treatment_run(
         scoring_reference_corpus_hash=FROZEN_SCORING_REFERENCE_CORPUS_HASH,
         control_arm_b_profile_hash=CONTROL_ARM_B_PROFILE_HASH,
         control_arm_b_semantic_hash=CONTROL_ARM_B_OUTCOMES_SEMANTIC_HASH,
+        execution_mneme_commit_sha=execution_sha,
         classifier_backend=FROZEN_CLASSIFIER_BACKEND,
         classifier_version=FROZEN_CLASSIFIER_VERSION,
         model_identifier=FROZEN_MODEL_IDENTIFIER,
@@ -800,6 +946,11 @@ def capture_treatment_run(
         treatment_semantic_content_hash=semantic_hash,
     )
 
+    # 7. Validate sidecar + outcomes fully in memory before writing
+    expected_ids = {r.reference_decision_id for r in references}
+    validate_treatment_provenance(sidecar, outcomes, expected_ids)
+
+    # 8. Only then write artifacts to directory
     rd.mkdir(parents=True, exist_ok=True)
     outcomes_file = rd / "outcomes.jsonl"
     provenance_file = rd / "provenance.json"
@@ -813,7 +964,9 @@ def capture_treatment_run(
         (json.dumps(sidecar.to_dict(), indent=2, sort_keys=True) + "\n").encode("utf-8")
     )
 
-    return outcomes, sidecar
+    # 9. Reload and validate persisted artifacts
+    loaded_outcomes, loaded_sidecar = load_treatment_run(rd, expected_ids)
+    return loaded_outcomes, loaded_sidecar
 
 
 def load_treatment_run(
@@ -833,7 +986,7 @@ def load_treatment_run(
     expected_set = set(expected_reference_ids)
     outcomes = load_treatment_outcomes(outcomes_file, expected_reference_ids=expected_set)
     sidecar_data = json.loads(provenance_file.read_text(encoding="utf-8"))
-    sidecar = BT1DProvenanceSidecar(**sidecar_data)
+    sidecar = BT1DProvenanceSidecar.from_dict(sidecar_data)
     validate_treatment_provenance(sidecar, outcomes, expected_set)
     return outcomes, sidecar
 
@@ -860,30 +1013,47 @@ def recompute_arm_b_v02_control_metrics(
 
     decomp_data = json.loads(residual_artifact_path.read_text(encoding="utf-8"))
 
-    # Assert exact required values from frozen artifact
-    assert decomp_data["total_references"] == 100
-    assert decomp_data["passing_references"] == 59
-    assert decomp_data["failing_references"] == 41
+    # Assert exact required values from frozen artifact without assert statements
+    if decomp_data["total_references"] != 100:
+        raise ValueError(f"Expected 100 total references, got {decomp_data['total_references']}")
+    if decomp_data["passing_references"] != 59:
+        raise ValueError(f"Expected 59 passing references, got {decomp_data['passing_references']}")
+    if decomp_data["failing_references"] != 41:
+        raise ValueError(f"Expected 41 failing references, got {decomp_data['failing_references']}")
 
     sc = decomp_data["structural_class_counts"]
-    assert sc["EXPECTED_EMPTY_FALSE_POSITIVE"] == 32
-    assert sc["PURE_TYPE_CONFUSION"] == 2
-    assert sc["EXACT_EXPECTED_PLUS_EXTRAS"] == 3
-    assert sc["TYPE_CONFUSION_PLUS_EXTRAS"] == 4
+    if sc["EXPECTED_EMPTY_FALSE_POSITIVE"] != 32:
+        raise ValueError(f"Expected 32 EXPECTED_EMPTY_FALSE_POSITIVE, got {sc['EXPECTED_EMPTY_FALSE_POSITIVE']}")
+    if sc["PURE_TYPE_CONFUSION"] != 2:
+        raise ValueError(f"Expected 2 PURE_TYPE_CONFUSION, got {sc['PURE_TYPE_CONFUSION']}")
+    if sc["EXACT_EXPECTED_PLUS_EXTRAS"] != 3:
+        raise ValueError(f"Expected 3 EXACT_EXPECTED_PLUS_EXTRAS, got {sc['EXACT_EXPECTED_PLUS_EXTRAS']}")
+    if sc["TYPE_CONFUSION_PLUS_EXTRAS"] != 4:
+        raise ValueError(f"Expected 4 TYPE_CONFUSION_PLUS_EXTRAS, got {sc['TYPE_CONFUSION_PLUS_EXTRAS']}")
 
     ta = decomp_data["target_attribution_totals"]
-    assert ta["total_expected_tuples"] == 18
-    assert ta["target_entity_recovered_any_type"] == 18
-    assert ta["exact_type_exact_target"] == 12
-    assert ta["wrong_type_recovery"] == 6
-    assert ta["conflicting_type_extra"] == 1
+    if ta["total_expected_tuples"] != 18:
+        raise ValueError(f"Expected 18 total expected tuples, got {ta['total_expected_tuples']}")
+    if ta["target_entity_recovered_any_type"] != 18:
+        raise ValueError(f"Expected 18 recovered targets, got {ta['target_entity_recovered_any_type']}")
+    if ta["exact_type_exact_target"] != 12:
+        raise ValueError(f"Expected 12 exact type targets, got {ta['exact_type_exact_target']}")
+    if ta["wrong_type_recovery"] != 6:
+        raise ValueError(f"Expected 6 wrong type recoveries, got {ta['wrong_type_recovery']}")
+    if ta["conflicting_type_extra"] != 1:
+        raise ValueError(f"Expected 1 conflicting type extra, got {ta['conflicting_type_extra']}")
 
     pb = decomp_data["prediction_behaviour_aggregate_counts"]
-    assert pb["extra_relationship"] == 105
-    assert pb["depends_on_overproduction"] == 72
-    assert pb["wrong_type_recovery"] == 6
-    assert pb["target_boundary_anomaly"] == 2
-    assert pb["conflicting_type_extra"] == 1
+    if pb["extra_relationship"] != 105:
+        raise ValueError(f"Expected 105 extra relationships, got {pb['extra_relationship']}")
+    if pb["depends_on_overproduction"] != 72:
+        raise ValueError(f"Expected 72 depends_on overproduction, got {pb['depends_on_overproduction']}")
+    if pb["wrong_type_recovery"] != 6:
+        raise ValueError(f"Expected 6 wrong type recoveries in pb, got {pb['wrong_type_recovery']}")
+    if pb["target_boundary_anomaly"] != 2:
+        raise ValueError(f"Expected 2 target boundary anomalies, got {pb['target_boundary_anomaly']}")
+    if pb["conflicting_type_extra"] != 1:
+        raise ValueError(f"Expected 1 conflicting type extra in pb, got {pb['conflicting_type_extra']}")
 
     # Extra-only evidence context counts (excluding 8 exact matches in failure set)
     extra_contexts: dict[str, int] = {}
@@ -898,12 +1068,18 @@ def recompute_arm_b_v02_control_metrics(
                 if is_empty_fp:
                     expected_empty_extra_count += 1
 
-    assert expected_empty_extra_count == 86, f"Expected 86 empty extras, got {expected_empty_extra_count}"
-    assert sum(extra_contexts.values()) == 105, f"Expected 105 total extras, got {sum(extra_contexts.values())}"
-    assert extra_contexts.get("narrative_body") == 58
-    assert extra_contexts.get("contextual_related_metadata") == 31
-    assert extra_contexts.get("lifecycle_revision_history") == 6
-    assert extra_contexts.get("unresolved") == 10
+    if expected_empty_extra_count != 86:
+        raise ValueError(f"Expected 86 empty extras, got {expected_empty_extra_count}")
+    if sum(extra_contexts.values()) != 105:
+        raise ValueError(f"Expected 105 total extras, got {sum(extra_contexts.values())}")
+    if extra_contexts.get("narrative_body") != 58:
+        raise ValueError(f"Expected 58 narrative_body, got {extra_contexts.get('narrative_body')}")
+    if extra_contexts.get("contextual_related_metadata") != 31:
+        raise ValueError(f"Expected 31 contextual_related_metadata, got {extra_contexts.get('contextual_related_metadata')}")
+    if extra_contexts.get("lifecycle_revision_history") != 6:
+        raise ValueError(f"Expected 6 lifecycle_revision_history, got {extra_contexts.get('lifecycle_revision_history')}")
+    if extra_contexts.get("unresolved") != 10:
+        raise ValueError(f"Expected 10 unresolved, got {extra_contexts.get('unresolved')}")
 
     return {
         "strict_exact_references": 59,

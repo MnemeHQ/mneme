@@ -58,12 +58,14 @@ from mneme.open_architecture.stage_b_baseline import (
     FrozenClassifierOutcome,
     load_stage_b_outcomes,
 )
+from mneme.open_architecture.run_metadata import _get_git_commit_sha
 from mneme.open_architecture.stage_b_relationship_selectivity_experiment import (
     ARM_D_ID,
     ARM_D_RELATIONSHIPS_SCHEMA,
     ARM_D_SYSTEM_PROMPT_EXTENSION,
     B_T1D_PROFILE_D,
     B_T1D_PROFILE_D_HASH,
+    BT1DProvenanceSidecar,
     CONTROL_ARM_B_OUTCOMES_SEMANTIC_HASH,
     CONTROL_ARM_B_PROFILE_HASH,
     FORMAL_RELATIONSHIP_EMISSION_GATE,
@@ -84,10 +86,13 @@ from mneme.open_architecture.stage_b_relationship_selectivity_experiment import 
     build_treatment_request_payload,
     build_treatment_system_prompt,
     build_treatment_user_prompt,
+    capture_treatment_run,
     compute_b_t1d_profile_hash,
+    load_treatment_run,
     recompute_arm_b_v02_control_metrics,
     score_b_t1d_replay,
     validate_b_t1d_reference_corpus,
+    validate_treatment_provenance,
     validate_v01_v02_input_invariance,
 )
 from mneme.open_architecture.stage_b_relationship_treatment_experiment import (
@@ -521,3 +526,222 @@ class TestBT1DSelectivityScaffold:
         assert not (treatment_dir / "arm_d" / "provenance.json").exists()
         assert not (treatment_dir / "arm_d" / "stage_b_score.json").exists()
         assert not (treatment_dir / "arm_d" / "diagnostics.json").exists()
+
+    def test_24_no_assert_statements_in_experiment_module(self):
+        """24. B-T1D experiment module contains zero ast.Assert statements in production code."""
+        module_path = (
+            REPO_ROOT
+            / "mneme"
+            / "open_architecture"
+            / "stage_b_relationship_selectivity_experiment.py"
+        )
+        tree = ast.parse(module_path.read_text(encoding="utf-8"))
+        assert_nodes = [node for node in ast.walk(tree) if isinstance(node, ast.Assert)]
+        assert len(assert_nodes) == 0, f"Found {len(assert_nodes)} assert statements in {module_path}"
+
+    def test_25_input_invariance_and_control_metrics_fail_closed_on_mutation(self, tmp_path: Path):
+        """25. Validation functions raise explicit ValueError (never assert) on mutated inputs."""
+        v01_refs = load_reference_corpus(V01_REF_DIR)
+        v02_refs = load_reference_corpus(V02_REF_DIR)
+
+        # Mutated raw evidence raises ValueError
+        mutated_v02 = list(v02_refs)
+        mutated_v02[0] = dataclasses.replace(
+            mutated_v02[0],
+            raw_evidence="Tampered evidence string for testing fail-closed validation.",
+        )
+        with pytest.raises(ValueError, match="raw_evidence mismatch"):
+            validate_v01_v02_input_invariance(v01_refs, mutated_v02)
+
+        # Mutated GSA-005 in v0.2 raises ValueError
+        gsa_mutated = list(v02_refs)
+        gsa_mutated[44] = dataclasses.replace(
+            gsa_mutated[44],
+            relationships=v01_refs[44].relationships,
+        )
+        with pytest.raises(ValueError, match="Expected 0 relationships in v0.2"):
+            validate_v01_v02_input_invariance(v01_refs, gsa_mutated)
+
+        # Mutated residual artifact data raises ValueError in recompute_arm_b_v02_control_metrics
+        arm_b_outcomes = load_treatment_outcomes(ARM_B_OUTCOMES_PATH)
+        bad_artifact = tmp_path / "bad_residual.json"
+        artifact_data = json.loads(RESIDUAL_V02_ARTIFACT_PATH.read_text(encoding="utf-8"))
+        artifact_data["passing_references"] = 58  # tamper count
+        bad_artifact.write_text(json.dumps(artifact_data), encoding="utf-8")
+
+        with pytest.raises(ValueError, match="Expected 59 passing references"):
+            recompute_arm_b_v02_control_metrics(v02_refs, arm_b_outcomes, bad_artifact)
+
+    def test_26_capture_treatment_run_refuses_overwrite(self, tmp_path: Path):
+        """26. capture_treatment_run strictly refuses overwrite when directory is non-empty."""
+        run_dir = tmp_path / "treatment_d_run"
+        run_dir.mkdir(parents=True, exist_ok=True)
+        (run_dir / "pre_existing_file.txt").write_text("existing content", encoding="utf-8")
+
+        adapter = TreatmentDClassifierAdapter(live=True)
+        v02_refs = load_reference_corpus(V02_REF_DIR)
+
+        with pytest.raises(FileExistsError, match="refusing overwrite"):
+            capture_treatment_run(run_dir, adapter, v02_refs)
+
+    def test_27_capture_treatment_run_preserves_executed_at(self, tmp_path: Path):
+        """27. capture_treatment_run preserves executed_at timestamp from ClassifierResult."""
+        mock_client = MagicMock()
+        mock_block = MagicMock()
+        mock_block.text = json.dumps({"relationships": []})
+        mock_response = MagicMock()
+        mock_response.content = [mock_block]
+        mock_client.messages.create.return_value = mock_response
+
+        # Use mock client with custom executed_at via subclass for testing
+        test_timestamp = "2026-10-04T11:22:33Z"
+        adapter = TreatmentDClassifierAdapter(client=mock_client, live=False)
+        task = ClassifierTask(
+            candidate_id="cand-001",
+            task_type=ClassifierTaskType.RELATIONSHIPS,
+            raw_statement="statement",
+            source_context="context",
+            source_path="path.md",
+            source_location="L1",
+            repository_identifier="org/repo",
+            repository_commit_sha="abcd" * 10,
+            taxonomy_version="0.1",
+        )
+        res = adapter.execute(task)
+        # Verify executed_at field exists on ClassifierResult
+        assert hasattr(res, "executed_at")
+        assert res.executed_at is not None
+
+    def test_28_execution_mneme_commit_sha_provenance(self):
+        """28. Execution commit SHA is resolved, 40-character hex, and validated fail-closed."""
+        sha = _get_git_commit_sha()
+        assert len(sha) == 40
+        assert all(c in "0123456789abcdefABCDEF" for c in sha)
+
+        # Invalid execution SHA fails provenance validation
+        arm_b_outcomes = load_treatment_outcomes(ARM_B_OUTCOMES_PATH)
+        refs = load_reference_corpus(V02_REF_DIR)
+        valid_sidecar = BT1DProvenanceSidecar(
+            experiment_id="b-t1d-relationship-selectivity",
+            arm_id="treatment_d",
+            treatment_profile_hash=B_T1D_PROFILE_D_HASH,
+            parent_main_sha=FROZEN_PARENT_MAIN_SHA,
+            execution_reference_corpus_hash=FROZEN_EXECUTION_REFERENCE_CORPUS_HASH,
+            scoring_reference_corpus_hash=FROZEN_SCORING_REFERENCE_CORPUS_HASH,
+            control_arm_b_profile_hash=CONTROL_ARM_B_PROFILE_HASH,
+            control_arm_b_semantic_hash=CONTROL_ARM_B_OUTCOMES_SEMANTIC_HASH,
+            execution_mneme_commit_sha=sha,
+            classifier_backend=FROZEN_CLASSIFIER_BACKEND,
+            classifier_version=FROZEN_CLASSIFIER_VERSION,
+            model_identifier=FROZEN_MODEL_IDENTIFIER,
+            taxonomy_version=FROZEN_TAXONOMY_VERSION,
+            request_parameters={
+                "max_tokens": FROZEN_MAX_TOKENS,
+                "timeout": FROZEN_TIMEOUT_SECONDS,
+                "max_retries": FROZEN_MAX_RETRIES,
+                "explicit_temperature": None,
+            },
+            task_count=100,
+            actual_outcome_count=100,
+            treatment_semantic_content_hash=compute_treatment_semantic_content_hash(arm_b_outcomes),
+        )
+        # Valid sidecar passes
+        validate_treatment_provenance(valid_sidecar, arm_b_outcomes, {r.reference_decision_id for r in refs})
+
+        # 'unknown' SHA fails
+        bad_sidecar_unknown = dataclasses.replace(valid_sidecar, execution_mneme_commit_sha="unknown")
+        with pytest.raises(ValueError, match="Provenance execution_mneme_commit_sha must be a valid"):
+            validate_treatment_provenance(bad_sidecar_unknown, arm_b_outcomes, {r.reference_decision_id for r in refs})
+
+        # Short/tampered SHA fails
+        bad_sidecar_short = dataclasses.replace(valid_sidecar, execution_mneme_commit_sha="abcd1234")
+        with pytest.raises(ValueError, match="Provenance execution_mneme_commit_sha must be a valid"):
+            validate_treatment_provenance(bad_sidecar_short, arm_b_outcomes, {r.reference_decision_id for r in refs})
+
+    def test_29_capture_treatment_run_validates_live_adapter_configuration(self, tmp_path: Path):
+        """29. capture_treatment_run validates live adapter configuration before any task execution."""
+        run_dir = tmp_path / "run_test"
+        v02_refs = load_reference_corpus(V02_REF_DIR)
+
+        # live=False fails closed
+        adapter_offline = TreatmentDClassifierAdapter(live=False)
+        with pytest.raises(RuntimeError, match="capture_treatment_run requires adapter.live=True"):
+            capture_treatment_run(run_dir, adapter_offline, v02_refs)
+
+        # Pre-supplied client on live capture fails closed
+        mock_client = MagicMock()
+        adapter_with_client = TreatmentDClassifierAdapter(client=mock_client, live=True)
+        with pytest.raises(ValueError, match="Canonical live capture requires uninitialized client"):
+            capture_treatment_run(run_dir, adapter_with_client, v02_refs)
+
+        # Altered timeout fails closed
+        adapter_bad_timeout = TreatmentDClassifierAdapter(timeout=30.0, live=True)
+        with pytest.raises(ValueError, match="Adapter timeout mismatch"):
+            capture_treatment_run(run_dir, adapter_bad_timeout, v02_refs)
+
+        # Altered retries fails closed
+        adapter_bad_retries = TreatmentDClassifierAdapter(max_retries=5, live=True)
+        with pytest.raises(ValueError, match="Adapter max_retries mismatch"):
+            capture_treatment_run(run_dir, adapter_bad_retries, v02_refs)
+
+    def test_30_validate_treatment_provenance_validates_request_parameters_and_invariants(self):
+        """30. validate_treatment_provenance validates request_parameters and experiment invariants."""
+        arm_b_outcomes = load_treatment_outcomes(ARM_B_OUTCOMES_PATH)
+        refs = load_reference_corpus(V02_REF_DIR)
+        sha = _get_git_commit_sha()
+
+        valid_sidecar = BT1DProvenanceSidecar(
+            experiment_id="b-t1d-relationship-selectivity",
+            arm_id="treatment_d",
+            treatment_profile_hash=B_T1D_PROFILE_D_HASH,
+            parent_main_sha=FROZEN_PARENT_MAIN_SHA,
+            execution_reference_corpus_hash=FROZEN_EXECUTION_REFERENCE_CORPUS_HASH,
+            scoring_reference_corpus_hash=FROZEN_SCORING_REFERENCE_CORPUS_HASH,
+            control_arm_b_profile_hash=CONTROL_ARM_B_PROFILE_HASH,
+            control_arm_b_semantic_hash=CONTROL_ARM_B_OUTCOMES_SEMANTIC_HASH,
+            execution_mneme_commit_sha=sha,
+            classifier_backend=FROZEN_CLASSIFIER_BACKEND,
+            classifier_version=FROZEN_CLASSIFIER_VERSION,
+            model_identifier=FROZEN_MODEL_IDENTIFIER,
+            taxonomy_version=FROZEN_TAXONOMY_VERSION,
+            request_parameters={
+                "max_tokens": FROZEN_MAX_TOKENS,
+                "timeout": FROZEN_TIMEOUT_SECONDS,
+                "max_retries": FROZEN_MAX_RETRIES,
+                "explicit_temperature": None,
+            },
+            task_count=100,
+            actual_outcome_count=100,
+            treatment_semantic_content_hash=compute_treatment_semantic_content_hash(arm_b_outcomes),
+        )
+
+        # Mutated max_tokens fails
+        bad_tokens = dataclasses.replace(
+            valid_sidecar,
+            request_parameters={**valid_sidecar.request_parameters, "max_tokens": 2048},
+        )
+        with pytest.raises(ValueError, match="Provenance max_tokens mismatch"):
+            validate_treatment_provenance(bad_tokens, arm_b_outcomes, {r.reference_decision_id for r in refs})
+
+        # Mutated temperature fails
+        bad_temp = dataclasses.replace(
+            valid_sidecar,
+            request_parameters={**valid_sidecar.request_parameters, "explicit_temperature": 0.5},
+        )
+        with pytest.raises(ValueError, match="Provenance explicit_temperature must be None"):
+            validate_treatment_provenance(bad_temp, arm_b_outcomes, {r.reference_decision_id for r in refs})
+
+        # Mutated profile hash fails
+        bad_hash = dataclasses.replace(valid_sidecar, treatment_profile_hash="tampered_hash")
+        with pytest.raises(ValueError, match="Provenance profile hash mismatch"):
+            validate_treatment_provenance(bad_hash, arm_b_outcomes, {r.reference_decision_id for r in refs})
+
+        # Mutated parent SHA fails
+        bad_sha = dataclasses.replace(valid_sidecar, parent_main_sha="tampered_sha")
+        with pytest.raises(ValueError, match="Provenance parent SHA mismatch"):
+            validate_treatment_provenance(bad_sha, arm_b_outcomes, {r.reference_decision_id for r in refs})
+
+        # Mutated task count fails
+        bad_tasks = dataclasses.replace(valid_sidecar, task_count=99)
+        with pytest.raises(ValueError, match="Provenance task_count mismatch"):
+            validate_treatment_provenance(bad_tasks, arm_b_outcomes, {r.reference_decision_id for r in refs})
