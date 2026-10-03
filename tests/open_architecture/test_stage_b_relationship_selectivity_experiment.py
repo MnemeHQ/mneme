@@ -520,25 +520,50 @@ class TestBT1DSelectivityScaffold:
         assert mock_client.messages.create.call_count == 1
 
     def test_23_execution_artifacts_lifecycle_guard(self):
-        """23. Validate committed execution artifacts if present; ensure no post-hoc artifacts."""
-        treatment_dir = REPO_ROOT / "benchmarks" / "open_architecture" / "batch_01" / "treatments" / "b_t1d"
-        outcomes_file = treatment_dir / "arm_d" / "outcomes.jsonl"
-        provenance_file = treatment_dir / "arm_d" / "provenance.json"
+        """23. Validate committed execution and scoring artifacts; ensure diagnostics.json is forbidden."""
+        treatment_dir = REPO_ROOT / "benchmarks" / "open_architecture" / "batch_01" / "treatments" / "b_t1d" / "arm_d"
+        outcomes_file = treatment_dir / "outcomes.jsonl"
+        provenance_file = treatment_dir / "provenance.json"
+        score_file = treatment_dir / "stage_b_score.json"
 
-        if outcomes_file.exists():
-            assert provenance_file.exists()
-            v02_refs = load_reference_corpus(V02_REF_DIR)
-            expected_ids = {r.reference_decision_id for r in v02_refs}
-            outcomes, sidecar = load_treatment_run(treatment_dir / "arm_d", expected_ids)
-            assert len(outcomes) == 100
-            assert sidecar.treatment_profile_hash == B_T1D_PROFILE_D_HASH
-            # Ensure post-hoc / scoring artifacts have not been created yet in this capture phase
-            assert not (treatment_dir / "arm_d" / "stage_b_score.json").exists()
-            assert not (treatment_dir / "arm_d" / "diagnostics.json").exists()
-        else:
-            assert not provenance_file.exists()
-            assert not (treatment_dir / "arm_d" / "stage_b_score.json").exists()
-            assert not (treatment_dir / "arm_d" / "diagnostics.json").exists()
+        # 1. Require valid outcomes and provenance
+        assert outcomes_file.is_file(), f"Missing outcomes file: {outcomes_file}"
+        assert provenance_file.is_file(), f"Missing provenance file: {provenance_file}"
+
+        v02_refs = load_reference_corpus(V02_REF_DIR)
+        expected_ids = {r.reference_decision_id for r in v02_refs}
+        outcomes, sidecar = load_treatment_run(treatment_dir, expected_ids)
+        assert len(outcomes) == 100
+        assert sidecar.treatment_profile_hash == B_T1D_PROFILE_D_HASH
+
+        # 2. Allow and validate stage_b_score.json if present
+        if score_file.is_file():
+            score_data = json.loads(score_file.read_text(encoding="utf-8"))
+            assert score_data["source_outcomes_semantic_hash"] == sidecar.treatment_semantic_content_hash
+            assert (
+                score_data["scoring_reference_corpus_hash"]
+                == FROZEN_SCORING_REFERENCE_CORPUS_HASH
+                == "700a569e24bf90707ba14ff65eea2ab5"
+            )
+            assert score_data["arm_id"] == "treatment_d"
+            assert score_data["experiment_id"] == "b-t1d-relationship-selectivity"
+            assert score_data["model_calls"] == 0
+            assert score_data["total_references"] == 100
+            assert score_data["total_outcomes"] == 800
+            assert score_data["scorer_authority"] == "harness._execute_stage_b_tasks_and_scoring"
+            assert score_data["source_execution_commit_sha"] == sidecar.execution_mneme_commit_sha
+            assert score_data["treatment_profile_hash"] == sidecar.treatment_profile_hash
+
+            # Independent validation against score_b_t1d_replay
+            manifest = Manifest.load(MANIFEST_PATH)
+            b0_outcomes = load_stage_b_outcomes(FROZEN_B0_PATH)
+            mixed = build_mixed_stage_b_outcomes(b0_outcomes, outcomes)
+            replayed = score_b_t1d_replay(mixed, v02_refs, manifest)
+            assert score_data["strict_relationship_accuracy"] == replayed.strict_relationship_accuracy
+            assert score_data["stage_b_semantic_score"] == replayed.composite_score
+
+        # 3. Continue to forbid diagnostics.json in this phase
+        assert not (treatment_dir / "diagnostics.json").exists()
 
     def test_24_no_assert_statements_in_experiment_module(self):
         """24. B-T1D experiment module contains zero ast.Assert statements in production code."""
