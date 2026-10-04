@@ -44,9 +44,14 @@ from mneme.decision_authority import (
 from mneme.decision_index import (
     CANONICAL_VERSION,
     CanonicalArchitectureIndex,
-    decisions_to_canonical,
+    CanonicalDecisionRecord,
 )
-from mneme.decision_index_service import DecisionIndexService
+from mneme.decision_index_persistence import load_decision_index_from_memory_file
+from mneme.decision_index_service import (
+    CanonicalDecisionTrace,
+    DecisionIndexService,
+    ProposalTrace,
+)
 from mneme.decision_proposal import (
     ORIGIN_AI_GENERATED,
     PROPOSAL_STATUS_ACCEPTED,
@@ -1214,6 +1219,49 @@ def test_materialized_decision_carries_proposal_provenance_only(
     assert evidence.content_fingerprint == proposal.content_fingerprint
     assert evidence.accepted_decision_id == result.decision_id
     assert evidence.verification_status == ""
+
+
+def test_g15_accepted_proposal_is_visible_without_service_restart(
+    tmp_path: Path,
+) -> None:
+    """One live service sees authority acceptance through canonical memory."""
+    proposals_path = tmp_path / "p.json"
+    memory = _write_memory(tmp_path)
+    producer_store = JsonFileDecisionProposalStore(proposals_path)
+    service = DecisionIndexService(
+        producer_store,
+        canonical_index_loader=lambda: load_decision_index_from_memory_file(memory),
+        clock=lambda: FIXED_TIME,
+    )
+    proposed = service.propose(_candidate()).proposal
+
+    accepted = DecisionAuthorityService(
+        JsonFileDecisionProposalStore(proposals_path),
+        memory,
+        clock=lambda: FIXED_TIME,
+    ).accept(proposed.proposal_id)
+
+    # Same service instance, no reconstruction/restart and no ADR-derived index.
+    record = service.get(accepted.decision_id)
+    assert isinstance(record, CanonicalDecisionRecord)
+    assert record.decision_id == accepted.decision_id
+    assert record.statement == proposed.candidate.statement
+
+    search = service.search(query=proposed.candidate.statement)
+    assert [r.decision_id for r in search.canonical_decisions] == [
+        accepted.decision_id
+    ]
+
+    canonical_trace = service.trace(accepted.decision_id)
+    assert isinstance(canonical_trace, CanonicalDecisionTrace)
+    assert canonical_trace.canonical_record is not None
+    assert canonical_trace.canonical_record.decision_id == accepted.decision_id
+
+    proposal_trace = service.trace(proposed.proposal_id)
+    assert isinstance(proposal_trace, ProposalTrace)
+    assert proposal_trace.accepted_decision_id == accepted.decision_id
+    assert proposal_trace.canonical_record is not None
+    assert proposal_trace.canonical_record.decision_id == accepted.decision_id
 
 
 def test_materialized_memory_loads_through_existing_memorystore(
