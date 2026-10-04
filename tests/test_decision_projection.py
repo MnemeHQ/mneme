@@ -582,6 +582,24 @@ def test_projection_fails_closed_on_rule_lifecycle_mismatch():
     assert "lifecycle_status" in str(exc.value)
 
 
+def test_proposal_provenance_does_not_become_runtime_source_path():
+    canonical = CanonicalDecisionRecord(
+        decision_id="ddec-proposal",
+        version="1",
+        version_id="dver-proposal",
+        statement="Use the reviewed storage boundary",
+        lifecycle_status="active",
+        source_evidence=(CanonicalSourceEvidence(
+            source_type="proposal",
+            source_locator="design/storage-review.md",
+            proposal_id="dprop-example",
+            accepted_decision_id="ddec-proposal",
+        ),),
+    )
+    projected = project_canonical_decision(canonical)
+    assert projected.source_path == ""
+
+
 def test_projection_fails_closed_on_unknown_source_type():
     canonical = dataclasses.replace(
         _record(decision_id="D0-SRC"),

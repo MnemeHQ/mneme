@@ -503,6 +503,187 @@ def migrate_memory_document(document: dict[str, Any]) -> dict[str, Any]:
     return migrated
 
 
+
+def append_initial_canonical_decision(
+    document: dict[str, Any],
+    *,
+    decision_id: str,
+    statement: str,
+    rationale: str,
+    context_scope: list[str] | tuple[str, ...],
+    lifecycle_status: str,
+    created_at: str,
+    updated_at: str,
+    occurrence_source_identity: list[Any] | tuple[Any, ...],
+    source_evidence: list[dict[str, Any]],
+) -> tuple[dict[str, Any], bool]:
+    """Append one first canonical occurrence and its derived compatibility row.
+
+    This is a persistence primitive only. The caller owns authority and
+    transition semantics. A section-less document is migrated first so the
+    write always lands in the durable Decision Index. Existing decision ids
+    are returned unchanged for the caller to verify or fail closed.
+    """
+    migrated = migrate_memory_document(document)
+    section = copy.deepcopy(
+        _require_dict(migrated["decision_index"], "decision_index")
+    )
+    logical_rows = _require_list(
+        section.get("decisions"), "decision_index.decisions"
+    )
+    if any(
+        isinstance(row, dict) and row.get("decision_id") == decision_id
+        for row in logical_rows
+    ):
+        return migrated, False
+
+    digest = content_digest_of(
+        statement,
+        rationale,
+        context_scope,
+        (),
+        (),
+    )
+    version_id = version_id_of(
+        decision_id,
+        digest,
+        occurrence_source_identity,
+        NO_PREDECESSOR,
+    )
+    logical_rows.append({
+        "decision_id": decision_id,
+        "decision_class": CANONICAL_DECISION_CLASS_ARCHITECTURE,
+        "lifecycle_status": lifecycle_status,
+        "active_version_id": version_id,
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": updated_at,
+    })
+    _require_list(
+        section.get("versions"), "decision_index.versions"
+    ).append({
+        "version_id": version_id,
+        "decision_id": decision_id,
+        "revision": "1",
+        "content_digest": digest,
+        "statement": statement,
+        "rationale": rationale,
+        "context_scope": list(context_scope),
+        "constraints": [],
+        "anti_patterns": [],
+        "source_evidence": copy.deepcopy(source_evidence),
+        "occurrence_source_identity": list(occurrence_source_identity),
+        "supersedes_version_id": None,
+        "created_at": created_at,
+    })
+
+    migrated["decision_index"] = section
+    index = load_persisted_decision_index(section)
+    projected = project_canonical_index(index)
+    decision = next(item for item in projected if item.id == decision_id)
+    decisions = _require_list(migrated.get("decisions", []), "decisions")
+    decisions.append(_snapshot_record_from_decision(decision))
+    return migrated, True
+
+
+def rebind_legacy_initial_occurrence(
+    document: dict[str, Any],
+    *,
+    decision_id: str,
+    occurrence_source_identity: list[Any] | tuple[Any, ...],
+    source_evidence: list[dict[str, Any]],
+) -> tuple[dict[str, Any], bool]:
+    """Replace only a migration-only legacy occurrence identity.
+
+    D1C uses this when a proposal was accepted before canonical cutover and
+    its old compatibility row was migrated by D1B. Content, rule ids,
+    ordering, lifecycle, timestamps, and the compatibility snapshot remain
+    unchanged; only first-occurrence identity and provenance are corrected.
+    """
+    migrated = migrate_memory_document(document)
+    section = copy.deepcopy(
+        _require_dict(migrated["decision_index"], "decision_index")
+    )
+    logical_rows = _require_list(
+        section.get("decisions"), "decision_index.decisions"
+    )
+    logical = next(
+        (
+            row
+            for row in logical_rows
+            if isinstance(row, dict) and row.get("decision_id") == decision_id
+        ),
+        None,
+    )
+    if logical is None:
+        return migrated, False
+    active_version_id = _require_str(
+        logical.get("active_version_id"),
+        f"decision {decision_id!r} active_version_id",
+        non_empty=True,
+    )
+    versions = _require_list(
+        section.get("versions"), "decision_index.versions"
+    )
+    version = next(
+        (
+            row
+            for row in versions
+            if isinstance(row, dict) and row.get("version_id") == active_version_id
+        ),
+        None,
+    )
+    if version is None:
+        raise DecisionIndexPersistenceError(
+            f"decision {decision_id!r} active version is missing"
+        )
+    existing_identity = _require_list(
+        version.get("occurrence_source_identity", []),
+        f"decision {decision_id!r} occurrence_source_identity",
+    )
+    if existing_identity != ["legacy-decisions", decision_id]:
+        return migrated, False
+    if version.get("supersedes_version_id") is not None:
+        raise DecisionIndexPersistenceError(
+            f"decision {decision_id!r} legacy migration occurrence has a predecessor"
+        )
+
+    new_version_id = version_id_of(
+        decision_id,
+        _require_str(
+            version.get("content_digest"),
+            f"decision {decision_id!r} content_digest",
+            non_empty=True,
+        ),
+        occurrence_source_identity,
+        NO_PREDECESSOR,
+    )
+    if any(
+        isinstance(row, dict)
+        and row is not version
+        and row.get("version_id") == new_version_id
+        for row in versions
+    ):
+        raise DecisionIndexPersistenceError(
+            f"proposal-backed version id {new_version_id!r} already exists"
+        )
+    version["version_id"] = new_version_id
+    version["occurrence_source_identity"] = list(occurrence_source_identity)
+    version["source_evidence"] = copy.deepcopy(source_evidence)
+    logical["active_version_id"] = new_version_id
+    for rule in _require_list(section.get("rules"), "decision_index.rules"):
+        if (
+            isinstance(rule, dict)
+            and rule.get("decision_id") == decision_id
+            and rule.get("decision_version_id") == active_version_id
+        ):
+            rule["decision_version_id"] = new_version_id
+
+    migrated["decision_index"] = section
+    load_persisted_decision_index(section)
+    return migrated, True
+
+
 def _parse_source_evidence(
     raw: object,
     decision_id: str,
@@ -516,29 +697,107 @@ def _parse_source_evidence(
             f"source_evidence[{index}].source_type",
             non_empty=True,
         )
-        if source_type not in {"adr", "runtime"}:
+        if source_type not in {"adr", "runtime", "proposal"}:
             raise DecisionIndexPersistenceError(
                 f"decision {decision_id!r} source evidence has unknown source_type "
                 f"{source_type!r}"
             )
-        evidence.append(CanonicalSourceEvidence(
-            source_type=source_type,
-            source_locator=_require_str(
+        common_keys = {
+            "source_type",
+            "source_locator",
+            "source_revision",
+            "observed_at",
+            "verification_status",
+        }
+        proposal_keys = {
+            "proposal_id",
+            "producer_key",
+            "content_fingerprint",
+            "origin_classification",
+            "proposed_at",
+            "source_reference",
+            "accepted_decision_id",
+        }
+        allowed_keys = (
+            common_keys | proposal_keys
+            if source_type == "proposal"
+            else common_keys
+        )
+        unknown_keys = set(item) - allowed_keys
+        if unknown_keys:
+            raise DecisionIndexPersistenceError(
+                f"decision {decision_id!r} source evidence type {source_type!r} "
+                f"contains unsupported fields {sorted(unknown_keys)}"
+            )
+
+        common = {
+            "source_type": source_type,
+            "source_locator": _require_str(
                 item.get("source_locator", ""),
                 f"source_evidence[{index}].source_locator",
             ),
-            source_revision=_require_str(
+            "source_revision": _require_str(
                 item.get("source_revision", ""),
                 f"source_evidence[{index}].source_revision",
             ),
-            observed_at=_require_str(
+            "observed_at": _require_str(
                 item.get("observed_at", ""),
                 f"source_evidence[{index}].observed_at",
             ),
-            verification_status=_require_str(
+            "verification_status": _require_str(
                 item.get("verification_status", ""),
                 f"source_evidence[{index}].verification_status",
             ),
+        }
+        if source_type != "proposal":
+            evidence.append(CanonicalSourceEvidence(**common))
+            continue
+
+        proposal_fields = {
+            "proposal_id": _require_str(
+                item.get("proposal_id"),
+                f"source_evidence[{index}].proposal_id",
+                non_empty=True,
+            ),
+            "producer_key": _require_str(
+                item.get("producer_key"),
+                f"source_evidence[{index}].producer_key",
+                non_empty=True,
+            ),
+            "content_fingerprint": _require_str(
+                item.get("content_fingerprint"),
+                f"source_evidence[{index}].content_fingerprint",
+                non_empty=True,
+            ),
+            "origin_classification": _require_str(
+                item.get("origin_classification"),
+                f"source_evidence[{index}].origin_classification",
+                non_empty=True,
+            ),
+            "proposed_at": _require_str(
+                item.get("proposed_at"),
+                f"source_evidence[{index}].proposed_at",
+                non_empty=True,
+            ),
+            "source_reference": _require_str(
+                item.get("source_reference"),
+                f"source_evidence[{index}].source_reference",
+                non_empty=True,
+            ),
+            "accepted_decision_id": _require_str(
+                item.get("accepted_decision_id"),
+                f"source_evidence[{index}].accepted_decision_id",
+                non_empty=True,
+            ),
+        }
+        if proposal_fields["accepted_decision_id"] != decision_id:
+            raise DecisionIndexPersistenceError(
+                f"decision {decision_id!r} proposal provenance links to "
+                f"{proposal_fields['accepted_decision_id']!r}"
+            )
+        evidence.append(CanonicalSourceEvidence(
+            **common,
+            **proposal_fields,
         ))
     return tuple(evidence)
 
@@ -1000,6 +1259,29 @@ def verify_compatibility_snapshot(
     return projected
 
 
+
+def load_decision_index_from_memory_file(
+    path: str | Path,
+) -> CanonicalArchitectureIndex:
+    """Load the authoritative persisted index from project memory, read-only.
+
+    Section-less pre-D1 memory is not adapted here: canonical consumers must
+    never reconstruct a second authority from the compatibility snapshot.
+    """
+    memory_path = Path(path)
+    with open(memory_path, encoding="utf-8") as handle:
+        document = json.load(handle)
+    if not isinstance(document, dict):
+        raise DecisionIndexPersistenceError("project memory must be an object")
+    if "decision_index" not in document:
+        raise DecisionIndexPersistenceError(
+            "project memory has no authoritative decision_index section"
+        )
+    index = load_persisted_decision_index(document["decision_index"])
+    verify_compatibility_snapshot(document, index, memory_path)
+    return index
+
+
 def migrate_memory_file(path: str | Path) -> bool:
     """Atomically add D1B canonical persistence to one pre-D1 memory file.
 
@@ -1038,12 +1320,15 @@ __all__ = [
     "DECISION_INDEX_SCHEMA",
     "NO_PREDECESSOR",
     "DecisionIndexPersistenceError",
+    "append_initial_canonical_decision",
     "compatibility_snapshot_decisions",
     "content_digest_of",
     "legacy_item_to_runtime_decision",
+    "load_decision_index_from_memory_file",
     "load_persisted_decision_index",
     "migrate_memory_document",
     "migrate_memory_file",
+    "rebind_legacy_initial_occurrence",
     "rule_id_of",
     "runtime_decision_from_memory_record",
     "verify_compatibility_snapshot",

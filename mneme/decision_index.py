@@ -83,10 +83,12 @@ VALID_LIFECYCLE_STATUSES: frozenset[str] = frozenset({
 # kernel must not falsify provenance.
 SOURCE_TYPE_ADR = "adr"
 SOURCE_TYPE_RUNTIME = "runtime"
+SOURCE_TYPE_PROPOSAL = "proposal"
 
 VALID_SOURCE_TYPES: frozenset[str] = frozenset({
     SOURCE_TYPE_ADR,
     SOURCE_TYPE_RUNTIME,
+    SOURCE_TYPE_PROPOSAL,
 })
 
 CANONICAL_VERSION = "1"
@@ -111,6 +113,13 @@ class CanonicalSourceEvidence:
     source_revision: str = ""
     observed_at: str = ""
     verification_status: str = ""
+    proposal_id: str = ""
+    producer_key: str = ""
+    content_fingerprint: str = ""
+    origin_classification: str = ""
+    proposed_at: str = ""
+    source_reference: str = ""
+    accepted_decision_id: str = ""
 
 
 @dataclass(frozen=True)
@@ -459,6 +468,7 @@ __all__ = [
     "CANONICAL_DECISION_CLASS_ARCHITECTURE",
     "CANONICAL_VERSION",
     "SOURCE_TYPE_ADR",
+    "SOURCE_TYPE_PROPOSAL",
     "SOURCE_TYPE_RUNTIME",
     "CanonicalArchitectureIndex",
     "CanonicalDecisionRecord",

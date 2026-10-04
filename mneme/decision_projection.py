@@ -41,6 +41,7 @@ from pathlib import Path
 from mneme.decision_index import (
     CANONICAL_DECISION_CLASS_ARCHITECTURE,
     SOURCE_TYPE_ADR,
+    SOURCE_TYPE_PROPOSAL,
     VALID_SOURCE_TYPES,
     CanonicalArchitectureIndex,
     CanonicalDecisionRecord,
@@ -122,6 +123,11 @@ def _source_path_of(
             )
     if record.source_evidence:
         evidence = record.source_evidence[0]
+        if evidence.source_type == SOURCE_TYPE_PROPOSAL:
+            # Proposal provenance is canonical lineage, not a runtime policy
+            # file. Never turn its document reference into an ADR-019/020
+            # source-path exemption.
+            return ""
         locator = evidence.source_locator
         if (
             evidence.source_type == SOURCE_TYPE_ADR

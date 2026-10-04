@@ -60,6 +60,7 @@ from mneme.decision_mcp import (
     TOOL_TRACE,
     build_server_from_parts,
 )
+from mneme.decision_index_persistence import load_decision_index_from_memory_file
 from mneme.decision_proposal import ORIGIN_AI_GENERATED
 from mneme.decision_proposal_store import JsonFileDecisionProposalStore
 
@@ -142,17 +143,16 @@ def _batch_payload() -> dict:
     }
 
 
-def _mcp_server(store_path: Path):
-    """Compose the real MCP server over the durable proposal store.
-
-    Exactly the composition ``mneme decision-mcp`` uses by default
-    (``open_proposal_store(path)`` + no canonical ADR directory). The
-    injected clock keeps ``proposed_at`` deterministic; proposal identity
-    never depends on it.
-    """
+def _mcp_server(store_path: Path, memory_path: Path | None = None):
+    """Compose the real MCP service pieces with optional live canonical memory."""
+    loader = (
+        (lambda: load_decision_index_from_memory_file(memory_path))
+        if memory_path is not None
+        else None
+    )
     return build_server_from_parts(
         JsonFileDecisionProposalStore(store_path),
-        canonical_index=None,
+        canonical_index_loader=loader,
         clock=lambda: FIXED_TIME,
     )
 
@@ -782,7 +782,7 @@ def test_rejected_proposal_is_a_full_negative_control(tmp_path):
     assert rejected.accepted_decision_id is None
 
     # Retrievable as rejected through MCP search.
-    server = _mcp_server(flow.proposals_path)
+    server = _mcp_server(flow.proposals_path, flow.memory_path)
     found = _call(
         server, TOOL_SEARCH, {"proposal_status": "rejected"}
     ).structured_content
@@ -914,7 +914,7 @@ def test_reconstructed_mcp_sees_durable_accepted_proposal_state(tmp_path):
     known/missing canonical linkage honestly."""
     flow = _run_producer_flow(tmp_path)
     fixture = flow.fixture
-    server = _mcp_server(flow.proposals_path)
+    server = _mcp_server(flow.proposals_path, flow.memory_path)
 
     for key in flow.accepted_keys:
         proposal_id = flow.proposal_id_by_key[key]
@@ -930,72 +930,58 @@ def test_reconstructed_mcp_sees_durable_accepted_proposal_state(tmp_path):
         trace_payload = traced.structured_content
         assert trace_payload["result_type"] == "proposal_trace"
         assert trace_payload["accepted_decision_id"] == decision_id
-        # The accepted canonical decision is NOT composed into this MCP
-        # server's canonical index (documented D2 composition boundary):
-        # trace reports the missing link explicitly instead of fabricating
-        # a canonical record, derived rules, or evidence.
-        assert trace_payload["canonical_record"] is None
+        canonical = trace_payload["canonical_record"]
+        assert canonical is not None
+        assert canonical["decision_id"] == decision_id
+        assert canonical["version_id"]
+        assert canonical["decision_version_id"] == canonical["version_id"]
+        assert canonical["content_digest"]
         assert trace_payload["canonical_derived_rule_ids"] == []
         missing = trace_payload["missing_links"]
-        assert any(decision_id in m and "canonical_record" in m for m in missing)
         assert any("enforcement" in m for m in missing)
         assert any("trusted_evidence" in m for m in missing)
-        flat = json.dumps(trace_payload)
-        for fabricated in ("FORBID_LITERAL", "rule_payload"):
-            assert fabricated not in flat, fabricated
 
-    # Canonical accepted-decision visibility, explicitly characterized:
-    # the accepted decision id is not an MCP-visible canonical record.
     canonical_id = flow.decision_id_by_key["fail_closed_output_contract"]
     got_canonical = _call(server, TOOL_GET, {"record_id": canonical_id})
-    assert got_canonical.structured_content["record_type"] == "not_found"
+    canonical_payload = got_canonical.structured_content
+    assert canonical_payload["record_type"] == "canonical_decision"
+    assert canonical_payload["canonical_decision"]["decision_id"] == canonical_id
     traced_canonical = _call(server, TOOL_TRACE, {"record_id": canonical_id})
-    assert traced_canonical.structured_content["result_type"] == "trace_not_found"
-    assert traced_canonical.structured_content["record_id"] == canonical_id
+    assert traced_canonical.structured_content["result_type"] == "canonical_trace"
+    assert traced_canonical.structured_content["canonical_record"][
+        "decision_id"
+    ] == canonical_id
 
 
-def test_decision_mcp_composition_has_no_project_memory_input():
-    """The current supported MCP composition contract serves the proposal
-    store plus an optional strict ADR canonical directory; no supported
-    input composes project_memory-backed decisions into the canonical
-    index. Recorded, not changed."""
+def test_decision_mcp_composition_uses_project_memory_canonical_index():
+    """The supported CLI composes canonical reads from project memory."""
     stdout, stderr = io.StringIO(), io.StringIO()
     with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
         with pytest.raises(SystemExit) as excinfo:
             main(["decision-mcp", "--help"])
     assert excinfo.value.code == 0
     help_text = stdout.getvalue()
-    # The supported inputs are the proposal store and an explicit strict
-    # canonical ADR directory only.
     assert "--proposals" in help_text
+    assert "--memory" in help_text
     assert "--adr-dir" in help_text
-    assert "--memory" not in help_text
+    assert "validation" in help_text.lower()
 
 
 # ── Long-running MCP store freshness ────────────────────────────────────────
 
 
-def test_long_running_mcp_instance_stays_stale_without_restart(tmp_path):
-    """A server instance created BEFORE the external CLI authority action
-    does NOT observe the proposal transition without restart; a
-    reconstructed server correctly reads the durable proposal state.
-
-    Current behavior, explicitly characterized: the proposal store is
-    loaded once at construction (documented D2B store contract); no live
-    cross-process refresh is promised, so this is recorded as expected
-    behavior and no file-watching/reload behavior is added."""
+def test_long_running_mcp_instance_observes_authority_without_restart(tmp_path):
+    """D1C refreshes both proposal state and canonical memory on live reads."""
     proposals_path = tmp_path / "decision_proposals.json"
     memory_path = _write_memory(tmp_path / ".mneme" / "project_memory.json")
-    stale_server = _mcp_server(proposals_path)
+    live_server = _mcp_server(proposals_path, memory_path)
 
-    ingested = _call(stale_server, TOOL_PROPOSE_BATCH, _batch_payload())
+    ingested = _call(live_server, TOOL_PROPOSE_BATCH, _batch_payload())
     assert ingested.is_error is False
     proposal_id = ingested.structured_content["results"][0]["proposal"][
         "proposal_id"
     ]
 
-    # A separate human authority surface transitions the proposal against
-    # the same durable store path.
     code, out, err = _run(
         [
             "decision", "accept", proposal_id,
@@ -1006,19 +992,20 @@ def test_long_running_mcp_instance_stays_stale_without_restart(tmp_path):
     assert code == 0, out + err
     decision_id = _decision_id_from_output(out)
 
-    # The already-running MCP instance remains stale: it still serves the
-    # in-memory proposed record and never sees the transition.
-    stale = _call(stale_server, TOOL_GET, {"record_id": proposal_id})
-    stale_payload = stale.structured_content["proposal"]
-    assert stale_payload["proposal_status"] == "proposed"
-    assert stale_payload["accepted_decision_id"] is None
+    proposal_result = _call(live_server, TOOL_GET, {"record_id": proposal_id})
+    proposal_payload = proposal_result.structured_content["proposal"]
+    assert proposal_payload["proposal_status"] == "accepted"
+    assert proposal_payload["accepted_decision_id"] == decision_id
 
-    # A reconstructed server reads the durable proposal state correctly.
-    fresh_server = _mcp_server(proposals_path)
-    fresh = _call(fresh_server, TOOL_GET, {"record_id": proposal_id})
-    fresh_payload = fresh.structured_content["proposal"]
-    assert fresh_payload["proposal_status"] == "accepted"
-    assert fresh_payload["accepted_decision_id"] == decision_id
+    canonical_result = _call(
+        live_server, TOOL_GET, {"record_id": decision_id}
+    ).structured_content
+    assert canonical_result["record_type"] == "canonical_decision"
+    assert canonical_result["canonical_decision"]["decision_id"] == decision_id
+
+    trace = _call(live_server, TOOL_TRACE, {"record_id": proposal_id})
+    assert trace.structured_content["accepted_decision_id"] == decision_id
+    assert trace.structured_content["canonical_record"]["decision_id"] == decision_id
 
 
 # ── No producer-specific runtime logic ──────────────────────────────────────

@@ -44,9 +44,14 @@ from mneme.decision_authority import (
 from mneme.decision_index import (
     CANONICAL_VERSION,
     CanonicalArchitectureIndex,
-    decisions_to_canonical,
+    CanonicalDecisionRecord,
 )
-from mneme.decision_index_service import DecisionIndexService
+from mneme.decision_index_persistence import load_decision_index_from_memory_file
+from mneme.decision_index_service import (
+    CanonicalDecisionTrace,
+    DecisionIndexService,
+    ProposalTrace,
+)
 from mneme.decision_proposal import (
     ORIGIN_AI_GENERATED,
     PROPOSAL_STATUS_ACCEPTED,
@@ -185,9 +190,7 @@ def _accept(
 
 
 def _canonical_index(memory_path: Path) -> CanonicalArchitectureIndex:
-    store = MemoryStore(memory_path)
-    store.load()
-    return decisions_to_canonical(store.decisions())
+    return load_decision_index_from_memory_file(memory_path)
 
 
 def _memory_bytes(path: Path) -> bytes:
@@ -786,16 +789,10 @@ def test_default_id_remains_ddec_namespace(tmp_path: Path) -> None:
     assert result.decision_id.startswith("ddec-")
 
 
-def test_accept_retry_tolerates_downstream_protection_enrichment(
+def test_accept_retry_fails_closed_on_snapshot_only_protection_enrichment(
     tmp_path: Path,
 ) -> None:
-    """Legitimate downstream enrichment must survive an acceptance retry.
-
-    The rule here is created by the existing protection subsystem's write
-    primitive AFTER acceptance; D2C did not create it. The retry must not
-    treat the enrichment as an ID collision, must not delete or rewrite
-    it, and must still return the idempotent already-accepted result.
-    """
+    """D1C never adopts a protection write made only to derived decisions[]."""
     from mneme.protection import _install_rule
     from mneme.schemas import Rule
 
@@ -805,72 +802,39 @@ def test_accept_retry_tolerates_downstream_protection_enrichment(
     result = _accept(JsonFileDecisionProposalStore(path), memory, proposal.proposal_id)
     decision_id = result.decision_id
 
-    # At acceptance time the decision is bare: D2C created no rule.
-    bare_entry = _entry_for(memory, decision_id)
-    assert bare_entry["rules"] == []
-    assert _canonical_index(memory).rules_for_decision(decision_id) == ()
-
-    # Legitimate downstream protection via the existing protection write
-    # primitive (the exact primitive protection activation uses).
     rule = Rule(type="FORBID_LITERAL", value="legacy_client")
     assert _install_rule(memory, decision_id, rule) is True
-    enriched_entry = _entry_for(memory, decision_id)
-    assert enriched_entry["rules"] == [
-        {"type": "FORBID_LITERAL", "value": "legacy_client"}
-    ]
-    snapshot = _memory_bytes(memory)
+    divergent = _memory_bytes(memory)
 
-    # Retry acceptance: idempotent success, no rewrite, rule intact.
-    retry = _accept(JsonFileDecisionProposalStore(path), memory, proposal.proposal_id)
-    assert retry.proposal_id == proposal.proposal_id
-    assert retry.decision_id == decision_id
-    assert retry.already_accepted is True
-    assert retry.materialized is False
-    assert retry.recovered is False
-    assert retry.verified is True
-    assert _memory_bytes(memory) == snapshot
-    after_entry = _entry_for(memory, decision_id)
-    assert after_entry["rules"] == enriched_entry["rules"]
+    with pytest.raises(MemoryInvalidError, match="compatibility snapshot diverges"):
+        _accept(JsonFileDecisionProposalStore(path), memory, proposal.proposal_id)
+    assert _memory_bytes(memory) == divergent
     stored = JsonFileDecisionProposalStore(path).get(proposal.proposal_id)
     assert stored is not None
+    assert stored.status == PROPOSAL_STATUS_ACCEPTED
     assert stored.accepted_decision_id == decision_id
 
-    # The canonical record keeps the downstream-derived rule linkage that
-    # D2C itself did not create.
-    record = next(
-        r for r in _canonical_index(memory).records
-        if r.decision_id == decision_id
-    )
-    assert record.derived_rule_ids == (f"{decision_id}:FORBID_LITERAL:0",)
 
-
-def test_accept_retry_tolerates_declared_test_evidence_linkage(
+def test_accept_retry_fails_closed_on_snapshot_only_test_evidence(
     tmp_path: Path,
 ) -> None:
-    """Declared test evidence added after acceptance is downstream
-    enrichment: a retry must neither claim nor remove it."""
+    """D1C never adopts evidence written only to the compatibility snapshot."""
     path = tmp_path / "p.json"
     proposal = _propose(JsonFileDecisionProposalStore(path))
     memory = _write_memory(tmp_path)
     result = _accept(JsonFileDecisionProposalStore(path), memory, proposal.proposal_id)
-    decision_id = result.decision_id
     with open(memory, encoding="utf-8") as handle:
         raw = json.load(handle)
-    entry = next(e for e in raw["decisions"] if e.get("id") == decision_id)
+    entry = next(e for e in raw["decisions"] if e.get("id") == result.decision_id)
     entry["test_evidence"] = [
         {"selector": "tests/test_downstream.py::test_rule", "sha": ""}
     ]
     memory.write_text(json.dumps(raw, indent=2) + "\n", encoding="utf-8")
-    snapshot = _memory_bytes(memory)
+    divergent = _memory_bytes(memory)
 
-    retry = _accept(JsonFileDecisionProposalStore(path), memory, proposal.proposal_id)
-    assert retry.already_accepted is True
-    assert retry.materialized is False
-    assert retry.verified is True
-    assert _memory_bytes(memory) == snapshot
-    assert _entry_for(memory, decision_id)["test_evidence"] == [
-        {"selector": "tests/test_downstream.py::test_rule", "sha": ""}
-    ]
+    with pytest.raises(MemoryInvalidError, match="compatibility snapshot diverges"):
+        _accept(JsonFileDecisionProposalStore(path), memory, proposal.proposal_id)
+    assert _memory_bytes(memory) == divergent
 
 
 def test_explicit_decision_id_empty_fails(tmp_path: Path) -> None:
@@ -999,11 +963,11 @@ def test_same_id_different_content_fails_closed(tmp_path: Path) -> None:
     memory.write_text(json.dumps(raw, indent=2) + "\n", encoding="utf-8")
     tampered = _memory_bytes(memory)
 
-    with pytest.raises(DecisionIdCollisionError):
+    with pytest.raises(MemoryInvalidError, match="compatibility snapshot diverges"):
         _service(JsonFileDecisionProposalStore(path), memory).accept(
             proposal.proposal_id
         )
-    with pytest.raises(DecisionIdCollisionError):
+    with pytest.raises(MemoryInvalidError, match="compatibility snapshot diverges"):
         _accept(
             JsonFileDecisionProposalStore(path),
             memory,
@@ -1195,7 +1159,7 @@ def test_materialized_decision_projects_to_canonical_record(tmp_path: Path) -> N
     assert index.rules_for_decision(result.decision_id) == ()
 
 
-def test_materialized_decision_carries_no_fabricated_provenance(
+def test_materialized_decision_carries_proposal_provenance_only(
     tmp_path: Path,
 ) -> None:
     path = tmp_path / "p.json"
@@ -1208,7 +1172,57 @@ def test_materialized_decision_carries_no_fabricated_provenance(
         r for r in _canonical_index(memory).records
         if r.decision_id == result.decision_id
     )
-    assert record.source_evidence == ()
+    assert len(record.source_evidence) == 1
+    evidence = record.source_evidence[0]
+    assert evidence.source_type == "proposal"
+    assert evidence.proposal_id == proposal.proposal_id
+    assert evidence.producer_key == proposal.producer_key
+    assert evidence.content_fingerprint == proposal.content_fingerprint
+    assert evidence.accepted_decision_id == result.decision_id
+    assert evidence.verification_status == ""
+
+
+def test_g15_accepted_proposal_is_visible_without_service_restart(
+    tmp_path: Path,
+) -> None:
+    """One live service sees authority acceptance through canonical memory."""
+    proposals_path = tmp_path / "p.json"
+    memory = _write_memory(tmp_path)
+    producer_store = JsonFileDecisionProposalStore(proposals_path)
+    service = DecisionIndexService(
+        producer_store,
+        canonical_index_loader=lambda: load_decision_index_from_memory_file(memory),
+        clock=lambda: FIXED_TIME,
+    )
+    proposed = service.propose(_candidate()).proposal
+
+    accepted = DecisionAuthorityService(
+        JsonFileDecisionProposalStore(proposals_path),
+        memory,
+        clock=lambda: FIXED_TIME,
+    ).accept(proposed.proposal_id)
+
+    # Same service instance, no reconstruction/restart and no ADR-derived index.
+    record = service.get(accepted.decision_id)
+    assert isinstance(record, CanonicalDecisionRecord)
+    assert record.decision_id == accepted.decision_id
+    assert record.statement == proposed.candidate.statement
+
+    search = service.search(query=proposed.candidate.statement)
+    assert [r.decision_id for r in search.canonical_decisions] == [
+        accepted.decision_id
+    ]
+
+    canonical_trace = service.trace(accepted.decision_id)
+    assert isinstance(canonical_trace, CanonicalDecisionTrace)
+    assert canonical_trace.canonical_record is not None
+    assert canonical_trace.canonical_record.decision_id == accepted.decision_id
+
+    proposal_trace = service.trace(proposed.proposal_id)
+    assert isinstance(proposal_trace, ProposalTrace)
+    assert proposal_trace.accepted_decision_id == accepted.decision_id
+    assert proposal_trace.canonical_record is not None
+    assert proposal_trace.canonical_record.decision_id == accepted.decision_id
 
 
 def test_materialized_memory_loads_through_existing_memorystore(
@@ -1269,7 +1283,8 @@ def test_rejection_produces_no_canonical_record(tmp_path: Path) -> None:
     store = MemoryStore(memory)
     store.load()
     assert store.decisions() == []
-    assert _canonical_index(memory).records == ()
+    raw = json.loads(memory.read_text(encoding="utf-8"))
+    assert "decision_index" not in raw
 
 
 def test_repeated_rejection_is_deterministic(tmp_path: Path) -> None:

@@ -961,24 +961,14 @@ def _cmd_eventcatalog_import(args: argparse.Namespace) -> int:
 # ── Subcommand: decision-mcp (D2B local MCP transport) ───────────────────────
 
 DEFAULT_PROPOSALS_PATH = ".mneme/decision_proposals.json"
+DEFAULT_DECISION_MEMORY_PATH = ".mneme/project_memory.json"
 
 
 def _cmd_decision_mcp(args: argparse.Namespace) -> int:
-    """Launch the local Decision Index MCP server over stdio (D2B, #362).
-
-    The command launches the local MCP transport and nothing more: no
-    acceptance UI, no authority mutation surface (D2C is separate). The
-    proposal store is the dedicated D2A store — never
-    ``.mneme/project_memory.json``. Canonical ADR loading is optional:
-    by default the server serves the proposal store with no canonical
-    directory; with ``--adr-dir`` the corpus must pass the strict Mneme
-    ADR compiler path (parse -> validate -> precedence resolve) before
-    the server starts — an invalid or ambiguous corpus prevents startup
-    rather than degrading canonical authority.
-    """
+    """Launch Decision MCP over the persisted canonical Decision Index."""
     try:
         from mneme.decision_mcp import serve_stdio
-    except ImportError as exc:
+    except ImportError:
         print(
             "ERROR: the Decision MCP server requires the mcp extra: "
             "pip install 'mneme-hq[mcp]'",
@@ -991,23 +981,32 @@ def _cmd_decision_mcp(args: argparse.Namespace) -> int:
     if args.proposals is None:
         proposals_arg = DEFAULT_PROPOSALS_PATH
     elif args.proposals == "":
-        proposals_arg = None  # explicit in-memory store
+        proposals_arg = None
     else:
         proposals_arg = args.proposals
+
+    if not isinstance(args.memory, str) or not args.memory:
+        return _error_exit("--memory requires a project_memory.json path")
+    if not Path(args.memory).is_file():
+        return _error_exit(f"memory file {args.memory} does not exist")
+    memory_arg = args.memory
 
     adr_dir: str | None = None
     if args.adr_dir is not None:
         if args.adr_dir == "":
             return _error_exit(
                 "--adr-dir requires a directory path; omit the option to "
-                "start without a canonical ADR directory"
+                "start without ADR validation"
             )
         if not Path(args.adr_dir).is_dir():
             return _error_exit(f"ADR directory {args.adr_dir} does not exist")
         adr_dir = args.adr_dir
 
-    # serve_stdio blocks for the life of the stdio server.
-    serve_stdio(proposal_store_path=proposals_arg, adr_dir=adr_dir)
+    serve_stdio(
+        proposal_store_path=proposals_arg,
+        memory_path=memory_arg,
+        adr_dir=adr_dir,
+    )
     return 0
 
 
@@ -1827,18 +1826,22 @@ def _build_parser() -> argparse.ArgumentParser:
         ),
     )
     p_mcp.add_argument(
+        "--memory",
+        default=DEFAULT_DECISION_MEMORY_PATH,
+        help=(
+            "Path to project_memory.json containing the authoritative "
+            "decision_index section "
+            f"(default: {DEFAULT_DECISION_MEMORY_PATH})"
+        ),
+    )
+    p_mcp.add_argument(
         "--adr-dir",
         dest="adr_dir",
         default=None,
         help=(
-            "Directory containing ADR markdown files compiled into the "
-            "canonical decision index. Optional: by default the server "
-            "starts with proposal-store access only and no canonical ADR "
-            "directory. When supplied, the corpus must pass the strict "
-            "Mneme ADR compiler path (parse -> validate -> precedence "
-            "resolve) before the server starts; an invalid or ambiguous "
-            "corpus prevents startup rather than degrading canonical "
-            "authority"
+            "Optional ADR directory to validate through the strict Mneme "
+            "compiler path before startup. ADRs are validation/import "
+            "sources only; MCP canonical reads always come from --memory."
         ),
     )
     p_mcp.set_defaults(func=_cmd_decision_mcp)

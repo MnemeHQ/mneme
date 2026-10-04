@@ -94,11 +94,13 @@ from pydantic import BaseModel, ConfigDict, Field
 from mneme.adr_compiler import resolve_precedence, validate_corpus
 from mneme.adr_parser import parse_adr_directory
 from mneme.decision_index import (
+    SOURCE_TYPE_PROPOSAL,
     CanonicalDecisionRecord,
     CanonicalRuleRecord,
     CanonicalTestEvidence,
     build_canonical_index,
 )
+from mneme.decision_index_persistence import load_decision_index_from_memory_file
 from mneme.decision_index_service import (
     CanonicalDecisionTrace,
     DecisionIndexIntegrityError,
@@ -347,11 +349,41 @@ def rule_to_transport(rule: CanonicalRuleRecord) -> dict[str, Any]:
         "rule_id": rule.rule_id,
         "decision_id": rule.decision_id,
         "decision_version": rule.decision_version,
+        "decision_version_id": rule.decision_version_id,
+        "sequence": rule.sequence,
         "rule_type": rule.rule_type,
         "rule_payload": dict(rule.rule_payload),
         "applicability": dict(rule.applicability),
         "lifecycle_status": rule.lifecycle_status,
     }
+
+
+def source_evidence_to_transport(evidence: Any) -> dict[str, Any]:
+    """Serialize canonical source provenance without widening old records.
+
+    ADR/runtime evidence keeps its existing transport fields plus the
+    ADR-030 common additive fields. Proposal-only identity is emitted only
+    for proposal-backed evidence, whose source_evidence list was empty
+    before D1C.
+    """
+    payload: dict[str, Any] = {
+        "source_type": evidence.source_type,
+        "source_locator": evidence.source_locator,
+        "source_revision": evidence.source_revision,
+        "observed_at": evidence.observed_at,
+    }
+    if evidence.source_type == SOURCE_TYPE_PROPOSAL:
+        payload.update({
+            "verification_status": evidence.verification_status,
+            "proposal_id": evidence.proposal_id,
+            "producer_key": evidence.producer_key,
+            "content_fingerprint": evidence.content_fingerprint,
+            "origin_classification": evidence.origin_classification,
+            "proposed_at": evidence.proposed_at,
+            "source_reference": evidence.source_reference,
+            "accepted_decision_id": evidence.accepted_decision_id,
+        })
+    return payload
 
 
 def canonical_record_to_transport(
@@ -366,6 +398,9 @@ def canonical_record_to_transport(
     return {
         "decision_id": record.decision_id,
         "version": record.version,
+        "version_id": record.version_id,
+        "decision_version_id": record.version_id,
+        "content_digest": record.content_digest,
         "decision_class": record.decision_class,
         "statement": record.statement,
         "rationale": record.rationale,
@@ -378,8 +413,7 @@ def canonical_record_to_transport(
         "constraints": list(record.constraints),
         "anti_patterns": list(record.anti_patterns),
         "source_evidence": [
-            {"source_type": e.source_type, "source_locator": e.source_locator}
-            for e in record.source_evidence
+            source_evidence_to_transport(e) for e in record.source_evidence
         ],
         "test_evidence": [declared_evidence_to_transport(e) for e in record.test_evidence],
         "relationships": [[kind, target] for kind, target in record.relationships],
@@ -445,6 +479,7 @@ def canonical_scope_ref_to_transport(
     return {
         "decision_id": record.decision_id,
         "version": record.version,
+        "version_id": record.version_id,
         "statement": record.statement,
         "lifecycle_status": record.lifecycle_status,
         "context_scope": list(record.context_scope),
@@ -945,12 +980,14 @@ def build_server(service: DecisionIndexService) -> MCPServer:
 def build_server_from_parts(
     proposal_store: DecisionProposalStore,
     canonical_index: Any | None = None,
+    canonical_index_loader: Any | None = None,
     clock: Any | None = None,
 ) -> MCPServer:
-    """Compose a server from store + canonical index (transport-side DI)."""
+    """Compose a server from store + canonical read dependency."""
     service = DecisionIndexService(
         proposal_store,
         canonical_index=canonical_index,
+        canonical_index_loader=canonical_index_loader,
         clock=clock,
     )
     return build_server(service)
@@ -995,25 +1032,27 @@ def load_canonical_index_from_adr_dir(adr_dir: str | Path) -> Any:
 
 def serve_stdio(
     proposal_store_path: str | Path | None = None,
+    memory_path: str | Path = ".mneme/project_memory.json",
     adr_dir: str | Path | None = None,
 ) -> None:
-    """Compose the service and serve it over the local stdio transport.
+    """Compose the stdio service over the authoritative persisted index.
 
-    The only launch surface (``mneme decision-mcp``). The proposal store
-    is always composed (``open_proposal_store``). Canonical ADR loading
-    is optional: ``adr_dir=None`` starts the server with proposal-store
-    access only, while an explicit directory must pass the strict Mneme
-    ADR compiler path (parse -> validate -> precedence resolve) before
-    the server starts — an invalid or ambiguous corpus prevents startup
-    rather than degrading canonical authority. It launches the local
-    MCP transport and nothing more.
+    The project-memory Decision Index is validated once before startup and
+    then reloaded for every canonical read operation, so an accepted decision
+    becomes visible without restarting the MCP server. An explicit ADR
+    directory remains a strict validation source only; it never becomes a
+    second canonical authority.
     """
-    canonical_index = (
-        load_canonical_index_from_adr_dir(adr_dir) if adr_dir is not None else None
-    )
+    if adr_dir is not None:
+        load_canonical_index_from_adr_dir(adr_dir)
+
+    def canonical_loader() -> Any:
+        return load_decision_index_from_memory_file(memory_path)
+
+    canonical_loader()
     server = build_server_from_parts(
         open_proposal_store(proposal_store_path),
-        canonical_index=canonical_index,
+        canonical_index_loader=canonical_loader,
     )
     server.run()
 
@@ -1046,6 +1085,7 @@ __all__ = [
     "provenance_from_input",
     "provenance_to_transport",
     "rule_to_transport",
+    "source_evidence_to_transport",
     "scope_hint_result_to_transport",
     "search_result_to_transport",
     "serve_stdio",

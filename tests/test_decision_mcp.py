@@ -17,6 +17,7 @@ Proves the MCP boundary is a thin capability adapter over
 """
 from __future__ import annotations
 
+import dataclasses
 import asyncio
 import inspect
 import json
@@ -34,6 +35,7 @@ from mneme.decision_index import (
     CanonicalArchitectureIndex,
     CanonicalDecisionRecord,
     CanonicalRuleRecord,
+    CanonicalSourceEvidence,
     CanonicalTestEvidence,
 )
 from mneme.decision_mcp import (
@@ -64,6 +66,7 @@ from mneme.decision_mcp import (
     trace_not_found_to_transport,
     trace_to_transport,
 )
+from mneme.decision_index_persistence import migrate_memory_document
 from mneme.decision_index_service import (
     CanonicalDecisionTrace,
     DecisionIndexIntegrityError,
@@ -708,7 +711,7 @@ def test_canonical_scope_matches_carry_no_rule_data():
         # Slim context references only: no rules, no ADR-020 selectors,
         # no enforcement linkage.
         assert set(record.keys()) == {
-            "decision_id", "version", "statement",
+            "decision_id", "version", "version_id", "statement",
             "lifecycle_status", "context_scope",
         }
 
@@ -1010,6 +1013,52 @@ def test_proposal_serialization_is_explicit_and_deterministic():
     assert json.loads(json.dumps(payload)) == payload
 
 
+
+
+
+def test_source_evidence_transport_limits_proposal_fields_to_proposal_records():
+    adr_record = dataclasses.replace(
+        _canonical_record(),
+        source_evidence=(CanonicalSourceEvidence(
+            source_type="adr",
+            source_locator="docs/adr/ADR-9001.md",
+            source_revision="sha256-abc",
+            observed_at="2026-09-01T00:00:00Z",
+            verification_status="verified",
+        ),),
+    )
+    adr_evidence = canonical_record_to_transport(adr_record)["source_evidence"][0]
+    assert adr_evidence == {
+        "source_type": "adr",
+        "source_locator": "docs/adr/ADR-9001.md",
+        "source_revision": "sha256-abc",
+        "observed_at": "2026-09-01T00:00:00Z",
+    }
+
+    proposal_record = dataclasses.replace(
+        _canonical_record(decision_id="ddec-example"),
+        source_evidence=(CanonicalSourceEvidence(
+            source_type="proposal",
+            source_locator="design/review.md",
+            source_revision="commit-1",
+            observed_at="2026-09-02T00:00:00Z",
+            proposal_id="dprop-example",
+            producer_key="producer-key",
+            content_fingerprint="content-fingerprint",
+            origin_classification=ORIGIN_AI_GENERATED,
+            proposed_at="2026-09-01T12:00:00Z",
+            source_reference="design/review.md",
+            accepted_decision_id="ddec-example",
+        ),),
+    )
+    proposal_evidence = canonical_record_to_transport(
+        proposal_record
+    )["source_evidence"][0]
+    assert proposal_evidence["proposal_id"] == "dprop-example"
+    assert proposal_evidence["accepted_decision_id"] == "ddec-example"
+    assert proposal_evidence["source_reference"] == "design/review.md"
+
+
 def test_canonical_record_serialization_preserves_ordering():
     payload = canonical_record_to_transport(_canonical_record())
     assert payload["context_scope"] == ["storage"]
@@ -1020,6 +1069,9 @@ def test_canonical_record_serialization_preserves_ordering():
     assert list(payload.keys()) == [
         "decision_id",
         "version",
+        "version_id",
+        "decision_version_id",
+        "content_digest",
         "decision_class",
         "statement",
         "rationale",
@@ -1049,6 +1101,8 @@ def test_rule_serialization_passes_applicability_verbatim():
         "rule_id",
         "decision_id",
         "decision_version",
+        "decision_version_id",
+        "sequence",
         "rule_type",
         "rule_payload",
         "applicability",
@@ -1419,6 +1473,17 @@ def test_no_active_zero_degradation_fallback_exists():
     assert "active = []" not in source
 
 
+def _canonical_memory(tmp_path: Path) -> Path:
+    path = tmp_path / "project_memory.json"
+    document = migrate_memory_document({
+        "items": [],
+        "examples": [],
+        "decisions": [],
+    })
+    path.write_text(json.dumps(document, indent=2) + "\n", encoding="utf-8")
+    return path
+
+
 class _RecordingServer(MCPServer):
     run_calls: list[bool] = []
 
@@ -1439,7 +1504,11 @@ def test_serve_stdio_strict_composes_and_starts_on_valid_corpus(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 ):
     RecordingServer = _serve_stdio_with_recording_run(monkeypatch)
-    serve_stdio(proposal_store_path=None, adr_dir=_valid_adr_dir(tmp_path))
+    serve_stdio(
+        proposal_store_path=None,
+        memory_path=_canonical_memory(tmp_path),
+        adr_dir=_valid_adr_dir(tmp_path),
+    )
     assert RecordingServer.run_calls == [True]
 
 
@@ -1487,6 +1556,7 @@ def test_cli_default_starts_without_canonical_adr_dir(monkeypatch):
     _, kwargs = calls[0]
     assert kwargs["adr_dir"] is None
     assert kwargs["proposal_store_path"] is None  # explicit in-memory store
+    assert kwargs["memory_path"] == ".mneme/project_memory.json"
 
 
 def test_cli_explicit_adr_dir_passes_strict_canonical_loading(
