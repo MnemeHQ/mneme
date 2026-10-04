@@ -342,6 +342,167 @@ def test_apply_import_refuses_when_unresolved_active_active(tmp_path):
         apply_import(report, target_path=target, allow_update=False, approve_conflicts=False)
 
 
+
+# ── D1D canonical versioning and supersession ────────────────────────────────
+
+
+def test_d1d_first_import_retains_nonactive_lineage_canonically(tmp_path):
+    from mneme.adr_import import apply_import, compile_for_import
+    from mneme.decision_index_persistence import load_persisted_decision_index
+
+    target = tmp_path / "project_memory.json"
+    _seed_empty_memory(target)
+    report = compile_for_import(FIXTURES / "adrs_import_basic")
+
+    apply_import(report, target_path=target)
+
+    raw = json.loads(target.read_text(encoding="utf-8"))
+    index = load_persisted_decision_index(raw["decision_index"])
+    by_id = {record.decision_id: record for record in index.records}
+    assert set(by_id) == {"ADR-101", "ADR-102", "ADR-103"}
+    assert by_id["ADR-101"].lifecycle_status == "active"
+    assert by_id["ADR-102"].lifecycle_status == "active"
+    assert by_id["ADR-103"].lifecycle_status == "superseded"
+    assert [row["id"] for row in raw["decisions"]] == ["ADR-101", "ADR-102"]
+
+
+def test_d1d_reimport_creates_immutable_version_and_retry_is_byte_idempotent(tmp_path):
+    from mneme.adr_import import apply_import, compile_for_import
+    from mneme.decision_index_persistence import load_persisted_decision_index
+
+    adr_dir = tmp_path / "adrs"
+    adr_dir.mkdir()
+    _write_adr(
+        adr_dir,
+        "ADR-501",
+        "storage",
+        body="## Constraints\n\n- FORBID_LITERAL: mongodb\n",
+    )
+    target = tmp_path / "project_memory.json"
+    _seed_empty_memory(target)
+
+    apply_import(compile_for_import(adr_dir), target_path=target)
+    first = json.loads(target.read_text(encoding="utf-8"))
+    first_index = load_persisted_decision_index(first["decision_index"])
+    first_record = first_index.records[0]
+
+    _write_adr(
+        adr_dir,
+        "ADR-501",
+        "storage",
+        body="## Constraints\n\n- FORBID_LITERAL: cassandra\n",
+    )
+    report = compile_for_import(adr_dir)
+    apply_import(report, target_path=target, allow_update=True)
+
+    second = json.loads(target.read_text(encoding="utf-8"))
+    second_index = load_persisted_decision_index(second["decision_index"])
+    second_record = second_index.records[0]
+    versions = [
+        row for row in second["decision_index"]["versions"]
+        if row["decision_id"] == "ADR-501"
+    ]
+    assert len(versions) == 2
+    assert second_record.version_id != first_record.version_id
+    active_version = next(
+        row for row in versions if row["version_id"] == second_record.version_id
+    )
+    assert active_version["supersedes_version_id"] == first_record.version_id
+    assert any(
+        row["version_id"] == first_record.version_id
+        and "mongodb" in row["rationale"]
+        for row in versions
+    )
+    assert second["decisions"][0]["rules"][0]["value"] == "cassandra"
+
+    before_retry = target.read_bytes()
+    apply_import(report, target_path=target, allow_update=True)
+    assert target.read_bytes() == before_retry
+    retry = json.loads(target.read_text(encoding="utf-8"))
+    assert len([
+        row for row in retry["decision_index"]["versions"]
+        if row["decision_id"] == "ADR-501"
+    ]) == 2
+
+
+def test_d1d_reimport_does_not_silently_carry_removed_rules(tmp_path):
+    from mneme.adr_import import apply_import, compile_for_import
+    from mneme.decision_index_persistence import load_persisted_decision_index
+
+    adr_dir = tmp_path / "adrs"
+    adr_dir.mkdir()
+    _write_adr(adr_dir, "ADR-510", "storage")
+    target = tmp_path / "project_memory.json"
+    _seed_empty_memory(target)
+    apply_import(compile_for_import(adr_dir), target_path=target)
+
+    raw_before = json.loads(target.read_text(encoding="utf-8"))
+    old_version = raw_before["decision_index"]["decisions"][0]["active_version_id"]
+    old_binding_ids = {
+        row["rule_id"]
+        for row in raw_before["decision_index"]["rules"]
+        if row["decision_version_id"] == old_version
+    }
+    assert old_binding_ids
+
+    _write_adr(
+        adr_dir,
+        "ADR-510",
+        "storage",
+        body="Decision remains retrieval-only.\n",
+    )
+    apply_import(
+        compile_for_import(adr_dir),
+        target_path=target,
+        allow_update=True,
+    )
+
+    raw_after = json.loads(target.read_text(encoding="utf-8"))
+    index = load_persisted_decision_index(raw_after["decision_index"])
+    record = index.records[0]
+    assert index.rules_for_decision("ADR-510") == ()
+    assert any(
+        row["rule_id"] in old_binding_ids
+        and row["decision_version_id"] == old_version
+        for row in raw_after["decision_index"]["rules"]
+    )
+    assert raw_after["decisions"][0]["rules"] == []
+    assert record.version_id != old_version
+
+
+def test_g14_adr_supersedes_persists_relationship_and_deactivates_target(tmp_path):
+    from mneme.adr_import import apply_import, compile_for_import
+    from mneme.decision_index_persistence import load_persisted_decision_index
+
+    adr_dir = tmp_path / "adrs"
+    adr_dir.mkdir()
+    _write_adr(adr_dir, "ADR-601", "storage")
+    target = tmp_path / "project_memory.json"
+    _seed_empty_memory(target)
+    apply_import(compile_for_import(adr_dir), target_path=target)
+
+    first = json.loads(target.read_text(encoding="utf-8"))
+    first_index = load_persisted_decision_index(first["decision_index"])
+    old_target_version = first_index.records[0].version_id
+
+    _write_adr(
+        adr_dir,
+        "ADR-602",
+        "storage",
+        body="## Constraints\n\n- FORBID_LITERAL: cassandra\n",
+        supersedes=["ADR-601"],
+    )
+    apply_import(compile_for_import(adr_dir), target_path=target)
+
+    raw = json.loads(target.read_text(encoding="utf-8"))
+    index = load_persisted_decision_index(raw["decision_index"])
+    by_id = {record.decision_id: record for record in index.records}
+    assert by_id["ADR-601"].lifecycle_status == "superseded"
+    assert by_id["ADR-601"].version_id == old_target_version
+    assert by_id["ADR-602"].relationships == (("supersedes", "ADR-601"),)
+    assert [row["id"] for row in raw["decisions"]] == ["ADR-602"]
+
+
 # ── Partial import under --approve-conflicts ────────────────────────────────
 
 
@@ -353,7 +514,13 @@ def _write_adr(
     date: str = "2026-04-15",
     priority: str = "normal",
     body: str = "## Constraints\n\n- FORBID_LITERAL: mongodb\n",
+    supersedes: list[str] | None = None,
 ) -> None:
+    supersedes_block = ""
+    if supersedes:
+        supersedes_block = "supersedes:\n" + "".join(
+            f"  - {target}\n" for target in supersedes
+        )
     (adr_dir / f"{adr_id}.md").write_text(
         "---\n"
         f"id: {adr_id}\n"
@@ -362,6 +529,7 @@ def _write_adr(
         f"priority: {priority}\n"
         f"date: {date}\n"
         f"scope: {json.dumps(scope)}\n"
+        f"{supersedes_block}"
         "---\n\n"
         f"{body}",
         encoding="utf-8",
