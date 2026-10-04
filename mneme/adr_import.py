@@ -129,10 +129,11 @@ class ImportDiagnostic:
 class ImportReport:
     """Output of `compile_for_import`.
 
-    ``adr_sources_by_id`` carries the on-disk path of each active ADR so
-    ``apply_import`` can persist a provenance block (path + sha256) on
-    each written decision. Decisions that lack a matching entry get no
-    ``source`` block (e.g. legacy callers constructing reports by hand).
+    ``adr_sources_by_id`` carries active-source paths for preview and
+    persistence compatibility; ``parsed_adrs`` retains the validated corpus
+    used by D1D canonical writes. ``apply_import`` requires that validated
+    corpus when decisions are written, so callers cannot fabricate new
+    canonical ADR authority by constructing an ``ImportReport`` by hand.
 
     ``skipped_scopes`` maps each scope excluded by an unresolvable
     active-active tie to the sorted ids that tied there. No ADR from a
