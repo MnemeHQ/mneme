@@ -425,6 +425,83 @@ def test_d1d_reimport_creates_immutable_version_and_retry_is_byte_idempotent(tmp
     ]) == 2
 
 
+def test_g11_late_adr_import_retry_reuses_original_predecessor(tmp_path):
+    from mneme.adr_import import apply_import, compile_for_import
+    from mneme.decision_index_persistence import load_persisted_decision_index
+
+    adr_dir = tmp_path / "adrs"
+    adr_dir.mkdir()
+    adr_path = adr_dir / "ADR-520.md"
+    _write_adr(
+        adr_dir,
+        "ADR-520",
+        "storage",
+        body="## Constraints\n\n- FORBID_LITERAL: alpha\n",
+    )
+    a_bytes = adr_path.read_bytes()
+    target = tmp_path / "project_memory.json"
+    _seed_empty_memory(target)
+
+    apply_import(compile_for_import(adr_dir), target_path=target)
+    raw_a1 = json.loads(target.read_text(encoding="utf-8"))
+    a1_id = raw_a1["decision_index"]["decisions"][0]["active_version_id"]
+
+    _write_adr(
+        adr_dir,
+        "ADR-520",
+        "storage",
+        body="## Constraints\n\n- FORBID_LITERAL: beta\n",
+    )
+    apply_import(
+        compile_for_import(adr_dir),
+        target_path=target,
+        allow_update=True,
+    )
+    raw_b = json.loads(target.read_text(encoding="utf-8"))
+    b_id = raw_b["decision_index"]["decisions"][0]["active_version_id"]
+
+    adr_path.write_bytes(a_bytes)
+    report_a2 = compile_for_import(adr_dir)
+    apply_import(report_a2, target_path=target, allow_update=True)
+    raw_a2 = json.loads(target.read_text(encoding="utf-8"))
+    a2_id = raw_a2["decision_index"]["decisions"][0]["active_version_id"]
+    assert a2_id not in {a1_id, b_id}
+
+    _write_adr(
+        adr_dir,
+        "ADR-520",
+        "storage",
+        body="## Constraints\n\n- FORBID_LITERAL: gamma\n",
+    )
+    apply_import(
+        compile_for_import(adr_dir),
+        target_path=target,
+        allow_update=True,
+    )
+    raw_c = json.loads(target.read_text(encoding="utf-8"))
+    c_id = raw_c["decision_index"]["decisions"][0]["active_version_id"]
+
+    before_retry = target.read_bytes()
+    apply_import(
+        report_a2,
+        target_path=target,
+        allow_update=True,
+        expected_predecessor_version_ids={"ADR-520": b_id},
+    )
+    after_retry = json.loads(target.read_text(encoding="utf-8"))
+    index = load_persisted_decision_index(after_retry["decision_index"])
+    assert index.records[0].version_id == c_id
+    assert target.read_bytes() == before_retry
+    versions = [
+        row for row in after_retry["decision_index"]["versions"]
+        if row["decision_id"] == "ADR-520"
+    ]
+    assert len(versions) == 4
+    assert {row["version_id"] for row in versions} == {
+        a1_id, b_id, a2_id, c_id
+    }
+
+
 def test_d1d_reimport_does_not_silently_carry_removed_rules(tmp_path):
     from mneme.adr_import import apply_import, compile_for_import
     from mneme.decision_index_persistence import load_persisted_decision_index

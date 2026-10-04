@@ -368,6 +368,7 @@ def apply_import(
     target_path: str | Path,
     allow_update: bool = False,
     approve_conflicts: bool = False,
+    expected_predecessor_version_ids: dict[str, str] | None = None,
 ) -> list[str]:
     """Apply ADR authority to the canonical Decision Index (D1D)."""
     from mneme.adr_freshness import compute_source_hash, relative_source_path
@@ -418,7 +419,16 @@ def apply_import(
             f"ADR import refused: target memory is not valid canonical state: {exc}"
         ) from exc
 
-    initial_existing_ids = {record.decision_id for record in initial_index.records}
+    initial_records_by_id = {
+        record.decision_id: record for record in initial_index.records
+    }
+    initial_existing_ids = set(initial_records_by_id)
+    operation_predecessors = {
+        decision_id: record.version_id
+        for decision_id, record in initial_records_by_id.items()
+    }
+    if expected_predecessor_version_ids is not None:
+        operation_predecessors.update(expected_predecessor_version_ids)
     item_ids = {
         item.get("id")
         for item in working.get("items", [])
@@ -575,7 +585,7 @@ def apply_import(
             working, _, _ = append_canonical_version_occurrence(
                 working,
                 decision_id=decision.id,
-                predecessor_version_id=record.version_id,
+                predecessor_version_id=operation_predecessors[decision.id],
                 statement=decision.decision,
                 rationale=decision.rationale,
                 context_scope=decision.scope,
