@@ -1,0 +1,833 @@
+{
+  "accepted_endpoint_scorecard": {
+    "comparison_deltas": {
+      "delta_exact_set_matches": -4,
+      "delta_false_negatives": 3,
+      "delta_false_positives": 1,
+      "delta_macro_f1": -0.0604285714285715,
+      "delta_macro_precision": -0.06885714285714284,
+      "delta_macro_recall": -0.04999999999999993,
+      "end_to_end_exact_set_matches": 22,
+      "end_to_end_false_negatives": 13,
+      "end_to_end_false_positives": 46,
+      "end_to_end_macro_f1": 0.6506666666666666,
+      "end_to_end_macro_precision": 0.6023333333333334,
+      "end_to_end_macro_recall": 0.79,
+      "human_exact_set_matches": 26,
+      "human_false_negatives": 10,
+      "human_false_positives": 45,
+      "human_macro_f1": 0.7110952380952381,
+      "human_macro_precision": 0.6711904761904762,
+      "human_macro_recall": 0.84,
+      "profile": "B3"
+    },
+    "end_to_end_metrics": {
+      "exact_set_matches": 22,
+      "macro_f1": 0.6506666666666666,
+      "macro_precision": 0.6023333333333334,
+      "macro_recall": 0.79,
+      "mean_predicted_set_size": 1.74,
+      "total_expected_decisions": 54,
+      "total_false_negatives": 13,
+      "total_false_positives": 46,
+      "total_predicted_decisions": 87,
+      "total_scenarios": 50
+    },
+    "human_reference_metrics": {
+      "exact_set_matches": 26,
+      "macro_f1": 0.7110952380952381,
+      "macro_precision": 0.6711904761904762,
+      "macro_recall": 0.84,
+      "mean_predicted_set_size": 1.78,
+      "total_expected_decisions": 54,
+      "total_false_negatives": 10,
+      "total_false_positives": 45,
+      "total_predicted_decisions": 89,
+      "total_scenarios": 50
+    },
+    "per_repository": {
+      "end_to_end": {
+        "adrkit": {
+          "exact_set_matches": 6,
+          "macro_f1": 0.7333333333333333,
+          "macro_precision": 0.75,
+          "macro_recall": 0.75,
+          "mean_predicted_set_size": 1.4,
+          "repo_id": "adrkit",
+          "repository_identifier": "mbeacom/adrkit",
+          "total_false_negatives": 4,
+          "total_false_positives": 5,
+          "total_scenarios": 10
+        },
+        "archlint": {
+          "exact_set_matches": 3,
+          "macro_f1": 0.6066666666666667,
+          "macro_precision": 0.525,
+          "macro_recall": 0.8,
+          "mean_predicted_set_size": 2.0,
+          "repo_id": "archlint",
+          "repository_identifier": "muhammetsafak/archlint",
+          "total_false_negatives": 2,
+          "total_false_positives": 12,
+          "total_scenarios": 10
+        },
+        "gsa_agentic_coding_quickstart": {
+          "exact_set_matches": 3,
+          "macro_f1": 0.5733333333333334,
+          "macro_precision": 0.4916666666666667,
+          "macro_recall": 0.8,
+          "mean_predicted_set_size": 1.9,
+          "repo_id": "gsa_agentic_coding_quickstart",
+          "repository_identifier": "GSA-TTS/agentic-coding-quickstart",
+          "total_false_negatives": 3,
+          "total_false_positives": 11,
+          "total_scenarios": 10
+        },
+        "helix": {
+          "exact_set_matches": 3,
+          "macro_f1": 0.5066666666666666,
+          "macro_precision": 0.445,
+          "macro_recall": 0.7,
+          "mean_predicted_set_size": 2.1,
+          "repo_id": "helix",
+          "repository_identifier": "AZX-PBC-OSS/helix",
+          "total_false_negatives": 3,
+          "total_false_positives": 14,
+          "total_scenarios": 10
+        },
+        "modonome": {
+          "exact_set_matches": 7,
+          "macro_f1": 0.8333333333333334,
+          "macro_precision": 0.8,
+          "macro_recall": 0.9,
+          "mean_predicted_set_size": 1.3,
+          "repo_id": "modonome",
+          "repository_identifier": "enumind/modonome",
+          "total_false_negatives": 1,
+          "total_false_positives": 4,
+          "total_scenarios": 10
+        }
+      },
+      "human_reference": {
+        "adrkit": {
+          "exact_set_matches": 5,
+          "macro_f1": 0.8166666666666667,
+          "macro_precision": 0.8,
+          "macro_recall": 0.9,
+          "mean_predicted_set_size": 1.5,
+          "repo_id": "adrkit",
+          "repository_identifier": "mbeacom/adrkit",
+          "total_false_negatives": 2,
+          "total_false_positives": 4,
+          "total_scenarios": 10
+        },
+        "archlint": {
+          "exact_set_matches": 3,
+          "macro_f1": 0.45666666666666667,
+          "macro_precision": 0.4083333333333333,
+          "macro_recall": 0.6,
+          "mean_predicted_set_size": 2.0,
+          "repo_id": "archlint",
+          "repository_identifier": "muhammetsafak/archlint",
+          "total_false_negatives": 4,
+          "total_false_positives": 14,
+          "total_scenarios": 10
+        },
+        "gsa_agentic_coding_quickstart": {
+          "exact_set_matches": 7,
+          "macro_f1": 0.7952380952380953,
+          "macro_precision": 0.7666666666666667,
+          "macro_recall": 0.9,
+          "mean_predicted_set_size": 1.6,
+          "repo_id": "gsa_agentic_coding_quickstart",
+          "repository_identifier": "GSA-TTS/agentic-coding-quickstart",
+          "total_false_negatives": 2,
+          "total_false_positives": 7,
+          "total_scenarios": 10
+        },
+        "helix": {
+          "exact_set_matches": 3,
+          "macro_f1": 0.6202380952380953,
+          "macro_precision": 0.530952380952381,
+          "macro_recall": 0.9,
+          "mean_predicted_set_size": 2.5,
+          "repo_id": "helix",
+          "repository_identifier": "AZX-PBC-OSS/helix",
+          "total_false_negatives": 1,
+          "total_false_positives": 16,
+          "total_scenarios": 10
+        },
+        "modonome": {
+          "exact_set_matches": 8,
+          "macro_f1": 0.8666666666666666,
+          "macro_precision": 0.85,
+          "macro_recall": 0.9,
+          "mean_predicted_set_size": 1.3,
+          "repo_id": "modonome",
+          "repository_identifier": "enumind/modonome",
+          "total_false_negatives": 1,
+          "total_false_positives": 4,
+          "total_scenarios": 10
+        }
+      }
+    },
+    "profile": "B3"
+  },
+  "artifact_type": "stage_c_batch_01_closure",
+  "artifact_version": "0.1",
+  "b3_profile_definition": {
+    "profile_id": "B3",
+    "query_transformation_function": "transform_query_for_b3",
+    "query_treatment": "B3 transformed query: strip registered structural prefixes while strictly preserving their values, and suppress five registered high-frequency function words.",
+    "registered_structural_prefixes": [
+      "path: ",
+      "component: ",
+      "change_type: ",
+      "dependencies: ",
+      "api: ",
+      "technology: "
+    ],
+    "relative_threshold_ratio": 0.8,
+    "selection_epsilon": 1e-09,
+    "selection_policy": "relative_80",
+    "suppressed_function_words": [
+      "from",
+      "that",
+      "when",
+      "with",
+      "without"
+    ]
+  },
+  "baseline_id": "o1a-batch-01-baseline",
+  "batch_id": "o1a-batch-01",
+  "closure_declaration": {
+    "accepted_endpoint": "B3",
+    "closure_scope": "Batch 01 Stage C Governing Decision Set evaluation is frozen. No later Batch 01 Stage C treatment or calibration profile is accepted. Any future Stage C research must occur under a new benchmark version, new batch, or explicitly reopened programme rather than mutating Batch 01.",
+    "production_readiness": "Research benchmark endpoint only; not declared a globally optimal or production-ready retrieval policy.",
+    "status": "CLOSED / FROZEN"
+  },
+  "closure_status": "closed_frozen",
+  "corpora_and_inputs": {
+    "baseline_configuration_hash": "31e18dc1e2bd9ad30bec86dce1a9295a",
+    "baseline_id": "o1a-batch-01-baseline",
+    "manifest_configuration_hash": "4af7e5794011b43d39682cdfeac9f54e",
+    "reference_corpus_hash": "0455bd66aae52551c35b37a63c2d185f",
+    "scenario_corpus_hash": "2ff8751955fd64a33316aca6692dc803",
+    "stage_b_mixed_semantic_hash": "sha256:662de96721513ab1fd0d6e2d55eb7c037dedcb04c75b441b610aa3a57e236b8a",
+    "stage_c_experiment_profile_hash": "5f031434a95ea94c53255901b1ada39e"
+  },
+  "dataset": {
+    "decisions_per_repository": 20,
+    "scenarios_per_repository": 10,
+    "total_reference_decisions": 100,
+    "total_scenarios": 50
+  },
+  "endpoint_identity": {
+    "endpoint_name": "B3",
+    "experiment_id": "o1a-stage-c-end-to-end",
+    "profile": "B3",
+    "purpose": "governing_decision_set_retrieval"
+  },
+  "endpoint_rationale": {
+    "headline_metric": "governing_decision_set_f1",
+    "key_comparisons": {
+      "end_to_end_predictions": {
+        "B0": {
+          "exact_set_matches": "0 / 50",
+          "false_negatives": 0,
+          "false_positives": 945,
+          "macro_f1": 0.10225974025974026,
+          "macro_precision": 0.05405263157894737,
+          "macro_recall": 1.0
+        },
+        "B3": {
+          "exact_set_matches": "22 / 50",
+          "false_negatives": 13,
+          "false_positives": 46,
+          "macro_f1": 0.6506666666666666,
+          "macro_precision": 0.6023333333333334,
+          "macro_recall": 0.79
+        },
+        "C-T1A": {
+          "exact_set_matches": "18 / 50",
+          "false_negatives": 11,
+          "false_positives": 69,
+          "macro_f1": 0.6033809523809524,
+          "macro_precision": 0.5358571428571429,
+          "macro_recall": 0.81
+        }
+      },
+      "human_reference_calibration": {
+        "B0": {
+          "exact_set_matches": "0 / 50",
+          "false_negatives": 0,
+          "false_positives": 930,
+          "macro_f1": 0.10372841193893825,
+          "macro_precision": 0.054865497076023395,
+          "macro_recall": 1.0
+        },
+        "B3": {
+          "exact_set_matches": "26 / 50",
+          "false_negatives": 10,
+          "false_positives": 45,
+          "macro_f1": 0.7110952380952381,
+          "macro_precision": 0.6711904761904762,
+          "macro_recall": 0.84
+        },
+        "C-T1A": {
+          "exact_set_matches": "19 / 50",
+          "false_negatives": 11,
+          "false_positives": 69,
+          "macro_f1": 0.6211587301587301,
+          "macro_precision": 0.5560238095238096,
+          "macro_recall": 0.82
+        }
+      }
+    },
+    "research_limitations": "Research benchmark endpoint only. Not demonstrated to be globally optimal. Does not constitute production-readiness evidence. The experiment demonstrates empirical association within Batch 01, not definitive causal proof that the B3 query transform components alone produced the gain.",
+    "selection_summary": "B3 achieved the highest macro F1 on the declared headline metric under both human-reference calibration (0.711095) and accepted Stage B end-to-end evaluation (0.650667), with the highest exact governing set match count (22/50).",
+    "tradeoff_disclosure": "End-to-end B3 recall is 0.79 vs C-T1A recall 0.81 (-0.02 recall trade-off for reducing false positives from 69 to 46, improving precision from 0.535857 to 0.602333, and improving exact sets from 18 to 22). B3 is accepted on headline metric and overall F1 balance, not because it dominates every individual dimension."
+  },
+  "headline_metric": "governing_decision_set_f1",
+  "mneme_execution_sha": "fcc36a60b9ec95014eb8931c3bac6bfee418e781",
+  "profile_evaluations_comparison": {
+    "end_to_end": {
+      "B0": {
+        "exact_set_matches": 0,
+        "macro_f1": 0.10225974025974026,
+        "macro_precision": 0.05405263157894737,
+        "macro_recall": 1.0,
+        "mean_predicted_set_size": 19.98,
+        "per_repository": {
+          "adrkit": {
+            "exact_set_matches": 0,
+            "macro_f1": 0.12121212121212122,
+            "macro_precision": 0.065,
+            "macro_recall": 1.0,
+            "mean_predicted_set_size": 20.0,
+            "repo_id": "adrkit",
+            "repository_identifier": "mbeacom/adrkit",
+            "total_false_negatives": 0,
+            "total_false_positives": 187,
+            "total_scenarios": 10
+          },
+          "archlint": {
+            "exact_set_matches": 0,
+            "macro_f1": 0.09523809523809523,
+            "macro_precision": 0.05,
+            "macro_recall": 1.0,
+            "mean_predicted_set_size": 20.0,
+            "repo_id": "archlint",
+            "repository_identifier": "muhammetsafak/archlint",
+            "total_false_negatives": 0,
+            "total_false_positives": 190,
+            "total_scenarios": 10
+          },
+          "gsa_agentic_coding_quickstart": {
+            "exact_set_matches": 0,
+            "macro_f1": 0.10389610389610389,
+            "macro_precision": 0.05500000000000001,
+            "macro_recall": 1.0,
+            "mean_predicted_set_size": 20.0,
+            "repo_id": "gsa_agentic_coding_quickstart",
+            "repository_identifier": "GSA-TTS/agentic-coding-quickstart",
+            "total_false_negatives": 0,
+            "total_false_positives": 189,
+            "total_scenarios": 10
+          },
+          "helix": {
+            "exact_set_matches": 0,
+            "macro_f1": 0.09523809523809523,
+            "macro_precision": 0.05,
+            "macro_recall": 1.0,
+            "mean_predicted_set_size": 20.0,
+            "repo_id": "helix",
+            "repository_identifier": "AZX-PBC-OSS/helix",
+            "total_false_negatives": 0,
+            "total_false_positives": 190,
+            "total_scenarios": 10
+          },
+          "modonome": {
+            "exact_set_matches": 0,
+            "macro_f1": 0.09571428571428571,
+            "macro_precision": 0.05026315789473684,
+            "macro_recall": 1.0,
+            "mean_predicted_set_size": 19.9,
+            "repo_id": "modonome",
+            "repository_identifier": "enumind/modonome",
+            "total_false_negatives": 0,
+            "total_false_positives": 189,
+            "total_scenarios": 10
+          }
+        },
+        "profile": "B0",
+        "query_treatment": "canonical_query",
+        "selection_policy": "score_gt_zero",
+        "total_expected_decisions": 54,
+        "total_false_negatives": 0,
+        "total_false_positives": 945,
+        "total_predicted_decisions": 999,
+        "total_scenarios": 50
+      },
+      "B3": {
+        "exact_set_matches": 22,
+        "macro_f1": 0.6506666666666666,
+        "macro_precision": 0.6023333333333334,
+        "macro_recall": 0.79,
+        "mean_predicted_set_size": 1.74,
+        "per_repository": {
+          "adrkit": {
+            "exact_set_matches": 6,
+            "macro_f1": 0.7333333333333333,
+            "macro_precision": 0.75,
+            "macro_recall": 0.75,
+            "mean_predicted_set_size": 1.4,
+            "repo_id": "adrkit",
+            "repository_identifier": "mbeacom/adrkit",
+            "total_false_negatives": 4,
+            "total_false_positives": 5,
+            "total_scenarios": 10
+          },
+          "archlint": {
+            "exact_set_matches": 3,
+            "macro_f1": 0.6066666666666667,
+            "macro_precision": 0.525,
+            "macro_recall": 0.8,
+            "mean_predicted_set_size": 2.0,
+            "repo_id": "archlint",
+            "repository_identifier": "muhammetsafak/archlint",
+            "total_false_negatives": 2,
+            "total_false_positives": 12,
+            "total_scenarios": 10
+          },
+          "gsa_agentic_coding_quickstart": {
+            "exact_set_matches": 3,
+            "macro_f1": 0.5733333333333334,
+            "macro_precision": 0.4916666666666667,
+            "macro_recall": 0.8,
+            "mean_predicted_set_size": 1.9,
+            "repo_id": "gsa_agentic_coding_quickstart",
+            "repository_identifier": "GSA-TTS/agentic-coding-quickstart",
+            "total_false_negatives": 3,
+            "total_false_positives": 11,
+            "total_scenarios": 10
+          },
+          "helix": {
+            "exact_set_matches": 3,
+            "macro_f1": 0.5066666666666666,
+            "macro_precision": 0.445,
+            "macro_recall": 0.7,
+            "mean_predicted_set_size": 2.1,
+            "repo_id": "helix",
+            "repository_identifier": "AZX-PBC-OSS/helix",
+            "total_false_negatives": 3,
+            "total_false_positives": 14,
+            "total_scenarios": 10
+          },
+          "modonome": {
+            "exact_set_matches": 7,
+            "macro_f1": 0.8333333333333334,
+            "macro_precision": 0.8,
+            "macro_recall": 0.9,
+            "mean_predicted_set_size": 1.3,
+            "repo_id": "modonome",
+            "repository_identifier": "enumind/modonome",
+            "total_false_negatives": 1,
+            "total_false_positives": 4,
+            "total_scenarios": 10
+          }
+        },
+        "profile": "B3",
+        "query_treatment": "structural_label_and_function_word_suppressed",
+        "selection_policy": "relative_80",
+        "total_expected_decisions": 54,
+        "total_false_negatives": 13,
+        "total_false_positives": 46,
+        "total_predicted_decisions": 87,
+        "total_scenarios": 50
+      },
+      "C-T1A": {
+        "exact_set_matches": 18,
+        "macro_f1": 0.6033809523809524,
+        "macro_precision": 0.5358571428571429,
+        "macro_recall": 0.81,
+        "mean_predicted_set_size": 2.24,
+        "per_repository": {
+          "adrkit": {
+            "exact_set_matches": 6,
+            "macro_f1": 0.7133333333333334,
+            "macro_precision": 0.6866666666666666,
+            "macro_recall": 0.8,
+            "mean_predicted_set_size": 1.8,
+            "repo_id": "adrkit",
+            "repository_identifier": "mbeacom/adrkit",
+            "total_false_negatives": 3,
+            "total_false_positives": 8,
+            "total_scenarios": 10
+          },
+          "archlint": {
+            "exact_set_matches": 2,
+            "macro_f1": 0.47833333333333333,
+            "macro_precision": 0.3892857142857143,
+            "macro_recall": 0.8,
+            "mean_predicted_set_size": 3.3,
+            "repo_id": "archlint",
+            "repository_identifier": "muhammetsafak/archlint",
+            "total_false_negatives": 2,
+            "total_false_positives": 25,
+            "total_scenarios": 10
+          },
+          "gsa_agentic_coding_quickstart": {
+            "exact_set_matches": 2,
+            "macro_f1": 0.5633333333333332,
+            "macro_precision": 0.4666666666666667,
+            "macro_recall": 0.85,
+            "mean_predicted_set_size": 2.3,
+            "repo_id": "gsa_agentic_coding_quickstart",
+            "repository_identifier": "GSA-TTS/agentic-coding-quickstart",
+            "total_false_negatives": 2,
+            "total_false_positives": 14,
+            "total_scenarios": 10
+          },
+          "helix": {
+            "exact_set_matches": 2,
+            "macro_f1": 0.4619047619047619,
+            "macro_precision": 0.38666666666666666,
+            "macro_recall": 0.7,
+            "mean_predicted_set_size": 2.4,
+            "repo_id": "helix",
+            "repository_identifier": "AZX-PBC-OSS/helix",
+            "total_false_negatives": 3,
+            "total_false_positives": 17,
+            "total_scenarios": 10
+          },
+          "modonome": {
+            "exact_set_matches": 6,
+            "macro_f1": 0.8,
+            "macro_precision": 0.75,
+            "macro_recall": 0.9,
+            "mean_predicted_set_size": 1.4,
+            "repo_id": "modonome",
+            "repository_identifier": "enumind/modonome",
+            "total_false_negatives": 1,
+            "total_false_positives": 5,
+            "total_scenarios": 10
+          }
+        },
+        "profile": "C-T1A",
+        "query_treatment": "canonical_query",
+        "selection_policy": "relative_80",
+        "total_expected_decisions": 54,
+        "total_false_negatives": 11,
+        "total_false_positives": 69,
+        "total_predicted_decisions": 112,
+        "total_scenarios": 50
+      }
+    },
+    "human_reference": {
+      "B0": {
+        "exact_set_matches": 0,
+        "macro_f1": 0.10372841193893825,
+        "macro_precision": 0.054865497076023395,
+        "macro_recall": 1.0,
+        "mean_predicted_set_size": 19.68,
+        "per_repository": {
+          "adrkit": {
+            "exact_set_matches": 0,
+            "macro_f1": 0.12269081795397585,
+            "macro_precision": 0.0658187134502924,
+            "macro_recall": 1.0,
+            "mean_predicted_set_size": 19.7,
+            "repo_id": "adrkit",
+            "repository_identifier": "mbeacom/adrkit",
+            "total_false_negatives": 0,
+            "total_false_positives": 184,
+            "total_scenarios": 10
+          },
+          "archlint": {
+            "exact_set_matches": 0,
+            "macro_f1": 0.09571428571428571,
+            "macro_precision": 0.05026315789473684,
+            "macro_recall": 1.0,
+            "mean_predicted_set_size": 19.9,
+            "repo_id": "archlint",
+            "repository_identifier": "muhammetsafak/archlint",
+            "total_false_negatives": 0,
+            "total_false_positives": 189,
+            "total_scenarios": 10
+          },
+          "gsa_agentic_coding_quickstart": {
+            "exact_set_matches": 0,
+            "macro_f1": 0.10389610389610389,
+            "macro_precision": 0.05500000000000001,
+            "macro_recall": 1.0,
+            "mean_predicted_set_size": 20.0,
+            "repo_id": "gsa_agentic_coding_quickstart",
+            "repository_identifier": "GSA-TTS/agentic-coding-quickstart",
+            "total_false_negatives": 0,
+            "total_false_positives": 189,
+            "total_scenarios": 10
+          },
+          "helix": {
+            "exact_set_matches": 0,
+            "macro_f1": 0.09523809523809523,
+            "macro_precision": 0.05,
+            "macro_recall": 1.0,
+            "mean_predicted_set_size": 20.0,
+            "repo_id": "helix",
+            "repository_identifier": "AZX-PBC-OSS/helix",
+            "total_false_negatives": 0,
+            "total_false_positives": 190,
+            "total_scenarios": 10
+          },
+          "modonome": {
+            "exact_set_matches": 0,
+            "macro_f1": 0.10110275689223058,
+            "macro_precision": 0.05324561403508772,
+            "macro_recall": 1.0,
+            "mean_predicted_set_size": 18.8,
+            "repo_id": "modonome",
+            "repository_identifier": "enumind/modonome",
+            "total_false_negatives": 0,
+            "total_false_positives": 178,
+            "total_scenarios": 10
+          }
+        },
+        "profile": "B0",
+        "query_treatment": "canonical_query",
+        "selection_policy": "score_gt_zero",
+        "total_expected_decisions": 54,
+        "total_false_negatives": 0,
+        "total_false_positives": 930,
+        "total_predicted_decisions": 984,
+        "total_scenarios": 50
+      },
+      "B3": {
+        "exact_set_matches": 26,
+        "macro_f1": 0.7110952380952381,
+        "macro_precision": 0.6711904761904762,
+        "macro_recall": 0.84,
+        "mean_predicted_set_size": 1.78,
+        "per_repository": {
+          "adrkit": {
+            "exact_set_matches": 5,
+            "macro_f1": 0.8166666666666667,
+            "macro_precision": 0.8,
+            "macro_recall": 0.9,
+            "mean_predicted_set_size": 1.5,
+            "repo_id": "adrkit",
+            "repository_identifier": "mbeacom/adrkit",
+            "total_false_negatives": 2,
+            "total_false_positives": 4,
+            "total_scenarios": 10
+          },
+          "archlint": {
+            "exact_set_matches": 3,
+            "macro_f1": 0.45666666666666667,
+            "macro_precision": 0.4083333333333333,
+            "macro_recall": 0.6,
+            "mean_predicted_set_size": 2.0,
+            "repo_id": "archlint",
+            "repository_identifier": "muhammetsafak/archlint",
+            "total_false_negatives": 4,
+            "total_false_positives": 14,
+            "total_scenarios": 10
+          },
+          "gsa_agentic_coding_quickstart": {
+            "exact_set_matches": 7,
+            "macro_f1": 0.7952380952380953,
+            "macro_precision": 0.7666666666666667,
+            "macro_recall": 0.9,
+            "mean_predicted_set_size": 1.6,
+            "repo_id": "gsa_agentic_coding_quickstart",
+            "repository_identifier": "GSA-TTS/agentic-coding-quickstart",
+            "total_false_negatives": 2,
+            "total_false_positives": 7,
+            "total_scenarios": 10
+          },
+          "helix": {
+            "exact_set_matches": 3,
+            "macro_f1": 0.6202380952380953,
+            "macro_precision": 0.530952380952381,
+            "macro_recall": 0.9,
+            "mean_predicted_set_size": 2.5,
+            "repo_id": "helix",
+            "repository_identifier": "AZX-PBC-OSS/helix",
+            "total_false_negatives": 1,
+            "total_false_positives": 16,
+            "total_scenarios": 10
+          },
+          "modonome": {
+            "exact_set_matches": 8,
+            "macro_f1": 0.8666666666666666,
+            "macro_precision": 0.85,
+            "macro_recall": 0.9,
+            "mean_predicted_set_size": 1.3,
+            "repo_id": "modonome",
+            "repository_identifier": "enumind/modonome",
+            "total_false_negatives": 1,
+            "total_false_positives": 4,
+            "total_scenarios": 10
+          }
+        },
+        "profile": "B3",
+        "query_treatment": "structural_label_and_function_word_suppressed",
+        "selection_policy": "relative_80",
+        "total_expected_decisions": 54,
+        "total_false_negatives": 10,
+        "total_false_positives": 45,
+        "total_predicted_decisions": 89,
+        "total_scenarios": 50
+      },
+      "C-T1A": {
+        "exact_set_matches": 19,
+        "macro_f1": 0.6211587301587301,
+        "macro_precision": 0.5560238095238096,
+        "macro_recall": 0.82,
+        "mean_predicted_set_size": 2.24,
+        "per_repository": {
+          "adrkit": {
+            "exact_set_matches": 5,
+            "macro_f1": 0.7733333333333333,
+            "macro_precision": 0.725,
+            "macro_recall": 0.9,
+            "mean_predicted_set_size": 1.8,
+            "repo_id": "adrkit",
+            "repository_identifier": "mbeacom/adrkit",
+            "total_false_negatives": 2,
+            "total_false_positives": 7,
+            "total_scenarios": 10
+          },
+          "archlint": {
+            "exact_set_matches": 1,
+            "macro_f1": 0.30666666666666664,
+            "macro_precision": 0.24166666666666664,
+            "macro_recall": 0.5,
+            "mean_predicted_set_size": 2.4,
+            "repo_id": "archlint",
+            "repository_identifier": "muhammetsafak/archlint",
+            "total_false_negatives": 5,
+            "total_false_positives": 19,
+            "total_scenarios": 10
+          },
+          "gsa_agentic_coding_quickstart": {
+            "exact_set_matches": 5,
+            "macro_f1": 0.7055555555555555,
+            "macro_precision": 0.6458333333333333,
+            "macro_recall": 0.9,
+            "mean_predicted_set_size": 2.1,
+            "repo_id": "gsa_agentic_coding_quickstart",
+            "repository_identifier": "GSA-TTS/agentic-coding-quickstart",
+            "total_false_negatives": 2,
+            "total_false_positives": 12,
+            "total_scenarios": 10
+          },
+          "helix": {
+            "exact_set_matches": 2,
+            "macro_f1": 0.5202380952380953,
+            "macro_precision": 0.41761904761904767,
+            "macro_recall": 0.9,
+            "mean_predicted_set_size": 3.4,
+            "repo_id": "helix",
+            "repository_identifier": "AZX-PBC-OSS/helix",
+            "total_false_negatives": 1,
+            "total_false_positives": 25,
+            "total_scenarios": 10
+          },
+          "modonome": {
+            "exact_set_matches": 6,
+            "macro_f1": 0.8,
+            "macro_precision": 0.75,
+            "macro_recall": 0.9,
+            "mean_predicted_set_size": 1.5,
+            "repo_id": "modonome",
+            "repository_identifier": "enumind/modonome",
+            "total_false_negatives": 1,
+            "total_false_positives": 6,
+            "total_scenarios": 10
+          }
+        },
+        "profile": "C-T1A",
+        "query_treatment": "canonical_query",
+        "selection_policy": "relative_80",
+        "total_expected_decisions": 54,
+        "total_false_negatives": 11,
+        "total_false_positives": 69,
+        "total_predicted_decisions": 112,
+        "total_scenarios": 50
+      }
+    },
+    "profile_comparisons": {
+      "B0": {
+        "delta_exact_set_matches": 0,
+        "delta_false_negatives": 0,
+        "delta_false_positives": 15,
+        "delta_macro_f1": -0.0014686716791979942,
+        "delta_macro_precision": -0.0008128654970760221,
+        "delta_macro_recall": 0.0,
+        "end_to_end_exact_set_matches": 0,
+        "end_to_end_false_negatives": 0,
+        "end_to_end_false_positives": 945,
+        "end_to_end_macro_f1": 0.10225974025974026,
+        "end_to_end_macro_precision": 0.05405263157894737,
+        "end_to_end_macro_recall": 1.0,
+        "human_exact_set_matches": 0,
+        "human_false_negatives": 0,
+        "human_false_positives": 930,
+        "human_macro_f1": 0.10372841193893825,
+        "human_macro_precision": 0.054865497076023395,
+        "human_macro_recall": 1.0,
+        "profile": "B0"
+      },
+      "B3": {
+        "delta_exact_set_matches": -4,
+        "delta_false_negatives": 3,
+        "delta_false_positives": 1,
+        "delta_macro_f1": -0.0604285714285715,
+        "delta_macro_precision": -0.06885714285714284,
+        "delta_macro_recall": -0.04999999999999993,
+        "end_to_end_exact_set_matches": 22,
+        "end_to_end_false_negatives": 13,
+        "end_to_end_false_positives": 46,
+        "end_to_end_macro_f1": 0.6506666666666666,
+        "end_to_end_macro_precision": 0.6023333333333334,
+        "end_to_end_macro_recall": 0.79,
+        "human_exact_set_matches": 26,
+        "human_false_negatives": 10,
+        "human_false_positives": 45,
+        "human_macro_f1": 0.7110952380952381,
+        "human_macro_precision": 0.6711904761904762,
+        "human_macro_recall": 0.84,
+        "profile": "B3"
+      },
+      "C-T1A": {
+        "delta_exact_set_matches": -1,
+        "delta_false_negatives": 0,
+        "delta_false_positives": 0,
+        "delta_macro_f1": -0.01777777777777778,
+        "delta_macro_precision": -0.020166666666666666,
+        "delta_macro_recall": -0.009999999999999898,
+        "end_to_end_exact_set_matches": 18,
+        "end_to_end_false_negatives": 11,
+        "end_to_end_false_positives": 69,
+        "end_to_end_macro_f1": 0.6033809523809524,
+        "end_to_end_macro_precision": 0.5358571428571429,
+        "end_to_end_macro_recall": 0.81,
+        "human_exact_set_matches": 19,
+        "human_false_negatives": 11,
+        "human_false_positives": 69,
+        "human_macro_f1": 0.6211587301587301,
+        "human_macro_precision": 0.5560238095238096,
+        "human_macro_recall": 0.82,
+        "profile": "C-T1A"
+      }
+    }
+  },
+  "provenance_sources": {
+    "baseline_config": "benchmarks/open_architecture/batch_01/baseline.yaml",
+    "baseline_manifest": "benchmarks/open_architecture/batch_01/manifest.yaml",
+    "scenarios": "benchmarks/open_architecture/batch_01/scenarios/scenarios.jsonl",
+    "stage_b_closure": "benchmarks/open_architecture/batch_01/stage_b/stage_b_closure.json",
+    "stage_c_end_to_end_summary": "benchmarks/open_architecture/batch_01/stage_c/stage_c_end_to_end_summary.json"
+  }
+}
