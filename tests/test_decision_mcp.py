@@ -709,7 +709,7 @@ def test_canonical_scope_matches_carry_no_rule_data():
         # Slim context references only: no rules, no ADR-020 selectors,
         # no enforcement linkage.
         assert set(record.keys()) == {
-            "decision_id", "version", "statement",
+            "decision_id", "version", "version_id", "statement",
             "lifecycle_status", "context_scope",
         }
 
@@ -1022,6 +1022,7 @@ def test_canonical_record_serialization_preserves_ordering():
         "decision_id",
         "version",
         "version_id",
+        "decision_version_id",
         "content_digest",
         "decision_class",
         "statement",
