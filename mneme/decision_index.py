@@ -468,6 +468,7 @@ __all__ = [
     "CANONICAL_DECISION_CLASS_ARCHITECTURE",
     "CANONICAL_VERSION",
     "SOURCE_TYPE_ADR",
+    "SOURCE_TYPE_PROPOSAL",
     "SOURCE_TYPE_RUNTIME",
     "CanonicalArchitectureIndex",
     "CanonicalDecisionRecord",
