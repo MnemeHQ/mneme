@@ -148,9 +148,11 @@ class InMemoryDecisionProposalStore:
         return proposal, True
 
     def get(self, proposal_id: str) -> DecisionProposal | None:
+        self._load()
         return self._by_id.get(proposal_id)
 
     def list_proposals(self) -> tuple[DecisionProposal, ...]:
+        self._load()
         return tuple(self._by_id[pid] for pid in self._order)
 
     def transition_if_proposed(
@@ -195,11 +197,12 @@ class JsonFileDecisionProposalStore:
 
         {"schema": "mneme.decision-proposals/v1", "proposals": [...]}
 
-    The file is loaded once at construction and rewritten atomically
-    (temporary file + ``os.replace``) on each successful append. Existing
-    entries are never rewritten: an idempotent ``add_if_new`` performs no
-    write at all. Reload reproduces proposal ids, history, and insertion
-    order deterministically.
+    The file is loaded at construction and refreshed before read operations,
+    so a long-running MCP reader observes a separate human-authority process
+    transitioning a proposal without restart. Writes remain atomic
+    (temporary file + ``os.replace``). Existing entries are never rewritten
+    by producer idempotency; reload reproduces proposal ids, history, and
+    insertion order deterministically.
     """
 
     def __init__(self, path: str | Path) -> None:
@@ -209,6 +212,8 @@ class JsonFileDecisionProposalStore:
         self._load()
 
     def _load(self) -> None:
+        self._by_id = {}
+        self._order = []
         if not self.path.exists():
             return
         with open(self.path, encoding="utf-8") as handle:
