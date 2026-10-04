@@ -5,8 +5,14 @@ Reads the JSON format defined in examples/project_memory.json and
 deserialises it into typed Python objects. The file is parsed once at
 load time and held in memory for the lifetime of the process.
 
-Typed accessors on MemoryStore let callers filter by item type without
-iterating manually — e.g. store.rules(), store.anti_patterns().
+D1B (ADR-030) preserves the existing compatibility API while adding one
+authoritative read path when a valid top-level ``decision_index`` section is
+present:
+
+    decision_index -> canonical validation -> Layer 1 Decision[] projection
+
+Section-less files continue through the pre-D1 native-decisions + legacy-item
+synthesis path unchanged.
 """
 
 from __future__ import annotations
@@ -14,60 +20,19 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from mneme.decision_index_persistence import (
+    legacy_item_to_runtime_decision,
+    load_persisted_decision_index,
+    runtime_decision_from_memory_record,
+    verify_compatibility_snapshot,
+)
 from mneme.schemas import (
     Decision,
     DecisionExample,
     MemoryItem,
     ProjectMeta,
     ProjectMemory,
-    Rule,
 )
-
-
-def _resolve_source_path(
-    memory_path: Path,
-    source: object,
-    decision_id: str,
-) -> str:
-    """Resolve an imported ADR provenance path for runtime comparisons.
-
-    Older and hand-authored decisions have no ``source`` block. Malformed
-    optional provenance is ignored here because freshness validation owns its
-    diagnostics; loading enforcement memory must remain backward compatible.
-    """
-    if not isinstance(source, dict) or source.get("type") != "adr":
-        return ""
-    raw_path = source.get("path")
-    if not isinstance(raw_path, str) or not raw_path:
-        return ""
-    source_name = Path(raw_path).name
-    if Path(source_name).suffix.lower() != ".md":
-        return ""
-    if source_name != f"{decision_id}.md" and not source_name.startswith(
-        f"{decision_id}-"
-    ):
-        return ""
-    return str((memory_path.parent / raw_path).resolve())
-
-
-def _load_rule(record: object) -> Rule:
-    if not isinstance(record, dict):
-        raise ValueError("rule record must be an object")
-    include_paths: tuple[str, ...] | None = None
-    if "include_paths" in record:
-        raw_include = record["include_paths"]
-        if not isinstance(raw_include, list):
-            raise ValueError("rule include_paths must be a list")
-        include_paths = tuple(raw_include)
-    raw_exclude = record.get("exclude_paths", [])
-    if not isinstance(raw_exclude, list):
-        raise ValueError("rule exclude_paths must be a list")
-    return Rule(
-        type=record["type"],
-        value=record["value"],
-        include_paths=include_paths,
-        exclude_paths=tuple(raw_exclude),
-    )
 
 
 class MemoryStore:
@@ -96,9 +61,22 @@ class MemoryStore:
     def load(self) -> ProjectMemory:
         """Parse the JSON file and return a populated ProjectMemory.
 
+        A valid D1B ``decision_index`` section is authoritative when present.
+        Its active versions are projected into the unchanged runtime
+        ``Decision`` API, and the persisted ``decisions[]`` compatibility
+        snapshot is verified against that projection. Legacy item synthesis is
+        deliberately disabled in that mode so one decision cannot have two
+        authorities.
+
+        When ``decision_index`` is absent, the exact pre-D1 behavior is kept:
+        native ``decisions[]`` are loaded and legacy rule/anti_pattern items
+        are synthesized into runtime Decisions.
+
         Raises:
             FileNotFoundError: If the memory file does not exist.
-            KeyError:          If a required field is missing.
+            KeyError:          If a required legacy field is missing.
+            ValueError:        If canonical persistence is malformed or its
+                               compatibility snapshot diverges.
         """
         with open(self.path, encoding="utf-8") as f:
             data = json.load(f)
@@ -135,69 +113,31 @@ class MemoryStore:
             for ex in data.get("examples", [])
         ]
 
-        # Native Decision records (v2 schema).
-        native_decisions = [
-            Decision(
-                id=d["id"],
-                decision=d["decision"],
-                rationale=d.get("rationale", ""),
-                scope=list(d.get("scope", [])),
-                constraints=list(d.get("constraints", [])),
-                anti_patterns=list(d.get("anti_patterns", [])),
-                rules=[
-                    _load_rule(rule)
-                    for rule in d.get("rules", [])
-                ],
-                test_evidence=[
-                    entry
-                    for entry in (d.get("test_evidence") or [])
-                    if isinstance(entry, dict)
-                ],
-                source_path=_resolve_source_path(
-                    self.path,
-                    d.get("source"),
-                    d["id"],
-                ),
-                memory_path=str(self.path.resolve()),
-                created_at=d.get("created_at", ""),
-                updated_at=d.get("updated_at", ""),
-                status=d.get("status", "active"),
+        if "decision_index" in data:
+            index = load_persisted_decision_index(data["decision_index"])
+            decisions = verify_compatibility_snapshot(
+                data,
+                index,
+                self.path,
             )
-            for d in data.get("decisions", [])
-        ]
+        else:
+            native_decisions = [
+                runtime_decision_from_memory_record(d, self.path)
+                for d in data.get("decisions", [])
+            ]
+            migrated = [
+                decision
+                for item in items
+                if (decision := legacy_item_to_runtime_decision(item)) is not None
+            ]
+            decisions = native_decisions + migrated
 
-        # Backward compatibility: migrate legacy rule/anti_pattern items.
-        migrated: list[Decision] = []
-        for item in items:
-            if item.type == "rule":
-                migrated.append(
-                    Decision(
-                        id=item.id,
-                        decision=item.title,
-                        rationale="",
-                        scope=["general"],
-                        constraints=[item.content] if item.content else [],
-                    )
-                )
-            elif item.type == "anti_pattern":
-                # Step 3C Stage 1: mirror the rule migration (content ->
-                # constraints). Previously anti_pattern.content landed in
-                # rationale, leaving migrated anti-patterns invisible to the
-                # constraints-weighted retrieval signal (1.5x vs 0.5x).
-                migrated.append(
-                    Decision(
-                        id=item.id,
-                        decision=f"Avoid: {item.title}",
-                        rationale="",
-                        scope=["general"],
-                        constraints=[item.content] if item.content else [],
-                        anti_patterns=[item.title],
-                    )
-                )
-
-        decisions = native_decisions + migrated
-
-        self._memory = ProjectMemory(meta=meta, items=items, examples=examples, decisions=decisions)
+        self._memory = ProjectMemory(
+            meta=meta,
+            items=items,
+            examples=examples,
+            decisions=decisions,
+        )
         return self._memory
 
     @property
@@ -210,14 +150,7 @@ class MemoryStore:
     # ── Typed accessors ───────────────────────────────────────────────────────
 
     def by_type(self, *types: str) -> list[MemoryItem]:
-        """Return all items whose type matches any of the given type strings.
-
-        Args:
-            *types: One or more MemoryItemType values, e.g. "rule", "fact".
-
-        Returns:
-            Items filtered to the requested types, in original file order.
-        """
+        """Return all items whose type matches any of the given type strings."""
         type_set = set(types)
         return [item for item in self.memory.items if item.type in type_set]
 
@@ -242,7 +175,7 @@ class MemoryStore:
         return self.by_type("fact")
 
     def decisions(self) -> list[Decision]:
-        """Return all Decision records (native + legacy-migrated)."""
+        """Return all runtime Decision records from the active loading path."""
         return list(self.memory.decisions)
 
     def summary(self) -> str:
