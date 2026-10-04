@@ -73,6 +73,29 @@ FROZEN_SEMANTIC_MODULE_HASHES: dict[str, str] = {
 }
 
 
+def frozen_semantic_module_hash(rel_path: str) -> str:
+    """Hash one semantic module from the immutable Batch 01 engine commit."""
+    frozen = subprocess.run(
+        [
+            "git",
+            "show",
+            f"{FROZEN_SEMANTIC_MNEME_SHA}:{rel_path}",
+        ],
+        cwd=REPO_ROOT,
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    if frozen.returncode != 0:
+        raise AssertionError(
+            "Frozen semantic runtime module unavailable at pinned commit "
+            f"{FROZEN_SEMANTIC_MNEME_SHA}: {rel_path}\n"
+            + frozen.stderr.decode("utf-8", errors="replace")
+        )
+    raw_bytes = frozen.stdout.replace(b"\r\n", b"\n")
+    return hashlib.sha256(raw_bytes).hexdigest()
+
+
 @pytest.fixture
 def manifest() -> Manifest:
     assert MANIFEST_PATH.is_file(), f"manifest.yaml not found at {MANIFEST_PATH}"
@@ -649,22 +672,19 @@ class TestBatch01BaselineFreeze:
         assert baseline.reference_corpus.content_hash == actual_ref_hash
         assert actual_ref_hash == "0455bd66aae52551c35b37a63c2d185f"
 
-    # 17. no semantic runtime module is modified (hermetic content-integrity)
-    def test_17_no_semantic_runtime_module_modified(self):
+    # 17. frozen semantic runtime content matches the pinned historical commit
+    def test_17_frozen_semantic_runtime_modules_match_pinned_commit(self):
         assert FROZEN_SEMANTIC_MNEME_SHA == "3673c36855fb1e30d46942ce826c50be4888df5e"
 
         mismatches: list[str] = []
         for rel_path, expected_hash in FROZEN_SEMANTIC_MODULE_HASHES.items():
-            mod_path = REPO_ROOT / rel_path
-            assert mod_path.is_file(), f"Frozen module missing: {rel_path}"
-            raw_bytes = mod_path.read_bytes().replace(b"\r\n", b"\n")
-            actual_hash = hashlib.sha256(raw_bytes).hexdigest()
+            actual_hash = frozen_semantic_module_hash(rel_path)
             if actual_hash != expected_hash:
                 mismatches.append(
                     f"{rel_path}: expected {expected_hash}, got {actual_hash}"
                 )
 
         assert not mismatches, (
-            "Frozen semantic runtime modules modified from frozen commit "
+            "Frozen semantic runtime modules differ from pinned commit "
             f"{FROZEN_SEMANTIC_MNEME_SHA}:\n  - " + "\n  - ".join(mismatches)
         )

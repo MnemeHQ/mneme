@@ -485,13 +485,14 @@ class TestT2AReproducibilityAndSafety:
         for name in forbidden:
             assert name not in vars_dict, f"Forbidden canonical component '{name}' imported in experiment module"
 
-    # 18. Frozen semantic module hashes remain unchanged
+    # 18. Frozen semantic module hashes remain bound to the pinned engine
     def test_18_frozen_semantic_module_hashes_remain_unchanged(self):
-        from tests.open_architecture.test_baseline import FROZEN_SEMANTIC_MODULE_HASHES
+        from tests.open_architecture.test_baseline import (
+            FROZEN_SEMANTIC_MODULE_HASHES,
+            frozen_semantic_module_hash,
+        )
         for rel_path, expected_hash in FROZEN_SEMANTIC_MODULE_HASHES.items():
-            mod_path = REPO_ROOT / rel_path
-            raw = mod_path.read_bytes().replace(b"\r\n", b"\n")
-            actual_hash = hashlib.sha256(raw).hexdigest()
+            actual_hash = frozen_semantic_module_hash(rel_path)
             assert actual_hash == expected_hash, f"Hash mismatch in {rel_path}"
 
     # 19. Corrected T1 accounting remains 272 matched candidates

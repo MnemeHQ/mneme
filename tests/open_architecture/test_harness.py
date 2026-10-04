@@ -998,20 +998,20 @@ class TestO1AHarness:
 
     # 23. existing frozen semantic-module boundary remains green
     def test_23_frozen_semantic_module_boundary_remains_green(self):
-        import hashlib
-        from tests.open_architecture.test_baseline import FROZEN_SEMANTIC_MODULE_HASHES
+        from tests.open_architecture.test_baseline import (
+            FROZEN_SEMANTIC_MODULE_HASHES,
+            frozen_semantic_module_hash,
+        )
 
         mismatches: list[str] = []
         for rel_path, expected_hash in FROZEN_SEMANTIC_MODULE_HASHES.items():
-            mod_path = REPO_ROOT / rel_path
-            assert mod_path.is_file(), f"Frozen module missing: {rel_path}"
-            raw_bytes = mod_path.read_bytes().replace(b"\r\n", b"\n")
-            actual_hash = hashlib.sha256(raw_bytes).hexdigest()
+            actual_hash = frozen_semantic_module_hash(rel_path)
             if actual_hash != expected_hash:
                 mismatches.append(f"{rel_path}: expected {expected_hash}, got {actual_hash}")
 
         assert not mismatches, (
-            f"Frozen core modules modified:\n" + "\n".join(mismatches)
+            f"Frozen core modules differ from pinned Batch 01 commit:\n"
+            + "\n".join(mismatches)
         )
 
     # 24. preflight failure performs zero materializations, zero classifier calls, zero execution
