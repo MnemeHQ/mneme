@@ -1,0 +1,124 @@
+{
+  "artifact_type": "batch_01_closure_manifest",
+  "artifact_version": "0.1",
+  "baseline_id": "o1a-batch-01-baseline",
+  "batch_id": "o1a-batch-01",
+  "closure_declaration": {
+    "methodology_invariant": "Stages remain discrete and independent: Stage A dynamic discovery, Stage B semantic classification, and Stage C governing decision set retrieval. Per O1A benchmark methodology, stages are never collapsed or averaged into an overall benchmark score.",
+    "production_readiness": "Research benchmark closure only; not declared a production-ready system.",
+    "scope": "O1A Batch 01 benchmark program is formally closed and frozen across all three stages (Stage A Discovery, Stage B Semantic Classification, and Stage C Governing Decision Set). No further treatments, tunings, or calibrations are accepted for Batch 01. Any future research must occur under a new benchmark version, new batch, or explicitly reopened programme rather than mutating Batch 01.",
+    "status": "CLOSED / FROZEN"
+  },
+  "closure_status": "closed_frozen",
+  "corpora_identities": {
+    "baseline_configuration_hash": "31e18dc1e2bd9ad30bec86dce1a9295a",
+    "manifest_configuration_hash": "4af7e5794011b43d39682cdfeac9f54e",
+    "reference_corpus_v0_1_hash": "0455bd66aae52551c35b37a63c2d185f",
+    "reference_corpus_v0_2_grounding_hash": "700a569e24bf90707ba14ff65eea2ab5",
+    "scenario_corpus_hash": "2ff8751955fd64a33316aca6692dc803"
+  },
+  "dataset": {
+    "decisions_per_repository": 20,
+    "repositories": [
+      "adrkit",
+      "archlint",
+      "gsa_agentic_coding_quickstart",
+      "helix",
+      "modonome"
+    ],
+    "repository_count": 5,
+    "scenarios_per_repository": 10,
+    "total_reference_decisions": 100,
+    "total_scenarios": 50
+  },
+  "headline_metric": "governing_decision_set_f1",
+  "mneme_execution_sha": "8f2a9281bc5e54ccacac12577c04d2ce1694cfb9",
+  "provenance_sources": {
+    "baseline_config": "benchmarks/open_architecture/batch_01/baseline.yaml",
+    "manifest": "benchmarks/open_architecture/batch_01/manifest.yaml",
+    "stage_a_summary": "benchmarks/open_architecture/batch_01/stage_a/stage_a_summary.json",
+    "stage_b_closure": "benchmarks/open_architecture/batch_01/stage_b/stage_b_closure.json",
+    "stage_c_closure": "benchmarks/open_architecture/batch_01/stage_c/stage_c_closure.json"
+  },
+  "stages": {
+    "stage_a": {
+      "artifact_path": "benchmarks/open_architecture/batch_01/stage_a/stage_a_summary.json",
+      "artifact_sha256": "a554d2fc9c3ff7e84f616387b25e257c0d0019b43c80250c7c9ec890af5e62f6",
+      "extractor": {
+        "confidence": 0.5,
+        "id": "heuristic",
+        "keyword_count": 26,
+        "max_lines": 50,
+        "min_lines": 2,
+        "version": "0.1"
+      },
+      "matching_contract": "deterministic_source_path_and_line_interval_overlap",
+      "reference_corpus_hash": "0455bd66aae52551c35b37a63c2d185f",
+      "stage_name": "Stage A \u2014 Dynamic Discovery",
+      "status": "BASELINE_FROZEN",
+      "summary_metrics": {
+        "discovered_documents": 687,
+        "extracted_candidates": 5459,
+        "macro_f1": 0.16232962158801395,
+        "macro_precision": 0.1276030877012214,
+        "macro_recall": 0.85,
+        "matched_candidates": 256,
+        "matched_references": 85,
+        "missed_source_references": 14,
+        "reference_decisions": 100
+      }
+    },
+    "stage_b": {
+      "accepted_endpoint": "B-T1D / Arm D",
+      "accepted_mixed_semantic_hash": "sha256:662de96721513ab1fd0d6e2d55eb7c037dedcb04c75b441b610aa3a57e236b8a",
+      "arm_d_outcomes_semantic_hash": "sha256:ae1fbd24f6b36099d3c58006886503f6ba14bf5fd7cfa9bfb93c4befaabbedc0",
+      "arm_d_treatment_profile_hash": "d66bb19c9e4c64e835a6191293a95570",
+      "arm_id": "treatment_d",
+      "artifact_path": "benchmarks/open_architecture/batch_01/stage_b/stage_b_closure.json",
+      "artifact_sha256": "3ced430b70fd0eda336ac4fee7c8e012b4eb3cc0e902ea769118a52939ec16b5",
+      "experiment_id": "b-t1d-relationship-selectivity",
+      "scoring_reference_corpus_hash": "700a569e24bf90707ba14ff65eea2ab5",
+      "stage_name": "Stage B \u2014 Semantic Classification",
+      "status": "CLOSED / FROZEN",
+      "summary_metrics": {
+        "authority_accuracy": 0.57,
+        "decision_classification_accuracy": 0.76,
+        "domain_micro_f1": 0.560284156811,
+        "enforcement_classification_accuracy": 0.78,
+        "lifecycle_accuracy": 0.94,
+        "preservation_conditions_passed": true,
+        "purpose_micro_f1": 0.52716646099,
+        "relationship_accuracy": 0.61,
+        "relationship_exact_matches": 61,
+        "scope_accuracy": 0.0,
+        "stage_b_semantic_score": 0.5934313272250952,
+        "strict_relationship_accuracy": 0.6100000000000001
+      },
+      "total_assembled_outcomes": 800
+    },
+    "stage_c": {
+      "accepted_endpoint": "B3",
+      "artifact_path": "benchmarks/open_architecture/batch_01/stage_c/stage_c_closure.json",
+      "artifact_sha256": "5cd49ea6c8282113b59db654ca05953711a080f130cb1136f195a2423318af29",
+      "experiment_id": "o1a-stage-c-end-to-end",
+      "headline_metric": "governing_decision_set_f1",
+      "profile": "B3",
+      "scenario_corpus_hash": "2ff8751955fd64a33316aca6692dc803",
+      "selection_policy": "relative_80",
+      "stage_c_experiment_profile_hash": "5f031434a95ea94c53255901b1ada39e",
+      "stage_name": "Stage C \u2014 Governing Decision Set",
+      "status": "CLOSED / FROZEN",
+      "summary_metrics": {
+        "end_to_end_exact_set_matches": 22,
+        "end_to_end_macro_f1": 0.6506666666666666,
+        "end_to_end_macro_precision": 0.6023333333333334,
+        "end_to_end_macro_recall": 0.79,
+        "human_reference_exact_set_matches": 26,
+        "human_reference_macro_f1": 0.7110952380952381,
+        "total_false_negatives": 13,
+        "total_false_positives": 46,
+        "total_scenarios": 50
+      }
+    }
+  }
+}
