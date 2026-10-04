@@ -196,7 +196,7 @@ class JsonFileDecisionProposalStore:
         {"schema": "mneme.decision-proposals/v1", "proposals": [...]}
 
     The file is loaded at construction and refreshed before read operations,
-    so a long-running MCP reader observes a separate human-authority process
+    so a long-running reader observes a separate human-authority process
     transitioning a proposal without restart. Writes remain atomic
     (temporary file + ``os.replace``). Existing entries are never rewritten
     by producer idempotency; reload reproduces proposal ids, history, and
