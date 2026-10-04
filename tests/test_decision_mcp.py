@@ -64,6 +64,7 @@ from mneme.decision_mcp import (
     trace_not_found_to_transport,
     trace_to_transport,
 )
+from mneme.decision_index_persistence import migrate_memory_document
 from mneme.decision_index_service import (
     CanonicalDecisionTrace,
     DecisionIndexIntegrityError,
@@ -1020,6 +1021,8 @@ def test_canonical_record_serialization_preserves_ordering():
     assert list(payload.keys()) == [
         "decision_id",
         "version",
+        "version_id",
+        "content_digest",
         "decision_class",
         "statement",
         "rationale",
@@ -1049,6 +1052,8 @@ def test_rule_serialization_passes_applicability_verbatim():
         "rule_id",
         "decision_id",
         "decision_version",
+        "decision_version_id",
+        "sequence",
         "rule_type",
         "rule_payload",
         "applicability",
@@ -1419,6 +1424,17 @@ def test_no_active_zero_degradation_fallback_exists():
     assert "active = []" not in source
 
 
+def _canonical_memory(tmp_path: Path) -> Path:
+    path = tmp_path / "project_memory.json"
+    document = migrate_memory_document({
+        "items": [],
+        "examples": [],
+        "decisions": [],
+    })
+    path.write_text(json.dumps(document, indent=2) + "\n", encoding="utf-8")
+    return path
+
+
 class _RecordingServer(MCPServer):
     run_calls: list[bool] = []
 
@@ -1439,7 +1455,11 @@ def test_serve_stdio_strict_composes_and_starts_on_valid_corpus(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 ):
     RecordingServer = _serve_stdio_with_recording_run(monkeypatch)
-    serve_stdio(proposal_store_path=None, adr_dir=_valid_adr_dir(tmp_path))
+    serve_stdio(
+        proposal_store_path=None,
+        memory_path=_canonical_memory(tmp_path),
+        adr_dir=_valid_adr_dir(tmp_path),
+    )
     assert RecordingServer.run_calls == [True]
 
 
@@ -1487,6 +1507,7 @@ def test_cli_default_starts_without_canonical_adr_dir(monkeypatch):
     _, kwargs = calls[0]
     assert kwargs["adr_dir"] is None
     assert kwargs["proposal_store_path"] is None  # explicit in-memory store
+    assert kwargs["memory_path"] == ".mneme/project_memory.json"
 
 
 def test_cli_explicit_adr_dir_passes_strict_canonical_loading(
