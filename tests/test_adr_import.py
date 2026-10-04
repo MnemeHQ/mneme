@@ -609,6 +609,34 @@ def test_g14_adr_supersedes_persists_relationship_and_deactivates_target(tmp_pat
     assert [row["id"] for row in raw["decisions"]] == ["ADR-602"]
 
 
+def test_d1d_reimport_refuses_general_lifecycle_change_without_supersedes(
+    tmp_path,
+):
+    from mneme.adr_import import apply_import, compile_for_import
+
+    adr_dir = tmp_path / "adrs"
+    adr_dir.mkdir()
+    _write_adr(adr_dir, "ADR-650", "storage")
+    target = tmp_path / "project_memory.json"
+    _seed_empty_memory(target)
+    apply_import(compile_for_import(adr_dir), target_path=target)
+    before = target.read_bytes()
+
+    _write_adr(
+        adr_dir,
+        "ADR-650",
+        "storage",
+        status="deprecated",
+    )
+    with pytest.raises(RuntimeError, match="General lifecycle editing is D1E"):
+        apply_import(
+            compile_for_import(adr_dir),
+            target_path=target,
+            allow_update=True,
+        )
+    assert target.read_bytes() == before
+
+
 # ── Partial import under --approve-conflicts ────────────────────────────────
 
 
@@ -621,6 +649,7 @@ def _write_adr(
     priority: str = "normal",
     body: str = "## Constraints\n\n- FORBID_LITERAL: mongodb\n",
     supersedes: list[str] | None = None,
+    status: str = "accepted",
 ) -> None:
     supersedes_block = ""
     if supersedes:
@@ -631,7 +660,7 @@ def _write_adr(
         "---\n"
         f"id: {adr_id}\n"
         f"title: {adr_id} title\n"
-        "status: accepted\n"
+        f"status: {status}\n"
         f"priority: {priority}\n"
         f"date: {date}\n"
         f"scope: {json.dumps(scope)}\n"

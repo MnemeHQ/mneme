@@ -496,6 +496,26 @@ def apply_import(
         decision.id: (decision, lifecycle, supersedes, source_path)
         for decision, lifecycle, supersedes, source_path in plans
     }
+    explicit_supersession_targets = {
+        target
+        for node in report.active_nodes
+        for target in node.supersedes
+    }
+    for decision, planned_lifecycle, _, _ in plans:
+        existing = initial_records_by_id.get(decision.id)
+        if existing is None or existing.lifecycle_status == planned_lifecycle:
+            continue
+        if (
+            planned_lifecycle == "superseded"
+            and decision.id in explicit_supersession_targets
+        ):
+            continue
+        raise RuntimeError(
+            f"ADR import refused: decision {decision.id!r} would change "
+            f"lifecycle from {existing.lifecycle_status!r} to "
+            f"{planned_lifecycle!r} without an explicit active supersedes "
+            "relationship. General lifecycle editing is D1E."
+        )
 
     def source_contract(
         decision: Decision, source_path: str
