@@ -914,7 +914,7 @@ def test_reconstructed_mcp_sees_durable_accepted_proposal_state(tmp_path):
     known/missing canonical linkage honestly."""
     flow = _run_producer_flow(tmp_path)
     fixture = flow.fixture
-    server = _mcp_server(flow.proposals_path)
+    server = _mcp_server(flow.proposals_path, flow.memory_path)
 
     for key in flow.accepted_keys:
         proposal_id = flow.proposal_id_by_key[key]

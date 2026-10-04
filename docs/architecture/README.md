@@ -92,18 +92,20 @@ and future architecture contracts.
 - [ADR-023](../adr/ADR-023-canonical-decision-index-and-runtime-projection-boundary.md)
   is **accepted**. It establishes the canonical Decision Index abstraction and
   the Layer 1 runtime projection boundary.
-- The current `mneme/decision_index.py` implementation is the validated D0
-  canonical model. It remains an in-memory canonical view with the compatibility
-  constraints described by ADR-023.
+- The current `mneme/decision_index.py` implementation remains the validated
+  canonical model. D1B added the persisted `decision_index` substrate and
+  load-time projection: when that section exists, it is the canonical read
+  authority and `decisions[]` is only a verified compatibility snapshot.
 - [ADR-027](../adr/ADR-027-decision-mcp-proposal-ingestion-and-authority-boundary.md)
   is **accepted**. The Decision MCP may propose and read decision state, but it
   does not receive authority to accept, reject, activate, supersede, bypass, or
   create trusted evidence.
 - [ADR-030](../adr/ADR-030-canonical-decision-persistence-version-identity-and-stable-rule-lineage.md)
-  is currently **proposed**, not accepted. Its durable `decision_index`
-  persistence, version-occurrence identity, and stable rule-lineage model must
-  therefore be treated as a target architecture, not as completed runtime
-  behavior.
+  is currently **proposed**, not accepted. Separately reviewed D1B and D1C
+  implementation slices operationalize its persistence and unified-read
+  foundations without treating the whole ADR as accepted: accepted proposals
+  write the persisted Decision Index, Decision MCP reads that same index, and
+  `decisions[]` remains a compatibility snapshot. D1D-D1F remain target work.
 - [ADR-025](../adr/ADR-025-trusted-test-execution-attestation.md) is also
   **proposed**. Trusted test-execution attestation remains reserved/deferred.
 
@@ -219,11 +221,12 @@ flowchart LR
         ADR["ADR parser / compiler / import"]
         Proposal["DecisionProposalStore"]
         Authority["DecisionAuthorityService<br/>human authority path"]
-        RuntimeMemory["MemoryStore / Layer 1 decisions"]
+        Persisted["Persisted Decision Index<br/>project_memory.json decision_index"]
+        MemoryStore["MemoryStore<br/>compatibility loader"]
     end
 
     subgraph Model["Decision representation"]
-        Index["Canonical Decision Index<br/>D0 model"]
+        Index["Canonical Decision Index<br/>validated read model"]
         Projection["Decision projection / adapters"]
         Runtime["Runtime Decision + Rule model"]
     end
@@ -243,13 +246,14 @@ flowchart LR
     end
 
     ADR --> Index
-    RuntimeMemory --> Index
     Proposal --> Authority
-    Authority --> RuntimeMemory
+    Authority --> Persisted
+    Persisted --> Index
+    Persisted --> MemoryStore
 
     Index --> Projection
     Projection --> Runtime
-    RuntimeMemory --> Runtime
+    MemoryStore --> Runtime
 
     Runtime --> Retriever
     Runtime --> Enforcer
@@ -265,8 +269,10 @@ flowchart LR
 ```
 
 The arrows describe responsibility and data flow at an architectural level.
-They do not imply that every component is already backed by one durable
-canonical persistence path. In particular, ADR-030 remains proposed.
+D1B/D1C establish the persisted canonical/read boundary for accepted proposals
+and MCP reads, while ADR-030 remains proposed as the broader target contract.
+ADR import/version evolution, remaining lifecycle/protection writers, and
+eventual compatibility-snapshot removal remain later D1 slices.
 
 # Research boundary — O1A Open Architecture
 

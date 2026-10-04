@@ -68,16 +68,22 @@ Install the optional MCP dependency:
 pip install "mneme-hq[mcp]"
 ```
 
-Start the local stdio server with the proposal store enabled:
+Start the local stdio server. Canonical reads come from the persisted Decision Index in `.mneme/project_memory.json` by default; the proposal store remains separate.
 
 ```bash
 mneme decision-mcp
 ```
 
-Optionally add a canonical ADR corpus. Mneme validates and precedence-resolves the corpus before the server starts; invalid or ambiguous ADR state fails closed rather than serving a degraded authority view.
+Use `--memory` to select another project memory file. The file must contain a valid authoritative `decision_index` section; MCP fails closed rather than reconstructing authority from the compatibility `decisions[]` snapshot.
 
 ```bash
-mneme decision-mcp --adr-dir path/to/adrs
+mneme decision-mcp --memory path/to/project_memory.json
+```
+
+`--adr-dir` is now optional validation input only. Mneme still validates and precedence-resolves that corpus before startup, but ADRs do not become a second MCP authority source.
+
+```bash
+mneme decision-mcp --memory path/to/project_memory.json --adr-dir path/to/adrs
 ```
 
 The MCP surface is intentionally frozen to six tools:
