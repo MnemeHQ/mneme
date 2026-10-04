@@ -9,6 +9,7 @@ import pytest
 
 from mneme.benchmark import BenchmarkRunner
 from mneme.decision_index_persistence import (
+    append_initial_canonical_decision,
     DECISION_INDEX_SCHEMA,
     DecisionIndexPersistenceError,
     content_digest_of,
@@ -134,6 +135,78 @@ def test_real_migrated_projection_preserves_frozen_benchmark_results() -> None:
     ).run_suite(REPO_ROOT / "examples" / "benchmarks")
 
     assert migrated_results == baseline
+
+
+
+
+
+def test_source_evidence_rejects_proposal_fields_on_runtime_records():
+    document = migrate_memory_document({
+        "items": [],
+        "examples": [],
+        "decisions": [{
+            "id": "runtime-1",
+            "decision": "Keep runtime decision",
+            "rationale": "",
+            "scope": [],
+            "constraints": [],
+            "anti_patterns": [],
+        }],
+    })
+    section = document["decision_index"]
+    section["versions"][0]["source_evidence"][0]["proposal_id"] = "dprop-invalid"
+    with pytest.raises(
+        DecisionIndexPersistenceError,
+        match="contains unsupported fields",
+    ):
+        load_persisted_decision_index(section)
+
+
+def test_proposal_source_evidence_requires_matching_accepted_decision_id():
+    document = migrate_memory_document({
+        "items": [],
+        "examples": [],
+        "decisions": [],
+    })
+    document, created = append_initial_canonical_decision(
+        document,
+        decision_id="ddec-one",
+        statement="Use canonical storage",
+        rationale="Reviewed",
+        context_scope=[],
+        lifecycle_status="active",
+        created_at="2026-10-03T00:00:00Z",
+        updated_at="2026-10-03T00:00:00Z",
+        occurrence_source_identity=[
+            "dprop-one",
+            "producer-key",
+            "content-fingerprint",
+        ],
+        source_evidence=[{
+            "source_type": "proposal",
+            "source_locator": "design/review.md",
+            "source_revision": "",
+            "observed_at": "2026-10-03T00:00:00Z",
+            "verification_status": "",
+            "proposal_id": "dprop-one",
+            "producer_key": "producer-key",
+            "content_fingerprint": "content-fingerprint",
+            "origin_classification": "ai_generated",
+            "proposed_at": "2026-10-02T00:00:00Z",
+            "source_reference": "design/review.md",
+            "accepted_decision_id": "ddec-one",
+        }],
+    )
+    assert created is True
+    section = document["decision_index"]
+    section["versions"][0]["source_evidence"][0][
+        "accepted_decision_id"
+    ] = "ddec-other"
+    with pytest.raises(
+        DecisionIndexPersistenceError,
+        match="proposal provenance links to",
+    ):
+        load_persisted_decision_index(section)
 
 
 def test_identity_golden_vectors() -> None:

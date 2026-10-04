@@ -702,52 +702,102 @@ def _parse_source_evidence(
                 f"decision {decision_id!r} source evidence has unknown source_type "
                 f"{source_type!r}"
             )
-        evidence.append(CanonicalSourceEvidence(
-            source_type=source_type,
-            source_locator=_require_str(
+        common_keys = {
+            "source_type",
+            "source_locator",
+            "source_revision",
+            "observed_at",
+            "verification_status",
+        }
+        proposal_keys = {
+            "proposal_id",
+            "producer_key",
+            "content_fingerprint",
+            "origin_classification",
+            "proposed_at",
+            "source_reference",
+            "accepted_decision_id",
+        }
+        allowed_keys = (
+            common_keys | proposal_keys
+            if source_type == "proposal"
+            else common_keys
+        )
+        unknown_keys = set(item) - allowed_keys
+        if unknown_keys:
+            raise DecisionIndexPersistenceError(
+                f"decision {decision_id!r} source evidence type {source_type!r} "
+                f"contains unsupported fields {sorted(unknown_keys)}"
+            )
+
+        common = {
+            "source_type": source_type,
+            "source_locator": _require_str(
                 item.get("source_locator", ""),
                 f"source_evidence[{index}].source_locator",
             ),
-            source_revision=_require_str(
+            "source_revision": _require_str(
                 item.get("source_revision", ""),
                 f"source_evidence[{index}].source_revision",
             ),
-            observed_at=_require_str(
+            "observed_at": _require_str(
                 item.get("observed_at", ""),
                 f"source_evidence[{index}].observed_at",
             ),
-            verification_status=_require_str(
+            "verification_status": _require_str(
                 item.get("verification_status", ""),
                 f"source_evidence[{index}].verification_status",
             ),
-            proposal_id=_require_str(
-                item.get("proposal_id", ""),
+        }
+        if source_type != "proposal":
+            evidence.append(CanonicalSourceEvidence(**common))
+            continue
+
+        proposal_fields = {
+            "proposal_id": _require_str(
+                item.get("proposal_id"),
                 f"source_evidence[{index}].proposal_id",
+                non_empty=True,
             ),
-            producer_key=_require_str(
-                item.get("producer_key", ""),
+            "producer_key": _require_str(
+                item.get("producer_key"),
                 f"source_evidence[{index}].producer_key",
+                non_empty=True,
             ),
-            content_fingerprint=_require_str(
-                item.get("content_fingerprint", ""),
+            "content_fingerprint": _require_str(
+                item.get("content_fingerprint"),
                 f"source_evidence[{index}].content_fingerprint",
+                non_empty=True,
             ),
-            origin_classification=_require_str(
-                item.get("origin_classification", ""),
+            "origin_classification": _require_str(
+                item.get("origin_classification"),
                 f"source_evidence[{index}].origin_classification",
+                non_empty=True,
             ),
-            proposed_at=_require_str(
-                item.get("proposed_at", ""),
+            "proposed_at": _require_str(
+                item.get("proposed_at"),
                 f"source_evidence[{index}].proposed_at",
+                non_empty=True,
             ),
-            source_reference=_require_str(
-                item.get("source_reference", ""),
+            "source_reference": _require_str(
+                item.get("source_reference"),
                 f"source_evidence[{index}].source_reference",
+                non_empty=True,
             ),
-            accepted_decision_id=_require_str(
-                item.get("accepted_decision_id", ""),
+            "accepted_decision_id": _require_str(
+                item.get("accepted_decision_id"),
                 f"source_evidence[{index}].accepted_decision_id",
+                non_empty=True,
             ),
+        }
+        if proposal_fields["accepted_decision_id"] != decision_id:
+            raise DecisionIndexPersistenceError(
+                f"decision {decision_id!r} proposal provenance links to "
+                f"{proposal_fields['accepted_decision_id']!r}"
+            )
+        evidence.append(CanonicalSourceEvidence(
+            **common,
+            **proposal_fields,
         ))
     return tuple(evidence)
 

@@ -94,6 +94,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from mneme.adr_compiler import resolve_precedence, validate_corpus
 from mneme.adr_parser import parse_adr_directory
 from mneme.decision_index import (
+    SOURCE_TYPE_PROPOSAL,
     CanonicalDecisionRecord,
     CanonicalRuleRecord,
     CanonicalTestEvidence,
@@ -358,21 +359,31 @@ def rule_to_transport(rule: CanonicalRuleRecord) -> dict[str, Any]:
 
 
 def source_evidence_to_transport(evidence: Any) -> dict[str, Any]:
-    """Serialize canonical source provenance without upgrading trust."""
-    return {
+    """Serialize canonical source provenance without widening old records.
+
+    ADR/runtime evidence keeps its existing transport fields plus the
+    ADR-030 common additive fields. Proposal-only identity is emitted only
+    for proposal-backed evidence, whose source_evidence list was empty
+    before D1C.
+    """
+    payload: dict[str, Any] = {
         "source_type": evidence.source_type,
         "source_locator": evidence.source_locator,
         "source_revision": evidence.source_revision,
         "observed_at": evidence.observed_at,
-        "verification_status": evidence.verification_status,
-        "proposal_id": evidence.proposal_id,
-        "producer_key": evidence.producer_key,
-        "content_fingerprint": evidence.content_fingerprint,
-        "origin_classification": evidence.origin_classification,
-        "proposed_at": evidence.proposed_at,
-        "source_reference": evidence.source_reference,
-        "accepted_decision_id": evidence.accepted_decision_id,
     }
+    if evidence.source_type == SOURCE_TYPE_PROPOSAL:
+        payload.update({
+            "verification_status": evidence.verification_status,
+            "proposal_id": evidence.proposal_id,
+            "producer_key": evidence.producer_key,
+            "content_fingerprint": evidence.content_fingerprint,
+            "origin_classification": evidence.origin_classification,
+            "proposed_at": evidence.proposed_at,
+            "source_reference": evidence.source_reference,
+            "accepted_decision_id": evidence.accepted_decision_id,
+        })
+    return payload
 
 
 def canonical_record_to_transport(

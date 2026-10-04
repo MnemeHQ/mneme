@@ -34,6 +34,7 @@ from mneme.decision_index import (
     CanonicalArchitectureIndex,
     CanonicalDecisionRecord,
     CanonicalRuleRecord,
+    CanonicalSourceEvidence,
     CanonicalTestEvidence,
 )
 from mneme.decision_mcp import (
@@ -1009,6 +1010,52 @@ def test_proposal_serialization_is_explicit_and_deterministic():
         "accepted_decision_id",
     ]
     assert json.loads(json.dumps(payload)) == payload
+
+
+
+
+
+def test_source_evidence_transport_limits_proposal_fields_to_proposal_records():
+    adr_record = dataclasses.replace(
+        _canonical_record(),
+        source_evidence=(CanonicalSourceEvidence(
+            source_type="adr",
+            source_locator="docs/adr/ADR-9001.md",
+            source_revision="sha256-abc",
+            observed_at="2026-09-01T00:00:00Z",
+            verification_status="verified",
+        ),),
+    )
+    adr_evidence = canonical_record_to_transport(adr_record)["source_evidence"][0]
+    assert adr_evidence == {
+        "source_type": "adr",
+        "source_locator": "docs/adr/ADR-9001.md",
+        "source_revision": "sha256-abc",
+        "observed_at": "2026-09-01T00:00:00Z",
+    }
+
+    proposal_record = dataclasses.replace(
+        _canonical_record(decision_id="ddec-example"),
+        source_evidence=(CanonicalSourceEvidence(
+            source_type="proposal",
+            source_locator="design/review.md",
+            source_revision="commit-1",
+            observed_at="2026-09-02T00:00:00Z",
+            proposal_id="dprop-example",
+            producer_key="producer-key",
+            content_fingerprint="content-fingerprint",
+            origin_classification=ORIGIN_AI_GENERATED,
+            proposed_at="2026-09-01T12:00:00Z",
+            source_reference="design/review.md",
+            accepted_decision_id="ddec-example",
+        ),),
+    )
+    proposal_evidence = canonical_record_to_transport(
+        proposal_record
+    )["source_evidence"][0]
+    assert proposal_evidence["proposal_id"] == "dprop-example"
+    assert proposal_evidence["accepted_decision_id"] == "ddec-example"
+    assert proposal_evidence["source_reference"] == "design/review.md"
 
 
 def test_canonical_record_serialization_preserves_ordering():
