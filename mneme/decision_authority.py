@@ -111,9 +111,15 @@ from typing import Callable
 from mneme.decision_index import (
     CANONICAL_VERSION,
     VALID_LIFECYCLE_STATUSES,
-    CanonicalArchitectureIndex,
     CanonicalDecisionRecord,
-    decisions_to_canonical,
+)
+from mneme.decision_index_persistence import (
+    DecisionIndexPersistenceError,
+    append_initial_canonical_decision,
+    load_persisted_decision_index,
+    migrate_memory_document,
+    rebind_legacy_initial_occurrence,
+    verify_compatibility_snapshot,
 )
 from mneme.decision_proposal import (
     PROPOSAL_STATUS_ACCEPTED,
@@ -373,6 +379,103 @@ def _default_clock() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+def _proposal_occurrence_identity(proposal: DecisionProposal) -> list[str]:
+    return [
+        proposal.proposal_id,
+        proposal.producer_key,
+        proposal.content_fingerprint,
+    ]
+
+
+def _proposal_source_evidence(
+    proposal: DecisionProposal,
+    decision_id: str,
+    observed_at: str,
+) -> list[dict[str, object]]:
+    provenance = proposal.candidate.provenance
+    if provenance is None:
+        raise ProposalStoreCorruptError(
+            f"proposal {proposal.proposal_id!r} has no source provenance"
+        )
+    return [{
+        "source_type": "proposal",
+        "source_locator": provenance.source_reference,
+        "source_revision": provenance.source_version,
+        "observed_at": observed_at,
+        "verification_status": "",
+        "proposal_id": proposal.proposal_id,
+        "producer_key": proposal.producer_key,
+        "content_fingerprint": proposal.content_fingerprint,
+        "origin_classification": provenance.origin_classification,
+        "proposed_at": proposal.proposed_at,
+        "source_reference": provenance.source_reference,
+        "accepted_decision_id": decision_id,
+    }]
+
+
+def _accepted_canonical_mismatch(
+    record: CanonicalDecisionRecord,
+    proposal: DecisionProposal,
+    decision_id: str,
+) -> str | None:
+    candidate = proposal.candidate
+    expected_fields: tuple[tuple[str, object, object], ...] = (
+        ("decision_id", record.decision_id, decision_id),
+        ("version", record.version, CANONICAL_VERSION),
+        ("statement", record.statement, candidate.statement),
+        ("rationale", record.rationale, candidate.rationale),
+        ("context_scope", record.context_scope, tuple(candidate.scope_hints)),
+        ("constraints", record.constraints, ()),
+        ("anti_patterns", record.anti_patterns, ()),
+        (
+            "occurrence_source_identity",
+            record.occurrence_source_identity,
+            tuple(_proposal_occurrence_identity(proposal)),
+        ),
+    )
+    for field, actual, expected in expected_fields:
+        if actual != expected:
+            return f"canonical field {field!r} differs from accepted proposal"
+    if record.lifecycle_status not in VALID_LIFECYCLE_STATUSES:
+        return f"canonical lifecycle status {record.lifecycle_status!r} is invalid"
+    if not record.version_id or not record.content_digest:
+        return "canonical version identity is missing"
+    if len(record.source_evidence) != 1:
+        return "canonical proposal provenance snapshot is missing or ambiguous"
+    evidence = record.source_evidence[0]
+    provenance = candidate.provenance
+    if provenance is None:
+        return "proposal source provenance is missing"
+    expected_evidence: tuple[tuple[str, object, object], ...] = (
+        ("source_type", evidence.source_type, "proposal"),
+        ("source_locator", evidence.source_locator, provenance.source_reference),
+        ("source_revision", evidence.source_revision, provenance.source_version),
+        ("proposal_id", evidence.proposal_id, proposal.proposal_id),
+        ("producer_key", evidence.producer_key, proposal.producer_key),
+        (
+            "content_fingerprint",
+            evidence.content_fingerprint,
+            proposal.content_fingerprint,
+        ),
+        (
+            "origin_classification",
+            evidence.origin_classification,
+            provenance.origin_classification,
+        ),
+        ("proposed_at", evidence.proposed_at, proposal.proposed_at),
+        (
+            "source_reference",
+            evidence.source_reference,
+            provenance.source_reference,
+        ),
+        ("accepted_decision_id", evidence.accepted_decision_id, decision_id),
+    )
+    for field, actual, expected in expected_evidence:
+        if actual != expected:
+            return f"canonical source evidence field {field!r} differs"
+    return None
+
+
 class DecisionAuthorityService:
     """Mneme authority service over one proposal store + one memory file.
 
@@ -459,9 +562,10 @@ class DecisionAuthorityService:
                     "the proposal-id namespace; a canonical decision id "
                     "must never equal a proposal id"
                 )
+
         stored_id = proposal.accepted_decision_id
         if proposal.status == PROPOSAL_STATUS_ACCEPTED:
-            if stored_id is None:  # defensive; the domain type forbids this
+            if stored_id is None:
                 raise ProposalStoreCorruptError(
                     f"proposal {proposal_id!r} is accepted without a "
                     "stored accepted_decision_id"
@@ -470,8 +574,7 @@ class DecisionAuthorityService:
                 raise AcceptedProposalIdConflictError(
                     f"proposal {proposal_id!r} is already accepted with "
                     f"decision id {stored_id!r}; retries cannot replace "
-                    f"the stored accepted_decision_id with "
-                    f"{decision_id!r}"
+                    f"the stored accepted_decision_id with {decision_id!r}"
                 )
             effective_id = stored_id
             already_accepted = True
@@ -484,26 +587,82 @@ class DecisionAuthorityService:
             already_accepted = False
 
         raw = self._load_memory_raw()
-        entries = raw["decisions"]
-        existing_entry = self._collision_scan(entries, effective_id)
-        if not already_accepted and existing_entry is not None:
-            raise ReverseHalfStateError(
-                f"decision id {effective_id!r} already exists in "
-                f"{self._memory_path} while proposal {proposal_id!r} is "
-                "still proposed; acceptance is never inferred from an "
-                "existing runtime decision (dangerous reverse half-state; "
-                "fail closed)"
+        had_index = "decision_index" in raw
+        try:
+            canonical_document = migrate_memory_document(raw)
+            index = load_persisted_decision_index(
+                canonical_document["decision_index"]
             )
-        if existing_entry is not None:
+        except (DecisionIndexPersistenceError, KeyError, TypeError) as exc:
+            raise MemoryInvalidError(
+                f"memory file {self._memory_path} cannot establish the "
+                f"canonical Decision Index: {exc}"
+            ) from exc
+
+        existing_record = next(
+            (r for r in index.records if r.decision_id == effective_id),
+            None,
+        )
+        entries = canonical_document["decisions"]
+        existing_entry = self._collision_scan(entries, effective_id)
+
+        if not already_accepted and existing_record is not None:
+            raise ReverseHalfStateError(
+                f"decision id {effective_id!r} already exists in the "
+                f"canonical Decision Index while proposal {proposal_id!r} "
+                "is still proposed; acceptance is never inferred from an "
+                "existing decision (dangerous reverse half-state; fail closed)"
+            )
+
+        rebound = False
+        if already_accepted and existing_record is not None:
+            if existing_entry is None:
+                raise MemoryInvalidError(
+                    f"canonical decision {effective_id!r} has no derived "
+                    "compatibility snapshot row"
+                )
             mismatch = _accepted_identity_mismatch(
                 existing_entry, proposal, effective_id
             )
             if mismatch is not None:
                 raise DecisionIdCollisionError(
-                    f"decision id {effective_id!r} already exists in "
-                    f"{self._memory_path} but is not this accepted decision "
-                    f"({mismatch}); the existing decision is never "
-                    "overwritten or merged"
+                    f"decision id {effective_id!r} already exists but is not "
+                    f"this accepted decision ({mismatch})"
+                )
+            if existing_record.occurrence_source_identity == (
+                "legacy-decisions",
+                effective_id,
+            ):
+                try:
+                    canonical_document, rebound = rebind_legacy_initial_occurrence(
+                        canonical_document,
+                        decision_id=effective_id,
+                        occurrence_source_identity=_proposal_occurrence_identity(
+                            proposal
+                        ),
+                        source_evidence=_proposal_source_evidence(
+                            proposal, effective_id, ""
+                        ),
+                    )
+                    index = load_persisted_decision_index(
+                        canonical_document["decision_index"]
+                    )
+                    existing_record = next(
+                        r for r in index.records if r.decision_id == effective_id
+                    )
+                except (DecisionIndexPersistenceError, StopIteration) as exc:
+                    raise CanonicalVerificationError(
+                        f"could not bind migrated accepted decision "
+                        f"{effective_id!r} to proposal provenance: {exc}"
+                    ) from exc
+
+            mismatch = _accepted_canonical_mismatch(
+                existing_record, proposal, effective_id
+            )
+            if mismatch is not None:
+                raise DecisionIdCollisionError(
+                    f"canonical decision id {effective_id!r} already exists "
+                    f"but is not this accepted proposal ({mismatch})"
                 )
 
         if not already_accepted:
@@ -522,15 +681,33 @@ class DecisionAuthorityService:
 
         materialized = False
         expected_timestamp: str | None = None
-        if existing_entry is None:
+        if existing_record is None:
             expected_timestamp = self._clock()
-            entries.append(
-                expected_materialization_entry(
-                    proposal, effective_id, expected_timestamp
+            try:
+                canonical_document, materialized = append_initial_canonical_decision(
+                    canonical_document,
+                    decision_id=effective_id,
+                    statement=proposal.candidate.statement,
+                    rationale=proposal.candidate.rationale,
+                    context_scope=proposal.candidate.scope_hints,
+                    lifecycle_status="active",
+                    created_at=expected_timestamp,
+                    updated_at=expected_timestamp,
+                    occurrence_source_identity=_proposal_occurrence_identity(
+                        proposal
+                    ),
+                    source_evidence=_proposal_source_evidence(
+                        proposal, effective_id, expected_timestamp
+                    ),
                 )
-            )
-            self._write_memory_raw(raw)
-            materialized = True
+            except DecisionIndexPersistenceError as exc:
+                raise CanonicalVerificationError(
+                    f"could not materialize canonical decision "
+                    f"{effective_id!r}: {exc}"
+                ) from exc
+            self._write_memory_raw(canonical_document)
+        elif already_accepted and (rebound or not had_index):
+            self._write_memory_raw(canonical_document)
 
         self._verify(proposal, effective_id, expected_timestamp)
         return AcceptResult(
@@ -770,16 +947,35 @@ class DecisionAuthorityService:
                     f"materialized decision {decision_id!r} field "
                     f"{field!r} is {actual!r}, expected {expected!r}"
                 )
-        index: CanonicalArchitectureIndex = decisions_to_canonical(
-            store.decisions()
-        )
+        try:
+            with open(self._memory_path, encoding="utf-8") as handle:
+                raw = json.load(handle)
+            index = load_persisted_decision_index(raw["decision_index"])
+            verify_compatibility_snapshot(raw, index, self._memory_path)
+        except (
+            OSError,
+            ValueError,
+            KeyError,
+            TypeError,
+            DecisionIndexPersistenceError,
+        ) as exc:
+            raise CanonicalVerificationError(
+                f"canonical Decision Index verification failed: {exc}"
+            ) from exc
         record: CanonicalDecisionRecord | None = next(
             (r for r in index.records if r.decision_id == decision_id), None
         )
         if record is None:
             raise CanonicalVerificationError(
-                f"canonical record {decision_id!r} missing after "
-                "decisions_to_canonical"
+                f"canonical record {decision_id!r} missing after reload"
+            )
+        mismatch = _accepted_canonical_mismatch(
+            record, proposal, decision_id
+        )
+        if mismatch is not None:
+            raise CanonicalVerificationError(
+                f"canonical record {decision_id!r} failed proposal binding "
+                f"verification ({mismatch})"
             )
         if expected_timestamp is not None:
             canonical_expectations: tuple[tuple[str, object, object], ...] = (
