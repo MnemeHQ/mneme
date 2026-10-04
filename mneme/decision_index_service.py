@@ -247,11 +247,23 @@ class DecisionIndexService:
         self,
         proposal_store: DecisionProposalStore,
         canonical_index: CanonicalArchitectureIndex | None = None,
+        canonical_index_loader: Callable[[], CanonicalArchitectureIndex] | None = None,
         clock: Callable[[], str] | None = None,
     ) -> None:
+        if canonical_index is not None and canonical_index_loader is not None:
+            raise ValueError(
+                "supply canonical_index or canonical_index_loader, not both"
+            )
         self._store = proposal_store
         self._canonical = canonical_index
+        self._canonical_loader = canonical_index_loader
         self._clock = clock if clock is not None else _default_clock
+
+    def _canonical_index(self) -> CanonicalArchitectureIndex | None:
+        """Resolve one canonical snapshot for the current read operation."""
+        if self._canonical_loader is not None:
+            return self._canonical_loader()
+        return self._canonical
 
     # ── Producer operations (non-authoritative) ──────────────────────────
 
@@ -342,8 +354,9 @@ class DecisionIndexService:
         proposal = self._store.get(record_id)
         if proposal is not None:
             return proposal
-        if self._canonical is not None:
-            for record in self._canonical.records:
+        canonical = self._canonical_index()
+        if canonical is not None:
+            for record in canonical.records:
                 if record.decision_id == record_id:
                     return record
         return None
@@ -429,8 +442,9 @@ class DecisionIndexService:
                 continue
             proposals.append(proposal)
         canonical_decisions: list[CanonicalDecisionRecord] = []
-        if self._canonical is not None:
-            for record in self._canonical.records:
+        canonical = self._canonical_index()
+        if canonical is not None:
+            for record in canonical.records:
                 if canonical_lifecycle_status is not None and (
                     record.lifecycle_status != canonical_lifecycle_status
                 ):
@@ -504,8 +518,9 @@ class DecisionIndexService:
                     proposal_id=proposal.proposal_id,
                     matched_hints=matched,
                 ))
-        if self._canonical is not None:
-            for record in self._canonical.records:
+        canonical = self._canonical_index()
+        if canonical is not None:
+            for record in canonical.records:
                 if any(
                     self._hint_matches(scope, context_items)
                     for scope in record.context_scope
@@ -552,13 +567,14 @@ class DecisionIndexService:
         ``DecisionIndexIntegrityError`` (fail closed) instead of
         returning ambiguous lineage.
         """
+        canonical = self._canonical_index()
         proposal = self._store.get(record_id)
         if proposal is not None:
-            return self._trace_proposal(proposal)
-        if self._canonical is not None:
-            for record in self._canonical.records:
+            return self._trace_proposal(proposal, canonical)
+        if canonical is not None:
+            for record in canonical.records:
                 if record.decision_id == record_id:
-                    return self._trace_canonical(record)
+                    return self._trace_canonical(record, canonical)
         return DecisionTraceNotFound(
             record_id=record_id,
             missing_links=(
@@ -571,7 +587,11 @@ class DecisionIndexService:
             ),
         )
 
-    def _trace_proposal(self, proposal: DecisionProposal) -> ProposalTrace:
+    def _trace_proposal(
+        self,
+        proposal: DecisionProposal,
+        canonical: CanonicalArchitectureIndex | None,
+    ) -> ProposalTrace:
         missing: list[str] = []
         accepted_id = proposal.accepted_decision_id
         canonical_record: CanonicalDecisionRecord | None = None
@@ -580,13 +600,13 @@ class DecisionIndexService:
             missing.append("accepted_decision_id: absent (proposal not accepted)")
             missing.append("canonical_record: absent (proposal not accepted)")
             missing.append("derived_rules: absent")
-        elif self._canonical is None:
+        elif canonical is None:
             missing.append(
                 f"canonical_record: accepted_decision_id {accepted_id!r} "
                 "cannot be resolved (no canonical index supplied)"
             )
         else:
-            for record in self._canonical.records:
+            for record in canonical.records:
                 if record.decision_id == accepted_id:
                     canonical_record = record
                     break
@@ -619,13 +639,13 @@ class DecisionIndexService:
         )
 
     def _trace_canonical(
-        self, record: CanonicalDecisionRecord
+        self,
+        record: CanonicalDecisionRecord,
+        canonical: CanonicalArchitectureIndex | None,
     ) -> CanonicalDecisionTrace:
         derived_rules: tuple[CanonicalRuleRecord, ...] = ()
-        if self._canonical is not None:
-            derived_rules = self._canonical.rules_for_decision(
-                record.decision_id
-            )
+        if canonical is not None:
+            derived_rules = canonical.rules_for_decision(record.decision_id)
         stored_ids = tuple(rule.rule_id for rule in derived_rules)
         if stored_ids != record.derived_rule_ids:
             raise DecisionIndexIntegrityError(
