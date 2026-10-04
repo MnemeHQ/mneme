@@ -1788,7 +1788,9 @@ def _build_parser() -> argparse.ArgumentParser:
     ec_sub = p_ec.add_subparsers(dest="ec_cmd", required=True)
 
     p_ec_import = ec_sub.add_parser(
-        "import", help="Import ADRs from an EventCatalog index into project memory"
+        "import", help=("Import retrieval-only ADRs from an EventCatalog index; "
+                       "canonical decision_index targets fail closed until an "
+                       "EventCatalog provenance contract is defined")
     )
     p_ec_import.add_argument(
         "--index", required=True, help="Path to EventCatalog index JSON (from buildIndex)"
@@ -1806,11 +1808,17 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     grp.add_argument(
         "--apply", action="store_true",
-        help="Write imported decisions to --memory after preview",
+        help=(
+            "Write imported decisions only when --memory is legacy sectionless "
+            "memory; canonical decision_index targets fail closed"
+        ),
     )
     p_ec_import.add_argument(
         "--update-existing", action="store_true",
-        help="Allow same-id overwrite of existing decisions[] entries",
+        help=(
+            "Allow same-id overwrite only in legacy sectionless decisions[]; "
+            "canonical decision_index targets fail closed"
+        ),
     )
     p_ec_import.set_defaults(func=_cmd_eventcatalog_import)
 
