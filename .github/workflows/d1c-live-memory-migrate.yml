@@ -1,16 +1,16 @@
 name: d1c live memory migration
 
 on:
-  push:
+  pull_request:
     branches:
-      - feat/d1c-authority-mcp-canonical
+      - main
 
 permissions:
   contents: write
 
 jobs:
   migrate:
-    if: github.actor != 'github-actions[bot]'
+    if: github.head_ref == 'feat/d1c-authority-mcp-canonical'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
