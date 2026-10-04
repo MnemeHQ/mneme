@@ -198,6 +198,7 @@
       "without"
     ]
   },
+  "baseline_id": "o1a-batch-01-baseline",
   "batch_id": "o1a-batch-01",
   "closure_declaration": {
     "accepted_endpoint": "B3",
@@ -208,6 +209,7 @@
   "closure_status": "closed_frozen",
   "corpora_and_inputs": {
     "baseline_configuration_hash": "31e18dc1e2bd9ad30bec86dce1a9295a",
+    "baseline_id": "o1a-batch-01-baseline",
     "manifest_configuration_hash": "4af7e5794011b43d39682cdfeac9f54e",
     "reference_corpus_hash": "0455bd66aae52551c35b37a63c2d185f",
     "scenario_corpus_hash": "2ff8751955fd64a33316aca6692dc803",

@@ -52,10 +52,13 @@ from mneme.open_architecture.gds_calibration_experiment import (
     RELATIVE_THRESHOLD_RATIO,
     SELECTION_EPSILON,
 )
+from mneme.open_architecture.manifest import Manifest
 
 # ── Frozen Constants ────────────────────────────────────────────────────────────
 
 FROZEN_STAGE_C_CLOSURE_MNEME_SHA: str = "fcc36a60b9ec95014eb8931c3bac6bfee418e781"
+FROZEN_BASELINE_ID: str = "o1a-batch-01-baseline"
+FROZEN_STAGE_C_EXPERIMENT_ID: str = "o1a-stage-c-end-to-end"
 FROZEN_SCENARIO_CORPUS_HASH: str = "2ff8751955fd64a33316aca6692dc803"
 FROZEN_REFERENCE_CORPUS_HASH: str = "0455bd66aae52551c35b37a63c2d185f"
 FROZEN_BASELINE_CONFIG_HASH: str = "31e18dc1e2bd9ad30bec86dce1a9295a"
@@ -104,7 +107,42 @@ def build_stage_c_closure(
     if not e2e_summary_path.is_file():
         raise FileNotFoundError(f"Missing required Stage C summary artifact: {e2e_summary_path}")
 
+    manifest_path = (
+        root
+        / "benchmarks"
+        / "open_architecture"
+        / "batch_01"
+        / "manifest.yaml"
+    )
+    if not manifest_path.is_file():
+        raise FileNotFoundError(f"Missing required Batch 01 manifest: {manifest_path}")
+
+    manifest = Manifest.load(manifest_path)
+    if manifest.headline_metric != HEADLINE_METRIC:
+        raise ValueError(
+            f"Authoritative manifest headline metric mismatch: expected {HEADLINE_METRIC!r}, "
+            f"got {manifest.headline_metric!r}"
+        )
+    computed_manifest_hash = manifest.configuration_hash()
+    if computed_manifest_hash != FROZEN_MANIFEST_CONFIG_HASH:
+        raise ValueError(
+            f"Manifest configuration hash mismatch: expected {FROZEN_MANIFEST_CONFIG_HASH!r}, "
+            f"got {computed_manifest_hash!r}"
+        )
+
     e2e_data = json.loads(e2e_summary_path.read_text(encoding="utf-8"))
+
+    # Fail-closed validation of experiment and baseline identities
+    if e2e_data.get("experiment_id") != FROZEN_STAGE_C_EXPERIMENT_ID:
+        raise ValueError(
+            f"Stage C experiment_id mismatch: expected {FROZEN_STAGE_C_EXPERIMENT_ID!r}, "
+            f"got {e2e_data.get('experiment_id')!r}"
+        )
+    if e2e_data.get("baseline_id") != FROZEN_BASELINE_ID:
+        raise ValueError(
+            f"Baseline ID mismatch: expected {FROZEN_BASELINE_ID!r}, "
+            f"got {e2e_data.get('baseline_id')!r}"
+        )
 
     # Fail-closed validation of frozen cryptographic identities
     if e2e_data.get("baseline_config_hash") != FROZEN_BASELINE_CONFIG_HASH:
@@ -209,6 +247,7 @@ def build_stage_c_closure(
             "selection_policy": POLICY_RELATIVE_80,
             "suppressed_function_words": sorted(FROZEN_FUNCTION_WORDS),
         },
+        "baseline_id": e2e_data.get("baseline_id", FROZEN_BASELINE_ID),
         "batch_id": "o1a-batch-01",
         "closure_declaration": {
             "accepted_endpoint": ACCEPTED_STAGE_C_ENDPOINT,
@@ -227,7 +266,8 @@ def build_stage_c_closure(
         "closure_status": "closed_frozen",
         "corpora_and_inputs": {
             "baseline_configuration_hash": FROZEN_BASELINE_CONFIG_HASH,
-            "manifest_configuration_hash": FROZEN_MANIFEST_CONFIG_HASH,
+            "baseline_id": e2e_data.get("baseline_id", FROZEN_BASELINE_ID),
+            "manifest_configuration_hash": computed_manifest_hash,
             "reference_corpus_hash": FROZEN_REFERENCE_CORPUS_HASH,
             "scenario_corpus_hash": FROZEN_SCENARIO_CORPUS_HASH,
             "stage_b_mixed_semantic_hash": ACCEPTED_STAGE_B_MIXED_SEMANTIC_HASH,
@@ -319,7 +359,7 @@ def build_stage_c_closure(
                 "metric and overall F1 balance, not because it dominates every individual dimension."
             ),
         },
-        "headline_metric": HEADLINE_METRIC,
+        "headline_metric": manifest.headline_metric,
         "mneme_execution_sha": mneme_execution_sha,
         "profile_evaluations_comparison": {
             "end_to_end": e2e_data.get("end_to_end_predictions", {}),
@@ -363,6 +403,8 @@ def write_stage_c_closure(
 
 __all__ = [
     "FROZEN_STAGE_C_CLOSURE_MNEME_SHA",
+    "FROZEN_BASELINE_ID",
+    "FROZEN_STAGE_C_EXPERIMENT_ID",
     "FROZEN_SCENARIO_CORPUS_HASH",
     "FROZEN_REFERENCE_CORPUS_HASH",
     "FROZEN_BASELINE_CONFIG_HASH",

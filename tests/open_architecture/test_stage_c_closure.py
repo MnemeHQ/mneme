@@ -54,10 +54,12 @@ from mneme.open_architecture.stage_c_closure import (
     ACCEPTED_STAGE_B_MIXED_SEMANTIC_HASH,
     ACCEPTED_STAGE_C_ENDPOINT,
     FROZEN_BASELINE_CONFIG_HASH,
+    FROZEN_BASELINE_ID,
     FROZEN_MANIFEST_CONFIG_HASH,
     FROZEN_REFERENCE_CORPUS_HASH,
     FROZEN_SCENARIO_CORPUS_HASH,
     FROZEN_STAGE_C_CLOSURE_MNEME_SHA,
+    FROZEN_STAGE_C_EXPERIMENT_ID,
     FROZEN_STAGE_C_EXPERIMENT_PROFILE_HASH,
     HEADLINE_METRIC,
     build_stage_c_closure,
@@ -127,6 +129,7 @@ class TestStageCClosureArtifact:
         assert data["artifact_type"] == "stage_c_batch_01_closure"
         assert data["artifact_version"] == "0.1"
         assert data["batch_id"] == "o1a-batch-01"
+        assert data["baseline_id"] == FROZEN_BASELINE_ID
         assert data["closure_status"] == "closed_frozen"
         assert data["headline_metric"] == HEADLINE_METRIC
 
@@ -139,7 +142,7 @@ class TestStageCClosureArtifact:
         endpoint = data["endpoint_identity"]
         assert endpoint["endpoint_name"] == ACCEPTED_STAGE_C_ENDPOINT
         assert endpoint["profile"] == ACCEPTED_STAGE_C_ENDPOINT
-        assert endpoint["experiment_id"] == "o1a-stage-c-end-to-end"
+        assert endpoint["experiment_id"] == FROZEN_STAGE_C_EXPERIMENT_ID
         assert endpoint["purpose"] == "governing_decision_set_retrieval"
 
     def test_committed_closure_artifact_required_bindings(self):
@@ -261,6 +264,31 @@ class TestStageCClosureArtifact:
         assert "not definitive causal proof" in rat["research_limitations"].lower()
 
 
+def _setup_tmp_sources(tmp_path: Path) -> tuple[Path, Path]:
+    m_dir = tmp_path / "benchmarks" / "open_architecture" / "batch_01"
+    m_dir.mkdir(parents=True, exist_ok=True)
+    c_dir = m_dir / "stage_c"
+    c_dir.mkdir(parents=True, exist_ok=True)
+
+    real_manifest = REPO_ROOT / "benchmarks" / "open_architecture" / "batch_01" / "manifest.yaml"
+    real_e2e = (
+        REPO_ROOT
+        / "benchmarks"
+        / "open_architecture"
+        / "batch_01"
+        / "stage_c"
+        / "stage_c_end_to_end_summary.json"
+    )
+
+    tmp_manifest = m_dir / "manifest.yaml"
+    tmp_e2e = c_dir / "stage_c_end_to_end_summary.json"
+
+    tmp_manifest.write_text(real_manifest.read_text(encoding="utf-8"), encoding="utf-8")
+    tmp_e2e.write_text(real_e2e.read_text(encoding="utf-8"), encoding="utf-8")
+
+    return tmp_manifest, tmp_e2e
+
+
 class TestStageCClosureEvidenceGuard:
     def test_fresh_reconstruction_matches_committed_artifact(self):
         """Verify fresh deterministic reconstruction has semantic and byte identity with committed artifact."""
@@ -274,3 +302,36 @@ class TestStageCClosureEvidenceGuard:
         # 2. Byte identity
         serialized_fresh = json.dumps(fresh, indent=2, sort_keys=True) + "\n"
         assert serialized_fresh == committed_text
+
+    def test_guard_fails_when_manifest_headline_metric_mismatches(self, tmp_path: Path):
+        """Guard fails closed when authoritative manifest headline metric differs."""
+        tmp_manifest, _ = _setup_tmp_sources(tmp_path)
+        content = tmp_manifest.read_text(encoding="utf-8")
+        tampered = content.replace(
+            "headline_metric: governing_decision_set_f1",
+            "headline_metric: other_metric_f1",
+        )
+        tmp_manifest.write_text(tampered, encoding="utf-8")
+
+        with pytest.raises(ValueError, match="Authoritative manifest headline metric mismatch"):
+            build_stage_c_closure(tmp_path)
+
+    def test_guard_fails_when_stage_c_experiment_id_mismatches(self, tmp_path: Path):
+        """Guard fails closed when Stage C experiment_id in summary artifact differs."""
+        _, tmp_e2e = _setup_tmp_sources(tmp_path)
+        e2e_data = json.loads(tmp_e2e.read_text(encoding="utf-8"))
+        e2e_data["experiment_id"] = "tampered-experiment-id"
+        tmp_e2e.write_text(json.dumps(e2e_data), encoding="utf-8")
+
+        with pytest.raises(ValueError, match="Stage C experiment_id mismatch"):
+            build_stage_c_closure(tmp_path)
+
+    def test_guard_fails_when_baseline_id_mismatches(self, tmp_path: Path):
+        """Guard fails closed when baseline_id in Stage C summary artifact differs."""
+        _, tmp_e2e = _setup_tmp_sources(tmp_path)
+        e2e_data = json.loads(tmp_e2e.read_text(encoding="utf-8"))
+        e2e_data["baseline_id"] = "tampered-baseline-id"
+        tmp_e2e.write_text(json.dumps(e2e_data), encoding="utf-8")
+
+        with pytest.raises(ValueError, match="Baseline ID mismatch"):
+            build_stage_c_closure(tmp_path)
