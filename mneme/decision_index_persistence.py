@@ -844,11 +844,26 @@ def apply_canonical_supersession(
                 f"supersedes target {target_id!r} does not exist canonically"
             )
 
+    existing_relationships = _require_list(
+        source.get("relationships", []),
+        f"decision {superseding_decision_id!r} relationships",
+    )
+    existing_targets = [
+        row.get("target_decision_id")
+        for row in existing_relationships
+        if isinstance(row, dict) and row.get("type") == "supersedes"
+    ]
+    removed = [target_id for target_id in existing_targets if target_id not in targets]
+    if removed:
+        raise DecisionIndexPersistenceError(
+            f"decision {superseding_decision_id!r} cannot remove persisted "
+            f"supersedes relationships in D1D: {removed!r}"
+        )
     desired_relationships = [
         {"type": "supersedes", "target_decision_id": target_id}
         for target_id in targets
     ]
-    changed = source.get("relationships", []) != desired_relationships
+    changed = existing_relationships != desired_relationships
     source["relationships"] = desired_relationships
     if changed:
         source["updated_at"] = updated_at
