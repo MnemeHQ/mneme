@@ -1,7 +1,7 @@
 # ADR Import
 
 `mneme adr import` lets a team import an existing ADR corpus into Mneme's
-enforceable decision memory. The command is deterministic, has a preview
+canonical Decision Index. The command is deterministic, has a preview
 gate before any writes, and surfaces conflicts explicitly rather than silently
 resolving them.
 
@@ -104,7 +104,7 @@ mneme adr import docs/adr --memory .mneme/project_memory.json --dry-run
 # Apply (writes to memory file)
 mneme adr import docs/adr --memory .mneme/project_memory.json --apply
 
-# Allow same-id overwrite of existing decisions[] entries
+# Evolve an existing same-id decision as a new immutable canonical version
 mneme adr import docs/adr --memory .mneme/project_memory.json --apply --update-existing
 
 # Import every non-conflicting scope and skip each active-active contradiction
@@ -170,8 +170,10 @@ legitimately contains the word "mneme" everywhere.
 ### 1. Explicit supersession (silent)
 
 If ADR-012 lists ADR-011 in its `supersedes`, ADR-011 is removed from the
-active set at compile time. No diagnostic is raised -- explicit supersession
-is the intended resolution mechanism.
+active set at compile time. On apply, D1D persists the explicit canonical
+`supersedes` relationship and transitions ADR-011 to canonical
+`superseded`; its historical version remains queryable but no longer
+projects into active Layer 1 governance.
 
 ### 2. Active-active contradiction (loud)
 
@@ -192,21 +194,32 @@ higher priority, or give one a newer date.
 
 ### 3. Same-id collision (explicit gate)
 
-If an incoming ADR's id already exists in the target memory file's
-`decisions[]` or `items[]` array, the import refuses with a diagnostic.
+If an incoming active ADR's id already exists in canonical decision authority,
+the import refuses with a diagnostic.
 
-- `--update-existing` allows the colliding entry in `decisions[]` to be
-  overwritten in place (preserving its position in the array).
-- Cross-section migration (`items[]` to `decisions[]`) is refused even with
-  `--update-existing` -- rename the incoming ADR instead.
+- `--update-existing` does **not** overwrite history. It creates or reuses an
+  immutable version occurrence whose identity is bound to the prior active
+  `version_id`, then advances the logical decision's `active_version_id`.
+- Prior version records and prior rule bindings remain immutable and queryable.
+- Rules are re-derived explicitly from the incoming ADR. An unchanged rule keeps
+  its stable `rule_id` but binds to the new `decision_version_id`; a removed
+  rule is not silently carried forward.
+- A collision with a legacy `items[]` id is still refused even with
+  `--update-existing`; ADR authority does not silently repurpose item identity.
 
 ---
 
 ## Persistence
 
-The import writes atomically: it serializes the updated memory to a
-sibling temp file in the same directory, then calls `os.replace()` to
-swap it in. A failed write leaves the original file intact.
+The authoritative write target is the `decision_index` section. After the
+canonical mutation validates, Mneme regenerates `decisions[]` only as the
+deprecation-window compatibility projection and verifies it against the same
+canonical index before the atomic file replace.
+
+The import serializes the complete updated memory to a sibling temp file in the
+same directory, then calls `os.replace()`. A failed write leaves the original
+file intact. Repeating an identical ADR occurrence is idempotent: it does not
+create a phantom version.
 
 No backup files are created -- the original is always recoverable from git
 history.

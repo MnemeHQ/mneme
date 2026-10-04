@@ -103,11 +103,12 @@ and future architecture contracts.
 - [ADR-030](../adr/ADR-030-canonical-decision-persistence-version-identity-and-stable-rule-lineage.md)
   is **accepted** as the governing persistence, version-identity, and
   rule-lineage architecture, after reconciliation against the merged D1B/D1C
-  slices. Accepted proposals write the persisted Decision Index, Decision MCP
+  slices. Accepted proposals and ADR import write the persisted Decision
+  Index (ADR import as immutable version occurrences, D1D), Decision MCP
   reads that same index, and `decisions[]` is a fail-closed compatibility
   snapshot that legacy writers may not mutate. Only `active` decisions
   project into Layer 1 (ADR-023 §6), so migration ends Layer 1 participation
-  for legacy non-active decisions. Acceptance is not completion: D1D-D1F
+  for legacy non-active decisions. Acceptance is not completion: D1E-D1F
   remain open implementation work, and the ADR's release gate applies.
 - [ADR-025](../adr/ADR-025-trusted-test-execution-attestation.md) is also
   **proposed**. Trusted test-execution attestation remains reserved/deferred.
@@ -248,7 +249,7 @@ flowchart LR
         Evidence["Evidence + CI linkage"]
     end
 
-    ADR --> Index
+    ADR --> Persisted
     Proposal --> Authority
     Authority --> Persisted
     Persisted --> Index
@@ -272,10 +273,10 @@ flowchart LR
 ```
 
 The arrows describe responsibility and data flow at an architectural level.
-D1B/D1C establish the persisted canonical/read boundary for accepted proposals
-and MCP reads under accepted ADR-030. ADR import/version evolution (D1D),
-remaining lifecycle/protection writers and the migration entry point (D1E),
-and eventual compatibility-snapshot removal (D1F) remain later D1 slices.
+D1B-D1D establish the persisted canonical/read boundary under accepted
+ADR-030, plus immutable ADR version evolution and explicit cross-id
+supersession. Remaining lifecycle/protection writers and the migration entry
+point remain D1E; compatibility-snapshot removal remains D1F.
 
 # Research boundary — O1A Open Architecture
 

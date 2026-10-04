@@ -1772,7 +1772,7 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p_adr_import.add_argument(
         "--update-existing", action="store_true",
-        help="Allow same-id overwrite of existing decisions[] entries",
+        help="Create or reuse an immutable canonical version for a same-id decision",
     )
     p_adr_import.add_argument(
         "--approve-conflicts", action="store_true",
