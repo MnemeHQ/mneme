@@ -446,7 +446,7 @@ def test_accept_reverse_half_state_surfaces_core_refusal(tmp_path, capsys):
     assert "Traceback" not in err
 
 
-def test_accept_id_collision_surfaces_core_refusal(tmp_path, capsys):
+def test_accept_snapshot_tamper_surfaces_core_refusal(tmp_path, capsys):
     path = tmp_path / "proposals.json"
     memory = _write_memory(tmp_path)
     proposal_id = _propose(path, _candidate())
@@ -459,7 +459,7 @@ def test_accept_id_collision_surfaces_core_refusal(tmp_path, capsys):
     assert code == 1
     assert out == ""
     assert "ERROR:" in err
-    assert "never overwritten or merged" in err
+    assert "compatibility snapshot diverges" in err
     assert "Traceback" not in err
 
 
