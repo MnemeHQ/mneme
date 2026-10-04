@@ -627,23 +627,27 @@ def append_initial_canonical_decision(
     migrated["decision_index"] = section
     index = load_persisted_decision_index(section)
     projected = project_canonical_index(index)
-    decision = next(item for item in projected if item.id == decision_id)
-    decisions = _require_list(migrated.get("decisions", []), "decisions")
-    snapshot_row = _snapshot_record_from_decision(decision)
-    if source_evidence:
-        first_source = source_evidence[0]
-        if (
-            isinstance(first_source, dict)
-            and first_source.get("source_type") == "adr"
-            and isinstance(first_source.get("source_locator"), str)
-            and first_source.get("source_locator")
-        ):
-            snapshot_row["source"] = {
-                "type": "adr",
-                "path": first_source["source_locator"],
-                "sha256": str(first_source.get("source_revision", "")),
-            }
-    decisions.append(snapshot_row)
+    decision = next(
+        (item for item in projected if item.id == decision_id),
+        None,
+    )
+    if decision is not None:
+        decisions = _require_list(migrated.get("decisions", []), "decisions")
+        snapshot_row = _snapshot_record_from_decision(decision)
+        if source_evidence:
+            first_source = source_evidence[0]
+            if (
+                isinstance(first_source, dict)
+                and first_source.get("source_type") == "adr"
+                and isinstance(first_source.get("source_locator"), str)
+                and first_source.get("source_locator")
+            ):
+                snapshot_row["source"] = {
+                    "type": "adr",
+                    "path": first_source["source_locator"],
+                    "sha256": str(first_source.get("source_revision", "")),
+                }
+        decisions.append(snapshot_row)
     return migrated, True
 
 
@@ -792,6 +796,73 @@ def append_canonical_version_occurrence(
     migrated["decision_index"] = section
     load_persisted_decision_index(section)
     return migrated, version_id, True
+
+
+def apply_canonical_supersession(
+    document: dict[str, Any],
+    *,
+    superseding_decision_id: str,
+    target_decision_ids: list[str] | tuple[str, ...],
+    updated_at: str,
+) -> tuple[dict[str, Any], bool]:
+    """Persist explicit cross-decision supersedes semantics only.
+
+    This is deliberately narrower than a general lifecycle writer: D1D may
+    mark targets superseded only as the consequence of an explicit
+    ADR-sanctioned ``supersedes`` relationship.
+    """
+    migrated = migrate_memory_document(document)
+    section = copy.deepcopy(
+        _require_dict(migrated["decision_index"], "decision_index")
+    )
+    logical_rows = _require_list(
+        section.get("decisions"), "decision_index.decisions"
+    )
+    by_id = {
+        row.get("decision_id"): row
+        for row in logical_rows
+        if isinstance(row, dict)
+    }
+    source = by_id.get(superseding_decision_id)
+    if source is None:
+        raise DecisionIndexPersistenceError(
+            f"superseding decision {superseding_decision_id!r} does not exist"
+        )
+
+    targets = list(target_decision_ids)
+    if len(set(targets)) != len(targets):
+        raise DecisionIndexPersistenceError(
+            f"decision {superseding_decision_id!r} declares duplicate supersedes targets"
+        )
+    if superseding_decision_id in targets:
+        raise DecisionIndexPersistenceError(
+            f"decision {superseding_decision_id!r} cannot supersede itself"
+        )
+    for target_id in targets:
+        if target_id not in by_id:
+            raise DecisionIndexPersistenceError(
+                f"supersedes target {target_id!r} does not exist canonically"
+            )
+
+    desired_relationships = [
+        {"type": "supersedes", "target_decision_id": target_id}
+        for target_id in targets
+    ]
+    changed = source.get("relationships", []) != desired_relationships
+    source["relationships"] = desired_relationships
+    if changed:
+        source["updated_at"] = updated_at
+
+    for target_id in targets:
+        target = by_id[target_id]
+        if target.get("lifecycle_status") != "superseded":
+            target["lifecycle_status"] = "superseded"
+            target["updated_at"] = updated_at
+            changed = True
+
+    migrated["decision_index"] = section
+    load_persisted_decision_index(section)
+    return migrated, changed
 
 def rebind_legacy_initial_occurrence(
     document: dict[str, Any],
