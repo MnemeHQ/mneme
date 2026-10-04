@@ -1,0 +1,45 @@
+name: d1c live memory migration
+
+on:
+  push:
+    branches:
+      - feat/d1c-authority-mcp-canonical
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/d1c-authority-mcp-canonical
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Mneme
+        run: python -m pip install -e .
+
+      - name: Migrate live memory with D1B canonical persistence
+        run: |
+          python - <<'PY'
+          from mneme.decision_index_persistence import migrate_memory_file
+          changed = migrate_memory_file(".mneme/project_memory.json")
+          if not changed:
+              raise SystemExit("expected live memory to require D1C migration")
+          PY
+
+      - name: Commit migrated memory
+        run: |
+          git config user.name "Mneme D1C Migration"
+          git config user.email "deploy@mnemehq.com"
+          git add .mneme/project_memory.json
+          git diff --cached --check
+          git diff --cached --quiet && exit 1
+          git commit -m "chore: migrate live memory to canonical Decision Index"
+          git push origin HEAD:feat/d1c-authority-mcp-canonical
