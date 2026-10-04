@@ -388,6 +388,7 @@ def canonical_record_to_transport(
         "decision_id": record.decision_id,
         "version": record.version,
         "version_id": record.version_id,
+        "decision_version_id": record.version_id,
         "content_digest": record.content_digest,
         "decision_class": record.decision_class,
         "statement": record.statement,
