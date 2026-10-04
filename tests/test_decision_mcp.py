@@ -17,6 +17,7 @@ Proves the MCP boundary is a thin capability adapter over
 """
 from __future__ import annotations
 
+import dataclasses
 import asyncio
 import inspect
 import json
