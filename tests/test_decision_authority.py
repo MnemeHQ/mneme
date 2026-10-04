@@ -185,9 +185,7 @@ def _accept(
 
 
 def _canonical_index(memory_path: Path) -> CanonicalArchitectureIndex:
-    store = MemoryStore(memory_path)
-    store.load()
-    return decisions_to_canonical(store.decisions())
+    return load_decision_index_from_memory_file(memory_path)
 
 
 def _memory_bytes(path: Path) -> bytes:
@@ -1195,7 +1193,7 @@ def test_materialized_decision_projects_to_canonical_record(tmp_path: Path) -> N
     assert index.rules_for_decision(result.decision_id) == ()
 
 
-def test_materialized_decision_carries_no_fabricated_provenance(
+def test_materialized_decision_carries_proposal_provenance_only(
     tmp_path: Path,
 ) -> None:
     path = tmp_path / "p.json"
@@ -1208,7 +1206,14 @@ def test_materialized_decision_carries_no_fabricated_provenance(
         r for r in _canonical_index(memory).records
         if r.decision_id == result.decision_id
     )
-    assert record.source_evidence == ()
+    assert len(record.source_evidence) == 1
+    evidence = record.source_evidence[0]
+    assert evidence.source_type == "proposal"
+    assert evidence.proposal_id == proposal.proposal_id
+    assert evidence.producer_key == proposal.producer_key
+    assert evidence.content_fingerprint == proposal.content_fingerprint
+    assert evidence.accepted_decision_id == result.decision_id
+    assert evidence.verification_status == ""
 
 
 def test_materialized_memory_loads_through_existing_memorystore(
