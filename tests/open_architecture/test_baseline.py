@@ -73,6 +73,29 @@ FROZEN_SEMANTIC_MODULE_HASHES: dict[str, str] = {
 }
 
 
+def frozen_semantic_module_hash(rel_path: str) -> str:
+    """Hash one semantic module from the immutable Batch 01 engine commit."""
+    frozen = subprocess.run(
+        [
+            "git",
+            "show",
+            f"{FROZEN_SEMANTIC_MNEME_SHA}:{rel_path}",
+        ],
+        cwd=REPO_ROOT,
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    if frozen.returncode != 0:
+        raise AssertionError(
+            "Frozen semantic runtime module unavailable at pinned commit "
+            f"{FROZEN_SEMANTIC_MNEME_SHA}: {rel_path}\n"
+            + frozen.stderr.decode("utf-8", errors="replace")
+        )
+    raw_bytes = frozen.stdout.replace(b"\r\n", b"\n")
+    return hashlib.sha256(raw_bytes).hexdigest()
+
+
 @pytest.fixture
 def manifest() -> Manifest:
     assert MANIFEST_PATH.is_file(), f"manifest.yaml not found at {MANIFEST_PATH}"
@@ -655,24 +678,7 @@ class TestBatch01BaselineFreeze:
 
         mismatches: list[str] = []
         for rel_path, expected_hash in FROZEN_SEMANTIC_MODULE_HASHES.items():
-            frozen = subprocess.run(
-                [
-                    "git",
-                    "show",
-                    f"{FROZEN_SEMANTIC_MNEME_SHA}:{rel_path}",
-                ],
-                cwd=REPO_ROOT,
-                check=False,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-            assert frozen.returncode == 0, (
-                "Frozen semantic runtime module unavailable at pinned commit "
-                f"{FROZEN_SEMANTIC_MNEME_SHA}: {rel_path}\n"
-                + frozen.stderr.decode("utf-8", errors="replace")
-            )
-            raw_bytes = frozen.stdout.replace(b"\r\n", b"\n")
-            actual_hash = hashlib.sha256(raw_bytes).hexdigest()
+            actual_hash = frozen_semantic_module_hash(rel_path)
             if actual_hash != expected_hash:
                 mismatches.append(
                     f"{rel_path}: expected {expected_hash}, got {actual_hash}"
