@@ -396,6 +396,13 @@ def apply_import(
             "ones, or fix the contradicting ADRs."
         )
 
+    if report.decisions and not report.parsed_adrs:
+        raise RuntimeError(
+            "ADR import refused: canonical ADR authority requires an "
+            "ImportReport produced by compile_for_import so source provenance "
+            "and occurrence identity are validated."
+        )
+
     # ADR import is a canonical authority writer (ADR-030 §1), not a legacy
     # decisions[] writer, so the legacy-writer containment guard does not
     # apply: it validates canonical state before any write, mutates only
@@ -452,42 +459,38 @@ def apply_import(
                 "the incoming ADR."
             )
 
-    plans: list[tuple[Decision, str, list[str], str | None]] = []
-    if report.parsed_adrs:
-        decision_by_id = {
-            decision.id: decision
-            for decision in adrs_to_decisions(report.parsed_adrs)
-        }
-        for adr in report.parsed_adrs:
-            if adr.scope in report.skipped_scopes:
-                continue
-            decision = decision_by_id[adr.id]
-            node = all_nodes_by_id.get(adr.id)
-            if node is None:
-                continue
-            if adr.id in active_ids:
-                lifecycle = "active"
-            else:
-                lifecycle = node.status
-                if lifecycle == "active":
-                    lifecycle = "inactive"
-            plans.append((
-                decision,
-                lifecycle,
-                list(node.supersedes),
-                report.adr_sources_by_id.get(adr.id) or decision.source_path or None,
-            ))
-    else:
-        for decision in report.decisions:
-            node = active_nodes_by_id.get(decision.id)
-            plans.append((
-                decision,
-                node.status if node is not None else "active",
-                list(node.supersedes) if node is not None else [],
-                report.adr_sources_by_id.get(decision.id)
-                or decision.source_path
-                or None,
-            ))
+    plans: list[tuple[Decision, str, list[str], str]] = []
+    decision_by_id = {
+        decision.id: decision
+        for decision in adrs_to_decisions(report.parsed_adrs)
+    }
+    for adr in report.parsed_adrs:
+        if adr.scope in report.skipped_scopes:
+            continue
+        decision = decision_by_id[adr.id]
+        node = all_nodes_by_id.get(adr.id)
+        if node is None:
+            continue
+        if adr.id in active_ids:
+            lifecycle = "active"
+        else:
+            lifecycle = node.status
+            if lifecycle == "active":
+                lifecycle = "inactive"
+        source_path = (
+            report.adr_sources_by_id.get(adr.id)
+            or decision.source_path
+        )
+        if not source_path:
+            raise RuntimeError(
+                f"ADR import refused: {adr.id!r} has no validated source path"
+            )
+        plans.append((
+            decision,
+            lifecycle,
+            list(node.supersedes),
+            source_path,
+        ))
 
     plan_by_id = {
         decision.id: (decision, lifecycle, supersedes, source_path)
@@ -495,27 +498,16 @@ def apply_import(
     }
 
     def source_contract(
-        decision: Decision, source_path: str | None
+        decision: Decision, source_path: str
     ) -> tuple[list[object], list[dict[str, object]]]:
-        if source_path:
-            source_revision = compute_source_hash(source_path)
-            locator = relative_source_path(source_path, target_path)
-            return (
-                [decision.id, source_revision, "adr-import"],
-                [{
-                    "source_type": "adr",
-                    "source_locator": locator,
-                    "source_revision": source_revision,
-                    "observed_at": "",
-                    "verification_status": "",
-                }],
-            )
+        source_revision = compute_source_hash(source_path)
+        locator = relative_source_path(source_path, target_path)
         return (
-            ["legacy-decisions", decision.id],
+            [decision.id, source_revision, "adr-import"],
             [{
-                "source_type": "runtime",
-                "source_locator": "",
-                "source_revision": "",
+                "source_type": "adr",
+                "source_locator": locator,
+                "source_revision": source_revision,
                 "observed_at": "",
                 "verification_status": "",
             }],

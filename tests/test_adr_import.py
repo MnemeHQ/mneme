@@ -261,31 +261,35 @@ def test_apply_import_persists_typed_rules(tmp_path):
 
 
 def test_apply_import_persists_typed_rule_path_selectors(tmp_path):
-    from mneme.adr_import import ImportReport, apply_import
-    from mneme.schemas import Decision, Rule
+    from mneme.adr_import import apply_import, compile_for_import
 
+    adr_dir = tmp_path / "adrs"
+    adr_dir.mkdir()
+    (adr_dir / "ADR-020.md").write_text(
+        "---\n"
+        "id: ADR-020\n"
+        "title: Scope the rule\n"
+        "status: accepted\n"
+        "priority: normal\n"
+        "date: 2026-04-15\n"
+        "scope: enforcement\n"
+        "---\n\n"
+        "## Constraints\n"
+        "- FORBID_LITERAL:\n"
+        "    value: install legacy-client\n"
+        "    include_paths:\n"
+        "      - docs/**\n"
+        "    exclude_paths:\n"
+        "      - docs/generated/**\n",
+        encoding="utf-8",
+    )
     target = tmp_path / "project_memory.json"
     target.write_text(json.dumps({
         "meta": {"name": "test", "description": "test"},
         "items": [], "examples": [], "decisions": [],
     }), encoding="utf-8")
-    node = DecisionNode(id="ADR-020", status="active")
-    report = ImportReport(
-        active_nodes=[node],
-        all_nodes=[node],
-        decisions=[Decision(
-            id="ADR-020",
-            decision="Scope the rule",
-            rules=[Rule(
-                type="FORBID_LITERAL",
-                value="install legacy-client",
-                include_paths=("docs/**",),
-                exclude_paths=("docs/generated/**",),
-            )],
-        )],
-        diagnostics=[],
-    )
-    apply_import(report, target_path=target)
+
+    apply_import(compile_for_import(adr_dir), target_path=target)
     persisted = json.loads(target.read_text(encoding="utf-8"))
     assert persisted["decisions"][0]["rules"] == [{
         "type": "FORBID_LITERAL",
@@ -293,6 +297,31 @@ def test_apply_import_persists_typed_rule_path_selectors(tmp_path):
         "include_paths": ["docs/**"],
         "exclude_paths": ["docs/generated/**"],
     }]
+
+
+def test_d1d_apply_refuses_manual_report_without_validated_adr_provenance(
+    tmp_path,
+):
+    from mneme.adr_import import ImportReport, apply_import
+    from mneme.schemas import Decision
+
+    target = tmp_path / "project_memory.json"
+    _seed_empty_memory(target)
+    before = target.read_bytes()
+    node = DecisionNode(id="ADR-999", status="active")
+    report = ImportReport(
+        active_nodes=[node],
+        all_nodes=[node],
+        decisions=[Decision(id="ADR-999", decision="Unverified")],
+        diagnostics=[],
+    )
+
+    with pytest.raises(
+        RuntimeError,
+        match="requires an ImportReport produced by compile_for_import",
+    ):
+        apply_import(report, target_path=target)
+    assert target.read_bytes() == before
 
 
 def test_apply_import_refuses_overwrite_without_allow_update(tmp_path):
