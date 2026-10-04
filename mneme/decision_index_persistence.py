@@ -19,6 +19,7 @@ from typing import Any
 
 from mneme.decision_index import (
     CANONICAL_DECISION_CLASS_ARCHITECTURE,
+    CANONICAL_VERSION,
     CanonicalArchitectureIndex,
     CanonicalDecisionRecord,
     CanonicalRuleRecord,
@@ -269,6 +270,36 @@ def _applicability_of(rule: Rule) -> dict[str, Any]:
     return applicability
 
 
+def _rule_bindings_for_version(
+    decision_id: str,
+    version_id: str,
+    revision: str,
+    rules: list[Rule] | tuple[Rule, ...],
+) -> list[dict[str, Any]]:
+    """Build explicit immutable rule bindings for one version occurrence."""
+    bindings: list[dict[str, Any]] = []
+    seen_rule_ids: set[str] = set()
+    for sequence, rule in enumerate(rules):
+        applicability = _applicability_of(rule)
+        rule_id = rule_id_of(decision_id, rule.type, rule.value, applicability)
+        if rule_id in seen_rule_ids:
+            raise DecisionIndexPersistenceError(
+                f"decision {decision_id!r} contains duplicate identical rule bindings"
+            )
+        seen_rule_ids.add(rule_id)
+        bindings.append({
+            "rule_id": rule_id,
+            "decision_id": decision_id,
+            "decision_version_id": version_id,
+            "decision_version": revision,
+            "sequence": sequence,
+            "rule_type": rule.type,
+            "rule_payload": {"value": rule.value},
+            "applicability": applicability,
+        })
+    return bindings
+
+
 def _source_snapshot(
     raw_decision: dict[str, Any] | None,
 ) -> tuple[list[dict[str, str]], list[str]]:
@@ -346,31 +377,12 @@ def _version_and_rules_for_migration(
         "supersedes_version_id": None,
         "created_at": created_at,
     }
-    bindings: list[dict[str, Any]] = []
-    seen_rule_ids: set[str] = set()
-    for sequence, rule in enumerate(decision.rules):
-        applicability = _applicability_of(rule)
-        rule_id = rule_id_of(
-            decision.id,
-            rule.type,
-            rule.value,
-            applicability,
-        )
-        if rule_id in seen_rule_ids:
-            raise DecisionIndexPersistenceError(
-                f"decision {decision.id!r} contains duplicate identical rule bindings"
-            )
-        seen_rule_ids.add(rule_id)
-        bindings.append({
-            "rule_id": rule_id,
-            "decision_id": decision.id,
-            "decision_version_id": version_id,
-            "decision_version": "1",
-            "sequence": sequence,
-            "rule_type": rule.type,
-            "rule_payload": {"value": rule.value},
-            "applicability": applicability,
-        })
+    bindings = _rule_bindings_for_version(
+        decision.id,
+        version_id,
+        CANONICAL_VERSION,
+        decision.rules,
+    )
     return version, bindings
 
 
@@ -539,6 +551,10 @@ def append_initial_canonical_decision(
     updated_at: str,
     occurrence_source_identity: list[Any] | tuple[Any, ...],
     source_evidence: list[dict[str, Any]],
+    constraints: list[str] | tuple[str, ...] = (),
+    anti_patterns: list[str] | tuple[str, ...] = (),
+    rules: list[Rule] | tuple[Rule, ...] = (),
+    relationships: list[dict[str, str]] | tuple[dict[str, str], ...] = (),
 ) -> tuple[dict[str, Any], bool]:
     """Append one first canonical occurrence and its derived compatibility row.
 
@@ -564,8 +580,8 @@ def append_initial_canonical_decision(
         statement,
         rationale,
         context_scope,
-        (),
-        (),
+        constraints,
+        anti_patterns,
     )
     version_id = version_id_of(
         decision_id,
@@ -579,7 +595,7 @@ def append_initial_canonical_decision(
         "lifecycle_status": lifecycle_status,
         "active_version_id": version_id,
         "test_evidence": [],
-        "relationships": [],
+        "relationships": copy.deepcopy(list(relationships)),
         "updated_at": updated_at,
     })
     _require_list(
@@ -592,22 +608,190 @@ def append_initial_canonical_decision(
         "statement": statement,
         "rationale": rationale,
         "context_scope": list(context_scope),
-        "constraints": [],
-        "anti_patterns": [],
+        "constraints": list(constraints),
+        "anti_patterns": list(anti_patterns),
         "source_evidence": copy.deepcopy(source_evidence),
         "occurrence_source_identity": list(occurrence_source_identity),
         "supersedes_version_id": None,
         "created_at": created_at,
     })
 
+    _require_list(section.get("rules"), "decision_index.rules").extend(
+        _rule_bindings_for_version(
+            decision_id,
+            version_id,
+            CANONICAL_VERSION,
+            rules,
+        )
+    )
     migrated["decision_index"] = section
     index = load_persisted_decision_index(section)
     projected = project_canonical_index(index)
     decision = next(item for item in projected if item.id == decision_id)
     decisions = _require_list(migrated.get("decisions", []), "decisions")
-    decisions.append(_snapshot_record_from_decision(decision))
+    snapshot_row = _snapshot_record_from_decision(decision)
+    if source_evidence:
+        first_source = source_evidence[0]
+        if (
+            isinstance(first_source, dict)
+            and first_source.get("source_type") == "adr"
+            and isinstance(first_source.get("source_locator"), str)
+            and first_source.get("source_locator")
+        ):
+            snapshot_row["source"] = {
+                "type": "adr",
+                "path": first_source["source_locator"],
+                "sha256": str(first_source.get("source_revision", "")),
+            }
+    decisions.append(snapshot_row)
     return migrated, True
 
+
+def append_canonical_version_occurrence(
+    document: dict[str, Any],
+    *,
+    decision_id: str,
+    predecessor_version_id: str,
+    statement: str,
+    rationale: str,
+    context_scope: list[str] | tuple[str, ...],
+    constraints: list[str] | tuple[str, ...],
+    anti_patterns: list[str] | tuple[str, ...],
+    rules: list[Rule] | tuple[Rule, ...],
+    created_at: str,
+    updated_at: str,
+    occurrence_source_identity: list[Any] | tuple[Any, ...],
+    source_evidence: list[dict[str, Any]],
+) -> tuple[dict[str, Any], str, bool]:
+    """Append or idempotently reuse one immutable D1D version occurrence.
+
+    The predecessor is an explicit authority input. It is never re-derived
+    after the operation starts. An exact persisted retry is a structural
+    no-op even if a later authority action moved the active pointer.
+    """
+    migrated = migrate_memory_document(document)
+    section = copy.deepcopy(
+        _require_dict(migrated["decision_index"], "decision_index")
+    )
+    logical_rows = _require_list(
+        section.get("decisions"), "decision_index.decisions"
+    )
+    logical = next(
+        (
+            row for row in logical_rows
+            if isinstance(row, dict) and row.get("decision_id") == decision_id
+        ),
+        None,
+    )
+    if logical is None:
+        raise DecisionIndexPersistenceError(
+            f"decision {decision_id!r} does not exist for version evolution"
+        )
+    active_version_id = _require_str(
+        logical.get("active_version_id"),
+        f"decision {decision_id!r} active_version_id",
+        non_empty=True,
+    )
+
+    digest = content_digest_of(
+        statement,
+        rationale,
+        context_scope,
+        constraints,
+        anti_patterns,
+    )
+    version_id = version_id_of(
+        decision_id,
+        digest,
+        occurrence_source_identity,
+        predecessor_version_id,
+    )
+    version_record = {
+        "version_id": version_id,
+        "decision_id": decision_id,
+        # Public version/revision remains display-only in D1D. Do not
+        # create a second authority signal by deriving identity from it.
+        "revision": CANONICAL_VERSION,
+        "content_digest": digest,
+        "statement": statement,
+        "rationale": rationale,
+        "context_scope": list(context_scope),
+        "constraints": list(constraints),
+        "anti_patterns": list(anti_patterns),
+        "source_evidence": copy.deepcopy(source_evidence),
+        "occurrence_source_identity": list(occurrence_source_identity),
+        "supersedes_version_id": predecessor_version_id,
+        "created_at": created_at,
+    }
+    expected_bindings = _rule_bindings_for_version(
+        decision_id,
+        version_id,
+        CANONICAL_VERSION,
+        rules,
+    )
+
+    versions = _require_list(section.get("versions"), "decision_index.versions")
+    existing = next(
+        (
+            row for row in versions
+            if isinstance(row, dict) and row.get("version_id") == version_id
+        ),
+        None,
+    )
+    if existing is not None:
+        if existing != version_record:
+            raise DecisionIndexPersistenceError(
+                f"version occurrence {version_id!r} already exists with "
+                "different immutable content"
+            )
+        existing_bindings = sorted(
+            [
+                row for row in _require_list(
+                    section.get("rules"), "decision_index.rules"
+                )
+                if isinstance(row, dict)
+                and row.get("decision_version_id") == version_id
+            ],
+            key=lambda row: row.get("sequence", -1),
+        )
+        if existing_bindings != expected_bindings:
+            raise DecisionIndexPersistenceError(
+                f"version occurrence {version_id!r} rule bindings differ "
+                "from the persisted immutable occurrence"
+            )
+        load_persisted_decision_index(section)
+        return migrated, version_id, False
+
+    if active_version_id != predecessor_version_id:
+        raise DecisionIndexPersistenceError(
+            f"stale version evolution for {decision_id!r}: expected active "
+            f"predecessor {predecessor_version_id!r}, found {active_version_id!r}"
+        )
+
+    predecessor = next(
+        (
+            row for row in versions
+            if isinstance(row, dict)
+            and row.get("version_id") == predecessor_version_id
+            and row.get("decision_id") == decision_id
+        ),
+        None,
+    )
+    if predecessor is None:
+        raise DecisionIndexPersistenceError(
+            f"decision {decision_id!r} predecessor "
+            f"{predecessor_version_id!r} does not exist"
+        )
+
+    versions.append(version_record)
+    _require_list(section.get("rules"), "decision_index.rules").extend(
+        expected_bindings
+    )
+    logical["active_version_id"] = version_id
+    logical["updated_at"] = updated_at
+    migrated["decision_index"] = section
+    load_persisted_decision_index(section)
+    return migrated, version_id, True
 
 def rebind_legacy_initial_occurrence(
     document: dict[str, Any],
@@ -1242,6 +1426,29 @@ def load_persisted_decision_index(
         rules=tuple(all_rules),
     )
 
+
+def rebuild_compatibility_snapshot(
+    document: dict[str, Any],
+) -> dict[str, Any]:
+    """Re-project active canonical authority into deprecated decisions[]."""
+    migrated = migrate_memory_document(document)
+    index = load_persisted_decision_index(migrated["decision_index"])
+    records_by_id = {record.decision_id: record for record in index.records}
+    rows: list[dict[str, Any]] = []
+    for decision in project_canonical_index(index):
+        row = _snapshot_record_from_decision(decision)
+        record = records_by_id[decision.id]
+        if record.source_evidence:
+            evidence = record.source_evidence[0]
+            if evidence.source_type == "adr" and evidence.source_locator:
+                row["source"] = {
+                    "type": "adr",
+                    "path": evidence.source_locator,
+                    "sha256": evidence.source_revision,
+                }
+        rows.append(row)
+    migrated["decisions"] = rows
+    return migrated
 
 def compatibility_snapshot_decisions(
     document: dict[str, Any],

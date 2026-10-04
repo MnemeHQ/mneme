@@ -9,6 +9,7 @@ import pytest
 
 from mneme.benchmark import BenchmarkRunner
 from mneme.decision_index_persistence import (
+    append_canonical_version_occurrence,
     append_initial_canonical_decision,
     DECISION_INDEX_SCHEMA,
     DecisionIndexPersistenceError,
@@ -16,11 +17,13 @@ from mneme.decision_index_persistence import (
     load_persisted_decision_index,
     migrate_memory_document,
     migrate_memory_file,
+    rebuild_compatibility_snapshot,
     rule_id_of,
     version_id_of,
 )
 from mneme.decision_projection import project_canonical_index
 from mneme.memory_store import MemoryStore
+from mneme.schemas import Rule
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -208,6 +211,105 @@ def test_proposal_source_evidence_requires_matching_accepted_decision_id():
     ):
         load_persisted_decision_index(section)
 
+
+def _evolve_decision(document: dict, predecessor: str, *, statement: str, source_sha: str):
+    return append_canonical_version_occurrence(
+        document,
+        decision_id="dec-1",
+        predecessor_version_id=predecessor,
+        statement=statement,
+        rationale=f"Rationale for {statement}",
+        context_scope=("storage",),
+        constraints=("no postgres",),
+        anti_patterns=("ORM",),
+        rules=[Rule(
+            type="FORBID_LITERAL",
+            value="pip install bad",
+            include_paths=("src/**",),
+            exclude_paths=("src/generated/**",),
+        )],
+        created_at="2026-10-04",
+        updated_at="2026-10-04",
+        occurrence_source_identity=("dec-1", source_sha, "adr-import"),
+        source_evidence=[{
+            "source_type": "adr",
+            "source_locator": "../docs/adr/dec-1.md",
+            "source_revision": source_sha,
+            "observed_at": "",
+            "verification_status": "",
+        }],
+    )
+
+
+def test_d1d_version_occurrence_is_predecessor_bound_and_retry_is_noop():
+    migrated = migrate_memory_document(_document())
+    index = load_persisted_decision_index(migrated["decision_index"])
+    predecessor = next(
+        r.version_id for r in index.records if r.decision_id == "dec-1"
+    )
+
+    evolved, version_id, created = _evolve_decision(
+        migrated, predecessor, statement="Use JSON v2", source_sha="sha-v2"
+    )
+    assert created is True
+    assert version_id != predecessor
+
+    retried, retry_id, retry_created = _evolve_decision(
+        evolved, predecessor, statement="Use JSON v2", source_sha="sha-v2"
+    )
+    assert retry_created is False
+    assert retry_id == version_id
+    assert retried == evolved
+
+
+def test_d1d_stale_new_occurrence_fails_closed():
+    migrated = migrate_memory_document(_document())
+    index = load_persisted_decision_index(migrated["decision_index"])
+    predecessor = next(
+        r.version_id for r in index.records if r.decision_id == "dec-1"
+    )
+    evolved, _, _ = _evolve_decision(
+        migrated, predecessor, statement="Use JSON v2", source_sha="sha-v2"
+    )
+    with pytest.raises(DecisionIndexPersistenceError, match="stale version evolution"):
+        _evolve_decision(
+            evolved, predecessor, statement="Use JSON v3", source_sha="sha-v3"
+        )
+
+
+def test_d1d_unchanged_rule_id_rebinds_to_new_version():
+    migrated = migrate_memory_document(_document())
+    index = load_persisted_decision_index(migrated["decision_index"])
+    predecessor = next(
+        r.version_id for r in index.records if r.decision_id == "dec-1"
+    )
+    old_rule = index.rules_for_decision("dec-1")[0]
+    evolved, version_id, _ = _evolve_decision(
+        migrated, predecessor, statement="Use JSON v2", source_sha="sha-v2"
+    )
+    evolved_index = load_persisted_decision_index(evolved["decision_index"])
+    new_rule = evolved_index.rules_for_decision("dec-1")[0]
+    assert new_rule.rule_id == old_rule.rule_id
+    assert new_rule.decision_version_id == version_id
+    bindings = [
+        row for row in evolved["decision_index"]["rules"]
+        if row["rule_id"] == old_rule.rule_id
+    ]
+    assert {row["decision_version_id"] for row in bindings} == {
+        predecessor,
+        version_id,
+    }
+
+
+def test_d1d_rebuild_snapshot_preserves_adr_source_block():
+    migrated = migrate_memory_document(_document())
+    rebuilt = rebuild_compatibility_snapshot(migrated)
+    row = next(d for d in rebuilt["decisions"] if d["id"] == "dec-1")
+    assert row["source"] == {
+        "type": "adr",
+        "path": "../docs/adr/dec-1.md",
+        "sha256": "source-sha",
+    }
 
 def test_identity_golden_vectors() -> None:
     digest = content_digest_of(
