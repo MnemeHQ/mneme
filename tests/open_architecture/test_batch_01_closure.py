@@ -66,7 +66,7 @@ class TestBatch01ClosureManifest:
         assert data["artifact_version"] == "0.1"
         assert data["batch_id"] == "o1a-batch-01"
         assert data["baseline_id"] == "o1a-batch-01-baseline"
-        assert data["closure_status"] == "CLOSED / FROZEN"
+        assert data["closure_status"] == "closed_frozen"
         assert data["headline_metric"] == HEADLINE_METRIC
         assert data["mneme_execution_sha"] == FROZEN_BATCH_01_CLOSURE_MNEME_SHA
 

@@ -198,7 +198,7 @@ def build_batch_01_closure(
             ),
             "status": "CLOSED / FROZEN",
         },
-        "closure_status": "CLOSED / FROZEN",
+        "closure_status": "closed_frozen",
         "corpora_identities": {
             "baseline_configuration_hash": baseline_hash,
             "manifest_configuration_hash": manifest_hash,

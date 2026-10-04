@@ -9,7 +9,7 @@
     "scope": "O1A Batch 01 benchmark program is formally closed and frozen across all three stages (Stage A Discovery, Stage B Semantic Classification, and Stage C Governing Decision Set). No further treatments, tunings, or calibrations are accepted for Batch 01. Any future research must occur under a new benchmark version, new batch, or explicitly reopened programme rather than mutating Batch 01.",
     "status": "CLOSED / FROZEN"
   },
-  "closure_status": "CLOSED / FROZEN",
+  "closure_status": "closed_frozen",
   "corpora_identities": {
     "baseline_configuration_hash": "31e18dc1e2bd9ad30bec86dce1a9295a",
     "manifest_configuration_hash": "4af7e5794011b43d39682cdfeac9f54e",
