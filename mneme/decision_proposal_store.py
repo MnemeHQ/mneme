@@ -148,11 +148,9 @@ class InMemoryDecisionProposalStore:
         return proposal, True
 
     def get(self, proposal_id: str) -> DecisionProposal | None:
-        self._load()
         return self._by_id.get(proposal_id)
 
     def list_proposals(self) -> tuple[DecisionProposal, ...]:
-        self._load()
         return tuple(self._by_id[pid] for pid in self._order)
 
     def transition_if_proposed(
@@ -354,9 +352,11 @@ class JsonFileDecisionProposalStore:
         return transitioned, True
 
     def get(self, proposal_id: str) -> DecisionProposal | None:
+        self._load()
         return self._by_id.get(proposal_id)
 
     def list_proposals(self) -> tuple[DecisionProposal, ...]:
+        self._load()
         return tuple(self._by_id[pid] for pid in self._order)
 
 
