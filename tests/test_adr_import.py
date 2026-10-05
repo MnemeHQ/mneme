@@ -772,3 +772,50 @@ def test_resolve_precedence_still_raises_on_first_ambiguous_scope(tmp_path):
     with pytest.raises(ADRPrecedenceError) as excinfo:
         resolve_precedence(adrs)
     assert excinfo.value.scope == "api"
+
+
+def test_r5_source_revision_binds_to_parsed_bytes_not_disk_at_apply(tmp_path):
+    """ADR-030 §10: an edit between compile and apply cannot re-pin provenance."""
+    import hashlib
+
+    from mneme.adr_import import apply_import, compile_for_import
+
+    adr_dir = tmp_path / "adrs"
+    adr_dir.mkdir()
+    _write_adr(
+        adr_dir,
+        "ADR-530",
+        "storage",
+        body="## Constraints\n\n- FORBID_LITERAL: alpha\n",
+    )
+    adr_path = adr_dir / "ADR-530.md"
+    parsed_bytes = adr_path.read_bytes()
+    target = tmp_path / "project_memory.json"
+    _seed_empty_memory(target)
+
+    report = compile_for_import(adr_dir)
+    _write_adr(
+        adr_dir,
+        "ADR-530",
+        "storage",
+        body="## Constraints\n\n- FORBID_LITERAL: beta\n",
+    )
+    assert adr_path.read_bytes() != parsed_bytes
+
+    apply_import(report, target_path=target)
+
+    raw = json.loads(target.read_text(encoding="utf-8"))
+    (version,) = [
+        row for row in raw["decision_index"]["versions"]
+        if row["decision_id"] == "ADR-530"
+    ]
+    parsed_revision = hashlib.sha256(parsed_bytes).hexdigest()
+    assert version["source_evidence"][0]["source_revision"] == parsed_revision
+    assert version["occurrence_source_identity"] == [
+        "ADR-530", parsed_revision, "adr-import"
+    ]
+    (rule,) = [
+        row for row in raw["decision_index"]["rules"]
+        if row["decision_id"] == "ADR-530"
+    ]
+    assert rule["rule_payload"] == {"value": "alpha"}

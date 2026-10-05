@@ -58,6 +58,10 @@ class ADR:
         supersedes:   Ids of ADRs this record replaces.
         body:         Raw markdown body that follows the frontmatter.
         source_path:  Absolute path to the source file (for diagnostics).
+        source_sha256: SHA-256 hex digest of the exact file bytes this record
+                      was parsed from; empty when not built by the parser.
+                      ADR-030 §10 binds import ``source_revision`` to it.
+                      Excluded from equality: it is provenance, not content.
     """
 
     id: str
@@ -69,6 +73,7 @@ class ADR:
     supersedes: list[str] = field(default_factory=list)
     body: str = ""
     source_path: str = ""
+    source_sha256: str = field(default="", compare=False)
 
 
 # ── Errors ────────────────────────────────────────────────────────────────────

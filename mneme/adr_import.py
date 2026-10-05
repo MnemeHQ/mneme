@@ -372,7 +372,7 @@ def apply_import(
     expected_predecessor_version_ids: dict[str, str] | None = None,
 ) -> list[str]:
     """Apply ADR authority to the canonical Decision Index (D1D)."""
-    from mneme.adr_freshness import compute_source_hash, relative_source_path
+    from mneme.adr_freshness import relative_source_path
     from mneme.decision_index_persistence import (
         DecisionIndexPersistenceError,
         apply_canonical_supersession,
@@ -461,6 +461,7 @@ def apply_import(
             )
 
     plans: list[tuple[Decision, str, list[str], str]] = []
+    source_revision_by_id: dict[str, str] = {}
     decision_by_id = {
         decision.id: decision
         for decision in adrs_to_decisions(report.parsed_adrs)
@@ -486,6 +487,13 @@ def apply_import(
             raise RuntimeError(
                 f"ADR import refused: {adr.id!r} has no validated source path"
             )
+        if not adr.source_sha256:
+            raise RuntimeError(
+                f"ADR import refused: {adr.id!r} has no parsed-source "
+                "revision; canonical ADR authority requires the hash of the "
+                "exact bytes its content was parsed from"
+            )
+        source_revision_by_id[adr.id] = adr.source_sha256
         plans.append((
             decision,
             lifecycle,
@@ -521,7 +529,9 @@ def apply_import(
     def source_contract(
         decision: Decision, source_path: str
     ) -> tuple[list[object], list[dict[str, object]]]:
-        source_revision = compute_source_hash(source_path)
+        # The revision of the bytes the content was parsed from, never a
+        # fresh read of the file at write time (ADR-030 §10).
+        source_revision = source_revision_by_id[decision.id]
         locator = relative_source_path(source_path, target_path)
         return (
             [decision.id, source_revision, "adr-import"],

@@ -68,3 +68,42 @@ def test_parse_directory_ignores_non_adr_markdown(tmp_path):
 
     adrs = parse_adr_directory(tmp_path)
     assert [a.id for a in adrs] == ["ADR-001"]
+
+
+# ── ADR-030 §10: parsed-bytes source revision ────────────────────────────────
+
+
+def test_parse_records_hash_of_exact_parsed_bytes(tmp_path):
+    import hashlib
+
+    path = tmp_path / "ADR-901.md"
+    data = (
+        "---\r\nid: ADR-901\r\ntitle: CRLF\r\nstatus: accepted\r\n"
+        "priority: normal\r\ndate: 2026-01-01\r\nscope: storage\r\n---\r\n\r\n"
+        "Body line\r\n"
+    ).encode("utf-8")
+    path.write_bytes(data)
+
+    lf_path = tmp_path / "lf" / "ADR-901.md"
+    lf_path.parent.mkdir()
+    lf_data = data.replace(b"\r\n", b"\n")
+    lf_path.write_bytes(lf_data)
+
+    adr = parse_adr_file(path)
+    lf_adr = parse_adr_file(lf_path)
+
+    assert adr.source_sha256 == hashlib.sha256(data).hexdigest()
+    assert lf_adr.source_sha256 == hashlib.sha256(lf_data).hexdigest()
+    # Decoding keeps read_text semantics (universal newlines): same parsed
+    # record, distinct byte revisions.
+    assert adr.body == lf_adr.body
+    assert "\r" not in adr.body
+    assert adr.source_sha256 != lf_adr.source_sha256
+
+
+def test_source_sha256_is_excluded_from_adr_equality():
+    base = dict(
+        id="ADR-902", title="t", status="accepted", priority="normal",
+        date="2026-01-01", scope="",
+    )
+    assert ADR(**base, source_sha256="a" * 64) == ADR(**base)
