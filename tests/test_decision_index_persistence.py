@@ -9,6 +9,8 @@ import pytest
 
 from mneme.benchmark import BenchmarkRunner
 from mneme.decision_index_persistence import (
+    apply_canonical_supersession,
+    append_canonical_version_occurrence,
     append_initial_canonical_decision,
     DECISION_INDEX_SCHEMA,
     DecisionIndexPersistenceError,
@@ -16,11 +18,13 @@ from mneme.decision_index_persistence import (
     load_persisted_decision_index,
     migrate_memory_document,
     migrate_memory_file,
+    rebuild_compatibility_snapshot,
     rule_id_of,
     version_id_of,
 )
 from mneme.decision_projection import project_canonical_index
 from mneme.memory_store import MemoryStore
+from mneme.schemas import Rule
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -208,6 +212,240 @@ def test_proposal_source_evidence_requires_matching_accepted_decision_id():
     ):
         load_persisted_decision_index(section)
 
+
+def _evolve_decision(document: dict, predecessor: str, *, statement: str, source_sha: str):
+    return append_canonical_version_occurrence(
+        document,
+        decision_id="dec-1",
+        predecessor_version_id=predecessor,
+        statement=statement,
+        rationale=f"Rationale for {statement}",
+        context_scope=("storage",),
+        constraints=("no postgres",),
+        anti_patterns=("ORM",),
+        rules=[Rule(
+            type="FORBID_LITERAL",
+            value="pip install bad",
+            include_paths=("src/**",),
+            exclude_paths=("src/generated/**",),
+        )],
+        created_at="2026-10-04",
+        updated_at="2026-10-04",
+        occurrence_source_identity=("dec-1", source_sha, "adr-import"),
+        source_evidence=[{
+            "source_type": "adr",
+            "source_locator": "../docs/adr/dec-1.md",
+            "source_revision": source_sha,
+            "observed_at": "",
+            "verification_status": "",
+        }],
+    )
+
+
+def test_d1d_version_occurrence_is_predecessor_bound_and_retry_is_noop():
+    migrated = migrate_memory_document(_document())
+    index = load_persisted_decision_index(migrated["decision_index"])
+    predecessor = next(
+        r.version_id for r in index.records if r.decision_id == "dec-1"
+    )
+
+    evolved, version_id, created = _evolve_decision(
+        migrated, predecessor, statement="Use JSON v2", source_sha="sha-v2"
+    )
+    assert created is True
+    assert version_id != predecessor
+
+    retried, retry_id, retry_created = _evolve_decision(
+        evolved, predecessor, statement="Use JSON v2", source_sha="sha-v2"
+    )
+    assert retry_created is False
+    assert retry_id == version_id
+    assert retried == evolved
+
+
+def test_d1d_stale_new_occurrence_fails_closed():
+    migrated = migrate_memory_document(_document())
+    index = load_persisted_decision_index(migrated["decision_index"])
+    predecessor = next(
+        r.version_id for r in index.records if r.decision_id == "dec-1"
+    )
+    evolved, _, _ = _evolve_decision(
+        migrated, predecessor, statement="Use JSON v2", source_sha="sha-v2"
+    )
+    with pytest.raises(DecisionIndexPersistenceError, match="stale version evolution"):
+        _evolve_decision(
+            evolved, predecessor, statement="Use JSON v3", source_sha="sha-v3"
+        )
+
+
+def test_d1d_unchanged_rule_id_rebinds_to_new_version():
+    migrated = migrate_memory_document(_document())
+    index = load_persisted_decision_index(migrated["decision_index"])
+    predecessor = next(
+        r.version_id for r in index.records if r.decision_id == "dec-1"
+    )
+    old_rule = index.rules_for_decision("dec-1")[0]
+    evolved, version_id, _ = _evolve_decision(
+        migrated, predecessor, statement="Use JSON v2", source_sha="sha-v2"
+    )
+    evolved_index = load_persisted_decision_index(evolved["decision_index"])
+    new_rule = evolved_index.rules_for_decision("dec-1")[0]
+    assert new_rule.rule_id == old_rule.rule_id
+    assert new_rule.decision_version_id == version_id
+    bindings = [
+        row for row in evolved["decision_index"]["rules"]
+        if row["rule_id"] == old_rule.rule_id
+    ]
+    assert {row["decision_version_id"] for row in bindings} == {
+        predecessor,
+        version_id,
+    }
+
+
+def test_d1d_rebuild_snapshot_preserves_adr_source_block():
+    migrated = migrate_memory_document(_document())
+    rebuilt = rebuild_compatibility_snapshot(migrated)
+    row = next(d for d in rebuilt["decisions"] if d["id"] == "dec-1")
+    assert row["source"] == {
+        "type": "adr",
+        "path": "../docs/adr/dec-1.md",
+        "sha256": "source-sha",
+    }
+
+def test_g11_a1_b_a2_and_late_retry_preserve_occurrence_history():
+    migrated = migrate_memory_document(_document())
+    initial_index = load_persisted_decision_index(migrated["decision_index"])
+    a1 = next(r for r in initial_index.records if r.decision_id == "dec-1")
+
+    after_b, b_id, _ = _evolve_decision(
+        migrated, a1.version_id, statement="Use Postgres", source_sha="sha-b"
+    )
+    b_index = load_persisted_decision_index(after_b["decision_index"])
+    b = next(r for r in b_index.records if r.decision_id == "dec-1")
+    assert b.version_id == b_id
+
+    original_rule = Rule(
+        type="FORBID_LITERAL",
+        value="pip install bad",
+        include_paths=("src/**",),
+        exclude_paths=("src/generated/**",),
+    )
+    after_a2, a2_id, created = append_canonical_version_occurrence(
+        after_b,
+        decision_id="dec-1",
+        predecessor_version_id=b_id,
+        statement="Use JSON",
+        rationale="Because",
+        context_scope=("storage",),
+        constraints=("no postgres",),
+        anti_patterns=("ORM",),
+        rules=[original_rule],
+        created_at="2026-10-04",
+        updated_at="2026-10-04",
+        occurrence_source_identity=("dec-1", "source-sha", "adr-import"),
+        source_evidence=[{
+            "source_type": "adr",
+            "source_locator": "../docs/adr/dec-1.md",
+            "source_revision": "source-sha",
+            "observed_at": "",
+            "verification_status": "",
+        }],
+    )
+    assert created is True
+    assert a2_id != a1.version_id
+    a2_index = load_persisted_decision_index(after_a2["decision_index"])
+    a2 = next(r for r in a2_index.records if r.decision_id == "dec-1")
+    assert a2.content_digest == a1.content_digest
+
+    after_c, c_id, _ = _evolve_decision(
+        after_a2, a2_id, statement="Use SQLite", source_sha="sha-c"
+    )
+    retried, retry_id, retry_created = append_canonical_version_occurrence(
+        after_c,
+        decision_id="dec-1",
+        predecessor_version_id=b_id,
+        statement="Use JSON",
+        rationale="Because",
+        context_scope=("storage",),
+        constraints=("no postgres",),
+        anti_patterns=("ORM",),
+        rules=[original_rule],
+        created_at="2026-10-04",
+        updated_at="2026-10-04",
+        occurrence_source_identity=("dec-1", "source-sha", "adr-import"),
+        source_evidence=[{
+            "source_type": "adr",
+            "source_locator": "../docs/adr/dec-1.md",
+            "source_revision": "source-sha",
+            "observed_at": "",
+            "verification_status": "",
+        }],
+    )
+    assert retry_created is False
+    assert retry_id == a2_id
+    retried_index = load_persisted_decision_index(retried["decision_index"])
+    current = next(r for r in retried_index.records if r.decision_id == "dec-1")
+    assert current.version_id == c_id
+
+    versions = [
+        row for row in retried["decision_index"]["versions"]
+        if row["decision_id"] == "dec-1"
+    ]
+    assert len(versions) == 4
+    assert {row["version_id"] for row in versions} == {
+        a1.version_id, b_id, a2_id, c_id
+    }
+
+
+def test_g14_cross_id_supersession_is_not_version_lineage():
+    migrated = migrate_memory_document(_document())
+    migrated, created = append_initial_canonical_decision(
+        migrated,
+        decision_id="dec-2",
+        statement="Replace the JSON decision",
+        rationale="New architecture",
+        context_scope=("storage",),
+        lifecycle_status="active",
+        created_at="2026-10-04",
+        updated_at="2026-10-04",
+        occurrence_source_identity=("dec-2", "sha-2", "adr-import"),
+        source_evidence=[{
+            "source_type": "adr",
+            "source_locator": "../docs/adr/dec-2.md",
+            "source_revision": "sha-2",
+            "observed_at": "",
+            "verification_status": "",
+        }],
+    )
+    assert created is True
+    before = load_persisted_decision_index(migrated["decision_index"])
+    dec1_version = next(r.version_id for r in before.records if r.decision_id == "dec-1")
+    dec2_version = next(r.version_id for r in before.records if r.decision_id == "dec-2")
+
+    superseded, changed = apply_canonical_supersession(
+        migrated,
+        superseding_decision_id="dec-2",
+        target_decision_ids=("dec-1",),
+        updated_at="2026-10-04",
+    )
+    assert changed is True
+    index = load_persisted_decision_index(superseded["decision_index"])
+    dec1 = next(r for r in index.records if r.decision_id == "dec-1")
+    dec2 = next(r for r in index.records if r.decision_id == "dec-2")
+    assert dec1.lifecycle_status == "superseded"
+    assert dec1.version_id == dec1_version
+    assert dec2.version_id == dec2_version
+    assert dec2.relationships == (("supersedes", "dec-1"),)
+
+    version_by_id = {
+        row["version_id"]: row for row in superseded["decision_index"]["versions"]
+    }
+    assert version_by_id[dec2_version]["supersedes_version_id"] is None
+
+    rebuilt = rebuild_compatibility_snapshot(superseded)
+    runtime_ids = [d["id"] for d in rebuilt["decisions"]]
+    assert "dec-1" not in runtime_ids
+    assert "dec-2" in runtime_ids
 
 def test_identity_golden_vectors() -> None:
     digest = content_digest_of(
@@ -484,3 +722,149 @@ def test_non_active_decision_is_retained_canonically_not_runtime_snapshot() -> N
     record = next(r for r in index.records if r.decision_id == "dec-1")
     assert record.lifecycle_status == "superseded"
     assert "dec-1" not in {row["id"] for row in migrated["decisions"]}
+
+
+# ── ADR-030 R1: lifecycle conformance at migration (§12, §14 G16/G17 scope) ──
+
+
+_R1_TS = "2026-01-01T00:00:00Z"
+
+
+def _r1_decision(decision_id: str, statement: str, status: str, **extra) -> dict:
+    record = {
+        "id": decision_id,
+        "decision": statement,
+        "rationale": f"{decision_id} rationale",
+        "scope": ["messaging"],
+        "constraints": [],
+        "anti_patterns": [],
+        "created_at": _R1_TS,
+        "updated_at": _R1_TS,
+        "status": status,
+    }
+    record.update(extra)
+    return record
+
+
+def _r1_document() -> dict:
+    return {
+        "meta": {"name": "r1", "description": "lifecycle conformance"},
+        "items": [],
+        "examples": [],
+        "decisions": [
+            _r1_decision(
+                "D-ACTIVE", "Route messaging through the service bus", "active",
+                rules=[{"type": "FORBID_LITERAL", "value": "legacy_queue"}],
+            ),
+            _r1_decision(
+                "D-SUPERSEDED", "Route messaging through the retired client",
+                "superseded",
+                rules=[{"type": "FORBID_LITERAL", "value": "retired_client"}],
+            ),
+            _r1_decision(
+                "D-DEPRECATED", "Log messaging events to the old sink",
+                "deprecated",
+            ),
+            _r1_decision(
+                "D-INACTIVE", "Cache messaging lookups in a draft layer",
+                "inactive",
+            ),
+        ],
+    }
+
+
+def _r1_enforced_ids(decisions) -> set[str]:
+    from mneme.decision_retriever import DecisionRetriever
+    from mneme.enforcer import check_prompt
+
+    scored = DecisionRetriever(decisions).retrieve("messaging client queue")
+    result = check_prompt(
+        "send via legacy_queue and retired_client", scored, top=3
+    )
+    return {violation.decision_id for violation in result.violations}
+
+
+def test_r1_migration_removes_non_active_decisions_from_layer1(tmp_path):
+    """Active decisions keep exact parity; non-active ones leave Layer 1.
+
+    Pre-D1, the section-less loader returned every native decision whatever
+    its status, and runtime consumers do not filter by status, so a
+    superseded decision's typed rule was still enforced. Migration brings
+    this into conformance with ADR-023 §6 (only ``active`` projects).
+    """
+    from mneme.decision_retriever import DecisionRetriever
+    from mneme.enforcer import generate_protection_report
+
+    path = tmp_path / "project_memory.json"
+    path.write_text(json.dumps(_r1_document(), indent=2), encoding="utf-8")
+
+    pre = MemoryStore(path)
+    pre.load()
+    pre_decisions = pre.decisions()
+    assert [d.id for d in pre_decisions] == [
+        "D-ACTIVE", "D-SUPERSEDED", "D-DEPRECATED", "D-INACTIVE",
+    ]
+    # Documents the pre-D1 behaviour being corrected.
+    assert _r1_enforced_ids(pre_decisions) == {"D-ACTIVE", "D-SUPERSEDED"}
+    pre_report = generate_protection_report(pre_decisions)
+
+    assert migrate_memory_file(path) is True
+
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    lifecycle = {
+        row["decision_id"]: row["lifecycle_status"]
+        for row in raw["decision_index"]["decisions"]
+    }
+    # Retained canonically with lifecycle preserved ...
+    assert lifecycle == {
+        "D-ACTIVE": "active",
+        "D-SUPERSEDED": "superseded",
+        "D-DEPRECATED": "deprecated",
+        "D-INACTIVE": "inactive",
+    }
+    superseded_rules = [
+        row for row in raw["decision_index"]["rules"]
+        if row["decision_id"] == "D-SUPERSEDED"
+    ]
+    assert [row["rule_payload"] for row in superseded_rules] == [
+        {"value": "retired_client"}
+    ]
+    # ... but absent from the derived compatibility snapshot.
+    assert [row["id"] for row in raw["decisions"]] == ["D-ACTIVE"]
+
+    post = MemoryStore(path)
+    post.load()
+    post_decisions = post.decisions()
+
+    # Projection: exact runtime parity for the active decision only.
+    assert post_decisions == [pre_decisions[0]]
+
+    # Retrieval: non-active decisions are no longer candidates.
+    post_retrieved = {
+        scored.decision.id
+        for scored in DecisionRetriever(post_decisions).retrieve(
+            "messaging client queue"
+        )
+    }
+    assert post_retrieved <= {"D-ACTIVE"}
+
+    # Enforcement: the superseded decision's typed rule no longer fires.
+    assert _r1_enforced_ids(post_decisions) == {"D-ACTIVE"}
+
+    # Audit: the decision set and total drop non-active entries; tier
+    # percentages, already computed over active decisions, are unchanged.
+    post_report = generate_protection_report(post_decisions)
+    assert pre_report.total_decisions == 4
+    assert post_report.total_decisions == 1
+    assert [d.id for d in post_report.decisions] == ["D-ACTIVE"]
+    for field in (
+        "protection_relevant",
+        "protected",
+        "mneme_ready",
+        "requires_modelling",
+        "guidance",
+        "current_protection_pct",
+        "identified_mneme_potential_pct",
+        "protection_gap_pct",
+    ):
+        assert getattr(post_report, field) == getattr(pre_report, field), field

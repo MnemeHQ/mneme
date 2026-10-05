@@ -11,6 +11,8 @@ may still be schema-invalid; that is a deliberate separation of concerns.
 
 from __future__ import annotations
 
+import hashlib
+import io
 from pathlib import Path
 
 import yaml
@@ -39,9 +41,15 @@ def parse_adr_file(path: str | Path) -> ADR:
                            the frontmatter is not parseable as YAML.
     """
     path = Path(path)
-    text = path.read_text(encoding="utf-8")
+    # Read the bytes once: the parsed content and its source hash must come
+    # from the same read (ADR-030 §10). Decoding through TextIOWrapper keeps
+    # the exact ``read_text`` semantics, including universal newlines.
+    data = path.read_bytes()
+    text = io.TextIOWrapper(io.BytesIO(data), encoding="utf-8").read()
     metadata, body = _split_frontmatter(text, path)
-    return _build_adr(metadata, body, path)
+    adr = _build_adr(metadata, body, path)
+    adr.source_sha256 = hashlib.sha256(data).hexdigest()
+    return adr
 
 
 def parse_adr_directory(directory: str | Path) -> list[ADR]:

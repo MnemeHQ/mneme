@@ -3,9 +3,13 @@
 Once the top-level ``decision_index`` section exists, the merged D1B/D1C
 loader treats it as the durable decision authority and ``decisions[]`` as a
 derived compatibility snapshot. The remaining legacy writers (``add_decision``,
-protection activation, ``adr import --apply``, ``eventcatalog import
---apply``) must refuse such files before any mutation, leave them
-byte-identical, and keep section-less legacy files behaving as before.
+protection activation, ``eventcatalog import --apply``) must refuse such
+files before any mutation, leave them byte-identical, and keep section-less
+legacy files behaving as before.
+
+``adr import --apply`` is no longer a legacy writer: since D1D it is a
+canonical authority writer, and its contract is pinned in
+``tests/test_adr_import.py``.
 """
 from __future__ import annotations
 
@@ -14,8 +18,6 @@ from pathlib import Path
 
 import pytest
 
-from mneme.adr_import import apply_import as adr_apply_import
-from mneme.adr_import import compile_for_import as adr_compile_for_import
 from mneme.cli import main
 from mneme.decision_index_persistence import (
     LegacyDecisionsWriteRefused,
@@ -28,7 +30,6 @@ from mneme.memory_store import MemoryStore
 from mneme.protection import ProtectionError, activate_protection
 
 FIXTURES = Path(__file__).parent / "fixtures"
-ADR_CORPUS = FIXTURES / "adrs_import_basic"
 EC_FIXTURES = FIXTURES / "eventcatalog_import"
 
 BASE_TS = "2026-01-01T00:00:00Z"
@@ -212,50 +213,6 @@ def test_protection_on_legacy_memory_is_unchanged(tmp_path):
         {"type": "FORBID_LITERAL", "value": "postgres"}
     ]
     assert raw["activation"]["state"] == "active"
-
-
-# ── adr import --apply ───────────────────────────────────────────────────────
-
-
-def test_adr_import_apply_refuses_canonical_memory(tmp_path):
-    memory = _canonical_memory(tmp_path / "project_memory.json")
-    before = memory.read_bytes()
-
-    with pytest.raises(RuntimeError) as excinfo:
-        adr_apply_import(adr_compile_for_import(ADR_CORPUS), target_path=memory)
-
-    assert "mneme adr import --apply" in str(excinfo.value)
-    assert REFUSAL_TEXT in str(excinfo.value)
-    _assert_refused_unchanged(memory, before)
-
-
-def test_adr_import_apply_cli_refuses_canonical_memory(tmp_path, capsys):
-    memory = _canonical_memory(tmp_path / "project_memory.json")
-    before = memory.read_bytes()
-
-    code = main([
-        "adr", "import", str(ADR_CORPUS),
-        "--memory", str(memory), "--apply",
-    ])
-    captured = capsys.readouterr()
-
-    assert code == 2
-    assert REFUSAL_TEXT in captured.err
-    assert "Wrote" not in captured.out
-    _assert_refused_unchanged(memory, before)
-
-
-def test_adr_import_apply_on_legacy_memory_is_unchanged(tmp_path):
-    memory = _write_memory(tmp_path / "project_memory.json")
-
-    written = adr_apply_import(
-        adr_compile_for_import(ADR_CORPUS), target_path=memory
-    )
-
-    assert written
-    raw = json.loads(memory.read_text(encoding="utf-8"))
-    assert "decision_index" not in raw
-    assert [d["id"] for d in raw["decisions"]] == written
 
 
 # ── eventcatalog import --apply ──────────────────────────────────────────────

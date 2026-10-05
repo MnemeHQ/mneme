@@ -129,10 +129,11 @@ class ImportDiagnostic:
 class ImportReport:
     """Output of `compile_for_import`.
 
-    ``adr_sources_by_id`` carries the on-disk path of each active ADR so
-    ``apply_import`` can persist a provenance block (path + sha256) on
-    each written decision. Decisions that lack a matching entry get no
-    ``source`` block (e.g. legacy callers constructing reports by hand).
+    ``adr_sources_by_id`` carries active-source paths for preview and
+    persistence compatibility; ``parsed_adrs`` retains the validated corpus
+    used by D1D canonical writes. ``apply_import`` requires that validated
+    corpus when decisions are written, so callers cannot fabricate new
+    canonical ADR authority by constructing an ``ImportReport`` by hand.
 
     ``skipped_scopes`` maps each scope excluded by an unresolvable
     active-active tie to the sorted ids that tied there. No ADR from a
@@ -145,6 +146,7 @@ class ImportReport:
     diagnostics: list[ImportDiagnostic]
     adr_sources_by_id: dict[str, str] = field(default_factory=dict)
     skipped_scopes: dict[str, list[str]] = field(default_factory=dict)
+    parsed_adrs: list[ADR] = field(default_factory=list)
 
 
 def _has_mechanically_enforceable_rule(decision: Decision) -> bool:
@@ -218,6 +220,7 @@ def compile_for_import(adr_dir: str | Path) -> ImportReport:
         diagnostics=diagnostics,
         adr_sources_by_id=adr_sources_by_id,
         skipped_scopes=skipped_scopes,
+        parsed_adrs=adrs,
     )
 
 
@@ -225,45 +228,64 @@ def detect_collisions(
     incoming: list[DecisionNode],
     target_memory: dict[str, Any],
 ) -> list[ImportDiagnostic]:
-    """Return diagnostics for incoming ids that already exist in the target memory.
-
-    MVP: same-id collisions only.
-    """
-    existing_in_decisions = {
-        d.get("id"): "decisions" for d in target_memory.get("decisions", [])
-    }
+    """Return same-id diagnostics against canonical or legacy authority."""
+    section = target_memory.get("decision_index")
+    active_version_by_id: dict[str, str] = {}
+    if isinstance(section, dict):
+        existing_in_decisions = {
+            row.get("decision_id"): "decision_index"
+            for row in section.get("decisions", [])
+            if isinstance(row, dict)
+        }
+        active_version_by_id = {
+            row.get("decision_id"): row.get("active_version_id")
+            for row in section.get("decisions", [])
+            if isinstance(row, dict)
+            and isinstance(row.get("active_version_id"), str)
+        }
+    else:
+        existing_in_decisions = {
+            row.get("id"): "decisions"
+            for row in target_memory.get("decisions", [])
+            if isinstance(row, dict)
+        }
     existing_in_items = {
-        i.get("id"): "items" for i in target_memory.get("items", [])
+        row.get("id"): "items"
+        for row in target_memory.get("items", [])
+        if isinstance(row, dict)
     }
 
     out: list[ImportDiagnostic] = []
     for node in incoming:
-        if node.id in existing_in_decisions:
-            out.append(ImportDiagnostic(
-                kind="same_id",
-                adr_id=node.id,
-                existing_in="decisions",
-                message=(
-                    f"{node.id} already exists in target memory under "
-                    f"decisions[]. Pass --update-existing to overwrite, "
-                    f"or rename the incoming ADR."
-                ),
-            ))
-        elif node.id in existing_in_items:
+        if node.id in existing_in_items:
             out.append(ImportDiagnostic(
                 kind="same_id",
                 adr_id=node.id,
                 existing_in="items",
                 message=(
-                    f"{node.id} already exists in target memory under "
-                    f"items[] (legacy rule/anti_pattern slot). Imported "
-                    f"ADRs land in decisions[]; renaming the incoming "
-                    f"ADR is the safest path. --update-existing will "
-                    f"refuse to migrate across sections."
+                    f"{node.id} already exists in target memory under items[]. "
+                    "ADR authority must not silently replace a legacy item identity."
                 ),
             ))
+        elif node.id in existing_in_decisions:
+            message = (
+                f"{node.id} already exists in canonical decision authority. "
+                "Pass --update-existing to create or reuse an immutable "
+                "version occurrence, or rename the incoming ADR."
+            )
+            current = active_version_by_id.get(node.id)
+            if current:
+                # The persisted active pointer as of this read. An operator
+                # who later needs to retry this exact apply pins it with
+                # --expected-predecessor; reading it creates no identity.
+                message += f" current predecessor: {current}"
+            out.append(ImportDiagnostic(
+                kind="same_id",
+                adr_id=node.id,
+                existing_in=existing_in_decisions[node.id],
+                message=message,
+            ))
     return out
-
 
 def format_preview(
     report: ImportReport,
@@ -361,32 +383,23 @@ def apply_import(
     target_path: str | Path,
     allow_update: bool = False,
     approve_conflicts: bool = False,
+    expected_predecessor_version_ids: dict[str, str] | None = None,
 ) -> list[str]:
-    """Write imported Decisions into ``target_path``'s ``decisions[]``.
-
-    Same-id collisions: if ``allow_update`` is False and any incoming
-    Decision id already exists in ``decisions[]`` of the target, raises
-    RuntimeError. If True, the colliding entry is replaced in place
-    (preserving its position in the array).
-
-    Active-active contradictions: if the report carries an unresolved
-    contradiction diagnostic and ``approve_conflicts`` is False, raises
-    RuntimeError. With ``approve_conflicts`` True, the report's decisions
-    (every non-conflicting scope) are written and the conflicting scopes
-    in ``report.skipped_scopes`` are left out.
-
-    Atomic: writes to a sibling tempfile and os.replace()s into place.
-
-    Returns the list of ids actually written, in input order.
-    """
-    from mneme.adr_freshness import compute_source_hash, relative_source_path
+    """Apply ADR authority to the canonical Decision Index (D1D)."""
+    from mneme.adr_freshness import relative_source_path
     from mneme.decision_index_persistence import (
-        LegacyDecisionsWriteRefused,
-        refuse_legacy_decisions_write,
+        DecisionIndexPersistenceError,
+        apply_canonical_supersession,
+        append_canonical_version_occurrence,
+        append_initial_canonical_decision,
+        content_digest_of,
+        load_persisted_decision_index,
+        migrate_memory_document,
+        rebuild_compatibility_snapshot,
+        verify_compatibility_snapshot,
     )
 
     target_path = Path(target_path)
-
     has_active_active = any(
         d.kind == "active_active_contradiction" for d in report.diagnostics
     )
@@ -398,50 +411,304 @@ def apply_import(
             "ones, or fix the contradicting ADRs."
         )
 
-    raw = _json.loads(target_path.read_text(encoding="utf-8"))
+    if report.decisions and not report.parsed_adrs:
+        raise RuntimeError(
+            "ADR import refused: canonical ADR authority requires an "
+            "ImportReport produced by compile_for_import so source provenance "
+            "and occurrence identity are validated."
+        )
+
+    # ADR import is a canonical authority writer (ADR-030 §1), not a legacy
+    # decisions[] writer, so the legacy-writer containment guard does not
+    # apply: it validates canonical state before any write, mutates only
+    # decision_index, re-derives decisions[] from it, verifies snapshot
+    # parity, and replaces the file atomically.
     try:
-        refuse_legacy_decisions_write(raw, operation="mneme adr import --apply")
-    except LegacyDecisionsWriteRefused as exc:
-        raise RuntimeError(f"ADR import refused: {exc}") from exc
-    raw.setdefault("decisions", [])
-    existing_idx = {d.get("id"): i for i, d in enumerate(raw["decisions"])}
-
-    written_ids: list[str] = []
-    for decision in report.decisions:
-        entry = {
-            "id": decision.id,
-            "decision": decision.decision,
-            "rationale": decision.rationale,
-            "scope": list(decision.scope),
-            "constraints": list(decision.constraints),
-            "anti_patterns": list(decision.anti_patterns),
-            "rules": [_serialize_rule(rule) for rule in decision.rules],
-            "created_at": decision.created_at,
-            "updated_at": decision.updated_at,
-        }
-        source_path = report.adr_sources_by_id.get(decision.id)
-        if source_path:
-            entry["source"] = {
-                "type": "adr",
-                "path": relative_source_path(source_path, target_path),
-                "sha256": compute_source_hash(source_path),
-            }
-        if decision.id in existing_idx:
-            if not allow_update:
-                raise RuntimeError(
-                    f"ADR import refused: id {decision.id!r} already exists "
-                    f"in target memory decisions[]. Pass --update-existing to "
-                    f"overwrite, or rename the incoming ADR."
-                )
-            raw["decisions"][existing_idx[decision.id]] = entry
+        raw = _json.loads(target_path.read_text(encoding="utf-8"))
+        if not isinstance(raw, dict):
+            raise DecisionIndexPersistenceError("project memory must be an object")
+        if "decision_index" in raw:
+            initial_index = load_persisted_decision_index(raw["decision_index"])
+            verify_compatibility_snapshot(raw, initial_index, target_path)
+            working = migrate_memory_document(raw)
         else:
-            raw["decisions"].append(entry)
-        written_ids.append(decision.id)
+            working = migrate_memory_document(raw)
+            initial_index = load_persisted_decision_index(
+                working["decision_index"]
+            )
+    except (OSError, ValueError, TypeError) as exc:
+        raise RuntimeError(
+            f"ADR import refused: target memory is not valid canonical state: {exc}"
+        ) from exc
 
-    # Atomic write: tempfile in the same directory, then os.replace().
-    serialized = _json.dumps(raw, indent=2) + "\n"
+    initial_records_by_id = {
+        record.decision_id: record for record in initial_index.records
+    }
+    initial_existing_ids = set(initial_records_by_id)
+    # ADR-030 §5: an unpinned apply is a new authority operation whose
+    # predecessor is the active version when it starts. A late retry of an
+    # earlier operation must carry that operation's predecessor explicitly;
+    # the pin is never re-derived from the current active pointer.
+    pinned_predecessors = dict(expected_predecessor_version_ids or {})
+    operation_predecessors = {
+        decision_id: record.version_id
+        for decision_id, record in initial_records_by_id.items()
+    }
+    if pinned_predecessors:
+        if not allow_update:
+            raise RuntimeError(
+                "ADR import refused: an expected predecessor applies only to "
+                "same-id version evolution; pass --update-existing."
+            )
+        incoming_ids = {decision.id for decision in report.decisions}
+        persisted_versions = {
+            row.get("version_id"): row.get("decision_id")
+            for row in working["decision_index"].get("versions", [])
+            if isinstance(row, dict)
+        }
+        for decision_id, version_id in sorted(pinned_predecessors.items()):
+            if decision_id not in incoming_ids:
+                raise RuntimeError(
+                    f"ADR import refused: expected predecessor names "
+                    f"{decision_id!r}, which is not an incoming active ADR."
+                )
+            if decision_id not in initial_records_by_id:
+                raise RuntimeError(
+                    f"ADR import refused: expected predecessor names "
+                    f"{decision_id!r}, which is not yet canonical; a new "
+                    "decision has no predecessor to pin."
+                )
+            if persisted_versions.get(version_id) != decision_id:
+                raise RuntimeError(
+                    f"ADR import refused: expected predecessor {version_id!r} "
+                    f"is not a persisted version of {decision_id!r}."
+                )
+        operation_predecessors.update(pinned_predecessors)
+    item_ids = {
+        item.get("id")
+        for item in working.get("items", [])
+        if isinstance(item, dict)
+    }
+    active_ids = {decision.id for decision in report.decisions}
+    active_nodes_by_id = {node.id: node for node in report.active_nodes}
+    all_nodes_by_id = {node.id: node for node in report.all_nodes}
+
+    for decision_id in active_ids:
+        if decision_id in item_ids:
+            raise RuntimeError(
+                f"ADR import refused: id {decision_id!r} exists in items[]; "
+                "--update-existing cannot migrate identity across sections."
+            )
+        if decision_id in initial_existing_ids and not allow_update:
+            raise RuntimeError(
+                f"ADR import refused: id {decision_id!r} already exists in "
+                "canonical decision authority. Pass --update-existing to "
+                "create or reuse an immutable version occurrence, or rename "
+                "the incoming ADR."
+            )
+
+    plans: list[tuple[Decision, str, list[str], str]] = []
+    source_revision_by_id: dict[str, str] = {}
+    decision_by_id = {
+        decision.id: decision
+        for decision in adrs_to_decisions(report.parsed_adrs)
+    }
+    for adr in report.parsed_adrs:
+        if adr.scope in report.skipped_scopes:
+            continue
+        decision = decision_by_id[adr.id]
+        node = all_nodes_by_id.get(adr.id)
+        if node is None:
+            continue
+        if adr.id in active_ids:
+            lifecycle = "active"
+        else:
+            lifecycle = node.status
+            if lifecycle == "active":
+                lifecycle = "inactive"
+        source_path = (
+            report.adr_sources_by_id.get(adr.id)
+            or decision.source_path
+        )
+        if not source_path:
+            raise RuntimeError(
+                f"ADR import refused: {adr.id!r} has no validated source path"
+            )
+        if not adr.source_sha256:
+            raise RuntimeError(
+                f"ADR import refused: {adr.id!r} has no parsed-source "
+                "revision; canonical ADR authority requires the hash of the "
+                "exact bytes its content was parsed from"
+            )
+        source_revision_by_id[adr.id] = adr.source_sha256
+        plans.append((
+            decision,
+            lifecycle,
+            list(node.supersedes),
+            source_path,
+        ))
+
+    plan_by_id = {
+        decision.id: (decision, lifecycle, supersedes, source_path)
+        for decision, lifecycle, supersedes, source_path in plans
+    }
+    explicit_supersession_targets = {
+        target
+        for node in report.active_nodes
+        for target in node.supersedes
+    }
+    for decision, planned_lifecycle, _, _ in plans:
+        existing = initial_records_by_id.get(decision.id)
+        if existing is None or existing.lifecycle_status == planned_lifecycle:
+            continue
+        if (
+            planned_lifecycle == "superseded"
+            and decision.id in explicit_supersession_targets
+        ):
+            continue
+        raise RuntimeError(
+            f"ADR import refused: decision {decision.id!r} would change "
+            f"lifecycle from {existing.lifecycle_status!r} to "
+            f"{planned_lifecycle!r} without an explicit active supersedes "
+            "relationship. General lifecycle editing is D1E."
+        )
+
+    def source_contract(
+        decision: Decision, source_path: str
+    ) -> tuple[list[object], list[dict[str, object]]]:
+        # The revision of the bytes the content was parsed from, never a
+        # fresh read of the file at write time (ADR-030 §10).
+        source_revision = source_revision_by_id[decision.id]
+        locator = relative_source_path(source_path, target_path)
+        return (
+            [decision.id, source_revision, "adr-import"],
+            [{
+                "source_type": "adr",
+                "source_locator": locator,
+                "source_revision": source_revision,
+                "observed_at": "",
+                "verification_status": "",
+            }],
+        )
+
+    current_index = load_persisted_decision_index(working["decision_index"])
+    current_ids = {record.decision_id for record in current_index.records}
+    for decision, lifecycle, supersedes, source_path in plans:
+        if decision.id in current_ids:
+            continue
+        if decision.id in item_ids:
+            raise RuntimeError(
+                f"ADR import refused: id {decision.id!r} exists in items[]; "
+                "canonical ADR identity cannot replace it."
+            )
+        occurrence_identity, evidence = source_contract(decision, source_path)
+        working, created = append_initial_canonical_decision(
+            working,
+            decision_id=decision.id,
+            statement=decision.decision,
+            rationale=decision.rationale,
+            context_scope=decision.scope,
+            lifecycle_status=lifecycle,
+            created_at=decision.created_at,
+            updated_at=decision.updated_at,
+            occurrence_source_identity=occurrence_identity,
+            source_evidence=evidence,
+            constraints=decision.constraints,
+            anti_patterns=decision.anti_patterns,
+            rules=decision.rules,
+            relationships=[
+                {"type": "supersedes", "target_decision_id": target}
+                for target in supersedes
+            ],
+        )
+        if created:
+            current_ids.add(decision.id)
+
+    for decision in report.decisions:
+        if decision.id not in initial_existing_ids:
+            continue
+        current_index = load_persisted_decision_index(working["decision_index"])
+        record = next(
+            rec for rec in current_index.records if rec.decision_id == decision.id
+        )
+        if record.lifecycle_status != "active":
+            raise RuntimeError(
+                f"ADR import refused: existing decision {decision.id!r} has "
+                f"lifecycle {record.lifecycle_status!r}; general lifecycle "
+                "editing is outside D1D."
+            )
+        _, _, _, source_path = plan_by_id[decision.id]
+        occurrence_identity, evidence = source_contract(decision, source_path)
+        incoming_digest = content_digest_of(
+            decision.decision,
+            decision.rationale,
+            decision.scope,
+            decision.constraints,
+            decision.anti_patterns,
+        )
+        # Unchanged content and source on top of the active version is a
+        # no-op. A pin naming an older version is a late retry, decided only
+        # by its exact occurrence key (reuse if persisted anywhere in
+        # history, otherwise stale), never by comparison with the active one.
+        if (
+            pinned_predecessors.get(decision.id, record.version_id)
+            == record.version_id
+            and record.content_digest == incoming_digest
+            and record.occurrence_source_identity == tuple(occurrence_identity)
+        ):
+            continue
+        try:
+            working, _, _ = append_canonical_version_occurrence(
+                working,
+                decision_id=decision.id,
+                predecessor_version_id=operation_predecessors[decision.id],
+                statement=decision.decision,
+                rationale=decision.rationale,
+                context_scope=decision.scope,
+                constraints=decision.constraints,
+                anti_patterns=decision.anti_patterns,
+                rules=decision.rules,
+                created_at=decision.created_at,
+                updated_at=decision.updated_at,
+                occurrence_source_identity=occurrence_identity,
+                source_evidence=evidence,
+            )
+        except DecisionIndexPersistenceError as exc:
+            raise RuntimeError(
+                f"ADR import refused while evolving {decision.id!r}: {exc}"
+            ) from exc
+
+    for node in report.active_nodes:
+        if node.id not in plan_by_id:
+            continue
+        decision = plan_by_id[node.id][0]
+        try:
+            working, _ = apply_canonical_supersession(
+                working,
+                superseding_decision_id=node.id,
+                target_decision_ids=node.supersedes,
+                updated_at=decision.updated_at,
+            )
+        except DecisionIndexPersistenceError as exc:
+            raise RuntimeError(
+                f"ADR import refused while applying supersession from "
+                f"{node.id!r}: {exc}"
+            ) from exc
+
+    try:
+        working = rebuild_compatibility_snapshot(working)
+        final_index = load_persisted_decision_index(working["decision_index"])
+        verify_compatibility_snapshot(working, final_index, target_path)
+    except DecisionIndexPersistenceError as exc:
+        raise RuntimeError(
+            f"ADR import refused: canonical post-write verification failed: {exc}"
+        ) from exc
+
+    serialized = _json.dumps(working, indent=2) + "\n"
     fd, tmp = tempfile.mkstemp(
-        prefix=target_path.name + ".", suffix=".tmp", dir=str(target_path.parent)
+        prefix=target_path.name + ".",
+        suffix=".tmp",
+        dir=str(target_path.parent),
     )
     try:
         with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as f:
@@ -451,15 +718,14 @@ def apply_import(
         try:
             os.close(fd)
         except OSError:
-            pass  # already closed by os.fdopen's context manager
+            pass
         try:
             os.unlink(tmp)
         except OSError:
             pass
         raise
 
-    return written_ids
-
+    return [decision.id for decision in report.decisions]
 
 __all__ = [
     "DecisionNode",

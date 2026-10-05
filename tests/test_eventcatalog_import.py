@@ -224,6 +224,31 @@ def test_repeated_import_deterministic(tmp_path):
     assert len(persisted["decisions"]) == 1
 
 
+def test_apply_import_refuses_to_mutate_canonical_compatibility_snapshot(
+    tmp_path,
+):
+    from mneme.decision_index_persistence import migrate_memory_document
+
+    report = compile_for_import(FIXTURES / "index.json", FIXTURES)
+    target = tmp_path / "project_memory.json"
+    document = migrate_memory_document({
+        "items": [],
+        "examples": [],
+        "decisions": [],
+    })
+    target.write_text(json.dumps(document, indent=2) + "\n", encoding="utf-8")
+    before = target.read_bytes()
+
+    with pytest.raises(RuntimeError, match=r"legacy decisions\[\] writer"):
+        apply_import(
+            report,
+            target_path=target,
+            catalog_root=FIXTURES,
+            allow_update=True,
+        )
+    assert target.read_bytes() == before
+
+
 def test_malformed_index_raises():
     """Malformed index should raise."""
     bad_index = FIXTURES / "bad_index.json"

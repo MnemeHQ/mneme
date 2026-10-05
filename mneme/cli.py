@@ -40,6 +40,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -873,6 +874,9 @@ def _cmd_benchmark(args: argparse.Namespace) -> int:
 
 # ── Subcommand: adr import ───────────────────────────────────────────────────
 
+_EXPECTED_PREDECESSOR_RE = re.compile(r"(ADR-\d+)=(dver-[0-9a-f]{32})")
+
+
 def _cmd_adr_import(args: argparse.Namespace) -> int:
     """Import ADRs from a directory into target memory.
 
@@ -896,6 +900,25 @@ def _cmd_adr_import(args: argparse.Namespace) -> int:
         print(f"ERROR: memory file {target_path} does not exist", file=sys.stderr, flush=True)
         return 2
 
+    expected_predecessors: dict[str, str] = {}
+    for raw_pin in args.expected_predecessor or []:
+        match = _EXPECTED_PREDECESSOR_RE.fullmatch(raw_pin)
+        if match is None:
+            return _error_exit(
+                f"--expected-predecessor {raw_pin!r} must be "
+                "ADR-ID=dver-<32 hex> (for example ADR-012=dver-0123...)"
+            )
+        decision_id, version_id = match.groups()
+        if decision_id in expected_predecessors:
+            return _error_exit(
+                f"--expected-predecessor names {decision_id} more than once"
+            )
+        expected_predecessors[decision_id] = version_id
+    if expected_predecessors and not (args.apply and args.update_existing):
+        return _error_exit(
+            "--expected-predecessor is valid only with --apply --update-existing"
+        )
+
     report = compile_for_import(adr_dir)
     target_memory = json.loads(target_path.read_text(encoding="utf-8"))
     collisions = detect_collisions(report.active_nodes, target_memory)
@@ -909,6 +932,7 @@ def _cmd_adr_import(args: argparse.Namespace) -> int:
                 target_path=target_path,
                 allow_update=args.update_existing,
                 approve_conflicts=args.approve_conflicts,
+                expected_predecessor_version_ids=expected_predecessors or None,
             )
         except RuntimeError as exc:
             print(f"ERROR: {exc}", file=sys.stderr, flush=True)
@@ -1772,7 +1796,19 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p_adr_import.add_argument(
         "--update-existing", action="store_true",
-        help="Allow same-id overwrite of existing decisions[] entries",
+        help="Create or reuse an immutable canonical version for a same-id decision",
+    )
+    p_adr_import.add_argument(
+        "--expected-predecessor", action="append", default=None,
+        dest="expected_predecessor", metavar="ADR-ID=VERSION_ID",
+        help=(
+            "Retry an earlier --update-existing apply: pin the version_id that "
+            "was active when it ran (shown as 'current predecessor' in the "
+            "preview). Repeatable, once per ADR. Reuses the exact persisted "
+            "occurrence if it exists, creates it if the pinned version is "
+            "still active, and otherwise fails as stale. Requires --apply "
+            "and --update-existing."
+        ),
     )
     p_adr_import.add_argument(
         "--approve-conflicts", action="store_true",
@@ -1788,7 +1824,9 @@ def _build_parser() -> argparse.ArgumentParser:
     ec_sub = p_ec.add_subparsers(dest="ec_cmd", required=True)
 
     p_ec_import = ec_sub.add_parser(
-        "import", help="Import ADRs from an EventCatalog index into project memory"
+        "import", help=("Import retrieval-only ADRs from an EventCatalog index; "
+                       "canonical decision_index targets fail closed until an "
+                       "EventCatalog provenance contract is defined")
     )
     p_ec_import.add_argument(
         "--index", required=True, help="Path to EventCatalog index JSON (from buildIndex)"
@@ -1806,11 +1844,17 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     grp.add_argument(
         "--apply", action="store_true",
-        help="Write imported decisions to --memory after preview",
+        help=(
+            "Write imported decisions only when --memory is legacy sectionless "
+            "memory; canonical decision_index targets fail closed"
+        ),
     )
     p_ec_import.add_argument(
         "--update-existing", action="store_true",
-        help="Allow same-id overwrite of existing decisions[] entries",
+        help=(
+            "Allow same-id overwrite only in legacy sectionless decisions[]; "
+            "canonical decision_index targets fail closed"
+        ),
     )
     p_ec_import.set_defaults(func=_cmd_eventcatalog_import)
 
