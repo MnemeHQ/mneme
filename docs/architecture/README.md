@@ -101,11 +101,14 @@ and future architecture contracts.
   does not receive authority to accept, reject, activate, supersede, bypass, or
   create trusted evidence.
 - [ADR-030](../adr/ADR-030-canonical-decision-persistence-version-identity-and-stable-rule-lineage.md)
-  is currently **proposed**, not accepted. Separately reviewed D1B and D1C
-  implementation slices operationalize its persistence and unified-read
-  foundations without treating the whole ADR as accepted: accepted proposals
-  write the persisted Decision Index, Decision MCP reads that same index, and
-  `decisions[]` remains a compatibility snapshot. D1D-D1F remain target work.
+  is **accepted** as the governing persistence, version-identity, and
+  rule-lineage architecture, after reconciliation against the merged D1B/D1C
+  slices. Accepted proposals write the persisted Decision Index, Decision MCP
+  reads that same index, and `decisions[]` is a fail-closed compatibility
+  snapshot that legacy writers may not mutate. Only `active` decisions
+  project into Layer 1 (ADR-023 §6), so migration ends Layer 1 participation
+  for legacy non-active decisions. Acceptance is not completion: D1D-D1F
+  remain open implementation work, and the ADR's release gate applies.
 - [ADR-025](../adr/ADR-025-trusted-test-execution-attestation.md) is also
   **proposed**. Trusted test-execution attestation remains reserved/deferred.
 
@@ -270,9 +273,9 @@ flowchart LR
 
 The arrows describe responsibility and data flow at an architectural level.
 D1B/D1C establish the persisted canonical/read boundary for accepted proposals
-and MCP reads, while ADR-030 remains proposed as the broader target contract.
-ADR import/version evolution, remaining lifecycle/protection writers, and
-eventual compatibility-snapshot removal remain later D1 slices.
+and MCP reads under accepted ADR-030. ADR import/version evolution (D1D),
+remaining lifecycle/protection writers and the migration entry point (D1E),
+and eventual compatibility-snapshot removal (D1F) remain later D1 slices.
 
 # Research boundary — O1A Open Architecture
 
@@ -321,14 +324,14 @@ minimum reading set for understanding the current runtime architecture.
 | [ADR-027](../adr/ADR-027-decision-mcp-proposal-ingestion-and-authority-boundary.md) | Accepted | Why MCP producers can propose/read but cannot exercise decision authority. |
 | [ADR-028](../adr/ADR-028-public-decision-intent-assessment.md) | Accepted | Public API semantics for classifying decision intent. |
 | [ADR-029](../adr/ADR-029-enforcement-evidence-binding-semantics.md) | Accepted | How enforcement evidence binds to governed decisions without requiring runtime observation. |
-| [ADR-030](../adr/ADR-030-canonical-decision-persistence-version-identity-and-stable-rule-lineage.md) | Proposed | Target persistence, version identity, and stable rule lineage for the canonical index. |
+| [ADR-030](../adr/ADR-030-canonical-decision-persistence-version-identity-and-stable-rule-lineage.md) | Accepted | Persistence, version identity, and stable rule lineage for the canonical index. |
 
 ## Suggested reading paths
 
 **To understand enforcement:** ADR-017 -> ADR-018 -> ADR-019 -> ADR-020 -> ADR-021.
 
-**To understand the Decision Index and MCP:** ADR-023 -> ADR-027 -> ADR-029,
-then read proposed ADR-030 as target architecture.
+**To understand the Decision Index and MCP:** ADR-023 -> ADR-027 -> ADR-029
+-> ADR-030.
 
 **To understand Audit evidence:** ADR-024 -> ADR-026 -> ADR-028 -> ADR-029.
 Read proposed ADR-025 only for the deferred trusted-attestation direction.
