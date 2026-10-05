@@ -239,7 +239,7 @@ def test_apply_import_refuses_to_mutate_canonical_compatibility_snapshot(
     target.write_text(json.dumps(document, indent=2) + "\n", encoding="utf-8")
     before = target.read_bytes()
 
-    with pytest.raises(RuntimeError, match="canonical decision_index is authoritative"):
+    with pytest.raises(RuntimeError, match=r"legacy decisions\[\] writer"):
         apply_import(
             report,
             target_path=target,

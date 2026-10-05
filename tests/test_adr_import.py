@@ -819,3 +819,129 @@ def test_r5_source_revision_binds_to_parsed_bytes_not_disk_at_apply(tmp_path):
         if row["decision_id"] == "ADR-530"
     ]
     assert rule["rule_payload"] == {"value": "alpha"}
+
+
+# ── D1D canonical-writer contract (replaces #444's ADR-import containment) ───
+#
+# Since D1D, ADR import is a canonical authority writer, not a legacy
+# decisions[] writer, so the #444 legacy-writer guard no longer applies to it.
+# These tests pin the contract that replaced it (ADR-030 §1).
+
+_NATIVE_DECISION = {
+    "id": "D-NATIVE",
+    "decision": "Keep the native decision",
+    "rationale": "pre-existing",
+    "scope": ["general"],
+    "constraints": [],
+    "anti_patterns": [],
+    "rules": [{"type": "FORBID_LITERAL", "value": "native_literal"}],
+    "created_at": "2026-01-01T00:00:00Z",
+    "updated_at": "2026-01-01T00:00:00Z",
+}
+
+
+def _contract_memory(path: Path) -> Path:
+    path.write_text(json.dumps({
+        "meta": {"name": "x", "description": "x"},
+        "items": [],
+        "examples": [],
+        "decisions": [dict(_NATIVE_DECISION)],
+    }, indent=2) + "\n", encoding="utf-8")
+    return path
+
+
+def _contract_corpus(tmp_path: Path) -> Path:
+    adr_dir = tmp_path / "adrs"
+    adr_dir.mkdir()
+    _write_adr(
+        adr_dir,
+        "ADR-540",
+        "storage",
+        body="## Constraints\n\n- FORBID_LITERAL: contract_literal\n",
+    )
+    return adr_dir
+
+
+def _assert_snapshot_derived_from_canonical(path: Path) -> dict:
+    from mneme.decision_index_persistence import (
+        load_persisted_decision_index,
+        verify_compatibility_snapshot,
+    )
+    from mneme.memory_store import MemoryStore
+
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    index = load_persisted_decision_index(raw["decision_index"])
+    projected = verify_compatibility_snapshot(raw, index, path)
+    store = MemoryStore(path)
+    store.load()
+    assert [d.id for d in store.decisions()] == [d.id for d in projected]
+    return raw
+
+
+def test_d1d_canonical_target_import_writes_through_decision_index(tmp_path):
+    from mneme.adr_import import apply_import, compile_for_import
+    from mneme.decision_index_persistence import migrate_memory_file
+
+    target = _contract_memory(tmp_path / "project_memory.json")
+    assert migrate_memory_file(target) is True
+
+    written = apply_import(compile_for_import(_contract_corpus(tmp_path)), target)
+
+    assert written == ["ADR-540"]
+    raw = _assert_snapshot_derived_from_canonical(target)
+    canonical_ids = [
+        row["decision_id"] for row in raw["decision_index"]["decisions"]
+    ]
+    assert canonical_ids == ["D-NATIVE", "ADR-540"]
+    (version,) = [
+        row for row in raw["decision_index"]["versions"]
+        if row["decision_id"] == "ADR-540"
+    ]
+    assert version["source_evidence"][0]["source_type"] == "adr"
+    assert [row["id"] for row in raw["decisions"]] == ["D-NATIVE", "ADR-540"]
+
+
+def test_d1d_sectionless_target_migrates_deterministically_then_imports(tmp_path):
+    from mneme.adr_import import apply_import, compile_for_import
+
+    corpus = _contract_corpus(tmp_path)
+    (tmp_path / "a").mkdir()
+    (tmp_path / "b").mkdir()
+    first = _contract_memory(tmp_path / "a" / "project_memory.json")
+    second = _contract_memory(tmp_path / "b" / "project_memory.json")
+    assert "decision_index" not in json.loads(first.read_text(encoding="utf-8"))
+
+    apply_import(compile_for_import(corpus), first)
+    apply_import(compile_for_import(corpus), second)
+
+    raw = _assert_snapshot_derived_from_canonical(first)
+    assert raw["decision_index"]["schema"] == "mneme.decision-index/v1"
+    assert [row["id"] for row in raw["decisions"]] == ["D-NATIVE", "ADR-540"]
+    # Deterministic: identical inputs produce identical canonical bytes.
+    assert first.read_bytes() == second.read_bytes()
+
+
+@pytest.mark.parametrize("corruption", ["divergent_snapshot", "invalid_index"])
+def test_d1d_invalid_or_divergent_canonical_target_fails_closed(
+    tmp_path, corruption
+):
+    from mneme.adr_import import apply_import, compile_for_import
+    from mneme.decision_index_persistence import migrate_memory_file
+
+    target = _contract_memory(tmp_path / "project_memory.json")
+    assert migrate_memory_file(target) is True
+    raw = json.loads(target.read_text(encoding="utf-8"))
+    if corruption == "divergent_snapshot":
+        # A hand edit to the derived snapshot only.
+        raw["decisions"][0]["rules"].append(
+            {"type": "FORBID_LITERAL", "value": "snapshot_only"}
+        )
+    else:
+        raw["decision_index"]["versions"][0]["statement"] = "tampered"
+    target.write_text(json.dumps(raw, indent=2) + "\n", encoding="utf-8")
+    before = target.read_bytes()
+
+    with pytest.raises(RuntimeError, match="not valid canonical state"):
+        apply_import(compile_for_import(_contract_corpus(tmp_path)), target)
+
+    assert target.read_bytes() == before
