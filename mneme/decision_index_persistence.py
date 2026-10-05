@@ -38,6 +38,29 @@ class DecisionIndexPersistenceError(ValueError):
     """The durable Decision Index is malformed or internally inconsistent."""
 
 
+class LegacyDecisionsWriteRefused(DecisionIndexPersistenceError):
+    """A legacy ``decisions[]`` writer targeted canonical project memory."""
+
+
+def refuse_legacy_decisions_write(document: object, *, operation: str) -> None:
+    """Refuse a legacy ``decisions[]`` mutation of canonical project memory.
+
+    ADR-030 containment invariant, keyed purely on section presence: once a
+    top-level ``decision_index`` exists it is the sole durable decision
+    authority and ``decisions[]`` is derived compatibility state, so no
+    legacy writer may mutate it. Callers must invoke this after reading the
+    document and before any mutation or write. ``operation`` only names the
+    caller in the error; it does not change the invariant.
+    """
+    if isinstance(document, dict) and "decision_index" in document:
+        raise LegacyDecisionsWriteRefused(
+            f"{operation} is a legacy decisions[] writer and cannot modify "
+            "project memory that uses canonical Decision Index persistence "
+            "(ADR-030). decisions[] is a derived compatibility snapshot of "
+            "the authoritative decision_index section. Nothing was written."
+        )
+
+
 def _canonical_json(value: Any) -> str:
     return json.dumps(
         value,
@@ -1320,6 +1343,7 @@ __all__ = [
     "DECISION_INDEX_SCHEMA",
     "NO_PREDECESSOR",
     "DecisionIndexPersistenceError",
+    "LegacyDecisionsWriteRefused",
     "append_initial_canonical_decision",
     "compatibility_snapshot_decisions",
     "content_digest_of",
@@ -1329,6 +1353,7 @@ __all__ = [
     "migrate_memory_document",
     "migrate_memory_file",
     "rebind_legacy_initial_occurrence",
+    "refuse_legacy_decisions_write",
     "rule_id_of",
     "runtime_decision_from_memory_record",
     "verify_compatibility_snapshot",

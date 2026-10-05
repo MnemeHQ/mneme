@@ -380,6 +380,10 @@ def apply_import(
     Returns the list of ids actually written, in input order.
     """
     from mneme.adr_freshness import compute_source_hash, relative_source_path
+    from mneme.decision_index_persistence import (
+        LegacyDecisionsWriteRefused,
+        refuse_legacy_decisions_write,
+    )
 
     target_path = Path(target_path)
 
@@ -395,6 +399,10 @@ def apply_import(
         )
 
     raw = _json.loads(target_path.read_text(encoding="utf-8"))
+    try:
+        refuse_legacy_decisions_write(raw, operation="mneme adr import --apply")
+    except LegacyDecisionsWriteRefused as exc:
+        raise RuntimeError(f"ADR import refused: {exc}") from exc
     raw.setdefault("decisions", [])
     existing_idx = {d.get("id"): i for i, d in enumerate(raw["decisions"])}
 

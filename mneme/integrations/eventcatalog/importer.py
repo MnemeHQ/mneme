@@ -457,10 +457,21 @@ def apply_import(
     import os
     import tempfile
 
+    from mneme.decision_index_persistence import (
+        LegacyDecisionsWriteRefused,
+        refuse_legacy_decisions_write,
+    )
+
     target_path = Path(target_path)
     catalog_root = Path(catalog_root)
 
     target_memory = json.loads(target_path.read_text(encoding="utf-8"))
+    try:
+        refuse_legacy_decisions_write(
+            target_memory, operation="mneme eventcatalog import --apply"
+        )
+    except LegacyDecisionsWriteRefused as exc:
+        raise RuntimeError(f"EventCatalog import refused: {exc}") from exc
     collisions = detect_collisions(report.nodes, target_memory)
     if collisions and not allow_update:
         raise RuntimeError(
