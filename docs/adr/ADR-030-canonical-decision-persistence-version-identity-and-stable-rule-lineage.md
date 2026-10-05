@@ -1,7 +1,7 @@
 ---
 id: ADR-030
 title: "Canonical Decision Persistence, Version Identity, and Stable Rule Lineage"
-status: proposed
+status: accepted
 priority: foundational
 date: 2026-09-16
 scope: decision_index.persistence
@@ -9,9 +9,42 @@ scope: decision_index.persistence
 
 # ADR-030: Canonical Decision Persistence, Version Identity, and Stable Rule Lineage
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-09-16
+**Amended:** 2026-10-05 — accepted after reconciliation against the merged D1B/D1C implementation; lifecycle-conformance correction and other reconciliation amendments recorded (see "Implementation reconciliation" below)
 **Deciders:** Theo Valmis
+
+---
+
+## Acceptance record (2026-10-05)
+
+Promoted from `proposed` to `accepted` after reconciling this ADR against what
+the D1 slices actually shipped. Acceptance means this is the persistence,
+identity, and lineage architecture Mneme has decided to implement. It does
+**not** mean every slice is complete: D1D–D1F remain open, and the
+"Acceptance criterion" section below still defines when the ADR is
+*satisfied*.
+
+Implementation evidence at acceptance:
+
+- **D1B** (issue #423, PR #424) — persisted `mneme.decision-index/v1`
+  section, deterministic migration of native `decisions[]` and legacy
+  `items[]`, content/version/rule identity re-derivation at load, and
+  load-time Layer 1 projection through `MemoryStore`.
+- **D1C** (PR #440) — accepted proposals write the persisted index with a
+  frozen proposal provenance snapshot; the Decision MCP reads that same index
+  with no restart and no `--adr-dir` authority.
+- **Live memory cutover** (PR #441) — this repository's
+  `.mneme/project_memory.json` carries the authoritative section.
+- **D1 containment** (PR #444) — once the section exists, every remaining
+  legacy `decisions[]` writer refuses before any mutation.
+
+The reconciliation found the merged slices consistent with this ADR's
+architecture, with the divergences listed under "Implementation
+reconciliation". Each is resolved there by amending this ADR or by assigning
+explicit work to a named slice. The most significant is the lifecycle
+conformance correction (§12): migration ends Layer 1 participation for
+legacy non-active decisions, as accepted ADR-023 §6 already requires.
 
 ---
 
@@ -56,7 +89,11 @@ D1A — the architecture reconciliation completed against repository SHA
 `6e5cf09b6a604b68d4610db82d9e7f83a681d99a` — resolved these boundaries.
 This ADR records those conclusions as one bounded implementation decision
 under ADR-023's contract. It introduces no new source adapters, no new rule
-types, no MCP tool additions, and no enforcement-semantics change.
+types, no MCP tool additions, and no enforcement-semantics change for
+decisions eligible for Layer 1 projection. The one runtime-visible lifecycle
+effect is the explicitly authorized conformance correction in §12: legacy
+non-active decisions stop participating in Layer 1, as ADR-023 §6 already
+requires.
 
 ---
 
@@ -90,6 +127,13 @@ authority** for canonical architectural decisions.
 Only Mneme-owned, validated canonical write paths may write the
 `decision_index` section. Producer and transport callers may never write it
 directly or assert authority.
+
+Conversely, once a top-level `decision_index` section exists, no legacy writer
+may mutate `decisions[]`. The test is section presence alone. A writer that
+has not been migrated to a canonical authority operation must refuse before
+any mutation and leave the file byte-identical, rather than write a snapshot
+that the loader will then reject (D1 containment, PR #444). Section-less
+pre-D1 files keep their legacy writer behaviour.
 
 ### 2. Legacy item migration
 
@@ -174,6 +218,24 @@ version_id = "dver-" + SHA-256(canonical_json([
 - Immutability is verified, not conventional: load-time re-derivation of
   `content_digest` and `version_id` must reproduce the stored values; a
   mismatch fails closed.
+- **Migration-identity rebind (the only exception to §6's no-rewrite
+  rule).** A `["legacy-decisions", decision_id]` identity is a placeholder
+  that migration assigns when no truthful occurrence identity is known. If an
+  accepted proposal in the proposal store later proves that the decision was
+  created by that acceptance, the Mneme authority path may replace the
+  placeholder **once** with the proposal occurrence identity. It may also
+  replace the empty provenance with the proposal snapshot (§10). This
+  rewrites that version's `version_id` and the `decision_version_id` of its
+  rule bindings. The rebind is allowed only when the version:
+  - is the decision's active version;
+  - has no predecessor;
+  - carries exactly the `legacy-decisions` identity.
+
+  Content, `content_digest`, rule IDs, sequence, lifecycle, and timestamps
+  must stay byte-identical. The new `version_id` must not collide with any
+  existing occurrence. No other identity, including any `adr-import` or
+  proposal identity, is ever rebound. (Shipped in D1C:
+  `rebind_legacy_initial_occurrence`.)
 
 ### 5. Occurrence retry/idempotency
 
@@ -203,6 +265,14 @@ Every authority operation that creates a version occurrence has an exact
   `content_digest` but carry distinct `version_id`s and distinct frozen
   provenance. The full history is reconstructable from the persisted version
   records and lineage pointers alone — no event log.
+- The occurrence lookup covers the decision's **whole version history**, not
+  only the active version. D1C's accepted-proposal retry currently compares
+  against the active version only. That is correct while a proposal-backed
+  decision has exactly one occurrence. But a late retry after a later version
+  would then fail closed as an ID collision instead of resolving to its
+  persisted occurrence. Any slice that adds a version-evolution path for
+  proposal-backed decisions must first make that retry resolve by exact
+  occurrence key.
 
 ### 6. Immutable decision content boundary
 
@@ -354,6 +424,12 @@ known) without requiring the proposal store to interpret basic lineage:
   `source_locator` and the existing `sha256` pin as `source_revision`,
   correcting the D0 adapter's blanket `runtime` typing of ADR-imported
   records.
+- An ADR import's `source_revision` is the hash of the **exact bytes from
+  which that version's content was parsed**. It is captured when the source
+  is read for compilation and is never recomputed from the file on disk at
+  write time. Otherwise a source edited between compile and apply would pin
+  one file revision to another revision's content. It would also change the
+  occurrence key (§5), so a legitimate retry would be rejected as stale.
 - Legacy migration must not fabricate provenance: legacy records carry
   honest `runtime` typing and empty locators exactly as the synthesized
   shape produces today.
@@ -371,6 +447,12 @@ known) without requiring the proposal store to interpret basic lineage:
   ```text
   active | superseded | deprecated | inactive
   ```
+
+  This is ADR-023 §6's vocabulary. `inactive` is the existing
+  non-authoritative bucket: an explicitly `proposed` ADR, or an accepted
+  same-scope precedence loser. Only `active` is eligible for Layer 1
+  projection. `superseded`, `deprecated`, and `inactive` are retained for
+  lineage and never projected.
 
   Version occurrences have immutable predecessor lineage but introduce **no
   second lifecycle state machine**: a version's effective state derives from
@@ -405,8 +487,43 @@ through MCP and Layer 1 governance from the same authoritative representation
 — no restart-specific path, no second canonical store. MCP remains a thin
 transport and does not own storage or authority.
 
-A hand-edited `decisions[]` after migration is never silently adopted: the
-loader warns and directs the author to explicit ingestion paths.
+The MCP server therefore requires a memory file that already carries a valid
+`decision_index` section. It fails closed otherwise and never reconstructs
+authority from `decisions[]`. This removes the pre-D1 proposal-store-only
+startup mode. A supported way to give a memory file the section is
+consequently part of D1: an explicit migration command, plus a
+section-bearing scaffold from `mneme init`. It is assigned to D1E (§15) and
+must land before any release ships the MCP canonical read path.
+
+A hand-edited `decisions[]` after migration is never silently adopted. The
+loader verifies the persisted snapshot against the canonical projection and
+**fails closed** on any divergence; it does not warn and continue. Legacy
+writers are refused before they can create that divergence (§1). Authors are
+directed to explicit authority and ingestion paths.
+
+**Lifecycle conformance at migration.** D1 preserves enforcement semantics
+for every decision eligible for Layer 1 projection. Migration also brings
+legacy lifecycle handling into conformance with accepted ADR-023 §6: only
+`active` canonical decisions project into Layer 1 governance. Before D1, the
+section-less loader returned every native `decisions[]` entry regardless of
+`status`, and the runtime consumers do not filter by status.
+
+After migration, legacy `superseded`, `deprecated`, and `inactive` decisions
+are retained canonically but no longer take part in any of these:
+
+- retrieval;
+- enforcement (including their typed rules);
+- ConflictDetector;
+- benchmark runtime sets;
+- the Audit decision set. The Audit report's `total_decisions` count and its
+  per-decision list drop those entries. Audit tier percentages, which were
+  already computed over `active` decisions only, do not change.
+
+The derived `decisions[]` compatibility snapshot carries active decisions
+only. Decisions compiled from ADR sources were already active-only, so the
+correction affects only the legacy `decisions[]` path. This is an explicitly
+authorized correction, not a regression. It must be release-noted with the
+first release that ships D1 migration.
 
 ### 13. MCP compatibility
 
@@ -418,19 +535,36 @@ and field names remain unchanged. Field-level treatment:
   backwards-compatible revision/display fields (`"1"` for every existing
   record); their semantics are documented as non-identifying ordinals.
 - `version_id`, `content_digest`, and `decision_version_id` are **additive**
-  fields on canonical record / trace / rule payloads.
+  fields on canonical record / trace / rule payloads. On a canonical record,
+  `decision_version_id` carries the same value as `version_id`. Rule payloads
+  also gain the additive presentation field `sequence` (§9), which carries no
+  identity.
 - `rule_id` and `derived_rule_ids` **values** migrate from positional IDs to
   stable content-derived IDs (§7). This migration is externally observable:
   it must be release-noted and golden-vector tested; the old positional ID
   is reconstructable **from the legacy derived order during migration** for
   audit tooling — it is not a continuing identity contract, and no dual
   old/new rule-ID authority is created (both formats are never emitted
-  simultaneously).
+  simultaneously). For a migrated first occurrence, migration assigns
+  `sequence` in the legacy derived order, so the old ID is
+  `<decision_id>:<RULE_TYPE>:<sequence>` (every current rule is
+  `FORBID_LITERAL`). The persisted bindings are sufficient; no separate
+  mapping table is persisted.
+- The rule-ID value change must be release-noted with the first release that
+  ships D1 persistence. The merged D1B/D1C slices did not include that note.
+  It is a release gate, not an optional follow-up.
 - `derived_rule_ids` field names and ordering semantics (derived order via
   sequence) are unchanged; only identifier values change.
 - `source_evidence` objects may gain additive keys
   (`source_revision`, `observed_at`) and accepted records change from empty
-  to non-empty; `relationships` vocabulary is unchanged.
+  to non-empty; `relationships` vocabulary is unchanged. Proposal-backed
+  evidence additionally carries the §10 proposal reference keys
+  (`proposal_id`, `producer_key`, `content_fingerprint`,
+  `origin_classification`, `proposed_at`, `source_reference`,
+  `accepted_decision_id`). ADR and runtime evidence never carries them. The
+  transport also emits `verification_status` only for proposal-backed
+  evidence. It is persisted for every source type and is currently always
+  empty.
 
 ### 14. Validation gates
 
@@ -477,6 +611,16 @@ unchanged fixtures. New gates:
 - **G17 — Audit/enforcement/ConflictDetector/benchmark parity.** Identical
   tiers, verdicts, conflicts, and frozen benchmark results pre/post migration
   on real corpora.
+- **G16/G17 scope.** Parity is required for decisions eligible for Layer 1
+  projection. The §12 lifecycle-conformance correction is explicitly excluded
+  from both gates. It needs its own fixture: a pre-D1 memory with `active`
+  and non-active native decisions, including a non-active decision that
+  carries a typed rule. The fixture proves that active decisions keep exact
+  runtime parity, and that non-active decisions are retained canonically but
+  absent from the projection, the compatibility snapshot, enforcement, and
+  the Audit decision set. A parity corpus that contains only `active`
+  decisions (such as this repository's live memory) cannot by itself satisfy
+  G16/G17. This fixture is required before D1D merges.
 - **G18 — Migration idempotency and collision failure.** Migrate twice →
   byte-identical section; item-ID vs canonical-ID collisions fail closed;
   section-less files load through the legacy path; deprecation-window
@@ -493,12 +637,30 @@ ADR-022; none is authorized by this ADR change:
 
 - **D1B** — canonical persistence, models, migration, loader, and read-side
   projection (incl. legacy-item migration and deprecation-window snapshot).
+  *Merged (#424).*
 - **D1C** — authority write-path switch and MCP canonical loading.
-- **D1D** — versioning, ADR re-import, and supersession.
+  *Merged (#440); live memory cut over in #441; legacy writers contained in
+  #444.*
+- **D1D** — versioning, ADR re-import, and supersession. Includes the §10
+  parsed-bytes `source_revision` binding and the §14 lifecycle-conformance
+  fixture.
 - **D1E** — protection/lifecycle writer migration and full parity closeout.
+  It also covers:
+  - the migration entry point and section-bearing `mneme init` scaffold
+    (§12);
+  - an explicit decision for `mneme add_decision`: retire it, redirect it to
+    an existing authority path, or make it a canonical authority operation.
+    It is not left as a contained legacy writer;
+  - EventCatalog import: either a defined canonical provenance contract or
+    an explicit retirement of its apply path for canonical memory.
 - **D1F** — optional later removal of the persisted `decisions[]`
   compatibility snapshot, gated by a consumer inventory; must never ride
   along in another slice.
+
+**Release gate.** No release may ship D1 persistence until three things are
+in place: the §12 migration entry point, the §12 lifecycle-conformance
+release note, and the §13 rule-ID release note. Until then, released
+artifacts must not include D1B/D1C.
 
 ---
 
@@ -611,8 +773,12 @@ ADR-030 is satisfied when:
    (G18); and
 7. the §13 MCP field contract is pinned by tests (G19).
 
-Until those conditions pass, the `decision_index` section is an
-architecture contract, not a replacement runtime.
+Accepting this ADR does not mean these conditions already hold. Since D1B
+and D1C, the `decision_index` section is already the runtime read authority
+for any memory file that carries it. Until all seven conditions pass, D1 is
+an **incomplete transition**: that authority is real, but the version
+evolution, writer migration, and parity closeout it depends on are not yet
+finished.
 
 ---
 
@@ -629,8 +795,32 @@ separate canonical entities with stable, order-independent, 128-bit
 content-derived identity bound to exact versions by
 `(decision_id, version_id, rule_id)`, ordered for presentation by immutable
 per-version sequence. Provenance is frozen, referenced, and never
-authorizing. Lifecycle vocabularies, trust boundaries, MCP tool inventory,
-and all Layer 1 enforcement semantics remain unchanged.
+authorizing. Lifecycle vocabularies, trust boundaries, and the MCP tool
+inventory remain unchanged. Layer 1 enforcement semantics are unchanged for
+every projection-eligible decision. Migration only brings legacy non-active
+decisions into conformance with ADR-023's active-only projection (§12).
+
+---
+
+## Implementation reconciliation (2026-10-05)
+
+This ADR was reconciled against the merged D1B/D1C implementation before
+acceptance. Each divergence is resolved below, either by amending this ADR to
+match a deliberate implementation choice or by assigning explicit work.
+Section numbering is unchanged.
+
+| # | Divergence | Resolution | Where |
+| --- | --- | --- | --- |
+| R1 | Migration drops legacy non-active decisions from Layer 1, but the ADR claimed "no enforcement-semantics change" and broad G16/G17 parity. | ADR amended. This is an authorized conformance correction under accepted ADR-023 §6. Parity is scoped to projection-eligible decisions. A dedicated fixture and a release note are required. | Context, §12, §14, Decision summary |
+| R2 | §12 said a hand-edited `decisions[]` makes the loader warn; the loader fails closed. Legacy writers could create that divergence. | ADR amended to fail-closed. Section-presence containment of legacy writers recorded (#444). | §1, §12 |
+| R3 | D1C rewrites a `legacy-decisions` placeholder occurrence in place when binding a pre-cutover accepted proposal, which §6 prohibits. | ADR amended with one bounded, once-only, migration-identity-only exception. | §4 |
+| R4 | D1C accept retry checks only the active version, not the exact occurrence key across history. | Recorded as correct for single-occurrence decisions. Required before any version-evolution path for proposal-backed decisions. | §5 |
+| R5 | D1D draft (#443) recomputes ADR `source_revision` from disk at apply time. | ADR made explicit: the revision is bound to the parsed bytes. Assigned to D1D. | §10, §15 |
+| R6 | MCP now requires a section-bearing memory file, but no supported way to create one exists (`mneme init` produces a section-less file). | Migration entry point and `init` scaffold assigned to D1E. Release gate added. | §12, §15 |
+| R7 | The rule-ID value change shipped without a release note; positional-ID reconstruction was unspecified. | Release note made a release gate. Reconstruction specified from migration `sequence`. | §13, §15 |
+| R8 | Additive MCP fields `sequence` and proposal-only evidence keys were not listed; `decision_version_id` duplicates `version_id` on records. | §13 field list completed. | §13 |
+| R9 | `mneme add_decision` and EventCatalog import were not assigned to any slice. | Assigned to D1E with an explicit decision required. | §15 |
+| R10 | `inactive` was used without tying it to ADR-023's lifecycle vocabulary. | Clarified as ADR-023's non-authoritative, non-projecting bucket. | §11 |
 
 ## Related
 
