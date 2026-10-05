@@ -183,13 +183,13 @@ def test_adr_import_apply_with_approve_conflicts_imports_clean_scopes(tmp_path, 
 # operation carries that operation's predecessor explicitly.
 
 
-def _write_g11_adr(adr_dir: Path, literal: str) -> None:
+def _write_g11_adr(adr_dir: Path, literal: str, *, priority_note: str = "") -> None:
     (adr_dir / "ADR-520.md").write_text(
         "---\n"
         "id: ADR-520\n"
         "title: ADR-520 title\n"
         "status: accepted\n"
-        "priority: normal\n"
+        f"priority: normal{priority_note}\n"
         "date: 2026-04-15\n"
         'scope: "storage"\n'
         "---\n\n"
@@ -378,3 +378,31 @@ def test_cli_expected_predecessor_rejects_new_decision(tmp_path, capsys):
     assert code == 2
     assert "not yet canonical" in capsys.readouterr().err
     assert target.read_bytes() == before
+
+
+@pytest.mark.parametrize("pinned", [True, False], ids=["pinned-active", "unpinned"])
+def test_cli_source_bytes_change_is_a_new_occurrence_even_with_equal_content(
+    g11_history, pinned
+):
+    """The no-op needs content AND source revision to match the active one.
+
+    A frontmatter YAML comment changes the ADR bytes (so source_revision and
+    the occurrence source identity) but not the parsed decision content.
+    """
+    h = g11_history
+    _write_g11_adr(h["adr_dir"], "gamma", priority_note="  # reviewed")
+    extra = ["--expected-predecessor", f"ADR-520={h['c']}"] if pinned else []
+
+    assert _g11_apply(h["adr_dir"], h["target"], *extra) == 0
+
+    versions, active = _g11_versions(h["target"])
+    assert len(versions) == 5
+    section = json.loads(h["target"].read_text(encoding="utf-8"))["decision_index"]
+    by_id = {row["version_id"]: row for row in section["versions"]}
+    new, c = by_id[active], by_id[h["c"]]
+    assert new["supersedes_version_id"] == h["c"]
+    assert new["content_digest"] == c["content_digest"]
+    assert (
+        new["source_evidence"][0]["source_revision"]
+        != c["source_evidence"][0]["source_revision"]
+    )
