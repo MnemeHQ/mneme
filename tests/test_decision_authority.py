@@ -792,18 +792,22 @@ def test_default_id_remains_ddec_namespace(tmp_path: Path) -> None:
 def test_accept_retry_fails_closed_on_snapshot_only_protection_enrichment(
     tmp_path: Path,
 ) -> None:
-    """D1C never adopts a protection write made only to derived decisions[]."""
-    from mneme.protection import _install_rule
-    from mneme.schemas import Rule
+    """D1C never adopts a protection rule written only to derived decisions[].
 
+    The protection writer itself now refuses canonical memory (D1
+    containment), so the snapshot-only rule is written by hand here.
+    """
     path = tmp_path / "p.json"
     proposal = _propose(JsonFileDecisionProposalStore(path))
     memory = _write_memory(tmp_path)
     result = _accept(JsonFileDecisionProposalStore(path), memory, proposal.proposal_id)
     decision_id = result.decision_id
 
-    rule = Rule(type="FORBID_LITERAL", value="legacy_client")
-    assert _install_rule(memory, decision_id, rule) is True
+    with open(memory, encoding="utf-8") as handle:
+        raw = json.load(handle)
+    entry = next(e for e in raw["decisions"] if e.get("id") == decision_id)
+    entry["rules"] = [{"type": "FORBID_LITERAL", "value": "legacy_client"}]
+    memory.write_text(json.dumps(raw, indent=2) + "\n", encoding="utf-8")
     divergent = _memory_bytes(memory)
 
     with pytest.raises(MemoryInvalidError, match="compatibility snapshot diverges"):

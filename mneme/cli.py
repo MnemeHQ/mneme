@@ -63,6 +63,10 @@ from mneme.benchmark_report import format_json, format_markdown, format_terminal
 from mneme.context_builder import DEFAULT_MAX_DECISIONS, format_decisions
 from mneme.cursor_generator import generate_mdc
 from mneme.decision_authority import DecisionAuthorityError, DecisionAuthorityService
+from mneme.decision_index_persistence import (
+    LegacyDecisionsWriteRefused,
+    refuse_legacy_decisions_write,
+)
 from mneme.decision_proposal_store import JsonFileDecisionProposalStore
 from mneme.decision_retriever import DecisionRetriever
 from mneme.enforcer import (
@@ -269,6 +273,10 @@ def _cmd_add(args: argparse.Namespace) -> int:
     if not path.exists():
         return _error_exit(f"memory file {path} does not exist")
     data = json.loads(path.read_text(encoding="utf-8"))
+    try:
+        refuse_legacy_decisions_write(data, operation="mneme add_decision")
+    except LegacyDecisionsWriteRefused as exc:
+        return _error_exit(str(exc))
     data.setdefault("decisions", [])
 
     now = _utc_now()

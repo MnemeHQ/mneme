@@ -53,6 +53,10 @@ from mneme.enforcer import (
     generate_protection_report,
     propose_literal_rule,
 )
+from mneme.decision_index_persistence import (
+    LegacyDecisionsWriteRefused,
+    refuse_legacy_decisions_write,
+)
 from mneme.memory_store import MemoryStore
 from mneme.path_selectors import SelectorOutcome, policy_root
 from mneme.rule_matcher import literal_in_text
@@ -532,6 +536,11 @@ def _install_rule(
     """
     with open(memory_path, encoding="utf-8") as f:
         raw = json.load(f)
+    # Before both the rule and the activation-record mutation below.
+    try:
+        refuse_legacy_decisions_write(raw, operation="mneme protect activate")
+    except LegacyDecisionsWriteRefused as exc:
+        raise ProtectionError(str(exc)) from exc
     entries = raw.get("decisions")
     if not isinstance(entries, list):
         raise ProtectionError(
