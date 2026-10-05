@@ -722,3 +722,149 @@ def test_non_active_decision_is_retained_canonically_not_runtime_snapshot() -> N
     record = next(r for r in index.records if r.decision_id == "dec-1")
     assert record.lifecycle_status == "superseded"
     assert "dec-1" not in {row["id"] for row in migrated["decisions"]}
+
+
+# ── ADR-030 R1: lifecycle conformance at migration (§12, §14 G16/G17 scope) ──
+
+
+_R1_TS = "2026-01-01T00:00:00Z"
+
+
+def _r1_decision(decision_id: str, statement: str, status: str, **extra) -> dict:
+    record = {
+        "id": decision_id,
+        "decision": statement,
+        "rationale": f"{decision_id} rationale",
+        "scope": ["messaging"],
+        "constraints": [],
+        "anti_patterns": [],
+        "created_at": _R1_TS,
+        "updated_at": _R1_TS,
+        "status": status,
+    }
+    record.update(extra)
+    return record
+
+
+def _r1_document() -> dict:
+    return {
+        "meta": {"name": "r1", "description": "lifecycle conformance"},
+        "items": [],
+        "examples": [],
+        "decisions": [
+            _r1_decision(
+                "D-ACTIVE", "Route messaging through the service bus", "active",
+                rules=[{"type": "FORBID_LITERAL", "value": "legacy_queue"}],
+            ),
+            _r1_decision(
+                "D-SUPERSEDED", "Route messaging through the retired client",
+                "superseded",
+                rules=[{"type": "FORBID_LITERAL", "value": "retired_client"}],
+            ),
+            _r1_decision(
+                "D-DEPRECATED", "Log messaging events to the old sink",
+                "deprecated",
+            ),
+            _r1_decision(
+                "D-INACTIVE", "Cache messaging lookups in a draft layer",
+                "inactive",
+            ),
+        ],
+    }
+
+
+def _r1_enforced_ids(decisions) -> set[str]:
+    from mneme.decision_retriever import DecisionRetriever
+    from mneme.enforcer import check_prompt
+
+    scored = DecisionRetriever(decisions).retrieve("messaging client queue")
+    result = check_prompt(
+        "send via legacy_queue and retired_client", scored, top=3
+    )
+    return {violation.decision_id for violation in result.violations}
+
+
+def test_r1_migration_removes_non_active_decisions_from_layer1(tmp_path):
+    """Active decisions keep exact parity; non-active ones leave Layer 1.
+
+    Pre-D1, the section-less loader returned every native decision whatever
+    its status, and runtime consumers do not filter by status, so a
+    superseded decision's typed rule was still enforced. Migration brings
+    this into conformance with ADR-023 §6 (only ``active`` projects).
+    """
+    from mneme.decision_retriever import DecisionRetriever
+    from mneme.enforcer import generate_protection_report
+
+    path = tmp_path / "project_memory.json"
+    path.write_text(json.dumps(_r1_document(), indent=2), encoding="utf-8")
+
+    pre = MemoryStore(path)
+    pre.load()
+    pre_decisions = pre.decisions()
+    assert [d.id for d in pre_decisions] == [
+        "D-ACTIVE", "D-SUPERSEDED", "D-DEPRECATED", "D-INACTIVE",
+    ]
+    # Documents the pre-D1 behaviour being corrected.
+    assert _r1_enforced_ids(pre_decisions) == {"D-ACTIVE", "D-SUPERSEDED"}
+    pre_report = generate_protection_report(pre_decisions)
+
+    assert migrate_memory_file(path) is True
+
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    lifecycle = {
+        row["decision_id"]: row["lifecycle_status"]
+        for row in raw["decision_index"]["decisions"]
+    }
+    # Retained canonically with lifecycle preserved ...
+    assert lifecycle == {
+        "D-ACTIVE": "active",
+        "D-SUPERSEDED": "superseded",
+        "D-DEPRECATED": "deprecated",
+        "D-INACTIVE": "inactive",
+    }
+    superseded_rules = [
+        row for row in raw["decision_index"]["rules"]
+        if row["decision_id"] == "D-SUPERSEDED"
+    ]
+    assert [row["rule_payload"] for row in superseded_rules] == [
+        {"value": "retired_client"}
+    ]
+    # ... but absent from the derived compatibility snapshot.
+    assert [row["id"] for row in raw["decisions"]] == ["D-ACTIVE"]
+
+    post = MemoryStore(path)
+    post.load()
+    post_decisions = post.decisions()
+
+    # Projection: exact runtime parity for the active decision only.
+    assert post_decisions == [pre_decisions[0]]
+
+    # Retrieval: non-active decisions are no longer candidates.
+    post_retrieved = {
+        scored.decision.id
+        for scored in DecisionRetriever(post_decisions).retrieve(
+            "messaging client queue"
+        )
+    }
+    assert post_retrieved <= {"D-ACTIVE"}
+
+    # Enforcement: the superseded decision's typed rule no longer fires.
+    assert _r1_enforced_ids(post_decisions) == {"D-ACTIVE"}
+
+    # Audit: the decision set and total drop non-active entries; tier
+    # percentages, already computed over active decisions, are unchanged.
+    post_report = generate_protection_report(post_decisions)
+    assert pre_report.total_decisions == 4
+    assert post_report.total_decisions == 1
+    assert [d.id for d in post_report.decisions] == ["D-ACTIVE"]
+    for field in (
+        "protection_relevant",
+        "protected",
+        "mneme_ready",
+        "requires_modelling",
+        "guidance",
+        "current_protection_pct",
+        "identified_mneme_potential_pct",
+        "protection_gap_pct",
+    ):
+        assert getattr(post_report, field) == getattr(pre_report, field), field
