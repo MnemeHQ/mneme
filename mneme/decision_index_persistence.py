@@ -45,18 +45,18 @@ class LegacyDecisionsWriteRefused(DecisionIndexPersistenceError):
 def refuse_legacy_decisions_write(document: object, *, operation: str) -> None:
     """Refuse a legacy ``decisions[]`` mutation of canonical project memory.
 
-    ADR-030 containment invariant, keyed purely on section presence: once a
-    top-level ``decision_index`` exists it is the sole durable decision
-    authority and ``decisions[]`` is derived compatibility state, so no
-    legacy writer may mutate it. Callers must invoke this after reading the
+    D1 persisted-index containment invariant, keyed purely on section
+    presence: once a top-level ``decision_index`` exists the loader treats it
+    as the durable decision authority and ``decisions[]`` as derived
+    compatibility state, so no legacy writer may mutate it. Callers must invoke this after reading the
     document and before any mutation or write. ``operation`` only names the
     caller in the error; it does not change the invariant.
     """
     if isinstance(document, dict) and "decision_index" in document:
         raise LegacyDecisionsWriteRefused(
             f"{operation} is a legacy decisions[] writer and cannot modify "
-            "project memory that uses canonical Decision Index persistence "
-            "(ADR-030). decisions[] is a derived compatibility snapshot of "
+            "project memory that uses canonical Decision Index persistence. "
+            "decisions[] is a derived compatibility snapshot of "
             "the authoritative decision_index section. Nothing was written."
         )
 

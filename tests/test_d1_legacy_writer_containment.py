@@ -1,8 +1,8 @@
 """D1 containment: legacy decisions[] writers refuse canonical memory.
 
-ADR-030 makes the top-level ``decision_index`` section the sole durable
-decision authority; once it exists, ``decisions[]`` is a derived
-compatibility snapshot. The remaining legacy writers (``add_decision``,
+Once the top-level ``decision_index`` section exists, the merged D1B/D1C
+loader treats it as the durable decision authority and ``decisions[]`` as a
+derived compatibility snapshot. The remaining legacy writers (``add_decision``,
 protection activation, ``adr import --apply``, ``eventcatalog import
 --apply``) must refuse such files before any mutation, leave them
 byte-identical, and keep section-less legacy files behaving as before.
