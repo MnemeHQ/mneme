@@ -230,11 +230,18 @@ def detect_collisions(
 ) -> list[ImportDiagnostic]:
     """Return same-id diagnostics against canonical or legacy authority."""
     section = target_memory.get("decision_index")
+    active_version_by_id: dict[str, str] = {}
     if isinstance(section, dict):
         existing_in_decisions = {
             row.get("decision_id"): "decision_index"
             for row in section.get("decisions", [])
             if isinstance(row, dict)
+        }
+        active_version_by_id = {
+            row.get("decision_id"): row.get("active_version_id")
+            for row in section.get("decisions", [])
+            if isinstance(row, dict)
+            and isinstance(row.get("active_version_id"), str)
         }
     else:
         existing_in_decisions = {
@@ -261,15 +268,22 @@ def detect_collisions(
                 ),
             ))
         elif node.id in existing_in_decisions:
+            message = (
+                f"{node.id} already exists in canonical decision authority. "
+                "Pass --update-existing to create or reuse an immutable "
+                "version occurrence, or rename the incoming ADR."
+            )
+            current = active_version_by_id.get(node.id)
+            if current:
+                # The persisted active pointer as of this read. An operator
+                # who later needs to retry this exact apply pins it with
+                # --expected-predecessor; reading it creates no identity.
+                message += f" current predecessor: {current}"
             out.append(ImportDiagnostic(
                 kind="same_id",
                 adr_id=node.id,
                 existing_in=existing_in_decisions[node.id],
-                message=(
-                    f"{node.id} already exists in canonical decision authority. "
-                    "Pass --update-existing to create or reuse an immutable "
-                    "version occurrence, or rename the incoming ADR."
-                ),
+                message=message,
             ))
     return out
 
@@ -431,12 +445,45 @@ def apply_import(
         record.decision_id: record for record in initial_index.records
     }
     initial_existing_ids = set(initial_records_by_id)
+    # ADR-030 §5: an unpinned apply is a new authority operation whose
+    # predecessor is the active version when it starts. A late retry of an
+    # earlier operation must carry that operation's predecessor explicitly;
+    # the pin is never re-derived from the current active pointer.
+    pinned_predecessors = dict(expected_predecessor_version_ids or {})
     operation_predecessors = {
         decision_id: record.version_id
         for decision_id, record in initial_records_by_id.items()
     }
-    if expected_predecessor_version_ids is not None:
-        operation_predecessors.update(expected_predecessor_version_ids)
+    if pinned_predecessors:
+        if not allow_update:
+            raise RuntimeError(
+                "ADR import refused: an expected predecessor applies only to "
+                "same-id version evolution; pass --update-existing."
+            )
+        incoming_ids = {decision.id for decision in report.decisions}
+        persisted_versions = {
+            row.get("version_id"): row.get("decision_id")
+            for row in working["decision_index"].get("versions", [])
+            if isinstance(row, dict)
+        }
+        for decision_id, version_id in sorted(pinned_predecessors.items()):
+            if decision_id not in incoming_ids:
+                raise RuntimeError(
+                    f"ADR import refused: expected predecessor names "
+                    f"{decision_id!r}, which is not an incoming active ADR."
+                )
+            if decision_id not in initial_records_by_id:
+                raise RuntimeError(
+                    f"ADR import refused: expected predecessor names "
+                    f"{decision_id!r}, which is not yet canonical; a new "
+                    "decision has no predecessor to pin."
+                )
+            if persisted_versions.get(version_id) != decision_id:
+                raise RuntimeError(
+                    f"ADR import refused: expected predecessor {version_id!r} "
+                    f"is not a persisted version of {decision_id!r}."
+                )
+        operation_predecessors.update(pinned_predecessors)
     item_ids = {
         item.get("id")
         for item in working.get("items", [])
@@ -599,8 +646,14 @@ def apply_import(
             decision.constraints,
             decision.anti_patterns,
         )
+        # Unchanged content and source on top of the active version is a
+        # no-op. A pin naming an older version is a late retry, decided only
+        # by its exact occurrence key (reuse if persisted anywhere in
+        # history, otherwise stale), never by comparison with the active one.
         if (
-            record.content_digest == incoming_digest
+            pinned_predecessors.get(decision.id, record.version_id)
+            == record.version_id
+            and record.content_digest == incoming_digest
             and record.occurrence_source_identity == tuple(occurrence_identity)
         ):
             continue

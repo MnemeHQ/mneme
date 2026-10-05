@@ -107,6 +107,11 @@ mneme adr import docs/adr --memory .mneme/project_memory.json --apply
 # Evolve an existing same-id decision as a new immutable canonical version
 mneme adr import docs/adr --memory .mneme/project_memory.json --apply --update-existing
 
+# Retry an earlier --update-existing apply after a later version became active,
+# pinning the version that was active when the original apply ran
+mneme adr import docs/adr --memory .mneme/project_memory.json --apply --update-existing \
+  --expected-predecessor ADR-012=dver-0123456789abcdef0123456789abcdef
+
 # Import every non-conflicting scope and skip each active-active contradiction
 mneme adr import docs/adr --memory .mneme/project_memory.json --apply --approve-conflicts
 ```
@@ -206,6 +211,35 @@ the import refuses with a diagnostic.
   rule is not silently carried forward.
 - A collision with a legacy `items[]` id is still refused even with
   `--update-existing`; ADR authority does not silently repurpose item identity.
+
+#### Retries versus new operations
+
+An `--update-existing` apply without a pin is a **new authority operation**:
+its predecessor is whatever version is active when it runs. So restoring an
+ADR to earlier content after a later version is active is a deliberate
+revert, and it creates a new occurrence. A1 → B → A2 is three occurrences
+even though A1 and A2 have identical content.
+
+To **retry** an earlier operation after a later version became active, pin
+the predecessor that operation ran against:
+
+- The preview lists `current predecessor: dver-...` for each existing
+  same-id decision. That is the persisted active version at the moment of
+  reading. Record it if you may need to retry the apply later; reading it
+  creates no retry identity.
+- `--expected-predecessor ADR-ID=VERSION_ID` is repeatable, at most once per
+  ADR. It is valid only with `--apply --update-existing`, and only for an
+  incoming ADR that is already canonical. It must name a persisted version of
+  that decision.
+- With a pin:
+  - if the exact occurrence (decision, content, source revision, pinned
+    predecessor) already exists anywhere in history, the apply reuses it and
+    changes nothing, even if a newer version is active;
+  - if it does not exist and the pinned version is still active, it is
+    created;
+  - otherwise the apply fails closed as stale.
+- Malformed, duplicate, unknown, or not-yet-canonical pins are refused before
+  any write.
 
 ---
 
