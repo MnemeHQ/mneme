@@ -54,7 +54,10 @@ from mneme.enforcer import (
     propose_literal_rule,
 )
 from mneme.decision_index_persistence import (
+    DecisionIndexPersistenceError,
     LegacyDecisionsWriteRefused,
+    append_protection_binding,
+    rebuild_compatibility_snapshot,
     refuse_legacy_decisions_write,
 )
 from mneme.memory_store import MemoryStore
@@ -68,6 +71,7 @@ from mneme.setup_state import (
     STATE_SETUP,
     ActivationRecord,
     ActivationStateError,
+    ConcurrentModificationError,
     atomic_write_json,
     utc_now,
 )
@@ -513,11 +517,15 @@ def _install_rule(
     decision_id: str,
     proposal: Rule,
 ) -> bool:
-    """Append the typed rule to one decision's record in the memory file.
+    """Install the typed rule for one decision in the memory file.
 
-    Raw read-modify-write preserving every other key verbatim (meta, items,
-    examples, other decisions, and any future sections). Idempotent: an
-    identical existing rule is left alone and no duplicate is created.
+    Canonical memory (a ``decision_index`` section) gets a ``protection``
+    rule binding on the decision's active version (ADR-030 §9, D1E2b),
+    written with the re-derived compatibility snapshot and the activation
+    record in one guarded write. Section-less memory keeps the legacy
+    ``decisions[]`` write until D1E5. Either way the read-modify-write
+    preserves every other key verbatim. Idempotent: an identical existing
+    rule is left alone and no duplicate is created.
 
     The explicit activation also completes the frozen M1.3 activation-state
     model (``setup`` = no preventive protection, ``active`` = at least one
@@ -534,9 +542,14 @@ def _install_rule(
 
     Raises :class:`ProtectionError` before any write on unsafe input.
     """
-    with open(memory_path, encoding="utf-8") as f:
-        raw = json.load(f)
-    # Before both the rule and the activation-record mutation below.
+    source_bytes = Path(memory_path).read_bytes()
+    raw = json.loads(source_bytes.decode("utf-8"))
+    if isinstance(raw, dict) and "decision_index" in raw:
+        return _install_canonical_rule(
+            memory_path, raw, source_bytes, decision_id, proposal
+        )
+
+    # Section-less memory keeps the legacy write until D1E5 (ADR-030 §1).
     try:
         refuse_legacy_decisions_write(raw, operation="mneme protect activate")
     except LegacyDecisionsWriteRefused as exc:
@@ -574,14 +587,57 @@ def _install_rule(
         record["exclude_paths"] = list(proposal.exclude_paths)
     entry["rules"] = [*existing, record]
 
+    _activate_project(raw, memory_path)
+    atomic_write_json(memory_path, raw)
+    return True
+
+
+def _install_canonical_rule(
+    memory_path: Path,
+    raw: dict,
+    source_bytes: bytes,
+    decision_id: str,
+    proposal: Rule,
+) -> bool:
+    """Canonical protection write (ADR-030 §9, D1E2b).
+
+    One ``protection`` binding on the decision's active version, the
+    re-derived compatibility snapshot, and the activation-record transition
+    land in a single atomic write. The write is refused if the file
+    changed after it was read. An already-bound identical rule is a no-op.
+    """
+    try:
+        document, _, created = append_protection_binding(
+            raw, decision_id=decision_id, rule=proposal
+        )
+        if not created:
+            return False
+        document = rebuild_compatibility_snapshot(document)
+    except DecisionIndexPersistenceError as exc:
+        raise ProtectionError(
+            f"cannot install canonical protection for {decision_id!r}: {exc}"
+        ) from exc
+
+    _activate_project(document, memory_path)
+    try:
+        atomic_write_json(memory_path, document, expected_bytes=source_bytes)
+    except ConcurrentModificationError as exc:
+        raise ProtectionError(str(exc)) from exc
+    return True
+
+
+def _activate_project(raw: dict, memory_path: Path) -> None:
+    """Complete the frozen M1.3 activation state model in ``raw``.
+
+    A pre-M1.3 memory file with no activation record is de-facto ``setup``
+    state (``derive_activation_state``). Explicitly activating the first
+    protection persists one valid record in ``active`` state instead of
+    leaving the invalid "Protected decision + setup project" combination.
+    An already ``active`` record is left untouched; an unsupported or
+    invalid record is refused before any write.
+    """
     raw_activation = raw.get("activation")
     if raw_activation is None:
-        # A pre-M1.3 memory file with no activation record is de-facto
-        # ``setup`` state (``derive_activation_state``). Explicitly
-        # activating the first protection completes the frozen M1.3 state
-        # model here: persist one valid record in ``active`` state instead
-        # of leaving the invalid "Protected decision + setup project"
-        # combination.
         record_state = ActivationRecord(state=STATE_SETUP)
     else:
         if (
@@ -612,9 +668,6 @@ def _install_rule(
         if raw_activation is None:
             record_state.mneme_version = mneme_version()
         raw["activation"] = record_state.to_dict()
-
-    atomic_write_json(memory_path, raw)
-    return True
 
 
 def _verify(

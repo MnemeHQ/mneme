@@ -51,10 +51,27 @@ mneme protect activate <decision-id> --memory .mneme/project_memory.json
 
 **Activation is an explicit user action.** Audit, setup, rule generation and
 validation never enable protection; only this command installs enforcement.
-It appends the typed `FORBID_LITERAL` rule to that one decision's record in
-project memory — the same artifact `mneme check` and the agent hooks enforce —
-and refuses on any unsafe or unsupported state. Activation is idempotent:
+It installs the typed `FORBID_LITERAL` rule for that one decision in project
+memory, the same artifact `mneme check` and the agent hooks enforce, and
+refuses on any unsafe or unsupported state. Activation is idempotent:
 rerunning does not create duplicate rules.
+
+How the rule is stored depends on the memory file:
+
+- **Canonical memory** (one with a `decision_index` section; see
+  `mneme decision-index migrate`). The rule becomes a `protection` rule
+  binding on the decision's active version. The version record and existing
+  rules are never modified. If the same rule is already bound, nothing
+  changes. The binding, the derived `decisions[]` snapshot, and the activation
+  record are written together, and the write is refused if the file changed
+  after it was read.
+- **Section-less memory.** The rule is appended to the decision's
+  `decisions[]` entry, as before.
+
+A protection binding survives ADR evolution. If an edited ADR re-imported
+with `--update-existing` no longer derives the rule, the import refuses until
+you pass `--preserve-protection` or `--release-protection` for it. See ADR
+import, "Protection continuity".
 
 ```bash
 mneme protect status <decision-id> --memory .mneme/project_memory.json
