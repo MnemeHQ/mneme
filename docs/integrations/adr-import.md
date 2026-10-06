@@ -121,7 +121,7 @@ mneme adr import docs/adr --memory .mneme/project_memory.json --apply --approve-
 | Code | Meaning |
 |:---:|---|
 | 0 | Clean preview or successful apply |
-| 1 | Dry-run: diagnostics present (including retrieval-only ADRs, active-active contradictions, or collisions). Useful as a CI signal. |
+| 1 | Dry-run: diagnostics present: retrieval-only ADRs, active-active contradictions, collisions, protection continuity obligations, or supersession enforcement effects (a supersession that retires `protection`/`legacy_unknown` rules). Useful as a CI signal. |
 | 2 | Apply refused (unresolved diagnostics or invalid input path) |
 
 ---
@@ -172,13 +172,20 @@ legitimately contains the word "mneme" everywhere.
 
 ## Conflict model
 
-### 1. Explicit supersession (silent)
+### 1. Explicit supersession (authorized, visible)
 
 If ADR-012 lists ADR-011 in its `supersedes`, ADR-011 is removed from the
 active set at compile time. On apply, D1D persists the explicit canonical
 `supersedes` relationship and transitions ADR-011 to canonical
 `superseded`; its historical version remains queryable but no longer
 projects into active Layer 1 governance.
+
+The `supersedes` relationship is the authority for retiring ADR-011, so no
+extra flag is needed. Retirement is never hidden, though. If ADR-011 carries
+`protection` or `legacy_unknown` rule bindings, the preview lists them under
+**Supersession enforcement effects**, because their enforcement leaves
+Layer 1. The dry-run then exits `1`, like any other diagnostic, so CI
+notices. See "Protection continuity" below.
 
 ### 2. Active-active contradiction (loud)
 
@@ -240,6 +247,45 @@ the predecessor that operation ran against:
   - otherwise the apply fails closed as stale.
 - Malformed, duplicate, unknown, or not-yet-canonical pins are refused before
   any write.
+
+#### Protection continuity (ADR-030 §9a)
+
+A `protection` or `legacy_unknown` rule binding never disappears silently
+when an ADR evolves into a new version. A `legacy_unknown` binding is a
+migrated pre-D1 rule whose origin cannot be reconstructed. The preview lists
+every such binding the new ADR content would no longer derive, under
+**Protection continuity obligations**, with its `rule_id`. Each one needs an
+explicit decision:
+
+```bash
+mneme adr import docs/adr --memory .mneme/project_memory.json --apply --update-existing \
+  --preserve-protection 'ADR-012:FORBID_LITERAL:<hash>' \
+  --release-protection  'ADR-012:FORBID_LITERAL:<hash>'
+```
+
+- `--preserve-protection RULE_ID` carries the exact rule into the new
+  version. Your flag is the authority; Mneme only re-runs the deterministic
+  protection validation against the new version. Only a global
+  `FORBID_LITERAL` can be preserved; anything else must be released.
+- `--release-protection RULE_ID` omits the rule. If the new ADR still
+  derives it, the rule stays, as an ordinary version rule.
+- With neither flag, the apply refuses and writes nothing. If the new ADR
+  still derives the rule, nothing is needed: the rule keeps its protection.
+- Both flags are repeatable and need `--apply --update-existing`. These are
+  refused before any write:
+  - naming a rule for both flags;
+  - an unknown rule;
+  - a rule that is not a `protection`/`legacy_unknown` binding;
+  - preserving a rule the new ADR still derives;
+  - requests for a decision that is not evolving.
+- A retry with the same flags is a no-op. A retry with different flags fails
+  closed.
+
+Superseding a decision through another ADR's `supersedes` retires it, so it
+needs no per-rule release. The preview lists its protected rules under
+**Supersession enforcement effects**, because their enforcement leaves
+Layer 1, and the dry-run exits `1`. That warning does not block `--apply`;
+the `supersedes` relationship is the authority.
 
 ---
 

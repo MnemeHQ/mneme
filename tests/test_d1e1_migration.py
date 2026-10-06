@@ -421,7 +421,10 @@ def test_explicit_legacy_unknown_is_not_interchangeable_with_version(tmp_path):
     evolved, predecessor, version_id = _evolved(tmp_path)
     for row in evolved["decision_index"]["rules"]:
         if row["decision_version_id"] == version_id:
-            row["binding_authority"] = "legacy_unknown"
+            # The re-derived legacy rule keeps legacy_unknown (§9a collapse);
+            # an explicitly persisted "version" must not match it.
+            assert row["binding_authority"] == "legacy_unknown"
+            row["binding_authority"] = "version"
 
     with pytest.raises(DecisionIndexPersistenceError, match="rule bindings differ"):
         append_canonical_version_occurrence(
