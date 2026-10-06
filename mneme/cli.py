@@ -16,6 +16,8 @@ Subcommands
                     See docs/protect-activation.md.
   decision-mcp      Serve the Decision Index MCP tools over local stdio
                     (D2B, ADR-027). Six non-authoritative tools only.
+  decision-index    Canonical Decision Index commands: migrate (ADR-030
+                    §12; preview by default, --apply writes).
   decision          Decision proposal inspection and human authority:
                     proposals | show | accept | reject (D2C2, ADR-027).
                     A thin adapter over the Core DecisionAuthorityService.
@@ -65,7 +67,14 @@ from mneme.context_builder import DEFAULT_MAX_DECISIONS, format_decisions
 from mneme.cursor_generator import generate_mdc
 from mneme.decision_authority import DecisionAuthorityError, DecisionAuthorityService
 from mneme.decision_index_persistence import (
+    DecisionIndexMigrationRefused,
+    DecisionIndexMigrationRequired,
+    DecisionIndexPersistenceError,
     LegacyDecisionsWriteRefused,
+    MemoryMigrationPlan,
+    apply_memory_migration,
+    load_decision_index_from_memory_file,
+    plan_memory_migration,
     refuse_legacy_decisions_write,
 )
 from mneme.decision_proposal_store import JsonFileDecisionProposalStore
@@ -996,6 +1005,91 @@ DEFAULT_PROPOSALS_PATH = ".mneme/decision_proposals.json"
 DEFAULT_DECISION_MEMORY_PATH = ".mneme/project_memory.json"
 
 
+def _migration_required_message(memory: str | Path) -> str:
+    return (
+        f"project memory {memory} has no authoritative decision_index "
+        "section.\n"
+        f"  Preview the migration:  mneme decision-index migrate --memory {memory}\n"
+        "  After reviewing it, apply: "
+        f"mneme decision-index migrate --memory {memory} --apply"
+    )
+
+
+def _format_migration_preview(plan: MemoryMigrationPlan) -> str:
+    """Render the user-visible ADR-030 consequences of a planned migration."""
+    if plan.state == "already_canonical":
+        return (
+            f"Decision Index migration: {plan.path}\n"
+            "  Already migrated: decision_index is authoritative and valid; "
+            "nothing to do."
+        )
+    native = len(plan.native_decision_ids)
+    non_active = len(plan.non_active_decisions)
+    items = len(plan.legacy_item_ids)
+    lines = [
+        f"Decision Index migration preview: {plan.path}",
+        f"  Native decisions:                {native}",
+        f"  Active after migration:          {native - non_active + items}",
+        f"  Non-active leaving Layer 1:      {non_active}",
+    ]
+    lines.extend(
+        f"    {decision_id} ({status})"
+        for decision_id, status in plan.non_active_decisions
+    )
+    lines.append(f"  Legacy items becoming decisions: {items}")
+    lines.extend(f"    {item_id}" for item_id in plan.legacy_item_ids)
+    lines.append(
+        f"  Migrated rule bindings:          {plan.migrated_rule_bindings}"
+        + (" (binding authority: legacy_unknown)"
+           if plan.migrated_rule_bindings else "")
+    )
+    lines.extend([
+        "",
+        "  After migration:",
+        "    decision_index becomes the authoritative decision record",
+        "    decisions[] becomes a derived compatibility snapshot",
+        "    new rule/anti_pattern items no longer synthesize decisions",
+    ])
+    return "\n".join(lines)
+
+
+def _cmd_decision_index_migrate(args: argparse.Namespace) -> int:
+    """Preview (default) or apply the ADR-030 §12 canonical migration.
+
+    Exit codes: 0 = previewed, applied, or already canonical; 2 = refused
+    (lossy legacy state, invalid canonical state, concurrent change, or
+    bad input). There is no force, repair, or loss-acknowledgment option.
+    """
+    memory = Path(args.memory)
+    if not memory.is_file():
+        return _error_exit(f"memory file {memory} does not exist")
+    try:
+        plan = plan_memory_migration(memory)
+    except DecisionIndexMigrationRefused as exc:
+        return _error_exit(f"migration refused: {exc}")
+    except DecisionIndexPersistenceError as exc:
+        return _error_exit(
+            f"the canonical Decision Index in {memory} is invalid; migration "
+            f"is not a repair path: {exc}"
+        )
+
+    print(_format_migration_preview(plan))
+    if plan.state == "already_canonical":
+        return 0
+    if not args.apply:
+        print(
+            "\nPreview only; nothing was written. Re-run with --apply to "
+            "write exactly this migration."
+        )
+        return 0
+    try:
+        apply_memory_migration(plan)
+    except DecisionIndexMigrationRefused as exc:
+        return _error_exit(f"migration refused: {exc}")
+    print(f"\nMigrated {memory}: decision_index is now authoritative.")
+    return 0
+
+
 def _cmd_decision_mcp(args: argparse.Namespace) -> int:
     """Launch Decision MCP over the persisted canonical Decision Index."""
     try:
@@ -1033,6 +1127,18 @@ def _cmd_decision_mcp(args: argparse.Namespace) -> int:
         if not Path(args.adr_dir).is_dir():
             return _error_exit(f"ADR directory {args.adr_dir} does not exist")
         adr_dir = args.adr_dir
+
+    # ADR-030 §12: a missing section is a migration prerequisite, reported
+    # preview-first and never auto-migrated; an invalid existing section is
+    # reported as invalid without suggesting migration as a repair.
+    try:
+        load_decision_index_from_memory_file(memory_arg)
+    except DecisionIndexMigrationRequired:
+        return _error_exit(_migration_required_message(memory_arg))
+    except (DecisionIndexPersistenceError, ValueError, OSError) as exc:
+        return _error_exit(
+            f"the canonical Decision Index in {memory_arg} is invalid: {exc}"
+        )
 
     serve_stdio(
         proposal_store_path=proposals_arg,
@@ -1897,6 +2003,35 @@ def _build_parser() -> argparse.ArgumentParser:
         ),
     )
     p_mcp.set_defaults(func=_cmd_decision_mcp)
+
+    # decision-index (ADR-030 §12 canonical migration entry point, D1E1)
+    p_di = sub.add_parser(
+        "decision-index",
+        help="Canonical Decision Index commands (ADR-030)",
+    )
+    di_sub = p_di.add_subparsers(dest="decision_index_cmd", required=True)
+    p_di_migrate = di_sub.add_parser(
+        "migrate",
+        help=(
+            "Preview (default) or apply the one-time migration of project "
+            "memory to the authoritative decision_index section. Lossless or "
+            "refused; no force or repair mode"
+        ),
+    )
+    p_di_migrate.add_argument(
+        "--memory",
+        default=DEFAULT_DECISION_MEMORY_PATH,
+        help=f"Path to project_memory.json (default: {DEFAULT_DECISION_MEMORY_PATH})",
+    )
+    p_di_migrate.add_argument(
+        "--apply",
+        action="store_true",
+        help=(
+            "Write exactly the previewed migration (refused if the file "
+            "changed after it was read)"
+        ),
+    )
+    p_di_migrate.set_defaults(func=_cmd_decision_index_migrate)
 
     # decision (D2C2 human authority surface over DecisionAuthorityService)
     p_decision = sub.add_parser(

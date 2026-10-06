@@ -240,8 +240,23 @@ def derive_activation_state(memory_path: str | Path) -> ActivationState:
     return record.state
 
 
-def atomic_write_json(path: Path, data: dict) -> None:
-    """Write JSON atomically: tempfile in the same directory, then replace."""
+class ConcurrentModificationError(RuntimeError):
+    """The target changed after it was read; the guarded write was refused."""
+
+
+def atomic_write_json(
+    path: Path,
+    data: dict,
+    *,
+    expected_bytes: bytes | None = None,
+) -> None:
+    """Write JSON atomically: tempfile in the same directory, then replace.
+
+    With ``expected_bytes``, the replace happens only if the target still
+    holds exactly those bytes, checked immediately before ``os.replace``.
+    This is an optimistic guard within the single-writer discipline, not a
+    lock. Callers that omit it keep the unguarded behaviour.
+    """
     serialized = json.dumps(data, indent=2) + "\n"
     fd, tmp = tempfile.mkstemp(
         prefix=path.name + ".", suffix=".tmp", dir=str(path.parent)
@@ -249,6 +264,10 @@ def atomic_write_json(path: Path, data: dict) -> None:
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as f:
             f.write(serialized)
+        if expected_bytes is not None and path.read_bytes() != expected_bytes:
+            raise ConcurrentModificationError(
+                f"{path} changed after it was read; nothing was written"
+            )
         os.replace(tmp, path)
     except BaseException:
         try:

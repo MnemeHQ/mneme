@@ -13,11 +13,13 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
-import os
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 from mneme.decision_index import (
+    BINDING_AUTHORITY_LEGACY_UNKNOWN,
+    BINDING_AUTHORITY_VERSION,
     CANONICAL_DECISION_CLASS_ARCHITECTURE,
     CANONICAL_VERSION,
     CanonicalArchitectureIndex,
@@ -25,6 +27,7 @@ from mneme.decision_index import (
     CanonicalRuleRecord,
     CanonicalSourceEvidence,
     CanonicalTestEvidence,
+    VALID_BINDING_AUTHORITIES,
     VALID_LIFECYCLE_STATUSES,
 )
 from mneme.decision_projection import project_canonical_index
@@ -37,6 +40,18 @@ _RESERVED_PROPOSAL_PREFIX = "dprop-"
 
 class DecisionIndexPersistenceError(ValueError):
     """The durable Decision Index is malformed or internally inconsistent."""
+
+
+class DecisionIndexMigrationRequired(DecisionIndexPersistenceError):
+    """Project memory has no ``decision_index`` section yet (ADR-030 §12).
+
+    Distinct from an invalid existing section: this state is resolved by the
+    explicit migration command, never by repair or auto-migration.
+    """
+
+
+class DecisionIndexMigrationRefused(DecisionIndexPersistenceError):
+    """Migration would lose legacy state or cannot be applied safely."""
 
 
 class LegacyDecisionsWriteRefused(DecisionIndexPersistenceError):
@@ -275,8 +290,18 @@ def _rule_bindings_for_version(
     version_id: str,
     revision: str,
     rules: list[Rule] | tuple[Rule, ...],
+    *,
+    binding_authority: str,
 ) -> list[dict[str, Any]]:
-    """Build explicit immutable rule bindings for one version occurrence."""
+    """Build explicit immutable rule bindings for one version occurrence.
+
+    Every new binding persists ``binding_authority`` explicitly (ADR-030
+    §9a); only bindings written before the field existed may lack it.
+    """
+    if binding_authority not in VALID_BINDING_AUTHORITIES:
+        raise DecisionIndexPersistenceError(
+            f"invalid binding_authority {binding_authority!r}"
+        )
     bindings: list[dict[str, Any]] = []
     seen_rule_ids: set[str] = set()
     for sequence, rule in enumerate(rules):
@@ -296,8 +321,36 @@ def _rule_bindings_for_version(
             "rule_type": rule.type,
             "rule_payload": {"value": rule.value},
             "applicability": applicability,
+            "binding_authority": binding_authority,
         })
     return bindings
+
+
+def _bindings_match_historical(
+    persisted: list[dict[str, Any]],
+    expected: list[dict[str, Any]],
+) -> bool:
+    """Exact historical binding comparison (ADR-030 §9a).
+
+    A persisted binding whose ``binding_authority`` is actually absent
+    predates the field: it matches on every other field exactly and its
+    authority is not compared. An explicitly persisted authority, including
+    ``legacy_unknown``, is compared exactly.
+    """
+    if len(persisted) != len(expected):
+        return False
+    for stored, wanted in zip(persisted, expected):
+        if "binding_authority" in stored:
+            if stored != wanted:
+                return False
+            continue
+        if stored != {
+            key: value
+            for key, value in wanted.items()
+            if key != "binding_authority"
+        }:
+            return False
+    return True
 
 
 def _source_snapshot(
@@ -377,11 +430,14 @@ def _version_and_rules_for_migration(
         "supersedes_version_id": None,
         "created_at": created_at,
     }
+    # Migration cannot tell ADR-derived rules from rules legacy protection
+    # appended to decisions[] (ADR-030 §9a).
     bindings = _rule_bindings_for_version(
         decision.id,
         version_id,
         CANONICAL_VERSION,
         decision.rules,
+        binding_authority=BINDING_AUTHORITY_LEGACY_UNKNOWN,
     )
     return version, bindings
 
@@ -622,6 +678,7 @@ def append_initial_canonical_decision(
             version_id,
             CANONICAL_VERSION,
             rules,
+            binding_authority=BINDING_AUTHORITY_VERSION,
         )
     )
     migrated["decision_index"] = section
@@ -732,6 +789,7 @@ def append_canonical_version_occurrence(
         version_id,
         CANONICAL_VERSION,
         rules,
+        binding_authority=BINDING_AUTHORITY_VERSION,
     )
 
     versions = _require_list(section.get("versions"), "decision_index.versions")
@@ -758,7 +816,7 @@ def append_canonical_version_occurrence(
             ],
             key=lambda row: row.get("sequence", -1),
         )
-        if existing_bindings != expected_bindings:
+        if not _bindings_match_historical(existing_bindings, expected_bindings):
             raise DecisionIndexPersistenceError(
                 f"version occurrence {version_id!r} rule bindings differ "
                 "from the persisted immutable occurrence"
@@ -1319,6 +1377,21 @@ def load_persisted_decision_index(
             raw.get("applicability", {}),
             f"rules[{index}].applicability",
         )
+        # ADR-030 §9a: a binding persisted before the field existed reads
+        # as legacy_unknown and is never rewritten; a present value must be
+        # one of the known authorities.
+        if "binding_authority" in raw:
+            binding_authority = raw["binding_authority"]
+            if (
+                not isinstance(binding_authority, str)
+                or binding_authority not in VALID_BINDING_AUTHORITIES
+            ):
+                raise DecisionIndexPersistenceError(
+                    f"rule {rule_id!r} has invalid binding_authority "
+                    f"{binding_authority!r}"
+                )
+        else:
+            binding_authority = BINDING_AUTHORITY_LEGACY_UNKNOWN
         unknown_applicability = set(applicability) - {
             "include_paths",
             "exclude_paths",
@@ -1379,6 +1452,7 @@ def load_persisted_decision_index(
                 rule_type=rule_type,
                 rule_payload={"value": value},
                 applicability=copy.deepcopy(applicability),
+                binding_authority=binding_authority,
             )
         )
 
@@ -1454,6 +1528,7 @@ def load_persisted_decision_index(
                 rule_payload=rule.rule_payload,
                 applicability=rule.applicability,
                 lifecycle_status=lifecycle,
+                binding_authority=rule.binding_authority,
             )
             for rule in decision_rules
         ]
@@ -1590,7 +1665,7 @@ def load_decision_index_from_memory_file(
     if not isinstance(document, dict):
         raise DecisionIndexPersistenceError("project memory must be an object")
     if "decision_index" not in document:
-        raise DecisionIndexPersistenceError(
+        raise DecisionIndexMigrationRequired(
             "project memory has no authoritative decision_index section"
         )
     index = load_persisted_decision_index(document["decision_index"])
@@ -1598,45 +1673,272 @@ def load_decision_index_from_memory_file(
     return index
 
 
-def migrate_memory_file(path: str | Path) -> bool:
-    """Atomically add D1B canonical persistence to one pre-D1 memory file.
+_LOSSLESS_DECISION_FIELDS = frozenset({
+    "id",
+    "decision",
+    "rationale",
+    "scope",
+    "constraints",
+    "anti_patterns",
+    "rules",
+    "test_evidence",
+    "created_at",
+    "updated_at",
+    "status",
+    "source",
+})
+_LOSSLESS_RULE_FIELDS = frozenset({
+    "type", "value", "include_paths", "exclude_paths",
+})
+_LOSSLESS_TEST_EVIDENCE_FIELDS = frozenset({"selector", "sha"})
+_LOSSLESS_SOURCE_FIELDS = frozenset({"type", "path", "sha256"})
 
-    Returns ``True`` when a migration write occurred and ``False`` for an
-    already-migrated, valid file. A second call performs no write, preserving
-    the exact bytes produced by the first call.
+
+def _is_str_list(value: object) -> bool:
+    return isinstance(value, list) and all(isinstance(v, str) for v in value)
+
+
+def lossless_migration_problems(document: dict[str, Any]) -> list[str]:
+    """Name every legacy ``decisions[]`` value migration would lose.
+
+    ADR-030 §12: canonicalization plus the next compatibility-snapshot
+    rebuild must preserve every legacy decision row exactly, so validation is
+    recursive over decision, rule, test-evidence, and source records.
+    Unknown top-level project-memory sections are not inspected: canonical
+    writers preserve them.
+    """
+    rows = document.get("decisions", [])
+    if not isinstance(rows, list):
+        return ["decisions must be a list"]
+    problems: list[str] = []
+    for index, row in enumerate(rows):
+        where = f"decisions[{index}]"
+        if not isinstance(row, dict):
+            problems.append(f"{where} is not an object")
+            continue
+        decision_id = row.get("id")
+        if not isinstance(decision_id, str) or not decision_id:
+            problems.append(f"{where} has no non-empty string id")
+            continue
+        where = f"decision {decision_id!r}"
+        for key in sorted(set(row) - _LOSSLESS_DECISION_FIELDS):
+            problems.append(f"{where} contains unsupported field {key!r}")
+        if not isinstance(row.get("decision"), str):
+            problems.append(f"{where} field 'decision' must be a string")
+        for key in ("rationale", "created_at", "updated_at"):
+            if key in row and not isinstance(row[key], str):
+                problems.append(f"{where} field {key!r} must be a string")
+        for key in ("scope", "constraints", "anti_patterns"):
+            if key in row and not _is_str_list(row[key]):
+                problems.append(
+                    f"{where} field {key!r} must be a list of strings"
+                )
+        if "status" in row and row["status"] not in VALID_LIFECYCLE_STATUSES:
+            problems.append(
+                f"{where} field 'status' has unsupported value {row['status']!r}"
+            )
+
+        rules = row.get("rules", [])
+        if not isinstance(rules, list):
+            problems.append(f"{where} field 'rules' must be a list")
+            rules = []
+        for rule_index, rule in enumerate(rules):
+            rule_where = f"{where} rules[{rule_index}]"
+            if not isinstance(rule, dict):
+                problems.append(f"{rule_where} is not an object")
+                continue
+            for key in sorted(set(rule) - _LOSSLESS_RULE_FIELDS):
+                problems.append(
+                    f"{rule_where} contains unsupported field {key!r}"
+                )
+            for key in ("type", "value"):
+                if not isinstance(rule.get(key), str):
+                    problems.append(
+                        f"{rule_where} field {key!r} must be a string"
+                    )
+            for key in ("include_paths", "exclude_paths"):
+                if key in rule and not _is_str_list(rule[key]):
+                    problems.append(
+                        f"{rule_where} field {key!r} must be a list of strings"
+                    )
+
+        evidence = row.get("test_evidence")
+        if evidence is not None and not isinstance(evidence, list):
+            problems.append(f"{where} field 'test_evidence' must be a list")
+            evidence = []
+        for evidence_index, entry in enumerate(evidence or []):
+            entry_where = f"{where} test_evidence[{evidence_index}]"
+            if not isinstance(entry, dict):
+                problems.append(f"{entry_where} is not an object")
+                continue
+            for key in sorted(set(entry) - _LOSSLESS_TEST_EVIDENCE_FIELDS):
+                problems.append(
+                    f"{entry_where} contains unsupported field {key!r}"
+                )
+            if not isinstance(entry.get("selector"), str):
+                problems.append(
+                    f"{entry_where} field 'selector' must be a string"
+                )
+            if "sha" in entry and not isinstance(entry["sha"], str):
+                problems.append(f"{entry_where} field 'sha' must be a string")
+
+        if "source" in row:
+            source = row["source"]
+            source_where = f"{where} source"
+            if not isinstance(source, dict):
+                problems.append(f"{source_where} is not an object")
+                continue
+            for key in sorted(set(source) - _LOSSLESS_SOURCE_FIELDS):
+                problems.append(
+                    f"{source_where} contains unsupported field {key!r}"
+                )
+            if source.get("type") != "adr":
+                problems.append(
+                    f"{source_where} type {source.get('type')!r} has no "
+                    "canonical provenance representation in D1 (only 'adr' "
+                    "sources migrate)"
+                )
+            elif not _resolved_adr_source_path(None, source, decision_id):
+                problems.append(
+                    f"{source_where} path {source.get('path')!r} does not "
+                    "resolve to an ADR file for this decision"
+                )
+            if "sha256" in source and not isinstance(source["sha256"], str):
+                problems.append(
+                    f"{source_where} field 'sha256' must be a string"
+                )
+    return problems
+
+
+@dataclass(frozen=True)
+class MemoryMigrationPlan:
+    """One migration derived from a single read of project memory.
+
+    ``state`` is ``"migrate"`` (section-less and migratable) or
+    ``"already_canonical"`` (a valid section exists; applying is a no-op).
+    The preview fields describe the user-visible ADR-030 consequences of
+    ``document``, the exact result that ``--apply`` writes.
+    """
+
+    path: Path
+    state: str
+    source_bytes: bytes
+    document: dict[str, Any]
+    native_decision_ids: tuple[str, ...] = ()
+    non_active_decisions: tuple[tuple[str, str], ...] = ()
+    legacy_item_ids: tuple[str, ...] = ()
+    migrated_rule_bindings: int = 0
+
+
+def plan_memory_migration(path: str | Path) -> MemoryMigrationPlan:
+    """Read project memory once and build its migration (ADR-030 §12).
+
+    Raises ``DecisionIndexMigrationRefused`` before any write when legacy
+    state cannot be represented losslessly or the input is unreadable, and
+    ``DecisionIndexPersistenceError`` when an existing section is invalid.
+    Migration is never a repair path.
     """
     memory_path = Path(path)
-    with open(memory_path, encoding="utf-8") as handle:
-        document = json.load(handle)
+    source_bytes = memory_path.read_bytes()
+    try:
+        document = json.loads(source_bytes.decode("utf-8"))
+    except (UnicodeDecodeError, ValueError) as exc:
+        raise DecisionIndexMigrationRefused(
+            f"project memory is not valid UTF-8 JSON: {exc}"
+        ) from exc
+    if not isinstance(document, dict):
+        raise DecisionIndexMigrationRefused("project memory must be an object")
+
     if "decision_index" in document:
         index = load_persisted_decision_index(document["decision_index"])
         verify_compatibility_snapshot(document, index, memory_path)
-        return False
+        return MemoryMigrationPlan(
+            path=memory_path,
+            state="already_canonical",
+            source_bytes=source_bytes,
+            document=document,
+        )
 
-    migrated = migrate_memory_document(document)
-    index = load_persisted_decision_index(migrated["decision_index"])
-    verify_compatibility_snapshot(migrated, index, memory_path)
-
-    rendered = json.dumps(
-        migrated,
-        indent=2,
-        ensure_ascii=False,
-    ) + "\n"
-    tmp_path = memory_path.with_name(memory_path.name + ".d1b.tmp")
+    problems = lossless_migration_problems(document)
+    if problems:
+        raise DecisionIndexMigrationRefused(
+            "migration must be lossless; refused before writing:\n  - "
+            + "\n  - ".join(problems)
+        )
     try:
-        tmp_path.write_text(rendered, encoding="utf-8")
-        os.replace(tmp_path, memory_path)
-    finally:
-        if tmp_path.exists():
-            tmp_path.unlink()
+        migrated = migrate_memory_document(document)
+        index = load_persisted_decision_index(migrated["decision_index"])
+        verify_compatibility_snapshot(migrated, index, memory_path)
+    except (DecisionIndexPersistenceError, KeyError, TypeError) as exc:
+        raise DecisionIndexMigrationRefused(str(exc)) from exc
+
+    native = list(document.get("decisions", []))
+    return MemoryMigrationPlan(
+        path=memory_path,
+        state="migrate",
+        source_bytes=source_bytes,
+        document=migrated,
+        native_decision_ids=tuple(row["id"] for row in native),
+        non_active_decisions=tuple(
+            (row["id"], row.get("status", "active"))
+            for row in native
+            if row.get("status", "active") != "active"
+        ),
+        legacy_item_ids=tuple(
+            item["id"]
+            for item in document.get("items", [])
+            if isinstance(item, dict)
+            and item.get("type") in {"rule", "anti_pattern"}
+        ),
+        migrated_rule_bindings=len(migrated["decision_index"]["rules"]),
+    )
+
+
+def apply_memory_migration(plan: MemoryMigrationPlan) -> bool:
+    """Write exactly the planned migration; ``False`` when already canonical.
+
+    Nothing is written if the file no longer holds the bytes the plan was
+    built from. The written result is reloaded and verified.
+    """
+    if plan.state == "already_canonical":
+        return False
+    from mneme.setup_state import (
+        ConcurrentModificationError,
+        atomic_write_json,
+    )
+
+    try:
+        atomic_write_json(
+            plan.path,
+            plan.document,
+            expected_bytes=plan.source_bytes,
+        )
+    except ConcurrentModificationError as exc:
+        raise DecisionIndexMigrationRefused(str(exc)) from exc
+    load_decision_index_from_memory_file(plan.path)
     return True
+
+
+def migrate_memory_file(path: str | Path) -> bool:
+    """Plan and apply migration of one memory file (ADR-030 §12).
+
+    Returns ``True`` when a migration write occurred and ``False`` for an
+    already-migrated, valid file. A second call performs no write.
+    """
+    return apply_memory_migration(plan_memory_migration(path))
 
 
 __all__ = [
     "DECISION_INDEX_SCHEMA",
     "NO_PREDECESSOR",
+    "DecisionIndexMigrationRefused",
+    "DecisionIndexMigrationRequired",
     "DecisionIndexPersistenceError",
     "LegacyDecisionsWriteRefused",
+    "MemoryMigrationPlan",
+    "apply_memory_migration",
+    "lossless_migration_problems",
+    "plan_memory_migration",
     "append_initial_canonical_decision",
     "compatibility_snapshot_decisions",
     "content_digest_of",
