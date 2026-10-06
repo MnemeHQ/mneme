@@ -48,12 +48,22 @@ Claude `Bash`) and `Delete` tools do not match, and `mneme-hook.py`'s
 delete/rename therefore bypass architectural enforcement. `beforeShellExecution`,
 `beforeMCPExecution`, and the Tab hooks are not configured.
 
-## Interactive (agent-only) cells — pending
+## Interactive (agent-only) cells
 
-| Test | Scenario | Expected |
-|---|---|---|
-| T3 | block → recover | agent receives reason, retries with allowed alternative |
-| T6 | multi-file task | every underlying mutation recorded; partial-application classified |
+Run in the fixture workspace with a live Cursor Agent chat.
+
+| Test | Scenario | Expected | Observed |
+|---|---|---|---|
+| T3 | block → recover | agent receives reason, retries with allowed alternative | **PASS** — first attempt `install legacy-client` refused by `CUR-001`; agent recovered with allowed alternative `install cursor-only-client`; `setup.md` created |
+| T6 | multi-file task | every underlying mutation recorded; partial-application classified | **PASS** — `a.txt` + `c.txt` created, `b.txt` blocked by `CUR-001`; partial application (2/3) observed |
+
+### T3 detail
+
+The agent's recovery attempt first wrote an explanatory note that still contained
+the forbidden literal; that write was also blocked. Only after removing the
+literal did the write succeed. This confirms exact literal matching with no
+"quoted example" escape (occurrence escapes are a deferred ADR-020 concern), and
+confirms the denial reason reaches the agent.
 
 ## Notes
 
