@@ -246,6 +246,24 @@ Every authority operation that creates a version occurrence has an exact
 (decision_id, content_digest, occurrence_source_identity, predecessor_version_id)
 ```
 
+A caller distinguishes a retry from a new authority operation only by the
+predecessor it supplies:
+
+- **An unpinned invocation is a new authority operation.** It takes the
+  version active when it starts as its predecessor.
+- **A retry carries the predecessor recorded for the original operation.** It
+  never re-derives the predecessor from the active pointer, so its occurrence
+  key is the original operation's key.
+- **Reapplying identical content and source is not automatically a retry.**
+  Deliberately reapplied as a new operation after a later version has become
+  active, it legitimately produces another occurrence (A2 below).
+- **The "already active occurrence" no-op is separate from retry resolution.**
+  A new operation whose `content_digest` and `occurrence_source_identity` both
+  already match the active occurrence creates nothing. That is an
+  optimization over the active version only. It is distinct from resolving a
+  retry by its exact historical occurrence key, which searches the whole
+  version history and includes the predecessor.
+
 - A retry first resolves an already-persisted occurrence with that exact key
   and reuses it (idempotent no-op, no new occurrence).
 - A retry **must not rederive the predecessor from the current active
