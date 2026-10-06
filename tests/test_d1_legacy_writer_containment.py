@@ -3,13 +3,15 @@
 Once the top-level ``decision_index`` section exists, the merged D1B/D1C
 loader treats it as the durable decision authority and ``decisions[]`` as a
 derived compatibility snapshot. The remaining legacy writers (``add_decision``,
-protection activation, ``eventcatalog import --apply``) must refuse such
-files before any mutation, leave them byte-identical, and keep section-less
-legacy files behaving as before.
+``eventcatalog import --apply``) must refuse such files before any mutation,
+leave them byte-identical, and keep section-less legacy files behaving as
+before.
 
-``adr import --apply`` is no longer a legacy writer: since D1D it is a
-canonical authority writer, and its contract is pinned in
-``tests/test_adr_import.py``.
+``adr import --apply`` (since D1D) and ``protect activate`` (since D1E2b) are
+no longer legacy writers on canonical memory: they are canonical authority
+writers, pinned in ``tests/test_adr_import.py`` and
+``tests/test_d1e2b_canonical_protect.py``. Section-less protection keeps its
+legacy write until D1E5 (pinned below).
 """
 from __future__ import annotations
 
@@ -27,7 +29,7 @@ from mneme.decision_index_persistence import (
 from mneme.integrations.eventcatalog import apply_import as ec_apply_import
 from mneme.integrations.eventcatalog import compile_for_import as ec_compile_for_import
 from mneme.memory_store import MemoryStore
-from mneme.protection import ProtectionError, activate_protection
+from mneme.protection import activate_protection
 
 FIXTURES = Path(__file__).parent / "fixtures"
 EC_FIXTURES = FIXTURES / "eventcatalog_import"
@@ -161,42 +163,6 @@ def _repo(tmp_path: Path) -> tuple[Path, Path]:
     root = tmp_path / "repo"
     (root / ".git").mkdir(parents=True)
     return root, root / ".mneme" / "project_memory.json"
-
-
-@pytest.mark.parametrize("activation", [None, SETUP_ACTIVATION])
-def test_protection_refuses_canonical_memory_before_any_mutation(
-    tmp_path, activation
-):
-    root, memory = _repo(tmp_path)
-    _canonical_memory(memory, decisions=[READY_DECISION], activation=activation)
-    before = memory.read_bytes()
-
-    with pytest.raises(ProtectionError) as excinfo:
-        activate_protection("d_ready", memory, repo_root=root)
-
-    assert "mneme protect activate" in str(excinfo.value)
-    assert REFUSAL_TEXT in str(excinfo.value)
-    # Neither the rule nor the activation record was written.
-    _assert_refused_unchanged(memory, before)
-
-
-def test_protect_activate_cli_refuses_canonical_memory(tmp_path, capsys):
-    root, memory = _repo(tmp_path)
-    _canonical_memory(
-        memory, decisions=[READY_DECISION], activation=SETUP_ACTIVATION
-    )
-    before = memory.read_bytes()
-
-    code = main([
-        "protect", "activate", "d_ready",
-        "--memory", str(memory), "--repo-root", str(root),
-    ])
-    captured = capsys.readouterr()
-
-    assert code == 2
-    assert REFUSAL_TEXT in captured.err
-    assert "diverges" not in captured.err
-    _assert_refused_unchanged(memory, before)
 
 
 def test_protection_on_legacy_memory_is_unchanged(tmp_path):

@@ -1052,6 +1052,77 @@ def append_canonical_version_occurrence(
     return migrated, version_id, True
 
 
+def append_protection_binding(
+    document: dict[str, Any],
+    *,
+    decision_id: str,
+    rule: Rule,
+) -> tuple[dict[str, Any], str, bool]:
+    """Install one canonical ``protection`` rule binding (ADR-030 §9, D1E2b).
+
+    The binding attaches to the decision's active version at
+    ``max(sequence) + 1`` with ``binding_authority = protection``. The
+    owning version record, its ``version_id``, its ``content_digest``, and
+    every existing binding stay untouched.
+
+    If the active version already binds the same ``rule_id`` under any
+    authority, nothing is written and ``created`` is ``False``: immutable
+    authority is never rewritten, and the rule is already enforced.
+    Returns ``(document, rule_id, created)``.
+    """
+    migrated = require_canonical_document(document)
+    section = copy.deepcopy(
+        _require_dict(migrated["decision_index"], "decision_index")
+    )
+    logical = next(
+        (
+            row for row in _require_list(
+                section.get("decisions"), "decision_index.decisions"
+            )
+            if isinstance(row, dict) and row.get("decision_id") == decision_id
+        ),
+        None,
+    )
+    if logical is None:
+        raise DecisionIndexPersistenceError(
+            f"decision {decision_id!r} does not exist canonically"
+        )
+    if logical.get("lifecycle_status") != "active":
+        raise DecisionIndexPersistenceError(
+            f"decision {decision_id!r} is {logical.get('lifecycle_status')!r}; "
+            "protection installs only on active decisions"
+        )
+    active_version_id = logical["active_version_id"]
+    version = next(
+        row for row in _require_list(section.get("versions"), "decision_index.versions")
+        if isinstance(row, dict) and row.get("version_id") == active_version_id
+    )
+    rule_id = rule_id_for(decision_id, rule)
+    rows = _require_list(section.get("rules"), "decision_index.rules")
+    bound = [
+        row for row in rows
+        if isinstance(row, dict) and row.get("decision_version_id") == active_version_id
+    ]
+    if any(row.get("rule_id") == rule_id for row in bound):
+        load_persisted_decision_index(section)
+        return migrated, rule_id, False
+
+    rows.append({
+        "rule_id": rule_id,
+        "decision_id": decision_id,
+        "decision_version_id": active_version_id,
+        "decision_version": version["revision"],
+        "sequence": max((row["sequence"] for row in bound), default=-1) + 1,
+        "rule_type": rule.type,
+        "rule_payload": {"value": rule.value},
+        "applicability": _applicability_of(rule),
+        "binding_authority": BINDING_AUTHORITY_PROTECTION,
+    })
+    migrated["decision_index"] = section
+    load_persisted_decision_index(section)
+    return migrated, rule_id, True
+
+
 def apply_canonical_supersession(
     document: dict[str, Any],
     *,
@@ -2137,6 +2208,7 @@ __all__ = [
     "lossless_migration_problems",
     "plan_memory_migration",
     "append_initial_canonical_decision",
+    "append_protection_binding",
     "compatibility_snapshot_decisions",
     "content_digest_of",
     "continuity_bindings",
