@@ -298,3 +298,23 @@ def test_legacy_item_decision_still_not_activatable_on_canonical_memory(tmp_path
     assert outcome.result == "validation_failed"
     assert outcome.rule_installed is False
     assert memory.read_bytes() == before
+
+
+def test_divergent_snapshot_is_refused_not_repaired(tmp_path):
+    """Valid decision_index + divergent decisions[] -> refuse, byte-identical.
+
+    Reproduces the race where decisions[] diverges after activate_protection's
+    initial MemoryStore load: the writer must verify the exact bytes it is
+    about to mutate and refuse, never rebuild (repair) the snapshot as a side
+    effect of activation.
+    """
+    _, memory = _repo(tmp_path, [READY])
+    raw = json.loads(memory.read_text(encoding="utf-8"))
+    raw["decisions"][0]["decision"] = "Hand-edited snapshot only"
+    memory.write_text(json.dumps(raw, indent=2) + "\n", encoding="utf-8")
+    before = memory.read_bytes()
+
+    with pytest.raises(ProtectionError, match="compatibility snapshot diverges"):
+        _install_rule(memory, "d_ready", POSTGRES)
+
+    assert memory.read_bytes() == before

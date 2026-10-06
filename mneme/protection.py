@@ -57,8 +57,10 @@ from mneme.decision_index_persistence import (
     DecisionIndexPersistenceError,
     LegacyDecisionsWriteRefused,
     append_protection_binding,
+    load_persisted_decision_index,
     rebuild_compatibility_snapshot,
     refuse_legacy_decisions_write,
+    verify_compatibility_snapshot,
 )
 from mneme.memory_store import MemoryStore
 from mneme.path_selectors import SelectorOutcome, policy_root
@@ -607,6 +609,12 @@ def _install_canonical_rule(
     changed after it was read. An already-bound identical rule is a no-op.
     """
     try:
+        # Verify the exact canonical state about to be mutated, including the
+        # compatibility snapshot, from these same bytes. A divergent
+        # decisions[] is refused here, never repaired by the rebuild below
+        # (ADR-030 §1/§12: writers do not repair canonical state).
+        index = load_persisted_decision_index(raw["decision_index"])
+        verify_compatibility_snapshot(raw, index, Path(memory_path))
         document, _, created = append_protection_binding(
             raw, decision_id=decision_id, rule=proposal
         )
