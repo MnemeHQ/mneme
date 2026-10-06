@@ -13,7 +13,7 @@ scope: decision_index.persistence
 **Date:** 2026-09-16
 **Amended:** 2026-10-05 — accepted after reconciliation against the merged D1B/D1C implementation; lifecycle-conformance correction and other reconciliation amendments recorded (see "Implementation reconciliation" below)
 **Amended:** 2026-10-05 — D1E0 architecture decisions: binding authority and protection continuity (§9a), canonical `add_decision` identity (§4), EventCatalog canonical apply retired for D1, and the D1E order and release gate (§15) (see "D1E0 amendment" below)
-**Amended:** 2026-10-06 — D1E1 migration contract: `mneme decision-index migrate`, lossless-or-refuse migration with recursive representability validation, EventCatalog migration consequence, and comparison against bindings that predate `binding_authority` (§9a, §12, §15)
+**Amended:** 2026-10-06 — D1E1 migration contract: `mneme decision-index migrate`, lossless-or-refuse migration with recursive representability validation, EventCatalog migration consequence, and comparison against bindings that predate `binding_authority` (§9a, §12, §15); `mneme decision-index migrate` as the sole section-less-to-canonical transition, withdrawing implicit migration from canonical writers (§1, §12, §15)
 **Deciders:** Theo Valmis
 
 ---
@@ -136,6 +136,21 @@ has not been migrated to a canonical authority operation must refuse before
 any mutation and leave the file byte-identical, rather than write a snapshot
 that the loader will then reject (D1 containment, PR #444). Section-less
 pre-D1 files keep their legacy writer behaviour.
+
+**Single transition (D1E1).** `mneme decision-index migrate` (§12) is the
+sole supported transition from section-less memory to canonical
+`decision_index` memory. Canonical writers must fail with
+`DecisionIndexMigrationRequired` when they encounter section-less memory, and
+must never migrate implicitly. That covers ADR import, proposal acceptance,
+and every later canonical writer. Migration is an explicit authority
+transition, never a side effect of another authority action. The two
+directions are therefore symmetric:
+
+```text
+section-less memory → legacy writers only; canonical writers refuse
+canonical memory    → canonical writers only; legacy writers refuse
+the only bridge     → mneme decision-index migrate (preview, then --apply)
+```
 
 ### 2. Legacy item migration
 
@@ -627,7 +642,9 @@ consequently part of D1: an explicit migration command, plus a
 section-bearing scaffold from `mneme init`. It is assigned to D1E (§15) and
 must land before any release ships the MCP canonical read path.
 
-**Migration entry point (D1E1).** The public command is:
+**Migration entry point (D1E1).** This command is the only transition from
+section-less to canonical memory (§1). No canonical writer migrates
+implicitly. The public command is:
 
 ```text
 mneme decision-index migrate --memory <path>            # preview, no write (default)
@@ -871,8 +888,13 @@ ADR-022; none is authorized by this ADR change:
      when memory is missing the section (§12), and `binding_authority`
      persistence plumbing (§9a): migrated rules are written as
      `legacy_unknown`, newly created ADR-derived rules as `version`, and a
-     missing field reads as `legacy_unknown`. No preserve/release, no
-     continuity enforcement, and no `init`/`setup` change yet.
+     missing field reads as `legacy_unknown`. D1E1 also **withdraws the
+     implicit migration** that D1C proposal acceptance and D1D ADR import
+     performed on section-less targets. Those writers, and the canonical
+     append, evolve, supersede, and rebuild primitives, now refuse
+     section-less memory with `DecisionIndexMigrationRequired` (§1). No
+     preserve/release, no continuity enforcement, and no `init`/`setup` change
+     yet.
   3. **D1E2** — canonical `mneme protect activate`: writes `protection`
      bindings (§9, §9a). Also the per-binding preserve/release operations,
      and fail-closed continuity enforcement in ADR version evolution,
@@ -890,6 +912,19 @@ ADR-022; none is authorized by this ADR change:
      empty `decision_index` section.
   7. **D1E6** — parity closeout (G16–G20), release notes, and the release
      gate below.
+
+  **Accepted interim state (unreleased, D1E1 to D1E5).** Until D1E5, no single
+  memory mode supports every writer:
+
+  - section-less memory: the legacy `add_decision`, `protect`, and
+    EventCatalog apply work, explicit migration is available, and canonical
+    writers refuse;
+  - canonical memory: ADR import, proposal authority, and canonical reads
+    work, and legacy writers refuse.
+
+  D1E2 to D1E4 close the writer gaps, and D1E5 makes new projects canonical by
+  default. This state is acceptable only because D1 is unreleased; the
+  release gate below applies.
 - **D1F** — optional later removal of the persisted `decisions[]`
   compatibility snapshot, gated by a consumer inventory; must never ride
   along in another slice.
@@ -1091,6 +1126,7 @@ after D1D merged (#443). They are recorded before any D1E implementation.
 | E4 | Making `init` canonical before the writers would block every new project. | D1E order fixed, with `init`/`setup` last. A clean MCP migration error comes early. | §12, §15 |
 | E5 | Pre-D1 protection rules on migrated memory are already exposed to silent loss on `main`. | Release blocker: no silent loss of `protection`/`legacy_unknown` across version evolution. | §15 |
 | E6 | Migration already discarded unrepresentable legacy metadata. EventCatalog provenance and unknown fields survived only in the raw snapshot, and the next canonical write erased them (reproduced). | Lossless-or-refuse migration with recursive validation and no force option. EventCatalog-bearing memory stays section-less in D1. Absent `binding_authority` acts as a wildcard only in exact historical-binding comparison. | §9a, §12, §15 |
+| E7 | Implicit migration inside D1C acceptance, D1D ADR import, and the canonical primitives bypassed the lossless migration check. Reproduced: ADR import on section-less memory erased an EventCatalog decision's provenance. | `mneme decision-index migrate` is the sole transition. Canonical writers refuse section-less memory with `DecisionIndexMigrationRequired`, giving a symmetric writer boundary. The interim state is accepted while D1 is unreleased. | §1, §12, §15 |
 
 ## Related
 
