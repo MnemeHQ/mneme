@@ -15,10 +15,11 @@ import hashlib
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from mneme.decision_index import (
     BINDING_AUTHORITY_LEGACY_UNKNOWN,
+    BINDING_AUTHORITY_PROTECTION,
     BINDING_AUTHORITY_VERSION,
     CANONICAL_DECISION_CLASS_ARCHITECTURE,
     CANONICAL_VERSION,
@@ -52,6 +53,15 @@ class DecisionIndexMigrationRequired(DecisionIndexPersistenceError):
 
 class DecisionIndexMigrationRefused(DecisionIndexPersistenceError):
     """Migration would lose legacy state or cannot be applied safely."""
+
+
+class DecisionIndexContinuityError(DecisionIndexPersistenceError):
+    """Version evolution would break ADR-030 §9a binding continuity.
+
+    Raised before any write when a ``protection``/``legacy_unknown`` binding
+    would lapse without explicit preserve/release, or when a preserve/release
+    request is invalid.
+    """
 
 
 class LegacyDecisionsWriteRefused(DecisionIndexPersistenceError):
@@ -324,6 +334,158 @@ def _rule_bindings_for_version(
             "binding_authority": binding_authority,
         })
     return bindings
+
+
+def rule_id_for(decision_id: str, rule: Rule) -> str:
+    """Stable ADR-030 §7 ``rule_id`` of one runtime ``Rule``."""
+    return rule_id_of(decision_id, rule.type, rule.value, _applicability_of(rule))
+
+
+_CONTINUITY_AUTHORITIES = frozenset({
+    BINDING_AUTHORITY_PROTECTION,
+    BINDING_AUTHORITY_LEGACY_UNKNOWN,
+})
+
+
+def continuity_bindings(
+    section: dict[str, Any],
+    version_id: str,
+) -> list[dict[str, Any]]:
+    """``protection``/``legacy_unknown`` bindings of one version, in order.
+
+    A binding persisted before ``binding_authority`` existed reads as
+    ``legacy_unknown`` (ADR-030 §9a) and is therefore a continuity binding.
+    """
+    rows = [
+        row for row in _require_list(section.get("rules"), "decision_index.rules")
+        if isinstance(row, dict) and row.get("decision_version_id") == version_id
+    ]
+    rows.sort(key=lambda row: row.get("sequence", -1))
+    return [
+        row for row in rows
+        if row.get("binding_authority", BINDING_AUTHORITY_LEGACY_UNKNOWN)
+        in _CONTINUITY_AUTHORITIES
+    ]
+
+
+def _continuity_bindings_for_version(
+    section: dict[str, Any],
+    *,
+    decision_id: str,
+    predecessor_version_id: str,
+    version_id: str,
+    rules: list[Rule] | tuple[Rule, ...],
+    preserve_rule_ids: frozenset[str],
+    release_rule_ids: frozenset[str],
+    validate_preserved: Callable[[Rule], None] | None,
+) -> list[dict[str, Any]]:
+    """Expected bindings of a new version under ADR-030 §9a continuity.
+
+    A ``protection``/``legacy_unknown`` binding on the predecessor never
+    lapses without explicit authority:
+
+    - the new source re-derives it: one binding that keeps the stronger
+      authority, or ``version`` if explicitly released;
+    - the new source drops it: carried only if explicitly preserved and
+      ``validate_preserved`` accepts the exact unchanged rule, omitted only
+      if explicitly released, otherwise refused.
+
+    Source-derived rules come first in source order; preserved bindings
+    follow at ``max(sequence) + 1`` in their previous relative order.
+    """
+    both = preserve_rule_ids & release_rule_ids
+    if both:
+        raise DecisionIndexContinuityError(
+            f"decision {decision_id!r}: rule ids both preserved and released: "
+            f"{sorted(both)}"
+        )
+    continuity = {
+        row["rule_id"]: row
+        for row in continuity_bindings(section, predecessor_version_id)
+    }
+    unknown = (preserve_rule_ids | release_rule_ids) - set(continuity)
+    if unknown:
+        raise DecisionIndexContinuityError(
+            f"decision {decision_id!r}: {sorted(unknown)} are not protection "
+            "or legacy_unknown bindings of the predecessor version"
+        )
+
+    derived = _rule_bindings_for_version(
+        decision_id,
+        version_id,
+        CANONICAL_VERSION,
+        rules,
+        binding_authority=BINDING_AUTHORITY_VERSION,
+    )
+    derived_ids = {binding["rule_id"] for binding in derived}
+    redundant = preserve_rule_ids & derived_ids
+    if redundant:
+        raise DecisionIndexContinuityError(
+            f"decision {decision_id!r}: {sorted(redundant)} are still derived "
+            "by the new source; preserving them is meaningless (release "
+            "downgrades them to version)"
+        )
+    for binding in derived:
+        prior = continuity.get(binding["rule_id"])
+        if prior is not None and binding["rule_id"] not in release_rule_ids:
+            binding["binding_authority"] = prior.get(
+                "binding_authority", BINDING_AUTHORITY_LEGACY_UNKNOWN
+            )
+
+    unresolved: list[str] = []
+    carried: list[dict[str, Any]] = []
+    for rule_id, prior in continuity.items():
+        if rule_id in derived_ids or rule_id in release_rule_ids:
+            continue
+        if rule_id not in preserve_rule_ids:
+            unresolved.append(rule_id)
+            continue
+        if validate_preserved is None:
+            raise DecisionIndexContinuityError(
+                f"decision {decision_id!r}: preserving {rule_id!r} requires "
+                "deterministic revalidation, but no validator was supplied"
+            )
+        applicability = prior.get("applicability", {})
+        rule = Rule(
+            type=prior["rule_type"],
+            value=prior["rule_payload"]["value"],
+            include_paths=(
+                tuple(applicability["include_paths"])
+                if "include_paths" in applicability
+                else None
+            ),
+            exclude_paths=tuple(applicability.get("exclude_paths", [])),
+        )
+        try:
+            validate_preserved(rule)
+        except DecisionIndexContinuityError:
+            raise
+        except (ValueError, TypeError) as exc:
+            raise DecisionIndexContinuityError(
+                f"decision {decision_id!r}: preserved {rule_id!r} failed "
+                f"revalidation: {exc}"
+            ) from exc
+        carried.append({
+            "rule_id": rule_id,
+            "decision_id": decision_id,
+            "decision_version_id": version_id,
+            "decision_version": CANONICAL_VERSION,
+            "sequence": len(derived) + len(carried),
+            "rule_type": prior["rule_type"],
+            "rule_payload": copy.deepcopy(prior["rule_payload"]),
+            "applicability": copy.deepcopy(applicability),
+            "binding_authority": prior.get(
+                "binding_authority", BINDING_AUTHORITY_LEGACY_UNKNOWN
+            ),
+        })
+    if unresolved:
+        raise DecisionIndexContinuityError(
+            f"decision {decision_id!r}: version evolution would drop "
+            f"protection/legacy_unknown bindings {unresolved}; pass "
+            "--preserve-protection or --release-protection for each "
+            "(ADR-030 §9a)"
+        )
+    return derived + carried
 
 
 def _bindings_match_historical(
@@ -746,8 +908,16 @@ def append_canonical_version_occurrence(
     updated_at: str,
     occurrence_source_identity: list[Any] | tuple[Any, ...],
     source_evidence: list[dict[str, Any]],
+    preserve_rule_ids: list[str] | tuple[str, ...] | frozenset[str] = (),
+    release_rule_ids: list[str] | tuple[str, ...] | frozenset[str] = (),
+    validate_preserved: Callable[[Rule], None] | None = None,
 ) -> tuple[dict[str, Any], str, bool]:
     """Append or idempotently reuse one immutable D1D version occurrence.
+
+    ADR-030 §9a continuity governs the new version's bindings: see
+    ``_continuity_bindings_for_version``. Preserve/release requests are not
+    part of the occurrence key, so a retry whose requests would produce
+    different bindings than the persisted occurrence fails closed.
 
     The predecessor is an explicit authority input. It is never re-derived
     after the operation starts. An exact persisted retry is a structural
@@ -807,12 +977,15 @@ def append_canonical_version_occurrence(
         "supersedes_version_id": predecessor_version_id,
         "created_at": created_at,
     }
-    expected_bindings = _rule_bindings_for_version(
-        decision_id,
-        version_id,
-        CANONICAL_VERSION,
-        rules,
-        binding_authority=BINDING_AUTHORITY_VERSION,
+    expected_bindings = _continuity_bindings_for_version(
+        section,
+        decision_id=decision_id,
+        predecessor_version_id=predecessor_version_id,
+        version_id=version_id,
+        rules=rules,
+        preserve_rule_ids=frozenset(preserve_rule_ids),
+        release_rule_ids=frozenset(release_rule_ids),
+        validate_preserved=validate_preserved,
     )
 
     versions = _require_list(section.get("versions"), "decision_index.versions")
@@ -1954,6 +2127,7 @@ def migrate_memory_file(path: str | Path) -> bool:
 __all__ = [
     "DECISION_INDEX_SCHEMA",
     "NO_PREDECESSOR",
+    "DecisionIndexContinuityError",
     "DecisionIndexMigrationRefused",
     "DecisionIndexMigrationRequired",
     "DecisionIndexPersistenceError",
@@ -1965,6 +2139,7 @@ __all__ = [
     "append_initial_canonical_decision",
     "compatibility_snapshot_decisions",
     "content_digest_of",
+    "continuity_bindings",
     "legacy_item_to_runtime_decision",
     "load_decision_index_from_memory_file",
     "load_persisted_decision_index",
@@ -1972,6 +2147,7 @@ __all__ = [
     "rebind_legacy_initial_occurrence",
     "refuse_legacy_decisions_write",
     "require_canonical_document",
+    "rule_id_for",
     "rule_id_of",
     "runtime_decision_from_memory_record",
     "verify_compatibility_snapshot",

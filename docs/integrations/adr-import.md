@@ -241,6 +241,44 @@ the predecessor that operation ran against:
 - Malformed, duplicate, unknown, or not-yet-canonical pins are refused before
   any write.
 
+#### Protection continuity (ADR-030 §9a)
+
+A `protection` or `legacy_unknown` rule binding never disappears silently
+when an ADR evolves into a new version. A `legacy_unknown` binding is a
+migrated pre-D1 rule whose origin cannot be reconstructed. The preview lists
+every such binding the new ADR content would no longer derive, under
+**Protection continuity obligations**, with its `rule_id`. Each one needs an
+explicit decision:
+
+```bash
+mneme adr import docs/adr --memory .mneme/project_memory.json --apply --update-existing \
+  --preserve-protection 'ADR-012:FORBID_LITERAL:<hash>' \
+  --release-protection  'ADR-012:FORBID_LITERAL:<hash>'
+```
+
+- `--preserve-protection RULE_ID` carries the exact rule into the new
+  version. Your flag is the authority; Mneme only re-runs the deterministic
+  protection validation against the new version. Only a global
+  `FORBID_LITERAL` can be preserved; anything else must be released.
+- `--release-protection RULE_ID` omits the rule. If the new ADR still
+  derives it, the rule stays, as an ordinary version rule.
+- With neither flag, the apply refuses and writes nothing. If the new ADR
+  still derives the rule, nothing is needed: the rule keeps its protection.
+- Both flags are repeatable and need `--apply --update-existing`. These are
+  refused before any write:
+  - naming a rule for both flags;
+  - an unknown rule;
+  - a rule that is not a `protection`/`legacy_unknown` binding;
+  - preserving a rule the new ADR still derives;
+  - requests for a decision that is not evolving.
+- A retry with the same flags is a no-op. A retry with different flags fails
+  closed.
+
+Superseding a decision through another ADR's `supersedes` retires it, so it
+needs no per-rule release. The preview lists its protected rules under
+**Supersession enforcement effects**, because their enforcement leaves
+Layer 1.
+
 ---
 
 ## Persistence

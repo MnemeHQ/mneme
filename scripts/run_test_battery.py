@@ -76,6 +76,7 @@ GATE_CORE_PATHS: tuple[str, ...] = (
     "tests/test_decision_index_persistence.py",
     "tests/test_d1_legacy_writer_containment.py",
     "tests/test_d1e1_migration.py",
+    "tests/test_d1e2a_continuity.py",
     "tests/test_decision_projection.py",
     "tests/test_decision_proposal.py",
     "tests/test_decision_index_service.py",

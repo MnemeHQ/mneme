@@ -21,7 +21,7 @@ import re
 import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Callable, Literal
 
 from mneme.adr_schema import ADR
 from mneme.adr_compiler import (
@@ -112,6 +112,8 @@ DiagnosticKind = Literal[
     "active_active_contradiction",  # same-scope tie the compiler couldn't break
     "same_id",                      # incoming id collides with existing memory id
     "validation_error",             # malformed ADR — shown but doesn't raise
+    "continuity_obligation",        # §9a binding the new source would drop
+    "supersession_enforcement",     # §9a: enforcement leaving Layer 1
 ]
 
 
@@ -287,9 +289,108 @@ def detect_collisions(
             ))
     return out
 
+def detect_continuity_effects(
+    report: ImportReport,
+    target_memory: dict[str, Any],
+) -> list[ImportDiagnostic]:
+    """Preview ADR-030 §9a consequences against canonical target memory.
+
+    - ``continuity_obligation``: an incoming same-id decision that would
+      evolve, whose active version carries ``protection``/``legacy_unknown``
+      bindings the new source no longer derives. Each must be preserved or
+      released explicitly, or the apply refuses.
+    - ``supersession_enforcement``: a decision an incoming ADR will
+      supersede that carries such bindings. Supersession retires the
+      decision, so no per-binding release is needed, but its enforcement
+      leaves Layer 1 and the preview says so.
+
+    Section-less or invalid memory yields no diagnostics; the apply path
+    refuses it on its own terms.
+    """
+    from mneme.decision_index_persistence import (
+        DecisionIndexPersistenceError,
+        content_digest_of,
+        continuity_bindings,
+        load_persisted_decision_index,
+        rule_id_for,
+    )
+
+    section = target_memory.get("decision_index")
+    if not isinstance(section, dict):
+        return []
+    try:
+        index = load_persisted_decision_index(section)
+    except DecisionIndexPersistenceError:
+        return []
+    records = {record.decision_id: record for record in index.records}
+    revisions = {adr.id: adr.source_sha256 for adr in report.parsed_adrs}
+
+    def describe(rows: list[dict[str, Any]]) -> str:
+        return ", ".join(
+            f"{row['rule_id']} ({row.get('binding_authority', 'legacy_unknown')})"
+            for row in rows
+        )
+
+    out: list[ImportDiagnostic] = []
+    for decision in report.decisions:
+        record = records.get(decision.id)
+        if record is None:
+            continue
+        identity = (decision.id, revisions.get(decision.id, ""), "adr-import")
+        if (
+            record.content_digest == content_digest_of(
+                decision.decision,
+                decision.rationale,
+                decision.scope,
+                decision.constraints,
+                decision.anti_patterns,
+            )
+            and record.occurrence_source_identity == identity
+        ):
+            continue
+        derived = {rule_id_for(decision.id, rule) for rule in decision.rules}
+        dropped = [
+            row for row in continuity_bindings(section, record.version_id)
+            if row["rule_id"] not in derived
+        ]
+        if dropped:
+            out.append(ImportDiagnostic(
+                kind="continuity_obligation",
+                adr_id=decision.id,
+                existing_in="decision_index",
+                message=(
+                    f"{decision.id} version evolution would drop "
+                    f"protection/legacy_unknown bindings: {describe(dropped)}. "
+                    "Pass --preserve-protection <rule_id> or "
+                    "--release-protection <rule_id> for each."
+                ),
+            ))
+
+    seen: set[str] = set()
+    for node in report.active_nodes:
+        for target in node.supersedes:
+            record = records.get(target)
+            if record is None or target in seen or record.lifecycle_status != "active":
+                continue
+            seen.add(target)
+            leaving = continuity_bindings(section, record.version_id)
+            if leaving:
+                out.append(ImportDiagnostic(
+                    kind="supersession_enforcement",
+                    adr_id=target,
+                    existing_in="decision_index",
+                    message=(
+                        f"{target} will become superseded by {node.id}; "
+                        f"enforcement leaving Layer 1: {describe(leaving)}"
+                    ),
+                ))
+    return out
+
+
 def format_preview(
     report: ImportReport,
     collisions: list[ImportDiagnostic],
+    continuity: list[ImportDiagnostic] | None = None,
 ) -> str:
     """Render an ImportReport + collision list as a deterministic preview.
 
@@ -375,6 +476,23 @@ def format_preview(
         )
         lines.append("")
 
+    obligations = [
+        d for d in (continuity or []) if d.kind == "continuity_obligation"
+    ]
+    if obligations:
+        lines.append("Protection continuity obligations (ADR-030 §9a):")
+        for d in obligations:
+            lines.append(f"  - {d.message}")
+        lines.append("")
+    supersession = [
+        d for d in (continuity or []) if d.kind == "supersession_enforcement"
+    ]
+    if supersession:
+        lines.append("Supersession enforcement effects:")
+        for d in supersession:
+            lines.append(f"  - {d.message}")
+        lines.append("")
+
     return "\n".join(lines)
 
 
@@ -384,8 +502,20 @@ def apply_import(
     allow_update: bool = False,
     approve_conflicts: bool = False,
     expected_predecessor_version_ids: dict[str, str] | None = None,
+    preserve_protection: list[str] | tuple[str, ...] = (),
+    release_protection: list[str] | tuple[str, ...] = (),
+    preservation_validator: Callable[[Decision, Rule], None] | None = None,
 ) -> list[str]:
-    """Apply ADR authority to the canonical Decision Index (D1D)."""
+    """Apply ADR authority to the canonical Decision Index (D1D).
+
+    ADR-030 §9a continuity: a ``protection``/``legacy_unknown`` binding the
+    new ADR content no longer derives must be named in
+    ``preserve_protection`` (carried after ``preservation_validator``
+    revalidates the exact rule against the new version) or in
+    ``release_protection`` (omitted); otherwise version evolution refuses.
+    The validator is injected by the caller so this authority module does
+    not depend on the protection/enforcement layer.
+    """
     from mneme.adr_freshness import relative_source_path
     from mneme.decision_index_persistence import (
         DecisionIndexPersistenceError,
@@ -483,6 +613,34 @@ def apply_import(
                     f"is not a persisted version of {decision_id!r}."
                 )
         operation_predecessors.update(pinned_predecessors)
+
+    continuity_requests: dict[str, tuple[set[str], set[str]]] = {}
+    for kind, requested in (("preserve", preserve_protection), ("release", release_protection)):
+        for rule_id in requested:
+            decision_id = rule_id.rsplit(":", 2)[0]
+            if not allow_update:
+                raise RuntimeError(
+                    "ADR import refused: --preserve-protection and "
+                    "--release-protection apply only to same-id version "
+                    "evolution; pass --update-existing."
+                )
+            if (
+                decision_id not in {d.id for d in report.decisions}
+                or decision_id not in initial_records_by_id
+            ):
+                raise RuntimeError(
+                    f"ADR import refused: {kind} request {rule_id!r} does not "
+                    "name a rule of an incoming, already-canonical decision."
+                )
+            preserve_set, release_set = continuity_requests.setdefault(
+                decision_id, (set(), set())
+            )
+            (preserve_set if kind == "preserve" else release_set).add(rule_id)
+    if preserve_protection and preservation_validator is None:
+        raise RuntimeError(
+            "ADR import refused: preserving a protection binding requires a "
+            "deterministic preservation validator."
+        )
     item_ids = {
         item.get("id")
         for item in working.get("items", [])
@@ -655,12 +813,37 @@ def apply_import(
             and record.content_digest == incoming_digest
             and record.occurrence_source_identity == tuple(occurrence_identity)
         ):
-            continue
+            if decision.id not in continuity_requests:
+                continue
+            # A retry of the operation that created the active occurrence:
+            # its requested continuity outcome must match the persisted
+            # bindings exactly (ADR-030 §9a), keyed on that occurrence's own
+            # predecessor, never re-derived from the active pointer.
+            active_row = next(
+                row for row in working["decision_index"]["versions"]
+                if row.get("version_id") == record.version_id
+            )
+            if active_row.get("supersedes_version_id") is None:
+                raise RuntimeError(
+                    f"ADR import refused: {decision.id!r} is not evolving "
+                    "(unchanged content and source, no predecessor), so "
+                    "preserve/release requests for it would have no effect."
+                )
+            retry_predecessor = active_row["supersedes_version_id"]
+        else:
+            retry_predecessor = None
+        preserve_set, release_set = continuity_requests.get(
+            decision.id, (set(), set())
+        )
         try:
             working, _, _ = append_canonical_version_occurrence(
                 working,
                 decision_id=decision.id,
-                predecessor_version_id=operation_predecessors[decision.id],
+                predecessor_version_id=(
+                    retry_predecessor
+                    if retry_predecessor is not None
+                    else operation_predecessors[decision.id]
+                ),
                 statement=decision.decision,
                 rationale=decision.rationale,
                 context_scope=decision.scope,
@@ -671,6 +854,13 @@ def apply_import(
                 updated_at=decision.updated_at,
                 occurrence_source_identity=occurrence_identity,
                 source_evidence=evidence,
+                preserve_rule_ids=frozenset(preserve_set),
+                release_rule_ids=frozenset(release_set),
+                validate_preserved=(
+                    (lambda rule, _d=decision: preservation_validator(_d, rule))
+                    if preservation_validator is not None
+                    else None
+                ),
             )
         except DecisionIndexPersistenceError as exc:
             raise RuntimeError(
@@ -735,6 +925,7 @@ __all__ = [
     "project_decision_graph",
     "compile_for_import",
     "detect_collisions",
+    "detect_continuity_effects",
     "format_preview",
     "apply_import",
 ]

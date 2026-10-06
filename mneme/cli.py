@@ -53,6 +53,7 @@ from mneme.adr_import import (
     apply_import,
     compile_for_import,
     detect_collisions,
+    detect_continuity_effects,
     format_preview,
 )
 from mneme.integrations.eventcatalog import (
@@ -928,11 +929,34 @@ def _cmd_adr_import(args: argparse.Namespace) -> int:
             "--expected-predecessor is valid only with --apply --update-existing"
         )
 
+    # ADR-030 §9a: per-binding continuity requests.
+    preserve = list(args.preserve_protection or [])
+    release = list(args.release_protection or [])
+    for flag, values in (
+        ("--preserve-protection", preserve),
+        ("--release-protection", release),
+    ):
+        duplicates = sorted({v for v in values if values.count(v) > 1})
+        if duplicates:
+            return _error_exit(f"{flag} names {duplicates} more than once")
+    both = sorted(set(preserve) & set(release))
+    if both:
+        return _error_exit(
+            f"{both} named by both --preserve-protection and "
+            "--release-protection"
+        )
+    if (preserve or release) and not (args.apply and args.update_existing):
+        return _error_exit(
+            "--preserve-protection and --release-protection are valid only "
+            "with --apply --update-existing"
+        )
+
     report = compile_for_import(adr_dir)
     target_memory = json.loads(target_path.read_text(encoding="utf-8"))
     collisions = detect_collisions(report.active_nodes, target_memory)
+    continuity = detect_continuity_effects(report, target_memory)
 
-    print(format_preview(report, collisions=collisions))
+    print(format_preview(report, collisions=collisions, continuity=continuity))
 
     if args.apply:
         try:
@@ -942,6 +966,9 @@ def _cmd_adr_import(args: argparse.Namespace) -> int:
                 allow_update=args.update_existing,
                 approve_conflicts=args.approve_conflicts,
                 expected_predecessor_version_ids=expected_predecessors or None,
+                preserve_protection=preserve,
+                release_protection=release,
+                preservation_validator=_preservation_validator(target_path),
             )
         except DecisionIndexMigrationRequired:
             return _error_exit(_migration_required_message(target_path))
@@ -953,8 +980,42 @@ def _cmd_adr_import(args: argparse.Namespace) -> int:
             print(f"Skipped conflicting scope {scope!r}: {', '.join(ids)}")
         return 0
 
-    has_diags = bool(report.diagnostics) or bool(collisions)
+    has_diags = bool(report.diagnostics) or bool(collisions) or bool(continuity)
     return 1 if has_diags else 0
+
+
+def _preservation_validator(memory_path: Path):
+    """ADR-030 §9a preserve revalidation: the mechanical protection check.
+
+    Explicit ``--preserve-protection`` supplies the authority; this only
+    checks that the exact, unchanged rule still enforces correctly against
+    the new version. No prose inference and no ``activation_precheck``.
+    Shapes the validator does not support (anything but a global
+    ``FORBID_LITERAL``) cannot be preserved.
+    """
+
+    import dataclasses
+
+    resolved_memory = str(Path(memory_path).resolve())
+
+    def validate(decision, rule) -> None:
+        # Validate B as runtime projection will load it: the memory file is
+        # the decision's policy source, exactly as MemoryStore sets it.
+        runtime = dataclasses.replace(decision, memory_path=resolved_memory)
+        result = validate_proposal(runtime, rule, memory_path=resolved_memory)
+        if result.status == "unsupported":
+            raise ValueError(
+                "preservation is supported only for a global FORBID_LITERAL "
+                "rule; release it instead"
+            )
+        if result.status != "valid":
+            failed = [check.name for check in result.checks if not check.passed]
+            raise ValueError(
+                "deterministic protection validation failed: "
+                + ", ".join(failed)
+            )
+
+    return validate
 
 
 def _cmd_eventcatalog_import(args: argparse.Namespace) -> int:
@@ -1907,6 +1968,26 @@ def _build_parser() -> argparse.ArgumentParser:
     p_adr_import.add_argument(
         "--update-existing", action="store_true",
         help="Create or reuse an immutable canonical version for a same-id decision",
+    )
+    p_adr_import.add_argument(
+        "--preserve-protection", action="append", default=None,
+        dest="preserve_protection", metavar="RULE_ID",
+        help=(
+            "Carry a protection/legacy_unknown rule binding the new ADR no "
+            "longer derives into the new version, after deterministic "
+            "revalidation (ADR-030 §9a). Repeatable. Requires --apply "
+            "--update-existing."
+        ),
+    )
+    p_adr_import.add_argument(
+        "--release-protection", action="append", default=None,
+        dest="release_protection", metavar="RULE_ID",
+        help=(
+            "Explicitly release a protection/legacy_unknown rule binding: "
+            "omit it if the new ADR no longer derives it, or downgrade it to "
+            "a version binding if it still does (ADR-030 §9a). Repeatable. "
+            "Requires --apply --update-existing."
+        ),
     )
     p_adr_import.add_argument(
         "--expected-predecessor", action="append", default=None,
