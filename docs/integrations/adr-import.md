@@ -121,7 +121,7 @@ mneme adr import docs/adr --memory .mneme/project_memory.json --apply --approve-
 | Code | Meaning |
 |:---:|---|
 | 0 | Clean preview or successful apply |
-| 1 | Dry-run: diagnostics present (including retrieval-only ADRs, active-active contradictions, or collisions). Useful as a CI signal. |
+| 1 | Dry-run: diagnostics present: retrieval-only ADRs, active-active contradictions, collisions, protection continuity obligations, or supersession enforcement effects (a supersession that retires `protection`/`legacy_unknown` rules). Useful as a CI signal. |
 | 2 | Apply refused (unresolved diagnostics or invalid input path) |
 
 ---
@@ -172,13 +172,20 @@ legitimately contains the word "mneme" everywhere.
 
 ## Conflict model
 
-### 1. Explicit supersession (silent)
+### 1. Explicit supersession (authorized, visible)
 
 If ADR-012 lists ADR-011 in its `supersedes`, ADR-011 is removed from the
 active set at compile time. On apply, D1D persists the explicit canonical
 `supersedes` relationship and transitions ADR-011 to canonical
 `superseded`; its historical version remains queryable but no longer
 projects into active Layer 1 governance.
+
+The `supersedes` relationship is the authority for retiring ADR-011, so no
+extra flag is needed. Retirement is never hidden, though. If ADR-011 carries
+`protection` or `legacy_unknown` rule bindings, the preview lists them under
+**Supersession enforcement effects**, because their enforcement leaves
+Layer 1. The dry-run then exits `1`, like any other diagnostic, so CI
+notices. See "Protection continuity" below.
 
 ### 2. Active-active contradiction (loud)
 
@@ -277,7 +284,8 @@ mneme adr import docs/adr --memory .mneme/project_memory.json --apply --update-e
 Superseding a decision through another ADR's `supersedes` retires it, so it
 needs no per-rule release. The preview lists its protected rules under
 **Supersession enforcement effects**, because their enforcement leaves
-Layer 1.
+Layer 1, and the dry-run exits `1`. That warning does not block `--apply`;
+the `supersedes` relationship is the authority.
 
 ---
 

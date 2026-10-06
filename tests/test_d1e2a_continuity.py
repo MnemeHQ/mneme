@@ -358,6 +358,30 @@ def test_supersession_previews_enforcement_leaving_layer1_without_release(env):
     assert [d.id for d in store.decisions()] == ["ADR-801"]
 
 
+def test_cli_supersession_only_retirement_is_loud_but_writes_nothing(env, capsys):
+    """Authorized retirement of protected rules: visible preview, dry-run exit 1.
+
+    The superseded ADR is not active (no collision) and the superseding ADR
+    carries a typed rule (no retrieval-only warning), so the supersession
+    enforcement effect is the only diagnostic driving the exit code.
+    """
+    adr_dir, memory = env
+    ids = _protected(env, ("alpha_client", "protection"))
+    _write_adr(adr_dir, "omega_client", adr_id="ADR-801", supersedes=(ADR_ID,))
+    before = memory.read_bytes()
+
+    code = main(["adr", "import", str(adr_dir), "--memory", str(memory)])
+
+    out = capsys.readouterr().out
+    assert code == 1
+    assert "Supersession enforcement effects:" in out
+    assert ids["alpha_client"] in out
+    assert "Protection continuity obligations" not in out
+    assert "Conflicts vs existing memory" not in out
+    assert "Retrieval-only ADR warnings" not in out
+    assert memory.read_bytes() == before
+
+
 # ── CLI surface ─────────────────────────────────────────────────────────────
 
 
