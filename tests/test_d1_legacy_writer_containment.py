@@ -2,16 +2,17 @@
 
 Once the top-level ``decision_index`` section exists, the merged D1B/D1C
 loader treats it as the durable decision authority and ``decisions[]`` as a
-derived compatibility snapshot. The remaining legacy writers (``add_decision``,
-``eventcatalog import --apply``) must refuse such files before any mutation,
+derived compatibility snapshot. The remaining legacy writer
+(``eventcatalog import --apply``) must refuse such files before any mutation,
 leave them byte-identical, and keep section-less legacy files behaving as
 before.
 
-``adr import --apply`` (since D1D) and ``protect activate`` (since D1E2b) are
-no longer legacy writers on canonical memory: they are canonical authority
-writers, pinned in ``tests/test_adr_import.py`` and
-``tests/test_d1e2b_canonical_protect.py``. Section-less protection keeps its
-legacy write until D1E5 (pinned below).
+``adr import --apply`` (since D1D), ``protect activate`` (since D1E2b), and
+``add_decision`` (since D1E3) are no longer legacy writers on canonical
+memory: they are canonical authority writers, pinned in
+``tests/test_adr_import.py``, ``tests/test_d1e2b_canonical_protect.py``, and
+``tests/test_d1e3_canonical_add_decision.py``. Section-less protection and
+``add_decision`` keep their legacy writes until D1E5 (pinned below).
 """
 from __future__ import annotations
 
@@ -119,26 +120,6 @@ def test_guard_is_keyed_only_on_section_presence():
 
 
 # ── add_decision ─────────────────────────────────────────────────────────────
-
-
-def test_add_decision_refuses_canonical_memory(tmp_path, capsys):
-    memory = _canonical_memory(
-        tmp_path / "project_memory.json", decisions=[READY_DECISION]
-    )
-    before = memory.read_bytes()
-
-    code = main([
-        "add_decision", "--memory", str(memory),
-        "--id", "d_new", "--decision", "Something new",
-    ])
-    captured = capsys.readouterr()
-
-    assert code == 2
-    assert "mneme add_decision" in captured.err
-    assert REFUSAL_TEXT in captured.err
-    assert "diverges" not in captured.err
-    assert "Added decision" not in captured.out
-    _assert_refused_unchanged(memory, before)
 
 
 def test_add_decision_on_legacy_memory_is_unchanged(tmp_path, capsys):
