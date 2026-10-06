@@ -64,6 +64,7 @@ from mneme.integrations.eventcatalog import (
     compile_for_import as ec_compile_for_import,
     detect_collisions as ec_detect_collisions,
     format_preview as ec_format_preview,
+    refuse_canonical_apply as ec_refuse_canonical_apply,
 )
 from mneme.benchmark import BenchmarkRunner, ScenarioVerdict
 from mneme.benchmark_report import format_json, format_markdown, format_terminal
@@ -1069,11 +1070,21 @@ def _cmd_eventcatalog_import(args: argparse.Namespace) -> int:
         print(f"ERROR: memory file {target_path} does not exist", file=sys.stderr, flush=True)
         return 2
 
-    report = ec_compile_for_import(index_path, catalog_root)
     target_memory = json.loads(target_path.read_text(encoding="utf-8"))
+    canonical = isinstance(target_memory, dict) and "decision_index" in target_memory
+    if canonical and args.apply:
+        # Retired for D1 (ADR-030 §15, D1E4): refuse before compiling or
+        # previewing anything.
+        try:
+            ec_refuse_canonical_apply(target_memory)
+        except RuntimeError as exc:
+            print(f"ERROR: {exc}", file=sys.stderr, flush=True)
+            return 2
+
+    report = ec_compile_for_import(index_path, catalog_root)
     collisions = ec_detect_collisions(report.nodes, target_memory)
 
-    print(ec_format_preview(report, collisions=collisions))
+    print(ec_format_preview(report, collisions=collisions, canonical=canonical))
 
     if args.apply:
         try:
@@ -2047,8 +2058,8 @@ def _build_parser() -> argparse.ArgumentParser:
 
     p_ec_import = ec_sub.add_parser(
         "import", help=("Import retrieval-only ADRs from an EventCatalog index; "
-                       "canonical decision_index targets fail closed until an "
-                       "EventCatalog provenance contract is defined")
+                       "apply is retired for canonical decision_index memory "
+                       "in D1 (preview remains available)")
     )
     p_ec_import.add_argument(
         "--index", required=True, help="Path to EventCatalog index JSON (from buildIndex)"
@@ -2068,14 +2079,14 @@ def _build_parser() -> argparse.ArgumentParser:
         "--apply", action="store_true",
         help=(
             "Write imported decisions only when --memory is legacy sectionless "
-            "memory; canonical decision_index targets fail closed"
+            "memory; retired for canonical decision_index memory in D1"
         ),
     )
     p_ec_import.add_argument(
         "--update-existing", action="store_true",
         help=(
             "Allow same-id overwrite only in legacy sectionless decisions[]; "
-            "canonical decision_index targets fail closed"
+            "apply is retired for canonical decision_index memory in D1"
         ),
     )
     p_ec_import.set_defaults(func=_cmd_eventcatalog_import)

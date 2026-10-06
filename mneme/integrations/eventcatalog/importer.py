@@ -354,8 +354,16 @@ def detect_collisions(
 def format_preview(
     report: EventCatalogImportReport,
     collisions: list[ImportDiagnostic],
+    *,
+    canonical: bool = False,
 ) -> str:
-    """Render an import report as a deterministic preview."""
+    """Render an import report as a deterministic preview.
+
+    ``canonical`` marks a canonical Decision Index target, where apply is
+    retired for D1 (ADR-030 §15, D1E4). The collision scan stays
+    informational, but no overwrite action is suggested and the preview
+    states that apply is unavailable.
+    """
     lines: list[str] = []
     lines.append("EventCatalog import preview")
     lines.append("=" * 60)
@@ -413,18 +421,59 @@ def format_preview(
     if collisions:
         lines.append("Conflicts vs existing memory:")
         for c in collisions:
-            lines.append(f"  - {c.message}")
+            if canonical:
+                lines.append(
+                    f"  - {c.node_id} already exists in target memory under "
+                    f"{c.existing_in}[]."
+                )
+            else:
+                lines.append(f"  - {c.message}")
         lines.append("")
-        lines.append(
-            "  To overwrite existing decisions[] entries, re-run with "
-            "--update-existing."
-        )
+        if not canonical:
+            lines.append(
+                "  To overwrite existing decisions[] entries, re-run with "
+                "--update-existing."
+            )
+            lines.append("")
+
+    if canonical:
+        lines.append(CANONICAL_APPLY_RETIRED)
         lines.append("")
 
     return "\n".join(lines)
 
 
 # ── Persistence ──────────────────────────────────────────────────────────────
+
+CANONICAL_APPLY_RETIRED = (
+    "EventCatalog apply is retired for canonical Decision Index memory in D1. "
+    "Preview remains available. Existing section-less projects may continue "
+    "using the legacy apply path during the compatibility window."
+)
+
+
+def refuse_canonical_apply(target_memory: object) -> None:
+    """Refuse EventCatalog apply on canonical memory (ADR-030 §15, D1E4).
+
+    Keyed purely on ``decision_index`` presence, through the shared D1
+    containment guard. No canonical EventCatalog writer exists in D1;
+    defining one needs a separate EventCatalog provenance decision.
+    """
+    from mneme.decision_index_persistence import (
+        LegacyDecisionsWriteRefused,
+        refuse_legacy_decisions_write,
+    )
+
+    try:
+        refuse_legacy_decisions_write(
+            target_memory, operation="mneme eventcatalog import --apply"
+        )
+    except LegacyDecisionsWriteRefused as exc:
+        raise RuntimeError(
+            f"EventCatalog import refused: {CANONICAL_APPLY_RETIRED} "
+            "Nothing was written."
+        ) from exc
+
 
 def _serialize_rule(rule: Rule) -> dict[str, object]:
     payload: dict[str, object] = {
@@ -457,21 +506,11 @@ def apply_import(
     import os
     import tempfile
 
-    from mneme.decision_index_persistence import (
-        LegacyDecisionsWriteRefused,
-        refuse_legacy_decisions_write,
-    )
-
     target_path = Path(target_path)
     catalog_root = Path(catalog_root)
 
     target_memory = json.loads(target_path.read_text(encoding="utf-8"))
-    try:
-        refuse_legacy_decisions_write(
-            target_memory, operation="mneme eventcatalog import --apply"
-        )
-    except LegacyDecisionsWriteRefused as exc:
-        raise RuntimeError(f"EventCatalog import refused: {exc}") from exc
+    refuse_canonical_apply(target_memory)
     collisions = detect_collisions(report.nodes, target_memory)
     if collisions and not allow_update:
         raise RuntimeError(
@@ -539,9 +578,11 @@ def apply_import(
 
 
 __all__ = [
+    "CANONICAL_APPLY_RETIRED",
     "EventCatalogNode",
     "EventCatalogImportReport",
     "ImportDiagnostic",
+    "refuse_canonical_apply",
     "compile_for_import",
     "detect_collisions",
     "format_preview",

@@ -213,9 +213,12 @@ flowchart TB
 - Decision MCP proposal ingestion does not grant producer authority.
 - Audit evidence does not silently become trusted enforcement evidence.
 - O1A research state is isolated from canonical product authority.
-- The legacy EventCatalog importer does not mutate a canonical `decision_index`
-  through the deprecated `decisions[]` snapshot. It fails closed until an
-  explicit EventCatalog canonical provenance contract is reviewed.
+- EventCatalog canonical apply is retired for D1 (ADR-030 §15, D1E4). On
+  canonical `decision_index` memory, `eventcatalog import --apply` refuses
+  before compiling or previewing, and writes nothing. Preview stays available
+  and read-only. Section-less projects may keep the legacy apply path during
+  the compatibility window. A future EventCatalog canonical provenance
+  contract requires a separate decision.
 
 # C4 Level 3 — Core Components
 

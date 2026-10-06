@@ -1,18 +1,22 @@
-"""D1 containment: legacy decisions[] writers refuse canonical memory.
+"""D1 containment: the shared legacy-writer guard and section-less writes.
 
-Once the top-level ``decision_index`` section exists, the merged D1B/D1C
-loader treats it as the durable decision authority and ``decisions[]`` as a
-derived compatibility snapshot. The remaining legacy writer
-(``eventcatalog import --apply``) must refuse such files before any mutation,
-leave them byte-identical, and keep section-less legacy files behaving as
-before.
+Once the top-level ``decision_index`` section exists, the D1 loader treats it
+as the durable decision authority and ``decisions[]`` as a derived
+compatibility snapshot. ``refuse_legacy_decisions_write`` is the shared guard,
+keyed only on section presence (pinned below).
 
-``adr import --apply`` (since D1D), ``protect activate`` (since D1E2b), and
-``add_decision`` (since D1E3) are no longer legacy writers on canonical
-memory: they are canonical authority writers, pinned in
-``tests/test_adr_import.py``, ``tests/test_d1e2b_canonical_protect.py``, and
-``tests/test_d1e3_canonical_add_decision.py``. Section-less protection and
-``add_decision`` keep their legacy writes until D1E5 (pinned below).
+Every writer that reaches canonical memory is now either a canonical
+authority writer or retired:
+
+- ``adr import --apply`` (D1D), ``protect activate`` (D1E2b), and
+  ``add_decision`` (D1E3) are canonical writers, pinned in
+  ``tests/test_adr_import.py``, ``tests/test_d1e2b_canonical_protect.py``,
+  and ``tests/test_d1e3_canonical_add_decision.py``;
+- ``eventcatalog import --apply`` is retired for canonical memory in D1
+  (D1E4), pinned in ``tests/test_d1e4_eventcatalog_retirement.py``.
+
+Section-less memory keeps the legacy ``add_decision``, protection, and
+EventCatalog apply writes until D1E5 (pinned below).
 """
 from __future__ import annotations
 
@@ -24,12 +28,10 @@ import pytest
 from mneme.cli import main
 from mneme.decision_index_persistence import (
     LegacyDecisionsWriteRefused,
-    migrate_memory_file,
     refuse_legacy_decisions_write,
 )
 from mneme.integrations.eventcatalog import apply_import as ec_apply_import
 from mneme.integrations.eventcatalog import compile_for_import as ec_compile_for_import
-from mneme.memory_store import MemoryStore
 from mneme.protection import activate_protection
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -79,19 +81,6 @@ def _write_memory(
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(document, indent=2) + "\n", encoding="utf-8")
     return path
-
-
-def _canonical_memory(path: Path, **kwargs) -> Path:
-    _write_memory(path, **kwargs)
-    assert migrate_memory_file(path) is True
-    assert "decision_index" in json.loads(path.read_text(encoding="utf-8"))
-    return path
-
-
-def _assert_refused_unchanged(path: Path, before: bytes) -> None:
-    assert path.read_bytes() == before
-    # A refused write leaves no decisions[] / decision_index divergence.
-    MemoryStore(path).load()
 
 
 # ── Shared guard ─────────────────────────────────────────────────────────────
@@ -163,38 +152,6 @@ def test_protection_on_legacy_memory_is_unchanged(tmp_path):
 
 
 # ── eventcatalog import --apply ──────────────────────────────────────────────
-
-
-def test_eventcatalog_import_apply_refuses_canonical_memory(tmp_path):
-    memory = _canonical_memory(tmp_path / "project_memory.json")
-    before = memory.read_bytes()
-    report = ec_compile_for_import(EC_FIXTURES / "index.json", EC_FIXTURES)
-
-    with pytest.raises(RuntimeError) as excinfo:
-        ec_apply_import(report, target_path=memory, catalog_root=EC_FIXTURES)
-
-    assert "mneme eventcatalog import --apply" in str(excinfo.value)
-    assert REFUSAL_TEXT in str(excinfo.value)
-    _assert_refused_unchanged(memory, before)
-
-
-def test_eventcatalog_import_apply_cli_refuses_canonical_memory(tmp_path, capsys):
-    memory = _canonical_memory(tmp_path / "project_memory.json")
-    before = memory.read_bytes()
-
-    code = main([
-        "eventcatalog", "import",
-        "--index", str(EC_FIXTURES / "index.json"),
-        "--catalog-root", str(EC_FIXTURES),
-        "--memory", str(memory),
-        "--apply",
-    ])
-    captured = capsys.readouterr()
-
-    assert code == 2
-    assert REFUSAL_TEXT in captured.err
-    assert "Wrote" not in captured.out
-    _assert_refused_unchanged(memory, before)
 
 
 def test_eventcatalog_import_apply_on_legacy_memory_is_unchanged(tmp_path):

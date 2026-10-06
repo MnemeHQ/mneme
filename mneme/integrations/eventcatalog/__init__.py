@@ -6,6 +6,7 @@ from mneme.integrations.eventcatalog.importer import (
     detect_collisions,
     format_preview,
     apply_import,
+    refuse_canonical_apply,
 )
 
 __all__ = [
@@ -15,4 +16,5 @@ __all__ = [
     "detect_collisions",
     "format_preview",
     "apply_import",
+    "refuse_canonical_apply",
 ]
