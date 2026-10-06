@@ -14,7 +14,7 @@ scope: decision_index.persistence
 **Amended:** 2026-10-05 — accepted after reconciliation against the merged D1B/D1C implementation; lifecycle-conformance correction and other reconciliation amendments recorded (see "Implementation reconciliation" below)
 **Amended:** 2026-10-05 — D1E0 architecture decisions: binding authority and protection continuity (§9a), canonical `add_decision` identity (§4), EventCatalog canonical apply retired for D1, and the D1E order and release gate (§15) (see "D1E0 amendment" below)
 **Amended:** 2026-10-06 — D1E1 migration contract: `mneme decision-index migrate`, lossless-or-refuse migration with recursive representability validation, EventCatalog migration consequence, and comparison against bindings that predate `binding_authority` (§9a, §12, §15); `mneme decision-index migrate` as the sole section-less-to-canonical transition, withdrawing implicit migration from canonical writers (§1, §12, §15)
-**Amended:** 2026-10-06 — D1E2 continuity clarifications: preserve revalidation is the mechanical validator only, with explicit preserve supplying the authority; §9a governs continuing decisions, not cross-decision supersession; preview obligations; D1E2a then D1E2b (§9a, §15)
+**Amended:** 2026-10-06 — D1E2 continuity clarifications: preserve revalidation is the mechanical validator only, with explicit preserve supplying the authority; §9a governs continuing decisions, not cross-decision supersession; preview obligations (§9a)
 **Deciders:** Theo Valmis
 
 ---
@@ -929,21 +929,10 @@ ADR-022; none is authorized by this ADR change:
      section-less memory with `DecisionIndexMigrationRequired` (§1). No
      preserve/release, no continuity enforcement, and no `init`/`setup` change
      yet.
-  3. **D1E2**, in two slices, continuity first:
-     - **D1E2a**: fail-closed §9a continuity enforcement in ADR version
-       evolution, including for `legacy_unknown`. Per-binding
-       preserve/release inputs with mechanical revalidation. Preview of
-       continuity obligations and of supersession enforcement effects.
-       Retry consistency, stronger-authority collapse, and ordering.
-     - **D1E2b**: canonical `mneme protect activate`, which writes
-       `protection` bindings (§9, §9a) at `max(sequence) + 1` in one guarded
-       write with the activation record. If the same `rule_id` is already
-       bound as `version`, it is a no-op, because an immutable authority is
-       never changed. It includes the accepted-proposal retry regression
-       after protection enrichment.
-
-     D1E2b must not precede D1E2a. Otherwise new `protection` bindings would
-     be exposed to silent loss on the next ADR edit.
+  3. **D1E2** — canonical `mneme protect activate`: writes `protection`
+     bindings (§9, §9a). Also the per-binding preserve/release operations,
+     and fail-closed continuity enforcement in ADR version evolution,
+     including for `legacy_unknown`.
   4. **D1E3** — canonical `mneme add_decision` with the `["cli-add",
      decision_id]` identity and `runtime` provenance (§4). The command is
      kept; it is documented in the README and quickstart.
@@ -1172,7 +1161,7 @@ after D1D merged (#443). They are recorded before any D1E implementation.
 | E5 | Pre-D1 protection rules on migrated memory are already exposed to silent loss on `main`. | Release blocker: no silent loss of `protection`/`legacy_unknown` across version evolution. | §15 |
 | E6 | Migration already discarded unrepresentable legacy metadata. EventCatalog provenance and unknown fields survived only in the raw snapshot, and the next canonical write erased them (reproduced). | Lossless-or-refuse migration with recursive validation and no force option. EventCatalog-bearing memory stays section-less in D1. Absent `binding_authority` acts as a wildcard only in exact historical-binding comparison. | §9a, §12, §15 |
 | E7 | Implicit migration inside D1C acceptance, D1D ADR import, and the canonical primitives bypassed the lossless migration check. Reproduced: ADR import on section-less memory erased an EventCatalog decision's provenance. | `mneme decision-index migrate` is the sole transition. Canonical writers refuse section-less memory with `DecisionIndexMigrationRequired`, giving a symmetric writer boundary. The interim state is accepted while D1 is unreleased. | §1, §12, §15 |
-| E8 | §9a said preservation is "revalidated" without saying how, and did not say whether cross-decision supersession of a protected decision needs per-binding release. | Revalidation is the existing mechanical validator (`validate_proposal`) only: explicit preserve supplies the authority, with no prose inference, the same standard for `legacy_unknown`, and only global `FORBID_LITERAL` preservable. Supersession is decision-level retirement authority, so no per-binding release is needed, but the preview shows the enforcement leaving Layer 1. Continuity first (D1E2a), protect writer second (D1E2b). | §9a, §15 |
+| E8 | §9a said preservation is "revalidated" without saying how, and did not say whether cross-decision supersession of a protected decision needs per-binding release. | Revalidation is the existing mechanical validator (`validate_proposal`) only: explicit preserve supplies the authority, with no prose inference, the same standard for `legacy_unknown`, and only global `FORBID_LITERAL` preservable. Supersession is decision-level retirement authority, so no per-binding release is needed, but the preview shows the enforcement leaving Layer 1. | §9a |
 
 ## Related
 
