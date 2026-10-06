@@ -12,6 +12,7 @@ scope: decision_index.persistence
 **Status:** Accepted
 **Date:** 2026-09-16
 **Amended:** 2026-10-05 — accepted after reconciliation against the merged D1B/D1C implementation; lifecycle-conformance correction and other reconciliation amendments recorded (see "Implementation reconciliation" below)
+**Amended:** 2026-10-05 — D1E0 architecture decisions: binding authority and protection continuity (§9a), canonical `add_decision` identity (§4), EventCatalog canonical apply retired for D1, and the D1E order and release gate (§15) (see "D1E0 amendment" below)
 **Deciders:** Theo Valmis
 
 ---
@@ -210,6 +211,16 @@ version_id = "dver-" + SHA-256(canonical_json([
   accepted-proposal occurrence identity,
   `["legacy-decisions", decision_id]`. The last form is migration identity
   only: it does not fabricate source provenance or grant new authority.
+- **Canonical `mneme add_decision`** (D1E0) is an explicit human authority
+  path with its own identity, `["cli-add", decision_id]`. It carries no
+  timestamp.
+  - It creates only a first occurrence, with the no-predecessor sentinel, and
+    honest `runtime` provenance (empty locator and revision). It never claims
+    ADR or proposal origin.
+  - An exact retry (same `decision_id` and same content) resolves to the
+    persisted occurrence and changes nothing.
+  - The same `decision_id` with different content fails closed. `add_decision`
+    is not an edit or version-evolution surface.
 - The first version uses the fixed no-predecessor sentinel `"-"`. The literal
   is part of the version-identity contract and is golden-vector pinned.
 - The explicit `active_version_id` on the logical decision is the **only**
@@ -319,7 +330,10 @@ anti-patterns.
 - rules and rule applicability — separate canonical rule bindings (§7–§9);
   a change creates a new rule binding; an existing rule binding is never
   mutated. Rule bindings bind to the version active when derived/installed,
-  with no silent carry-over across version creation;
+  with no silent carry-over across version creation. Carrying a
+  `protection` or `legacy_unknown` binding into a new version is explicit
+  and governed by §9a, and its `binding_authority` is part of the immutable
+  binding;
 - the version's provenance snapshot — frozen at occurrence write;
 - version lineage (`supersedes_version_id`) — fixed at occurrence write;
 - version `created_at` — fixed at occurrence write; excluded from identity.
@@ -382,7 +396,9 @@ Every canonical rule binding identifies:
 - `rule_id`;
 - immutable per-version `sequence` (§9);
 - rule payload (`value` plus type semantics);
-- applicability (ADR-020 selectors).
+- applicability (ADR-020 selectors);
+- `binding_authority` (D1E0, §9a): the immutable classification of why the
+  binding exists.
 
 The identity-grade historical binding used later by ADR-029 is:
 
@@ -424,6 +440,88 @@ Rule identity and ordering are separate.
   within one version, malformed values, bindings that do not resolve
   consistently to their claimed decision/version, or any ordering
   non-determinism — fail closed at load and are never repaired.
+
+### 9a. Binding authority and protection continuity (D1E0)
+
+The problem this section closes: version evolution (D1D) re-derives a new
+version's rules from its source and carries nothing silently (§6). A rule
+installed by protection, or a pre-D1 rule whose origin is unknown, would then
+disappear when the source changes. This was reproduced on `main` after D1D: an
+unrelated edit to an ADR, re-imported, removed a protection-installed rule.
+
+**Binding authority.** Every rule binding carries an immutable
+`binding_authority`:
+
+```text
+version | protection | legacy_unknown
+```
+
+- `version`: derived from the owning version's source, or installed by the
+  authority operation that created the version.
+- `protection`: installed by `mneme protect activate`.
+- `legacy_unknown`: an origin that cannot be honestly reconstructed.
+- `binding_authority` is not part of `rule_id`. The same rule semantics keep
+  the same stable `rule_id` (§7) whatever the authority.
+- **No backfill.** Bindings persisted before this field existed stay
+  byte-identical. A missing field is read as `legacy_unknown`. That includes
+  bindings migrated by D1B and bindings written by D1D ADR import before the
+  field was implemented. Writing the field onto an existing binding would be
+  an in-place change to an immutable Tier 2 record and is prohibited. Adding
+  the field is a backward-compatible change within
+  `mneme.decision-index/v1`.
+- **Migration writes `legacy_unknown`.** Pre-D1 native rules migrated after
+  this field exists are written as `legacy_unknown`, because migration cannot
+  tell ADR-derived rules from rules that legacy protection appended to
+  `decisions[]`.
+- New bindings always persist the field explicitly.
+
+**Continuity invariant.** A `protection` or `legacy_unknown` binding cannot
+disappear between version occurrences unless the operation that creates the
+version explicitly authorizes its release. The rules below apply when a new
+version B is created over an active version A, for each rule R bound to A as
+`protection` or `legacy_unknown`. A's historical binding is never moved or
+edited.
+
+- **B's source still derives R (same `rule_id`).** B carries exactly one
+  binding for R, never a duplicate. That binding keeps the stronger
+  classification (`protection` or `legacy_unknown`) unless R is explicitly
+  released. Downgrading it to `version` silently would only postpone the loss
+  to the next version.
+- **R is explicitly released and B's source still derives R.** B carries one
+  `version` binding for R.
+- **R is explicitly released and B's source does not derive R.** B carries no
+  binding for R.
+- **R is explicitly preserved and B's source does not derive R.** The
+  preservation is revalidated deterministically against B: the same
+  protection validation applies to B's content, and applicability is
+  unchanged. If revalidation passes, B carries a new binding for R with the
+  same `rule_id` and authority. If it fails, or the rule's semantics would
+  change, version creation fails. Protection is never silently dropped or
+  altered.
+- **Neither preserved nor released, and B's source does not derive R.**
+  Version creation **fails closed**.
+- Preservation and release are explicit and per binding, never a broad
+  preserve-all switch, and are named by `rule_id`, for example
+  `--preserve-protection <rule_id>` and `--release-protection <rule_id>`.
+  The exact CLI spelling is settled in D1E2; these per-binding semantics are
+  fixed here. `legacy_unknown` gets the same treatment even though it cannot
+  honestly be claimed to originate from protection.
+- **Ordering.** B's source-derived rules come first, in their source order.
+  Bindings preserved without being re-derived follow at `max(sequence) + 1`,
+  keeping their previous relative order.
+- **Retry consistency.** Preservation and release change Tier 2 bindings but
+  not `content_digest` or the occurrence source identity, so they are not
+  part of the occurrence key. On a retry that resolves to an existing
+  occurrence (§5), the requested preservation/release outcome must match the
+  persisted bindings of that occurrence exactly. Otherwise the retry fails
+  closed rather than reinterpreting the same `version_id` with different
+  Tier 2 semantics.
+- No event log is introduced. The transition can be reconstructed from A's
+  retained bindings and B's bindings and authorities alone.
+- An accepted-proposal retry keeps excluding `rules`, `test_evidence`, and
+  `updated_at` from proposal-owned identity verification (D1C), so canonical
+  protection enrichment of an accepted decision survives a retry of its
+  acceptance.
 
 ### 10. Provenance
 
@@ -647,6 +745,29 @@ unchanged fixtures. New gates:
 - **G19 — MCP field compatibility.** §13 pinned by tests: stable fields
   byte-stable; additive fields present; rule-ID migration deterministic and
   golden-vector verified; no dual-ID emission.
+- **G20 — Binding authority and protection continuity (§9a, D1E0).** Tests
+  must prove each of the following:
+  - **No silent loss:** version evolution that would drop a `protection` or
+    `legacy_unknown` binding fails closed, including the reproduced case of
+    an unrelated ADR edit.
+  - **Same-rule satisfaction:** a re-derived identical `rule_id` yields one
+    binding that keeps the stronger authority.
+  - **Explicit preserve:** the binding is revalidated, created on the new
+    version with the same `rule_id`, and a failed revalidation fails closed.
+  - **Explicit release:** the rule is downgraded to `version` or omitted, as
+    the §9a table specifies.
+  - **Missing-field read:** a missing field reads as `legacy_unknown`, and
+    existing rows stay byte-identical.
+  - **Migration:** migration writes `legacy_unknown`.
+  - **Ordering:** source-derived rules come first, then preserved bindings in
+    their previous relative order.
+  - **Retry consistency:** a retry whose preserve/release request differs
+    from the persisted bindings fails closed. Stale-predecessor behaviour is
+    unchanged.
+  - **Accepted-proposal retry:** a retry succeeds after canonical protection
+    enrichment.
+  - **`cli-add`:** the identity is golden-vector pinned, an exact retry is a
+    no-op, and a different-content same-ID call fails closed.
 
 ### 15. Implementation sequence
 
@@ -661,24 +782,56 @@ ADR-022; none is authorized by this ADR change:
   #444.*
 - **D1D** — versioning, ADR re-import, and supersession. Includes the §10
   parsed-bytes `source_revision` binding and the §14 lifecycle-conformance
-  fixture.
+  fixture. *Merged (#443); §5 retry wording clarified in #446.*
 - **D1E** — protection/lifecycle writer migration and full parity closeout.
-  It also covers:
-  - the migration entry point and section-bearing `mneme init` scaffold
-    (§12);
-  - an explicit decision for `mneme add_decision`: retire it, redirect it to
-    an existing authority path, or make it a canonical authority operation.
-    It is not left as a contained legacy writer;
-  - EventCatalog import: either a defined canonical provenance contract or
-    an explicit retirement of its apply path for canonical memory.
+  The order is fixed. `init`/`setup` become canonical **last**, so that every
+  supported writer can already operate on canonical files before new
+  projects are created with the section:
+  1. **D1E0** — architecture decisions (this amendment): §9a binding
+     authority and protection continuity, the §4 `cli-add` identity, and the
+     EventCatalog decision below.
+  2. **D1E1** — an explicit, opt-in migration command, and a clean MCP error
+     naming that command when memory has no `decision_index` (§12). No
+     `init`/`setup` change yet.
+  3. **D1E2** — canonical `mneme protect activate`: writes `protection`
+     bindings (§9, §9a). Also the per-binding preserve/release operations,
+     and fail-closed continuity enforcement in ADR version evolution,
+     including for `legacy_unknown`.
+  4. **D1E3** — canonical `mneme add_decision` with the `["cli-add",
+     decision_id]` identity and `runtime` provenance (§4). The command is
+     kept; it is documented in the README and quickstart.
+  5. **D1E4** — EventCatalog: the canonical `eventcatalog import --apply`
+     is **retired for D1**. Read and preview remain. Section-less legacy
+     targets may keep the legacy apply path during the compatibility window.
+     Canonical targets refuse it (the #444 guard). Defining an EventCatalog
+     canonical provenance contract would be a separate future decision; it
+     is not prohibited, but it would widen D1.
+  6. **D1E5** — `mneme init` and `mneme setup` create memory that carries an
+     empty `decision_index` section.
+  7. **D1E6** — parity closeout (G16–G20), release notes, and the release
+     gate below.
 - **D1F** — optional later removal of the persisted `decisions[]`
   compatibility snapshot, gated by a consumer inventory; must never ride
   along in another slice.
 
-**Release gate.** No release may ship D1 persistence until three things are
-in place: the §12 migration entry point, the §12 lifecycle-conformance
-release note, and the §13 rule-ID release note. Until then, released
-artifacts must not include D1B/D1C.
+**Release gate.** No release may ship D1 persistence until all of the
+following hold. Until then, released artifacts must not include D1B/C/D.
+
+- the §12 migration entry point exists (D1E1);
+- **no silent loss of `protection` or `legacy_unknown` bindings** across
+  version evolution (§9a, G20). This is a release blocker independent of
+  D1E2's other work: pre-D1 rules migrate as indistinguishable bindings, so
+  until §9a is enforced, an ADR re-import can already drop a pre-D1
+  protection rule on `main`;
+- release notes cover:
+  - the §12 lifecycle-conformance correction;
+  - the §13 rule-ID value change;
+  - the retirement of EventCatalog canonical apply, which becomes
+    unavailable for every new project once D1E5 lands;
+  - the incompatibility of older `mneme-hq` binaries (≤ 0.9.2), whose legacy
+    writers mutate `decisions[]` directly and make a migrated file fail to
+    load. No in-file version marker is added, because an older binary would
+    ignore it.
 
 ---
 
@@ -839,6 +992,21 @@ Section numbering is unchanged.
 | R8 | Additive MCP fields `sequence` and proposal-only evidence keys were not listed; `decision_version_id` duplicates `version_id` on records. | §13 field list completed. | §13 |
 | R9 | `mneme add_decision` and EventCatalog import were not assigned to any slice. | Assigned to D1E with an explicit decision required. | §15 |
 | R10 | `inactive` was used without tying it to ADR-023's lifecycle vocabulary. | Clarified as ADR-023's non-authoritative, non-projecting bucket. | §11 |
+
+---
+
+## D1E0 amendment (2026-10-05)
+
+These architecture decisions came out of a pressure test of the D1E scope
+after D1D merged (#443). They are recorded before any D1E implementation.
+
+| # | Finding | Decision | Where |
+| --- | --- | --- | --- |
+| E1 | Version evolution re-derives rules from source, so a protection-installed rule (or a pre-D1 rule of unknown origin) is silently dropped by an unrelated ADR edit. Reproduced on `main`. | Immutable `binding_authority` (`version`/`protection`/`legacy_unknown`). A missing field reads as `legacy_unknown`, with no backfill. A continuity invariant: carry-over only when explicit, per-binding preserve/release, a same-rule collapse that keeps the stronger authority, fixed ordering, and retry consistency. Fail closed otherwise. | §6, §8, §9a, G20 |
+| E2 | `mneme add_decision` matched no authority identity in §4. | Kept as a canonical authority path with identity `["cli-add", decision_id]`, `runtime` provenance, first occurrence only, idempotent exact retry, different content fails closed. | §4, G20 |
+| E3 | EventCatalog had no D1 canonical writer contract. | Canonical apply is retired for D1. Read and preview remain, and the legacy section-less path is bounded by the compatibility window. A future canonical contract is not prohibited. | §15 |
+| E4 | Making `init` canonical before the writers would block every new project. | D1E order fixed, with `init`/`setup` last. A clean MCP migration error comes early. | §12, §15 |
+| E5 | Pre-D1 protection rules on migrated memory are already exposed to silent loss on `main`. | Release blocker: no silent loss of `protection`/`legacy_unknown` across version evolution. | §15 |
 
 ## Related
 
