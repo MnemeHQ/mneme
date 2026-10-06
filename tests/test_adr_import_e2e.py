@@ -11,6 +11,7 @@ from mneme.cli import main as cli_main
 from mneme.decision_retriever import DecisionRetriever
 from mneme.enforcer import Severity, check_prompt
 from mneme.memory_store import MemoryStore
+from tests.canonical_fixtures import migrate_memory_fixture
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -20,6 +21,7 @@ def _seed(target: Path) -> None:
         "meta": {"name": "e2e", "description": "e2e", "version": "1.0.0", "owner": "e2e", "created": "2026-01-01"},
         "items": [], "examples": [], "decisions": [],
     }), encoding="utf-8")
+    migrate_memory_fixture(target)  # ADR-030 §1: no implicit migration
 
 
 def test_imported_forbid_dependency_triggers_enforcer_warn(tmp_path):

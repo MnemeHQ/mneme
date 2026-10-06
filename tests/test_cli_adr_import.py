@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from mneme.cli import main
+from tests.canonical_fixtures import migrate_memory_fixture
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -17,6 +18,7 @@ def _seed_empty_memory(path: Path) -> None:
         "meta": {"name": "test", "description": "test", "version": "1.0.0", "owner": "test", "created": "2026-01-01"},
         "items": [], "examples": [], "decisions": [],
     }), encoding="utf-8")
+    migrate_memory_fixture(path)  # ADR-030 §1: no implicit migration
 
 
 def test_adr_import_dry_run_prints_preview_and_does_not_write(tmp_path, capsys):
@@ -79,6 +81,7 @@ def test_adr_import_apply_refuses_collision_without_update_existing(tmp_path, ca
         (FIXTURES / "memory_for_import_collision.json").read_text(encoding="utf-8"),
         encoding="utf-8",
     )
+    migrate_memory_fixture(target)  # ADR-030 §1: no implicit migration
     before = target.read_text(encoding="utf-8")
 
     rc = main([
@@ -103,6 +106,7 @@ def test_adr_import_apply_with_update_existing_overwrites(tmp_path):
         encoding="utf-8",
     )
 
+    migrate_memory_fixture(target)  # ADR-030 §1: no implicit migration
     rc = main([
         "adr", "import",
         str(FIXTURES / "adrs_import_basic"),

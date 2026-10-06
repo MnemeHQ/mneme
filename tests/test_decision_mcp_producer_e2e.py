@@ -63,6 +63,7 @@ from mneme.decision_mcp import (
 from mneme.decision_index_persistence import load_decision_index_from_memory_file
 from mneme.decision_proposal import ORIGIN_AI_GENERATED
 from mneme.decision_proposal_store import JsonFileDecisionProposalStore
+from tests.canonical_fixtures import migrate_memory_fixture
 
 FIXTURE_PATH = (
     Path(__file__).resolve().parent
@@ -204,6 +205,7 @@ def _write_memory(path: Path) -> Path:
         + "\n",
         encoding="utf-8",
     )
+    migrate_memory_fixture(path)  # ADR-030 §1: no implicit migration
     return path
 
 

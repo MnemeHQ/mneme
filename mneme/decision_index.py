@@ -91,6 +91,17 @@ VALID_SOURCE_TYPES: frozenset[str] = frozenset({
     SOURCE_TYPE_PROPOSAL,
 })
 
+# ADR-030 §9a rule-binding authority. Internal canonical metadata only.
+BINDING_AUTHORITY_VERSION = "version"
+BINDING_AUTHORITY_PROTECTION = "protection"
+BINDING_AUTHORITY_LEGACY_UNKNOWN = "legacy_unknown"
+
+VALID_BINDING_AUTHORITIES: frozenset[str] = frozenset({
+    BINDING_AUTHORITY_VERSION,
+    BINDING_AUTHORITY_PROTECTION,
+    BINDING_AUTHORITY_LEGACY_UNKNOWN,
+})
+
 CANONICAL_VERSION = "1"
 
 
@@ -151,6 +162,11 @@ class CanonicalRuleRecord:
                           ``{"include_paths": [...], "exclude_paths": [...]}``;
                           empty dict means global applicability.
         lifecycle_status: Lifecycle inherited from the owning decision.
+        binding_authority: ADR-030 §9a classification of why the binding
+                          exists (``version``/``protection``/
+                          ``legacy_unknown``). Internal canonical metadata:
+                          never emitted through MCP, not part of
+                          ``rule_id``, and ignored by projection.
     """
 
     rule_id: str
@@ -162,6 +178,7 @@ class CanonicalRuleRecord:
     sequence: int | None = None
     applicability: dict[str, Any] = field(default_factory=dict)
     lifecycle_status: str = "active"
+    binding_authority: str = "legacy_unknown"
 
 
 @dataclass(frozen=True)
@@ -465,6 +482,10 @@ def canonical_from(
 
 
 __all__ = [
+    "BINDING_AUTHORITY_LEGACY_UNKNOWN",
+    "BINDING_AUTHORITY_PROTECTION",
+    "BINDING_AUTHORITY_VERSION",
+    "VALID_BINDING_AUTHORITIES",
     "CANONICAL_DECISION_CLASS_ARCHITECTURE",
     "CANONICAL_VERSION",
     "SOURCE_TYPE_ADR",

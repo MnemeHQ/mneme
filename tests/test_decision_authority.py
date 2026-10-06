@@ -66,6 +66,7 @@ from mneme.decision_proposal_store import (
     JsonFileDecisionProposalStore,
 )
 from mneme.memory_store import MemoryStore
+from tests.canonical_fixtures import migrate_memory_fixture
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 AUTHORITY_MODULE = REPO_ROOT / "mneme" / "decision_authority.py"
@@ -155,7 +156,12 @@ def _memory_document() -> dict:
     }
 
 
-def _write_memory(tmp_path: Path, document: dict | None = None) -> Path:
+def _write_memory(
+    tmp_path: Path,
+    document: object | None = None,
+    *,
+    migrate: bool = True,
+) -> Path:
     path = tmp_path / "project_memory.json"
     path.write_text(
         json.dumps(
@@ -164,7 +170,16 @@ def _write_memory(tmp_path: Path, document: dict | None = None) -> Path:
         + "\n",
         encoding="utf-8",
     )
+    # Canonical writers never migrate implicitly (ADR-030 §1).
+    if migrate:
+        migrate_memory_fixture(path)
     return path
+
+
+def _corrupt_snapshot(memory: Path, decisions: object) -> None:
+    raw = json.loads(memory.read_text(encoding="utf-8"))
+    raw["decisions"] = decisions
+    memory.write_text(json.dumps(raw, indent=2) + "\n", encoding="utf-8")
 
 
 def _service(
@@ -927,13 +942,10 @@ def test_proposed_plus_existing_decision_fails_closed(tmp_path: Path) -> None:
     path = tmp_path / "p.json"
     proposal = _propose(JsonFileDecisionProposalStore(path))
     decision_id = default_decision_id_of(proposal)
-    memory = _write_memory(tmp_path)
-    with open(memory, encoding="utf-8") as handle:
-        raw = json.load(handle)
-    raw["decisions"].append(
-        expected_materialization_entry(proposal, decision_id, FIXED_TIME)
-    )
-    memory.write_text(json.dumps(raw, indent=2) + "\n", encoding="utf-8")
+    # The existing decision is canonical: migrated from a pre-D1 row with the
+    # proposal's default id while the proposal is still proposed.
+    existing = expected_materialization_entry(proposal, decision_id, FIXED_TIME)
+    memory = _write_memory(tmp_path, {**_memory_document(), "decisions": [existing]})
     snapshot = _memory_bytes(memory)
 
     with pytest.raises(ReverseHalfStateError):
@@ -944,11 +956,11 @@ def test_proposed_plus_existing_decision_fails_closed(tmp_path: Path) -> None:
     assert stored.accepted_decision_id is None
     assert _memory_bytes(memory) == snapshot
 
-    # The same guard applies to a mismatching existing entry.
-    with open(memory, encoding="utf-8") as handle:
-        raw = json.load(handle)
-    raw["decisions"][0]["decision"] = "Different statement entirely."
-    memory.write_text(json.dumps(raw, indent=2) + "\n", encoding="utf-8")
+    # The same guard applies to a mismatching existing canonical decision.
+    mismatched = {**existing, "decision": "Different statement entirely."}
+    other = tmp_path / "other"
+    other.mkdir()
+    memory = _write_memory(other, {**_memory_document(), "decisions": [mismatched]})
     with pytest.raises(ReverseHalfStateError):
         _accept(JsonFileDecisionProposalStore(path), memory, proposal.proposal_id)
     stored = JsonFileDecisionProposalStore(path).get(proposal.proposal_id)
@@ -1064,7 +1076,8 @@ def test_accept_memory_decisions_not_a_list_fails(tmp_path: Path) -> None:
     path = tmp_path / "p.json"
     proposal = _propose(JsonFileDecisionProposalStore(path))
     store = JsonFileDecisionProposalStore(path)
-    memory = _write_memory(tmp_path, {**_memory_document(), "decisions": {}})
+    memory = _write_memory(tmp_path)
+    _corrupt_snapshot(memory, {})
     with pytest.raises(MemoryInvalidError):
         _service(store, memory).accept(proposal.proposal_id)
     stored = JsonFileDecisionProposalStore(path).get(proposal.proposal_id)
@@ -1076,7 +1089,7 @@ def test_accept_memory_non_object_fails(tmp_path: Path) -> None:
     path = tmp_path / "p.json"
     proposal = _propose(JsonFileDecisionProposalStore(path))
     store = JsonFileDecisionProposalStore(path)
-    memory = _write_memory(tmp_path, ["not", "an", "object"])
+    memory = _write_memory(tmp_path, ["not", "an", "object"], migrate=False)
     with pytest.raises(MemoryInvalidError):
         _service(store, memory).accept(proposal.proposal_id)
     stored = JsonFileDecisionProposalStore(path).get(proposal.proposal_id)
@@ -1090,9 +1103,8 @@ def test_accept_memory_with_non_object_decision_entry_fails(
     path = tmp_path / "p.json"
     proposal = _propose(JsonFileDecisionProposalStore(path))
     store = JsonFileDecisionProposalStore(path)
-    memory = _write_memory(
-        tmp_path, {**_memory_document(), "decisions": ["oops"]}
-    )
+    memory = _write_memory(tmp_path)
+    _corrupt_snapshot(memory, ["oops"])
     with pytest.raises(MemoryInvalidError):
         _service(store, memory).accept(proposal.proposal_id)
     stored = JsonFileDecisionProposalStore(path).get(proposal.proposal_id)
@@ -1281,6 +1293,7 @@ def test_rejection_produces_no_canonical_record(tmp_path: Path) -> None:
     path = tmp_path / "p.json"
     proposal = _propose(JsonFileDecisionProposalStore(path))
     memory = _write_memory(tmp_path)
+    before = _memory_bytes(memory)
     _service(JsonFileDecisionProposalStore(path), memory).reject(
         proposal.proposal_id
     )
@@ -1288,7 +1301,8 @@ def test_rejection_produces_no_canonical_record(tmp_path: Path) -> None:
     store.load()
     assert store.decisions() == []
     raw = json.loads(memory.read_text(encoding="utf-8"))
-    assert "decision_index" not in raw
+    assert raw["decision_index"]["decisions"] == []
+    assert _memory_bytes(memory) == before
 
 
 def test_repeated_rejection_is_deterministic(tmp_path: Path) -> None:

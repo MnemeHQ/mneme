@@ -66,7 +66,7 @@ from mneme.decision_mcp import (
     trace_not_found_to_transport,
     trace_to_transport,
 )
-from mneme.decision_index_persistence import migrate_memory_document
+from tests.canonical_fixtures import canonical_document
 from mneme.decision_index_service import (
     CanonicalDecisionTrace,
     DecisionIndexIntegrityError,
@@ -1475,7 +1475,7 @@ def test_no_active_zero_degradation_fallback_exists():
 
 def _canonical_memory(tmp_path: Path) -> Path:
     path = tmp_path / "project_memory.json"
-    document = migrate_memory_document({
+    document = canonical_document({
         "items": [],
         "examples": [],
         "decisions": [],

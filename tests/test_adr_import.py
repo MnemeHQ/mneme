@@ -9,6 +9,7 @@ import pytest
 
 from mneme.adr_import import DecisionNode, project_decision_graph
 from mneme.adr_parser import parse_adr_directory
+from tests.canonical_fixtures import migrate_memory_fixture
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -197,6 +198,7 @@ def test_apply_import_appends_decisions_to_target_memory(tmp_path):
         "items": [], "examples": [], "decisions": [],
     }), encoding="utf-8")
 
+    migrate_memory_fixture(target)  # ADR-030 §1: no implicit migration
     report = compile_for_import(FIXTURES / "adrs_import_basic")
     written_ids = apply_import(report, target_path=target, allow_update=False)
 
@@ -222,6 +224,7 @@ def test_apply_import_writes_source_provenance_block(tmp_path):
         "items": [], "examples": [], "decisions": [],
     }), encoding="utf-8")
 
+    migrate_memory_fixture(target)  # ADR-030 §1: no implicit migration
     report = compile_for_import(FIXTURES / "adrs_import_basic")
     apply_import(report, target_path=target, allow_update=False)
 
@@ -250,6 +253,7 @@ def test_apply_import_persists_typed_rules(tmp_path):
         "items": [], "examples": [], "decisions": [],
     }), encoding="utf-8")
 
+    migrate_memory_fixture(target)  # ADR-030 §1: no implicit migration
     report = compile_for_import(FIXTURES / "adrs_literal")
     apply_import(report, target_path=target)
 
@@ -289,6 +293,7 @@ def test_apply_import_persists_typed_rule_path_selectors(tmp_path):
         "items": [], "examples": [], "decisions": [],
     }), encoding="utf-8")
 
+    migrate_memory_fixture(target)  # ADR-030 §1: no implicit migration
     apply_import(compile_for_import(adr_dir), target_path=target)
     persisted = json.loads(target.read_text(encoding="utf-8"))
     assert persisted["decisions"][0]["rules"] == [{
@@ -332,6 +337,7 @@ def test_apply_import_refuses_overwrite_without_allow_update(tmp_path):
     # seed with a collision against ADR-101
     target.write_text((FIXTURES / "memory_for_import_collision.json").read_text(encoding="utf-8"), encoding="utf-8")
 
+    migrate_memory_fixture(target)  # ADR-030 §1: no implicit migration
     report = compile_for_import(FIXTURES / "adrs_import_basic")
     with pytest.raises(RuntimeError, match="ADR-101.*--update-existing"):
         apply_import(report, target_path=target, allow_update=False)
@@ -344,6 +350,7 @@ def test_apply_import_overwrites_with_allow_update(tmp_path):
     target = tmp_path / "project_memory.json"
     target.write_text((FIXTURES / "memory_for_import_collision.json").read_text(encoding="utf-8"), encoding="utf-8")
 
+    migrate_memory_fixture(target)  # ADR-030 §1: no implicit migration
     report = compile_for_import(FIXTURES / "adrs_import_basic")
     written_ids = apply_import(report, target_path=target, allow_update=True)
     assert "ADR-101" in written_ids
@@ -676,6 +683,7 @@ def _seed_empty_memory(path: Path) -> None:
         "meta": {"name": "x", "description": "x", "version": "1.0.0", "owner": "x", "created": "2026-01-01"},
         "items": [], "examples": [], "decisions": [],
     }), encoding="utf-8")
+    migrate_memory_fixture(path)  # ADR-030 §1: no implicit migration
 
 
 def _one_conflict_one_clean(tmp_path: Path) -> Path:
@@ -825,7 +833,10 @@ def test_r5_source_revision_binds_to_parsed_bytes_not_disk_at_apply(tmp_path):
 #
 # Since D1D, ADR import is a canonical authority writer, not a legacy
 # decisions[] writer, so the #444 legacy-writer guard no longer applies to it.
-# These tests pin the contract that replaced it (ADR-030 §1).
+# These tests pin the contract that replaced it (ADR-030 §1). Since D1E1 it
+# never migrates: section-less targets refuse with
+# DecisionIndexMigrationRequired, and only `mneme decision-index migrate`
+# turns them canonical.
 
 _NATIVE_DECISION = {
     "id": "D-NATIVE",
@@ -901,7 +912,50 @@ def test_d1d_canonical_target_import_writes_through_decision_index(tmp_path):
     assert [row["id"] for row in raw["decisions"]] == ["D-NATIVE", "ADR-540"]
 
 
-def test_d1d_sectionless_target_migrates_deterministically_then_imports(tmp_path):
+def test_d1e1_sectionless_target_refuses_without_implicit_migration(tmp_path):
+    """ADR-030 §1: ADR import never migrates; section-less memory refuses."""
+    from mneme.adr_import import apply_import, compile_for_import
+    from mneme.decision_index_persistence import DecisionIndexMigrationRequired
+
+    target = _contract_memory(tmp_path / "project_memory.json")
+    before = target.read_bytes()
+
+    with pytest.raises(DecisionIndexMigrationRequired):
+        apply_import(compile_for_import(_contract_corpus(tmp_path)), target)
+
+    assert target.read_bytes() == before
+
+
+def test_d1e1_import_cannot_bypass_lossless_migration(tmp_path):
+    """Lossy section-less memory is refused, never implicitly canonicalized.
+
+    Before D1E1, ADR import migrated this target implicitly and erased the
+    EventCatalog decision's provenance and extra field.
+    """
+    from mneme.adr_import import apply_import, compile_for_import
+    from mneme.decision_index_persistence import DecisionIndexMigrationRequired
+
+    target = tmp_path / "project_memory.json"
+    target.write_text(json.dumps({
+        "meta": {"name": "x", "description": "x"},
+        "items": [],
+        "examples": [],
+        "decisions": [{
+            "id": "EC-1",
+            "decision": "Payments own refunds",
+            "source": {"type": "eventcatalog", "path": "d/r.md", "sha256": "ab" * 32},
+            "notes": "owner: payments",
+        }],
+    }, indent=2) + "\n", encoding="utf-8")
+    before = target.read_bytes()
+
+    with pytest.raises(DecisionIndexMigrationRequired):
+        apply_import(compile_for_import(_contract_corpus(tmp_path)), target)
+
+    assert target.read_bytes() == before
+
+
+def test_d1e1_explicitly_migrated_target_imports_deterministically(tmp_path):
     from mneme.adr_import import apply_import, compile_for_import
 
     corpus = _contract_corpus(tmp_path)
@@ -909,7 +963,8 @@ def test_d1d_sectionless_target_migrates_deterministically_then_imports(tmp_path
     (tmp_path / "b").mkdir()
     first = _contract_memory(tmp_path / "a" / "project_memory.json")
     second = _contract_memory(tmp_path / "b" / "project_memory.json")
-    assert "decision_index" not in json.loads(first.read_text(encoding="utf-8"))
+    migrate_memory_fixture(first)
+    migrate_memory_fixture(second)
 
     apply_import(compile_for_import(corpus), first)
     apply_import(compile_for_import(corpus), second)

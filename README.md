@@ -80,6 +80,20 @@ Use `--memory` to select another project memory file. The file must contain a va
 mneme decision-mcp --memory path/to/project_memory.json
 ```
 
+If the file has no `decision_index` section yet, MCP stops with an error that tells you to migrate. Preview the migration first. It writes nothing and lists the visible effects: non-active decisions leave Layer 1, and legacy `rule`/`anti_pattern` items are migrated once.
+
+```bash
+mneme decision-index migrate --memory path/to/project_memory.json
+```
+
+Then apply exactly that migration:
+
+```bash
+mneme decision-index migrate --memory path/to/project_memory.json --apply
+```
+
+Migration is lossless or it refuses. There is no force or repair mode. Memory containing legacy decision metadata that the canonical index cannot represent, such as EventCatalog-imported decisions, stays on the section-less path and is not migrated.
+
 `--adr-dir` is now optional validation input only. Mneme still validates and precedence-resolves that corpus before startup, but ADRs do not become a second MCP authority source.
 
 ```bash
