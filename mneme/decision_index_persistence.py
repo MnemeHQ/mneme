@@ -490,8 +490,12 @@ def _snapshot_record_from_decision(decision: Decision) -> dict[str, Any]:
     return record
 
 
-def migrate_memory_document(document: dict[str, Any]) -> dict[str, Any]:
-    """Build the initial D1B canonical section from a pre-D1 memory document.
+def _migrate_memory_document(document: dict[str, Any]) -> dict[str, Any]:
+    """Build the initial canonical section from a pre-D1 memory document.
+
+    Migration-internal only (ADR-030 §1): the sole production caller is
+    ``plan_memory_migration``. Canonical writers never migrate; they call
+    ``require_canonical_document`` and refuse section-less memory.
 
     If a section already exists it is validated and the document is returned
     unchanged, making a second migration a structural no-op.
@@ -595,6 +599,25 @@ def migrate_memory_document(document: dict[str, Any]) -> dict[str, Any]:
 
 
 
+def require_canonical_document(document: object) -> dict[str, Any]:
+    """Return a validated copy of canonical project memory (ADR-030 §1).
+
+    Every canonical writer and primitive calls this instead of migrating.
+    Section-less memory raises ``DecisionIndexMigrationRequired``: the only
+    transition to canonical memory is ``mneme decision-index migrate``.
+    """
+    if not isinstance(document, dict):
+        raise DecisionIndexPersistenceError("project memory must be an object")
+    if "decision_index" not in document:
+        raise DecisionIndexMigrationRequired(
+            "project memory has no authoritative decision_index section; "
+            "canonical writers never migrate implicitly. Preview with "
+            "`mneme decision-index migrate`, then apply with --apply."
+        )
+    load_persisted_decision_index(document["decision_index"])
+    return copy.deepcopy(document)
+
+
 def append_initial_canonical_decision(
     document: dict[str, Any],
     *,
@@ -615,11 +638,11 @@ def append_initial_canonical_decision(
     """Append one first canonical occurrence and its derived compatibility row.
 
     This is a persistence primitive only. The caller owns authority and
-    transition semantics. A section-less document is migrated first so the
-    write always lands in the durable Decision Index. Existing decision ids
+    transition semantics. Section-less memory is refused with
+    ``DecisionIndexMigrationRequired`` (ADR-030 §1). Existing decision ids
     are returned unchanged for the caller to verify or fail closed.
     """
-    migrated = migrate_memory_document(document)
+    migrated = require_canonical_document(document)
     section = copy.deepcopy(
         _require_dict(migrated["decision_index"], "decision_index")
     )
@@ -730,7 +753,7 @@ def append_canonical_version_occurrence(
     after the operation starts. An exact persisted retry is a structural
     no-op even if a later authority action moved the active pointer.
     """
-    migrated = migrate_memory_document(document)
+    migrated = require_canonical_document(document)
     section = copy.deepcopy(
         _require_dict(migrated["decision_index"], "decision_index")
     )
@@ -869,7 +892,7 @@ def apply_canonical_supersession(
     mark targets superseded only as the consequence of an explicit
     ADR-sanctioned ``supersedes`` relationship.
     """
-    migrated = migrate_memory_document(document)
+    migrated = require_canonical_document(document)
     section = copy.deepcopy(
         _require_dict(migrated["decision_index"], "decision_index")
     )
@@ -951,7 +974,7 @@ def rebind_legacy_initial_occurrence(
     ordering, lifecycle, timestamps, and the compatibility snapshot remain
     unchanged; only first-occurrence identity and provenance are corrected.
     """
-    migrated = migrate_memory_document(document)
+    migrated = require_canonical_document(document)
     section = copy.deepcopy(
         _require_dict(migrated["decision_index"], "decision_index")
     )
@@ -1592,7 +1615,7 @@ def rebuild_compatibility_snapshot(
     document: dict[str, Any],
 ) -> dict[str, Any]:
     """Re-project active canonical authority into deprecated decisions[]."""
-    migrated = migrate_memory_document(document)
+    migrated = require_canonical_document(document)
     index = load_persisted_decision_index(migrated["decision_index"])
     records_by_id = {record.decision_id: record for record in index.records}
     rows: list[dict[str, Any]] = []
@@ -1866,7 +1889,7 @@ def plan_memory_migration(path: str | Path) -> MemoryMigrationPlan:
             + "\n  - ".join(problems)
         )
     try:
-        migrated = migrate_memory_document(document)
+        migrated = _migrate_memory_document(document)
         index = load_persisted_decision_index(migrated["decision_index"])
         verify_compatibility_snapshot(migrated, index, memory_path)
     except (DecisionIndexPersistenceError, KeyError, TypeError) as exc:
@@ -1945,10 +1968,10 @@ __all__ = [
     "legacy_item_to_runtime_decision",
     "load_decision_index_from_memory_file",
     "load_persisted_decision_index",
-    "migrate_memory_document",
     "migrate_memory_file",
     "rebind_legacy_initial_occurrence",
     "refuse_legacy_decisions_write",
+    "require_canonical_document",
     "rule_id_of",
     "runtime_decision_from_memory_record",
     "verify_compatibility_snapshot",

@@ -227,11 +227,11 @@ def test_repeated_import_deterministic(tmp_path):
 def test_apply_import_refuses_to_mutate_canonical_compatibility_snapshot(
     tmp_path,
 ):
-    from mneme.decision_index_persistence import migrate_memory_document
+    from tests.canonical_fixtures import canonical_document
 
     report = compile_for_import(FIXTURES / "index.json", FIXTURES)
     target = tmp_path / "project_memory.json"
-    document = migrate_memory_document({
+    document = canonical_document({
         "items": [],
         "examples": [],
         "decisions": [],

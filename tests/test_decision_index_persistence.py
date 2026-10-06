@@ -16,12 +16,12 @@ from mneme.decision_index_persistence import (
     DecisionIndexPersistenceError,
     content_digest_of,
     load_persisted_decision_index,
-    migrate_memory_document,
     migrate_memory_file,
     rebuild_compatibility_snapshot,
     rule_id_of,
     version_id_of,
 )
+from tests.canonical_fixtures import canonical_document
 from mneme.decision_projection import project_canonical_index
 from mneme.memory_store import MemoryStore
 from mneme.schemas import Rule
@@ -110,7 +110,7 @@ def test_real_memory_migration_projects_exact_runtime_decisions(
     memory_path = REPO_ROOT / relative_path
     document = json.loads(memory_path.read_text(encoding="utf-8"))
     baseline = MemoryStore(memory_path).load().decisions
-    migrated = migrate_memory_document(document)
+    migrated = canonical_document(document)
     index = load_persisted_decision_index(migrated["decision_index"])
     projected = project_canonical_index(
         index,
@@ -128,7 +128,7 @@ def test_real_migrated_projection_preserves_frozen_benchmark_results() -> None:
         REPO_ROOT / "examples" / "benchmarks"
     )
 
-    migrated = migrate_memory_document(document)
+    migrated = canonical_document(document)
     index = load_persisted_decision_index(migrated["decision_index"])
     projected = project_canonical_index(
         index,
@@ -145,7 +145,7 @@ def test_real_migrated_projection_preserves_frozen_benchmark_results() -> None:
 
 
 def test_source_evidence_rejects_proposal_fields_on_runtime_records():
-    document = migrate_memory_document({
+    document = canonical_document({
         "items": [],
         "examples": [],
         "decisions": [{
@@ -167,7 +167,7 @@ def test_source_evidence_rejects_proposal_fields_on_runtime_records():
 
 
 def test_proposal_source_evidence_requires_matching_accepted_decision_id():
-    document = migrate_memory_document({
+    document = canonical_document({
         "items": [],
         "examples": [],
         "decisions": [],
@@ -243,7 +243,7 @@ def _evolve_decision(document: dict, predecessor: str, *, statement: str, source
 
 
 def test_d1d_version_occurrence_is_predecessor_bound_and_retry_is_noop():
-    migrated = migrate_memory_document(_document())
+    migrated = canonical_document(_document())
     index = load_persisted_decision_index(migrated["decision_index"])
     predecessor = next(
         r.version_id for r in index.records if r.decision_id == "dec-1"
@@ -264,7 +264,7 @@ def test_d1d_version_occurrence_is_predecessor_bound_and_retry_is_noop():
 
 
 def test_d1d_stale_new_occurrence_fails_closed():
-    migrated = migrate_memory_document(_document())
+    migrated = canonical_document(_document())
     index = load_persisted_decision_index(migrated["decision_index"])
     predecessor = next(
         r.version_id for r in index.records if r.decision_id == "dec-1"
@@ -279,7 +279,7 @@ def test_d1d_stale_new_occurrence_fails_closed():
 
 
 def test_d1d_unchanged_rule_id_rebinds_to_new_version():
-    migrated = migrate_memory_document(_document())
+    migrated = canonical_document(_document())
     index = load_persisted_decision_index(migrated["decision_index"])
     predecessor = next(
         r.version_id for r in index.records if r.decision_id == "dec-1"
@@ -303,7 +303,7 @@ def test_d1d_unchanged_rule_id_rebinds_to_new_version():
 
 
 def test_d1d_rebuild_snapshot_preserves_adr_source_block():
-    migrated = migrate_memory_document(_document())
+    migrated = canonical_document(_document())
     rebuilt = rebuild_compatibility_snapshot(migrated)
     row = next(d for d in rebuilt["decisions"] if d["id"] == "dec-1")
     assert row["source"] == {
@@ -313,7 +313,7 @@ def test_d1d_rebuild_snapshot_preserves_adr_source_block():
     }
 
 def test_g11_a1_b_a2_and_late_retry_preserve_occurrence_history():
-    migrated = migrate_memory_document(_document())
+    migrated = canonical_document(_document())
     initial_index = load_persisted_decision_index(migrated["decision_index"])
     a1 = next(r for r in initial_index.records if r.decision_id == "dec-1")
 
@@ -398,7 +398,7 @@ def test_g11_a1_b_a2_and_late_retry_preserve_occurrence_history():
 
 
 def test_g14_cross_id_supersession_is_not_version_lineage():
-    migrated = migrate_memory_document(_document())
+    migrated = canonical_document(_document())
     migrated, created = append_initial_canonical_decision(
         migrated,
         decision_id="dec-2",
@@ -504,9 +504,9 @@ def test_migration_is_byte_idempotent(tmp_path: Path) -> None:
 def test_document_migration_is_side_effect_free_and_structurally_idempotent() -> None:
     original = _document()
     before = copy.deepcopy(original)
-    migrated = migrate_memory_document(original)
+    migrated = canonical_document(original)
     assert original == before
-    assert migrate_memory_document(migrated) == migrated
+    assert canonical_document(migrated) == migrated
     assert not any(
         key.startswith("_validated")
         for version in migrated["decision_index"]["versions"]
@@ -518,11 +518,11 @@ def test_native_and_legacy_item_id_collision_fails_closed() -> None:
     document = _document()
     document["items"][0]["id"] = "dec-1"
     with pytest.raises(DecisionIndexPersistenceError, match="collides"):
-        migrate_memory_document(document)
+        canonical_document(document)
 
 
 def test_migration_records_adr_revision_and_occurrence_identity() -> None:
-    migrated = migrate_memory_document(_document())
+    migrated = canonical_document(_document())
     [version, legacy_version] = migrated["decision_index"]["versions"]
 
     assert version["source_evidence"] == [{
@@ -546,7 +546,7 @@ def test_migration_records_adr_revision_and_occurrence_identity() -> None:
 def test_native_without_verified_adr_revision_uses_legacy_decision_identity() -> None:
     document = _document()
     document["decisions"][0].pop("source")
-    migrated = migrate_memory_document(document)
+    migrated = canonical_document(document)
     [version, _] = migrated["decision_index"]["versions"]
     assert version["occurrence_source_identity"] == [
         "legacy-decisions",
@@ -564,7 +564,7 @@ def test_adr_locator_without_revision_is_preserved_without_claiming_adr_identity
     _write(path, document)
     before_source = MemoryStore(path).load().decisions[0].source_path
 
-    migrated = migrate_memory_document(document)
+    migrated = canonical_document(document)
     [version, _] = migrated["decision_index"]["versions"]
     assert version["source_evidence"][0]["source_locator"] == "../docs/adr/dec-1.md"
     assert version["source_evidence"][0]["source_revision"] == ""
@@ -582,8 +582,8 @@ def test_rule_identity_is_stable_under_reordering() -> None:
     second = copy.deepcopy(first)
     second["decisions"][0]["rules"].reverse()
 
-    first_section = migrate_memory_document(first)["decision_index"]
-    second_section = migrate_memory_document(second)["decision_index"]
+    first_section = canonical_document(first)["decision_index"]
+    second_section = canonical_document(second)["decision_index"]
 
     assert first_section["versions"][0]["version_id"] == (
         second_section["versions"][0]["version_id"]
@@ -597,10 +597,10 @@ def test_rule_identity_is_stable_under_reordering() -> None:
 
 
 def test_rule_identity_changes_when_semantics_change() -> None:
-    first = migrate_memory_document(_document())["decision_index"]["rules"][0]
+    first = canonical_document(_document())["decision_index"]["rules"][0]
     changed = _document()
     changed["decisions"][0]["rules"][0]["value"] = "pip install worse"
-    second = migrate_memory_document(changed)["decision_index"]["rules"][0]
+    second = canonical_document(changed)["decision_index"]["rules"][0]
     assert first["rule_id"] != second["rule_id"]
 
 
@@ -613,18 +613,18 @@ def test_duplicate_identical_rule_bindings_fail_closed() -> None:
         DecisionIndexPersistenceError,
         match="duplicate identical rule bindings",
     ):
-        migrate_memory_document(document)
+        canonical_document(document)
 
 
 def test_content_digest_corruption_fails_closed() -> None:
-    section = migrate_memory_document(_document())["decision_index"]
+    section = canonical_document(_document())["decision_index"]
     section["versions"][0]["statement"] = "tampered"
     with pytest.raises(DecisionIndexPersistenceError, match="content_digest mismatch"):
         load_persisted_decision_index(section)
 
 
 def test_version_identity_corruption_fails_closed() -> None:
-    section = migrate_memory_document(_document())["decision_index"]
+    section = canonical_document(_document())["decision_index"]
     section["versions"][0]["version_id"] = "dver-" + ("0" * 32)
     section["decisions"][0]["active_version_id"] = "dver-" + ("0" * 32)
     section["rules"][0]["decision_version_id"] = "dver-" + ("0" * 32)
@@ -633,7 +633,7 @@ def test_version_identity_corruption_fails_closed() -> None:
 
 
 def test_active_version_pointer_is_only_resolution_path() -> None:
-    section = migrate_memory_document(_document())["decision_index"]
+    section = canonical_document(_document())["decision_index"]
     section["decisions"][0]["active_version_id"] = "dver-" + ("f" * 32)
     with pytest.raises(
         DecisionIndexPersistenceError,
@@ -643,21 +643,21 @@ def test_active_version_pointer_is_only_resolution_path() -> None:
 
 
 def test_duplicate_rule_sequence_fails_closed() -> None:
-    section = migrate_memory_document(_document(two_rules=True))["decision_index"]
+    section = canonical_document(_document(two_rules=True))["decision_index"]
     section["rules"][1]["sequence"] = section["rules"][0]["sequence"]
     with pytest.raises(DecisionIndexPersistenceError, match="duplicate rule sequence"):
         load_persisted_decision_index(section)
 
 
 def test_rule_identity_corruption_fails_closed() -> None:
-    section = migrate_memory_document(_document())["decision_index"]
+    section = canonical_document(_document())["decision_index"]
     section["rules"][0]["rule_payload"]["value"] = "changed"
     with pytest.raises(DecisionIndexPersistenceError, match="rule .* identity mismatch"):
         load_persisted_decision_index(section)
 
 
 def test_unknown_persisted_rule_payload_field_fails_closed() -> None:
-    section = migrate_memory_document(_document())["decision_index"]
+    section = canonical_document(_document())["decision_index"]
     section["rules"][0]["rule_payload"]["future"] = "unsupported"
     with pytest.raises(
         DecisionIndexPersistenceError,
@@ -667,7 +667,7 @@ def test_unknown_persisted_rule_payload_field_fails_closed() -> None:
 
 
 def test_unknown_persisted_applicability_field_fails_closed() -> None:
-    section = migrate_memory_document(_document())["decision_index"]
+    section = canonical_document(_document())["decision_index"]
     section["rules"][0]["applicability"]["component"] = "api"
     with pytest.raises(
         DecisionIndexPersistenceError,
@@ -716,7 +716,7 @@ def test_new_legacy_item_after_migration_stays_context_only(tmp_path: Path) -> N
 def test_non_active_decision_is_retained_canonically_not_runtime_snapshot() -> None:
     document = _document()
     document["decisions"][0]["status"] = "superseded"
-    migrated = migrate_memory_document(document)
+    migrated = canonical_document(document)
     index = load_persisted_decision_index(migrated["decision_index"])
 
     record = next(r for r in index.records if r.decision_id == "dec-1")

@@ -116,8 +116,9 @@ from mneme.decision_index import (
 from mneme.decision_index_persistence import (
     DecisionIndexPersistenceError,
     append_initial_canonical_decision,
+    DecisionIndexMigrationRequired,
     load_persisted_decision_index,
-    migrate_memory_document,
+    require_canonical_document,
     rebind_legacy_initial_occurrence,
     verify_compatibility_snapshot,
 )
@@ -587,12 +588,21 @@ class DecisionAuthorityService:
             already_accepted = False
 
         raw = self._load_memory_raw()
-        had_index = "decision_index" in raw
+        # ADR-030 §1: acceptance never migrates. Section-less memory raises
+        # DecisionIndexMigrationRequired here, before any proposal state
+        # transition below.
         try:
-            canonical_document = migrate_memory_document(raw)
+            canonical_document = require_canonical_document(raw)
             index = load_persisted_decision_index(
                 canonical_document["decision_index"]
             )
+            # The whole canonical state, including the derived snapshot, is
+            # verified before any proposal transition, as ADR import does.
+            verify_compatibility_snapshot(
+                canonical_document, index, self._memory_path
+            )
+        except DecisionIndexMigrationRequired:
+            raise
         except (DecisionIndexPersistenceError, KeyError, TypeError) as exc:
             raise MemoryInvalidError(
                 f"memory file {self._memory_path} cannot establish the "
@@ -706,7 +716,7 @@ class DecisionAuthorityService:
                     f"{effective_id!r}: {exc}"
                 ) from exc
             self._write_memory_raw(canonical_document)
-        elif already_accepted and (rebound or not had_index):
+        elif already_accepted and rebound:
             self._write_memory_raw(canonical_document)
 
         self._verify(proposal, effective_id, expected_timestamp)

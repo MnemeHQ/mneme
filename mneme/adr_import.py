@@ -393,8 +393,9 @@ def apply_import(
         append_canonical_version_occurrence,
         append_initial_canonical_decision,
         content_digest_of,
+        DecisionIndexMigrationRequired,
         load_persisted_decision_index,
-        migrate_memory_document,
+        require_canonical_document,
         rebuild_compatibility_snapshot,
         verify_compatibility_snapshot,
     )
@@ -427,15 +428,13 @@ def apply_import(
         raw = _json.loads(target_path.read_text(encoding="utf-8"))
         if not isinstance(raw, dict):
             raise DecisionIndexPersistenceError("project memory must be an object")
-        if "decision_index" in raw:
-            initial_index = load_persisted_decision_index(raw["decision_index"])
-            verify_compatibility_snapshot(raw, initial_index, target_path)
-            working = migrate_memory_document(raw)
-        else:
-            working = migrate_memory_document(raw)
-            initial_index = load_persisted_decision_index(
-                working["decision_index"]
-            )
+        # ADR-030 §1: ADR import never migrates. Section-less memory raises
+        # DecisionIndexMigrationRequired before any write.
+        working = require_canonical_document(raw)
+        initial_index = load_persisted_decision_index(raw["decision_index"])
+        verify_compatibility_snapshot(raw, initial_index, target_path)
+    except DecisionIndexMigrationRequired:
+        raise
     except (OSError, ValueError, TypeError) as exc:
         raise RuntimeError(
             f"ADR import refused: target memory is not valid canonical state: {exc}"

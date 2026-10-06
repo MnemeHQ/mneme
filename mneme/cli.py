@@ -943,6 +943,8 @@ def _cmd_adr_import(args: argparse.Namespace) -> int:
                 approve_conflicts=args.approve_conflicts,
                 expected_predecessor_version_ids=expected_predecessors or None,
             )
+        except DecisionIndexMigrationRequired:
+            return _error_exit(_migration_required_message(target_path))
         except RuntimeError as exc:
             print(f"ERROR: {exc}", file=sys.stderr, flush=True)
             return 2
@@ -1313,6 +1315,8 @@ def _cmd_decision_accept(args: argparse.Namespace) -> int:
         result = service.accept(
             args.proposal_id, decision_id=args.decision_id
         )
+    except DecisionIndexMigrationRequired:
+        return _error_exit(_migration_required_message(args.memory))
     except DecisionAuthorityError as exc:
         return _authority_error_exit(exc)
     if result.recovered:

@@ -20,9 +20,9 @@ from mneme.decision_index_persistence import (
     append_canonical_version_occurrence,
     load_decision_index_from_memory_file,
     load_persisted_decision_index,
-    migrate_memory_document,
     plan_memory_migration,
 )
+from tests.canonical_fixtures import canonical_document
 from mneme.decision_projection import project_canonical_index
 from mneme.memory_store import MemoryStore
 from mneme.schemas import Rule
@@ -308,7 +308,7 @@ def test_rows_without_binding_authority_read_legacy_unknown_unrewritten(tmp_path
 
 @pytest.mark.parametrize("value", ["adr", "", 1, None])
 def test_invalid_binding_authority_fails_closed(tmp_path, value):
-    section = migrate_memory_document(json.loads(
+    section = canonical_document(json.loads(
         _standard_memory(tmp_path).read_text(encoding="utf-8")
     ))["decision_index"]
     section["rules"][0]["binding_authority"] = value
@@ -332,6 +332,7 @@ def test_adr_import_bindings_persist_version_authority(tmp_path):
         )
 
     memory = _memory(tmp_path / "project_memory.json", [])
+    apply_memory_migration(plan_memory_migration(memory))
     write("alpha")
     apply_import(compile_for_import(adr_dir), memory)
     write("beta")
@@ -343,7 +344,7 @@ def test_adr_import_bindings_persist_version_authority(tmp_path):
 
 
 def test_projection_ignores_binding_authority(tmp_path):
-    document = migrate_memory_document(json.loads(
+    document = canonical_document(json.loads(
         _standard_memory(tmp_path).read_text(encoding="utf-8")
     ))
     with_field = project_canonical_index(
@@ -360,7 +361,7 @@ def test_projection_ignores_binding_authority(tmp_path):
 def test_mcp_rule_transport_never_emits_binding_authority(tmp_path):
     from mneme.decision_mcp import rule_to_transport
 
-    section = migrate_memory_document(json.loads(
+    section = canonical_document(json.loads(
         _standard_memory(tmp_path).read_text(encoding="utf-8")
     ))["decision_index"]
     rules = load_persisted_decision_index(section).rules
@@ -387,7 +388,7 @@ def _occurrence_inputs() -> dict:
 
 
 def _evolved(tmp_path: Path) -> tuple[dict, str, str]:
-    document = migrate_memory_document(json.loads(
+    document = canonical_document(json.loads(
         _standard_memory(tmp_path).read_text(encoding="utf-8")
     ))
     (logical,) = [
@@ -491,3 +492,156 @@ def test_mcp_canonical_memory_starts_unchanged(tmp_path, monkeypatch):
 def test_loader_raises_migration_required_for_section_less_memory(tmp_path):
     with pytest.raises(DecisionIndexMigrationRequired):
         load_decision_index_from_memory_file(_standard_memory(tmp_path))
+
+
+# ── Single transition: canonical writers never migrate (ADR-030 §1) ──────────
+
+
+def _section_less_lossy(path: Path) -> Path:
+    """Section-less memory whose EventCatalog row cannot migrate losslessly."""
+    return _memory(path, [{
+        "id": "EC-1",
+        "decision": "Payments own refunds",
+        "source": {"type": "eventcatalog", "path": "d/r.md", "sha256": "ab" * 32},
+        "notes": "owner: payments",
+    }])
+
+
+@pytest.mark.parametrize("lossy", [False, True], ids=["clean", "lossy-eventcatalog"])
+def test_acceptance_refuses_section_less_memory_before_proposal_transition(
+    tmp_path, lossy
+):
+    from mneme.decision_authority import DecisionAuthorityService
+    from mneme.decision_proposal_store import JsonFileDecisionProposalStore
+    from tests.test_decision_authority import _propose
+
+    proposals = tmp_path / "proposals.json"
+    proposal = _propose(JsonFileDecisionProposalStore(proposals))
+    memory = (
+        _section_less_lossy(tmp_path / "project_memory.json")
+        if lossy
+        else _standard_memory(tmp_path)
+    )
+    memory_before, store_before = memory.read_bytes(), proposals.read_bytes()
+
+    with pytest.raises(DecisionIndexMigrationRequired):
+        DecisionAuthorityService(
+            JsonFileDecisionProposalStore(proposals), memory
+        ).accept(proposal.proposal_id)
+
+    assert memory.read_bytes() == memory_before
+    assert proposals.read_bytes() == store_before
+
+
+def test_cli_accept_on_section_less_memory_reports_preview_first(tmp_path, capsys):
+    from mneme.decision_proposal_store import JsonFileDecisionProposalStore
+    from tests.test_decision_authority import _propose
+
+    proposals = tmp_path / "proposals.json"
+    proposal = _propose(JsonFileDecisionProposalStore(proposals))
+    memory = _standard_memory(tmp_path)
+    store_before = proposals.read_bytes()
+
+    code = main([
+        "decision", "accept", proposal.proposal_id,
+        "--proposals", str(proposals), "--memory", str(memory),
+    ])
+
+    err = capsys.readouterr().err
+    assert code == 2
+    assert "no authoritative decision_index section" in err
+    assert err.index("migrate --memory") < err.index("--apply")
+    assert "Traceback" not in err
+    assert proposals.read_bytes() == store_before
+
+
+def test_cli_adr_import_on_section_less_memory_reports_preview_first(
+    tmp_path, capsys
+):
+    memory = _section_less_lossy(tmp_path / "project_memory.json")
+    before = memory.read_bytes()
+
+    code = main([
+        "adr", "import", str(REPO_ROOT / "tests" / "fixtures" / "adrs_import_basic"),
+        "--memory", str(memory), "--apply",
+    ])
+
+    err = capsys.readouterr().err
+    assert code == 2
+    assert "no authoritative decision_index section" in err
+    assert err.index("migrate --memory") < err.index("--apply")
+    assert memory.read_bytes() == before
+
+
+def _primitive_calls() -> list:
+    from mneme import decision_index_persistence as p
+
+    return [
+        pytest.param(lambda d: p.append_initial_canonical_decision(
+            d, decision_id="D-NEW", statement="s", rationale="r",
+            context_scope=["x"], lifecycle_status="active", created_at=TS,
+            updated_at=TS, occurrence_source_identity=["cli-add", "D-NEW"],
+            source_evidence=[],
+        ), id="append-initial"),
+        pytest.param(lambda d: p.append_canonical_version_occurrence(
+            d, predecessor_version_id="dver-" + "0" * 32, **_occurrence_inputs()
+        ), id="append-version"),
+        pytest.param(lambda d: p.apply_canonical_supersession(
+            d, superseding_decision_id="D-ACTIVE",
+            target_decision_ids=["D-OLD"], updated_at=TS,
+        ), id="supersede"),
+        pytest.param(lambda d: p.rebind_legacy_initial_occurrence(
+            d, decision_id="D-ACTIVE", occurrence_source_identity=["x"],
+            source_evidence=[],
+        ), id="rebind"),
+        pytest.param(p.rebuild_compatibility_snapshot, id="rebuild-snapshot"),
+    ]
+
+
+@pytest.mark.parametrize("call", _primitive_calls())
+def test_canonical_primitives_require_canonical_input(tmp_path, call):
+    document = json.loads(_standard_memory(tmp_path).read_text(encoding="utf-8"))
+    original = json.loads(json.dumps(document))
+
+    with pytest.raises(DecisionIndexMigrationRequired):
+        call(document)
+
+    assert document == original
+
+
+def test_migration_transformation_is_private_to_the_migration_command():
+    """Source boundary: only plan_memory_migration may migrate (ADR-030 §1)."""
+    import ast
+
+    from mneme import decision_index_persistence as persistence
+
+    assert "migrate_memory_document" not in persistence.__all__
+    assert "_migrate_memory_document" not in persistence.__all__
+    assert not hasattr(persistence, "migrate_memory_document")
+
+    names = {"migrate_memory_document", "_migrate_memory_document"}
+    offenders: list[str] = []
+    for path in sorted((REPO_ROOT / "mneme").rglob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        rel = path.relative_to(REPO_ROOT).as_posix()
+        if rel == "mneme/decision_index_persistence.py":
+            for func in ast.walk(tree):
+                if not isinstance(func, ast.FunctionDef):
+                    continue
+                for node in ast.walk(func):
+                    if (
+                        isinstance(node, ast.Call)
+                        and isinstance(node.func, ast.Name)
+                        and node.func.id in names
+                        and func.name != "plan_memory_migration"
+                    ):
+                        offenders.append(f"{rel}:{func.name}")
+            continue
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Name) and node.id in names:
+                offenders.append(f"{rel}:{node.lineno}")
+            elif isinstance(node, ast.Attribute) and node.attr in names:
+                offenders.append(f"{rel}:{node.lineno}")
+            elif isinstance(node, ast.alias) and node.name in names:
+                offenders.append(f"{rel}:import")
+    assert offenders == []

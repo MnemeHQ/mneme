@@ -245,6 +245,16 @@ the predecessor that operation ran against:
 
 ## Persistence
 
+`--apply` requires canonical memory. If the target has no `decision_index`
+section, the import refuses and changes nothing. ADR import never migrates
+implicitly. The only transition is the explicit migration command: preview it
+first, then apply it.
+
+```bash
+mneme decision-index migrate --memory .mneme/project_memory.json
+mneme decision-index migrate --memory .mneme/project_memory.json --apply
+```
+
 The authoritative write target is the `decision_index` section. After the
 canonical mutation validates, Mneme regenerates `decisions[]` only as the
 deprecation-window compatibility projection and verifies it against the same

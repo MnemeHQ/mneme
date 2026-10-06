@@ -39,6 +39,7 @@ from mneme.decision_proposal_store import (
     InMemoryDecisionProposalStore,
     JsonFileDecisionProposalStore,
 )
+from tests.canonical_fixtures import migrate_memory_fixture
 
 PROPOSALS_SCHEMA = "mneme.decision-proposals/v1"
 FIXED_TIME = "2026-09-14T12:00:00Z"
@@ -119,6 +120,7 @@ def _write_memory(tmp_path: Path) -> Path:
     path.write_text(
         json.dumps(_memory_document(), indent=2) + "\n", encoding="utf-8"
     )
+    migrate_memory_fixture(path)  # ADR-030 §1: no implicit migration
     return path
 
 
@@ -428,15 +430,19 @@ def test_accept_rejected_proposal_surfaces_core_refusal(tmp_path, capsys):
 
 def test_accept_reverse_half_state_surfaces_core_refusal(tmp_path, capsys):
     path = tmp_path / "proposals.json"
-    memory = _write_memory(tmp_path)
     proposal_id = _propose(path, _candidate())
     proposal = JsonFileDecisionProposalStore(path).get(proposal_id)
     decision_id = default_decision_id_of(proposal)
-    raw = json.loads(memory.read_text(encoding="utf-8"))
-    raw["decisions"].append(
-        expected_materialization_entry(proposal, decision_id, FIXED_TIME)
-    )
-    memory.write_text(json.dumps(raw, indent=2) + "\n", encoding="utf-8")
+    # The existing decision is canonical (migrated pre-D1 row) while the
+    # proposal is still proposed.
+    memory = tmp_path / "project_memory.json"
+    memory.write_text(json.dumps({
+        **_memory_document(),
+        "decisions": [
+            expected_materialization_entry(proposal, decision_id, FIXED_TIME)
+        ],
+    }, indent=2) + "\n", encoding="utf-8")
+    migrate_memory_fixture(memory)
     code, out, err = _run(
         capsys, ["decision", "accept", proposal_id, "--proposals", str(path), "--memory", str(memory)]
     )
