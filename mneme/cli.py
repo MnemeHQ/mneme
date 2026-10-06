@@ -6,7 +6,10 @@ Subcommands
   init              Scaffold an empty project_memory.json.
   setup             Initialize Mneme project state in setup mode (no
                     enforcement). See docs/plans/m1-3-audit-to-setup-activation.md.
-  add_decision      Append a new Decision to a project_memory.json file.
+  add_decision      Add a new Decision to a project_memory.json file. On
+                    canonical memory it creates a first occurrence with
+                    identity ["cli-add", id] (ADR-030 §4); an exact retry
+                    is a no-op and it never edits an existing decision.
   list_decisions    Print every Decision in the memory file.
   test_query        Run a query through the retriever and show scores + injected.
   cursor generate   Generate a Cursor .mdc rules file from retrieved decisions.
@@ -66,6 +69,7 @@ from mneme.benchmark import BenchmarkRunner, ScenarioVerdict
 from mneme.benchmark_report import format_json, format_markdown, format_terminal
 from mneme.context_builder import DEFAULT_MAX_DECISIONS, format_decisions
 from mneme.cursor_generator import generate_mdc
+from mneme.decision_add import AddDecisionError, add_canonical_decision
 from mneme.decision_authority import DecisionAuthorityError, DecisionAuthorityService
 from mneme.decision_index_persistence import (
     DecisionIndexMigrationRefused,
@@ -283,7 +287,34 @@ def _cmd_add(args: argparse.Namespace) -> int:
     path = Path(args.memory)
     if not path.exists():
         return _error_exit(f"memory file {path} does not exist")
-    data = json.loads(path.read_text(encoding="utf-8"))
+    source_bytes = path.read_bytes()
+    data = json.loads(source_bytes.decode("utf-8"))
+    if isinstance(data, dict) and "decision_index" in data:
+        try:
+            created = add_canonical_decision(
+                path,
+                data,
+                source_bytes,
+                decision_id=args.id,
+                statement=args.decision,
+                rationale=args.rationale or "",
+                scope=list(args.scope or []),
+                constraints=list(args.constraint or []),
+                anti_patterns=list(args.anti_pattern or []),
+                now=_utc_now(),
+            )
+        except AddDecisionError as exc:
+            return _error_exit(str(exc))
+        if not created:
+            print(
+                f"Decision [{args.id}] already exists with identical content; "
+                "nothing was written"
+            )
+            return 0
+        print(f"Added decision [{args.id}]")
+        return 0
+
+    # Section-less memory keeps the legacy write until D1E5 (ADR-030 §1).
     try:
         refuse_legacy_decisions_write(data, operation="mneme add_decision")
     except LegacyDecisionsWriteRefused as exc:
