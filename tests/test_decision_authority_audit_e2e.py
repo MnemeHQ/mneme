@@ -50,6 +50,7 @@ from mneme.decision_proposal import (
     DecisionProposalSourceProvenance,
 )
 from mneme.decision_proposal_store import JsonFileDecisionProposalStore
+from tests.canonical_fixtures import migrate_memory_fixture
 
 PROPOSALS_SCHEMA = "mneme.decision-proposals/v1"
 FIXED_TIME = "2026-09-15T12:00:00Z"
@@ -150,6 +151,7 @@ def _write_memory(path: Path) -> Path:
         + "\n",
         encoding="utf-8",
     )
+    migrate_memory_fixture(path)  # ADR-030 §1: no implicit migration
     return path
 
 
