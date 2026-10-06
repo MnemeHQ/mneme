@@ -13,6 +13,7 @@ scope: decision_index.persistence
 **Date:** 2026-09-16
 **Amended:** 2026-10-05 — accepted after reconciliation against the merged D1B/D1C implementation; lifecycle-conformance correction and other reconciliation amendments recorded (see "Implementation reconciliation" below)
 **Amended:** 2026-10-05 — D1E0 architecture decisions: binding authority and protection continuity (§9a), canonical `add_decision` identity (§4), EventCatalog canonical apply retired for D1, and the D1E order and release gate (§15) (see "D1E0 amendment" below)
+**Amended:** 2026-10-06 — D1E1 migration contract: `mneme decision-index migrate`, lossless-or-refuse migration with recursive representability validation, EventCatalog migration consequence, and comparison against bindings that predate `binding_authority` (§9a, §12, §15); `mneme decision-index migrate` as the sole section-less-to-canonical transition, withdrawing implicit migration from canonical writers (§1, §12, §15)
 **Deciders:** Theo Valmis
 
 ---
@@ -135,6 +136,21 @@ has not been migrated to a canonical authority operation must refuse before
 any mutation and leave the file byte-identical, rather than write a snapshot
 that the loader will then reject (D1 containment, PR #444). Section-less
 pre-D1 files keep their legacy writer behaviour.
+
+**Single transition (D1E1).** `mneme decision-index migrate` (§12) is the
+sole supported transition from section-less memory to canonical
+`decision_index` memory. Canonical writers must fail with
+`DecisionIndexMigrationRequired` when they encounter section-less memory, and
+must never migrate implicitly. That covers ADR import, proposal acceptance,
+and every later canonical writer. Migration is an explicit authority
+transition, never a side effect of another authority action. The two
+directions are therefore symmetric:
+
+```text
+section-less memory → legacy writers only; canonical writers refuse
+canonical memory    → canonical writers only; legacy writers refuse
+the only bridge     → mneme decision-index migrate (preview, then --apply)
+```
 
 ### 2. Legacy item migration
 
@@ -481,6 +497,13 @@ version | protection | legacy_unknown
   this field exists are written as `legacy_unknown`, because migration cannot
   tell ADR-derived rules from rules that legacy protection appended to
   `decisions[]`.
+- **Comparing against bindings that predate the field.** When an exact
+  historical binding is compared, for example a §5 retry resolving to an
+  occurrence persisted before the field existed, a binding whose
+  `binding_authority` is **actually absent** matches on every other field
+  exactly, and its authority is not compared. This applies to that
+  comparison only. An explicitly persisted `legacy_unknown` is a real
+  conservative classification and is never interchangeable with `version`.
 - New bindings always persist the field explicitly.
 
 **Continuity invariant.** A `protection` or `legacy_unknown` binding cannot
@@ -618,6 +641,64 @@ startup mode. A supported way to give a memory file the section is
 consequently part of D1: an explicit migration command, plus a
 section-bearing scaffold from `mneme init`. It is assigned to D1E (§15) and
 must land before any release ships the MCP canonical read path.
+
+**Migration entry point (D1E1).** This command is the only transition from
+section-less to canonical memory (§1). No canonical writer migrates
+implicitly. The public command is:
+
+```text
+mneme decision-index migrate --memory <path>            # preview, no write (default)
+mneme decision-index migrate --memory <path> --apply    # write the previewed migration
+```
+
+- **One read.** The source bytes are read once. The preview and the written
+  result are derived from that single migration result.
+  - `--apply` writes only if the file still holds exactly those bytes
+    immediately before the atomic replace. Otherwise it refuses and writes
+    nothing.
+  - This is an optimistic guard within the existing single-writer discipline,
+    not a locking system.
+- **Three inputs.**
+  - Section-less valid memory previews, then migrates on `--apply`.
+  - Already-canonical valid memory is reported as migrated; `--apply` is a
+    byte-identical no-op.
+  - Invalid canonical memory is refused. Migration is never a repair path.
+- **What the preview shows:** the §12 lifecycle-conformance effects (which
+  non-active decisions leave Layer 1), the one-time `items[]` migration and
+  the fact that new `rule`/`anti_pattern` items will stop synthesizing
+  decisions (§2), and the `legacy_unknown` classification of migrated rules
+  (§9a).
+- **No force, repair, or loss-acknowledgment option.** Mneme never authorizes
+  destroying durable decision metadata.
+- **Migration is lossless or it refuses.** Validation is recursive and
+  applies to legacy `decisions[]` rows, because that is where reconstructing
+  the canonical record and rebuilding the compatibility snapshot would
+  otherwise destroy information. A row may contain only:
+  - the representable decision fields: `id`, `decision`, `rationale`, `scope`,
+    `constraints`, `anti_patterns`, `rules`, `test_evidence`, `created_at`,
+    `updated_at`, `status`, `source`;
+  - rule records with only `type`, `value`, `include_paths`, `exclude_paths`;
+  - test evidence with only `selector` and `sha`;
+  - a `source` only when it is a valid `adr` source (`type`, `path`, `sha256`)
+    whose path resolves to that decision.
+
+  Anything else fails before any write, naming the exact record and field.
+  That includes unknown decision, rule, or evidence fields, EventCatalog
+  source metadata, and malformed or unresolvable ADR source metadata. Unknown
+  top-level project-memory sections are not refused, because canonical
+  writers preserve them.
+- **EventCatalog consequence.** Section-less memory that contains legacy
+  EventCatalog-imported decisions (`source.type: eventcatalog`) or other
+  unrepresentable metadata **cannot migrate in D1**. It stays section-less on
+  the compatibility path until a future EventCatalog canonical provenance
+  contract exists. This is stronger than retiring EventCatalog canonical apply
+  (§15, D1E4), and it must be release-noted.
+- **Missing-section MCP error.** When memory has no section, MCP reports that
+  migration is required and points to the preview first, then `--apply`. It
+  never auto-migrates. Invalid canonical state is reported as invalid, without
+  suggesting migration.
+- **Serialization.** Canonical writers share one serialization:
+  `json.dumps(..., indent=2) + "\n"`.
 
 A hand-edited `decisions[]` after migration is never silently adopted. The
 loader verifies the persisted snapshot against the canonical projection and
@@ -802,9 +883,18 @@ ADR-022; none is authorized by this ADR change:
   1. **D1E0** — architecture decisions (this amendment): §9a binding
      authority and protection continuity, the §4 `cli-add` identity, and the
      EventCatalog decision below.
-  2. **D1E1** — an explicit, opt-in migration command, and a clean MCP error
-     naming that command when memory has no `decision_index` (§12). No
-     `init`/`setup` change yet.
+  2. **D1E1** — the opt-in `mneme decision-index migrate` command (preview by
+     default, lossless-or-refuse, guarded atomic apply), a clean MCP error
+     when memory is missing the section (§12), and `binding_authority`
+     persistence plumbing (§9a): migrated rules are written as
+     `legacy_unknown`, newly created ADR-derived rules as `version`, and a
+     missing field reads as `legacy_unknown`. D1E1 also **withdraws the
+     implicit migration** that D1C proposal acceptance and D1D ADR import
+     performed on section-less targets. Those writers, and the canonical
+     append, evolve, supersede, and rebuild primitives, now refuse
+     section-less memory with `DecisionIndexMigrationRequired` (§1). No
+     preserve/release, no continuity enforcement, and no `init`/`setup` change
+     yet.
   3. **D1E2** — canonical `mneme protect activate`: writes `protection`
      bindings (§9, §9a). Also the per-binding preserve/release operations,
      and fail-closed continuity enforcement in ADR version evolution,
@@ -822,6 +912,19 @@ ADR-022; none is authorized by this ADR change:
      empty `decision_index` section.
   7. **D1E6** — parity closeout (G16–G20), release notes, and the release
      gate below.
+
+  **Accepted interim state (unreleased, D1E1 to D1E5).** Until D1E5, no single
+  memory mode supports every writer:
+
+  - section-less memory: the legacy `add_decision`, `protect`, and
+    EventCatalog apply work, explicit migration is available, and canonical
+    writers refuse;
+  - canonical memory: ADR import, proposal authority, and canonical reads
+    work, and legacy writers refuse.
+
+  D1E2 to D1E4 close the writer gaps, and D1E5 makes new projects canonical by
+  default. This state is acceptable only because D1 is unreleased; the
+  release gate below applies.
 - **D1F** — optional later removal of the persisted `decisions[]`
   compatibility snapshot, gated by a consumer inventory; must never ride
   along in another slice.
@@ -840,6 +943,9 @@ following hold. Until then, released artifacts must not include D1B/C/D.
   - the §13 rule-ID value change;
   - the retirement of EventCatalog canonical apply, which becomes
     unavailable for every new project once D1E5 lands;
+  - that memory containing legacy EventCatalog-imported decisions or other
+    unrepresentable `decisions[]` metadata cannot migrate in D1 and stays on
+    the section-less compatibility path (§12);
   - the incompatibility of older `mneme-hq` binaries (≤ 0.9.2), whose legacy
     writers mutate `decisions[]` directly and make a migrated file fail to
     load. No in-file version marker is added, because an older binary would
@@ -1019,6 +1125,8 @@ after D1D merged (#443). They are recorded before any D1E implementation.
 | E3 | EventCatalog had no D1 canonical writer contract. | Canonical apply is retired for D1. Read and preview remain, and the legacy section-less path is bounded by the compatibility window. A future canonical contract is not prohibited. | §15 |
 | E4 | Making `init` canonical before the writers would block every new project. | D1E order fixed, with `init`/`setup` last. A clean MCP migration error comes early. | §12, §15 |
 | E5 | Pre-D1 protection rules on migrated memory are already exposed to silent loss on `main`. | Release blocker: no silent loss of `protection`/`legacy_unknown` across version evolution. | §15 |
+| E6 | Migration already discarded unrepresentable legacy metadata. EventCatalog provenance and unknown fields survived only in the raw snapshot, and the next canonical write erased them (reproduced). | Lossless-or-refuse migration with recursive validation and no force option. EventCatalog-bearing memory stays section-less in D1. Absent `binding_authority` acts as a wildcard only in exact historical-binding comparison. | §9a, §12, §15 |
+| E7 | Implicit migration inside D1C acceptance, D1D ADR import, and the canonical primitives bypassed the lossless migration check. Reproduced: ADR import on section-less memory erased an EventCatalog decision's provenance. | `mneme decision-index migrate` is the sole transition. Canonical writers refuse section-less memory with `DecisionIndexMigrationRequired`, giving a symmetric writer boundary. The interim state is accepted while D1 is unreleased. | §1, §12, §15 |
 
 ## Related
 
