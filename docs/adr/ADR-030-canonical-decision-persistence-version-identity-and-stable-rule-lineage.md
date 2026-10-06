@@ -462,6 +462,14 @@ version | protection | legacy_unknown
 - `legacy_unknown`: an origin that cannot be honestly reconstructed.
 - `binding_authority` is not part of `rule_id`. The same rule semantics keep
   the same stable `rule_id` (§7) whatever the authority.
+- **Transport and semantics boundary.** `binding_authority` is persisted
+  canonical/internal authority metadata for D1:
+  - it is not emitted through MCP (§13, G19);
+  - it does not change the ADR-029 identity tuple
+    `(decision_id, version_id, rule_id)`;
+  - it does not alter Audit tiers, enforcement, or rule matching.
+
+  It governs only whether a binding may lapse across version evolution.
 - **No backfill.** Bindings persisted before this field existed stay
   byte-identical. A missing field is read as `legacy_unknown`. That includes
   bindings migrated by D1B and bindings written by D1D ADR import before the
@@ -681,6 +689,9 @@ and field names remain unchanged. Field-level treatment:
   transport also emits `verification_status` only for proposal-backed
   evidence. It is persisted for every source type and is currently always
   empty.
+- `binding_authority` (§9a) is **not** emitted through MCP. Rule transport
+  payloads keep their current field set. Exposing the field would require an
+  explicit future amendment to this section and G19.
 
 ### 14. Validation gates
 
@@ -744,7 +755,8 @@ unchanged fixtures. New gates:
   (extending the D2C1 matrix).
 - **G19 — MCP field compatibility.** §13 pinned by tests: stable fields
   byte-stable; additive fields present; rule-ID migration deterministic and
-  golden-vector verified; no dual-ID emission.
+  golden-vector verified; no dual-ID emission; `binding_authority` absent
+  from every MCP rule payload (§9a).
 - **G20 — Binding authority and protection continuity (§9a, D1E0).** Tests
   must prove each of the following:
   - **No silent loss:** version evolution that would drop a `protection` or
