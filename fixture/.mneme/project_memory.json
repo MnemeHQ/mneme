@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "name": "cursor-hook-compat-fixtured",
+    "description": "Fixture memory for Mneme-Cursor hook compatibility validation. Contains sentinel decisions CUR-001 and CUR-002.",
+    "version": 1
+  },
+  "items": [],
+  "examples": [],
+  "artifacts": [],
+  "decisions": [
+    {
+      "id": "CUR-001",
+      "decision": "Do not allow 'install legacy-client' in any architectural context.",
+      "rationale": "Global enforcement of the legacy-client literal. Used by T1–T3, T5–T10.",
+      "scope": ["global"],
+      "anti_patterns": ["install legacy-client"]
+    },
+    {
+      "id": "CUR-002",
+      "decision": "Do not allow 'install cursor-only-client' inside .cursor or similar tooling directories.",
+      "rationale": "Scoped enforcement for T4 (irrelevant-path testing). Governs only .cursor/ artifacts.",
+      "scope": ["global"],
+      "anti_patterns": ["install cursor-only-client"],
+      "include_paths": [".cursor/**/*"]
+    }
+  ]
+}
