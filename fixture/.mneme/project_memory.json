@@ -1,7 +1,7 @@
 {
   "meta": {
     "name": "cursor-hook-compat-fixtured",
-    "description": "Fixture memory for Mneme-Cursor hook compatibility validation. Contains sentinel decisions CUR-001 and CUR-002.",
+    "description": "Fixture memory for Mneme-Cursor hook compatibility validation. Uses typed FORBID_LITERAL rules (always enforced, retrieval-independent per ADR-017/ADR-019), not multi-term anti_patterns (which are retrieval-gated).",
     "version": 1
   },
   "items": [],
@@ -11,17 +11,24 @@
     {
       "id": "CUR-001",
       "decision": "Do not allow 'install legacy-client' in any architectural context.",
-      "rationale": "Global enforcement of the legacy-client literal. Used by T1–T3, T5–T10.",
+      "rationale": "Global typed literal enforcement. Used by T1-T3, T5-T10.",
       "scope": ["global"],
-      "anti_patterns": ["install legacy-client"]
+      "rules": [
+        {"type": "FORBID_LITERAL", "value": "install legacy-client"}
+      ]
     },
     {
       "id": "CUR-002",
       "decision": "Do not allow 'install cursor-only-client' inside .cursor or similar tooling directories.",
-      "rationale": "Scoped enforcement for T4 (irrelevant-path testing). Governs only .cursor/ artifacts.",
+      "rationale": "Scoped typed literal enforcement for T4 (irrelevant-path testing). Governs only .cursor/ artifacts.",
       "scope": ["global"],
-      "anti_patterns": ["install cursor-only-client"],
-      "include_paths": [".cursor/**/*"]
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "install cursor-only-client",
+          "include_paths": [".cursor/**/*"]
+        }
+      ]
     }
   ]
 }
