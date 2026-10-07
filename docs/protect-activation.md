@@ -58,7 +58,8 @@ rerunning does not create duplicate rules.
 
 How the rule is stored depends on the memory file:
 
-- **Canonical memory** (one with a `decision_index` section; see
+- **Canonical memory** (one with a `decision_index` section: memory created
+  by `mneme init` or `mneme setup`, or older memory converted with
   `mneme decision-index migrate`). The rule becomes a `protection` rule
   binding on the decision's active version. The version record and existing
   rules are never modified. If the same rule is already bound, nothing

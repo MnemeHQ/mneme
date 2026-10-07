@@ -80,7 +80,15 @@ def scaffold_project_memory(created_by: str = "mneme init") -> dict:
     Same shape as the ``mneme init`` scaffold: no seeded decisions, because
     every decision is enforceable and sample content would create phantom
     rules. ``created_by`` records which flow created the file.
+
+    New memory is canonical from creation (ADR-030 §15, D1E5): it carries an
+    empty ``decision_index`` section, so it never passes through a temporary
+    section-less state. Existing files are never given the section here.
     """
+    # Function-local import keeps this module free of mneme imports; the
+    # canonical file format belongs to the persistence layer.
+    from mneme.decision_index_persistence import empty_decision_index_section
+
     return {
         "meta": {
             "name": "",
@@ -91,6 +99,7 @@ def scaffold_project_memory(created_by: str = "mneme init") -> dict:
         "items": [],
         "examples": [],
         "decisions": [],
+        "decision_index": empty_decision_index_section(),
     }
 
 

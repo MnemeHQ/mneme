@@ -780,6 +780,26 @@ def require_canonical_document(document: object) -> dict[str, Any]:
     return copy.deepcopy(document)
 
 
+def empty_decision_index_section() -> dict[str, Any]:
+    """Return a fresh, valid, empty canonical ``decision_index`` section.
+
+    New project memory carries this from creation (``mneme init`` and
+    ``mneme setup``, ADR-030 §15, D1E5). That is construction, not migration:
+    a new file has no section-less state to transition from, so
+    ``mneme decision-index migrate`` stays the only transition for existing
+    memory (§1). The shape equals the migration of empty memory. Every call
+    returns a new object.
+    """
+    section: dict[str, Any] = {
+        "schema": DECISION_INDEX_SCHEMA,
+        "decisions": [],
+        "versions": [],
+        "rules": [],
+    }
+    load_persisted_decision_index(section)
+    return section
+
+
 def append_initial_canonical_decision(
     document: dict[str, Any],
     *,
@@ -2212,6 +2232,7 @@ __all__ = [
     "compatibility_snapshot_decisions",
     "content_digest_of",
     "continuity_bindings",
+    "empty_decision_index_section",
     "legacy_item_to_runtime_decision",
     "load_decision_index_from_memory_file",
     "load_persisted_decision_index",
