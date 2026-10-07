@@ -234,10 +234,19 @@ publishes `server.json` through GitHub OIDC. A successful Registry publish
 then starts **MCP directory maintenance**
 ([`.github/workflows/mcp-directory-maintenance.yml`](../../.github/workflows/mcp-directory-maintenance.yml)).
 That audit verifies the canonical Registry launch contract and checks Glama,
-mcpservers.org, TensorBlock, punkpeye's curated list, and MCPhq. Confirmed
-metadata drift fails the audit; transient third-party HTTP failures are
-warnings. The same audit runs quarterly and can be dispatched manually for a
-specific released version:
+mcpservers.org, TensorBlock, punkpeye's curated list, and MCPhq. The audit
+classifies each listing (`pass`, `drift`, `invalid`, `pending`,
+`unreachable`) and then applies this policy:
+
+- an Official MCP Registry mismatch (or an unreachable Registry) fails the
+  audit;
+- third-party semantic drift or invalid metadata is a warning and needs a
+  maintenance owner or issue;
+- third-party HTTP failures are warnings;
+- directories awaiting manual review report pending.
+
+The same audit runs weekly and can be dispatched manually for a specific
+released version:
 
 ```powershell
 gh workflow run mcp-directory-maintenance.yml -f version=X.Y.Z
@@ -306,6 +315,7 @@ Run in order. Do not advance past a failing step.
       disposable-repo clean-setup check (`state: setup`,
       `enforcement: not_enabled`).
 - [ ] **Publish MCP Registry** passed, followed by **MCP directory
-      maintenance**; any confirmed stale static listing has an owner or
-      correction PR, and transient external warnings have been reviewed.
+      maintenance** with no Registry failure; any third-party drift or
+      invalid-metadata warning has a maintenance owner or issue, and
+      transient external warnings have been reviewed.
 - [ ] Temporary release venv removed; `git status --short` clean.
