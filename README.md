@@ -80,7 +80,7 @@ Use `--memory` to select another project memory file. The file must contain a va
 mneme decision-mcp --memory path/to/project_memory.json
 ```
 
-If the file has no `decision_index` section yet, MCP stops with an error that tells you to migrate. Preview the migration first. It writes nothing and lists the visible effects: non-active decisions leave Layer 1, and legacy `rule`/`anti_pattern` items are migrated once.
+Memory created by `mneme init` or `mneme setup` already carries an empty `decision_index` section and needs no migration. An older file with no `decision_index` section yet makes MCP stop with an error that tells you to migrate. Preview the migration first. It writes nothing and lists the visible effects: non-active decisions leave Layer 1, and legacy `rule`/`anti_pattern` items are migrated once.
 
 ```bash
 mneme decision-index migrate --memory path/to/project_memory.json
