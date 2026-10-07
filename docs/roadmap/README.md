@@ -42,9 +42,9 @@ Prefer frozen fixtures, deterministic scoring, clear treatment/control boundarie
 
 D0 is shipped: Mneme has a canonical, source-independent Decision Index boundary with Layer 1 runtime projection parity.
 
-D1 makes that boundary the actual durable authority. D1B-D1D established canonical persistence, load-time projection, authority-path cutover, immutable version evolution, ADR re-import, explicit supersession, and stable rule lineage. D1E-D1F remain the closeout path for canonical protection/lifecycle writers, migration/parity completion, and retirement of the compatibility snapshot.
+**D1 is complete and shipped in `mneme-hq==0.10.0`.** D1B-D1E made that boundary the actual durable authority: canonical persistence, load-time projection, authority-path cutover, immutable version evolution, ADR re-import, explicit supersession, stable rule lineage, canonical protection and `add_decision` writers, the explicit `mneme decision-index migrate` transition, and canonical `init`/`setup`. Evidence and the release gate are recorded in the [D1 closeout](../architecture/d1-closeout.md). Retiring the compatibility snapshot (D1F) remains optional and separate.
 
-D1 must finish before Mneme expands the Decision Index into organization-level governance semantics. The invariant is:
+The invariant D1 established, and that DG1 builds on, is:
 
 ```text
 source / proposal
@@ -64,9 +64,11 @@ See accepted [ADR-023](../adr/ADR-023-canonical-decision-index-and-runtime-proje
 
 ### P1 — DG1: Decision governance semantics (post-D1)
 
-After D1 closes, formalize the decision-governance semantics that determine which authoritative decision governs a particular action. This is the next core-model step before broad cross-repository federation or enterprise source expansion.
+With D1 shipped, formalize the decision-governance semantics that determine which authoritative decision governs a particular action. This is the next core-model step before broad cross-repository federation or enterprise source expansion.
 
-DG1 should define a public, versioned semantic contract for:
+The governing architecture is proposed [ADR-031](../adr/ADR-031-decision-governance-semantics.md) (DG1A). It reconciles DG1 with semantics 0.10.0 already applies (import-time ADR precedence, load-time `active` projection, retrieval-only `context_scope` and MCP `decision.applicable_to`, surrogate evidence identity) and fixes the slice order: first make today's semantics explicit and shared (DG1C effective resolver with projection parity, DG1E canonical evidence identity, DG1D snapshot change resolution), then remove date as precedence authority (DG1P), and only then add new semantics. Decision applicability (DG1B1) and waivers (DG1B2) are evidence-gated, need persisted data under `mneme.decision-index/v2`, and each requires a Layer 1 charter amendment.
+
+DG1 defines a public, versioned semantic contract for:
 
 - decision authority and authority source;
 - decision scope and applicability, while preserving the distinction from typed-rule applicability;
