@@ -159,9 +159,10 @@ Verify that:
 This verification is event-driven release hygiene. It complements, but does not
 replace, same-PR maintenance.
 
-A future deterministic checker may automate facts such as broken links, ADR
-existence, and ADR-status consistency. Semantic correctness of a C4 diagram is
-a review responsibility unless and until it can be validated reliably.
+The deterministic checker automates mechanically provable facts such as broken
+links, ADR identity/status consistency, and PR declaration completeness.
+Semantic correctness of a C4 diagram remains a review responsibility unless and
+until it can be validated reliably.
 
 ## Periodic review
 
