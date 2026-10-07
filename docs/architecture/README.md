@@ -102,14 +102,20 @@ and future architecture contracts.
   create trusted evidence.
 - [ADR-030](../adr/ADR-030-canonical-decision-persistence-version-identity-and-stable-rule-lineage.md)
   is **accepted** as the governing persistence, version-identity, and
-  rule-lineage architecture, after reconciliation against the merged D1B/D1C
-  slices. Accepted proposals and ADR import write the persisted Decision
-  Index (ADR import as immutable version occurrences, D1D), Decision MCP
-  reads that same index, and `decisions[]` is a fail-closed compatibility
-  snapshot that legacy writers may not mutate. Only `active` decisions
-  project into Layer 1 (ADR-023 §6), so migration ends Layer 1 participation
-  for legacy non-active decisions. Acceptance is not completion: D1E-D1F
-  remain open implementation work, and the ADR's release gate applies.
+  rule-lineage architecture. Its D1 implementation is complete through D1E5:
+  accepted proposals, ADR import (immutable version occurrences, D1D),
+  `protect activate` (D1E2), and `add_decision` (D1E3) are canonical writers
+  of the persisted Decision Index; Decision MCP reads that same index; and
+  `decisions[]` is a fail-closed compatibility snapshot that legacy writers
+  may not mutate. `mneme decision-index migrate` is the only transition for
+  existing section-less memory (D1E1), EventCatalog canonical apply is
+  retired for D1 (D1E4), and `mneme init`/`mneme setup` create canonical
+  memory (D1E5). Only `active` decisions project into Layer 1 (ADR-023 §6),
+  so migration ends Layer 1 participation for legacy non-active decisions.
+  The closeout evidence and the release gate are recorded in
+  [D1 closeout](d1-closeout.md); no release ships D1 until that gate is met
+  through the release procedure. Compatibility-snapshot removal (D1F) remains
+  optional and separate.
 - [ADR-025](../adr/ADR-025-trusted-test-execution-attestation.md) is also
   **proposed**. Trusted test-execution attestation remains reserved/deferred.
 
@@ -281,8 +287,10 @@ flowchart LR
 The arrows describe responsibility and data flow at an architectural level.
 D1B-D1D establish the persisted canonical/read boundary under accepted
 ADR-030, plus immutable ADR version evolution and explicit cross-id
-supersession. Remaining lifecycle/protection writers and the migration entry
-point remain D1E; compatibility-snapshot removal remains D1F.
+supersession. D1E completes the writer migration: the explicit migration
+entry point, canonical protection and `add_decision` writers with binding
+continuity, the EventCatalog canonical-apply retirement, and canonical
+`init`/`setup` memory. Compatibility-snapshot removal remains D1F.
 
 # Research boundary — O1A Open Architecture
 
