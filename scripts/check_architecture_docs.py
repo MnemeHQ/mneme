@@ -152,8 +152,6 @@ def _normalize_status(value: str) -> str:
     return value.strip().strip("*" + chr(96)).strip().lower()
 
 
-
-
 def validate_architecture_impact_declaration(body: str) -> list[str]:
     """Validate the explicit PR architecture-impact declaration.
 
