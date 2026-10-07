@@ -167,7 +167,7 @@ def validate_architecture_impact_declaration(body: str) -> list[str]:
     selected: list[str] = []
     for option in ARCHITECTURE_IMPACT_OPTIONS:
         pattern = re.compile(
-            rf"^\\s*-\\s*\\[[xX]\\]\\s*{re.escape(option)}\\s*$",
+            rf"^\s*-\s*\[[xX]\]\s*{re.escape(option)}\s*$",
             re.MULTILINE,
         )
         if pattern.search(section):
@@ -185,7 +185,7 @@ def validate_architecture_impact_declaration(body: str) -> list[str]:
     if classification in {"Architecture change", "Target architecture"}:
         for field in REQUIRED_ARCHITECTURE_IMPACT_FIELDS:
             match = re.search(
-                rf"^\\s*-\\s*{re.escape(field)}:\\s*(.*?)\\s*$",
+                rf"^\s*-\s*{re.escape(field)}:\s*(.*?)\s*$",
                 section,
                 re.MULTILINE,
             )
