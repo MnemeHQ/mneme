@@ -57,7 +57,8 @@ following:
 
 The PR template records this classification. Classification is an explicit
 engineering assertion by the change author and reviewer; it is not inferred
-from file extensions.
+from file extensions. On pull-request CI, the deterministic architecture
+checker requires exactly one of these four classifications to be selected.
 
 ## What counts as architecture impact
 
@@ -158,9 +159,10 @@ Verify that:
 This verification is event-driven release hygiene. It complements, but does not
 replace, same-PR maintenance.
 
-A future deterministic checker may automate facts such as broken links, ADR
-existence, and ADR-status consistency. Semantic correctness of a C4 diagram is
-a review responsibility unless and until it can be validated reliably.
+The deterministic checker automates mechanically provable facts such as broken
+links, ADR identity/status consistency, and PR declaration completeness.
+Semantic correctness of a C4 diagram remains a review responsibility unless and
+until it can be validated reliably.
 
 ## Periodic review
 
@@ -192,7 +194,10 @@ The repository implements a narrow deterministic checker at
 - unique ADR frontmatter identity;
 - ADR-map link, identity, and status consistency;
 - explicit proposed/target/deferred treatment for proposed ADRs shown in the
-  architecture map.
+  architecture map;
+- on pull-request events, exactly one architecture-impact classification;
+- for **Architecture change** and **Target architecture**, non-empty ADR,
+  architecture-map, C4, and ASCII-map impact statements.
 
 Run it locally with:
 
@@ -202,6 +207,10 @@ python scripts/check_architecture_docs.py
 
 The `Validate architecture documentation` workflow runs the same checker on
 pull requests and pushes to `main`.
+
+The PR-body checks validate declaration completeness only. They do not decide
+whether the author selected the correct classification or whether an impact
+statement is semantically sufficient.
 
 The checker does **not** ask an LLM to decide whether a C4 diagram is
 semantically correct, infer whether arbitrary source code "looks
