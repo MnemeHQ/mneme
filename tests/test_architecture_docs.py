@@ -1,12 +1,16 @@
 """Tests for deterministic architecture-documentation integrity checks."""
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from scripts.check_architecture_docs import (
     ARCHIVAL_LINK_CHECK_EXCLUSIONS,
+    ARCHITECTURE_IMPACT_OPTIONS,
     REQUIRED_ARCHITECTURE_HEADINGS,
     validate_architecture_docs,
+    validate_architecture_impact_declaration,
+    validate_github_event_architecture_impact,
 )
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -54,6 +58,36 @@ def _architecture_index(
         "| --- | --- | --- |\n"
         f"| [ADR-001](../adr/ADR-001-fixture.md) | {displayed_status} | Fixture. |\n"
     )
+
+
+
+
+def _architecture_impact_body(
+    selected: tuple[str, ...],
+    *,
+    adr_impact: str = "",
+    architecture_map_impact: str = "",
+    c4_impact: str = "",
+    ascii_map_impact: str = "",
+) -> str:
+    lines = ["## Architecture impact", ""]
+    for option in ARCHITECTURE_IMPACT_OPTIONS:
+        mark = "x" if option in selected else " "
+        lines.append(f"- [{mark}] {option}")
+    lines.extend(
+        [
+            "",
+            f"- ADR impact: {adr_impact}",
+            f"- Architecture map impact: {architecture_map_impact}",
+            f"- C4 impact: {c4_impact}",
+            f"- ASCII map impact: {ascii_map_impact}",
+            "",
+            "## Validation",
+            "",
+            "Fixture.",
+        ]
+    )
+    return "\n".join(lines)
 
 
 def _fixture_repo(
@@ -186,3 +220,77 @@ def test_detects_missing_required_heading(tmp_path):
         "missing required heading: # C4 Level 3 — Core Components" in error
         for error in errors
     )
+
+
+def test_pr_architecture_impact_accepts_one_non_architecture_classification():
+    body = _architecture_impact_body(("None",))
+
+    assert validate_architecture_impact_declaration(body) == []
+
+
+def test_pr_architecture_impact_requires_section():
+    errors = validate_architecture_impact_declaration("## Summary\n\nFixture.\n")
+
+    assert errors == [
+        "pull request body: missing '## Architecture impact' section"
+    ]
+
+
+def test_pr_architecture_impact_requires_exactly_one_selection():
+    none_selected = _architecture_impact_body(())
+    multiple_selected = _architecture_impact_body(
+        ("None", "Representation only")
+    )
+
+    assert validate_architecture_impact_declaration(none_selected) == [
+        "pull request body: select exactly one architecture impact "
+        "classification; selected: none"
+    ]
+    assert validate_architecture_impact_declaration(multiple_selected) == [
+        "pull request body: select exactly one architecture impact "
+        "classification; selected: None, Representation only"
+    ]
+
+
+def test_architecture_change_requires_all_four_impact_statements():
+    body = _architecture_impact_body(
+        ("Architecture change",),
+        adr_impact="ADR-030 reviewed",
+        architecture_map_impact="updated",
+        c4_impact="",
+        ascii_map_impact="n/a",
+    )
+
+    assert validate_architecture_impact_declaration(body) == [
+        "pull request body: 'Architecture change' requires non-empty 'C4 impact'"
+    ]
+
+
+def test_target_architecture_accepts_explicit_non_empty_impact_statements():
+    body = _architecture_impact_body(
+        ("Target architecture",),
+        adr_impact="proposed ADR added",
+        architecture_map_impact="target view updated",
+        c4_impact="n/a",
+        ascii_map_impact="n/a",
+    )
+
+    assert validate_architecture_impact_declaration(body) == []
+
+
+def test_github_pull_request_event_reads_body_and_push_skips(tmp_path):
+    body = _architecture_impact_body(("Representation only",))
+    event_path = tmp_path / "event.json"
+    event_path.write_text(
+        json.dumps({"pull_request": {"body": body}}),
+        encoding="utf-8",
+    )
+
+    assert validate_github_event_architecture_impact(
+        event_name="pull_request",
+        event_path=event_path,
+    ) == []
+    assert validate_github_event_architecture_impact(
+        event_name="push",
+        event_path=event_path,
+    ) == []
