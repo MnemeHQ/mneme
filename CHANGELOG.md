@@ -1,5 +1,98 @@
 # Changelog
 
+## v0.10.0 — 2026-10-07
+
+**Canonical Decision Index persistence (ADR-030 D1)**
+
+The persisted `decision_index` section of `project_memory.json` is now the
+authoritative decision record, with immutable decision versions,
+content-derived identity, and stable rule lineage; `decisions[]` becomes a
+derived compatibility snapshot. Existing memory is never converted
+implicitly. This release contains breaking and compatibility changes; see
+`docs/releases/v0.10.0.md` for full detail and upgrade steps.
+
+### Breaking and compatibility changes
+
+- **Lifecycle conformance.** After migration, only `active` decisions take
+  part in Layer 1. Legacy `superseded`, `deprecated`, and `inactive`
+  decisions are retained canonically but no longer take part in retrieval,
+  enforcement (including their typed rules), `ConflictDetector`, benchmark
+  runtime sets, or the Architecture Audit decision set. Audit tier
+  percentages are unchanged; `total_decisions` and the per-decision list
+  drop those entries.
+- **Rule-ID value change.** `rule_id` and `derived_rule_ids` values change
+  from positional IDs (`<decision_id>:<RULE_TYPE>:<index>`) to stable
+  content-derived IDs (`<decision_id>:<RULE_TYPE>:<32 hex>`). Field names and
+  ordering are unchanged, both formats are never emitted together, and the
+  old positional ID is `<decision_id>:<RULE_TYPE>:<sequence>`.
+- **EventCatalog canonical apply retired.** `eventcatalog import --apply`
+  refuses canonical memory. Because `init`/`setup` now create canonical
+  memory, it is unavailable for every new project. Preview remains
+  available; existing section-less projects may keep the legacy apply path
+  during the compatibility window.
+- **Migration limitation.** Memory containing legacy EventCatalog-imported
+  decisions, or other `decisions[]` metadata the canonical index cannot
+  represent, cannot migrate in this release and stays on the section-less
+  compatibility path. Migration is lossless or it refuses.
+- **Older binaries.** `mneme-hq` 0.9.2 and earlier write `decisions[]`
+  directly through legacy writers, which makes a migrated file fail to load.
+  Migrated memory must not be used with those binaries. No in-file version
+  marker exists.
+- **New command.** `mneme decision-index migrate --memory <path>` previews
+  the migration and `--apply` writes it. It is the only way to convert
+  existing memory.
+- **Decision MCP requires canonical memory.** `mneme decision-mcp` refuses to
+  start on section-less memory and directs the user to preview, then apply,
+  the migration. The pre-D1 proposal-store-only startup mode is gone.
+  `mneme adr import --apply` and `mneme decision accept` likewise refuse
+  section-less memory with the same guidance.
+- **Additive MCP fields.** Canonical records gain `version_id`,
+  `decision_version_id`, and `content_digest`; rule payloads gain
+  `decision_version_id` and `sequence`; `source_evidence` may gain
+  `source_revision` and `observed_at`. Existing fields and the six-tool
+  inventory are unchanged.
+- **New projects are canonical.** `mneme init` and `mneme setup` create
+  memory with an empty `decision_index`; existing files are never converted
+  implicitly. `init --force` still resets the file, now to canonical memory.
+
+### Added
+
+- `mneme decision-index migrate` (preview by default, `--apply` writes).
+- Immutable ADR version evolution: on canonical memory,
+  `adr import --apply --update-existing` creates or reuses an immutable
+  version instead of overwriting, with cross-id supersession.
+- Protection continuity across ADR edits, with explicit
+  `--preserve-protection` / `--release-protection` options; an edit that
+  would silently drop a protection binding fails closed.
+- `adr import --expected-predecessor ADR-ID=VERSION_ID` for exact retries of
+  an earlier `--update-existing` apply.
+- Canonical writers for `protect activate` and `add_decision` (identity
+  `["cli-add", <id>]`; exact retry is a no-op).
+- `mneme research open-architecture`: research-only O1A benchmark harness,
+  outside the decision, enforcement, and Audit surfaces.
+
+### Fixed
+
+- `adr import --apply --approve-conflicts` now imports every non-conflicting
+  scope and skips each conflicting scope; previously it wrote zero decisions
+  on any active-active tie.
+
+### Unchanged
+
+- Retrieval ranking, `DecisionRetriever`, `ConflictDetector`, and typed-rule
+  enforcement semantics for `active` decisions; real-corpus parity is pinned
+  before and after migration.
+- `mneme.audit/v1`, the six Decision MCP tools, and the ADR-027 authority
+  boundary.
+
+## Install
+
+```bash
+pip install "mneme-hq[mcp]==0.10.0"
+```
+
+---
+
 ## v0.9.2 — 2026-09-21
 
 **Complete Decision MCP input-schema documentation**

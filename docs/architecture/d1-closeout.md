@@ -5,9 +5,9 @@
 D1 (slice D1E6). It records why D1 is architecturally complete and what the
 eventual release must communicate.
 
-This is not a release note. No version has been chosen. The release itself
-follows [RELEASING.md](../releases/RELEASING.md) in a separate release-prep
-change: version bump, `CHANGELOG.md` entry, `docs/releases/vX.Y.Z.md`, the
+This is not a release note. D1 ships in `mneme-hq` 0.10.0
+([release notes](../releases/v0.10.0.md)). The release itself follows
+[RELEASING.md](../releases/RELEASING.md) in a separate release-prep change: version bump, `CHANGELOG.md` entry, `docs/releases/vX.Y.Z.md`, the
 exact-SHA release battery, artifact validation, tag, and GitHub release.
 
 ## Implementation slices (all squash-merged on `main`)
@@ -127,10 +127,12 @@ The new G19 tests are in
 | §12 migration entry point exists | Met (D1E1) |
 | No silent loss of `protection`/`legacy_unknown` bindings | Met (D1E2, G20) |
 | No released artifact contains D1B/C/D | Met: no tag contains D1B (`9992d727`); the latest tag `v0.9.2` predates it |
-| Release notes cover the required subjects | **Open.** Belongs to the release-prep change; see below |
+| Release notes cover the required subjects | Met by the 0.10.0 release-prep change: [`v0.10.0.md`](../releases/v0.10.0.md) and the `CHANGELOG.md` entry; see below |
 
-The package version is `0.9.2`. D1 ships only through a later release-prep
-change under [RELEASING.md](../releases/RELEASING.md).
+D1 ships in 0.10.0 only through the remaining
+[RELEASING.md](../releases/RELEASING.md) steps on the exact
+release-candidate SHA (release battery, artifact validation, tag, GitHub
+release).
 
 ## Required release communication
 
