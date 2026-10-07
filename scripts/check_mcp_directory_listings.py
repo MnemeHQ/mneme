@@ -185,7 +185,7 @@ def validate_tensorblock(payload: dict[str, Any], version: str) -> CheckResult:
         return CheckResult(
             "TensorBlock",
             "drift",
-            f"Install metadata is stale or invalid for released version {version}.",
+            f"Install metadata is stale for released version {version}.",
             TENSORBLOCK_URL,
         )
 

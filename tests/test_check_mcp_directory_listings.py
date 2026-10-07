@@ -139,6 +139,7 @@ def test_policy_fails_any_registry_mismatch_or_outage():
 def test_policy_warns_on_third_party_drift_and_points_to_maintenance():
     drift = _tensorblock_drift()
     assert drift.status == "drift"
+    assert drift.detail == "Install metadata is stale for released version 0.10.0."
 
     outcome = apply_policy(drift)
     assert outcome.severity == "warning"
