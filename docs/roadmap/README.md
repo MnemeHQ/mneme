@@ -1,6 +1,6 @@
 # Mneme — Current Roadmap
 
-> **Current roadmap — August 2026.**
+> **Current roadmap — October 2026.**
 >
 > The original [April 2026 adoption and enhancement roadmap](./2026-04-24-adoption-and-enhancement-roadmap.md) is retained as historical context. It describes the path from an early working implementation to a usable developer tool. Mneme has moved beyond that stage: the core enforcement mechanism and several native agent integrations now ship. This file is the current operational roadmap.
 
@@ -38,17 +38,88 @@ Extend the existing benchmark discipline toward externally legible comparisons o
 
 Prefer frozen fixtures, deterministic scoring, clear treatment/control boundaries, and explicit separation of functional completion from architectural compliance.
 
-### P0 — Decision Index architecture contract (D0)
+### P0 — Decision Index authority completion (D1)
 
-Establish a canonical, source-independent Decision Index boundary without changing the validated Layer 1 runtime.
+D0 is shipped: Mneme has a canonical, source-independent Decision Index boundary with Layer 1 runtime projection parity.
 
-The existing `mneme.schemas.Decision` / `Rule` representation remains the architecture runtime projection. D0 must prove that the current ADR corpus can be represented canonically and projected back with identical retrieval, enforcement, ConflictDetector, Architecture Audit, and benchmark behavior.
+D1 makes that boundary the actual durable authority. D1B-D1D established canonical persistence, load-time projection, authority-path cutover, immutable version evolution, ADR re-import, explicit supersession, and stable rule lineage. D1E-D1F remain the closeout path for canonical protection/lifecycle writers, migration/parity completion, and retirement of the compatibility snapshot.
 
-This is architecture hardening, not a broad enterprise feature build. It must not displace the external-validation priorities above or introduce new ingestion surfaces, rule types, hosted control-plane behavior, or non-code enforcement.
+D1 must finish before Mneme expands the Decision Index into organization-level governance semantics. The invariant is:
 
-See proposed [ADR-023](../adr/ADR-023-canonical-decision-index-and-runtime-projection-boundary.md) and the D0 implementation issue.
+```text
+source / proposal
+      ↓
+canonical Decision Index
+      ↓
+authoritative lifecycle + version + rule lineage
+      ↓
+Layer 1 projection
+      ↓
+retrieval / enforcement / Audit / evidence
+```
+
+See accepted [ADR-023](../adr/ADR-023-canonical-decision-index-and-runtime-projection-boundary.md) and [ADR-030](../adr/ADR-030-canonical-decision-persistence-version-identity-and-stable-rule-lineage.md).
 
 ## NEXT — strengthen the product surface
+
+### P1 — DG1: Decision governance semantics (post-D1)
+
+After D1 closes, formalize the decision-governance semantics that determine which authoritative decision governs a particular action. This is the next core-model step before broad cross-repository federation or enterprise source expansion.
+
+DG1 should define a public, versioned semantic contract for:
+
+- decision authority and authority source;
+- decision scope and applicability, while preserving the distinction from typed-rule applicability;
+- precedence and deterministic effective-decision resolution;
+- lifecycle and supersession;
+- provenance and source evidence;
+- explicit exceptions / waivers and their authority;
+- enforceability and rule lineage;
+- enforcement/evidence linkage; and
+- deterministic explanation of why a decision is effective for a given context.
+
+The target question is:
+
+```text
+Given the decisions known to Mneme,
+which authoritative decision applies here,
+which one wins if several apply,
+and why?
+```
+
+DG1 is intentionally **local and model-first**. The OSS boundary may expose the semantic contract, canonical records, deterministic local resolution, and explanation surfaces needed to establish the model publicly and make it interoperable.
+
+DG1 must **not** silently become the enterprise control plane. Keep these outside the OSS core unless a separate architecture/product decision promotes them:
+
+- organization-wide identity and RBAC/SSO;
+- authority inference from enterprise roles or directory systems;
+- cross-system reconciliation/deduplication algorithms;
+- retained organization-wide evidence history;
+- hosted multi-tenant governance;
+- fleet-wide propagation; and
+- commercial analytics/control-plane behavior.
+
+### P1.5 — DG2: bounded decision federation
+
+Once DG1 semantics are stable, validate federation over more than one decision source/repository. Learn from existing federation designs, but federate **Mneme decision authority**, not merely files or Markdown corpora.
+
+The bounded reference model should test:
+
+```text
+organization decisions
+        ↓
+platform / domain decisions
+        ↓
+repository decisions
+        ↓
+authorized exception / waiver
+        ↓
+effective decision for this task
+```
+
+Required properties include stable source identity/namespaces, pinned source revisions, provenance-preserving inheritance, deterministic ambiguity failure, explicit override/exception chains, and one resolution path shared by retrieval, enforcement and explanation.
+
+Do not promote organization-wide federation, enterprise ingestion, or a hosted graph merely because the local reference model works. Promotion requires design-partner evidence and a separate commercial-boundary decision.
 
 ### P1 — Architecture Review Skill
 
