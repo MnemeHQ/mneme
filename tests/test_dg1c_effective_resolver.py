@@ -1,12 +1,14 @@
 """DG1C: effective-decision resolution over v1 semantics (ADR-031 §1, §3, §11).
 
 The resolver introduces no new governance semantics. Its acceptance gate is
-parity: for every well-formed canonical state, the effective set equals the
-Layer 1 load-time projection, decision for decision and rule for rule.
-Beyond parity it must explain ineffective decisions honestly, never guess
-an unrecorded cause, report contradictory supersession as an explicit
-ambiguity, and be invariant to input order, unrelated decisions, and the
+parity: for every canonical state the v1 loader accepts, the effective set
+equals the Layer 1 load-time projection, decision for decision and rule for
+rule. Beyond parity it must explain ineffective decisions honestly, never
+guess an unrecorded cause, expose inconsistent supersession (an active
+target, or a dangling target) as a finding while preserving projection
+parity, and be invariant to input order, unrelated decisions, and the
 governance context (no context-dependent semantics exist yet).
+GovernanceContext paths use the single ADR-020 relative-path grammar.
 """
 from __future__ import annotations
 
@@ -37,6 +39,7 @@ from mneme.decision_index import (
 from mneme.decision_index_persistence import load_decision_index_from_memory_file
 from mneme.decision_mcp import load_canonical_index_from_adr_dir
 from mneme.decision_projection import project_canonical_index
+from mneme.path_selectors import path_matches, validate_relative_path
 from tests.canonical_fixtures import canonical_document
 
 REPO = Path(__file__).resolve().parent.parent
@@ -364,13 +367,43 @@ def test_context_normalizes_order_and_duplicates() -> None:
     assert GovernanceContext(labels=("y", "x")).labels == ("x", "y")
 
 
-@pytest.mark.parametrize(
-    "bad",
-    ["", "/abs/path.py", "C:/abs/path.py", "back\\slash.py", "../escape.py", "a/../b.py"],
-)
+_NON_NORMALIZED_PATHS = [
+    "",
+    "/abs/path.py",
+    "C:/abs/path.py",
+    "back\\slash.py",
+    "../escape.py",
+    "a/../b.py",
+    "a//b.py",
+    "./a.py",
+    "a/./b.py",
+    "a/",
+    ".",
+]
+
+
+@pytest.mark.parametrize("bad", _NON_NORMALIZED_PATHS)
 def test_context_rejects_non_relative_paths(bad: str) -> None:
     with pytest.raises(ValueError):
         GovernanceContext(paths=(bad,))
+
+
+@pytest.mark.parametrize(
+    "candidate", [*_NON_NORMALIZED_PATHS, "a.py", "src/a/b.py", "x/**y.py"]
+)
+def test_context_paths_use_the_single_adr020_path_grammar(candidate: str) -> None:
+    # GovernanceContext and ADR-020 rule matching must accept and reject
+    # exactly the same relative paths: one grammar, not two.
+    def accepted(fn) -> bool:
+        try:
+            fn()
+        except ValueError:
+            return False
+        return True
+
+    assert accepted(lambda: GovernanceContext(paths=(candidate,))) == accepted(
+        lambda: validate_relative_path(candidate)
+    ) == accepted(lambda: path_matches("**", candidate))
 
 
 def test_context_rejects_non_string_values() -> None:

@@ -53,6 +53,7 @@ from mneme.decision_index import (
     CanonicalArchitectureIndex,
 )
 from mneme.decision_index_persistence import load_decision_index_from_memory_file
+from mneme.path_selectors import validate_relative_path
 
 GOVERNANCE_SEMANTICS_VERSION = "mneme.governance-semantics/dg1c-1"
 
@@ -76,24 +77,14 @@ _LIFECYCLE_CAUSES = {
 }
 
 
-def _require_relative_path(path: object) -> str:
-    if not isinstance(path, str) or not path:
-        raise ValueError("governance context paths must be non-empty strings")
-    if "\\" in path:
-        raise ValueError(f"governance context path {path!r} must use forward slashes")
-    if path.startswith("/") or (len(path) > 1 and path[1] == ":"):
-        raise ValueError(f"governance context path {path!r} must be repository-relative")
-    if ".." in path.split("/"):
-        raise ValueError(f"governance context path {path!r} must not traverse upward")
-    return path
-
-
 @dataclass(frozen=True)
 class GovernanceContext:
     """The context a resolution is computed for (ADR-031 §6).
 
     Attributes:
-        paths:  Repository-relative POSIX paths. Stored sorted and de-duplicated.
+        paths:  ADR-020 normalized repository-relative paths
+                (``path_selectors.validate_relative_path``). Stored sorted and
+                de-duplicated.
         as_of:  Explicit instant for time-bound semantics. The resolver never
                 reads the clock. ``None`` means no instant was supplied.
         labels: Opaque project-local strings with no identity, team, role or
@@ -105,7 +96,7 @@ class GovernanceContext:
     labels: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
-        paths = tuple(sorted({_require_relative_path(p) for p in self.paths}))
+        paths = tuple(sorted({validate_relative_path(p) for p in self.paths}))
         for label in self.labels:
             if not isinstance(label, str) or not label:
                 raise ValueError("governance context labels must be non-empty strings")

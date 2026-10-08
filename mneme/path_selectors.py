@@ -87,9 +87,12 @@ def validate_path_pattern(pattern: object) -> str:
     return pattern
 
 
-def path_matches(pattern: str, relative_path: str) -> bool:
-    """Return whether a normalized relative path matches pattern."""
-    validate_path_pattern(pattern)
+def validate_relative_path(relative_path: object) -> str:
+    """Validate and return one ADR-020 normalized repository-relative path.
+
+    The single definition of a normalized relative path: non-empty, forward
+    slashes only, not absolute, and no empty, ``.`` or ``..`` segment.
+    """
     if (
         not isinstance(relative_path, str)
         or not relative_path
@@ -100,11 +103,17 @@ def path_matches(pattern: str, relative_path: str) -> bool:
         raise ValueError(
             f"relative path {relative_path!r} is not normalized"
         )
-    path_segments = relative_path.split("/")
-    if any(segment in ("", ".", "..") for segment in path_segments):
+    if any(segment in ("", ".", "..") for segment in relative_path.split("/")):
         raise ValueError(
             f"relative path {relative_path!r} contains an empty or dot segment"
         )
+    return relative_path
+
+
+def path_matches(pattern: str, relative_path: str) -> bool:
+    """Return whether a normalized relative path matches pattern."""
+    validate_path_pattern(pattern)
+    path_segments = validate_relative_path(relative_path).split("/")
     pattern_segments = pattern.split("/")
 
     @lru_cache(maxsize=None)
@@ -274,4 +283,5 @@ __all__ = [
     "path_matches",
     "policy_root",
     "validate_path_pattern",
+    "validate_relative_path",
 ]
