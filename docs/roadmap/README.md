@@ -64,9 +64,9 @@ See accepted [ADR-023](../adr/ADR-023-canonical-decision-index-and-runtime-proje
 
 ### P1 — DG1: Decision governance semantics (post-D1)
 
-With D1 shipped, formalize the decision-governance semantics that determine which authoritative decision governs a particular action. This is the next core-model step before broad cross-repository federation or enterprise source expansion.
+DG1 is now partly implemented. DG1A, DG1C, DG1E, DG1D and DG1P have landed: the governance contract is accepted, the effective-decision resolver matches v1 projection, canonical evidence identity is threaded through enforcement traces, snapshot-to-snapshot governance change is available, and ADR `date` no longer carries precedence authority.
 
-The governing architecture is accepted [ADR-031](../adr/ADR-031-decision-governance-semantics.md) (DG1A). It reconciles DG1 with semantics 0.10.0 already applies (import-time ADR precedence, load-time `active` projection, retrieval-only `context_scope` and MCP `decision.applicable_to`, surrogate evidence identity) and fixes the slice order: first make today's semantics explicit and shared (DG1C effective resolver with projection parity, DG1E canonical evidence identity, DG1D snapshot change resolution), then remove date as precedence authority (DG1P), and only then add new semantics. Decision applicability (DG1B1) and waivers (DG1B2) are evidence-gated, need persisted data under `mneme.decision-index/v2`, and each requires a Layer 1 charter amendment.
+The governing architecture remains accepted [ADR-031](../adr/ADR-031-decision-governance-semantics.md). The remaining sequence is intentionally gated: decision applicability (DG1B1) and waivers (DG1B2) start only with concrete repository evidence and a Layer 1 charter amendment, each introducing persisted semantics under `mneme.decision-index/v2`; DG1F then converges runtime consumers onto the shared governance result, followed by DG1G adversarial closeout. Until those gates are met, no new applicability or waiver semantics should be added.
 
 DG1 defines a public, versioned semantic contract for:
 
