@@ -90,11 +90,15 @@ def test_same_scope_exception_loses_to_normal():
     assert [r.id for r in out] == ["ADR-002"]
 
 
-def test_same_scope_same_priority_newer_date_wins():
+def test_same_scope_same_priority_different_dates_is_ambiguous():
+    # DG1P (ADR-031 §2): ADR date is not governance authority. A newer ADR
+    # never wins a same-priority tie; only supersession or priority do.
     older = _make("ADR-001", date="2026-01-01")
     newer = _make("ADR-002", date="2026-03-01")
-    out = resolve_precedence([older, newer])
-    assert [r.id for r in out] == ["ADR-002"]
+    with pytest.raises(ADRPrecedenceError) as excinfo:
+        resolve_precedence([older, newer])
+    assert excinfo.value.scope == "storage"
+    assert sorted(excinfo.value.ids) == ["ADR-001", "ADR-002"]
 
 
 def test_same_scope_same_priority_same_date_raises():

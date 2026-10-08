@@ -182,9 +182,9 @@ def analyze_lifecycle(corpus_dir: str | Path, memory_path: str | Path) -> list[F
                 message=(
                     f"Active-active contradiction at scope {exc.scope!r} between: "
                     f"{', '.join(sorted(exc.ids))}. These accepted ADRs share the "
-                    f"same scope, priority, and date — precedence cannot break the "
-                    f"tie. Resolve by editing status/priority/date or adding an "
-                    f"explicit supersedes link."
+                    f"same scope and priority — precedence cannot break the tie "
+                    f"(ADR date is not authority). Resolve by editing status or "
+                    f"priority, or by adding an explicit supersedes link."
                 ),
             ))
 

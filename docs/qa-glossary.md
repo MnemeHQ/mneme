@@ -189,7 +189,7 @@ Body markdown follows.
 
 #### 23. How does ADR precedence resolution work?
 
-When two ADRs cover the same scope, the compiler resolves them in a strict order: first, explicit `supersedes` references remove ADRs from consideration (chain-aware, including N-node chains). Second, within the same scope, higher priority wins (`foundational` > `normal` > `exception`). Third, same scope and same priority, newer `date` wins. If still ambiguous, the compiler raises `ADRPrecedenceError` instead of picking a winner. Broader and narrower scopes coexist; output is sorted most-specific-first.
+When two ADRs cover the same scope, the compiler resolves them in a strict order: first, explicit `supersedes` references remove ADRs from consideration (chain-aware, including N-node chains). Second, within the same scope, higher priority wins (`foundational` > `normal` > `exception`). If two ADRs still tie on priority, the compiler raises `ADRPrecedenceError` instead of picking a winner: an ADR's `date` never breaks the tie, because it records when the ADR was written, not which decision governs (ADR-031 §2; earlier releases used the newer date). Broader and narrower scopes coexist; output is sorted most-specific-first.
 
 #### 24. What does corpus validation check?
 
@@ -303,7 +303,7 @@ A versioned markdown document describing an architectural choice, its context an
 
 ### ADR compiler
 
-The pipeline that turns an ADR corpus into an active constraint set. Three stages: parse (YAML frontmatter parsing, structural validation), validate (required fields, references, no cycles), and resolve precedence (status filter, then supersession chains, then priority, then date). Implemented in `mneme/adr_compiler.py`.
+The pipeline that turns an ADR corpus into an active constraint set. Three stages: parse (YAML frontmatter parsing, structural validation), validate (required fields, references, no cycles), and resolve precedence (status filter, then supersession chains, then priority; a priority tie is an ambiguity, never broken by date). Implemented in `mneme/adr_compiler.py`.
 
 ### Alignment score
 

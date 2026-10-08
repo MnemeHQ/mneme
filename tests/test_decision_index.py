@@ -392,6 +392,9 @@ def test_g6_same_scope_precedence_loser_retained_as_non_projectable_lineage(
 ):
     """Two accepted same-scope ADRs: precedence picks one runtime winner.
 
+    The winner is chosen by explicit priority. ADR date never decides a
+    same-priority tie (ADR-031 §2, DG1P).
+
     Required result: both decisions are canonically represented; only the
     precedence winner projects to Layer 1; the loser is retained as
     non-authoritative lineage with the non-projectable ``inactive`` state.
@@ -410,7 +413,7 @@ def test_g6_same_scope_precedence_loser_retained_as_non_projectable_lineage(
         "accepted",
         scope="d0.precedence",
     )
-    _bump_date(adr_dir / "ADR-9201.md", "2026-09-02")
+    _raise_priority(adr_dir / "ADR-9201.md")
 
     memory = tmp_path / "project_memory.json"
     memory.write_text(
@@ -435,10 +438,10 @@ def test_g6_same_scope_precedence_loser_retained_as_non_projectable_lineage(
     assert all(rule.lifecycle_status == "inactive" for rule in loser)
 
 
-def _bump_date(path: Path, date: str) -> None:
+def _raise_priority(path: Path) -> None:
     text = path.read_text(encoding="utf-8")
     path.write_text(
-        text.replace("date: 2026-09-01", f"date: {date}", 1),
+        text.replace("priority: normal", "priority: foundational", 1),
         encoding="utf-8",
     )
 

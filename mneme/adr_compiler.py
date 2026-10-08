@@ -250,12 +250,16 @@ def resolve_precedence(adrs: list[ADR]) -> list[ADR]:
         2. Explicit supersedes — any ADR whose id is referenced by another
            accepted ADR's ``supersedes`` is removed.
         3. Same-scope conflicts — within a scope group, higher priority
-           wins; on a priority tie, the newer date wins.
+           wins. A priority tie is never broken by ADR ``date``: date
+           records when an ADR was written, not which decision governs
+           (ADR-031 §2, DG1P). Only explicit supersession (step 2) or a
+           different priority resolves it.
         4. Specificity — does NOT cause compile-time conflicts; broader
            and narrower scopes coexist in the active set. The output is
            sorted most-specific-first so consumers can apply constraints
            in the natural overriding order.
-        5. Ambiguity — if same-scope precedence cannot be broken,
+        5. Ambiguity — if same-scope precedence cannot be broken (equal
+           top priority, with no explicit supersession between them),
            ``ADRPrecedenceError`` is raised. The compiler never silently
            picks a winner.
 
@@ -325,7 +329,11 @@ def resolve_precedence_partial(
 
 
 def _pick_within_scope(scope: str, group: list[ADR]) -> ADR:
-    """Pick the single winner for a scope group via priority then date."""
+    """Pick the single winner for a scope group by explicit priority only.
+
+    ADR ``date`` is not governance authority (ADR-031 §2, DG1P): a tie on
+    the top priority is an ambiguity, never resolved by which ADR is newer.
+    """
     if len(group) == 1:
         return group[0]
 
@@ -334,12 +342,7 @@ def _pick_within_scope(scope: str, group: list[ADR]) -> ADR:
     if len(top_priority) == 1:
         return top_priority[0]
 
-    newest_date = max(a.date for a in top_priority)
-    newest = [a for a in top_priority if a.date == newest_date]
-    if len(newest) == 1:
-        return newest[0]
-
-    raise ADRPrecedenceError(scope=scope, ids=[a.id for a in newest])
+    raise ADRPrecedenceError(scope=scope, ids=[a.id for a in top_priority])
 
 
 def _specificity(scope: str) -> int:

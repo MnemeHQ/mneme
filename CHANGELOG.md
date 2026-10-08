@@ -1,5 +1,46 @@
 # Changelog
 
+## Unreleased
+
+**Decision governance semantics (ADR-031, DG1)**
+
+### Behavior change
+
+- **ADR `date` is no longer precedence authority (DG1P).** Two accepted ADRs
+  in the same exact scope with the same priority used to be resolved by the
+  newer `date`. They are now an active-active contradiction unless one
+  explicitly `supersedes` the other or has a higher priority. Date records
+  when an ADR was written, not which decision governs (ADR-031 §2).
+  - `mneme adr import` reports the scope as a contradiction: dry-run exits 1,
+    and `--apply` refuses unless `--approve-conflicts`, which skips that
+    scope.
+  - Decisions that are already canonical in such a scope are never
+    deactivated or rewritten by re-import; the scope is left exactly as it
+    is.
+  - The Decision MCP `--adr-dir` view and `compile_adrs` raise
+    `ADRPrecedenceError` (fail closed) for such a corpus.
+  - The lifecycle analyzer reports `ACTIVE_CONTRADICTION` instead of
+    `SILENT_PRECEDENCE_ELIMINATION` for a date-only tie.
+  - **Upgrade:** add an explicit `supersedes` link, or give one ADR a higher
+    priority. Different scopes and broader/narrower scopes still coexist.
+
+### Additions (no verdict changes)
+
+- **Canonical evidence identity (DG1E).** `mneme check --json` adds
+  `rule_id` and `decision_version_id` to every `applicability[]` and typed
+  `violations[]` entry (`mneme.check/v1` is unchanged; keys are additive).
+  `decision_version_id` is set only for decisions loaded from the persisted
+  Decision Index.
+- **One rule-ID format everywhere.** The Decision MCP `--adr-dir` view now
+  serves content-derived ADR-030 rule IDs (`<decision_id>:<RULE_TYPE>:<32
+  hex>`) instead of positional `<decision_id>:<RULE_TYPE>:<index>` IDs, and
+  rejects a decision that declares the same rule twice.
+- **Governance library (DG1C, DG1D).** `mneme.decision_governance` adds
+  `resolve_effective` (which decisions govern, with an explanation trace and
+  integrity findings), `evidence_identity_of`, and `resolve_change` (the
+  governance delta between two supplied memory snapshots). Nothing in
+  retrieval or enforcement consumes them yet.
+
 ## v0.10.0 — 2026-10-07
 
 **Canonical Decision Index persistence (ADR-030 D1)**

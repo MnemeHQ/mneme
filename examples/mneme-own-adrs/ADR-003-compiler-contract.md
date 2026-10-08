@@ -96,10 +96,12 @@ same corpus always produces the same output.
    accepted.
 
 3. **Same-scope conflict resolution**: ADRs sharing the same `scope` value
-   compete. The winner is chosen by this tiebreaker chain:
+   compete. The winner is chosen by explicit authority only:
    - **Higher priority wins** (`foundational` > `normal` > `exception`).
-   - **Newer date wins** on a priority tie.
-   - **`ADRPrecedenceError` raised** if priority and date both tie. The
+   - **`ADRPrecedenceError` raised** on a priority tie. ADR `date` never
+     breaks a tie: it records when the ADR was written, not which decision
+     governs (ADR-031 §2, DG1P; earlier releases used the newer date). An
+     explicit `supersedes` link or a different priority resolves it. The
      compiler never silently picks a winner.
 
 4. **Scope coexistence**: ADRs with different scopes (including broader vs.
@@ -189,7 +191,7 @@ active = resolve_precedence(adrs)        # raises ADRPrecedenceError on ambiguit
 |---|---|---|
 | `ADRParseError` | `parse_adr_directory` | File missing YAML frontmatter or unparseable YAML |
 | `ADRValidationError` | `validate_corpus` | Any schema, format, or graph violation (all errors aggregated) |
-| `ADRPrecedenceError` | `resolve_precedence` | Two accepted ADRs share scope and tie on priority and date |
+| `ADRPrecedenceError` | `resolve_precedence` | Two accepted ADRs share scope and tie on priority (date never breaks the tie) |
 
 # Enforcement
 
