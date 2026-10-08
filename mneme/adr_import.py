@@ -191,8 +191,9 @@ def compile_for_import(adr_dir: str | Path) -> ImportReport:
             message=(
                 f"Active-active contradiction at scope {exc.scope!r} "
                 f"between: {', '.join(tied)}. Resolve by editing "
-                f"the ADRs (mark one superseded, change priority, or change "
-                f"date) or pass --approve-conflicts to import the rest of "
+                f"the ADRs (mark one superseded or give one a higher "
+                f"priority; ADR date never breaks a tie) or pass "
+                f"--approve-conflicts to import the rest of "
                 f"the corpus and skip this scope."
             ),
         ))

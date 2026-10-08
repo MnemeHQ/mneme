@@ -124,14 +124,25 @@ class TestLifecycleAnalyzer:
 
     def test_silent_precedence_elimination(self, tmp_path: Path):
         # ADR-001 and ADR-002 both accepted in scope 'ci' without supersedes link.
-        # ADR-001 is newer (2026-02-01 vs 2026-01-01), so precedence selects ADR-001.
+        # ADR-001 has the higher priority, so precedence selects ADR-001 and
         # ADR-002 is silently eliminated solely by precedence.
-        _write_adr(tmp_path, "ADR-001", "accepted", "ci", priority="normal", date="2026-02-01")
-        _write_adr(tmp_path, "ADR-002", "accepted", "ci", priority="normal", date="2026-01-01")
+        _write_adr(tmp_path, "ADR-001", "accepted", "ci", priority="foundational", date="2026-01-01")
+        _write_adr(tmp_path, "ADR-002", "accepted", "ci", priority="normal", date="2026-02-01")
         _write_ledger(tmp_path, [])
         findings = analyze_lifecycle(tmp_path, tmp_path / "project_memory.json")
         assert any(f.code == SILENT_PRECEDENCE_ELIMINATION and f.adr_id == "ADR-002"
                    for f in findings)
+
+    def test_newer_date_does_not_eliminate_a_same_priority_adr(self, tmp_path: Path):
+        # DG1P (ADR-031 §2): a same-scope, same-priority pair with different
+        # dates is an active contradiction, never a date-based elimination.
+        _write_adr(tmp_path, "ADR-001", "accepted", "ci", priority="normal", date="2026-02-01")
+        _write_adr(tmp_path, "ADR-002", "accepted", "ci", priority="normal", date="2026-01-01")
+        _write_ledger(tmp_path, [])
+        findings = analyze_lifecycle(tmp_path, tmp_path / "project_memory.json")
+        assert any(f.code == ACTIVE_CONTRADICTION and "ADR-001" in f.adr_id
+                   and "ADR-002" in f.adr_id for f in findings)
+        assert not any(f.code == SILENT_PRECEDENCE_ELIMINATION for f in findings)
 
     def test_ledger_status_mismatch_stale_retrievable(self, tmp_path: Path):
         # Corpus: ADR-004 deprecated on disk

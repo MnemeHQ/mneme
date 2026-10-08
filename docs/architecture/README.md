@@ -131,7 +131,11 @@ and future architecture contracts.
   snapshots derived only from two resolver results. No verdict depends on any
   of this and no runtime surface consumes the resolver yet (DG1F):
   effectiveness is still load-time `active` projection and precedence is
-  still resolved at ADR import (DG1P is next).
+  still resolved at ADR import. DG1P removed ADR `date` as precedence
+  authority: a same-scope, same-priority tie is an ambiguity unless explicit
+  supersession or priority resolves it, and re-import never deactivates a
+  decision that is already canonical in such a scope. Decision applicability
+  (DG1B1) and waivers (DG1B2) remain evidence- and charter-gated.
 - [ADR-025](../adr/ADR-025-trusted-test-execution-attestation.md) is also
   **proposed**. Trusted test-execution attestation remains reserved/deferred.
 

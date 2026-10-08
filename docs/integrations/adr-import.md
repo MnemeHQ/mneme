@@ -189,8 +189,8 @@ notices. See "Protection continuity" below.
 
 ### 2. Active-active contradiction (loud)
 
-If two accepted ADRs share the same scope, priority, and date, the compiler
-cannot pick a winner deterministically. The import command surfaces this as a
+If two accepted ADRs share the same scope and priority, and neither explicitly
+supersedes the other, the compiler cannot pick a winner deterministically. The import command surfaces this as a
 diagnostic and either:
 - Exits with code 1 in dry-run (shows the problem).
 - Refuses `--apply` unless `--approve-conflicts` is also passed.
@@ -201,8 +201,10 @@ is reported and left out (including any lower-precedence ADRs in it) while
 all other scopes import normally. The apply output lists each skipped
 scope. It does not silently pick a winner.
 
-**Fix path:** Edit the contradicting ADRs -- mark one superseded, give one a
-higher priority, or give one a newer date.
+**Fix path:** Edit the contradicting ADRs -- mark one superseded (an explicit
+`supersedes` link) or give one a higher priority. An ADR's `date` never
+breaks a tie: it records when the ADR was written, not which decision governs
+(ADR-031 §2).
 
 ### 3. Same-id collision (explicit gate)
 
