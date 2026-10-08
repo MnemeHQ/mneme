@@ -54,7 +54,7 @@ Later-layer territory. Promote only with user pull or evidence that it strengthe
 
 - Multi-developer / team governance.
 - Shared policy packs.
-- Cross-repo / org-wide governance.
+- Cross-repository federation of known decisions beyond DG1 (tracked as DG2 on the roadmap; public OSS). Organization-wide decision operations (discovery, reconciliation, synchronization, administration) are enterprise scope, not core.
 - Generic MCP / hosted HTTP control plane.
 - Deeper IDE integrations where no reliable control seam exists.
 - Higher-level policy DSL beyond the current typed-rule path.
