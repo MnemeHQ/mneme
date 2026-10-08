@@ -81,7 +81,7 @@ See the [current roadmap](../roadmap/README.md). In brief:
 
 - **Now:** design-partner / real-repository pilots, Architecture Audit as an acquisition and evidence surface, and reproducible architecture-compliance benchmarking.
 - **Core model:** D1 canonical decision authority shipped in `mneme-hq==0.10.0`. DG1 decision governance semantics is next, governed by accepted [ADR-031](../adr/ADR-031-decision-governance-semantics.md); its first slices change no retrieval or enforcement behavior, and its context-dependent slices require a charter amendment under the freeze procedure.
-- **Next:** evolve the existing Claude Skill toward an Architecture Review workflow; continue high-value ADR/source ingestion such as Confluence; extend the Audit workflow for migration use cases; run the planned Deep Agents capability POC.
+- **Next:** evolve the existing Claude Skill toward an Architecture Review workflow; keep the source-independent decision ingestion contract stable; extend the Audit workflow for migration use cases; run the planned Deep Agents capability POC.
 - **Research:** Slack Code/shared multi-agent constraints, AWS AgentCore benchmarking, Salesforce Skills interoperability, and revisit triggers for Claude Managed Agents.
 
 ## Links
