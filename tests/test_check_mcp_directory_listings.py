@@ -108,9 +108,9 @@ def test_punkpeye_detects_a_stale_pinned_entry():
     assert "older release" in result.detail
 
 
-def test_roninforge_census_absence_is_pending_not_failed():
-    assert validate_roninforge({"total_count": 0, "items": []}).status == "pending"
-    assert validate_roninforge({"total_count": 1, "items": [{}]}).status == "pass"
+def test_roninforge_page_checks_the_canonical_server_identity():
+    assert validate_roninforge(f"<h1>{SERVER_NAME}</h1>").status == "pass"
+    assert validate_roninforge("<h1>another server</h1>").status == "invalid"
 
 
 def test_summary_calls_out_intentionally_excluded_paid_listing():
@@ -153,6 +153,9 @@ def test_policy_warns_on_third_party_drift_and_points_to_maintenance():
     untracked = apply_policy(CheckResult("Glama", "invalid", "x", "u"))
     assert untracked.severity == "warning"
     assert "maintenance owner or issue" in untracked.action
+
+    mcphq = apply_policy(CheckResult("MCPhq", "invalid", "x", "u"))
+    assert "mcpHQ/awesome-mcp-servers/issues/145" in mcphq.action
 
 
 def test_policy_warns_on_http_failure_and_reports_manual_review_pending():
