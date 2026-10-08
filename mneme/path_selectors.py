@@ -42,7 +42,17 @@ class PathSelection:
 
 @dataclass(frozen=True)
 class RuleEvaluation:
-    """Auditable applicability trace for one typed rule."""
+    """Auditable applicability trace for one typed rule.
+
+    ``rule_id`` is the ADR-030 §7 canonical rule identity and
+    ``decision_version_id`` the canonical active version, present only when
+    the decision came from the persisted Decision Index (ADR-031 §10).
+    ``rule_index``/``rule_value`` are display fields, never evidence identity.
+    Both identity fields take part in equality: a different rule or version
+    binding is different (stale or mismatched) evidence (ADR-029 §2), even
+    when the outcome is identical. Behavioral comparisons across load paths
+    must exclude them explicitly.
+    """
 
     decision_id: str
     rule_type: str
@@ -53,6 +63,8 @@ class RuleEvaluation:
     input_path: str | None
     selector: str | None = None
     reason: str = ""
+    rule_id: str = ""
+    decision_version_id: str = ""
 
 
 _WINDOWS_ABSOLUTE = re.compile(r"^[A-Za-z]:/")

@@ -36,6 +36,7 @@ from mneme.decision_projection import (
 from mneme.decision_retriever import DecisionRetriever
 from mneme.enforcer import check_prompt, generate_protection_report
 from mneme.memory_store import MemoryStore
+from tests.canonical_fixtures import without_version_identity
 from mneme.schemas import Decision, Rule
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -236,10 +237,9 @@ def test_g3_strict_verdict_parity_on_violating_and_compliant_inputs():
                 (v.decision_id, v.rule, v.trigger, v.kind, v.severity.value)
                 for v in projected.violations
             ], (memory_path, text)
-            assert current.applicability == projected.applicability, (
-                memory_path,
-                text,
-            )
+            assert without_version_identity(current.applicability) == (
+                without_version_identity(projected.applicability)
+            ), (memory_path, text)
 
 
 # ── G4 ConflictDetector parity ──────────────────────────────────────────────

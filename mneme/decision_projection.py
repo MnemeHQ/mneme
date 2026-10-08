@@ -237,6 +237,7 @@ def project_canonical_decision(
             else memory_path
         ),
         status=record.lifecycle_status,
+        version_id=record.version_id,
     )
 
 

@@ -36,6 +36,7 @@ from mneme.path_selectors import (
     SelectorOutcome,
     evaluate_path_selectors,
 )
+from mneme.rule_identity import rule_id_for
 from mneme.rule_matcher import literal_in_text
 
 
@@ -59,6 +60,8 @@ class Violation:
     rule_type: str | None = None
     input_path: str | None = None
     selector: str | None = None
+    rule_id: str | None = None             # typed rules only (ADR-031 §10)
+    decision_version_id: str | None = None  # typed rules only; "" if unknown
 
 
 @dataclass
@@ -226,6 +229,7 @@ def check_prompt(
         d = s.decision
 
         for rule_index, rule in enumerate(d.rules):
+            rule_id = rule_id_for(d.id, rule)
             selection = evaluate_path_selectors(
                 include_paths=rule.include_paths,
                 exclude_paths=rule.exclude_paths,
@@ -243,6 +247,8 @@ def check_prompt(
                 input_path=selection.input_path,
                 selector=selection.selector,
                 reason=selection.reason,
+                rule_id=rule_id,
+                decision_version_id=d.version_id,
             ))
             if (
                 selection.outcome == SelectorOutcome.APPLIED
@@ -259,6 +265,8 @@ def check_prompt(
                     rule_type=rule.type,
                     input_path=selection.input_path,
                     selector=selection.selector,
+                    rule_id=rule_id,
+                    decision_version_id=d.version_id,
                 ))
 
         for ap in d.anti_patterns:

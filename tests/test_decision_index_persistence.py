@@ -21,7 +21,7 @@ from mneme.decision_index_persistence import (
     rule_id_of,
     version_id_of,
 )
-from tests.canonical_fixtures import canonical_document
+from tests.canonical_fixtures import canonical_document, without_version_identity
 from mneme.decision_projection import project_canonical_index
 from mneme.memory_store import MemoryStore
 from mneme.schemas import Rule
@@ -116,7 +116,9 @@ def test_real_memory_migration_projects_exact_runtime_decisions(
         index,
         memory_path=str(memory_path.resolve()),
     )
-    assert projected == baseline
+    # Either side may be canonical (the repo memory already is): compare behavior.
+    assert without_version_identity(projected) == without_version_identity(baseline)
+    assert all(d.version_id.startswith("dver-") for d in projected)
 
 
 def test_real_migrated_projection_preserves_frozen_benchmark_results() -> None:
@@ -485,7 +487,7 @@ def test_migration_builds_schema_and_preserves_runtime_projection(tmp_path: Path
     assert raw["decision_index"]["schema"] == DECISION_INDEX_SCHEMA
 
     after = MemoryStore(path).load().decisions
-    assert after == before
+    assert without_version_identity(after) == before
     assert [decision.id for decision in after] == ["dec-1", "legacy-rule"]
     assert after[0].memory_path == str(path.resolve())
     assert after[1].memory_path == ""
@@ -837,7 +839,7 @@ def test_r1_migration_removes_non_active_decisions_from_layer1(tmp_path):
     post_decisions = post.decisions()
 
     # Projection: exact runtime parity for the active decision only.
-    assert post_decisions == [pre_decisions[0]]
+    assert without_version_identity(post_decisions) == [pre_decisions[0]]
 
     # Retrieval: non-active decisions are no longer candidates.
     post_retrieved = {

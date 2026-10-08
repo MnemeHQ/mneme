@@ -53,6 +53,7 @@ from mneme.adr_compiler import _directive_to_constraint_string
 from mneme.adr_constraints import parse_constraints_section
 from mneme.adr_import import project_decision_graph
 from mneme.adr_schema import ADR
+from mneme.rule_identity import rule_applicability, rule_id_for, rule_id_of
 from mneme.schemas import Decision, Rule
 
 CANONICAL_DECISION_CLASS_ARCHITECTURE = "architecture"
@@ -150,9 +151,10 @@ class CanonicalRuleRecord:
     """One explicitly derived, typed rule attached to a decision version.
 
     Attributes:
-        rule_id:          Deterministic identity derived from the decision
-                          and the rule's position, e.g.
-                          ``"ADR-005:FORBID_LITERAL:0"``.
+        rule_id:          ADR-030 §7 identity derived from the decision, the
+                          rule type, the value and the applicability
+                          (``mneme.rule_identity.rule_id_of``), never from
+                          rule position (ADR-031 §10).
         decision_id:      Owning decision id.
         decision_version: Owning decision version.
         rule_type:        Typed rule type (D0: ``FORBID_LITERAL`` only).
@@ -234,39 +236,43 @@ class CanonicalArchitectureIndex:
         return tuple(rule for rule in self.rules if rule.decision_id == decision_id)
 
 
-def _rule_id(decision_id: str, index: int) -> str:
-    return f"{decision_id}:FORBID_LITERAL:{index}"
-
-
 def _rule_applicability(
     include_paths: tuple[str, ...] | None,
     exclude_paths: tuple[str, ...],
 ) -> dict[str, Any]:
-    applicability: dict[str, Any] = {}
-    if include_paths is not None:
-        applicability["include_paths"] = list(include_paths)
-    if exclude_paths:
-        applicability["exclude_paths"] = list(exclude_paths)
-    return applicability
+    return rule_applicability(include_paths, exclude_paths)
+
+
+def _require_unique_rule_ids(decision_id: str, rules: list[CanonicalRuleRecord]) -> None:
+    """Fail closed on duplicate identical rules, as persisted authority does."""
+    seen: set[str] = set()
+    for rule in rules:
+        if rule.rule_id in seen:
+            raise ValueError(
+                f"decision {decision_id!r} contains duplicate identical rule bindings"
+            )
+        seen.add(rule.rule_id)
 
 
 def _directive_to_canonical_rule(
     decision_id: str,
     version: str,
     lifecycle_status: str,
-    index: int,
     directive,  # ConstraintDirective; untyped to avoid a public-name dependency
 ) -> CanonicalRuleRecord:
     """Translate one ``FORBID_LITERAL`` directive into a canonical rule."""
+    applicability = _rule_applicability(
+        directive.include_paths, directive.exclude_paths
+    )
     return CanonicalRuleRecord(
-        rule_id=_rule_id(decision_id, index),
+        rule_id=rule_id_of(
+            decision_id, "FORBID_LITERAL", directive.value, applicability
+        ),
         decision_id=decision_id,
         decision_version=version,
         rule_type="FORBID_LITERAL",
         rule_payload={"value": directive.value},
-        applicability=_rule_applicability(
-            directive.include_paths, directive.exclude_paths
-        ),
+        applicability=applicability,
         lifecycle_status=lifecycle_status,
     )
 
@@ -286,15 +292,14 @@ def _directives_to_canonical(
     """
     rules: list[CanonicalRuleRecord] = []
     constraints: list[str] = []
-    rule_index = 0
     for directive in parse_constraints_section(body):
         if directive.kind == "FORBID_LITERAL":
             rules.append(_directive_to_canonical_rule(
-                decision_id, version, lifecycle_status, rule_index, directive
+                decision_id, version, lifecycle_status, directive
             ))
-            rule_index += 1
         else:
             constraints.append(_directive_to_constraint_string(directive))
+    _require_unique_rule_ids(decision_id, rules)
     return rules, constraints
 
 
@@ -366,9 +371,9 @@ def decisions_to_canonical(
     rules: list[CanonicalRuleRecord] = []
     for decision in decisions:
         decision_rules: list[CanonicalRuleRecord] = []
-        for index, rule in enumerate(decision.rules):
+        for rule in decision.rules:
             decision_rules.append(CanonicalRuleRecord(
-                rule_id=_rule_id(decision.id, index),
+                rule_id=rule_id_for(decision.id, rule),
                 decision_id=decision.id,
                 decision_version=CANONICAL_VERSION,
                 rule_type=rule.type,
@@ -378,6 +383,7 @@ def decisions_to_canonical(
                 ),
                 lifecycle_status=decision.status,
             ))
+        _require_unique_rule_ids(decision.id, decision_rules)
         records.append(CanonicalDecisionRecord(
             decision_id=decision.id,
             version=CANONICAL_VERSION,

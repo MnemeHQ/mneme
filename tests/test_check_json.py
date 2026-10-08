@@ -10,6 +10,7 @@ import json
 from pathlib import Path
 
 from mneme.cli import main
+from mneme.rule_identity import rule_id_of
 
 from tests.test_check_modes import (
     _FAIL_TEXT,
@@ -130,8 +131,19 @@ def test_json_target_path_controls_scoped_rule_applicability(tmp_path, capsys):
         "outcome": "APPLIED",
         "selector": "docs/**",
         "reason": "an include selector matched",
+        # ADR-031 §10: canonical rule identity is always present; this memory
+        # is section-less, so there is no canonical decision version.
+        "rule_id": rule_id_of(
+            "ADR-020",
+            "FORBID_LITERAL",
+            "install legacy-client",
+            {"include_paths": ["docs/**"], "exclude_paths": ["docs/generated/**"]},
+        ),
+        "decision_version_id": "",
     }]
     assert payload["violations"][0]["input_path"] == "docs/guide.md"
+    assert payload["violations"][0]["rule_id"] == payload["applicability"][0]["rule_id"]
+    assert payload["violations"][0]["decision_version_id"] == ""
 
 
 def test_json_unknown_applicability_is_operational_failure_even_warn_mode(

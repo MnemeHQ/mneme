@@ -33,6 +33,7 @@ from mneme.decision_projection import (
 )
 from mneme.enforcer import check_prompt
 from mneme.decision_retriever import DecisionRetriever
+from mneme.rule_identity import rule_id_of
 from mneme.schemas import Decision, Rule
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -123,8 +124,13 @@ def test_adr_adapter_splits_constraints_from_typed_rules():
     }
     assert rule.decision_id == "ADR-9001"
     assert rule.decision_version == "1"
-    assert rule.rule_id == "ADR-9001:FORBID_LITERAL:0"
-    assert record.derived_rule_ids == ("ADR-9001:FORBID_LITERAL:0",)
+    # ADR-031 §10: the D0 adapter uses the single ADR-030 §7 identity.
+    expected = rule_id_of(
+        "ADR-9001", "FORBID_LITERAL", "install legacy-package", rule.applicability
+    )
+    assert rule.rule_id == expected
+    assert rule.rule_id != "ADR-9001:FORBID_LITERAL:0"
+    assert record.derived_rule_ids == (expected,)
 
 
 def test_adr_adapter_preserves_provenance_timestamps_and_relationships():
