@@ -145,13 +145,13 @@ structured architecture review
 
 Initial work should reuse the shipped `/mneme:context`, `/mneme:check`, `/mneme:record`, and `/mneme:review` surfaces before adding new runtime behavior.
 
-### P1 — Decision-source ingestion: Confluence first, Jira when authoritative
+### P1 — Source-independent decision ingestion contract
 
-Continue the source-ingestion track where it gives teams a lower-friction path from existing decision records into Mneme.
-
-Confluence ADR ingestion remains the first explicit target. Jira may follow where a team genuinely records authoritative architectural decisions there. Do not add a Jira adapter merely because Jira is widely integrated elsewhere.
+Core keeps the public, source-independent path from existing decision records into Mneme: the proposal-ingestion contract (ADR-027), provenance, and the explicit authority transition into the canonical Decision Index. Any source adapter, first-party or third-party, builds on that contract. A source never declares itself authoritative.
 
 Keep ingestion separate from enforcement semantics: source adapters import decision evidence and intent; the Mneme core owns decision authority, lifecycle, representation, rule compilation, and governance.
+
+Automated discovery and continuous synchronization of organizational sources (for example wikis, ticketing and chat systems) are enterprise decision operations, not core runtime work, and are not tracked on this roadmap.
 
 Do not assume another review/context platform's Confluence, Jira, Slack, Notion, or monitoring connections are a reusable Mneme ingestion API unless an explicit supported data contract is validated.
 
