@@ -12,9 +12,9 @@ from scripts.check_mcp_directory_listings import (
     render_summary,
     validate_punkpeye,
     validate_registry,
+    validate_roninforge,
     validate_tensorblock,
 )
-
 
 VERSION = "0.9.2"
 
@@ -106,6 +106,11 @@ def test_punkpeye_detects_a_stale_pinned_entry():
 
     assert result.status == "drift"
     assert "older release" in result.detail
+
+
+def test_roninforge_census_absence_is_pending_not_failed():
+    assert validate_roninforge({"total_count": 0, "items": []}).status == "pending"
+    assert validate_roninforge({"total_count": 1, "items": [{}]}).status == "pass"
 
 
 def test_summary_calls_out_intentionally_excluded_paid_listing():

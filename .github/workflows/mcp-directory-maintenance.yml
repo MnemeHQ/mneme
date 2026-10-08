@@ -15,7 +15,7 @@ on:
     workflows: ["Publish MCP Registry"]
     types: [completed]
   schedule:
-    - cron: "17 9 * * 1"
+    - cron: "17 14 * * 1"
 
 permissions:
   contents: read
