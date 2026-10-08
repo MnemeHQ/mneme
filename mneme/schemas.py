@@ -243,9 +243,11 @@ class Decision:
         version_id:    Canonical active ``decision_version_id`` when this
                        decision was projected from the persisted Decision
                        Index (ADR-030); empty for every other source.
-                       Runtime evidence identity only (ADR-031 §10): it
-                       never takes part in equality, so compatibility and
-                       parity comparisons are unchanged.
+                       Runtime evidence identity (ADR-031 §10). It takes
+                       part in equality: two decisions bound to different
+                       canonical versions are different evidence even when
+                       their behavior is identical. Behavioral comparisons
+                       must exclude it explicitly.
     """
 
     id: str
@@ -261,7 +263,7 @@ class Decision:
     source_path: str = ""
     memory_path: str = ""
     status: str = "active"
-    version_id: str = field(default="", compare=False)
+    version_id: str = ""
 
 
 # ── Pipeline models ───────────────────────────────────────────────────────────

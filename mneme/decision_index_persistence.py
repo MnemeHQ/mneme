@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import copy
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Callable
 
@@ -1905,7 +1905,11 @@ def verify_compatibility_snapshot(
     for decision in snapshot:
         if decision.id in legacy_item_ids:
             decision.memory_path = ""
-    if snapshot != projected:
+    # decisions[] carries no canonical version identity (ADR-031 §10), so
+    # the snapshot is verified against the projection's behavioral content
+    # with version identity excluded explicitly; the projection returned to
+    # callers keeps its version ids.
+    if snapshot != [replace(decision, version_id="") for decision in projected]:
         raise DecisionIndexPersistenceError(
             "persisted decisions[] compatibility snapshot diverges from "
             "authoritative decision_index projection"

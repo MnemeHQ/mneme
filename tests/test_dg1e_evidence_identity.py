@@ -28,7 +28,7 @@ from mneme.decision_index import decisions_to_canonical
 from mneme.decision_index_persistence import load_decision_index_from_memory_file
 from mneme.decision_mcp import load_canonical_index_from_adr_dir
 from mneme.decision_retriever import DecisionRetriever
-from mneme.enforcer import Severity, check_prompt
+from mneme.enforcer import Severity, Violation, check_prompt
 from mneme.memory_store import MemoryStore
 from mneme.path_selectors import RuleEvaluation, SelectorOutcome
 from mneme.rule_identity import rule_id_for, rule_id_of
@@ -143,15 +143,20 @@ def test_d0_adapter_rejects_duplicate_identical_rules_like_persistence() -> None
 # ── projection carries version identity without changing equality ──────────
 
 
-def test_version_id_never_takes_part_in_decision_equality() -> None:
-    a = Decision(id="D", decision="d", version_id="dver-a")
-    b = Decision(id="D", decision="d", version_id="dver-b")
-    assert a == b
+_V_A = "dver-" + "a" * 32
+_V_B = "dver-" + "b" * 32
+_DIGEST = "0123456789abcdef" * 2
 
 
-def test_trace_equality_ignores_version_but_not_rule_identity() -> None:
-    # Version identity is evidence metadata (parity across load paths holds);
-    # rule identity is one algorithm everywhere, so it does take part.
+def test_different_versions_are_different_decision_evidence() -> None:
+    # Same behavior, different canonical version: different evidence.
+    a = Decision(id="D", decision="d", version_id=_V_A)
+    b = Decision(id="D", decision="d", version_id=_V_B)
+    assert a != b
+    assert a == Decision(id="D", decision="d", version_id=_V_A)
+
+
+def test_trace_equality_includes_version_and_rule_identity() -> None:
     base = {
         "decision_id": "D",
         "rule_type": "FORBID_LITERAL",
@@ -160,12 +165,31 @@ def test_trace_equality_ignores_version_but_not_rule_identity() -> None:
         "path_scoped": False,
         "outcome": SelectorOutcome.APPLIED,
         "input_path": None,
+        "rule_id": f"D:FORBID_LITERAL:{_DIGEST}",
     }
-    assert RuleEvaluation(**base, rule_id="D:FORBID_LITERAL:a", decision_version_id="dver-1") == (
-        RuleEvaluation(**base, rule_id="D:FORBID_LITERAL:a", decision_version_id="")
+    assert RuleEvaluation(**base, decision_version_id=_V_A) != RuleEvaluation(
+        **base, decision_version_id=_V_B
     )
-    assert RuleEvaluation(**base, rule_id="D:FORBID_LITERAL:a") != RuleEvaluation(
-        **base, rule_id="D:FORBID_LITERAL:b"
+    assert RuleEvaluation(**base, decision_version_id=_V_A) == RuleEvaluation(
+        **base, decision_version_id=_V_A
+    )
+    other_rule = {**base, "rule_id": f"D:FORBID_LITERAL:{'f' * 32}"}
+    assert RuleEvaluation(**base) != RuleEvaluation(**other_rule)
+
+
+def test_violation_equality_includes_version_identity() -> None:
+    base = {
+        "decision_id": "D",
+        "decision_text": "d",
+        "severity": Severity.FAIL,
+        "rule": "x",
+        "trigger": "x",
+        "kind": "typed_rule",
+        "rule_type": "FORBID_LITERAL",
+        "rule_id": f"D:FORBID_LITERAL:{_DIGEST}",
+    }
+    assert Violation(**base, decision_version_id=_V_A) != Violation(
+        **base, decision_version_id=_V_B
     )
 
 
@@ -262,19 +286,58 @@ def test_check_json_reports_canonical_identity(tmp_path: Path, capsys) -> None:
 
 
 def test_identity_requires_all_fields_and_decision_owned_rule() -> None:
-    assert EvidenceIdentity("D", "dver-1", "D:FORBID_LITERAL:abc").complete
-    assert EvidenceIdentity("D", "", "D:FORBID_LITERAL:abc").missing == ("decision_version_id",)
-    assert EvidenceIdentity("D", "dver-1", "").missing == ("rule_id",)
-    foreign = EvidenceIdentity("D", "dver-1", "E:FORBID_LITERAL:abc")
+    rule = f"D:FORBID_LITERAL:{_DIGEST}"
+    assert EvidenceIdentity("D", _V_A, rule).complete
+    assert EvidenceIdentity("D", "", rule).missing == ("decision_version_id",)
+    assert EvidenceIdentity("D", _V_A, "").missing == ("rule_id",)
+    foreign = EvidenceIdentity("D", _V_A, f"E:FORBID_LITERAL:{_DIGEST}")
     assert not foreign.missing
     assert not foreign.rule_owned_by_decision
+    assert foreign.malformed == ("rule_id",)
     assert not foreign.complete
     # A prefix match must be on the whole decision id.
-    assert not EvidenceIdentity("D", "dver-1", "DX:FORBID_LITERAL:abc").complete
+    assert not EvidenceIdentity("D", _V_A, f"DX:FORBID_LITERAL:{_DIGEST}").complete
+
+
+@pytest.mark.parametrize(
+    "version_id",
+    ["dver-1", "dver-" + "a" * 31, "dver-" + "a" * 33, "dver-" + "A" * 32, "v-" + "a" * 32, _V_A + "\n"],
+)
+def test_malformed_version_ids_are_incomplete(version_id: str) -> None:
+    identity = EvidenceIdentity("D", version_id, f"D:FORBID_LITERAL:{_DIGEST}")
+    assert identity.malformed == ("decision_version_id",)
+    assert not identity.complete
+
+
+@pytest.mark.parametrize(
+    "rule_id",
+    [
+        "D:FORBID_LITERAL:abc",
+        "D:FORBID_LITERAL:0",
+        f"D:FORBID_LITERAL:{'a' * 31}",
+        f"D:FORBID_LITERAL:{'A' * 32}",
+        f"D:UNKNOWN_TYPE:{_DIGEST}",
+        f"D:{_DIGEST}",
+        f"D:FORBID_LITERAL:{_DIGEST}:extra",
+    ],
+)
+def test_malformed_rule_ids_are_incomplete(rule_id: str) -> None:
+    identity = EvidenceIdentity("D", _V_A, rule_id)
+    assert identity.malformed == ("rule_id",)
+    assert not identity.complete
+
+
+def test_real_canonical_identities_are_well_formed(tmp_path: Path) -> None:
+    path = _canonical_memory(tmp_path)
+    index = load_decision_index_from_memory_file(path)
+    for record in index.records:
+        for rule_id in record.derived_rule_ids:
+            identity = EvidenceIdentity(record.decision_id, record.version_id, rule_id)
+            assert identity.complete, identity
 
 
 def test_legacy_prose_violation_identity_is_incomplete(tmp_path: Path) -> None:
-    decision = Decision(id="D", decision="d", anti_patterns=["mongodb"], version_id="dver-1")
+    decision = Decision(id="D", decision="d", anti_patterns=["mongodb"], version_id=_V_A)
     result = _enforce([decision], "use mongodb here")
     [violation] = result.violations
     assert violation.kind == "anti_pattern"

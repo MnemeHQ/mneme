@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import fnmatch
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from functools import lru_cache
 from pathlib import Path
@@ -48,9 +48,10 @@ class RuleEvaluation:
     ``decision_version_id`` the canonical active version, present only when
     the decision came from the persisted Decision Index (ADR-031 §10).
     ``rule_index``/``rule_value`` are display fields, never evidence identity.
-    Like ``Decision.version_id``, ``decision_version_id`` never takes part in
-    equality: it is evidence metadata, so behavioral parity comparisons across
-    load paths (for example before and after migration) are unchanged.
+    Both identity fields take part in equality: a different rule or version
+    binding is different (stale or mismatched) evidence (ADR-029 §2), even
+    when the outcome is identical. Behavioral comparisons across load paths
+    must exclude them explicitly.
     """
 
     decision_id: str
@@ -63,7 +64,7 @@ class RuleEvaluation:
     selector: str | None = None
     reason: str = ""
     rule_id: str = ""
-    decision_version_id: str = field(default="", compare=False)
+    decision_version_id: str = ""
 
 
 _WINDOWS_ABSOLUTE = re.compile(r"^[A-Za-z]:/")

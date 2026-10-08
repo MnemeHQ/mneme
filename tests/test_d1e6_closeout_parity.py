@@ -49,6 +49,7 @@ from mneme.decision_retriever import DecisionRetriever
 from mneme.enforcer import check_prompt, generate_protection_report
 from mneme.memory_store import MemoryStore
 from mneme.rule_identity import rule_applicability
+from tests.canonical_fixtures import without_version_identity
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 FIXTURE = REPO_ROOT / "tests" / "fixtures" / "d1_parity" / "pre_d1_live_project_memory.json"
@@ -133,7 +134,10 @@ def test_g16_corpora_are_all_active_so_lifecycle_correction_is_excluded(migrated
 
 
 def test_g16_load_time_projection_is_identical(migrated):
-    assert migrated.post == migrated.pre
+    # Behavior is identical; only the canonical version identity is new.
+    assert without_version_identity(migrated.post) == migrated.pre
+    assert all(d.version_id.startswith("dver-") for d in migrated.post)
+    assert all(d.version_id == "" for d in migrated.pre)
     assert len(migrated.post) > 0
 
 
@@ -166,7 +170,9 @@ def test_g17_strict_enforcement_verdicts_are_identical(migrated):  # D0 G3
                 (v.decision_id, v.rule, v.trigger, v.kind, v.severity.value)
                 for v in right.violations
             ], (query, text)
-            assert left.applicability == right.applicability, (query, text)
+            assert without_version_identity(left.applicability) == (
+                without_version_identity(right.applicability)
+            ), (query, text)
 
 
 def test_g17_enforcement_fires_on_the_real_typed_rule(tmp_path):
@@ -184,7 +190,9 @@ def test_g17_conflict_detector_is_identical(migrated):  # D0 G4
             left = detector.evaluate(text, migrated.pre, target_path=target)
             right = detector.evaluate(text, migrated.post, target_path=target)
             assert left.conflicts == right.conflicts, (text, target)
-            assert left.applicability == right.applicability, (text, target)
+            assert without_version_identity(left.applicability) == (
+                without_version_identity(right.applicability)
+            ), (text, target)
 
 
 def test_g17_architecture_audit_is_identical(migrated):  # D0 G5

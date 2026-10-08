@@ -52,6 +52,7 @@ depends on it.
 """
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -61,6 +62,7 @@ from mneme.decision_index import (
 )
 from mneme.decision_index_persistence import load_decision_index_from_memory_file
 from mneme.path_selectors import validate_relative_path
+from mneme.schemas import VALID_RULE_TYPES
 
 GOVERNANCE_SEMANTICS_VERSION = "mneme.governance-semantics/dg1c-1"
 
@@ -301,16 +303,24 @@ def resolve_effective_from_memory_file(
 EVIDENCE_IDENTITY_FIELDS = ("decision_id", "decision_version_id", "rule_id")
 
 
+_VERSION_ID_PATTERN = re.compile(r"dver-[0-9a-f]{32}")
+_RULE_DIGEST_PATTERN = re.compile(r"[0-9a-f]{32}")
+
+
 @dataclass(frozen=True)
 class EvidenceIdentity:
     """The ADR-029 decision/rule identity of one evaluated rule.
 
-    ``complete`` only when the decision id, the canonical active decision
-    version, and an ADR-030 §7 rule id owned by that decision are all
-    present. This covers ADR-029 binding dimensions 3 and 4 only: it is
-    necessary, never sufficient, for "relevant enforcement observed".
-    Sources without a canonical version (section-less memory, ``--adr-dir``,
-    ADR compile paths) are never complete, so binding fails closed.
+    ``complete`` only when all three fields are present and structurally
+    canonical: ``decision_version_id`` is ``dver-<32 hex>`` (ADR-030 version
+    identity) and ``rule_id`` is ``<exact decision id>:<known rule type>:<32
+    hex>`` (ADR-030 §7). This covers ADR-029 binding dimensions 3 and 4 only:
+    it is necessary, never sufficient, for "relevant enforcement observed".
+    Structure is not authority: trust still comes from how the trace was
+    built, so an arbitrary caller-made string never becomes canonical
+    evidence merely by being well formed. Sources without a canonical
+    version (section-less memory, ``--adr-dir``, ADR compile paths) are never
+    complete, so binding fails closed.
     """
 
     decision_id: str
@@ -324,12 +334,32 @@ class EvidenceIdentity:
         )
 
     @property
+    def malformed(self) -> tuple[str, ...]:
+        """Present fields that are not structurally canonical identities."""
+        bad: list[str] = []
+        if self.decision_version_id and not _VERSION_ID_PATTERN.fullmatch(
+            self.decision_version_id
+        ):
+            bad.append("decision_version_id")
+        if self.rule_id and not self.rule_owned_by_decision:
+            bad.append("rule_id")
+        return tuple(bad)
+
+    @property
     def rule_owned_by_decision(self) -> bool:
-        return bool(self.rule_id) and self.rule_id.startswith(f"{self.decision_id}:")
+        prefix = f"{self.decision_id}:"
+        if not self.decision_id or not self.rule_id.startswith(prefix):
+            return False
+        rule_type, sep, digest = self.rule_id[len(prefix):].partition(":")
+        return (
+            bool(sep)
+            and rule_type in VALID_RULE_TYPES
+            and _RULE_DIGEST_PATTERN.fullmatch(digest) is not None
+        )
 
     @property
     def complete(self) -> bool:
-        return not self.missing and self.rule_owned_by_decision
+        return not self.missing and not self.malformed
 
 
 def evidence_identity_of(evaluation: object) -> EvidenceIdentity:

@@ -61,9 +61,7 @@ class Violation:
     input_path: str | None = None
     selector: str | None = None
     rule_id: str | None = None             # typed rules only (ADR-031 §10)
-    # Typed rules only; "" if unknown. Evidence metadata: never part of
-    # equality, like Decision.version_id (ADR-031 §10).
-    decision_version_id: str | None = field(default=None, compare=False)
+    decision_version_id: str | None = None  # typed rules only; "" if unknown
 
 
 @dataclass
