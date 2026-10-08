@@ -118,10 +118,12 @@ and future architecture contracts.
 - [ADR-031](../adr/ADR-031-decision-governance-semantics.md) is
   **accepted** as the governing architecture for DG1 decision governance
   semantics (effective resolution, governance change, evidence identity).
-  Its implementation has not started (next slice: DG1C), so current
-  behavior is unchanged: effectiveness is still load-time `active`
-  projection, precedence is still resolved at ADR import, and evidence still
-  uses surrogate rule identity.
+  DG1C has landed as the pure resolver `mneme/decision_governance.py`
+  (`resolve_effective`), which reproduces the Layer 1 projection exactly on
+  well-formed canonical state and explains each decision. No runtime surface
+  consumes it yet (DG1F), so behavior is unchanged: effectiveness is still
+  load-time `active` projection, precedence is still resolved at ADR import,
+  and evidence still uses surrogate rule identity (DG1E is next).
 - [ADR-025](../adr/ADR-025-trusted-test-execution-attestation.md) is also
   **proposed**. Trusted test-execution attestation remains reserved/deferred.
 
