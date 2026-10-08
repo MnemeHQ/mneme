@@ -50,12 +50,9 @@ TENSORBLOCK_URL = f"https://mcp-index.tensorblock.co/v1/servers/{PROFILE_ID}"
 MCPHQ_URL = "https://mcphq.ai/mcp/mnemehq-mneme"
 MCPREPOSITORY_URL = "https://mcprepository.com/mnemehq/mneme"
 MCPNAV_URL = "https://mcpnav.dev/servers/mnemehq/mneme/"
-RONINFORGE_URL = "https://roninforge.org/data/state-of-mcp/servers/"
-RONINFORGE_SEARCH_URL = (
-    "https://api.github.com/search/code?q="
-    + urllib.parse.quote(
-        f'"{SERVER_NAME}" repo:RoninForge/state-of-mcp', safe=""
-    )
+RONINFORGE_URL = (
+    "https://roninforge.org/data/state-of-mcp/servers/"
+    f"{SERVER_NAME}/"
 )
 PUNKPEYE_README_URL = (
     "https://raw.githubusercontent.com/punkpeye/awesome-mcp-servers/main/README.md"
@@ -69,6 +66,7 @@ REGISTRY_NAME = "Official MCP Registry"
 # but its warning asks for an owner or issue to be recorded.
 MAINTENANCE_TRACKERS = {
     "TensorBlock": "https://github.com/MnemeHQ/mneme/issues/463",
+    "MCPhq": "https://github.com/mcpHQ/awesome-mcp-servers/issues/145",
 }
 
 
@@ -255,19 +253,12 @@ def validate_punkpeye(
     )
 
 
-def validate_roninforge(payload: dict[str, Any]) -> CheckResult:
-    if payload.get("total_count", 0) < 1:
-        return CheckResult(
-            "RoninForge/Akashi",
-            "pending",
-            "Mneme is not present in the latest published State of MCP census yet.",
-            RONINFORGE_URL,
-        )
-    return CheckResult(
+def validate_roninforge(text: str) -> CheckResult:
+    return validate_page(
         "RoninForge/Akashi",
-        "pass",
-        "Mneme is present in the published State of MCP census.",
         RONINFORGE_URL,
+        text,
+        (SERVER_NAME,),
     )
 
 
@@ -446,7 +437,19 @@ def run_audit(version: str) -> list[CheckResult]:
         results.append(unreachable("MCP Repository", MCPREPOSITORY_URL, exc))
 
     try:
-        results.append(validate_roninforge(fetch_json(RONINFORGE_SEARCH_URL)))
+        results.append(validate_roninforge(fetch_text(RONINFORGE_URL)))
+    except urllib.error.HTTPError as exc:
+        if exc.code == 404:
+            results.append(
+                CheckResult(
+                    "RoninForge/Akashi",
+                    "pending",
+                    "Mneme is not present in the latest published State of MCP census yet.",
+                    RONINFORGE_URL,
+                )
+            )
+        else:
+            results.append(unreachable("RoninForge/Akashi", RONINFORGE_URL, exc))
     except Exception as exc:
         results.append(unreachable("RoninForge/Akashi", RONINFORGE_URL, exc))
 
