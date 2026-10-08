@@ -84,44 +84,45 @@ The target question is:
 
 ```text
 Given the decisions known to Mneme,
-which authoritative decision applies here,
-which one wins if several apply,
+which authoritative decisions govern this context,
+which do not,
 and why?
 ```
 
-DG1 is intentionally **local and model-first**. The OSS boundary may expose the semantic contract, canonical records, deterministic local resolution, and explanation surfaces needed to establish the model publicly and make it interoperable.
+DG1 is **public OSS in full**: the semantic contract, canonical records, deterministic effective and change resolution, applicability, precedence, waivers, evidence identity, and explanation surfaces all belong to the core.
 
-DG1 must **not** silently become the enterprise control plane. Keep these outside the OSS core unless a separate architecture/product decision promotes them:
+The publication boundary is: **OSS owns decision execution; enterprise owns decision operations at organizational scale.** Neither DG1 nor DG2 becomes that operations layer. These stay outside the OSS core:
 
-- organization-wide identity and RBAC/SSO;
-- authority inference from enterprise roles or directory systems;
-- cross-system reconciliation/deduplication algorithms;
+- automated discovery of decisions in organizational sources;
+- continuous synchronization with those sources;
+- cross-system identity, reconciliation and deduplication;
+- authority or relationship inference, including from enterprise roles or directory systems;
+- organization-wide identity, RBAC/SSO and delegated governance;
 - retained organization-wide evidence history;
-- hosted multi-tenant governance;
-- fleet-wide propagation; and
-- commercial analytics/control-plane behavior.
+- hosted multi-tenant governance, approval/admin workflows, fleet propagation; and
+- organization-wide analytics/control-plane behavior.
 
-### P1.5 — DG2: bounded decision federation
+### P1.5 — DG2: deterministic decision federation (public OSS)
 
-Once DG1 semantics are stable, validate federation over more than one decision source/repository. Learn from existing federation designs, but federate **Mneme decision authority**, not merely files or Markdown corpora.
+Once DG1 semantics are stable, extend the same governance resolver across more than one known decision source or repository. Learn from existing federation designs, but federate **Mneme decision authority**, not merely files or Markdown corpora.
 
-The bounded reference model should test:
+DG2 is public OSS and must be production-capable for multi-repository software factories, not a reference model. It federates **known** decision sources deterministically:
 
 ```text
-organization decisions
+declared organization-level decisions
         ↓
-platform / domain decisions
+declared platform / domain decisions
         ↓
 repository decisions
         ↓
 authorized exception / waiver
         ↓
-effective decision for this task
+effective decisions for this context
 ```
 
-Required properties include stable source identity/namespaces, pinned source revisions, provenance-preserving inheritance, deterministic ambiguity failure, explicit override/exception chains, and one resolution path shared by retrieval, enforcement and explanation.
+Required properties include stable source identity/namespaces, pinned source revisions, provenance-preserving inheritance, deterministic ambiguity failure, explicit override/exception chains (ADR-031 waiver semantics), and one governance resolution result consumed by retrieval, enforcement and explanation (the ADR-031 resolver, never a second policy engine). Retrieval ranking remains non-authoritative under ADR-017.
 
-Do not promote organization-wide federation, enterprise ingestion, or a hosted graph merely because the local reference model works. Promotion requires design-partner evidence and a separate commercial-boundary decision.
+"Bounded" describes the architecture (a finite set of declared sources at pinned revisions, a deterministic graph), never a limit on what OSS may do. The enterprise boundary begins where Mneme would have to discover, reconcile, infer, synchronize or administrate organizational decision truth rather than resolve declared sources.
 
 ### P1 — Architecture Review Skill
 
@@ -201,7 +202,7 @@ Proposal ingestion must be idempotent by stable producer/source/version identity
 
 Use `sagarika29/ai-system-architect` as the first producer-workflow compatibility test after the generic contract exists. Do not add Sagarika-specific logic to the Decision Index/MCP core.
 
-This surface remains distinct from the generic hosted MCP / HTTP control plane listed under Deferred. A local OSS implementation may expose proposal ingestion and retrieval over the Decision Index kernel; organization-wide persistence, cross-repo aggregation, source reconciliation, RBAC/SSO, multi-tenant governance, and hosted control-plane behavior remain separate boundaries.
+This surface remains distinct from the generic hosted MCP / HTTP control plane listed under Deferred. A local OSS implementation may expose proposal ingestion and retrieval over the Decision Index kernel; cross-repository federation of known decisions is DG2 (public OSS). Organization-wide persistence, source discovery and reconciliation, RBAC/SSO, multi-tenant governance, and hosted control-plane behavior remain outside the core.
 
 See proposed [ADR-027](../adr/ADR-027-decision-mcp-proposal-ingestion-and-authority-boundary.md) and issue #362.
 
@@ -268,14 +269,11 @@ Revisit only if Anthropic exposes one or more of the missing control surfaces id
 ## DEFERRED — wait for evidence or user pull
 
 - EventCatalog graph enrichment beyond the validated retrieval-only boundary, until there is a jointly useful hypothesis.
-- Team/org policy synchronization.
-- Cross-repository governance.
 - Shared policy packs.
 - Generic hosted MCP / HTTP control plane. This does **not** include the narrow Decision MCP consumer/proposal surface described above.
 - Broad SaaS administration, billing, or account surfaces.
 - Higher-level policy DSL beyond the current typed-rule path.
 - Deeper integrations that do not expose a reliable mutation or verification seam.
-- Broad Slack / Teams / Notion decision ingestion until source evidence or user pull shows that those systems contain authoritative decisions Mneme should ingest.
 
 ## Shipped foundation
 
