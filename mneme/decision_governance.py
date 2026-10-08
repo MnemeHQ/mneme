@@ -22,12 +22,19 @@ v1 semantics (ADR-030 §11, ADR-031 §2-§3)
   v1, so the trace reports it as ``not_recorded`` and never guesses whether
   an ``inactive`` decision was a precedence loser or a proposed ADR.
 
-Contradictions are reported, never resolved silently (ADR-031 §1). An
-``active`` decision that an authoritative decision declares it supersedes is
-returned as ``ambiguous`` (not effective) with a
-``supersession_lifecycle_conflict`` finding. A ``supersedes`` target that is
-not in the index is a ``dangling_supersedes`` finding. Canonical writers
-never produce either state; the v1 loader does not reject them.
+Inconsistent v1 state is exposed, never resolved (ADR-031 §1, §7). The v1
+loader accepts two states that canonical writers never produce:
+
+- an ``active`` decision that an authoritative decision declares it
+  supersedes. It stays ``effective`` (lifecycle decides, exactly as the
+  projection does) and the resolution carries a
+  ``supersession_lifecycle_conflict`` finding;
+- a ``supersedes`` target that is not in the index. The effective set is
+  unchanged and the resolution carries a ``dangling_supersedes`` finding.
+
+Whether such a finding should block execution is a later decision (DG1F),
+not a DG1C semantic. ``ambiguous`` is reserved for genuine governance
+ambiguity introduced by later slices (DG1P onward); DG1C never emits it.
 
 The resolver never reads the clock, retrieval scores, or input order.
 ``GovernanceContext`` is accepted and validated, but no v1 semantic depends
@@ -56,7 +63,6 @@ STATUS_AMBIGUOUS = "ambiguous"
 CAUSE_LIFECYCLE_SUPERSEDED = "lifecycle_superseded"
 CAUSE_LIFECYCLE_DEPRECATED = "lifecycle_deprecated"
 CAUSE_LIFECYCLE_INACTIVE = "lifecycle_inactive"
-CAUSE_AMBIGUOUS = "ambiguous"
 
 FINDING_SUPERSESSION_LIFECYCLE_CONFLICT = "supersession_lifecycle_conflict"
 FINDING_DANGLING_SUPERSEDES = "dangling_supersedes"
@@ -127,7 +133,8 @@ class DecisionResolution:
         decision_version_id: Active version id (empty when the source view
                              carries no version identity, e.g. ``--adr-dir``).
         lifecycle_status:    Recorded canonical lifecycle.
-        status:              ``effective`` | ``ineffective`` | ``ambiguous``.
+        status:              ``effective`` | ``ineffective`` (``ambiguous`` is
+                             reserved for later slices; DG1C never emits it).
         cause:               ``None`` when effective; otherwise a cause code.
         rule_ids:            Rule lineage of the active version, in derived order.
         superseded_by:       Authoritative decisions declaring ``supersedes`` on it.
@@ -252,15 +259,14 @@ def resolve_effective(
             ),
             TraceStep("precedence", "not_recorded"),
         ]
-        if record.lifecycle_status == _EFFECTIVE_LIFECYCLE and superseded_by:
-            status, cause = STATUS_AMBIGUOUS, CAUSE_AMBIGUOUS
-            findings.append(GovernanceFinding(
-                code=FINDING_SUPERSESSION_LIFECYCLE_CONFLICT,
-                decision_id=record.decision_id,
-                detail=superseded_by,
-            ))
-        elif record.lifecycle_status == _EFFECTIVE_LIFECYCLE:
+        if record.lifecycle_status == _EFFECTIVE_LIFECYCLE:
             status, cause = STATUS_EFFECTIVE, None
+            if superseded_by:
+                findings.append(GovernanceFinding(
+                    code=FINDING_SUPERSESSION_LIFECYCLE_CONFLICT,
+                    decision_id=record.decision_id,
+                    detail=superseded_by,
+                ))
         else:
             status, cause = STATUS_INEFFECTIVE, _LIFECYCLE_CAUSES[record.lifecycle_status]
         trace.append(TraceStep("result", status, (cause,) if cause else ()))
@@ -292,7 +298,6 @@ def resolve_effective_from_memory_file(
 
 
 __all__ = [
-    "CAUSE_AMBIGUOUS",
     "CAUSE_LIFECYCLE_DEPRECATED",
     "CAUSE_LIFECYCLE_INACTIVE",
     "CAUSE_LIFECYCLE_SUPERSEDED",

@@ -19,7 +19,6 @@ from pathlib import Path
 import pytest
 
 from mneme.decision_governance import (
-    CAUSE_AMBIGUOUS,
     CAUSE_LIFECYCLE_DEPRECATED,
     CAUSE_LIFECYCLE_INACTIVE,
     CAUSE_LIFECYCLE_SUPERSEDED,
@@ -199,19 +198,72 @@ def test_rule_lineage_mismatch_fails_closed() -> None:
         resolve_effective(index)
 
 
-# ── ambiguity and integrity: never select a winner silently ───────────────
+# ── integrity: expose inconsistent v1 state, never resolve it ─────────────
 
 
-def test_active_target_of_in_force_supersession_is_ambiguous() -> None:
+def test_active_target_of_in_force_supersession_stays_effective_with_finding() -> None:
+    # ADR-031 §7: DG1C reproduces the projection exactly. Lifecycle decides;
+    # the contradiction is exposed as a finding, not resolved.
     index = _index(_record("A"), _record("B", supersedes=("A",)))
     resolution = resolve_effective(index)
-    assert resolution.effective_ids == ("B",)
-    (ambiguous,) = resolution.ambiguities
-    assert ambiguous.decision_id == "A"
-    assert ambiguous.cause == CAUSE_AMBIGUOUS
-    assert ambiguous.superseded_by == ("B",)
+    assert resolution.effective_ids == ("A", "B")
+    assert resolution.effective_ids == tuple(
+        sorted(d.id for d in project_canonical_index(index))
+    )
+    assert not resolution.ambiguities
+    by_id = {d.decision_id: d for d in resolution.decisions}
+    assert by_id["A"].cause is None
+    assert by_id["A"].superseded_by == ("B",)
+    assert [(f.code, f.decision_id, f.detail) for f in resolution.findings] == [
+        (FINDING_SUPERSESSION_LIFECYCLE_CONFLICT, "A", ("B",))
+    ]
+
+
+def _persisted_v1_document(tmp_path: Path, mutate) -> Path:
+    """A canonical v1 file the 0.10.0 loader accepts after ``mutate``."""
+    source = FIXTURES / "d1_parity" / "pre_d1_live_project_memory.json"
+    document = canonical_document(json.loads(source.read_text(encoding="utf-8")))
+    mutate(document["decision_index"]["decisions"])
+    path = tmp_path / "project_memory.json"
+    path.write_bytes(json.dumps(document).encode("utf-8"))
+    return path
+
+
+def test_persisted_v1_supersession_conflict_keeps_projection_parity(tmp_path: Path) -> None:
+    def mutate(rows):
+        assert rows[0]["lifecycle_status"] == rows[1]["lifecycle_status"] == "active"
+        rows[0]["relationships"].append(
+            {"type": "supersedes", "target_decision_id": rows[1]["decision_id"]}
+        )
+
+    path = _persisted_v1_document(tmp_path, mutate)
+    index = load_decision_index_from_memory_file(path)  # 0.10.0 loader accepts it
+    resolution = resolve_effective_from_memory_file(path)
+    assert resolution.effective_ids == tuple(
+        sorted(d.id for d in project_canonical_index(index))
+    )
+    superseder, target = index.records[0].decision_id, index.records[1].decision_id
+    assert target in resolution.effective_ids
+    assert not resolution.ambiguities
+    assert [(f.code, f.decision_id, f.detail) for f in resolution.findings] == [
+        (FINDING_SUPERSESSION_LIFECYCLE_CONFLICT, target, (superseder,))
+    ]
+
+
+def test_persisted_v1_dangling_supersedes_keeps_projection_parity(tmp_path: Path) -> None:
+    def mutate(rows):
+        rows[0]["relationships"].append(
+            {"type": "supersedes", "target_decision_id": "GHOST-404"}
+        )
+
+    path = _persisted_v1_document(tmp_path, mutate)
+    index = load_decision_index_from_memory_file(path)  # 0.10.0 loader accepts it
+    resolution = resolve_effective_from_memory_file(path)
+    assert resolution.effective_ids == tuple(
+        sorted(d.id for d in project_canonical_index(index))
+    )
     assert [(f.code, f.decision_id) for f in resolution.findings] == [
-        (FINDING_SUPERSESSION_LIFECYCLE_CONFLICT, "A")
+        (FINDING_DANGLING_SUPERSEDES, "GHOST-404")
     ]
 
 

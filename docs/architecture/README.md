@@ -120,7 +120,8 @@ and future architecture contracts.
   semantics (effective resolution, governance change, evidence identity).
   DG1C has landed as the pure resolver `mneme/decision_governance.py`
   (`resolve_effective`), which reproduces the Layer 1 projection exactly on
-  well-formed canonical state and explains each decision. No runtime surface
+  every state the v1 loader accepts, explains each decision, and reports
+  inconsistent supersession as findings without resolving it. No runtime surface
   consumes it yet (DG1F), so behavior is unchanged: effectiveness is still
   load-time `active` projection, precedence is still resolved at ADR import,
   and evidence still uses surrogate rule identity (DG1E is next).
