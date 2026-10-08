@@ -234,16 +234,17 @@ publishes `server.json` through GitHub OIDC. A successful Registry publish
 then starts **MCP directory maintenance**
 ([`.github/workflows/mcp-directory-maintenance.yml`](../../.github/workflows/mcp-directory-maintenance.yml)).
 That audit verifies the canonical Registry launch contract and checks Glama,
-mcpservers.org, TensorBlock, punkpeye's curated list, and MCPhq. The audit
-classifies each listing (`pass`, `drift`, `invalid`, `pending`,
-`unreachable`) and then applies this policy:
+mcpservers.org, TensorBlock, punkpeye's curated list, MCPhq, MCPNav,
+MCP Repository, and the RoninForge/Akashi census. The audit classifies each
+listing (`pass`, `drift`, `invalid`, `pending`, `unreachable`) and then applies
+this policy:
 
 - an Official MCP Registry mismatch (or an unreachable Registry) fails the
   audit;
 - third-party semantic drift or invalid metadata is a warning and needs a
   maintenance owner or issue;
 - third-party HTTP failures are warnings;
-- directories awaiting manual review report pending.
+- directories awaiting manual review, import, or census report pending.
 
 The same audit runs weekly and can be dispatched manually for a specific
 released version:

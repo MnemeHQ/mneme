@@ -28,7 +28,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-
 SERVER_NAME = "io.github.MnemeHQ/mneme"
 PROFILE_ID = "github-mnemehq-mneme-763aeb8b"
 TOOLS = (
@@ -49,6 +48,15 @@ GLAMA_URL = "https://glama.ai/mcp/servers/MnemeHQ/mneme"
 MCPSERVERS_URL = "https://mcpservers.org/servers/mnemehq/mneme"
 TENSORBLOCK_URL = f"https://mcp-index.tensorblock.co/v1/servers/{PROFILE_ID}"
 MCPHQ_URL = "https://mcphq.ai/mcp/mnemehq-mneme"
+MCPREPOSITORY_URL = "https://mcprepository.com/mnemehq/mneme"
+MCPNAV_URL = "https://mcpnav.dev/servers/mnemehq/mneme/"
+RONINFORGE_URL = "https://roninforge.org/data/state-of-mcp/servers/"
+RONINFORGE_SEARCH_URL = (
+    "https://api.github.com/search/code?q="
+    + urllib.parse.quote(
+        f'"{SERVER_NAME}" repo:RoninForge/state-of-mcp', safe=""
+    )
+)
 PUNKPEYE_README_URL = (
     "https://raw.githubusercontent.com/punkpeye/awesome-mcp-servers/main/README.md"
 )
@@ -247,6 +255,22 @@ def validate_punkpeye(
     )
 
 
+def validate_roninforge(payload: dict[str, Any]) -> CheckResult:
+    if payload.get("total_count", 0) < 1:
+        return CheckResult(
+            "RoninForge/Akashi",
+            "pending",
+            "Mneme is not present in the latest published State of MCP census yet.",
+            RONINFORGE_URL,
+        )
+    return CheckResult(
+        "RoninForge/Akashi",
+        "pass",
+        "Mneme is present in the published State of MCP census.",
+        RONINFORGE_URL,
+    )
+
+
 def validate_page(name: str, url: str, text: str, fragments: tuple[str, ...]) -> CheckResult:
     missing = [fragment for fragment in fragments if fragment.lower() not in text.lower()]
     if missing:
@@ -382,6 +406,49 @@ def run_audit(version: str) -> list[CheckResult]:
         results.append(result)
     except Exception as exc:
         results.append(unreachable("MCPhq", MCPHQ_URL, exc))
+
+    try:
+        text = fetch_text(MCPNAV_URL)
+        results.append(
+            validate_page(
+                "MCPNav",
+                MCPNAV_URL,
+                text,
+                ("Mneme Decision MCP", "MnemeHQ/mneme"),
+            )
+        )
+    except Exception as exc:
+        results.append(unreachable("MCPNav", MCPNAV_URL, exc))
+
+    try:
+        text = fetch_text(MCPREPOSITORY_URL)
+        results.append(
+            validate_page(
+                "MCP Repository",
+                MCPREPOSITORY_URL,
+                text,
+                ("Mneme", "MnemeHQ"),
+            )
+        )
+    except urllib.error.HTTPError as exc:
+        if exc.code == 404:
+            results.append(
+                CheckResult(
+                    "MCP Repository",
+                    "pending",
+                    "The accepted submission is still processing.",
+                    MCPREPOSITORY_URL,
+                )
+            )
+        else:
+            results.append(unreachable("MCP Repository", MCPREPOSITORY_URL, exc))
+    except Exception as exc:
+        results.append(unreachable("MCP Repository", MCPREPOSITORY_URL, exc))
+
+    try:
+        results.append(validate_roninforge(fetch_json(RONINFORGE_SEARCH_URL)))
+    except Exception as exc:
+        results.append(unreachable("RoninForge/Akashi", RONINFORGE_URL, exc))
 
     return results
 
