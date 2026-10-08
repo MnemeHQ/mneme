@@ -1,7 +1,7 @@
 ---
 id: ADR-031
 title: "Decision Governance Semantics: Effective Resolution, Governance Change, and Evidence Identity (DG1)"
-status: proposed
+status: accepted
 priority: foundational
 date: 2026-10-07
 scope: decision_index.governance_semantics
@@ -9,8 +9,8 @@ scope: decision_index.governance_semantics
 
 # ADR-031: Decision Governance Semantics (DG1)
 
-**Status:** Proposed
-**Date:** 2026-10-07
+**Status:** Accepted
+**Date:** 2026-10-07 (accepted 2026-10-08)
 **Deciders:** Theo Valmis
 
 ---
@@ -164,9 +164,12 @@ an explicit ambiguity and never selects a winner.
   continue to co-govern.
 - **`priority` is explicit, author-supplied governance precedence** and is
   retained.
-- **ADR `date` is not governance authority.** A same-scope, same-priority
-  tie becomes an ambiguity reported through the existing
-  `resolve_precedence_partial` path. It is never broken by date. Removing the
+- **ADR `date` is not governance authority.** `date` records when an ADR
+  was written; using it to decide which decision governs is implicit
+  authority. A same-scope, same-priority tie is resolved only by explicit
+  supersession or another explicit authority relation; otherwise it is an
+  ambiguity reported through the existing `resolve_precedence_partial`
+  path. It is never broken by date. Removing the
   date step changes ADR import behavior and therefore ships as its own slice
   (DG1P, §11) with release notes, not inside DG1A or the parity resolver.
   DG1P must not silently deactivate a currently active decision on
@@ -267,11 +270,40 @@ that changes or explains resolution is added to `mneme.decision-index/v1`**.
 - The v1 to v2 transition is an explicit migration command, following
   ADR-030 §1's single-transition rule: no canonical writer migrates
   implicitly, and there is no repair.
-- v2 is introduced once, by the first slice that needs persisted DG1 data,
-  and carries every DG1 field known at that point (precedence reason,
-  applicability, waiver slots), to avoid serial schema bumps.
+- v2 is introduced by the first slice that needs persisted DG1 data and
+  contains only that slice's fields. No speculative applicability or waiver
+  fields are pre-created to avoid later schema changes; later semantics are
+  added under the evolution rule below.
 - Release notes for that release state that binaries at or below 0.10.x
   cannot read v2 memory, as the 0.10.0 notes did for 0.9.2.
+
+**v2 must not repeat v1's permissive unknown-field behavior.** Refusing v2 in
+0.10.x only protects one boundary. If v2 readers ignore unknown fields, a
+later release that adds a v2 semantic recreates the same failure in every
+earlier v2 reader. The v2 evolution contract is therefore:
+
+- **Closed semantic key sets.** A v2 reader fails closed on any unknown key
+  in a governance-bearing position: the `decision_index` root and every
+  decision, version, rule, relationship, precedence, applicability and
+  waiver row. Unknown relationship types and enum values stay rejected.
+- **Declared semantic features.** The v2 root carries a required
+  `semantic_features` set naming every governance semantic the document
+  uses beyond the v2 baseline. A reader rejects a document that declares a
+  feature it does not implement. A new governance semantic is added by
+  defining a new feature (or, for incompatible restructuring, a new schema
+  version), never by adding an optional field.
+- **One designated extension point.** Non-semantic metadata (tooling notes,
+  display hints) may live only under a namespaced `extensions` object at a
+  position the schema defines. Content there must never affect
+  resolution, explanation, authority or evidence, and a reader may ignore
+  it. Anything that does affect them is a semantic feature by definition.
+- **Writers preserve nothing they do not understand in semantic
+  positions.** Because unknown semantic keys and features are refused at
+  load, a writer can never carry an unapplied governance semantic through a
+  rewrite.
+
+The first v2 slice adds characterization tests for each rule above, matching
+`tests/test_dg1a_compatibility_characterization.py` for v1.
 
 ### 9. Governance change is snapshot-based
 
@@ -305,10 +337,21 @@ resolve_change(before_snapshot, after_snapshot, context?) -> DecisionChangeSet
   EventCatalog-bearing memory) has no canonical identity, so binding fails
   closed at ADR-029 dimension 3/4 and never upgrades to relevant
   enforcement observed.
-- The D0 adapter's positional rule IDs are surrogates of the same class as
-  `rule_index`. DG1E must either compute ADR-030 §7 identity in that path or
-  mark its IDs as non-evidence identity. In both cases `--adr-dir` mode has
-  no `decision_version_id`, so its evidence binding fails closed.
+- **One `rule_id` algorithm everywhere.** ADR-030 §7 content-derived
+  identity is the only definition of `rule_id`. DG1E replaces the D0
+  adapter's positional IDs (`<decision_id>:FORBID_LITERAL:<index>`) with
+  ADR-030 §7 identity in every path, including the Decision MCP `--adr-dir`
+  view. A positional ID is never a canonical rule identity.
+- **A rule ID alone is not evidence identity.** The `--adr-dir` view has no
+  canonical `decision_version_id`, so it still cannot satisfy evidence
+  identity and its binding fails closed at ADR-029 dimension 3:
+
+  ```text
+  --adr-dir rule
+      canonical rule_id (ADR-030 §7)   yes
+      canonical decision_version_id    no
+      valid evidence identity          no
+  ```
 - **Evidence is current-run only.** No evidence store is added (ADR-029 §7).
   DG1 answers "what did this run evaluate, under which canonical decision
   version and rule"; it cannot answer "has this decision ever been observed
@@ -418,15 +461,23 @@ Audit tier formulas (ADR-026) or frozen benchmark fixtures.
 
 ---
 
-## Open questions for review
+## Review resolutions
 
-1. **Date authority (§2).** This ADR removes date as a precedence
-   tiebreaker. The alternative is to accept date as an explicit,
-   documented governance semantic and keep current import behavior. This is
-   the highest-impact choice in the ADR and should be confirmed before
-   acceptance.
-2. **D0 adapter identity (§10).** Compute ADR-030 §7 rule identity in the
-   `--adr-dir` path, or label its IDs as non-evidence identity.
+Resolved during DG1A review, before acceptance:
+
+1. **Date authority (§2).** Confirmed: date is not authority. Same scope and
+   same priority resolve only through explicit supersession or another
+   explicit authority relation; otherwise ambiguity.
+2. **Rule identity (§10).** Both parts apply: one ADR-030 §7 `rule_id`
+   algorithm in every path, including `--adr-dir`, and `--adr-dir` still
+   fails evidence identity because it has no canonical
+   `decision_version_id`.
+3. **v2 evolution (§8).** Added: closed semantic key sets, declared
+   `semantic_features`, one non-semantic `extensions` point, and no
+   speculative v2 fields.
+
+After acceptance, the next slice is DG1C only. No applicability or waiver
+work starts before DG1C, DG1E and DG1D land.
 
 ---
 

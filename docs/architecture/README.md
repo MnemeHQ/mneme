@@ -116,8 +116,9 @@ and future architecture contracts.
   [D1 closeout](d1-closeout.md); D1 shipped in `mneme-hq==0.10.0`.
   Compatibility-snapshot removal (D1F) remains optional and separate.
 - [ADR-031](../adr/ADR-031-decision-governance-semantics.md) is
-  **proposed** target architecture for DG1 decision governance semantics
-  (effective resolution, governance change, evidence identity). Current
+  **accepted** as the governing architecture for DG1 decision governance
+  semantics (effective resolution, governance change, evidence identity).
+  Its implementation has not started (next slice: DG1C), so current
   behavior is unchanged: effectiveness is still load-time `active`
   projection, precedence is still resolved at ADR import, and evidence still
   uses surrogate rule identity.
@@ -345,14 +346,14 @@ minimum reading set for understanding the current runtime architecture.
 | [ADR-028](../adr/ADR-028-public-decision-intent-assessment.md) | Accepted | Public API semantics for classifying decision intent. |
 | [ADR-029](../adr/ADR-029-enforcement-evidence-binding-semantics.md) | Accepted | How enforcement evidence binds to governed decisions without requiring runtime observation. |
 | [ADR-030](../adr/ADR-030-canonical-decision-persistence-version-identity-and-stable-rule-lineage.md) | Accepted | Persistence, version identity, and stable rule lineage for the canonical index. |
-| [ADR-031](../adr/ADR-031-decision-governance-semantics.md) | Proposed | Target DG1 semantics: which decisions are effective, what governance changed, and canonical evidence identity. |
+| [ADR-031](../adr/ADR-031-decision-governance-semantics.md) | Accepted | DG1 semantics (implementation pending): which decisions are effective, what governance changed, and canonical evidence identity. |
 
 ## Suggested reading paths
 
 **To understand enforcement:** ADR-017 -> ADR-018 -> ADR-019 -> ADR-020 -> ADR-021.
 
 **To understand the Decision Index and MCP:** ADR-023 -> ADR-027 -> ADR-029
--> ADR-030. Read proposed ADR-031 for the target DG1 governance semantics.
+-> ADR-030. Then ADR-031 for DG1 governance semantics (implementation pending).
 
 **To understand Audit evidence:** ADR-024 -> ADR-026 -> ADR-028 -> ADR-029.
 Read proposed ADR-025 only for the deferred trusted-attestation direction.
