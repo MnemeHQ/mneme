@@ -11,7 +11,6 @@ enforcement, Audit, or Open Architecture research data.
 from __future__ import annotations
 
 import copy
-import hashlib
 import json
 from dataclasses import dataclass
 from pathlib import Path
@@ -32,6 +31,13 @@ from mneme.decision_index import (
     VALID_LIFECYCLE_STATUSES,
 )
 from mneme.decision_projection import project_canonical_index
+from mneme.rule_identity import (
+    canonical_json,
+    rule_applicability,
+    rule_id_for,
+    rule_id_of,
+    sha256_hex,
+)
 from mneme.schemas import Decision, MemoryItem, Rule
 
 DECISION_INDEX_SCHEMA = "mneme.decision-index/v1"
@@ -87,17 +93,8 @@ def refuse_legacy_decisions_write(document: object, *, operation: str) -> None:
         )
 
 
-def _canonical_json(value: Any) -> str:
-    return json.dumps(
-        value,
-        sort_keys=True,
-        separators=(",", ":"),
-        ensure_ascii=True,
-    )
-
-
-def _sha256_hex(value: Any) -> str:
-    return hashlib.sha256(_canonical_json(value).encode("utf-8")).hexdigest()
+_canonical_json = canonical_json
+_sha256_hex = sha256_hex
 
 
 def content_digest_of(
@@ -132,17 +129,6 @@ def version_id_of(
         predecessor,
     ])
     return f"dver-{digest[:32]}"
-
-
-def rule_id_of(
-    decision_id: str,
-    rule_type: str,
-    value: str,
-    applicability: dict[str, Any],
-) -> str:
-    """ADR-030 stable rule identity, independent of rule order."""
-    digest = _sha256_hex([value, applicability])
-    return f"{decision_id}:{rule_type}:{digest[:32]}"
 
 
 def _require_dict(value: object, label: str) -> dict[str, Any]:
@@ -287,12 +273,7 @@ def _memory_item_from_record(record: object) -> MemoryItem:
 
 
 def _applicability_of(rule: Rule) -> dict[str, Any]:
-    applicability: dict[str, Any] = {}
-    if rule.include_paths is not None:
-        applicability["include_paths"] = list(rule.include_paths)
-    if rule.exclude_paths:
-        applicability["exclude_paths"] = list(rule.exclude_paths)
-    return applicability
+    return rule_applicability(rule.include_paths, rule.exclude_paths)
 
 
 def _rule_bindings_for_version(
@@ -334,11 +315,6 @@ def _rule_bindings_for_version(
             "binding_authority": binding_authority,
         })
     return bindings
-
-
-def rule_id_for(decision_id: str, rule: Rule) -> str:
-    """Stable ADR-030 §7 ``rule_id`` of one runtime ``Rule``."""
-    return rule_id_of(decision_id, rule.type, rule.value, _applicability_of(rule))
 
 
 _CONTINUITY_AUTHORITIES = frozenset({

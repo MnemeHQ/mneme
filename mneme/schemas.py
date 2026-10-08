@@ -240,6 +240,12 @@ class Decision:
         status:        Lifecycle state — "active", "superseded", or
                        "deprecated". Only active decisions count toward
                        protection-relevant metrics (P1.2 audit).
+        version_id:    Canonical active ``decision_version_id`` when this
+                       decision was projected from the persisted Decision
+                       Index (ADR-030); empty for every other source.
+                       Runtime evidence identity only (ADR-031 §10): it
+                       never takes part in equality, so compatibility and
+                       parity comparisons are unchanged.
     """
 
     id: str
@@ -255,6 +261,7 @@ class Decision:
     source_path: str = ""
     memory_path: str = ""
     status: str = "active"
+    version_id: str = field(default="", compare=False)
 
 
 # ── Pipeline models ───────────────────────────────────────────────────────────

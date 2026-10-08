@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import fnmatch
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from functools import lru_cache
 from pathlib import Path
@@ -42,7 +42,16 @@ class PathSelection:
 
 @dataclass(frozen=True)
 class RuleEvaluation:
-    """Auditable applicability trace for one typed rule."""
+    """Auditable applicability trace for one typed rule.
+
+    ``rule_id`` is the ADR-030 §7 canonical rule identity and
+    ``decision_version_id`` the canonical active version, present only when
+    the decision came from the persisted Decision Index (ADR-031 §10).
+    ``rule_index``/``rule_value`` are display fields, never evidence identity.
+    Like ``Decision.version_id``, ``decision_version_id`` never takes part in
+    equality: it is evidence metadata, so behavioral parity comparisons across
+    load paths (for example before and after migration) are unchanged.
+    """
 
     decision_id: str
     rule_type: str
@@ -53,6 +62,8 @@ class RuleEvaluation:
     input_path: str | None
     selector: str | None = None
     reason: str = ""
+    rule_id: str = ""
+    decision_version_id: str = field(default="", compare=False)
 
 
 _WINDOWS_ABSOLUTE = re.compile(r"^[A-Za-z]:/")

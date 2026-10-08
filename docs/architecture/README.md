@@ -121,10 +121,17 @@ and future architecture contracts.
   DG1C has landed as the pure resolver `mneme/decision_governance.py`
   (`resolve_effective`), which reproduces the Layer 1 projection exactly on
   every state the v1 loader accepts, explains each decision, and reports
-  inconsistent supersession as findings without resolving it. No runtime surface
-  consumes it yet (DG1F), so behavior is unchanged: effectiveness is still
-  load-time `active` projection, precedence is still resolved at ADR import,
-  and evidence still uses surrogate rule identity (DG1E is next).
+  inconsistent supersession as findings without resolving it. DG1E threads
+  canonical identity into the enforcement trace: every `RuleEvaluation` and
+  typed-rule violation (and `mneme check --json`) carries the single ADR-030 §7
+  `rule_id` (`mneme/rule_identity.py`, also used by the `--adr-dir` view) and,
+  only for decisions projected from the persisted index, the canonical
+  `decision_version_id`; `evidence_identity_of` fails closed without both.
+  DG1D adds `resolve_change`, a governance delta between two supplied
+  snapshots derived only from two resolver results. No verdict depends on any
+  of this and no runtime surface consumes the resolver yet (DG1F):
+  effectiveness is still load-time `active` projection and precedence is
+  still resolved at ADR import (DG1P is next).
 - [ADR-025](../adr/ADR-025-trusted-test-execution-attestation.md) is also
   **proposed**. Trusted test-execution attestation remains reserved/deferred.
 

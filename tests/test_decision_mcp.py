@@ -1418,9 +1418,18 @@ def test_load_canonical_index_strict_valid_corpus_is_validated_and_loaded(
     # non-authoritative lineage, not dropped.
     assert by_id["ADR-9001"].lifecycle_status == "active"
     assert by_id["ADR-9002"].lifecycle_status == "inactive"
+    # ADR-031 §10: --adr-dir serves ADR-030 §7 rule identity, never a
+    # positional ID; it has no decision_version_id, so evidence identity
+    # stays incomplete there.
+    from mneme.rule_identity import rule_id_of
+
     assert [r.rule_id for r in index.rules] == [
-        "ADR-9001:FORBID_LITERAL:0",
+        rule_id_of("ADR-9001", r.rule_type, r.rule_payload["value"], r.applicability)
+        for r in index.rules
     ]
+    assert len(index.rules) == 1
+    assert not index.rules[0].rule_id.endswith(":0")
+    assert all(record.version_id == "" for record in index.records)
 
 
 def test_load_canonical_index_rejects_invalid_adr_enum(tmp_path: Path):

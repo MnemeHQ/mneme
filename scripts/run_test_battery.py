@@ -84,6 +84,8 @@ GATE_CORE_PATHS: tuple[str, ...] = (
     "tests/test_d1e6_closeout_parity.py",
     "tests/test_dg1a_compatibility_characterization.py",
     "tests/test_dg1c_effective_resolver.py",
+    "tests/test_dg1d_change_resolution.py",
+    "tests/test_dg1e_evidence_identity.py",
     "tests/test_decision_projection.py",
     "tests/test_decision_proposal.py",
     "tests/test_decision_index_service.py",

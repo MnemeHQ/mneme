@@ -409,6 +409,8 @@ def _check_payload(
                 "outcome": item.outcome.value,
                 "selector": item.selector,
                 "reason": item.reason,
+                "rule_id": item.rule_id,
+                "decision_version_id": item.decision_version_id,
             }
             for item in result.applicability
         ],
@@ -423,6 +425,8 @@ def _check_payload(
                 "rule_type": v.rule_type,
                 "input_path": v.input_path,
                 "selector": v.selector,
+                "rule_id": v.rule_id,
+                "decision_version_id": v.decision_version_id,
             }
             for v in result.violations
         ],

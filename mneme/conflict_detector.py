@@ -26,6 +26,7 @@ from mneme.path_selectors import (
     SelectorOutcome,
     evaluate_path_selectors,
 )
+from mneme.rule_identity import rule_id_for
 from mneme.rule_matcher import literal_in_text
 from mneme.schemas import Decision
 
@@ -157,6 +158,8 @@ class ConflictDetector:
                     input_path=selection.input_path,
                     selector=selection.selector,
                     reason=selection.reason,
+                    rule_id=rule_id_for(d.id, rule),
+                    decision_version_id=d.version_id,
                 ))
                 if selection.outcome != SelectorOutcome.APPLIED:
                     continue
