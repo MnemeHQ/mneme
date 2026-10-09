@@ -9,6 +9,38 @@ It bundles the enforcement hook, the `mneme` skill, and four namespaced slash
 commands (`/mneme:context`, `/mneme:check`, `/mneme:record`, `/mneme:review`)
 into a single distributable unit.
 
+## What this plugin runs and connects to
+
+The plugin directory contains only configuration and Markdown: `hooks/hooks.json`,
+four slash-command prompts in `commands/`, one skill in `skills/mneme/`, the
+manifest, and this README. It ships no executable code, no MCP server, and no
+HTTP hooks.
+
+**Executables it invokes:**
+
+| What | Where it comes from | When |
+|---|---|---|
+| `mneme-hook` | Console script from the [`mneme-hq`](https://pypi.org/project/mneme-hq/) PyPI package, installed separately by the user ([source](https://github.com/MnemeHQ/mneme/blob/main/mneme/integrations/claude_code/hook.py)) | `PreToolUse` (Edit/Write/MultiEdit/Bash), `SessionStart`, `Stop` |
+| `python -m mneme check` | Spawned by `mneme-hook` with the same interpreter, on a temp file holding the proposed change | Per gated tool call and at `Stop` |
+| `git ls-files` | The user's local `git` | `SessionStart` baseline and `Stop` session-delta audit |
+| `mneme check`, `mneme list`, `mneme add`, `mneme test` | Same `mneme-hq` package, run through Claude Code's normal Bash tool | Only when the user runs a `/mneme:*` command or the skill is used |
+
+**Network and data:**
+
+- The hook and every CLI command above run entirely locally. They read
+  `.mneme/project_memory.json` and the files being edited. The hook writes only
+  a temp file and a per-session baseline under the OS temp directory;
+  `/mneme:record` (`mneme add`) appends the new decision to
+  `.mneme/project_memory.json`.
+- They make no network requests: no telemetry, no analytics, no LLM or API
+  calls, and no data leaves the machine.
+- `mneme-hq` also contains code that can use the network: the opt-in
+  `mneme setup` audit pairing, plus library modules for GitHub CI evidence
+  verification and research classifiers. This plugin never invokes any of them.
+
+If `mneme-hook` is not installed, nothing runs: Claude Code reports a
+non-blocking hook error and edits proceed (see [Fail-open guarantees](#fail-open-guarantees)).
+
 ## Prerequisite: install Mneme
 
 The plugin drives the `mneme-hook` / `mneme` CLI, which ships with the
