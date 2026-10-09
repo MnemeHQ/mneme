@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "mneme-decisions": {
+      "command": "mneme",
+      "args": ["decision-mcp"]
+    }
+  }
+}
