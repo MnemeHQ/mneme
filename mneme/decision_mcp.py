@@ -82,6 +82,7 @@ Other callers use the existing D0 adapters or supply an already-built
 """
 from __future__ import annotations
 
+from functools import wraps
 from pathlib import Path
 from typing import Annotated, Any, Literal, Sequence
 
@@ -604,6 +605,27 @@ def _tool_error_from_value_error(exc: ValueError) -> ToolError:
     return ToolError(str(exc))
 
 
+def _measured_tool(operation_name: str):
+    """Record a completed MCP handler without changing its public signature."""
+    def decorate(handler):
+        @wraps(handler)
+        def measured(*args, **kwargs):
+            try:
+                return handler(*args, **kwargs)
+            finally:
+                try:
+                    from mneme.usage.cli import record_mcp
+                    from mneme.usage.contracts import Operation
+
+                    record_mcp(Operation(operation_name))
+                except Exception:
+                    pass
+
+        return measured
+
+    return decorate
+
+
 def _register_tools(server: MCPServer, service: DecisionIndexService) -> None:
     """Register exactly the six approved tools on ``server``."""
 
@@ -622,6 +644,7 @@ def _register_tools(server: MCPServer, service: DecisionIndexService) -> None:
         ),
         annotations=_PROPOSE_ANNOTATIONS,
     )
+    @_measured_tool(TOOL_PROPOSE)
     def decision_propose(
         candidate: Annotated[
             CandidateInput,
@@ -660,6 +683,7 @@ def _register_tools(server: MCPServer, service: DecisionIndexService) -> None:
         ),
         annotations=_PROPOSE_ANNOTATIONS,
     )
+    @_measured_tool(TOOL_PROPOSE_BATCH)
     def decision_propose_batch(
         candidates: Annotated[
             list[CandidateInput],
@@ -711,6 +735,7 @@ def _register_tools(server: MCPServer, service: DecisionIndexService) -> None:
         ),
         annotations=_READ_ANNOTATIONS,
     )
+    @_measured_tool(TOOL_GET)
     def decision_get(
         record_id: Annotated[
             str,
@@ -746,6 +771,7 @@ def _register_tools(server: MCPServer, service: DecisionIndexService) -> None:
         ),
         annotations=_READ_ANNOTATIONS,
     )
+    @_measured_tool(TOOL_SEARCH)
     def decision_search(
         query: Annotated[
             str,
@@ -840,6 +866,7 @@ def _register_tools(server: MCPServer, service: DecisionIndexService) -> None:
         ),
         annotations=_READ_ANNOTATIONS,
     )
+    @_measured_tool(TOOL_APPLICABLE_TO)
     def decision_applicable_to(
         context: Annotated[
             list[str] | None,
@@ -883,6 +910,7 @@ def _register_tools(server: MCPServer, service: DecisionIndexService) -> None:
         ),
         annotations=_READ_ANNOTATIONS,
     )
+    @_measured_tool(TOOL_TRACE)
     def decision_trace(
         record_id: Annotated[
             str,

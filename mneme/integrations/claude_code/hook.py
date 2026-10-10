@@ -245,6 +245,9 @@ def _child_env() -> Dict[str, str]:
     existing = env.get("PYTHONPATH", "")
     root = str(_PACKAGE_ROOT)
     env["PYTHONPATH"] = f"{root}{os.pathsep}{existing}" if existing else root
+    # The hook itself is the measured boundary.  Its internal ``mneme check``
+    # child must never also increment the CLI counter.
+    env["MNEME_USAGE_INTERNAL_HOOK_CHECK"] = "1"
     return env
 
 
@@ -923,7 +926,27 @@ def main(
     except json.JSONDecodeError as e:
         print(f"mneme-hook: bad envelope: {e}", file=stderr)
         return 0
-    return handle_event(envelope, stderr, stdout)
+    result = handle_event(envelope, stderr, stdout)
+    if isinstance(envelope, dict):
+        operation_name = {
+            "SessionStart": "claude_code.session_start",
+            "PreToolUse": "claude_code.pre_tool_use",
+            "Stop": "claude_code.stop",
+        }.get(envelope.get("hook_event_name"))
+        if envelope.get("hook_event_name") == "PreToolUse" and not (
+            isinstance(envelope.get("tool_name"), str)
+            and isinstance(envelope.get("tool_input", {}), dict)
+        ):
+            operation_name = None
+        if operation_name is not None:
+            try:
+                from mneme.usage.cli import record_hook
+                from mneme.usage.contracts import Operation
+
+                record_hook(Operation(operation_name))
+            except Exception:
+                pass
+    return result
 
 
 def cli_main() -> None:

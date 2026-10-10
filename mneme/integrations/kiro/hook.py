@@ -283,6 +283,30 @@ def main(
         print(f"mneme-kiro-hook: bad envelope: {e}", file=stderr)
         return 0
 
+    result = _handle_payload(payload, stderr=stderr, stdout=stdout)
+    if (
+        str(payload.get("hook_event_name", "")).lower() == _EVENT_NAME
+        and isinstance(payload.get("tool_name"), str)
+        and isinstance(payload.get("tool_input", {}), dict)
+    ):
+        try:
+            from mneme.usage.cli import record_hook
+            from mneme.usage.contracts import Operation
+
+            record_hook(Operation.HOOK_KIRO_PRE_TOOL_USE)
+        except Exception:
+            pass
+    return result
+
+
+def _handle_payload(
+    payload: Dict[str, object],
+    *,
+    stderr: TextIO,
+    stdout: TextIO,
+) -> int:
+    """Produce the adapter response before the best-effort usage boundary."""
+
     event, unhandled_reason = normalize_to_tool_event(payload)
     if unhandled_reason is not None:
         _emit_unevaluated(stdout, unhandled_reason)
