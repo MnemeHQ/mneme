@@ -111,6 +111,24 @@ The MCP surface is intentionally frozen to six tools:
 
 Proposal tools create non-authoritative proposals only. Read tools query proposal and canonical decision state. MCP deliberately exposes no accept, reject, activate, supersede, exception, bypass, or trusted-evidence authority.
 
+## Optional local usage measurement
+
+Usage measurement is disabled by default and requires explicit, versioned
+consent. U1 stores only closed, aggregated counters in the user's local profile;
+it contains no uploader, endpoint, scheduler, or network path.
+
+```bash
+mneme usage enable
+mneme usage status
+mneme usage preview
+mneme usage disable
+mneme usage purge
+```
+
+See [Local usage measurement](docs/usage-measurement.md) for the exact
+allowlist, privacy boundaries, storage locations, retention behavior, and
+measurement limitations.
+
 Human authority remains explicit through `mneme decision proposals | show | accept | reject`. Accepting a proposal materializes a canonical decision; it does not activate protection or run the Architecture Audit.
 
 See [ADR-027](docs/adr/ADR-027-decision-mcp-proposal-ingestion-and-authority-boundary.md) and the [v0.9.0 release notes](docs/releases/v0.9.0.md) for the authority boundary and release contract.

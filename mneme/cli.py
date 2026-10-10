@@ -24,6 +24,8 @@ Subcommands
   decision          Decision proposal inspection and human authority:
                     proposals | show | accept | reject (D2C2, ADR-027).
                     A thin adapter over the Core DecisionAuthorityService.
+  usage             Explicit local usage-measurement administration:
+                    enable | disable | status | preview | purge (ADR-032 U1).
 
 Usage::
 
@@ -1766,6 +1768,44 @@ def _cmd_research_o1a_run_experiment(args: argparse.Namespace) -> int:
         return _error_exit(f"experiment execution failed: {exc}")
 
 
+# ── Subcommand: usage (ADR-032 U1 local administration) ─────────────────────
+
+def _usage_store():
+    from mneme.usage.store import UsageStore
+
+    return UsageStore()
+
+
+def _cmd_usage_enable(_args: argparse.Namespace) -> int:
+    from mneme.usage.cli import enable
+
+    return enable(_usage_store())
+
+
+def _cmd_usage_disable(_args: argparse.Namespace) -> int:
+    from mneme.usage.cli import disable
+
+    return disable(_usage_store())
+
+
+def _cmd_usage_status(_args: argparse.Namespace) -> int:
+    from mneme.usage.cli import status
+
+    return status(_usage_store())
+
+
+def _cmd_usage_preview(_args: argparse.Namespace) -> int:
+    from mneme.usage.cli import preview
+
+    return preview(_usage_store())
+
+
+def _cmd_usage_purge(_args: argparse.Namespace) -> int:
+    from mneme.usage.cli import purge
+
+    return purge(_usage_store())
+
+
 # ── Entry point ──────────────────────────────────────────────────────────────
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -2267,6 +2307,34 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p_decision_reject.set_defaults(func=_cmd_decision_reject)
 
+    # usage (ADR-032 U1; local only — submit and weekly scheduling are U2)
+    p_usage = sub.add_parser(
+        "usage", help="Manage optional local-only usage measurement"
+    )
+    usage_sub = p_usage.add_subparsers(dest="usage_cmd", required=True)
+    p_usage_enable = usage_sub.add_parser(
+        "enable", help="Explicitly enable local aggregate counting"
+    )
+    p_usage_enable.add_argument(
+        "--submission",
+        choices=["manual"],
+        default="manual",
+        help="Submission mode (U1 supports local manual preview only)",
+    )
+    p_usage_enable.set_defaults(func=_cmd_usage_enable)
+    usage_sub.add_parser("disable", help="Stop new local counts").set_defaults(
+        func=_cmd_usage_disable
+    )
+    usage_sub.add_parser("status", help="Show local consent and retained data").set_defaults(
+        func=_cmd_usage_status
+    )
+    usage_sub.add_parser("preview", help="Print exact pending payload bytes").set_defaults(
+        func=_cmd_usage_preview
+    )
+    usage_sub.add_parser("purge", help="Delete all local usage state").set_defaults(
+        func=_cmd_usage_purge
+    )
+
     # research
     p_research = sub.add_parser(
         "research",
@@ -2459,7 +2527,63 @@ def main(argv: list[str] | None = None) -> int:
     _force_utf8_stdio()
     parser = _build_parser()
     args = parser.parse_args(argv)
-    return args.func(args)
+    result = args.func(args)
+    _record_cli_usage(args)
+    return result
+
+
+def _record_cli_usage(args: argparse.Namespace) -> None:
+    """Record one finalized substantive command without affecting its result."""
+    command = getattr(args, "cmd", None)
+    if command in {"benchmark", "research", "decision-mcp", "usage", None}:
+        return
+    key: str | tuple[str, str]
+    if command == "protect":
+        key = (command, getattr(args, "protect_cmd", ""))
+    elif command == "cursor":
+        key = (command, getattr(args, "cursor_cmd", ""))
+    elif command == "adr":
+        key = (command, getattr(args, "adr_cmd", ""))
+    elif command == "eventcatalog":
+        key = (command, getattr(args, "ec_cmd", ""))
+    elif command == "decision-index":
+        key = (command, getattr(args, "decision_index_cmd", ""))
+    elif command == "decision":
+        key = (command, getattr(args, "decision_cmd", ""))
+    else:
+        key = command
+    try:
+        from mneme.usage.cli import record_cli
+        from mneme.usage.contracts import Operation
+
+        operations = {
+            "init": Operation.CLI_INIT,
+            "setup": Operation.CLI_SETUP,
+            "list_decisions": Operation.CLI_LIST_DECISIONS,
+            "add_decision": Operation.CLI_ADD_DECISION,
+            "test_query": Operation.CLI_TEST_QUERY,
+            "check": Operation.CLI_CHECK,
+            "audit": Operation.CLI_AUDIT,
+            ("protect", "list"): Operation.CLI_PROTECT_LIST,
+            ("protect", "status"): Operation.CLI_PROTECT_STATUS,
+            ("protect", "validate"): Operation.CLI_PROTECT_VALIDATE,
+            ("protect", "activate"): Operation.CLI_PROTECT_ACTIVATE,
+            ("cursor", "generate"): Operation.CLI_CURSOR_GENERATE,
+            ("adr", "import"): Operation.CLI_ADR_IMPORT,
+            ("eventcatalog", "import"): Operation.CLI_EVENTCATALOG_IMPORT,
+            ("decision-index", "migrate"): Operation.CLI_DECISION_INDEX_MIGRATE,
+            ("decision", "proposals"): Operation.CLI_DECISION_PROPOSALS,
+            ("decision", "show"): Operation.CLI_DECISION_SHOW,
+            ("decision", "accept"): Operation.CLI_DECISION_ACCEPT,
+            ("decision", "reject"): Operation.CLI_DECISION_REJECT,
+        }
+        operation = operations.get(key)
+        if operation is not None:
+            record_cli(operation)
+    except Exception:
+        # Measurement can never change stdout, stderr, or the exit code of the
+        # operation that already completed.
+        return
 
 
 if __name__ == "__main__":

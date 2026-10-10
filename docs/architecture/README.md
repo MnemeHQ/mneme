@@ -82,6 +82,16 @@ It deliberately links to ADRs rather than restating their full contracts.
 
  The research path does NOT write to canonical Mneme authority, MemoryStore,
  DecisionIndex, or DecisionProposal state.
+
+ Optional local usage boundary (ADR-032 U1):
+
+ CLI / six Decision MCP tools / supported agent hooks
+          |
+          v
+ closed aggregate adapter -> user-local usage state
+
+ Counting requires current consent. This path never writes repository state,
+ changes a governance result, or opens a network connection.
 ```
 
 ## Important current-versus-target boundary
@@ -136,6 +146,14 @@ and future architecture contracts.
   supersession or priority resolves it, and re-import never deactivates a
   decision that is already canonical in such a scope. Decision applicability
   (DG1B1) and waivers (DG1B2) remain evidence- and charter-gated.
+- [ADR-032](../adr/ADR-032-opt-in-product-usage-measurement.md) is
+  **accepted**. U1 implements explicit local consent, aggregate counters,
+  epoch-scoped pseudonymous identifiers, immutable preview snapshots, and
+  purge in an isolated user-profile store. Counting is off by default and is
+  a non-authoritative edge adapter around CLI, the existing six MCP tools, and
+  the Claude Code, Codex CLI, and Kiro hook entry points. U1 contains no submit
+  command, network client, collector, endpoint, or scheduler; those remain
+  separately gated U2 work.
 - [ADR-025](../adr/ADR-025-trusted-test-execution-attestation.md) is also
   **proposed**. Trusted test-execution attestation remains reserved/deferred.
 
@@ -196,11 +214,13 @@ flowchart TB
         CLI["CLI / Python API<br/>mneme ..."]
         Hooks["Agent integration adapters<br/>hooks / plugins / middleware"]
         MCP["Decision MCP<br/>local stdio server"]
+        Usage["Optional usage edge<br/>closed aggregate counters"]
         Core["Runtime governance core"]
         Audit["Audit / protection / evidence"]
     end
 
     Proposals["Local proposal state"]
+    UsageState["User-local usage state<br/>outside repositories"]
     Research["O1A research runner<br/>mneme research open-architecture"]
     ResearchDB["SQLite ResearchStore"]
     ExternalRepo["Pinned external repository checkout"]
@@ -218,6 +238,10 @@ flowchart TB
     MCP --> Core
     MCP <--> Proposals
     CLI <--> Proposals
+    CLI --> Usage
+    Hooks --> Usage
+    MCP --> Usage
+    Usage <--> UsageState
 
     Memory --> Audit
     Core --> Audit
@@ -239,6 +263,9 @@ flowchart TB
 - Decision MCP proposal ingestion does not grant producer authority.
 - Audit evidence does not silently become trusted enforcement evidence.
 - O1A research state is isolated from canonical product authority.
+- Usage measurement is disabled without current consent, writes only to its
+  user-local store, has no U1 network path, and never becomes governance,
+  enforcement, Audit, proposal, project-memory, or Decision Index state.
 - EventCatalog canonical apply is retired for D1 (ADR-030 §15, D1E4). On
   canonical `decision_index` memory, `eventcatalog import --apply` refuses
   before compiling or previewing, and writes nothing. Preview stays available
@@ -361,6 +388,7 @@ minimum reading set for understanding the current runtime architecture.
 | [ADR-029](../adr/ADR-029-enforcement-evidence-binding-semantics.md) | Accepted | How enforcement evidence binds to governed decisions without requiring runtime observation. |
 | [ADR-030](../adr/ADR-030-canonical-decision-persistence-version-identity-and-stable-rule-lineage.md) | Accepted | Persistence, version identity, and stable rule lineage for the canonical index. |
 | [ADR-031](../adr/ADR-031-decision-governance-semantics.md) | Accepted | DG1 semantics (implementation pending): which decisions are effective, what governance changed, and canonical evidence identity. |
+| [ADR-032](../adr/ADR-032-opt-in-product-usage-measurement.md) | Accepted | Why optional product measurement is aggregate, local-first, epoch-scoped, and separately gated from network collection. |
 
 ## Suggested reading paths
 
@@ -371,6 +399,10 @@ minimum reading set for understanding the current runtime architecture.
 
 **To understand Audit evidence:** ADR-024 -> ADR-026 -> ADR-028 -> ADR-029.
 Read proposed ADR-025 only for the deferred trusted-attestation direction.
+
+**To understand optional usage measurement:** ADR-032, then
+[`docs/usage-measurement.md`](../usage-measurement.md) for the shipped U1
+surface. U2 network collection remains unimplemented and unauthorized.
 
 # Source-to-enforcement trace
 

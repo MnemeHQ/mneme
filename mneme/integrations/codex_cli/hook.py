@@ -85,10 +85,15 @@ def main(
 
     event_name = payload.get("hook_event_name")
     if event_name == "Stop":
-        return stop_audit.handle_stop(payload, stderr=stderr, stdout=stdout)
+        result = stop_audit.handle_stop(payload, stderr=stderr, stdout=stdout)
+        _record_usage("codex_cli.stop")
+        return result
     if event_name == "SessionStart":
-        return stop_audit.handle_session_start(payload, stderr=stderr,
-                                               stdout=stdout)
+        result = stop_audit.handle_session_start(
+            payload, stderr=stderr, stdout=stdout
+        )
+        _record_usage("codex_cli.session_start")
+        return result
 
     if event_name in ("PreToolUse", "PostToolUse"):
         # Secondary net: capture the session baseline if SessionStart did not
@@ -99,6 +104,8 @@ def main(
     # The hooks.json matcher scopes registration to apply_patch; anything else
     # reaching this entrypoint gets no opinion rather than a parse failure.
     if payload.get("tool_name") != "apply_patch":
+        if event_name == "PreToolUse" and isinstance(payload.get("tool_name"), str):
+            _record_usage("codex_cli.pre_tool_use")
         return 0
 
     result = evaluate_apply_patch(payload, cwd=str(payload.get("cwd") or ""))
@@ -106,7 +113,19 @@ def main(
     if output is not None:
         json.dump(output, stdout)
         stdout.write("\n")
+    if event_name == "PreToolUse" and isinstance(payload.get("tool_name"), str):
+        _record_usage("codex_cli.pre_tool_use")
     return 0
+
+
+def _record_usage(operation_name: str) -> None:
+    try:
+        from mneme.usage.cli import record_hook
+        from mneme.usage.contracts import Operation
+
+        record_hook(Operation(operation_name))
+    except Exception:
+        pass
 
 
 def cli_main() -> None:
