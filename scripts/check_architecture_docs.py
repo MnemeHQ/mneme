@@ -11,10 +11,15 @@ Checks:
 - ADR frontmatter IDs are unique;
 - ADR map links resolve to ADR files whose frontmatter ID and status match;
 - proposed ADRs shown in the ADR map are explicitly treated as proposed,
-  target, or deferred in the current-versus-target section.
+  target, or deferred in the current-versus-target section;
+- pull requests declare exactly one architecture-impact classification;
+- Architecture change / Target architecture declarations include the four
+  required impact statements.
 """
 from __future__ import annotations
 
+import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -42,6 +47,20 @@ REQUIRED_ARCHITECTURE_HEADINGS: tuple[str, ...] = (
     "# Research boundary — O1A Open Architecture",
     "# ADR map",
     "# Maintenance rules",
+)
+
+ARCHITECTURE_IMPACT_HEADING = "## Architecture impact"
+ARCHITECTURE_IMPACT_OPTIONS: tuple[str, ...] = (
+    "None",
+    "Representation only",
+    "Architecture change",
+    "Target architecture",
+)
+REQUIRED_ARCHITECTURE_IMPACT_FIELDS: tuple[str, ...] = (
+    "ADR impact",
+    "Architecture map impact",
+    "C4 impact",
+    "ASCII map impact",
 )
 
 _LINK_RE = re.compile(r"!?" + r"\[[^\]]*\]\(([^)]+)\)")
@@ -131,6 +150,99 @@ def _architecture_section(text: str, heading: str) -> str:
 
 def _normalize_status(value: str) -> str:
     return value.strip().strip("*" + chr(96)).strip().lower()
+
+
+def validate_architecture_impact_declaration(body: str) -> list[str]:
+    """Validate the explicit PR architecture-impact declaration.
+
+    This checks declaration completeness only. It does not infer whether the
+    selected classification is semantically correct for the code change.
+    """
+    section = _architecture_section(body, ARCHITECTURE_IMPACT_HEADING)
+    if not section:
+        return [
+            "pull request body: missing '## Architecture impact' section"
+        ]
+
+    selected: list[str] = []
+    for option in ARCHITECTURE_IMPACT_OPTIONS:
+        pattern = re.compile(
+            rf"^\s*-\s*\[[xX]\]\s*{re.escape(option)}\s*$",
+            re.MULTILINE,
+        )
+        if pattern.search(section):
+            selected.append(option)
+
+    if len(selected) != 1:
+        rendered = ", ".join(selected) if selected else "none"
+        return [
+            "pull request body: select exactly one architecture impact "
+            f"classification; selected: {rendered}"
+        ]
+
+    classification = selected[0]
+    errors: list[str] = []
+    if classification in {"Architecture change", "Target architecture"}:
+        for field in REQUIRED_ARCHITECTURE_IMPACT_FIELDS:
+            match = re.search(
+                rf"^\s*-\s*{re.escape(field)}:\s*(.*?)\s*$",
+                section,
+                re.MULTILINE,
+            )
+            if match is None or not match.group(1).strip():
+                errors.append(
+                    f"pull request body: '{classification}' requires "
+                    f"non-empty '{field}'"
+                )
+
+    return errors
+
+
+def validate_github_event_architecture_impact(
+    *,
+    event_name: str | None = None,
+    event_path: Path | None = None,
+) -> list[str]:
+    """Validate PR declaration when running under a GitHub pull_request event."""
+    resolved_event_name = (
+        event_name if event_name is not None else os.environ.get("GITHUB_EVENT_NAME", "")
+    )
+    if resolved_event_name != "pull_request":
+        return []
+
+    resolved_event_path = event_path
+    if resolved_event_path is None:
+        raw_event_path = os.environ.get("GITHUB_EVENT_PATH", "")
+        if not raw_event_path:
+            return [
+                "pull request architecture-impact validation: "
+                "GITHUB_EVENT_PATH is missing"
+            ]
+        resolved_event_path = Path(raw_event_path)
+
+    try:
+        payload = json.loads(_read(resolved_event_path))
+    except (OSError, json.JSONDecodeError) as exc:
+        return [
+            "pull request architecture-impact validation: "
+            f"cannot read GitHub event payload: {exc}"
+        ]
+
+    pull_request = payload.get("pull_request")
+    if not isinstance(pull_request, dict):
+        return [
+            "pull request architecture-impact validation: "
+            "event payload has no pull_request object"
+        ]
+
+    body = pull_request.get("body") or ""
+    if not isinstance(body, str):
+        return [
+            "pull request architecture-impact validation: "
+            "pull_request.body is not text"
+        ]
+
+    return validate_architecture_impact_declaration(body)
 
 
 def validate_architecture_docs(repo_root: Path = REPO_ROOT) -> list[str]:
@@ -271,6 +383,8 @@ def validate_architecture_docs(repo_root: Path = REPO_ROOT) -> list[str]:
 
 def main() -> int:
     errors = validate_architecture_docs()
+    errors.extend(validate_github_event_architecture_impact())
+    errors = sorted(set(errors))
     if errors:
         print("architecture documentation validation failed:", file=sys.stderr)
         for error in errors:
