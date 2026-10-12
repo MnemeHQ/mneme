@@ -216,6 +216,20 @@ This is a compatibility/reference integration, not a dependency. Mneme must cont
 
 Do not add CodeRabbit-specific logic to the Decision Index or enforcement core.
 
+### P1 — Kiro Memory differential validation (existing native integration)
+
+Kiro Memory (announced October 2026) adds agent-learned, cross-session context such as repository conventions, debugging lessons, and discarded approaches. Treat this as **market validation and a competitive baseline**, not proof that Kiro models decision authority or deterministic architectural governance. Mneme already has a native Kiro CLI v3 pre-write hook; this work is **not** another Kiro integration.
+
+Run a frozen, multi-session, version-pinned comparison:
+
+1. **A — Kiro Memory + Steering:** native memory/context baseline.
+2. **B — Kiro Memory + Steering + custom native hooks:** best reasonable agent-native governance baseline, with the custom rules disclosed.
+3. **C — Kiro Memory + Steering + Mneme:** canonical decisions, effective-decision resolution where shipped, and the existing deterministic Mneme Kiro hook.
+
+Use identical tasks and starting repository states; include stale/superseded decisions, contradictory remembered advice, path-scoped constraints, allowed changes, and attempted forbidden changes. Score correct decision recall separately from **correct authoritative applicability**, first-attempt architectural compliance, true/false blocking, functional completion, scope expansion, session-to-session consistency, and setup/maintenance cost. Distinguish native pre-write enforcement from post-hoc auditing and document uncovered mutation seams.
+
+**Gates and ownership:** benchmark/reproduction belongs in the OSS Core evidence program; source acquisition and decision-candidate classification research belongs in the [Data Engine](https://github.com/MnemeHQ/mneme-data-engine) after its existing P0 baseline. A remembered observation, Steering instruction, Skill, or agent-authored note is **source evidence, not automatically an accepted Mneme decision**. Only the canonical Decision Index and its reviewed lifecycle/rules can establish authority and deterministic enforcement. No Kiro-specific policy engine, no implicit promotion of memories to rules, and no expanded Kiro support claim before live validation. Prioritize design-partner evidence over integration count.
+
 ### P1 — Migration-aware Architecture Audit
 
 Extend the existing Audit workflow for long-running migrations and modernization, where legacy and target architectures coexist and path applicability matters.
