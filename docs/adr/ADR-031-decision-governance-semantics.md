@@ -331,8 +331,13 @@ uppercase letters; underscores or any non-`[a-z0-9-]` character; a segment that
 starts or ends with `-`; whitespace; and non-ASCII characters.
 
 **Ownership and collision avoidance.** Namespaces follow the reverse-DNS
-principle: the key is the reverse of a DNS name the producer controls, so
-ownership is externally verifiable and needs no central registry.
+principle: by convention the key is the reverse of a DNS name the producer
+controls, so ownership needs no central registry.
+
+**Validation is syntactic only.** Key validation checks syntax against the
+grammar above. It does not authenticate domain ownership, producer identity, or
+any authority to use a namespace — including `mneme.*`. Ownership remains a
+producer convention, enforced by human review rather than by the loader.
 
 - A producer-owned key must be **reverse-DNS with at least three segments**:
   `<tld>.<domain>.<tool>[...]`, for example `com.example.audittool`.
@@ -373,16 +378,17 @@ instead.
 | Requirement | How the convention satisfies it |
 |---|---|
 | Deterministic syntax | A single regex over `[a-z0-9-]`; no locale, case, or Unicode variance. |
-| Ownership and collision avoidance | Reverse-DNS ties a key to a DNS name the producer controls; the `<tool>` segment separates tools under one domain. |
-| Mneme-reserved namespace | The reserved `mneme` root is reachable only by Mneme; producers use reverse-DNS. |
+| Ownership and collision avoidance | Reverse-DNS is a producer convention that discourages collisions; the `<tool>` segment separates tools under one domain. Validation is syntactic only. |
+| Mneme-reserved namespace | The `mneme` root is reserved by convention to Mneme; producers root at reverse-DNS. Syntax, not identity, is validated. |
 | Invalid key rejection | The grammar is closed and anchored; malformed segments fail the match. |
 | Optional-object compatibility | The object stays optional; only malformed keys are newly rejected. |
 | Non-semantic behavior | Content is ignored and cannot enter resolution/authority/evidence; anything semantic is a declared feature. |
 
 **Migration and compatibility consequences.**
 
-- No production `mneme.decision-index/v2` memory exists yet — v2 is introduced
-  by the DG1B1 slice, which is not released. No data migration is required.
+- No released Mneme version currently introduces canonical decision-index v2
+  memory. Any experimental or pre-release v2 documents must be checked against
+  this namespace contract.
 - For any future v2 document, a well-formed `extensions` object is accepted and
   ignored exactly as before; a malformed key now fails closed where an earlier
   draft of the v2 loader would have accepted an arbitrary key.
