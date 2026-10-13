@@ -66,7 +66,7 @@ from mneme.integrations.claude_code.hook import (
     format_reason,
     introduced_content,
     MaterializeError,
-    parse_verdict,
+    assess_verdict,
     resolve_mode,
 )
 
@@ -216,8 +216,13 @@ def _run_check(
             _emit_unevaluated(stdout, f"check could not run ({e})")
             return 0
 
-        payload = parse_verdict(proc.stdout)
+        assessment = assess_verdict(proc.stdout, proc.returncode, mode)
+        payload = assessment.payload
         if payload is None:
+            if assessment.inconsistent:
+                print(f"mneme-kiro-hook: {assessment.problem}.", file=stderr)
+                _emit_unevaluated(stdout, assessment.problem)
+                return 0
             if _is_stale_runtime(proc.stderr):
                 print(
                     "mneme-kiro-hook: the installed mneme CLI does not support "

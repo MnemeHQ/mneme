@@ -337,6 +337,27 @@ class TestLoopSafetyAndDegrade:
         context = emitted["hookSpecificOutput"]["additionalContext"]
         assert "could not be evaluated" in context
 
+    def test_contradictory_checker_result_never_blocks(self, repo, monkeypatch):
+        """A FAIL payload exiting 1 in strict mode broke the CLI contract (#260)."""
+        from mneme.integrations.claude_code import hook
+        from tests.integrations.check_contract import check_payload
+
+        assert _run(_session_start(repo))[0] == 0
+        (repo / "storage_db.py").write_text("import psycopg2\n", encoding="utf-8")
+        monkeypatch.setattr(
+            hook,
+            "_invoke_check",
+            lambda *a, **k: subprocess.CompletedProcess(
+                [], 1, json.dumps(check_payload("FAIL")), ""
+            ),
+        )
+        rc, err, out = _run(_stop_event(repo))
+        assert rc == 0
+        emitted = json.loads(out)
+        assert "decision" not in emitted, "an incoherent verdict must never block"
+        assert "could not be evaluated" in emitted["hookSpecificOutput"]["additionalContext"]
+        assert "inconsistent verdict payload (FAIL with exit 1 in strict mode)" in err
+
     def test_warn_mode_reports_without_blocking(self, repo, monkeypatch):
         monkeypatch.setenv("MNEME_HOOK_MODE", "warn")
         assert _run(_session_start(repo))[0] == 0

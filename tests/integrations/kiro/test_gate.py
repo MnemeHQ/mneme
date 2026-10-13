@@ -11,6 +11,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from tests.integrations.check_contract import check_result_for, violation
 from mneme.integrations.kiro.hook import main
 
 FIXTURE = Path(__file__).parent / "fixtures" / "project_memory.json"
@@ -43,30 +44,42 @@ def _envelope(cwd, path, content, tool="fs_write"):
 
 
 def _verdict(verdict="FAIL", evaluation_complete=True):
-    payload = {
-        "schema": "mneme.check/v1",
-        "verdict": verdict,
-        "mode": "strict",
-        "violations": [{
-            "decision_id": "test_002",
-            "decision_text": "Do not call the legacy client directly",
-            "severity": verdict,
-            "rule_type": "FORBID_LITERAL",
-            "rule": VIOLATION,
-            "trigger": VIOLATION,
-        }],
-        "freshness": [],
-    }
-    if not evaluation_complete:
-        payload["evaluation_complete"] = False
-        payload["applicability"] = [{
-            "decision_id": "test_003",
-            "rule_type": "FORBID_LITERAL",
-            "rule_value": "EXPERIMENTAL_MARKER_XY",
-            "outcome": "UNKNOWN",
-            "reason": "outside policy root",
-        }]
-    return json.dumps(payload)
+    """Answer as the real CLI would, in whatever mode the hook requested."""
+    violations = [] if verdict == "PASS" else [
+        violation(
+            verdict,
+            decision_id="test_002",
+            decision_text="Do not call the legacy client directly",
+            rule=VIOLATION,
+            kind="typed_rule",
+            rule_type="FORBID_LITERAL",
+        )
+    ]
+    applicability = None if evaluation_complete else [{
+        "decision_id": "test_003",
+        "rule_type": "FORBID_LITERAL",
+        "rule_value": "EXPERIMENTAL_MARKER_XY",
+        "outcome": "UNKNOWN",
+        "reason": "outside policy root",
+    }]
+
+    def answer(command):
+        return check_result_for(
+            command,
+            verdict,
+            violations=violations,
+            complete=evaluation_complete,
+            applicability=applicability,
+        )
+
+    return answer
+
+
+def _answer(stdout, stderr, command):
+    """A scripted ``mneme check`` reply: a contract answer or raw stdout."""
+    if callable(stdout):
+        return stdout(command)
+    return MagicMock(returncode=0, stdout=stdout, stderr=stderr)
 
 
 class _Capture:
@@ -85,7 +98,7 @@ class _Capture:
         self._record_input(len(self.commands) - 1, input_path)
         if self.exc is not None:
             raise self.exc
-        return MagicMock(returncode=0, stdout=self.stdout, stderr=self.stderr)
+        return _answer(self.stdout, self.stderr, command)
 
     def checked_text(self, index=0):
         """The text handed to `mneme check` via --input, captured at call
@@ -218,8 +231,10 @@ def test_generic_filename_still_enforces_typed_literal(tmp_path):
 
 def _gate(cwd, envelope, stdout="", stderr=""):
     """Run main() against a mocked mneme check; returns (rc, out, err, mock)."""
-    fake = MagicMock(returncode=0, stdout=stdout, stderr=stderr)
     out, err = io.StringIO(), io.StringIO()
-    with patch("mneme.integrations.kiro.hook.subprocess.run", return_value=fake) as mrun:
+    with patch(
+        "mneme.integrations.kiro.hook.subprocess.run",
+        side_effect=lambda command, **kwargs: _answer(stdout, stderr, command),
+    ) as mrun:
         rc = main(stdin=io.StringIO(envelope), stderr=err, stdout=out)
     return rc, out.getvalue(), err.getvalue(), mrun

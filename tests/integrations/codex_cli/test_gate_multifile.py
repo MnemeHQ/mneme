@@ -9,6 +9,7 @@ from pathlib import Path
 
 import pytest
 
+from tests.integrations.check_contract import check_result_for, violation
 from mneme.integrations.codex_cli.gate import (
     DENY,
     FAIL_OPEN,
@@ -76,26 +77,16 @@ class _PassRunner:
         self.verdict = verdict
 
     def __call__(self, command, **kwargs):
-        import subprocess
-        return subprocess.CompletedProcess(
-            command, 0, stdout=json.dumps({
-                "schema": "mneme.check/v1", "verdict": self.verdict,
-                "mode": "strict", "violations": [], "freshness": [],
-                "evaluation_complete": True}), stderr="")
+        return check_result_for(command, self.verdict)
 
 
 def _fail_runner():
     """Runner returning a FAIL verdict payload."""
-    import subprocess
     def run(command, **kwargs):
-        return subprocess.CompletedProcess(command, 1, stdout=json.dumps({
-            "schema": "mneme.check/v1", "verdict": "FAIL", "mode": "strict",
-            "violations": [{
-                "decision_id": "ADR-M", "severity": "FAIL",
-                "rule": "FORBIDDEN_TOKEN_XYZ", "trigger": "FORBIDDEN_TOKEN_XYZ",
-                "decision_text": "The forbidden token must not appear.",
-                "input_path": "service.py"}],
-            "freshness": [], "evaluation_complete": True}), stderr="")
+        return check_result_for(command, "FAIL", violations=[violation(
+            "FAIL", decision_id="ADR-M", rule="FORBIDDEN_TOKEN_XYZ",
+            decision_text="The forbidden token must not appear.",
+            input_path="service.py")])
     return run
 
 

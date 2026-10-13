@@ -33,6 +33,7 @@ from langchain_core.outputs import ChatGeneration, ChatResult  # noqa: E402
 from langchain_core.tools import tool  # noqa: E402
 
 from mneme.integrations.langchain import MnemeLangChain  # noqa: E402
+from tests.integrations.check_contract import check_result_for, violation  # noqa: E402
 
 MEMORY = {
     "meta": {
@@ -487,26 +488,22 @@ class TestCommandResultAnnotation:
 
     def _gate_warn(self, project):
         def runner(command, **kwargs):
-            return FakeCompleted(
-                verdict_json(
-                    "WARN",
-                    violations=[
-                        {
-                            "decision_id": "store_001",
-                            "severity": "WARN",
-                            "rule": "no postgres",
-                            "trigger": "postgres",
-                        }
-                    ],
-                )
+            return check_result_for(
+                command,
+                "WARN",
+                violations=[
+                    violation("WARN", decision_id="store_001", rule="no postgres", trigger="postgres")
+                ],
             )
 
         return MnemeLangChain(project_dir=project, mode="warn", check_runner=runner)
 
     def _gate_deny(self, project):
         def runner(command, **kwargs):
-            return FakeCompleted(
-                verdict_json("FAIL", violations=[{"decision_id": "store_001", "severity": "FAIL", "rule": "psycopg2", "trigger": "psycopg2"}])
+            return check_result_for(
+                command,
+                "FAIL",
+                violations=[violation("FAIL", decision_id="store_001", rule="psycopg2")],
             )
 
         return MnemeLangChain(project_dir=project, check_runner=runner)
@@ -641,26 +638,3 @@ class TestCommandResultAnnotation:
         assert out.update is None
         gaps = [e for e in gate.trace if e.get("annotation") == "skipped"]
         assert gaps and gaps[0]["action"] == "warn"
-
-
-# ── small local helpers ─────────────────────────────────────────────────────
-
-
-def verdict_json(verdict, *, complete=True, violations=None):
-    payload = {
-        "schema": SCHEMA_LIVE,
-        "verdict": verdict,
-        "violations": violations or [],
-        "evaluation_complete": complete,
-    }
-    return json.dumps(payload)
-
-
-SCHEMA_LIVE = "mneme.check/v1"
-
-
-class FakeCompleted:
-    def __init__(self, stdout):
-        self.stdout = stdout
-        self.stderr = ""
-        self.returncode = 0

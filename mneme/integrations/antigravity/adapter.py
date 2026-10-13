@@ -75,7 +75,7 @@ from mneme.integrations.claude_code.hook import (
     format_reason,
     introduced_content,
     MaterializeError,
-    parse_verdict,
+    assess_verdict,
     resolve_mode,
     should_check,
 )
@@ -271,14 +271,11 @@ def main(
         emit({}, stdout)
         return 0
 
-    payload = parse_verdict(proc.stdout)
+    assessment = assess_verdict(proc.stdout, proc.returncode, mode)
+    payload = assessment.payload
     if payload is None:
-        print(
-            "mneme-antigravity: no parseable verdict from mneme check "
-            f"(exit {proc.returncode}). Failing open.",
-            file=stderr,
-        )
-        if proc.stderr:
+        print(f"mneme-antigravity: {assessment.problem}. Failing open.", file=stderr)
+        if proc.stderr and not assessment.inconsistent:
             print(proc.stderr, file=stderr)
         emit({}, stdout)
         return 0
