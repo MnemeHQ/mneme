@@ -11,7 +11,7 @@ scope: decision_index.governance_semantics
 
 **Status:** Accepted
 **Date:** 2026-10-07 (accepted 2026-10-08)
-**Amended:** 2026-10-13 — v2 `extensions` namespace key contract (§8a)
+**Amended:** 2026-10-13 — v2 `extensions` namespace key contract (§8a); DG1F applicability-only sequencing exception (§11)
 **Deciders:** Theo Valmis
 
 ---
@@ -468,10 +468,12 @@ DG1P  remove date as precedence authority            ADR import change
   |
 DG1B1 decision applicability (first v2 slice)        charter required
   |
-DG1B2 exceptions / waivers                           charter required
+  +-- DG1F applicability-only runtime increment      separately merged charter
+  |   (optional, may precede DG1B2)                   + freeze amendment
   |
-DG1F  surfaces consume one governance result         charter where enforcement
-                                                     inputs change
+DG1B2 exceptions / waivers                           evidence + charter required
+  |
+DG1F  remaining / waiver-aware surface convergence   charter for each change
   |
 DG1G  adversarial fixtures + closeout
 ```
@@ -485,6 +487,44 @@ DG1F replaces the duplicated `status == "active"` checks (projection,
 protection candidate selection and activation precheck, Audit aggregation,
 readiness) with the shared resolver result, only after DG1C parity holds.
 Retrieval ranking never becomes authoritative.
+
+**Sequencing amendment (2026-10-13): applicability-only DG1F may precede
+DG1B2.** The default sequence still places the full, waiver-aware convergence
+after DG1B2. As a bounded exception, the first DG1F runtime increment may
+consume **already-implemented DG1B1 decision applicability only**, before
+waivers exist. This separates the proven decision-applicability mechanism from
+the separately evidence-gated waiver model; it does **not** mark DG1B2
+complete, waive its canonical target-binding requirement in §12, or authorize
+DG1G closeout before the full sequence is complete.
+
+**Evidence and reason for the exception.** DG1B1 was integrated in PR #487
+with offline functional acceptance using the pinned, accepted GSA-TTS
+Windows-native secret-storage ADR. At the time of this amendment, Data Engine
+P0.1B/P0.2 implementation was progressing in draft PR #42 under sequencing
+PR #41; independent V5.1D annotation/V5.1E validation and P0.3 evidence
+relationships were not complete (Data Engine tracker #40). Research
+observations, evidence links and classifications are not authority and do
+not, by themselves, provide a DG1B2 waiver bound to an authoritative
+decision/version. DG1B2 can proceed when its own evidence gate is met, whether
+or not this early DG1F increment has shipped.
+
+**Authorization remains separate.** This amendment changes **ordering only**.
+Before *any* DG1F runtime-input change, ADR-031 §7 still requires a distinct,
+merged behavioral charter, followed by the corresponding `[layer1-freeze]`
+amendment under the Freeze Amendment Procedure. That charter must identify a
+bounded first consumer, a deterministic and reviewed source of
+`GovernanceContext.labels`, and an explicit fail-safe contract for missing,
+untrusted or conflicting context. In particular, absence of a required label
+in the DG1B1 resolver must not be used by a runtime adapter to silently drop
+a protective decision when context is unavailable. Global decisions keep
+existing protection, ADR-020 typed-rule path selectors remain independent,
+and retrieval ranking never becomes governance authority. Existing CLI,
+enforcer, ConflictDetector, hook, MCP, protection, Audit and readiness behavior
+remains unchanged until separately chartered.
+
+No waiver representation, authority transition, CLI flag, MCP API, automatic
+context inference, new evidence persistence, schema change or benchmark
+methodology change is authorized by this sequencing amendment.
 
 ### 12. Waiver slot (semantics fixed now, implementation deferred)
 
