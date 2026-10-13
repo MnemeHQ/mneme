@@ -914,7 +914,14 @@ def set_decision_applicability(
     if section.get("schema") != DECISION_INDEX_SCHEMA_V2:
         raise DecisionIndexMigrationRequired(
             "decision applicability requires mneme.decision-index/v2; upgrade "
-            "project memory with `mneme decision-index migrate` first"
+            "project memory with `mneme decision-index migrate --to-v2` first"
+        )
+    if isinstance(required_labels, str) or not isinstance(
+        required_labels, (list, tuple)
+    ):
+        raise DecisionIndexPersistenceError(
+            "applicability required_labels must be a list of non-empty "
+            "strings; a bare string is not a label set"
         )
     normalized: list[str] = []
     for label in required_labels:
@@ -1645,17 +1652,16 @@ def _parse_applicability(
     raw: object,
     decision_id: str,
     semantic_features: list[str],
-    strict: bool,
 ) -> tuple[str, ...]:
-    """Parse optional v2 decision applicability (ADR-031 §4, DG1B1).
+    """Parse a **present** v2 decision applicability value (ADR-031 §4, DG1B1).
 
-    v1 is permissive: an unknown ``applicability`` key is ignored, exactly as
-    ADR-031 §8's Context table warns, so a v1 decision is globally eligible.
-    v2 fails closed: closed keys, a non-empty label set, and the required
+    Called only when the ``applicability`` key is present on a v2 decision row.
+    Absence is the compatible default (globally eligible) and is handled by the
+    caller; an explicitly present ``null`` is not absence and fails closed
+    (``_require_dict`` rejects a non-object). v2 applicability also fails closed
+    on unknown keys, a non-empty label set, and the required
     ``decision_applicability`` feature declaration.
     """
-    if raw is None or not strict:
-        return ()
     applicability = _require_dict(
         raw, f"decision {decision_id!r} applicability"
     )
@@ -2099,12 +2105,17 @@ def load_persisted_decision_index(
             for rule in decision_rules
         ]
         all_rules.extend(decision_rules)
-        required_labels = _parse_applicability(
-            raw.get("applicability"),
-            decision_id,
-            semantic_features,
-            is_v2,
-        )
+        if is_v2 and "applicability" in raw:
+            required_labels = _parse_applicability(
+                raw["applicability"],
+                decision_id,
+                semantic_features,
+            )
+        else:
+            # v1 ignores an unknown applicability key (globally eligible); an
+            # absent v2 key also means globally eligible. An explicitly present
+            # v2 ``applicability: null`` is not "absent" and fails closed.
+            required_labels = ()
         records.append(CanonicalDecisionRecord(
             decision_id=decision_id,
             version=version["_validated_revision"],

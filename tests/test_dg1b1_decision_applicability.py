@@ -271,6 +271,53 @@ def test_v2_rejects_empty_required_labels() -> None:
         load_persisted_decision_index(document["decision_index"])
 
 
+def test_v2_absent_applicability_is_globally_eligible() -> None:
+    document = _v2(_decision("A"))
+    assert "applicability" not in document["decision_index"]["decisions"][0]
+    assert _effective_ids(_index(document)) == ("A",)
+
+
+def test_v2_explicit_null_applicability_fails_closed() -> None:
+    # Absent means globally eligible; an explicitly present ``null`` is not
+    # absence and must fail validation.
+    document = _v2(_decision("A"))
+    document["decision_index"]["decisions"][0]["applicability"] = None
+    with pytest.raises(DecisionIndexPersistenceError, match="must be an object"):
+        load_persisted_decision_index(document["decision_index"])
+
+
+def test_v2_rejects_scalar_string_required_labels() -> None:
+    # A bare string is not a label set: the loader must not read it as a list.
+    document = _v2(_decision("A"))
+    document["decision_index"]["semantic_features"] = [APPLICABILITY_FEATURE]
+    document["decision_index"]["decisions"][0]["applicability"] = {
+        "required_labels": "platform:windows"
+    }
+    with pytest.raises(DecisionIndexPersistenceError, match="must be a list"):
+        load_persisted_decision_index(document["decision_index"])
+
+
+# ── the one designated non-semantic extension point (ADR-031 §8) ──────────
+
+
+def test_v2_extensions_is_accepted_and_never_affects_resolution() -> None:
+    bare = _v2(_decision("A"))
+    annotated = _v2(_decision("A"))
+    annotated["decision_index"]["extensions"] = {
+        "com.example.tool": {"note": "display hint"}
+    }
+    # Accepted, and byte-for-byte the same resolution as without it.
+    assert _index(annotated) == _index(bare)
+    assert resolve_effective(_index(annotated)) == resolve_effective(_index(bare))
+
+
+def test_v2_extensions_must_be_an_object() -> None:
+    document = _v2(_decision("A"))
+    document["decision_index"]["extensions"] = []
+    with pytest.raises(DecisionIndexPersistenceError, match="extensions must be an object"):
+        load_persisted_decision_index(document["decision_index"])
+
+
 # ── 4-6. deterministic resolution ─────────────────────────────────────────
 
 
@@ -449,6 +496,22 @@ def test_applicability_requires_v2_memory() -> None:
     v1 = v1_document(_v2(_decision("A")))
     with pytest.raises(DecisionIndexMigrationRequired, match="v2"):
         set_decision_applicability(v1, decision_id="A", required_labels=WINDOWS_LABELS)
+
+
+def test_v1_diagnostic_points_to_the_explicit_to_v2_upgrade() -> None:
+    v1 = v1_document(_v2(_decision("A")))
+    with pytest.raises(DecisionIndexMigrationRequired) as excinfo:
+        set_decision_applicability(v1, decision_id="A", required_labels=WINDOWS_LABELS)
+    assert "mneme decision-index migrate --to-v2" in str(excinfo.value)
+
+
+def test_set_applicability_rejects_scalar_string_labels() -> None:
+    with pytest.raises(DecisionIndexPersistenceError, match="not a label set"):
+        set_decision_applicability(
+            _v2(_decision("A")),
+            decision_id="A",
+            required_labels="platform:windows",  # type: ignore[arg-type]
+        )
 
 
 # ── 13. DG1D governance change from the same resolver ─────────────────────
