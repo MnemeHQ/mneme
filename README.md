@@ -192,7 +192,7 @@ caller-asserted context labels, add an opt-in, repeatable
 `--applicability-preview <label>` to `mneme check`:
 
 ```bash
-mneme check --memory .mneme/project_memory.json --input prompt.txt\n  --query configuration --applicability-preview platform:windows
+mneme check --memory .mneme/project_memory.json --input prompt.txt --query configuration --applicability-preview platform:windows
 ```
 
 The preview prints only on **stderr**, independently of the normal check
