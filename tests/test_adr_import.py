@@ -970,7 +970,7 @@ def test_d1e1_explicitly_migrated_target_imports_deterministically(tmp_path):
     apply_import(compile_for_import(corpus), second)
 
     raw = _assert_snapshot_derived_from_canonical(first)
-    assert raw["decision_index"]["schema"] == "mneme.decision-index/v1"
+    assert raw["decision_index"]["schema"] == "mneme.decision-index/v2"
     assert [row["id"] for row in raw["decisions"]] == ["D-NATIVE", "ADR-540"]
     # Deterministic: identical inputs produce identical canonical bytes.
     assert first.read_bytes() == second.read_bytes()

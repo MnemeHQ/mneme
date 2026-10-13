@@ -1132,6 +1132,16 @@ def _format_migration_preview(plan: MemoryMigrationPlan) -> str:
             "  Already migrated: decision_index is authoritative and valid; "
             "nothing to do."
         )
+    if plan.state == "upgrade_to_v2":
+        return (
+            f"Decision Index migration: {plan.path}\n"
+            "  Canonical schema: mneme.decision-index/v1 -> "
+            "mneme.decision-index/v2\n"
+            "  Only the schema tag changes; no semantic features are declared, "
+            "so every decision stays globally eligible.\n"
+            "  Decisions, versions, rules, and the compatibility snapshot are "
+            "unchanged."
+        )
     native = len(plan.native_decision_ids)
     non_active = len(plan.non_active_decisions)
     items = len(plan.legacy_item_ids)
@@ -1173,7 +1183,7 @@ def _cmd_decision_index_migrate(args: argparse.Namespace) -> int:
     if not memory.is_file():
         return _error_exit(f"memory file {memory} does not exist")
     try:
-        plan = plan_memory_migration(memory)
+        plan = plan_memory_migration(memory, to_v2=args.to_v2)
     except DecisionIndexMigrationRefused as exc:
         return _error_exit(f"migration refused: {exc}")
     except DecisionIndexPersistenceError as exc:
@@ -2160,6 +2170,15 @@ def _build_parser() -> argparse.ArgumentParser:
         help=(
             "Write exactly the previewed migration (refused if the file "
             "changed after it was read)"
+        ),
+    )
+    p_di_migrate.add_argument(
+        "--to-v2",
+        action="store_true",
+        help=(
+            "Explicitly upgrade an already-canonical mneme.decision-index/v1 "
+            "file to v2 (DG1B1, ADR-031 §8). No-op once the section is v2. "
+            "Valid v1 files are never upgraded implicitly."
         ),
     )
     p_di_migrate.set_defaults(func=_cmd_decision_index_migrate)

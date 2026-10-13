@@ -12,7 +12,7 @@ from mneme.decision_index_persistence import (
     apply_canonical_supersession,
     append_canonical_version_occurrence,
     append_initial_canonical_decision,
-    DECISION_INDEX_SCHEMA,
+    DECISION_INDEX_SCHEMA_V2,
     DecisionIndexPersistenceError,
     content_digest_of,
     load_persisted_decision_index,
@@ -484,7 +484,7 @@ def test_migration_builds_schema_and_preserves_runtime_projection(tmp_path: Path
 
     assert migrate_memory_file(path) is True
     raw = json.loads(path.read_text(encoding="utf-8"))
-    assert raw["decision_index"]["schema"] == DECISION_INDEX_SCHEMA
+    assert raw["decision_index"]["schema"] == DECISION_INDEX_SCHEMA_V2
 
     after = MemoryStore(path).load().decisions
     assert without_version_identity(after) == before

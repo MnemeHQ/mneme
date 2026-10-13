@@ -64,7 +64,7 @@ from mneme.decision_index_persistence import load_decision_index_from_memory_fil
 from mneme.path_selectors import validate_relative_path
 from mneme.schemas import VALID_RULE_TYPES
 
-GOVERNANCE_SEMANTICS_VERSION = "mneme.governance-semantics/dg1c-1"
+GOVERNANCE_SEMANTICS_VERSION = "mneme.governance-semantics/dg1b1-1"
 
 STATUS_EFFECTIVE = "effective"
 STATUS_INEFFECTIVE = "ineffective"
@@ -73,6 +73,9 @@ STATUS_AMBIGUOUS = "ambiguous"
 CAUSE_LIFECYCLE_SUPERSEDED = "lifecycle_superseded"
 CAUSE_LIFECYCLE_DEPRECATED = "lifecycle_deprecated"
 CAUSE_LIFECYCLE_INACTIVE = "lifecycle_inactive"
+# DG1B1 (ADR-031 §3): a lifecycle-active decision whose declared required
+# context labels are not all present in GovernanceContext.labels.
+CAUSE_NOT_APPLICABLE = "not_applicable"
 
 FINDING_SUPERSESSION_LIFECYCLE_CONFLICT = "supersession_lifecycle_conflict"
 FINDING_DANGLING_SUPERSEDES = "dangling_supersedes"
@@ -138,6 +141,8 @@ class DecisionResolution:
         cause:               ``None`` when effective; otherwise a cause code.
         rule_ids:            Rule lineage of the active version, in derived order.
         superseded_by:       Authoritative decisions declaring ``supersedes`` on it.
+        applicability_required_labels: Declared decision applicability (DG1B1);
+                             empty means globally eligible.
         trace:               Ordered explanation of the resolution.
     """
 
@@ -148,6 +153,7 @@ class DecisionResolution:
     cause: str | None
     rule_ids: tuple[str, ...] = ()
     superseded_by: tuple[str, ...] = ()
+    applicability_required_labels: tuple[str, ...] = ()
     trace: tuple[TraceStep, ...] = ()
 
     @property
@@ -259,16 +265,39 @@ def resolve_effective(
             ),
             TraceStep("precedence", "not_recorded"),
         ]
+        required_labels = record.applicability_required_labels
         if record.lifecycle_status == _EFFECTIVE_LIFECYCLE:
-            status, cause = STATUS_EFFECTIVE, None
             if superseded_by:
                 findings.append(GovernanceFinding(
                     code=FINDING_SUPERSESSION_LIFECYCLE_CONFLICT,
                     decision_id=record.decision_id,
                     detail=superseded_by,
                 ))
+            # Decision applicability is evaluated only after lifecycle
+            # eligibility (DG1B1, charter §2.1). Deterministic set containment:
+            # absent applicability is global; otherwise every required label
+            # must be present in GovernanceContext.labels.
+            if not required_labels:
+                status, cause = STATUS_EFFECTIVE, None
+                trace.append(TraceStep("applicability", "not_declared"))
+            else:
+                context_labels = set(context.labels)
+                missing = tuple(
+                    label for label in required_labels if label not in context_labels
+                )
+                if missing:
+                    status, cause = STATUS_INEFFECTIVE, CAUSE_NOT_APPLICABLE
+                    trace.append(
+                        TraceStep("applicability", "not_applicable", missing)
+                    )
+                else:
+                    status, cause = STATUS_EFFECTIVE, None
+                    trace.append(
+                        TraceStep("applicability", "matched", required_labels)
+                    )
         else:
             status, cause = STATUS_INEFFECTIVE, _LIFECYCLE_CAUSES[record.lifecycle_status]
+            trace.append(TraceStep("applicability", "not_evaluated"))
         trace.append(TraceStep("result", status, (cause,) if cause else ()))
         decisions.append(DecisionResolution(
             decision_id=record.decision_id,
@@ -278,6 +307,7 @@ def resolve_effective(
             cause=cause,
             rule_ids=record.derived_rule_ids,
             superseded_by=superseded_by,
+            applicability_required_labels=required_labels,
             trace=tuple(trace),
         ))
 
@@ -387,6 +417,8 @@ CHANGE_CAUSE = "resolution_cause_changed"
 CHANGE_VERSION = "version_changed"
 CHANGE_RULE_SET = "rule_set_changed"
 CHANGE_SUPERSEDED_BY = "superseded_by_changed"
+# DG1B1: a decision's declared applicability (governed scope) changed.
+CHANGE_GOVERNED_SCOPE = "governed_scope_changed"
 
 # Canonical order of change kinds within one DecisionChange.
 CHANGE_KINDS = (
@@ -399,6 +431,7 @@ CHANGE_KINDS = (
     CHANGE_VERSION,
     CHANGE_RULE_SET,
     CHANGE_SUPERSEDED_BY,
+    CHANGE_GOVERNED_SCOPE,
 )
 
 
@@ -469,6 +502,11 @@ def _change_kinds(
             kinds.add(CHANGE_RULE_SET)
         if before.superseded_by != after.superseded_by:
             kinds.add(CHANGE_SUPERSEDED_BY)
+        if (
+            before.applicability_required_labels
+            != after.applicability_required_labels
+        ):
+            kinds.add(CHANGE_GOVERNED_SCOPE)
     return tuple(kind for kind in CHANGE_KINDS if kind in kinds)
 
 
@@ -576,11 +614,13 @@ __all__ = [
     "CAUSE_LIFECYCLE_DEPRECATED",
     "CAUSE_LIFECYCLE_INACTIVE",
     "CAUSE_LIFECYCLE_SUPERSEDED",
+    "CAUSE_NOT_APPLICABLE",
     "CHANGE_BECAME_EFFECTIVE",
     "CHANGE_BECAME_INEFFECTIVE",
     "CHANGE_CAUSE",
     "CHANGE_DECISION_ADDED",
     "CHANGE_DECISION_REMOVED",
+    "CHANGE_GOVERNED_SCOPE",
     "CHANGE_KINDS",
     "CHANGE_LIFECYCLE",
     "CHANGE_RULE_SET",

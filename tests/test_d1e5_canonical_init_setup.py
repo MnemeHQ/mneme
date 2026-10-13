@@ -15,7 +15,7 @@ import pytest
 
 from mneme.cli import main
 from mneme.decision_index_persistence import (
-    DECISION_INDEX_SCHEMA,
+    DECISION_INDEX_SCHEMA_V2,
     apply_memory_migration,
     empty_decision_index_section,
     load_decision_index_from_memory_file,
@@ -29,7 +29,8 @@ from tests.canonical_fixtures import canonical_document, migrate_memory_fixture
 BASE_TS = "2026-01-01T00:00:00Z"
 
 EMPTY_SECTION = {
-    "schema": "mneme.decision-index/v1",
+    "schema": "mneme.decision-index/v2",
+    "semantic_features": [],
     "decisions": [],
     "versions": [],
     "rules": [],
@@ -90,7 +91,7 @@ def test_empty_section_matches_migration_of_empty_memory():
              "decisions": []}
     assert empty_decision_index_section() == canonical_document(empty)["decision_index"]
     assert empty_decision_index_section() == EMPTY_SECTION
-    assert empty_decision_index_section()["schema"] == DECISION_INDEX_SCHEMA
+    assert empty_decision_index_section()["schema"] == DECISION_INDEX_SCHEMA_V2
 
 
 def test_empty_section_is_fresh_on_every_call():

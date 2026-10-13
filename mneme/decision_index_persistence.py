@@ -41,6 +41,71 @@ from mneme.rule_identity import (
 from mneme.schemas import Decision, MemoryItem, Rule
 
 DECISION_INDEX_SCHEMA = "mneme.decision-index/v1"
+# DG1B1 (ADR-031 §8) introduces the first persisted DG1 semantic under a new
+# schema. v1 stays readable and permissive for backwards compatibility; v2
+# fails closed on unknown governance-bearing keys and declares the governance
+# semantics it uses through ``semantic_features``.
+DECISION_INDEX_SCHEMA_V2 = "mneme.decision-index/v2"
+SUPPORTED_DECISION_INDEX_SCHEMAS = frozenset({
+    DECISION_INDEX_SCHEMA,
+    DECISION_INDEX_SCHEMA_V2,
+})
+
+# ADR-031 §8: the v2 root names every governance semantic the document uses
+# beyond the v2 baseline. Decision applicability is the first such feature.
+APPLICABILITY_FEATURE = "decision_applicability"
+SUPPORTED_SEMANTIC_FEATURES = frozenset({APPLICABILITY_FEATURE})
+
+# Closed semantic key sets (ADR-031 §8). Present only for v2; v1 keeps its
+# permissive unknown-key behavior so every 0.10.0 decision is unchanged.
+_V2_ROOT_KEYS = frozenset({
+    "schema",
+    "semantic_features",
+    "extensions",
+    "decisions",
+    "versions",
+    "rules",
+})
+_V2_DECISION_KEYS = frozenset({
+    "decision_id",
+    "decision_class",
+    "lifecycle_status",
+    "active_version_id",
+    "test_evidence",
+    "relationships",
+    "updated_at",
+    "applicability",
+})
+_V2_VERSION_KEYS = frozenset({
+    "version_id",
+    "decision_id",
+    "revision",
+    "content_digest",
+    "statement",
+    "rationale",
+    "context_scope",
+    "constraints",
+    "anti_patterns",
+    "source_evidence",
+    "occurrence_source_identity",
+    "supersedes_version_id",
+    "created_at",
+})
+_V2_RULE_KEYS = frozenset({
+    "rule_id",
+    "decision_id",
+    "decision_version_id",
+    "decision_version",
+    "sequence",
+    "rule_type",
+    "rule_payload",
+    "applicability",
+    "binding_authority",
+})
+_V2_RELATIONSHIP_KEYS = frozenset({"type", "target_decision_id"})
+_V2_TEST_EVIDENCE_KEYS = frozenset({"selector", "sha"})
+_V2_APPLICABILITY_KEYS = frozenset({"required_labels"})
+
 NO_PREDECESSOR = "-"
 _RESERVED_PROPOSAL_PREFIX = "dprop-"
 
@@ -141,6 +206,19 @@ def _require_list(value: object, label: str) -> list[Any]:
     if not isinstance(value, list):
         raise DecisionIndexPersistenceError(f"{label} must be a list")
     return value
+
+
+def _reject_unknown_keys(
+    value: dict[str, Any],
+    allowed: frozenset[str],
+    label: str,
+) -> None:
+    """Fail closed on unknown keys in a governance-bearing v2 position."""
+    unknown = sorted(set(value) - allowed)
+    if unknown:
+        raise DecisionIndexPersistenceError(
+            f"{label} contains unsupported fields {unknown}"
+        )
 
 
 def _require_str(value: object, label: str, *, non_empty: bool = False) -> str:
@@ -714,7 +792,8 @@ def _migrate_memory_document(document: dict[str, Any]) -> dict[str, Any]:
         bindings.extend(decision_rules)
 
     section = {
-        "schema": DECISION_INDEX_SCHEMA,
+        "schema": DECISION_INDEX_SCHEMA_V2,
+        "semantic_features": [],
         "decisions": logical,
         "versions": versions,
         "rules": bindings,
@@ -756,6 +835,127 @@ def require_canonical_document(document: object) -> dict[str, Any]:
     return copy.deepcopy(document)
 
 
+def _upgrade_v1_section_to_v2(section: object) -> tuple[dict[str, Any], bool]:
+    """Return the schema-v2 form of a validated v1 section (ADR-031 §8).
+
+    Lossless or refuse: v2 fails closed on unknown governance-bearing keys and
+    requires a ``semantic_features`` declaration, so a v1 section that carries
+    unknown keys — or an ``applicability`` value v1 silently ignored — is
+    refused rather than silently reinterpreted. The compatibility default
+    holds: no decision gains applicability, so every decision stays globally
+    eligible.
+    """
+    root = _require_dict(section, "decision_index")
+    schema = root.get("schema")
+    if schema == DECISION_INDEX_SCHEMA_V2:
+        load_persisted_decision_index(root)
+        return copy.deepcopy(root), False
+    if schema != DECISION_INDEX_SCHEMA:
+        raise DecisionIndexPersistenceError(
+            "decision_index schema must be one of "
+            f"{sorted(SUPPORTED_DECISION_INDEX_SCHEMAS)!r}"
+        )
+    load_persisted_decision_index(root)
+    upgraded = copy.deepcopy(root)
+    upgraded["schema"] = DECISION_INDEX_SCHEMA_V2
+    upgraded["semantic_features"] = []
+    try:
+        load_persisted_decision_index(upgraded)
+    except DecisionIndexPersistenceError as exc:
+        raise DecisionIndexMigrationRefused(
+            "cannot upgrade the decision_index to schema v2 without losing "
+            f"state: {exc}"
+        ) from exc
+    return upgraded, True
+
+
+def upgrade_decision_index_v1_to_v2(
+    document: dict[str, Any],
+) -> tuple[dict[str, Any], bool]:
+    """Explicitly upgrade canonical project memory from v1 to v2 (ADR-031 §8).
+
+    Only the ``decision_index`` section changes (schema tag plus the empty
+    feature declaration); decisions, versions, rules, and the compatibility
+    snapshot stay byte-identical, and no decision gains applicability.
+    Section-less memory is refused: the v1-to-v2 upgrade is not the
+    section-less transition.
+    """
+    migrated = require_canonical_document(document)
+    upgraded_section, changed = _upgrade_v1_section_to_v2(
+        migrated["decision_index"]
+    )
+    if not changed:
+        return migrated, False
+    migrated["decision_index"] = upgraded_section
+    return migrated, True
+
+
+def set_decision_applicability(
+    document: dict[str, Any],
+    *,
+    decision_id: str,
+    required_labels: list[str] | tuple[str, ...],
+) -> tuple[dict[str, Any], bool]:
+    """Set one decision's canonical applicability (DG1B1, ADR-031 §4).
+
+    A persistence primitive only: the caller owns authority and must persist
+    the returned document atomically (ADR-030 writer discipline). Decision
+    applicability is governance authority, not retrieval metadata; it may be
+    created or changed only through this explicit Mneme-owned operation, never
+    copied from ``context_scope``, MCP scope hints, O1A classification, or
+    source text.
+
+    Requires schema v2: v1 memory is refused with
+    ``DecisionIndexMigrationRequired`` so applicability is never written under
+    a schema whose readers would silently ignore it.
+    """
+    migrated = require_canonical_document(document)
+    section = _require_dict(migrated["decision_index"], "decision_index")
+    if section.get("schema") != DECISION_INDEX_SCHEMA_V2:
+        raise DecisionIndexMigrationRequired(
+            "decision applicability requires mneme.decision-index/v2; upgrade "
+            "project memory with `mneme decision-index migrate` first"
+        )
+    normalized: list[str] = []
+    for label in required_labels:
+        if not isinstance(label, str) or not label:
+            raise DecisionIndexPersistenceError(
+                "applicability required_labels must be non-empty strings"
+            )
+        normalized.append(label)
+    normalized = sorted(set(normalized))
+    if not normalized:
+        raise DecisionIndexPersistenceError(
+            "applicability required_labels must be non-empty; omit "
+            "applicability for global eligibility"
+        )
+    section = copy.deepcopy(section)
+    logical = next(
+        (
+            row
+            for row in _require_list(
+                section.get("decisions"), "decision_index.decisions"
+            )
+            if isinstance(row, dict) and row.get("decision_id") == decision_id
+        ),
+        None,
+    )
+    if logical is None:
+        raise DecisionIndexPersistenceError(
+            f"decision {decision_id!r} does not exist canonically"
+        )
+    applicability = {"required_labels": normalized}
+    changed = logical.get("applicability") != applicability
+    logical["applicability"] = applicability
+    features = list(section.get("semantic_features", []))
+    if APPLICABILITY_FEATURE not in features:
+        features.append(APPLICABILITY_FEATURE)
+    section["semantic_features"] = sorted(set(features))
+    migrated["decision_index"] = section
+    load_persisted_decision_index(section)
+    return migrated, changed
+
+
 def empty_decision_index_section() -> dict[str, Any]:
     """Return a fresh, valid, empty canonical ``decision_index`` section.
 
@@ -767,7 +967,8 @@ def empty_decision_index_section() -> dict[str, Any]:
     returns a new object.
     """
     section: dict[str, Any] = {
-        "schema": DECISION_INDEX_SCHEMA,
+        "schema": DECISION_INDEX_SCHEMA_V2,
+        "semantic_features": [],
         "decisions": [],
         "versions": [],
         "rules": [],
@@ -1419,11 +1620,14 @@ def _parse_source_evidence(
 def _parse_test_evidence(
     raw: object,
     decision_id: str,
+    strict: bool = False,
 ) -> tuple[CanonicalTestEvidence, ...]:
     rows = _require_list(raw, f"decision {decision_id!r} test_evidence")
     out: list[CanonicalTestEvidence] = []
     for index, row in enumerate(rows):
         item = _require_dict(row, f"test_evidence[{index}]")
+        if strict:
+            _reject_unknown_keys(item, _V2_TEST_EVIDENCE_KEYS, f"test_evidence[{index}]")
         out.append(CanonicalTestEvidence(
             selector=_require_str(
                 item.get("selector", ""),
@@ -1437,14 +1641,64 @@ def _parse_test_evidence(
     return tuple(out)
 
 
+def _parse_applicability(
+    raw: object,
+    decision_id: str,
+    semantic_features: list[str],
+    strict: bool,
+) -> tuple[str, ...]:
+    """Parse optional v2 decision applicability (ADR-031 §4, DG1B1).
+
+    v1 is permissive: an unknown ``applicability`` key is ignored, exactly as
+    ADR-031 §8's Context table warns, so a v1 decision is globally eligible.
+    v2 fails closed: closed keys, a non-empty label set, and the required
+    ``decision_applicability`` feature declaration.
+    """
+    if raw is None or not strict:
+        return ()
+    applicability = _require_dict(
+        raw, f"decision {decision_id!r} applicability"
+    )
+    _reject_unknown_keys(
+        applicability,
+        _V2_APPLICABILITY_KEYS,
+        f"decision {decision_id!r} applicability",
+    )
+    labels = _require_list(
+        applicability.get("required_labels"),
+        f"decision {decision_id!r} applicability.required_labels",
+    )
+    for label in labels:
+        if not isinstance(label, str) or not label:
+            raise DecisionIndexPersistenceError(
+                f"decision {decision_id!r} applicability.required_labels must "
+                "contain only non-empty strings"
+            )
+    if not labels:
+        raise DecisionIndexPersistenceError(
+            f"decision {decision_id!r} applicability.required_labels must be "
+            "non-empty; omit applicability for global eligibility"
+        )
+    if APPLICABILITY_FEATURE not in semantic_features:
+        raise DecisionIndexPersistenceError(
+            f"decision {decision_id!r} uses decision applicability but the "
+            f"document does not declare the {APPLICABILITY_FEATURE!r} "
+            "semantic feature"
+        )
+    return tuple(sorted(set(labels)))
+
+
 def _parse_relationships(
     raw: object,
     decision_id: str,
+    strict: bool = False,
 ) -> tuple[tuple[str, str], ...]:
     rows = _require_list(raw, f"decision {decision_id!r} relationships")
     out: list[tuple[str, str]] = []
     for index, row in enumerate(rows):
         item = _require_dict(row, f"relationships[{index}]")
+        if strict:
+            _reject_unknown_keys(item, _V2_RELATIONSHIP_KEYS, f"relationships[{index}]")
         rel_type = _require_str(
             item.get("type"),
             f"relationships[{index}].type",
@@ -1464,15 +1718,58 @@ def _parse_relationships(
     return tuple(out)
 
 
+def _validate_semantic_features(root: dict[str, Any]) -> list[str]:
+    """Validate the v2 ``semantic_features`` declaration (ADR-031 §8)."""
+    if "semantic_features" not in root:
+        raise DecisionIndexPersistenceError(
+            "decision_index.semantic_features is required for schema v2"
+        )
+    features = _require_list(
+        root.get("semantic_features"), "decision_index.semantic_features"
+    )
+    for feature in features:
+        if not isinstance(feature, str) or not feature:
+            raise DecisionIndexPersistenceError(
+                "decision_index.semantic_features must contain only non-empty "
+                "strings"
+            )
+    if len(set(features)) != len(features):
+        raise DecisionIndexPersistenceError(
+            "decision_index.semantic_features contains duplicates"
+        )
+    unsupported = sorted(set(features) - SUPPORTED_SEMANTIC_FEATURES)
+    if unsupported:
+        raise DecisionIndexPersistenceError(
+            f"decision_index declares unsupported semantic_features {unsupported}"
+        )
+    return list(features)
+
+
 def load_persisted_decision_index(
     section: object,
 ) -> CanonicalArchitectureIndex:
-    """Validate a D1B section and build the existing canonical read model."""
+    """Validate a canonical section and build the canonical read model.
+
+    Both ``mneme.decision-index/v1`` and ``mneme.decision-index/v2`` are
+    accepted. v1 keeps its permissive unknown-key behavior; v2 fails closed on
+    any unknown governance-bearing key and requires a supported
+    ``semantic_features`` declaration (ADR-031 §8).
+    """
     root = _require_dict(section, "decision_index")
-    if root.get("schema") != DECISION_INDEX_SCHEMA:
+    schema = root.get("schema")
+    if schema not in SUPPORTED_DECISION_INDEX_SCHEMAS:
         raise DecisionIndexPersistenceError(
-            f"decision_index schema must be {DECISION_INDEX_SCHEMA!r}"
+            "decision_index schema must be one of "
+            f"{sorted(SUPPORTED_DECISION_INDEX_SCHEMAS)!r}"
         )
+    is_v2 = schema == DECISION_INDEX_SCHEMA_V2
+    if is_v2:
+        _reject_unknown_keys(root, _V2_ROOT_KEYS, "decision_index root")
+        semantic_features = _validate_semantic_features(root)
+        if "extensions" in root:
+            _require_dict(root["extensions"], "decision_index.extensions")
+    else:
+        semantic_features = []
 
     logical_rows = _require_list(root.get("decisions"), "decision_index.decisions")
     version_rows = _require_list(root.get("versions"), "decision_index.versions")
@@ -1481,6 +1778,8 @@ def load_persisted_decision_index(
     versions_by_id: dict[str, dict[str, Any]] = {}
     for index, row in enumerate(version_rows):
         raw = _require_dict(row, f"decision_index.versions[{index}]")
+        if is_v2:
+            _reject_unknown_keys(raw, _V2_VERSION_KEYS, f"versions[{index}]")
         version_id = _require_str(
             raw.get("version_id"),
             f"versions[{index}].version_id",
@@ -1577,6 +1876,8 @@ def load_persisted_decision_index(
     binding_keys: set[tuple[str, str, str]] = set()
     for index, row in enumerate(rule_rows):
         raw = _require_dict(row, f"decision_index.rules[{index}]")
+        if is_v2:
+            _reject_unknown_keys(raw, _V2_RULE_KEYS, f"rules[{index}]")
         rule_id = _require_str(
             raw.get("rule_id"),
             f"rules[{index}].rule_id",
@@ -1726,6 +2027,8 @@ def load_persisted_decision_index(
 
     for index, row in enumerate(logical_rows):
         raw = _require_dict(row, f"decision_index.decisions[{index}]")
+        if is_v2:
+            _reject_unknown_keys(raw, _V2_DECISION_KEYS, f"decisions[{index}]")
         decision_id = _require_str(
             raw.get("decision_id"),
             f"decisions[{index}].decision_id",
@@ -1796,6 +2099,12 @@ def load_persisted_decision_index(
             for rule in decision_rules
         ]
         all_rules.extend(decision_rules)
+        required_labels = _parse_applicability(
+            raw.get("applicability"),
+            decision_id,
+            semantic_features,
+            is_v2,
+        )
         records.append(CanonicalDecisionRecord(
             decision_id=decision_id,
             version=version["_validated_revision"],
@@ -1826,12 +2135,15 @@ def load_persisted_decision_index(
             test_evidence=_parse_test_evidence(
                 raw.get("test_evidence", []),
                 decision_id,
+                is_v2,
             ),
             relationships=_parse_relationships(
                 raw.get("relationships", []),
                 decision_id,
+                is_v2,
             ),
             derived_rule_ids=tuple(rule.rule_id for rule in decision_rules),
+            applicability_required_labels=required_labels,
         ))
 
     for version_id, version in versions_by_id.items():
@@ -2081,8 +2393,12 @@ def lossless_migration_problems(document: dict[str, Any]) -> list[str]:
 class MemoryMigrationPlan:
     """One migration derived from a single read of project memory.
 
-    ``state`` is ``"migrate"`` (section-less and migratable) or
-    ``"already_canonical"`` (a valid section exists; applying is a no-op).
+    ``state`` is one of:
+
+    - ``"migrate"`` — section-less and migratable;
+    - ``"upgrade_to_v2"`` — canonical schema v1, upgraded to v2 (DG1B1);
+    - ``"already_canonical"`` — a valid section exists; applying is a no-op.
+
     The preview fields describe the user-visible ADR-030 consequences of
     ``document``, the exact result that ``--apply`` writes.
     """
@@ -2095,10 +2411,22 @@ class MemoryMigrationPlan:
     non_active_decisions: tuple[tuple[str, str], ...] = ()
     legacy_item_ids: tuple[str, ...] = ()
     migrated_rule_bindings: int = 0
+    source_schema: str = ""
+    target_schema: str = DECISION_INDEX_SCHEMA_V2
 
 
-def plan_memory_migration(path: str | Path) -> MemoryMigrationPlan:
+def plan_memory_migration(
+    path: str | Path,
+    *,
+    to_v2: bool = False,
+) -> MemoryMigrationPlan:
     """Read project memory once and build its migration (ADR-030 §12).
+
+    Section-less memory migrates straight to the current schema
+    (``mneme.decision-index/v2``). An already-canonical file is a no-op by
+    default; ``to_v2=True`` is the explicit DG1B1 v1-to-v2 upgrade (ADR-031
+    §8) and is ignored once the section is already v2. A valid v1 section is
+    never upgraded implicitly.
 
     Raises ``DecisionIndexMigrationRefused`` before any write when legacy
     state cannot be represented losslessly or the input is unreadable, and
@@ -2117,13 +2445,35 @@ def plan_memory_migration(path: str | Path) -> MemoryMigrationPlan:
         raise DecisionIndexMigrationRefused("project memory must be an object")
 
     if "decision_index" in document:
-        index = load_persisted_decision_index(document["decision_index"])
+        section = document["decision_index"]
+        index = load_persisted_decision_index(section)
         verify_compatibility_snapshot(document, index, memory_path)
+        if (
+            to_v2
+            and isinstance(section, dict)
+            and section.get("schema") == DECISION_INDEX_SCHEMA
+        ):
+            upgraded_section, _ = _upgrade_v1_section_to_v2(section)
+            upgraded = copy.deepcopy(document)
+            upgraded["decision_index"] = upgraded_section
+            load_persisted_decision_index(upgraded_section)
+            return MemoryMigrationPlan(
+                path=memory_path,
+                state="upgrade_to_v2",
+                source_bytes=source_bytes,
+                document=upgraded,
+                source_schema=DECISION_INDEX_SCHEMA,
+                target_schema=DECISION_INDEX_SCHEMA_V2,
+            )
         return MemoryMigrationPlan(
             path=memory_path,
             state="already_canonical",
             source_bytes=source_bytes,
             document=document,
+            source_schema=(
+                section.get("schema") if isinstance(section, dict) else ""
+            ),
+            target_schema=DECISION_INDEX_SCHEMA_V2,
         )
 
     problems = lossless_migration_problems(document)
@@ -2196,8 +2546,12 @@ def migrate_memory_file(path: str | Path) -> bool:
 
 
 __all__ = [
+    "APPLICABILITY_FEATURE",
     "DECISION_INDEX_SCHEMA",
+    "DECISION_INDEX_SCHEMA_V2",
     "NO_PREDECESSOR",
+    "SUPPORTED_DECISION_INDEX_SCHEMAS",
+    "SUPPORTED_SEMANTIC_FEATURES",
     "DecisionIndexContinuityError",
     "DecisionIndexMigrationRefused",
     "DecisionIndexMigrationRequired",
@@ -2223,6 +2577,8 @@ __all__ = [
     "rule_id_for",
     "rule_id_of",
     "runtime_decision_from_memory_record",
+    "set_decision_applicability",
+    "upgrade_decision_index_v1_to_v2",
     "verify_compatibility_snapshot",
     "version_id_of",
 ]

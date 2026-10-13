@@ -64,9 +64,9 @@ See accepted [ADR-023](../adr/ADR-023-canonical-decision-index-and-runtime-proje
 
 ### P1 — DG1: Decision governance semantics (post-D1)
 
-DG1 is now partly implemented. DG1A, DG1C, DG1E, DG1D and DG1P have landed: the governance contract is accepted, the effective-decision resolver matches v1 projection, canonical evidence identity is threaded through enforcement traces, snapshot-to-snapshot governance change is available, and ADR `date` no longer carries precedence authority.
+DG1 is now partly implemented. DG1A, DG1C, DG1E, DG1D, DG1P and DG1B1 have landed: the governance contract is accepted, the effective-decision resolver matches v1 projection, canonical evidence identity is threaded through enforcement traces, snapshot-to-snapshot governance change is available, ADR `date` no longer carries precedence authority, and canonical decision applicability now resolves deterministically under `mneme.decision-index/v2`.
 
-The governing architecture remains accepted [ADR-031](../adr/ADR-031-decision-governance-semantics.md). The remaining sequence is intentionally gated: decision applicability (DG1B1) and waivers (DG1B2) start only with concrete repository evidence and a Layer 1 charter amendment, each introducing persisted semantics under `mneme.decision-index/v2`; DG1F then converges runtime consumers onto the shared governance result, followed by DG1G adversarial closeout. Until those gates are met, no new applicability or waiver semantics should be added.
+The governing architecture remains accepted [ADR-031](../adr/ADR-031-decision-governance-semantics.md). Decision applicability (DG1B1) landed under its [merged charter](../plans/2026-10-08-dg1b1-decision-applicability-charter.md) and [Layer 1 freeze amendment](../architecture/layer1-freeze-e73ff7d.md): optional exact project-local `required_labels` persist under `mneme.decision-index/v2`, an explicit v1 → v2 migration preserves global eligibility, and the shared resolver gains a `not_applicable` cause. Waivers (DG1B2) remain evidence- and target-binding-gated. DG1F then converges runtime consumers onto the shared governance result, followed by DG1G adversarial closeout. Until DG1F lands, no runtime consumer changes which decisions it enforces.
 
 DG1 defines a public, versioned semantic contract for:
 
