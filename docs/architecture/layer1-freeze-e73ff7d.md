@@ -397,6 +397,103 @@ The exact public authoring UX is not authorized here (merged charter §4).
 
 ---
 
+## Amendment — authorize DG1F-C1a report-only applicability preview (2026-10-13)
+
+> This is an authorization for a **future, bounded implementation**, not a
+> statement that CLI behavior has changed. It does not authorize applicability
+> exclusions, trusted-context persistence, or broader DG1F convergence.
+
+**Change:** Permit an **opt-in, report-only** applicability preview in
+`mneme check` (DG1F-C1a) while keeping the enforced decision set, verdicts,
+stdout, machine-readable JSON, exit codes and hook behavior unchanged.
+
+**Sections referenced:** the Freeze Anchor **Status** clause ("No behavioral
+change to retrieval or enforcement without an explicit charter amendment"),
+the frozen retrieval / enforcement / benchmark invariants, and the Amendment
+Procedure below.
+
+**Rationale (Amendment Procedure §3(b)).** A distinct behavioral charter was
+**already merged** before this amendment:
+[DG1F-C1 applicability-only CLI charter](../plans/2026-10-13-dg1f-applicability-only-charter.md),
+PR [#493](https://github.com/MnemeHQ/mneme/pull/493), squash
+`96ec857e`. ADR-031 §11 (as amended by merged PR #492) permits a bounded
+applicability-only DG1F increment before evidence-gated DG1B2. DG1B1 (#487)
+supplied the canonical resolver and accepted real-repository offline case, but
+not runtime consumption. This amendment authorizes **C1a only** under that
+previously merged charter; no behavior change is retroactively justified.
+
+**Governing authority:** accepted
+[ADR-031](../adr/ADR-031-decision-governance-semantics.md) §4/§6–§7/§11,
+[ADR-017](../adr/ADR-017-enforcement-scope-vs-retrieval-scope.md),
+[ADR-020](../adr/ADR-020-explicit-path-applicability-for-typed-rules.md),
+[ADR-029](../adr/ADR-029-enforcement-evidence-binding-semantics.md),
+[ADR-030](../adr/ADR-030-canonical-decision-persistence-version-identity-and-stable-rule-lineage.md),
+and the merged DG1F-C1 charter §2/§5a.
+
+### Permitted C1a change — only `mneme check`
+
+- Add an explicitly **opt-in**, repeatable
+  `--applicability-preview <label>` CLI argument. Its labels are **caller
+  assertions for display only**, never enforcement context or evidence of
+  authority. They are not authenticated.
+- For the preview only, use the *existing* canonical
+  `resolve_effective(index, GovernanceContext(labels=...))`, over the same
+  validated canonical memory snapshot as the ordinary CLI check, to show
+  decision effectiveness and `not_applicable` causes. The preview does not
+  become a second resolver or precedence path; absent applicability remains
+  globally eligible.
+- Render preview information **only on stderr**, explicitly marked
+  **NON-AUTHORITATIVE**. If preview computation is unavailable, emit
+  `PREVIEW UNAVAILABLE` on stderr. A preview failure never changes the
+  ordinary enforcement verdict or exit code; ordinary enforcement failures
+  retain their current handling.
+- **Non-interference is mandatory.** For the same check input, compare the
+  no-preview and preview invocations: the enforced decision corpus, rule
+  evaluations, violations, retrieval ranking, **stdout**, complete
+  `mneme.check/v1` JSON payload, exit codes and hook behavior must be
+  identical. No decision is dropped because of preview labels. Keep
+  ADR-017 enforcement tiers, ADR-020 rule-path selection, and canonical
+  version/rule/evidence identities unchanged.
+- No opt-in preserves all existing output and behavior, including for v1 and
+  section-less memory. Preview unavailability on those inputs does not rewrite
+  or implicitly migrate them.
+
+### Validation gate for the later implementation PR
+
+Before C1a implementation can merge, demonstrate the **five independent
+acceptance requirements in the merged DG1F charter §5a**, including:
+(1) exact default parity across v1/v2/section-less memory; (2) unchanged
+enforcement, stdout, JSON, exit codes and hook outcomes with and without
+preview; (3) stderr-only NON-AUTHORITATIVE and PREVIEW UNAVAILABLE output,
+including error isolation; (4) spoofed labels cannot disable protection; and
+(5) strict/warn, human/JSON, existing regressions and Layer 1 benchmark
+compatibility. Reuse the committed, pinned GSA-TTS ADR-0028 test fixture;
+add tests **outside** the frozen canonical benchmark fixture/methodology.
+Pass full existing gate and applicable CI before any implementation merge.
+
+### Explicitly not authorized
+
+1. **DG1F-C1b enforcement exclusion.** No label source (argv, env, OS, source
+   text, hook/MCP inputs, Data Engine or local file assertions) can exclude an
+   otherwise active decision. The merged charter requires a separately
+   authorized persisted canonical-context semantic and independently
+   verifiable approved revision, substitution protection, controlled context
+   selection, an additional behavioral charter/freeze amendment, and
+   blocking-seam validation before C1b.
+2. Any change to `DecisionRetriever` scoring, top-K / tie order, enforcement
+   rule matching, `ConflictDetector`, ADR-020 applicability, typed rules,
+   protection, Audit, readiness, hooks, MCP, or benchmark fixtures/methodology.
+3. New persisted fields or schema, new authority writers, implicit v1→v2
+   migration, new waiver representation/semantics, Data Engine changes,
+   extra CLI/MCP capabilities beyond the bounded non-authoritative preview,
+   or claims of end-to-end fail-closed enforcement.
+
+The existing DG1B1 freeze amendment remains unchanged; its DG1F prohibition
+still governs **all runtime consumers other than this specifically authorized
+C1a preview**.
+
+---
+
 ## Amendment Procedure
 
 This document is frozen at `e73ff7d`. To amend it:
