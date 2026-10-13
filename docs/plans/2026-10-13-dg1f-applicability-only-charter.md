@@ -1,6 +1,6 @@
 # DG1F-C1 — Applicability-only CLI enforcement charter (proposed)
 
-**Status:** PROPOSED — architecture and threat-model review required. **Not merged; no runtime implementation authorized.**  
+**Status:** PROPOSED — architecture and threat-model review required. The trusted-context contract (§3) is now specified; the remaining review items are the C1a interface/output wording and the deployment boundary for any future operator-owned context source. **Not merged; no runtime implementation authorized.** The first increment is report-only (§2 C1a); actual exclusion (C1b) is deferred until its trusted context source is separately authorized.  
 **Anchor:** `MnemeHQ/mneme` `main` at `c1816aa5541e86452fb1998356635fb818918373` (ADR-031 sequencing amendment #492).  
 **Governs:** only the proposed *first* DG1F increment. Not DG1B2, the full DG1F convergence programme, or DG1G.
 
@@ -12,30 +12,104 @@
 - In current `mneme/cli.py:_cmd_check`, `MemoryStore.load` projects every lifecycle-active decision, `DecisionRetriever.retrieve(query)` ranks the corpus, and `check_prompt` enforces rules. No label context is passed. `mneme/decision_projection.py` projects lifecycle-active records regardless of DG1B1 applicability. `mneme/enforcer.py` combines retrieval-gated *multi-term legacy* checks with corpus-wide typed literal rules (ADR-017); ADR-020 selects rule paths separately.
 - Current CLI `--json` uses `mneme.check/v1` and the path-applicability `evaluation_complete` field. Hook and CI consumers may depend on that contract. This slice must not silently repurpose or change those semantics.
 
-## 2. Candidate first consumer and permitted change (for review)
+## 2. Candidate first increment — report-only (C1a); exclusion deferred (C1b)
 
-**First and only consumer proposed:** `mneme check` invoked by a **trusted human-operated or separately controlled CI invocation**, not an untrusted coding-agent-controlled command. For opt-in invocations with a *reviewed complete label context*, use the existing canonical `resolve_effective` answer to select the decision set that reaches `check_prompt`. Keep the rest of the runtime untouched.
+The first consumer remains `mneme check`. It is split so that the part with no
+trust problem can proceed while exclusion stays blocked on §3:
 
-The proposed opt-in interface for architecture review is repeatable `--governance-label <opaque-label>` plus `--governance-context-complete`. **These flags do not exist today and are not approved merely by opening this draft.** Their naming and public-interface compatibility must be explicitly accepted when this charter is reviewed. Without explicit opt-in, preserve current `mneme check` behavior byte-for-byte where feasible.
+- **C1a — report-only applicability preview (proposed as the first increment).**
+  An opt-in `mneme check` mode computes `resolve_effective(index,
+  GovernanceContext(labels))` against a context supplied *for display only* and
+  reports, per decision, whether it is effective or would be `not_applicable` —
+  **without changing which decisions reach `check_prompt`**. Because it never
+  removes a decision from enforcement, a caller-supplied (even agent-supplied)
+  context cannot disable protection here. Output is additive and opt-in;
+  `mneme.check/v1`, the enforced set, violations, exit codes, and hook behavior
+  are unchanged by default.
+- **C1b — enforcement exclusion (deferred).** Changing the enforced set using
+  applicability requires a *trusted* context source. Per §3 that source must be
+  the reviewed canonical authority, which this charter does not authorize. C1b
+  therefore requires a separate authorization for the canonical context
+  declaration (and then the `[layer1-freeze]` amendment) before any decision is
+  excluded.
 
-Do not add a second applicability resolver, re-run import precedence, change canonical data, or infer labels from `context_scope`, retrieval scores, path names, machine OS, LLM output, agent arguments, or Data Engine observations. In-memory execution must use the **same validated canonical snapshot** from which the compatibility projection was made; any identity mismatch or unreconciled ambiguity is an error, not a silently filtered result.
+The proposed opt-in interface for C1a is a single repeatable
+`--applicability-preview <label>` (naming subject to review). It is
+**non-authoritative** and MUST NOT be named or documented as a security control.
+`--governance-label` as an *enforcement* input and `--governance-context-complete`
+are **withdrawn** from this charter: a completeness assertion on the command line
+is not provenance (§3).
 
-**Enforcement scope invariant:** derive an enforcement-only ordered full corpus of *effective* decisions using authoritative canonical IDs before `check_prompt` computes its top-N tier. Merely filtering the already selected top-N is forbidden: it could incorrectly remove a top-ranked nonapplicable decision without exposing the next relevant effective decision. Preserve `DecisionRetriever` scoring, tie-order, and K; preserve corpus-wide typed-rule checks for all effective decisions and unchanged ADR-020 path selection. Retrieval/context injection is not redefined as governance.
+Do not add a second applicability resolver, re-run import precedence, change
+canonical data, or infer labels from `context_scope`, retrieval scores, path
+names, machine OS, LLM output, agent arguments, or Data Engine observations. Any
+report must use the **same validated canonical snapshot** the compatibility
+projection was made from; identity mismatch or unreconciled ambiguity is an
+error, never a silently filtered result.
 
-## 3. Context provenance and safe-failure contract (review gate)
+**Enforcement scope invariant (applies to C1b when it lands):** derive an
+enforcement-only ordered full corpus of *effective* decisions using
+authoritative canonical IDs before `check_prompt` computes its top-N tier.
+Merely filtering the already selected top-N is forbidden: it could remove a
+top-ranked nonapplicable decision without exposing the next relevant effective
+decision. Preserve `DecisionRetriever` scoring, tie-order, and K; preserve
+corpus-wide typed-rule checks for all effective decisions and unchanged ADR-020
+path selection. Retrieval/context injection is not redefined as governance.
 
-ADR-031 §6 labels are exact, project-local, opaque strings. **They are not credentials, authenticated roles, or a trusted source by themselves.** This proposed CLI input records that the operator or CI wrapper *asserted* a complete context; the CLI cannot cryptographically verify the origin, completeness, or honesty of command-line arguments.
+## 3. Trusted-context contract (resolved)
 
-**Trust boundary:** exclusion of lifecycle-active protective decisions on label mismatch is admissible only when invocation arguments are controlled by an operator-owned workflow **outside the agent's authority to edit or substitute**. The operational conditions demonstrating this boundary must be supplied and reviewed **before this charter can merge**; e.g. a pinned CI workflow and an explicit assessment of whether the checked PR/agent can modify the arguments or the wrapper. A plain `--governance-context-complete` switch does **not** establish trust. A command run by an untrusted agent is not a protected enforcement seam in this first slice.
+**Problem.** `resolve_effective` returns `not_applicable` when a decision's
+`required_labels` are not all present in the supplied
+`GovernanceContext.labels`; a consumer that acts on that result stops enforcing
+the decision. Any label set the governed agent can supply — command-line flag,
+environment variable, prompt or file content, hook/MCP input, or a wrapper it
+controls — is an **assertion**, not provenance. Treating it as authoritative
+lets the agent silently disable a protective decision.
 
-**Fail-safe behavior proposed:**
-- **No opt-in / no reviewed trusted context:** enforce the existing lifecycle-active corpus; do not interpret empty labels as evidence of nonapplicability. Never silently drop protective decisions. Explicitly label any diagnostic as *context unavailable*, not `not_applicable`.
-- **Opt-in but incomplete, malformed, or untrusted context:** refuse to apply context-based exclusions. A deterministic, explicit operational-error result is preferred to a silent PASS. The charter review must pin handling for both human-readable and JSON CLI modes, including exit codes, **without misusing** existing `mneme.check/v1` fields; no new public result schema may be introduced without its own versioned compatibility decision.
-- **Complete context from a reviewed trusted invocation:** resolve decision effectiveness under exactly the asserted `GovernanceContext.labels`; if a required label is absent, `not_applicable` can exclude that decision. Preserve global decisions and lifecycle exclusions. Record the context/provenance and resolved identities in a reproducible **test trace**, without inventing persistent enforcement evidence.
-- **Conflicting labels:** since labels are opaque, the CLI must not infer mutually exclusive taxonomies (e.g. from a `platform:` prefix). The trusted caller must establish completeness and consistency externally; if it cannot, context is unavailable and exclusion is refused.
-- **Governance integrity findings:** `dangling_supersedes` / `supersession_lifecycle_conflict` are not automatically policy-violations or precedence winners. The reviewer must approve an explicit policy for whether such findings block, make evaluation incomplete, or retain conservative coverage **before implementation**.
+**Resolution — one authoritative source, fail closed.**
 
-**Review blocker (not presumed solved):** operator-owned, verifiable context provenance is **not implemented or evidenced** by current Mneme Core. Until that operational contract and CLI JSON/error disposition are reviewed, this is a candidate behavioral charter, *not* a merge-ready authorization. An untrusted agent controlling both its `--governance-label` values and its completeness assertion could otherwise bypass a protective decision.
+1. **Only the reviewed canonical authority is authoritative.** Evaluation-
+   context labels are declared in `.mneme/project_memory.json` under the
+   Mneme-owned, review-gated writer discipline (ADR-030): a durable,
+   diff-visible reviewed change. An untrusted agent cannot alter the context
+   without a reviewable change, so the context carries the same trust level as
+   the decisions it gates.
+2. **Command-line and environment arguments are never authoritative.** `mneme
+   check` must not read enforcement-gating labels from argv, env, hook/MCP
+   input, prompt/content, retrieval, paths, or OS. A caller may at most select
+   *which* reviewed context applies; it may never supply the label values for
+   exclusion.
+3. **Fail-closed, three-valued.**
+   - **No context declaration:** enforce every lifecycle-active decision —
+     byte-for-byte today's behavior. Empty labels are never read as evidence of
+     nonapplicability.
+   - **Valid declaration:** exclusions are allowed only from the declared
+     labels; only a positively established, trusted absence excludes.
+   - **Malformed, ambiguous, conflicting, or unreadable declaration:**
+     operational error; enforce all; surface explicitly; never a silent PASS.
+4. **No inference.** Labels are opaque project-local strings taken verbatim. No
+   taxonomy, no `platform:`-prefix parsing, no mutual-exclusion inference, and
+   no derivation from OS, paths, retrieval, agent input, or Data Engine
+   observations.
+5. **Completeness is reviewed, not asserted.** The declaration is the complete
+   context for the project; a runtime completeness flag is not provenance and is
+   rejected.
+6. **Auditability.** Any result or trace records the context source identity
+   (for example a digest of the declaration), the labels used, and per-decision
+   applicability; every exclusion is explicit and reproducible.
+
+**Governance integrity findings.** `dangling_supersedes` /
+`supersession_lifecycle_conflict` are not policy violations or precedence
+winners. Until a reviewer approves an explicit policy, such findings make
+context evaluation **incomplete**, which fails closed (no exclusion) and is
+reported — never a silent success.
+
+**Resolved consequence.** Establishing the canonical context declaration is
+itself a persisted-semantic change (a v2 declaration/feature) needing its own
+authorization. Until then, exclusion is **not authorized**; only the report-only
+increment in §2 (C1a) may proceed. The earlier "trusted invocation arguments"
+proposal is withdrawn: trust is a property of the reviewed authority, not of the
+invocation, and no in-process flag or wrapper assertion can establish it.
 
 ## 4. Explicit non-goals
 
@@ -58,14 +132,29 @@ Before any implementation merge, a separately authorized offline acceptance suit
 9. **Findings and malformed data:** ambiguous, corrupt, unsupported-feature, missing-identity, or inconsistent canonical state never produces an invented effective winner or silent success.
 10. **Compatibility:** CLI strict/warn, human and JSON modes, hook-exposed `mneme.check/v1`, and existing regression/Layer 1 benchmark suites have pinned expected-versus-actual outcomes. No benchmark fixture or methodology changes.
 
-A reviewer must distinguish unit tests of `resolve_effective` (already done in DG1B1) from **end-to-end runtime exclusion tests** (not yet executed).
+11. **Report-only non-interference (C1a):** with and without the report-only preview, the enforced decision set, rule evaluation, violations, exit codes, human output, and `mneme.check/v1` are identical; the preview is additive/opt-in and never gates enforcement.
+
+Items 2–4 (context-based matching, nonmatch, and refusal) apply to **C1b** and may only be implemented once the trusted context source in §3 is authorized. A reviewer must distinguish unit tests of `resolve_effective` (already done in DG1B1) from end-to-end runtime exclusion tests (not yet executed).
 
 ## 6. Approval and change sequence
 
-1. **Review this draft's first-consumer selection, actual trusted context source, operational fallback/error mapping, and output compatibility.** Revise before approval. Approval of this draft is not implied by #492.
-2. Only after resolving §3's review blockers, **merge this behavioral charter** as a separate PR.
-3. Then open and merge a matching `[layer1-freeze]` amendment under the frozen document's Amendment Procedure; reference the merged charter and its bounded first surface.
-4. Only then implement the authorized runtime slice in its own PR with the §5 offline, adversarial, compatibility and full-suite gates.
-5. DG1B2 remains independently evidence-gated; remaining DG1F surfaces and DG1G remain unimplemented.
+1. **Review this revision.** §3 now specifies the trusted-context contract and
+   §2 splits report-only (C1a) from exclusion (C1b). Remaining review items:
+   the C1a interface/flag naming, its exact additive output mapping, and the
+   deployment boundary for any future operator-owned context source. Approval
+   of this draft is not implied by #492.
+2. Merge this behavioral charter as a separate PR.
+3. Open and merge the matching `[layer1-freeze]` amendment under the frozen
+   document's Amendment Procedure, referencing the merged charter and its
+   bounded first surface.
+4. Implement and accept **C1a (report-only)** in its own PR with the §5 gates.
+   Because C1a never removes a decision from enforcement, it cannot disable
+   protection; this is the safe first increment.
+5. **C1b (exclusion) is not authorized by this charter alone.** It requires a
+   separately authorized canonical context declaration (§3, item 1) — a
+   persisted-semantic change — plus a further charter/freeze update, before any
+   decision is excluded.
+6. DG1B2 remains independently evidence-gated; remaining DG1F surfaces and DG1G
+   remain unimplemented.
 
-**Merge status of this draft: HOLD until §3 provenance and status/output decisions are independently reviewed.**
+**Merge status of this draft: HOLD until independently reviewed.**
