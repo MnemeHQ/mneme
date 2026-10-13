@@ -243,3 +243,20 @@ def test_governance_findings_make_preview_unavailable_not_enforcement(
     assert preview[:2] == base[:2]
     assert "PREVIEW UNAVAILABLE" in preview[2]
     assert "NON-AUTHORITATIVE" in preview[2]
+
+
+def test_unwritable_preview_channel_cannot_change_verdict(
+    tmp_path: Path, capsys, monkeypatch
+) -> None:
+    """A broken stderr rendering path must never affect checked stdout/exit."""
+    args, _ = _setup(tmp_path, "v2")
+    args += ["--json", "--mode", "strict"]
+    base = _run(args, capsys)
+
+    def broken_stderr(*_args, **_kwargs):
+        raise OSError("preview output stream unavailable")
+
+    monkeypatch.setattr(cli, "_print_applicability_preview", broken_stderr)
+    preview = _run(args + ["--applicability-preview", "platform:windows"], capsys)
+    assert preview[:2] == base[:2]
+    assert "PREVIEW UNAVAILABLE" in preview[2]
