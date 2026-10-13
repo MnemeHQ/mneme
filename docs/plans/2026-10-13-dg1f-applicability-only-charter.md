@@ -1,6 +1,6 @@
 # DG1F-C1 — Applicability-only CLI enforcement charter (proposed)
 
-**Status:** PROPOSED — architecture and threat-model review required. The trusted-context contract (§3) is now specified; the remaining review items are the C1a interface/output wording and the deployment boundary for any future operator-owned context source. **Not merged; no runtime implementation authorized.** The first increment is report-only (§2 C1a); actual exclusion (C1b) is deferred until its trusted context source is separately authorized.  
+**Status:** PROPOSED — architecture and threat-model review required. §3 specifies the trusted-context contract, its two fail-closed conditions, and the C1b trust prerequisites; §2 and §5 specify the C1a report-only interface and separate its acceptance from the deferred C1b exclusion tests. Remaining review items are the C1a output wording and the C1b trust mechanism (explicitly not designed here). **Not merged; no runtime implementation authorized.** The first increment is report-only (§2 C1a); exclusion (C1b) is deferred.  
 **Anchor:** `MnemeHQ/mneme` `main` at `c1816aa5541e86452fb1998356635fb818918373` (ADR-031 sequencing amendment #492).  
 **Governs:** only the proposed *first* DG1F increment. Not DG1B2, the full DG1F convergence programme, or DG1G.
 
@@ -19,13 +19,13 @@ trust problem can proceed while exclusion stays blocked on §3:
 
 - **C1a — report-only applicability preview (proposed as the first increment).**
   An opt-in `mneme check` mode computes `resolve_effective(index,
-  GovernanceContext(labels))` against a context supplied *for display only* and
+  GovernanceContext(labels))` against a caller-supplied preview context and
   reports, per decision, whether it is effective or would be `not_applicable` —
   **without changing which decisions reach `check_prompt`**. Because it never
-  removes a decision from enforcement, a caller-supplied (even agent-supplied)
-  context cannot disable protection here. Output is additive and opt-in;
-  `mneme.check/v1`, the enforced set, violations, exit codes, and hook behavior
-  are unchanged by default.
+  removes a decision from enforcement, even agent-supplied preview labels cannot
+  disable protection. The enforced set, exit codes, stdout, the
+  `mneme.check/v1` JSON payload, and hook behavior are unchanged whether or not
+  the preview is requested.
 - **C1b — enforcement exclusion (deferred).** Changing the enforced set using
   applicability requires a *trusted* context source. Per §3 that source must be
   the reviewed canonical authority, which this charter does not authorize. C1b
@@ -33,12 +33,17 @@ trust problem can proceed while exclusion stays blocked on §3:
   declaration (and then the `[layer1-freeze]` amendment) before any decision is
   excluded.
 
-The proposed opt-in interface for C1a is a single repeatable
-`--applicability-preview <label>` (naming subject to review). It is
-**non-authoritative** and MUST NOT be named or documented as a security control.
-`--governance-label` as an *enforcement* input and `--governance-context-complete`
-are **withdrawn** from this charter: a completeness assertion on the command line
-is not provenance (§3).
+**C1a preview interface and output.** A single **opt-in, repeatable**
+`--applicability-preview <label>` flag (naming subject to review) supplies the
+preview context. It is **NON-AUTHORITATIVE** and MUST NOT be named or documented
+as a security control. Preview output is informational and written to
+**stderr**, clearly marked NON-AUTHORITATIVE; stdout and the `mneme.check/v1`
+JSON payload are byte-unchanged. A preview evaluation failure prints
+`PREVIEW UNAVAILABLE` on stderr and **never** changes the underlying enforcement
+verdict or exit code — unless the ordinary enforcement path independently fails,
+in which case the normal enforcement result stands. `--governance-label` as an
+*enforcement* input and `--governance-context-complete` remain **withdrawn**: a
+completeness assertion on the command line is not provenance (§3).
 
 Do not add a second applicability resolver, re-run import precedence, change
 canonical data, or infer labels from `context_scope`, retrieval scores, path
@@ -68,25 +73,36 @@ lets the agent silently disable a protective decision.
 
 **Resolution — one authoritative source, fail closed.**
 
-1. **Only the reviewed canonical authority is authoritative.** Evaluation-
-   context labels are declared in `.mneme/project_memory.json` under the
-   Mneme-owned, review-gated writer discipline (ADR-030): a durable,
-   diff-visible reviewed change. An untrusted agent cannot alter the context
-   without a reviewable change, so the context carries the same trust level as
-   the decisions it gates.
+1. **The reviewed canonical authority is the intended source — but storage
+   location is not trust.** Evaluation-context labels would be declared under
+   the canonical decision authority, changed only through the Mneme-owned,
+   review-gated writer discipline (ADR-030). Merely being stored under
+   `.mneme/` does **not** make a value trusted: an unreviewed local edit, or a
+   substituted file, would otherwise silently change the context. Any future
+   exclusion (C1b) therefore additionally requires an **independently verifiable
+   approved revision**, protection against **unreviewed substitution**, and
+   **controlled context selection** — all deferred to C1b (see "C1b trust
+   prerequisites" below) and not designed here.
 2. **Command-line and environment arguments are never authoritative.** `mneme
    check` must not read enforcement-gating labels from argv, env, hook/MCP
    input, prompt/content, retrieval, paths, or OS. A caller may at most select
    *which* reviewed context applies; it may never supply the label values for
    exclusion.
-3. **Fail-closed, three-valued.**
+3. **Fail-closed, with distinct handling for each failure condition.**
    - **No context declaration:** enforce every lifecycle-active decision —
      byte-for-byte today's behavior. Empty labels are never read as evidence of
      nonapplicability.
-   - **Valid declaration:** exclusions are allowed only from the declared
-     labels; only a positively established, trusted absence excludes.
-   - **Malformed, ambiguous, conflicting, or unreadable declaration:**
-     operational error; enforce all; surface explicitly; never a silent PASS.
+   - **Valid context declaration over valid canonical memory:** exclusions are
+     allowed only from the declared labels; only a positively established,
+     trusted absence excludes.
+   - **Invalid, ambiguous, or conflicting context declaration, but otherwise
+     valid canonical memory:** refuse context-based exclusions and preserve
+     existing protective coverage (do not exclude); surface the condition;
+     never a silent PASS. Decisions are retained, not dropped.
+   - **Invalid or unreadable canonical memory:** the authoritative decision
+     corpus could not be loaded, so there is **no trustworthy enforcement
+     verdict at all**. Report an operational failure. Do **not** claim that all
+     decisions were enforced — coverage is *unknown*, not *complete*.
 4. **No inference.** Labels are opaque project-local strings taken verbatim. No
    taxonomy, no `platform:`-prefix parsing, no mutual-exclusion inference, and
    no derivation from OS, paths, retrieval, agent input, or Data Engine
@@ -104,12 +120,32 @@ winners. Until a reviewer approves an explicit policy, such findings make
 context evaluation **incomplete**, which fails closed (no exclusion) and is
 reported — never a silent success.
 
+**Blocking-seam caveat.** Some consumers currently **fail open** when they do
+not receive a valid JSON verdict — for example a hook or CI step that treats a
+missing or malformed verdict as non-blocking. A CLI invocation that reports an
+operational failure is therefore **not** end-to-end fail-closed by itself. This
+charter must not claim end-to-end fail-closed enforcement until the blocking
+seam is validated: the consumer's treatment of a missing or invalid verdict must
+be shown to block rather than pass. Where that seam concerns enforcement inputs
+it remains subject to the `[layer1-freeze]` amendment; the validation is
+required evidence (§5).
+
 **Resolved consequence.** Establishing the canonical context declaration is
 itself a persisted-semantic change (a v2 declaration/feature) needing its own
 authorization. Until then, exclusion is **not authorized**; only the report-only
 increment in §2 (C1a) may proceed. The earlier "trusted invocation arguments"
 proposal is withdrawn: trust is a property of the reviewed authority, not of the
 invocation, and no in-process flag or wrapper assertion can establish it.
+
+**C1b trust prerequisites (deferred; not designed here).** Turning the reviewed
+authority into a trusted enforcement input is itself unresolved and out of scope
+for this charter. Before any exclusion (C1b) is authorized it must be
+established, and separately reviewed, that a run (a) evaluated an
+**independently verifiable approved revision** of the canonical memory it
+actually used, (b) is protected against **unreviewed substitution** between
+review and execution, and (c) performs **controlled context selection** so no
+caller can choose an arbitrary context. This charter neither specifies nor
+implements that mechanism.
 
 ## 4. Explicit non-goals
 
@@ -119,41 +155,92 @@ This does **not** promise agent-proof enforcement, tool-agnostic identity, or or
 
 ## 5. Required acceptance and adversarial evidence
 
-Before any implementation merge, a separately authorized offline acceptance suite must demonstrate:
+Acceptance is split with the increments. **C1a is report-only and does not
+validate trusted enforcement context or actual exclusion**; the exclusion tests
+are deferred with C1b.
 
-1. **Default parity:** no opt-in means the exact existing lifecycle-active decision set and rule/violation/exit behavior (v1, v2 without applicability, and section-less legacy memory).
-2. **Explicit matching context:** on the pinned GSA-TTS Windows fixture, trusted `platform:windows` keeps the Windows-only decision and evaluates its authored typed rule.
-3. **Explicit nonmatch:** trusted complete `platform:linux` excludes only the Windows-only decision; independent global decisions are still enforced.
-4. **Missing/incomplete/untrusted context:** no silent PASS through dropped governance, including agent-controlled spoofed labels; negative test cases demonstrate the refusal path. Document the real trust boundary and its limits.
-5. **Lifecycle ordering:** superseded, deprecated, and inactive decisions never regain authority via labels.
-6. **Rank invariance:** high-ranked excluded decisions do not consume retrieval-gated enforcement slots; literal rules of effective decisions are never lost because of top-K, while guidance retrieval remains unchanged.
-7. **Path independence:** decision labels gate decision authority first; ADR-020 applies separately to individual typed rules. Path UNKNOWN remains fail-safe under the pre-existing selector contract.
-8. **Canonical/evidence identity:** effective decision IDs, `decision_version_id`, canonical `rule_id`, and current-run evaluation evidence are stable and replayable; no source-proposal or research candidate is promoted.
-9. **Findings and malformed data:** ambiguous, corrupt, unsupported-feature, missing-identity, or inconsistent canonical state never produces an invented effective winner or silent success.
-10. **Compatibility:** CLI strict/warn, human and JSON modes, hook-exposed `mneme.check/v1`, and existing regression/Layer 1 benchmark suites have pinned expected-versus-actual outcomes. No benchmark fixture or methodology changes.
+### 5a. C1a — report-only acceptance (required before any C1a merge)
 
-11. **Report-only non-interference (C1a):** with and without the report-only preview, the enforced decision set, rule evaluation, violations, exit codes, human output, and `mneme.check/v1` are identical; the preview is additive/opt-in and never gates enforcement.
+A separately authorized offline suite must demonstrate:
 
-Items 2–4 (context-based matching, nonmatch, and refusal) apply to **C1b** and may only be implemented once the trusted context source in §3 is authorized. A reviewer must distinguish unit tests of `resolve_effective` (already done in DG1B1) from end-to-end runtime exclusion tests (not yet executed).
+1. **Default parity:** with no preview flag, the exact existing lifecycle-active
+   decision set and rule/violation/exit behavior (v1, v2 without applicability,
+   and section-less legacy memory).
+2. **Report-only non-interference:** with and without the preview, the enforced
+   decision set, rule evaluation, violations, **stdout**, the `mneme.check/v1`
+   JSON payload, exit codes, and hook behavior are identical; the preview is
+   additive/opt-in and never gates enforcement.
+3. **Preview output contract:** preview is opt-in and stderr-only, clearly
+   marked NON-AUTHORITATIVE; a preview evaluation failure reports
+   `PREVIEW UNAVAILABLE` on stderr **without** changing the underlying
+   enforcement verdict or exit code, unless the ordinary enforcement path
+   independently fails.
+4. **Preview cannot disable protection:** agent-spoofed preview labels never
+   remove a decision from enforcement (true by construction; pinned by a test).
+5. **Compatibility:** CLI strict/warn, human and JSON modes, hook-exposed
+   `mneme.check/v1`, and existing regression/Layer 1 benchmark suites have
+   pinned expected-versus-actual outcomes. No benchmark fixture or methodology
+   changes.
+
+C1a explicitly does **not** establish a trusted enforcement context and does
+**not** test actual exclusion.
+
+### 5b. C1b — exclusion acceptance (deferred with C1b)
+
+Required only if and when C1b is separately authorized (canonical context
+declaration plus `[layer1-freeze]` amendment):
+
+6. **Explicit matching context:** on the pinned GSA-TTS Windows fixture, trusted
+   `platform:windows` keeps the Windows-only decision and evaluates its authored
+   typed rule.
+7. **Explicit nonmatch:** trusted complete `platform:linux` excludes only the
+   Windows-only decision; independent global decisions are still enforced.
+8. **Context failure conditions:** invalid/incomplete/untrusted context with
+   otherwise valid canonical memory → no exclusion, protective coverage
+   preserved; invalid or unreadable canonical memory → operational failure, and
+   never a claim that all decisions were enforced.
+9. **Lifecycle ordering:** superseded, deprecated, and inactive decisions never
+   regain authority via labels.
+10. **Rank invariance:** high-ranked excluded decisions do not consume
+    retrieval-gated enforcement slots; literal rules of effective decisions are
+    never lost because of top-K, while guidance retrieval remains unchanged.
+11. **Path independence:** decision labels gate decision authority first;
+    ADR-020 applies separately to individual typed rules. Path UNKNOWN remains
+    fail-safe under the pre-existing selector contract.
+12. **Canonical/evidence identity:** effective decision IDs,
+    `decision_version_id`, canonical `rule_id`, and current-run evaluation
+    evidence are stable and replayable; no source-proposal or research candidate
+    is promoted.
+13. **Findings and malformed data:** ambiguous, corrupt, unsupported-feature,
+    missing-identity, or inconsistent canonical state never produces an invented
+    effective winner or silent success.
+14. **Blocking seam:** the consumer's handling of a missing or invalid verdict
+    is shown to **block rather than fail open** before any end-to-end
+    fail-closed claim.
+
+A reviewer must distinguish unit tests of `resolve_effective` (already done in
+DG1B1) from end-to-end runtime exclusion tests (not yet executed).
 
 ## 6. Approval and change sequence
 
-1. **Review this revision.** §3 now specifies the trusted-context contract and
-   §2 splits report-only (C1a) from exclusion (C1b). Remaining review items:
-   the C1a interface/flag naming, its exact additive output mapping, and the
-   deployment boundary for any future operator-owned context source. Approval
-   of this draft is not implied by #492.
+1. **Review this revision.** §2 and §5a specify the C1a report-only interface
+   and its acceptance; §3 specifies the trusted-context contract, the two
+   fail-closed conditions, and the C1b trust prerequisites (deferred, not
+   designed here); §5b holds the exclusion tests for C1b. Remaining review
+   items: the C1a output wording and the C1b trust mechanism. Approval of this
+   draft is not implied by #492.
 2. Merge this behavioral charter as a separate PR.
 3. Open and merge the matching `[layer1-freeze]` amendment under the frozen
    document's Amendment Procedure, referencing the merged charter and its
    bounded first surface.
-4. Implement and accept **C1a (report-only)** in its own PR with the §5 gates.
+4. Implement and accept **C1a (report-only)** in its own PR with the §5a gates.
    Because C1a never removes a decision from enforcement, it cannot disable
    protection; this is the safe first increment.
-5. **C1b (exclusion) is not authorized by this charter alone.** It requires a
-   separately authorized canonical context declaration (§3, item 1) — a
-   persisted-semantic change — plus a further charter/freeze update, before any
-   decision is excluded.
+5. **C1b (exclusion) is not authorized by this charter alone.** It requires the
+   C1b trust prerequisites (§3) — an independently verifiable approved
+   revision, protection against unreviewed substitution, and controlled context
+   selection — plus the persisted canonical context declaration and a further
+   charter/freeze update, before any decision is excluded.
 6. DG1B2 remains independently evidence-gated; remaining DG1F surfaces and DG1G
    remain unimplemented.
 
