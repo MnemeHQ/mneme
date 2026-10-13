@@ -6,12 +6,14 @@ DG1B1 acceptance fixture. These tests do not modify Layer 1 benchmarks.
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
 
 import mneme.cli as cli
 from mneme.cli import main
+from mneme.decision_governance import GovernanceFinding
 from mneme.decision_index_persistence import set_decision_applicability
 from tests.canonical_fixtures import canonical_document, v1_document
 
@@ -62,6 +64,8 @@ def _memory_document(kind: str) -> dict:
     canonical = canonical_document(original)
     if kind == "v1":
         return v1_document(canonical)
+    if kind == "v2_without_applicability":
+        return canonical
     assert kind == "v2"
     with_labels, changed = set_decision_applicability(
         canonical, decision_id=DECISION_ID,
@@ -91,14 +95,17 @@ def _run(args: list[str], capsys) -> tuple[int, str, str]:
     return code, output.out, output.err
 
 
-@pytest.mark.parametrize("kind", ["sectionless", "v1", "v2"])
+@pytest.mark.parametrize(
+    "kind", ["sectionless", "v1", "v2_without_applicability", "v2"]
+)
 @pytest.mark.parametrize("mode", ["strict", "warn"])
 @pytest.mark.parametrize("machine", [False, True], ids=["human", "json"])
 def test_default_parity_and_preview_noninterference(
     tmp_path: Path, capsys, kind: str, mode: str, machine: bool
 ) -> None:
     """§5a(1,2,5): same enforcement, stdout, JSON, mode and exit code."""
-    args, _ = _setup(tmp_path, kind)
+    args, memory = _setup(tmp_path, kind)
+    original_bytes = memory.read_bytes()
     args += ["--mode", mode]
     if machine:
         args.append("--json")
@@ -107,6 +114,7 @@ def test_default_parity_and_preview_noninterference(
         args + ["--applicability-preview", "platform:linux"], capsys
     )
     assert preview[:2] == base[:2]
+    assert memory.read_bytes() == original_bytes  # Neither mode writes authority.
     assert base[2] == ""
     assert base[0] == (2 if mode == "strict" else 0)
     assert "NON-AUTHORITATIVE" in preview[2]
@@ -117,9 +125,10 @@ def test_default_parity_and_preview_noninterference(
         assert "PREVIEW UNAVAILABLE" in preview[2]
     else:
         assert "PREVIEW UNAVAILABLE" not in preview[2]
-        assert f"[{DECISION_ID}] effective" in preview[2] or (
-            kind == "v2" and f"[{DECISION_ID}] ineffective" in preview[2]
-        )
+        if kind == "v2":
+            assert f"[{DECISION_ID}] ineffective" in preview[2]
+        else:
+            assert f"[{DECISION_ID}] effective" in preview[2]
     if kind == "v2":
         assert "cause=not_applicable" in preview[2]
 
@@ -212,3 +221,25 @@ def test_uses_same_snapshot_as_enforcement_not_second_file_read(
     assert preview[:2] == base[:2]
     assert "cause=not_applicable" in preview[2]
     assert "PREVIEW UNAVAILABLE" not in preview[2]
+
+
+def test_governance_findings_make_preview_unavailable_not_enforcement(
+    tmp_path: Path, capsys, monkeypatch
+) -> None:
+    """Incomplete governance resolution must not invent a preview winner."""
+    args, _ = _setup(tmp_path, "v2")
+    args += ["--json"]
+    base = _run(args, capsys)
+    original_resolve = cli.resolve_effective
+
+    def resolution_with_finding(index, context):
+        value = original_resolve(index, context)
+        return replace(value, findings=(GovernanceFinding(
+            code="dangling_supersedes", decision_id="dangling-id",
+        ),))
+
+    monkeypatch.setattr(cli, "resolve_effective", resolution_with_finding)
+    preview = _run(args + ["--applicability-preview", "platform:windows"], capsys)
+    assert preview[:2] == base[:2]
+    assert "PREVIEW UNAVAILABLE" in preview[2]
+    assert "NON-AUTHORITATIVE" in preview[2]
