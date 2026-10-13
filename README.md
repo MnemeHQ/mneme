@@ -187,6 +187,22 @@ In strict mode, the prohibited YAML proposal returns a `FAIL` verdict and exit c
 
 The CLI is the common enforcement surface. Agent integrations translate their native events into the same Mneme decision and enforcement model.
 
+For a **non-authoritative** preview of which canonical decisions would apply to
+caller-asserted context labels, add an opt-in, repeatable
+`--applicability-preview <label>` to `mneme check`:
+
+```bash
+mneme check --memory .mneme/project_memory.json --input prompt.txt \\
+  --query configuration --applicability-preview platform:windows
+```
+
+The preview prints only on **stderr**, independently of the normal check
+result. It does **not** trust the supplied labels, exclude decisions, change
+enforcement, or change stdout, JSON `mneme.check/v1`, hook behavior, or exit
+codes. Section-less memory or a preview computation error reports
+`PREVIEW UNAVAILABLE` on stderr; it does not migrate memory or weaken
+enforcement. This preview is **not a security control**.
+
 ## Setup mode (no enforcement)
 
 `mneme setup` initializes Mneme in a repository without changing how the team works: it creates or detects project memory, detects supported agent environments, and reports protection readiness — all without enabling any blocking enforcement. Setup never turns warn/observe behavior into blocking behavior; activation of preventive enforcement is always a separate, explicit decision.
