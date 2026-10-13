@@ -10,8 +10,11 @@ introduces DG1 semantics.
 - An unknown relationship type, an unknown lifecycle value, and any schema
   other than v1 are rejected at load.
 
-If one of these changes, ADR-031 §8 (persisted DG1 data requires schema v2)
-must be re-reviewed.
+These pins describe the shipped v1 loader against v1 documents. Since DG1B1
+(ADR-031 §8) the current loader also accepts ``mneme.decision-index/v2`` and
+enforces closed semantic keys on it; the unknown-key-ignored behavior below is
+characterized on the v1 view, and an unknown future schema (``v3``) is still
+rejected. If the v1 pins change, ADR-031 §8 must be re-reviewed.
 """
 from __future__ import annotations
 
@@ -28,14 +31,18 @@ from mneme.decision_index_persistence import (
     DecisionIndexPersistenceError,
     load_decision_index_from_memory_file,
 )
-from tests.canonical_fixtures import canonical_document
+from tests.canonical_fixtures import canonical_document, v1_document
 
 FIXTURE = Path(__file__).parent / "fixtures" / "d1_parity" / "pre_d1_live_project_memory.json"
 
 
 @pytest.fixture()
 def base() -> dict[str, Any]:
-    document = canonical_document(json.loads(FIXTURE.read_text(encoding="utf-8")))
+    # Characterization target is the shipped v1 loader, so build the v1 view
+    # of the canonical document (DG1B1 made the default schema v2).
+    document = v1_document(
+        canonical_document(json.loads(FIXTURE.read_text(encoding="utf-8")))
+    )
     index = document["decision_index"]
     assert index["schema"] == DECISION_INDEX_SCHEMA == "mneme.decision-index/v1"
     assert index["decisions"] and index["versions"] and index["rules"]
@@ -124,7 +131,11 @@ _REJECTED: dict[str, tuple[Callable[[dict[str, Any]], None], str]] = {
         "invalid lifecycle_status 'waived'",
     ),
     "schema_version": (
-        lambda d: d["decision_index"].__setitem__("schema", "mneme.decision-index/v2"),
+        # v2 is the current schema and is accepted (DG1B1); an unknown future
+        # schema is still rejected.
+        lambda d: d["decision_index"].__setitem__(
+            "schema", "mneme.decision-index/v3"
+        ),
         "decision_index schema must be",
     ),
 }

@@ -40,6 +40,27 @@
   integrity findings), `evidence_identity_of`, and `resolve_change` (the
   governance delta between two supplied memory snapshots). Nothing in
   retrieval or enforcement consumes them yet.
+- **Decision applicability and `mneme.decision-index/v2` (DG1B1).** A
+  canonical decision may declare optional exact project-local
+  `required_labels` (governance applicability, never retrieval metadata and
+  never ADR-020 rule applicability). `resolve_effective` gains a deterministic
+  `not_applicable` cause, evaluated only after lifecycle eligibility;
+  `resolve_change` reports `governed_scope_changed`. No runtime consumer
+  changes which decisions it enforces yet (DG1F); waivers remain gated (DG1B2).
+  - **Migration:** `mneme decision-index migrate --to-v2` explicitly upgrades
+    canonical v1 memory (a no-op once v2, and never implicit); section-less
+    migration and newly created memory now produce v2 directly. The upgrade is
+    lossless or refuses, and migrating a v1 document grants no decision any
+    applicability, so every decision stays globally eligible.
+  - **Namespaced `extensions` (ADR-031 §8a).** The v2 `extensions` object now
+    enforces its key namespace: keys are dotted lowercase ASCII namespaces,
+    reverse-DNS with at least three segments for producers, with two-segment
+    keys reserved to the `mneme` root. Validation is syntactic only; it does
+    not authenticate ownership. The object stays optional and strictly
+    non-semantic.
+  - **Compatibility (ADR-031 §8).** Binaries at or below `0.10.x` cannot read
+    `mneme.decision-index/v2` memory: they refuse a v2 document at load instead
+    of misresolving it. Do not open v2 memory with an older binary.
 
 ## v0.10.0 — 2026-10-07
 
