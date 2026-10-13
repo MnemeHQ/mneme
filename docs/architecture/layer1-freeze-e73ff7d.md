@@ -314,6 +314,89 @@ Layer 2 is **not** a continuation of Layer 1's benchmark work. It is a separate 
 
 ---
 
+## Amendment — authorize DG1B1 decision applicability (2026-10-13)
+
+> This section records a freeze amendment made under the Amendment Procedure
+> below. It authorizes a future slice; it changes no current behavior.
+
+**Change:** authorize implementation of the **DG1B1 decision applicability**
+slice.
+
+**Sections referenced:** the Freeze Anchor **Status** clause ("No behavioral
+change to retrieval or enforcement without an explicit charter amendment") and
+the Amendment Procedure below.
+
+**Rationale (Amendment Procedure §3(b)).** A charter amendment has *already*
+been made elsewhere. The [DG1B1 decision applicability
+charter](../plans/2026-10-08-dg1b1-decision-applicability-charter.md) merged
+first (PR #473), supplying the evidence and scope that ADR-031 §7 requires
+before any context-dependent governance may be implemented. This amendment
+authorizes the slice that merged charter opens; it does not itself change
+behavior, and it is not used to retroactively justify a behavioral change.
+
+**Governing authority:** accepted [ADR-031 — Decision Governance
+Semantics](../adr/ADR-031-decision-governance-semantics.md) §4, §6–§8 and §11.
+
+### What this amendment authorizes
+
+DG1B1 is limited to canonical decision applicability, schema v2 migration,
+validation, shared resolver semantics, and tests:
+
+- the first persisted decision-applicability semantic — optional exact
+  project-local `required_labels`, resolved by deterministic set containment as
+  defined by the merged charter §2.1;
+- the `mneme.decision-index/v2` schema and its **explicit** v1 → v2 migration
+  (ADR-031 §8); no reader or writer migrates implicitly;
+- v2 validation: closed semantic key sets, declared `semantic_features`
+  (unsupported features rejected), one non-semantic `extensions` point, no
+  speculative fields, and 0.10.x/v1 reader refusal of a v2 document;
+- the shared resolver (`resolve_effective` / `resolve_change`) gaining the
+  `not_applicable` cause for a lifecycle-active decision whose declared
+  `required_labels` are absent from `GovernanceContext.labels`, while absent
+  applicability preserves v1 global eligibility; and
+- characterization, validation and mutation tests for the above.
+
+The exact public authoring UX is not authorized here (merged charter §4).
+
+### Explicitly preserved (unchanged by DG1B1)
+
+1. **Existing `DecisionRetriever` behavior.** Five-field scoring and weights
+   (`scope`=2.0, `constraints`=1.5, `anti_patterns`=1.5, `decision`=1.0,
+   `rationale`=0.5), tokenization, stopword filter, the `len >= 4` token floor,
+   K=3, and insertion-order tie-break are unchanged. Retrieval score never
+   becomes applicability authority.
+2. **Existing `ConflictDetector` behavior.** Structural conflict detection and
+   its violation semantics are unchanged.
+3. **Current runtime enforcement inputs.** Which decisions the CLI, enforcer,
+   `ConflictDetector`, protection, Audit, readiness, hooks and MCP surfaces
+   consume is unchanged. No runtime consumer reads decision applicability in
+   DG1B1.
+4. **ADR-020 rule applicability.** Typed-rule include/exclude path selectors
+   remain rule-level and repository-path-only; ADR-020 semantics stay
+   independent of decision applicability.
+5. **Canonical authority and evidence identity.** [ADR-030](../adr/ADR-030-canonical-decision-persistence-version-identity-and-stable-rule-lineage.md)
+   canonical persistence, version identity and stable rule lineage remain the
+   sole durable authority, and [ADR-029](../adr/ADR-029-enforcement-evidence-binding-semantics.md)
+   evidence binding with its fail-closed identity chain is unchanged. DG1B1
+   adds no authority path beyond the explicit, validate-before-mutate
+   Mneme-owned operation the merged charter permits.
+6. **Existing benchmark methodology.** The canonical seven fixtures, the
+   enforcement-quality suite, K=3, the Layer 1/2 metric formulas, aggregation
+   filters, and byte-identical output remain frozen and unchanged.
+
+### Not authorized by this amendment
+
+- **DG1F runtime consumer convergence.** No CLI, enforcer, `ConflictDetector`,
+  protection, Audit, readiness, hook or MCP surface may consume the new
+  resolver result under this amendment. That requires its own merged charter
+  where enforcement inputs change (ADR-031 §7).
+- **DG1B2 waivers.** Waiver semantics remain separately gated on evidence and
+  canonical target-binding (ADR-031 §12); v2 pre-creates no waiver field.
+- **Data Engine.** The Data Engine is a separate repository and is not modified
+  by this amendment or by DG1B1.
+
+---
+
 ## Amendment Procedure
 
 This document is frozen at `e73ff7d`. To amend it:
