@@ -510,7 +510,19 @@ def _cmd_check(args: argparse.Namespace) -> int:
     # resolution to DecisionRetriever, check_prompt, stdout or JSON.
     preview_labels = getattr(args, "applicability_preview", None)
     if preview_labels is not None:
-        _print_applicability_preview(store, preview_labels)
+        try:
+            _print_applicability_preview(store, preview_labels)
+        except Exception:
+            # Even a broken diagnostic output stream must not change the
+            # enforcement result: this channel is strictly best effort.
+            try:
+                print(
+                    "NON-AUTHORITATIVE applicability preview: PREVIEW UNAVAILABLE",
+                    file=sys.stderr,
+                    flush=True,
+                )
+            except Exception:
+                pass
 
     if getattr(args, "json", False):
         # Machine-readable mode: the payload must be the only thing on stdout,
