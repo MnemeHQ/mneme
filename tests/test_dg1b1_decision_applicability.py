@@ -297,7 +297,7 @@ def test_v2_rejects_scalar_string_required_labels() -> None:
         load_persisted_decision_index(document["decision_index"])
 
 
-# ── the one designated non-semantic extension point (ADR-031 §8) ──────────
+# ── the one designated non-semantic extension point (ADR-031 §8, §8a) ─────
 
 
 def test_v2_extensions_is_accepted_and_never_affects_resolution() -> None:
@@ -316,6 +316,61 @@ def test_v2_extensions_must_be_an_object() -> None:
     document["decision_index"]["extensions"] = []
     with pytest.raises(DecisionIndexPersistenceError, match="extensions must be an object"):
         load_persisted_decision_index(document["decision_index"])
+
+
+@pytest.mark.parametrize(
+    "key",
+    [
+        "mneme.tooling",          # reserved two-segment root
+        "mneme.a.b",              # reserved root, deeper
+        "com.example.audittool",  # reverse-DNS, three segments
+        "org.example.a.b",        # reverse-DNS, deeper
+        "io.some-tool.detail",    # internal hyphens allowed
+    ],
+)
+def test_v2_extensions_accepts_namespaced_keys(key: str) -> None:
+    document = _v2(_decision("A"))
+    document["decision_index"]["extensions"] = {key: {"note": "ok"}}
+    # Accepted (validated) and still non-semantic.
+    assert _effective_ids(_index(document)) == ("A",)
+
+
+@pytest.mark.parametrize(
+    "key",
+    [
+        "tool",                    # single segment
+        "mneme",                   # single segment
+        "com.example",             # two segments, not the mneme root
+        "example.com",             # two segments, not the mneme root
+        "Com.example.tool",        # uppercase
+        "com.Example.tool",        # uppercase segment
+        "com.ex_ample.tool",       # underscore
+        "com..example.tool",       # empty segment
+        "com.example.tool.",       # trailing dot
+        ".com.example.tool",       # leading dot
+        "-com.example.tool",       # leading hyphen
+        "com.example-.tool",       # trailing hyphen
+        "com.example.tool ",       # whitespace
+        "com.example.tool/x",      # path separator
+        "com.example.tool:1",      # colon
+        "caf\u00e9.example.tool",  # non-ASCII
+    ],
+)
+def test_v2_extensions_rejects_malformed_keys(key: str) -> None:
+    document = _v2(_decision("A"))
+    document["decision_index"]["extensions"] = {key: {}}
+    with pytest.raises(DecisionIndexPersistenceError, match="invalid key"):
+        load_persisted_decision_index(document["decision_index"])
+
+
+def test_v2_extensions_validation_is_only_syntactic() -> None:
+    # A syntactically valid reverse-DNS key is accepted without any ownership
+    # authentication: an unowned domain still validates (ADR-031 §8a).
+    document = _v2(_decision("A"))
+    document["decision_index"]["extensions"] = {
+        "com.example-unowned.arbitrary-tool": {"note": "no ownership check"}
+    }
+    assert _effective_ids(_index(document)) == ("A",)
 
 
 # ── 4-6. deterministic resolution ─────────────────────────────────────────

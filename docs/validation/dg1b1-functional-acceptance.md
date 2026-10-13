@@ -139,6 +139,8 @@ the v1 document and refuses the v2 document at load, satisfying ADR-031 §8's
 ## 10. Scope / constraints honored
 
 No change to `DecisionRetriever`, `ConflictDetector`, enforcement-consumer
-convergence, DG1B2 waivers, schema surface, extension namespacing,
-`.mneme/project_memory.json`, or frozen benchmark methodology. Only temporary,
-test-scoped canonical memory is written.
+convergence, DG1B2 waivers, or frozen benchmark methodology, and no
+`.mneme/project_memory.json` write; only temporary, test-scoped canonical memory
+is written. The v2 `extensions` key namespace contract (ADR-031 §8a, merged in
+#490) is now enforced syntactically by the v2 loader; the object remains
+optional and strictly non-semantic.

@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import copy
 import json
+import re
 from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Callable
@@ -105,6 +106,13 @@ _V2_RULE_KEYS = frozenset({
 _V2_RELATIONSHIP_KEYS = frozenset({"type", "target_decision_id"})
 _V2_TEST_EVIDENCE_KEYS = frozenset({"selector", "sha"})
 _V2_APPLICABILITY_KEYS = frozenset({"required_labels"})
+
+# ADR-031 §8a namespaced ``extensions`` key contract. Validation is syntactic
+# only: the grammar below is checked, but domain ownership, producer identity,
+# and authority to use a namespace (including ``mneme.*``) are not
+# authenticated. Ownership remains a producer convention.
+_EXTENSION_SEGMENT_RE = re.compile(r"[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
+_MNEME_EXTENSION_ROOT = "mneme"
 
 NO_PREDECESSOR = "-"
 _RESERVED_PROPOSAL_PREFIX = "dprop-"
@@ -1751,6 +1759,42 @@ def _validate_semantic_features(root: dict[str, Any]) -> list[str]:
     return list(features)
 
 
+def _validate_extensions(value: object) -> None:
+    """Validate the v2 non-semantic ``extensions`` object (ADR-031 §8a).
+
+    Syntax only (ADR-031 §8a): the key grammar is checked, but domain
+    ownership, producer identity, and authority to use a namespace (including
+    ``mneme.*``) are **not** authenticated. Ownership remains a producer
+    convention. A key is a dotted namespace of two or more lowercase ASCII
+    segments; a segment is a lowercase alphanumeric run with optional internal
+    hyphens and no leading/trailing hyphen. Two-segment keys are valid only
+    under the reserved ``mneme`` root; every other key must be reverse-DNS with
+    at least three segments.
+    """
+    extensions = _require_dict(value, "decision_index.extensions")
+    for key in extensions:
+        segments = key.split(".")
+        if len(segments) < 2:
+            raise DecisionIndexPersistenceError(
+                f"decision_index.extensions has an invalid key {key!r}: a "
+                "key must have at least two dotted segments"
+            )
+        if any(_EXTENSION_SEGMENT_RE.fullmatch(seg) is None for seg in segments):
+            raise DecisionIndexPersistenceError(
+                f"decision_index.extensions has an invalid key {key!r}: "
+                "segments must be lowercase ASCII alphanumerics with optional "
+                "internal hyphens (no leading/trailing hyphen, dot, or other "
+                "character)"
+            )
+        if len(segments) == 2 and segments[0] != _MNEME_EXTENSION_ROOT:
+            raise DecisionIndexPersistenceError(
+                f"decision_index.extensions has an invalid key {key!r}: "
+                "producer keys must be reverse-DNS with at least three "
+                "segments; two-segment keys are reserved to the "
+                f"{_MNEME_EXTENSION_ROOT!r} root"
+            )
+
+
 def load_persisted_decision_index(
     section: object,
 ) -> CanonicalArchitectureIndex:
@@ -1773,7 +1817,7 @@ def load_persisted_decision_index(
         _reject_unknown_keys(root, _V2_ROOT_KEYS, "decision_index root")
         semantic_features = _validate_semantic_features(root)
         if "extensions" in root:
-            _require_dict(root["extensions"], "decision_index.extensions")
+            _validate_extensions(root["extensions"])
     else:
         semantic_features = []
 

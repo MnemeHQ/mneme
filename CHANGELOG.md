@@ -52,6 +52,12 @@
     migration and newly created memory now produce v2 directly. The upgrade is
     lossless or refuses, and migrating a v1 document grants no decision any
     applicability, so every decision stays globally eligible.
+  - **Namespaced `extensions` (ADR-031 §8a).** The v2 `extensions` object now
+    enforces its key namespace: keys are dotted lowercase ASCII namespaces,
+    reverse-DNS with at least three segments for producers, with two-segment
+    keys reserved to the `mneme` root. Validation is syntactic only; it does
+    not authenticate ownership. The object stays optional and strictly
+    non-semantic.
   - **Compatibility (ADR-031 §8).** Binaries at or below `0.10.x` cannot read
     `mneme.decision-index/v2` memory: they refuse a v2 document at load instead
     of misresolving it. Do not open v2 memory with an older binary.
