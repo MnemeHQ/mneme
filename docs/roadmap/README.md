@@ -38,6 +38,24 @@ Extend the existing benchmark discipline toward externally legible comparisons o
 
 Prefer frozen fixtures, deterministic scoring, clear treatment/control boundaries, and explicit separation of functional completion from architectural compliance.
 
+### P0 — Harness/Cosmos interoperability assessment (bounded, evidence-gated)
+
+Harness's announced addition of Augment Code/Cosmos makes autonomous software factories a relevant integration environment for Mneme, but **no Harness/Cosmos integration is currently validated or shipped**. This is a short, decision-focused compatibility assessment, not a commitment to a new platform adapter and not a replacement for design-partner pilots, DG1/DG2, or the existing benchmark program.
+
+**Question:** Can Mneme add observable, deterministic engineering-decision authority and enforcement to a Harness-operated factory beyond the context, approval, OPA policy and delivery controls Harness already provides?
+
+**P0 assessment (research/compatibility, not product promotion):**
+
+1. Map the documented, versioned integration surfaces independently: Harness custom pipeline steps / CI gates; third-party MCP gateway and its reach into Cosmos; Worker Agent extension points; and any Cosmos agent pre-write or pre-mutation interception capabilities. Do not conflate Harness AI Chat MCP support with Cosmos-specific MCP support.
+2. Produce a minimal Harness pipeline spike invoking the existing Mneme CLI against a fixed repository, known accepted decision set, and typed enforceable rule. Demonstrate a policy-violating change fails the gate and a compliant change passes, with commands, exit codes and decision-linked evidence recorded. Use existing `mneme check` semantics; no parallel enforcement engine.
+3. Test whether Cosmos can actually retrieve applicable authoritative decisions through Mneme's Decision MCP, and whether any pre-mutation interception is reliable and fail-closed. Explicitly record new-file, overwrite, shell/script and alternative write paths; a successful CI gate is **not** evidence of pre-generation blocking.
+4. Compare the added control against Harness-native policy, approvals and knowledge-graph context. Identify one concrete case in which decision identity, source authority, lifecycle, scope, precedence or explicit exception resolution changes the outcome; if no differentiated case survives, record a negative verdict and stop.
+5. Freeze the tested provider versions/configuration, archive positive and negative traces, record bypass paths and degraded behavior, and issue a PASS / PARTIAL / NULL / INCOMPATIBLE result. Treat marketing/API descriptions as hypotheses until validated.
+
+**Exit gate:** Promote to a maintained OSS reference integration only if there is a repeatable supported boundary, measurable value beyond Harness-native controls, and credible user/partner pull. If not, retain a capability matrix and a research-only result. No Harness or Cosmos support claim may enter the [integration support matrix](../integrations/README.md) before passing its stated evidence threshold.
+
+The boundary remains **OSS decision execution; enterprise decision operations**. Harness-specific ingestion, organizational discovery, synchronization, partner economics and commercial outreach are not responsibilities of the OSS core.
+
 ### P0 — Decision Index authority completion (D1)
 
 D0 is shipped: Mneme has a canonical, source-independent Decision Index boundary with Layer 1 runtime projection parity.
@@ -227,6 +245,10 @@ Do not create a separate migration product unless pilot evidence justifies it.
 Run the pinned Deep Agents validation already described in the integration roadmap. Determine whether filesystem mutation tools expose a reliable pre-mutation seam and whether nested/subagent behavior preserves the governance boundary.
 
 Promotion requires evidence; no support claim before the capability gate passes.
+
+### P1 — Harness decision-evidence adapter (conditional follow-on)
+
+Only after the bounded P0 Harness/Cosmos assessment passes: investigate a small reusable CLI/CI recipe or Worker Agent that publishes Mneme decision identity, applicable rule, verdict and evidence reference into a Harness execution record. Verify whether Harness accepts this evidence through a documented interface; do not invent an API or duplicate existing Mneme evidence authority. An upstream Cosmos integration or deeper pre-generation hook remains separately gated on observed mutation-boundary coverage. Preserve provider independence: Harness is one consumer, never a mandatory runtime dependency.
 
 ## RESEARCH — evidence before integration
 
