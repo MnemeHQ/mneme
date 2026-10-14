@@ -1,8 +1,10 @@
-# Reliable Enforcement C1 — Verdict-consistency defect-correction charter (proposed)
+# Reliable Enforcement C1 — Verdict-consistency defect-correction charter
 
-**Status:** PROPOSED — requires architecture review and the matching Layer 1
-freeze authorization before any implementation merge. **Not** an implementation,
-approval, ADR-033 authorization, or C1b authorization.
+**Status (reconciled 2026-10-14):** **MERGED / ACCEPTED.** This charter merged
+in PR #503 (`272632ca`) and the matching Layer 1 freeze amendment merged in
+PR #504 (`ecdcf6ec`). It authorizes **only** the #260 verdict-consistency
+correction (PR #484), which is pending revalidation. It is **not** an
+implementation, ADR-033 authorization, or C1b authorization.
 **Source anchor:** `MnemeHQ/mneme` `main` at
 `da6dafbc0f648cb7f8913bcadd83e8a6d23d92dc` (DG1F blocking-semantics matrix,
 PR #501).
@@ -64,15 +66,14 @@ No other behavior is authorized by this charter.
 - Any claim that a returned block is honoured by the host harness (the G1 gap
   in the merged blocking-semantics matrix).
 
-## 5. Layer 1 freeze authorization required (sequence step 2)
+## 5. Layer 1 freeze authorization (merged)
 
 Because C1 changes how invalid verdicts are handled at the enforcement
-boundary, the Layer 1 freeze requires prior authorization. Before #484 may
-merge, a matching `[layer1-freeze]` amendment must merge under the freeze
-Amendment Procedure (rationale anchored to a charter already made elsewhere,
-§3(b)), referencing this merged charter. That amendment authorizes **only** the
-verdict-trust correction and must restate the preserved items in §3; it does not
-authorize enforcement-scope or availability changes.
+boundary, the Layer 1 freeze required prior authorization. That authorization
+**merged** as the matching `[layer1-freeze]` amendment in PR #504 (`ecdcf6ec`),
+under the freeze Amendment Procedure §3(b), referencing this merged charter. It
+authorizes **only** the verdict-trust correction and restates the preserved
+items in §3; it does not authorize enforcement-scope or availability changes.
 
 ## 6. Required acceptance evidence
 
@@ -89,10 +90,11 @@ not duplicating, #484's tests):
 
 ## 7. Sequence
 
-1. Merge this charter.
-2. Merge the matching `[layer1-freeze]` amendment.
-3. Revalidate and squash-merge #484 under ADR-022.
-4. Then start **G4** (offline failure-scenario tests) reusing #484's merged
-   `tests/integrations/check_contract.py`.
+1. **Completed — merge this charter** (#503, `272632ca`).
+2. **Completed — merge the matching `[layer1-freeze]` amendment** (#504, `ecdcf6ec`).
+3. **Pending — revalidate and squash-merge #484 under ADR-022** against the
+   updated architecture (full test suite + frozen benchmark).
+4. **Pending — then start G4** (offline failure-scenario tests) reusing #484's
+   merged `tests/integrations/check_contract.py`.
 
 **C1b remains locked; ADR-033 remains proposed; DG1B2 remains evidence-gated.**
