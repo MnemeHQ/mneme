@@ -20,6 +20,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from mneme.decision_index import CanonicalArchitectureIndex
 from mneme.decision_index_persistence import (
     legacy_item_to_runtime_decision,
     load_persisted_decision_index,
@@ -55,6 +56,9 @@ class MemoryStore:
     def __init__(self, path: str | Path) -> None:
         self.path = Path(path)
         self._memory: ProjectMemory | None = None
+        # The exact validated authority snapshot used for runtime projection.
+        # Preview consumers must not re-read the path and risk a changed file.
+        self._canonical_index: CanonicalArchitectureIndex | None = None
 
     # ── Loading ───────────────────────────────────────────────────────────────
 
@@ -121,6 +125,7 @@ class MemoryStore:
                 self.path,
             )
         else:
+            index = None
             native_decisions = [
                 runtime_decision_from_memory_record(d, self.path)
                 for d in data.get("decisions", [])
@@ -132,6 +137,7 @@ class MemoryStore:
             ]
             decisions = native_decisions + migrated
 
+        self._canonical_index = index
         self._memory = ProjectMemory(
             meta=meta,
             items=items,
@@ -146,6 +152,17 @@ class MemoryStore:
         if self._memory is None:
             raise RuntimeError("Memory not loaded. Call load() first.")
         return self._memory
+
+    @property
+    def canonical_index(self) -> CanonicalArchitectureIndex | None:
+        """Validated canonical snapshot used by the most recent successful load.
+
+        Section-less memory has no canonical authority and returns ``None``.
+        This is read-only exposure; loading never reinterprets decision scope.
+        """
+        if self._memory is None:
+            raise RuntimeError("Memory not loaded. Call load() first.")
+        return self._canonical_index
 
     # ── Typed accessors ───────────────────────────────────────────────────────
 
