@@ -95,6 +95,16 @@ def test_compliant_change_completes_silently(tmp_path):
     assert code == 0 and wire is None
 
 
+def test_missing_memory_is_a_silent_no_op(tmp_path):
+    """S1: with no canonical authority the Stop audit is inactive and silent."""
+    import subprocess
+    (tmp_path / "seed.py").write_text("x = 1\n", encoding="utf-8")
+    subprocess.run(["git", "init"], cwd=tmp_path, capture_output=True, check=True)
+    code, wire = _run_handler(_stop(tmp_path), tmp_path)
+    assert code == 0
+    assert wire is None  # no block and no claim of coverage
+
+
 def test_preexisting_dirty_file_untouched_by_codex_is_not_blamed(tmp_path):
     dirty = f'keep = "{FORBIDDEN}"\n'
     project = _project(tmp_path, seed=dirty)  # dirty before session: baseline

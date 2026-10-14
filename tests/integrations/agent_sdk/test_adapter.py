@@ -230,6 +230,26 @@ class TestEnforcementPath:
         assert result.action == ACTION_FAIL_OPEN
         assert "could not run mneme check" in result.reason
 
+    def test_timeout_fails_open_visibly(self, project):
+        """S7: a timed-out checker fails open visibly, never blocks or passes."""
+        def runner(command, **kwargs):
+            raise subprocess.TimeoutExpired(cmd="mneme check", timeout=1)
+
+        sdk = make_integration(project, runner)
+        result = sdk.evaluate_mutation(**self.edit(project))
+        assert result.action == ACTION_FAIL_OPEN
+        assert "could not run mneme check" in result.reason
+
+    def test_absent_verdict_payload_fails_open(self, project):
+        """S11: an empty, well-formed-exit result carries no verdict to trust."""
+        def runner(command, **kwargs):
+            return completed("", returncode=0)
+
+        sdk = make_integration(project, runner)
+        result = sdk.evaluate_mutation(**self.edit(project))
+        assert result.action == ACTION_FAIL_OPEN
+        assert "no parseable verdict" in result.reason
+
     def test_warn_mode_flags_without_blocking(self, project, monkeypatch):
         monkeypatch.setenv("MNEME_HOOK_MODE", "warn")
 
