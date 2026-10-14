@@ -1,23 +1,23 @@
-# DG1F-C1 — Applicability-only CLI enforcement charter (proposed)
+# DG1F-C1 — Applicability-only CLI enforcement charter
 
-**Status:** PROPOSED — architecture and threat-model review required. §3 specifies the trusted-context contract, its two fail-closed conditions, and the C1b trust prerequisites; §2 and §5 specify the C1a report-only interface and separate its acceptance from the deferred C1b exclusion tests. Remaining review items are the C1a output wording and the C1b trust mechanism (explicitly not designed here). **Not merged; no runtime implementation authorized.** The first increment is report-only (§2 C1a); exclusion (C1b) is deferred.  
-**Anchor:** `MnemeHQ/mneme` `main` at `c1816aa5541e86452fb1998356635fb818918373` (ADR-031 sequencing amendment #492).  
-**Governs:** only the proposed *first* DG1F increment. Not DG1B2, the full DG1F convergence programme, or DG1G.
+**Status (reconciled 2026-10-14):** **MERGED / ACCEPTED for C1a only.** This behavioral charter merged in PR #493 (`96ec857e`), followed by the C1a Layer 1 freeze amendment #494 (`6e02f4ee`) and independently accepted report-only implementation #495 (`d1aa0d8c`). C1a is complete. **C1b enforcement exclusion remains deferred and is NOT authorized**: §3's canonical context declaration, independently verifiable approved revision, substitution protection, controlled context selection, and blocking-seam prerequisites are not delivered. §5b remains a future acceptance gate.  
+**Original architecture anchor:** `MnemeHQ/mneme` `main` at `c1816aa5541e86452fb1998356635fb818918373` (ADR-031 sequencing amendment #492). Baseline descriptions below are historical where noted.  
+**Governs:** only the bounded applicability-only first DG1F increment (C1a) and the explicitly deferred C1b conditions. Not DG1B2, full DG1F convergence, or DG1G.
 
 ## 1. Governing authority and observed starting behavior
 
-- Accepted [ADR-031](../adr/ADR-031-decision-governance-semantics.md) §4, §6–§8, §10–§11, as amended by #492, permits an **optional applicability-only DG1F increment before DG1B2**. It does **not** authorize a runtime-input change without a separate merged behavioral charter and the subsequent `[layer1-freeze]` amendment.
-- [DG1F readiness assessment](2026-10-13-dg1f-runtime-convergence-readiness.md) in draft PR #491 provides the initial inventory; its *unresolved sequencing question* was settled by #492. PR #491 is neither superseded as evidence nor an authorization.
+- Accepted [ADR-031](../adr/ADR-031-decision-governance-semantics.md) §4, §6–§8, §10–§11, as amended by #492, permits an **optional applicability-only DG1F increment before DG1B2**. That ordering exception alone did **not** authorize runtime changes; this charter #493 and the matching `[layer1-freeze]` amendment #494 authorized **C1a only**.
+- [DG1F readiness assessment](2026-10-13-dg1f-runtime-convergence-readiness.md) began in draft PR #491 as a point-in-time inventory; its sequencing question was settled by #492. Its status was reconciled and merged in #491 (`b87a8a23`) after C1a implementation. The inventory is **not** an authorization for additional runtime consumers.
 - DG1B1 (#487) merged canonical `required_labels`, explicit v1→v2 migration, and `resolve_effective(index, GovernanceContext)`; the pinned GSA-TTS ADR-0028 offline scenario demonstrates Windows matching and Linux nonmatching, but deliberately proves **existing runtime enforcement is unaffected**.
-- In current `mneme/cli.py:_cmd_check`, `MemoryStore.load` projects every lifecycle-active decision, `DecisionRetriever.retrieve(query)` ranks the corpus, and `check_prompt` enforces rules. No label context is passed. `mneme/decision_projection.py` projects lifecycle-active records regardless of DG1B1 applicability. `mneme/enforcer.py` combines retrieval-gated *multi-term legacy* checks with corpus-wide typed literal rules (ADR-017); ADR-020 selects rule paths separately.
-- Current CLI `--json` uses `mneme.check/v1` and the path-applicability `evaluation_complete` field. Hook and CI consumers may depend on that contract. This slice must not silently repurpose or change those semantics.
+- **Baseline at the original anchor:** `mneme/cli.py:_cmd_check` loaded and projected every lifecycle-active decision, `DecisionRetriever.retrieve(query)` ranked the corpus, and `check_prompt` enforced rules without a governance label context. **After #495:** an optional, NON-AUTHORITATIVE stderr-only preview runs separately after enforcement, against the same validated canonical snapshot. Neither the enforced corpus nor retrieval/rule selection is changed. `mneme/decision_projection.py` still projects lifecycle-active records regardless of DG1B1 applicability; ADR-017 and ADR-020 enforcement distinctions remain.
+- CLI `--json` continues to use `mneme.check/v1` and the path-applicability `evaluation_complete` field. The C1a preview did not repurpose that contract, modify stdout or exit codes, or change hook and CI behavior.
 
-## 2. Candidate first increment — report-only (C1a); exclusion deferred (C1b)
+## 2. First increment — report-only C1a delivered; exclusion C1b deferred
 
-The first consumer remains `mneme check`. It is split so that the part with no
-trust problem can proceed while exclusion stays blocked on §3:
+The first consumer is `mneme check`. The report-only part is delivered, while
+actual exclusion remains blocked on §3:
 
-- **C1a — report-only applicability preview (proposed as the first increment).**
+- **C1a — report-only applicability preview (implemented in #495).**
   An opt-in `mneme check` mode computes `resolve_effective(index,
   GovernanceContext(labels))` against a caller-supplied preview context and
   reports, per decision, whether it is effective or would be `not_applicable` —
@@ -34,7 +34,7 @@ trust problem can proceed while exclusion stays blocked on §3:
   excluded.
 
 **C1a preview interface and output.** A single **opt-in, repeatable**
-`--applicability-preview <label>` flag (naming subject to review) supplies the
+`--applicability-preview <label>` flag (shipped in #495) supplies the
 preview context. It is **NON-AUTHORITATIVE** and MUST NOT be named or documented
 as a security control. Preview output is informational and written to
 **stderr**, clearly marked NON-AUTHORITATIVE; stdout and the `mneme.check/v1`
@@ -159,9 +159,9 @@ Acceptance is split with the increments. **C1a is report-only and does not
 validate trusted enforcement context or actual exclusion**; the exclusion tests
 are deferred with C1b.
 
-### 5a. C1a — report-only acceptance (required before any C1a merge)
+### 5a. C1a — report-only acceptance (satisfied for merged #495)
 
-A separately authorized offline suite must demonstrate:
+The separately authorized offline suite was required to demonstrate the following, without changing frozen benchmark fixtures. Independent review of #495 recorded 25 passing C1a tests plus 138 related regression tests; PR CI recorded 2,799 passed, 6 skipped. These results evidence **report-only C1a acceptance only**:
 
 1. **Default parity:** with no preview flag, the exact existing lifecycle-active
    decision set and rule/violation/exit behavior (v1, v2 without applicability,
@@ -221,27 +221,26 @@ declaration plus `[layer1-freeze]` amendment):
 A reviewer must distinguish unit tests of `resolve_effective` (already done in
 DG1B1) from end-to-end runtime exclusion tests (not yet executed).
 
-## 6. Approval and change sequence
+## 6. Approval and change record
 
-1. **Review this revision.** §2 and §5a specify the C1a report-only interface
-   and its acceptance; §3 specifies the trusted-context contract, the two
-   fail-closed conditions, and the C1b trust prerequisites (deferred, not
-   designed here); §5b holds the exclusion tests for C1b. Remaining review
-   items: the C1a output wording and the C1b trust mechanism. Approval of this
-   draft is not implied by #492.
-2. Merge this behavioral charter as a separate PR.
-3. Open and merge the matching `[layer1-freeze]` amendment under the frozen
-   document's Amendment Procedure, referencing the merged charter and its
-   bounded first surface.
-4. Implement and accept **C1a (report-only)** in its own PR with the §5a gates.
-   Because C1a never removes a decision from enforcement, it cannot disable
-   protection; this is the safe first increment.
-5. **C1b (exclusion) is not authorized by this charter alone.** It requires the
-   C1b trust prerequisites (§3) — an independently verifiable approved
-   revision, protection against unreviewed substitution, and controlled context
-   selection — plus the persisted canonical context declaration and a further
-   charter/freeze update, before any decision is excluded.
-6. DG1B2 remains independently evidence-gated; remaining DG1F surfaces and DG1G
-   remain unimplemented.
+1. **Completed — charter review and merge:** C1a output wording and its
+   acceptance requirements (§2/§5a) were independently reviewed; the
+   behavioral charter merged in PR #493 (`96ec857e`).
+2. **Completed — bounded Layer 1 authorization:** the matching
+   `[layer1-freeze]` amendment merged in PR #494 (`6e02f4ee`), explicitly
+   authorizing **C1a only**.
+3. **Completed — C1a implementation and acceptance:** report-only preview
+   merged in PR #495 (`d1aa0d8c`) after independent §5a review and CI.
+   Preview labels do not disable protection.
+4. **Still deferred — C1b enforcement exclusion:** this charter does **not**
+   authorize it. Before any exclusions, separately establish and review an
+   independently verifiable approved revision, protection against unreviewed
+   substitution, controlled context selection, a persisted canonical context
+   declaration, blocking-seam safety, and an additional behavioral charter
+   and freeze amendment. §5b's exclusion acceptance gates remain outstanding.
+5. **Still deferred — DG1B2 and later DG1F/DG1G:** DG1B2 waivers remain
+   independently evidence-gated; remaining consumer convergence and DG1G
+   are not authorized by C1a completion.
 
-**Merge status of this draft: HOLD until independently reviewed.**
+**Record status:** C1a charter merged and C1a implementation accepted; C1b
+and all additional enforcement surfaces remain outside this authorization.
