@@ -22,40 +22,35 @@ the merged [C1 charter](2026-10-13-dg1f-applicability-only-charter.md); and the
 - **PR #483 (C0, draft).** Proposes ADR-033 (separate opt-in availability
   handling from architectural strict/warn; trusted-complete / incomplete /
   untrusted / skipped states) and a Layer 1 C0 charter. It states no
-  implementation is authorized while the ADR and charter remain proposed, and
-  sets four gates: accept ADR+charter; pin the check-v1 consistency matrix;
-  probe pinned Claude Code live behavior and verify no mutation; lock tests and
-  benchmark parity. **Unmerged; not presupposed here.**
+  implementation is authorized while the ADR and charter remain proposed, with
+  gates: accept ADR+charter; pin the check-v1 consistency matrix; probe pinned
+  Claude Code live behavior; lock tests and parity. **Unmerged; not presupposed.**
 - **PR #484 (C1, open; CI green).** Implements coherent verdict validation
-  (`hook.assess_verdict`) across the shipped consumers and keeps every
-  fail-open surface. It closes #260. Its own review point #1 asks to confirm its
-  sequencing against #483 before merge. **Unmerged.**
-- **PR #498 (merged).** The consumer inventory this matrix extends; it already
-  flags the blocking-seam gap and the unaudited CI consumers.
+  (`hook.assess_verdict`) across the shipped consumers and keeps every fail-open
+  surface. It closes #260. Its review point #1 asks to confirm sequencing
+  against #483 before merge. **Unmerged.**
+- **PR #498 (merged).** The consumer inventory this matrix extends.
 
-**Dependency consequence.** #484 changes *how a verdict is judged trustworthy*
-(it does not change *whether an operation is blocked on failure*). This matrix
-therefore cites #484 tests for the trust-classification rows and existing
-`main` tests for the failure-behavior rows, and marks the harness/CI rows that
-neither proves.
+**Dependency consequence.** #484 changes *how a verdict is judged trustworthy*,
+not *whether an operation is blocked on failure*. Its coherence tests are
+**not on `main`** and are cited below as **`#484` evidence**; `main`'s tests
+cover the failure-behavior rows. Neither proves host-harness enforcement.
 
 ## 2. What #484 already proves (do not duplicate)
 
 `tests/integrations/claude_code/test_hook_verdict_consistency.py` (30 tests,
-PR #484) plus the per-surface contradictory-result tests establish:
-
-- a payload is trusted only when envelope, violation records, aggregate,
-  requested-mode and exit code are mutually coherent;
-- an **incoherent** result **fails open** (ADR-021 transport policy) with a
-  non-echoing diagnostic — it never blocks;
-- coherent strict/warn results keep existing enforcement;
-- the exit-code table matches `mneme.cli._EXIT_CODES_BY_MODE`.
+`#484`) plus the per-surface contradictory-result tests (**all `#484`-only**)
+establish that a payload is trusted only when envelope, violation records,
+aggregate, requested-mode and exit code are mutually coherent; an **incoherent**
+result **fails open** with a non-echoing diagnostic; coherent strict/warn
+results keep existing enforcement; the exit-code table matches
+`mneme.cli._EXIT_CODES_BY_MODE`.
 
 #484 answers *"is this verdict trustworthy?"* It does **not** answer *"when
-evaluation fails, does this integration actually permit or block the action,
-and does the harness enforce it?"* — the question below.
+evaluation fails, does this integration actually permit or block the action, and
+does the host enforce it?"*
 
-## 3. Failure scenarios (columns) and consuming surfaces (rows)
+## 3. Failure scenarios × surfaces (with evidence class)
 
 Scenarios: **S1** missing project memory · **S2** invalid/unreadable canonical
 memory · **S3** unparseable/malformed verdict · **S4** contradictory verdict ·
@@ -64,97 +59,110 @@ launch failure / interpreter missing · **S7** timeout · **S8** materialization
 failure · **S9** unknown path applicability (ADR-020 `UNKNOWN`) · **S10** wrong
 schema / stale CLI · **S11** absent verdict payload.
 
-Legend: **B** = blocks (deny), **P** = permits (fail open), **V** = permits but
-visible/disclosed, **—** = not applicable. Evidence is a test path (on `main`
-unless marked `#484`).
+**Behavior:** `B` blocks (deny) · `S` **silent permit / no-op — the operation is
+permitted with no agent-visible diagnostic** · `V` permit with a visible/
+disclosed diagnostic · `?` not established · `—` not applicable.
+**Evidence class (second letter):** `t` direct offline test cited below · `i`
+inferred from source only · `u` untested/not established.
+
+A cell is `behavior+class`, e.g. `St` = silent permit, test-cited; `Vi` = visible
+permit, source-inferred; `?u` = unknown.
 
 | Surface | S1 | S2 | S3 | S4 | S5 | S6 | S7 | S8 | S9 | S10 | S11 |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| CLI `mneme check` | err | err | n/a | n/a | exit 2 | err | err | n/a | exit 2 | err | n/a |
-| CC PreToolUse edit gate | P | P | P | P | V | P | P | P | V | V | P |
-| CC Bash/heredoc preflight | P | P | P | P | V | P | P | P | V | V | P |
-| CC Stop session-delta | V | V | V | V | V | V | V | V | V | V | V |
-| Codex gate | P | P | P | P | V | P | P | P | P | P | P |
-| Codex Stop audit | V | V | V | V | V | V | V | V | V | V | V |
-| Kiro | P | P | P | P | V | P | P | P | P | V | P |
-| Agent SDK | P | P | P | P | V | P | P | P | P | P | P |
-| LangChain | P | P | P | P | V | P | P | P | P | P | P |
-| Hermes | P | P | P | P | V | P | P | P | V | P | P |
-| Antigravity | P | P | P | P | V | P | P | P | P | P | P |
-| Decision MCP | — | err | — | — | — | — | — | — | — | — | — |
-| Protection / Audit / readiness | — | err | — | — | — | — | — | — | — | — | — |
+| CLI `mneme check` | —t | —t | — | — | Bt | —t | ?u | — | Bt | —t | — |
+| CC PreToolUse edit gate | Si | ?u | Vt | Vt | Vt | Vt | ?u | ?u | Vt | Vt | ?u |
+| CC Bash/heredoc preflight | Si | ?u | Vt | Vt | Vt | Vt | ?u | ?u | Vt | Vt | ?u |
+| CC Stop session-delta | Si | Vt | Vt | Vt | Vt | Vt | ?u | Vt | Vt | Vt | Vt |
+| Codex gate | St | ?u | Vt | Vt | Vt | Vt | Vt | ?u | ?u | Vt | ?u |
+| Codex Stop audit | Si | ?u | Vt | Vt | Vt | ?u | ?u | ?u | ?u | ?u | ?u |
+| Kiro | St | ?u | Vt | Vt | Vt | Vt | Vt | Vt | ?u | Vt | ?u |
+| Agent SDK | ?u | ?u | Vt | Vt | Vt | Vt | ?u | Vt | ?u | ?u | ?u |
+| LangChain | ?u | ?u | Vt | Vt | Vt | Vt | ?u | Vt | ?u | ?u | ?u |
+| Hermes | ?u | ?u | Vt | Vt | Vt | Vt | ?u | ?u | ?u | ?u | ?u |
+| Antigravity | ?u | ?u | Vt | Vt | Vt | Vt | ?u | ?u | ?u | ?u | ?u |
+| Decision MCP | — | ?u | — | — | — | — | — | — | — | — | — |
+| Protection / Audit / readiness | — | ?u | — | — | — | — | — | — | — | — | — |
 
-Representative evidence (not exhaustive):
+**S1 is a silent skip, not a visible failure, on every hook that discovers
+memory.** Source-confirmed: `mneme/integrations/claude_code/hook.py` edit gate
+(`if memory is None: return 0`, ~L498) and `stop_event` (`if memory is None:
+return 0`, ~L692); `mneme/integrations/codex_cli/gate.py` ("no project memory ->
+SKIP"); `mneme/integrations/codex_cli/stop_audit.py` (`_find_memory_for` →
+`return None`). Test-confirmed: `tests/integrations/kiro/test_failopen.py::
+test_no_project_memory_quiet_zero`. The Stop **SessionStart** no-op test
+(`test_absent_memory_is_a_no_op`, `tests/integrations/claude_code/test_stop_boundary.py`)
+exercises **SessionStart, not Stop**, so Stop's S1 rests on source, not on that
+test.
+
+Representative evidence (all cited failure-behavior tests are on `main`; the
+coherence/contradictory tests are `#484`-only):
 
 - **CC PreToolUse / mode:** `tests/integrations/claude_code/test_hook_verdict.py`
   (`test_unparseable_stdout_with_exit_two_fails_open`,
   `test_traceback_with_exit_one_fails_open`,
   `test_unknown_path_applicability_fails_open_with_reason`,
-  `test_stale_runtime_warns_that_enforcement_is_inactive`),
-  `test_hook_mode.py`, `test_hook_verdict_consistency.py` (`#484`).
+  `test_stale_runtime_warns_that_enforcement_is_inactive`), `test_hook_mode.py`.
 - **CC Stop:** `tests/integrations/claude_code/test_stop_boundary.py`
-  (`test_absent_memory_is_a_no_op`, `test_corrupt_baseline_degrades_visibly`,
-  `test_crashing_checker_fails_open_with_diagnostics`,
-  `test_contradictory_checker_result_never_blocks`, `#484`).
+  (`test_corrupt_baseline_degrades_visibly`,
+  `test_crashing_checker_fails_open_with_diagnostics`).
 - **Codex gate:** `tests/integrations/codex_cli/test_gate.py`
   (`test_incomplete_evaluation_fails_open_with_applicability_reason`,
   `test_malformed_verdict_json_fails_open`, `test_wrong_schema_fails_open`,
-  `test_contradictory_verdict_fails_open`, `test_timeout_fails_open`,
-  `test_launch_failure_fails_open`, `test_parse_failure_fails_open_as_not_evaluated`).
+  `test_timeout_fails_open`, `test_launch_failure_fails_open`,
+  `test_parse_failure_fails_open_as_not_evaluated`).
 - **Codex Stop audit:** `tests/integrations/codex_cli/test_stop_audit.py`
-  (`test_contradictory_checker_result_is_disclosed_not_blocked`,
-  `test_unevaluated_artifact_disclosed_not_claimed_governed`).
-- **Kiro:** `tests/integrations/kiro/test_failopen.py` (18 tests spanning S1,
-  S3–S8, S10).
+  (`test_unevaluated_artifact_disclosed_not_claimed_governed`).
+- **Kiro:** `tests/integrations/kiro/test_failopen.py` (S3–S8, S10).
 - **Agent SDK:** `tests/integrations/agent_sdk/test_adapter.py`
-  (`test_unparseable_verdict_fails_open_visibly`,
-  `test_contradictory_verdict_fails_open_visibly`,
-  `test_operational_failure_fails_open`, `test_materialize_failure_fails_open`).
-- **LangChain:** `tests/integrations/langchain/test_adapter.py` (same set plus
+  (`test_operational_failure_fails_open`, `test_materialize_failure_fails_open`,
+  `test_unparseable_verdict_fails_open_visibly`).
+- **LangChain:** `tests/integrations/langchain/test_adapter.py`
+  (`test_materialize_failure_fails_open`, `test_operational_failure_fails_open`,
   `test_forbidden_write_blocked_with_target_path`).
 - **Hermes:** `tests/integrations/hermes/test_adapter_gate.py`
-  (`test_non_heredoc_command_passes_unevaluated`,
-  `test_missing_update_snapshot_is_disclosed_not_guessed`,
-  `test_incomplete_evaluation_fails_open`).
+  (`test_check_launch_failure_fails_open`, `test_incomplete_evaluation_fails_open`).
 - **Antigravity:** `tests/integrations/antigravity/test_adapter_gate.py`
   (`test_malformed_hook_input_fails_open`, `test_incomplete_evaluation_fails_open`).
+- **`#484`-only (not on `main`):** the S4 contradictory rows —
+  `test_contradictory_verdict_fails_open_visibly` (agent_sdk, antigravity,
+  hermes, langchain, kiro), `test_contradictory_verdict_fails_open`
+  (codex gate), `test_contradictory_checker_result_is_disclosed_not_blocked`
+  (codex stop audit), `test_contradictory_checker_result_never_blocks` (CC Stop),
+  and all of `tests/integrations/claude_code/test_hook_verdict_consistency.py`.
 
-Cells are the adapter's **returned action** (block/permit/visible) as asserted
-offline. They are **not** proof that the host harness honours it (see G1).
+Cells marked `t` are the adapter's **returned action** as asserted offline; they
+are **not** proof the host harness honours it (see G1).
 
-## 4. Uncovered scenarios and gaps (the actual finding)
+## 4. Uncovered scenarios and gaps
 
 | ID | Gap | Why it matters | What would close it |
 |---|---|---|---|
-| **G1** | **Harness enforcement is unproven.** Offline tests assert the adapter's `deny`/`block` return, not that the host (Claude Code, Codex, Kiro, Antigravity, Hermes) actually prevents the mutation. | A returned block that the harness ignores would be a false sense of protection. | A pinned, live/pinned-harness probe that triggers a violation and independently verifies no file mutation (#483 C3 gate). Out of offline unit scope. |
-| **G2** | **CI consumers are unaudited.** Which GitHub Actions jobs invoke `mneme check`, and whether a missing/malformed/incomplete verdict blocks the protected action, is not mapped. | CI is a primary enforcement seam; a fail-open CI step silently passes. | A per-workflow inventory + an offline test that a malformed/missing verdict makes the CI step fail (or is explicitly documented as non-blocking). |
-| **G3** | **Missing-memory policy is unsettled.** S1 yields permit/no-op on several surfaces (e.g. CC Stop `test_absent_memory_is_a_no_op`, Kiro quiet-zero). | Whether "no memory" should be inactive/unevaluated (permit) or an operational failure is an eligibility/witness decision, not a mechanical one. | #483 gate 1 (settle eligibility/witness when memory is missing) before any change. |
-| **G4** | **Per-surface scenario coverage is uneven.** Not every surface has an explicit S2 (corrupt canonical), S7 (timeout) or S9 (path `UNKNOWN`) test; MCP and protection/Audit/readiness have no blocking verdict by design. | Absence of a test is not evidence of safe behavior. | A small per-surface scenario matrix filling only the empty cells, reusing `tests/integrations/check_contract.py` (`#484`) rather than new doubles. |
-| **G5** | **Incomplete-vs-untrusted is only an adapter-level distinction.** #484 classifies trust; the *policy* (what the product should do when evaluation is incomplete or unavailable) is ADR-033 scope. | The matrix characterizes current behavior; it does not decide future availability policy. | ADR-033 / C0 charter decision (#483), not this preflight. |
+| **G1** | **Harness enforcement is unproven.** Offline tests assert the adapter's `deny`/`block` return, not that the host actually prevents the mutation. | A returned block the harness ignores is false protection. | A pinned live/pinned-harness probe verifying no mutation (#483 C3). Out of offline scope. |
+| **G2** | **CI consumers are unaudited.** Which jobs invoke `mneme check`, and whether a bad verdict blocks, is unmapped. | A fail-open CI step silently passes. | Per-workflow inventory + an offline test that a bad verdict fails the step (or is documented non-blocking). |
+| **G3** | **Missing-memory policy is unsettled** and currently a **silent skip** (S1). | Whether "no memory" should be inactive/unevaluated (permit) or an operational failure is an eligibility/witness decision. | #483 gate 1 before any change. |
+| **G4** | **Per-surface coverage is uneven.** The `?u` cells (notably S2 invalid canonical memory; S7 timeout; S9/S11 on several surfaces; all S1 on Agent SDK/LangChain/Hermes/Antigravity) have no direct test. | Absence of a test is not evidence of safe behavior. | A bounded offline matrix filling only the empty cells, reusing `tests/integrations/check_contract.py` (`#484`). |
+| **G5** | **Incomplete-vs-untrusted is only an adapter-level distinction.** #484 classifies trust; the *policy* is ADR-033 scope. | The matrix characterizes current behavior; it does not decide availability policy. | ADR-033 / C0 charter (#483). |
 
 ## 5. Bounded offline validation matrix — proposed next step (not authorized here)
 
-A separate, bounded offline work item may add only the missing cells from G4,
-reusing #484's `check_contract.py` and existing per-surface tests, asserting for
-each surface: the returned action, the visibility of any fail-open, and that no
-mutation is claimed as governed when evaluation failed. It must:
-
-- run fully offline (no network, no live harness) and reuse #484 tests instead
-  of duplicating them;
-- change **no** runtime behavior, CLI/MCP surface, schema, `.mneme` authority,
-  benchmark fixture, or Layer 1 freeze baseline;
-- record G1/G2/G3 as **out-of-offline-scope** and require separate evidence
-  (live probe; CI inventory; eligibility decision) before any fail-closed claim.
-
-It does not authorize C1b, DG1B2, ADR-033 implementation, or any change to
-enforcement.
+A separate bounded offline work item may add only the missing `u` cells from G4,
+reusing #484's `check_contract.py` and existing per-surface tests, asserting per
+surface: the returned action, the visibility of any fail-open, and that no
+mutation is claimed as governed when evaluation failed. It must run fully
+offline, reuse rather than duplicate #484, change **no** runtime/CLI/MCP/schema/
+`.mneme`/benchmark/freeze behavior, and record G1/G2/G3 as out-of-offline-scope.
 
 ## 6. Bottom line
 
-- **Proven offline today:** every shipped consumer *identifies* an untrustworthy
-  or absent verdict and *fails open visibly*; coherent strict/warn results keep
-  existing enforcement (#484 + existing suites).
+- **Established offline today:** every shipped consumer *identifies* an
+  untrustworthy or absent verdict and — except for **S1 missing memory, which is
+  a silent skip on the memory-discovering hooks** — fails open with a visible
+  diagnostic; coherent strict/warn results keep existing enforcement. This holds
+  for `main` for the failure-behavior tests; the **S4 contradictory rows and the
+  coherence suite are #484-only evidence**, not yet on `main`.
 - **Not proven:** that the host harness actually blocks on the adapter's block
-  (G1), that CI blocks on a bad verdict (G2), and the missing-memory policy (G3).
+  (G1); that CI blocks on a bad verdict (G2); the missing-memory policy (G3); and
+  the `u` cells (G4).
 - This preflight makes **no** end-to-end fail-closed claim and authorizes no
   enforcement change. **C1b remains locked.**
