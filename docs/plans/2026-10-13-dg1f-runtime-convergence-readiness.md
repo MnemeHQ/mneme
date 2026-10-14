@@ -62,9 +62,9 @@ DG1C reports governance-integrity findings such as `dangling_supersedes` and `su
 **Deferred C1b/remaining DG1F acceptance candidates (not authorization):** Reuse the committed offline GSA-TTS ADR-0028 fixture and `tests/test_dg1b1_functional_acceptance.py` under separately approved charters. The following items are candidates; the binding C1b gates are in the merged C1 charter §5b:
 
 1. **Parity:** with no applicability declared, old and new evaluations use the same decisions, rules, verdicts and evidence identities.
-2. **Matching context:** with explicitly supplied `platform:windows`, the Windows-only decision reaches rule applicability and enforcement.
-3. **Confirmed nonmatch:** with an explicitly supplied and trustworthy `platform:linux` context, only the Windows-restricted decision is excluded; global decisions remain protected.
-4. **Unavailable/invalid context:** must not produce a silent PASS by filtering out an otherwise active, constrained decision. The exact outcome requires choice B.
+2. **Matching context:** with an independently verified, approved `platform:windows` canonical evaluation context, the Windows-only decision reaches rule applicability and enforcement.
+3. **Confirmed nonmatch:** with an independently verified, approved `platform:linux` canonical evaluation context, only the Windows-restricted decision is excluded; global decisions remain protected.
+4. **Unavailable/invalid context:** must not produce a silent PASS by filtering out an otherwise active, constrained decision. Apply the distinct valid-memory versus invalid-memory failure contracts from the merged C1 charter §3; this is not proof of their C1b implementation.
 5. **Lifecycle:** superseded/deprecated/inactive decisions never regain authority through matching labels.
 6. **Independence:** retrieval scores/top-K cannot determine governing decisions; ADR-020 path applicability stays separate and unchanged.
 7. **Reproducibility:** context, effective IDs, cause codes, rule IDs and enforcement outcome can be replayed without a model or live network.
