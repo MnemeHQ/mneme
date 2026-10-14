@@ -34,10 +34,12 @@ A is answerable from existing evidence.
 - Activation is an optional top-level `activation` key **inside**
   `.mneme/project_memory.json` (schema `mneme.setup/v1`); the module states
   "No parallel state file is created."
-- States: `not_installed | setup | active`; setup always writes
-  `enforcement: "not_enabled"`; `active` is reachable only through an explicit
-  future action. `mneme init` scaffolds memory **without** an activation record;
-  `mneme setup` adds it.
+- States: `not_installed | setup | active`; setup writes
+  `enforcement: "not_enabled"`. **`active` is reachable today**: the explicit
+  `mneme protect activate` action (M1.4) installs a typed protection rule and
+  transitions the record to `active` with `activated_at` set
+  (`mneme/protection.py`). `mneme init` scaffolds memory **without** an
+  activation record; `mneme setup` adds it.
 
 **Consequence:** the activation record is **in-band**. Deleting the memory file
 deletes the only activation witness with it.
@@ -93,7 +95,7 @@ Mneme currently conflates several distinct states, which must not be merged:
 
 1. a repository **with decision memory** (it may be retrieval context only);
 2. a repository where protection was **explicitly activated**
-   (`activation.state == "active"` — not reachable today);
+   (`activation.state == "active"`, reached via `mneme protect activate`);
 3. a repository **explicitly configured** for a future fail-closed availability
    policy (no such flag exists yet).
 
@@ -106,6 +108,11 @@ Git can, at best, speak to (1)'s history. It cannot establish (2) or (3).
   repository access**. A witness that authorizes a protective action must name a
   **trusted revision** and an **independent verification** of it (for example a
   reviewed commit on a protected ref), not merely "the local clone says so."
+- A **trusted revision** can potentially establish that protection **was
+  activated at that revision**, provided the activation record and its
+  protection binding are verified. It **cannot** establish that protection
+  **remains active today**, nor that a future **fail-closed** policy was
+  authorized.
 - Therefore git is recorded as a **candidate historical witness** (Question A),
   **not** as an independently sufficient authorization mechanism (Question B).
 
