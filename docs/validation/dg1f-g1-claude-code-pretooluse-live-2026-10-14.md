@@ -18,6 +18,9 @@
 | Mode | **strict** (`MNEME_HOOK_MODE` unset) |
 | Governed repo | throwaway dir with `.mneme/project_memory.json`, one active decision `G1-DEC` with `FORBID_LITERAL "psycopg2"` |
 
+Probe A and Probe B each ran in their **own disposable governed repo** with an
+independent `app.py`, which is why their hashes differ (see §5).
+
 Raw captured outputs are preserved under
 [`artifacts/dg1f-g1-claude-code-pretooluse-2026-10-14/`](artifacts/dg1f-g1-claude-code-pretooluse-2026-10-14/).
 
@@ -67,8 +70,8 @@ PreToolUse:Write hook error: [mneme-hook]: mneme: FAIL - architectural decision 
 The `tool_result` shares the `tool_use_id` of the `Write` call, binding the
 rejection to the attempted modification. `app.py` SHA-256 was
 `DEA73BB07AAC829CF5A467A69E889923F70D2FB608B56907CA2EC68E8C3D492D` before and
-after (**unchanged**). Full events: `harness-violating.events.jsonl`; narrative:
-`harness-violating.transcript.md`.
+after (**unchanged**). Selected decisive host events:
+`harness-violating.events.jsonl`; narrative: `harness-violating.transcript.md`.
 
 **Permitted-write control — landed.** Asked only to change `return 1` to
 `return 2`, the agent reported *"Done. `existing()` now returns `2`"* and

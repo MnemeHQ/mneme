@@ -12,7 +12,9 @@ Command (run in the governed repo):
 
 ## Captured host events (verbatim, from the stream-json transcript)
 
-Full events preserved in [`harness-violating.events.jsonl`](harness-violating.events.jsonl).
+Selected decisive host events preserved in
+[`harness-violating.events.jsonl`](harness-violating.events.jsonl) (not the full
+event stream).
 
 **1. The agent attempted the modification** — an assistant `Write` tool call:
 
