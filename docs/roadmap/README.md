@@ -230,6 +230,15 @@ Promotion requires evidence; no support claim before the capability gate passes.
 
 ## RESEARCH — evidence before integration
 
+### P2 — Revision-bound conformance under concurrent agent changes
+
+[Track in issue #488](https://github.com/MnemeHQ/mneme/issues/488). Anthropic's [13 October 2026 Scion report](https://www.anthropic.com/engineering/redesigning-source-control) provides an agent-scale infrastructure signal: source control has become API-oriented, review policies distinguish sensitive logical changes, and post-merge/pre-deploy verification matters when many changes land concurrently. It is **not** an available integration, representative customer benchmark, or proof of commercial demand.
+
+Research the case where a change passes Mneme enforcement against one effective decision set, but its code base, canonical decision version, waiver or applicable rule changes before review, merge or deployment. Start with frozen Git-backed multi-agent fixtures and investigate whether a **version-control-neutral** change/revision identity and a canonical decision snapshot/rule-lineage binding can reveal stale verdicts without inventing new authority. Reuse DG1 effective resolution, governance change and ADR-029/030 evidence semantics.
+
+Promote to runtime design only after DG1F/DG1G, actual replayable evidence and the required Layer 1 charter/ADR gate. Report false passes/rejects, stale-evidence detection, correctness and overhead at available control seams; previous enforcement evidence never automatically proves current conformance. Keep source-control orchestration, organizational approvals, Scion support, and deployment platforms outside the core. This is **P2 research**, not an implementation or support promise.
+
+
 ### P2 — Slack Code and shared multi-agent constraints
 
 Investigate whether a shared coding workspace can consume one project architectural contract across multiple coding agents and sessions.

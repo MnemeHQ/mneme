@@ -4,6 +4,17 @@ Notes for AI agents working in this repository.
 
 Repository workflow, worktree lifecycle, merge policy, and architecture constraints are defined in `CLAUDE.md`; those rules apply regardless of which agent is executing the task.
 
+## Repository ownership and cross-repo handoff
+
+This **public OSS repository is the canonical Mneme decision and deterministic execution kernel**: Decision Index, decision identity/authority/scope/applicability/precedence/lifecycle/waivers (DG1/DG2), proposal/MCP contracts, rule enforcement, decision-linked evidence, and repository-local audit/integration surfaces.
+
+- **`MnemeHQ/mneme-data-engine` (private):** research evidence acquisition, candidate decision/architecture recovery, probabilistic classification, annotation and frozen evaluation. Results are **non-authoritative evidence** until explicitly reviewed and promoted via Core contracts/ADR. Do not import or depend on Data Engine internals.
+- **`MnemeHQ/mneme-enterprise` (private):** source-specific organisational connectors/sync, identity/RBAC/SSO, approval routing, retained organisation-wide audit and hosted operations. Enterprise consumes Core governance/enforcement semantics and may submit non-authoritative proposals; do not import or depend on Enterprise internals.
+- **Route work by ownership:** source-independent decision contracts, governance resolution and deterministic verdicts → **here**; discovery quality, benchmark pipelines, evidence reconstruction → **Data Engine**; organisation-specific connectors, permissions, approval/admin and hosted UX → **Enterprise**.
+- **Never confuse discovery with authority or a review recommendation with enforcement.** All authoritative transitions require explicit Core semantics; avoid a second policy engine or unsupported production claims.
+
+For reasoning about boundaries read [`docs/roadmap/README.md`](docs/roadmap/README.md), [ADR-031](docs/adr/ADR-031-decision-governance-semantics.md) and `CLAUDE.md`. These instructions govern any coding agent.
+
 ## Agent execution provenance
 
 Every pull request must record who actually produced the change. Git author identity is not sufficient because agent work is commonly committed under the human owner's Git identity.
