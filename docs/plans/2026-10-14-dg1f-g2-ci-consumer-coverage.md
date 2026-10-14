@@ -37,7 +37,7 @@ decision governance (`mneme check`).
 
 | Workflow | Governance? | Blocking? | What it actually runs | Failure / timeout / untrusted / missing-memory behavior |
 |---|---|---|---|---|
-| `mneme-check.yml` | **Yes** — `mneme check --mode warn` over changed `mneme/`, `docs/adr/`, `.mneme/`, `scripts/` files | **Required check name, but advisory in effect** | `python -m mneme.cli check … --mode warn` per file; posts a sticky PR comment | `--mode warn` exits 0 for **every** verdict (L6-8); the step adds `\|\| true` (L129) and never `exit 1` on FAIL/WARN; UNKNOWN is surfaced as a callout only (L150-152). **Missing memory → the whole step is skipped** (`if: present == 'true'`, L60/L98) and the job passes. No files in scope → `exit 0` (L113-116). |
+| `mneme-check.yml` | **Yes** — `mneme check --mode warn` over changed `mneme/`, `docs/adr/`, `.mneme/`, `scripts/` files | **Required check name, but advisory in effect** | `python -m mneme.cli check … --mode warn` per file; posts a sticky PR comment | `--mode warn` exits 0 for **complete** PASS/WARN/FAIL verdicts (L6-8); the step adds `\|\| true` (L129) so even a non-zero exit (e.g. **incomplete evaluation → exit 2**) is suppressed, and no branch exits 1 on FAIL/WARN. UNKNOWN is surfaced as a callout only (L150-152). **Missing memory → the step is skipped** (`if: present == 'true'`, L60/L98); a GitHub Actions `::notice::` is emitted (L64) but no governance verdict is produced and the job passes. No files in scope → `exit 0` (L113-116). |
 | `tests.yml` → `gate (PR battery)` | No | **Yes (required)** | `python scripts/run_test_battery.py gate` (pytest gate manifest) | Blocks on any gate-test failure. Tests **code**, not a governance verdict on a target artifact. |
 | `tests.yml` → `main` / `pytest-langchain` / `release` | No | No (push/dispatch) | `run_test_battery.py main` / langchain / release | Not run on PRs. |
 | `provenance-check.yml` | No | **Yes (required)** | `scripts/check_pr_provenance.py` | Blocks on a missing/malformed Execution provenance block. |
@@ -55,21 +55,31 @@ decision governance (`mneme check`).
    every verdict, the step is wrapped in `|| true`, and no branch exits 1 on a
    FAIL. Its **required-check name does not make a governance FAIL block a
    merge** — only an infrastructure failure of the job itself would.
-2. **Missing canonical memory is a silent pass in CI.** When
-   `.mneme/project_memory.json` is absent on the branch, the run step is skipped
-   (`if: present == 'true'`) and the check passes — consistent with the S1
-   silent-skip behavior in the [blocking-semantics matrix](2026-10-14-dg1f-adversarial-blocking-semantics-matrix.md),
-   but here it means a PR to a repo with no memory gets no governance signal and
-   no diagnostic.
-3. **UNKNOWN is surfaced, not enforced.** The workflow counts UNKNOWN verdicts
+2. **Missing canonical memory is a visible notice, not a governance verdict.**
+   When `.mneme/project_memory.json` is absent the run step is skipped
+   (`if: present == 'true'`) and the workflow emits a GitHub Actions `::notice::`
+   ("… not present on this branch — skipping check", L64). That notice is **not**
+   a governance verdict: evaluation never runs, no PASS/WARN/FAIL is produced,
+   and the required job still succeeds. This matches the S1 silent-skip behavior
+   at the adapter level in the [blocking-semantics matrix](2026-10-14-dg1f-adversarial-blocking-semantics-matrix.md),
+   but in CI it is surfaced only as a notice — a reader must not read it as
+   governance coverage.
+3. **Warn mode is not unconditionally zero-exit.** The CLI returns 0 in warn
+   mode for **complete** PASS/WARN/FAIL results, but **incomplete evaluation
+   returns exit 2** regardless of mode (ADR-020). The workflow runs the check
+   with `|| true` (L129), so that non-zero exit is suppressed and the missing
+   `Result:` line is reported as `UNKNOWN` (L131) without failing the job.
+   "Warn mode always succeeds" is therefore true *because the workflow swallows
+   the error*, not because the CLI always returns 0.
+4. **UNKNOWN is surfaced, not enforced.** The workflow counts UNKNOWN verdicts
    and emits a warning callout, but the job still passes (matching ADR-021's
    fail-open transport policy and the C1 charter's "no silent PASS" *visibility*
    intent, without blocking).
-4. **No CI workflow enforces a governance verdict as a merge gate.** The
+5. **No CI workflow enforces a governance verdict as a merge gate.** The
    required checks that do block are repository hygiene (encoding, install,
    provenance) and the test battery; none is a decision-governance gate on the
    PR's artifact.
-5. **Path-scoped, so many PRs get no governance check at all.** Only changes
+6. **Path-scoped, so many PRs get no governance check at all.** Only changes
    under `mneme/`, `docs/adr/`, `.mneme/`, `scripts/` are checked; other paths
    produce "No files in scope" and pass.
 
@@ -79,14 +89,15 @@ decision governance (`mneme check`).
 |---|---|---|
 | **C1** | A governance **FAIL** in CI is advisory only; nothing blocks a merge on it. | Decide (separately) whether a strict-mode CI gate for a narrow path set should exist; that is an enforcement-input change and would need its own charter + `[layer1-freeze]` amendment (ADR-031 §7). Not authorized here. |
 | **C2** | **Missing memory is a silent CI pass** (step skipped). | An offline test/assertion that a missing-memory CI invocation is reported as *inactive/unavailable*, not silently green. Ties to G3 (missing-memory policy). |
-| **C3** | No test pins the workflow's verdict parsing / UNKNOWN handling. | A small test that the `mneme-check.yml` parsing treats a FAIL/UNKNOWN payload as non-blocking and surfaces it (characterization only). |
+| **C3** | The workflow parses **human-readable `Result:` lines**, not a validated `mneme.check/v1` payload; no test pins the parsing/UNKNOWN handling. Contradictory output/exit (e.g. a PASS line with a non-zero exit) can produce misleading reporting. | A small characterization test that the `mneme-check.yml` parsing treats FAIL/UNKNOWN (and contradictory output) as non-blocking and surfaces it; ideally consume `mneme.check/v1` rather than a `Result:` line. |
 | **C4** | `architecture-docs-check.yml` runs but is not a required check. | Confirm intent (advisory vs required); no change without a decision. |
 
 ## 5. Bottom line
 
 - **CI does not currently block on a governance verdict.** The single
   `mneme check` consumer is explicitly advisory (`warn`, `|| true`, no exit 1),
-  and missing memory skips it silently.
+  and missing memory produces only an Actions notice — no verdict — while the
+  job still succeeds.
 - **What CI does block on** is repository hygiene and the test battery — not
   decision enforcement on the PR's artifact.
 - This audit changes nothing and authorizes nothing. **G1 (host-harness
