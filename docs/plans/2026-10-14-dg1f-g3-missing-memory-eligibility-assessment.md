@@ -22,6 +22,11 @@ missing memory as a failure would block legitimate unprotected work; treating it
 as a silent skip would keep silently disabling protection. A trustworthy
 **eligibility witness** is therefore a prerequisite for fail-closed enforcement.
 
+The assessment separates two questions: whether authoritative memory **once
+existed** here (**Question A**) and whether the repository was **explicitly
+protected** and should now fail closed (**Question B**). §4 shows only Question
+A is answerable from existing evidence.
+
 ## 2. What the existing contracts actually provide
 
 ### 2.1 Activation lifecycle (`mneme/setup_state.py`)
@@ -61,47 +66,88 @@ indistinguishable in-band, and the default is a silent permit.
 
 A usable witness must be (i) **durable** — survive deletion of the memory file;
 (ii) **trustworthy** — not silently forgeable by the governed agent; and
-(iii) **not a new authority store**.
+(iii) **not a new authority store**. Durability and trustworthiness are
+**separate** properties (see §4.1): surviving deletion does not make a witness
+trustworthy.
 
 | # | Witness | Survives file deletion? | Trust boundary | Failure modes |
 |---|---|---|---|---|
 | W1 | `activation` record inside `project_memory.json` | **No** (in-band) | the memory file itself | cannot distinguish; unusable alone |
-| W2 | **Git tracking** of `.mneme/project_memory.json` (a committed file) | **Yes**, if committed | git (durable, reviewable; `git rm` is a visible diff) | FP: repo commits memory but never intended blocking; FN: memory never committed, or history rewritten |
-| W3 | Committed `decision_index`/`activation` snapshot in a **committed** memory file | Same as W2 | git | same as W2 |
+| W2 | **Git tracking** of `.mneme/project_memory.json` (a committed file) | **Yes**, if committed | **Durable but not automatically trustworthy** — the local index, refs and history are agent-modifiable; needs a trusted revision + independent verification | FP: repo commits memory but never intended blocking; FN: memory never committed, history rewritten, or a `MNEME_MEMORY` override |
+| W3 | Committed `decision_index`/`activation` snapshot in a **committed** memory file | Same as W2 | same as W2 | same as W2 |
 | W4 | Hook/plugin **registration** (`.claude/settings.json`, installed plugin) | Yes | transport config, **agent-editable**, not authority | FP: hook installed for observation only; FN: hook removed with memory |
 | W5 | `MNEME_MEMORY` environment variable | No (per-invocation) | caller environment | not durable |
 | W6 | A **new** durable marker (e.g. `.mneme/active` or a git ref) | Yes | would be a **new authority store** | out of scope here (needs its own decision) |
 
 ## 4. Recommendation (bounded)
 
-1. **The only existing durable witness is W2/W3 — git tracking of a *committed*
-   memory file.** For a repository that commits `.mneme/project_memory.json`,
-   git can establish that the file *was* present and is now absent, which is a
-   positive "protected repo whose memory disappeared" signal.
-2. **The `activation` record (W1) cannot be the witness**, because it lives in
-   the file whose disappearance is the question.
-3. **Hook/plugin registration (W4) is not sufficient authority** — it is
-   agent-editable transport configuration, so it may corroborate but must not
-   gate.
-4. **Repositories that do not commit memory have no durable witness.** For
-   them, fail-closed cannot be made safe by reusing existing artifacts; it would
-   require a **new durable marker (W6)**, which is explicitly out of scope and
-   needs its own architectural decision.
-5. **Recommended eligibility rule (for a future, separately-authorized
-   change):** treat missing memory as an operational *unavailable* state — not a
-   silent permit — **only** when git positively witnesses that the repository
-   committed an authoritative memory file. Otherwise, keep today's
-   inactive/skip behavior and surface it as *inactive*, never as *pass*.
+Two questions must be kept separate:
 
-**Trust boundary:** the witness is git history/state for a committed path — the
-same durable, reviewable boundary ADR-030 already relies on for the memory file
-— never an agent-supplied argument or in-band field.
+- **Question A — did authoritative memory previously exist here?** Potentially
+  yes, using *sufficiently trustworthy* git evidence for a committed memory
+  path.
+- **Question B — was this repository explicitly protected, and should it now
+  fail closed?** **Not yet answerable** from existing git evidence.
 
-**Failure modes to carry forward:** W2 false positives (a repo commits memory
-for retrieval context but never intends blocking) must not be forced into
-fail-closed without an explicit opt-in; W2 false negatives (memory never
-committed, shallow clones, history rewrite) must fall back to the *inactive*
-state, never to a fabricated *pass*.
+Mneme currently conflates several distinct states, which must not be merged:
+
+1. a repository **with decision memory** (it may be retrieval context only);
+2. a repository where protection was **explicitly activated**
+   (`activation.state == "active"` — not reachable today);
+3. a repository **explicitly configured** for a future fail-closed availability
+   policy (no such flag exists yet).
+
+Git can, at best, speak to (1)'s history. It cannot establish (2) or (3).
+
+### 4.1 Git is a candidate *historical witness*, not an authorization
+
+- **Durability is not trustworthiness.** Git tracking survives file deletion,
+  but the local index, refs and history are **modifiable by an agent with
+  repository access**. A witness that authorizes a protective action must name a
+  **trusted revision** and an **independent verification** of it (for example a
+  reviewed commit on a protected ref), not merely "the local clone says so."
+- Therefore git is recorded as a **candidate historical witness** (Question A),
+  **not** as an independently sufficient authorization mechanism (Question B).
+
+### 4.2 The witness must be bound to the repository and the effective memory path
+
+Memory discovery is ambiguous (`mneme/integrations/claude_code/hook.py:find_memory`):
+
+- `MNEME_MEMORY` wins if set; if it points at a **non-existent** file, discovery
+  returns `None` **even when the repository's own memory exists**;
+- otherwise discovery **walks up parent directories**, so a child repo whose
+  memory disappeared could resolve a **parent directory's** memory.
+
+An eligibility witness must therefore be bound to the **intended repository
+root** *and* the **effective memory path** it expects — not to "some memory file
+was found or absent somewhere up the tree."
+
+### 4.3 Bounded recommendation
+
+1. Record git tracking of a committed memory file as a **candidate historical
+   witness** for Question A only.
+2. Do **not** treat it as authorization for fail-closed behavior: Question B
+   needs an explicit, durable, independently verifiable **protection/eligibility
+   declaration** that does not exist yet.
+3. The `activation` record (W1) cannot serve — it lives in the file whose
+   disappearance is the question.
+4. Hook/plugin registration (W4) is agent-editable transport config, not
+   authority.
+5. Any future eligibility change must (i) bind the witness to the intended repo
+   root and effective memory path, (ii) name the trusted revision and its
+   independent verification, and (iii) preserve the distinction between "memory
+   once existed", "protection was activated", and "fail-closed was configured".
+   It requires its own charter + `[layer1-freeze]` amendment.
+
+**Trust boundary:** a trusted, independently verified revision for a committed
+path — never an agent-supplied argument, an in-band field, or an unverified
+local clone state.
+
+**Failure modes to carry forward:** false positives (memory committed for
+context, never intended blocking) must not be forced into fail-closed without
+explicit opt-in; false negatives (memory never committed, shallow clone, history
+rewrite, or a `MNEME_MEMORY` override) must fall back to the *inactive* state,
+never a fabricated *pass*.
 
 ## 5. Explicit non-authorization
 
