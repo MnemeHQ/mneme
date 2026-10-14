@@ -76,13 +76,13 @@ test on a sibling surface (e.g. the edit gate) does not upgrade Bash/Stop.
 | CC PreToolUse edit gate | Si | ?u | Vt | Vt | Vt | Vt | Vt | Vt | Vt | Vt | ?u |
 | CC Bash/heredoc preflight | Si | ?u | Vt | Vt | Vt | Vt | ?u | ?u | Vt | Vt | ?u |
 | CC Stop session-delta | Si | Vt | Vt | Vt | Vt | Vt | ?u | Vt | Vt | Vt | Vt |
-| Codex gate | St | ?u | Vt | Vt | Vt | Vt | Vt | ?u | ?u | Vt | ?u |
+| Codex gate | St | ?u | Vt | Vt | Vt | Vt | Vt | ?u | Vt | Vt | ?u |
 | Codex Stop audit | St | ?u | ?u | Vt | Vt | ?u | ?u | ?u | ?u | ?u | ?u |
-| Kiro | St | Vt | Vt | Vt | Vt | Vt | Vt | Vt | ?u | Vt | ?u |
+| Kiro | St | Vt | Vt | Vt | Vt | Vt | Vt | Vt | Vt | Vt | ?u |
 | Agent SDK | St | ?u | Vt | Vt | Vt | Vt | Vt | Vt | Vt | ?u | Vt |
 | LangChain | St | ?u | Vt | Vt | Vt | Vt | ?u | Vt | Vt | ?u | ?u |
 | Hermes | St | ?u | Vt | Vt | Vt | Vt | ?u | ?u | ?u | ?u | ?u |
-| Antigravity | St | ?u | Vt | Vt | Vt | Vt | ?u | ?u | ?u | ?u | ?u |
+| Antigravity | St | ?u | Vt | Vt | Vt | Vt | ?u | ?u | Vt | ?u | ?u |
 | Decision MCP | — | ?u | — | — | — | — | — | — | — | — | — |
 | Protection / Audit / readiness | — | ?u | — | — | — | — | — | — | — | — | — |
 
@@ -130,7 +130,8 @@ Representative evidence (all on `main` after #484 merged):
   `test_contradictory_checker_result_is_disclosed_not_blocked`,
   `test_unevaluated_artifact_disclosed_not_claimed_governed`).
 - **Kiro:** `test_failopen.py` (S1, S3–S8, S10), `test_e2e.py`
-  (`test_corrupt_memory_fails_open_against_real_cli`, S2).
+  (`test_corrupt_memory_fails_open_against_real_cli`, S2),
+  `test_gate_applicability.py` (S9).
 - **Agent SDK:** `test_adapter.py` (`test_no_memory_skipped`,
   `test_unknown_evaluation_never_becomes_pass` (S9 adapter handling of an
   `UNKNOWN` trace), `test_operational_failure_fails_open`,
@@ -145,7 +146,8 @@ Representative evidence (all on `main` after #484 merged):
   `test_incomplete_evaluation_fails_open`,
   `test_no_project_memory_has_no_opinion`).
 - **Antigravity:** `test_adapter_gate.py` (`test_malformed_hook_input_fails_open`,
-  `test_incomplete_evaluation_fails_open`, `test_no_memory_has_no_opinion`).
+  `test_incomplete_evaluation_fails_open` (S5/S9),
+  `test_no_memory_has_no_opinion`).
 
 Cells marked `t` are the adapter's **returned action** as asserted offline; they
 are **not** proof the host harness honours it (see G1).
@@ -157,7 +159,7 @@ are **not** proof the host harness honours it (see G1).
 | **G1** | **Harness enforcement is unproven.** Offline tests assert the adapter's `deny`/`block` return, not that the host actually prevents the mutation. | A returned block the harness ignores is false protection. | A pinned live/pinned-harness probe verifying no mutation (#483 C3). Out of offline scope. |
 | **G2** | **CI consumers are unaudited.** Which jobs invoke `mneme check`, and whether a bad verdict blocks, is unmapped. | A fail-open CI step silently passes. | Per-workflow inventory + an offline test that a bad verdict fails the step (or is documented non-blocking). |
 | **G3** | **Missing-memory policy is unsettled** and currently a **silent skip** (S1). | Whether "no memory" should be inactive/unevaluated (permit) or an operational failure is an eligibility/witness decision. | #483 gate 1 before any change. |
-| **G4** | **Residual per-surface gaps.** After the coverage re-audit and the G4 tests, the genuinely untested cells are: S2 invalid canonical memory (all surfaces except Kiro and the CLI); S7 timeout on CC Bash/Stop, LangChain, Hermes, Antigravity; S9 on Codex gate/Stop, Kiro, Hermes, Antigravity; S11 absent verdict payload on most surfaces; and Codex Stop audit S3/S6–S11. | Absence of a test is not evidence of safe behavior. | A bounded offline module filling only these cells, reusing `tests/integrations/check_contract.py`. |
+| **G4** | **Residual per-surface gaps.** After the coverage re-audit and the G4 tests, the genuinely untested cells are: S2 invalid canonical memory (CC PreToolUse/Bash, Codex gate/Stop, Agent SDK, LangChain, Hermes, Antigravity, MCP, protection/Audit/readiness); S7 timeout on CC Bash/Stop, LangChain, Hermes, Antigravity; S9 on Codex Stop and Hermes; S11 absent verdict payload on most surfaces; and Codex Stop audit S3/S6–S11. | Absence of a test is not evidence of safe behavior. | A bounded offline module filling only these cells, reusing `tests/integrations/check_contract.py`. |
 | **G5** | **Incomplete-vs-untrusted is only an adapter-level distinction.** #484 classifies trust; the *policy* is ADR-033 scope. | The matrix characterizes current behavior; it does not decide availability policy. | ADR-033 / C0 charter (#483). |
 
 ## 5. Bounded offline validation matrix — the G4 work item
