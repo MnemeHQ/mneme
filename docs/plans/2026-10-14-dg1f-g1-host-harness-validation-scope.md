@@ -57,20 +57,41 @@ Keep the first validation minimal and falsifiable:
 
 | Harness | Surface to probe first | Block mechanism to observe |
 |---|---|---|
-| Claude Code | `PreToolUse` direct edit | `permissionDecision: deny` prevents the write |
+| Claude Code | `PreToolUse` direct edit | **exit code 2 + stderr reason** prevents the write. The hook does **not** use `permissionDecision: deny`; warn mode emits `permissionDecision: defer` (`hook.py`). |
 | Codex CLI | pre-tool patch gate | `DENY` prevents the patch |
-| Kiro | hook gate | non-zero exit blocks the tool |
+| Kiro | hook gate | non-zero exit blocks the tool (see §4a for existing live evidence) |
 | Antigravity | adapter gate | block response prevents the mutation |
 | Hermes | pre-tool-call hook | block directive prevents the mutation |
-| Claude Code / Codex | `Stop` backstop | post-mutation audit blocks completion (not pre-write) |
+| Claude Code / Codex | `Stop` backstop | **post-mutation** audit; establish whether the harness prevents **completion/continuation** — not that the write was prevented |
 
-Each slice needs the same no-mutation assertion; a Stop backstop is a
-**post-mutation** gate and must be reported as such, not as prevention.
+Each **pre-write** slice needs the no-mutation assertion. A `Stop` backstop is a
+**post-mutation** gate: its evidence is whether the harness prevents
+completion/continuation, **not** that the file is unchanged — a different
+guarantee that must be reported separately.
+
+### 4a. Existing live evidence to reuse (Kiro)
+
+G1 must not re-run experiments that already have documented live results. The
+[Kiro hook spec](../integrations/kiro-hook-spec.md) records a live reproduction
+(2026-08-26) with exactly the distinction this validation targets:
+
+| Harness | Blocking verdict | Pre-execution blocking |
+|---|---|---|
+| Kiro CLI 2.19.2, default v2 engine | exit 2 emitted | **FAIL** — file written despite exit 2 |
+| Kiro CLI 3.0 / v3 engine (`--v3`) | exit 2 emitted | **PASS** — tool blocked pre-disk, stderr shown to the agent |
+
+This is the canonical example of why G1 matters: the **same** Mneme block is
+honoured by one engine and ignored by another. G1 should cite this as existing
+evidence and extend the same methodology to Claude Code and the other harnesses,
+rather than treating Kiro as unvalidated.
 
 ## 5. Required evidence (per slice)
 
 - A reproducible transcript (commands, harness version, Mneme commit).
-- Before/after content hashes of the target artifact.
+- For **pre-write** slices: before/after content hashes of the target artifact
+  (unchanged = the write was prevented).
+- For the `Stop` backstop: whether the harness prevented
+  completion/continuation (its guarantee is post-mutation, not no-write).
 - The adapter's blocking decision and the harness's observed action.
 - The control run (permitted write) for the same artifact.
 - An explicit note of what the probe does **not** prove (e.g. other tool paths,
