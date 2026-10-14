@@ -494,6 +494,76 @@ C1a preview**.
 
 ---
 
+## Amendment — authorize the #260 verdict-consistency correction (2026-10-14)
+
+> This is an authorization for a **bounded defect correction**, not a statement
+> that behavior has changed. It does not authorize availability policy,
+> fail-closed enforcement, applicability exclusions, or waivers.
+
+**Change:** Permit the **verdict-consistency correction** (issue #260)
+implemented in PR #484: an integration trusts a checker result only when the
+payload envelope, violation records, aggregate, requested `mode` and process
+exit code are mutually coherent, and otherwise **fails open** with a diagnostic.
+This changes *which results Mneme trusts*, not the fail-open policy.
+
+**Sections referenced:** the Freeze Anchor **Status** clause ("No behavioral
+change to retrieval or enforcement without an explicit charter amendment") and
+the Amendment Procedure below.
+
+**Rationale (Amendment Procedure §3(b)).** A distinct behavioral charter was
+**already merged** before this amendment:
+[Reliable Enforcement C1 — verdict-consistency defect-correction charter](../plans/2026-10-14-reliable-enforcement-c1-verdict-consistency-charter.md),
+PR [#503](https://github.com/MnemeHQ/mneme/pull/503), squash `272632ca`. That
+charter authorizes only the #484 correction and explicitly preserves the items
+below; this amendment supplies the Layer 1 freeze authorization it requires. No
+behavior change is retroactively justified.
+
+**Governing authority:** accepted
+[ADR-021](../adr/ADR-021-shell-preflight-and-stop-session-delta.md) (fail-open
+transport policy),
+[ADR-017](../adr/ADR-017-enforcement-scope-vs-retrieval-scope.md),
+[ADR-020](../adr/ADR-020-explicit-path-applicability-for-typed-rules.md),
+[ADR-023](../adr/ADR-023-canonical-decision-index-and-runtime-projection-boundary.md),
+[ADR-029](../adr/ADR-029-enforcement-evidence-binding-semantics.md),
+[ADR-030](../adr/ADR-030-canonical-decision-persistence-version-identity-and-stable-rule-lineage.md),
+[ADR-031](../adr/ADR-031-decision-governance-semantics.md), and the merged C1
+charter.
+
+### Authorized change — verdict trust only
+
+- Trust a checker result only when the requested `mode`, the violation records,
+  the aggregate verdict/violation agreement, and the process exit code are
+  mutually coherent; an incoherent result **fails open** with a diagnostic that
+  never echoes proposed content.
+- Route every shipped consumer of `parse_verdict` through the coherence wrapper
+  with the mode it requested; an unhashable verdict value no longer raises.
+
+### Explicitly preserved (unchanged)
+
+1. **Fail-open policy (ADR-021).** Every untrusted, unparseable, incomplete or
+   contradictory result still fails open; no fail-closed or availability-strict
+   mode is introduced.
+2. **strict/warn semantics (ADR-017, ADR-020)** for coherent verdicts.
+3. **Canonical authority (ADR-023, ADR-030) and evidence identity (ADR-029,
+   ADR-031).**
+4. **Retrieval, `ConflictDetector`, enforcer, rule matching.**
+5. **`mneme.check/v1` payload and CLI exit codes.**
+6. **Frozen benchmark fixtures and methodology.**
+7. **`.mneme/project_memory.json`.**
+
+### Not authorized by this amendment
+
+- ADR-033 availability states or any availability policy; the proposed
+  ADR-033 / C0 charter (#483) remains separate and proposed.
+- Missing-memory eligibility/witness changes.
+- Fail-closed enforcement, new schema, CLI/MCP surface, or new engine.
+- DG1F-C1b applicability exclusion; DG1B2 waivers.
+- Any claim that a returned block is honoured by the host harness.
+
+The existing DG1B1 and DG1F-C1a freeze amendments remain unchanged.
+
+---
+
 ## Amendment Procedure
 
 This document is frozen at `e73ff7d`. To amend it:
