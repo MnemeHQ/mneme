@@ -195,6 +195,13 @@ class CanonicalDecisionRecord:
     last-modified timestamp differs from ``decided_at`` (ADR sources carry a
     single decision date, so the ADR adapter leaves this unset and the
     projector derives both runtime timestamps from ``decided_at``).
+
+    ``applicability_required_labels`` is the DG1B1 decision applicability
+    semantic (ADR-031 §4): an optional, non-empty set of exact
+    project-local context labels the decision requires to govern a
+    ``GovernanceContext``. An empty tuple means the decision is globally
+    eligible, so every v1 decision keeps its present behavior. It is not
+    retrieval metadata and never becomes ADR-020 rule applicability.
     """
 
     decision_id: str
@@ -217,6 +224,7 @@ class CanonicalDecisionRecord:
     test_evidence: tuple[CanonicalTestEvidence, ...] = ()
     relationships: tuple[tuple[str, str], ...] = ()
     derived_rule_ids: tuple[str, ...] = ()
+    applicability_required_labels: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)

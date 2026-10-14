@@ -7,11 +7,13 @@ place, from the same migration transformation the command uses.
 """
 from __future__ import annotations
 
+import copy
 from dataclasses import replace
 from pathlib import Path
 from typing import Any, Iterable
 
 from mneme.decision_index_persistence import (
+    DECISION_INDEX_SCHEMA,
     _migrate_memory_document,
     apply_memory_migration,
     plan_memory_migration,
@@ -19,8 +21,28 @@ from mneme.decision_index_persistence import (
 
 
 def canonical_document(document: dict[str, Any]) -> dict[str, Any]:
-    """Return the canonical form of an in-memory pre-D1 document."""
+    """Return the canonical form of an in-memory pre-D1 document.
+
+    This is the current canonical schema (``mneme.decision-index/v2`` since
+    DG1B1), matching what ``mneme decision-index migrate`` writes.
+    """
     return _migrate_memory_document(document)
+
+
+def v1_document(document: dict[str, Any]) -> dict[str, Any]:
+    """Return the schema-v1 view of a canonical document for characterization.
+
+    The shipped v1 loader rejects any non-v1 schema and ignores unknown keys.
+    Tests that characterize that loader build their fixture here: the current
+    canonical document uses schema v2 (DG1B1), so this drops the v2-only
+    ``semantic_features`` declaration and restores the v1 schema tag. Test-only
+    view; never production memory.
+    """
+    document = copy.deepcopy(document)
+    section = document["decision_index"]
+    section["schema"] = DECISION_INDEX_SCHEMA
+    section.pop("semantic_features", None)
+    return document
 
 
 def without_version_identity(items: Iterable[Any]) -> list[Any]:

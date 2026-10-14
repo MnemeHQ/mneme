@@ -71,6 +71,7 @@ from mneme.benchmark_report import format_json, format_markdown, format_terminal
 from mneme.context_builder import DEFAULT_MAX_DECISIONS, format_decisions
 from mneme.cursor_generator import generate_mdc
 from mneme.decision_add import AddDecisionError, add_canonical_decision
+from mneme.decision_governance import GovernanceContext, resolve_effective
 from mneme.decision_authority import DecisionAuthorityError, DecisionAuthorityService
 from mneme.decision_index_persistence import (
     DecisionIndexMigrationRefused,
@@ -446,6 +447,43 @@ def _collect_adr_diagnostics(
     return collect_adr_diagnostics(memory_path=memory_path, adr_dir=adr_dir)
 
 
+def _print_applicability_preview(store: MemoryStore, labels: list[str]) -> None:
+    """Report DG1F-C1a applicability without changing enforcement inputs.
+
+    Labels are unauthenticated caller assertions. Use only the validated
+    canonical index retained by MemoryStore.load (the exact snapshot projected
+    into runtime Decisions); never perform a second file read. An invalid
+    preview, including unresolved governance-integrity findings, is isolated
+    from the ordinary check result and its exit code.
+    """
+    try:
+        index = store.canonical_index
+        if index is None:
+            raise ValueError("no canonical decision_index section")
+        resolution = resolve_effective(index, GovernanceContext(labels=tuple(labels)))
+        if resolution.findings:
+            raise ValueError("governance integrity findings prevent complete preview")
+        lines = [
+            "NON-AUTHORITATIVE applicability preview (caller-asserted labels; "
+            "no effect on enforcement)",
+            "  labels: " + json.dumps(list(resolution.context.labels), ensure_ascii=True),
+        ]
+        for decision in resolution.decisions:
+            reason = decision.cause or "effective"
+            lines.append(
+                f"  [{decision.decision_id}] {decision.status} "
+                f"(cause={reason}; version={decision.decision_version_id})"
+            )
+    except Exception:
+        print(
+            "NON-AUTHORITATIVE applicability preview: PREVIEW UNAVAILABLE",
+            file=sys.stderr,
+            flush=True,
+        )
+        return
+    print("\n".join(lines), file=sys.stderr, flush=True)
+
+
 def _cmd_check(args: argparse.Namespace) -> int:
     input_path = Path(args.input)
     if not input_path.exists():
@@ -467,6 +505,24 @@ def _cmd_check(args: argparse.Namespace) -> int:
         top=args.top,
         input_path=target_path,
     )
+
+    # DG1F-C1a: informational stderr-only side channel; never feed this
+    # resolution to DecisionRetriever, check_prompt, stdout or JSON.
+    preview_labels = getattr(args, "applicability_preview", None)
+    if preview_labels is not None:
+        try:
+            _print_applicability_preview(store, preview_labels)
+        except Exception:
+            # Even a broken diagnostic output stream must not change the
+            # enforcement result: this channel is strictly best effort.
+            try:
+                print(
+                    "NON-AUTHORITATIVE applicability preview: PREVIEW UNAVAILABLE",
+                    file=sys.stderr,
+                    flush=True,
+                )
+            except Exception:
+                pass
 
     if getattr(args, "json", False):
         # Machine-readable mode: the payload must be the only thing on stdout,
@@ -1132,6 +1188,16 @@ def _format_migration_preview(plan: MemoryMigrationPlan) -> str:
             "  Already migrated: decision_index is authoritative and valid; "
             "nothing to do."
         )
+    if plan.state == "upgrade_to_v2":
+        return (
+            f"Decision Index migration: {plan.path}\n"
+            "  Canonical schema: mneme.decision-index/v1 -> "
+            "mneme.decision-index/v2\n"
+            "  Only the schema tag changes; no semantic features are declared, "
+            "so every decision stays globally eligible.\n"
+            "  Decisions, versions, rules, and the compatibility snapshot are "
+            "unchanged."
+        )
     native = len(plan.native_decision_ids)
     non_active = len(plan.non_active_decisions)
     items = len(plan.legacy_item_ids)
@@ -1173,7 +1239,7 @@ def _cmd_decision_index_migrate(args: argparse.Namespace) -> int:
     if not memory.is_file():
         return _error_exit(f"memory file {memory} does not exist")
     try:
-        plan = plan_memory_migration(memory)
+        plan = plan_memory_migration(memory, to_v2=args.to_v2)
     except DecisionIndexMigrationRefused as exc:
         return _error_exit(f"migration refused: {exc}")
     except DecisionIndexPersistenceError as exc:
@@ -1847,6 +1913,14 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p_check.add_argument("--query", required=True, help="Context query for retrieval")
     p_check.add_argument(
+        "--applicability-preview", action="append", default=None, metavar="LABEL",
+        help=(
+            "NON-AUTHORITATIVE preview of canonical decision applicability "
+            "for a caller-asserted label (repeatable). Reports only on stderr; "
+            "does not change enforcement or JSON results."
+        ),
+    )
+    p_check.add_argument(
         "--top", type=int, default=DEFAULT_MAX_DECISIONS,
         help=(
             "Size of the retrieval-gated tier. Bounds how many decisions have "
@@ -2160,6 +2234,15 @@ def _build_parser() -> argparse.ArgumentParser:
         help=(
             "Write exactly the previewed migration (refused if the file "
             "changed after it was read)"
+        ),
+    )
+    p_di_migrate.add_argument(
+        "--to-v2",
+        action="store_true",
+        help=(
+            "Explicitly upgrade an already-canonical mneme.decision-index/v1 "
+            "file to v2 (DG1B1, ADR-031 §8). No-op once the section is v2. "
+            "Valid v1 files are never upgraded implicitly."
         ),
     )
     p_di_migrate.set_defaults(func=_cmd_decision_index_migrate)
