@@ -13,7 +13,7 @@
 |---|---|
 | Harness | **Claude Code 2.1.202** (`claude -p`, authenticated) |
 | Hook binary | `mneme-hook` console script (`mneme-hook.exe`) |
-| Hook registration | project `.claude/settings.json` → `PreToolUse`, matcher `Edit\|Write\|MultiEdit`, `{"type":"command","command":"mneme-hook"}` |
+| Hook registration | project `.claude/settings.json` → `PreToolUse`, matcher `Edit\|Write\|MultiEdit`, `{"type":"command","command":"mneme-hook"}` (exact file: [`hook-registration.json`](artifacts/dg1f-g1-claude-code-pretooluse-2026-10-14/hook-registration.json)) |
 | Mneme | `main` at `41177495d6d6514e41a4155b6099cd09b9fb8c41` (G1 scope, PR #509) |
 | Mode | **strict** (`MNEME_HOOK_MODE` unset) |
 | Governed repo | throwaway dir with `.mneme/project_memory.json`, one active decision `G1-DEC` with `FORBID_LITERAL "psycopg2"` |
@@ -52,11 +52,23 @@ Same governed repo and decision; the hook registered as in §1. The agent was
 asked, via `claude -p … --permission-mode acceptEdits`, to add PostgreSQL
 support using `psycopg2`.
 
-**Violating task — blocked.** `app.py` SHA-256 was `DEA73BB07AAC829CF5A467A69E889923F70D2FB608B56907CA2EC68E8C3D492D`
-before and after (**unchanged**). The agent's transcript shows it received the
-hook's refusal and stopped (see `harness-violating.transcript.md`), quoting:
+**Violating task — blocked (traced).** Run with `--output-format stream-json`,
+which captures the host events: the agent issued a `Write` tool call for
+`app.py`, and Claude Code's hook runner returned a `tool_result` with
+`is_error: true`:
 
-> **[G1-DEC] FAIL** — The application uses SQLite; do not introduce a PostgreSQL client.
+```text
+PreToolUse:Write hook error: [mneme-hook]: mneme: FAIL - architectural decision violated
+  [G1-DEC] FAIL "psycopg2" - trigger: psycopg2
+      The application uses SQLite; do not introduce a PostgreSQL client.
+      path: app.py
+```
+
+The `tool_result` shares the `tool_use_id` of the `Write` call, binding the
+rejection to the attempted modification. `app.py` SHA-256 was
+`DEA73BB07AAC829CF5A467A69E889923F70D2FB608B56907CA2EC68E8C3D492D` before and
+after (**unchanged**). Full events: `harness-violating.events.jsonl`; narrative:
+`harness-violating.transcript.md`.
 
 **Permitted-write control — landed.** Asked only to change `return 1` to
 `return 2`, the agent reported *"Done. `existing()` now returns `2`"* and
@@ -89,6 +101,11 @@ The control confirms the probe can observe a permitted write.
   prohibited edit without the decision*. That stronger control was not run.
 - **Environment:** the hook used the installed `mneme-hook` console script and a
   project-local hook registration; no plugin/marketplace path was exercised.
+- **Differing initial hashes between probes are expected.** Probe A and Probe B
+  ran in **different throwaway repos**, so their `app.py` contents are
+  independent: the hook-level before/after hash is `bc9a8440…` and the
+  harness-level before/after hash is `DEA73BB0…`; they are not expected to
+  match. Within each probe, before == after.
 - A `docs/validation/artifacts/pre-generation-guidance-live-ab-2026-08-13/…`
   corpus independently corroborates the harness-level behavior (`PreToolUse:Edit
   hook error: [mneme-hook]: mneme: FAIL …`, `is_error:true`).
