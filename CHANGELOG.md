@@ -26,6 +26,18 @@
 
 ### Additions (no verdict changes)
 
+- **Actionable refusal for free-text decision sources.** `mneme decision-index
+  migrate` still refuses a legacy `decisions[]` row whose `source` is a
+  free-text note (it has no canonical provenance form, ADR-030 §12), and
+  still writes nothing. The refusal now names the lossless route: move the
+  decision into an ADR file that records the note, remove its row, re-run the
+  migration, then `mneme adr import` the file. A new gate regression test
+  (`tests/test_legacy_memory_compatibility.py`) pins the upgrade path for a
+  repository written by 0.9.x: its memory stays readable, writers point to the
+  migration preview, lossy rows are refused with a route forward, and the
+  route migrates with byte-identical repeat imports. Found on mnemehq-site,
+  whose governance CI stopped working on the 0.10.0 upgrade.
+
 - **Canonical evidence identity (DG1E).** `mneme check --json` adds
   `rule_id` and `decision_version_id` to every `applicability[]` and typed
   `violations[]` entry (`mneme.check/v1` is unchanged; keys are additive).

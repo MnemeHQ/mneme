@@ -2327,6 +2327,17 @@ _LOSSLESS_RULE_FIELDS = frozenset({
 _LOSSLESS_TEST_EVIDENCE_FIELDS = frozenset({"selector", "sha"})
 _LOSSLESS_SOURCE_FIELDS = frozenset({"type", "path", "sha256"})
 
+# A free-text ``source`` note (written straight into memory before ADR-030)
+# has no canonical provenance form, so migration refuses it. The refusal names
+# the lossless route instead of leaving a dead end; it never offers to drop
+# the note (§12: no force, repair, or loss-acknowledgment option).
+_FREE_TEXT_SOURCE_ROUTE = (
+    ": it is a free-text provenance note, which has no canonical form. To keep "
+    "it, move this decision into an ADR file whose body records the note, "
+    "remove its row from decisions[], re-run this migration, then import the "
+    "ADR file with `mneme adr import`"
+)
+
 
 def _is_str_list(value: object) -> bool:
     return isinstance(value, list) and all(isinstance(v, str) for v in value)
@@ -2420,7 +2431,10 @@ def lossless_migration_problems(document: dict[str, Any]) -> list[str]:
             source = row["source"]
             source_where = f"{where} source"
             if not isinstance(source, dict):
-                problems.append(f"{source_where} is not an object")
+                problems.append(
+                    f"{source_where} is not an object"
+                    + (_FREE_TEXT_SOURCE_ROUTE if isinstance(source, str) else "")
+                )
                 continue
             for key in sorted(set(source) - _LOSSLESS_SOURCE_FIELDS):
                 problems.append(
