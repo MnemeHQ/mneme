@@ -216,6 +216,14 @@ This is a compatibility/reference integration, not a dependency. Mneme must cont
 
 Do not add CodeRabbit-specific logic to the Decision Index or enforcement core.
 
+### P1 (evidence-gated spike) — Cursor Origin App repository enforcement
+
+Evaluate the [Cursor Origin App Marketplace](https://cursor.com/changelog/origin-app-marketplace) as a **pull-request/merge-time** enforcement and evidence surface, distinct from Cursor's existing **rules export** (`mneme cursor generate`). Origin supports app check runs and repository rulesets for **native Origin repositories**; app writes to **GitHub-mirrored repositories** are restricted, so GitHub continues to own their CI and merge enforcement. Do not imply that Origin provides a pre-file-write coding-agent hook.
+
+Start with a short, private-app compatibility spike: verify installation and minimum permissions, webhook and revision identity, deterministic evaluation of a reviewed rule using the existing Mneme core, check-run reporting, and a required check that actually blocks a violating merge. Record both clean and violation cases, stale/indeterminate/error behavior, evidence provenance, and local/customer-controlled evaluation viability. Require a demonstrated control and explicit promotion decision before building an adapter or submitting a public marketplace app. No new policy engine, decision-authority source, or support claim.
+
+**Status:** proposed P1 candidate, not approved implementation. **Tracker:** [MNEME-ORIGIN-001 / #499](https://github.com/MnemeHQ/mneme/issues/499). This must not displace P0 external validation or DG1 and Data Engine foundations.
+
 ### P1 — Migration-aware Architecture Audit
 
 Extend the existing Audit workflow for long-running migrations and modernization, where legacy and target architectures coexist and path applicability matters.
