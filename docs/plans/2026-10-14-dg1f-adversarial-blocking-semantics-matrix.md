@@ -59,9 +59,11 @@ launch failure / interpreter missing · **S7** timeout · **S8** materialization
 failure · **S9** unknown path applicability (ADR-020 `UNKNOWN`) · **S10** wrong
 schema / stale CLI · **S11** absent verdict payload.
 
-**Behavior:** `B` blocks (deny) · `S` **silent permit / no-op — the operation is
-permitted with no agent-visible diagnostic** · `V` permit with a visible/
-disclosed diagnostic · `?` not established · `—` not applicable.
+**Behavior:** `B` blocks (deny) · `S` **silent permit / no-op — permitted with
+no agent-visible diagnostic** · `V` permit with a visible/disclosed diagnostic ·
+`E` **operational error / non-zero exit — the command reports failure or raises;
+this does not by itself establish that a downstream agent was prevented** · `?`
+not established · `—` not applicable.
 **Evidence class (second letter):** `t` direct offline test cited below · `i`
 inferred from source only · `u` untested/not established.
 
@@ -70,7 +72,7 @@ permit, source-inferred; `?u` = unknown.
 
 | Surface | S1 | S2 | S3 | S4 | S5 | S6 | S7 | S8 | S9 | S10 | S11 |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| CLI `mneme check` | —t | —t | — | — | Bt | —t | ?u | — | Bt | —t | — |
+| CLI `mneme check` | Et | Et | — | — | Et | — | — | — | Et | — | — |
 | CC PreToolUse edit gate | Si | ?u | Vt | Vt | Vt | Vt | ?u | ?u | Vt | Vt | ?u |
 | CC Bash/heredoc preflight | Si | ?u | Vt | Vt | Vt | Vt | ?u | ?u | Vt | Vt | ?u |
 | CC Stop session-delta | Si | Vt | Vt | Vt | Vt | Vt | ?u | Vt | Vt | Vt | Vt |
@@ -94,6 +96,14 @@ test_no_project_memory_quiet_zero`. The Stop **SessionStart** no-op test
 (`test_absent_memory_is_a_no_op`, `tests/integrations/claude_code/test_stop_boundary.py`)
 exercises **SessionStart, not Stop**, so Stop's S1 rests on source, not on that
 test.
+
+**CLI is not a blocking seam.** `mneme check` exits non-zero on a missing or
+invalid memory (`E`, S1/S2) and on incomplete or `UNKNOWN` evaluation (exit 2,
+`E`, S5/S9), but those are operational results the caller must interpret; they
+do **not** by themselves establish that a downstream agent action was prevented
+(G1/G2). The old `—`/`B` classification for these cells was wrong: missing/
+invalid memory is an operational error, and exit 2 for incomplete evaluation is
+not proof of blocking.
 
 Representative evidence (all cited failure-behavior tests are on `main`; the
 coherence/contradictory tests are `#484`-only):
@@ -155,12 +165,15 @@ offline, reuse rather than duplicate #484, change **no** runtime/CLI/MCP/schema/
 
 ## 6. Bottom line
 
-- **Established offline today:** every shipped consumer *identifies* an
-  untrustworthy or absent verdict and — except for **S1 missing memory, which is
-  a silent skip on the memory-discovering hooks** — fails open with a visible
-  diagnostic; coherent strict/warn results keep existing enforcement. This holds
-  for `main` for the failure-behavior tests; the **S4 contradictory rows and the
-  coherence suite are #484-only evidence**, not yet on `main`.
+- **Established (tested or source-confirmed `t`/`i` cells only):** among those
+  cells, every shipped hook *identifies* an untrustworthy or absent verdict and —
+  except for **S1 missing memory, which is a silent skip on the
+  memory-discovering hooks** — fails open with a visible diagnostic; coherent
+  strict/warn results keep existing enforcement. The **`u` cells are not
+  established** and are excluded from this statement. The failure-behavior tests
+  are on `main`; the **S4 contradictory rows and the coherence suite are
+  #484-only evidence**, not yet on `main`. The **CLI is an operational-error
+  surface, not a blocking seam** (S1/S2/S5/S9 are `E`).
 - **Not proven:** that the host harness actually blocks on the adapter's block
   (G1); that CI blocks on a bad verdict (G2); the missing-memory policy (G3); and
   the `u` cells (G4).
