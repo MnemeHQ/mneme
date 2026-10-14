@@ -50,6 +50,7 @@ def test_middleware_module_has_no_governance_semantics():
         "subprocess",
         "introduced_content",
         "parse_verdict",
+        "assess_verdict",
         "format_reason",
         "find_memory",
         "resolve_mode",

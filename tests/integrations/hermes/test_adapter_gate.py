@@ -5,59 +5,30 @@ from types import SimpleNamespace
 
 import pytest
 
+from tests.integrations.check_contract import check_payload, check_result_for, violation
 from mneme.integrations.hermes import adapter
 from mneme.integrations.hermes.adapter import ACTION_DENY, ACTION_SKIP, MnemeHermes, directive_for
 
 
 def _verdict(verdict="FAIL", evaluation_complete=True):
-    stdout = json.dumps(
-        {
-            "schema": "mneme.check/v1",
-            "verdict": verdict,
-            "mode": "strict",
-            "evaluation_complete": evaluation_complete,
-            "violations": (
-                [
-                    {
-                        "decision_id": "D1",
-                        "decision_text": "never do the bad thing",
-                        "severity": "FAIL",
-                        "rule": "no forbidden token",
-                        "trigger": "FORBIDDEN_TOKEN",
-                        "kind": "literal",
-                        "rule_type": "FORBID_LITERAL",
-                        "input_path": "",
-                        "selector": "",
-                    }
-                ]
-                if verdict != "PASS"
-                else []
-            ),
-            "applicability": [],
-            "freshness": [],
-        }
-    )
-    if not evaluation_complete:
-        stdout = json.dumps(
-            {
-                "schema": "mneme.check/v1",
-                "verdict": "WARN",
-                "mode": "strict",
-                "evaluation_complete": False,
-                "violations": [],
-                "applicability": [
-                    {
-                        "decision_id": "D2",
-                        "rule_type": "FORBID_LITERAL",
-                        "rule_value": "X",
-                        "outcome": "UNKNOWN",
-                        "reason": "path applicability unknown",
-                    }
-                ],
-                "freshness": [],
-            }
+    """Answer as the real CLI would, in whatever mode the gate requested."""
+    violations = [] if verdict == "PASS" else [
+        violation(
+            verdict,
+            decision_id="D1",
+            decision_text="never do the bad thing",
+            rule="FORBIDDEN_TOKEN",
+            kind="typed_rule",
+            rule_type="FORBID_LITERAL",
         )
-    return SimpleNamespace(returncode=2 if verdict != "PASS" else 0, stdout=stdout, stderr="")
+    ]
+
+    def answer(command):
+        return check_result_for(
+            command, verdict, violations=violations, complete=evaluation_complete
+        )
+
+    return answer
 
 
 @pytest.fixture()
@@ -84,10 +55,10 @@ def gate(tmp_path, monkeypatch):
 
 
 def _runner(result=None, error=None):
-    def run(*args, **kwargs):
+    def run(command, **kwargs):
         if error is not None:
             raise error
-        return result
+        return result(command) if callable(result) else result
 
     return run
 
@@ -147,7 +118,7 @@ class TestPatchReplaceGate:
 
         def runner(command, **kwargs):
             seen["called"] = True
-            return _verdict("PASS")
+            return _verdict("PASS")(command)
 
         gate._check_runner = runner
         result = gate.evaluate_tool_call(
@@ -285,6 +256,17 @@ class TestFailureSemantics:
         )
         assert result.action == adapter.ACTION_FAIL_OPEN
 
+    def test_contradictory_verdict_fails_open_visibly(self, tmp_path, gate):
+        """A FAIL payload exiting 1 in strict mode is not a verdict (#260)."""
+        gate._check_runner = _runner(
+            SimpleNamespace(returncode=1, stdout=json.dumps(check_payload("FAIL")), stderr="")
+        )
+        result = gate.evaluate_tool_call(
+            "write_file", {"path": str(tmp_path / "n.py"), "content": "x\n"}, cwd=str(tmp_path)
+        )
+        assert result.action == adapter.ACTION_FAIL_OPEN
+        assert "inconsistent verdict payload (FAIL with exit 1" in result.reason
+
     def test_incomplete_evaluation_fails_open(self, tmp_path, gate):
         gate._check_runner = _runner(_verdict(evaluation_complete=False))
         result = gate.evaluate_tool_call(
@@ -317,7 +299,7 @@ class TestModeSemantics:
         seen = {}
         gate._check_runner = lambda command, **kw: seen.update(
             mode=command[command.index("--mode") + 1]
-        ) or _verdict("PASS")
+        ) or _verdict("PASS")(command)
         gate.evaluate_tool_call(
             "write_file", {"path": str(tmp_path / "n.py"), "content": "x\n"}, cwd=str(tmp_path)
         )
@@ -329,7 +311,7 @@ class TestCheckInvocation:
         seen = {}
         gate._check_runner = lambda command, **kwargs: seen.update(
             command=command, **kwargs
-        ) or _verdict("PASS")
+        ) or _verdict("PASS")(command)
         path = str(tmp_path / "n.py")
         gate.evaluate_tool_call("write_file", {"path": path, "content": "x\n"}, cwd=str(tmp_path))
         cmd = seen["command"]

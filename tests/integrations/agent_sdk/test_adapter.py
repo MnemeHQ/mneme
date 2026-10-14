@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pytest
 
+from tests.integrations.check_contract import check_result_for, violation
 from mneme.integrations.agent_sdk import (
     ACTION_ALLOW,
     ACTION_DENY,
@@ -20,8 +21,6 @@ from mneme.integrations.agent_sdk import (
     ACTION_WARN,
     MnemeAgentSdk,
 )
-
-SCHEMA = "mneme.check/v1"
 
 MEMORY = {
     "meta": {
@@ -57,24 +56,9 @@ def completed(stdout: str = "", stderr: str = "", returncode: int = 0):
     return subprocess.CompletedProcess([], returncode, stdout, stderr)
 
 
-def verdict_payload(verdict: str, *, complete: bool = True, violations=None):
-    payload = {
-        "schema": SCHEMA,
-        "verdict": verdict,
-        "violations": violations or [],
-        "evaluation_complete": complete,
-    }
-    if not complete:
-        payload["applicability"] = [
-            {
-                "decision_id": "scoped_001",
-                "rule_type": "FORBID_LITERAL",
-                "rule_value": "install legacy-client",
-                "outcome": "UNKNOWN",
-                "reason": "input path outside policy root",
-            }
-        ]
-    return json.dumps(payload)
+def check_runner(verdict: str, **kwargs):
+    """A runner answering every check as the real CLI would, in its mode."""
+    return lambda command, **_: check_result_for(command, verdict, **kwargs)
 
 
 @pytest.fixture()
@@ -159,7 +143,7 @@ class TestEnforcementPath:
 
         def runner(command, **kwargs):
             seen["command"] = command
-            return completed(verdict_payload("PASS"))
+            return check_result_for(command, "PASS")
 
         sdk = make_integration(project, runner)
         result = sdk.evaluate_mutation(**self.edit(project))
@@ -175,20 +159,12 @@ class TestEnforcementPath:
         )
 
         def runner(command, **kwargs):
-            return completed(
-                verdict_payload(
-                    "FAIL",
-                    violations=[
-                        {
-                            "decision_id": "store_001",
-                            "severity": "FAIL",
-                            "rule": "psycopg2",
-                            "trigger": "psycopg2",
-                        }
-                    ],
-                )
-                + "\n"
-            )  # stderr empty; reason comes from payload formatting
+            # stderr empty; reason comes from payload formatting
+            return check_result_for(
+                command,
+                "FAIL",
+                violations=[violation("FAIL", decision_id="store_001", rule="psycopg2")],
+            )
 
         sdk = make_integration(project, runner)
         result = sdk.evaluate_mutation(**self.edit(project))
@@ -205,7 +181,7 @@ class TestEnforcementPath:
 
         def runner(command, **kwargs):
             captured.update(zip(command, command[1:]))
-            return completed(verdict_payload("PASS"))
+            return check_result_for(command, "PASS")
 
         sdk = make_integration(project, runner)
         sdk.evaluate_mutation(**self.edit(project))
@@ -213,7 +189,7 @@ class TestEnforcementPath:
 
     def test_unknown_evaluation_never_becomes_pass(self, project):
         def runner(command, **kwargs):
-            return completed(verdict_payload("PASS", complete=False))
+            return check_result_for(command, "PASS", complete=False)
 
         sdk = make_integration(project, runner)
         result = sdk.evaluate_mutation(**self.edit(project))
@@ -234,6 +210,17 @@ class TestEnforcementPath:
         assert result.action == ACTION_FAIL_OPEN
         assert "no parseable verdict" in result.reason
 
+    def test_contradictory_verdict_fails_open_visibly(self, project):
+        """A FAIL payload exiting 1 in strict mode is not a verdict (#260)."""
+        def runner(command, **kwargs):
+            proc = check_result_for(command, "FAIL")
+            return completed(proc.stdout, returncode=1)
+
+        sdk = make_integration(project, runner)
+        result = sdk.evaluate_mutation(**self.edit(project))
+        assert result.action == ACTION_FAIL_OPEN
+        assert "inconsistent verdict payload (FAIL with exit 1" in result.reason
+
     def test_operational_failure_fails_open(self, project):
         def runner(command, **kwargs):
             raise OSError("spawn failed")
@@ -248,13 +235,12 @@ class TestEnforcementPath:
 
         def runner(command, **kwargs):
             assert "warn" in command
-            return completed(
-                verdict_payload(
-                    "WARN",
-                    violations=[
-                        {"decision_id": "store_001", "severity": "WARN", "rule": "no postgres", "trigger": "postgres"}
-                    ],
-                )
+            return check_result_for(
+                command,
+                "WARN",
+                violations=[
+                    violation("WARN", decision_id="store_001", rule="no postgres", trigger="postgres")
+                ],
             )
 
         sdk = make_integration(project, runner)
@@ -271,7 +257,7 @@ class TestEnforcementPath:
 
         def runner(command, **kwargs):
             calls["mode"] = command[command.index("--mode") + 1]
-            return completed(verdict_payload("FAIL"))
+            return check_result_for(command, "FAIL")
 
         sdk = make_integration(project, runner)
         assert sdk.evaluate_mutation(**self.edit(project)).action == ACTION_DENY
@@ -302,7 +288,7 @@ class TestEnforcementPath:
 
         def runner(command, **kwargs):
             ran.append(command)
-            return completed(verdict_payload("PASS"))
+            return check_result_for(command, "PASS")
 
         sdk = make_integration(project, runner)
         result = sdk.evaluate_mutation(
@@ -317,7 +303,7 @@ class TestEnforcementPath:
 class TestSdkWiring:
     def test_hooks_callable_shapes_without_sdk_types(self, project):
         """Core callbacks are plain dicts and need no claude_agent_sdk."""
-        sdk = make_integration(project, lambda *a, **k: completed(verdict_payload("PASS")))
+        sdk = make_integration(project, check_runner("PASS"))
         out = sdk.pre_tool_use(
             {"tool_name": "Read", "tool_input": {"file_path": "app.py"}, "cwd": str(project)}
         )
@@ -345,24 +331,16 @@ class TestSdkWiring:
 
         # Trusted PASS verdict: the wired callback has no opinion.
         passing = make_integration(
-            project, lambda *a, **k: completed(verdict_payload("PASS"))
+            project, check_runner("PASS")
         )
         assert asyncio.run(drive(passing, "y = 2")) == {}
 
         # Trusted FAIL verdict: the wired callback denies with the reason.
         def fail_runner(command, **kwargs):
-            return completed(
-                verdict_payload(
-                    "FAIL",
-                    violations=[
-                        {
-                            "decision_id": "store_001",
-                            "severity": "FAIL",
-                            "rule": "psycopg2",
-                            "trigger": "psycopg2",
-                        }
-                    ],
-                )
+            return check_result_for(
+                command,
+                "FAIL",
+                violations=[violation("FAIL", decision_id="store_001", rule="psycopg2")],
             )
 
         denying = make_integration(project, fail_runner)

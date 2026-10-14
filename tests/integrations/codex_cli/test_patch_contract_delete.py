@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pytest
 
+from tests.integrations.check_contract import check_result_for, violation
 from mneme.integrations.codex_cli.gate import (
     DENY,
     PASS,
@@ -61,29 +62,17 @@ def _project_with_seed(tmp_path, monkeypatch, seed="def existing():\n    return 
 
 
 def _pass_runner():
-    import subprocess
-
     def run(command, **kwargs):
-        return subprocess.CompletedProcess(command, 0, stdout=json.dumps({
-            "schema": "mneme.check/v1", "verdict": "PASS", "mode": "strict",
-            "violations": [], "freshness": [], "evaluation_complete": True}),
-            stderr="")
+        return check_result_for(command, "PASS")
     return run
 
 
 def _fail_runner():
-    import subprocess
-
     def run(command, **kwargs):
-        return subprocess.CompletedProcess(command, 1, stdout=json.dumps({
-            "schema": "mneme.check/v1", "verdict": "FAIL", "mode": "strict",
-            "violations": [{
-                "decision_id": "ADR-D", "severity": "FAIL",
-                "rule": "FORBIDDEN_TOKEN_XYZ",
-                "trigger": "FORBIDDEN_TOKEN_XYZ",
-                "decision_text": "The forbidden token must not appear.",
-                "input_path": "helper.py"}],
-            "freshness": [], "evaluation_complete": True}), stderr="")
+        return check_result_for(command, "FAIL", violations=[violation(
+            "FAIL", decision_id="ADR-D", rule="FORBIDDEN_TOKEN_XYZ",
+            decision_text="The forbidden token must not appear.",
+            input_path="helper.py")])
     return run
 
 

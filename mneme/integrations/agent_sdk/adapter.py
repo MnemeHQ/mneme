@@ -60,7 +60,7 @@ from mneme.integrations.claude_code.hook import (
     format_reason,
     introduced_content,
     MaterializeError,
-    parse_verdict,
+    assess_verdict,
     resolve_mode,
     should_check,
 )
@@ -222,14 +222,14 @@ class MnemeAgentSdk:
                 "mneme-agent-sdk: could not run mneme check. Failing open.",
             )
 
-        payload = parse_verdict(proc.stdout)
+        assessment = assess_verdict(proc.stdout, proc.returncode, mode)
+        payload = assessment.payload
         if payload is None:
             return self._gate(
                 ACTION_FAIL_OPEN,
                 tool_name,
                 file_path,
-                "mneme-agent-sdk: no parseable verdict from mneme check "
-                f"(exit {proc.returncode}). Failing open.",
+                f"mneme-agent-sdk: {assessment.problem}. Failing open.",
                 payload_stderr=proc.stderr,
             )
 

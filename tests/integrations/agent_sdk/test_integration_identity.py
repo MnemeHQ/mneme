@@ -16,7 +16,7 @@ REQUIRED_IMPORTS = [
     "introduced_content",
     "find_memory",
     "resolve_mode",
-    "parse_verdict",
+    "assess_verdict",
     "format_reason",
     "format_applicability_reason",
     "DecisionRetriever",

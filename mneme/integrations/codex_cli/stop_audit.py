@@ -38,7 +38,7 @@ from mneme.integrations.claude_code.hook import (
     _child_env,
     format_applicability_reason,
     format_reason,
-    parse_verdict,
+    assess_verdict,
     resolve_mode,
     _is_stale_runtime,
 )
@@ -210,9 +210,13 @@ def handle_stop(payload: Any, stderr=None, stdout=None) -> int:
         if proc is None:
             notes.append(f"{rel} could not be evaluated (check did not run)")
             continue
-        verdict_payload = parse_verdict(proc.stdout)
+        assessment = assess_verdict(proc.stdout, proc.returncode, mode)
+        verdict_payload = assessment.payload
         if verdict_payload is None:
-            if _is_stale_runtime(proc.stderr):
+            if assessment.inconsistent:
+                notes.append(f"{rel} could not be evaluated "
+                             f"({assessment.problem})")
+            elif _is_stale_runtime(proc.stderr):
                 notes.append(f"{rel}: installed mneme CLI lacks required "
                              "JSON/path-aware options; ENFORCEMENT INACTIVE.")
             else:
