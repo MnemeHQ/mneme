@@ -1,0 +1,66 @@
+mneme src: C:\dev\mneme  git HEAD: 2578a720a7d418dc4023a701bf5e8bfe0ef43171
+python: 3.12.10  target: <ENV>\repo_a\app.py
+protected memory sha256: aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+
+== V0 control: cwd = repo_a
+  selected_memory: <ENV>\repo_a\.mneme\project_memory.json
+  selected_is_target_repo_memory: True
+  hook_exit: 2
+  outcome: BLOCKED
+  hook_stderr: mneme: FAIL - architectural decision violated
+  [T08-DEC] FAIL "psycopg2" - trigger: psycopg2
+      The application uses SQLite; do not introduce a PostgreSQL client.
+      path: app.py
+  hook_stdout: 
+  checker_direct: {'exit': 2, 'verdict': 'FAIL', 'mode': 'strict', 'evaluation_complete': True, 'violations': ['T08-DEC']}
+  target sha256 before==after: True
+
+== V1 cwd = sibling repo_b (permissive memory)
+  selected_memory: <ENV>\repo_b\.mneme\project_memory.json
+  selected_is_target_repo_memory: False
+  hook_exit: 0
+  outcome: PERMITTED
+  hook_stderr: 
+  hook_stdout: 
+  checker_direct: {'exit': 0, 'verdict': 'PASS', 'mode': 'strict', 'evaluation_complete': True, 'violations': []}
+  target sha256 before==after: True
+
+== V2 cwd = plain dir (no memory up tree)
+  selected_memory: None
+  selected_is_target_repo_memory: False
+  hook_exit: 0
+  outcome: PERMITTED
+  hook_stderr: 
+  hook_stdout: 
+  checker_direct: None
+  target sha256 before==after: True
+
+== V3 cwd = repo_a/vendor_tools (in-repo planted permissive memory)
+  selected_memory: <ENV>\repo_a\vendor_tools\.mneme\project_memory.json
+  selected_is_target_repo_memory: False
+  hook_exit: 0
+  outcome: PERMITTED
+  hook_stderr: 
+  hook_stdout: 
+  checker_direct: {'exit': 0, 'verdict': 'PASS', 'mode': 'strict', 'evaluation_complete': True, 'violations': []}
+  target sha256 before==after: True
+
+== V4 cwd = repo_a, MNEME_MEMORY -> nonexistent
+  selected_memory: None
+  selected_is_target_repo_memory: False
+  hook_exit: 0
+  outcome: PERMITTED
+  hook_stderr: 
+  hook_stdout: 
+  checker_direct: None
+  target sha256 before==after: True
+
+== V5 cwd = repo_a, MNEME_MEMORY -> repo_b memory
+  selected_memory: <ENV>\repo_b\.mneme\project_memory.json
+  selected_is_target_repo_memory: False
+  hook_exit: 0
+  outcome: PERMITTED
+  hook_stderr: 
+  hook_stdout: 
+  checker_direct: {'exit': 0, 'verdict': 'PASS', 'mode': 'strict', 'evaluation_complete': True, 'violations': []}
+  target sha256 before==after: True

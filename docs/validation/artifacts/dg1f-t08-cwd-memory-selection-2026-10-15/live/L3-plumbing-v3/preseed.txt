@@ -1,0 +1,1 @@
+harness pre-seeded vendor_tools/.mneme/project_memory.json (not the agent)

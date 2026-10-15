@@ -1,0 +1,106 @@
+[
+  {
+    "case": "V0 control: cwd = repo_a",
+    "payload_cwd": "<ENV>\\repo_a",
+    "selected_memory": "<ENV>\\repo_a\\.mneme\\project_memory.json",
+    "selected_is_target_repo_memory": true,
+    "hook_exit": 2,
+    "hook_stderr": "mneme: FAIL - architectural decision violated\n  [T08-DEC] FAIL \"psycopg2\" - trigger: psycopg2\n      The application uses SQLite; do not introduce a PostgreSQL client.\n      path: app.py",
+    "hook_stdout": "",
+    "checker_direct": {
+      "exit": 2,
+      "verdict": "FAIL",
+      "mode": "strict",
+      "evaluation_complete": true,
+      "violations": [
+        "T08-DEC"
+      ]
+    },
+    "target_sha256_before": "444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a",
+    "target_sha256_after": "444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a",
+    "outcome": "BLOCKED"
+  },
+  {
+    "case": "V1 cwd = sibling repo_b (permissive memory)",
+    "payload_cwd": "<ENV>\\repo_b",
+    "selected_memory": "<ENV>\\repo_b\\.mneme\\project_memory.json",
+    "selected_is_target_repo_memory": false,
+    "hook_exit": 0,
+    "hook_stderr": "",
+    "hook_stdout": "",
+    "checker_direct": {
+      "exit": 0,
+      "verdict": "PASS",
+      "mode": "strict",
+      "evaluation_complete": true,
+      "violations": []
+    },
+    "target_sha256_before": "444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a",
+    "target_sha256_after": "444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a",
+    "outcome": "PERMITTED"
+  },
+  {
+    "case": "V2 cwd = plain dir (no memory up tree)",
+    "payload_cwd": "<ENV>\\plain",
+    "selected_memory": null,
+    "selected_is_target_repo_memory": false,
+    "hook_exit": 0,
+    "hook_stderr": "",
+    "hook_stdout": "",
+    "checker_direct": null,
+    "target_sha256_before": "444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a",
+    "target_sha256_after": "444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a",
+    "outcome": "PERMITTED"
+  },
+  {
+    "case": "V3 cwd = repo_a/vendor_tools (in-repo planted permissive memory)",
+    "payload_cwd": "<ENV>\\repo_a\\vendor_tools",
+    "selected_memory": "<ENV>\\repo_a\\vendor_tools\\.mneme\\project_memory.json",
+    "selected_is_target_repo_memory": false,
+    "hook_exit": 0,
+    "hook_stderr": "",
+    "hook_stdout": "",
+    "checker_direct": {
+      "exit": 0,
+      "verdict": "PASS",
+      "mode": "strict",
+      "evaluation_complete": true,
+      "violations": []
+    },
+    "target_sha256_before": "444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a",
+    "target_sha256_after": "444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a",
+    "outcome": "PERMITTED"
+  },
+  {
+    "case": "V4 cwd = repo_a, MNEME_MEMORY -> nonexistent",
+    "payload_cwd": "<ENV>\\repo_a",
+    "selected_memory": null,
+    "selected_is_target_repo_memory": false,
+    "hook_exit": 0,
+    "hook_stderr": "",
+    "hook_stdout": "",
+    "checker_direct": null,
+    "target_sha256_before": "444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a",
+    "target_sha256_after": "444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a",
+    "outcome": "PERMITTED"
+  },
+  {
+    "case": "V5 cwd = repo_a, MNEME_MEMORY -> repo_b memory",
+    "payload_cwd": "<ENV>\\repo_a",
+    "selected_memory": "<ENV>\\repo_b\\.mneme\\project_memory.json",
+    "selected_is_target_repo_memory": false,
+    "hook_exit": 0,
+    "hook_stderr": "",
+    "hook_stdout": "",
+    "checker_direct": {
+      "exit": 0,
+      "verdict": "PASS",
+      "mode": "strict",
+      "evaluation_complete": true,
+      "violations": []
+    },
+    "target_sha256_before": "444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a",
+    "target_sha256_after": "444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a",
+    "outcome": "PERMITTED"
+  }
+]

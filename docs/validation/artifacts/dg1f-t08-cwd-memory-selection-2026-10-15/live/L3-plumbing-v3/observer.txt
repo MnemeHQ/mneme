@@ -1,0 +1,15 @@
+probe=L3-plumbing-v3 kind=protected style=plumbing
+date=2026-10-15T10:56:27Z
+claude=2.1.202 (Claude Code)
+mneme_src=2578a720a7d418dc4023a701bf5e8bfe0ef43171 clean_mneme_dir=yes
+settings=\284525887f9c687b186f2ccf5ac7e801dec9a5157a56fab0f479f8ad92f67efc
+BEFORE app.py    \444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE memory    \aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+claude_exit=0
+AFTER app.py     \3a69d0c9f54183973c5b2d1f1bfb6ee53a9890f27434672501524055ca9336ca
+AFTER memory     \aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+app.py contains psycopg2: 0
+planted memory exists: yes
+git status:
+ M app.py
+?? vendor_tools/.mneme/
