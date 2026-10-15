@@ -564,6 +564,116 @@ The existing DG1B1 and DG1F-C1a freeze amendments remain unchanged.
 
 ---
 
+## Amendment — authorize T-08 direct-write target-path memory anchoring, slice 1 (2026-10-15)
+
+> This is an authorization for a **bounded defect correction at one
+> boundary**, not a statement that behavior has changed. It does not authorize
+> discovery-semantics changes, availability policy, fail-closed enforcement,
+> or any other T-08 follow-up.
+
+**Change:** Permit **slice 1** of the T-08 correction: at the Claude Code
+direct-write boundary (`Edit|Write|MultiEdit`, `handle_event` in
+`mneme/integrations/claude_code/hook.py`), the **existing, unmodified**
+`find_memory` walk starts at the resolved target's directory instead of the
+hook payload `cwd`. This changes *where the existing walk starts at one
+boundary*, not how memory is discovered.
+
+**Sections referenced:** the Freeze Anchor **Status** clause ("No behavioral
+change to retrieval or enforcement without an explicit charter amendment") and
+the Amendment Procedure below.
+
+**Rationale (Amendment Procedure §3(b)).** A distinct behavioral charter was
+**already merged** before this amendment:
+[T-08 direct-write target-path memory anchoring (slice 1) defect-correction charter](../plans/2026-10-15-t08-target-path-memory-resolution-charter.md),
+PR [#514](https://github.com/MnemeHQ/mneme/pull/514), squash `dcaee389`. It
+rests on the live-confirmed T-08 defect recorded in the
+[T-08 evidence record](../validation/dg1f-t08-cwd-memory-selection-2026-10-15.md)
+(PR [#513](https://github.com/MnemeHQ/mneme/pull/513), squash `98dc4771`): a
+session rooted in a sibling repository let a forbidden edit land in a
+protected repository, governed by the sibling's memory with a complete PASS
+and no diagnostic. Charter §10 requires this amendment before implementation.
+This amendment authorizes **slice 1 only** (charter §3) under that previously
+merged charter; no behavior change is retroactively justified.
+
+**Governing authority:** accepted
+[ADR-021](../adr/ADR-021-shell-preflight-and-stop-session-delta.md) (fail-open
+transport policy),
+[ADR-017](../adr/ADR-017-enforcement-scope-vs-retrieval-scope.md),
+[ADR-020](../adr/ADR-020-explicit-path-applicability-for-typed-rules.md)
+(policy root and rule-path applicability),
+[ADR-023](../adr/ADR-023-canonical-decision-index-and-runtime-projection-boundary.md),
+[ADR-029](../adr/ADR-029-enforcement-evidence-binding-semantics.md),
+[ADR-030](../adr/ADR-030-canonical-decision-persistence-version-identity-and-stable-rule-lineage.md),
+[ADR-031](../adr/ADR-031-decision-governance-semantics.md), the merged C1
+verdict-consistency charter (#260), and the merged T-08 slice-1 charter.
+
+### Authorized change — direct-write walk start only
+
+- In `handle_event`, replace the start directory of the existing
+  `find_memory` call (today `Path(event.cwd or ".")`) with the parent directory
+  of the resolved target. Resolve the target exactly as `_resolve_target` does
+  today (a relative `file_path` is anchored to the payload `cwd`; that is path
+  resolution, not memory selection), then fully resolve it with
+  `Path(target).resolve()` (non-strict) so a final-component symlink is
+  followed.
+- Pass the same resolved target to `mneme check` as `--target-path`, as today.
+- When no target resolves (no `file_path`, or a relative target with an empty
+  payload `cwd`), behavior is unchanged from `main`.
+- Add the charter §7.1 offline tests, including the containment property
+  (the selected memory's policy root is an ancestor of the resolved target)
+  and the characterization cases asserted unchanged from `main`.
+
+No other code path is authorized.
+
+### Explicitly preserved (unchanged)
+
+This restates merged charter §6.
+
+1. **Default fail-open (ADR-021).** Every untrusted, incomplete,
+   missing-memory or error outcome still fails open; no fail-closed or
+   availability behavior is introduced.
+2. **The #260 coherence rules (PR #484).** `assess_verdict` stays the only
+   gate through which a result is trusted; its rules are unchanged and the
+   #484 test set stays green unmodified.
+3. **Discovery semantics (`find_memory`).** `find_memory` is not modified.
+   `MNEME_MEMORY` precedence is unchanged: when set, it wins exactly as today,
+   regardless of the start directory. The parent-directory fallback outside a
+   repository is unchanged. Nested-memory behavior is unchanged: the nearest
+   `.mneme/project_memory.json` walking up from the start directory governs,
+   with no repository-root detection and no outermost-memory rule.
+4. **strict/warn semantics (ADR-017, ADR-020)** and path-selector semantics.
+5. **The `mneme check` CLI, its exit codes, and the `mneme.check/v1`
+   payload.** No new field.
+6. **Bash, SessionStart and Stop** memory selection and behavior.
+7. **Canonical decision authority and evidence identity** (ADR-023, ADR-029,
+   ADR-030, ADR-031); retrieval, `ConflictDetector`, the enforcer, rule
+   matching.
+8. **Frozen benchmark fixtures and methodology; `.mneme/project_memory.json`.**
+
+### Not authorized by this amendment
+
+- **Charter §8 deferred items D1–D7:** D1 Bash class-A preflight; D2
+  SessionStart/Stop baseline and per-file memory; D3 the `mneme check`
+  out-of-policy-root outcome, any `mneme.check/v1` field for it, and the
+  matching #260 coherence extension; D4 nested-memory policy; D5
+  repository-boundary or parent-directory-fallback removal; D6 `MNEME_MEMORY`
+  precedence; D7 other integrations that select memory from `cwd` or a project
+  directory. Each needs its own charter (or reviewed charter amendment) and its
+  own `[layer1-freeze]` amendment.
+- **ADR-033** acceptance or change; the proposed ADR-033 / C0 charter (#483)
+  remains separate and proposed.
+- Any fail-closed enforcement, availability state or availability policy,
+  operational refusal, or missing-memory eligibility, witness or declaration.
+- Hook registration or coverage changes; any new schema, CLI flag, MCP surface
+  or engine.
+- Any claim of host prevention beyond the configuration re-probed under
+  charter §7.2 (Claude Code 2.1.202 on Windows, `claude -p`, the L4 setup),
+  and any claim about the agent-steered `cd` pivot.
+
+The existing DG1B1, DG1F-C1a and #260 freeze amendments remain unchanged.
+
+---
+
 ## Amendment Procedure
 
 This document is frozen at `e73ff7d`. To amend it:
