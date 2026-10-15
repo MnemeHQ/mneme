@@ -59,6 +59,7 @@ from mneme.adr_import import (
     detect_continuity_effects,
     format_preview,
 )
+from mneme.adr_schema import ADRParseError, ADRValidationError
 from mneme.integrations.eventcatalog import (
     apply_import as ec_apply_import,
     compile_for_import as ec_compile_for_import,
@@ -1043,7 +1044,11 @@ def _cmd_adr_import(args: argparse.Namespace) -> int:
             "with --apply --update-existing"
         )
 
-    report = compile_for_import(adr_dir)
+    try:
+        report = compile_for_import(adr_dir)
+    except (ADRParseError, ADRValidationError) as exc:
+        return _error_exit(str(exc))
+
     target_memory = json.loads(target_path.read_text(encoding="utf-8"))
     collisions = detect_collisions(report.active_nodes, target_memory)
     continuity = detect_continuity_effects(report, target_memory)
