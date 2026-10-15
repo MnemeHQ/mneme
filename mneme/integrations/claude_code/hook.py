@@ -500,6 +500,22 @@ def _resolve_target(event: ToolEvent) -> tuple[str, str]:
     return rel, target_path
 
 
+def _direct_write_memory_start(event: ToolEvent) -> Path:
+    """Where the direct-write gate starts its ``find_memory`` walk (T-08 slice 1).
+
+    The repository being modified governs, not the session ``cwd``: the walk
+    starts at the parent of the fully resolved target, so the selected
+    memory's policy root always contains the checked path (a final-component
+    symlink is followed, exactly as ``mneme check`` resolves it). With no
+    resolvable target -- no ``file_path``, or a relative one and an empty
+    payload ``cwd`` -- the start stays the payload ``cwd`` as before.
+    """
+    _, target_path = _resolve_target(event)
+    if target_path and (event.cwd or Path(target_path).is_absolute()):
+        return Path(target_path).resolve().parent
+    return Path(event.cwd or ".")
+
+
 def _invoke_check(
     memory: Path,
     rel_label: str,
@@ -1055,7 +1071,7 @@ def handle_event(
     if not should_check(event.tool_name):
         return 0
 
-    memory = find_memory(Path(event.cwd or "."))
+    memory = find_memory(_direct_write_memory_start(event))
     if memory is None:
         return 0
 
