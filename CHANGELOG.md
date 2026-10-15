@@ -74,6 +74,33 @@
     `mneme.decision-index/v2` memory: they refuse a v2 document at load instead
     of misresolving it. Do not open v2 memory with an older binary.
 
+**Claude Code direct-write memory selection (T-08 slice 1)**
+
+### Behavior change
+
+- **The edited file's repository now governs a direct write.** For
+  `Edit`, `Write` and `MultiEdit`, the Claude Code hook now starts its
+  `.mneme/project_memory.json` search at the edited file's directory (after
+  resolving a relative path against the session `cwd` and following a
+  symlink) instead of at the session `cwd`. A session started in a sibling
+  repository, or in a directory with no memory, can no longer have a
+  forbidden edit to a protected repository checked against the wrong memory
+  and silently permitted (T-08, live-confirmed in the
+  [T-08 evidence record](docs/validation/dg1f-t08-cwd-memory-selection-2026-10-15.md)).
+  - **Narrowing:** a session rooted in a protected repository no longer
+    applies that repository's rules to edits of files in other repositories
+    or of files outside any memory. Those edits are governed by their own
+    repository's memory, or by none. If you relied on the session `cwd` to
+    block cross-repository edits, add a memory to the other repository.
+  - **Unchanged:** `MNEME_MEMORY` still takes precedence when set; the search
+    still selects the nearest memory walking up (including parent directories
+    outside a repository); an edit with no file path still searches from the
+    session `cwd`. The Bash preflight, SessionStart and Stop boundaries, the
+    `mneme check` CLI and `mneme.check/v1`, and other integrations are
+    unchanged. See the
+    [slice-1 charter](docs/plans/2026-10-15-t08-target-path-memory-resolution-charter.md)
+    for the deferred items.
+
 ## v0.10.0 — 2026-10-07
 
 **Canonical Decision Index persistence (ADR-030 D1)**

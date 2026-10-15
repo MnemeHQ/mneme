@@ -42,7 +42,10 @@ On every Edit, Write, or MultiEdit, Claude Code pipes the tool input to
 
 1. Reconstructs the full post-edit file content (not just the changed
    string) so decisions are checked in context.
-2. Discovers `.mneme/project_memory.json` by walking up from `cwd`.
+2. Discovers `.mneme/project_memory.json` by walking up from the edited
+   file's directory, so the repository being modified governs the edit,
+   not the session's working directory (`MNEME_MEMORY`, when set, still
+   takes precedence).
 3. Shells out to `mneme check`, passing a temp file and a query derived
    from the target file path.
 4. Exits 2 (block) if `mneme check` returns a non-zero verdict in strict
