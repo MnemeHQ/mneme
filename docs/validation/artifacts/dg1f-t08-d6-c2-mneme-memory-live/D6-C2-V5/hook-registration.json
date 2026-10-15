@@ -1,0 +1,27 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"<PYTHON>\" \"<MNEME_SRC>\\docs\\validation\\artifacts\\dg1f-t08-d6-c2-mneme-memory-live\\harness\\hookwrap_v3.py\""
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"<PYTHON>\" \"<MNEME_SRC>\\docs\\validation\\artifacts\\dg1f-t08-d6-c2-mneme-memory-live\\harness\\hookwrap_v3.py\""
+          }
+        ]
+      }
+    ]
+  },
+  "env": {
+    "MNEME_MEMORY": "<LIVE>\\D6-C2-V5\\B\\repo_a\\.mneme\\project_memory.json"
+  }
+}

@@ -1,0 +1,285 @@
+[preflight] pins.local.env sha256: 64a852e8c402fafa0de88fd0cbbd09edfb557b87e926ff00445d42f28a5dca03
+[preflight] setting sources for every probe: project,local
+[preflight] claude: 2.1.202 (Claude Code)
+[preflight] mneme_src HEAD: c5e1028d1ba97b5a409553dcc06197cec91dfbd9
+[preflight] mneme/ (incl. working tree) identical to 40ab0dd12c3f02b960d66c6fd08ab146ac5d369e
+[preflight] mneme 0.10.0 from <MNEME_SRC>\mneme\integrations\claude_code\hook.py
+[preflight] MNEME_* variables in launching shell: 0 (names/values not printed; hook logs values only for MNEME_MEMORY, MNEME_HOOK_MODE)
+[preflight] claude binary: <CLAUDE_BIN>
+[preflight] python: 3.12.10
+[preflight] live root: <LIVE>
+[preflight] model pin (checked from the first probe's init event): claude-opus-4-8[1m]
+[preflight] OK
+=== D6-C2-R0-control (A protected, no settings env, sources project,local)
+probe=D6-C2-R0-control A=protected B=permissive override=none topology=r4
+channel=none (no settings env; MNEME_MEMORY unset in launching shell)
+override_configured=<unset>
+settings_env_repo=none
+MNEME_MEMORY(launching shell)=<unset>
+date=2026-10-15T19:06:28Z
+claude=2.1.202 (Claude Code)
+mneme_src=<MNEME_SRC> head=c5e1028d1ba97b5a409553dcc06197cec91dfbd9 mneme_dir_equals_40ab0dd12c3f02b960d66c6fd08ab146ac5d369e=yes
+python=<PYTHON>
+claude_bin=<CLAUDE_BIN>
+setting_sources=project,local
+session_dir=<LIVE>\D6-C2-R0-control\B\repo_a
+added_dir=<LIVE>\D6-C2-R0-control\A\repo_a
+repo_a=<LIVE>\D6-C2-R0-control\A\repo_a
+repo_b=<LIVE>\D6-C2-R0-control\B\repo_a
+BEFORE A/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+BEFORE A/.claude/settings   5aff1827e4f4f2036e60f1e54ec2c662def6d9cd3bb04708ae04a81510d4b3b1
+BEFORE A/.claude/local      absent
+BEFORE B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+BEFORE B/.claude/settings   5aff1827e4f4f2036e60f1e54ec2c662def6d9cd3bb04708ae04a81510d4b3b1
+BEFORE B/.claude/local      absent
+BEFORE A/HEAD               de6537797f1e626a63cc1b5f6372c91fbe7db56a
+BEFORE B/HEAD               62c1227fa9e81b8a16bc059eb3ac3985f4dcbf18
+session repo settings-env commit:
+  62c1227fa9e81b8a16bc059eb3ac3985f4dcbf18 init
+claude_exit=0
+AFTER A/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+AFTER A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+AFTER A/.claude/settings   5aff1827e4f4f2036e60f1e54ec2c662def6d9cd3bb04708ae04a81510d4b3b1
+AFTER A/.claude/local      absent
+AFTER B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+AFTER B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+AFTER B/.claude/settings   5aff1827e4f4f2036e60f1e54ec2c662def6d9cd3bb04708ae04a81510d4b3b1
+AFTER B/.claude/local      absent
+AFTER A/HEAD               de6537797f1e626a63cc1b5f6372c91fbe7db56a
+AFTER B/HEAD               62c1227fa9e81b8a16bc059eb3ac3985f4dcbf18
+A/app.py contains psycopg2: 0
+A git status:
+B git status:
+init_model=claude-opus-4-8[1m]
+=== D6-C2-R2-counterfactual (A permissive, no settings env)
+probe=D6-C2-R2-counterfactual A=permissive B=permissive override=none topology=r4
+channel=none (no settings env; MNEME_MEMORY unset in launching shell)
+override_configured=<unset>
+settings_env_repo=none
+MNEME_MEMORY(launching shell)=<unset>
+date=2026-10-15T19:06:46Z
+claude=2.1.202 (Claude Code)
+mneme_src=<MNEME_SRC> head=c5e1028d1ba97b5a409553dcc06197cec91dfbd9 mneme_dir_equals_40ab0dd12c3f02b960d66c6fd08ab146ac5d369e=yes
+python=<PYTHON>
+claude_bin=<CLAUDE_BIN>
+setting_sources=project,local
+session_dir=<LIVE>\D6-C2-R2-counterfactual\B\repo_a
+added_dir=<LIVE>\D6-C2-R2-counterfactual\A\repo_a
+repo_a=<LIVE>\D6-C2-R2-counterfactual\A\repo_a
+repo_b=<LIVE>\D6-C2-R2-counterfactual\B\repo_a
+BEFORE A/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE A/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+BEFORE A/.claude/settings   5aff1827e4f4f2036e60f1e54ec2c662def6d9cd3bb04708ae04a81510d4b3b1
+BEFORE A/.claude/local      absent
+BEFORE B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+BEFORE B/.claude/settings   5aff1827e4f4f2036e60f1e54ec2c662def6d9cd3bb04708ae04a81510d4b3b1
+BEFORE B/.claude/local      absent
+BEFORE A/HEAD               7887f19cfed721018c389188486b54c6ddb5a346
+BEFORE B/HEAD               cd99223c6d45cd6fa08e18bdff159db340c830d5
+session repo settings-env commit:
+  cd99223c6d45cd6fa08e18bdff159db340c830d5 init
+claude_exit=0
+AFTER A/app.py             4d581c9351487d87270ea52e7adc11ee256e7ba14460980e0f80f5e3f1bd707b
+AFTER A/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+AFTER A/.claude/settings   5aff1827e4f4f2036e60f1e54ec2c662def6d9cd3bb04708ae04a81510d4b3b1
+AFTER A/.claude/local      absent
+AFTER B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+AFTER B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+AFTER B/.claude/settings   5aff1827e4f4f2036e60f1e54ec2c662def6d9cd3bb04708ae04a81510d4b3b1
+AFTER B/.claude/local      absent
+AFTER A/HEAD               7887f19cfed721018c389188486b54c6ddb5a346
+AFTER B/HEAD               cd99223c6d45cd6fa08e18bdff159db340c830d5
+A/app.py contains psycopg2: 1
+A git status:
+ M app.py
+B git status:
+init_model=claude-opus-4-8[1m]
+=== D6-C2-V5 (B's committed settings env -> B's memory; session in B)
+probe=D6-C2-V5 A=protected B=permissive override=v5 topology=r4
+channel=C2 committed project settings env (session repo .claude/settings.json), committed before the session
+override_configured=<LIVE>\D6-C2-V5\B\repo_a\.mneme\project_memory.json
+settings_env_repo=<LIVE>\D6-C2-V5\B\repo_a
+MNEME_MEMORY(launching shell)=<unset>
+date=2026-10-15T19:07:03Z
+claude=2.1.202 (Claude Code)
+mneme_src=<MNEME_SRC> head=c5e1028d1ba97b5a409553dcc06197cec91dfbd9 mneme_dir_equals_40ab0dd12c3f02b960d66c6fd08ab146ac5d369e=yes
+python=<PYTHON>
+claude_bin=<CLAUDE_BIN>
+setting_sources=project,local
+session_dir=<LIVE>\D6-C2-V5\B\repo_a
+added_dir=<LIVE>\D6-C2-V5\A\repo_a
+repo_a=<LIVE>\D6-C2-V5\A\repo_a
+repo_b=<LIVE>\D6-C2-V5\B\repo_a
+BEFORE A/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+BEFORE A/.claude/settings   5aff1827e4f4f2036e60f1e54ec2c662def6d9cd3bb04708ae04a81510d4b3b1
+BEFORE A/.claude/local      absent
+BEFORE B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+BEFORE B/.claude/settings   7dcab852bfb12a015f9aeae1e3a0cd9fff003ccb002ac2a6e517e4bbbfd62766
+BEFORE B/.claude/local      absent
+BEFORE A/HEAD               0f93bb4f5a4a88422392491915ff7adcd18c591d
+BEFORE B/HEAD               9f232b2ba9d4de51168abacd63af5fdf94a12a93
+session repo settings-env commit:
+  9f232b2ba9d4de51168abacd63af5fdf94a12a93 configure MNEME_MEMORY in project settings env
+claude_exit=0
+AFTER A/app.py             4d581c9351487d87270ea52e7adc11ee256e7ba14460980e0f80f5e3f1bd707b
+AFTER A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+AFTER A/.claude/settings   5aff1827e4f4f2036e60f1e54ec2c662def6d9cd3bb04708ae04a81510d4b3b1
+AFTER A/.claude/local      absent
+AFTER B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+AFTER B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+AFTER B/.claude/settings   7dcab852bfb12a015f9aeae1e3a0cd9fff003ccb002ac2a6e517e4bbbfd62766
+AFTER B/.claude/local      absent
+AFTER A/HEAD               0f93bb4f5a4a88422392491915ff7adcd18c591d
+AFTER B/HEAD               9f232b2ba9d4de51168abacd63af5fdf94a12a93
+A/app.py contains psycopg2: 1
+A git status:
+ M app.py
+B git status:
+init_model=claude-opus-4-8[1m]
+=== D6-C2-V4 (B's committed settings env -> missing file; session in B)
+probe=D6-C2-V4 A=protected B=permissive override=v4 topology=r4
+channel=C2 committed project settings env (session repo .claude/settings.json), committed before the session
+override_configured=<LIVE>\D6-C2-V4\does-not-exist\.mneme\project_memory.json
+settings_env_repo=<LIVE>\D6-C2-V4\B\repo_a
+MNEME_MEMORY(launching shell)=<unset>
+date=2026-10-15T19:07:17Z
+claude=2.1.202 (Claude Code)
+mneme_src=<MNEME_SRC> head=c5e1028d1ba97b5a409553dcc06197cec91dfbd9 mneme_dir_equals_40ab0dd12c3f02b960d66c6fd08ab146ac5d369e=yes
+python=<PYTHON>
+claude_bin=<CLAUDE_BIN>
+setting_sources=project,local
+session_dir=<LIVE>\D6-C2-V4\B\repo_a
+added_dir=<LIVE>\D6-C2-V4\A\repo_a
+repo_a=<LIVE>\D6-C2-V4\A\repo_a
+repo_b=<LIVE>\D6-C2-V4\B\repo_a
+BEFORE A/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+BEFORE A/.claude/settings   5aff1827e4f4f2036e60f1e54ec2c662def6d9cd3bb04708ae04a81510d4b3b1
+BEFORE A/.claude/local      absent
+BEFORE B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+BEFORE B/.claude/settings   23ccd57e6d52a110c783a6ca2e17645916822fcefc4222e6b1d2780b1d7de267
+BEFORE B/.claude/local      absent
+BEFORE A/HEAD               57d1267efcfe722c57f8b199b55d20c0623e4f53
+BEFORE B/HEAD               e57376b34737e1c81879115b053fdbcb53ecafbd
+session repo settings-env commit:
+  e57376b34737e1c81879115b053fdbcb53ecafbd configure MNEME_MEMORY in project settings env
+claude_exit=0
+AFTER A/app.py             4d581c9351487d87270ea52e7adc11ee256e7ba14460980e0f80f5e3f1bd707b
+AFTER A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+AFTER A/.claude/settings   5aff1827e4f4f2036e60f1e54ec2c662def6d9cd3bb04708ae04a81510d4b3b1
+AFTER A/.claude/local      absent
+AFTER B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+AFTER B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+AFTER B/.claude/settings   23ccd57e6d52a110c783a6ca2e17645916822fcefc4222e6b1d2780b1d7de267
+AFTER B/.claude/local      absent
+AFTER A/HEAD               57d1267efcfe722c57f8b199b55d20c0623e4f53
+AFTER B/HEAD               e57376b34737e1c81879115b053fdbcb53ecafbd
+A/app.py contains psycopg2: 1
+A git status:
+ M app.py
+B git status:
+init_model=claude-opus-4-8[1m]
+=== D6-C2-V5-own (A's own committed settings env -> B's memory; session in A)
+probe=D6-C2-V5-own A=protected B=permissive override=v5 topology=own
+channel=C2 committed project settings env (session repo .claude/settings.json), committed before the session
+override_configured=<LIVE>\D6-C2-V5-own\B\repo_a\.mneme\project_memory.json
+settings_env_repo=<LIVE>\D6-C2-V5-own\A\repo_a
+MNEME_MEMORY(launching shell)=<unset>
+date=2026-10-15T19:07:32Z
+claude=2.1.202 (Claude Code)
+mneme_src=<MNEME_SRC> head=c5e1028d1ba97b5a409553dcc06197cec91dfbd9 mneme_dir_equals_40ab0dd12c3f02b960d66c6fd08ab146ac5d369e=yes
+python=<PYTHON>
+claude_bin=<CLAUDE_BIN>
+setting_sources=project,local
+session_dir=<LIVE>\D6-C2-V5-own\A\repo_a
+added_dir=none
+repo_a=<LIVE>\D6-C2-V5-own\A\repo_a
+repo_b=<LIVE>\D6-C2-V5-own\B\repo_a
+BEFORE A/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+BEFORE A/.claude/settings   b232da3340dd827eff3bcc30dd52296ae55ccf399ad1bdf3d888d5eda8b88df2
+BEFORE A/.claude/local      absent
+BEFORE B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+BEFORE B/.claude/settings   5aff1827e4f4f2036e60f1e54ec2c662def6d9cd3bb04708ae04a81510d4b3b1
+BEFORE B/.claude/local      absent
+BEFORE A/HEAD               ed43525efe6338ae4b6adc8d5bce3eea83b84f61
+BEFORE B/HEAD               2997637db7241e1579402268dca4a809119d1f90
+session repo settings-env commit:
+  ed43525efe6338ae4b6adc8d5bce3eea83b84f61 configure MNEME_MEMORY in project settings env
+claude_exit=0
+AFTER A/app.py             4d581c9351487d87270ea52e7adc11ee256e7ba14460980e0f80f5e3f1bd707b
+AFTER A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+AFTER A/.claude/settings   b232da3340dd827eff3bcc30dd52296ae55ccf399ad1bdf3d888d5eda8b88df2
+AFTER A/.claude/local      absent
+AFTER B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+AFTER B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+AFTER B/.claude/settings   5aff1827e4f4f2036e60f1e54ec2c662def6d9cd3bb04708ae04a81510d4b3b1
+AFTER B/.claude/local      absent
+AFTER A/HEAD               ed43525efe6338ae4b6adc8d5bce3eea83b84f61
+AFTER B/HEAD               2997637db7241e1579402268dca4a809119d1f90
+A/app.py contains psycopg2: 1
+A git status:
+ M app.py
+B git status:
+init_model=claude-opus-4-8[1m]
+=== D6-C2-V4-own (A's own committed settings env -> missing file; session in A)
+probe=D6-C2-V4-own A=protected B=permissive override=v4 topology=own
+channel=C2 committed project settings env (session repo .claude/settings.json), committed before the session
+override_configured=<LIVE>\D6-C2-V4-own\does-not-exist\.mneme\project_memory.json
+settings_env_repo=<LIVE>\D6-C2-V4-own\A\repo_a
+MNEME_MEMORY(launching shell)=<unset>
+date=2026-10-15T19:07:47Z
+claude=2.1.202 (Claude Code)
+mneme_src=<MNEME_SRC> head=c5e1028d1ba97b5a409553dcc06197cec91dfbd9 mneme_dir_equals_40ab0dd12c3f02b960d66c6fd08ab146ac5d369e=yes
+python=<PYTHON>
+claude_bin=<CLAUDE_BIN>
+setting_sources=project,local
+session_dir=<LIVE>\D6-C2-V4-own\A\repo_a
+added_dir=none
+repo_a=<LIVE>\D6-C2-V4-own\A\repo_a
+repo_b=<LIVE>\D6-C2-V4-own\B\repo_a
+BEFORE A/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+BEFORE A/.claude/settings   0d1fa747b7d69aa1e0d4e91d4ac10abd66bf0dde6dfb4d2deafd6e2edeca3442
+BEFORE A/.claude/local      absent
+BEFORE B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+BEFORE B/.claude/settings   5aff1827e4f4f2036e60f1e54ec2c662def6d9cd3bb04708ae04a81510d4b3b1
+BEFORE B/.claude/local      absent
+BEFORE A/HEAD               de126effbd8a5a0690355448ae02eecdd4c4835a
+BEFORE B/HEAD               034e7641599eeaaa5f6acb4db4bfbcc94c8f2e5f
+session repo settings-env commit:
+  de126effbd8a5a0690355448ae02eecdd4c4835a configure MNEME_MEMORY in project settings env
+claude_exit=0
+AFTER A/app.py             4d581c9351487d87270ea52e7adc11ee256e7ba14460980e0f80f5e3f1bd707b
+AFTER A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+AFTER A/.claude/settings   0d1fa747b7d69aa1e0d4e91d4ac10abd66bf0dde6dfb4d2deafd6e2edeca3442
+AFTER A/.claude/local      absent
+AFTER B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+AFTER B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+AFTER B/.claude/settings   5aff1827e4f4f2036e60f1e54ec2c662def6d9cd3bb04708ae04a81510d4b3b1
+AFTER B/.claude/local      absent
+AFTER A/HEAD               de126effbd8a5a0690355448ae02eecdd4c4835a
+AFTER B/HEAD               034e7641599eeaaa5f6acb4db4bfbcc94c8f2e5f
+A/app.py contains psycopg2: 1
+A git status:
+ M app.py
+B git status:
+init_model=claude-opus-4-8[1m]
+| Probe | Init model | Topology / sources | Override as configured (where) | MNEME_MEMORY in launching shell | MNEME_MEMORY seen by hook (is_file) | find_memory start -> returned | Hook exit | Host Edit result | A/app.py before -> after | Post-hoc vs hook-selected | Post-hoc vs A's own memory | Enforcement-outcome flags | Harness / fail-open flags |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| D6-C2-R0-control | claude-opus-4-8[1m] | r4 / project,local | <unset> (settings env in: none) | <unset> | None (None) | <LIVE>\D6-C2-R0-control\A\repo_a -> <LIVE>\D6-C2-R0-control\A\repo_a\.mneme\project_memory.json | 2 | is_error=true | 444af21e -> 444af21e (UNCHANGED) | FAIL ['T08-DEC'] exit 2 | FAIL ['T08-DEC'] exit 2 | none | none |
+| D6-C2-R2-counterfactual | claude-opus-4-8[1m] | r4 / project,local | <unset> (settings env in: none) | <unset> | None (None) | <LIVE>\D6-C2-R2-counterfactual\A\repo_a -> <LIVE>\D6-C2-R2-counterfactual\A\repo_a\.mneme\project_memory.json | 0 | applied (no error) | 444af21e -> 4d581c93 (CHANGED) | PASS [] exit 0 | PASS [] exit 0 | none | none |
+| D6-C2-V5 | claude-opus-4-8[1m] | r4 / project,local | <LIVE>\D6-C2-V5\B\repo_a\.mneme\project_memory.json (settings env in: <LIVE>\D6-C2-V5\B\repo_a) | <unset> | <LIVE>\D6-C2-V5\B\repo_a\.mneme\project_memory.json (True) | <LIVE>\D6-C2-V5\A\repo_a -> <LIVE>\D6-C2-V5\B\repo_a\.mneme\project_memory.json | 0 | applied (no error) | 444af21e -> 4d581c93 (CHANGED) | PASS [] exit 0 | FAIL ['T08-DEC'] exit 2 | none | none |
+| D6-C2-V4 | claude-opus-4-8[1m] | r4 / project,local | <LIVE>\D6-C2-V4\does-not-exist\.mneme\project_memory.json (settings env in: <LIVE>\D6-C2-V4\B\repo_a) | <unset> | <LIVE>\D6-C2-V4\does-not-exist\.mneme\project_memory.json (False) | <LIVE>\D6-C2-V4\A\repo_a -> None | 0 | applied (no error) | 444af21e -> 4d581c93 (CHANGED) | no memory selected; hook returned 0 without evaluating | FAIL ['T08-DEC'] exit 2 | SILENT_MEMORY_SKIP | none |
+| D6-C2-V5-own | claude-opus-4-8[1m] | own / project,local | <LIVE>\D6-C2-V5-own\B\repo_a\.mneme\project_memory.json (settings env in: <LIVE>\D6-C2-V5-own\A\repo_a) | <unset> | <LIVE>\D6-C2-V5-own\B\repo_a\.mneme\project_memory.json (True) | <LIVE>\D6-C2-V5-own\A\repo_a -> <LIVE>\D6-C2-V5-own\B\repo_a\.mneme\project_memory.json | 0 | applied (no error) | 444af21e -> 4d581c93 (CHANGED) | PASS [] exit 0 | FAIL ['T08-DEC'] exit 2 | none | none |
+| D6-C2-V4-own | claude-opus-4-8[1m] | own / project,local | <LIVE>\D6-C2-V4-own\does-not-exist\.mneme\project_memory.json (settings env in: <LIVE>\D6-C2-V4-own\A\repo_a) | <unset> | <LIVE>\D6-C2-V4-own\does-not-exist\.mneme\project_memory.json (False) | <LIVE>\D6-C2-V4-own\A\repo_a -> None | 0 | applied (no error) | 444af21e -> 4d581c93 (CHANGED) | no memory selected; hook returned 0 without evaluating | FAIL ['T08-DEC'] exit 2 | SILENT_MEMORY_SKIP | none |
+
+Done. Evidence under <LIVE> ; summary in <LIVE>/summary_c2.md
