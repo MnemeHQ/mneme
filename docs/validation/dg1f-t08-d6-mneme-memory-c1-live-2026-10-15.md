@@ -36,8 +36,16 @@ The harness is in [`artifacts/dg1f-t08-d6-mneme-memory-live-2026-10-15/harness/`
 - **`posthoc.py`.** Rebuilds each attempted edit's proposed content from `repo_a`'s `HEAD:app.py` and the `tool_use` input. It then runs `mneme check --json` against (a) the memory the hook selected and (b) `repo_a`'s own memory.
 - **`safe_rmtree.py`.** The only recursive delete. It accepts only the four probe names, uses a fixed disposable root and refuses symlinks or junctions. It passed 48/48 deletion-safety tests before the run.
 - **`collect_redacted.py`.** Produces the published artifacts.
+- **`summarize.py`.** Builds `summary.md` from the raw evidence. It has two separate flag columns:
+  - *Enforcement-outcome flags* record what Mneme did on the host. `SILENT_MEMORY_SKIP` means that, for one Edit, all of the following held: the hook process saw an `MNEME_MEMORY` override; `find_memory` returned no memory; the hook exited 0 without evaluating; and the host applied the edit (`tool_result` not an error and the `repo_a/app.py` hash changed).
+  - *Harness / fail-open flags* record harness or transport faults: the checker failing open, wrapper log errors, wrapper load defects, an edit with no hook record, and self-test runs.
 
-**As-run integrity:** the SHA-256 of every harness file at run time matches the values recorded before the run. `pins.env` is published with operator paths replaced by placeholders. Its as-run SHA-256 is `33082d75599503bcb201a43512b0f4aa73147bb6a8f0fa4dc87dfb72dd9a972a`.
+**As-run integrity:** the SHA-256 of every harness file at run time matches the values recorded before the run. Two files were changed afterwards, and neither change affects any observation:
+
+- `pins.env` is published with operator paths replaced by placeholders. Its as-run SHA-256 is `33082d75599503bcb201a43512b0f4aa73147bb6a8f0fa4dc87dfb72dd9a972a`.
+- `summarize.py` was corrected after the run (review of #520) to add the `SILENT_MEMORY_SKIP` enforcement-outcome classification. Its as-run SHA-256 prefix is `d49750e6c3611ba8`.
+
+`summary.md` was regenerated from the unchanged raw evidence, with no Claude Code rerun, and `MANIFEST.json` was refreshed through `collect_redacted.py`. The SHA-256 of all 20 raw per-probe evidence files is unchanged. The as-run summary table, which reported V4's flags as "none" because no outcome column existed yet, is preserved verbatim in `run_d6_c1.log`.
 
 ## 2. Results
 
@@ -59,7 +67,8 @@ The remaining checks were identical in every probe:
 - Both repos' `settings.json` stayed at `1f46855b…`, and neither repo had a `settings.local.json` before or after.
 - `repo_b`'s `app.py` and memory were unchanged.
 - `claude` exited 0 and `claude.stderr.txt` was empty.
-- The summary's harness flags were "none": no fail-open message, no wrapper log error, no harness error, and no edit without a hook record.
+- The summary's *harness / fail-open* flags were "none" in every probe: no fail-open message, no wrapper log error, no harness error, and no edit without a hook record. No harness or transport fault explains any result.
+- The summary's *enforcement-outcome* flag is **`SILENT_MEMORY_SKIP` for C1-V4 only**. R0, R2 and C1-V5 have none. V5 is not a skip: its memory resolved, to the wrong repository, and was evaluated.
 
 In R2, `repo_a`'s memory hash is the permissive `c8e101a5…` by design.
 
@@ -68,7 +77,7 @@ In R2, `repo_a`'s memory hash is the permissive `c8e101a5…` by design.
 - **Controls hold in this topology.** R0 blocks with `MNEME_MEMORY` unset, so the slice-1 target-path selection (#517) is still in effect, consistent with #518 R4. R2 lands, so the harness does not block edits that should be allowed.
 - **C1 reaches the hook.** In both C1 probes, the override the operator exported before launching `claude` appears in the hook process's own environment, and `find_memory` honors it. The payload `cwd` stayed `repo_b`. The `find_memory` start was the edited repo `repo_a`, as slice 1 requires, and the override still took precedence over it.
 - **V5, live.** With the override pointing at `repo_b`'s memory, the hook evaluated the edit to `repo_a` against `repo_b`'s decisions. The result was a **complete PASS** (`evaluation_complete: true`) and an exit 0, and the forbidden edit landed (E1 hash change). `repo_a`'s own committed memory fails the same proposed content with `T08-DEC`.
-- **V4, live.** With the override pointing at a missing file, `find_memory` returned `None` even though `repo_a` has valid memory. The hook exited 0 with empty stderr and the forbidden edit landed. The skip is silent: nothing in the hook output or the host transcript indicates that enforcement did not run.
+- **V4, live.** With the override pointing at a missing file, `find_memory` returned `None` even though `repo_a` has valid memory. The hook exited 0 with empty stderr and the forbidden edit landed. The summary classifies this as **`SILENT_MEMORY_SKIP`**, an enforcement outcome, not a harness or transport fault. The skip is silent: nothing in the hook output or the host transcript indicates that enforcement did not run.
 
 ## 3. Classification against the scope (#519 §6)
 
@@ -83,8 +92,8 @@ In R2, `repo_a`'s memory hash is the permissive `c8e101a5…` by design.
 not established.** No §6 outcome class that depends on C2 to C6 can be assigned
 yet. In particular, this batch cannot support "only C1 reaches the hook", because
 no other channel was run. On this evidence alone, V5 and V4 are correctness
-issues of the override precedence (a false-completeness PASS, I3, and a silent
-skip). This is consistent with G3 W5: the override is non-durable caller
+issues of the override precedence (a false-completeness PASS, I3, and a
+`SILENT_MEMORY_SKIP`). This is consistent with G3 W5: the override is non-durable caller
 environment, not a witness. Whether it is also an agent-reachable bypass
 depends on C2 to C6.
 
@@ -113,7 +122,7 @@ section already stated.
 [`artifacts/dg1f-t08-d6-mneme-memory-live-2026-10-15/`](artifacts/dg1f-t08-d6-mneme-memory-live-2026-10-15/):
 
 - **Per probe:** `observer.txt` (E1 and pins), `prompt.txt`, `hook-registration.json`, `hook-log.jsonl` (hook view), `events.selected.jsonl` (E2) and `posthoc.json`.
-- **Batch level:** `summary.md` and `run_d6_c1.log` (preflight and observers).
+- **Batch level:** `summary.md` (regenerated after review with the corrected `summarize.py`; see §1) and `run_d6_c1.log` (as-run preflight, observers and original summary table).
 - **`MANIFEST.json`:** the SHA-256 of every source file and every published file. It also lists the hashes and sizes of the raw `events.jsonl` and `claude.stderr.txt`, which are not published.
 
 Redaction (`harness/collect_redacted.py`) replaces the following and then runs a leak scan that fails on any surviving local path or raw identifier:

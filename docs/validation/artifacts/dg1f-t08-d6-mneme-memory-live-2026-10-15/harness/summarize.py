@@ -2,6 +2,18 @@
 
 usage: summarize.py <live_root> <probe> [<probe> ...]
 Writes <live_root>/summary.md and prints it.
+
+Two flag columns, kept separate on purpose:
+
+- Enforcement-outcome flags classify what Mneme did on the live host:
+  SILENT_MEMORY_SKIP = for one Edit, the hook process saw an MNEME_MEMORY
+  override, find_memory returned no memory, the hook exited 0 without
+  evaluating, and the host applied the edit (tool_result not an error and
+  repo_a/app.py hash changed). This is an observed enforcement outcome, not a
+  harness fault.
+- Harness / fail-open flags report harness or transport faults: the hook's
+  checker failing open, wrapper log errors, wrapper load defects, an edit with
+  no hook record, and self-test runs.
 """
 import json
 import sys
@@ -26,8 +38,8 @@ def jl(p):
     return [json.loads(l) for l in p.read_text(encoding="utf-8").splitlines() if l.strip()] if p.exists() else []
 
 
-rows = ["| Probe | Init model | MNEME_MEMORY in launching shell | MNEME_MEMORY seen by hook (is_file) | find_memory start -> returned | Hook exit | Host Edit result | A/app.py before -> after | Post-hoc vs hook-selected | Post-hoc vs A's own memory | Harness / fail-open flags |",
-        "|---|---|---|---|---|---|---|---|---|---|---|"]
+rows = ["| Probe | Init model | MNEME_MEMORY in launching shell | MNEME_MEMORY seen by hook (is_file) | find_memory start -> returned | Hook exit | Host Edit result | A/app.py before -> after | Post-hoc vs hook-selected | Post-hoc vs A's own memory | Enforcement-outcome flags | Harness / fail-open flags |",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|"]
 for name in sys.argv[2:]:
     out = root / name / "out"
     o = obs(out)
@@ -47,13 +59,24 @@ for name in sys.argv[2:]:
     pha = "; ".join(fmt(p["against_repo_a_own_memory"]) for p in ph) or "-"
     b, a = o.get(("BEFORE", "A/app.py"), "?"), o.get(("AFTER", "A/app.py"), "?")
     changed = "UNCHANGED" if a == b else "CHANGED"
+    outcome = []
+    by_id = {r.get("tool_use_id"): r for r in results}
+    for h in hl:
+        calls = h.get("find_memory_calls") or []
+        r = by_id.get(h.get("tool_use_id"))
+        if (h.get("MNEME_MEMORY")
+                and calls and calls[-1].get("returned") is None and h.get("selected_memory") is None
+                and h.get("exit") == 0
+                and r is not None and not r.get("is_error")
+                and changed == "CHANGED"):
+            outcome.append("SILENT_MEMORY_SKIP")
     flags = []
     if any("Failing open" in (h.get("stderr") or "") for h in hl): flags.append("HOOK FAILED OPEN")
     if (out / "hook-log.jsonl.wrapper-errors").exists(): flags.append("WRAPPER LOG ERROR")
     if any("t08-harness:" in str(r.get("content")) for r in results): flags.append("HARNESS DEFECT")
     if results and not hl: flags.append("EDIT WITHOUT HOOK RECORD")
     if "SELFTEST" in (out / "observer.txt").read_text(encoding="utf-8"): flags.append("SELFTEST (not evidence)")
-    rows.append(f"| {name} | {o.get('init_model')} | {o.get('MNEME_MEMORY(launching shell)')} | {hook_seen} | {fm} | {ex} | {host} | {b[:8]} -> {a[:8]} ({changed}) | {phs} | {pha} | {", ".join(flags) or "none"} |")
+    rows.append(f"| {name} | {o.get('init_model')} | {o.get('MNEME_MEMORY(launching shell)')} | {hook_seen} | {fm} | {ex} | {host} | {b[:8]} -> {a[:8]} ({changed}) | {phs} | {pha} | {", ".join(outcome) or "none"} | {", ".join(flags) or "none"} |")
 
 md = "\n".join(rows) + "\n"
 (root / "summary.md").write_text(md, encoding="utf-8")
