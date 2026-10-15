@@ -25,7 +25,7 @@ that answers Question B.
 | # | Requirement | Meaning |
 |---|---|---|
 | **R1 Declaration** | What constitutes explicit authorization, and who can issue/revoke it? | An explicit, human-issued, review-gated statement — never inferred from memory or transport. |
-| **R2 Trust boundary** | How is it protected from the governed agent, **including local deletion**? | The trusted authorization baseline must **survive local deletion** of the declaration and memory: deleting them must not silently return the repo to "never authorized". |
+| **R2 Trust boundary** | How is it protected from the governed agent, **including local deletion, corruption, replacement or rollback**? | The trusted authorization baseline governs: once independently verified, protection **cannot be disabled by deleting, corrupting, replacing or rolling back local governance files**. |
 | **R3 Project identity** | How is it bound to the correct repo root and effective memory path? | Bound to the intended repository root and the exact memory path (`MNEME_MEMORY`/discovery are ambiguous — G3 §4.2). |
 | **R4 Verification** | What happens when the declaration, trusted revision, or verifier is unavailable? | Never a fabricated *pass*; never a silent fail-closed on an unverifiable declaration; an unverifiable baseline is an explicit operational state, not "never authorized". |
 | **R5 Compatibility** | Coexist with `setup → active` and ADR-030's single decision authority. | It is **configuration/authorization**, not a competing canonical decision store. |
@@ -76,13 +76,17 @@ not solely control, deleting local files would remove authorization (R2).
    revision — not merely that a config file exists. The three states stay
    distinct: *memory exists* / *protection activated* / *fail-closed
    authorized*.
-3. **Trust boundary that survives local deletion (R2):** authorization is
+3. **Trust boundary that survives local tampering (R2):** authorization is
    authoritative only against a **trusted authorization baseline the agent does
    not solely control** — e.g. a protected/remote ref or an equivalent
    independently verified revision (M4). The baseline records that authorization
-   existed; deleting the local declaration and/or memory **cannot** remove it.
-   Local deletion while the baseline shows authorization is **"removed without
-   approval"**, never "never authorized".
+   existed; **deleting, corrupting, replacing or rolling back** the local
+   declaration and/or memory **cannot** remove it. The **trusted baseline
+   governs**: when it shows authorization, a local declaration that is absent,
+   invalid, replaced, or rolled back is **"removed/tampered without approval"**,
+   never "never authorized" and never a downgrade to inactive. An invalid
+   **local** declaration is distinct from invalid **trusted-baseline** evidence
+   (the latter yields `AUTHORIZATION_UNVERIFIABLE`, §5a R10).
 4. **Project identity (R3):** the declaration records the **repository root**
    and the **effective memory path** it applies to; a declaration that does not
    match the resolved root/path is not honored.
@@ -96,9 +100,9 @@ not solely control, deleting local files would remove authorization (R2).
 
 **Local-only repositories.** Without a durable, agent-not-solely-controlled
 baseline the R2 bypass cannot be closed; for such repos fail-closed must not be
-claimed as bypass-proof (they stay *inactive/available*).
+claimed as bypass-proof (they stay *inactive*).
 
-### 5.7 Trusted revision selection, revocation, and negative verification
+### 5a. Trusted revision selection, revocation, and negative verification
 
 7. **Trusted revision selection (R7).** Authorization is evaluated at a revision
    **Mneme selects**, never one the governed agent supplies. Candidate anchors: a
@@ -130,30 +134,37 @@ evaluation, path `UNKNOWN`, launch/timeout, and others are separate).
 `B` = the trusted-baseline authorization state at the **Mneme-selected** revision
 (after applying the most recent reviewed authorization/revocation):
 **`authorized`** · **`revoked`** · **`verified-absent`** (positively verified
-never-authorized) · **`unverifiable`** · `L` = local declaration present ·
-`M` = canonical memory present · `V` = baseline verification available.
+never-authorized) · **`unverifiable`** (baseline invalid or unreachable).
+`L` = local declaration state: **`present`** · **`absent`** · **`invalid`**
+(deleted, corrupted, replaced, or rolled back). `M` = canonical memory present ·
+`V` = baseline verification available.
 
 | B | L | M | V | Outcome |
 |---|---|---|---|---|
 | authorized | present | present | yes | normal enforcement |
 | authorized | present | absent | yes | **fail closed** (authorized repo whose memory disappeared) |
-| authorized | absent | present | yes | **removed without approval** → operational error / fail closed |
-| authorized | absent | absent | yes | **removed without approval** → operational error / fail closed |
+| authorized | absent | present | yes | **removed without approval** → fail closed |
+| authorized | absent | absent | yes | **removed without approval** → fail closed |
+| authorized | **invalid** | present | yes | **tampered without approval** → fail closed |
+| authorized | **invalid** | absent | yes | **tampered without approval** → fail closed |
 | revoked | * | * | yes | **inactive** — the reviewed revocation governs; a stale local declaration is not honored |
 | verified-absent | present | * | yes | **inactive** — baseline positively shows never-authorized; a local declaration not in the baseline is not honored |
+| verified-absent | invalid | * | yes | **inactive / operational error** — baseline governs; never fail closed |
 | verified-absent | absent | present | yes | normal enforcement |
 | verified-absent | absent | absent | yes | **inactive** (never authorized) |
-| unverifiable | * | * | **no** | **`AUTHORIZATION_UNVERIFIABLE`** → operational error; never "never authorized", never a fabricated pass |
-| declaration invalid / missing activation evidence | * | * | yes | **operational error**; never fail closed |
+| unverifiable (baseline invalid / unreachable) | * | * | **no** | **`AUTHORIZATION_UNVERIFIABLE`** → operational error; never "never authorized", never a fabricated pass |
 
 Notes: (i) an **older** revision selected by the agent cannot change `B` — Mneme
-selects the revision (§5.7 R7); (ii) `verified-absent` must be **positively
-verified** (§5.7 R9), never inferred from a missing file; (iii) the only
-**fail-closed** cells require `authorized` **and** (missing memory or a locally
-removed declaration). The key property: **removing local governance files must
-not be sufficient to remove previously verified governance authorization**, and
-**concluding that authorization is absent requires the same independent
-verification as concluding that it exists**.
+selects the revision (§5a R7); (ii) `verified-absent` must be **positively
+verified** (§5a R9), never inferred from a missing file; (iii) an invalid
+**local** declaration is distinct from invalid **baseline** evidence — the
+former is subsumed by the verified baseline (`authorized` → fail closed;
+`verified-absent` → inactive), the latter yields `AUTHORIZATION_UNVERIFIABLE`;
+(iv) the only **fail-closed** cells require `authorized` **and** (`M` absent or
+`L` ∈ {absent, invalid}). The key property: **once independently verified,
+protection cannot be disabled by deleting, corrupting, replacing or rolling back
+local governance files**, and **concluding that authorization is absent requires
+the same independent verification as concluding that it exists**.
 
 ## 7. Explicit non-authorization and sequence
 
