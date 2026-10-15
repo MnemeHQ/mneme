@@ -7,12 +7,11 @@ acceptance or change of ADR-033. Once accepted, it authorizes **only slice 1**
 Everything else T-08 touches is deferred to separately gated follow-ups (§8).
 **Source anchor:** `MnemeHQ/mneme` `main` at
 `2578a720a7d418dc4023a701bf5e8bfe0ef43171` (DG1F G3-B design, PR #512). Line
-numbers below refer to that commit.
+numbers below refer to that commit. #513 merged as `98dc4771` and changed only
+documentation, so `mneme/` is identical at both commits.
 **Evidence:** [DG1F T-08 evidence record](../validation/dg1f-t08-cwd-memory-selection-2026-10-15.md)
 and its [artifacts](../validation/artifacts/dg1f-t08-cwd-memory-selection-2026-10-15/),
-added by draft PR #513 (`docs/dg1f-authorization-unverifiable-adversarial-spec`).
-Those relative links resolve once #513 merges; until then, read them from that
-branch. This charter must not merge before #513.
+added by PR #513, merged to `main` as `98dc4771`.
 **Governing contracts:** [ADR-021](../adr/ADR-021-shell-preflight-and-stop-session-delta.md)
 (fail-open transport policy);
 [ADR-017](../adr/ADR-017-enforcement-scope-vs-retrieval-scope.md) and
@@ -290,7 +289,7 @@ justification before it ships. It is never folded in silently.
 | D2 | **SessionStart / Stop** (`:706` / `:853`): baseline root and per-file memory for the session delta | **none.** Code inspection only. The L4 edit was outside Stop coverage anyway. | Changes what the session-delta backstop enumerates and how many memories one Stop evaluation uses. This is a coverage and semantics change, not a selection fix. |
 | D3 | **`mneme check` out-of-policy-root operational outcome**, any `mneme.check/v1` field to carry its reason, and the matching **#260 coherence extension** (today `evaluation_complete: false` with no `UNKNOWN` trace is judged incoherent, `hook.py:351-355`) | **offline** (V1/V5 direct checker PASS) and **live post-hoc** (L4 checker PASS) | Unreachable on the slice-1 direct-write path (§4). Remains reachable through D6 and D1/D2. Touches the CLI contract, the payload schema and #484's rules. |
 | D4 | **Nested-memory policy** (for example an outermost-within-repository rule; V6) | **offline only** (V3 as `cwd`); live V3 **not reproduced**; V6 never run | A policy decision about supported nested-memory layouts. Needs repository-root detection and a stated compatibility position. |
-| D5 | **Repository boundary / parent-directory fallback removal** | **none.** Identified by inspection (G3 §4.2) | Removes governance some layouts may rely on. Needs repository-root detection and a compatibility decision. |
+| D5 | **Repository boundary / parent-directory fallback removal** | **none.** Identified by inspection (G3 §4.2) | Removes governance some layouts may rely on. Needs repository-root detection and a compatibility decision. **Boundary review required:** the fallback lets a memory file above a repository govern it because of where it sits on disk, not because anyone declared it. The [roadmap publication boundary](../roadmap/README.md) puts deterministic cross-repository federation of *known, declared* decision sources in DG2 (public OSS). Discovering, reconciling or inferring organizational decision truth belongs to enterprise decision operations. The implicit fallback is neither a declared DG2 source nor an authorized OSS discovery mechanism. Its future must be decided against that boundary, and slice 1 must not be read as endorsing it. |
 | D6 | **`MNEME_MEMORY` precedence** (V4/V5) | **offline only**; V5 live not run | Interacts with the proposed ADR-033 §4.1 binding and with harness and test uses of the override. Needs its own architectural justification. |
 | D7 | **Other integrations** that select memory from `cwd` or a project directory: `codex_cli/gate.py:155`, `codex_cli/stop_audit.py:123`, `kiro/hook.py:298`, `antigravity/adapter.py:242`, `agent_sdk/adapter.py:336`, `hermes/adapter.py:256` | **none.** Code inspection only | Different hosts, payloads and test suites. Each needs its own scoping. |
 
@@ -335,8 +334,7 @@ availability, discovery-semantics or coverage change.
 
 ## 11. Sequence
 
-1. **Pending:** merge #513 (T-08 evidence), so that §1 and §7 cite merged
-   artifacts.
+1. **Done:** #513 (T-08 evidence) merged as `98dc4771`.
 2. **Pending:** review and merge this charter.
 3. **Pending:** merge the matching `[layer1-freeze]` amendment (slice 1 only).
 4. **Pending:** implement slice 1 in one PR with the §7.1 tests, squash-merged
