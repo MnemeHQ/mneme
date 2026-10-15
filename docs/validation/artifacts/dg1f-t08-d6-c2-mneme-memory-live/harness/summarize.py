@@ -43,8 +43,14 @@ def jl(p):
     return [json.loads(l) for l in p.read_text(encoding="utf-8").splitlines() if l.strip()] if p.exists() else []
 
 
-rows = ["| Probe | Init model | Topology / sources | Override as configured (where) | MNEME_MEMORY in launching shell | MNEME_MEMORY seen by hook (is_file) | find_memory start -> returned | Hook exit | Host Edit result | A/app.py before -> after | Post-hoc vs hook-selected | Post-hoc vs A's own memory | Enforcement-outcome flags | Harness / fail-open flags |",
-        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
+HEADER = ["Probe", "Init model", "Topology / sources", "Override as configured (where)",
+          "MNEME_MEMORY in launching shell", "MNEME_MEMORY seen by hook (is_file)",
+          "find_memory start -> returned", "Hook exit", "Host Edit result", "A/app.py before -> after",
+          "Post-hoc vs hook-selected", "Post-hoc vs A's own memory", "Enforcement-outcome flags",
+          "Harness / fail-open flags"]
+# Separator derived from the header so the column counts always match
+# (the as-run C2 summary had one separator column too many).
+rows = ["| " + " | ".join(HEADER) + " |", "|" + "---|" * len(HEADER)]
 for name in probes:
     out = root / name / "out"
     o = obs(out)
