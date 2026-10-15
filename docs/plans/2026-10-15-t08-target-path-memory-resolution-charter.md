@@ -1,9 +1,10 @@
 # T-08 — Direct-write target-path memory anchoring (slice 1) defect-correction charter
 
-**Status:** **PROPOSED (draft).** This charter is a docs-only proposal. It is
-**not** an implementation, **not** a Layer 1 freeze amendment, and **not** an
-acceptance or change of ADR-033. Once accepted, it authorizes **only slice 1**
-(§3), and only after a matching `[layer1-freeze]` amendment merges (§10).
+**Status:** **ACCEPTED (merged).** This charter merged via PR #514 as
+`dcaee389`. It is a docs-only charter. It is **not** an implementation, **not**
+a Layer 1 freeze amendment, and **not** an acceptance or change of ADR-033. It
+authorizes **only slice 1** (§3), and only under the matching
+`[layer1-freeze]` amendment (§10), which merged via PR #515 as `26b645bf`.
 Everything else T-08 touches is deferred to separately gated follow-ups (§8).
 **Source anchor:** `MnemeHQ/mneme` `main` at
 `2578a720a7d418dc4023a701bf5e8bfe0ef43171` (DG1F G3-B design, PR #512). Line
@@ -335,8 +336,9 @@ availability, discovery-semantics or coverage change.
 ## 11. Sequence
 
 1. **Done:** #513 (T-08 evidence) merged as `98dc4771`.
-2. **Pending:** review and merge this charter.
-3. **Pending:** merge the matching `[layer1-freeze]` amendment (slice 1 only).
+2. **Done:** this charter merged via #514 as `dcaee389`.
+3. **Done:** the matching `[layer1-freeze]` amendment (slice 1 only) merged via
+   #515 as `26b645bf`.
 4. **Pending:** implement slice 1 in one PR with the §7.1 tests, squash-merged
    under ADR-022.
 5. **Pending:** run the §7.2 live re-probe and record it as a separate evidence
