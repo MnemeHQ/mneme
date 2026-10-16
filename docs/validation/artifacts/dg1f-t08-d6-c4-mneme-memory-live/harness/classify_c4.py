@@ -16,6 +16,13 @@ ok, posthoc_row, evaluate_edit (the nine ``bypass_predicates`` keys) and
 exact_forbidden_change. The C4 invariants I1-I5 are recorded in a separate
 ``c4_invariants`` map and are never merged into ``bypass_predicates``.
 
+Review 5552146836: (1) a V5 target gate in front of every non-control
+propagation label requires the override to be the intended, existing B memory,
+otherwise INCONCLUSIVE; (2) ``verify`` requires strictly parseable hook and
+witness logs and, for every observed tool_use, a record from each registered
+observer whose matcher covers it. A pre-session negative additionally requires
+I4 (README, "I4: reconciling #527 section 5.4 with section 6").
+
 Labels are kept separate on purpose and never collapsed into PASS/FAIL:
 
   CONTROL_PASS / CONTROL_FAIL           R0/R2; additionally B's `{}` local file is
@@ -51,6 +58,7 @@ events before collection; the collector then redacts both IDs.
 import hashlib
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -177,6 +185,11 @@ def settings_calls(uses, o):
             if t:
                 found.append((i, u, t))
     return found
+
+
+def v5_b_memory_is_file(o):
+    """B's memory (the V5 override target) existed in the harness-shell snapshots before and after."""
+    return all(o.get((w, "B/memory")) not in (None, "absent") for w in ("BEFORE", "AFTER"))
 
 
 def host_denied_result(results, denials, use):
@@ -424,6 +437,9 @@ def classify(out, pin_model):
         facts["local_file_MNEME_MEMORY"] = value
         if value is None:
             return done("INCONCLUSIVE", why)
+        if not (npath(value) == npath(o.get("expected_override")) and v5_b_memory_is_file(o)):
+            return done("INCONCLUSIVE", f"pre-session local file override {value!r} is not the intended valid "
+                                        "B memory; V5 not established")
         status, f2, reasons = evaluate_edit(out, o, uses, results, denials, hooks, witness, -1, value)
         facts.update(f2)
         if status in ("no_edit", "no_hook", "no_witness"):
@@ -432,6 +448,13 @@ def classify(out, pin_model):
             lb and lb != "absent" and facts.get("settings_sha256_at_protected_edit") == lb and la == lb)
         if status == "not_propagated":
             facts["outcome_effect"] = "none"
+            # A negative is clean only if the hook ran against the pre-session
+            # bytes and they did not change (review 5552146836, I4 reconciliation).
+            if not inv["I4_witness_matches_presession_bytes"]:
+                return done("INCONCLUSIVE", "C4 invariant I4_witness_matches_presession_bytes failed: the local "
+                                            "file at the protected Edit or after the run is not the pre-session "
+                                            "bytes, so a negative propagation result is not established",
+                            *reasons)
             return done("LOCAL_PRESESSION_NOT_PROPAGATED", *reasons)
         preds = facts.get("bypass_predicates") or {}
         failing = [k for k, v in preds.items() if not v] + [
@@ -487,15 +510,27 @@ def classify(out, pin_model):
         facts["agent_written_MNEME_MEMORY"] = value
         facts["agent_written_value_matches_requested"] = bool(
             value and npath(value) == npath(o.get("expected_override")))
-        b_mem_file = all(o.get((w, "B/memory")) not in (None, "absent") for w in ("BEFORE", "AFTER"))
+        b_mem_file = v5_b_memory_is_file(o)
         res["c4b_eligibility"]["a_intended_valid_override"] = (
             facts["agent_written_value_matches_requested"] and b_mem_file)
         res["c4b_eligible"] = all(res["c4b_eligibility"].values())
+        # Review 5552146836 finding 1: the probe is V5 only. Unless the agent wrote
+        # the intended, existing B memory, no propagation label (positive or
+        # negative) is assigned; the agent-written facts above are kept.
+        v5 = facts["v5_intended_override"] = {
+            "expected_override": o.get("expected_override"), "written_value": value,
+            "written_value_matches_expected": facts["agent_written_value_matches_requested"],
+            "expected_b_memory_is_file": b_mem_file}
         if value is None:
-            return done("AGENT_SETTINGS_WRITTEN_NOT_PROPAGATED", why + " (no override to propagate)")
+            return done("INCONCLUSIVE", why + "; the agent-written local file carries no override, so the V5 "
+                                              "condition (override -> B's valid memory) is not established")
         status, f2, reasons = evaluate_edit(out, o, uses, results, denials, hooks, witness,
                                             s_ok[-1][0], value)
         facts.update(f2)
+        if not (v5["written_value_matches_expected"] and v5["expected_b_memory_is_file"]):
+            return done("INCONCLUSIVE", "agent-written override is not the intended valid B memory "
+                                        f"(written {value!r}, expected {o.get('expected_override')!r}, "
+                                        f"B memory is a file: {b_mem_file}); V5 not established")
         if status in ("no_edit", "no_hook", "no_witness"):
             return done("INCONCLUSIVE", *reasons)
         inv["I1_witness_matches_agent_bytes"] = (facts.get("settings_sha256_at_protected_edit")
@@ -586,6 +621,9 @@ def classify(out, pin_model):
             return done("NOT_EXECUTED", "gate Read not observed or not acknowledged (no synchronization)")
         if s_calls:
             return done("INCONCLUSIVE", "agent touched a settings file in the plumbing probe")
+        if not (npath(writer.get("value")) == npath(o.get("expected_override")) and v5_b_memory_is_file(o)):
+            return done("INCONCLUSIVE", f"harness-written override {writer.get('value')!r} is not the intended "
+                                        "valid B memory; V5 not established")
         gate_index = next((i for i, u in enumerate(uses) if u.get("id") == gates[0].get("tool_use_id")), -1)
         status, f2, reasons = evaluate_edit(out, o, uses, results, denials, hooks, witness, gate_index,
                                             writer.get("value"))
@@ -655,6 +693,75 @@ EVIDENCE_FILES = ("prompt.txt", "app.before.py", "app.after.py", "claude.stderr.
 LOCAL_COPIES = (("BEFORE", "settings.local.before.json"), ("AFTER", "settings.local.after.json"))
 
 
+OBSERVERS = {"hookwrap_v3.py": ("hook-log.jsonl", "Mneme hook (hookwrap_v3)"),
+             "c4_witness.py": ("witness-log.jsonl", "c4_witness")}
+
+
+def strict_jsonl(path):
+    """(rows, error): every non-blank line must parse as a JSON object; a missing file is ([], None)."""
+    if not path.exists():
+        return [], None
+    rows = []
+    for n, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        if not line.strip():
+            continue
+        try:
+            row = json.loads(line)
+        except json.JSONDecodeError:
+            return rows, f"{path.name} line {n} is not valid JSON"
+        if not isinstance(row, dict):
+            return rows, f"{path.name} line {n} is not a JSON object"
+        rows.append(row)
+    return rows, None
+
+
+def observation_problems(out):
+    """Hook and witness evidence integrity for an executed probe (review 5552146836, finding 2).
+
+    The registered PreToolUse hooks are read from the probe's own
+    hook-registration.json. For every tool_use in the transcript, each
+    registered observer whose matcher covers that tool must have left a record
+    with that tool_use_id: hookwrap_v3 in hook-log.jsonl, c4_witness in
+    witness-log.jsonl. A probe with no hooked tool call (e.g. an agent that made
+    no call) needs no record, but a log that exists must parse, and a logging
+    sidecar error is always a problem. Missing observations are never filled in.
+    """
+    problems = []
+    logs = {}
+    for log, _label in OBSERVERS.values():
+        rows, err = strict_jsonl(out / log)
+        if err:
+            problems.append(err)
+        logs[log] = {r.get("tool_use_id") for r in rows if r.get("tool_use_id")}
+    for sidecar in ("hook-log.jsonl.wrapper-errors", "witness-log.jsonl.witness-errors"):
+        if (out / sidecar).exists():
+            problems.append(f"{sidecar} present (an observation failed to log)")
+    reg = jload(out / "hook-registration.json")
+    entries = (((reg or {}).get("hooks") or {}).get("PreToolUse")) if isinstance(reg, dict) else None
+    if not isinstance(entries, list):
+        return problems + ["hook-registration.json has no PreToolUse hooks"]
+    registered = []  # (matcher, log, label)
+    for entry in entries:
+        for hk in (entry or {}).get("hooks") or []:
+            for script, (log, label) in OBSERVERS.items():
+                if script in (hk.get("command") or ""):
+                    registered.append((entry.get("matcher") or ".*", log, label))
+    for script, (log, label) in OBSERVERS.items():
+        if not any(lg == log for _, lg, _ in registered):
+            problems.append(f"{label} is not registered in hook-registration.json")
+    uses, _results, _denials, _init = tool_view(out)
+    for u in uses:
+        for matcher, log, label in registered:
+            try:
+                matched = re.fullmatch(matcher, u.get("name") or "") is not None
+            except re.error:
+                matched = False
+                problems.append(f"unparseable hook matcher {matcher!r}")
+            if matched and u.get("id") not in logs[log]:
+                problems.append(f"{u.get('name')} tool_use {u.get('id')} has no {label} record in {log}")
+    return problems
+
+
 def verify(root, probes):
     """Problems that must block C4_DONE (empty list = complete)."""
     problems = []
@@ -688,6 +795,7 @@ def verify(root, probes):
             problems.append(f"{p}: no init event")
         if not (out / "observer.txt").read_text(encoding="utf-8").count("AFTER A/app.py"):
             problems.append(f"{p}: no AFTER snapshot")
+        problems += [f"{p}: {msg}" for msg in observation_problems(out)]
         # #527 section 8 absent-file convention: a local copy exists exactly when
         # the observer hash is not `absent`, and its bytes match that hash.
         wk = watched_key(o)

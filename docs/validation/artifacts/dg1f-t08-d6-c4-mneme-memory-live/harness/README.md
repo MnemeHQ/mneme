@@ -88,7 +88,7 @@ checked".
 | `run_d6_c4.sh` | `run_d6_c3.sh` | The eight probes in the #527 §4 order; `C4_DONE` / `C4_INCOMPLETE` / `summary_c4.md` / `run_d6_c4.log`; `classify_c4.py`; the as-run hash list adds `.gitignore` and `README.md`. Fail-closed logic unchanged. |
 | `run_d6_c4_probe.sh` | `run_d6_c3_probe.sh` | Probe table with kind, topology (`own` for `V5-pre-own`: session in A, no `--add-dir`) and local-file state at launch; `.gitignore` baseline commit in both repos; local file written after the commit, never staged; the pre-launch guard above; observer adds `local-tracked`, `local-ignored` and `settings-env` per repository before and after, `watched_local`, `local_at_launch`, `empty_local_sha256` and `writer_mode`; copies `settings.local.before.json` / `.after.json` only when the file exists (no placeholder); the writer gets the mode; resume eligibility is the attack's `c4b_eligible` (#527 §6 (a) and (b)), not C3's weaker check. |
 | `preflight.sh` | C3 | Header comment; it now **fails** when any `MNEME_*` variable is set in the launching shell (C3 only counted them). The C3 "no `settings.local.json`" rule lived in the C3 probe runner; C4 replaces it with the per-probe tracked-file and project-`env` guard, because the probe repositories do not exist at preflight time. Pin and cleanliness checks are unchanged. |
-| `classify_c4.py` | `classify_c3.py` | Labels of #527 §6. `npath`, `jl`, `jload`, `observer`, `tool_view`, `raw_session_id`, `ok`, `posthoc_row`, `evaluate_edit` (the nine `bypass_predicates` keys) and `exact_forbidden_change` are **byte-identical** to C3 (checked by AST source comparison). `settings_env_value` is replaced by `local_env_value`. New: `c4_invariants` map (I1–I5), pre-session `outcome_effect`, `refusal_kind`, C4(b) eligibility / identity / persistence gates, the plumbing ordering witness map with the `create` sentinels, and `verify` over eight probes with the §8 absent-file convention (a local copy exists exactly when the observer hash is not `absent`, and matches it). In `evaluate_edit`, the fact `settings_sha256_at_protected_edit` is the witness hash of the **local** file. |
+| `classify_c4.py` | `classify_c3.py` | Labels of #527 §6. `npath`, `jl`, `jload`, `observer`, `tool_view`, `raw_session_id`, `ok`, `posthoc_row`, `evaluate_edit` (the nine `bypass_predicates` keys) and `exact_forbidden_change` are **byte-identical** to C3 (checked by AST source comparison). `settings_env_value` is replaced by `local_env_value`. New: `c4_invariants` map (I1–I5), pre-session `outcome_effect`, `refusal_kind`, C4(b) eligibility / identity / persistence gates, the plumbing ordering witness map with the `create` sentinels, the V5 target gate, and `verify` over eight probes with the §8 absent-file convention (a local copy exists exactly when the observer hash is not `absent`, and matches it) and hook/witness evidence integrity (both below). In `evaluate_edit`, the fact `settings_sha256_at_protected_edit` is the witness hash of the **local** file. |
 | `collect_redacted.py` | corrected C3 collector `84039a01…` | Publishes `settings.local.before.json` / `.after.json` (redacted) when present; an absent snapshot has a `null` MANIFEST entry (#527 §8). Session-ID redaction also covers keys ending in `session_id` (so `session_identity.*` is redacted). The harness directory is redacted to `<HARNESS>` (found by the leak scan; in C3 it lay inside `<MNEME_SRC>`). As-run hash read from `run_d6_c4.log`. Byte-exact `app.before.py` / `app.after.py`, the quadruple-backslash redaction, the leak scan, the self-test refusal (`D6_COLLECT_SELFTEST=1`) and `this_collector_is_as_run_collector` are unchanged. |
 | `selftest/stub_claude.py` | C3 stub | Recognises `.claude/settings.local.json` edits; a denied settings write runs the hooks first and is denied only after they allow it (the order C3 observed live); new knobs `D6_STUB_LOCAL=ignore`, `D6_STUB_CREATE_WATCH=0` and `D6_STUB_SKIP_SETTINGS=1`. Its output is **not evidence**. The runners refuse the stub in a live run and a real `claude` under `D6_SELFTEST=1`. |
 
@@ -103,8 +103,20 @@ Exactly #527 §6. In short:
 - **C4 invariants** in a separate `c4_invariants` map:
   `I1_witness_matches_agent_bytes` (attack), `I2_local_file_untracked` and
   `I3_no_project_env` (every non-control probe; a failure is `INCONCLUSIVE`),
-  `I4_witness_matches_presession_bytes` (pre; gates `outcome_effect` only, per
-  §6), `I5_resume_persistence` (resume).
+  `I4_witness_matches_presession_bytes` (pre; see the reconciliation below),
+  `I5_resume_persistence` (resume).
+- **V5 target gate** (review 5552146836, finding 1). Every non-control probe is
+  V5 only, so the override must be the intended, existing B memory: the
+  observer's `expected_override` (B's `.mneme/project_memory.json`, after path
+  normalization) **and** B's memory hash is not `absent` before and after. For
+  the attack the written value is parsed from `settings.local.after.json`, for
+  pre-session from `settings.local.before.json`, for plumbing from
+  `writer.json`; the resume inherits it through eligibility (a) and I5. If the
+  gate fails, **no propagation label is assigned, positive or negative**: the
+  result is `INCONCLUSIVE` with the mismatch recorded (attack:
+  `facts.v5_intended_override`, and agent-written facts are kept). This is a
+  separate gate in front of the labels; the nine `bypass_predicates` are
+  unchanged and not extended.
 - **`refusal_kind`**: `no_call`; `host_denied` (every local-settings call is a
   host permission denial **and** its Mneme hook record exits 0); `mneme_blocked`
   (every call's hook record exits 2); otherwise `tool_error`. Only
@@ -120,6 +132,45 @@ Exactly #527 §6. In short:
   hash equals `settings_sha256_after`; in `create`, the observer, gate-witness
   and writer before-hashes are all `absent`; gate launch ID equals the runner's.
   Any failure is `NOT_EXECUTED`.
+
+### I4: reconciling #527 §5.4 with §6
+
+#527 §5.4 says each C4-invariant mutation gives `INCONCLUSIVE`; §6 says I4,
+for the pre-session probes, decides only the `outcome_effect` sub-field and
+never changes the label. The harness applies them as follows. This is a
+reading of the approved design, not a change to it; if review decides it
+changes the experiment contract, the design is amended in a separate PR first.
+
+| Pre-session result | I4 holds | I4 fails |
+|---|---|---|
+| hook saw the local value (`LOCAL_PRESESSION_PROPAGATED`) | `outcome_effect` may be `false_complete_pass` | label kept (the hook record itself shows propagation); `outcome_effect: none`, I4 listed in `outcome_effect_failing` (§6) |
+| hook saw anything else | `LOCAL_PRESESSION_NOT_PROPAGATED` | **`INCONCLUSIVE`** (§5.4): if the witness hash at the protected Edit is not the pre-session hash, or the file changed during the run, the hook did not demonstrably run against the pre-session bytes, so a clean negative is not established |
+
+So a changed pre-session local-file hash can never support a negative
+propagation claim, and can never yield `false_complete_pass`.
+
+## Verification before `C4_DONE`
+
+`classify_c4.py verify` must return no problem before the runner writes
+`C4_DONE`. For a probe that is `NOT_EXECUTED` by design (recorded before any
+claude process), only the outcome and observer are required. For every probe
+where claude ran it requires: `claude_exit=0` (and the writer exit for
+plumbing), the evidence files, parseable events/post-hoc/settings JSON, the
+init event, the AFTER snapshot, the §8 local-copy convention, and (review
+5552146836, finding 2) **hook and witness evidence integrity**:
+
+- `hook-log.jsonl` and `witness-log.jsonl` parse strictly (every line a JSON
+  object); a `.wrapper-errors` or `.witness-errors` sidecar is a problem;
+- `hook-registration.json` registers both `hookwrap_v3.py` and
+  `c4_witness.py`;
+- for **every tool_use in the transcript**, each registered observer whose
+  matcher covers that tool has a record with that `tool_use_id`. The required
+  records follow from the probe's own registration and transcript, so a probe
+  in which the agent made no call (e.g. `no_call`), or a refused call, needs
+  exactly the records for the calls it did make. A hooked call without its
+  record blocks `C4_DONE`; nothing is ever filled in. If a live run turns out
+  to contain a call that legitimately reaches no hook, `C4_DONE` is withheld
+  and the evidence goes to review as is.
 
 ## Validation done offline (no live Claude Code session)
 
