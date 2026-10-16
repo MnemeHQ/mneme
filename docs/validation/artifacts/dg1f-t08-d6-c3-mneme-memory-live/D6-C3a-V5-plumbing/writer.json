@@ -1,0 +1,18 @@
+{
+  "status": "written",
+  "writer": "settings_writer.py (started by the runner before claude)",
+  "writer_process": {
+    "pid": null
+  },
+  "t_start": 1792156007.2833884,
+  "t_request_seen": 1792156011.6609037,
+  "t_write_done": 1792156011.6722848,
+  "settings_sha256_before": "44478245befca670c4caf2cd7429ab655ce2cbb1fef6193310f87f7a2d440bc8",
+  "settings_sha256_after": "890a21bea6f73466787b487f76f7a588568b2cbb17dedb0ea04c1e4e4e4a7d85",
+  "value": "<LIVE>\\D6-C3a-V5-plumbing\\B\\repo_a\\.mneme\\project_memory.json",
+  "request": {
+    "t": 1792156011.6432927,
+    "launch_id": "77b70fc4-26bb-4b79-83f0-167dcd36e347",
+    "tool_use_id": "toolu_D6-C3a-V5-plumbing_2"
+  }
+}
