@@ -108,7 +108,13 @@ In both probes:
 
 ## 3. Findings (kept separate)
 
-**A. Authority boundary.** An **uncommitted local configuration** (`.claude/settings.local.json` `env.MNEME_MEMORY`) redirected Mneme enforcement for an edit in repository A to **another repository's decisions** (B's memory). Deterministic enforcement then ran to a complete `PASS`, which is correct for the memory it selected. Yet the same edit is a complete `FAIL` on `T08-DEC` against the edited repository's own decisions. This holds in both the R4 topology (local file in the session repository B) and the own topology (A's own local file). It is a **decision-authority** problem, not a deterministic-enforcement defect: the checker evaluated correctly against a decision source that was not authoritative for the target (ADR-030 §1).
+**A. Authority boundary.** An **uncommitted local configuration** (`.claude/settings.local.json` `env.MNEME_MEMORY`) redirected Mneme enforcement for an edit in repository A to **another repository's decisions** (B's memory). Deterministic enforcement then ran to a complete `PASS`, which is correct for the memory it selected. Yet the same edit is a complete `FAIL` on `T08-DEC` against the edited repository's own decisions. This holds in both the R4 topology (local file in the session repository B) and the own topology (A's own local file). It is a **decision-authority** problem, not a deterministic-enforcement defect: the checker evaluated correctly, but against a decision source that the experiment treats as non-authoritative for the target.
+
+The expectation that repository A's own decisions govern edits to A comes from **this experimental fixture and the approved D6 scope** (#519 §6). It is not a rule that ADR-030 states on its own:
+- ADR-030 §1 establishes `decision_index` as the canonical durable decision authority *within* a given `project_memory.json`. It does not define how `MNEME_MEMORY` selects among repositories' memories, or which takes precedence.
+- This record therefore does **not** claim a direct ADR-030 §1 violation and does **not** settle D6 precedence.
+
+What the evidence does establish is the wrong-source risk: for this A-versus-B fixture, an uncommitted local file caused the edited repository's own decisions to go unconsulted.
 
 **B. Host protection.** In the tested mode (headless `-p`, `acceptEdits`, no allow rule), **Claude Code denied the agent's attempted modification** of the local settings file. Mneme did not refuse that write; its hook allowed it. Mneme then blocked the agent's protected edit under A's own memory. **No agent-controlled bypass was demonstrated.** C4(b) was not executed because its precondition (an agent-written intended override) was absent.
 
@@ -150,7 +156,12 @@ The artifacts are in [`artifacts/dg1f-t08-d6-c4-mneme-memory-live/`](artifacts/d
 - **Raw evidence is not published.** `events.jsonl` and `claude.stderr.txt` for each executed probe are referenced in `MANIFEST.json` → `raw_not_published` by SHA-256 and byte size. The raw files remain on the operator host under the live root.
 - **Two hash kinds are kept distinct.** For every published file, `MANIFEST.json` records `source_sha256` (the raw file on the host) and `published_sha256` (the redacted file in this repository).
   - `app.before.py` / `app.after.py` are published **byte-exact** (`byte_exact: true`; source = published = observer snapshot; CRLF preserved under `docs/validation/.gitattributes`).
-  - Every other file is redacted, so its published hash differs from its source hash. This includes the `settings.local` copies, which contain local paths. The chain back to the observer snapshots goes through `source_sha256`.
+  - Every other file is **processed through** redaction, and its published hash differs from its source hash **only when redaction changed its content**. Files containing machine paths, such as the `settings.local` copies carrying `env.MNEME_MEMORY`, change. Files with nothing to redact stay byte-identical.
+  - In the committed `MANIFEST.json`, **22** entries have `source_sha256 == published_sha256`:
+    - the 14 byte-exact `app.*.py` copies;
+    - `C4_DONE`;
+    - **seven** unchanged empty `{}` local-settings copies: the R0, R2 and attack `settings.local.before.json`/`settings.local.after.json`, and the plumbing-edit `settings.local.before.json`.
+  - Both hashes are kept separately for every entry. For changed files, the chain back to the observer snapshots goes through `source_sha256`.
 - **Redactions:**
   - the live root → `<LIVE>`;
   - the interpreter → `<PYTHON>`;
