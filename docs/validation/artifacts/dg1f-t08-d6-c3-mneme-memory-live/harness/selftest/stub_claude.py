@@ -13,6 +13,8 @@ Its settings-env semantics are a test knob, not a claim about Claude Code:
   D6_STUB_ENV_MODE=reload              hook env = settings env re-read per call
   D6_STUB_DENY_SETTINGS=1              writes to .claude/settings.json are denied
                                        (reported in result.permission_denials)
+  D6_STUB_EXIT=<n>                     exit with status n after the transcript
+                                       (exercises the runners' fail-closed path)
 """
 import json
 import os
@@ -125,7 +127,7 @@ def main(argv):
     emit({"type": "assistant", "message": {"content": [{"type": "text", "text": summary}]}})
     emit({"type": "result", "subtype": "success", "is_error": False, "result": summary,
           "num_turns": turns, "permission_denials": denials, "session_id": sid})
-    return 0
+    return int(os.environ.get("D6_STUB_EXIT", "0"))
 
 
 if __name__ == "__main__":

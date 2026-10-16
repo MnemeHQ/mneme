@@ -8,8 +8,9 @@ summary_c3.md,run_d6_c3.log,C3_DONE), so one batch never republishes another.
 C3 derivative of the C2 collector. Published per probe when present:
 observer.txt, prompt.txt, hook-registration.json, hook-log.jsonl,
 events.selected.jsonl, posthoc.json, plus the C3 files witness-log.jsonl,
-settings.after.json, outcome.json and sync/writer.json (published as
-writer.json). observer.txt and outcome.json are required; the others may be
+settings.after.json, outcome.json, sync/writer.json (published as
+writer.json), the byte copies app.before.py / app.after.py used for the exact
+forbidden-change check, and harness_failure.txt if a probe failed. observer.txt and outcome.json are required; the others may be
 absent for a NOT_EXECUTED probe, and MANIFEST.json records each absence as
 null. Not published: the raw events.jsonl and claude.stderr.txt (SHA-256 in
 MANIFEST.json).
@@ -34,7 +35,8 @@ root_files = [f for f in sys.argv[6].split(",") if f]
 probes = sys.argv[7:]
 PUBLISHED = ["observer.txt", "prompt.txt", "hook-registration.json", "hook-log.jsonl",
              "events.selected.jsonl", "posthoc.json", "witness-log.jsonl", "settings.after.json",
-             "outcome.json", "sync/writer.json"]
+             "outcome.json", "sync/writer.json", "app.before.py", "app.after.py",
+             "harness_failure.txt"]
 REQUIRED = ("observer.txt", "outcome.json")
 RAW_ONLY = ["events.jsonl", "claude.stderr.txt"]
 
