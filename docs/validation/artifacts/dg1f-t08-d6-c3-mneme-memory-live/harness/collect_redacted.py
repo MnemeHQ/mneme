@@ -15,6 +15,20 @@ absent for a NOT_EXECUTED probe, and MANIFEST.json records each absence as
 null. Not published: the raw events.jsonl and claude.stderr.txt (SHA-256 in
 MANIFEST.json).
 
+Byte-exact copies: app.before.py and app.after.py are published as their
+original bytes (CRLF preserved), never decoded and re-encoded, so their
+published SHA-256 equals the source SHA-256 and the observer snapshot hashes
+(the exact forbidden-change check stays independently reproducible). Before
+publication each must decode as UTF-8, pass the leak scan, and contain nothing
+the redactor would change; otherwise collection fails (exit 1). Every other
+file keeps the normal redaction path.
+
+Provenance: MANIFEST.json records this collector's own SHA-256, the harness
+HEAD(s) the live run recorded in observer.txt, and whether this collector is
+byte-identical to the as-run collect_redacted.py hashed in run_d6_c3.log. A
+re-collection with a newer collector is therefore never presented as the
+collector used during the live run.
+
 Self-test output (observer.txt containing SELFTEST) is refused (exit 1) unless
 D6_COLLECT_SELFTEST=1, so stub runs can never be published as evidence.
 
@@ -38,6 +52,7 @@ PUBLISHED = ["observer.txt", "prompt.txt", "hook-registration.json", "hook-log.j
              "outcome.json", "sync/writer.json", "app.before.py", "app.after.py",
              "harness_failure.txt"]
 REQUIRED = ("observer.txt", "outcome.json")
+BYTE_EXACT = ("app.before.py", "app.after.py")
 RAW_ONLY = ["events.jsonl", "claude.stderr.txt"]
 
 
@@ -95,6 +110,23 @@ for probe in probes:
             entry["published"][name] = None
             continue
         pub = Path(name).name
+        if name in BYTE_EXACT:
+            raw = (out / name).read_bytes()
+            try:
+                text = raw.decode("utf-8")
+            except UnicodeDecodeError:
+                bad.append(f"{probe}/{name}: not UTF-8; byte-exact publication refused")
+                continue
+            bad += [f"{probe}/{name}: {rx.pattern}" for rx in LEAKS if rx.search(text)]
+            if redact(text, {}, probe) != text:  # separate idmap: never perturbs pseudonyms
+                bad.append(f"{probe}/{name}: contains redactable content; byte-exact publication refused")
+                continue
+            (d / pub).write_bytes(raw)
+            entry["published"][name] = {"source_sha256": sha(out / name), "published_sha256": sha(d / pub),
+                                        "byte_exact": True}
+            if entry["published"][name]["source_sha256"] != entry["published"][name]["published_sha256"]:
+                bad.append(f"{probe}/{name}: published bytes differ from source")
+            continue
         text = redact((out / name).read_text(encoding="utf-8"), idmap, probe)
         (d / pub).write_text(text, encoding="utf-8", newline="\n")
         entry["published"][name] = {"source_sha256": sha(out / name), "published_sha256": sha(d / pub)}
@@ -109,6 +141,23 @@ for name in root_files:
     (dest / name).write_text(text, encoding="utf-8", newline="\n")
     manifest["root_files"][name] = {"source_sha256": sha(p), "published_sha256": sha(dest / name)}
     bad += [f"{name}: {rx.pattern}" for rx in LEAKS if rx.search(text)]
+heads = sorted({line.split("=", 1)[1].split()[0]
+                for probe in probes
+                for line in (Path(live) / probe / "out" / "observer.txt").read_text(encoding="utf-8").splitlines()
+                if line.startswith("harness_head=")})
+as_run = None
+log = Path(live) / "run_d6_c3.log"
+if log.exists():
+    m = re.search(r"harness sha256: ([0-9a-f]{64}) \*?\./collect_redacted\.py", log.read_text(encoding="utf-8"))
+    as_run = m.group(1) if m else None
+mine = sha(__file__)
+manifest["provenance"] = {
+    "live_run_harness_head": heads,
+    "as_run_collect_redacted_sha256": as_run,
+    "this_collector_sha256": mine,
+    "this_collector_is_as_run_collector": as_run == mine,
+    "byte_exact_files": list(BYTE_EXACT),
+}
 (dest / "MANIFEST.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8", newline="\n")
 if bad:
     print("LEAK SCAN FAILED:\n  " + "\n  ".join(bad))
