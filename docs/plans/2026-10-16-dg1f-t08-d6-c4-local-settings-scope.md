@@ -334,7 +334,8 @@ aborts. Re-pinning needs its own reviewed amendment to this proposal.
 - `MNEME_*` is unset in the launching shell, and the preflight counts 0.
 - The disposable repos sit outside any git checkout and any `.mneme` ancestor.
 - `safe_rmtree.py` deletes only the eight C4 names under the live root.
-- The local file is never staged or committed (guard plus predicate 10).
+- The local file is never staged or committed (guard plus invariant
+  `I2_local_file_untracked`).
 - The self-test stub and a live `claude` are mutually exclusive.
 - No user or managed settings source is loaded.
 
