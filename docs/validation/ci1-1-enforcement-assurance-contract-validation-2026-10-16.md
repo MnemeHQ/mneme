@@ -32,6 +32,7 @@ starting position:
 3. Which check the ruleset requires, and how a merge can still go through.
 4. Whether a PR can swap out its own policy and still get a green check.
 5. What the CI1.3 live experiment needs before anyone authorizes it.
+6. Which parts of the contract and CI1.2 fixtures can be reused on CI systems other than GitHub Actions.
 
 ## 2. Method
 
@@ -44,6 +45,11 @@ starting position:
 - Read `.mneme/project_memory.json` (blob `5002a6c0`) `decision_index`.
 - Read the live ruleset through the REST API (`gh api
   repos/MnemeHQ/mneme/rulesets/22196895`).
+- Cross-check the repository's [canonical integration support matrix](../integrations/README.md)
+  and [#278](https://github.com/MnemeHQ/mneme/issues/278): GitHub Actions
+  and GitLab CI have CLI-based reference patterns; a reusable GitHub Action
+  remains proposed and is not a second enforcement engine. The portability
+  section below is a requirement and platform inventory, not validation.
 
 Nothing was executed against CI. Every claim about how GitHub behaves at merge
 time is marked **to prove in CI1.3** unless it comes straight from the ruleset
@@ -78,12 +84,17 @@ must instead read `mneme.check/v1` and require `evaluation_complete: true`,
 and treat a non-parseable or empty stdout as "no verdict". This is the same
 contract #278 Step 0 asks for. CI1 needs no new CLI behavior to use it.
 
-**Finding F2: the CLI already produces ADR-029 binding fields.**
-`applicability[]` and `violations[]` carry `rule_id` and `decision_version_id`.
-The fields the CI1.4 evidence packet needs (governing decision and version,
-rule identity) are therefore available from the existing payload. They are not
-in today's PR comment, because the workflow parses only the human `Result:`
-line (G2 C3).
+**Finding F2: canonical identifiers exist; complete ADR-029 evidence does not.**
+`applicability[]` and `violations[]` carry `rule_id` and `decision_version_id`,
+so a CI adapter can preserve the evaluated decision version and rule identity
+without inventing its own IDs. Those fields alone do **not** satisfy ADR-029:
+CI1.4 must also bind the exact subject/change, applied applicability,
+attributable outcome, evaluated configuration, control version and provenance
+to the **same** evaluation. These dimensions are not all established by the
+current `mneme.check/v1` payload or today's PR comment, which parses only the
+human `Result:` line (G2 C3). Any missing binding remains unproven evidence;
+CI1.4 must identify how it is observed without asserting a core change is
+already unnecessary for *every* evidence field.
 
 ## 5. Ruleset and required-check position
 
@@ -108,11 +119,12 @@ job `name:` at L40. Two consequences follow:
   reported. The merge then waits on a check that never arrives, until the
   ruleset is changed at the same moment. Changing the mode and changing the
   ruleset are one coordinated change, not two separate ones.
-- **F3b (name spoofing).** The requirement is satisfied by **any** GitHub
-  Actions check run (integration 15368) with that name on the head commit. A
-  PR can add a separate workflow containing a trivially green job named
-  `mneme check --mode warn`. Whether that check run satisfies the requirement
-  while the real job is absent or failing is **to prove in CI1.3**.
+- **F3b (possible check-name substitution; unproven).** The ruleset pins both
+  the context name and GitHub Actions `integration_id: 15368`. Whether a
+  look-alike job with the same name and app identity can satisfy the
+  requirement when the actual governance job is absent or failing is **not
+  established** by this snapshot. Test it adversarially in CI1.3; a matching
+  name must not be assumed either sufficient or safely disambiguated.
 
 **Finding F4: no review gate sits behind the check.** With 0 required
 approvals, the required checks are the entire merge boundary for a PR that
@@ -209,27 +221,99 @@ CI1.2 fixture cross-check. The choice is a CI1.2 decision.
   forbidden literal FAILs exactly like one that *uses* it (observed while
   drafting this record). CI1 fixtures must not depend on that distinction.
 
-## 9. What the CI1.3 live experiment needs before authorization
+## 9. CI-platform portability and reusable fixture contract (proposed scope)
+
+**Portability invariant:** For identical trusted decision-memory bytes and
+version, Mneme package version, evaluated input bytes and target path, query
+and supported CLI options, the same Mneme enforcement path must return the same
+governance verdict, evaluation completeness, applicability and canonical
+decision/rule identity regardless of the CI executor. CI adapters must not
+reimplement DecisionRetriever, ConflictDetector, typed-rule evaluation, path
+applicability, or verdict semantics (ADR-017/020; #278).
+
+Separate the three boundaries:
+
+1. **Mneme evaluation:** the existing CLI and `mneme.check/v1` govern the
+   decision result. Exit codes alone cannot establish a trusted verdict (F1).
+2. **Trusted execution:** the adapter must obtain policy memory, evaluator and
+   pipeline/gate definition from sources the untrusted proposed change cannot
+   substitute; bind the evaluated subject, policy version and revision identity.
+   This is a requirement for the experiment, not an existing guarantee (F6).
+3. **Host enforcement:** the CI executor reports a result, but the repository
+   host or landing/deployment controller must actually reject the operation
+   when its independently authorized policy requires it. A failing pipeline
+   without a host-side required gate is **not** proof of merge prevention.
+   Post-merge validation is not pre-merge blocking evidence.
+
+The adapter may translate a *trusted* CLI outcome to native CI logs, jobs,
+statuses or annotations, but any strict/warn handling and availability-blocking
+policy must be stated in the experiment contract, not invented by an adapter.
+CI1.3's first live proof remains an isolated GitHub repository. Platform
+compatibility must not be inferred from that one proof.
+
+### Candidate platform inventory — not a support declaration
+
+| Surface | Current repository evidence | CI1 disposition |
+|---|---|---|
+| GitHub Actions + GitHub protected branch | Existing `mneme-check.yml` is advisory; GitHub CLI-based pattern documented. #278 proposes a reusable thin Action | **First** CI1.3 live host-blocking proof; no production rollout |
+| GitLab CI + GitLab merge controls | CLI-based CI reference pattern recorded in the canonical integration matrix | Reuse CI1.2 contract/fixtures; host enforcement not proven by CI1 |
+| Jenkins + protected SCM branch | No validated Mneme Jenkins adapter evidenced here | Proposed parity target; a failed Jenkins stage alone is insufficient without an effective SCM merge gate |
+| Azure Pipelines / Azure Repos, Buildkite, CircleCI | No validated Mneme adapters evidenced here | Later parity/host-boundary candidates, not current CI1 deliverables |
+| TeamCity, Bitbucket Pipelines, AWS CodeBuild/CodePipeline, Google Cloud Build, Harness, Tekton | No validation established by this record | Inventory only; prioritize separately if evidence warrants |
+| Anthropic Scion | Anthropic describes Scion as an **in-house source-control system**, not a CI product; see [engineering account](https://www.anthropic.com/engineering/redesigning-source-control) | Research only. No public Mneme integration, callable API or merge-blocking proof assumed |
+
+**Source-control independence:** A shared CI1 fixture must not require Git,
+a pull request, a particular check-run name, or a Git SHA to express the
+governance verdict. GitHub-specific evidence *does* record head/merge/base SHAs
+and required-check IDs; other source-control systems may use different opaque,
+immutable revision identifiers. An adapter must positively bind whatever
+revision it evaluated to the attempted merge, landing or deployment operation.
+No revision mapping is guessed.
+
+### CI1.2 cross-platform fixture requirements
+
+Keep a single fixture corpus for direct CLI and any later adapter: pinned
+Mneme version; trusted memory snapshot and decision/rule version; exact input
+bytes/digest; target path; query/options; expected `mneme.check/v1` result;
+and explicit coverage/evaluation completeness. Include compliant, violating,
+strict WARN, conflicting-decision/core-parity, applicability-excluded, missing
+or invalid configuration, contradictory/unparseable output and changed-revision
+cases where applicable. A missing verdict is **unevaluated**, not governance
+PASS or evidence of a policy violation. Tests of host-specific required checks
+and merge rejection sit **on top** of these common fixtures.
+
+For the first isolated live test, use a reviewed path-scoped literal rule in
+the test repository (§7) and preserve the existing unscoped ADR-005 rule as an
+offline cross-check. No new rule type, JSON schema or runtime path is authorized.
+No roadmap priority, claimed support level or CI1.3 experiment permission is
+changed by this inventory.
+
+## 10. What the CI1.3 live experiment needs before authorization
 
 | # | Item | Owner |
 |---|---|---|
 | A1 | An isolated test repository and protected branch, plus a ruleset with the required governance check (exact context name, `integration_id`, `bypass_actors: []`), recorded before and after | CI1.3 contract |
 | A2 | A trusted-source design for memory, evaluator and gate definition (F6), stated in the contract | CI1.3 contract |
-| A3 | Adapter verdict rule: block unless `mneme.check/v1` parses with `evaluation_complete: true` and `verdict: PASS`. Unevaluated runs are labeled as such, never as PASS (F1) | CI1.3 contract, aligned with #278 |
+| A3 | **Proposed experiment policy, not authorized:** success only on a trusted, complete `mneme.check/v1` PASS; distinguish strict WARN, governance FAIL, invalid transport, missing/invalid memory and crash. Do not call UNEVALUATED a governance violation. Approval of whether unavailability blocks belongs to the separate policy/ADR-033 boundary; document it before the experiment | CI1.3 contract, aligned with #278 and #483 |
 | A4 | Test matrix: compliant, violating, strict WARN, missing or invalid memory, CLI crash or contradictory output, new head commit, base moved (F5), substitution S1–S5, out-of-scope file | CI1.2 (offline) / CI1.3 (live) |
 | A5 | Evidence fields: head SHA **and** evaluated merge SHA, base SHA, `rule_id`, `decision_version_id`, raw `mneme.check/v1` payload, check-run id and conclusion, ruleset snapshot, observed merge-button/API merge result | CI1.4 |
 | A6 | Explicit statement that **this repository's** `mneme-check.yml` and `main-pr-only` stay unchanged. Promoting anything to this repository needs the G2 C1 charter + `[layer1-freeze]` amendment (ADR-031 §7) | CI1.4 recommendation |
+| A7 | Direct-CLI fixture parity remains CI-platform-independent (§9). GitHub-specific merge and check-run evidence is additive, not part of Mneme's verdict semantics | CI1.2 fixture definition / CI1.3 contract |
 
-## 10. Bottom line
+## 11. Bottom line
 
-- The CLI contract (`mneme.check/v1` + `evaluation_complete`) is enough for a
-  CI adapter. **No core change is needed** for CI1, provided the adapter does
-  not rely on exit codes alone (F1).
+- The CLI contract (`mneme.check/v1` + `evaluation_complete`) supplies the
+  common machine verdict and canonical rule identity for CI adapters, provided
+  they do not rely on exit codes alone (F1). It does **not**, by itself,
+  establish every ADR-029 subject/provenance binding or trusted-source control
+  required for CI1.4 (F2, F6).
 - The merge boundary today rests on a check required **by name** (F3), with
   **no review gate** behind it (F4), evaluated against inputs **the PR
   controls** (F6). Switching this workflow to strict mode on its own would not
   establish merge-blocking assurance.
 - CI1.3 should run only in an isolated repository, use a literal-tier rule
   (F7, S7), and record a trusted-source design (A2) before anything is
-  executed.
+  executed. The CI1.2 fixture/verdict contract is portable; Jenkins, GitLab
+  and other host-specific merge gates are later proof targets, not assumed
+  compatible or implemented (§9).
 - This record changes nothing and authorizes nothing.
