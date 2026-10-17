@@ -86,6 +86,24 @@ def _selected(target: Path, cwd: Path):
     return walk, gate
 
 
+@pytest.fixture
+def spy(monkeypatch):
+    """Record each real ``mneme check`` invocation; never alter it."""
+    calls = []
+    real = hook._invoke_check
+
+    def _spy(memory, rel_label, target_path, checked_content, stderr=None, **kwargs):
+        proc = real(memory, rel_label, target_path, checked_content, stderr=stderr, **kwargs)
+        calls.append({
+            "memory": Path(memory),
+            "payload": json.loads(proc.stdout) if proc is not None and proc.stdout else None,
+        })
+        return proc
+
+    monkeypatch.setattr(hook, "_invoke_check", _spy)
+    return calls
+
+
 def _run(envelope: dict):
     err, out = io.StringIO(), io.StringIO()
     rc = hook.main(stdin=io.StringIO(json.dumps(envelope)), stderr=err, stdout=out)
@@ -199,10 +217,20 @@ class TestPlantedMarkerPlusOverride:
         assert rc == 2
         assert "D5-DEC" in err
 
-    def test_forbidden_edit_is_permitted_under_override(self, layout, monkeypatch):
-        """The wrong-memory outcome D6/Q2 records: B's memory, forbidden edit permitted."""
+    def test_forbidden_edit_is_permitted_under_override(self, layout, monkeypatch, spy):
+        """The wrong-memory outcome D6/Q2 records: B's memory, complete PASS.
+
+        The checker payload rules out fail-open: exit 0 alone cannot tell a
+        complete PASS from a check that never ran. This stays a hook-level
+        baseline; it does not apply a host edit (live evidence is separate).
+        """
         a, _, mem_b, target = layout
         monkeypatch.setenv("MNEME_MEMORY", str(mem_b))
         rc, err = _run(_edit(target, a))
+        assert [c["memory"] for c in spy] == [mem_b]
+        payload = spy[0]["payload"]
+        assert payload is not None
+        assert payload["verdict"] == "PASS"
+        assert payload["evaluation_complete"] is True
         assert rc == 0
         assert "D5-DEC" not in err
