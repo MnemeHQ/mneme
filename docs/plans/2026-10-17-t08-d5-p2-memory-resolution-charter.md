@@ -1,7 +1,7 @@
-# T-08 D5 + P2: shared memory-resolution implementation charter (PROPOSED)
+# T-08 D5 + P2: shared memory-resolution implementation charter (ACCEPTED: no execution authorized)
 
 **Date:** 2026-10-17
-**Status:** **PROPOSED, not accepted.** Charter draft, docs only. It authorizes nothing: no code, no tests (including the L4 characterization test), no experiments or live probes, no `[layer1-freeze]` amendment, no ADR or ADR-033 change, no change to C1–C4 evidence, pins or worktrees.
+**Status:** **ACCEPTED as the implementation charter** (owner approval 2026-10-17, given in the owner's working session, following an independent-review ACCEPT on `37fc32c8`). Docs only. **Acceptance authorizes no execution:** no code, no tests (including the L4 characterization test), no experiments or live probes, no `[layer1-freeze]` amendment, no ADR or ADR-033 change, no change to C1–C4 evidence, pins or worktrees.
 **Revision 2 (2026-10-17):** answers the #542 review.
 - The resolver now always reports the nearest Git boundary, including when a memory is found first (§3.2, §7).
 - C3 takes the wait-for-evidence path: every consumer's host needs a verified channel before the freeze amendment (§5, §12).
@@ -228,7 +228,7 @@ After this charter merges, a separate `[layer1-freeze]` PR under Amendment Proce
 
 ## 12. Sequence
 
-1. **This charter**: review, then owner acceptance.
+1. **Done:** this charter, accepted 2026-10-17 (independent-review ACCEPT on `37fc32c8`; owner approval).
 2. **§6 characterization test PR** (test-only), after the owner authorizes it.
 3. **H1–H6 channel probes** (§5), each recorded as evidence and each separately authorized. **All six gates must pass, with every listed output path probed.**
 4. **`[layer1-freeze]` amendment PR** (§9), only after step 3.
