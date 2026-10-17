@@ -49,6 +49,7 @@ import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from mneme.adr_diagnostics import collect_adr_diagnostics
 from mneme.adr_freshness import FreshnessIssue
@@ -60,20 +61,8 @@ from mneme.adr_import import (
     format_preview,
 )
 from mneme.adr_schema import ADRParseError, ADRValidationError
-from mneme.integrations.eventcatalog import (
-    apply_import as ec_apply_import,
-    compile_for_import as ec_compile_for_import,
-    detect_collisions as ec_detect_collisions,
-    format_preview as ec_format_preview,
-    refuse_canonical_apply as ec_refuse_canonical_apply,
-)
-from mneme.benchmark import BenchmarkRunner, ScenarioVerdict
-from mneme.benchmark_report import format_json, format_markdown, format_terminal
 from mneme.context_builder import DEFAULT_MAX_DECISIONS, format_decisions
-from mneme.cursor_generator import generate_mdc
-from mneme.decision_add import AddDecisionError, add_canonical_decision
 from mneme.decision_governance import GovernanceContext, resolve_effective
-from mneme.decision_authority import DecisionAuthorityError, DecisionAuthorityService
 from mneme.decision_index_persistence import (
     DecisionIndexMigrationRefused,
     DecisionIndexMigrationRequired,
@@ -85,7 +74,6 @@ from mneme.decision_index_persistence import (
     plan_memory_migration,
     refuse_legacy_decisions_write,
 )
-from mneme.decision_proposal_store import JsonFileDecisionProposalStore
 from mneme.decision_retriever import DecisionRetriever
 from mneme.enforcer import (
     EnforcementResult,
@@ -94,20 +82,13 @@ from mneme.enforcer import (
     generate_protection_report,
 )
 from mneme.memory_store import MemoryStore
-from mneme.protection import (
-    ENFORCEMENT_BEHAVIOR,
-    ProtectionError,
-    activate_protection,
-    activation_precheck,
-    find_candidates,
-    find_decision,
-    load_decisions,
-    protection_status,
-    validate_proposal,
-)
-from mneme.readiness import READINESS_LABELS, READINESS_ORDER
-from mneme.setup import SetupError, SetupOutcome, run_setup
-from mneme.setup_state import STATE_ACTIVE, scaffold_project_memory
+
+if TYPE_CHECKING:
+    # Annotation-only. Subcommand-only modules are imported inside their
+    # command functions so `mneme check` (run by mneme-hook on every write)
+    # does not pay for them; see tests/test_cli_import_budget.py.
+    from mneme.decision_proposal_store import JsonFileDecisionProposalStore
+    from mneme.setup import SetupOutcome
 
 
 def _utc_now() -> str:
@@ -140,6 +121,7 @@ def _scaffold_memory() -> dict:
     enforce). meta.name and meta.description are the only fields the loader
     requires; created_by is recorded for provenance.
     """
+    from mneme.setup_state import scaffold_project_memory
     return scaffold_project_memory(created_by="mneme init")
 
 
@@ -168,6 +150,7 @@ def _cmd_init(args: argparse.Namespace) -> int:
 
 def _print_setup_summary(outcome: SetupOutcome) -> None:
     """Render the human-readable setup summary (ASCII, existing CLI style)."""
+    from mneme.readiness import READINESS_LABELS, READINESS_ORDER
     print("Mneme setup")
     print()
     print("Repository")
@@ -232,6 +215,8 @@ def _print_setup_summary(outcome: SetupOutcome) -> None:
 
 
 def _cmd_setup(args: argparse.Namespace) -> int:
+    from mneme.setup import SetupError, run_setup
+    from mneme.setup_state import STATE_ACTIVE
     audit_ref = args.audit_ref if args.audit_ref is not None else ""
     if args.audit_ref is not None and not audit_ref.strip():
         return _error_exit("audit reference must not be empty")
@@ -287,6 +272,7 @@ def _cmd_list(args: argparse.Namespace) -> int:
 # ── Subcommand: add_decision ─────────────────────────────────────────────────
 
 def _cmd_add(args: argparse.Namespace) -> int:
+    from mneme.decision_add import AddDecisionError, add_canonical_decision
     path = Path(args.memory)
     if not path.exists():
         return _error_exit(f"memory file {path} does not exist")
@@ -714,6 +700,7 @@ def _require_memory(
             return 2
         memory_path, decisions = loaded
     """
+    from mneme.protection import ProtectionError, load_decisions
     memory_path = Path(memory)
     if not memory_path.exists():
         _error_exit(f"memory file {memory_path} does not exist")
@@ -727,6 +714,7 @@ def _require_memory(
 
 
 def _cmd_protect_list(args: argparse.Namespace) -> int:
+    from mneme.protection import ENFORCEMENT_BEHAVIOR, find_candidates
     loaded = _require_memory(args.memory)
     if loaded is None:
         return 2
@@ -776,6 +764,7 @@ def _cmd_protect_list(args: argparse.Namespace) -> int:
 
 
 def _cmd_protect_status(args: argparse.Namespace) -> int:
+    from mneme.protection import ProtectionError, protection_status
     loaded = _require_memory(args.memory)
     if loaded is None:
         return 2
@@ -808,6 +797,7 @@ def _cmd_protect_status(args: argparse.Namespace) -> int:
 
 
 def _cmd_protect_validate(args: argparse.Namespace) -> int:
+    from mneme.protection import activation_precheck, find_decision, validate_proposal
     loaded = _require_memory(args.memory)
     if loaded is None:
         return 2
@@ -844,6 +834,7 @@ def _cmd_protect_validate(args: argparse.Namespace) -> int:
 
 
 def _cmd_protect_activate(args: argparse.Namespace) -> int:
+    from mneme.protection import ProtectionError, activate_protection
     loaded = _require_memory(args.memory)
     if loaded is None:
         return 2
@@ -906,6 +897,7 @@ def _cmd_protect_activate(args: argparse.Namespace) -> int:
 # ── Subcommand: cursor generate ──────────────────────────────────────────────
 
 def _cmd_cursor_generate(args: argparse.Namespace) -> int:
+    from mneme.cursor_generator import generate_mdc
     memory_path = Path(args.memory)
     if not memory_path.exists():
         return _error_exit(f"memory file {memory_path} does not exist")
@@ -933,6 +925,8 @@ def _cmd_cursor_generate(args: argparse.Namespace) -> int:
 
 def _cmd_benchmark(args: argparse.Namespace) -> int:
     """Run all benchmark scenarios in a directory and report results."""
+    from mneme.benchmark import BenchmarkRunner, ScenarioVerdict
+    from mneme.benchmark_report import format_json, format_markdown, format_terminal
     import sys
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
@@ -1090,6 +1084,7 @@ def _preservation_validator(memory_path: Path):
     Shapes the validator does not support (anything but a global
     ``FORBID_LITERAL``) cannot be preserved.
     """
+    from mneme.protection import validate_proposal
 
     import dataclasses
 
@@ -1117,6 +1112,13 @@ def _preservation_validator(memory_path: Path):
 
 def _cmd_eventcatalog_import(args: argparse.Namespace) -> int:
     """Import EventCatalog ADRs from an index into target memory."""
+    from mneme.integrations.eventcatalog import (
+        apply_import as ec_apply_import,
+        compile_for_import as ec_compile_for_import,
+        detect_collisions as ec_detect_collisions,
+        format_preview as ec_format_preview,
+        refuse_canonical_apply as ec_refuse_canonical_apply,
+    )
     import sys
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
@@ -1351,6 +1353,7 @@ def _require_proposal_store(
     document. Nothing is created implicitly and no in-memory fallback
     exists — human authority must act on an existing durable record.
     """
+    from mneme.decision_proposal_store import JsonFileDecisionProposalStore
     if not proposals:
         _error_exit(
             "--proposals requires a path to an existing "
@@ -1485,6 +1488,7 @@ def _cmd_decision_accept(args: argparse.Namespace) -> int:
     live in Core; the CLI implements none of them and activates no
     protection and runs no Audit.
     """
+    from mneme.decision_authority import DecisionAuthorityError, DecisionAuthorityService
     store = _require_proposal_store(args.proposals)
     if store is None:
         return 2
@@ -1523,6 +1527,7 @@ def _cmd_decision_reject(args: argparse.Namespace) -> int:
     CLI memory precheck exists and no memory file is created or
     modified. Exit codes follow the decision-command contract.
     """
+    from mneme.decision_authority import DecisionAuthorityError, DecisionAuthorityService
     store = _require_proposal_store(args.proposals)
     if store is None:
         return 2
