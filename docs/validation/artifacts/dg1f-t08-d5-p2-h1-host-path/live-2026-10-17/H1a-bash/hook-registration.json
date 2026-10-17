@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"<PYTHON>\" -I \"<HARNESS>\\emitter.py\" pretooluse \"<LIVE>\\H1a-bash\\out\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
