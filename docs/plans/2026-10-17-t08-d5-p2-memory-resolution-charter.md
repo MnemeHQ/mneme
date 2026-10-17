@@ -149,6 +149,31 @@ loop:
 
 Today none of the twelve output paths is verified. H2's non-DENY output shapes are explicitly unproven, and no live Kiro or Antigravity harness is recorded in the repository. **If any host gate cannot be met, the shared implementation stays blocked for all consumers (I1), and D5 must be revisited explicitly.** The charter itself may be accepted before the probes exist, but it authorizes no runtime change.
 
+## 5.1 Amendment A1: Claude Code Stop channel (PROPOSED)
+
+**Status: PROPOSED, not accepted.** It is coordinated with the probe-scope [Amendment A1](2026-10-17-dg1f-t08-d5-p2-host-path-probe-scope.md) (§4.2 there), reviewed together with it, and implements the owner's O1 selection in the [H1c Stop-path decision](2026-10-17-dg1f-t08-d5-p2-h1c-stop-path-decision.md) (#554, O1).
+
+**Change.** In the §5 channel table, Claude Code **Stop**'s candidate channel for anomalous outcomes (rows 2, 4, 5 and 7) changes from `hookSpecificOutput.additionalContext` to **top-level `systemMessage`** (exit 0, no `hookSpecificOutput`, no `decision`). By the shape-binding rule (probe scope §3 step 5), an eventual implementation would have to emit exactly the probed `systemMessage` form at Stop, and only once a probe has passed it.
+
+**Why.** H1c showed that Stop `additionalContext` makes the host continue the session. The Claude Code documentation describes that as intended (decision note §2). `systemMessage` is documented as a user-facing warning, and nothing documents it as continuing a Stop.
+
+**Unchanged:**
+- D5 §5.1's **developer-or-agent** visibility rule;
+- the §5 gate rule (all H1–H6 output paths must pass before the freeze amendment, with no per-host exception);
+- every other row of the channel table;
+- the §3 design and §4 consumers;
+- §6–§12.
+
+A Stop notice that reaches only the developer is acceptable, as it already is on any path (probe scope D3), and it would be recorded as developer-only.
+
+**Not authorized by A1:**
+- any harness change or live run, including the two H1c runs the probe-scope A1 specifies;
+- any runtime change, including the shipped `_emit_stop_feedback` (#550);
+- implementation;
+- the `[layer1-freeze]` amendment.
+
+**Gate status.** H1 remains **NOT MET** until H1c passes under the A1 shape, or until a D5 amendment for Stop is accepted (decision note O2, the fallback).
+
 ## 6. Characterization test first (D5 §7.4)
 
 A **test-only PR, before any behavior change**, pins today's `main` behavior with temporary-directory layouts. Each case below asserts today's `find_memory` result:
@@ -239,28 +264,3 @@ After this charter merges, a separate `[layer1-freeze]` PR under Amendment Proce
 6. **§8 behavioral live evidence PR.**
 
 Each step needs the previous one merged.
-
-## 5.1 Amendment A1: Claude Code Stop channel (PROPOSED)
-
-**Status: PROPOSED, not accepted.** It is coordinated with the probe-scope [Amendment A1](2026-10-17-dg1f-t08-d5-p2-host-path-probe-scope.md) (§4.2 there), reviewed together with it, and implements the owner's O1 selection in the [H1c Stop-path decision](2026-10-17-dg1f-t08-d5-p2-h1c-stop-path-decision.md) (#554, O1).
-
-**Change.** In the §5 channel table, Claude Code **Stop**'s candidate channel for anomalous outcomes (rows 2, 4, 5 and 7) changes from `hookSpecificOutput.additionalContext` to **top-level `systemMessage`** (exit 0, no `hookSpecificOutput`, no `decision`). By the shape-binding rule (probe scope §3 step 5), an eventual implementation would have to emit exactly the probed `systemMessage` form at Stop, and only once a probe has passed it.
-
-**Why.** H1c showed that Stop `additionalContext` makes the host continue the session. The Claude Code documentation describes that as intended (decision note §2). `systemMessage` is documented as a user-facing warning, and nothing documents it as continuing a Stop.
-
-**Unchanged:**
-- D5 §5.1's **developer-or-agent** visibility rule;
-- the §5 gate rule (all H1–H6 output paths must pass before the freeze amendment, with no per-host exception);
-- every other row of the channel table;
-- the §3 design and §4 consumers;
-- §6–§12.
-
-A Stop notice that reaches only the developer is acceptable, as it already is on any path (probe scope D3), and it would be recorded as developer-only.
-
-**Not authorized by A1:**
-- any harness change or live run, including the two H1c runs the probe-scope A1 specifies;
-- any runtime change, including the shipped `_emit_stop_feedback` (#550);
-- implementation;
-- the `[layer1-freeze]` amendment.
-
-**Gate status.** H1 remains **NOT MET** until H1c passes under the A1 shape, or until a D5 amendment for Stop is accepted (decision note O2, the fallback).
