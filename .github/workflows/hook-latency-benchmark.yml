@@ -1,0 +1,68 @@
+name: Hook latency benchmark
+
+# Benchmark-only (MnemeHQ/mneme-growth-ops#60): runs benchmarks/hook_latency on
+# Linux for Python 3.13, 3.15 and 3.15 with PYTHON_LAZY_IMPORTS=all (PEP 810).
+# Not a required check. Hosted runners are shared VMs, so treat absolute
+# numbers as indicative; compare cells within one run.
+#
+# Both interpreters use the same pure-Python PyYAML copy (compiled extension
+# removed) so the only difference between them is the interpreter.
+
+on:
+  workflow_dispatch:
+    inputs:
+      runs:
+        description: 'Timed runs per cell'
+        required: false
+        default: '50'
+  pull_request:
+    paths:
+      - 'benchmarks/hook_latency/**'
+      - '.github/workflows/hook-latency-benchmark.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    name: hook latency (linux)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: |
+            3.15
+            3.13
+          allow-prereleases: true
+
+      - name: Shared pure-Python dependency
+        run: |
+          python3.13 -m pip install --quiet --target deps pyyaml
+          find deps -name '_yaml*.so' -delete
+          python3.13 -c "import sys; sys.path[:0]=['deps']; import yaml; assert not yaml.__with_libyaml__"
+          python3.15 -c "import sys; sys.path[:0]=['deps']; import yaml; assert not yaml.__with_libyaml__"
+
+      - name: Run harness
+        env:
+          RUNS: ${{ inputs.runs || '50' }}
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          PP="$PWD:$PWD/deps"
+          run() {
+            local label="$1"; shift
+            echo "### $label" >> "$GITHUB_STEP_SUMMARY"
+            "$@" --runs "$RUNS" --warmup 5 --pythonpath "$PP" | tee -a "$GITHUB_STEP_SUMMARY"
+            echo >> "$GITHUB_STEP_SUMMARY"
+          }
+          run "Python 3.13" python3.13 benchmarks/hook_latency/run.py --python python3.13 --out out/linux-py313.json
+          run "Python 3.15" python3.15 benchmarks/hook_latency/run.py --python python3.15 --out out/linux-py315.json
+          run "Python 3.15, PYTHON_LAZY_IMPORTS=all" python3.15 benchmarks/hook_latency/run.py --python python3.15 --env PYTHON_LAZY_IMPORTS=all --out out/linux-py315-lazy-all.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hook-latency-linux
+          path: out/
