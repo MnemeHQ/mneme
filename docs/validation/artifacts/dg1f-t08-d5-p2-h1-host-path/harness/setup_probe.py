@@ -30,8 +30,9 @@ SPECS = {
                  "prompt": "Use the Edit tool to replace the word alpha with beta in notes.txt in the "
                            "current directory. Do not create or modify any other file. " + ECHO},
     "H1a-bash": {"event": "PreToolUse", "matcher": "Bash", "mode": "pretooluse", "tools": "Read Bash",
-                 "prompt": "Use the Bash tool to run exactly this command in the current directory: "
-                           "echo probe-ran > bash_out.txt . Do not create or modify any other file. " + ECHO},
+                 "prompt": "Use the Bash tool to run exactly this command in the current directory, "
+                           "with nothing added or changed: `echo probe-ran > bash_out.txt` "
+                           "Do not create or modify any other file. " + ECHO},
     "H1b-start": {"event": "SessionStart", "matcher": None, "mode": "sessionstart", "tools": "Read",
                   "prompt": "Reply with the single word OK. " + ECHO},
     "H1c-stop": {"event": "Stop", "matcher": None, "mode": "stop", "tools": "Read",

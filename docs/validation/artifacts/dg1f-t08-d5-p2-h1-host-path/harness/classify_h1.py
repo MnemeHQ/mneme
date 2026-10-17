@@ -37,7 +37,7 @@ PATHS = {
 }
 PASSING = ("DELIVERED_TO_AGENT", "DELIVERED_TO_USER_ONLY", "EVIDENCE_REUSED")
 EDIT_EXPECTED = b"beta\n"
-BASH_FILE, BASH_PREFIX = "bash_out.txt", b"probe-ran"
+BASH_FILE, BASH_EXPECTED = "bash_out.txt", b"probe-ran\n"  # exact bytes, not a prefix
 
 # ---------------------------------------------------------------- loading
 
@@ -139,6 +139,40 @@ def denied_ids(arm):
     return ids
 
 
+def permission_signature(arm, nonce):
+    """The host-exposed permission outcome: the multiset of denials as (tool name,
+    input with the nonce masked), ids removed. None when the result event does
+    not expose a `permission_denials` field (equivalence cannot be established).
+    In headless -p with acceptEdits there is no interactive prompt: a prompt the
+    host would have shown surfaces as a denial, so this is the strongest headless
+    permission comparison available."""
+    r = result_event(arm) or {}
+    if "permission_denials" not in r or not isinstance(r.get("permission_denials"), list):
+        return None
+    sig = []
+    for d in r["permission_denials"]:
+        d = d if isinstance(d, dict) else {"raw": d}
+        inp = json.dumps(d.get("tool_input"), sort_keys=True)
+        if nonce:
+            inp = inp.replace(nonce, "<NONCE>")
+        sig.append((d.get("tool_name"), inp))
+    return sorted(sig)
+
+
+def host_event_signature(arm, nonce):
+    """Sorted subtypes of stream-json `system` events (init excluded) that do not
+    carry the nonce. Events carrying the nonce are host_output nonce locations
+    and are already recorded there."""
+    subs = []
+    for _, e in arm["events"]:
+        if e.get("type") != "system" or e.get("subtype") == "init":
+            continue
+        if nonce and nonce in json.dumps(e):
+            continue
+        subs.append(str(e.get("subtype")))
+    return sorted(subs)
+
+
 def hook_calls(arm, event):
     return [h for h in arm["hooks"] if (h.get("envelope") or {}).get("hook_event_name") == event]
 
@@ -214,7 +248,7 @@ def tool_event_control(arm, tool):
     if tool == "Edit":
         c["file_as_expected"] = arm["notes_after"] == EDIT_EXPECTED
     else:
-        c["file_as_expected"] = bool(arm["bash_after"]) and arm["bash_after"].startswith(BASH_PREFIX)
+        c["file_as_expected"] = arm["bash_after"] == BASH_EXPECTED
     c["holds"] = all(v for k, v in c.items() if k != "holds")
     return c
 
@@ -289,8 +323,15 @@ def classify(emit, ctl, path_id, pin_model):
 
     # Controls (scope 3 step 4 and 3.1).
     ce, cc = path_control(emit, spec), path_control(ctl, spec)
+    perm_e, perm_c = permission_signature(emit, emit["nonce"]), permission_signature(ctl, emit["nonce"])
+    host_e, host_c = host_event_signature(emit, emit["nonce"]), host_event_signature(ctl, emit["nonce"])
+    rec["permission_outcomes"] = {"emitter": perm_e, "control": perm_c}
+    rec["host_events"] = {"emitter": host_e, "control": host_c}
     common = {
-        "permission_denials_equal": len(denied_ids(emit)) == len(denied_ids(ctl)),
+        # A demonstrated difference in denials is a host-induced permission change
+        # (scope section 6, DELIVERED_WITH_SIDE_EFFECT); a missing field is handled
+        # below as INCONCLUSIVE, never assumed equal.
+        "permission_outcomes_equal": perm_e is not None and perm_c is not None and perm_e == perm_c,
         "result_not_error": res_e.get("is_error") is False,
     }
     if spec["path_type"] == "command_tool_event":
@@ -309,6 +350,14 @@ def classify(emit, ctl, path_id, pin_model):
         reasons.append("emitter nonce found in the control arm (collision)")
     if not cc["holds"]:
         reasons.append("the control arm's own path-type control failed; differences cannot be attributed")
+    if perm_e is None or perm_c is None:
+        reasons.append("the host did not expose permission_denials in both arms; permission equivalence cannot be established")
+    if host_e != host_c:
+        reasons.append(f"unexplained host-event difference between arms (emitter {host_e}, control {host_c})")
+    # Unclassified-first: an unrecognised nonce location blocks any PASS, even when a
+    # model-bound location also exists (review of #546, finding 1).
+    if "unclassified" in cats:
+        reasons.append("nonce found in locations the category table does not recognise; review needed")
     if reasons:
         return done("INCONCLUSIVE")
 
@@ -317,9 +366,6 @@ def classify(emit, ctl, path_id, pin_model):
             return done("DELIVERED_TO_AGENT")
         reasons.append("host-induced side-effect control failed")
         return done("DELIVERED_WITH_SIDE_EFFECT")
-    if "unclassified" in cats:
-        reasons.append("nonce found only in locations the category table does not recognise; review needed")
-        return done("INCONCLUSIVE")
     if rec["echoed"]:
         reasons.append("echo without recorded model-bound delivery")
         return done("INCONCLUSIVE")
@@ -363,7 +409,9 @@ def cmd_summary(live, dst):
                    .get("observer", {}).get("selftest") for p in PATHS)
     banner = "**SELF-TEST (stub `claude`, not Claude Code): NOT live evidence.**\n\n" if selftest else ""
     text = "# H1 Claude Code host-output-path probe summary\n\n" + banner + "\n".join(rows) + \
-        f"\n\nH1 gate (every path passes): **{'PASS' if gate else 'NOT MET'}**\n"
+        f"\n\nH1 gate (every path passes): **{'PASS' if gate else 'NOT MET'}**\n" + \
+        "\nOnly the gate line above decides H1. `H1_DONE` means only that the batch finished " \
+        "and every outcome was written; it never means H1 passed.\n"
     (Path(live) / dst).write_text(text, encoding="utf-8")
     return 0
 

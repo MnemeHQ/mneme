@@ -7,7 +7,9 @@
 # Run from the operator's own terminal (Git Bash), never nested inside another
 # Claude Code session. Fail closed: any probe failure aborts, writes
 # H1_INCOMPLETE with the reason and exits 1. H1_DONE is written only after all
-# four outcomes are verified and the summary is written.
+# four outcomes are verified and the summary is written. H1_DONE means the batch
+# FINISHED, whatever the labels are; it never means H1 passed. Only the gate line
+# in summary_h1.md decides H1.
 set -u
 set -o pipefail
 BASE=$(cd "$(dirname "$0")" && pwd)
@@ -60,4 +62,5 @@ done
 "$PY" -I "$BASE/classify_h1.py" summary "$LIVE_W" summary_h1.md || abort "summary failed"
 [ -s "$LIVE/summary_h1.md" ] || abort "summary_h1.md missing"
 date -u +%FT%TZ > "$LIVE/H1_DONE" || abort "cannot write H1_DONE"
-echo "Done. Evidence under $LIVE ; summary in $LIVE/summary_h1.md"
+echo "Batch finished (H1_DONE is not a pass). Evidence under $LIVE ; the H1 gate result is the gate line in $LIVE/summary_h1.md:"
+grep '^H1 gate' "$LIVE/summary_h1.md"

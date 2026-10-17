@@ -144,6 +144,82 @@ def test_no_transcript_and_no_delivery_is_inconclusive(tmp_path):
     assert r["label"] == "INCONCLUSIVE", r
 
 
+def test_unclassified_location_blocks_pass_even_with_model_bound(tmp_path):
+    # Review of #546, finding 1: unclassified-first.
+    r = _run(tmp_path, "H1a-edit", {"H1_STUB_DUAL": "1"})
+    cats = {l["category"] for l in r["nonce_locations"]}
+    assert {"model_bound", "unclassified"} <= cats
+    assert r["label"] == "INCONCLUSIVE", r
+    assert r["passes_path"] is False
+
+
+def test_emitter_only_denial_is_side_effect(tmp_path):
+    # Review of #546, finding 2: a demonstrated permission difference.
+    r = _run(tmp_path, "H1a-edit", {"H1_STUB_DENY_EXTRA": "1"})
+    assert r["controls"]["common"]["permission_outcomes_equal"] is False
+    assert r["label"] == "DELIVERED_WITH_SIDE_EFFECT", r
+
+
+def test_equal_denial_counts_with_different_denials_are_not_equal(tmp_path):
+    # Same count (one each), different denial: never treated as equivalent.
+    live = tmp_path / "live"
+    r = _run(tmp_path, "H1a-edit")
+    emit = classify_h1.load_arm(live / "H1a-edit" / "out")
+    ctl = classify_h1.load_arm(live / "H1a-edit-ctl" / "out")
+    for arm, tool in ((emit, "Write"), (ctl, "Bash")):
+        classify_h1.result_event(arm)["permission_denials"] = [
+            {"tool_name": tool, "tool_use_id": "x", "tool_input": {}}]
+    r = classify_h1.classify(emit, ctl, "H1a-edit", PIN)
+    assert r["controls"]["common"]["permission_outcomes_equal"] is False
+    assert r["label"] == "DELIVERED_WITH_SIDE_EFFECT", r
+
+
+@pytest.mark.parametrize("which", ["emitter", "control"])
+def test_missing_permission_field_is_inconclusive(tmp_path, which):
+    knob = {"H1_STUB_NO_DENIALS_FIELD": "1"}
+    r = _run(tmp_path, "H1a-edit", knob if which == "emitter" else None,
+             knob if which == "control" else None)
+    assert r["label"] == "INCONCLUSIVE", r
+    assert any("permission equivalence" in x for x in r["reasons"])
+
+
+def test_unexplained_host_event_difference_is_inconclusive(tmp_path):
+    r = _run(tmp_path, "H1a-edit", {"H1_STUB_EXTRA_SYSTEM": "1"})
+    assert r["label"] == "INCONCLUSIVE", r
+    assert any("host-event difference" in x for x in r["reasons"])
+
+
+def test_bash_content_must_match_exactly(tmp_path):
+    live = tmp_path / "live"
+    _run(tmp_path, "H1a-bash")
+    for arm in ("H1a-bash", "H1a-bash-ctl"):
+        (live / arm / "ws" / "bash_out.txt").write_bytes(b"probe-ran extra\n")
+    emit = classify_h1.load_arm(live / "H1a-bash" / "out")
+    ctl = classify_h1.load_arm(live / "H1a-bash-ctl" / "out")
+    r = classify_h1.classify(emit, ctl, "H1a-bash", PIN)
+    # The control arm now fails its own path-type control, so nothing is attributable.
+    assert r["controls"]["path_type_emitter"]["file_as_expected"] is False
+    assert r["label"] == "INCONCLUSIVE", r
+
+
+def test_bash_prompt_has_exact_backticked_command(tmp_path):
+    pdir = tmp_path / "H1a-bash"
+    setup_probe.main(["setup_probe.py", "H1a-bash", str(pdir), sys.executable, str(HARNESS / "emitter.py")])
+    prompt = json.loads((pdir / "out" / "probe.json").read_text(encoding="utf-8"))["prompt"]
+    assert "`echo probe-ran > bash_out.txt`" in prompt
+    assert "bash_out.txt ." not in prompt
+
+
+def test_summary_states_done_is_not_pass(tmp_path):
+    live = tmp_path / "live"
+    for p in classify_h1.PATHS:
+        _run(tmp_path, p)
+        classify_h1.cmd_pair(str(live), p, PIN)
+    classify_h1.cmd_summary(str(live), "summary.md")
+    text = (live / "summary.md").read_text(encoding="utf-8")
+    assert "Only the gate line above decides H1" in text and "never means H1 passed" in text
+
+
 def test_emitter_never_emits_permission_decision(tmp_path):
     out = tmp_path / "out"
     out.mkdir()

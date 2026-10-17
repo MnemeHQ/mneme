@@ -25,6 +25,10 @@ about Claude Code. Learning the real behavior is what the live probes are for.
   H1_STUB_LEAK=1              the "agent" Reads ../out/nonce.txt first
   H1_STUB_NO_TRANSCRIPT=1     no session transcript file is written
   H1_STUB_MODEL=<m>           init-event model (default: the pinned model)
+  H1_STUB_DUAL=1              deliver to BOTH a user_text entry and a transcript attachment
+  H1_STUB_DENY_EXTRA=1        the result reports one extra permission denial
+  H1_STUB_NO_DENIALS_FIELD=1  the result event has no permission_denials field
+  H1_STUB_EXTRA_SYSTEM=1      one extra stream-json system event (subtype "status")
 """
 import json
 import os
@@ -86,6 +90,8 @@ class Host:
         return ctxs
 
     def deliver(self, ctx, event):
+        if env("H1_STUB_DUAL") == "1":
+            self.transcript.append({"type": "attachment", "attachment": {"type": "hook_context", "content": ctx}})
         mode = self.mode
         if mode == "tool_result" and event != "PreToolUse":
             mode = "user_text"
@@ -162,9 +168,16 @@ class Host:
                 self.emit({"type": "assistant", "message": {"role": "assistant", "content": [
                     {"type": "text", "text": "continuing"}]}})
                 self.run_hooks("Stop", {"stop_hook_active": True})
-        self.emit({"type": "result", "subtype": "success", "is_error": False, "result": final,
-                   "num_turns": self.turns, "session_id": self.sid, "permission_denials": []},
-                  to_transcript=False)
+        if env("H1_STUB_EXTRA_SYSTEM") == "1":
+            self.emit({"type": "system", "subtype": "status", "note": "extra"}, to_transcript=False)
+        result = {"type": "result", "subtype": "success", "is_error": False, "result": final,
+                  "num_turns": self.turns, "session_id": self.sid, "permission_denials": []}
+        if env("H1_STUB_DENY_EXTRA") == "1":
+            result["permission_denials"].append({"tool_name": "Write", "tool_use_id": "toolu_stub_denied",
+                                                 "tool_input": {"file_path": "other.txt"}})
+        if env("H1_STUB_NO_DENIALS_FIELD") == "1":
+            del result["permission_denials"]
+        self.emit(result, to_transcript=False)
         if env("H1_STUB_NO_TRANSCRIPT") != "1":
             with open(self.tpath, "w", encoding="utf-8") as f:
                 for e in self.transcript:
