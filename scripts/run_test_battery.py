@@ -234,6 +234,10 @@ GATE_EXCLUSIONS: tuple[tuple[str, str], ...] = (
     ),
     ("tests/test_check_worktree_context.py", "main-only: repo tooling"),
     ("tests/test_pre_push_main_guard.py", "main-only: repo tooling"),
+    (
+        "tests/test_hook_latency_harness.py",
+        "main-only: benchmark tooling (hook latency harness, issue #60)",
+    ),
     ("tests/test_eventcatalog_import.py", "main-only: experimental integration"),
     ("tests/integrations/hermes", "main-only: experimental integration"),
     (

@@ -201,6 +201,17 @@ def find_memory(start: Path) -> Optional[Path]:
 
 _CHECK_TIMEOUT_SECONDS = 10
 
+# Benchmark-only (issue #60): how the PreToolUse path runs ``mneme check``.
+# Unset/unknown -> "subprocess", today's behaviour. "inprocess" runs the CLI
+# inside this interpreter. Not a supported user option.
+_TRANSPORT_ENV_VAR = "MNEME_HOOK_CHECK_TRANSPORT"
+_VALID_TRANSPORTS = ("subprocess", "inprocess")
+
+
+def resolve_transport() -> str:
+    value = os.environ.get(_TRANSPORT_ENV_VAR, "").strip().lower()
+    return value if value in _VALID_TRANSPORTS else "subprocess"
+
 _VALID_MODES = ("strict", "warn")
 
 # Environment variables consulted for the enforcement mode, in precedence order.
@@ -522,11 +533,16 @@ def _invoke_check(
     target_path: str,
     checked_content: str,
     stderr: TextIO = sys.stderr,
+    transport: str = "subprocess",
 ) -> Optional[subprocess.CompletedProcess]:
     """Run ``mneme check`` over one proposed delta; return the child result.
 
     Returns ``None`` when the child could not be launched or timed out; the
     caller owns verdict interpretation and its fail-open policy.
+
+    ``transport="inprocess"`` is benchmark-only and used solely by the
+    PreToolUse path: a timeout there ends this hook process with exit 0
+    (fail open), which is what that path does with ``None`` anyway.
     """
     mode = resolve_mode()
 
@@ -547,6 +563,8 @@ def _invoke_check(
         ]
         if target_path:
             command.extend(["--target-path", target_path])
+        if transport == "inprocess":
+            return _invoke_check_inprocess(command[3:])
         try:
             return subprocess.run(
                 command,
@@ -573,6 +591,36 @@ def _invoke_check(
             pass
 
 
+def _inprocess_timeout(timeout: float) -> None:
+    sys.__stderr__.write(
+        f"mneme-hook: check could not run (timed out after {timeout:g}s, "
+        "in-process). Failing open.\n"
+    )
+    sys.__stderr__.flush()
+    os._exit(0)
+
+
+def _invoke_check_inprocess(argv: list) -> subprocess.CompletedProcess:
+    # Imported here so the default subprocess path never pays for them.
+    import threading
+    import time
+
+    from mneme.integrations.claude_code.inprocess_check import run_check_inprocess
+
+    # benchmark/test seam: both variables are read only on this branch.
+    timeout = float(os.environ.get("MNEME_HOOK_CHECK_TIMEOUT_TEST", _CHECK_TIMEOUT_SECONDS))
+    watchdog = threading.Timer(timeout, _inprocess_timeout, args=(timeout,))
+    watchdog.daemon = True
+    watchdog.start()
+    try:
+        stall = os.environ.get("MNEME_HOOK_TEST_STALL_SECONDS")
+        if stall:
+            time.sleep(float(stall))
+        return run_check_inprocess(argv)
+    finally:
+        watchdog.cancel()
+
+
 def _run_check(
     event: ToolEvent,
     proposed_content: str,
@@ -583,7 +631,9 @@ def _run_check(
     mode = resolve_mode()
 
     rel, target_path = _resolve_target(event)
-    proc = _invoke_check(memory, rel, target_path, proposed_content, stderr=stderr)
+    # Default path passes no transport, so the call is exactly today's.
+    extra = {"transport": "inprocess"} if resolve_transport() == "inprocess" else {}
+    proc = _invoke_check(memory, rel, target_path, proposed_content, stderr=stderr, **extra)
     if proc is None:
         return 0
 
