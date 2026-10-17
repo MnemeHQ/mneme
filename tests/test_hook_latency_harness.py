@@ -94,3 +94,13 @@ def test_native_spawn_baseline_and_env_are_recorded(harness, tmp_path):
     assert data["cells"]["baseline/native_spawn"]["summary"]["n"] == 2
     assert data["settings"]["native_spawn_cmd"]
     assert data["settings"]["env"] == {"MNEME_BENCH_PROBE": "1"}
+
+
+def test_unresolvable_mneme_fails_clearly(harness, tmp_path, monkeypatch, capsys):
+    # A namespace-package or missing mneme (e.g. a mangled --pythonpath) must
+    # stop the harness with a message, not a TypeError from Path(None).
+    monkeypatch.setattr(harness, "_describe", lambda python: {"mneme_file": None})
+    out = tmp_path / "o.json"
+    assert harness.main(["--python", sys.executable, "--out", str(out)]) == 1
+    assert "could not import mneme" in capsys.readouterr().err
+    assert not out.exists()

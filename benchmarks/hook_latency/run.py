@@ -189,7 +189,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     _EXTRA_ENV = extra
 
     info = _describe(args.python)
-    if "mneme_file" not in info:
+    if not info.get("mneme_file"):
         print(f"could not import mneme with {args.python}: {info}", file=sys.stderr)
         return 1
     precompile(args.python, Path(info["mneme_file"]).parent)
