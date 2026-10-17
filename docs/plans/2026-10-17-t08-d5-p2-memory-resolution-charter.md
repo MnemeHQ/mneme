@@ -2,6 +2,12 @@
 
 **Date:** 2026-10-17
 **Status:** **PROPOSED, not accepted.** Charter draft, docs only. It authorizes nothing: no code, no tests (including the L4 characterization test), no experiments or live probes, no `[layer1-freeze]` amendment, no ADR or ADR-033 change, no change to C1–C4 evidence, pins or worktrees.
+**Revision 2 (2026-10-17):** answers the #542 review.
+- The resolver now always reports the nearest Git boundary, including when a memory is found first (§3.2, §7).
+- C3 takes the wait-for-evidence path: every consumer's host needs a verified channel before the freeze amendment (§5, §12).
+- C2 is applied through an owner-approved refinement of D5 §5.1, recorded in the D5 contract itself (§3.4).
+- The C4 wrapper limit is stated (§3.1).
+
 **Source anchor:** `MnemeHQ/mneme` `main` at `28df1442`, read-only.
 **Implements (if accepted):** the [D5 repository-boundary contract](2026-10-17-dg1f-t08-d5-repository-boundary-contract.md) (ACCEPTED, definition only) and the [D6/Q2 P2 precedence rule](2026-10-17-dg1f-t08-d6-q2-external-memory-precedence.md) (ACCEPTED, definition only). One charter for both, as both documents require.
 **Format:** follows the [T-08 slice-1 charter](2026-10-15-t08-target-path-memory-resolution-charter.md).
@@ -21,7 +27,7 @@
 1. **I1 Stop rule.** Every implicit-discovery consumer (§4) ends its walk by the same rule.
 2. **I2 Precedence.** `M_X` never replaces an `M_R` that the walk found.
 3. **I3 Boundary-substitution guard.** If the walk stopped at a Git marker and a memory exists above that marker, `M_X` is applied **only if it is that same memory**. This is how the §5.4 outcome blocks rule-2 substitution (§3.3).
-4. **I4 No silent anomaly.** Every anomalous selection outcome (§3.4) produces a structured outcome. Where a verified channel exists, it is also reported host-visibly (§5).
+4. **I4 No silent anomaly.** Every anomalous selection outcome (§3.4) produces a structured outcome and is reported through a verified host-visible channel on every host (§5 gate H1–H6).
 5. **I5 No start-point change.** Each consumer's start (target, session `cwd` or `project_dir`) is unchanged (D1/D2/D7).
 
 ## 3. Proposed change
@@ -35,7 +41,7 @@ Add one resolver, for example `resolve_memory(start) -> MemorySelection`, in one
 - `boundary`: the Git root `R`, or `None` for no boundary;
 - `shadowed`: the nearest memory above `R`, if any; used for diagnostics and I3 only, never selected implicitly.
 
-Keep `find_memory(start) -> Optional[Path]` as a thin wrapper returning `resolve_memory(start).path`, so imports keep working. Its **semantics change** to the new rule. That change is what the freeze amendment (§9) authorizes.
+Keep `find_memory(start) -> Optional[Path]` as a thin wrapper returning `resolve_memory(start).path`, so imports keep working. Its **semantics change** to the new rule. **The wrapper carries no diagnostics** (no `reason`, `boundary` or `shadowed`), so every in-tree consumer in §4 must call `resolve_memory` directly. The wrapper exists only for external imports. That change is what the freeze amendment (§9) authorizes.
 
 Factor the marker test into one helper that `setup.find_project_root` also uses. Setup's behavior does not change.
 
@@ -44,7 +50,10 @@ Factor the marker test into one helper that `setup.find_project_root` also uses.
 ```text
 cur = resolve(start)
 loop:
-  if is_file(cur/.mneme/project_memory.json): M_R = it; stop
+  if is_file(cur/.mneme/project_memory.json):
+      M_R = it
+      R = nearest dir at or above cur with exists(dir/.git), else none
+      stop
   if exists(cur/.git):  R = cur; M_R = none
                         shadowed = nearest memory strictly above R (read-only)
                         stop
@@ -52,6 +61,12 @@ loop:
   cur = parent(cur)
 ```
 
+- **`boundary` is always the nearest Git marker from the start, whichever check stops the walk.** When `M_R` is found first, the walk keeps going upward from `M_R`'s directory to the first `.git` or the filesystem root, and records it as `R`. Nothing between the start and `M_R` can hold a marker, or the walk would have stopped there, so this is the nearest boundary from the start. The extra steps are read-only, and they do not change which memory is selected.
+  - **L1:** `R` = the directory holding both `.mneme/` and `.git`.
+  - **L7:** for a nested memory below the Git root, `R` = the Git root.
+  - **L2:** no Git anywhere above, so `R` = `None`.
+
+  This matters for G3-B: the binding of root to effective memory path needs a correct root, not only a correct memory.
 - **The memory check comes before the marker check in the same directory**, so L1 (`R/.mneme` next to `R/.git`) keeps its own memory.
 - **Existence-only marker** (D5 L8a/L8b). There is no `gitdir:` parsing and no `git` call.
 - **The `shadowed` lookahead walks the same ancestors today's walk would.** Worst-case cost equals today's unbounded walk.
@@ -81,7 +96,7 @@ loop:
 
 - **Anomalous:** rows 2, 4, 5 and 7. Reported host-visibly where a verified channel exists (§5).
 - **Informational:** rows 3 and 6. The override is in effect; it is recorded in structured output.
-- **Plain absence:** row 8. **Proposed refinement of D5 §5.1 (decision C2, §11):** row 8 stays "no opinion", as it is today, with a structured `NO_MEMORY_ON_PATH` where the consumer has a structured result. It is not reported on every event. Reason: with a user-wide plugin, every edit in every repository without Mneme would emit a notice, and nothing was displaced. Row 8 is still never reported as `PASS`.
+- **Plain absence:** row 8. Under the **owner-approved D5 §5.1 refinement** (2026-10-17, recorded in the [D5 contract §5.1](2026-10-17-dg1f-t08-d5-repository-boundary-contract.md)), row 8 produces a **structured non-PASS** `NO_MEMORY_ON_PATH` outcome where the consumer has a structured result. It gets no per-event host notice. Reason: with a user-wide plugin, every edit in every repository without Mneme would emit a notice, and nothing was displaced. Row 8 is still never reported as `PASS`. Rows 2, 4, 5 and 7 stay host-visible, exactly as D5 §5.1 requires.
 
 ## 4. Consumers in scope (all at once, D5 §5.3)
 
@@ -112,9 +127,20 @@ loop:
 | Codex gate and stop audit | none proven | Non-DENY wire shapes are **unproven** (`codex_cli/gate.py:418-423`, "belongs to M1d's live probing") |
 | Kiro, Antigravity | none proven | Unknown |
 
-**Rule.** No consumer may be described as "host-visible" without a recorded live probe on a pinned host version. A consumer without a verified channel still emits the structured outcome, and the evidence record must label it **not verified visible**.
+**Rule.** No consumer may be described as "host-visible" without a recorded live probe on a pinned host version.
 
-**Open gate (decision C3, §11).** D5 §8 requires a verified channel per host before implementation. This charter cannot satisfy that for Codex, Kiro or Antigravity today, and it cannot land the stop rule without them (I1). See §11.
+**Gate (C3: wait for evidence).** D5 §8 makes a verified channel per host an implementation prerequisite, and this charter adds no exception. Before the `[layer1-freeze]` amendment (§12), a recorded live probe must show that an anomalous outcome (rows 2, 4, 5 and 7) reaches the developer or agent on **every** host below:
+
+| Host gate | Consumers covered |
+|---|---|
+| H1 Claude Code | direct write, Bash, SessionStart, Stop |
+| H2 Codex CLI | gate, stop audit (baseline and Stop) |
+| H3 Kiro | hook |
+| H4 Antigravity | adapter |
+| H5 Agent SDK host path | Agent SDK, and LangChain through it |
+| H6 Hermes host path | Hermes |
+
+Today none of H1–H6 is verified. H2's non-DENY output shapes are explicitly unproven, and no live Kiro or Antigravity harness is recorded in the repository. **If any host gate cannot be met, the shared implementation stays blocked for all consumers (I1), and D5 must be revisited explicitly.** The charter itself may be accepted before the probes exist, but it authorizes no runtime change.
 
 ## 6. Characterization test first (D5 §7.4)
 
@@ -129,7 +155,7 @@ It changes no runtime code, so it needs **no freeze amendment**. It does need ex
 
 ## 7. Offline acceptance tests (implementation PR)
 
-1. **Stop-rule matrix:** L1, L2, L3, L4, L5, L6, L7, L8a and L8b, each with the expected `MemorySelection` (path, source, reason, boundary, shadowed).
+1. **Stop-rule matrix:** L1, L2, L3, L4, L5, L6, L7, L8a and L8b, each with the expected `MemorySelection` (path, source, reason, boundary, shadowed). This explicitly includes the **boundary assertions when a memory is found first**: L1 (`boundary` = the same directory), L7 (nested memory, `boundary` = the Git root) and L2 (`boundary` = `None`).
 2. **Precedence matrix:** all eight §3.3 rows, including path equality after `resolve()`, with `MNEME_MEMORY` given as a relative path, a symlinked path and a differently-cased path on Windows.
 3. **Adversarial row 5:** planted `A/src/.git` with override B. Assert B is not selected, the reason is `OVERRIDE_REFUSED_AT_BOUNDARY`, and the hook does not exit as if it were a `PASS`.
 4. **Legitimate row 3:** a submodule whose override names the outer memory is governed by it.
@@ -150,7 +176,7 @@ On the pinned Claude Code host (today 2.1.202 on Windows, `claude -p`), using ha
 - **Planted marker plus override:** expect row 5, nothing selected, a visible reason, and B never applied.
 - **L4 worktree:** expect row 4, visible.
 
-Probes on other hosts (Codex M1d, Kiro, Antigravity) are added as each host allows. Agent-written state stays out of scope. C5/C6 remain unauthorized.
+The **channel probes** for H1–H6 (§5) are the gate before the freeze amendment, not follow-ups. They are recorded as their own evidence. Agent-written state stays out of scope. C5/C6 remain unauthorized.
 
 ## 9. Required `[layer1-freeze]` amendment (not made here)
 
@@ -191,18 +217,18 @@ After this charter merges, a separate `[layer1-freeze]` PR under Amendment Proce
 | # | Decision | Recommendation |
 |---|---|---|
 | C1 | Is I3 (override applies at a boundary only if it equals the shadowed memory) the D5 §5.4 outcome? | **Yes.** It blocks the adversarial case, keeps the L5/L6 inheritance path, and needs no session state. The alternative, ignoring markers created during the session, needs baselines that PreToolUse does not have. |
-| C2 | Row 8 (plain absence) not reported per event: a refinement of D5 §5.1 | **Yes.** Structured `NO_MEMORY_ON_PATH` only. D5 §5.1's "never looks like `PASS`" still holds. |
-| C3 | Per-host channel gate: D5 §8 needs a verified channel per host, but I1 needs every consumer at once | **Probe Claude Code (and the Agent SDK precedent) first. For any host still unproven at implementation time, the reviewer decides between (a) waiting, or (b) shipping the structured outcome labelled "not verified visible", recorded as an explicit exception to D5 §5.1 for that host.** Never silently. |
-| C4 | Keep `find_memory` as a wrapper with new semantics, versus forcing every caller onto `resolve_memory` | Keep the wrapper for imports; migrate the in-tree consumers to `resolve_memory` so they can report |
+| C2 | Row 8 (plain absence) not reported per event | **Resolved:** the owner approved the D5 §5.1 refinement on 2026-10-17, recorded in the D5 contract. Row 8 gets a structured non-PASS outcome only. |
+| C3 | Per-host channel gate | **Resolved: wait.** H1–H6 must all be verified before the freeze amendment, with no per-host exception (§5). |
+| C4 | Keep `find_memory` as a wrapper with new semantics | **Yes.** The wrapper changes behavior and carries no diagnostics, so in-tree consumers use `resolve_memory` (§3.1). |
 | C5 | `OVERRIDE_IGNORED` (row 2) on every event vs. once per session | Every event for PreToolUse consumers. It signals a misconfiguration and should stay visible until fixed. |
 
 ## 12. Sequence
 
 1. **This charter**: review, then owner acceptance.
 2. **§6 characterization test PR** (test-only), after the owner authorizes it.
-3. **`[layer1-freeze]` amendment PR** (§9).
-4. **§8 channel probe** for Claude Code, recorded as evidence. This settles C3 for that host.
+3. **H1–H6 channel probes** (§5), each recorded as evidence and each separately authorized. **All six must pass.**
+4. **`[layer1-freeze]` amendment PR** (§9), only after step 3.
 5. **Implementation PR** with the §7 tests and a full-suite run, squash-merged under ADR-022.
-6. **§8 live evidence PR.**
+6. **§8 behavioral live evidence PR.**
 
 Each step needs the previous one merged.
