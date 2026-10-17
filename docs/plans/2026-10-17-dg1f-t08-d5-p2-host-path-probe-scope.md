@@ -1,6 +1,6 @@
-# DG1F T-08 D5 + P2: host-output-path channel probes H1–H6, live-evidence design (proposal)
+# DG1F T-08 D5 + P2: host-output-path channel probes H1–H6, live-evidence design (ACCEPTED: nothing executed or authorized to run)
 
-**Status:** **PROPOSED.** Design only. **Nothing here is executed.** It authorizes no probe, no harness build, no live host session, no runtime change, no `[layer1-freeze]` amendment and no implementation (see §11).
+**Status:** **ACCEPTED as the probe design** (owner approval 2026-10-17, following an independent-review ACCEPT on `37009457`). Design only. **Nothing here is executed, and acceptance authorizes nothing to run:** no probe, no harness build, no live host session, no runtime change, no `[layer1-freeze]` amendment and no implementation (see §11). Each batch needs its own go-ahead.
 **Anchor:** `main` @ `5d8bf82a`. That is after the accepted [D5 + P2 implementation charter](2026-10-17-t08-d5-p2-memory-resolution-charter.md) (#542) and its §6 characterization tests (#543).
 **Revision 2 (2026-10-17):** answers the #545 review.
 - Side-effect criteria are narrowed to host-induced effects; turn count and model text are evidence only (§3, §6).
