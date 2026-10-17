@@ -116,6 +116,7 @@ GATE_CORE_PATHS: tuple[str, ...] = (
 
 GATE_CLI_PATHS: tuple[str, ...] = (
     "tests/test_cli.py",
+    "tests/test_cli_import_budget.py",
     "tests/test_cli_init.py",
     "tests/test_cli_setup.py",
     "tests/test_cli_missing_paths.py",
