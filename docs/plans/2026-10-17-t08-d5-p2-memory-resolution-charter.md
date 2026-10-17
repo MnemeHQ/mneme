@@ -6,7 +6,7 @@
 - The resolver now always reports the nearest Git boundary, including when a memory is found first (§3.2, §7).
 - C3 takes the wait-for-evidence path: every consumer's host needs a verified channel before the freeze amendment (§5, §12).
 
-**Amendment A1 (PROPOSED, 2026-10-17; not accepted):** implements the accepted [H1c Stop-path decision](2026-10-17-dg1f-t08-d5-p2-h1c-stop-path-decision.md) (#554, O1). It changes **only** Claude Code Stop's candidate channel in §5, from `hookSpecificOutput.additionalContext` to top-level `systemMessage`. It is coordinated with the probe-scope Amendment A1 and is reviewed together with it. D5's developer-or-agent visibility rule, the gate rule, every other channel, implementation and the Layer 1 freeze are unchanged (§5.1).
+**Amendment A1 (ACCEPTED, 2026-10-17; owner approval following an independent-review ACCEPT on `19734ac8`):** implements the accepted [H1c Stop-path decision](2026-10-17-dg1f-t08-d5-p2-h1c-stop-path-decision.md) (#554, O1). It changes **only** Claude Code Stop's candidate channel in §5, from `hookSpecificOutput.additionalContext` to top-level `systemMessage`. It is coordinated with the probe-scope Amendment A1 and is reviewed together with it. D5's developer-or-agent visibility rule, the gate rule, every other channel, implementation and the Layer 1 freeze are unchanged (§5.1).
 
 **Revision 3 (2026-10-17):** records the provenance of the D5 §5.1 owner approval (§3.4, C2, and the D5 contract), and splits H1–H6 into per-output-path probe requirements (§5).
 - C2 is applied through an owner-approved refinement of D5 §5.1, recorded in the D5 contract itself (§3.4).
@@ -126,7 +126,7 @@ loop:
 |---|---|---|
 | Claude Code PreToolUse (direct write, Bash) | exit 0 with `hookSpecificOutput.additionalContext`, **no** `permissionDecision` | **Unverified live.** The precedent is the Agent SDK PreToolUse `additionalContext` for fail-open (`agent_sdk/adapter.py:295-304`). Must not use `defer` or `allow`: warn mode chose `defer` precisely so as not to change permissions (`hook.py:487-490`). |
 | Claude Code SessionStart | `hookSpecificOutput.additionalContext` | **Passed H1b under R1–R3** (#553). |
-| Claude Code Stop | **Amendment A1 (proposed):** top-level `systemMessage`, exit 0, with **no** `hookSpecificOutput` and **no** `decision` (§5.1). It was originally `hookSpecificOutput.additionalContext` (`_emit_stop_feedback`, `hook.py:743-758`). | The original shape failed H1c with host-induced continuation (#549, #553). The A1 shape is **unprobed**. |
+| Claude Code Stop | **Amendment A1 (accepted):** top-level `systemMessage`, exit 0, with **no** `hookSpecificOutput` and **no** `decision` (§5.1). It was originally `hookSpecificOutput.additionalContext` (`_emit_stop_feedback`, `hook.py:743-758`). | The original shape failed H1c with host-induced continuation (#549, #553). The A1 shape is **unprobed**. |
 | Agent SDK, LangChain | PreToolUse `additionalContext`, as `ACTION_FAIL_OPEN` already does. SKIP returns `{}` today (`agent_sdk/adapter.py:305`). | Code precedent. Visibility to the developer depends on the embedding host. |
 | Hermes | structured gate `reason` | Host visibility depends on the embedder |
 | Codex gate and stop audit | none proven | Non-DENY wire shapes are **unproven** (`codex_cli/gate.py:418-423`, "belongs to M1d's live probing") |
@@ -149,9 +149,9 @@ loop:
 
 Today none of the twelve output paths is verified. H2's non-DENY output shapes are explicitly unproven, and no live Kiro or Antigravity harness is recorded in the repository. **If any host gate cannot be met, the shared implementation stays blocked for all consumers (I1), and D5 must be revisited explicitly.** The charter itself may be accepted before the probes exist, but it authorizes no runtime change.
 
-## 5.1 Amendment A1: Claude Code Stop channel (PROPOSED)
+## 5.1 Amendment A1: Claude Code Stop channel (ACCEPTED)
 
-**Status: PROPOSED, not accepted.** It is coordinated with the probe-scope [Amendment A1](2026-10-17-dg1f-t08-d5-p2-host-path-probe-scope.md) (§4.2 there), reviewed together with it, and implements the owner's O1 selection in the [H1c Stop-path decision](2026-10-17-dg1f-t08-d5-p2-h1c-stop-path-decision.md) (#554, O1).
+**Status: ACCEPTED** (owner approval 2026-10-17, following an independent-review ACCEPT on `19734ac8`). Acceptance changes the proposed delivery mechanism only; it authorizes no harness, run, runtime change or freeze amendment. It is coordinated with the probe-scope [Amendment A1](2026-10-17-dg1f-t08-d5-p2-host-path-probe-scope.md) (§4.2 there), reviewed together with it, and implements the owner's O1 selection in the [H1c Stop-path decision](2026-10-17-dg1f-t08-d5-p2-h1c-stop-path-decision.md) (#554, O1).
 
 **Change.** In the §5 channel table, Claude Code **Stop**'s candidate channel for anomalous outcomes (rows 2, 4, 5 and 7) changes from `hookSpecificOutput.additionalContext` to **top-level `systemMessage`** (exit 0, no `hookSpecificOutput`, no `decision`). By the shape-binding rule (probe scope §3 step 5), an eventual implementation would have to emit exactly the probed `systemMessage` form at Stop, and only once a probe has passed it.
 
