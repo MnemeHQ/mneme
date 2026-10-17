@@ -3,6 +3,7 @@
 **Status:** **PROPOSED, not accepted.** Docs only. This note sets out the options for the Claude Code Stop output path (H1c) and recommends one. It authorizes **no** probe, harness change, scope amendment, D5 amendment, runtime change or freeze amendment (§7).
 
 **Anchor:** `main` @ `220ee31e`.
+**Revision 2 (2026-10-17):** answers the #554 review. O1 now requires a bounded charter §5 channel update alongside the probe-scope amendment (§4 O1). The interactive delivery run gets a paired no-op control (§4 O1). §2 keeps apart what is documented from what the live record established about the loop ending.
 
 **Inputs:**
 - the accepted [D5 contract](2026-10-17-dg1f-t08-d5-repository-boundary-contract.md) (§5.1 visibility condition);
@@ -24,7 +25,7 @@ Under the accepted rules R1–R3, H1a (Edit and Bash) and H1b (SessionStart) pas
 | Same page, *Stop input* | "Claude Code applies an 8-consecutive-continuation cap … overrides the next block and ends the turn", adjustable with `CLAUDE_CODE_STOP_HOOK_BLOCK_CAP`. |
 | Same page, common JSON output fields | `systemMessage`: "Warning message shown to the user." In `--output-format stream-json` it "can arrive as an `SDKInformationalMessage`". The page also says some events discard `systemMessage` or deliver it elsewhere. The Stop sections describe nothing Stop-specific for it. |
 
-**Reading.** The H1c re-entry is **documented host behavior, not a defect or an artifact**. Stop `additionalContext` is by design a *continuation* channel. The 9 invocations are exactly 1 plus the documented cap of 8. No reclassification or rule change can make this shape non-interfering. The documentation is cited as an explanation only: the live evidence decides, and nothing in the docs has been probed except what H1 recorded.
+**Reading.** The H1c re-entry is **documented host behavior, not a defect or an artifact**. Stop `additionalContext` is by design a *continuation* channel. The 9 invocations are **consistent with** 1 plus the documented cap of 8. **However, the live record did not independently establish what ended the continuation sequence.** It shows 9 invocations and a normal end, not the cause of that end, so the cap explanation is a documented hypothesis, not a measured fact. No reclassification or rule change can make this shape non-interfering. The documentation is cited as an explanation only: the live evidence decides, and nothing in the docs has been probed except what H1 recorded.
 
 ## 3. What the Stop path is needed for
 
@@ -39,11 +40,15 @@ The residual case only Stop can see is **a change during the session** that alte
 - **Shape.** Stop, exit 0, top-level `{"systemMessage": "<notice>"}`, with **no** `hookSpecificOutput` and **no** `decision`.
 - **Why it fits.** It is documented as a user-facing warning, and nothing documents it as continuing the conversation. D5 §5.1 and probe-scope decision D3 already accept **developer-only** delivery, recorded as `DELIVERED_TO_USER_ONLY`. That keeps D5 unchanged.
 - **What it needs (each separately gated):**
-  1. a probe-scope amendment changing H1c's candidate shape (and, under the charter's shape binding, the shape the implementation must emit at Stop);
-  2. a harness change: an emitter mode, plus classifier rules for evidence that the warning reached the developer;
-  3. **two runs**:
-     - a headless run that verifies non-interference (Stop invocations equal to the control, `stop_hook_active` never true) and records whether stream-json carries it as an informational message;
-     - an **operator-observed interactive run** with capture, because the scope accepts developer delivery only from observation (§3).
+  1. **A coordinated pair of amendments, reviewed together:**
+     - a **probe-scope amendment** changing H1c's candidate shape to top-level `systemMessage`;
+     - a **bounded charter §5 channel update** replacing Claude Code Stop's candidate channel (`hookSpecificOutput.additionalContext`, charter §5 table) with `systemMessage`, so the charter's channel table and its shape binding stay consistent with the scope.
+
+     Both change only the proposed **delivery mechanism** at Stop. Neither changes D5's developer-or-agent visibility requirement, authorizes implementation, or amends the Layer 1 freeze.
+  2. **A harness change:** an emitter mode, plus classifier rules for evidence that the warning reached the developer.
+  3. **Two runs, each with its own paired no-op control** (scope §3.1, lifecycle-event control):
+     - **Headless:** an emitter arm and a no-op control arm. They verify non-interference (equal Stop invocations, `stop_hook_active` never true, a normal end) and record whether stream-json carries the notice as an informational message.
+     - **Operator-observed interactive:** an emitter arm and a **paired no-op control arm**, both captured (screen recording or host UI log). The scope accepts developer delivery only from observation (§3), and the interactive host's behavior may differ from headless. The evidence must show **both** that the developer saw the notice in the emitter arm **and** that the emitter session started, ran and ended exactly as its paired control did: no extra turn, re-entry, prompt or blocked tool. A separately reviewed scope amendment could establish a different but equivalent interactive control, but none exists today.
 - **Risks.**
   - The host may discard `systemMessage` at Stop, which the page says some events do. That would be `NOT_DELIVERED`.
   - It may not reach the agent. That is acceptable under D5 §5.1, but the implementation charter would then record that Stop anomalies are developer-only.
@@ -84,5 +89,5 @@ Whatever this note's decision, it also informs #550: an accepted O1 shape (`syst
 ## 8. Decision requested
 
 1. Choose O1 (recommended), O2 or O3.
-2. If O1: approve drafting the probe-scope amendment for H1c (shape `systemMessage`, a headless non-interference run, an operator-observed interactive delivery run). The harness and the live runs stay separately gated.
+2. If O1: approve drafting the **coordinated** probe-scope amendment and charter §5 channel update for H1c, to be reviewed together. That means shape `systemMessage`; a headless run with a paired control; and an operator-observed interactive run with a paired control. The harness and the live runs stay separately gated.
 3. If O2, now or as the fallback: approve drafting the D5 §5.1 and charter §5 amendment, and state how the §3 mid-session residue is handled.
