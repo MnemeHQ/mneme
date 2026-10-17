@@ -3,6 +3,7 @@
 **Status:** **PROPOSED, not accepted.** Docs only. It proposes three changes to the H1 classifier's category and comparison rules, and it does **not** reclassify anything. It authorizes no classifier code change, no reclassification run, no live probe, no runtime change and no Stop-path decision (§6).
 
 **Anchor:** `main` @ `de4766ea`.
+**Revision 2 (2026-10-17):** answers the #551 review. It narrows the reproducibility claim and adds a completeness check for material the collector omitted (§5), and it corrects the SessionStart ordering (§2). R1–R3 are unchanged.
 
 **Inputs:**
 - the accepted probe scope (#545), §3 and §6;
@@ -20,7 +21,7 @@ The H1 batch came out `INCONCLUSIVE` on all four paths. The as-run classifier ma
 |---|---|---|
 | Transcript `attachment` entries with `attachment.type: "hook_additional_context"` | Exactly one per emitter hook invocation (1, 1, 1 and 9). **Every one** has `hookEvent` equal to the probed event and `content` equal, byte for byte, to the notice the emitter wrote (`hook-log.jsonl` `emitted.hookSpecificOutput.additionalContext`). | **None** |
 | Transcript `attachment` entries with `attachment.type: "hook_success"` | One per emitter invocation. `stdout` is the emitter's raw JSON; it also carries `exitCode`, `durationMs`, `command` and `hookName`. | **None.** The no-op printed nothing. |
-| What follows each `hook_additional_context` entry | The next non-attachment entry is the tool result (`user`) for PreToolUse or SessionStart, or the model's reply (`assistant`) for Stop. The model then repeats the nonce in its reply on every path. | n/a |
+| What follows each `hook_additional_context` entry | The next non-attachment entry is: for **PreToolUse**, the tool result (`user`); for **SessionStart**, the initial user prompt (`user`), since SessionStart context is recorded before the prompt; for **Stop**, the model's reply (`assistant`). The model then repeats the nonce in its reply on every path. | n/a |
 | Stream-json `thinking_tokens` events | Counts differ from the paired control: H1a-edit 4 vs 2, H1a-bash 0 vs 2; equal for H1b and H1c (2 vs 2). The fields are only `estimated_tokens`, `estimated_tokens_delta` and `session_id`, with no permission, block, retry or continuation field. | Same field set |
 | All other non-init `system` event subtypes | Identical between arms on every path (`task_started` and `task_notification` for Bash; `hook_started` and `hook_response` for SessionStart). | Identical |
 
@@ -83,11 +84,16 @@ This section projects the effect of the rules so the reviewer can judge them. **
    - R2 never counts as delivery;
    - R3 with a `thinking_tokens` count difference → ignored;
    - R3 with an indicator field inside `thinking_tokens` → still compared.
-2. **Offline reclassification.** No host session. Run the changed classifier on **both** the raw evidence (`C:\dev\d5p2-h1-live`, kept unchanged) **and** the published selected evidence in the repository. Require identical labels from both, which lets the reviewer reproduce the result from the repository alone. **Caveat:** the published evidence holds only the *selected* events and transcript, and has no workspace files. The as-run classifier reads `events.jsonl`, `transcript.jsonl` and `ws/notes.txt` / `ws/bash_out.txt`. So the repository-only run needs a small, disclosed loader that does two things:
-   - maps `*.selected.jsonl` onto those inputs;
-   - checks file content against the `notes_after` / `bash_out_after` SHA-256 in `observer.txt` and the known expected bytes, instead of reading the workspace.
+2. **Offline reclassification**, with no host session.
+   - **Authoritative run: the raw evidence** in `C:\dev\d5p2-h1-live`, kept unchanged and bound to the published `MANIFEST.json` SHA-256s, which must match before the run. Only this run scans **every** raw input, so only this run can apply the unclassified-first rule completely.
+   - **Completeness check for omitted material**, recorded with the run. The collector did not publish everything:
+     - transcript entries outside `user`, `assistant` and `hook_*` attachments, such as tool, skill and agent listings, queue operations and titles;
+     - thinking content;
+     - most `init` fields.
 
-   Any label that differs between the raw run and the repository-only run is reported, not reconciled.
+     For each arm, the run records how many omitted entries were scanned and how many contain the emitter nonce. It publishes, redacted, **every omitted entry that contains the nonce**. If any omitted entry contains it, that location is categorised under the table like any other, and it can block a pass.
+     - Read-only observation made while drafting this note (2026-10-17), to be repeated and recorded by the authorized run: **no omitted material contained the nonce in any arm.** The arms had 6–9 omitted transcript entries each, and there were 0 hits in omitted transcript entries, omitted thinking blocks and omitted `init` fields.
+   - **Repository-only replay is a subset check, not an independent reproduction.** A loader can replay the classifier on the published `*.selected.jsonl`, checking files against the `observer.txt` hashes. Its result is reproducible against the **published subset**, and it is complete only together with the raw run's recorded completeness check. The reviewer cannot verify that check from the repository alone. The record must say this, and must not present the subset replay as a fully independent reproduction. Any label that differs between the raw run and the subset replay is reported, not reconciled.
 3. **Record.** An addendum to the H1 evidence record gives the new labels next to the as-run labels, which stay as historical fact, plus the classifier SHA-256 used. The as-run `outcome.json` files are never overwritten; new outcomes are published alongside them.
 
 ## 6. Not decided here
