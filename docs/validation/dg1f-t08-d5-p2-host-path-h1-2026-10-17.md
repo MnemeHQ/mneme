@@ -26,12 +26,12 @@
 
 ## 2. Results as classified
 
-| Path | Path type | Label | Reasons (verbatim from `outcome.json`) |
+| Path | Path type | Label | Reasons (exact strings from the published `<path>/outcome.json`) |
 |---|---|---|---|
-| `H1a-edit` | command hook, tool event | **INCONCLUSIVE** | unexplained host-event difference between arms (emitter 4 × `thinking_tokens`, control 2 × `thinking_tokens`); nonce found in locations the category table does not recognise |
-| `H1a-bash` | command hook, tool event | **INCONCLUSIVE** | unexplained host-event difference between arms (emitter `task_notification`, `task_started`; control the same plus 2 × `thinking_tokens`); nonce found in unrecognised locations |
-| `H1b-start` | command hook, lifecycle event | **INCONCLUSIVE** | nonce found in unrecognised locations |
-| `H1c-stop` | command hook, lifecycle event | **INCONCLUSIVE** | nonce found in unrecognised locations |
+| `H1a-edit` | command hook, tool event | **INCONCLUSIVE** | `unexplained host-event difference between arms (emitter ['thinking_tokens', 'thinking_tokens', 'thinking_tokens', 'thinking_tokens'], control ['thinking_tokens', 'thinking_tokens'])`<br>`nonce found in locations the category table does not recognise; review needed` |
+| `H1a-bash` | command hook, tool event | **INCONCLUSIVE** | `unexplained host-event difference between arms (emitter ['task_notification', 'task_started'], control ['task_notification', 'task_started', 'thinking_tokens', 'thinking_tokens'])`<br>`nonce found in locations the category table does not recognise; review needed` |
+| `H1b-start` | command hook, lifecycle event | **INCONCLUSIVE** | `nonce found in locations the category table does not recognise; review needed` |
+| `H1c-stop` | command hook, lifecycle event | **INCONCLUSIVE** | `nonce found in locations the category table does not recognise; review needed` |
 
 **H1 gate: NOT MET** (`summary_h1.md`). `H1_DONE` exists. It means only that the batch finished.
 
