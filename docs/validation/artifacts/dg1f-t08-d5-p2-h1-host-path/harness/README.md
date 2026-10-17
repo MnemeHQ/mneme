@@ -50,10 +50,10 @@ No shape ever carries `permissionDecision` (scope §4: `defer`/`allow` must not 
 
 | Category | Rule | Counts as |
 |---|---|---|
-| `model_bound` | in a `user`-type entry: user-role text such as a `<system-reminder>`, or a `tool_result` | recorded delivery |
+| `model_bound` | in a `user`-type entry: user-role text such as a `<system-reminder>`, or a `tool_result`; **or (R1)** in `attachment.content` of a transcript `attachment` with `attachment.type: hook_additional_context`, **only when** its `hookEvent` is the probed event **and** this arm's emitter emitted the nonce for that event | recorded delivery |
 | `echo` / `agent_reuse` | in an `assistant` entry (text, or a tool input) or the final `result` | secondary evidence |
-| `host_output` | in a stream-json `system` event | stream-consumer output, not model input; never delivery |
-| `unclassified` | anything else, e.g. transcript entry types the table does not know | never delivery; makes the probe `INCONCLUSIVE` |
+| `host_output` | in a stream-json `system` event, **or (R2)** in a transcript `hook_success` attachment (the hook's own stdout) | host output, not model input; never delivery |
+| `unclassified` | anything else, including any other attachment type, or a `hook_additional_context` failing an R1 condition | never delivery; makes the probe `INCONCLUSIVE` |
 
 The table is deliberately conservative. Claude Code's exact transcript representation of hook context is what the live probe will reveal. **An `unclassified` location anywhere makes the outcome `INCONCLUSIVE`, even when a `model_bound` location also exists.** The check runs before any pass is assigned, and every location is listed. Extending the table is a reviewed change, and the raw evidence allows re-classification **without** re-running the probe.
 
@@ -69,6 +69,8 @@ The table is deliberately conservative. Claude Code's exact transcript represent
 
 H1 passes only if all four path ids pass (scope §6 gate rule). `summary_h1.md` reports this in its gate line.
 
+**R1–R3 (accepted in [`docs/plans/2026-10-17-dg1f-t08-d5-p2-h1-classifier-rules.md`](../../../../plans/2026-10-17-dg1f-t08-d5-p2-h1-classifier-rules.md), #551).** R1 and R2 are in the table above. **R3:** stream-json `system` events with subtype `thinking_tokens` are left out of the strict **subtype** comparison only. They are still scanned for permission, block, retry and continuation indicator fields, which are compared exactly as for every other event. Each `outcome.json` records `"rules": "as-run table + R1-R3 (#551)"`. The H1 live batch (#549) was classified **before** R1–R3, and its as-run outcomes stand. Reclassifying it is a separately authorized step.
+
 **Known consequence of the strict host-event rule.** If Claude Code emits a hook-output `system` event only when a hook prints something, the emitter and no-op arms will differ in event subtypes, and the probe will be `INCONCLUSIVE`. That is the conservative outcome by design (owner decision, 2026-10-17). The raw evidence is kept, so a reviewed rule change can re-classify without re-running.
 
 **`H1_DONE` is not a pass.** `run_h1.sh` writes `H1_DONE` when the batch has finished and every outcome has been written and verified, whatever the labels are. Only the gate line in `summary_h1.md`, derived from the classified outcomes, decides whether H1 passed. The summary says this too.
@@ -77,7 +79,7 @@ H1 passes only if all four path ids pass (scope §6 gate rule). `summary_h1.md` 
 
 Both runs below used the stub only. **None of this is evidence about Claude Code.**
 
-1. **Label tests:** `python -m pytest -q docs/validation/artifacts/dg1f-t08-d5-p2-h1-host-path/harness/selftest`. **33 passed.** Covered:
+1. **Label tests:** `python -m pytest -q docs/validation/artifacts/dg1f-t08-d5-p2-h1-host-path/harness/selftest`. **43 passed.** Covered:
    - each of the four paths under user-text delivery → `DELIVERED_TO_AGENT`;
    - tool_result delivery → `DELIVERED_TO_AGENT`;
    - echo and turn differences recorded but not decisive;
@@ -91,6 +93,15 @@ Both runs below used the stub only. **None of this is evidence about Claude Code
      - model-bound plus unclassified delivery → `INCONCLUSIVE`;
      - `permission_denials` missing in either arm → `INCONCLUSIVE`;
      - an extra host `system` event → `INCONCLUSIVE`;
+   - R1–R3 (#551):
+     - R1 positive on PreToolUse Edit, PreToolUse Bash and SessionStart → `DELIVERED_TO_AGENT`, with `hook_success` categorised `host_output` in the same run;
+     - R1 with the wrong `hookEvent` → unclassified → `INCONCLUSIVE`;
+     - R1 without an emitter invocation for the event → unclassified;
+     - R2 alone (only `hook_success`) → `NOT_DELIVERED`;
+     - R3: a `thinking_tokens` count difference (4 vs 2) is ignored;
+     - R3: a differing indicator inside `thinking_tokens` → `DELIVERED_WITH_SIDE_EFFECT`;
+     - R3: an indicator in one arm's `thinking_tokens` only → `INCONCLUSIVE`;
+     - Stop with re-entry under R1 → still `DELIVERED_WITH_SIDE_EFFECT`;
    - regressions from the #546 re-review:
      - a model-chosen extra request (denied) is recorded and not attributed → `DELIVERED_TO_AGENT`;
      - the same request denied in one arm only → `DELIVERED_WITH_SIDE_EFFECT`;
@@ -110,6 +121,8 @@ Both runs below used the stub only. **None of this is evidence about Claude Code
    ```
 
    The result is recorded in the PR description.
+
+**Caution: the live root now holds preserved evidence.** `C:\dev\d5p2-h1-live` holds the raw H1 evidence that `live-2026-10-17/MANIFEST.json` hashes refer to. Both `run_h1.sh` and the end-to-end self-test **delete and rebuild** the arm folders there. Before any further run or self-test, archive that evidence, or have a reviewed change move the self-test to its own root.
 
 ## Running it live (not authorized by this PR)
 

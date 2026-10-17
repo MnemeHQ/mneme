@@ -16,6 +16,9 @@ about Claude Code. Learning the real behavior is what the live probes are for.
                    attachment   a transcript-only `attachment` entry (unclassified by design)
                    host_event   a stream-json `system`/`hook_response` event only
                    none         dropped
+                   hook_attachment  transcript `hook_success` (raw stdout) + `hook_additional_context`
+                                (content = [ctx]), the shape Claude Code 2.1.202 recorded in #549
+                   hook_success_only  only the `hook_success` attachment (raw stdout)
   H1_STUB_ECHO=1              the "model" repeats any delivered MNEME-PROBE- token
   H1_STUB_ECHO_FORCE=1        the "model" repeats the token even if nothing was delivered
   H1_STUB_BLOCK=1             a PreToolUse hook that printed anything stops the tool
@@ -32,6 +35,9 @@ about Claude Code. Learning the real behavior is what the live probes are for.
   H1_STUB_HOOK_EVENTS=1       a stream-json system `hook_response` event for EVERY hook run
                               (output may be empty), carrying `decision`
   H1_STUB_HOOK_DECISION=<v>   the `decision` value in those events (default "approve")
+  H1_STUB_HAC_EVENT=<e>       hookEvent written into hook_additional_context (default: the real event)
+  H1_STUB_THINKING=<n>        emit n stream-json system `thinking_tokens` events after init
+  H1_STUB_THINKING_DECISION=<v>  put `decision: <v>` inside each thinking_tokens event
   H1_STUB_NO_DENIALS_FIELD=1  the result event has no permission_denials field
   H1_STUB_EXTRA_SYSTEM=1      one extra stream-json system event (subtype "status")
 """
@@ -112,6 +118,15 @@ class Host:
         elif mode == "attachment":
             self.transcript.append({"type": "attachment", "attachment": {"type": "hook_context", "content": ctx}})
             self.delivered.append(ctx)
+        elif mode in ("hook_attachment", "hook_success_only"):
+            raw = json.dumps({"hookSpecificOutput": {"hookEventName": event, "additionalContext": ctx}})
+            self.transcript.append({"type": "attachment", "attachment": {
+                "type": "hook_success", "hookEvent": event, "stdout": raw, "exitCode": 0, "content": ""}})
+            if mode == "hook_attachment":
+                self.transcript.append({"type": "attachment", "attachment": {
+                    "type": "hook_additional_context", "hookEvent": env("H1_STUB_HAC_EVENT") or event,
+                    "content": [ctx]}})
+                self.delivered.append(ctx)
         elif mode == "host_event":
             self.emit({"type": "system", "subtype": "hook_response", "hook_event_name": event, "output": ctx},
                       to_transcript=False)
@@ -153,6 +168,12 @@ class Host:
         self.emit({"type": "system", "subtype": "init", "session_id": self.sid, "cwd": self.cwd,
                    "model": env("H1_STUB_MODEL") or MODEL, "permissionMode": "acceptEdits",
                    "claude_code_version": VERSION.split()[0]}, to_transcript=False)
+        for _ in range(int(env("H1_STUB_THINKING") or 0)):
+            ev = {"type": "system", "subtype": "thinking_tokens", "estimated_tokens": 50,
+                  "estimated_tokens_delta": 50}
+            if env("H1_STUB_THINKING_DECISION"):
+                ev["decision"] = env("H1_STUB_THINKING_DECISION")
+            self.emit(ev, to_transcript=False)
         if env("H1_STUB_NO_SESSIONSTART") != "1":
             for c in self.run_hooks("SessionStart", {"source": "startup"}):
                 self.deliver(c, "SessionStart")

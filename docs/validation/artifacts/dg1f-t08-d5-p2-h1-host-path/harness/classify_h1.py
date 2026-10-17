@@ -20,6 +20,9 @@ Nonce locations. Every occurrence of the emitter-arm nonce in the stream-json
 events and the session transcript is recorded with its source, line, entry type
 and JSON path, and categorised by the table in CATEGORY RULES below. A location
 the table does not recognise is `unclassified`; it never counts as delivery.
+
+Rules R1-R3 (accepted in docs/plans/2026-10-17-dg1f-t08-d5-p2-h1-classifier-rules.md,
+#551) are implemented in categorise() (R1, R2) and host_events() (R3).
 Extending the table is a reviewed change, and because raw evidence is kept,
 the classifier can be re-run on existing evidence without a new probe.
 """
@@ -202,6 +205,8 @@ def compare_permissions(pe, pc):
             "non_equivalent_attempts": only}
 
 
+# R3 (#551): left out of the strict subtype comparison only; still scanned for indicators.
+EXCLUDED_FROM_SUBTYPE_COMPARISON = ("thinking_tokens",)
 INDICATOR_KEYS = ("decision", "permissionDecision", "permission_decision", "blocked", "block",
                   "retry", "continue", "stopReason", "stop_reason")
 
@@ -214,7 +219,8 @@ def host_events(arm, nonce):
         if e.get("type") != "system" or e.get("subtype") == "init":
             continue
         sub = str(e.get("subtype"))
-        subs.append(sub)
+        if sub not in EXCLUDED_FROM_SUBTYPE_COMPARISON:
+            subs.append(sub)
         stack = [e]
         while stack:
             o = stack.pop()
@@ -251,15 +257,29 @@ def walk(obj, path=""):
         yield path, obj
 
 
-def categorise(source, entry, path):
+def categorise(source, entry, path, probed_event=None, invoked_events=()):
     """CATEGORY RULES. Return one of:
-    model_bound    text the host placed in the model's input (user-role text, or a tool_result)
+    model_bound    text the host placed in the model's input (user-role text, or a tool_result),
+                   or (R1) a transcript `hook_additional_context` attachment for the probed
+                   event that the emitter invoked, with the token in `attachment.content`
     echo           text the model produced (assistant text or the final result text)
     agent_reuse    the model put the token into a tool input after receiving it
-    host_output    a stream-json `system` event: output to the stream consumer, not model input
+    host_output    a stream-json `system` event, or (R2) a transcript `hook_success`
+                   attachment (the hook's own stdout): output, not model input
     unclassified   anything else (never counted as delivery)
     """
     t = entry.get("type")
+    if source == "transcript" and t == "attachment":
+        att = entry.get("attachment") or {}
+        kind = att.get("type")
+        if kind == "hook_additional_context":  # R1, narrow: all three conditions
+            ok = (probed_event is not None and att.get("hookEvent") == probed_event
+                  and probed_event in invoked_events
+                  and (path == "attachment.content" or path.startswith("attachment.content[")))
+            return "model_bound" if ok else "unclassified"
+        if kind == "hook_success":  # R2
+            return "host_output"
+        return "unclassified"
     if t == "assistant":
         return "agent_reuse" if ".input" in path else "echo"
     if t == "result":
@@ -271,10 +291,13 @@ def categorise(source, entry, path):
     return "unclassified"
 
 
-def nonce_locations(arm, nonce):
+def nonce_locations(arm, nonce, probed_event=None):
     locs = []
     if not nonce:
         return locs
+    # R1 condition (2): events for which this arm's emitter actually emitted the nonce.
+    invoked = {(h.get("envelope") or {}).get("hook_event_name") for h in arm["hooks"]
+               if nonce in (h.get("emitted") or "")}
     for source in ("events", "transcript"):
         for line_no, entry in arm[source]:
             for path, s in walk(entry):
@@ -282,7 +305,7 @@ def nonce_locations(arm, nonce):
                     locs.append({
                         "source": source, "line": line_no, "entry_type": entry.get("type"),
                         "entry_subtype": entry.get("subtype"), "json_path": path,
-                        "category": categorise(source, entry, path),
+                        "category": categorise(source, entry, path, probed_event, invoked),
                     })
     return locs
 
@@ -367,8 +390,9 @@ def classify(emit, ctl, path_id, pin_model):
         return done("NOT_EXECUTED")
 
     # Evidence.
-    locs = nonce_locations(emit, emit["nonce"])
-    ctl_locs = nonce_locations(ctl, emit["nonce"])
+    locs = nonce_locations(emit, emit["nonce"], spec["event"])
+    ctl_locs = nonce_locations(ctl, emit["nonce"], spec["event"])
+    rec["rules"] = "as-run table + R1-R3 (#551)"
     cats = {l["category"] for l in locs}
     rec["nonce_locations"] = locs
     rec["transcript_collected"] = emit["transcript_collected"]

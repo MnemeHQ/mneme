@@ -255,6 +255,80 @@ def test_summary_states_done_is_not_pass(tmp_path):
     assert "Only the gate line above decides H1" in text and "never means H1 passed" in text
 
 
+# ---------------------------------------------------------------- R1-R3 (#551)
+
+HA = {"H1_STUB_DELIVERY": "hook_attachment"}
+
+
+@pytest.mark.parametrize("path_id", ["H1a-edit", "H1a-bash", "H1b-start"])
+def test_r1_hook_additional_context_for_probed_event_is_model_bound(tmp_path, path_id):
+    r = _run(tmp_path, path_id, HA, HA)
+    cats = {(l["json_path"].split("[")[0], l["category"]) for l in r["nonce_locations"]
+            if l["entry_type"] == "attachment"}
+    assert ("attachment.content", "model_bound") in cats
+    assert ("attachment.stdout", "host_output") in cats  # R2, same run
+    assert r["label"] == "DELIVERED_TO_AGENT", r
+    assert r["rules"] == "as-run table + R1-R3 (#551)"
+
+
+def test_r1_wrong_hook_event_stays_unclassified(tmp_path):
+    r = _run(tmp_path, "H1a-edit", {**HA, "H1_STUB_HAC_EVENT": "SessionStart"}, HA)
+    hac = [l for l in r["nonce_locations"] if l["json_path"].startswith("attachment.content")]
+    assert hac and all(l["category"] == "unclassified" for l in hac)
+    assert r["label"] == "INCONCLUSIVE", r
+
+
+def test_r1_requires_emitter_invocation(tmp_path):
+    # Condition (2) at the categorisation level: the same attachment, but this arm's
+    # hook log shows no emission for the probed event.
+    live = tmp_path / "live"
+    _run(tmp_path, "H1a-edit", HA, HA)
+    emit = classify_h1.load_arm(live / "H1a-edit" / "out")
+    nonce = emit["nonce"]
+    assert any(l["category"] == "model_bound"
+               for l in classify_h1.nonce_locations(emit, nonce, "PreToolUse")
+               if l["entry_type"] == "attachment")
+    emit["hooks"] = []
+    locs = [l for l in classify_h1.nonce_locations(emit, nonce, "PreToolUse")
+            if l["json_path"].startswith("attachment.content")]
+    assert locs and all(l["category"] == "unclassified" for l in locs)
+
+
+def test_r2_hook_success_never_counts_as_delivery(tmp_path):
+    r = _run(tmp_path, "H1a-edit", {"H1_STUB_DELIVERY": "hook_success_only"}, HA)
+    assert {l["category"] for l in r["nonce_locations"]} == {"host_output"}
+    assert r["label"] == "NOT_DELIVERED", r
+
+
+def test_r3_thinking_tokens_count_difference_is_ignored(tmp_path):
+    r = _run(tmp_path, "H1a-edit", {**HA, "H1_STUB_THINKING": "4"}, {**HA, "H1_STUB_THINKING": "2"})
+    assert "thinking_tokens" not in r["host_events"]["emitter_subtypes"]
+    assert r["label"] == "DELIVERED_TO_AGENT", r
+
+
+def test_r3_indicator_inside_thinking_tokens_is_still_compared(tmp_path):
+    r = _run(tmp_path, "H1a-edit",
+             {**HA, "H1_STUB_THINKING": "2", "H1_STUB_THINKING_DECISION": "block"},
+             {**HA, "H1_STUB_THINKING": "2", "H1_STUB_THINKING_DECISION": "approve"})
+    assert r["host_events"]["indicators"]["mismatched"]
+    assert r["controls"]["common"]["host_indicators_equal"] is False
+    assert r["label"] == "DELIVERED_WITH_SIDE_EFFECT", r
+
+
+def test_r3_indicator_in_thinking_tokens_of_one_arm_only_is_inconclusive(tmp_path):
+    r = _run(tmp_path, "H1a-edit",
+             {**HA, "H1_STUB_THINKING": "2", "H1_STUB_THINKING_DECISION": "block"},
+             {**HA, "H1_STUB_THINKING": "2"})
+    assert r["label"] == "INCONCLUSIVE", r
+    assert any("indicator appears in one arm only" in x for x in r["reasons"])
+
+
+def test_r1_stop_with_reentry_still_fails(tmp_path):
+    # R1 gives delivery on Stop, but host re-entry remains a side effect (H1c, #549).
+    r = _run(tmp_path, "H1c-stop", {**HA, "H1_STUB_STOP_REENTER": "1"}, HA)
+    assert r["label"] == "DELIVERED_WITH_SIDE_EFFECT", r
+
+
 def test_emitter_never_emits_permission_decision(tmp_path):
     out = tmp_path / "out"
     out.mkdir()
