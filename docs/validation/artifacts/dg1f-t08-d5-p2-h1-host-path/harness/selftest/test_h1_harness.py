@@ -100,9 +100,22 @@ def test_dropped_context_is_not_delivered(tmp_path):
 
 
 def test_host_output_event_alone_is_not_delivery(tmp_path):
-    r = _run(tmp_path, "H1a-edit", {"H1_STUB_DELIVERY": "host_event"})
+    # The host emits a hook_response event for every hook in both arms; only the
+    # emitter's carries the nonce. The nonce-carrying event is still compared
+    # (strict rule), the subtypes match, and nothing reached the model.
+    knob = {"H1_STUB_DELIVERY": "none", "H1_STUB_HOOK_EVENTS": "1"}
+    r = _run(tmp_path, "H1a-edit", knob, {"H1_STUB_HOOK_EVENTS": "1"})
     assert r["label"] == "NOT_DELIVERED", r
     assert {l["category"] for l in r["nonce_locations"]} == {"host_output"}
+    assert "hook_response" in r["host_events"]["emitter_subtypes"]
+
+
+def test_nonce_carrying_extra_event_is_not_discarded(tmp_path):
+    # Strict rule (review of #546): a nonce-carrying system event that exists in the
+    # emitter arm only is a host-event difference, not silently excluded.
+    r = _run(tmp_path, "H1a-edit", {"H1_STUB_DELIVERY": "host_event"})
+    assert r["label"] == "INCONCLUSIVE", r
+    assert any("host-event difference" in x for x in r["reasons"])
 
 
 def test_unrecognised_location_is_inconclusive(tmp_path):
@@ -153,24 +166,46 @@ def test_unclassified_location_blocks_pass_even_with_model_bound(tmp_path):
     assert r["passes_path"] is False
 
 
-def test_emitter_only_denial_is_side_effect(tmp_path):
-    # Review of #546, finding 2: a demonstrated permission difference.
-    r = _run(tmp_path, "H1a-edit", {"H1_STUB_DENY_EXTRA": "1"})
-    assert r["controls"]["common"]["permission_outcomes_equal"] is False
+def test_model_chosen_extra_request_denial_is_recorded_not_attributed(tmp_path):
+    # Review of #546 (re-review): a request only the emitter arm made is model-chosen.
+    r = _run(tmp_path, "H1a-edit", {"H1_STUB_EXTRA_ATTEMPT": "1"})
+    cmp = r["permissions"]["comparison"]
+    assert [a["request"][0] for a in cmp["non_equivalent_attempts"]["emitter"]] == ["Write"]
+    assert cmp["non_equivalent_attempts"]["emitter"][0]["decisions"] == ["denied"]
+    assert r["controls"]["common"]["permission_decisions_equal_for_equivalent_requests"] is True
+    assert r["label"] == "DELIVERED_TO_AGENT", r
+
+
+def test_same_request_denied_in_one_arm_only_is_side_effect(tmp_path):
+    r = _run(tmp_path, "H1a-edit", {"H1_STUB_DENY_PROBED": "1"})
+    cmp = r["permissions"]["comparison"]
+    assert cmp["mismatched_decisions"] and cmp["mismatched_decisions"][0]["emitter"] == ["denied"]
+    assert r["controls"]["common"]["permission_decisions_equal_for_equivalent_requests"] is False
     assert r["label"] == "DELIVERED_WITH_SIDE_EFFECT", r
 
 
-def test_equal_denial_counts_with_different_denials_are_not_equal(tmp_path):
-    # Same count (one each), different denial: never treated as equivalent.
-    live = tmp_path / "live"
+def test_unmatched_denial_is_inconclusive(tmp_path):
+    r = _run(tmp_path, "H1a-edit", {"H1_STUB_DENY_EXTRA": "1"})
+    assert r["label"] == "INCONCLUSIVE", r
+    assert any("matches no attempted request" in x for x in r["reasons"])
+
+
+def test_workspace_paths_are_masked_so_requests_are_equivalent(tmp_path):
+    # Each arm has its own workspace (<id>/ws vs <id>-ctl/ws); without masking the
+    # same Edit request would never be equivalent across arms.
     r = _run(tmp_path, "H1a-edit")
-    emit = classify_h1.load_arm(live / "H1a-edit" / "out")
-    ctl = classify_h1.load_arm(live / "H1a-edit-ctl" / "out")
-    for arm, tool in ((emit, "Write"), (ctl, "Bash")):
-        classify_h1.result_event(arm)["permission_denials"] = [
-            {"tool_name": tool, "tool_use_id": "x", "tool_input": {}}]
-    r = classify_h1.classify(emit, ctl, "H1a-edit", PIN)
-    assert r["controls"]["common"]["permission_outcomes_equal"] is False
+    eq = r["permissions"]["comparison"]["equivalent_requests"]
+    assert [k[0] for k in eq] == ["Edit"]
+    assert "<WS>" in eq[0][1] and "-ctl" not in eq[0][1]
+
+
+def test_indicator_in_nonce_carrying_event_is_compared(tmp_path):
+    # Strict rule: an indicator inside a nonce-carrying event is not discarded. Both
+    # arms emit hook_response events; the emitter's says decision=block.
+    r = _run(tmp_path, "H1a-edit", {"H1_STUB_HOOK_EVENTS": "1", "H1_STUB_HOOK_DECISION": "block"},
+             {"H1_STUB_HOOK_EVENTS": "1"})
+    assert r["host_events"]["indicators"]["mismatched"]
+    assert r["controls"]["common"]["host_indicators_equal"] is False
     assert r["label"] == "DELIVERED_WITH_SIDE_EFFECT", r
 
 

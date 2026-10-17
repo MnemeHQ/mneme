@@ -26,6 +26,7 @@ the classifier can be re-run on existing evidence without a new probe.
 import hashlib
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -139,38 +140,92 @@ def denied_ids(arm):
     return ids
 
 
-def permission_signature(arm, nonce):
-    """The host-exposed permission outcome: the multiset of denials as (tool name,
-    input with the nonce masked), ids removed. None when the result event does
-    not expose a `permission_denials` field (equivalence cannot be established).
+def masked(value, arm, nonce):
+    """JSON text of `value` with this arm's workspace path and the nonce masked, so
+    requests from the emitter arm (<id>/ws) and the control arm (<id>-ctl/ws) can be
+    compared as equivalent when the agent asked for the same thing."""
+    s = json.dumps(value, sort_keys=True)
+    ws = arm["out"].parent / "ws"
+    variants = {str(ws), str(ws).replace("\\", "\\\\"), ws.as_posix()}
+    drive = ws.as_posix()
+    if len(drive) > 2 and drive[1] == ":":
+        variants.add("/" + drive[0].lower() + drive[2:])  # Git Bash /c/... form
+    for v in sorted(variants, key=len, reverse=True):
+        s = re.sub(re.escape(v), "<WS>", s, flags=re.I)
+    if nonce:
+        s = s.replace(nonce, "<NONCE>")
+    return s
+
+
+def permission_attempts(arm, nonce):
+    """Per attempted tool request, the host's decision.
+
+    Returns None when the result event exposes no `permission_denials` list
+    (equivalence cannot be established). Otherwise:
+      by_request:        {(tool name, masked input): sorted set of decisions}
+                         decision is denied | executed | error | no_result
+      unmatched_denials: denials whose tool_use_id matches no attempted request
     In headless -p with acceptEdits there is no interactive prompt: a prompt the
-    host would have shown surfaces as a denial, so this is the strongest headless
-    permission comparison available."""
+    host would have shown surfaces as a denial."""
     r = result_event(arm) or {}
-    if "permission_denials" not in r or not isinstance(r.get("permission_denials"), list):
+    if not isinstance(r.get("permission_denials"), list):
         return None
-    sig = []
-    for d in r["permission_denials"]:
-        d = d if isinstance(d, dict) else {"raw": d}
-        inp = json.dumps(d.get("tool_input"), sort_keys=True)
-        if nonce:
-            inp = inp.replace(nonce, "<NONCE>")
-        sig.append((d.get("tool_name"), inp))
-    return sorted(sig)
+    uses, results = tool_uses(arm), tool_results(arm)
+    denied = {d.get("tool_use_id") for d in r["permission_denials"] if isinstance(d, dict)}
+    by_request = {}
+    for tid, u in uses.items():
+        res = results.get(tid)
+        if tid in denied:
+            dec = "denied"
+        elif res is None:
+            dec = "no_result"
+        else:
+            dec = "error" if res.get("is_error") else "executed"
+        key = (u.get("name"), masked(u.get("input"), arm, nonce))
+        by_request.setdefault(key, set()).add(dec)
+    unmatched = [masked(d, arm, nonce) for d in r["permission_denials"]
+                 if not isinstance(d, dict) or d.get("tool_use_id") not in uses]
+    return {"by_request": {k: sorted(v) for k, v in by_request.items()}, "unmatched_denials": unmatched}
 
 
-def host_event_signature(arm, nonce):
-    """Sorted subtypes of stream-json `system` events (init excluded) that do not
-    carry the nonce. Events carrying the nonce are host_output nonce locations
-    and are already recorded there."""
-    subs = []
+def compare_permissions(pe, pc):
+    """Compare decisions only for equivalent requests (present in both arms).
+    Requests present in one arm only were model-chosen: recorded, never attributed."""
+    shared = sorted(set(pe["by_request"]) & set(pc["by_request"]))
+    mismatched = [{"request": list(k), "emitter": pe["by_request"][k], "control": pc["by_request"][k]}
+                  for k in shared if pe["by_request"][k] != pc["by_request"][k]]
+    only = {
+        "emitter": [{"request": list(k), "decisions": v} for k, v in pe["by_request"].items() if k not in pc["by_request"]],
+        "control": [{"request": list(k), "decisions": v} for k, v in pc["by_request"].items() if k not in pe["by_request"]],
+    }
+    return {"equivalent_requests": [list(k) for k in shared], "mismatched_decisions": mismatched,
+            "non_equivalent_attempts": only}
+
+
+INDICATOR_KEYS = ("decision", "permissionDecision", "permission_decision", "blocked", "block",
+                  "retry", "continue", "stopReason", "stop_reason")
+
+
+def host_events(arm, nonce):
+    """Every stream-json `system` event except init, NONCE OR NOT (strict rule).
+    Returns (sorted subtypes, {(subtype, indicator key): sorted masked values})."""
+    subs, indicators = [], {}
     for _, e in arm["events"]:
         if e.get("type") != "system" or e.get("subtype") == "init":
             continue
-        if nonce and nonce in json.dumps(e):
-            continue
-        subs.append(str(e.get("subtype")))
-    return sorted(subs)
+        sub = str(e.get("subtype"))
+        subs.append(sub)
+        stack = [e]
+        while stack:
+            o = stack.pop()
+            if isinstance(o, dict):
+                for k, v in o.items():
+                    if k in INDICATOR_KEYS:
+                        indicators.setdefault((sub, k), set()).add(masked(v, arm, nonce))
+                    stack.append(v)
+            elif isinstance(o, list):
+                stack.extend(o)
+    return sorted(subs), {k: sorted(v) for k, v in indicators.items()}
 
 
 def hook_calls(arm, event):
@@ -323,15 +378,28 @@ def classify(emit, ctl, path_id, pin_model):
 
     # Controls (scope 3 step 4 and 3.1).
     ce, cc = path_control(emit, spec), path_control(ctl, spec)
-    perm_e, perm_c = permission_signature(emit, emit["nonce"]), permission_signature(ctl, emit["nonce"])
-    host_e, host_c = host_event_signature(emit, emit["nonce"]), host_event_signature(ctl, emit["nonce"])
-    rec["permission_outcomes"] = {"emitter": perm_e, "control": perm_c}
-    rec["host_events"] = {"emitter": host_e, "control": host_c}
+    nonce = emit["nonce"]
+    perm_e, perm_c = permission_attempts(emit, nonce), permission_attempts(ctl, nonce)
+    perm_cmp = compare_permissions(perm_e, perm_c) if perm_e is not None and perm_c is not None else None
+    rec["permissions"] = {"emitter": perm_e and {"unmatched_denials": perm_e["unmatched_denials"]},
+                          "control": perm_c and {"unmatched_denials": perm_c["unmatched_denials"]},
+                          "comparison": perm_cmp}
+    subs_e, ind_e = host_events(emit, nonce)
+    subs_c, ind_c = host_events(ctl, nonce)
+    ind_shared = sorted(set(ind_e) & set(ind_c))
+    ind_mismatch = [{"event_subtype": k[0], "field": k[1], "emitter": ind_e[k], "control": ind_c[k]}
+                    for k in ind_shared if ind_e[k] != ind_c[k]]
+    ind_one_side = sorted(set(ind_e) ^ set(ind_c))
+    rec["host_events"] = {"emitter_subtypes": subs_e, "control_subtypes": subs_c,
+                          "indicators": {"emitter": {f"{a}.{b}": v for (a, b), v in ind_e.items()},
+                                         "control": {f"{a}.{b}": v for (a, b), v in ind_c.items()},
+                                         "mismatched": ind_mismatch}}
     common = {
-        # A demonstrated difference in denials is a host-induced permission change
-        # (scope section 6, DELIVERED_WITH_SIDE_EFFECT); a missing field is handled
-        # below as INCONCLUSIVE, never assumed equal.
-        "permission_outcomes_equal": perm_e is not None and perm_c is not None and perm_e == perm_c,
+        # Only decisions for EQUIVALENT requests are attributed to the host; requests
+        # one arm made alone are model-chosen and only recorded (review of #546).
+        "permission_decisions_equal_for_equivalent_requests": perm_cmp is not None and not perm_cmp["mismatched_decisions"],
+        # A permission/block/retry indicator present in both arms with different values.
+        "host_indicators_equal": not ind_mismatch,
         "result_not_error": res_e.get("is_error") is False,
     }
     if spec["path_type"] == "command_tool_event":
@@ -352,8 +420,14 @@ def classify(emit, ctl, path_id, pin_model):
         reasons.append("the control arm's own path-type control failed; differences cannot be attributed")
     if perm_e is None or perm_c is None:
         reasons.append("the host did not expose permission_denials in both arms; permission equivalence cannot be established")
-    if host_e != host_c:
-        reasons.append(f"unexplained host-event difference between arms (emitter {host_e}, control {host_c})")
+    else:
+        for name, p in (("emitter", perm_e), ("control", perm_c)):
+            if p["unmatched_denials"]:
+                reasons.append(f"{name}: a permission denial matches no attempted request; it cannot be attributed")
+    if subs_e != subs_c:
+        reasons.append(f"unexplained host-event difference between arms (emitter {subs_e}, control {subs_c})")
+    if ind_one_side:
+        reasons.append(f"a permission/block/retry indicator appears in one arm only: {[f'{a}.{b}' for a, b in ind_one_side]}")
     # Unclassified-first: an unrecognised nonce location blocks any PASS, even when a
     # model-bound location also exists (review of #546, finding 1).
     if "unclassified" in cats:

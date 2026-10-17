@@ -26,7 +26,12 @@ about Claude Code. Learning the real behavior is what the live probes are for.
   H1_STUB_NO_TRANSCRIPT=1     no session transcript file is written
   H1_STUB_MODEL=<m>           init-event model (default: the pinned model)
   H1_STUB_DUAL=1              deliver to BOTH a user_text entry and a transcript attachment
-  H1_STUB_DENY_EXTRA=1        the result reports one extra permission denial
+  H1_STUB_DENY_EXTRA=1        the result reports one denial that matches no attempted request
+  H1_STUB_EXTRA_ATTEMPT=1     the "agent" also attempts a Write of other.txt, which is denied
+  H1_STUB_DENY_PROBED=1       the probed tool request itself (Edit or Bash) is denied
+  H1_STUB_HOOK_EVENTS=1       a stream-json system `hook_response` event for EVERY hook run
+                              (output may be empty), carrying `decision`
+  H1_STUB_HOOK_DECISION=<v>   the `decision` value in those events (default "approve")
   H1_STUB_NO_DENIALS_FIELD=1  the result event has no permission_denials field
   H1_STUB_EXTRA_SYSTEM=1      one extra stream-json system event (subtype "status")
 """
@@ -61,6 +66,7 @@ class Host:
             self.hooks = json.load(f).get("hooks") or {}
         self.mode = env("H1_STUB_DELIVERY") or "user_text"
         self.transcript, self.delivered, self.turns, self.ids = [], [], 1, 0
+        self.denials = []
 
     def emit(self, ev, to_transcript=True):
         print(json.dumps(ev), flush=True)
@@ -79,6 +85,10 @@ class Host:
                 p = subprocess.run(hk["command"], shell=True, input=json.dumps(envelope),
                                    capture_output=True, text=True)
                 out = (p.stdout or "").strip()
+                if env("H1_STUB_HOOK_EVENTS") == "1":
+                    self.emit({"type": "system", "subtype": "hook_response", "hook_event_name": event,
+                               "output": out, "decision": env("H1_STUB_HOOK_DECISION") or "approve"},
+                              to_transcript=False)
                 if not out:
                     continue
                 try:
@@ -107,9 +117,19 @@ class Host:
                       to_transcript=False)
         # "tool_result" for PreToolUse is handled in tool(); "none" drops it.
 
-    def tool(self, name, inp, apply):
+    def tool(self, name, inp, apply, deny=False):
         self.ids += 1
         tid = f"toolu_stub_{self.ids}"
+        if deny:
+            self.emit({"type": "assistant", "message": {"role": "assistant", "content": [
+                {"type": "tool_use", "id": tid, "name": name, "input": inp}]}})
+            for c in self.run_hooks("PreToolUse", {"tool_name": name, "tool_input": inp}):
+                self.deliver(c, "PreToolUse")
+            self.emit({"type": "user", "message": {"role": "user", "content": [
+                {"type": "tool_result", "tool_use_id": tid, "content": "permission denied", "is_error": True}]}})
+            self.denials.append({"tool_name": name, "tool_use_id": tid, "tool_input": inp})
+            self.turns += 1
+            return
         self.emit({"type": "assistant", "message": {"role": "assistant", "content": [
             {"type": "tool_use", "id": tid, "name": name, "input": inp}]}})
         ctxs = self.run_hooks("PreToolUse", {"tool_name": name, "tool_input": inp})
@@ -147,13 +167,18 @@ class Host:
                 with open(notes, "wb") as f:
                     f.write(b.replace(b"alpha", b"beta", 1))
                 return "edited"
-            self.tool("Edit", {"file_path": notes, "old_string": "alpha", "new_string": "beta"}, apply_edit)
+            self.tool("Edit", {"file_path": notes, "old_string": "alpha", "new_string": "beta"}, apply_edit,
+                      deny=env("H1_STUB_DENY_PROBED") == "1")
         elif "Bash tool" in self.prompt:
             def apply_bash():
                 with open(os.path.join(self.cwd, "bash_out.txt"), "wb") as f:
                     f.write(b"probe-ran\n")
                 return ""
-            self.tool("Bash", {"command": "echo probe-ran > bash_out.txt"}, apply_bash)
+            self.tool("Bash", {"command": "echo probe-ran > bash_out.txt"}, apply_bash,
+                      deny=env("H1_STUB_DENY_PROBED") == "1")
+        if env("H1_STUB_EXTRA_ATTEMPT") == "1":
+            self.tool("Write", {"file_path": os.path.join(self.cwd, "other.txt"), "content": "x"},
+                      lambda: "", deny=True)
         tokens = [t for c in self.delivered for t in TOKEN.findall(c)]
         if env("H1_STUB_ECHO_FORCE") == "1":
             with open(os.path.join(self.cwd, "..", "out", "nonce.txt"), encoding="utf-8") as f:
@@ -171,7 +196,7 @@ class Host:
         if env("H1_STUB_EXTRA_SYSTEM") == "1":
             self.emit({"type": "system", "subtype": "status", "note": "extra"}, to_transcript=False)
         result = {"type": "result", "subtype": "success", "is_error": False, "result": final,
-                  "num_turns": self.turns, "session_id": self.sid, "permission_denials": []}
+                  "num_turns": self.turns, "session_id": self.sid, "permission_denials": list(self.denials)}
         if env("H1_STUB_DENY_EXTRA") == "1":
             result["permission_denials"].append({"tool_name": "Write", "tool_use_id": "toolu_stub_denied",
                                                  "tool_input": {"file_path": "other.txt"}})

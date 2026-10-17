@@ -21,7 +21,9 @@ No shape ever carries `permissionDecision` (scope §4: `defer`/`allow` must not 
 - **Side-effect controls are host-induced only** (scope §3 step 4 and §3.1):
   - tool event: the tool ran (tool_use, a non-error tool_result, not permission-denied), and the file matches the expected content **exactly** (`beta\n` for Edit, `probe-ran\n` for Bash) and matches the control;
   - lifecycle: the session started or ended normally (init present, result `success`), and Stop did not re-enter (`stop_hook_active`) or run more often than in the control;
-  - common: **equal permission outcomes** and a non-error result. Permission outcomes are compared as the multiset of `permission_denials` entries, as tool name plus input with the nonce masked and ids removed, not as a count. In headless `-p` with `acceptEdits` there is no interactive prompt, so a prompt the host would have shown surfaces as a denial; this is the strongest headless permission comparison available. A missing `permission_denials` field in either arm is never assumed equivalent.
+  - common, **permissions attributed per request**: each arm's attempted tool requests are keyed by tool name plus input, with the arm's workspace path and the nonce masked so the two arms' requests can match. Each request gets the host's decision: `denied`, `executed`, `error` or `no_result`. Only requests made in **both** arms are compared. A different decision for the same request is a host-induced permission change. A request made in one arm only was chosen by the model: it is recorded under `non_equivalent_attempts`, with its decision, and **never** attributed to the host. A missing `permission_denials` field, or a denial that matches no attempted request, gives `INCONCLUSIVE`. In headless `-p` with `acceptEdits` there is no interactive prompt, so a prompt the host would have shown surfaces as a denial; this is the strongest headless permission comparison available.
+  - common, **host events, strict rule**: the subtypes of every stream-json `system` event except `init`, **including nonce-carrying ones**, must match between the arms. Any difference gives `INCONCLUSIVE`. Every such event is also scanned for permission, block, retry or continuation indicator fields (`decision`, `permissionDecision`, `blocked`, `retry`, `continue`, `stopReason` and similar). An indicator present in both arms with different values is a host-induced side effect; one present in only one arm gives `INCONCLUSIVE`.
+  - common: a non-error result.
 
   Turn count, reply text and the echo are recorded as evidence only.
 - **It does not establish developer (UI) visibility.** It is headless. `developer_also` is always `not_observed`, and the harness never assigns `DELIVERED_TO_USER_ONLY` (scope §3, visibility target).
@@ -60,12 +62,14 @@ The table is deliberately conservative. Claude Code's exact transcript represent
 | Label | When |
 |---|---|
 | `NOT_EXECUTED` | Either arm has no init or result event, or the init model differs from the pin, or the emitter or the control no-op was never invoked for the event (for example, SessionStart not firing under `-p`). Never a negative result. |
-| `INCONCLUSIVE` | Any of:<br>• a nonce leak (a tool call touching `nonce.txt` or `hook-log`);<br>• the nonce found in the control arm;<br>• the control arm failing its own path-type control;<br>• `permission_denials` missing from either arm's result (permission equivalence cannot be established);<br>• an unexplained difference between the arms' stream-json `system` event subtypes (init and nonce-carrying events excluded);<br>• **any** unclassified nonce location;<br>• an echo without recorded delivery;<br>• no delivery with no transcript collected. |
+| `INCONCLUSIVE` | Any of:<br>• a nonce leak (a tool call touching `nonce.txt` or `hook-log`);<br>• the nonce found in the control arm;<br>• the control arm failing its own path-type control;<br>• `permission_denials` missing from either arm's result;<br>• a denial matching no attempted request;<br>• any difference between the arms' stream-json `system` event subtypes (only `init` excluded; nonce-carrying events included);<br>• an indicator field present in one arm only;<br>• **any** unclassified nonce location;<br>• an echo without recorded delivery;<br>• no delivery with no transcript collected. |
 | `DELIVERED_TO_AGENT` | Model-bound delivery, and the path-type and common controls hold. **Passes.** |
-| `DELIVERED_WITH_SIDE_EFFECT` | Model-bound delivery, but a host-induced control failed, including a **demonstrated** difference in permission outcomes between the arms. **Fails.** |
+| `DELIVERED_WITH_SIDE_EFFECT` | Model-bound delivery, but a host-induced control failed. That includes a different host decision for the **same** request in the two arms, or the same indicator field with different values. Model-chosen extra requests never produce this label. **Fails.** |
 | `NOT_DELIVERED` | The emitter ran, and the nonce is in no model-bound, unclassified or echo location. **Fails.** |
 
 H1 passes only if all four path ids pass (scope §6 gate rule). `summary_h1.md` reports this in its gate line.
+
+**Known consequence of the strict host-event rule.** If Claude Code emits a hook-output `system` event only when a hook prints something, the emitter and no-op arms will differ in event subtypes, and the probe will be `INCONCLUSIVE`. That is the conservative outcome by design (owner decision, 2026-10-17). The raw evidence is kept, so a reviewed rule change can re-classify without re-running.
 
 **`H1_DONE` is not a pass.** `run_h1.sh` writes `H1_DONE` when the batch has finished and every outcome has been written and verified, whatever the labels are. Only the gate line in `summary_h1.md`, derived from the classified outcomes, decides whether H1 passed. The summary says this too.
 
@@ -73,7 +77,7 @@ H1 passes only if all four path ids pass (scope §6 gate rule). `summary_h1.md` 
 
 Both runs below used the stub only. **None of this is evidence about Claude Code.**
 
-1. **Label tests:** `python -m pytest -q docs/validation/artifacts/dg1f-t08-d5-p2-h1-host-path/harness/selftest`. **29 passed.** Covered:
+1. **Label tests:** `python -m pytest -q docs/validation/artifacts/dg1f-t08-d5-p2-h1-host-path/harness/selftest`. **33 passed.** Covered:
    - each of the four paths under user-text delivery → `DELIVERED_TO_AGENT`;
    - tool_result delivery → `DELIVERED_TO_AGENT`;
    - echo and turn differences recorded but not decisive;
@@ -85,9 +89,16 @@ Both runs below used the stub only. **None of this is evidence about Claude Code
    - the prompt and settings never contain the nonce or an env block;
    - regressions from the #546 review:
      - model-bound plus unclassified delivery → `INCONCLUSIVE`;
-     - an emitter-only denial, and equal-count but different denials → `DELIVERED_WITH_SIDE_EFFECT`;
      - `permission_denials` missing in either arm → `INCONCLUSIVE`;
      - an extra host `system` event → `INCONCLUSIVE`;
+   - regressions from the #546 re-review:
+     - a model-chosen extra request (denied) is recorded and not attributed → `DELIVERED_TO_AGENT`;
+     - the same request denied in one arm only → `DELIVERED_WITH_SIDE_EFFECT`;
+     - a denial matching no attempted request → `INCONCLUSIVE`;
+     - workspace-path masking makes the Edit request equivalent across arms;
+     - an emitter-only nonce-carrying event is not discarded → `INCONCLUSIVE`;
+     - a matching nonce-carrying `hook_response` in both arms, with no model-bound delivery → `NOT_DELIVERED`;
+     - an indicator differing inside a nonce-carrying event → `DELIVERED_WITH_SIDE_EFFECT`;
      - Bash content that only shares the prefix → not as expected;
      - the Bash prompt carries the exact back-quoted command;
      - the summary states that `H1_DONE` is not a pass.
