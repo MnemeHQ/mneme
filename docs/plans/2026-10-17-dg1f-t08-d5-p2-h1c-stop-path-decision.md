@@ -1,6 +1,6 @@
-# DG1F T-08 D5 + P2: H1c Stop-path architectural decision (PROPOSED)
+# DG1F T-08 D5 + P2: H1c Stop-path architectural decision (ACCEPTED: O1 selected)
 
-**Status:** **PROPOSED, not accepted.** Docs only. This note sets out the options for the Claude Code Stop output path (H1c) and recommends one. It authorizes **no** probe, harness change, scope amendment, D5 amendment, runtime change or freeze amendment (§7).
+**Status:** **ACCEPTED as an architectural decision note** (owner approval 2026-10-17, following an independent-review ACCEPT on `3db021d5`). **Owner decision: O1 selected as the direction** (probe Stop top-level `systemMessage`), **O2 as the fallback, O3 rejected.** Docs only. Accepting it does not mean O1 is proven, and it authorizes **no** probe, harness change, scope amendment, D5 amendment, runtime change or freeze amendment (§7).
 
 **Anchor:** `main` @ `220ee31e`.
 **Revision 2 (2026-10-17):** answers the #554 review. O1 now requires a bounded charter §5 channel update alongside the probe-scope amendment (§4 O1). The interactive delivery run gets a paired no-op control (§4 O1). §2 keeps apart what is documented from what the live record established about the loop ending.
@@ -86,7 +86,7 @@ Whatever this note's decision, it also informs #550: an accepted O1 shape (`syst
 - H2a's targeted re-run, and H2–H6.
 - **H1 remains NOT MET** until H1c passes under an accepted channel, or D5 is amended for Stop.
 
-## 8. Decision requested
+## 8. Decision requested (resolved 2026-10-17: O1 selected, O2 fallback, O3 rejected)
 
 1. Choose O1 (recommended), O2 or O3.
 2. If O1: approve drafting the **coordinated** probe-scope amendment and charter §5 channel update for H1c, to be reviewed together. That means shape `systemMessage`; a headless run with a paired control; and an operator-observed interactive run with a paired control. The harness and the live runs stay separately gated.
