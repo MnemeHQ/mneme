@@ -2,6 +2,7 @@
 
 **Date:** 2026-10-17
 **Status:** **PROPOSED, not accepted.** Architecture assessment, docs only. It does not authorize implementation, tests, experiments, C5/C6, ADR or Layer 1 freeze amendments, ADR-033 changes, or changes to C1–C4 evidence, pins or worktrees.
+**Revision 2 (2026-10-17):** answers the #538 review. It narrows P2's guarantee to correct boundary resolution and start points (§5, §8), ties rule 2 to D5 §5.4 with an added override constraint (§5, §7), and adds §5.4 to the implementation prerequisites (§10). The P2 rule itself is unchanged.
 **Source anchor:** `MnemeHQ/mneme` `main` at `28211f8b`, read-only.
 **Inputs:**
 - [D5 repository-boundary contract](2026-10-17-dg1f-t08-d5-repository-boundary-contract.md) (ACCEPTED, definition only);
@@ -73,11 +74,14 @@ Let `M_R` be the memory implicit discovery selects inside `R` (D5 stop rule), an
 
 **P2. Repository memory wins; an override only fills an absence. Proposed.**
 1. If `M_R` exists, it governs. A conflicting `M_X` is **not applied**. The consumer reports this through the host-visible channel D5 §5.1 requires: "override X ignored: repository memory Y governs target T".
-2. If no `M_R` exists and `M_X` is an existing file, `M_X` governs. This keeps U1 and U5.
+2. If no `M_R` exists and `M_X` is an existing file, `M_X` governs. This keeps U1 and U5. **Rule 2 is only as safe as the boundary that decided `M_R` is absent.** Consider a `.git` marker planted at `A/src/` while `A/.mneme/project_memory.json` exists. The D5 walk for `A/src/app.py` stops at `A/src/`, so `M_R` is absent, and rule 2 would apply `M_X`. With `M_X` pointing at a permissive repository B, that recreates the C2 wrong-memory complete `PASS`. Under D5 alone the same planted marker gives a visible `NO_MEMORY_SELECTED`. P2 rule 2 turns it into wrong-memory governance, so P2 **raises the stakes** of D5 §5.4. **Added constraint:** the outcome D5 §5.4 defines for a Git marker below the policy root of a memory that would otherwise govern must also **prevent rule 2 from substituting `M_X`** in that case. This document does not choose the mechanism.
 3. If `M_X` is set but missing or unreadable: with `M_R` present, rule 1 applies, so V4's silent masking ends. With no `M_R`, the outcome is `NO_MEMORY_SELECTED` with reason "override missing", reported host-visibly. Never a silent skip.
 4. If `M_X` equals `M_R` after `resolve()`, there is no conflict and nothing is reported (U2).
 
-**Property: an ambient override can add governance to an ungoverned repository, but can never remove or replace the repository's own.** That closes V5, V5-own and V4 without depending on who controls the channel (C1, C2 or C4), so C5/C6 cannot change the conclusion. It matches the proposed ADR-033 §4.1 direction that a differing `MNEME_MEMORY` "cannot bypass the established binding", but it does not depend on ADR-033 being accepted.
+**Property (bounded): when implicit discovery correctly identifies an existing governing memory, an ambient override can add governance to an ungoverned repository but can never remove or replace the repository's own.** Under that condition P2 removes V5, V5-own and V4 as override-substitution outcomes, whichever channel sets the variable (C1, C2 or C4). P2 does **not** independently resolve:
+- planted or incorrect boundaries (D5 §5.4; rule 2 above);
+- adapter start points that discover a different repository. Example: a Bash write to A from a session in B still selects B's memory under P2 (D1/D2; D5 §5.3);
+- verified authority (G3-B). It matches the proposed ADR-033 §4.1 direction that a differing `MNEME_MEMORY` "cannot bypass the established binding", but it does not depend on ADR-033 being accepted.
 
 **P3. A declared external source inside `R`** (for example, the in-repo memory names an external memory it extends). This is the DG2 declared-federation direction, and it is the right home for "an organization-wide memory *adds to* a repo memory". It is outside D6's scope and is not a precedence rule for an ambient env var. **Deferred to DG2;** P2 does not preclude it.
 
@@ -91,7 +95,7 @@ Let `M_R` be the memory implicit discovery selects inside `R` (D5 stop rule), an
 
 ## 7. Interactions
 
-- **D5:** P2 uses `R` to decide whether an in-repository memory exists. Under D5, implicit discovery inside `R` is what produces `M_R`. P2 supplies the D5 §5.2 "declared path" for L5/L6: set `MNEME_MEMORY` to the outer memory. P2 lets it apply only where `R` has none. D5 §5.2 is therefore satisfied by P2 **plus** the §5.1 visibility condition.
+- **D5:** P2 uses `R` to decide whether an in-repository memory exists. Under D5, implicit discovery inside `R` is what produces `M_R`. P2 supplies the D5 §5.2 "declared path" for L5/L6: set `MNEME_MEMORY` to the outer memory. P2 lets it apply only where `R` has none. D5 §5.2 is therefore satisfied by P2 **plus** the §5.1 visibility condition **plus** a §5.4 outcome that also blocks rule-2 substitution (§5).
 - **D3 (still open):** under P2 rule 2, `M_X` may sit outside the target's tree (U1), so the target can fall outside `policy_root(M_X)`. D3's out-of-root outcome is still needed. Unscoped rules are `APPLIED` and scoped rules are `UNKNOWN` today (`path_selectors.py:229-240`). P2 narrows **where** D3 occurs (never when `M_R` exists) but does not decide it.
 - **D4:** P2 is neutral. Which memory inside `R` counts as `M_R` is D4's question.
 - **D1/D2/D7:** P2 is evaluated after each consumer's own start point. It does not unify selection across tools; D5 §5.3 already states this limit.
@@ -100,7 +104,7 @@ Let `M_R` be the memory implicit discovery selects inside `R` (D5 stop rule), an
 
 ## 8. Is C5 or C6 needed?
 
-No. C5 (`export` in the Bash tool) and C6 (persistence after C3) test **who** can set the override. P2 makes the outcome independent of who sets it, because no channel can replace `M_R` and every case it handles is reported visibly. C5/C6 remain unauthorized and are not prerequisites.
+No. C5 (`export` in the Bash tool) and C6 (persistence after C3) test **who** can set the override. P2's outcome is the same whoever sets the variable, so C5/C6 cannot change the **choice of P2**. That is the only claim made here. The absence of C5/C6 is **not** evidence of bypass resistance: P2's protection remains conditional on correct boundaries and start points (§5). C5/C6 remain unauthorized and are not prerequisites for accepting this assessment.
 
 ## 9. Open decisions
 
@@ -118,7 +122,7 @@ No. C5 (`export` in the Bash tool) and C6 (persistence after C3) test **who** ca
 |---|---|---|
 | **Q2 assessment acceptance** (P2 becomes the accepted D6 precedence *definition*) | Independent review of this document | **Pending** |
 | **D5 implementation authorization** | Q2 accepted, plus D5 §5.1 verified host-visible channel, §5.4 planted-marker outcome, §7.4 L4 characterization test | Blocked |
-| **D6 (P2) implementation authorization** | Q2 accepted, plus its own charter and Layer 1 freeze amendment (it changes `find_memory`), plus the same host-visible channel as D5 §5.1 | Blocked |
+| **D6 (P2) implementation authorization** | Q2 accepted, plus its own charter and Layer 1 freeze amendment (it changes `find_memory`), plus the same host-visible channel as D5 §5.1, plus the D5 §5.4 planted-marker outcome defined **including** the rule-2 override case | Blocked |
 
 D5 and P2 both change `find_memory`. They **should share one implementation charter** so the stop rule and the precedence rule land together across every consumer. Landing them separately would leave a window in which, for example, the boundary exists but the override can still replace `M_R`.
 
