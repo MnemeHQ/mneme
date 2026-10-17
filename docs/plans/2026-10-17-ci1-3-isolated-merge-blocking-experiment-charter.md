@@ -31,8 +31,9 @@ protected repository:
 1. A PR containing a real violation of the trusted rule **cannot be merged**.
    The evidence is the repository host refusing the merge, not a red job.
 2. The same violation stays unmergeable when the PR **also** edits, deletes or
-   replaces the decision memory, the evaluator, the gate workflow, or adds a
-   look-alike check (§6, rows V2–V7).
+   replaces the decision memory, the evaluator or the gate workflow, adds a
+   look-alike check, or plants symlinks or traversal paths (§6, rows V2–V7 and
+   V13).
 3. A compliant PR **can** be merged, so the gate is not simply always red.
 4. A result computed for an earlier head commit cannot authorize a newer,
    unevaluated head (V10).
@@ -72,22 +73,41 @@ A trustworthy gate needs three inputs the PR cannot substitute: **policy**
 
 **Recommendation: T1 for the experiment.** T3 can be measured separately as
 defense in depth. It must not count toward the §1 proof, because it relies on
-people rather than mechanism. T4 is recorded as the productization candidate
-if V7 shows that same-app look-alike checks defeat T1. It is not built here.
+people rather than mechanism. If V7 shows that a same-app look-alike check
+defeats T1, the result is **NOT PROVEN — T1** (§8). T4 is then only a
+candidate remedy that needs its own charter and validation. It is not built
+here.
 
 ### T1 design details the experiment must validate
 
-- **Two checkouts.** Check out `base/` at the base SHA (trusted: memory and
-  workflow). Check out `pr/` at `github.event.pull_request.head.sha` as data
-  only, with `persist-credentials: false`.
-- **Policy root alignment.** ADR-020 derives the policy root from the memory
-  file's parent, so memory in `base/` and inputs in `pr/` would put every input
-  outside the root and yield UNKNOWN. The gate copies the trusted memory over
-  `pr/.mneme/project_memory.json` before checking, so the root is `pr/` and
-  any PR-supplied memory there is **overwritten**, never merged. V2 and V3
+- **No PR working tree.** The gate checks out only the **base** commit
+  (trusted memory and workflow, `persist-credentials: false`). It fetches the
+  PR head commit into the object store by SHA, but never checks it out. PR
+  content is read only as git blobs, so a PR cannot plant a symlink, junction,
+  special file or path that the gate later follows.
+- **Trusted scratch workspace.** The gate creates a fresh, empty directory
+  `ws/` outside both trees. Then:
+  1. It writes the trusted memory to `ws/.mneme/project_memory.json` from the
+     base blob (`git show <base_sha>:.mneme/project_memory.json`), never
+     through any PR-controlled path. `ws/` is the ADR-020 policy root, so
+     the policy-root semantics are preserved without touching PR paths.
+  2. It computes the changed-file list with trusted git from the recorded base
+     and head SHAs (`--diff-filter=ACMR`).
+  3. It materializes each changed file into `ws/` as a **regular file** from
+     `git cat-file blob <head_sha>:<path>`. It never copies from a filesystem
+     path.
+- **Materialization rules.** A changed path is **not** materialized, and is
+  classified UNEVALUATED with the reason recorded, when:
+  - its git mode is not a regular blob (`120000` symlink, `160000` submodule)
+  - it is absolute, contains `..` or a backslash, or normalizes outside `ws/`
+  - it is under `.mneme/`, so PR policy changes never reach the trusted policy location
+  - it collides with an entry the gate already wrote
+  
+  Every write uses create-new semantics into directories the gate itself
+  created, and refuses to follow or replace an existing entry. V2, V3 and V13
   test this.
 - **Changed-file list.** Computed by trusted code from the recorded base and
-  head SHAs. Not taken from PR-controlled scripts.
+  head SHAs, never taken from PR-controlled scripts.
 - **Verdict rule.** This is lab-local experiment policy, not product policy.
   The check succeeds only for VERIFIED_PASS on every in-scope file, as defined
   by the CI1.2 classification. Payload coherence follows the C1 charter's
@@ -141,6 +161,7 @@ means the host refused the merge **and** the refusal is captured.
 | V9 | Unevaluable input | Trusted gate deliberately given an out-of-root target, or a corrupted trusted-memory variant on a lab branch | UNEVALUATED | Lab policy: blocked. Recorded as lab policy, not ADR-033 | F1, #540 |
 | V10 | Stale head | V0 goes green, then a commit adding the literal is pushed | VIOLATION on the new head | Blocked. The earlier green must not satisfy the new head | CI1.1 F5 |
 | V11 | Base advanced | V0 goes green, then lab `main` gains a rule-relevant change (for example a second scoped literal that V0's content trips) | Measured. With `strict_required_status_checks_policy: false`, the stale green may still allow merge | **Measured.** Records whether base freshness is enforced. Not assumed | CI1.1 F5, #488 |
+| V13 | Violation plus filesystem redirection | V1, and the PR commits a symlink at `.mneme`, `.mneme/project_memory.json` or a `docs/` path (pointing at the workspace, the runner, or a permissive memory), plus a path using `..` | VIOLATION for the real `docs/` violation. The symlink and traversal paths are refused and recorded as UNEVALUATED. Trusted memory is unaffected | Blocked | Trusted-workspace hardening (§3) |
 | V12 | Requested-mode mismatch | Lab variant whose evaluator reports a `mode` other than the requested one (a stubbed wrapper on a lab branch, never PR code) | UNEVALUATED | Lab policy: blocked | #540 carry-forward |
 
 V9 and V12 exercise the gate's own robustness. They are configured by the
@@ -151,7 +172,10 @@ classification rather than substitution.
 
 For every row, record:
 
-- PR number, head SHA, base SHA, and the SHA actually checked out as `pr/`
+- PR number, head SHA and base SHA, plus the head SHA whose blobs were
+  materialized into `ws/`
+- the materialization log: each changed path, its git mode, and whether it was
+  materialized or refused (with the reason)
 - trusted-memory blob SHA and its source commit, plus the evaluator version and hash
 - raw `mneme.check/v1` payload for each in-scope file, requested mode, exit code and classification
 - check-run id, name, `app.id`, `head_sha` and conclusion, for every check run on the head commit (V7)
@@ -163,14 +187,27 @@ amended).
 
 ## 8. Outcomes
 
-- **Proven:** V0–V6 and V10 behave as expected, V7 is blocked, and the
-  evidence is complete.
-- **Proven with T4 dependency:** everything as above except V7 merges. That
-  means a same-app look-alike defeats name-pinned required checks, so T1 alone
-  is insufficient and T4 is required for assurance.
-- **Not proven:** any of V1–V6 or V10 merges. Record the row and stop.
+- **Proven (T1):** V0 merges. V1–V7, V10 and V13 are blocked. The evidence
+  is complete.
+- **NOT PROVEN — T1:** any of V1–V7, V10 or V13 merges a prohibited change.
+  That includes V7: if a same-app look-alike check lets a violation merge, T1
+  failed to protect the repository. Enforcement is **not** reported as proven
+  in any form. Record the failing row and stop. If V7 is the failing row, T4 is
+  recorded as a **candidate remedy** that needs its own charter and its own
+  validation. It is not assumed to fix the gap.
+- **NOT PROVEN — gate always red:** V0 cannot merge. A gate that blocks
+  everything proves nothing about violations.
 - V8 and V11 never decide the outcome. They are recorded as coverage and
   freshness limits.
+
+**Limitation carried into CI1.4 (V11).** If V11 shows a green result computed
+against an older base can still authorize a merge after the base has moved, a
+Proven (T1) result establishes **head-revision** blocking only. It does not
+establish protection against every later change to the governing decisions or
+the base branch. CI1.4 must state this explicitly and must not present T1 as
+base-fresh unless V11 is blocked. Required-check behavior depends on which
+commit was evaluated and how the check run is associated with the PR, so the
+recorded `head_sha` per check run (§7) is part of this evidence.
 
 The CI1.4 recommendation (promote or defer) follows from the outcome. It does
 not follow from this charter.
