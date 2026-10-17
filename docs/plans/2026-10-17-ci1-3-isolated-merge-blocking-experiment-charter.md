@@ -126,10 +126,44 @@ here.
 | # | Precondition |
 |---|---|
 | P1 | This charter is accepted by PR review |
-| P2 | The pinned evaluator passes the full CI1.2 corpus (`tests/test_ci1_contract_fixtures.py`, `tests/test_ci1_contract_matrix.py`) in a clean venv. `v0.10.0` carries `evaluation_complete`, `rule_id` and `decision_version_id`, but the corpus was validated against `main`, not that release. If it fails, pin a `MnemeHQ/mneme` commit instead and record why |
+| P2 | **Verified execution of the pinned evaluator** (§4a). The exact installed build must reproduce the CI1.2 corpus (`tests/fixtures/ci1_contract/**`: `cases.json` and golden payloads). `v0.10.0` carries `evaluation_complete`, `rule_id` and `decision_version_id`, but the corpus was validated against `main`, not that release. If parity fails, pin a `MnemeHQ/mneme` commit build instead and record why |
 | P3 | Lab repository name, owner and visibility are approved (§9) |
 | P4 | The lab ruleset is written down **before** it is applied: target branch, required check context and `integration_id`, `bypass_actors: []`, required approvals, `strict_required_status_checks_policy` |
 | P5 | The experimenter's merge attempts use the API (`PUT /repos/{o}/{r}/pulls/{n}/merge` with `sha`), so the refusal is a recorded HTTP response and not a screenshot |
+
+### 4a. Pinned-evaluator preflight (P2) contract
+
+The merged CI1.2 runners (`tests/test_ci1_contract_fixtures.py`,
+`tests/test_ci1_contract_matrix.py`) deliberately set `PYTHONPATH` to the
+repository checkout so that they test the tree under review. Running them
+inside a venv with `mneme-hq==0.10.0` installed would therefore still exercise
+the **checkout's** Mneme, not the release. They cannot satisfy P2 as written.
+
+The preflight is a **separate replay** of the committed corpus *data* against
+the installed build. It must:
+
+1. Install the evaluator into a fresh venv with hash checking (for example
+   `pip install --require-hashes` against a pinned requirements line, or a
+   pinned commit build whose wheel hash is recorded).
+2. Run with `PYTHONPATH` unset, isolated mode (`python -I`), and a working
+   directory **outside** any Mneme checkout, so the checkout cannot shadow the
+   installed package.
+3. Before replaying, verify and record which evaluator is executing: the venv
+   interpreter path, `mneme.__file__` (it must resolve inside the venv's
+   `site-packages`), `importlib.metadata.version("mneme-hq")`, the
+   distribution's `RECORD` and the installed wheel's sha256, and the
+   console-script or `-m` entry point actually invoked. A mismatch on any of
+   these fails the preflight. It is not a warning.
+4. Replay every case from each corpus's `cases.json` (copying each `vN/`
+   corpus to a temporary directory first) and compare each payload, exit code
+   and classification with the committed goldens. Record per-case parity.
+5. Record the result as a validation artifact: evaluator identity (step 3),
+   corpus versions and their commit SHA, and per-case parity.
+
+This is a test-execution contract. It does not change the enforcement engine,
+the existing runners, or any fixture expectation. Where the release differs
+from a golden, the release fails parity. The `v1` goldens are never edited to
+fit it.
 
 ## 5. Lab fixture
 
@@ -163,6 +197,16 @@ means the host refused the merge **and** the refusal is captured.
 | V11 | Base advanced | V0 goes green, then lab `main` gains a rule-relevant change (for example a second scoped literal that V0's content trips) | Measured. With `strict_required_status_checks_policy: false`, the stale green may still allow merge | **Measured.** Records whether base freshness is enforced. Not assumed | CI1.1 F5, #488 |
 | V13 | Violation plus filesystem redirection | V1, and the PR commits a symlink at `.mneme`, `.mneme/project_memory.json` or a `docs/` path (pointing at the workspace, the runner, or a permissive memory), plus a path using `..` | VIOLATION for the real `docs/` violation. The symlink and traversal paths are refused and recorded as UNEVALUATED. Trusted memory is unaffected | Blocked | Trusted-workspace hardening (§3) |
 | V12 | Requested-mode mismatch | Lab variant whose evaluator reports a `mode` other than the requested one (a stubbed wrapper on a lab branch, never PR code) | UNEVALUATED | Lab policy: blocked | #540 carry-forward |
+
+**V13 scope note.** Some redirection inputs cannot reach a PR at all. Git or
+GitHub may reject a path containing `..`, or a tree entry with an invalid
+name, before a commit can be pushed or a PR opened. Each such variant is
+recorded as an **input-rejection** result, naming the tool that rejected it,
+and is **not** counted as evidence that the gate or GitHub's merge blocking
+was exercised. Only variants that land in a real PR head (for example a
+committed symlink at `.mneme` or under `docs/`) count toward V13's merge
+outcome. Materialization rules for the rest are unit-tested offline in the
+gate's own tests.
 
 V9 and V12 exercise the gate's own robustness. They are configured by the
 experimenter on lab branches, never supplied by an untrusted PR, so they test
