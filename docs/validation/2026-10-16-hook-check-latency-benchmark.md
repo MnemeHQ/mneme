@@ -109,7 +109,7 @@ Files: `results/2026-10-16-win-{editable,installed,uvtool-py313}-bytecode.json`.
 
 **What changes:**
 - **Absolute latency is lower** than first reported. Today's subprocess p50 is 426–554 ms, not 506–616 ms. It's still above the plan's 300 ms threshold.
-- **The `mneme.cli` import is still most of the check work:** 86–90% of (d).
+- **The `mneme.cli` import is still most of the check work:** 89–90% of (d).
 - **In-process now cuts 29–38% of p95,** still under the plan's 40% bar.
 - **The decision rows give the same answers:** the latency is real; in-process stays below 40%; interpreter start is not most of it; check work dominates.
 - **Revised estimate for the planned lazy-import change:** importing only what `check` needs costs ~86–88 ms with bytecode, against ~156–158 ms for the full `mneme.cli` (separate measurements, 3.12). So the expected saving is about **70 ms per write**, not ~100 ms.
