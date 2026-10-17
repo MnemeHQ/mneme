@@ -2,8 +2,11 @@
 
 **Status:** validation record. **P2 is NOT met by `mneme-hq==0.10.0`.** The
 release does not reproduce the CI1.2 corpus. A commit build of `main` @
-`0b74d410` reproduces all of it. Choosing that build as the pinned evaluator is
-a decision for the CI1.3 approvals. This record does not make it.
+`0b74d410` reproduces all of it, on Windows (§3) and on Linux (§3a, added
+2026-10-17). Choosing that build as the pinned evaluator is a decision for the
+CI1.3 approvals. This record does not make it, and **P2 is not claimed
+complete**: the wheel hash is reproducible only under the conditions in §3a,
+and the build backend is still not hash-locked.
 **Scope:** offline replay only. No lab repository, ruleset, workflow, Core,
 enforcement engine, `.mneme/` or fixture expectation is changed. Strict mode is
 not enabled anywhere. The `v1` goldens are untouched.
@@ -130,19 +133,116 @@ Caveats for anyone pinning this build:
   `importlib.metadata.version("mneme-hq") == "0.10.0"`, exactly like the
   release that fails. The pin must be the commit SHA plus the wheel sha256,
   never the version.
-- **Reproducibility of the wheel hash was not tested.** A lab workflow that
-  rebuilds from the commit should record its own wheel hash, or consume one
-  stored build artifact.
+- **The Windows hash above is not reproducible.** It was built without a
+  fixed `SOURCE_DATE_EPOCH`, so six `dist-info` entries carry the build's
+  wall-clock time. Rebuilding the same commit on the same Windows host gave
+  `a14bffe2…` and then `6d87f30a…`, with identical file contents. It must not
+  be used as a pin. See §3a for what is reproducible.
 - **The build backend is not hash-locked.** pip's build isolation fetched
   `setuptools` without hash checking. The runtime dependency set and the
   built wheel are hash-locked.
 
+## 3a. Linux: commit build of `0b74d410` (Google Cloud Shell)
+
+Full per-case record: [`linux-commit-build-0b74d410.md`](ci1-3-p2-pinned-evaluator-preflight-2026-10-17/linux-commit-build-0b74d410.md).
+
+**Host.** Google Cloud Shell, Ubuntu 24.04.5 LTS, Linux 6.6.157+ x86_64,
+system Python 3.12.3. A fresh public clone of `MnemeHQ/mneme`, never an
+editable install. No GCP resources, IAM or project settings were changed.
+
+**First runs, merged harness @ `3876b735` (two defects found).**
+
+1. Run with the system interpreter, it stopped with
+   `ModuleNotFoundError: No module named 'pytest'`. The harness imports
+   `tests/test_ci1_contract_matrix.py`, which imports pytest. That was an
+   undocumented harness prerequisite, not an evaluator problem.
+2. Run from a harness venv with `pytest==9.1.1`, it failed the identity
+   check: `interpreter <work>/venv/bin/python is not inside venv <work>/venv`.
+   A POSIX venv's `bin/python` is a symlink to the base interpreter
+   (`/usr/bin/python3.12`), and the check resolved symlinks. Every other
+   identity check passed: `sys.prefix`, site-packages, isolated mode, both
+   `mneme` module paths, `sys.path`, version and `RECORD`.
+
+A scratch copy with only that one check made lexical then passed in full
+(46/46, 13/13, 2/2, 35/35). That run was diagnostic only. This record's Linux
+result comes from the fixed harness below.
+
+**Harness fix** (this PR, branch `fix/ci1-p2-linux-harness` @ `9b0861f5`):
+
+- the interpreter check is lexical (`sys.executable` must sit inside the venv
+  without following symlinks); the other checks still resolve
+- a missing harness pytest is a `PreflightError` naming the prerequisite
+  (exit 2)
+- commit builds set `SOURCE_DATE_EPOCH` to the commit time and record it and
+  the setuptools version
+- the script is stored with LF line endings (it had been committed CRLF)
+
+**Result, fixed harness, unpatched** (fresh clone at `9b0861f5`, harness venv
+with `pytest==9.1.1`):
+
+| Check | Runs | Parity |
+|---|---|---|
+| Manifest replay | 46 | 46 |
+| ADR-005 cross-check | 13 | 13 |
+| Corpus memory regeneration | 2 | 2 |
+| Classifier stubs | 35 | 35 |
+
+Exit 0. On the same host, the system interpreter without pytest exits 2 with
+the new prerequisite message, and `tests/test_ci1_evaluator_preflight.py`
+passes 44/44, including the symlinked-interpreter test that Windows skips.
+
+**Evaluator identity:** commit `0b74d410b45e7b3efcf08d00ce58e7bd7017b757`,
+`SOURCE_DATE_EPOCH=1792232397`, backend `setuptools-84.0.0` (not
+hash-locked), pip 24.0, wheel sha256
+`e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51`, 113
+installed files verified against `RECORD`, `mneme.__file__` inside the venv's
+site-packages, isolated mode. The interpreter path is `<work>/venv/bin/python`
+(a symlink to `/usr/bin/python3.12`).
+
+**Wheel hash reproducibility.** The Windows-recorded hash `e0ca654e…` was
+compared, as requested, and does not match. That is expected: it cannot be
+reproduced even on Windows (§3). The causes, established by comparing wheels
+entry by entry:
+
+| Build | sha256 | Notes |
+|---|---|---|
+| Windows, no `SOURCE_DATE_EPOCH` (recorded) | `e0ca654e…` | wall-clock `dist-info` timestamps |
+| Windows rebuilds, no `SOURCE_DATE_EPOCH` | `a14bffe2…`, `6d87f30a…` | same 114 entries and contents, timestamps differ |
+| Windows, `SOURCE_DATE_EPOCH` = commit time, ×2 | `4cfacf57…` ×2 | deterministic on Windows |
+| Linux, `tar -x` extraction, `SOURCE_DATE_EPOCH`, ×3 | `e6daf8a8…` ×3 | deterministic on Linux |
+| Linux, preflight procedure (`tarfile` `filter="data"`), umask 0002 | `e3fcc769…` | the preflight's run |
+| Linux, preflight procedure replicated independently, umask 0002 | `e3fcc769…` | **independently reproduced** |
+| Linux, preflight procedure replicated independently, umask 0022 | `6fb2d225…` | umask changes it |
+
+What the hash depends on:
+
+- **Timestamps.** Without `SOURCE_DATE_EPOCH`, every build differs. With it,
+  every entry carries the commit time.
+- **Platform.** Windows and Linux wheels with the same timestamp differ in
+  zip host system (MS-DOS vs Unix) on all 114 entries, file modes (`0o666` vs
+  `0o644`) on 113 entries, and `METADATA` (the long description is written
+  with CRLF on Windows: 376 CR bytes), and therefore in `RECORD`. Every
+  `mneme/` module's content is byte-identical.
+- **Extraction and umask.** The mode of `dist-info/licenses/LICENSE` follows
+  how the source was unpacked and the process umask (`0o644` vs `0o664`).
+- **Build backend.** `setuptools` is fetched unpinned. All runs here got
+  84.0.0. A different version may change the wheel.
+
+Conclusion: a commit-build pin is reproducible only for one platform, one
+setuptools version, one extraction method and one umask, with
+`SOURCE_DATE_EPOCH` set. `e3fcc769…` is that pin for Cloud Shell's
+conditions. It is not automatically the hash a GitHub Linux runner will
+produce, because the runner's umask and resolved setuptools may differ.
+
 ## 4. Not covered
 
-- **Linux.** Both runs were on Windows. The lab workflow will run on a GitHub
-  Linux runner. Rerunning the harness there is cheap (`python
-  scripts/ci1_evaluator_preflight.py ...`) and is recommended once the pin is
-  chosen.
+- **The lab runner itself.** Linux parity is shown on Cloud Shell (§3a), not
+  on the GitHub-hosted runner the lab will use. Either rerun the preflight
+  there, or have the lab consume one stored, hash-verified wheel instead of
+  rebuilding. Rebuilding is reproducible only under the §3a conditions.
+- **A hash-locked build backend.** `setuptools` (and pip's build isolation) are
+  still fetched without hash checking. Locking them, or fixing the umask in
+  the harness, is follow-up work, not done here.
 - **Network-free execution.** The install step needs PyPI. The unit tests in
   the battery are offline and use fakes. They do not install anything.
 - **Dependency drift.** The resolved runtime dependency set (listed in each
@@ -151,9 +251,14 @@ Caveats for anyone pinning this build:
 
 ## 5. Reproduce
 
+Run from a harness venv that has pytest. The evaluator still goes into its
+own fresh venv:
+
 ```bash
-python scripts/ci1_evaluator_preflight.py --version 0.10.0 --record-out <file.md> --json-out <file.json>
-python scripts/ci1_evaluator_preflight.py --commit-build 0b74d410 --record-out <file.md>
+python3.12 -m venv harness
+harness/bin/pip install 'pytest>=8'
+harness/bin/python scripts/ci1_evaluator_preflight.py --version 0.10.0 --record-out <file.md> --json-out <file.json>
+harness/bin/python scripts/ci1_evaluator_preflight.py --commit-build 0b74d410 --record-out <file.md> --json-out <file.json>
 ```
 
 Exit codes: 0 means full parity, 1 means parity failures (recorded), and 2
