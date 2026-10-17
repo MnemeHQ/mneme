@@ -69,3 +69,38 @@ def test_smoke_records_bytecode_setting(harness, tmp_path):
     out = tmp_path / "o.json"
     assert harness.main(["--python", sys.executable, "--runs", "2", "--warmup", "0", "--out", str(out)]) == 0
     assert json.loads(out.read_text(encoding="utf-8"))["settings"]["bytecode"] == "precompiled"
+
+
+def test_extra_env_applies_to_every_run(harness, monkeypatch):
+    monkeypatch.setattr(harness, "_EXTRA_ENV", {"PYTHON_LAZY_IMPORTS": "all"})
+    assert harness._env("subprocess", "")["PYTHON_LAZY_IMPORTS"] == "all"
+    assert harness._env(None, "somewhere")["PYTHON_LAZY_IMPORTS"] == "all"
+
+
+def test_extra_env_cannot_override_controlled_variables(harness, tmp_path):
+    for key in ("PYTHONPATH", "PYTHONDONTWRITEBYTECODE", "MNEME_HOOK_CHECK_TRANSPORT"):
+        with pytest.raises(SystemExit) as exc:
+            harness.main(["--python", sys.executable, "--out", str(tmp_path / "o.json"),
+                          "--env", f"{key}=1"])
+        assert exc.value.code == 2
+
+
+def test_native_spawn_baseline_and_env_are_recorded(harness, tmp_path):
+    out = tmp_path / "o.json"
+    rc = harness.main(["--python", sys.executable, "--runs", "2", "--warmup", "0",
+                       "--out", str(out), "--env", "MNEME_BENCH_PROBE=1"])
+    assert rc == 0
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert data["cells"]["baseline/native_spawn"]["summary"]["n"] == 2
+    assert data["settings"]["native_spawn_cmd"]
+    assert data["settings"]["env"] == {"MNEME_BENCH_PROBE": "1"}
+
+
+def test_unresolvable_mneme_fails_clearly(harness, tmp_path, monkeypatch, capsys):
+    # A namespace-package or missing mneme (e.g. a mangled --pythonpath) must
+    # stop the harness with a message, not a TypeError from Path(None).
+    monkeypatch.setattr(harness, "_describe", lambda python: {"mneme_file": None})
+    out = tmp_path / "o.json"
+    assert harness.main(["--python", sys.executable, "--out", str(out)]) == 1
+    assert "could not import mneme" in capsys.readouterr().err
+    assert not out.exists()

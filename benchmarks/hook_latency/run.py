@@ -70,6 +70,7 @@ def _env(transport: Optional[str], pythonpath: str) -> Dict[str, str]:
     # Real installs run from cached bytecode. Inheriting a no-bytecode shell
     # setting made every run recompile mneme (first 2026-10-16 results).
     env.pop("PYTHONDONTWRITEBYTECODE", None)
+    env.update(_EXTRA_ENV)
     if transport:
         env["MNEME_HOOK_CHECK_TRANSPORT"] = transport
     if pythonpath:
@@ -87,6 +88,16 @@ def _timed(cmd: List[str], cwd: Path, env: Dict[str, str], stdin: str = "") -> T
 
 # Set by main(); run_once keeps the plan's 4-argument signature.
 _PYTHONPATH = str(REPO_ROOT)
+_EXTRA_ENV: Dict[str, str] = {}
+# Variables the harness controls itself; --env may not override them.
+_CONTROLLED_ENV = ("PYTHONPATH", "PYTHONDONTWRITEBYTECODE", "MNEME_HOOK_CHECK_TRANSPORT")
+
+
+def native_spawn_cmd() -> List[str]:
+    """A trivial native executable: the process-spawn floor a compiled checker would pay."""
+    if os.name == "nt":
+        return [os.path.join(os.environ.get("SystemRoot", r"C:\Windows"), "System32", "hostname.exe")]
+    return [shutil.which("true") or "/bin/true"]
 
 
 def make_project(root: Path) -> Path:
@@ -150,7 +161,7 @@ def _markdown(cells: Dict[str, dict]) -> str:
 
 
 def main(argv: Optional[List[str]] = None) -> int:
-    global _PYTHONPATH
+    global _PYTHONPATH, _EXTRA_ENV
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--python", required=True, help="interpreter whose mneme install is measured")
     ap.add_argument("--runs", type=int, default=50)
@@ -161,25 +172,41 @@ def main(argv: Optional[List[str]] = None) -> int:
         help="PYTHONPATH for every run; default pins this checkout. Pass '' to measure the "
              "interpreter's own install (wheel mode).",
     )
+    ap.add_argument(
+        "--env", action="append", default=[], metavar="KEY=VALUE",
+        help="extra environment variable for every run, e.g. PYTHON_LAZY_IMPORTS=all (repeatable)",
+    )
     args = ap.parse_args(argv)
+    extra: Dict[str, str] = {}
+    for item in args.env:
+        key, sep, value = item.partition("=")
+        if not sep or not key:
+            ap.error(f"--env expects KEY=VALUE, got {item!r}")
+        if key in _CONTROLLED_ENV:
+            ap.error(f"--env may not set {key}; the harness controls it")
+        extra[key] = value
     _PYTHONPATH = args.pythonpath
+    _EXTRA_ENV = extra
 
     info = _describe(args.python)
-    if "mneme_file" not in info:
+    if not info.get("mneme_file"):
         print(f"could not import mneme with {args.python}: {info}", file=sys.stderr)
         return 1
     precompile(args.python, Path(info["mneme_file"]).parent)
 
     cells: List[Tuple[str, Optional[Scenario], Optional[str]]] = [
         (f"{s}/{t}", SCENARIOS[s], t) for s in SCENARIOS for t in TRANSPORTS
-    ] + [(name, None, None) for name in BASELINES]
+    ] + [(name, None, None) for name in BASELINES] + [("baseline/native_spawn", None, None)]
     samples: Dict[str, List[float]] = {name: [] for name, _, _ in cells}
 
     with tempfile.TemporaryDirectory(prefix="mneme-hook-bench-") as tmp:
         project = make_project(Path(tmp) / "project")
         for i in range(args.warmup + args.runs):
             for name, scenario, transport in cells:
-                if scenario is None:
+                if name == "baseline/native_spawn":
+                    ms, rc, err = _timed(native_spawn_cmd(), project, _env(None, _PYTHONPATH))
+                    expected = 0
+                elif scenario is None:
                     ms, rc, err = _timed([args.python, "-c", BASELINES[name]], project,
                                          _env(None, _PYTHONPATH))
                     expected = 0
@@ -196,7 +223,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     result = {
         **info,
         "settings": {"runs": args.runs, "warmup": args.warmup, "python": args.python,
-                     "pythonpath": args.pythonpath, "bytecode": "precompiled"},
+                     "pythonpath": args.pythonpath, "bytecode": "precompiled",
+                     "env": extra, "native_spawn_cmd": native_spawn_cmd()},
         "cells": {name: {"summary": summarize(s), "samples_ms": [round(x, 2) for x in s]}
                   for name, s in samples.items()},
     }
