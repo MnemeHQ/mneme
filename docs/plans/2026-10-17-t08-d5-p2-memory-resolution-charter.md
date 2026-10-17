@@ -5,6 +5,8 @@
 **Revision 2 (2026-10-17):** answers the #542 review.
 - The resolver now always reports the nearest Git boundary, including when a memory is found first (§3.2, §7).
 - C3 takes the wait-for-evidence path: every consumer's host needs a verified channel before the freeze amendment (§5, §12).
+
+**Revision 3 (2026-10-17):** records the provenance of the D5 §5.1 owner approval (§3.4, C2, and the D5 contract), and splits H1–H6 into per-output-path probe requirements (§5).
 - C2 is applied through an owner-approved refinement of D5 §5.1, recorded in the D5 contract itself (§3.4).
 - The C4 wrapper limit is stated (§3.1).
 
@@ -96,7 +98,7 @@ loop:
 
 - **Anomalous:** rows 2, 4, 5 and 7. Reported host-visibly where a verified channel exists (§5).
 - **Informational:** rows 3 and 6. The override is in effect; it is recorded in structured output.
-- **Plain absence:** row 8. Under the **owner-approved D5 §5.1 refinement** (2026-10-17, recorded in the [D5 contract §5.1](2026-10-17-dg1f-t08-d5-repository-boundary-contract.md)), row 8 produces a **structured non-PASS** `NO_MEMORY_ON_PATH` outcome where the consumer has a structured result. It gets no per-event host notice. Reason: with a user-wide plugin, every edit in every repository without Mneme would emit a notice, and nothing was displaced. Row 8 is still never reported as `PASS`. Rows 2, 4, 5 and 7 stay host-visible, exactly as D5 §5.1 requires.
+- **Plain absence:** row 8. Under the **owner-approved D5 §5.1 refinement** (2026-10-17, recorded with its approval provenance in the [D5 contract §5.1](2026-10-17-dg1f-t08-d5-repository-boundary-contract.md)), row 8 produces a **structured non-PASS** `NO_MEMORY_ON_PATH` outcome where the consumer has a structured result. It gets no per-event host notice. Reason: with a user-wide plugin, every edit in every repository without Mneme would emit a notice, and nothing was displaced. Row 8 is still never reported as `PASS`. Rows 2, 4, 5 and 7 stay host-visible, exactly as D5 §5.1 requires.
 
 ## 4. Consumers in scope (all at once, D5 §5.3)
 
@@ -131,16 +133,18 @@ loop:
 
 **Gate (C3: wait for evidence).** D5 §8 makes a verified channel per host an implementation prerequisite, and this charter adds no exception. Before the `[layer1-freeze]` amendment (§12), a recorded live probe must show that an anomalous outcome (rows 2, 4, 5 and 7) reaches the developer or agent on **every** host below:
 
-| Host gate | Consumers covered |
+| Host gate | Output paths, each needing its own recorded probe |
 |---|---|
-| H1 Claude Code | direct write, Bash, SessionStart, Stop |
-| H2 Codex CLI | gate, stop audit (baseline and Stop) |
-| H3 Kiro | hook |
-| H4 Antigravity | adapter |
-| H5 Agent SDK host path | Agent SDK, and LangChain through it |
-| H6 Hermes host path | Hermes |
+| H1 Claude Code | **H1a** PreToolUse (direct write, Bash) · **H1b** SessionStart · **H1c** Stop |
+| H2 Codex CLI | **H2a** gate · **H2b** stop audit Stop output (the baseline step emits nothing, so it has no output path to probe) |
+| H3 Kiro | **H3a** hook |
+| H4 Antigravity | **H4a** adapter |
+| H5 Agent SDK | **H5a** PreToolUse · **H5b** context injection · **H5c** LangChain gate result (its own delivery path, not SDK hook output) |
+| H6 Hermes | **H6a** gate result (file, patch, terminal) · **H6b** context injection |
 
-Today none of H1–H6 is verified. H2's non-DENY output shapes are explicitly unproven, and no live Kiro or Antigravity harness is recorded in the repository. **If any host gate cannot be met, the shared implementation stays blocked for all consumers (I1), and D5 must be revisited explicitly.** The charter itself may be accepted before the probes exist, but it authorizes no runtime change.
+**A gate passes only when every output path listed under it has a recorded probe** showing an anomalous outcome reaching the developer or agent. A probe of one event type proves nothing about another event type on the same host. H1–H6 remain the six organizing gates.
+
+Today none of the twelve output paths is verified. H2's non-DENY output shapes are explicitly unproven, and no live Kiro or Antigravity harness is recorded in the repository. **If any host gate cannot be met, the shared implementation stays blocked for all consumers (I1), and D5 must be revisited explicitly.** The charter itself may be accepted before the probes exist, but it authorizes no runtime change.
 
 ## 6. Characterization test first (D5 §7.4)
 
@@ -217,7 +221,7 @@ After this charter merges, a separate `[layer1-freeze]` PR under Amendment Proce
 | # | Decision | Recommendation |
 |---|---|---|
 | C1 | Is I3 (override applies at a boundary only if it equals the shadowed memory) the D5 §5.4 outcome? | **Yes.** It blocks the adversarial case, keeps the L5/L6 inheritance path, and needs no session state. The alternative, ignoring markers created during the session, needs baselines that PreToolUse does not have. |
-| C2 | Row 8 (plain absence) not reported per event | **Resolved:** the owner approved the D5 §5.1 refinement on 2026-10-17, recorded in the D5 contract. Row 8 gets a structured non-PASS outcome only. |
+| C2 | Row 8 (plain absence) not reported per event | **Resolved:** the owner approved the D5 §5.1 refinement on 2026-10-17 in the owner's working session, in these words: "Approve the D5 §5.1 refinement (row 8: structured non-PASS only, no per-event notice) and amend D5 in the same PR." The D5 contract records it. The reviewer's conditional support is not the approval. Row 8 gets a structured non-PASS outcome only. |
 | C3 | Per-host channel gate | **Resolved: wait.** H1–H6 must all be verified before the freeze amendment, with no per-host exception (§5). |
 | C4 | Keep `find_memory` as a wrapper with new semantics | **Yes.** The wrapper changes behavior and carries no diagnostics, so in-tree consumers use `resolve_memory` (§3.1). |
 | C5 | `OVERRIDE_IGNORED` (row 2) on every event vs. once per session | Every event for PreToolUse consumers. It signals a misconfiguration and should stay visible until fixed. |
@@ -226,7 +230,7 @@ After this charter merges, a separate `[layer1-freeze]` PR under Amendment Proce
 
 1. **This charter**: review, then owner acceptance.
 2. **§6 characterization test PR** (test-only), after the owner authorizes it.
-3. **H1–H6 channel probes** (§5), each recorded as evidence and each separately authorized. **All six must pass.**
+3. **H1–H6 channel probes** (§5), each recorded as evidence and each separately authorized. **All six gates must pass, with every listed output path probed.**
 4. **`[layer1-freeze]` amendment PR** (§9), only after step 3.
 5. **Implementation PR** with the §7 tests and a full-suite run, squash-merged under ADR-022.
 6. **§8 behavioral live evidence PR.**
