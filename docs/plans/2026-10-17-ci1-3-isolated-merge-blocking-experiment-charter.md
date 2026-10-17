@@ -165,6 +165,16 @@ the existing runners, or any fixture expectation. Where the release differs
 from a golden, the release fails parity. The `v1` goldens are never edited to
 fit it.
 
+**P2 result (2026-10-17, offline):** `mneme-hq==0.10.0` **fails** parity
+([record](../validation/ci1-3-p2-pinned-evaluator-preflight-2026-10-17.md)).
+It cannot load the corpus's `mneme.decision-index/v2` memory, and its `check`
+records carry no `rule_id` or `decision_version_id`, contrary to the P2 row
+above. The fallback applies: pin a `MnemeHQ/mneme` commit build. A build of
+`main` @ `0b74d410` reproduces the whole corpus, the ADR-005 cross-check and
+the classifier checks. Pin it by commit SHA and wheel sha256, never by
+version, because `main` still reports `0.10.0`. Choosing the pin remains part
+of the §9 approvals.
+
 ## 5. Lab fixture
 
 The trusted memory is the CI1.2.1 corpus memory
