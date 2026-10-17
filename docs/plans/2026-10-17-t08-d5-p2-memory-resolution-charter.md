@@ -6,6 +6,8 @@
 - The resolver now always reports the nearest Git boundary, including when a memory is found first (§3.2, §7).
 - C3 takes the wait-for-evidence path: every consumer's host needs a verified channel before the freeze amendment (§5, §12).
 
+**Amendment A1 (PROPOSED, 2026-10-17; not accepted):** implements the accepted [H1c Stop-path decision](2026-10-17-dg1f-t08-d5-p2-h1c-stop-path-decision.md) (#554, O1). It changes **only** Claude Code Stop's candidate channel in §5, from `hookSpecificOutput.additionalContext` to top-level `systemMessage`. It is coordinated with the probe-scope Amendment A1 and is reviewed together with it. D5's developer-or-agent visibility rule, the gate rule, every other channel, implementation and the Layer 1 freeze are unchanged (§5.1).
+
 **Revision 3 (2026-10-17):** records the provenance of the D5 §5.1 owner approval (§3.4, C2, and the D5 contract), and splits H1–H6 into per-output-path probe requirements (§5).
 - C2 is applied through an owner-approved refinement of D5 §5.1, recorded in the D5 contract itself (§3.4).
 - The C4 wrapper limit is stated (§3.1).
@@ -123,7 +125,8 @@ loop:
 | Host / consumer | Candidate channel for anomalous outcomes | Status at `28df1442` |
 |---|---|---|
 | Claude Code PreToolUse (direct write, Bash) | exit 0 with `hookSpecificOutput.additionalContext`, **no** `permissionDecision` | **Unverified live.** The precedent is the Agent SDK PreToolUse `additionalContext` for fail-open (`agent_sdk/adapter.py:295-304`). Must not use `defer` or `allow`: warn mode chose `defer` precisely so as not to change permissions (`hook.py:487-490`). |
-| Claude Code SessionStart / Stop | `hookSpecificOutput.additionalContext` (`_emit_stop_feedback`, `hook.py:743-758`) | In use for Stop. No recorded live visibility evidence. |
+| Claude Code SessionStart | `hookSpecificOutput.additionalContext` | **Passed H1b under R1–R3** (#553). |
+| Claude Code Stop | **Amendment A1 (proposed):** top-level `systemMessage`, exit 0, with **no** `hookSpecificOutput` and **no** `decision` (§5.1). It was originally `hookSpecificOutput.additionalContext` (`_emit_stop_feedback`, `hook.py:743-758`). | The original shape failed H1c with host-induced continuation (#549, #553). The A1 shape is **unprobed**. |
 | Agent SDK, LangChain | PreToolUse `additionalContext`, as `ACTION_FAIL_OPEN` already does. SKIP returns `{}` today (`agent_sdk/adapter.py:305`). | Code precedent. Visibility to the developer depends on the embedding host. |
 | Hermes | structured gate `reason` | Host visibility depends on the embedder |
 | Codex gate and stop audit | none proven | Non-DENY wire shapes are **unproven** (`codex_cli/gate.py:418-423`, "belongs to M1d's live probing") |
@@ -236,3 +239,28 @@ After this charter merges, a separate `[layer1-freeze]` PR under Amendment Proce
 6. **§8 behavioral live evidence PR.**
 
 Each step needs the previous one merged.
+
+## 5.1 Amendment A1: Claude Code Stop channel (PROPOSED)
+
+**Status: PROPOSED, not accepted.** It is coordinated with the probe-scope [Amendment A1](2026-10-17-dg1f-t08-d5-p2-host-path-probe-scope.md) (§4.2 there), reviewed together with it, and implements the owner's O1 selection in the [H1c Stop-path decision](2026-10-17-dg1f-t08-d5-p2-h1c-stop-path-decision.md) (#554, O1).
+
+**Change.** In the §5 channel table, Claude Code **Stop**'s candidate channel for anomalous outcomes (rows 2, 4, 5 and 7) changes from `hookSpecificOutput.additionalContext` to **top-level `systemMessage`** (exit 0, no `hookSpecificOutput`, no `decision`). By the shape-binding rule (probe scope §3 step 5), an eventual implementation would have to emit exactly the probed `systemMessage` form at Stop, and only once a probe has passed it.
+
+**Why.** H1c showed that Stop `additionalContext` makes the host continue the session. The Claude Code documentation describes that as intended (decision note §2). `systemMessage` is documented as a user-facing warning, and nothing documents it as continuing a Stop.
+
+**Unchanged:**
+- D5 §5.1's **developer-or-agent** visibility rule;
+- the §5 gate rule (all H1–H6 output paths must pass before the freeze amendment, with no per-host exception);
+- every other row of the channel table;
+- the §3 design and §4 consumers;
+- §6–§12.
+
+A Stop notice that reaches only the developer is acceptable, as it already is on any path (probe scope D3), and it would be recorded as developer-only.
+
+**Not authorized by A1:**
+- any harness change or live run, including the two H1c runs the probe-scope A1 specifies;
+- any runtime change, including the shipped `_emit_stop_feedback` (#550);
+- implementation;
+- the `[layer1-freeze]` amendment.
+
+**Gate status.** H1 remains **NOT MET** until H1c passes under the A1 shape, or until a D5 amendment for Stop is accepted (decision note O2, the fallback).

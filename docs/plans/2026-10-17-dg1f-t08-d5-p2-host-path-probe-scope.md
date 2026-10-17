@@ -7,6 +7,8 @@
 - Developer-only delivery may pass any path, recorded separately from agent delivery (§3, §6, D3).
 - An explicit H2a equivalence mapping against the committed M1d-a artifacts is added (§4.1).
 
+**Amendment A1 (PROPOSED, 2026-10-17; not accepted):** implements the accepted [H1c Stop-path decision](2026-10-17-dg1f-t08-d5-p2-h1c-stop-path-decision.md) (#554, O1). It replaces **H1c's** candidate shape with top-level `systemMessage` and specifies two H1c runs, a headless one and an operator-observed interactive one, **each with a paired no-op control** (§4.2). It is coordinated with the charter's §5.1 Amendment A1 and reviewed together with it. Nothing else in this scope changes, including the developer-or-agent rule (D3).
+
 **Revision 3 (2026-10-17):** answers the #545 re-review. The emitter mechanism and the side-effect control are now specific to each **path type**: command hook on a tool event, command hook on a lifecycle event, in-process callback, and middleware (§3.1). The nonce, evidence, audience and non-interference requirements stay common. No gate, decision or D5/P2 semantics change.
 **Parent:** charter §5 (gate rule) and §12 step 3. The format follows the D6 scopes [#519](2026-10-15-dg1f-t08-d6-mneme-memory-live-scope.md) and [#527](2026-10-16-dg1f-t08-d6-c4-local-settings-scope.md).
 
@@ -57,7 +59,7 @@ The §3.3 outcomes do not exist in code yet, and implementing them is not author
 |---|---|---|---|---|
 | **H1a** | Claude Code PreToolUse, direct write **and** Bash matchers | `hookSpecificOutput: {hookEventName: "PreToolUse", additionalContext}` with **no** `permissionDecision` | **None.** Only exit 2 with stderr is proven (G1 live record; T-08 re-probe). `defer`/`allow` must not be used (`hook.py:487-490`). | **Yes.** Two sub-probes: an Edit and a Bash command. |
 | **H1b** | Claude Code SessionStart | `hookSpecificOutput: {hookEventName: "SessionStart", additionalContext}`; plain stdout recorded as a variant | **None.** Every live registration so far was PreToolUse only (C1:114, C2:172, C4:142). | **Yes** |
-| **H1c** | Claude Code Stop | `hookSpecificOutput: {hookEventName: "Stop", additionalContext}` (`_emit_stop_feedback`, `hook.py:743-758`) | **None** | **Yes.** Also record whether a Stop notice can reach the agent at all once the turn has ended (§6, `DELIVERED_TO_USER_ONLY`). |
+| **H1c** | Claude Code Stop | **Amendment A1 (proposed):** top-level `{"systemMessage": "<notice>"}`, exit 0, with no `hookSpecificOutput` and no `decision` (§4.2). It was originally `hookSpecificOutput: {hookEventName: "Stop", additionalContext}` (`_emit_stop_feedback`, `hook.py:743-758`). | The original shape was run in the H1 batch: `DELIVERED_WITH_SIDE_EFFECT` under R1–R3 (#549, #553). The A1 shape is **unprobed**. | **Yes, under A1:** a headless run and an interactive run, each with a paired control (§4.2). |
 | **H2a** | Codex PreToolUse (gate) | `hookSpecificOutput.additionalContext` (`codex_cli/hook.py:52-70`) | **LIVE.** M1d-a run `20260824T110210Z`, codex-cli 0.149.1 on Windows with `codex exec`: delivered to agent context as a developer-role message (`validation/codex-cli/capability-matrix.md:49-53`) | **Evidence reuse with a targeted re-run** of artifact-backed delivery only (decision D1, §10; mapping §4.1). A full re-run happens only if the pin has changed. |
 | **H2b** | Codex Stop (stop audit) | `systemMessage` (`stop_audit.py:126-127`) | **Unproven live.** It is covered by unit tests only. Stop `decision: block` is proven (M3) but has side effects, so it does not qualify. | **Yes** |
 | **H3a** | Kiro hook | exit-0 stdout (`kiro/hook.py:274-276`) | **Documented live, no artifacts.** `docs/integrations/kiro-hook-spec.md:167-168`, CLI 2.19.2 with `--v3` (v3 engine): "Exit-0 stdout reaches agent context (observed in allow tests)". | **Yes**, with artifacts. A harness is needed: none exists in the repository. |
@@ -86,6 +88,41 @@ Source: committed run `validation/codex-cli/evidence/runs/20260824T110210Z-apply
 | Echo, turn count | not part of M1d-a's design | Evidence-only under §6; **not required** |
 
 **Result:** every criterion is covered except artifact-backed recorded delivery. Per D1, H2a needs a **targeted re-run** on the same pin that collects and commits a redacted rollout excerpt containing the token. No full re-run is needed.
+
+### 4.2 Amendment A1: H1c with top-level `systemMessage` (PROPOSED)
+
+**Status: PROPOSED, not accepted.** It is coordinated with the charter's §5.1 Amendment A1 and implements the owner's O1 selection ([H1c Stop-path decision](2026-10-17-dg1f-t08-d5-p2-h1c-stop-path-decision.md) (#554, O1)).
+
+**Shape.** The Stop command hook prints `{"systemMessage": "<notice with nonce>"}` and exits 0. There is no `hookSpecificOutput`, no `decision`, no `continue` and no `stopReason`. The paired no-op control prints nothing and exits 0. The path type is unchanged: a command hook on a lifecycle event (§3.1).
+
+**Two runs, each with its own paired no-op control.** Each run is an emitter arm plus a no-op arm, with the same workspace layout, prompt and pins as the H1 batch.
+
+| Run | Purpose | Evidence | Pass/fail criteria |
+|---|---|---|---|
+| **A1-headless** (`claude -p`, stream-json) | Non-interference; also records whether the host surfaces the notice to the stream consumer | hook log, stream-json events, session transcript, the paired control's same files | **Non-interference (both arms):** equal Stop invocations; `stop_hook_active` never `true`; no assistant entry after the final reply that the control lacks; normal `result`; equal permission outcomes for equivalent requests; strict host-event and indicator rules as today. |
+| **A1-interactive** (operator-run interactive `claude`, observed and captured) | Developer delivery, and non-interference in the interactive host | screen recording from launch until the session has been idle for at least 30 seconds after the reply; hook log; session transcript; the operator's written observation; the same for the paired control | **Developer delivery:** the nonce text is visible in the emitter arm's capture, in the host UI, and absent from the control's. **Non-interference:** as for headless, plus the capture shows the session returning to input with no further model activity, exactly as in its control. |
+
+**Evidence classification (specification only; any classifier change needs its own harness PR):**
+- **Developer delivery** comes **only** from the A1-interactive capture: the nonce is visible in the UI of the emitter arm and not in the control, confirmed against the recording, not only the operator's note. Stream-json output is never developer evidence on its own.
+- **A stream-json informational message** carrying the nonce (documented as a possible `SDKInformationalMessage`), or any stream `system` event, is `host_output`: recorded, never delivery.
+- **A nonce in a model-bound location** (the existing table, including R1 for `hook_additional_context`) is agent delivery, and the label is `DELIVERED_TO_AGENT` with `developer_also` from the interactive capture.
+- **Labels** (§6): `DELIVERED_TO_USER_ONLY` when the interactive capture shows the notice, it is absent from every model-bound location, and every non-interference criterion holds in **both** runs. `DELIVERED_WITH_SIDE_EFFECT` when either run fails a non-interference criterion. `NOT_DELIVERED` when the notice appears neither in the UI capture nor model-bound. `INCONCLUSIVE` when the capture is missing or unreadable, a control is missing, or a location is unclassified.
+- **H1c passes under A1** only when both runs' evidence supports a passing label.
+
+**Evidence handling.** A full screen recording can show personal data. So the recording stays local, its SHA-256 goes in the evidence manifest, and only redacted still frames showing the notice area (or its absence) are published. Each frame is listed with its timestamp in the recording. The written operator observation is published.
+
+**Pins** (§7): Claude Code `2.1.202` and the init model as in H1; the interactive host on the same machine and version. A pin change needs a reviewed amendment.
+
+**History.** The H1 batch's H1c evidence (`hookSpecificOutput.additionalContext`) stands as the record of the original shape. A1 does not reclassify it.
+
+**Not authorized by A1:**
+- the harness change (an emitter mode for `systemMessage`, interactive-run tooling, classifier rules);
+- either live run;
+- any runtime change, including `_emit_stop_feedback` (#550);
+- implementation;
+- the `[layer1-freeze]` amendment.
+
+Each needs its own go-ahead, in that order: harness PR, then the runs.
 
 ## 5. Harness: reuse and build, per host
 
