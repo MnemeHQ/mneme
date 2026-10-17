@@ -1,0 +1,208 @@
+# T-08 D5 + P2: shared memory-resolution implementation charter (PROPOSED)
+
+**Date:** 2026-10-17
+**Status:** **PROPOSED, not accepted.** Charter draft, docs only. It authorizes nothing: no code, no tests (including the L4 characterization test), no experiments or live probes, no `[layer1-freeze]` amendment, no ADR or ADR-033 change, no change to C1–C4 evidence, pins or worktrees.
+**Source anchor:** `MnemeHQ/mneme` `main` at `28df1442`, read-only.
+**Implements (if accepted):** the [D5 repository-boundary contract](2026-10-17-dg1f-t08-d5-repository-boundary-contract.md) (ACCEPTED, definition only) and the [D6/Q2 P2 precedence rule](2026-10-17-dg1f-t08-d6-q2-external-memory-precedence.md) (ACCEPTED, definition only). One charter for both, as both documents require.
+**Format:** follows the [T-08 slice-1 charter](2026-10-15-t08-target-path-memory-resolution-charter.md).
+
+## 1. Basis
+
+- **D5** accepted the B1 stop rule: implicit discovery stops at the nearest `.git` directory or file (existence-only, same as `setup.py:find_project_root`). Non-Git projects keep today's walk. It also accepted four conditions:
+  - §5.1: a host-visible `NO_MEMORY_SELECTED`, distinct from `PASS`;
+  - §5.2: a declared external path;
+  - §5.3: one cross-consumer stop rule;
+  - §5.4: a defined outcome for planted markers.
+- **D6/Q2** accepted P2: the repository memory `M_R` wins, and the `MNEME_MEMORY` override `M_X` only fills an absence. Its guarantee is bounded to correct boundaries and start points. It added a constraint: the §5.4 outcome must also block rule-2 substitution.
+- **Invariant both acceptances place on this charter:** *a repository-controlled boundary change must not allow an external memory override to replace governance that would otherwise apply to the target.*
+
+## 2. Invariants this charter must deliver
+
+1. **I1 Stop rule.** Every implicit-discovery consumer (§4) ends its walk by the same rule.
+2. **I2 Precedence.** `M_X` never replaces an `M_R` that the walk found.
+3. **I3 Boundary-substitution guard.** If the walk stopped at a Git marker and a memory exists above that marker, `M_X` is applied **only if it is that same memory**. This is how the §5.4 outcome blocks rule-2 substitution (§3.3).
+4. **I4 No silent anomaly.** Every anomalous selection outcome (§3.4) produces a structured outcome. Where a verified channel exists, it is also reported host-visibly (§5).
+5. **I5 No start-point change.** Each consumer's start (target, session `cwd` or `project_dir`) is unchanged (D1/D2/D7).
+
+## 3. Proposed change
+
+### 3.1 One shared resolver
+
+Add one resolver, for example `resolve_memory(start) -> MemorySelection`, in one module that every consumer imports. `MemorySelection` carries:
+- `path`: the selected memory, or `None`;
+- `source`: `discovered`, `override` or `none`;
+- `reason`: §3.4;
+- `boundary`: the Git root `R`, or `None` for no boundary;
+- `shadowed`: the nearest memory above `R`, if any; used for diagnostics and I3 only, never selected implicitly.
+
+Keep `find_memory(start) -> Optional[Path]` as a thin wrapper returning `resolve_memory(start).path`, so imports keep working. Its **semantics change** to the new rule. That change is what the freeze amendment (§9) authorizes.
+
+Factor the marker test into one helper that `setup.find_project_root` also uses. Setup's behavior does not change.
+
+### 3.2 Walk (B1)
+
+```text
+cur = resolve(start)
+loop:
+  if is_file(cur/.mneme/project_memory.json): M_R = it; stop
+  if exists(cur/.git):  R = cur; M_R = none
+                        shadowed = nearest memory strictly above R (read-only)
+                        stop
+  if cur is filesystem root: R = none; M_R = none; stop
+  cur = parent(cur)
+```
+
+- **The memory check comes before the marker check in the same directory**, so L1 (`R/.mneme` next to `R/.git`) keeps its own memory.
+- **Existence-only marker** (D5 L8a/L8b). There is no `gitdir:` parsing and no `git` call.
+- **The `shadowed` lookahead walks the same ancestors today's walk would.** Worst-case cost equals today's unbounded walk.
+
+### 3.3 Precedence (P2) with the I3 guard
+
+`M_X` is the non-empty `MNEME_MEMORY` value. Paths are compared after `resolve()`.
+
+| # | Walk result | `M_X` | Selected | `reason` |
+|---|---|---|---|---|
+| 1 | `M_R` found | unset, or equal to `M_R` | `M_R` | `DISCOVERED` |
+| 2 | `M_R` found | set, different, or missing | `M_R` | `OVERRIDE_IGNORED` |
+| 3 | no `M_R`, `shadowed` exists | an existing file equal to `shadowed` | `M_X` | `OVERRIDE_DECLARED_INHERITANCE` (D5 L5/L6 path) |
+| 4 | no `M_R`, `shadowed` exists | unset | none | `BOUNDARY_SHADOWS_MEMORY` |
+| 5 | no `M_R`, `shadowed` exists | set and not equal to `shadowed` (or missing) | none | `OVERRIDE_REFUSED_AT_BOUNDARY` |
+| 6 | no `M_R`, no `shadowed` | an existing file | `M_X` | `OVERRIDE_FILLS_ABSENCE` (U1) |
+| 7 | no `M_R`, no `shadowed` | set but missing or unreadable | none | `OVERRIDE_MISSING` |
+| 8 | no `M_R`, no `shadowed` | unset | none | `NO_MEMORY_ON_PATH` |
+
+**The adversarial case** (D6/Q2 §5 rule 2): `A/.mneme` exists, `.git` is planted at `A/src/`, the target is `A/src/app.py`, and `M_X` points at a permissive B. That is row 5: nothing is selected, the reason is visible, and B is **not** applied. Without the I3 guard, P2 rule 2 would have selected B.
+
+**What I3 costs.** A legitimate submodule or parent-fallback user can inherit only the memory directly above their boundary, by naming it in `MNEME_MEMORY` (row 3). Naming any other memory is refused (row 5). Broader external sources are DG2 declared federation, not this charter.
+
+**Residual, unchanged.** Planting a `.mneme/project_memory.json` (V3/V6) is still nearest-wins. That is D4, out of scope.
+
+### 3.4 Outcome tiers
+
+- **Anomalous:** rows 2, 4, 5 and 7. Reported host-visibly where a verified channel exists (§5).
+- **Informational:** rows 3 and 6. The override is in effect; it is recorded in structured output.
+- **Plain absence:** row 8. **Proposed refinement of D5 §5.1 (decision C2, §11):** row 8 stays "no opinion", as it is today, with a structured `NO_MEMORY_ON_PATH` where the consumer has a structured result. It is not reported on every event. Reason: with a user-wide plugin, every edit in every repository without Mneme would emit a notice, and nothing was displaced. Row 8 is still never reported as `PASS`.
+
+## 4. Consumers in scope (all at once, D5 §5.3)
+
+| Consumer | Call site today | Start (unchanged) |
+|---|---|---|
+| Claude Code direct write | `hook.py:1124` | resolved target |
+| Claude Code Bash class A | `hook.py:710` | session `cwd` |
+| Claude Code SessionStart | `hook.py:772` | session `cwd` |
+| Claude Code Stop | `hook.py:919` | session `cwd` |
+| Codex gate | `codex_cli/gate.py:155` | `cwd` |
+| Codex stop audit (baseline and Stop) | `codex_cli/stop_audit.py:121-123` (used at `:88`, `:137`) | payload `cwd` |
+| Kiro hook | `kiro/hook.py:298` | `cwd` |
+| Antigravity adapter | `antigravity/adapter.py:242` | `cwd` |
+| Agent SDK | `agent_sdk/adapter.py:336` | `project_dir` |
+| Hermes | `hermes/adapter.py:256` | `project_dir` |
+| LangChain | through its internal Agent SDK (`langchain/adapter.py:101-104`) | `project_dir` |
+
+**Unchanged** (explicit paths, not discovery, per D6/Q2 O3): constructor `memory=` in Agent SDK, Hermes and LangChain; the Codex `memory_override`; `mneme check --memory`. Constructor overrides record `source: explicit` in the trace.
+
+## 5. Host-visible channels: verify, don't assume
+
+| Host / consumer | Candidate channel for anomalous outcomes | Status at `28df1442` |
+|---|---|---|
+| Claude Code PreToolUse (direct write, Bash) | exit 0 with `hookSpecificOutput.additionalContext`, **no** `permissionDecision` | **Unverified live.** The precedent is the Agent SDK PreToolUse `additionalContext` for fail-open (`agent_sdk/adapter.py:295-304`). Must not use `defer` or `allow`: warn mode chose `defer` precisely so as not to change permissions (`hook.py:487-490`). |
+| Claude Code SessionStart / Stop | `hookSpecificOutput.additionalContext` (`_emit_stop_feedback`, `hook.py:743-758`) | In use for Stop. No recorded live visibility evidence. |
+| Agent SDK, LangChain | PreToolUse `additionalContext`, as `ACTION_FAIL_OPEN` already does. SKIP returns `{}` today (`agent_sdk/adapter.py:305`). | Code precedent. Visibility to the developer depends on the embedding host. |
+| Hermes | structured gate `reason` | Host visibility depends on the embedder |
+| Codex gate and stop audit | none proven | Non-DENY wire shapes are **unproven** (`codex_cli/gate.py:418-423`, "belongs to M1d's live probing") |
+| Kiro, Antigravity | none proven | Unknown |
+
+**Rule.** No consumer may be described as "host-visible" without a recorded live probe on a pinned host version. A consumer without a verified channel still emits the structured outcome, and the evidence record must label it **not verified visible**.
+
+**Open gate (decision C3, §11).** D5 §8 requires a verified channel per host before implementation. This charter cannot satisfy that for Codex, Kiro or Antigravity today, and it cannot land the stop rule without them (I1). See §11.
+
+## 6. Characterization test first (D5 §7.4)
+
+A **test-only PR, before any behavior change**, pins today's `main` behavior with temporary-directory layouts. Each case below asserts today's `find_memory` result:
+- **L4:** `outer/.git/` plus `outer/.mneme/`, and `outer/.worktrees/wt/.git` (a file: `gitdir: …`) with no memory. Target `outer/.worktrees/wt/app.py` selects `outer`'s memory, i.e. it **crosses** the worktree.
+- **L5:** a submodule-style `.git` file with no memory selects the outer memory.
+- **L6:** a parent memory above a repository that has none governs.
+- **L8b:** a `.git` file whose `gitdir:` target is missing is ignored by the walk.
+- **Planted marker plus override:** `A/.mneme`, `A/src/.git` and `MNEME_MEMORY` = B select B.
+
+It changes no runtime code, so it needs **no freeze amendment**. It does need explicit owner authorization (D5 §7.4: "running it is not yet authorized"). The implementation PR then flips these assertions to §3.3's outcomes, and that flip is the reviewable diff of the behavior change.
+
+## 7. Offline acceptance tests (implementation PR)
+
+1. **Stop-rule matrix:** L1, L2, L3, L4, L5, L6, L7, L8a and L8b, each with the expected `MemorySelection` (path, source, reason, boundary, shadowed).
+2. **Precedence matrix:** all eight §3.3 rows, including path equality after `resolve()`, with `MNEME_MEMORY` given as a relative path, a symlinked path and a differently-cased path on Windows.
+3. **Adversarial row 5:** planted `A/src/.git` with override B. Assert B is not selected, the reason is `OVERRIDE_REFUSED_AT_BOUNDARY`, and the hook does not exit as if it were a `PASS`.
+4. **Legitimate row 3:** a submodule whose override names the outer memory is governed by it.
+5. **Consumer parity:** each §4 consumer, given the same layout and start directory, gets the same selection. A table-driven test covers all eleven.
+6. **Flipped characterizations:** V4 → row 2 or row 7 (whichever applies); V5 and V5-own → row 2; plus the §6 characterization set.
+7. **Unchanged:** `test_memory_discovery.py` cases (tmp dirs without `.git`), every T-08 slice-1 test, the #484 coherence set, setup tests, and all strict/warn tests.
+8. **Channel shape:** the anomalous outcomes emit the §5 candidate shape. They **never** emit `permissionDecision`, and exit codes are unchanged.
+9. **Latency:** run the existing PreToolUse latency benchmark (#531/#535) and record before and after. No threshold is set here.
+
+The full canonical suite must run. A docs-only CI skip is not enough.
+
+## 8. Live evidence (separate evidence PR, separately authorized)
+
+On the pinned Claude Code host (today 2.1.202 on Windows, `claude -p`), using harness-planted state only, as in the C3/C4 plumbing probes:
+- **R0/R2 controls.**
+- **Channel probe:** is a row-2/4/5/7 notice visible to the agent, and to the user, through the §5 channel?
+- **C2 re-run:** committed `env.MNEME_MEMORY` set to B, in the R4 and own topologies. Expect `M_R` to govern, the forbidden edit refused, and `OVERRIDE_IGNORED` visible.
+- **Planted marker plus override:** expect row 5, nothing selected, a visible reason, and B never applied.
+- **L4 worktree:** expect row 4, visible.
+
+Probes on other hosts (Codex M1d, Kiro, Antigravity) are added as each host allows. Agent-written state stays out of scope. C5/C6 remain unauthorized.
+
+## 9. Required `[layer1-freeze]` amendment (not made here)
+
+After this charter merges, a separate `[layer1-freeze]` PR under Amendment Procedure §3(b) must:
+- **authorize only** §3: the shared resolver; the B1 stop rule; P2 with the I3 guard; the §3.4 outcomes; the migration of every §4 consumer to the resolver, with start points unchanged; `find_memory` kept as a wrapper with the new semantics;
+- **restate §10 as preserved**, and explicitly supersede the T-08 amendment's preserved item 3 ("`find_memory` is not modified; `MNEME_MEMORY` precedence unchanged; parent-directory fallback unchanged") **for these three points only**;
+- **leave unauthorized** everything in §10's "not authorized" list.
+
+## 10. Preserved, and not authorized
+
+**Preserved:**
+- ADR-021 fail-open and every exit code: no outcome in §3.4 blocks.
+- The #260 coherence rules (#484).
+- `mneme check`, its CLI, exit codes and `mneme.check/v1`: no new field.
+- strict/warn and path-selector semantics (ADR-017, ADR-020).
+- Each consumer's start point (D1/D2/D7).
+- Explicit constructor and CLI memory paths.
+- D4 nearest-wins inside `R`.
+- D3 out-of-root behavior (still reachable through rows 3 and 6).
+- `mneme setup` behavior.
+- Canonical authority (ADR-023, ADR-029, ADR-030, ADR-031).
+- Frozen benchmark fixtures; `.mneme/project_memory.json`.
+
+**Not authorized:**
+- implementation by this charter;
+- the freeze amendment in this PR;
+- the §6 test, until the owner says so;
+- any live probe;
+- D1, D2, D3, D4 and D7;
+- G3/G3-B authority, ADR-033, or any fail-closed or availability behavior;
+- hook registration or coverage changes;
+- new CLI flags, schemas or MCP surfaces;
+- DG2 federation;
+- C5/C6.
+
+## 11. Decisions requested of the reviewer
+
+| # | Decision | Recommendation |
+|---|---|---|
+| C1 | Is I3 (override applies at a boundary only if it equals the shadowed memory) the D5 §5.4 outcome? | **Yes.** It blocks the adversarial case, keeps the L5/L6 inheritance path, and needs no session state. The alternative, ignoring markers created during the session, needs baselines that PreToolUse does not have. |
+| C2 | Row 8 (plain absence) not reported per event: a refinement of D5 §5.1 | **Yes.** Structured `NO_MEMORY_ON_PATH` only. D5 §5.1's "never looks like `PASS`" still holds. |
+| C3 | Per-host channel gate: D5 §8 needs a verified channel per host, but I1 needs every consumer at once | **Probe Claude Code (and the Agent SDK precedent) first. For any host still unproven at implementation time, the reviewer decides between (a) waiting, or (b) shipping the structured outcome labelled "not verified visible", recorded as an explicit exception to D5 §5.1 for that host.** Never silently. |
+| C4 | Keep `find_memory` as a wrapper with new semantics, versus forcing every caller onto `resolve_memory` | Keep the wrapper for imports; migrate the in-tree consumers to `resolve_memory` so they can report |
+| C5 | `OVERRIDE_IGNORED` (row 2) on every event vs. once per session | Every event for PreToolUse consumers. It signals a misconfiguration and should stay visible until fixed. |
+
+## 12. Sequence
+
+1. **This charter**: review, then owner acceptance.
+2. **§6 characterization test PR** (test-only), after the owner authorizes it.
+3. **`[layer1-freeze]` amendment PR** (§9).
+4. **§8 channel probe** for Claude Code, recorded as evidence. This settles C3 for that host.
+5. **Implementation PR** with the §7 tests and a full-suite run, squash-merged under ADR-022.
+6. **§8 live evidence PR.**
+
+Each step needs the previous one merged.
