@@ -4,6 +4,7 @@
 **Status:** **PROPOSED, not accepted.** Docs only. This draft does not authorize implementation, tests, experiments, ADR or Layer 1 freeze amendments, or changes to C1–C4 evidence, pins or worktrees.
 **Revision 2 (2026-10-17):** adds host-visible diagnostics (§5.1), separates contract acceptance from implementation authorization (§8), records the agreed B1 decision statement (§7), and sets up one cross-consumer charter for the stop rule (§5.3). This revision itself is the only change authorized.
 **Revision 3 (2026-10-17):** folds in two independent-review checks. The stop rule governs implicit discovery only; explicit memory overrides are a Q2 question (§2, §5.3). §5.1 adds a source-verified inventory of current missing-memory behavior per consumer.
+**Revision 4 (2026-10-17):** answers the #537 review. It splits an absent Git marker from an existing but invalid one (L8a/L8b, §4 B1), states that D5 guarantees consistent walk termination but not identical memory selection across tools (§5.3), and completes the §5.1 consumer inventory.
 **Source anchor:** `MnemeHQ/mneme` `main` at `45cefa63`, read-only. `mneme/` is unchanged between `45cefa63` and this branch's base `68d1aaed`, so all line anchors hold.
 **Inputs:** T-08 charter §2–§8 ([charter](2026-10-15-t08-target-path-memory-resolution-charter.md)); [D6-Q1 review reconciliation](2026-10-17-dg1f-t08-d6-q1-review-reconciliation.md). The 2026-10-16 preliminary review and the 2026-10-17 Opus validation are unpublished working documents; their accepted corrections are recorded in the reconciliation note.
 
@@ -47,7 +48,8 @@ So **the installer already treats the nearest `.git` (directory or file) as the 
 | L5 | Submodule or nested independent repo, no memory of its own | Outer repo's memory governs | Inner `.git` file or directory. The outer memory governs a different repository because of where it sits on disk. |
 | L6 | Repo with no memory under a directory that has one (parent fallback) | Parent memory governs | Charter §8 D5: this is neither a declared DG2 source nor an authorized OSS discovery mechanism. |
 | L7 | Monorepo with nested `.mneme/` below the Git root | Nearest wins (V6) | **D4**, not D5. Both nested and outer memories sit inside one boundary. |
-| L8 | Memory inside the boundary but `.git` missing or corrupt | Walk continues upward | Same as L2 for boundary purposes. |
+| L8a | `.git` **absent** (for example, an exported tree or a deleted marker) | Walk continues upward | Same as L2: no boundary. |
+| L8b | `.git` **exists but is invalid** (for example, a `.git` file whose `gitdir:` target is missing, or a damaged `.git/` directory) | Walk continues upward (`find_memory` ignores `.git`) | `find_project_root` uses `.exists()` (`setup.py:120`), so setup already treats it as a root. Under B1 it **is a boundary** (§4). |
 
 ## 4. Candidate contracts
 
@@ -55,9 +57,13 @@ So **the installer already treats the nearest `.git` (directory or file) as the 
 
 **B1. Bound the walk at the nearest Git root (directory or file), reusing `find_project_root` semantics. Proposed.**
 - Starting at the walk's start directory, stop at the first ancestor `R` where `R/.git` exists. Consider memory only in `R` and its descendants on the path.
-- If no `.git` is found, there is no boundary: keep today's walk (L2 and L8 unchanged).
+- **Marker semantics are existence-only, deliberately the same as `find_project_root`** (`setup.py:120`, `(candidate / ".git").exists()`). A `.git` directory or file counts as a boundary whether or not Git considers it valid. D5 does not parse `gitdir:`, call `git`, or check repository integrity. Reasons:
+  1. Install and enforcement then agree on the root by construction.
+  2. Validating the marker would read and act on checkout-controlled metadata, which moves `.git` toward an identity signal (G3-B forbids relying on it).
+  3. When in doubt the rule stops *earlier*. Its worst case is `NO_MEMORY_SELECTED`, which must be visible (§5.1), never a memory from a different repository.
+- If no `.git` exists on the path, there is no boundary: keep today's walk (L2 and L8a unchanged).
 - `.git` is a **location signal only**. It is never authority, trust or identity attestation (G3-B; the review's M1).
-- Outcome per case: L1, L2, L3, L7 and L8 are unchanged. **L4 is fixed**: a worktree without memory becomes ungoverned instead of silently governed by `main`. **L5 changes**: a submodule is no longer governed by the outer memory. **L6 changes**: a parent memory above a Git root stops governing.
+- Outcome per case: L1, L2, L3, L7 and L8a are unchanged. **L8b changes** only if a memory sits above the invalid marker; it is then no longer selected. **L4 is fixed**: a worktree without memory becomes ungoverned instead of silently governed by `main`. **L5 changes**: a submodule is no longer governed by the outer memory. **L6 changes**: a parent memory above a Git root stops governing.
 
 **B2. Declared root marker** (for example a key in the memory or a sentinel file). Most explicit, but every existing install would need a migration, and it duplicates what `setup` already establishes. That makes it a D6/DG2-style declaration mechanism, not a boundary rule. Rejected for D5 and kept as a possible D6 input.
 
@@ -74,9 +80,16 @@ B1 **removes governance** in L4, L5 and L6. Today those edits are checked agains
      | Codex CLI gate | `SKIP` result with reason `"no project memory"` | `codex_cli/gate.py:150-156` |
      | Kiro hook | exit 0 | `kiro/hook.py:298-300` |
      | Antigravity adapter | emits `{}` | `antigravity/adapter.py:242-247` |
+     | Claude Code SessionStart | exit 0, no output; no baseline taken | `hook.py:772-774` |
+     | Claude Code Stop | exit 0, no output; no session-delta audit | `hook.py:919-921` |
+     | Codex stop audit: baseline and Stop | baseline returns `None`; Stop exits 0, no output | `codex_cli/stop_audit.py:88-90`, `:137-139` |
      | Agent SDK gate | `ACTION_SKIP` with `"no project memory"` | `agent_sdk/adapter.py:192-196` |
+     | Agent SDK context | empty injection; trace records `outcome="NO_MEMORY"` | `agent_sdk/adapter.py:133-140` |
+     | Hermes gates (file, patch, terminal) | `ACTION_SKIP` with `"no project memory"` | `hermes/adapter.py:286-289`, `:410-411`, `:492-493` |
+     | Hermes context | empty `ContextInjection` | `hermes/adapter.py:141-142` |
+     | LangChain | delegates to an internal Agent SDK instance, so it inherits the Agent SDK rows | `langchain/adapter.py:101-104`, `:143-146` |
 
-     A structured `SKIP` (Codex, Agent SDK) is distinguishable from `PASS` in machine-readable output, but whether the host surfaces it to the developer is unverified. Host-visible delivery is an **implementation prerequisite, not a demonstrated capability**.
+     The inventory covers every `find_memory` caller in §2. A structured `SKIP` or `NO_MEMORY` trace (Codex gate, Agent SDK, Hermes, LangChain) is distinguishable from `PASS` in machine-readable output, but **host-visible reporting is unverified for every row**, including the exit-0 rows, where nothing is emitted at all. Host-visible delivery is an **implementation prerequisite, not a demonstrated capability**.
    - Every consumer must report a distinct `NO_MEMORY_SELECTED` outcome whenever discovery selects no memory. A sub-case applies when the walk stopped at a Git boundary and a memory exists above it. Example: "memory at X is outside repository root R and was not applied".
    - That outcome must never look the same as a genuine enforcement `PASS`, either to the developer or in machine-readable output.
    - **"Visible" means a reporting channel that has been verified to reach the developer or the agent through the host.** On Claude Code, stderr from a PreToolUse hook that exits 0 is not shown to the model and is not normally shown to the user. Today the V4 skip returns 0 with no output at all (`hook.py:1125-1126`). So stderr does not satisfy this condition.
@@ -88,6 +101,7 @@ B1 **removes governance** in L4, L5 and L6. Today those edits are checked agains
 3. **One cross-consumer charter for the stop rule.**
    - **D5** defines one shared rule for **where implicit discovery stops**. It does not apply to explicit overrides (§2), which Q2 decides. A single implementation charter adopts it for every consumer in §2 at once: Claude Code direct write, Bash, SessionStart and Stop; the Codex gate and stop audit; Kiro; Antigravity; Agent SDK; Hermes; LangChain.
    - The stop rule must not land one adapter at a time. Otherwise one session gets different governance depending on which tool the agent uses.
+   - **What D5 does and does not guarantee.** D5 guarantees that every consumer **terminates** its walk by the same rule. It does **not** guarantee that every tool selects the **same governing memory** for the same target, because start points differ. Example: the Claude Code direct-write path starts at the resolved target, while Bash starts at the session `cwd` (`hook.py:710` vs. `:1124`). A Bash write to `repo_a/app.py` from a session in `repo_b` can therefore still select `repo_b`'s memory after D5. Identical selection across tools needs D1/D2/D7 as well.
    - **D1/D2/D7** stay separately gated. They decide **where each adapter starts** discovery (target or session `cwd`/`project_dir`). D5 does not change any start point.
    - **D6/Q2** decides external-memory precedence and compatibility, and must be resolved before D5 implementation is authorized.
 
