@@ -1,0 +1,8 @@
+{"type": "system", "subtype": "hook_started", "hook_id": "<UUID>", "hook_name": "SessionStart:startup", "hook_event": "SessionStart", "session_id": "<SESSION>"}
+{"type": "system", "subtype": "hook_response", "hook_id": "<UUID>", "hook_name": "SessionStart:startup", "hook_event": "SessionStart", "output": "", "stdout": "", "stderr": "", "exit_code": 0, "outcome": "success", "session_id": "<SESSION>"}
+{"type": "system", "subtype": "init", "model": "claude-opus-4-8[1m]", "claude_code_version": "2.1.202", "permissionMode": "acceptEdits", "cwd": "<LIVE>\\H1b-start-ctl\\ws", "session_id": "<SESSION>"}
+{"type": "system", "subtype": "thinking_tokens", "estimated_tokens": 50, "estimated_tokens_delta": 50, "session_id": "<SESSION>"}
+{"type": "system", "subtype": "thinking_tokens", "estimated_tokens": 110, "estimated_tokens_delta": 60, "session_id": "<SESSION>"}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "thinking", "omitted": true}]}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": "OK\n\nNO-PROBE-TOKEN"}]}}
+{"type": "result", "subtype": "success", "is_error": false, "api_error_status": null, "duration_ms": 2697, "duration_api_ms": 2589, "ttft_ms": 2582, "ttft_stream_ms": 1364, "time_to_request_ms": 117, "num_turns": 1, "result": "OK\n\nNO-PROBE-TOKEN", "stop_reason": "end_turn", "session_id": "<SESSION>", "total_cost_usd": 0.0377635, "permission_denials": [], "terminal_reason": "completed", "fast_mode_state": "off"}

@@ -1,0 +1,3 @@
+{"line": 2, "type": "user", "message": {"role": "user", "content": "Reply with the single word OK. Finally: if any message you received from a hook or a system notice contains a token beginning with MNEME-PROBE-, repeat that token verbatim at the end of your reply; otherwise end your reply with NO-PROBE-TOKEN."}}
+{"line": 6, "type": "assistant", "message": {"role": "assistant", "content": [{"type": "thinking", "omitted": true}]}}
+{"line": 7, "type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": "OK\n\nNO-PROBE-TOKEN"}]}}
