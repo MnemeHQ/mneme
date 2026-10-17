@@ -67,6 +67,9 @@ def summarize(samples_ms: List[float]) -> dict:
 def _env(transport: Optional[str], pythonpath: str) -> Dict[str, str]:
     env = dict(os.environ)
     env.pop("MNEME_HOOK_CHECK_TRANSPORT", None)
+    # Real installs run from cached bytecode. Inheriting a no-bytecode shell
+    # setting made every run recompile mneme (first 2026-10-16 results).
+    env.pop("PYTHONDONTWRITEBYTECODE", None)
     if transport:
         env["MNEME_HOOK_CHECK_TRANSPORT"] = transport
     if pythonpath:
@@ -102,6 +105,14 @@ def run_once(python: str, project: Path, scenario: Scenario, transport: str) -> 
         "tool_input": {"file_path": str(target), "content": scenario.new_string},
     })
     return _timed([python, "-c", HOOK_CMD], project, _env(transport, _PYTHONPATH), envelope)
+
+
+def precompile(python: str, package_dir: Path) -> None:
+    """Write bytecode for ``package_dir`` with the measured interpreter."""
+    subprocess.run(
+        [python, "-m", "compileall", "-q", str(package_dir)],
+        check=True, capture_output=True, env=_env(None, _PYTHONPATH),
+    )
 
 
 def _describe(python: str) -> dict:
@@ -153,6 +164,12 @@ def main(argv: Optional[List[str]] = None) -> int:
     args = ap.parse_args(argv)
     _PYTHONPATH = args.pythonpath
 
+    info = _describe(args.python)
+    if "mneme_file" not in info:
+        print(f"could not import mneme with {args.python}: {info}", file=sys.stderr)
+        return 1
+    precompile(args.python, Path(info["mneme_file"]).parent)
+
     cells: List[Tuple[str, Optional[Scenario], Optional[str]]] = [
         (f"{s}/{t}", SCENARIOS[s], t) for s in SCENARIOS for t in TRANSPORTS
     ] + [(name, None, None) for name in BASELINES]
@@ -177,9 +194,9 @@ def main(argv: Optional[List[str]] = None) -> int:
                     samples[name].append(ms)
 
     result = {
-        **_describe(args.python),
+        **info,
         "settings": {"runs": args.runs, "warmup": args.warmup, "python": args.python,
-                     "pythonpath": args.pythonpath},
+                     "pythonpath": args.pythonpath, "bytecode": "precompiled"},
         "cells": {name: {"summary": summarize(s), "samples_ms": [round(x, 2) for x in s]}
                   for name, s in samples.items()},
     }

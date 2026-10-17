@@ -11,6 +11,8 @@ Measures how long `mneme-hook` takes to answer one PreToolUse event, end to end,
 | `baseline/python_pass` | `python -c pass`: bare interpreter startup |
 | `baseline/import_hook` | `python -c "import mneme.integrations.claude_code.hook"`: startup plus hook import |
 
+Before timing, the harness byte-compiles the measured `mneme` package with the measured interpreter. It also removes `PYTHONDONTWRITEBYTECODE` from every run's environment. Real installs run from cached bytecode; without this, each run recompiles mneme from source, which inflated the first 2026-10-16 results by roughly 100 ms per import of `mneme.cli`.
+
 Every run's exit code is checked: 0 for allowed, 2 for blocked. If any run gives the wrong verdict, the harness exits 1 and writes nothing.
 
 ## Run
