@@ -1,7 +1,7 @@
-# D6/Q2: External-memory precedence and compatibility (PROPOSED)
+# D6/Q2: External-memory precedence and compatibility (ACCEPTED: definition only)
 
 **Date:** 2026-10-17
-**Status:** **PROPOSED, not accepted.** Architecture assessment, docs only. It does not authorize implementation, tests, experiments, C5/C6, ADR or Layer 1 freeze amendments, ADR-033 changes, or changes to C1–C4 evidence, pins or worktrees.
+**Status:** **ACCEPTED as the D6 precedence definition (P2) only** (owner approval, 2026-10-17, following an independent-review ACCEPT on `972712c9`). Architecture assessment, docs only. Acceptance does not authorize implementation, tests, experiments, C5/C6, ADR or Layer 1 freeze amendments, ADR-033 changes, or changes to C1–C4 evidence, pins or worktrees.
 **Revision 2 (2026-10-17):** answers the #538 review. It narrows P2's guarantee to correct boundary resolution and start points (§5, §8), ties rule 2 to D5 §5.4 with an added override constraint (§5, §7), and adds §5.4 to the implementation prerequisites (§10). The P2 rule itself is unchanged.
 **Source anchor:** `MnemeHQ/mneme` `main` at `28211f8b`, read-only.
 **Inputs:**
@@ -120,10 +120,12 @@ No. C5 (`export` in the Bash tool) and C6 (persistence after C3) test **who** ca
 
 | Stage | Prerequisite | Status |
 |---|---|---|
-| **Q2 assessment acceptance** (P2 becomes the accepted D6 precedence *definition*) | Independent review of this document | **Pending** |
+| **Q2 assessment acceptance** (P2 becomes the accepted D6 precedence *definition*) | Independent review of this document | **Done** (review ACCEPT on `972712c9`; owner approval 2026-10-17) |
 | **D5 implementation authorization** | Q2 accepted, plus D5 §5.1 verified host-visible channel, §5.4 planted-marker outcome, §7.4 L4 characterization test | Blocked |
 | **D6 (P2) implementation authorization** | Q2 accepted, plus its own charter and Layer 1 freeze amendment (it changes `find_memory`), plus the same host-visible channel as D5 §5.1, plus the D5 §5.4 planted-marker outcome defined **including** the rule-2 override case | Blocked |
 
 D5 and P2 both change `find_memory`. They **should share one implementation charter** so the stop rule and the precedence rule land together across every consumer. Landing them separately would leave a window in which, for example, the boundary exists but the override can still replace `M_R`.
 
-**Next gate:** an independent review of this assessment. This document authorizes only itself.
+**Invariant for the shared implementation charter** (from the accepting review): *a repository-controlled boundary change must not allow an external memory override to replace governance that would otherwise apply to the target.* The charter must include the combined planted-marker and override adversarial case (§5 rule 2) and the host-visible diagnostics (D5 §5.1).
+
+**Next gate:** scope the shared D5 + P2 implementation charter. This acceptance does not authorize that charter, a Layer 1 freeze amendment, tests, experiments or runtime changes.
