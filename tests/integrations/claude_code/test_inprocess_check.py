@@ -97,3 +97,27 @@ def test_inprocess_uses_hook_package_tree():
     import mneme.cli
 
     assert Path(mneme.cli.__file__).resolve().parents[1] == hook._PACKAGE_ROOT
+
+
+@pytest.mark.parametrize("raised,expected_rc,expected_err", [
+    (SystemExit(None), 0, ""),
+    (SystemExit("bad thing"), 1, "bad thing"),
+    (SystemExit(3), 3, ""),
+])
+def test_inprocess_systemexit_matches_interpreter(monkeypatch, raised, expected_rc, expected_err):
+    import mneme.cli
+
+    def fake_main(argv):
+        raise raised
+
+    monkeypatch.setattr(mneme.cli, "main", fake_main)
+    result = run_check_inprocess(["check"])
+    assert result.returncode == expected_rc
+    assert expected_err in result.stderr
+
+
+def test_inprocess_none_return_is_zero(monkeypatch):
+    import mneme.cli
+
+    monkeypatch.setattr(mneme.cli, "main", lambda argv: None)
+    assert run_check_inprocess(["check"]).returncode == 0

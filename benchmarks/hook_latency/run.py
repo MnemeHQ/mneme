@@ -33,6 +33,7 @@ HOOK_CMD = "from mneme.integrations.claude_code.hook import cli_main; cli_main()
 BASELINES = {
     "baseline/python_pass": "pass",
     "baseline/import_hook": "import mneme.integrations.claude_code.hook",
+    "baseline/import_cli": "import mneme.integrations.claude_code.hook, mneme.cli",
 }
 
 

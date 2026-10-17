@@ -38,7 +38,7 @@ def test_stop_path_never_uses_inprocess(repo, monkeypatch):  # noqa: F811
     def boom(argv):
         raise AssertionError("Stop path must stay on the subprocess transport")
 
-    monkeypatch.setattr(hook, "run_check_inprocess", boom)
+    monkeypatch.setattr(hook, "_invoke_check_inprocess", boom)
     assert _run(_session_start(repo))[0] == 0
     (repo / "storage_db.py").write_text("import psycopg2\n", encoding="utf-8")
     rc, _, out = _run(_stop_event(repo))
@@ -74,3 +74,15 @@ def test_inprocess_timeout_fails_open(tmp_path):
     assert proc.returncode == 0
     assert "failing open" in proc.stderr.lower()
     assert elapsed_s < 4
+
+
+def test_hook_import_does_not_load_inprocess_machinery():
+    # The default subprocess path must not pay for the benchmark-only transport.
+    probe = (
+        "import sys, mneme.integrations.claude_code.hook; "
+        "print('mneme.integrations.claude_code.inprocess_check' in sys.modules)"
+    )
+    proc = subprocess.run([sys.executable, "-c", probe], capture_output=True,
+                          text=True, env=hook._child_env())
+    assert proc.returncode == 0, proc.stderr
+    assert proc.stdout.strip() == "False"

@@ -41,6 +41,6 @@ def test_real_smoke_both_transports(harness, tmp_path):
     assert {
         "edit_allowed/subprocess", "edit_allowed/inprocess",
         "edit_blocked/subprocess", "edit_blocked/inprocess",
-        "baseline/python_pass", "baseline/import_hook",
+        "baseline/python_pass", "baseline/import_hook", "baseline/import_cli",
     } <= set(data["cells"])
     assert data["cells"]["edit_blocked/inprocess"]["summary"]["n"] == 2

@@ -30,10 +30,19 @@ def run_check_inprocess(argv: List[str]) -> subprocess.CompletedProcess:
         try:
             returncode = cli.main(list(argv))
         except SystemExit as e:
-            returncode = e.code if isinstance(e.code, int) else 1
+            # Same mapping the interpreter applies at exit.
+            if e.code is None:
+                returncode = 0
+            elif isinstance(e.code, int):
+                returncode = e.code
+            else:
+                err.write(f"{e.code}\n")
+                returncode = 1
         except Exception:
             err.write(traceback.format_exc())
             returncode = 1
+    if returncode is None:  # `raise SystemExit(main())` with a None return exits 0
+        returncode = 0
     return subprocess.CompletedProcess(
         args=list(argv), returncode=returncode, stdout=out.getvalue(), stderr=err.getvalue()
     )

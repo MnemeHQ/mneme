@@ -17,13 +17,10 @@ import os
 import subprocess
 import sys
 import tempfile
-import threading
-import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Optional, TextIO
 
-from mneme.integrations.claude_code.inprocess_check import run_check_inprocess
 from mneme.integrations.claude_code.session_state import (
     MAX_FILE_BYTES,
     capture_baseline,
@@ -604,6 +601,12 @@ def _inprocess_timeout(timeout: float) -> None:
 
 
 def _invoke_check_inprocess(argv: list) -> subprocess.CompletedProcess:
+    # Imported here so the default subprocess path never pays for them.
+    import threading
+    import time
+
+    from mneme.integrations.claude_code.inprocess_check import run_check_inprocess
+
     # benchmark/test seam: both variables are read only on this branch.
     timeout = float(os.environ.get("MNEME_HOOK_CHECK_TIMEOUT_TEST", _CHECK_TIMEOUT_SECONDS))
     watchdog = threading.Timer(timeout, _inprocess_timeout, args=(timeout,))
