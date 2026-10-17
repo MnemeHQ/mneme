@@ -1,6 +1,6 @@
-# DG1F T-08 D5 + P2: H1 evidence-classification rule review (PROPOSED)
+# DG1F T-08 D5 + P2: H1 evidence-classification rule review (ACCEPTED: rules only)
 
-**Status:** **PROPOSED, not accepted.** Docs only. It proposes three changes to the H1 classifier's category and comparison rules, and it does **not** reclassify anything. It authorizes no classifier code change, no reclassification run, no live probe, no runtime change and no Stop-path decision (§6).
+**Status:** **ACCEPTED as the H1 classification rules R1–R3 only** (owner approval 2026-10-17, following an independent-review ACCEPT on `c729686d`). Docs only. It does **not** reclassify anything. Acceptance authorizes no classifier code change, no reclassification run, no live probe, no runtime change and no Stop-path decision (§6).
 
 **Anchor:** `main` @ `de4766ea`.
 **Revision 2 (2026-10-17):** answers the #551 review. It narrows the reproducibility claim and adds a completeness check for material the collector omitted (§5), and it corrects the SessionStart ordering (§2). R1–R3 are unchanged.
