@@ -6,6 +6,8 @@
 - Side-effect criteria are narrowed to host-induced effects; turn count and model text are evidence only (§3, §6).
 - Developer-only delivery may pass any path, recorded separately from agent delivery (§3, §6, D3).
 - An explicit H2a equivalence mapping against the committed M1d-a artifacts is added (§4.1).
+
+**Revision 3 (2026-10-17):** answers the #545 re-review. The emitter mechanism and the side-effect control are now specific to each **path type**: command hook on a tool event, command hook on a lifecycle event, in-process callback, and middleware (§3.1). The nonce, evidence, audience and non-interference requirements stay common. No gate, decision or D5/P2 semantics change.
 **Parent:** charter §5 (gate rule) and §12 step 3. The format follows the D6 scopes [#519](2026-10-15-dg1f-t08-d6-mneme-memory-live-scope.md) and [#527](2026-10-16-dg1f-t08-d6-c4-local-settings-scope.md).
 
 ## 1. Where this sits
@@ -18,7 +20,7 @@ For each output path P, two questions:
 
 > **Q-P1.** Does the candidate wire shape for P, emitted at P's event with exit 0, reach the **agent's context** (or the developer) on the pinned host?
 >
-> **Q-P2.** Does it do so **without host-induced side effects**? The host must still execute the tool call. It must not change a permission prompt or decision, and it must not itself block, retry or force a continuation. Differences in what the model says or how many turns it takes are **not** side effects: a delivered notice is expected to influence the model.
+> **Q-P2.** Does it do so **without host-induced side effects**, judged by the control for P's path type (§3.1)? The host's normal flow for that path must continue. Depending on the type, that means the tool still executes, the session still starts or ends normally, the callback's return is not treated as a block, or the tool result is otherwise preserved. No permission prompt or decision may change, and the host must not itself block, retry or force a continuation. Differences in what the model says or how many turns it takes are **not** side effects: a delivered notice is expected to influence the model.
 
 Q-P2 matters because a channel that delivers a notice by blocking or re-prompting is not a notice. Codex Stop `decision: block` is an example: it is proven live, but it forces continuation, so it does not qualify (§4, H2b).
 
@@ -26,23 +28,32 @@ Q-P2 matters because a channel that delivers a notice by blocking or re-promptin
 
 The §3.3 outcomes do not exist in code yet, and implementing them is not authorized. So each probe tests the **delivery channel** directly:
 
-1. **Harness-only emitter.** A probe-only command, outside `mneme/`, is registered for P's event in place of the Mneme hook. It reads the host envelope, writes it to the hook log, and emits P's candidate wire shape (§4) carrying a fresh nonce `MNEME-PROBE-<16 hex>`. It exits 0. It runs no Mneme code, so the probes need **no freeze amendment** and do not depend on Mneme's version.
+1. **Harness-only emitter.** A probe-only emitter, outside `mneme/` and running no Mneme code, replaces the Mneme integration at P's surface and produces P's candidate shape (§4) carrying a fresh nonce `MNEME-PROBE-<16 hex>`. **What "emitter" means depends on P's path type** (§3.1): a command for hook paths, a registered callback for in-process paths, or a middleware for LangChain. It also logs what it received and what it produced. The probes therefore need **no freeze amendment** and do not depend on Mneme's version.
 2. **Recorded delivery** (primary evidence). The nonce appears in a message delivered to the model, in the host's own session record. Examples: Claude Code stream-json or the session transcript, the Codex rollout, the SDK message stream, the LangChain model input.
 3. **Echo** (secondary evidence). The prompt asks the agent to repeat verbatim any token beginning `MNEME-PROBE-` that it received from a hook or system notice. An echo without recorded delivery is `INCONCLUSIVE`. Recorded delivery without an echo still passes.
-4. **Side-effect controls.** Each probe runs **paired with a no-emitter control**: same prompt, same tool call, emitter replaced by an exit-0 no-op. The pair is used to **attribute** differences, not to require identical transcripts. **Pass/fail criteria (host-induced only):**
-   - the tool executed (the host applied it, and its result is not an error);
-   - the permission prompt or decision is unchanged;
-   - the host did not block, retry or force a continuation (for example, no Stop-`block`-style re-entry);
-   - the file bytes match the control **where the host applied the same tool input**.
+4. **Side-effect controls.** Each probe runs **paired with a no-emitter control**: the same prompt and flow, with the emitter replaced by the path type's no-op (§3.1). The pair is used to **attribute** differences, not to require identical transcripts. **Pass/fail criteria are host-induced only, and they are the path type's control in §3.1**, plus two common to every path:
+   - **common:** the permission prompt or decision is unchanged wherever the host has one;
+   - **common:** the host did not block, retry or force a continuation because of the emitter's output.
 
    **Recorded as evidence only, never pass/fail:** turn count, model reply text, extra model-chosen tool calls, and whether the agent echoed the nonce. The echo request in step 3 is expected to change the reply; the probe records that rather than failing on it.
-5. **Shape binding.** The implementation PR must emit the probed shape for P byte-structurally: the same event, the same JSON keys, the same exit code. An offline test must compare that shape against the recorded probe payload. A passing probe is evidence **for that shape only**.
+5. **Shape binding.** The implementation PR must reproduce the probed form for P structurally: the same surface and event, the same keys or fields, and the same exit code where the path has one. That covers a command's JSON and exit code, a callback's returned dict, or a middleware's message annotation. An offline test must compare it against the recorded probe output. A passing probe is evidence **for that form only**.
+
+### 3.1 Emitter and control by path type
+
+| Path type | Paths | Emitter | No-op for the paired control | Host-induced side-effect control (pass/fail) |
+|---|---|---|---|---|
+| **Command hook, tool event** | H1a, H2a, H3a, H4a | probe command registered for the tool event; writes the candidate JSON or stdout; exits 0 | command that writes nothing and exits 0 | the tool executes (the host applies it and its result is not an error); file bytes match the control where the host applied the same tool input |
+| **Command hook, lifecycle event** | H1b (SessionStart), H1c (Stop), H2b (Codex Stop) | probe command registered for the lifecycle event; writes the candidate JSON; exits 0. No tool call is involved. | same as above | the session **starts** (H1b) or **ends** (H1c, H2b) normally: no forced continuation, no host-driven extra turn or re-entry, and the exit status matches the control |
+| **In-process callback** | H5a (SDK PreToolUse), H5b (SDK context injection), H6a (Hermes tool-call notice), H6b (Hermes `pre_llm_call`) | probe callback registered **in place of** the adapter's callback through the host's own registration API; **returns** the candidate value: a dict such as `hookSpecificOutput`, or Hermes `{"context": ...}`. There is no stdout or exit code. | callback returning the host's "no opinion" value (`{}` or `None`) | the host's normal flow continues: the tool still **dispatches** (H5a, H6a), or the turn still **proceeds** (H5b, H6b). The host does not treat the return value as a block or deny. For H6a, shape discovery comes first (§5), because `pre_tool_call` offers only a block or nothing. |
+| **Middleware** | H5c (LangChain) | probe middleware inserted into LangChain's **real** middleware chain that annotates the actual `ToolMessage` on its way back to the model | pass-through middleware | the annotation reaches the model input; the tool result's content and status are otherwise **unchanged** versus the control; the tool still runs once |
+
+**Common to every path type:** the fresh nonce; recorded delivery as primary evidence and the echo as secondary; the audience recorded (`agent`, `developer` or both); the two common criteria in §3 step 4; and shape binding.
 
 **Visibility target.** D5 §5.1 accepts the developer **or** the agent, and this scope uses exactly that criterion on **every** path. Agent delivery is established from the host's session record (headless or interactive). Developer delivery is established only by an operator-observed interactive run with capture (screen recording or host UI log), and it is never inferred. Each path records **which audience was reached** (`agent`, `developer`, or both), so the implementation charter knows where the agent will not see the notice.
 
 ## 4. Probe set: twelve output paths
 
-| Path | Event / surface | Candidate shape (exit 0) | Existing evidence (`5d8bf82a`) | Probe needed |
+| Path | Event / surface | Candidate shape (exit 0 where the path type has an exit code; §3.1) | Existing evidence (`5d8bf82a`) | Probe needed |
 |---|---|---|---|---|
 | **H1a** | Claude Code PreToolUse, direct write **and** Bash matchers | `hookSpecificOutput: {hookEventName: "PreToolUse", additionalContext}` with **no** `permissionDecision` | **None.** Only exit 2 with stderr is proven (G1 live record; T-08 re-probe). `defer`/`allow` must not be used (`hook.py:487-490`). | **Yes.** Two sub-probes: an Edit and a Bash command. |
 | **H1b** | Claude Code SessionStart | `hookSpecificOutput: {hookEventName: "SessionStart", additionalContext}`; plain stdout recorded as a variant | **None.** Every live registration so far was PreToolUse only (C1:114, C2:172, C4:142). | **Yes** |
@@ -92,10 +103,10 @@ Every harness gets an offline self-test, with a stub host where one is possible,
 
 | Label | Criteria |
 |---|---|
-| `DELIVERED_TO_AGENT` | The nonce appears in a model-bound message in the host's session record, **and** every host-induced side-effect criterion (§3 step 4) holds. Sub-fields: `echoed` (true/false); `developer_also` (true, false or `not_observed`); `turns` and `turns_control` (evidence only). **Passes** the path. |
-| `DELIVERED_TO_USER_ONLY` | The nonce is shown to the developer in an operator-observed, captured interactive run; it is absent from every model-bound message; and every host-induced side-effect criterion holds. **Passes** the path under D5 §5.1 (developer **or** agent), on **any** path, and is reported separately from agent delivery. |
-| `DELIVERED_WITH_SIDE_EFFECT` | The nonce is delivered, but a **host-induced** criterion fails: the tool did not execute; a permission prompt or decision changed; or the host blocked, retried or forced a continuation. Model-chosen differences (reply text, turn count, extra tool calls) never produce this label. **Fails** the path. |
-| `NOT_DELIVERED` | The emitter ran (hook log shows the event and the emitted bytes), and the nonce is in no model-bound message and no observed UI. **Fails** the path. |
+| `DELIVERED_TO_AGENT` | The nonce appears in a model-bound message in the host's session record, **and** the path type's control (§3.1) plus the common criteria (§3 step 4) hold. Sub-fields: `path_type`; `echoed` (true/false); `developer_also` (true, false or `not_observed`); `turns` and `turns_control` (evidence only). **Passes** the path. |
+| `DELIVERED_TO_USER_ONLY` | The nonce is shown to the developer in an operator-observed, captured interactive run; it is absent from every model-bound message; and the path type's control plus the common criteria hold. **Passes** the path under D5 §5.1 (developer **or** agent), on **any** path, and is reported separately from agent delivery. |
+| `DELIVERED_WITH_SIDE_EFFECT` | The nonce is delivered, but the path type's control or a common criterion fails. Examples: the tool did not execute or dispatch; the session did not start or end normally; the host treated a callback return as a block; the tool result changed beyond the annotation; a permission changed; or the host retried or forced a continuation. Model-chosen differences (reply text, turn count, extra tool calls) never produce this label. **Fails** the path. |
+| `NOT_DELIVERED` | The emitter ran (its log shows the surface was invoked and what it produced), and the nonce is in no model-bound message and no observed UI. **Fails** the path. |
 | `NO_NONBLOCKING_CHANNEL` | Shape discovery (H4a, H6a) found no exit-0 shape the host accepts without side effects. **Fails** the path. |
 | `EVIDENCE_REUSED` | Decision D1 applies, and the §4.1 equivalence mapping shows every §6 criterion as **covered** by committed artifacts: same host version, same event, same shape. **Passes** the path, citing the record. A criterion mapped **not covered** requires a targeted re-run of that criterion only. |
 | `NOT_EXECUTED` | Preconditions not met: pin mismatch, credentials absent, emitter not registered, no session record. **Never** a negative result. |
