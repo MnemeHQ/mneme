@@ -126,7 +126,7 @@ here.
 | # | Precondition |
 |---|---|
 | P1 | This charter is accepted by PR review |
-| P2 | **Verified execution of the pinned evaluator** (§4a). The exact installed build must reproduce the CI1.2 corpus (`tests/fixtures/ci1_contract/**`: `cases.json` and golden payloads). `v0.10.0` carries `evaluation_complete`, `rule_id` and `decision_version_id`, but the corpus was validated against `main`, not that release. If parity fails, pin a `MnemeHQ/mneme` commit build instead and record why |
+| P2 | **Verified execution of the pinned evaluator** (§4a). The exact installed build must reproduce the CI1.2 corpus (`tests/fixtures/ci1_contract/**`: `cases.json` and golden payloads). The pinned evaluator is an immutable `MnemeHQ/mneme` commit build, identified by commit SHA and wheel sha256 and never by version string. `mneme-hq` 0.10.0 fails parity: it cannot load decision-index v2, and its check records lack `rule_id` and `decision_version_id` ([P2 record](../validation/ci1-3-p2-pinned-evaluator-preflight-2026-10-17.md)). **Not yet satisfied for the lab:** commit-build parity has only run on Windows, not the planned Linux runner, and the wheel hash has not been independently reproduced (the build backend is not hash-locked). Linux verification of the chosen commit-and-wheel pin comes next, before §9 approval |
 | P3 | Lab repository name, owner and visibility are approved (§9) |
 | P4 | The lab ruleset is written down **before** it is applied: target branch, required check context and `integration_id`, `bypass_actors: []`, required approvals, `strict_required_status_checks_policy` |
 | P5 | The experimenter's merge attempts use the API (`PUT /repos/{o}/{r}/pulls/{n}/merge` with `sha`), so the refusal is a recorded HTTP response and not a screenshot |
@@ -165,15 +165,13 @@ the existing runners, or any fixture expectation. Where the release differs
 from a golden, the release fails parity. The `v1` goldens are never edited to
 fit it.
 
-**P2 result (2026-10-17, offline):** `mneme-hq==0.10.0` **fails** parity
-([record](../validation/ci1-3-p2-pinned-evaluator-preflight-2026-10-17.md)).
-It cannot load the corpus's `mneme.decision-index/v2` memory, and its `check`
-records carry no `rule_id` or `decision_version_id`, contrary to the P2 row
-above. The fallback applies: pin a `MnemeHQ/mneme` commit build. A build of
+**P2 result (2026-10-17, offline, Windows):** see the
+[record](../validation/ci1-3-p2-pinned-evaluator-preflight-2026-10-17.md).
+`mneme-hq==0.10.0` fails, for the reasons in the P2 row. A commit build of
 `main` @ `0b74d410` reproduces the whole corpus, the ADR-005 cross-check and
-the classifier checks. Pin it by commit SHA and wheel sha256, never by
-version, because `main` still reports `0.10.0`. Choosing the pin remains part
-of the §9 approvals.
+the classifier checks. `main` still reports version `0.10.0`, which is why the
+pin cannot be a version string. The open limits are listed in the P2 row.
+Choosing the pin remains part of the §9 approvals.
 
 ## 5. Lab fixture
 

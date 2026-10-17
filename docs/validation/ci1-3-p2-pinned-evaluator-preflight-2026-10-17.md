@@ -89,8 +89,9 @@ canonical rule identity on `mneme check` records (DG1E evidence identity,
 These causes are attributed from the observed error and missing fields plus
 the merge dates. They were not bisected.
 
-**Correction to the charter.** P2 says that `v0.10.0` "carries
-`evaluation_complete`, `rule_id` and `decision_version_id`". The `0.10.0`
+**Correction to the charter.** The merged P2 row (#541) said that `v0.10.0`
+"carries `evaluation_complete`, `rule_id` and `decision_version_id`". This PR
+replaces that row. The `0.10.0`
 check payload carries `evaluation_complete`, but its `applicability` and
 `violations` records carry neither `rule_id` nor `decision_version_id`, and it
 cannot load a v2 decision index at all.
