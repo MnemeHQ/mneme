@@ -2,6 +2,8 @@
 
 Plan: `docs/plans/2026-10-16-hook-check-latency-benchmark.md`. Tracking: MnemeHQ/mneme-growth-ops#60.
 
+> **Correction (later on 2026-10-16):** the results below were measured without cached bytecode, so every run recompiled mneme from source. They overstate absolute latency. See [Correction: with cached bytecode](#correction-with-cached-bytecode) at the end; the decision is unchanged.
+
 **Scope: Windows only, so the decision below is provisional.** The plan's first decision rule asks about "all platforms", and Linux and macOS have not been measured.
 
 ## Setup
@@ -78,3 +80,39 @@ Applying the plan's rule:
 - Larger, real-world memory files, where load and evaluation (currently ~15 ms) could grow.
 - Cold-cache first runs (warmups were discarded).
 - **Watchdog limitation (in-process only):** the 10 s fail-open timer is a Python thread, so it cannot interrupt a check stuck inside a single C call that holds the GIL, such as catastrophic regex backtracking. The subprocess timeout can kill such a child. This needs addressing before in-process is ever considered for production.
+
+## Correction: with cached bytecode
+
+**What went wrong.** The harness inherited `PYTHONDONTWRITEBYTECODE=1` from the agent shell it was started from, and it ran in a fresh worktree with no `__pycache__`. Together those meant every run recompiled every `mneme` module from source. Real installs don't do that: the uv-installed `mneme-hq` has bytecode for every module on the check path. The harness now removes the variable and byte-compiles the measured package before timing (`fix/bench-bytecode`).
+
+**Re-run:** 50 runs + 5 warmup per cell, every verdict correct, `settings.bytecode = "precompiled"`.
+
+| p50 / p95 ms | editable 3.12 | installed copy 3.12 | uv `mneme-hq` interpreter 3.13 (pinned to branch) |
+|---|---|---|---|
+| `edit_*/subprocess` (today) | 426 / 446–453 | 491–502 / 555–571 | 551–554 / 592–595 |
+| `edit_*/inprocess` | 272–273 / 287–292 | 321 / 352–363 | 382–386 / 419–422 |
+| `baseline/python_pass` | 75 / 80 | 119 / 133 | 62 / 66 |
+| `baseline/import_hook` | 132 / 145 | 177 / 205 | 185 / 200 |
+| `baseline/import_cli` | 256 / 271 | 306 / 356 | 365 / 399 |
+
+Files: `results/2026-10-16-win-{editable,installed,uvtool-py313}-bytecode.json`. The uv run uses the interpreter real hooks run under (`mneme-hq` via `uv tool`), with `PYTHONPATH` pinned to the branch code.
+
+**Attribution (p50):**
+
+| Component | editable | installed | uv 3.13 |
+|---|---|---|---|
+| (e) `mneme.cli` import (`import_cli` − `import_hook`) | 124 | 128 | 180 |
+| (d) in-process check (`inprocess` − `import_hook`) | 140 | 144 | 199 |
+| (d) − (e): memory load + evaluation | ~16 | ~16 | ~19 |
+| (c) − (d): second process | 153–154 | 169–181 | 165–172 |
+| In-process cut in p95 | 35–36% | 35–38% | 29–30% |
+
+**What changes:**
+- **Absolute latency is lower** than first reported. Today's subprocess p50 is 426–554 ms, not 506–616 ms. It's still above the plan's 300 ms threshold.
+- **The `mneme.cli` import is still most of the check work:** 89–90% of (d).
+- **In-process now cuts 29–38% of p95,** still under the plan's 40% bar.
+- **The decision rows give the same answers:** the latency is real; in-process stays below 40%; interpreter start is not most of it; check work dominates.
+- **Revised estimate for the planned lazy-import change:** importing only what `check` needs costs ~86–88 ms with bytecode, against ~156–158 ms for the full `mneme.cli` (separate measurements, 3.12). So the expected saving is about **70 ms per write**, not ~100 ms.
+
+**New observation (uv 3.13 interpreter):** the hook's own import costs ~123 ms there, against ~58 ms on 3.12. The stdlib imports are heavier on that interpreter, and `difflib` alone is ~27 ms. That's a second lazy-import candidate, in `hook.py`. It hasn't been profiled further.
+
