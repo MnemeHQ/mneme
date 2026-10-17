@@ -10,6 +10,9 @@ Modes (probe scope section 3.1):
   pretooluse    command hook, tool event       -> PreToolUse additionalContext
   sessionstart  command hook, lifecycle event  -> SessionStart additionalContext
   stop          command hook, lifecycle event  -> Stop additionalContext
+  stop-systemmessage  command hook, lifecycle event -> Stop TOP-LEVEL systemMessage
+                (Amendment A1, probe scope 4.2): no hookSpecificOutput, no decision,
+                no continue, no stopReason
   noop          the paired control's no-op     -> writes nothing
 
 Every mode exits 0 and never emits ``permissionDecision`` (scope section 4,
@@ -38,7 +41,7 @@ def notice(nonce):
 
 
 def main(argv):
-    if len(argv) != 3 or argv[1] not in ("pretooluse", "sessionstart", "stop", "noop"):
+    if len(argv) != 3 or argv[1] not in ("pretooluse", "sessionstart", "stop", "stop-systemmessage", "noop"):
         print(f"emitter: bad arguments {argv[1:]!r}", file=sys.stderr)
         return 0  # never block the host, even on misuse
     mode, out_dir = argv[1], argv[2]
@@ -51,10 +54,13 @@ def main(argv):
     if mode != "noop":
         with open(f"{out_dir}/nonce.txt", encoding="utf-8") as f:
             nonce = f.read().strip()
-        emitted = json.dumps({"hookSpecificOutput": {
-            "hookEventName": EVENT[mode],
-            "additionalContext": notice(nonce),
-        }})
+        if mode == "stop-systemmessage":
+            emitted = json.dumps({"systemMessage": notice(nonce)})
+        else:
+            emitted = json.dumps({"hookSpecificOutput": {
+                "hookEventName": EVENT[mode],
+                "additionalContext": notice(nonce),
+            }})
     rec = {
         "ts": datetime.now(timezone.utc).isoformat(),
         "mode": mode,

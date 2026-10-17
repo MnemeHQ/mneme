@@ -28,6 +28,11 @@ about Claude Code. Learning the real behavior is what the live probes are for.
   H1_STUB_LEAK=1              the "agent" Reads ../out/nonce.txt first
   H1_STUB_NO_TRANSCRIPT=1     no session transcript file is written
   H1_STUB_MODEL=<m>           init-event model (default: the pinned model)
+  H1_STUB_SM_MODE=<m>         how a hook's top-level systemMessage is treated (A1):
+                   stream  (default) a stream-json system `informational` event carrying it
+                   model   delivered into model context as user_text
+                   reenter on Stop, forces one extra turn (stop_hook_active re-entry)
+                   drop    ignored
   H1_STUB_DUAL=1              deliver to BOTH a user_text entry and a transcript attachment
   H1_STUB_DENY_EXTRA=1        the result reports one denial that matches no attempted request
   H1_STUB_EXTRA_ATTEMPT=1     the "agent" also attempts a Write of other.txt, which is denied
@@ -73,6 +78,7 @@ class Host:
         self.mode = env("H1_STUB_DELIVERY") or "user_text"
         self.transcript, self.delivered, self.turns, self.ids = [], [], 1, 0
         self.denials = []
+        self.system_messages = []
 
     def emit(self, ev, to_transcript=True):
         print(json.dumps(ev), flush=True)
@@ -98,7 +104,10 @@ class Host:
                 if not out:
                     continue
                 try:
-                    ctx = (json.loads(out).get("hookSpecificOutput") or {}).get("additionalContext")
+                    parsed = json.loads(out)
+                    ctx = (parsed.get("hookSpecificOutput") or {}).get("additionalContext")
+                    if parsed.get("systemMessage"):
+                        self.system_messages.append((event, parsed["systemMessage"]))
                 except ValueError:
                     ctx = out
                 if ctx:
@@ -207,7 +216,19 @@ class Host:
         echo = env("H1_STUB_ECHO") == "1" or env("H1_STUB_ECHO_FORCE") == "1"
         final = "OK " + (tokens[0] if tokens and echo else "NO-PROBE-TOKEN")
         self.emit({"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": final}]}})
-        for c in self.run_hooks("Stop", {"stop_hook_active": False}):
+        stop_ctxs = self.run_hooks("Stop", {"stop_hook_active": False})
+        sm_mode = env("H1_STUB_SM_MODE") or "stream"
+        for ev, sm in list(self.system_messages):
+            if sm_mode == "stream":
+                self.emit({"type": "system", "subtype": "informational", "message": sm}, to_transcript=False)
+            elif sm_mode == "model":
+                self.deliver(sm, ev)
+            elif sm_mode == "reenter" and ev == "Stop":
+                self.turns += 1
+                self.emit({"type": "assistant", "message": {"role": "assistant", "content": [
+                    {"type": "text", "text": "continuing"}]}})
+                self.run_hooks("Stop", {"stop_hook_active": True})
+        for c in stop_ctxs:
             self.deliver(c, "Stop")
             if env("H1_STUB_STOP_REENTER") == "1":
                 self.turns += 1
