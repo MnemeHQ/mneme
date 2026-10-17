@@ -2,7 +2,7 @@
 
 usage:
   classify_a1.py headless    <live> <pin_model>   -> <live>/outcome_a1_headless.json
-  classify_a1.py interactive <live>               -> <live>/outcome_a1_interactive.json
+  classify_a1.py interactive <live> <pin_version> <pin_model> -> <live>/outcome_a1_interactive.json
   classify_a1.py combine     <live>               -> <live>/outcome_a1.json (the H1c result under A1)
 
 Rules (probe scope 4.2, accepted in #555):
@@ -15,6 +15,17 @@ Rules (probe scope 4.2, accepted in #555):
 - **Developer delivery** comes ONLY from the interactive capture: the operator's
   observation.json (`notice_visible`) for the emitter arm, true, and for the control,
   false, backed by a recording whose SHA-256 is in observer.txt and by listed frames.
+- Interactive delivery must be VERIFIED, not only asserted (review of #556):
+  the emitter's `notice_text_seen` must contain the exact nonce, the control's must
+  not; every listed frame must name an existing, non-empty file inside the arm's
+  out/ directory (hashed into the outcome); and both arms need a collected
+  session transcript. Anything missing gives INCONCLUSIVE.
+- Interactive host pins are ENFORCED (review of #556): observer `claude_version`
+  must equal the pinned version, and every transcript assistant `message.model`
+  must equal the pinned model with its `[...]` context suffix removed (the
+  transcript records `claude-opus-4-8` where the stream init reports
+  `claude-opus-4-8[1m]`, as the H1 batch shows). A mismatch gives NOT_EXECUTED,
+  and an unverifiable model (no model field) gives INCONCLUSIVE.
 - A stream-json informational/system event carrying the nonce is `host_output`:
   recorded, never delivery (classify_h1 table, unchanged).
 - A model-bound nonce location (classify_h1 table, including R1) is agent delivery.
@@ -103,10 +114,47 @@ def _transcript_attempts(arm, nonce):
     return {k: sorted(v) for k, v in by.items()}
 
 
-def interactive(live):
+def _base_model(m):
+    return m.split("[", 1)[0] if isinstance(m, str) else m
+
+
+def _pin_check(arm, pin_version, pin_model):
+    """('ok' | 'mismatch' | 'unverifiable', detail) for one interactive arm."""
+    v = arm["observer"].get("claude_version")
+    if v != pin_version:
+        return "mismatch", f"claude_version {v!r} != pinned {pin_version!r}"
+    models = {(e.get("message") or {}).get("model") for _, e in arm["transcript"] if e.get("type") == "assistant"}
+    models.discard(None)
+    if not models:
+        return "unverifiable", "no model recorded in the transcript's assistant entries"
+    if models != {_base_model(pin_model)}:
+        return "mismatch", f"transcript models {sorted(models)} != pinned {_base_model(pin_model)!r}"
+    return "ok", ""
+
+
+def _frames_ok(arm):
+    """Verify every listed frame is an existing, non-empty file inside out/."""
+    out = Path(arm["out"]).resolve()
+    frames = (arm["observation"] or {}).get("frames") or []
+    checked, problems = [], []
+    for f in frames:
+        name = f.get("file") if isinstance(f, dict) else None
+        if not name or not isinstance(f.get("t"), str):
+            problems.append(f"frame entry needs 't' and 'file': {f!r}")
+            continue
+        p = (out / name).resolve()
+        if out not in p.parents or not p.is_file() or p.stat().st_size == 0:
+            problems.append(f"frame file missing, empty or outside out/: {name!r}")
+            continue
+        checked.append({"t": f["t"], "file": name, "sha256": hashlib.sha256(p.read_bytes()).hexdigest()})
+    return checked, problems
+
+
+def interactive(live, pin_version, pin_model):
     emit, ctl = _int_arm(live, "H1c-sm-int"), _int_arm(live, "H1c-sm-int-ctl")
     nonce = emit["nonce"]
-    rec = {"path_id": "H1c-sm-int", "run": "interactive", "rules": A1_ID, "reasons": []}
+    rec = {"path_id": "H1c-sm-int", "run": "interactive", "rules": A1_ID, "reasons": [],
+           "pins": {"claude_version": pin_version, "model": pin_model}}
     reasons = rec["reasons"]
 
     def done(label):
@@ -126,7 +174,24 @@ def interactive(live):
     if reasons:
         return done("NOT_EXECUTED")
 
-    # Capture and observation are mandatory for an interactive verdict.
+    # Host pins are enforced (review of #556).
+    unverifiable = []
+    for name, a in (("emitter", emit), ("control", ctl)):
+        if not a["transcript_collected"] or not a["transcript"]:
+            continue  # reported below as missing transcript
+        status, detail = _pin_check(a, pin_version, pin_model)
+        if status == "mismatch":
+            reasons.append(f"{name}: pin mismatch: {detail}")
+        elif status == "unverifiable":
+            unverifiable.append(f"{name}: pin unverifiable: {detail}")
+    if reasons:
+        return done("NOT_EXECUTED")
+    reasons.extend(unverifiable)
+
+    # Capture, observation and transcript are mandatory for an interactive verdict.
+    for name, a in (("emitter", emit), ("control", ctl)):
+        if not a["transcript_collected"] or not a["transcript"]:
+            reasons.append(f"{name}: session transcript not collected")
     for name, a in (("emitter", emit), ("control", ctl)):
         o = a["observation"]
         if not a["observer"].get("recording_sha256") or a["observer"].get("recording_sha256") == "absent":
@@ -139,6 +204,13 @@ def interactive(live):
     if reasons:
         return done("INCONCLUSIVE")
     oe, oc = emit["observation"], ctl["observation"]
+    frames, frame_problems = _frames_ok(emit)
+    rec["frames_verified"] = frames
+    reasons.extend(f"emitter: {p}" for p in frame_problems)
+    if oe["notice_visible"] and nonce not in (oe.get("notice_text_seen") or ""):
+        reasons.append("emitter: notice_visible but notice_text_seen does not contain the exact nonce")
+    if nonce in (oc.get("notice_text_seen") or ""):
+        reasons.append("control: notice_text_seen contains the emitter nonce")
     if oc["notice_visible"]:
         reasons.append("control arm reports a visible notice; attribution impossible")
 
@@ -213,8 +285,8 @@ if __name__ == "__main__":
     a = sys.argv[1:]
     if len(a) == 3 and a[0] == "headless":
         _write(a[1], "outcome_a1_headless.json", headless(a[1], a[2]))
-    elif len(a) == 2 and a[0] == "interactive":
-        _write(a[1], "outcome_a1_interactive.json", interactive(a[1]))
+    elif len(a) == 4 and a[0] == "interactive":
+        _write(a[1], "outcome_a1_interactive.json", interactive(a[1], a[2], a[3]))
     elif len(a) == 2 and a[0] == "combine":
         h = json.loads((Path(a[1]) / "outcome_a1_headless.json").read_text(encoding="utf-8"))
         i = json.loads((Path(a[1]) / "outcome_a1_interactive.json").read_text(encoding="utf-8"))

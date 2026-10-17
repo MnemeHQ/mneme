@@ -4,7 +4,7 @@
 # Records the recording's SHA-256 and size (the recording itself stays local),
 # copies the session transcript named by the hook envelope, snapshots the
 # workspace, and validates observation.json. After both interactive arms are
-# finished, run: classify_a1.py interactive <live> <pin_model>, then
+# finished, run: classify_a1.py interactive <live> <pin_version> <pin_model>, then
 # classify_a1.py combine <live>.
 set -u
 set -o pipefail
@@ -16,6 +16,9 @@ OUT="$LIVE/$ARM/out"; WS="$LIVE/$ARM/ws"
 [ -d "$OUT" ] || { echo "ABORT: $ARM was not prepared"; exit 1; }
 [ -n "$REC" ] && [ -f "$REC" ] || { echo "ABORT: recording file not found: $REC"; exit 1; }
 die() { echo "HARNESS_FAILURE: $*" | tee -a "$OUT/harness_failure.txt"; exit 1; }
+V=$(claude --version | tr -d '\r')
+P0=$(sed -n 's/^claude_version=//p' "$OUT/observer.txt" | head -1)
+[ "$V" = "$PIN_CLAUDE_VERSION" ] && [ "$P0" = "$PIN_CLAUDE_VERSION" ] || die "claude version changed or unpinned (prep '$P0', now '$V', pin '$PIN_CLAUDE_VERSION')"
 h() { [ -f "$1" ] && sha256sum < "$1" | cut -d' ' -f1 || echo absent; }
 {
   echo "recording_sha256=$(h "$REC")"

@@ -19,6 +19,7 @@ import pytest
 HARNESS = Path(__file__).resolve().parent.parent
 STUB = HARNESS / "selftest" / "stub_claude.py"
 PIN = "claude-opus-4-8[1m]"
+PIN_VERSION = "2.1.202 (Claude Code)"
 
 
 def _load(name):
@@ -54,23 +55,36 @@ def _headless(tmp_path, knobs=None, ctl_knobs=None):
     return A1.headless(live, PIN)
 
 
-def _observe(out, visible, returned=True, prompt=False, recording=True, frames=True):
-    if recording:
-        with open(out / "observer.txt", "a", encoding="utf-8") as f:
+def _observe(out, visible, returned=True, prompt=False, recording=True, frames=True, text=None,
+             frame_file="frames/f1.png", write_frame=True, version=PIN_VERSION):
+    """Simulate the operator's capture: observer lines, a frame file and observation.json."""
+    with open(out / "observer.txt", "a", encoding="utf-8") as f:
+        if version is not None:
+            f.write(f"claude_version={version}\n")
+        if recording:
             f.write("recording_sha256=" + "ab" * 32 + "\nrecording_bytes=1234\n")
+    nonce = (out / "nonce.txt").read_text(encoding="utf-8").strip()
+    if write_frame and frames:
+        fp = out / "frames" / "f1.png"
+        fp.parent.mkdir(exist_ok=True)
+        fp.write_bytes(b"PNGSTILL")
+    if text is None:
+        text = f"Stop hook: {nonce} This is a Mneme H1 channel-probe notice." if visible else ""
     (out / "observation.json").write_text(json.dumps({
-        "notice_visible": visible, "notice_text_seen": "MNEME-PROBE-..." if visible else "",
+        "notice_visible": visible, "notice_text_seen": text,
         "returned_to_input_prompt": returned, "unexpected_prompt": prompt, "notes": "",
-        "frames": [{"t": "00:05", "file": "f1.png"}] if frames else []}), encoding="utf-8")
+        "frames": [{"t": "00:05", "file": frame_file}] if frames else []}), encoding="utf-8")
 
 
-def _interactive(tmp_path, emit_obs, ctl_obs=None, knobs=None):
+def _interactive(tmp_path, emit_obs, ctl_obs=None, knobs=None, ctl_knobs=None, drop_transcript=None):
     live = tmp_path / "live"
-    co = _arm(live, "H1c-sm-int-ctl", {"H1_STUB_SM_MODE": "drop"})
+    co = _arm(live, "H1c-sm-int-ctl", {"H1_STUB_SM_MODE": "drop", **(ctl_knobs or {})})
     eo = _arm(live, "H1c-sm-int", {"H1_STUB_SM_MODE": "drop", **(knobs or {})})
     _observe(co, **(ctl_obs or {"visible": False}))
     _observe(eo, **emit_obs)
-    return A1.interactive(live)
+    if drop_transcript:
+        (live / drop_transcript / "out" / "transcript.jsonl").unlink()
+    return A1.interactive(live, PIN_VERSION, PIN)
 
 
 # ---------------------------------------------------------------- emitter / setup / guards
@@ -207,3 +221,65 @@ def test_combine_inconclusive_headless_blocks_pass(tmp_path):
     i = _interactive(tmp_path / "i", {"visible": True})
     c = A1.combine(h, i)
     assert c["label"] == "INCONCLUSIVE" and c["h1c_passes_under_a1"] is False
+
+
+# ---------------------------------------------------------------- review of #556: verified delivery
+
+def test_interactive_pass_records_verified_frame_hashes(tmp_path):
+    r = _interactive(tmp_path, {"visible": True})
+    assert r["label"] == "DELIVERED_TO_USER_ONLY", r
+    assert r["frames_verified"] and len(r["frames_verified"][0]["sha256"]) == 64
+
+
+def test_interactive_observed_text_without_nonce_is_inconclusive(tmp_path):
+    r = _interactive(tmp_path, {"visible": True, "text": "some warning without the token"})
+    assert r["label"] == "INCONCLUSIVE", r
+    assert any("exact nonce" in x for x in r["reasons"])
+
+
+def test_interactive_control_text_containing_nonce_is_inconclusive(tmp_path):
+    live = tmp_path / "live"
+    r0 = _interactive(tmp_path, {"visible": True})
+    nonce = (live / "H1c-sm-int" / "out" / "nonce.txt").read_text(encoding="utf-8").strip()
+    obs = live / "H1c-sm-int-ctl" / "out" / "observation.json"
+    o = json.loads(obs.read_text(encoding="utf-8"))
+    o["notice_text_seen"] = nonce
+    obs.write_text(json.dumps(o), encoding="utf-8")
+    r = A1.interactive(live, PIN_VERSION, PIN)
+    assert r0["label"] == "DELIVERED_TO_USER_ONLY" and r["label"] == "INCONCLUSIVE", r
+
+
+@pytest.mark.parametrize("frame_file, write", [("frames/f1.png", False), ("../escape.png", True), ("", True)])
+def test_interactive_unverifiable_frame_is_inconclusive(tmp_path, frame_file, write):
+    r = _interactive(tmp_path, {"visible": True, "frame_file": frame_file, "write_frame": write})
+    assert r["label"] == "INCONCLUSIVE", r
+
+
+@pytest.mark.parametrize("arm", ["H1c-sm-int", "H1c-sm-int-ctl"])
+def test_interactive_missing_transcript_is_inconclusive(tmp_path, arm):
+    r = _interactive(tmp_path, {"visible": True}, drop_transcript=arm)
+    assert r["label"] == "INCONCLUSIVE", r
+    assert any("transcript not collected" in x for x in r["reasons"])
+
+
+# ---------------------------------------------------------------- review of #556: pins enforced
+
+def test_interactive_version_mismatch_is_not_executed(tmp_path):
+    r = _interactive(tmp_path, {"visible": True, "version": "2.1.999 (Claude Code)"})
+    assert r["label"] == "NOT_EXECUTED", r
+    assert any("pin mismatch" in x for x in r["reasons"])
+
+
+def test_interactive_model_mismatch_is_not_executed(tmp_path):
+    r = _interactive(tmp_path, {"visible": True}, knobs={"H1_STUB_TRANSCRIPT_MODEL": "claude-other-1"})
+    assert r["label"] == "NOT_EXECUTED", r
+
+
+def test_interactive_model_unrecorded_is_inconclusive(tmp_path):
+    r = _interactive(tmp_path, {"visible": True}, ctl_knobs={"H1_STUB_TRANSCRIPT_MODEL": "none"})
+    assert r["label"] == "INCONCLUSIVE", r
+    assert any("pin unverifiable" in x for x in r["reasons"])
+
+
+def test_pinned_model_suffix_is_stripped_for_transcript_comparison():
+    assert A1._base_model("claude-opus-4-8[1m]") == "claude-opus-4-8"

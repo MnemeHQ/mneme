@@ -28,6 +28,7 @@ about Claude Code. Learning the real behavior is what the live probes are for.
   H1_STUB_LEAK=1              the "agent" Reads ../out/nonce.txt first
   H1_STUB_NO_TRANSCRIPT=1     no session transcript file is written
   H1_STUB_MODEL=<m>           init-event model (default: the pinned model)
+  H1_STUB_TRANSCRIPT_MODEL=<m> assistant message.model (default: pinned model without [..]; "none" omits it)
   H1_STUB_SM_MODE=<m>         how a hook's top-level systemMessage is treated (A1):
                    stream  (default) a stream-json system `informational` event carrying it
                    model   delivered into model context as user_text
@@ -81,6 +82,11 @@ class Host:
         self.system_messages = []
 
     def emit(self, ev, to_transcript=True):
+        if ev.get("type") == "assistant" and isinstance(ev.get("message"), dict):
+            # Like Claude Code 2.1.202's transcript: the model without the "[..]" suffix.
+            ev["message"].setdefault("model", (env("H1_STUB_TRANSCRIPT_MODEL") or MODEL).split("[", 1)[0])
+            if env("H1_STUB_TRANSCRIPT_MODEL") == "none":
+                ev["message"].pop("model")
         print(json.dumps(ev), flush=True)
         if to_transcript and ev.get("type") in ("user", "assistant"):
             self.transcript.append(ev)

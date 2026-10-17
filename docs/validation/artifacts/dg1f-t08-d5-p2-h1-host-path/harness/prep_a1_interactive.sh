@@ -16,6 +16,9 @@ case "$ARM" in H1c-sm-int|H1c-sm-int-ctl) ;; *) echo "ABORT: arm must be H1c-sm-
 if [ "${H1_SELFTEST:-}" != 1 ] && [ -n "${CLAUDECODE:-}" ]; then echo "ABORT: CLAUDECODE set (run from your own terminal)"; exit 1; fi
 [ "$(cygpath -w "$LIVE")" = 'C:\dev\d5p2-h1c-a1-live' ] || { echo "ABORT: live root is not C:\\dev\\d5p2-h1c-a1-live"; exit 1; }
 "$PY" -I "$BASE/safe_rmtree_a1.py" check-root || { echo "ABORT: disposable root unsafe"; exit 1; }
+# Host pin enforced before anything is prepared (review of #556).
+V=$(claude --version | tr -d '\r')
+[ "$V" = "$PIN_CLAUDE_VERSION" ] || { echo "ABORT: claude '$V' != pinned '$PIN_CLAUDE_VERSION'"; exit 1; }
 mkdir -p "$LIVE" || exit 1
 P="$LIVE/$ARM"
 "$PY" -I "$BASE/safe_rmtree_a1.py" delete "$ARM" || { echo "ABORT: guarded delete refused"; exit 1; }
@@ -30,7 +33,8 @@ h() { [ -f "$1" ] && sha256sum < "$1" | cut -d' ' -f1 || echo absent; }
 {
   echo "arm=$ARM"; echo "mode=interactive"
   [ "${H1_SELFTEST:-}" = 1 ] && echo "selftest=1 (NOT live evidence)"
-  echo "claude_version=$(claude --version | tr -d '\r')"
+  echo "claude_version=$V"
+  echo "pinned_model=$PIN_MODEL"
   echo "harness_head=$(git -C "$BASE" rev-parse HEAD 2>/dev/null || echo unknown)"
   echo "sources=$SOURCES"; echo "settings_sha=$(h "$WS/.claude/settings.json")"
   echo "prepared=$(date -u +%FT%TZ)"
@@ -57,7 +61,10 @@ Prepared $ARM. Operator steps (PowerShell, your own window, NOT inside Claude Co
        $(cat "$OUT/prompt.txt")
   5. After the reply, wait at the input prompt for at least 30 seconds. Note any warning/notice text.
   6. Type /exit, then stop the recording. Keep the recording file.
-  7. Fill in $(cygpath -w "$OUT/observation.json") (notice_visible, notice_text_seen,
-     returned_to_input_prompt, unexpected_prompt, and frames: [{"t": "mm:ss", "file": "<still>.png"}]).
+  7. Save redacted still frames of the notice area (or where it would appear) into
+     $(cygpath -w "$OUT")\frames\ and fill in $(cygpath -w "$OUT/observation.json"):
+     notice_visible, notice_text_seen (copy the EXACT text you saw, including the
+     MNEME-PROBE- token), returned_to_input_prompt, unexpected_prompt, and
+     frames: [{"t": "mm:ss", "file": "frames/<still>.png"}].
   8. Run: finish_a1_interactive.sh $ARM "<path to recording>"
 EOF
