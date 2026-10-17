@@ -33,4 +33,4 @@ Define a compatible repository/project boundary for **ordinary Git checkouts, no
 
 **Sources:** [T-08 charter](2026-10-15-t08-target-path-memory-resolution-charter.md) · [hook](https://github.com/MnemeHQ/mneme/blob/45cefa63/mneme/integrations/claude_code/hook.py) · [tests](https://github.com/MnemeHQ/mneme/blob/45cefa63/tests/integrations/claude_code/test_hook_target_memory_resolution.py) · [path selectors](https://github.com/MnemeHQ/mneme/blob/45cefa63/mneme/path_selectors.py) · [ADR-020](https://github.com/MnemeHQ/mneme/blob/45cefa63/docs/adr/ADR-020-explicit-path-applicability-for-typed-rules.md) · [G3-B](2026-10-14-dg1f-g3b-eligibility-authorization-design.md).
 
-**Next:** the D5 boundary contract is [2026-10-17-dg1f-t08-d5-repository-boundary-contract.md](2026-10-17-dg1f-t08-d5-repository-boundary-contract.md) (PROPOSED).
+**Next:** the D5 boundary contract is [2026-10-17-dg1f-t08-d5-repository-boundary-contract.md](2026-10-17-dg1f-t08-d5-repository-boundary-contract.md) (ACCEPTED as a definition only, 2026-10-17).

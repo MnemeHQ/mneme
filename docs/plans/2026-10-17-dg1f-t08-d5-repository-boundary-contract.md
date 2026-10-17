@@ -1,10 +1,11 @@
-# D5: Repository boundary contract (PROPOSED)
+# D5: Repository boundary contract (ACCEPTED: definition only)
 
 **Date:** 2026-10-17
-**Status:** **PROPOSED, not accepted.** Docs only. This draft does not authorize implementation, tests, experiments, ADR or Layer 1 freeze amendments, or changes to C1–C4 evidence, pins or worktrees.
+**Status:** **ACCEPTED as the D5 boundary definition only** (owner approval, 2026-10-17, following an independent-review ACCEPT on `0c1ed8e6`). Docs only. Acceptance does not authorize implementation, tests, experiments, ADR or Layer 1 freeze amendments, or changes to C1–C4 evidence, pins or worktrees.
 **Revision 2 (2026-10-17):** adds host-visible diagnostics (§5.1), separates contract acceptance from implementation authorization (§8), records the agreed B1 decision statement (§7), and sets up one cross-consumer charter for the stop rule (§5.3). This revision itself is the only change authorized.
 **Revision 3 (2026-10-17):** folds in two independent-review checks. The stop rule governs implicit discovery only; explicit memory overrides are a Q2 question (§2, §5.3). §5.1 adds a source-verified inventory of current missing-memory behavior per consumer.
 **Revision 4 (2026-10-17):** answers the #537 review. It splits an absent Git marker from an existing but invalid one (L8a/L8b, §4 B1), states that D5 guarantees consistent walk termination but not identical memory selection across tools (§5.3), and completes the §5.1 consumer inventory.
+**Acceptance (2026-10-17):** adds condition §5.4 (planted Git markers) and records owner acceptance of the definition.
 **Source anchor:** `MnemeHQ/mneme` `main` at `45cefa63`, read-only. `mneme/` is unchanged between `45cefa63` and this branch's base `68d1aaed`, so all line anchors hold.
 **Inputs:** T-08 charter §2–§8 ([charter](2026-10-15-t08-target-path-memory-resolution-charter.md)); [D6-Q1 review reconciliation](2026-10-17-dg1f-t08-d6-q1-review-reconciliation.md). The 2026-10-16 preliminary review and the 2026-10-17 Opus validation are unpublished working documents; their accepted corrections are recorded in the reconciliation note.
 
@@ -69,7 +70,7 @@ So **the installer already treats the nearest `.git` (directory or file) as the 
 
 ## 5. Compatibility cost of B1, stated plainly
 
-B1 **removes governance** in L4, L5 and L6. Today those edits are checked against a memory; under B1 they find no memory and are skipped. That moves the hook toward fail-open, and the missing-memory skip is silent today (V4 behavior; ADR-021). B1 is therefore only acceptable together with:
+B1 **removes governance** in L4, L5 and L6. Today those edits are checked against a memory; under B1 they find no memory and are skipped. That moves the hook toward fail-open, and the missing-memory skip is silent today (V4 behavior; ADR-021). B1 is therefore only acceptable together with the following four conditions:
 
 1. **A host-visible diagnostic that separates `NO_MEMORY_SELECTED` from `PASS`.**
    - **Today no consumer meets this condition.** Current missing-memory behavior, source-verified at `45cefa63`:
@@ -104,6 +105,7 @@ B1 **removes governance** in L4, L5 and L6. Today those edits are checked agains
    - **What D5 does and does not guarantee.** D5 guarantees that every consumer **terminates** its walk by the same rule. It does **not** guarantee that every tool selects the **same governing memory** for the same target, because start points differ. Example: the Claude Code direct-write path starts at the resolved target, while Bash starts at the session `cwd` (`hook.py:710` vs. `:1124`). A Bash write to `repo_a/app.py` from a session in `repo_b` can therefore still select `repo_b`'s memory after D5. Identical selection across tools needs D1/D2/D7 as well.
    - **D1/D2/D7** stay separately gated. They decide **where each adapter starts** discovery (target or session `cwd`/`project_dir`). D5 does not change any start point.
    - **D6/Q2** decides external-memory precedence and compatibility, and must be resolved before D5 implementation is authorized.
+4. **Planted Git markers are handled explicitly.** The `.git` marker is checkout-controlled, so B1 lets anyone who can write to the checkout, including an agent, create an empty `.git` file or directory in a subdirectory and make edits beneath it ungoverned. That is a cheaper evasion than planting a memory file (V3/V6). The implementation charter must define the outcome when a Git marker sits **below the policy root of the memory that would otherwise govern** the target. Options include at least a host-visible diagnostic, or not honoring markers created during the session. Making the outcome visible does not by itself restore enforcement, and stronger guarantees remain G3-B's. This condition records the risk; it does not choose a mechanism.
 
 Layer 1 freeze: changing the stop rule changes `find_memory`. Charter §3 froze `find_memory` as unmodified and kept `test_memory_discovery.py` valid. Adopting B1 therefore needs its own charter and a freeze amendment. This draft authorizes neither.
 
@@ -120,7 +122,7 @@ Layer 1 freeze: changing the stop rule changes `find_memory`. Charter §3 froze 
 
 Owner review on 2026-10-17 provisionally answered the four questions as follows:
 1. B1 is preferred over B0 and B2.
-2. All three §5 conditions are mandatory.
+2. All §5 conditions are mandatory (§5.4, planted markers, was added at acceptance).
 3. Submodule isolation (L5) is intended as a boundary principle. Explicitly declared inheritance is a separate D6 question.
 4. An offline characterization test of L4 is required before any behavioral change. Running it is not yet authorized.
 
@@ -128,14 +130,14 @@ The proposed decision:
 
 > **Adopt target-derived, nearest-Git-marker project boundaries as the preferred D5 direction, with non-Git compatibility preserved. Require observable missing-memory outcomes and an explicit external-memory compatibility contract before implementing boundary enforcement.**
 
-Here, "Git marker" means a `.git` directory or file. It is a candidate local project boundary only, not a trusted identity credential (G3-B). This statement stays **PROPOSED** until the independent review in §8.
+Here, "Git marker" means a `.git` directory or file. It is a candidate local project boundary only, not a trusted identity credential (G3-B). Accepted by the owner on 2026-10-17 as the D5 definition, after the independent review in §8.
 
 ## 8. Acceptance vs. authorization
 
 | Stage | What it means | Prerequisite | Status |
 |---|---|---|---|
-| **D5 contract acceptance** | The §7 statement becomes the accepted boundary *definition*. No code, test or behavior changes. | Independent review of this draft | **Pending** |
-| **Q2 opens** | D6 external-memory precedence and compatibility is defined against the accepted boundary `R` | D5 contract acceptance | Blocked |
-| **D5 implementation authorization** | One cross-consumer charter (§5.3) plus a Layer 1 freeze amendment for `find_memory` | Q2 resolved (§5.2), a verified host-visible channel per host (§5.1), and the L4 characterization test (§7.4) authorized and recorded | Blocked |
+| **D5 contract acceptance** | The §7 statement becomes the accepted boundary *definition*. No code, test or behavior changes. | Independent review of this draft | **Done** (review ACCEPT on `0c1ed8e6`; owner approval 2026-10-17) |
+| **Q2 opens** | D6 external-memory precedence and compatibility is defined against the accepted boundary `R` | D5 contract acceptance | **Eligible** |
+| **D5 implementation authorization** | One cross-consumer charter (§5.3) plus a Layer 1 freeze amendment for `find_memory` | Q2 resolved (§5.2), a verified host-visible channel per host (§5.1), a defined planted-marker outcome (§5.4), and the L4 characterization test (§7.4) authorized and recorded | Blocked |
 
-**Next gate:** an independent review of this D5 contract. This revision authorizes only the documentation change. It does not authorize architectural acceptance, implementation, tests or experiments.
+**Next gate:** open D6/Q2 (external-memory precedence and compatibility) against the accepted boundary `R`. This acceptance does not authorize implementation, tests, experiments, ADR changes or Layer 1 freeze amendments.
