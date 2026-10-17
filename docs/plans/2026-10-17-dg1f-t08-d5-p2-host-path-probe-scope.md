@@ -2,6 +2,10 @@
 
 **Status:** **PROPOSED.** Design only. **Nothing here is executed.** It authorizes no probe, no harness build, no live host session, no runtime change, no `[layer1-freeze]` amendment and no implementation (see §11).
 **Anchor:** `main` @ `5d8bf82a`. That is after the accepted [D5 + P2 implementation charter](2026-10-17-t08-d5-p2-memory-resolution-charter.md) (#542) and its §6 characterization tests (#543).
+**Revision 2 (2026-10-17):** answers the #545 review.
+- Side-effect criteria are narrowed to host-induced effects; turn count and model text are evidence only (§3, §6).
+- Developer-only delivery may pass any path, recorded separately from agent delivery (§3, §6, D3).
+- An explicit H2a equivalence mapping against the committed M1d-a artifacts is added (§4.1).
 **Parent:** charter §5 (gate rule) and §12 step 3. The format follows the D6 scopes [#519](2026-10-15-dg1f-t08-d6-mneme-memory-live-scope.md) and [#527](2026-10-16-dg1f-t08-d6-c4-local-settings-scope.md).
 
 ## 1. Where this sits
@@ -14,7 +18,7 @@ For each output path P, two questions:
 
 > **Q-P1.** Does the candidate wire shape for P, emitted at P's event with exit 0, reach the **agent's context** (or the developer) on the pinned host?
 >
-> **Q-P2.** Does it do so **without side effects**? The tool call must proceed, no permission outcome may change, and the event must not block, retry or force a continuation.
+> **Q-P2.** Does it do so **without host-induced side effects**? The host must still execute the tool call. It must not change a permission prompt or decision, and it must not itself block, retry or force a continuation. Differences in what the model says or how many turns it takes are **not** side effects: a delivered notice is expected to influence the model.
 
 Q-P2 matters because a channel that delivers a notice by blocking or re-prompting is not a notice. Codex Stop `decision: block` is an example: it is proven live, but it forces continuation, so it does not qualify (§4, H2b).
 
@@ -25,10 +29,16 @@ The §3.3 outcomes do not exist in code yet, and implementing them is not author
 1. **Harness-only emitter.** A probe-only command, outside `mneme/`, is registered for P's event in place of the Mneme hook. It reads the host envelope, writes it to the hook log, and emits P's candidate wire shape (§4) carrying a fresh nonce `MNEME-PROBE-<16 hex>`. It exits 0. It runs no Mneme code, so the probes need **no freeze amendment** and do not depend on Mneme's version.
 2. **Recorded delivery** (primary evidence). The nonce appears in a message delivered to the model, in the host's own session record. Examples: Claude Code stream-json or the session transcript, the Codex rollout, the SDK message stream, the LangChain model input.
 3. **Echo** (secondary evidence). The prompt asks the agent to repeat verbatim any token beginning `MNEME-PROBE-` that it received from a hook or system notice. An echo without recorded delivery is `INCONCLUSIVE`. Recorded delivery without an echo still passes.
-4. **Side-effect controls.** Each probe runs **paired with a no-emitter control**: same prompt, same tool call, emitter replaced by an exit-0 no-op. The tool result, the permission outcome, the file bytes and the turn count must match between the two runs.
+4. **Side-effect controls.** Each probe runs **paired with a no-emitter control**: same prompt, same tool call, emitter replaced by an exit-0 no-op. The pair is used to **attribute** differences, not to require identical transcripts. **Pass/fail criteria (host-induced only):**
+   - the tool executed (the host applied it, and its result is not an error);
+   - the permission prompt or decision is unchanged;
+   - the host did not block, retry or force a continuation (for example, no Stop-`block`-style re-entry);
+   - the file bytes match the control **where the host applied the same tool input**.
+
+   **Recorded as evidence only, never pass/fail:** turn count, model reply text, extra model-chosen tool calls, and whether the agent echoed the nonce. The echo request in step 3 is expected to change the reply; the probe records that rather than failing on it.
 5. **Shape binding.** The implementation PR must emit the probed shape for P byte-structurally: the same event, the same JSON keys, the same exit code. An offline test must compare that shape against the recorded probe payload. A passing probe is evidence **for that shape only**.
 
-**Visibility target.** D5 §5.1 accepts the developer **or** the agent. Headless probes can establish agent delivery only. Developer (UI) visibility is recorded only where an interactive run is operator-observed, and it is reported separately, never inferred.
+**Visibility target.** D5 §5.1 accepts the developer **or** the agent, and this scope uses exactly that criterion on **every** path. Agent delivery is established from the host's session record (headless or interactive). Developer delivery is established only by an operator-observed interactive run with capture (screen recording or host UI log), and it is never inferred. Each path records **which audience was reached** (`agent`, `developer`, or both), so the implementation charter knows where the agent will not see the notice.
 
 ## 4. Probe set: twelve output paths
 
@@ -37,7 +47,7 @@ The §3.3 outcomes do not exist in code yet, and implementing them is not author
 | **H1a** | Claude Code PreToolUse, direct write **and** Bash matchers | `hookSpecificOutput: {hookEventName: "PreToolUse", additionalContext}` with **no** `permissionDecision` | **None.** Only exit 2 with stderr is proven (G1 live record; T-08 re-probe). `defer`/`allow` must not be used (`hook.py:487-490`). | **Yes.** Two sub-probes: an Edit and a Bash command. |
 | **H1b** | Claude Code SessionStart | `hookSpecificOutput: {hookEventName: "SessionStart", additionalContext}`; plain stdout recorded as a variant | **None.** Every live registration so far was PreToolUse only (C1:114, C2:172, C4:142). | **Yes** |
 | **H1c** | Claude Code Stop | `hookSpecificOutput: {hookEventName: "Stop", additionalContext}` (`_emit_stop_feedback`, `hook.py:743-758`) | **None** | **Yes.** Also record whether a Stop notice can reach the agent at all once the turn has ended (§6, `DELIVERED_TO_USER_ONLY`). |
-| **H2a** | Codex PreToolUse (gate) | `hookSpecificOutput.additionalContext` (`codex_cli/hook.py:52-70`) | **LIVE.** M1d-a run `20260824T110210Z`, codex-cli 0.149.1 on Windows with `codex exec`: delivered to agent context as a developer-role message (`validation/codex-cli/capability-matrix.md:49-53`) | **Evidence reuse proposed** (decision D1, §10). A re-run happens only if the pin has changed. |
+| **H2a** | Codex PreToolUse (gate) | `hookSpecificOutput.additionalContext` (`codex_cli/hook.py:52-70`) | **LIVE.** M1d-a run `20260824T110210Z`, codex-cli 0.149.1 on Windows with `codex exec`: delivered to agent context as a developer-role message (`validation/codex-cli/capability-matrix.md:49-53`) | **Evidence reuse with a targeted re-run** of artifact-backed delivery only (decision D1, §10; mapping §4.1). A full re-run happens only if the pin has changed. |
 | **H2b** | Codex Stop (stop audit) | `systemMessage` (`stop_audit.py:126-127`) | **Unproven live.** It is covered by unit tests only. Stop `decision: block` is proven (M3) but has side effects, so it does not qualify. | **Yes** |
 | **H3a** | Kiro hook | exit-0 stdout (`kiro/hook.py:274-276`) | **Documented live, no artifacts.** `docs/integrations/kiro-hook-spec.md:167-168`, CLI 2.19.2 with `--v3` (v3 engine): "Exit-0 stdout reaches agent context (observed in allow tests)". | **Yes**, with artifacts. A harness is needed: none exists in the repository. |
 | **H4a** | Antigravity adapter | to be determined: `{}` plus a stderr reason, or a JSON reason field (`docs/integrations/antigravity.md:70-76`) | **None.** "Verified against 2.8.1 (IDE)" with no run or artifact. | **Yes.** Shape discovery first (§5). **At risk:** IDE only, no harness. |
@@ -46,6 +56,25 @@ The §3.3 outcomes do not exist in code yet, and implementing them is not author
 | **H5c** | LangChain middleware | `ToolMessage` annotation (`langchain/middleware.py` `_append_note`, `:240`) | **Dispatch-layer LIVE, scripted model.** Run `validation/langgraph/evidence/runs/20260825T162444Z-m0`: a DENIED reason reached the model input. The non-blocking annotation path is documented, not recorded. | **Yes**, for the non-blocking annotation path |
 | **H6a** | Hermes tool-call notice | to be determined. `pre_tool_call` offers `block` or nothing, so a non-blocking notice may need next-turn context (`plugin.py:57`, `adapter.py:509-519`) | **Dispatch-layer only**, hermes-agent 0.19.0. No live model session (no credentials, `docs/integrations/hermes.md:76`). | **Yes.** Shape discovery first. **At risk.** |
 | **H6b** | Hermes context injection | `pre_llm_call` `{"context"}` (`adapter.py:214-219`) | Dispatch-layer only | **Yes**, with a live model session |
+
+### 4.1 H2a equivalence mapping: M1d-a against the §6 criteria
+
+Source: committed run `validation/codex-cli/evidence/runs/20260824T110210Z-applypatch/`. It has three arms in one run: `allow` (control), `deny`, and `diagctx` (the emitter arm). It was read at `5d8bf82a`.
+
+| §6 criterion | M1d-a artifact | Status |
+|---|---|---|
+| Pin: codex-cli 0.149.1, binary hash, Windows, `codex exec` | `env.json`: `codex_version: codex-cli 0.149.1`, `pinned_sha256_verified: true`, `platform: win32`, `hook_trust_bypass: false` | **Covered** |
+| Same event and shape: PreToolUse `hookSpecificOutput.additionalContext`, no `permissionDecision`, exit 0 | `analysis-m1da.md` quotes the exact emitted JSON; `transcript-diagctx.log` shows exit 0 with no hook-failure mentions | **Covered.** The shape equals `codex_cli/hook.py:_context_output`; only the text differs. |
+| Harness-only emitter, no Mneme code | the hook is `validation/codex-cli/probe/log_hook.py` (`.codex/hooks.json` hash is identical across arms) | **Covered** |
+| Unique token | fixed sentinel `NONBLOCKING_DIAGNOSTIC_1491`, not a fresh random nonce | **Covered with a note.** The token is unique in the repository, apart from the analysis and the emitter that defines it, so no collision is possible. |
+| Tool executed | `diagctx/worktree-after.json`: `probe_target.py` created; `events-diagctx/events/` contains `PreToolUse`, `PostToolUse`, `Stop` | **Covered** |
+| File bytes match the control | the `probe_target.py` hash `4e523a8b…` is identical in `allow/worktree-after.json` and `diagctx/worktree-after.json`; all other file hashes are identical too | **Covered** |
+| Permission unchanged | both arms ran `codex exec --sandbox workspace-write` with identical commands, and neither recorded an approval prompt | **Covered** |
+| No host block, retry or forced continuation | same event sequence in the `allow` and `diagctx` arms (`summary.json` `hook_events_observed`); both return code 0 | **Covered** |
+| **Recorded delivery: the token in a model-bound message in the host's session record** | `analysis-m1da.md` fact 4 quotes the rollout entry (`role: developer`, `input_text` containing the sentinel). The **raw rollout file is not committed**: the sentinel appears in the repository only in `analysis-m1da.md` and `log_hook.py`. It was also not found under the local `~/.codex/sessions` at review time. | **Not covered by an artifact.** It rests on the reviewed analysis quote. |
+| Echo, turn count | not part of M1d-a's design | Evidence-only under §6; **not required** |
+
+**Result:** every criterion is covered except artifact-backed recorded delivery. Per D1, H2a needs a **targeted re-run** on the same pin that collects and commits a redacted rollout excerpt containing the token. No full re-run is needed.
 
 ## 5. Harness: reuse and build, per host
 
@@ -63,16 +92,16 @@ Every harness gets an offline self-test, with a stub host where one is possible,
 
 | Label | Criteria |
 |---|---|
-| `DELIVERED_TO_AGENT` | The nonce appears in a model-bound message in the host's session record, **and** every side-effect control matches the paired no-emitter run (tool result, permission outcome, file bytes, turn count). The sub-field `echoed` (true/false) records the secondary echo, and it does not change the label. **Only this label, or `DELIVERED_TO_USER_ONLY` where §10 D3 allows it, passes a path.** |
-| `DELIVERED_TO_USER_ONLY` | The nonce is shown to the operator in an observed interactive run, it is absent from every model-bound message, and the side-effect controls match. It passes D5 §5.1 only if decision D3 accepts developer-only visibility for that path. |
-| `DELIVERED_WITH_SIDE_EFFECT` | The nonce is delivered, but at least one side-effect control differs: blocked, re-prompted, permission changed, extra turn, or file differs. **Fails** the path. |
+| `DELIVERED_TO_AGENT` | The nonce appears in a model-bound message in the host's session record, **and** every host-induced side-effect criterion (§3 step 4) holds. Sub-fields: `echoed` (true/false); `developer_also` (true, false or `not_observed`); `turns` and `turns_control` (evidence only). **Passes** the path. |
+| `DELIVERED_TO_USER_ONLY` | The nonce is shown to the developer in an operator-observed, captured interactive run; it is absent from every model-bound message; and every host-induced side-effect criterion holds. **Passes** the path under D5 §5.1 (developer **or** agent), on **any** path, and is reported separately from agent delivery. |
+| `DELIVERED_WITH_SIDE_EFFECT` | The nonce is delivered, but a **host-induced** criterion fails: the tool did not execute; a permission prompt or decision changed; or the host blocked, retried or forced a continuation. Model-chosen differences (reply text, turn count, extra tool calls) never produce this label. **Fails** the path. |
 | `NOT_DELIVERED` | The emitter ran (hook log shows the event and the emitted bytes), and the nonce is in no model-bound message and no observed UI. **Fails** the path. |
 | `NO_NONBLOCKING_CHANNEL` | Shape discovery (H4a, H6a) found no exit-0 shape the host accepts without side effects. **Fails** the path. |
-| `EVIDENCE_REUSED` | Decision D1 applies: same host version, same event, same shape, existing artifact-backed record. **Passes** the path, citing the record. |
+| `EVIDENCE_REUSED` | Decision D1 applies, and the §4.1 equivalence mapping shows every §6 criterion as **covered** by committed artifacts: same host version, same event, same shape. **Passes** the path, citing the record. A criterion mapped **not covered** requires a targeted re-run of that criterion only. |
 | `NOT_EXECUTED` | Preconditions not met: pin mismatch, credentials absent, emitter not registered, no session record. **Never** a negative result. |
-| `INCONCLUSIVE` | Echo without recorded delivery; emitter output missing from the hook log; the control run is missing or differs for an unrelated reason; a nonce collision. Reasons are listed. |
+| `INCONCLUSIVE` | Echo without recorded delivery; emitter output missing from the hook log; the paired control run is missing, or a host-induced difference cannot be attributed to the emitter; a nonce collision. Reasons are listed. |
 
-**Gate rule** (from the charter): H*n* passes only when **every** path under it is `DELIVERED_TO_AGENT`, `EVIDENCE_REUSED` or (with D3) `DELIVERED_TO_USER_ONLY`. One `NOT_DELIVERED`, `DELIVERED_WITH_SIDE_EFFECT` or `NO_NONBLOCKING_CHANNEL` anywhere blocks the freeze amendment for all consumers.
+**Gate rule** (from the charter): H*n* passes only when **every** path under it is `DELIVERED_TO_AGENT`, `DELIVERED_TO_USER_ONLY` or `EVIDENCE_REUSED`. One `NOT_DELIVERED`, `DELIVERED_WITH_SIDE_EFFECT` or `NO_NONBLOCKING_CHANNEL` anywhere blocks the freeze amendment for all consumers. The gate summary record lists the audience reached per path.
 
 ## 7. Pins and safety guards
 
@@ -129,9 +158,9 @@ The `codex_cli/gate.py:420-424` docstring that the charter relied on is stale. T
 
 | # | Decision | Recommendation |
 |---|---|---|
-| D1 | May H2a reuse M1d-a (same pin, event and shape) instead of re-running? | **Yes,** as `EVIDENCE_REUSED`, provided the implementation emits `codex_cli/hook.py:_context_output`'s shape unchanged. A pin change requires a re-run. |
+| D1 | May H2a reuse M1d-a instead of re-running? | **Yes for every criterion §4.1 maps as covered.** The one criterion that is not artifact-backed (the raw rollout record) gets a **targeted** re-run on the same pin, collecting only the rollout delivery record, provided the implementation emits `codex_cli/hook.py:_context_output`'s shape unchanged. A pin change requires a full re-run. |
 | D2 | Is a scripted-model dispatch-layer run enough for H5c (LangChain is a library, and the model input is the observable)? | **Yes** for H5c. **No** for H6 (Hermes is an agent application): it needs a live model session. |
-| D3 | Can `DELIVERED_TO_USER_ONLY` pass a path? D5 §5.1 says the developer **or** the agent. | **Yes, but only for H1c** (Stop after the final turn), where agent delivery may be structurally impossible. Elsewhere, agent delivery is required. |
+| D3 | Can developer-only delivery pass a path? | **Yes, on any path**, per D5 §5.1 (developer **or** agent). It is recorded separately as `DELIVERED_TO_USER_ONLY`, and the gate summary shows the audience per path. No owner approval is needed, because this is the accepted D5 criterion, not a stronger one. |
 | D4 | Repeat count | n = 1 per path, plus the paired control. A re-run is required only on `INCONCLUSIVE`. |
 | D5 | Batch order | H1 (harness reuse), then H2b and H5c (existing harnesses), then H3, H5a/H5b and H6 (new harnesses, credentials), then H4 last (IDE, operator-driven, highest risk). Each batch gets its own evidence PR. |
 
