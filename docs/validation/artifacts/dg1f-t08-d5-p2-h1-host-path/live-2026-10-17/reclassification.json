@@ -1,0 +1,145 @@
+{
+  "rules": "as-run table + R1-R3 (#551)",
+  "classifier_sha256": "bd883ca3795099f042bc783f8d0fe2c3460af659b953fb1cdfe0c17c77fd6082",
+  "reclassify_tool_sha256": "5232dc0b950480e411e0db5d9fe6d97edbec62576d2c873c144f09672591c9f7",
+  "integrity": {
+    "archive_files_listed": 97,
+    "archive_sums_sha256": "f50f122154e19f557a0972292be0c4069774e70b4687a159ab4698e223189a87",
+    "manifest_raw_files_checked": 24,
+    "problems": []
+  },
+  "paths": {
+    "H1a-edit": {
+      "label_as_run": "INCONCLUSIVE",
+      "label_r1r3_raw": "DELIVERED_TO_AGENT",
+      "label_r1r3_subset": "DELIVERED_TO_AGENT",
+      "raw_and_subset_agree": true,
+      "subset_reasons": [],
+      "passes_path_r1r3_raw": true,
+      "completeness": {
+        "H1a-edit": {
+          "omitted_transcript_entries": 7,
+          "omitted_transcript_hits": [],
+          "thinking_blocks": 4,
+          "thinking_hits": 0,
+          "omitted_init_fields": 13,
+          "omitted_init_hits": [],
+          "omitted_result_fields": 2,
+          "omitted_result_hits": [],
+          "hits_total": 0
+        },
+        "H1a-edit-ctl": {
+          "omitted_transcript_entries": 9,
+          "omitted_transcript_hits": [],
+          "thinking_blocks": 2,
+          "thinking_hits": 0,
+          "omitted_init_fields": 13,
+          "omitted_init_hits": [],
+          "omitted_result_fields": 2,
+          "omitted_result_hits": [],
+          "hits_total": 0
+        }
+      }
+    },
+    "H1a-bash": {
+      "label_as_run": "INCONCLUSIVE",
+      "label_r1r3_raw": "DELIVERED_TO_AGENT",
+      "label_r1r3_subset": "DELIVERED_TO_AGENT",
+      "raw_and_subset_agree": true,
+      "subset_reasons": [],
+      "passes_path_r1r3_raw": true,
+      "completeness": {
+        "H1a-bash": {
+          "omitted_transcript_entries": 7,
+          "omitted_transcript_hits": [],
+          "thinking_blocks": 2,
+          "thinking_hits": 0,
+          "omitted_init_fields": 13,
+          "omitted_init_hits": [],
+          "omitted_result_fields": 2,
+          "omitted_result_hits": [],
+          "hits_total": 0
+        },
+        "H1a-bash-ctl": {
+          "omitted_transcript_entries": 7,
+          "omitted_transcript_hits": [],
+          "thinking_blocks": 2,
+          "thinking_hits": 0,
+          "omitted_init_fields": 13,
+          "omitted_init_hits": [],
+          "omitted_result_fields": 2,
+          "omitted_result_hits": [],
+          "hits_total": 0
+        }
+      }
+    },
+    "H1b-start": {
+      "label_as_run": "INCONCLUSIVE",
+      "label_r1r3_raw": "DELIVERED_TO_AGENT",
+      "label_r1r3_subset": "DELIVERED_TO_AGENT",
+      "raw_and_subset_agree": true,
+      "subset_reasons": [],
+      "passes_path_r1r3_raw": true,
+      "completeness": {
+        "H1b-start": {
+          "omitted_transcript_entries": 6,
+          "omitted_transcript_hits": [],
+          "thinking_blocks": 2,
+          "thinking_hits": 0,
+          "omitted_init_fields": 13,
+          "omitted_init_hits": [],
+          "omitted_result_fields": 2,
+          "omitted_result_hits": [],
+          "hits_total": 0
+        },
+        "H1b-start-ctl": {
+          "omitted_transcript_entries": 6,
+          "omitted_transcript_hits": [],
+          "thinking_blocks": 2,
+          "thinking_hits": 0,
+          "omitted_init_fields": 13,
+          "omitted_init_hits": [],
+          "omitted_result_fields": 2,
+          "omitted_result_hits": [],
+          "hits_total": 0
+        }
+      }
+    },
+    "H1c-stop": {
+      "label_as_run": "INCONCLUSIVE",
+      "label_r1r3_raw": "DELIVERED_WITH_SIDE_EFFECT",
+      "label_r1r3_subset": "DELIVERED_WITH_SIDE_EFFECT",
+      "raw_and_subset_agree": true,
+      "subset_reasons": [
+        "host-induced side-effect control failed"
+      ],
+      "passes_path_r1r3_raw": false,
+      "completeness": {
+        "H1c-stop": {
+          "omitted_transcript_entries": 9,
+          "omitted_transcript_hits": [],
+          "thinking_blocks": 4,
+          "thinking_hits": 0,
+          "omitted_init_fields": 13,
+          "omitted_init_hits": [],
+          "omitted_result_fields": 2,
+          "omitted_result_hits": [],
+          "hits_total": 0
+        },
+        "H1c-stop-ctl": {
+          "omitted_transcript_entries": 7,
+          "omitted_transcript_hits": [],
+          "thinking_blocks": 2,
+          "thinking_hits": 0,
+          "omitted_init_fields": 13,
+          "omitted_init_hits": [],
+          "omitted_result_fields": 2,
+          "omitted_result_hits": [],
+          "hits_total": 0
+        }
+      }
+    }
+  },
+  "h1_gate_r1r3_raw": "NOT MET",
+  "subset_note": "Subset replay is a supporting check against the published subset only; it depends on the raw completeness check and is not an independent reproduction."
+}
