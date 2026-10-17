@@ -11,11 +11,16 @@ is modified. The procedure follows docs/plans/2026-10-17-dg1f-t08-d5-p2-h1-class
    recorded SHA-256 and size. Any mismatch aborts (exit 1) before classification.
 2. Authoritative run. The merged classify_h1.classify() (rules R1-R3) runs on
    the archived RAW evidence for each path and its control.
-3. Completeness check. For every arm, the material the collector did not
-   publish is scanned for the path's emitter nonce: transcript entries outside
-   user/assistant/hook_* attachments, thinking blocks (events and transcript),
-   omitted init fields and omitted result fields. Counts and hits are recorded,
-   and every hit is published redacted.
+3. Completeness check (per-entry collector diff). For every arm, EVERY raw
+   entry of events.jsonl and transcript.jsonl is compared with exactly what the
+   #549 collector publishes for it (collect_h1.select_events /
+   select_transcript, then the collector's key-dropping redaction). An entry is
+   `dropped` (nothing published), `trimmed` (published with fields removed,
+   e.g. init fields, result usage, thinking content, or any non-role/content
+   field of user/assistant entries) or `whole`. A nonce occurrence counts as
+   omitted when the raw entry holds more occurrences than its published form.
+   Counts by kind and source, and every omitted hit (redacted), are recorded.
+   This covers every omission the collector can make, not a hand-listed subset.
 4. Subset replay (supporting only). The same classifier runs on the published
    selected evidence (*.selected.jsonl, hook-log.jsonl, observer.txt hashes).
    It is NOT an independent reproduction: it depends on the raw completeness
@@ -37,7 +42,6 @@ HERE = Path(__file__).resolve().parent
 PATHS = ("H1a-edit", "H1a-bash", "H1b-start", "H1c-stop")
 EVENT = {"H1a-edit": "PreToolUse", "H1a-bash": "PreToolUse", "H1b-start": "SessionStart", "H1c-stop": "Stop"}
 PIN_MODEL = "claude-opus-4-8[1m]"
-SELECTED_INIT = {"type", "subtype", "model", "claude_code_version", "permissionMode", "cwd", "session_id"}
 
 
 def load(name):
@@ -83,51 +87,40 @@ def verify(archive, sums, manifest):
             "manifest_raw_files_checked": n, "problems": bad}
 
 
-def completeness(archive, arm, nonce):
+def _publish_form(source, row, red):
+    """What the #549 collector publishes for one raw entry (list of 0 or 1 items)."""
+    if source == "events":
+        sel = COL.select_events([row])
+    else:
+        sel = COL.select_transcript([row], {})
+        for x in sel:
+            x.pop("line", None)
+    return [red.obj(x) for x in sel]
+
+
+def completeness(archive, arm, nonce, red):
+    """Per-entry diff between the raw inputs and what the collector publishes."""
     out = archive / arm / "out"
-    res = {"omitted_transcript_entries": 0, "omitted_transcript_hits": [],
-           "thinking_blocks": 0, "thinking_hits": 0,
-           "omitted_init_fields": 0, "omitted_init_hits": [],
-           "omitted_result_fields": 0, "omitted_result_hits": []}
-    for i, line in enumerate((out / "transcript.jsonl").read_text(encoding="utf-8").splitlines()):
-        if not line.strip():
-            continue
-        e = json.loads(line)
-        t = e.get("type")
-        selected = t in ("user", "assistant") or (
-            t == "attachment" and str((e.get("attachment") or {}).get("type", "")).startswith("hook_"))
-        if not selected:
-            res["omitted_transcript_entries"] += 1
-            if nonce in line:
-                res["omitted_transcript_hits"].append({"line": i, "entry": e})
-        if t == "assistant":
-            for it in (e.get("message") or {}).get("content") or []:
-                if isinstance(it, dict) and it.get("type") in ("thinking", "redacted_thinking"):
-                    res["thinking_blocks"] += 1
-                    res["thinking_hits"] += nonce in json.dumps(it)
-    for line in (out / "events.jsonl").read_text(encoding="utf-8").splitlines():
-        if not line.strip():
-            continue
-        e = json.loads(line)
-        if e.get("type") == "system" and e.get("subtype") == "init":
-            for k, v in e.items():
-                if k not in SELECTED_INIT:
-                    res["omitted_init_fields"] += 1
-                    if nonce in json.dumps(v):
-                        res["omitted_init_hits"].append(k)
-        elif e.get("type") == "result":
-            for k in ("usage", "modelUsage"):
-                if k in e:
-                    res["omitted_result_fields"] += 1
-                    if nonce in json.dumps(e[k]):
-                        res["omitted_result_hits"].append(k)
-        elif e.get("type") == "assistant":
-            for it in (e.get("message") or {}).get("content") or []:
-                if isinstance(it, dict) and it.get("type") in ("thinking", "redacted_thinking"):
-                    res["thinking_blocks"] += 1
-                    res["thinking_hits"] += nonce in json.dumps(it)
-    res["hits_total"] = (len(res["omitted_transcript_hits"]) + res["thinking_hits"]
-                         + len(res["omitted_init_hits"]) + len(res["omitted_result_hits"]))
+    res = {"entries": {}, "omitted_hits": [], "hits_total": 0}
+    for source, name in (("events", "events.jsonl"), ("transcript", "transcript.jsonl")):
+        counts = {"whole": 0, "trimmed": 0, "dropped": 0, "by_type": {}}
+        for i, line in enumerate((out / name).read_text(encoding="utf-8").splitlines()):
+            if not line.strip():
+                continue
+            row = json.loads(line)
+            pub = _publish_form(source, row, red)
+            raw_n = json.dumps(row).count(nonce)
+            pub_n = json.dumps(pub).count(nonce) if pub else 0
+            kind = "dropped" if not pub else ("whole" if red.obj(row) == pub[0] else "trimmed")
+            counts[kind] += 1
+            key = f"{row.get('type')}:{row.get('subtype') or (row.get('attachment') or {}).get('type')}:{kind}"
+            counts["by_type"][key] = counts["by_type"].get(key, 0) + 1
+            if raw_n > pub_n:
+                res["omitted_hits"].append({"source": source, "line": i, "kind": kind,
+                                            "raw_occurrences": raw_n, "published_occurrences": pub_n,
+                                            "entry": row})
+        res["entries"][source] = counts
+    res["hits_total"] = len(res["omitted_hits"])
     return res
 
 
@@ -170,6 +163,9 @@ def main(argv):
         raise SystemExit("integrity check failed; nothing classified")
 
     red = COL.Redactor(archive, HERE, py, cbin)
+    # The collector redacted the LIVE root; publish forms are compared under the
+    # same key-dropping, so use a redactor for the original live root here.
+    red_raw = COL.Redactor(Path(r"C:\dev\d5p2-h1-live"), HERE, py, cbin)
     red_live = COL.Redactor(Path(r"C:\dev\d5p2-h1-live"), HERE, py, cbin)
     summary = {"rules": C.RULES_ID, "classifier_sha256": sha(HERE / "classify_h1.py"),
                "reclassify_tool_sha256": sha(Path(__file__)), "integrity": integrity, "paths": {}}
@@ -179,9 +175,9 @@ def main(argv):
         ctl = C.load_arm(archive / f"{p}-ctl" / "out")
         raw = C.classify(emit, ctl, p, PIN_MODEL)
         sub = C.classify(subset_arm(pub, p), subset_arm(pub, f"{p}-ctl"), p, PIN_MODEL)
-        comp = {arm: completeness(archive, arm, emit["nonce"]) for arm in (p, f"{p}-ctl")}
+        comp = {arm: completeness(archive, arm, emit["nonce"], red_raw) for arm in (p, f"{p}-ctl")}
         for arm, c in comp.items():  # publish every hit, redacted
-            c["omitted_transcript_hits"] = [red.obj(red_live.obj(h)) for h in c["omitted_transcript_hits"]]
+            c["omitted_hits"] = [red.obj(red_live.obj(h)) for h in c["omitted_hits"]]
         body = json.dumps(red.obj(red_live.obj(raw)), indent=2) + "\n"
         COL.write_text(pub / p / "outcome.r1r3.json", body, red, {})
         summary["paths"][p] = {

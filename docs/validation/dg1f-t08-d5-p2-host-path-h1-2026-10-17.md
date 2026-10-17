@@ -118,10 +118,10 @@ The result event in both arms reports `num_turns: 1` and `subtype: success`, and
 
 ### 7.2 Procedure
 
-[`harness/reclassify_h1.py`](artifacts/dg1f-t08-d5-p2-h1-host-path/harness/reclassify_h1.py) (SHA-256 `5232dc0b…591c9f7`) ran the merged `classify_h1.py` (SHA-256 `bd883ca3…7fd6082`, rules id `as-run table + R1-R3 (#551)`) in this order:
+[`harness/reclassify_h1.py`](artifacts/dg1f-t08-d5-p2-h1-host-path/harness/reclassify_h1.py) (SHA-256 `1dbbfdd4…ddef0f89b`; revised after the #553 review, see §7.5) ran the merged `classify_h1.py` (SHA-256 `bd883ca3…7fd6082`, rules id `as-run table + R1-R3 (#551)`) in this order:
 1. **Integrity:** archive checksums plus the manifest raw-file check. Both passed, with no problems.
 2. **Authoritative run** on the archived **raw** evidence.
-3. **Completeness check** of the material the collector did not publish (omitted transcript entries, thinking blocks, omitted `init` and `result` fields), for all eight arms.
+3. **Completeness check: a per-entry collector diff.** Every raw `events.jsonl` and `transcript.jsonl` entry in all eight arms is compared with exactly what the #549 collector publishes for it (the same selection functions and the same key-dropping redaction). Each entry is classed **whole**, **trimmed** (published with fields removed: `init` fields, `result` usage, thinking content, or any non-role/content field of user and assistant entries) or **dropped** (not published). A nonce occurrence is omitted when the raw entry holds more occurrences than its published form.
 4. **Subset replay** on the published selected evidence. This is supporting only: it depends on step 3 and is **not** an independent reproduction.
 
 The output is [`live-2026-10-17/<path>/outcome.r1r3.json`](artifacts/dg1f-t08-d5-p2-h1-host-path/live-2026-10-17/) (redacted, from the raw run) plus [`live-2026-10-17/reclassification.json`](artifacts/dg1f-t08-d5-p2-h1-host-path/live-2026-10-17/reclassification.json), all published alongside the unchanged as-run files.
@@ -135,7 +135,11 @@ The output is [`live-2026-10-17/<path>/outcome.r1r3.json`](artifacts/dg1f-t08-d5
 | `H1b-start` | INCONCLUSIVE | **DELIVERED_TO_AGENT** | DELIVERED_TO_AGENT | R1 and R2; stream `hook_response` counts as host_output |
 | `H1c-stop` | INCONCLUSIVE | **DELIVERED_WITH_SIDE_EFFECT** | DELIVERED_WITH_SIDE_EFFECT | reason `host-induced side-effect control failed`: 9 Stop invocations, `no_stop_reentry: false` |
 
-**Completeness check: 0 nonce occurrences in omitted material in every arm.** Per arm, 6–9 omitted transcript entries, 2–4 thinking blocks, 13 omitted `init` fields and 2 omitted `result` fields were scanned. The raw and subset labels agree on all four paths.
+**Completeness check: 0 omitted nonce occurrences in every arm.** Across the eight arms, the diff covered:
+- **events:** 78 entries (24 whole, 54 trimmed, 0 dropped);
+- **transcript:** 128 entries (0 whole, 70 trimmed, 58 dropped).
+
+Per-arm counts are in `reclassification.json`. The raw and subset labels agree on all four paths.
 
 **H1 gate under R1–R3 (raw, authoritative): NOT MET.** H1a (Edit and Bash) and H1b now pass under the accepted rules. **H1c fails** with a demonstrated host side effect, so H1 cannot pass with Stop `additionalContext`. The H1c path needs the separate architectural decision in §6.3 (a different Stop channel under a scope amendment and new probe, or a D5 revisit).
 
@@ -144,3 +148,18 @@ The output is [`live-2026-10-17/<path>/outcome.r1r3.json`](artifacts/dg1f-t08-d5
 - Developer (UI) visibility: still `not_observed`.
 - Any other host version, model, interactive mode, or repeatability (n = 1).
 - Anything about H2–H6, the freeze amendment, implementation, or the shipped `_emit_stop_feedback` behaviour (#550).
+
+### 7.5 Revision after review (#553)
+
+The first version of the completeness check listed the omitted categories by hand. It did not cover two kinds of omission:
+- fields stripped from user and assistant entries;
+- whole stream events of unselected types.
+
+It was replaced by the per-entry collector diff in §7.2 step 3, with six synthetic regression tests (`harness/selftest/test_reclassify_completeness.py`) covering a stripped assistant field, a stripped user-message field, a dropped stream event, dropped transcript entries, thinking/`init`/`result` omissions, and published occurrences that must not count.
+
+The reclassification was re-run from the same verified archive:
+- **all four raw-run `outcome.r1r3.json` files are byte-identical to the first run**, so no classification changed;
+- the archive re-verified;
+- the as-run outcomes are unchanged.
+
+`reclassification.json` now carries the per-entry counts and the revised tool hash.
