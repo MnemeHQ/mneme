@@ -353,3 +353,91 @@ def test_record_masks_the_scratch_directory(tmp_path):
     assert "**Verdict: FAIL.**" in text
     assert work.as_posix() not in text and "<work>/venv" in text
     assert "**NO**: boom" in text
+
+
+# ── Linux portability (Cloud Shell run, 2026-10-17) ──────────────────────────
+
+def test_identity_accepts_a_venv_interpreter_symlinked_outside(tmp_path):
+    """A POSIX venv's bin/python is a symlink to the base interpreter; the
+    interpreter check must not follow it out of the venv."""
+    base = tmp_path / "base" / "python3.12"
+    base.parent.mkdir()
+    base.write_text("")
+    venv = tmp_path / "venv"
+    (venv / "bin").mkdir(parents=True)
+    link = venv / "bin" / "python"
+    try:
+        link.symlink_to(base)
+    except (OSError, NotImplementedError):
+        pytest.skip("symlinks not permitted on this host")
+    probe = _probe(venv, tmp_path) | {"executable": str(link)}
+    errors = pf.identity_errors(probe, venv, REPO_ROOT, "0.10.0")
+    assert not any("interpreter" in e for e in errors), errors
+
+
+@pytest.mark.parametrize("executable", [
+    lambda venv: venv.parent / "python",
+    lambda venv: venv / ".." / "python",
+    lambda venv: venv,
+])
+def test_identity_interpreter_check_is_lexical_but_still_strict(tmp_path, executable):
+    venv = tmp_path / "venv"
+    probe = _probe(venv, tmp_path) | {"executable": str(executable(venv))}
+    errors = pf.identity_errors(probe, venv, REPO_ROOT, "0.10.0")
+    assert any("interpreter" in e for e in errors), errors
+
+
+def test_missing_pytest_in_the_harness_is_a_clear_preflight_error(tmp_path, monkeypatch):
+    fake = tmp_path / "matrix.py"
+    fake.write_text("import pytest\n", encoding="utf-8")
+    monkeypatch.setattr(pf, "MATRIX_TESTS", fake)
+    monkeypatch.setitem(__import__("sys").modules, "pytest", None)
+    with pytest.raises(pf.PreflightError, match="harness interpreter needs pytest"):
+        pf.load_matrix_module()
+
+
+def test_commit_build_pins_source_date_epoch_to_the_commit_time(tmp_path, monkeypatch):
+    commit = "0" * 40
+    git_calls = []
+
+    def fake_git(*args):
+        git_calls.append(args)
+        return commit if args[0] == "rev-parse" else "1792232397"
+
+    seen = {}
+
+    def fake_run(cmd, cwd, extra_env=None):
+        seen["cmd"], seen["env"] = cmd, extra_env
+        wheel_dir = Path(cmd[cmd.index("--wheel-dir") + 1])
+        wheel_dir.mkdir(parents=True, exist_ok=True)
+        (wheel_dir / "mneme_hq-0.10.0-py3-none-any.whl").write_bytes(b"wheel")
+        return _proc(0, "Successfully installed setuptools-84.0.0\n")
+
+    monkeypatch.setattr(pf, "git", fake_git)
+    monkeypatch.setattr(pf, "_run", fake_run)
+    monkeypatch.setattr(pf.subprocess, "run", lambda *a, **k: subprocess.CompletedProcess(a, 0, _empty_tar(), b""))
+    build = pf.build_commit_wheel(tmp_path, tmp_path / "venv", "0b74d410")
+
+    assert ("log", "-1", "--format=%ct", commit) in git_calls
+    assert seen["env"] == {"SOURCE_DATE_EPOCH": "1792232397"}
+    assert build["source_date_epoch"] == "1792232397"
+    assert build["build_backend"] == "setuptools-84.0.0"
+    assert build["sha256"] == hashlib.sha256(b"wheel").hexdigest()
+
+
+def _empty_tar() -> bytes:
+    import io
+    import tarfile
+    buf = io.BytesIO()
+    with tarfile.open(fileobj=buf, mode="w"):
+        pass
+    return buf.getvalue()
+
+
+def test_clean_env_is_extended_not_replaced_for_the_build(monkeypatch):
+    captured = {}
+    monkeypatch.setenv("PYTHONPATH", "/somewhere")
+    monkeypatch.setattr(pf.subprocess, "run", lambda cmd, **k: captured.update(k) or _proc(0))
+    pf._run(["x"], Path("."), {"SOURCE_DATE_EPOCH": "1"})
+    assert captured["env"]["SOURCE_DATE_EPOCH"] == "1"
+    assert "PYTHONPATH" not in captured["env"]

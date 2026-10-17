@@ -24,6 +24,19 @@ the separate replay the CI1.3 charter requires (§4a,
    separately.
 6. Write a JSON report and a Markdown validation record.
 
+Harness prerequisite: the interpreter that runs *this script* needs
+``pytest`` importable, because step 5 reuses the merged
+``tests/test_ci1_contract_matrix.py`` (which imports it). Use a dedicated
+harness venv (``python3.12 -m venv harness && harness/bin/pip install
+'pytest>=8'``). That venv only runs the harness; the evaluator is always
+installed into its own fresh venv and identity-checked there.
+
+Commit builds (``--commit-build``) set ``SOURCE_DATE_EPOCH`` to the commit's
+committer time, so wheel timestamps do not depend on when the build ran. The
+wheel is still platform-dependent (file modes, zip host system, newline
+translation in ``METADATA``), so a pin is valid only for the platform it was
+built on, and the build backend (setuptools) is not hash-locked.
+
 Test-execution contract only: nothing here changes the enforcement engine, the
 existing runners or any fixture expectation. Where the installed build differs
 from a golden, the build fails parity; the ``v1`` goldens are never edited.
@@ -39,6 +52,7 @@ import io
 import json
 import os
 import platform
+import re
 import shutil
 import subprocess
 import sys
@@ -94,7 +108,17 @@ def load_matrix_module():
     battery and the ADR-005 constants are the merged ones, not a copy."""
     spec = importlib.util.spec_from_file_location("ci1_contract_matrix", MATRIX_TESTS)
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    try:
+        spec.loader.exec_module(module)
+    except ImportError as exc:
+        if exc.name == "pytest":
+            raise PreflightError(
+                "the harness interpreter needs pytest: the merged matrix module "
+                f"({MATRIX_TESTS.name}) imports it. Run this script from a harness venv, "
+                "for example: python3.12 -m venv harness && harness/bin/pip install 'pytest>=8' "
+                "(the evaluator is still installed into its own fresh venv)"
+            ) from exc
+        raise
     return module
 
 
@@ -179,14 +203,14 @@ def clean_env() -> dict[str, str]:
     return {k: v for k, v in os.environ.items() if k.upper() not in drop}
 
 
-def _run(cmd: list[str], cwd: Path) -> subprocess.CompletedProcess:
+def _run(cmd: list[str], cwd: Path, extra_env: dict[str, str] | None = None) -> subprocess.CompletedProcess:
     return subprocess.run(
-        cmd, cwd=cwd, env=clean_env(), capture_output=True, text=True, encoding="utf-8",
+        cmd, cwd=cwd, env=clean_env() | (extra_env or {}), capture_output=True, text=True, encoding="utf-8",
     )
 
 
-def _checked(cmd: list[str], cwd: Path) -> subprocess.CompletedProcess:
-    proc = _run(cmd, cwd)
+def _checked(cmd: list[str], cwd: Path, extra_env: dict[str, str] | None = None) -> subprocess.CompletedProcess:
+    proc = _run(cmd, cwd, extra_env)
     if proc.returncode != 0:
         raise PreflightError(f"command failed ({proc.returncode}): {cmd}\n{proc.stderr}")
     return proc
@@ -204,8 +228,11 @@ def build_commit_wheel(work: Path, venv: Path, ref: str) -> dict[str, str]:
     The source is exported with ``git archive`` into the scratch directory, so
     the build never reads the working tree. The build backend (setuptools) is
     fetched by pip's build isolation without hash checking; the resulting
-    wheel's sha256 is what pins the evaluator."""
+    wheel's sha256 is what pins the evaluator. ``SOURCE_DATE_EPOCH`` is set to
+    the commit's committer time so that rebuilding the same commit with the
+    same backend on the same platform gives the same sha256."""
     commit = git("rev-parse", "--verify", f"{ref}^{{commit}}")
+    source_date_epoch = git("log", "-1", "--format=%ct", commit)
     src = work / "src"
     src.mkdir()
     archive = subprocess.run(["git", "archive", "--format=tar", commit], cwd=REPO_ROOT,
@@ -213,11 +240,15 @@ def build_commit_wheel(work: Path, venv: Path, ref: str) -> dict[str, str]:
     with tarfile.open(fileobj=io.BytesIO(archive)) as tf:
         tf.extractall(src, filter="data")
     built = work / "built"
-    _checked([str(venv_python(venv)), "-I", "-m", "pip", "wheel", "--no-deps", "--disable-pip-version-check",
-              "--wheel-dir", str(built), str(src)], work)
+    proc = _checked([str(venv_python(venv)), "-I", "-m", "pip", "wheel", "-v", "--no-deps",
+                     "--disable-pip-version-check", "--wheel-dir", str(built), str(src)], work,
+                    {"SOURCE_DATE_EPOCH": source_date_epoch})
     [wheel] = list(built.glob("*.whl"))
     _name, version = wheel_name_version(wheel.name)
-    return {"commit": commit, "wheel": str(wheel), "version": version, "sha256": sha256_file(wheel)}
+    backend = re.search(r"Successfully installed .*?\b(setuptools-[0-9][\w.]*)", proc.stdout + proc.stderr)
+    return {"commit": commit, "wheel": str(wheel), "version": version, "sha256": sha256_file(wheel),
+            "source_date_epoch": source_date_epoch,
+            "build_backend": backend.group(1) if backend else "unknown"}
 
 
 def install_evaluator(
@@ -279,10 +310,25 @@ def _is_within(path: str | Path, root: str | Path) -> bool:
         return False
 
 
+def _is_within_lexically(path: str | Path, root: str | Path) -> bool:
+    """Like ``_is_within`` but without following symlinks.
+
+    A POSIX venv's ``bin/python`` is a symlink to the base interpreter, so
+    resolving it always lands outside the venv. What identifies the venv
+    interpreter is the path it was started from (``sys.executable``), which is
+    checked lexically; ``sys.prefix`` and site-packages are checked resolved."""
+    p = os.path.normcase(os.path.abspath(path))
+    r = os.path.normcase(os.path.abspath(root))
+    try:
+        return os.path.commonpath([p, r]) == r and p != r
+    except ValueError:  # different drives on Windows
+        return False
+
+
 def identity_errors(probe: dict[str, Any], venv: Path, repo_root: Path, version: str) -> list[str]:
     """Every way the executing evaluator could differ from the pinned install."""
     errors = []
-    if not _is_within(probe["executable"], venv):
+    if not _is_within_lexically(probe["executable"], venv):
         errors.append(f"interpreter {probe['executable']} is not inside venv {venv}")
     if not _is_within(probe["prefix"], venv):
         errors.append(f"sys.prefix {probe['prefix']} is not the venv")
@@ -712,6 +758,14 @@ def _section(results: list[dict], label: str) -> dict[str, Any]:
             "failed": len(results) - passed, "results": results}
 
 
+def _harness_pytest_version() -> str:
+    try:
+        import importlib.metadata as md
+        return md.version("pytest")
+    except Exception:  # noqa: BLE001 -- reporting only
+        return "unknown"
+
+
 def render_markdown(report: dict[str, Any]) -> str:
     ident = report["identity"]
     prov = report["corpus_provenance"]
@@ -719,8 +773,12 @@ def render_markdown(report: dict[str, Any]) -> str:
         source_line = "PyPI release"
         sha_label = "local = PyPI JSON API = pinned"
     else:
-        source_line = (f"commit build of `{report['source']['commit']}` (`git archive`, `pip wheel --no-deps`); "
-                       "the version string alone does not identify it, the wheel sha256 does")
+        src = report["source"]
+        source_line = (f"commit build of `{src['commit']}` (`git archive`, `pip wheel --no-deps`, "
+                       f"`SOURCE_DATE_EPOCH={src.get('source_date_epoch', 'unset')}`, "
+                       f"backend `{src.get('build_backend', 'unknown')}`, not hash-locked); "
+                       "the version string alone does not identify it, the wheel sha256 does, "
+                       "and only for the platform it was built on")
         sha_label = "local build, pinned for this run"
     lines = [
         f"# CI1.3 P2 pinned-evaluator preflight: {DISTRIBUTION} {report['version']}",
@@ -755,6 +813,8 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"| `PYTHONPATH` | removed from the environment; `-I` also ignores `PYTHON*` variables |",
         f"| Installer | `{ident['pip']}`, `--require-hashes --no-index --no-deps` from PyPI-verified wheels |",
         f"| Host | {report['host']} |",
+        f"| Harness | pytest `{report.get('harness', {}).get('pytest', 'unknown')}` "
+        "(harness venv only; not the evaluator) |",
         f"| Identity re-checked after replay | {'yes, unchanged' if ident['rechecked'] else 'NO'} |",
         "",
         "Hash-locked runtime dependency set (each wheel's sha256 checked against PyPI's JSON API):",
@@ -856,9 +916,12 @@ def run_preflight(version: str, work: Path, commit_build: str | None = None) -> 
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "work_dir": str(work),
         "version": version,
-        "source": ({"kind": "commit-build", "commit": build["commit"]} if build
+        "source": ({"kind": "commit-build", "commit": build["commit"],
+                    "source_date_epoch": build["source_date_epoch"],
+                    "build_backend": build["build_backend"]} if build
                    else {"kind": "pypi", "index": "https://pypi.org"}),
         "host": f"{platform.system()} {platform.release()}, host Python {platform.python_version()}",
+        "harness": {"python": sys.executable, "pytest": _harness_pytest_version()},
         "identity": {
             "wheel_filename": installed["wheel"].name, "wheel_sha256": installed["wheel_sha256"],
             "lock": installed["lock"], "pip": installed["pip"], "probe": probe,
