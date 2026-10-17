@@ -79,7 +79,7 @@ H1 passes only if all four path ids pass (scope §6 gate rule). `summary_h1.md` 
 
 Both runs below used the stub only. **None of this is evidence about Claude Code.**
 
-1. **Label tests:** `python -m pytest -q docs/validation/artifacts/dg1f-t08-d5-p2-h1-host-path/harness/selftest`. **43 passed.** Covered:
+1. **Label tests:** `python -m pytest -q docs/validation/artifacts/dg1f-t08-d5-p2-h1-host-path/harness/selftest`. **46 passed.** Covered:
    - each of the four paths under user-text delivery → `DELIVERED_TO_AGENT`;
    - tool_result delivery → `DELIVERED_TO_AGENT`;
    - echo and turn differences recorded but not decisive;
@@ -102,6 +102,7 @@ Both runs below used the stub only. **None of this is evidence about Claude Code
      - R3: a differing indicator inside `thinking_tokens` → `DELIVERED_WITH_SIDE_EFFECT`;
      - R3: an indicator in one arm's `thinking_tokens` only → `INCONCLUSIVE`;
      - Stop with re-entry under R1 → still `DELIVERED_WITH_SIDE_EFFECT`;
+     - every outcome, including early `NOT_EXECUTED` returns (pin mismatch, event not fired), records the rule-set id (`"rules"`);
    - regressions from the #546 re-review:
      - a model-chosen extra request (denied) is recorded and not attributed → `DELIVERED_TO_AGENT`;
      - the same request denied in one arm only → `DELIVERED_WITH_SIDE_EFFECT`;

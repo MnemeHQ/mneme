@@ -329,6 +329,25 @@ def test_r1_stop_with_reentry_still_fails(tmp_path):
     assert r["label"] == "DELIVERED_WITH_SIDE_EFFECT", r
 
 
+@pytest.mark.parametrize("case", ["pin_mismatch", "event_not_fired"])
+def test_not_executed_outcomes_record_the_rule_set(tmp_path, case):
+    # Review of #552: early NOT_EXECUTED returns must carry the rule-set id too.
+    if case == "pin_mismatch":
+        r = _run(tmp_path, "H1a-edit", pin="some-other-model")
+    else:
+        knob = {"H1_STUB_NO_SESSIONSTART": "1"}
+        r = _run(tmp_path, "H1b-start", knob, knob)
+    assert r["label"] == "NOT_EXECUTED", r
+    assert r["rules"] == classify_h1.RULES_ID == "as-run table + R1-R3 (#551)"
+
+
+def test_every_label_records_the_rule_set(tmp_path):
+    for i, (path_id, knobs) in enumerate([("H1a-edit", HA), ("H1a-edit", {"H1_STUB_DELIVERY": "none"}),
+                                          ("H1a-edit", {"H1_STUB_DELIVERY": "attachment"})]):
+        r = _run(tmp_path / str(i), path_id, knobs)
+        assert r["rules"] == classify_h1.RULES_ID, r
+
+
 def test_emitter_never_emits_permission_decision(tmp_path):
     out = tmp_path / "out"
     out.mkdir()

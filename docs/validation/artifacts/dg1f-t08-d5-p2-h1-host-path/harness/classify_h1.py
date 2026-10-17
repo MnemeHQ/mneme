@@ -39,6 +39,7 @@ PATHS = {
     "H1b-start": {"path_type": "command_lifecycle_event", "event": "SessionStart", "tool": None},
     "H1c-stop": {"path_type": "command_lifecycle_event", "event": "Stop", "tool": None},
 }
+RULES_ID = "as-run table + R1-R3 (#551)"  # recorded in every outcome
 PASSING = ("DELIVERED_TO_AGENT", "DELIVERED_TO_USER_ONLY", "EVIDENCE_REUSED")
 EDIT_EXPECTED = b"beta\n"
 BASH_FILE, BASH_EXPECTED = "bash_out.txt", b"probe-ran\n"  # exact bytes, not a prefix
@@ -356,8 +357,11 @@ def path_control(arm, spec):
 def classify(emit, ctl, path_id, pin_model):
     spec = PATHS[path_id]
     reasons = []
+    # The rule-set id is set at creation so every outcome, including early
+    # NOT_EXECUTED returns, records which rules produced it (review of #552).
     rec = {"path_id": path_id, "path_type": spec["path_type"], "event": spec["event"],
-           "developer_also": "not_observed", "harness": "headless (-p, stream-json)"}
+           "developer_also": "not_observed", "harness": "headless (-p, stream-json)",
+           "rules": RULES_ID}
 
     def done(label):
         rec["label"] = label
@@ -392,7 +396,6 @@ def classify(emit, ctl, path_id, pin_model):
     # Evidence.
     locs = nonce_locations(emit, emit["nonce"], spec["event"])
     ctl_locs = nonce_locations(ctl, emit["nonce"], spec["event"])
-    rec["rules"] = "as-run table + R1-R3 (#551)"
     cats = {l["category"] for l in locs}
     rec["nonce_locations"] = locs
     rec["transcript_collected"] = emit["transcript_collected"]
