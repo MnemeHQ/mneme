@@ -124,6 +124,30 @@ Required properties include stable source identity/namespaces, pinned source rev
 
 "Bounded" describes the architecture (a finite set of declared sources at pinned revisions, a deterministic graph), never a limit on what OSS may do. The enterprise boundary begins where Mneme would have to discover, reconcile, infer, synchronize or administrate organizational decision truth rather than resolve declared sources.
 
+### P1.5 — INF1: application and infrastructure decision enforcement (proposed, public OSS)
+
+**Status:** Proposed Core engineering workstream; roadmap inclusion is **planning only**, not a charter, accepted ADR, Layer 1 freeze amendment, implementation authorization, support claim, or CI1 merge-gate promotion. Keep INF1 separate from DG1 (decision governance), DG2 (known-source federation), and CI1 (trusted merge enforcement). INF1.0 can be scoped without changing the runtime; behavior-changing increments wait for their own reviewed contracts and current DG1/CI1 trust-boundary gates.
+
+**Objective:** Reuse one authoritative Mneme decision and one deterministic enforcement path for changes to application code and infrastructure configuration. Do not build a second policy engine, a Kubernetes controller, an infrastructure orchestrator, or a ContextOS-specific Core fork.
+
+**Existing contracts and gaps.** ADR-017 separates retrieval ranking from enforcement. ADR-019 currently permits only `FORBID_LITERAL`; ADR-020 defines deterministic rule-level path applicability. ADR-023/030/031 own canonical decision authority, projection, governance resolution, and stable rule identity; ADR-029 owns evidence binding. Structured configuration rules, batch/repository evaluation (issue [#251](https://github.com/MnemeHQ/mneme/issues/251)), and trusted host merge blocking are not interchangeable with those shipped contracts. CI1 ([#540](https://github.com/MnemeHQ/mneme/issues/540)) remains the separate assurance owner. Memory-selection D5/D6 and DG1F trust boundaries must be reconciled; successful rule execution against the wrong memory is not compliant governance.
+
+**First bounded proof:** one repository with an application source file and a Kubernetes YAML manifest. Use the existing typed-literal semantics to reject one explicitly forbidden direct storage import; that check does *not* prove every adapter bypass is detected. Separately specify and validate one new structured YAML field/value invariant (for example, a prohibited GPU resource request). Unsupported or ambiguous constructs must be distinguishable from verified compliance. No live-cluster admission or Terraform evaluation in the first increment.
+
+| Increment | Scope / exit gate | Rough effort |
+| --- | --- | --- |
+| **INF1.0 — Architecture contract** | Validate current CLI, parser, persistence/projection, typed-rule/evidence paths, and CI1 interfaces; pin two fixtures; identify any required proposed ADR and behavioral charter before code. | 1–2 engineering days |
+| **INF1.1 — Artifact baseline** | Deterministic source/YAML identification, read-only extraction, repository-relative path handling, malformed/unsupported-input outcomes; existing literal-rule parity. | 3–5 days |
+| **INF1.2 — Structured typed rule** | After explicit approval, define one narrowly scoped YAML field/value rule with authoring, validation, canonical persistence, projection, rule identity, applicability, trace and adversarial regression tests. No inferred policy or generic DSL. | 5–8 days |
+| **INF1.3 — Repository/CLI evaluation** | Reuse Core evaluation for a bounded multi-artifact invocation and deterministic aggregation; do not reimplement `DecisionRetriever`, `ConflictDetector`, selector logic or verdict semantics. | 3–5 days |
+| **INF1.4 — CI1 assurance validation** | Exercise the new artifact evaluation through separately authorized CI1 trusted policy/evaluator/revision boundaries; demonstrate a permitted change and a host-refused forbidden change, plus policy substitution, stale-revision, absent/invalid-evidence cases. | 3–5 days |
+
+**Effort:** 15–25 engineering days, indicative only; excludes separately owned DG1/CI1 gates, ADR approval/review lead time, and deployment-specific adapters. INF1.0 is the next action, not permission to execute INF1.1–1.4.
+
+**Definition of done:** on pinned fixtures, the same authoritative decision/version and exact artifact revision produce reproducible results across the application and configuration checks; canonical decision/rule identities, rule applicability, subject and outcome are traceable under ADR-029; missing, contradictory or unsupported evaluation never masquerades as a verified pass. Reuse CI1's `VERIFIED_PASS / VIOLATION / UNEVALUATED` *assurance classifications* without replacing the existing `mneme.check/v1` CLI verdict contract. Preserve the frozen 7/7 benchmark and current retrieval, legacy enforcement and fail-open transport semantics unless separately authorized.
+
+**Dependencies and later scope:** DG1 resolver convergence and approved authority/context binding precede trusted runtime selection; CI1 owns merge assurance, not INF1; DG2 becomes relevant for inherited decisions across declared repositories but is **not** needed for the single-repository proof. Data Engine candidates/evidence cannot activate policy. A cross-artifact invariant such as `pool_size * max_replicas <= database_connection_budget` is **INF1.5 / later hypothesis**, needing an independently reviewed fact-extraction and relational-rule contract. Terraform, policy export to OPA/Kyverno, deployment admission, drift reconciliation, and runtime remediation remain uncommitted follow-ups.
+
 ### P1 — Architecture Review Skill
 
 Evolve the existing Claude Code `mneme` Skill into a clearer executable architecture-review interface over existing Mneme capabilities.
