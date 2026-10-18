@@ -62,7 +62,9 @@ See accepted [ADR-023](../adr/ADR-023-canonical-decision-index-and-runtime-proje
 
 ## NEXT — strengthen the product surface
 
-### P1 — DG1: Decision governance semantics (post-D1)
+### P1 — DG1: Decision Governance — Core Semantics (post-D1)
+
+**DG means Decision Governance.** DG1 establishes canonical governance semantics, DG2 extends deterministic governance across declared decision sources, and DG3 addresses organization-scale governance operations.
 
 DG1 is now partly implemented. DG1A, DG1C, DG1E, DG1D, DG1P and DG1B1 have landed: the governance contract is accepted, the effective-decision resolver matches v1 projection, canonical evidence identity is threaded through enforcement traces, snapshot-to-snapshot governance change is available, ADR `date` no longer carries precedence authority, and canonical decision applicability now resolves deterministically under `mneme.decision-index/v2`.
 
@@ -102,7 +104,7 @@ The publication boundary is: **OSS owns decision execution; enterprise owns deci
 - hosted multi-tenant governance, approval/admin workflows, fleet propagation; and
 - organization-wide analytics/control-plane behavior.
 
-### P1.5 — DG2: deterministic decision federation (public OSS)
+### P1.5 — DG2: Decision Governance — Federation (public OSS)
 
 Once DG1 semantics are stable, extend the same governance resolver across more than one known decision source or repository. Learn from existing federation designs, but federate **Mneme decision authority**, not merely files or Markdown corpora.
 
@@ -122,7 +124,7 @@ effective decisions for this context
 
 Required properties include stable source identity/namespaces, pinned source revisions, provenance-preserving inheritance, deterministic ambiguity failure, explicit override/exception chains (ADR-031 waiver semantics), and one governance resolution result consumed by retrieval, enforcement and explanation (the ADR-031 resolver, never a second policy engine). Retrieval ranking remains non-authoritative under ADR-017.
 
-"Bounded" describes the architecture (a finite set of declared sources at pinned revisions, a deterministic graph), never a limit on what OSS may do. The enterprise boundary begins where Mneme would have to discover, reconcile, infer, synchronize or administrate organizational decision truth rather than resolve declared sources.
+"Bounded" describes the architecture (a finite set of declared sources at pinned revisions, a deterministic graph), never a limit on what OSS may do. **DG3 — Decision Governance — Enterprise Operations** names that organizational operating layer, where Mneme would have to discover, reconcile, infer, synchronize or administrate organizational decision truth rather than resolve declared sources.
 
 ### P1 — Architecture Review Skill
 
