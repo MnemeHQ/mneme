@@ -1,0 +1,14 @@
+arm=H1c-sm-ctl
+claude_version=2.1.202 (Claude Code)
+claude_bin=<CLAUDE_BIN>
+harness_head=626941df56b436d4acd45f31c966952839f1fbca
+sources=project
+tools=Read
+notes_before=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+bash_out_before=absent
+settings_sha=1564b912293117fa4e8ccad3be6204ef39a2c887fba69a8e62f8fb876b887da0
+date=2026-10-19T09:01:55Z
+claude_exit=0
+notes_after=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+bash_out_after=absent
+transcript_collected=yes

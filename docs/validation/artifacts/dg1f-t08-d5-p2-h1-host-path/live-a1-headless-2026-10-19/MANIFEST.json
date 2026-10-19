@@ -1,0 +1,97 @@
+{
+  "arms": {
+    "H1c-sm-ctl": {
+      "published": {
+        "observer.txt": "18f6144380c34feeaf254ac2687def0c9bf558ae7968fd3edc5cb6f217d5e2cf",
+        "prompt.txt": "97f82e6f0bc2ac252a3c24eb3c9f7781d14b667151201cd51e3f65d468a60500",
+        "probe.json": "b6af2403a1f0614316bdd8a92e78d0bc4331a1d15e6af3732e8cb5ae099b0408",
+        "hook-registration.json": "1a504d5c46f4b745f9b88452ba5adce27f51cb82c02216c92b510564e7cc371a",
+        "hook-log.jsonl": "28ea13c8611f0532f45c6209131532d2236b310ad10cf5ed88c48fbd2a9166a3",
+        "nonce.txt": "79df1224e223c34c4939cbd49bcc45d0a26c4a70be4c508062f870ddaeb77cb1",
+        "events.selected.jsonl": "c7517b5b8d90b993687928efc965ba68771d2279fd694790ddacf2c02bcbccdc",
+        "transcript.selected.jsonl": "a2f038e70c9dfee79c23752a46c42bdc62acbb887d099e85ae861d30e765c271"
+      },
+      "raw_not_published": {
+        "events.jsonl": {
+          "sha256": "39cc8253e2c4032c438facc02c0f1dd1cb7a12ceaa906c1cfb01bd0ad65b4455",
+          "bytes": 3843
+        },
+        "transcript.jsonl": {
+          "sha256": "8ffaf2ae6aac9b6dde084ae24c1034337d8bd3c9f86c4061469908b042ca0e06",
+          "bytes": 12483
+        },
+        "claude.stderr.txt": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "transcript_entries_not_published": {
+        "queue-operation": 2,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "ai-title": 1,
+        "last-prompt": 1
+      }
+    },
+    "H1c-sm": {
+      "published": {
+        "observer.txt": "1951e68a72ade34d58d67bf4a416641f16b7b932f4a26c868547b216a25d941a",
+        "prompt.txt": "97f82e6f0bc2ac252a3c24eb3c9f7781d14b667151201cd51e3f65d468a60500",
+        "probe.json": "1c1d03b1dbe47843882d371a3c603eb023b80807d530bd24aa5c9858a89a0061",
+        "hook-registration.json": "74d40a2e4dad1b4f26e8b5ecbb500a0762fe4675b4c2130ece72f87b4859c710",
+        "hook-log.jsonl": "c4ccd2aacdef0f422c984d7959581e9d249aadfb0a0dd486234688a83acbfc08",
+        "nonce.txt": "b173b83d541805864c5efaa6c485639a043c4dbeedfef9ac0061705837c7b8d2",
+        "events.selected.jsonl": "76c1948d007abd6f6448aaaa735576f9b18eef707b3132f126917985651950f9",
+        "transcript.selected.jsonl": "2e8f4022849b9fe81a2c4b39bdae506227f7b7f618ded5289f755bada9bdaf59"
+      },
+      "raw_not_published": {
+        "events.jsonl": {
+          "sha256": "8dcc220860c9aa36bca3cb0baa129309d09cba2910c149eb64c481608a82a87c",
+          "bytes": 5517
+        },
+        "transcript.jsonl": {
+          "sha256": "ed3272c279e693cca69ce7267f5784af8cb0f6e49d01a32d987868a3ed755c6b",
+          "bytes": 15925
+        },
+        "claude.stderr.txt": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "transcript_entries_not_published": {
+        "queue-operation": 2,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "ai-title": 1,
+        "last-prompt": 1
+      }
+    }
+  },
+  "batch": {
+    "outcome_a1_headless.json": "5e51f3a979a350084f9691afd67acd1a33ed9bb7d8a623353aeef2de125f53ef",
+    "outcome_a1_headless.json.raw": {
+      "sha256": "1612b2bc9c54b967158475cd0bd8e99fb9ce53bed7dcb834c581f3445453f7c8",
+      "bytes": 2188
+    },
+    "run_a1_headless.log": "ae472243267dca10dad3a40fd68d0a20c8926dcfa49a5076396a53f2c95f1a2c",
+    "run_a1_headless.log.raw": {
+      "sha256": "b49d07ff05f41f0afa6b3821297609e2664f4d4249db07a48b1ebd58cb5d0603",
+      "bytes": 4436
+    },
+    "A1_HEADLESS_DONE": "bf2f1797d754890e716ab98ab75452d16dd9a355c593551d84b8deeea453cb84",
+    "A1_HEADLESS_DONE.raw": {
+      "sha256": "bf2f1797d754890e716ab98ab75452d16dd9a355c593551d84b8deeea453cb84",
+      "bytes": 21
+    }
+  },
+  "collector": {
+    "file": "harness/collect_a1.py",
+    "sha256": "99e969921b5b6f834c271eb6e0b1a7e90c0f912ad0246cfc769fbf897a84215e",
+    "reuses": "harness/collect_h1.py",
+    "reuses_sha256": "64445c3c073e3e0d1c14ce6a651b4b5e9dd66c51110769d26c1305829570b25c",
+    "added_after_live_run": true,
+    "reclassified": false
+  }
+}
