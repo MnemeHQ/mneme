@@ -1,0 +1,115 @@
+{
+  "rules": "as-run table + R1-R4 (#551, #561)",
+  "a1_rules": "A1 (#555) on as-run table + R1-R4 (#551, #561)",
+  "classifier_sha256": {
+    "classify_h1.py": "ba90811498ab4c90cbceb82873832fa4192c7d5f5245abac43916230c9760568",
+    "classify_a1.py": "3f407814e1569537737bee380f4978b9089b24d39bcf1d5b3dc4bb70795ef58b"
+  },
+  "reclassify_tool_sha256": {
+    "reclassify_a1.py": "9b26e01b7b8a41e91e4cdd0d2d6f3c0dae413284fda68e5a17395a59785d92c2",
+    "reclassify_h1.py (helpers)": "1dbbfdd4209d14afcaa8351e2fe82ebd4461dc62d89dc9d3e676563ddef0f89b",
+    "collect_h1.py (selection)": "64445c3c073e3e0d1c14ce6a651b4b5e9dd66c51110769d26c1305829570b25c"
+  },
+  "integrity": {
+    "archive_files_listed": 25,
+    "archive_sums_sha256": "ac05749a8db8b4254c5d292ac416e5ae4193f3486f630ef4161db3af6c870bf0",
+    "manifest_raw_files_checked": 9,
+    "problems": []
+  },
+  "label_as_run": "INCONCLUSIVE",
+  "label_r1r4_raw": "NOT_DELIVERED",
+  "label_r1r4_subset": "NOT_DELIVERED",
+  "raw_and_subset_agree": true,
+  "reasons_r1r4_raw": [],
+  "reasons_r1r4_subset": [],
+  "host_interference_as_run": [],
+  "host_interference_r1r4_raw": [],
+  "nonce_categories_r1r4_raw": [
+    [
+      "attachment.content",
+      "host_output"
+    ],
+    [
+      "attachment.stdout",
+      "host_output"
+    ]
+  ],
+  "completeness": {
+    "H1c-sm": {
+      "entries": {
+        "events": {
+          "whole": 2,
+          "trimmed": 4,
+          "dropped": 0,
+          "by_type": {
+            "system:init:trimmed": 1,
+            "system:thinking_tokens:whole": 2,
+            "assistant:None:trimmed": 2,
+            "result:success:trimmed": 1
+          }
+        },
+        "transcript": {
+          "whole": 0,
+          "trimmed": 5,
+          "dropped": 7,
+          "by_type": {
+            "queue-operation:None:dropped": 2,
+            "user:None:trimmed": 1,
+            "attachment:deferred_tools_delta:dropped": 1,
+            "attachment:agent_listing_delta:dropped": 1,
+            "attachment:skill_listing:dropped": 1,
+            "ai-title:None:dropped": 1,
+            "assistant:None:trimmed": 2,
+            "attachment:hook_success:trimmed": 1,
+            "attachment:hook_system_message:trimmed": 1,
+            "last-prompt:None:dropped": 1
+          }
+        }
+      },
+      "omitted_hits": [],
+      "hits_total": 0,
+      "stderr": {
+        "bytes": 0,
+        "nonce_occurrences": 0
+      }
+    },
+    "H1c-sm-ctl": {
+      "entries": {
+        "events": {
+          "whole": 0,
+          "trimmed": 3,
+          "dropped": 0,
+          "by_type": {
+            "system:init:trimmed": 1,
+            "assistant:None:trimmed": 1,
+            "result:success:trimmed": 1
+          }
+        },
+        "transcript": {
+          "whole": 0,
+          "trimmed": 2,
+          "dropped": 7,
+          "by_type": {
+            "queue-operation:None:dropped": 2,
+            "user:None:trimmed": 1,
+            "attachment:deferred_tools_delta:dropped": 1,
+            "attachment:agent_listing_delta:dropped": 1,
+            "attachment:skill_listing:dropped": 1,
+            "ai-title:None:dropped": 1,
+            "assistant:None:trimmed": 1,
+            "last-prompt:None:dropped": 1
+          }
+        }
+      },
+      "omitted_hits": [],
+      "hits_total": 0,
+      "stderr": {
+        "bytes": 0,
+        "nonce_occurrences": 0
+      }
+    }
+  },
+  "omitted_material_nonce_hits": 0,
+  "subset_note": "Subset replay is a supporting check against the published subset only; it depends on the raw completeness check and is not an independent reproduction.",
+  "h1_gate": "NOT MET (H1c under A1 also needs the A1-interactive run; not run)"
+}

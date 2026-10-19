@@ -82,3 +82,55 @@ The #556 review flagged a risk: an emitter-only stream `system` event for the `s
 2. **The A1-interactive run**, which is separately gated: prep, recording, finish, capture review, then `classify_a1.py interactive` and `combine`. It is the only source of developer-delivery evidence.
 
 Order and go-aheads are the owner's call. The raw evidence in `C:\dev\d5p2-h1c-a1-live` must be kept until any reclassification is recorded.
+
+## 7. Addendum: offline reclassification under R1–R4 (2026-10-19)
+
+> Sections 1–6 above are the as-run record and are **unchanged**. The as-run
+> `outcome_a1_headless.json` is unchanged too, and the as-run label stays
+> `INCONCLUSIVE` as historical fact. This addendum records a separately authorized
+> **offline** reclassification under rules R1–R4 (R4 accepted in #561 and implemented
+> in #562, merge `1d9148f4`). No host session ran, and nothing was re-run. Decision 1
+> in §6 was answered by #561. Decision 2 (the A1-interactive run) is unaffected and
+> remains separately gated.
+
+### 7.1 Archive and integrity
+
+- **Archive.** `C:\dev\d5p2-h1c-a1-live` was copied to `C:\dev\d5p2-h1c-a1-archive\2026-10-19` before any tool read it for this step. The copy is byte-identical: 25 files with identical SHA-256 listings. The listing is stored beside it as `2026-10-19.SHA256SUMS` (SHA-256 `ac05749a…6c870bf0`).
+- **Manifest check.** All **9** raw files that this record's `MANIFEST.json` hashes were checked, and all match its SHA-256s and sizes. They are `events.jsonl`, `transcript.jsonl` and `claude.stderr.txt` for both arms, plus the batch files `outcome_a1_headless.json`, `run_a1_headless.log` and `A1_HEADLESS_DONE`.
+- **The tool stops before classifying.** A copy of the checksum list with one hash altered made it abort ("integrity check failed; nothing classified") without writing any output.
+- **Protection.** The archive files are read-only. As with the H1 archive (§7.1 of the H1 record), Windows still allows new files in the folders. A test file created while checking writability was removed. The tool rejects any archive file missing from the checksum list, and after the reclassification the archive held exactly the 25 listed files and verified again.
+- **The original `C:\dev\d5p2-h1c-a1-live` is untouched.** It also verified against the same listing after the run.
+
+### 7.2 Procedure
+
+[`harness/reclassify_a1.py`](artifacts/dg1f-t08-d5-p2-h1-host-path/harness/reclassify_a1.py) (SHA-256 `9b26e01b…785d92c2`) reuses the #553 tool's integrity, completeness and subset-replay helpers unchanged (`reclassify_h1.py`, `1dbbfdd4…def0f89b`), with the #560 collector's selection (`collect_h1.py`, `64445c3c…9570b25c`). It ran the merged classifiers from `1d9148f4`: `classify_a1.py` `3f407814…795ef58b` and `classify_h1.py` `ba908114…c9760568`, with rules id `as-run table + R1-R4 (#551, #561)`. The order was:
+1. **Integrity:** archive checksums, no unlisted files, and the manifest raw-file check. All passed with no problems.
+2. **Authoritative run:** `classify_a1.headless()` on the archived **raw** evidence.
+3. **Completeness check:** a per-entry collector diff of every raw `events.jsonl` and `transcript.jsonl` entry in both arms (whole, trimmed or dropped; an omitted occurrence is a raw entry holding more nonce occurrences than its published form), plus a nonce scan of each arm's `claude.stderr.txt`.
+4. **Subset replay** of the same `headless()` on the published selected evidence. This is supporting only: it depends on step 3 and is **not** an independent reproduction.
+
+The output is [`outcome_a1_headless.r1r4.json`](artifacts/dg1f-t08-d5-p2-h1-host-path/live-a1-headless-2026-10-19/outcome_a1_headless.r1r4.json) (redacted, from the raw run) and [`reclassification.json`](artifacts/dg1f-t08-d5-p2-h1-host-path/live-a1-headless-2026-10-19/reclassification.json), both published alongside the unchanged as-run files. The collector's redaction and leak scan applied to both.
+
+### 7.3 Results
+
+| Run | As-run (§2–§3) | R1–R4, raw (authoritative) | R1–R4, subset replay |
+|---|---|---|---|
+| A1-headless (`H1c-sm` vs `H1c-sm-ctl`) | INCONCLUSIVE | **NOT_DELIVERED** | NOT_DELIVERED |
+
+- **Nonce locations under R1–R4:** `hook_success` `attachment.stdout` → `host_output` (R2), and `hook_system_message` `attachment.content` → `host_output` (R4). No location is unclassified, and none is model-bound.
+- **The change from the as-run outcome is exactly what R4 accounts for.** That location's category goes from `unclassified` to `host_output`; the label goes from `INCONCLUSIVE` to `NOT_DELIVERED`; the reason list is now empty; and `side_effect_observed: false` is added. Every other field is identical, apart from `rules`.
+- **Host interference:** none, unchanged (`a1.host_interference` is empty in both).
+- **Completeness: 0 omitted nonce occurrences.** The diff covered events: 9 entries (2 whole, 7 trimmed, 0 dropped), and transcript: 21 entries (0 whole, 7 trimmed, 14 dropped). Both `claude.stderr.txt` files are empty (0 bytes, 0 occurrences).
+- The raw run and the subset replay agree.
+
+**What `NOT_DELIVERED` means here:** the headless evidence does not establish delivery to either accepted audience. Headless delivery to the developer cannot be observed by design (§4.2), and R4 never counts as delivery. It does **not** mean the A1-interactive run must fail. Under `combine`, a headless `NOT_DELIVERED` with no interference blocks nothing: H1c under A1 passes only if the interactive run passes.
+
+**H1 gate: still NOT MET.** H1c under A1 also needs the A1-interactive run, which has not run and is not authorized.
+
+### 7.4 Not established by this addendum
+
+- **Developer (UI) visibility**, which comes only from the A1-interactive capture.
+- **Whether the host ever feeds `hook_system_message` to the model** on a later turn (#561 §3 limit, option C).
+- **Independent inspection of the raw files.** The review of #560 inspected the published evidence and the manifest hashes, not the unpublished raw contents. This addendum's integrity and completeness results come from the operator-side tool run. The reviewer can check them only through the published hashes, the tool source and the subset replay.
+- Any other host version, model or mode, and repeatability (n = 1).
+- Anything about H2–H6, the freeze amendment, implementation, or the shipped `_emit_stop_feedback` behaviour (#550).
