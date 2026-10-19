@@ -37,6 +37,12 @@ SPECS = {
                   "prompt": "Reply with the single word OK. " + ECHO},
     "H1c-stop": {"event": "Stop", "matcher": None, "mode": "stop", "tools": "Read",
                  "prompt": "Reply with the single word OK. " + ECHO},
+    # Amendment A1 (probe scope 4.2): Stop with top-level systemMessage. The same
+    # workspace and prompt serve the headless pair and the interactive pair.
+    "H1c-sm": {"event": "Stop", "matcher": None, "mode": "stop-systemmessage", "tools": "Read",
+               "prompt": "Reply with the single word OK. " + ECHO},
+    "H1c-sm-int": {"event": "Stop", "matcher": None, "mode": "stop-systemmessage", "tools": "Read",
+                   "prompt": "Reply with the single word OK. " + ECHO},
 }
 
 

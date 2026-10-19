@@ -133,3 +133,37 @@ When, and only when, the owner authorizes the H1 live batch:
 2. Put `PY='<absolute python.exe, no spaces>'` in `harness/pins.local.env`.
 3. Run `bash <harness>/run_h1.sh` from a clean, committed checkout of this harness.
 4. The evidence goes to `C:\dev\d5p2-h1-live`. Redacted collection and the validation record (`docs/validation/dg1f-t08-d5-p2-host-path-h1-<date>.md`) are a separate evidence PR. Developer-visibility observation, if wanted, is a separate operator-observed interactive run.
+
+## Amendment A1: H1c with Stop top-level `systemMessage` (offline-validated only)
+
+**Nothing here has run live.** Each of the two A1 runs needs a separate, explicit go-ahead. The accepted A1 specification is probe scope §4.2 (#555).
+
+| File | Role |
+|---|---|
+| `emitter.py` mode `stop-systemmessage` | Prints `{"systemMessage": "<notice with nonce>"}` and exits 0. There is no `hookSpecificOutput`, `decision`, `continue` or `stopReason`. |
+| `setup_probe.py` arms `H1c-sm`, `H1c-sm-int` (+ `-ctl`) | Same workspace and prompt as H1c, with the Stop hook only. The `-ctl` arms are the paired no-op controls. |
+| `pins_a1.env`, `safe_rmtree_a1.py` | The same pins as H1, but a **separate disposable root**, `C:\dev\d5p2-h1c-a1-live`. The guarded delete allowlists only the four A1 arms, and it refuses the H1 live root and the H1 archive (`PROTECTED`). |
+| `run_a1_headless.sh` (+ `run_a1_probe.sh`) | **Headless pair:** `H1c-sm-ctl`, then `H1c-sm`, then `classify_a1.py headless`. `A1_HEADLESS_DONE` means only that the pair finished. |
+| `prep_a1_interactive.sh` / `finish_a1_interactive.sh` | **Interactive pair, run by the operator.** `prep` builds the arm and prints the steps: start a screen recording; run interactive `claude --setting-sources project --permission-mode acceptEdits --allowedTools Read` in the workspace; type the prompt; wait at least 30 seconds at the input prompt; `/exit`; fill in `observation.json`. `finish` records the recording's SHA-256 and size (the recording itself stays local), copies the transcript, and validates the observation. Run the control arm first. |
+| `classify_a1.py` | `headless`, `interactive` and `combine`, per §4.2. Failure is only **host-induced** interference; model reply text, turn counts and model-chosen activity are evidence only. Developer delivery comes **only** from the interactive capture (`observation.json` plus the recording hash plus listed frames). Stream-json informational or `system` events are `host_output`. `combine` gives the H1c result under A1 (`h1c_passes_under_a1`). **Interactive delivery is verified, not just asserted:** the emitter's `notice_text_seen` must contain the exact nonce and the control's must not; every listed frame must be an existing, non-empty file inside the arm's `out/` (hashed into the outcome); both arms need a collected transcript. Anything missing gives `INCONCLUSIVE`. **Pins are enforced:** `prep` and `finish` refuse a Claude Code version other than the pin, and the classifier requires `claude_version` to equal the pin and every transcript `message.model` to equal the pinned model without its `[...]` suffix. The transcript records `claude-opus-4-8` where the stream init reports `claude-opus-4-8[1m]`. A mismatch gives `NOT_EXECUTED`, and an unrecorded model gives `INCONCLUSIVE`. **A passing verdict also needs an evidence review of BOTH captures:** a `capture_review.json` per arm (`finish` writes a pre-filled template). It names the reviewer, is bound by SHA-256 to that arm's recording and listed frames (frames are now required and verified for the control too), and states per frame whether it shows the nonce. The emitter review must confirm the nonce in at least one frame, and the control review must find it in none. Without both, a result that would pass is `INCONCLUSIVE` (`capture review pending`); the operator's observation alone never passes. |
+
+**Known collision (reported, not decided).** If Claude Code surfaces the Stop `systemMessage` as a stream-json `system` event (the docs mention an `SDKInformationalMessage`) that appears only in the emitter arm, the unchanged strict host-event subtype rule makes the headless run `INCONCLUSIVE`, and therefore H1c too. A test pins this. Changing it would need its own reviewed rule; the raw evidence allows reclassification without a re-run.
+
+**Offline validation (stub only, NOT evidence):**
+- `python -m pytest -q …/harness/selftest`: **96 passed**, of which 44 are A1 tests. They cover:
+  - the emitter's shape;
+  - setup for all four A1 arms;
+  - `safe_rmtree_a1` refusing H1 and archive names;
+  - headless: dropped notice → `NOT_DELIVERED` with no interference; stream event → strict-rule `INCONCLUSIVE`; re-entry → host interference; model delivery → `DELIVERED_TO_AGENT`; model reply differences → evidence only;
+  - interactive: developer-only → `DELIVERED_TO_USER_ONLY`; not seen → `NOT_DELIVERED`; no return to the prompt, an unexpected prompt, or re-entry → `DELIVERED_WITH_SIDE_EFFECT`; missing recording or frames, or the control showing the notice → `INCONCLUSIVE`; model reply differences → evidence only;
+  - combine: pass, interference fail, and `INCONCLUSIVE` blocking a pass;
+  - #556 review negatives: observed text without the nonce, control text containing it, a missing, empty or escaping frame path, a missing transcript in either arm → `INCONCLUSIVE`; a version or model mismatch → `NOT_EXECUTED`; an unrecorded model → `INCONCLUSIVE`; verified frame hashes on a pass;
+  - #556 review round 2: a pass needs confirmed reviews of both captures; a missing emitter or control review, missing control frames, a review not bound to the recording, a reviewed-frame hash mismatch, a review not confirming the nonce, a control review finding it, or no reviewer named → `INCONCLUSIVE`.
+- **The runners were run end to end under `H1_SELFTEST=1`** in the A1 root: the headless pair, and both interactive arms through prep, a stub session, a filled observation, finish, classify and combine. The H1 live root and the H1 archive were not touched; the archive re-verified. The A1 self-test output was removed with `safe_rmtree_a1.py`.
+
+**Running from PowerShell (when authorized).** Use your own window, never inside Claude Code:
+
+```powershell
+& "C:\Program Files\Git\bin\bash.exe" -l "<harness>/run_a1_headless.sh"
+& "C:\Program Files\Git\bin\bash.exe" -l "<harness>/prep_a1_interactive.sh" H1c-sm-int-ctl
+```
