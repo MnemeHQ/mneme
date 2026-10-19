@@ -34,6 +34,11 @@ about Claude Code. Learning the real behavior is what the live probes are for.
                    model   delivered into model context as user_text
                    reenter on Stop, forces one extra turn (stop_hook_active re-entry)
                    drop    ignored
+                   transcript  transcript-only `hook_success` (raw stdout) + `hook_system_message`
+                           (the shape recorded on Claude Code 2.1.202, #560)
+  H1_STUB_HSM_EVENT=<e>       hookEvent written into hook_system_message (default: the real event)
+  H1_STUB_HSM_FIELD=<f>       field of hook_system_message holding the text (default: content)
+  H1_STUB_HSM_UNKNOWN=1       also write the notice into an attachment type no rule recognises
   H1_STUB_DUAL=1              deliver to BOTH a user_text entry and a transcript attachment
   H1_STUB_DENY_EXTRA=1        the result reports one denial that matches no attempted request
   H1_STUB_EXTRA_ATTEMPT=1     the "agent" also attempts a Write of other.txt, which is denied
@@ -229,6 +234,17 @@ class Host:
                 self.emit({"type": "system", "subtype": "informational", "message": sm}, to_transcript=False)
             elif sm_mode == "model":
                 self.deliver(sm, ev)
+            elif sm_mode == "transcript":
+                self.transcript.append({"type": "attachment", "attachment": {
+                    "type": "hook_success", "hookName": ev, "hookEvent": ev, "content": "",
+                    "stdout": json.dumps({"systemMessage": sm}), "stderr": "", "exitCode": 0}})
+                att = {"type": "hook_system_message", "hookName": ev,
+                       "hookEvent": env("H1_STUB_HSM_EVENT") or ev}
+                att[env("H1_STUB_HSM_FIELD") or "content"] = sm
+                self.transcript.append({"type": "attachment", "attachment": att})
+                if env("H1_STUB_HSM_UNKNOWN") == "1":
+                    self.transcript.append({"type": "attachment", "attachment": {
+                        "type": "hook_notice_unrecognised", "hookEvent": ev, "content": sm}})
             elif sm_mode == "reenter" and ev == "Stop":
                 self.turns += 1
                 self.emit({"type": "assistant", "message": {"role": "assistant", "content": [
