@@ -268,7 +268,7 @@ def test_r1_hook_additional_context_for_probed_event_is_model_bound(tmp_path, pa
     assert ("attachment.content", "model_bound") in cats
     assert ("attachment.stdout", "host_output") in cats  # R2, same run
     assert r["label"] == "DELIVERED_TO_AGENT", r
-    assert r["rules"] == "as-run table + R1-R3 (#551)"
+    assert r["rules"] == "as-run table + R1-R4 (#551, #561)"
 
 
 def test_r1_wrong_hook_event_stays_unclassified(tmp_path):
@@ -338,7 +338,7 @@ def test_not_executed_outcomes_record_the_rule_set(tmp_path, case):
         knob = {"H1_STUB_NO_SESSIONSTART": "1"}
         r = _run(tmp_path, "H1b-start", knob, knob)
     assert r["label"] == "NOT_EXECUTED", r
-    assert r["rules"] == classify_h1.RULES_ID == "as-run table + R1-R3 (#551)"
+    assert r["rules"] == classify_h1.RULES_ID == "as-run table + R1-R4 (#551, #561)"
 
 
 def test_every_label_records_the_rule_set(tmp_path):

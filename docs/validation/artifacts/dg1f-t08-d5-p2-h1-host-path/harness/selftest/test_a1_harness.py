@@ -353,3 +353,89 @@ def test_interactive_control_review_finding_notice_is_inconclusive(tmp_path):
 def test_interactive_review_without_reviewer_is_inconclusive(tmp_path):
     r = _interactive(tmp_path, {"visible": True}, emit_review={"notice": True, "shows": True, "reviewer": " "})
     assert r["label"] == "INCONCLUSIVE", r
+
+
+# ---------------------------------------------------------------- R4 (#561)
+
+TR = {"H1_STUB_SM_MODE": "transcript"}  # hook_success + hook_system_message, as recorded in #560
+
+
+def _hsm(r):
+    return [l for l in r["nonce_locations"] if l["source"] == "transcript"
+            and l["entry_type"] == "attachment" and not l["json_path"].startswith("attachment.stdout")]
+
+
+def test_r4_hook_system_message_for_probed_event_is_host_output(tmp_path):
+    r = _headless(tmp_path, TR, TR)
+    assert [l["category"] for l in _hsm(r)] == ["host_output"]
+    assert {l["category"] for l in r["nonce_locations"]} == {"host_output"}  # R2 + R4
+    assert r["label"] == "NOT_DELIVERED", r
+    assert r["a1"]["host_interference"] == []
+    assert r["rules"] == A1.C.RULES_ID == "as-run table + R1-R4 (#551, #561)"
+    assert r["a1"]["rules"] == "A1 (#555) on as-run table + R1-R4 (#551, #561)"
+
+
+def test_r4_wrong_hook_event_stays_unclassified(tmp_path):
+    r = _headless(tmp_path, {**TR, "H1_STUB_HSM_EVENT": "SessionStart"}, TR)
+    assert [l["category"] for l in _hsm(r)] == ["unclassified"]
+    assert r["label"] == "INCONCLUSIVE", r
+
+
+def test_r4_requires_emitter_invocation(tmp_path):
+    # Condition (2) at the categorisation level: the same attachment, but this arm's
+    # hook log shows no emission for the probed event.
+    live = tmp_path / "live"
+    _headless(tmp_path, TR, TR)
+    emit = A1.C.load_arm(live / "H1c-sm" / "out")
+    nonce = emit["nonce"]
+
+    def hsm_cats(arm):
+        return [l["category"] for l in A1.C.nonce_locations(arm, nonce, "Stop")
+                if l["json_path"].startswith("attachment.content")]
+    assert hsm_cats(emit) == ["host_output"]
+    emit["hooks"] = []
+    assert hsm_cats(emit) == ["unclassified"]
+
+
+def test_r4_nonce_outside_content_stays_unclassified(tmp_path):
+    r = _headless(tmp_path, {**TR, "H1_STUB_HSM_FIELD": "message"}, TR)
+    locs = _hsm(r)
+    assert [(l["json_path"], l["category"]) for l in locs] == [("attachment.message", "unclassified")]
+    assert r["label"] == "INCONCLUSIVE", r
+
+
+def test_r4_never_yields_delivery_by_itself(tmp_path):
+    # Direct table check: whatever the path or event, R4 never returns model_bound.
+    entry = {"type": "attachment", "attachment": {"type": "hook_system_message", "hookEvent": "Stop"}}
+    for path in ("attachment.content", "attachment.message", "attachment.hookEvent"):
+        for invoked in ((), ("Stop",)):
+            assert A1.C.categorise("transcript", entry, path, "Stop", invoked) in ("host_output", "unclassified")
+    # End to end: even with a forced echo, R4 alone is not agent delivery.
+    r = _headless(tmp_path, {**TR, "H1_STUB_ECHO_FORCE": "1"}, TR)
+    assert "model_bound" not in {l["category"] for l in r["nonce_locations"]}
+    assert r["label"] == "INCONCLUSIVE" and r["label"] != "DELIVERED_TO_AGENT", r
+    assert any("echo without recorded model-bound delivery" in x for x in r["reasons"])
+
+
+def test_r4_does_not_mask_a_co_present_unclassified_location(tmp_path):
+    r = _headless(tmp_path, {**TR, "H1_STUB_HSM_UNKNOWN": "1"}, TR)
+    cats = {(l["json_path"], l["category"]) for l in _hsm(r)}
+    assert ("attachment.content", "host_output") in cats
+    assert ("attachment.content", "unclassified") in cats  # the unrecognised attachment type
+    assert r["label"] == "INCONCLUSIVE", r
+    assert any("does not recognise" in x for x in r["reasons"])
+
+
+def test_r4_lets_capture_reviewed_developer_delivery_pass(tmp_path):
+    # Without R4 the transcript entry would force INCONCLUSIVE whatever the capture
+    # shows (#561 section 1); with R4 the capture decides.
+    i = _interactive(tmp_path / "i", {"visible": True}, knobs=TR, ctl_knobs=TR)
+    assert {l["category"] for l in i["nonce_locations"]} == {"host_output"}
+    assert i["label"] == "DELIVERED_TO_USER_ONLY" and i["capture_review"] == "confirmed", i
+    assert "developer_also" not in i  # no agent delivery is claimed
+    h = _headless(tmp_path / "h", TR, TR)
+    c = A1.combine(h, i)
+    assert c["label"] == "DELIVERED_TO_USER_ONLY" and c["h1c_passes_under_a1"] is True, c
+    # The capture still decides: notice not seen -> NOT_DELIVERED, never a pass.
+    n = _interactive(tmp_path / "n", {"visible": False}, knobs=TR, ctl_knobs=TR)
+    assert n["label"] == "NOT_DELIVERED" and n["passes_run"] is False, n

@@ -22,7 +22,9 @@ and JSON path, and categorised by the table in CATEGORY RULES below. A location
 the table does not recognise is `unclassified`; it never counts as delivery.
 
 Rules R1-R3 (accepted in docs/plans/2026-10-17-dg1f-t08-d5-p2-h1-classifier-rules.md,
-#551) are implemented in categorise() (R1, R2) and host_events() (R3).
+#551) are implemented in categorise() (R1, R2) and host_events() (R3). Rule R4
+(accepted in docs/plans/2026-10-19-dg1f-t08-d5-p2-a1-hook-system-message-rule.md,
+#561) is implemented in categorise().
 Extending the table is a reviewed change, and because raw evidence is kept,
 the classifier can be re-run on existing evidence without a new probe.
 """
@@ -39,7 +41,7 @@ PATHS = {
     "H1b-start": {"path_type": "command_lifecycle_event", "event": "SessionStart", "tool": None},
     "H1c-stop": {"path_type": "command_lifecycle_event", "event": "Stop", "tool": None},
 }
-RULES_ID = "as-run table + R1-R3 (#551)"  # recorded in every outcome
+RULES_ID = "as-run table + R1-R4 (#551, #561)"  # recorded in every outcome
 PASSING = ("DELIVERED_TO_AGENT", "DELIVERED_TO_USER_ONLY", "EVIDENCE_REUSED")
 EDIT_EXPECTED = b"beta\n"
 BASH_FILE, BASH_EXPECTED = "bash_out.txt", b"probe-ran\n"  # exact bytes, not a prefix
@@ -266,20 +268,26 @@ def categorise(source, entry, path, probed_event=None, invoked_events=()):
     echo           text the model produced (assistant text or the final result text)
     agent_reuse    the model put the token into a tool input after receiving it
     host_output    a stream-json `system` event, or (R2) a transcript `hook_success`
-                   attachment (the hook's own stdout): output, not model input
+                   attachment (the hook's own stdout): output, not model input,
+                   or (R4) a transcript `hook_system_message` attachment for the probed
+                   event that the emitter invoked, with the token in `attachment.content`
+                   (never delivery to the agent or the developer)
     unclassified   anything else (never counted as delivery)
     """
     t = entry.get("type")
     if source == "transcript" and t == "attachment":
         att = entry.get("attachment") or {}
         kind = att.get("type")
-        if kind == "hook_additional_context":  # R1, narrow: all three conditions
-            ok = (probed_event is not None and att.get("hookEvent") == probed_event
+        # R1 and R4 share the same three narrow conditions.
+        narrow = (probed_event is not None and att.get("hookEvent") == probed_event
                   and probed_event in invoked_events
                   and (path == "attachment.content" or path.startswith("attachment.content[")))
-            return "model_bound" if ok else "unclassified"
+        if kind == "hook_additional_context":  # R1
+            return "model_bound" if narrow else "unclassified"
         if kind == "hook_success":  # R2
             return "host_output"
+        if kind == "hook_system_message":  # R4
+            return "host_output" if narrow else "unclassified"
         return "unclassified"
     if t == "assistant":
         return "agent_reuse" if ".input" in path else "echo"
