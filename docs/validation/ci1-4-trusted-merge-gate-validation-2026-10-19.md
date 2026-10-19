@@ -28,8 +28,8 @@ ADR-033 availability policy and does not authorize adoption.
   memory, substituted the evaluator or gate, or added a look-alike check. A
   green result on an earlier head did not authorize a later head.
 - **What it does not mean.** The gate judges the PR diff, not the merge
-  result (V11). It cannot protect its own definition against a separate,
-  compliant PR that weakens it first. Protection stops at each rule's path
+  result (V11). A separate, compliant PR that weakens the gate first is a
+  structurally identified, untested vulnerability. Protection stops at each rule's path
   selectors (V8). Decision-version freshness is not proven. Behavior after
   GitHub enforces its default `pull_request_target` policy (2026-11-02) is
   unknown.
@@ -115,7 +115,7 @@ check, conflicting).
 | It stays unmergeable with memory edit, deletion or symlink, evaluator substitution, gate or workflow edit, extra workflow, look-alike check, or filesystem redirection | **Met** for every attempted variant | V2, V3, V3a, V4, V5, V6, V7, V7b, V13-A, V13-B |
 | A compliant PR can merge (gate not always red) | **Met** | V0, V8, plus V11 seed #19 and rename #21 |
 | An earlier head's result cannot authorize a newer head | **Met** for the final state | V10 |
-| Overall | **Proven (T1)**, scoped to head-revision blocking (§8 V11 limitation applies) | |
+| Overall | **Proven (T1)**, scoped to head-revision blocking (§8 V11 limitation applies), with the §7 evidence gaps listed in section 2 (ruleset snapshots, `..` traversal not exercised live) | |
 
 ### 3.2 Host blocking versus classification
 
@@ -138,10 +138,13 @@ test classification, never PR input).
    merge API, citing the required check. It is not a red job (charter §10).
 3. **Check identity.** The PR-added checks in V6, V7 and V7b came from the
    same app (15368) as the gate, so the ruleset's integration pin does not
-   tell them apart. Only the check name does. With a same-name look-alike
-   green in both completion orders, GitHub still treated the context as
-   failing. That is consistent with "any failing check of the required name
-   blocks".
+   tell them apart. In V7 and V7b the look-alike also had the same name, so
+   neither name nor app id distinguished it from the genuine gate. What was
+   demonstrated is that GitHub refused the merge while a genuine failed
+   check coexisted with a successful same-name, same-app look-alike, in both
+   observed completion orders. That is consistent with "any failing check of
+   the required name blocks". It does not show that GitHub can tell the two
+   checks apart, and other orderings (re-runs, re-requests) were not tested.
 4. **Head binding.** Check runs attach to the PR head SHA (V0). A new head
    gets a new evaluation, and the old green stays attached only to the old
    SHA (V10).
@@ -156,32 +159,42 @@ report shape.
 | # | Dimension | What the evidence carries | Binding |
 |---|---|---|---|
 | 1 | Control / provenance | Workflow path and event (base copy, `pull_request_target`); run id; check run name, app id, `head_sha`; evaluator wheel sha256 **in the job log**; base commit of the gate script. The `mneme.check/v1` payload names no evaluator build, and `0.10.0` is not identity-grade (P2). `gate-report.json` holds neither the wheel hash nor the gate script digest | **Partial.** Assembled by the adapter from the log, the report and the API, not carried by the runtime trace |
-| 2 | Subject | Report: `base_sha`, `head_sha`, `merge_base`, and per file the path, git mode, content sha256 and blob id (abbreviated to 7 hex). Payload: repository-relative `input_path` only | **Partial.** Bound to the PR diff (merge-base..head) per file. Not bound to the would-be merge result (V11). The payload carries no subject digest |
+| 2 | Subject | Report: `base_sha`, `head_sha`, `merge_base`, and per file the path, git mode, content sha256 and blob id. The blob id is abbreviated (7 hex), because the gate reads `git diff --raw` without `--abbrev=40` or `--full-index`: both the V13-A and V8 artifacts record `"blob": "d7de394"` for blob `d7de39496a978e49d098472f95a3603a45bb647a`. Payload: repository-relative `input_path` only | **Partial.** Bound to the PR diff (merge-base..head) per file. Not bound to the would-be merge result (V11). The payload carries no subject digest |
 | 3 | Decision | Payload `decision_id` `ADR-901` and `decision_version_id` `dver-d3d431ff6d5edba8b555a040a7b85f9b`, in both `applicability` and `violations`. Configuration identity: memory blob `dd760bf0` and its sha256, source commit, recorded by the gate | **Bound** for the decision version in the trusted memory. Configuration identity is adapter-recorded, not runtime-emitted |
 | 4 | Rule | `rule_id` `ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b` (ADR-030 §7 form) in `applicability` and `violations` | **Bound** (ADR-031 §10: `decision_id → decision_version_id → rule_id`) |
 | 5 | Applicability | Per file and rule: `outcome` (`APPLIED` / `EXCLUDED`), `selector`, `reason`, `input_path` | **Bound.** V8's EXCLUDED is execution-observed only, never relevant enforcement (ADR-029 scenario B) |
 | 6 | Outcome | Per rule: `violations[]` with `rule_id` for FAIL; APPLIED with no violation for PASS. Host: HTTP 405 or 200 tied to the required check on `head_sha` | **Partial.** Rule-level outcome is bound inside the payload. GitHub's response names the check, not the rule; the link from 405 to rule goes through check run → workflow run → artifact |
 
-**Assessment.** For live VIOLATION rows, dimensions 3 to 5 are fully bound in
-the runtime payload, and the rule-level part of 6 is too. Dimensions 1, 2 and
-the host part of 6 are bound only by the adapter's own record (job log,
-`gate-report.json`, API responses). In ADR-029 terms the lab produces
-**relevant enforcement observed at the rule level for the PR diff**. The
-control provenance and subject bindings are adapter-asserted and not
-runtime-carried, and none of this is persisted beyond artifact retention
-(ADR-029 §7: no evidence store, which is expected).
+**Assessment.** ADR-029 §2 requires all six dimensions to be positively
+established for the **same** evaluation, and any missing dimension keeps the
+evidence at or below execution observed. For live VIOLATION rows, dimensions
+3 to 5 are bound in the runtime payload, and so is the rule-level part of 6.
+Dimensions 1, 2 and the host part of 6 rest on cross-record joins by the
+adapter: the job log, `gate-report.json`, the check run and the merge API
+response, linked by run id and head SHA. This record does not show that those
+joins meet ADR-029's bar. They are assembled by the experimenter's adapter,
+not carried by the runtime trace (ADR-029 §3, §5: no caller-supplied field
+manufactures trusted evidence). The control identity is in the job log, not
+the report, and the subject blob id is abbreviated.
+
+**Classification: execution observed, with partial evidence binding.** The
+lab does **not** claim "relevant enforcement observed" under ADR-029. The
+rule-level chain (decision version → rule → applicability → rule outcome) is
+complete inside the payload, which is the strongest part of the evidence.
+None of this is persisted beyond artifact retention (ADR-029 §7: no evidence
+store, which is expected).
 
 **Missing bindings, stated explicitly:**
 
 - the evaluator build identity in the runtime payload or in `gate-report.json`
 - the gate script digest in `gate-report.json`
-- a full (non-abbreviated) blob id per materialized file (the content sha256 is present)
+- a full blob id per materialized file: the report records 7 hex (see dimension 2). The content sha256 is present and fully identifies the bytes evaluated
 - any binding to the post-merge revision or the synthetic merge commit
 - the rule identity in the host's merge response (structural on GitHub, not fixable in the gate)
 - durable retention of the bound record beyond about 90 days
 
 UNEVALUATED rows (V9-A, V12) and refused paths carry no payload binding. They
-correctly stay below relevant enforcement observed and fail closed.
+fail closed and are not even rule-level bound.
 
 ## 5. Revision freshness
 
@@ -197,14 +210,16 @@ correctly stay below relevant enforcement observed and fail closed.
 
 ## 6. Limitations and unresolved risks
 
-1. **Separate-PR gate weakening (structural, not run).** The gate cannot
-   protect its own definition. A PR that changes only `gate/ci1_gate.py` or
-   `.github/workflows/ci1-trusted-gate.yml` has nothing in `docs/**`. Those
-   files are evaluated as data and classified VERIFIED_PASS (observed for the
-   gate and workflow files in V5, and the package files in V4). With 0
-   required approvals such a PR merges. Every later PR then runs the weakened
-   base gate. This follows from the T1 design and the V4/V5 evidence. It was
-   not executed live. Mitigation candidates (required review on gate paths,
+1. **Separate-PR gate weakening (structurally identified, untested).** The
+   gate has no mechanism that protects its own definition. A PR that changes
+   only `gate/ci1_gate.py` or `.github/workflows/ci1-trusted-gate.yml` has
+   nothing in `docs/**`. Such files were evaluated as data and classified
+   VERIFIED_PASS (the gate and workflow files in V5, the package files in
+   V4). With 0 required approvals, the strong prediction is that such a PR
+   would merge, and every later PR would then run the weakened base gate.
+   **No such PR was opened and no host-side merge was attempted**, so this is
+   a design-level prediction, not an observed result. It is enough on its own
+   to justify deferring adoption. Mitigation candidates (required review on gate paths,
    which is T3 and so human-dependent; an external check identity, T4; or
    refusing changes to gate paths) each need their own charter.
 2. **Excluded paths (by design).** Protection is exactly as wide as each
@@ -249,8 +264,9 @@ correctly stay below relevant enforcement observed and fail closed.
 **Basis.** The lab proved the narrow T1 claim: with trusted inputs from the
 base, a violating PR cannot merge, and substitution attempts inside the same
 PR do not change that. It did not prove that `main` stays conformant. The
-gate judges diffs, not merge results (V11). Its own definition can be
-weakened by an earlier, compliant PR (section 6.1). Decision freshness is
+gate judges diffs, not merge results (V11). There is a structurally
+identified, untested path to weaken its definition through an earlier,
+compliant PR (section 6.1). Decision freshness is
 unchecked. Experimental success is not production readiness, and charter §9.4
 and ADR-031 §7 require a separate charter and `[layer1-freeze]` amendment for
 any adoption in any case.
