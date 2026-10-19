@@ -46,4 +46,26 @@ o=json.load(open(sys.argv[1],encoding='utf-8'))
 bad=[k for k in ('notice_visible','returned_to_input_prompt','unexpected_prompt') if not isinstance(o.get(k),bool)]
 if bad: sys.exit('observation.json: fill in booleans: '+', '.join(bad))
 print('observation.json ok')" "$(cygpath -w "$OUT/observation.json")" || die "observation.json incomplete"
-echo "Finished $ARM."
+# Evidence-review template (review of #556): pre-filled with this arm's recording and
+# frame hashes; a reviewer other than the classifier must fill in shows_nonce per frame,
+# notice_visible and reviewer, from the RECORDING, and save it as capture_review.json.
+"$PY" -I - "$(cygpath -w "$OUT")" <<'PYEOF' || die "cannot write capture review template"
+import hashlib, json, os, sys
+out = sys.argv[1]
+obs = {}
+for line in open(os.path.join(out, "observer.txt"), encoding="utf-8"):
+    if "=" in line:
+        k, v = line.rstrip("\n").split("=", 1)
+        obs.setdefault(k, v)
+o = json.load(open(os.path.join(out, "observation.json"), encoding="utf-8"))
+frames = []
+for f in o.get("frames") or []:
+    p = os.path.join(out, f.get("file", ""))
+    if os.path.isfile(p):
+        frames.append({"file": f["file"], "t": f.get("t"),
+                       "sha256": hashlib.sha256(open(p, "rb").read()).hexdigest(), "shows_nonce": None})
+json.dump({"_instructions": "Review the recording and each frame; set shows_nonce per frame and notice_visible, name the reviewer, then save as capture_review.json.",
+           "reviewer": "", "recording_sha256": obs.get("recording_sha256"), "notice_visible": None,
+           "frames": frames}, open(os.path.join(out, "capture_review.template.json"), "w", encoding="utf-8"), indent=2)
+PYEOF
+echo "Finished $ARM. Capture review template: $(cygpath -w "$OUT/capture_review.template.json")"

@@ -76,7 +76,25 @@ def _observe(out, visible, returned=True, prompt=False, recording=True, frames=T
         "frames": [{"t": "00:05", "file": frame_file}] if frames else []}), encoding="utf-8")
 
 
-def _interactive(tmp_path, emit_obs, ctl_obs=None, knobs=None, ctl_knobs=None, drop_transcript=None):
+def _review(out, notice, shows, reviewer="independent reviewer", sha=None, frame_sha=None, skip=False):
+    """Simulate the evidence review of one arm's capture (capture_review.json)."""
+    if skip:
+        return
+    import hashlib
+    obs = dict(l.split("=", 1) for l in (out / "observer.txt").read_text(encoding="utf-8").splitlines() if "=" in l)
+    o = json.loads((out / "observation.json").read_text(encoding="utf-8"))
+    frames = []
+    for f in o.get("frames") or []:
+        fp = out / f["file"]
+        h = hashlib.sha256(fp.read_bytes()).hexdigest() if fp.is_file() else "0" * 64
+        frames.append({"file": f["file"], "sha256": frame_sha or h, "shows_nonce": shows})
+    (out / "capture_review.json").write_text(json.dumps({
+        "reviewer": reviewer, "recording_sha256": sha or obs.get("recording_sha256"),
+        "notice_visible": notice, "frames": frames}), encoding="utf-8")
+
+
+def _interactive(tmp_path, emit_obs, ctl_obs=None, knobs=None, ctl_knobs=None, drop_transcript=None,
+                 emit_review=None, ctl_review=None):
     live = tmp_path / "live"
     co = _arm(live, "H1c-sm-int-ctl", {"H1_STUB_SM_MODE": "drop", **(ctl_knobs or {})})
     eo = _arm(live, "H1c-sm-int", {"H1_STUB_SM_MODE": "drop", **(knobs or {})})
@@ -84,6 +102,8 @@ def _interactive(tmp_path, emit_obs, ctl_obs=None, knobs=None, ctl_knobs=None, d
     _observe(eo, **emit_obs)
     if drop_transcript:
         (live / drop_transcript / "out" / "transcript.jsonl").unlink()
+    _review(eo, **(emit_review or {"notice": True, "shows": True}))
+    _review(co, **(ctl_review or {"notice": False, "shows": False}))
     return A1.interactive(live, PIN_VERSION, PIN)
 
 
@@ -246,7 +266,8 @@ def test_interactive_control_text_containing_nonce_is_inconclusive(tmp_path):
     o["notice_text_seen"] = nonce
     obs.write_text(json.dumps(o), encoding="utf-8")
     r = A1.interactive(live, PIN_VERSION, PIN)
-    assert r0["label"] == "DELIVERED_TO_USER_ONLY" and r["label"] == "INCONCLUSIVE", r
+    assert r0["label"] == "DELIVERED_TO_USER_ONLY", r0
+    assert r["label"] == "INCONCLUSIVE", r
 
 
 @pytest.mark.parametrize("frame_file, write", [("frames/f1.png", False), ("../escape.png", True), ("", True)])
@@ -283,3 +304,52 @@ def test_interactive_model_unrecorded_is_inconclusive(tmp_path):
 
 def test_pinned_model_suffix_is_stripped_for_transcript_comparison():
     assert A1._base_model("claude-opus-4-8[1m]") == "claude-opus-4-8"
+
+
+# ---------------------------------------------------------------- review of #556 (round 2): capture review
+
+def test_interactive_pass_requires_confirmed_capture_review(tmp_path):
+    r = _interactive(tmp_path, {"visible": True})
+    assert r["label"] == "DELIVERED_TO_USER_ONLY" and r["capture_review"] == "confirmed", r
+    assert r["control_frames_verified"]
+
+
+@pytest.mark.parametrize("which", ["emitter", "control"])
+def test_interactive_missing_capture_review_is_inconclusive(tmp_path, which):
+    kw = {"emit_review": {"notice": True, "shows": True, "skip": True}} if which == "emitter" else \
+         {"ctl_review": {"notice": False, "shows": False, "skip": True}}
+    r = _interactive(tmp_path, {"visible": True}, **kw)
+    assert r["label"] == "INCONCLUSIVE", r
+    assert any("capture review pending" in x and which in x for x in r["reasons"])
+
+
+def test_interactive_missing_control_capture_frames_is_inconclusive(tmp_path):
+    r = _interactive(tmp_path, {"visible": True}, ctl_obs={"visible": False, "frames": False})
+    assert r["label"] == "INCONCLUSIVE", r
+    assert any("control" in x and "frames" in x for x in r["reasons"])
+
+
+def test_interactive_review_not_bound_to_recording_is_inconclusive(tmp_path):
+    r = _interactive(tmp_path, {"visible": True}, emit_review={"notice": True, "shows": True, "sha": "cd" * 32})
+    assert r["label"] == "INCONCLUSIVE", r
+
+
+def test_interactive_review_frame_hash_mismatch_is_inconclusive(tmp_path):
+    r = _interactive(tmp_path, {"visible": True}, ctl_review={"notice": False, "shows": False, "frame_sha": "ef" * 32})
+    assert r["label"] == "INCONCLUSIVE", r
+
+
+def test_interactive_review_not_showing_nonce_is_inconclusive(tmp_path):
+    r = _interactive(tmp_path, {"visible": True}, emit_review={"notice": True, "shows": False})
+    assert r["label"] == "INCONCLUSIVE", r
+    assert any("does not confirm the nonce" in x for x in r["reasons"])
+
+
+def test_interactive_control_review_finding_notice_is_inconclusive(tmp_path):
+    r = _interactive(tmp_path, {"visible": True}, ctl_review={"notice": False, "shows": True})
+    assert r["label"] == "INCONCLUSIVE", r
+
+
+def test_interactive_review_without_reviewer_is_inconclusive(tmp_path):
+    r = _interactive(tmp_path, {"visible": True}, emit_review={"notice": True, "shows": True, "reviewer": " "})
+    assert r["label"] == "INCONCLUSIVE", r

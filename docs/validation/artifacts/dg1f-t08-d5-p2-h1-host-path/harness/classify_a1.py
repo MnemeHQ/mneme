@@ -26,6 +26,13 @@ Rules (probe scope 4.2, accepted in #555):
   transcript records `claude-opus-4-8` where the stream init reports
   `claude-opus-4-8[1m]`, as the H1 batch shows). A mismatch gives NOT_EXECUTED,
   and an unverifiable model (no model field) gives INCONCLUSIVE.
+- A PASSING interactive verdict also requires an EVIDENCE REVIEW of BOTH captures
+  (review of #556, second round): `<arm>/out/capture_review.json` for the emitter and
+  the control, naming the reviewer, bound by SHA-256 to that arm's recording and
+  listed frames, and stating per frame whether it shows the nonce. The emitter review
+  must confirm the notice in at least one frame, and the control review must confirm
+  no frame shows it. Without both reviews, a result that would pass is INCONCLUSIVE
+  (`capture review pending`). The operator's observation alone never passes.
 - A stream-json informational/system event carrying the nonce is `host_output`:
   recorded, never delivery (classify_h1 table, unchanged).
 - A model-bound nonce location (classify_h1 table, including R1) is agent delivery.
@@ -150,6 +157,41 @@ def _frames_ok(arm):
     return checked, problems
 
 
+def _review_ok(arm, frames, expect_notice):
+    """Check <out>/capture_review.json against the arm's recording hash and verified frames."""
+    p = Path(arm["out"]) / "capture_review.json"
+    if not p.exists():
+        return ["capture review missing"]
+    try:
+        rv = json.loads(p.read_text(encoding="utf-8"))
+    except ValueError:
+        return ["capture review is not valid JSON"]
+    problems = []
+    if not (isinstance(rv.get("reviewer"), str) and rv["reviewer"].strip()):
+        problems.append("capture review names no reviewer")
+    if rv.get("recording_sha256") != arm["observer"].get("recording_sha256"):
+        problems.append("capture review is not bound to this arm's recording (SHA-256 differs)")
+    reviewed = {f.get("file"): f for f in rv.get("frames") or [] if isinstance(f, dict)}
+    for fr in frames:
+        r = reviewed.get(fr["file"])
+        if r is None:
+            problems.append(f"frame not reviewed: {fr['file']}")
+        elif r.get("sha256") != fr["sha256"]:
+            problems.append(f"reviewed frame hash differs: {fr['file']}")
+        elif not isinstance(r.get("shows_nonce"), bool):
+            problems.append(f"review gives no shows_nonce for {fr['file']}")
+    if problems:
+        return problems
+    shown = any(reviewed[fr["file"]]["shows_nonce"] for fr in frames)
+    if not isinstance(rv.get("notice_visible"), bool):
+        return ["capture review gives no notice_visible conclusion"]
+    if expect_notice and not (shown and rv["notice_visible"]):
+        return ["capture review does not confirm the nonce in any frame"]
+    if not expect_notice and (shown or rv["notice_visible"]):
+        return ["capture review finds the notice in the control"]
+    return []
+
+
 def interactive(live, pin_version, pin_model):
     emit, ctl = _int_arm(live, "H1c-sm-int"), _int_arm(live, "H1c-sm-int-ctl")
     nonce = emit["nonce"]
@@ -205,8 +247,13 @@ def interactive(live, pin_version, pin_model):
         return done("INCONCLUSIVE")
     oe, oc = emit["observation"], ctl["observation"]
     frames, frame_problems = _frames_ok(emit)
+    ctl_frames, ctl_frame_problems = _frames_ok(ctl)
     rec["frames_verified"] = frames
+    rec["control_frames_verified"] = ctl_frames
     reasons.extend(f"emitter: {p}" for p in frame_problems)
+    reasons.extend(f"control: {p}" for p in ctl_frame_problems)
+    if not ctl_frames and not ctl_frame_problems:
+        reasons.append("control: no frames listed for the notice area")
     if oe["notice_visible"] and nonce not in (oe.get("notice_text_seen") or ""):
         reasons.append("emitter: notice_visible but notice_text_seen does not contain the exact nonce")
     if nonce in (oc.get("notice_text_seen") or ""):
@@ -246,6 +293,15 @@ def interactive(live, pin_version, pin_model):
         "control": sum(1 for _, e in ctl["transcript"] if e.get("type") == "assistant")}}
     if interference:
         return done("DELIVERED_WITH_SIDE_EFFECT")
+    would_pass = "model_bound" in cats or oe["notice_visible"]
+    if would_pass:
+        # A passing verdict needs the evidence review of BOTH captures.
+        review = [f"emitter: {p}" for p in _review_ok(emit, frames, expect_notice=oe["notice_visible"])]
+        review += [f"control: {p}" for p in _review_ok(ctl, ctl_frames, expect_notice=False)]
+        rec["capture_review"] = "confirmed" if not review else "pending"
+        if review:
+            reasons.append("capture review pending: " + "; ".join(review))
+            return done("INCONCLUSIVE")
     if "model_bound" in cats:
         rec["developer_also"] = oe["notice_visible"]
         return done("DELIVERED_TO_AGENT")
