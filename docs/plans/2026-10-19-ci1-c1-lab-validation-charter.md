@@ -79,8 +79,9 @@ and gate at `3a87809c`, not from a general list.
 
 **Not on the surface, with reasons:**
 - `tests/**`: not read by any gate run, and no workflow runs it. Weakening a
-  test does not change a verdict. Leaving it open keeps C1's own tests
-  editable through a later bootstrap-style change. **Open question Q2.**
+  test does not change a verdict. Tests are not gate inputs, so they are not
+  protected. The offline evidence is fixed instead by recording the tested
+  implementation and test commit SHAs (section 7).
 - `GATE.md`, `README.md`, `docs/**`, `src/**`: not read by the gate. `docs/**`
   stays subject to ADR-901.
 
@@ -151,10 +152,15 @@ and merge. This is the threat from the threat model §1, in a benign form.
 |---|---|---|---|---|
 | B0 | Bootstrap C1 | `gate/ci1_gate.py` (C1) + `tests/test_ci1_gate.py` (O1 to O10); optional `GATE.md` note | VERIFIED_PASS for every file (evaluated as data by the **old** base gate) | **HTTP 200**, lab `main` moves |
 
-B0 is also the **first observed instance** of the threat-model prediction "a
-PR that changes only the gate's trusted surface merges" (threat model §1.3,
-"predicted, never attempted"). It turns that prediction into an observation
-without installing a weakened gate. The record must say so, and must not
+**What B0 demonstrates, exactly.** B0 is not a PR that changes only the
+trusted surface: it also changes `tests/test_ci1_gate.py`, which is off the
+surface, and may change `GATE.md`. What it shows is narrower: **a PR
+containing a benign modification of the gate script (`gate/ci1_gate.py`)
+merges under the old gate**, with the gate script evaluated as data. That is
+the core mechanism behind the threat model's prediction (§1.3, "predicted,
+never attempted"), observed without installing a weakened gate. It does not
+show that a weakening edit would merge, nor what later PRs would then run.
+The record must state B0's exact contents and this scope, and must not
 present it as a bypass.
 
 After B0, every further trusted-surface change, **including a revert of C1**,
@@ -200,12 +206,21 @@ As CI1.3 charter §7 and as collected for V0 to V13, plus C1-specific items:
 - every check run on the head: name, app id, `head_sha`, conclusion
 - the artifact name and digest
 - the merge API status line, request id and body
-- after each row: lab `main` SHA, `main`'s memory blob, and ruleset `25313704`
-  and policy `7806` as read back (id, enforcement, `updated_at`). Full ruleset
-  and policy JSON once before B0 and once after the batch. CI1.4 §2 named the
-  missing per-row snapshot as a gap, so this closes it
-- for B0 only: the C1 commit's diff, the offline test run output (O1 to O10),
-  and the gate script blob that lands on `main`
+- **complete authoritative snapshots, per row:** immediately before each pinned
+  merge attempt and immediately after it, the full JSON of
+  `GET /repos/MnemeHQ/mneme-ci1-lab/rulesets/25313704` and of
+  `GET /repos/MnemeHQ/mneme-ci1-lab/actions/policies/7806` (API version
+  `2026-03-10`), stored verbatim with their sha256, plus lab `main` SHA and
+  `main`'s memory blob. Also once before B0 and once after the batch. This
+  closes the per-row snapshot gap CI1.4 §2 named, for this experiment only.
+  The snapshots are read through the operator's token; they show what GitHub
+  reported at that moment, not a signed attestation
+- for B0 only: the C1 commit's diff, the gate script blob that lands on
+  `main`, and the offline test run output (O1 to O10)
+- **the tested commits:** the implementation commit SHA and the test commit
+  SHA that O1 to O10 ran against, and confirmation that B0's head contains
+  exactly those blobs. This fixes the offline evidence without protecting
+  `tests/**` (section 3)
 
 The local evidence collector (`ci1_evidence.py`) is executor tooling that has
 not been reviewed. It reads; it never decides a row. The record states this.
@@ -222,8 +237,9 @@ when it merges. Fixes found after B0 cannot use the gated path.
 separately approved admin action outside C1 (P8):
 
 1. **Archive the lab after the batch (preferred).** The lab is temporary. Its
-   README plans archiving after CI1.4; this batch would extend its life by one
-   step. Archiving needs no revert.
+   README plans archiving after CI1.4, which is complete, so running this
+   experiment at all **extends the lab's lifetime** and needs its own
+   approval (section 10, item 2). Archiving needs no revert.
 2. **Temporarily set ruleset `25313704` enforcement to `disabled`**, merge a
    revert PR, and re-enable it. This is the documented fallback for an
    unmergeable lab (#540). It is a P8 admin action and is recorded as such,
@@ -272,12 +288,20 @@ recommendation by itself.
 Each is separate:
 
 1. Acceptance of this charter (PR review).
-2. Review of the C1 implementation commit and its offline results (O1 to O10)
+2. **Extension of the lab's lifetime** beyond CI1.4, limited to this
+   experiment (B0 and L1 to L6). The approval names the end condition (batch
+   complete or stopped), requires the evidence in section 7 to be preserved
+   before teardown, and fixes the teardown disposition (item 4). It does not
+   extend the lab for any other work.
+3. Review of the C1 implementation commit and its offline results (O1 to O10)
    **before** B0 is opened, including the surface list in section 3 and the
    open questions in section 12.
-3. The post-batch disposition (section 8, option 1 or 2), decided before B0.
-4. B0: opening the bootstrap PR and its one pinned merge.
-5. The batch L1 to L6, run in order with stop-on-unexpected.
+4. The post-batch disposition (section 8, option 1 or 2), decided before B0.
+5. B0: opening the bootstrap PR and its one pinned merge.
+6. The batch L1 to L6, run in order with stop-on-unexpected.
+
+No bootstrap PR, live merge attempt or configuration change happens without
+the matching approval above.
 
 ## 11. Explicitly not authorized
 
@@ -299,15 +323,16 @@ Each is separate:
   at `3a87809c`. O9 checks the workflow's `base/` reads mechanically. Any
   input outside `base/` (for example a new action input) is not covered by O9
   and needs review.
-- **Q2. `tests/**`.** Left off the surface because nothing runs it in CI.
-  Should C1 protect it anyway, so the offline evidence cannot be edited after
-  B0?
+- **Q2. `tests/**` (resolved in review).** Not protected: tests are not gate
+  inputs. The tested implementation and test commit SHAs are preserved as
+  evidence instead (section 7).
 - **Q3. `.gitattributes` influence (S6).** Listed because the base checkout
   reads it. Whether a change could alter a verdict was not analyzed.
 - **Q4. Reporting field.** The exact name and values of the refusal `kind`
   field, and whether the `Gate decision` step should surface it.
 - **Q5. Post-2026-11-02 behavior.** Unknown. Section 8 handles timing, not the
   behavior itself.
-- **Q6. Lab lifetime.** Whether the lab is still needed after the batch, for
-  example for an exception-route charter. That decides between section 8's
-  options.
+- **Q6. Lab lifetime after the batch.** The extension in section 10 covers
+  this experiment only. Whether the lab is needed afterwards (for example for
+  an exception-route charter) is a separate decision. It also decides between
+  section 8's options.
