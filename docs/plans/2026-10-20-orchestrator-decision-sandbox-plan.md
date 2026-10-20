@@ -2,7 +2,10 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** EXECUTED on this branch. Results:
+**Status:** EXECUTED on this branch, then reconciled against `main` after
+MnemeHQ/mneme#573 (`cf6bc40b`): pre-fix evidence is frozen under
+`validation/orchestrator-decision-sandbox/evidence/pre-fix/` and current
+measurements are under `evidence/post-fix/`. Results:
 [`validation/orchestrator-decision-sandbox/RESULTS.md`](../../validation/orchestrator-decision-sandbox/RESULTS.md).
 Deviations from the tasks below, made after an independent adversarial
 review: supported-path agent scenarios pass absolute in-project paths;
@@ -108,8 +111,8 @@ therefore runs with `cwd=<fixture root>`.
 
 ## Global Constraints
 
-- Synthetic only. No partner, customer, or project names; no "design partner"
-  wording; no private audit text or inferences; no screenshots. Applies to
+- Synthetic only. No third-party, organization or project names, no
+  non-synthetic identifiers or material, and no screenshots. Applies to
   source, fixtures, prompts, logs, commit messages, PR text and issues.
 - No network, no provider keys, no live model in this plan. A live
   Claude Code run is out of scope.
@@ -470,21 +473,19 @@ them. Adding them to CI is a later, separate change.
 
 - [ ] **Step 1:** `python scripts/run_test_battery.py gate` and
   `mneme check --mode warn` per repo instructions. Expected: no new failures.
-- [ ] **Step 2:** Confidentiality pass, run by the operator outside the repo
-  with a private term list (the list never enters the repo): grep the diff,
-  commit messages and PR body. Expected: zero hits.
+- [ ] **Step 2:** Confidentiality pass: scan the diff, commit messages and PR
+  body for non-synthetic identifiers. Expected: zero hits.
 - [ ] **Step 3:** Open the PR titled
   `feat(validation): synthetic orchestrator decision sandbox (A-F, LangGraph 6A/6B)`
   with an `## Execution provenance` block, validated with
   `python scripts/check_pr_provenance.py --body-file <file>`.
 - [ ] **Step 4:** Stop at review. Do not merge.
 
-## Out of this repository
+## Out of scope for this PR
 
-These belong to the private side and are not tasks in this PR:
-- The one-page findings note for the external reviewer, written from
-  `RESULTS.md` once the PR is reviewed.
-- The two reviewer questions (are the four router changes representative;
-  is there an isolated mutation point worth a later experiment).
-- Any experiment against a real orchestrator, which needs its own scope,
-  approval and a private environment.
+- A short summary of the synthetic validation for independent review,
+  written from `RESULTS.md` once the PR is reviewed.
+- Review questions: whether the four router changes are representative, and
+  whether an isolated mutation point is worth a later experiment.
+- Any experiment against a non-synthetic orchestrator, which needs its own
+  scope, approval and an isolated environment.

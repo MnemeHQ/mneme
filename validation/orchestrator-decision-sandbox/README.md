@@ -57,8 +57,11 @@ the runner exits 3 (blocker) if any installed version differs.
 
 `run_sandbox.py` prints a transcript, writes raw output to
 `evidence/runs/<UTC stamp>/` (git-ignored) and reports whether the fresh
-deterministic summary is byte-identical to the committed
-[`evidence/summary.json`](evidence/summary.json). Pass `--write-summary` only
-when intentionally refreshing the committed summary.
+deterministic summary is byte-identical to the committed current-runtime
+summary [`evidence/post-fix/summary.json`](evidence/post-fix/summary.json).
+Pass `--write-summary` only when intentionally refreshing that summary. The
+historical pre-fix evidence in [`evidence/pre-fix/`](evidence/pre-fix/) is
+never written by the runner; a test checks its digests. The runner requires a
+checkout that contains MnemeHQ/mneme#573 (`cf6bc40b`) and exits 3 otherwise.
 
 The tests live outside the default `testpaths` and are not part of CI.

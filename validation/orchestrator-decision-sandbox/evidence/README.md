@@ -2,10 +2,15 @@
 
 ## What is committed
 
-- `summary.json`: deterministic summary of one full run. No timestamps,
-  absolute paths, tool-message text or environment data, so a rerun on the
-  pinned build must reproduce it byte for byte.
-- `summary.csv`: the same rows, flattened.
+- `post-fix/summary.json` and `post-fix/summary.csv`: the current-runtime
+  measurement (`main` including MnemeHQ/mneme#573). Deterministic: no
+  timestamps, absolute paths, tool-message text or environment data, so a
+  rerun on the pinned build must reproduce it byte for byte.
+- `pre-fix/`: historical evidence from the runtime before #573: the summary,
+  CSV and original `RESULTS.md`, moved unchanged, plus `PROVENANCE.json` with
+  their SHA-256 digests and source commits. Immutable: never regenerate or
+  edit; `test_pre_fix_evidence_is_unchanged` enforces the digests. Relative
+  links inside `pre-fix/RESULTS.md` refer to its original location.
 
 Raw run output (`runs/<UTC stamp>/`: `report.json` with environment and full
 `pip freeze`, CLI stdout/stderr, audit JSON, transcript, `MANIFEST.sha256`
