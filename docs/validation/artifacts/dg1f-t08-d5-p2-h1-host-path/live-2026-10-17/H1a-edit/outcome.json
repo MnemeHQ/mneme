@@ -1,0 +1,132 @@
+{
+  "path_id": "H1a-edit",
+  "path_type": "command_tool_event",
+  "event": "PreToolUse",
+  "developer_also": "not_observed",
+  "harness": "headless (-p, stream-json)",
+  "emitter_invocations": 1,
+  "control_hook_invocations": 1,
+  "nonce_locations": [
+    {
+      "source": "events",
+      "line": 11,
+      "entry_type": "assistant",
+      "entry_subtype": null,
+      "json_path": "message.content[0].text",
+      "category": "echo"
+    },
+    {
+      "source": "events",
+      "line": 12,
+      "entry_type": "result",
+      "entry_subtype": "success",
+      "json_path": "result",
+      "category": "echo"
+    },
+    {
+      "source": "transcript",
+      "line": 11,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.stdout",
+      "category": "unclassified"
+    },
+    {
+      "source": "transcript",
+      "line": 12,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.content[0]",
+      "category": "unclassified"
+    },
+    {
+      "source": "transcript",
+      "line": 15,
+      "entry_type": "assistant",
+      "entry_subtype": null,
+      "json_path": "message.content[0].text",
+      "category": "echo"
+    }
+  ],
+  "transcript_collected": true,
+  "echoed": true,
+  "turns": 3,
+  "turns_control": 3,
+  "permissions": {
+    "emitter": {
+      "unmatched_denials": []
+    },
+    "control": {
+      "unmatched_denials": []
+    },
+    "comparison": {
+      "equivalent_requests": [
+        [
+          "Edit",
+          "{\"file_path\": \"<WS>\\\\notes.txt\", \"new_string\": \"beta\", \"old_string\": \"alpha\", \"replace_all\": false}"
+        ],
+        [
+          "Read",
+          "{\"file_path\": \"<WS>\\\\notes.txt\"}"
+        ]
+      ],
+      "mismatched_decisions": [],
+      "non_equivalent_attempts": {
+        "emitter": [],
+        "control": []
+      }
+    }
+  },
+  "host_events": {
+    "emitter_subtypes": [
+      "thinking_tokens",
+      "thinking_tokens",
+      "thinking_tokens",
+      "thinking_tokens"
+    ],
+    "control_subtypes": [
+      "thinking_tokens",
+      "thinking_tokens"
+    ],
+    "indicators": {
+      "emitter": {},
+      "control": {},
+      "mismatched": []
+    }
+  },
+  "controls": {
+    "path_type_emitter": {
+      "tool_use_present": true,
+      "tool_result_present": true,
+      "tool_result_not_error": true,
+      "not_permission_denied": true,
+      "file_as_expected": true,
+      "holds": true
+    },
+    "path_type_control_arm": {
+      "tool_use_present": true,
+      "tool_result_present": true,
+      "tool_result_not_error": true,
+      "not_permission_denied": true,
+      "file_as_expected": true,
+      "holds": true
+    },
+    "common": {
+      "permission_decisions_equal_for_equivalent_requests": true,
+      "host_indicators_equal": true,
+      "result_not_error": true,
+      "file_matches_control": true
+    }
+  },
+  "label": "INCONCLUSIVE",
+  "passes_path": false,
+  "reasons": [
+    "unexplained host-event difference between arms (emitter ['thinking_tokens', 'thinking_tokens', 'thinking_tokens', 'thinking_tokens'], control ['thinking_tokens', 'thinking_tokens'])",
+    "nonce found in locations the category table does not recognise; review needed"
+  ],
+  "observer": {
+    "claude_version": "2.1.202 (Claude Code)",
+    "selftest": null,
+    "date": "2026-10-17T17:51:36Z"
+  }
+}

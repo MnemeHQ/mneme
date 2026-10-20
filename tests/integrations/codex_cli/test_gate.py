@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pytest
 
+from tests.integrations.check_contract import check_payload, check_result_for, violation
 from mneme.integrations.codex_cli.gate import (
     DENY,
     FAIL_OPEN,
@@ -26,17 +27,20 @@ FIXTURES = Path(__file__).resolve().parent / "fixtures"
 FROZEN = "pretooluse_applypatch_addfile_allow.json"
 
 
-def _verdict_stdout(verdict="PASS", **overrides):
-    payload = {
-        "schema": "mneme.check/v1",
-        "verdict": verdict,
-        "mode": "strict",
-        "violations": [],
-        "freshness": [],
-        "evaluation_complete": True,
-    }
-    payload.update(overrides)
-    return json.dumps(payload)
+def _verdict(verdict="PASS", *, violations=None, evaluation_complete=True,
+             applicability=None):
+    """Answer as the real CLI would, in whatever mode the gate requested."""
+
+    def answer(command):
+        return check_result_for(
+            command,
+            verdict,
+            violations=violations,
+            complete=evaluation_complete,
+            applicability=applicability,
+        )
+
+    return answer
 
 
 class RecordingRunner:
@@ -53,6 +57,8 @@ class RecordingRunner:
         self.calls.append((command, kwargs))
         if self.raise_exc is not None:
             raise self.raise_exc
+        if callable(self.stdout):
+            return self.stdout(command)
         return subprocess.CompletedProcess(
             command, self.returncode, stdout=self.stdout, stderr=self.stderr
         )
@@ -84,7 +90,7 @@ def _evaluate(tmp_path, runner, mode=None, fixture=FROZEN):
 
 def test_frozen_payload_produces_exact_invocation(tmp_path, monkeypatch):
     project, memory = _governed_project(tmp_path, monkeypatch)
-    runner = RecordingRunner(stdout=_verdict_stdout("PASS"))
+    runner = RecordingRunner(stdout=_verdict("PASS"))
     result = _evaluate(project, runner)
 
     assert len(runner.calls) == 1
@@ -109,7 +115,7 @@ def test_frozen_payload_produces_exact_invocation(tmp_path, monkeypatch):
 
 def test_pass_returns_pass_with_no_deny_output(tmp_path, monkeypatch):
     project, _ = _governed_project(tmp_path, monkeypatch)
-    result = _evaluate(project, RecordingRunner(stdout=_verdict_stdout("PASS")))
+    result = _evaluate(project, RecordingRunner(stdout=_verdict("PASS")))
     assert result.action == PASS
     assert codex_deny_output(result) is None
 
@@ -119,17 +125,15 @@ def test_pass_returns_pass_with_no_deny_output(tmp_path, monkeypatch):
 
 def test_strict_violation_denies_with_mneme_reason(tmp_path, monkeypatch):
     project, _ = _governed_project(tmp_path, monkeypatch)
-    violation = [{
-        "decision_id": "storage_json",
-        "decision_text": "Use JSON storage only",
-        "severity": "FAIL",
-        "rule": "introduce ORM",
-        "trigger": "ORM",
-        "input_path": "probe_target.py",
-    }]
-    runner = RecordingRunner(
-        stdout=_verdict_stdout("FAIL", violations=violation)
-    )
+    violations = [violation(
+        "FAIL",
+        decision_id="storage_json",
+        decision_text="Use JSON storage only",
+        rule="introduce ORM",
+        trigger="ORM",
+        input_path="probe_target.py",
+    )]
+    runner = RecordingRunner(stdout=_verdict("FAIL", violations=violations))
     result = _evaluate(project, runner)
 
     assert result.action == DENY
@@ -147,7 +151,7 @@ def test_strict_violation_denies_with_mneme_reason(tmp_path, monkeypatch):
 
 def test_warn_mode_violation_is_non_blocking(tmp_path, monkeypatch):
     project, _ = _governed_project(tmp_path, monkeypatch)
-    runner = RecordingRunner(stdout=_verdict_stdout("FAIL"))
+    runner = RecordingRunner(stdout=_verdict("FAIL"))
     result = _evaluate(project, runner, mode="warn")
     assert result.action == WARN
     assert codex_deny_output(result) is None
@@ -161,7 +165,7 @@ def test_incomplete_evaluation_fails_open_with_applicability_reason(
 ):
     project, _ = _governed_project(tmp_path, monkeypatch)
     runner = RecordingRunner(
-        stdout=_verdict_stdout(
+        stdout=_verdict(
             "PASS",
             evaluation_complete=False,
             applicability=[{
@@ -188,10 +192,20 @@ def test_malformed_verdict_json_fails_open(tmp_path, monkeypatch):
 
 def test_wrong_schema_fails_open(tmp_path, monkeypatch):
     project, _ = _governed_project(tmp_path, monkeypatch)
-    result = _evaluate(project, RecordingRunner(stdout=_verdict_stdout().replace(
+    result = _evaluate(project, RecordingRunner(stdout=json.dumps(check_payload("PASS")).replace(
         "mneme.check/v1", "mneme.check/v2"
     )))
     assert result.action == FAIL_OPEN
+
+
+def test_contradictory_verdict_fails_open(tmp_path, monkeypatch):
+    """A FAIL payload exiting 1 in strict mode is not a verdict (#260)."""
+    project, _ = _governed_project(tmp_path, monkeypatch)
+    runner = RecordingRunner(stdout=json.dumps(check_payload("FAIL")), returncode=1)
+    result = _evaluate(project, runner)
+    assert result.action == FAIL_OPEN
+    assert "inconsistent verdict payload (FAIL with exit 1" in result.reason
+    assert codex_deny_output(result) is None
 
 
 def test_timeout_fails_open(tmp_path, monkeypatch):
@@ -225,7 +239,7 @@ def test_parse_failure_fails_open_as_not_evaluated(tmp_path, monkeypatch):
 
 def test_absolute_target_path_reaches_target_path_flag(tmp_path, monkeypatch):
     project, _ = _governed_project(tmp_path, monkeypatch)
-    runner = RecordingRunner(stdout=_verdict_stdout())
+    runner = RecordingRunner(stdout=_verdict())
     _evaluate(project, runner)
     command, _ = runner.last
     assert command[command.index("--target-path") + 1] == str(
@@ -252,7 +266,7 @@ def test_no_project_memory_skips(tmp_path, monkeypatch):
     monkeypatch.delenv("MNEME_MEMORY", raising=False)
     empty = tmp_path / "not-governed"
     empty.mkdir()
-    result = _evaluate(empty, RecordingRunner(stdout=_verdict_stdout()))
+    result = _evaluate(empty, RecordingRunner(stdout=_verdict()))
     assert result.action == SKIP
 
 
@@ -263,7 +277,7 @@ def test_blank_introduced_content_skips(tmp_path, monkeypatch):
         "*** Begin Patch\n*** Add File: blank.py\n+\n+\n*** End Patch"
     )
     result = evaluate_apply_patch(
-        payload, cwd=str(project), check_runner=RecordingRunner(stdout=_verdict_stdout())
+        payload, cwd=str(project), check_runner=RecordingRunner(stdout=_verdict())
     )
     assert result.action == SKIP
 
@@ -293,7 +307,7 @@ def _update_command(path, body="@@\n def existing():\n-    return 1\n+    return
 def test_update_introducing_violation_denies_with_real_target_path(
         tmp_path, monkeypatch):
     project = _seeded_project(tmp_path, monkeypatch)
-    runner = RecordingRunner(stdout=_verdict_stdout("FAIL"))
+    runner = RecordingRunner(stdout=_verdict("FAIL"))
     result = evaluate_apply_patch(
         _update_payload(project, _update_command(project / "service.py")),
         cwd=str(project), check_runner=runner)
@@ -304,7 +318,7 @@ def test_update_introducing_violation_denies_with_real_target_path(
 
 def test_compliant_update_passes_and_sends_snapshot_delta(tmp_path, monkeypatch):
     project = _seeded_project(tmp_path, monkeypatch)
-    runner = RecordingRunner(stdout=_verdict_stdout("PASS"))
+    runner = RecordingRunner(stdout=_verdict("PASS"))
     result = evaluate_apply_patch(
         _update_payload(project, _update_command(project / "service.py")),
         cwd=str(project), check_runner=runner)
@@ -316,7 +330,7 @@ def test_compliant_update_passes_and_sends_snapshot_delta(tmp_path, monkeypatch)
 
 def test_update_warn_mode_is_non_blocking(tmp_path, monkeypatch):
     project = _seeded_project(tmp_path, monkeypatch)
-    runner = RecordingRunner(stdout=_verdict_stdout("FAIL"))
+    runner = RecordingRunner(stdout=_verdict("FAIL"))
     result = evaluate_apply_patch(
         _update_payload(project, _update_command(project / "service.py")),
         cwd=str(project), mode="warn", check_runner=runner)
@@ -367,7 +381,7 @@ def test_update_parser_mismatch_fails_open_not_evaluated(tmp_path, monkeypatch):
 
 def test_relative_update_path_resolves_inside_root(tmp_path, monkeypatch):
     project = _seeded_project(tmp_path, monkeypatch)
-    runner = RecordingRunner(stdout=_verdict_stdout("PASS"))
+    runner = RecordingRunner(stdout=_verdict("PASS"))
     result = evaluate_apply_patch(
         _update_payload(project, _update_command("service.py")),
         cwd=str(project), check_runner=runner)
@@ -387,5 +401,5 @@ def test_blank_only_update_skips(tmp_path, monkeypatch):
            + "\n@@\n def existing():\n-    return 1\n+\n*** End Patch")
     result = evaluate_apply_patch(
         _update_payload(project, cmd), cwd=str(project),
-        check_runner=RecordingRunner(stdout=_verdict_stdout()))
+        check_runner=RecordingRunner(stdout=_verdict()))
     assert result.action == SKIP

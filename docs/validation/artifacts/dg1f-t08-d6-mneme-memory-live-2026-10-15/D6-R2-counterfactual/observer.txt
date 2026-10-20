@@ -1,0 +1,33 @@
+probe=D6-R2-counterfactual A=permissive B=permissive override=none
+channel=none (MNEME_MEMORY unset in launching shell)
+MNEME_MEMORY(launching shell)=<unset>
+date=2026-10-15T18:40:25Z
+claude=2.1.202 (Claude Code)
+mneme_src=<MNEME_SRC> head=d325b32f0e70bbdedea42b223122eb1ba4df633c mneme_dir_equals_40ab0dd12c3f02b960d66c6fd08ab146ac5d369e=yes
+python=<PYTHON>
+claude_bin=<CLAUDE_BIN>
+setting_sources=project
+session_dir(repo_b)=<LIVE>\D6-R2-counterfactual\B\repo_a
+added_dir(repo_a)=<LIVE>\D6-R2-counterfactual\A\repo_a
+BEFORE A/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE A/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+BEFORE A/.claude/settings   1f46855b29e838143f0beb66a9f2623fe6c425fdce2fd4c8f68106d810ef8cd8
+BEFORE A/.claude/local      absent
+BEFORE B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+BEFORE B/.claude/settings   1f46855b29e838143f0beb66a9f2623fe6c425fdce2fd4c8f68106d810ef8cd8
+BEFORE B/.claude/local      absent
+claude_exit=0
+AFTER A/app.py             4d581c9351487d87270ea52e7adc11ee256e7ba14460980e0f80f5e3f1bd707b
+AFTER A/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+AFTER A/.claude/settings   1f46855b29e838143f0beb66a9f2623fe6c425fdce2fd4c8f68106d810ef8cd8
+AFTER A/.claude/local      absent
+AFTER B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+AFTER B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+AFTER B/.claude/settings   1f46855b29e838143f0beb66a9f2623fe6c425fdce2fd4c8f68106d810ef8cd8
+AFTER B/.claude/local      absent
+A/app.py contains psycopg2: 1
+A git status:
+ M app.py
+B git status:
+init_model=claude-opus-4-8[1m]

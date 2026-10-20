@@ -5,6 +5,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from tests.integrations.check_contract import check_payload, check_result_for, violation
 from mneme.integrations.antigravity import adapter
 
 
@@ -32,54 +33,26 @@ def _hook_input(event):
     )
 
 
+_VIOLATION = violation(
+    "FAIL",
+    decision_id="D1",
+    decision_text="never do the bad thing",
+    rule="FORBIDDEN_TOKEN",
+    kind="typed_rule",
+    rule_type="FORBID_LITERAL",
+)
+
+
 def _verdict(verdict="FAIL", evaluation_complete=True):
-    return SimpleNamespace(
-        returncode=2 if verdict != "PASS" else 0,
-        stdout=json.dumps(
-            {
-                "schema": "mneme.check/v1",
-                "verdict": verdict,
-                "mode": "strict",
-                "evaluation_complete": evaluation_complete,
-                "violations": [
-                    {
-                        "decision_id": "D1",
-                        "decision_text": "never do the bad thing",
-                        "severity": "FAIL",
-                        "rule": "no forbidden token",
-                        "trigger": "FORBIDDEN_TOKEN",
-                        "kind": "literal",
-                        "rule_type": "FORBID_LITERAL",
-                        "input_path": "",
-                        "selector": "",
-                    }
-                ],
-                "applicability": [],
-                "freshness": [],
-            }
+    """Answer as the real CLI would, in whatever mode the adapter requested."""
+    violations = [_VIOLATION] if verdict == "FAIL" else []
+
+    def answer(command):
+        return check_result_for(
+            command, verdict, violations=violations, complete=evaluation_complete
         )
-        if evaluation_complete or verdict == "PASS"
-        else json.dumps(
-            {
-                "schema": "mneme.check/v1",
-                "verdict": "WARN",
-                "mode": "strict",
-                "evaluation_complete": False,
-                "violations": [],
-                "applicability": [
-                    {
-                        "decision_id": "D2",
-                        "rule_type": "FORBID_LITERAL",
-                        "rule_value": "X",
-                        "outcome": "UNKNOWN",
-                        "reason": "path applicability unknown",
-                    }
-                ],
-                "freshness": [],
-            }
-        ),
-        stderr="",
-    )
+
+    return answer
 
 
 @pytest.fixture()
@@ -125,10 +98,10 @@ def _invoke(raw, check_runner=None):
 
 
 def _runner(result=None, error=None):
-    def run(*args, **kwargs):
+    def run(command, **kwargs):
         if error is not None:
             raise error
-        return result
+        return result(command) if callable(result) else result
 
     return run
 
@@ -173,6 +146,21 @@ class TestFailureSemantics:
         assert json.loads(out) == {}
         assert "Failing open" in err
 
+    def test_contradictory_verdict_fails_open_visibly(self, tmp_path, memory):
+        """A FAIL payload exiting 1 in strict mode is not a verdict (#260)."""
+        contradictory = SimpleNamespace(
+            returncode=1,
+            stdout=json.dumps(check_payload("FAIL", violations=[_VIOLATION])),
+            stderr="",
+        )
+        code, out, err = _invoke(
+            _hook_input(_write_event(tmp_path)),
+            check_runner=_runner(contradictory),
+        )
+        assert code == 0
+        assert json.loads(out) == {}
+        assert "inconsistent verdict payload (FAIL with exit 1" in err
+
     def test_check_launch_failure_fails_open(self, tmp_path, memory):
         code, out, err = _invoke(
             _hook_input(_write_event(tmp_path)),
@@ -215,7 +203,7 @@ class TestModeSemantics:
 
         def runner(command, **kwargs):
             seen["mode"] = command[command.index("--mode") + 1]
-            return _verdict("PASS")
+            return _verdict("PASS")(command)
 
         _, _, _ = _invoke(_hook_input(_write_event(tmp_path)), check_runner=runner)
         assert seen["mode"] == "strict"
@@ -244,7 +232,7 @@ class TestCheckInvocation:
         def runner(command, **kwargs):
             seen.update(kwargs)
             seen["command"] = command
-            return _verdict("PASS")
+            return _verdict("PASS")(command)
 
         event = _write_event(tmp_path)
         _invoke(_hook_input(event), check_runner=runner)

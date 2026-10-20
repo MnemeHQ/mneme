@@ -1,0 +1,19 @@
+{
+  "status": "written",
+  "mode": "create",
+  "writer": "settings_writer.py (started by the runner before claude)",
+  "writer_process": {
+    "pid": null
+  },
+  "t_start": 1792181204.2424388,
+  "t_request_seen": 1792181209.0838892,
+  "t_write_done": 1792181209.0948994,
+  "settings_sha256_before": "absent",
+  "settings_sha256_after": "f7668200749ba0da56c7bac8d14f0796d997b0086f69f2b67f6f37f346c3cdc5",
+  "value": "<LIVE>\\D6-C4a-V5-plumbing-create\\B\\repo_a\\.mneme\\project_memory.json",
+  "request": {
+    "t": 1792181209.0656042,
+    "launch_id": "4702670e-e9bd-4f17-b070-c4b4a788748c",
+    "tool_use_id": "toolu_D6-C4a-V5-plumbing-create_2"
+  }
+}

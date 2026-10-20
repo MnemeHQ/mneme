@@ -1,0 +1,352 @@
+"""Classify the H1c Amendment A1 runs (Stop top-level systemMessage; probe scope 4.2).
+
+usage:
+  classify_a1.py headless    <live> <pin_model>   -> <live>/outcome_a1_headless.json
+  classify_a1.py interactive <live> <pin_version> <pin_model> -> <live>/outcome_a1_interactive.json
+  classify_a1.py combine     <live>               -> <live>/outcome_a1.json (the H1c result under A1)
+
+Rules (probe scope 4.2, accepted in #555):
+- **Failure** is only demonstrated HOST-INDUCED interference: Stop invocations above
+  the control's, `stop_hook_active: true`, a different permission decision for an
+  equivalent request, an unexpected prompt, a host block or retry, no normal end
+  (headless: a `result` event; interactive: the return to the input prompt), or a
+  strict host-event or indicator flag (headless, via classify_h1). Model reply text,
+  turn counts and model-chosen activity are evidence only.
+- **Developer delivery** comes ONLY from the interactive capture: the operator's
+  observation.json (`notice_visible`) for the emitter arm, true, and for the control,
+  false, backed by a recording whose SHA-256 is in observer.txt and by listed frames.
+- Interactive delivery must be VERIFIED, not only asserted (review of #556):
+  the emitter's `notice_text_seen` must contain the exact nonce, the control's must
+  not; every listed frame must name an existing, non-empty file inside the arm's
+  out/ directory (hashed into the outcome); and both arms need a collected
+  session transcript. Anything missing gives INCONCLUSIVE.
+- Interactive host pins are ENFORCED (review of #556): observer `claude_version`
+  must equal the pinned version, and every transcript assistant `message.model`
+  must equal the pinned model with its `[...]` context suffix removed (the
+  transcript records `claude-opus-4-8` where the stream init reports
+  `claude-opus-4-8[1m]`, as the H1 batch shows). A mismatch gives NOT_EXECUTED,
+  and an unverifiable model (no model field) gives INCONCLUSIVE.
+- A PASSING interactive verdict also requires an EVIDENCE REVIEW of BOTH captures
+  (review of #556, second round): `<arm>/out/capture_review.json` for the emitter and
+  the control, naming the reviewer, bound by SHA-256 to that arm's recording and
+  listed frames, and stating per frame whether it shows the nonce. The emitter review
+  must confirm the notice in at least one frame, and the control review must confirm
+  no frame shows it. Without both reviews, a result that would pass is INCONCLUSIVE
+  (`capture review pending`). The operator's observation alone never passes.
+- A stream-json informational/system event carrying the nonce is `host_output`:
+  recorded, never delivery (classify_h1 table, unchanged).
+- A model-bound nonce location (classify_h1 table, including R1) is agent delivery.
+
+Known collision (reported, not decided here): if the host surfaces the systemMessage
+as a stream-json `system` event that appears in the emitter arm only, the strict
+host-event subtype rule (unchanged) makes the headless run INCONCLUSIVE. Any rule
+change for that case needs its own review; raw evidence allows reclassification.
+"""
+import hashlib
+import importlib.util
+import json
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+_spec = importlib.util.spec_from_file_location("classify_h1", HERE / "classify_h1.py")
+C = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(C)
+
+A1_ID = "A1 (#555) on " + C.RULES_ID
+C.PATHS.setdefault("H1c-sm", {"path_type": "command_lifecycle_event", "event": "Stop", "tool": None})
+PASSING = ("DELIVERED_TO_AGENT", "DELIVERED_TO_USER_ONLY")
+
+
+def _observer(out):
+    obs = {}
+    p = Path(out) / "observer.txt"
+    if p.exists():
+        for line in p.read_text(encoding="utf-8").splitlines():
+            if "=" in line:
+                k, v = line.split("=", 1)
+                obs.setdefault(k, v)
+    return obs
+
+
+# ---------------------------------------------------------------- headless
+def headless(live, pin_model):
+    emit = C.load_arm(Path(live) / "H1c-sm" / "out")
+    ctl = C.load_arm(Path(live) / "H1c-sm-ctl" / "out")
+    r = C.classify(emit, ctl, "H1c-sm", pin_model)
+    controls = r.get("controls") or {}
+    pe, common = controls.get("path_type_emitter") or {}, controls.get("common") or {}
+    interference = []
+    if pe and not pe.get("no_stop_reentry", True):
+        interference.append("stop_hook_active re-entry")
+    if common and common.get("stop_invocations_equal") is False:
+        interference.append("Stop invocations differ from the control")
+    if common and common.get("permission_decisions_equal_for_equivalent_requests") is False:
+        interference.append("permission decision differs for an equivalent request")
+    if common and common.get("host_indicators_equal") is False:
+        interference.append("host indicator differs")
+    if pe and pe.get("result_success") is False:
+        interference.append("no normal result event")
+    r["a1"] = {"run": "headless", "rules": A1_ID, "host_interference": interference}
+    return r
+
+
+# ---------------------------------------------------------------- interactive
+def _int_arm(live, arm):
+    out = Path(live) / arm / "out"
+    a = {"out": out, "observer": _observer(out),
+         "hooks": [r for _, r in C.read_jsonl(out / "hook-log.jsonl")],
+         "transcript": C.read_jsonl(out / "transcript.jsonl"),
+         "transcript_collected": (out / "transcript.jsonl").exists(),
+         "events": [], "nonce": (out / "nonce.txt").read_text(encoding="utf-8").strip() if (out / "nonce.txt").exists() else None}
+    p = out / "observation.json"
+    a["observation"] = json.loads(p.read_text(encoding="utf-8")) if p.exists() else None
+    return a
+
+
+def _transcript_attempts(arm, nonce):
+    """Tool requests and decisions from the interactive session transcript."""
+    uses, results = {}, {}
+    for _, e in arm["transcript"]:
+        for it in C.content_items(e):
+            if e.get("type") == "assistant" and it.get("type") == "tool_use":
+                uses[it.get("id")] = it
+            elif e.get("type") == "user" and it.get("type") == "tool_result":
+                results[it.get("tool_use_id")] = it
+    by = {}
+    for tid, u in uses.items():
+        res = results.get(tid)
+        dec = "no_result" if res is None else ("error" if res.get("is_error") else "executed")
+        by.setdefault((u.get("name"), C.masked(u.get("input"), arm, nonce)), set()).add(dec)
+    return {k: sorted(v) for k, v in by.items()}
+
+
+def _base_model(m):
+    return m.split("[", 1)[0] if isinstance(m, str) else m
+
+
+def _pin_check(arm, pin_version, pin_model):
+    """('ok' | 'mismatch' | 'unverifiable', detail) for one interactive arm."""
+    v = arm["observer"].get("claude_version")
+    if v != pin_version:
+        return "mismatch", f"claude_version {v!r} != pinned {pin_version!r}"
+    models = {(e.get("message") or {}).get("model") for _, e in arm["transcript"] if e.get("type") == "assistant"}
+    models.discard(None)
+    if not models:
+        return "unverifiable", "no model recorded in the transcript's assistant entries"
+    if models != {_base_model(pin_model)}:
+        return "mismatch", f"transcript models {sorted(models)} != pinned {_base_model(pin_model)!r}"
+    return "ok", ""
+
+
+def _frames_ok(arm):
+    """Verify every listed frame is an existing, non-empty file inside out/."""
+    out = Path(arm["out"]).resolve()
+    frames = (arm["observation"] or {}).get("frames") or []
+    checked, problems = [], []
+    for f in frames:
+        name = f.get("file") if isinstance(f, dict) else None
+        if not name or not isinstance(f.get("t"), str):
+            problems.append(f"frame entry needs 't' and 'file': {f!r}")
+            continue
+        p = (out / name).resolve()
+        if out not in p.parents or not p.is_file() or p.stat().st_size == 0:
+            problems.append(f"frame file missing, empty or outside out/: {name!r}")
+            continue
+        checked.append({"t": f["t"], "file": name, "sha256": hashlib.sha256(p.read_bytes()).hexdigest()})
+    return checked, problems
+
+
+def _review_ok(arm, frames, expect_notice):
+    """Check <out>/capture_review.json against the arm's recording hash and verified frames."""
+    p = Path(arm["out"]) / "capture_review.json"
+    if not p.exists():
+        return ["capture review missing"]
+    try:
+        rv = json.loads(p.read_text(encoding="utf-8"))
+    except ValueError:
+        return ["capture review is not valid JSON"]
+    problems = []
+    if not (isinstance(rv.get("reviewer"), str) and rv["reviewer"].strip()):
+        problems.append("capture review names no reviewer")
+    if rv.get("recording_sha256") != arm["observer"].get("recording_sha256"):
+        problems.append("capture review is not bound to this arm's recording (SHA-256 differs)")
+    reviewed = {f.get("file"): f for f in rv.get("frames") or [] if isinstance(f, dict)}
+    for fr in frames:
+        r = reviewed.get(fr["file"])
+        if r is None:
+            problems.append(f"frame not reviewed: {fr['file']}")
+        elif r.get("sha256") != fr["sha256"]:
+            problems.append(f"reviewed frame hash differs: {fr['file']}")
+        elif not isinstance(r.get("shows_nonce"), bool):
+            problems.append(f"review gives no shows_nonce for {fr['file']}")
+    if problems:
+        return problems
+    shown = any(reviewed[fr["file"]]["shows_nonce"] for fr in frames)
+    if not isinstance(rv.get("notice_visible"), bool):
+        return ["capture review gives no notice_visible conclusion"]
+    if expect_notice and not (shown and rv["notice_visible"]):
+        return ["capture review does not confirm the nonce in any frame"]
+    if not expect_notice and (shown or rv["notice_visible"]):
+        return ["capture review finds the notice in the control"]
+    return []
+
+
+def interactive(live, pin_version, pin_model):
+    emit, ctl = _int_arm(live, "H1c-sm-int"), _int_arm(live, "H1c-sm-int-ctl")
+    nonce = emit["nonce"]
+    rec = {"path_id": "H1c-sm-int", "run": "interactive", "rules": A1_ID, "reasons": [],
+           "pins": {"claude_version": pin_version, "model": pin_model}}
+    reasons = rec["reasons"]
+
+    def done(label):
+        rec["label"] = label
+        rec["passes_run"] = label in PASSING
+        return rec
+
+    emitted = [h for h in emit["hooks"] if (h.get("envelope") or {}).get("hook_event_name") == "Stop"
+               and nonce and nonce in (h.get("emitted") or "")]
+    ctl_calls = [h for h in ctl["hooks"] if (h.get("envelope") or {}).get("hook_event_name") == "Stop"]
+    emit_calls = [h for h in emit["hooks"] if (h.get("envelope") or {}).get("hook_event_name") == "Stop"]
+    rec["stop_invocations"] = {"emitter": len(emit_calls), "control": len(ctl_calls)}
+    if not emitted:
+        reasons.append("emitter did not emit the systemMessage at Stop")
+    if not ctl_calls:
+        reasons.append("control no-op not invoked at Stop")
+    if reasons:
+        return done("NOT_EXECUTED")
+
+    # Host pins are enforced (review of #556).
+    unverifiable = []
+    for name, a in (("emitter", emit), ("control", ctl)):
+        if not a["transcript_collected"] or not a["transcript"]:
+            continue  # reported below as missing transcript
+        status, detail = _pin_check(a, pin_version, pin_model)
+        if status == "mismatch":
+            reasons.append(f"{name}: pin mismatch: {detail}")
+        elif status == "unverifiable":
+            unverifiable.append(f"{name}: pin unverifiable: {detail}")
+    if reasons:
+        return done("NOT_EXECUTED")
+    reasons.extend(unverifiable)
+
+    # Capture, observation and transcript are mandatory for an interactive verdict.
+    for name, a in (("emitter", emit), ("control", ctl)):
+        if not a["transcript_collected"] or not a["transcript"]:
+            reasons.append(f"{name}: session transcript not collected")
+    for name, a in (("emitter", emit), ("control", ctl)):
+        o = a["observation"]
+        if not a["observer"].get("recording_sha256") or a["observer"].get("recording_sha256") == "absent":
+            reasons.append(f"{name}: no recording hash (capture missing)")
+        if o is None or not all(isinstance(o.get(k), bool) for k in
+                                ("notice_visible", "returned_to_input_prompt", "unexpected_prompt")):
+            reasons.append(f"{name}: observation.json missing or incomplete")
+    if not reasons and not emit["observation"].get("frames"):
+        reasons.append("emitter: no frames listed for the observed notice area")
+    if reasons:
+        return done("INCONCLUSIVE")
+    oe, oc = emit["observation"], ctl["observation"]
+    frames, frame_problems = _frames_ok(emit)
+    ctl_frames, ctl_frame_problems = _frames_ok(ctl)
+    rec["frames_verified"] = frames
+    rec["control_frames_verified"] = ctl_frames
+    reasons.extend(f"emitter: {p}" for p in frame_problems)
+    reasons.extend(f"control: {p}" for p in ctl_frame_problems)
+    if not ctl_frames and not ctl_frame_problems:
+        reasons.append("control: no frames listed for the notice area")
+    if oe["notice_visible"] and nonce not in (oe.get("notice_text_seen") or ""):
+        reasons.append("emitter: notice_visible but notice_text_seen does not contain the exact nonce")
+    if nonce in (oc.get("notice_text_seen") or ""):
+        reasons.append("control: notice_text_seen contains the emitter nonce")
+    if oc["notice_visible"]:
+        reasons.append("control arm reports a visible notice; attribution impossible")
+
+    locs = C.nonce_locations(emit, nonce, "Stop")
+    cats = {l["category"] for l in locs}
+    rec["nonce_locations"] = locs
+    if "unclassified" in cats:
+        reasons.append("nonce found in locations the category table does not recognise; review needed")
+    if C.nonce_locations(ctl, nonce, "Stop"):
+        reasons.append("emitter nonce found in the control arm (collision)")
+    if not oc["returned_to_input_prompt"]:
+        reasons.append("control did not return to the input prompt; differences cannot be attributed")
+    if reasons:
+        return done("INCONCLUSIVE")
+
+    interference = []
+    if len(emit_calls) > len(ctl_calls):
+        interference.append("more Stop invocations than the control")
+    if any((h.get("envelope") or {}).get("stop_hook_active") for h in emit_calls):
+        interference.append("stop_hook_active re-entry")
+    if oe["unexpected_prompt"] and not oc["unexpected_prompt"]:
+        interference.append("a prompt appeared that the control lacks")
+    if not oe["returned_to_input_prompt"]:
+        interference.append("emitter session did not return to the input prompt")
+    ae, ac = _transcript_attempts(emit, nonce), _transcript_attempts(ctl, nonce)
+    mism = [list(k) for k in set(ae) & set(ac) if ae[k] != ac[k]]
+    if mism:
+        interference.append("permission/tool decision differs for an equivalent request")
+    rec["host_interference"] = interference
+    rec["developer_visible"] = oe["notice_visible"]
+    rec["evidence_only"] = {"assistant_entries": {
+        "emitter": sum(1 for _, e in emit["transcript"] if e.get("type") == "assistant"),
+        "control": sum(1 for _, e in ctl["transcript"] if e.get("type") == "assistant")}}
+    if interference:
+        return done("DELIVERED_WITH_SIDE_EFFECT")
+    would_pass = "model_bound" in cats or oe["notice_visible"]
+    if would_pass:
+        # A passing verdict needs the evidence review of BOTH captures.
+        review = [f"emitter: {p}" for p in _review_ok(emit, frames, expect_notice=oe["notice_visible"])]
+        review += [f"control: {p}" for p in _review_ok(ctl, ctl_frames, expect_notice=False)]
+        rec["capture_review"] = "confirmed" if not review else "pending"
+        if review:
+            reasons.append("capture review pending: " + "; ".join(review))
+            return done("INCONCLUSIVE")
+    if "model_bound" in cats:
+        rec["developer_also"] = oe["notice_visible"]
+        return done("DELIVERED_TO_AGENT")
+    if oe["notice_visible"]:
+        return done("DELIVERED_TO_USER_ONLY")
+    return done("NOT_DELIVERED")
+
+
+# ---------------------------------------------------------------- combine
+def combine(h, i):
+    rec = {"path_id": "H1c", "rules": A1_ID, "headless_label": h.get("label"),
+           "interactive_label": i.get("label"), "reasons": []}
+    for name, r in (("headless", h), ("interactive", i)):
+        if r.get("label") in ("NOT_EXECUTED", "INCONCLUSIVE"):
+            rec["reasons"].append(f"{name} run is {r['label']}")
+    if rec["reasons"]:
+        lab = "NOT_EXECUTED" if any(r.get("label") == "NOT_EXECUTED" for r in (h, i)) else "INCONCLUSIVE"
+    elif (h.get("a1") or {}).get("host_interference") or i.get("label") == "DELIVERED_WITH_SIDE_EFFECT":
+        lab = "DELIVERED_WITH_SIDE_EFFECT"
+    elif h.get("label") == "DELIVERED_TO_AGENT" or i.get("label") == "DELIVERED_TO_AGENT":
+        lab = "DELIVERED_TO_AGENT"
+    elif i.get("label") == "DELIVERED_TO_USER_ONLY":
+        lab = "DELIVERED_TO_USER_ONLY"
+    else:
+        lab = "NOT_DELIVERED"
+    rec["label"] = lab
+    rec["h1c_passes_under_a1"] = lab in PASSING
+    return rec
+
+
+def _write(live, name, obj):
+    (Path(live) / name).write_text(json.dumps(obj, indent=2), encoding="utf-8")
+    print(obj["label"])
+
+
+if __name__ == "__main__":
+    a = sys.argv[1:]
+    if len(a) == 3 and a[0] == "headless":
+        _write(a[1], "outcome_a1_headless.json", headless(a[1], a[2]))
+    elif len(a) == 4 and a[0] == "interactive":
+        _write(a[1], "outcome_a1_interactive.json", interactive(a[1], a[2], a[3]))
+    elif len(a) == 2 and a[0] == "combine":
+        h = json.loads((Path(a[1]) / "outcome_a1_headless.json").read_text(encoding="utf-8"))
+        i = json.loads((Path(a[1]) / "outcome_a1_interactive.json").read_text(encoding="utf-8"))
+        _write(a[1], "outcome_a1.json", combine(h, i))
+    else:
+        print(__doc__, file=sys.stderr)
+        sys.exit(2)

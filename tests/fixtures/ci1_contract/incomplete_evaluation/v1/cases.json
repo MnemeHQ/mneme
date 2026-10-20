@@ -1,0 +1,73 @@
+{
+  "fixture": "ci1_contract/incomplete_evaluation",
+  "version": "v1",
+  "contract": "mneme.check/v1",
+  "memory": "project_memory.json",
+  "adr_dir": "adr",
+  "rules": [
+    {
+      "rule_id": "ADR-921:FORBID_LITERAL:8ea9d1c2fc9247acd0fb4505ddd8d24e",
+      "decision_id": "ADR-921",
+      "decision_version_id": "dver-441d7a93b5c2b0c6440fab501cd0eb7c",
+      "applicability": {}
+    },
+    {
+      "rule_id": "ADR-922:FORBID_LITERAL:21a32494727a473bd487a2580e075557",
+      "decision_id": "ADR-922",
+      "decision_version_id": "dver-a31f3d502703fc07ffe709b95c1d74b4",
+      "applicability": {"include_paths": ["docs/**"]}
+    }
+  ],
+  "query_variants": [
+    {"query": "sync", "top": 1},
+    {"query": "staging documentation hostname", "top": 1},
+    {"query": "unrelated words entirely", "top": 3}
+  ],
+  "cases": [
+    {
+      "id": "complete_pass",
+      "input": "docs/clean.md",
+      "target_path": null,
+      "mode": "strict",
+      "expected_exit": 0,
+      "expected_classification": "VERIFIED_PASS",
+      "expected": "expected/complete_pass.json"
+    },
+    {
+      "id": "complete_fail",
+      "input": "docs/global_violation.md",
+      "target_path": null,
+      "mode": "strict",
+      "expected_exit": 2,
+      "expected_classification": "VIOLATION",
+      "expected": "expected/complete_fail.json"
+    },
+    {
+      "id": "unknown_target_is_policy_root",
+      "input": "docs/clean.md",
+      "target_path": ".",
+      "mode": "strict",
+      "expected_exit": 2,
+      "expected_classification": "UNEVALUATED",
+      "expected": "expected/unknown_target_is_policy_root.json"
+    },
+    {
+      "id": "unknown_in_warn_mode",
+      "input": "docs/clean.md",
+      "target_path": "../README.md",
+      "mode": "warn",
+      "expected_exit": 2,
+      "expected_classification": "UNEVALUATED",
+      "expected": "expected/unknown_in_warn_mode.json"
+    },
+    {
+      "id": "unknown_with_global_fail",
+      "input": "docs/global_violation.md",
+      "target_path": "../README.md",
+      "mode": "strict",
+      "expected_exit": 2,
+      "expected_classification": "UNEVALUATED",
+      "expected": "expected/unknown_with_global_fail.json"
+    }
+  ]
+}

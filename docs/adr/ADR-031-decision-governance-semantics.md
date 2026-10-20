@@ -11,6 +11,7 @@ scope: decision_index.governance_semantics
 
 **Status:** Accepted
 **Date:** 2026-10-07 (accepted 2026-10-08)
+**Amended:** 2026-10-13 — v2 `extensions` namespace key contract (§8a); DG1F applicability-only sequencing exception (§11)
 **Deciders:** Theo Valmis
 
 ---
@@ -305,6 +306,98 @@ earlier v2 reader. The v2 evolution contract is therefore:
 The first v2 slice adds characterization tests for each rule above, matching
 `tests/test_dg1a_compatibility_characterization.py` for v1.
 
+### 8a. Namespaced `extensions` key contract (amendment 2026-10-13)
+
+§8 designates one non-semantic `extensions` object but never defines what
+"namespaced" means, and no repository convention for extension keys existed.
+This amendment fixes the key syntax, ownership, and rejection rules. It adds
+no governance semantics: `extensions` stays optional and non-semantic, and no
+loader, resolver, or consumer behavior changes here.
+
+**Key syntax.** A key is a dotted namespace:
+
+```text
+key     := segment ( "." segment )+
+segment := [a-z0-9] ( [a-z0-9-]* [a-z0-9] )?
+```
+
+Keys and segments are ASCII and lowercase. A segment is a lowercase
+alphanumeric run with optional internal hyphens, and never starts or ends with
+a hyphen. A key is two or more segments joined by `.`.
+
+**Invalid keys (rejected, never normalized or ignored):** the empty string; a
+single-segment key; any empty segment (leading/trailing `.`, or `a..b`);
+uppercase letters; underscores or any non-`[a-z0-9-]` character; a segment that
+starts or ends with `-`; whitespace; and non-ASCII characters.
+
+**Ownership and collision avoidance.** Namespaces follow the reverse-DNS
+principle: by convention the key is the reverse of a DNS name the producer
+controls, so ownership needs no central registry.
+
+**Validation is syntactic only.** Key validation checks syntax against the
+grammar above. It does not authenticate domain ownership, producer identity, or
+any authority to use a namespace — including `mneme.*`. Ownership remains a
+producer convention, enforced by human review rather than by the loader.
+
+- A producer-owned key must be **reverse-DNS with at least three segments**:
+  `<tld>.<domain>.<tool>[...]`, for example `com.example.audittool`.
+- A two-segment producer key (`com.example`) is invalid: a registrable domain
+  alone does not identify a tool, and every tool at that domain would collide
+  under one key. The `<tool>` segment (and any deeper segment) provides the
+  per-producer collision boundary.
+
+This resolves the two-segment versus three-segment ambiguity explicitly:
+**two-segment keys are valid only under the reserved Mneme root defined
+below; every other key requires at least three segments.**
+
+**Mneme-reserved namespace.** The first segment `mneme` is reserved to Mneme.
+Mneme-owned keys take the form `mneme.<purpose>[.<detail>...]`, for example
+`mneme.tooling`. Producers must not root a key at `mneme`, and Mneme does not
+claim a reverse-DNS root for its own keys. This mirrors the existing schema
+identifier convention (`mneme.<domain>/vN`, e.g. `mneme.decision-index/v2`),
+which is likewise rooted at `mneme`.
+
+**Rejection.** A v2 reader fails closed on any `extensions` key that is not a
+valid key under this contract, in addition to §8's rule that `extensions`, when
+present, must be an object. Malformed keys are never silently ignored or
+rewritten.
+
+**Compatibility with the optional object.** `extensions` remains optional:
+absent means no extensions, and a present, well-formed object is accepted under
+the non-semantic rule below. The only new failure mode is a present object that
+carries a malformed key.
+
+**Strictly non-semantic.** Content under any extension key must never affect
+resolution, explanation, authority, or evidence, and a reader may ignore it
+entirely. Any key whose content would affect those is, by definition, a semantic
+feature under §8, not an extension, and must be declared in `semantic_features`
+instead.
+
+**Reverse-DNS evaluation against the requirements.**
+
+| Requirement | How the convention satisfies it |
+|---|---|
+| Deterministic syntax | A single regex over `[a-z0-9-]`; no locale, case, or Unicode variance. |
+| Ownership and collision avoidance | Reverse-DNS is a producer convention that discourages collisions; the `<tool>` segment separates tools under one domain. Validation is syntactic only. |
+| Mneme-reserved namespace | The `mneme` root is reserved by convention to Mneme; producers root at reverse-DNS. Syntax, not identity, is validated. |
+| Invalid key rejection | The grammar is closed and anchored; malformed segments fail the match. |
+| Optional-object compatibility | The object stays optional; only malformed keys are newly rejected. |
+| Non-semantic behavior | Content is ignored and cannot enter resolution/authority/evidence; anything semantic is a declared feature. |
+
+**Migration and compatibility consequences.**
+
+- No released Mneme version currently introduces canonical decision-index v2
+  memory. Any experimental or pre-release v2 documents must be checked against
+  this namespace contract.
+- For any future v2 document, a well-formed `extensions` object is accepted and
+  ignored exactly as before; a malformed key now fails closed where an earlier
+  draft of the v2 loader would have accepted an arbitrary key.
+- v1 memory is unaffected: v1 remains permissive and ignores `extensions`, and
+  0.10.x already refuses all v2 memory (§8).
+- Enforcing this contract in the loader is a separate, later implementation
+  change. This amendment is documentation-only and does not modify any v2
+  implementation.
+
 ### 9. Governance change is snapshot-based
 
 ```text
@@ -375,10 +468,12 @@ DG1P  remove date as precedence authority            ADR import change
   |
 DG1B1 decision applicability (first v2 slice)        charter required
   |
-DG1B2 exceptions / waivers                           charter required
+  +-- DG1F applicability-only runtime increment      separately merged charter
+  |   (optional, may precede DG1B2)                   + freeze amendment
   |
-DG1F  surfaces consume one governance result         charter where enforcement
-                                                     inputs change
+DG1B2 exceptions / waivers                           evidence + charter required
+  |
+DG1F  remaining / waiver-aware surface convergence   charter for each change
   |
 DG1G  adversarial fixtures + closeout
 ```
@@ -392,6 +487,44 @@ DG1F replaces the duplicated `status == "active"` checks (projection,
 protection candidate selection and activation precheck, Audit aggregation,
 readiness) with the shared resolver result, only after DG1C parity holds.
 Retrieval ranking never becomes authoritative.
+
+**Sequencing amendment (2026-10-13): applicability-only DG1F may precede
+DG1B2.** The default sequence still places the full, waiver-aware convergence
+after DG1B2. As a bounded exception, the first DG1F runtime increment may
+consume **already-implemented DG1B1 decision applicability only**, before
+waivers exist. This separates the proven decision-applicability mechanism from
+the separately evidence-gated waiver model; it does **not** mark DG1B2
+complete, waive its canonical target-binding requirement in §12, or authorize
+DG1G closeout before the full sequence is complete.
+
+**Evidence and reason for the exception.** DG1B1 was integrated in PR #487
+with offline functional acceptance using the pinned, accepted GSA-TTS
+Windows-native secret-storage ADR. At the time of this amendment, Data Engine
+P0.1B/P0.2 implementation was progressing in draft PR #42 under sequencing
+PR #41; independent V5.1D annotation/V5.1E validation and P0.3 evidence
+relationships were not complete (Data Engine tracker #40). Research
+observations, evidence links and classifications are not authority and do
+not, by themselves, provide a DG1B2 waiver bound to an authoritative
+decision/version. DG1B2 can proceed when its own evidence gate is met, whether
+or not this early DG1F increment has shipped.
+
+**Authorization remains separate.** This amendment changes **ordering only**.
+Before *any* DG1F runtime-input change, ADR-031 §7 still requires a distinct,
+merged behavioral charter, followed by the corresponding `[layer1-freeze]`
+amendment under the Freeze Amendment Procedure. That charter must identify a
+bounded first consumer, a deterministic and reviewed source of
+`GovernanceContext.labels`, and an explicit fail-safe contract for missing,
+untrusted or conflicting context. In particular, absence of a required label
+in the DG1B1 resolver must not be used by a runtime adapter to silently drop
+a protective decision when context is unavailable. Global decisions keep
+existing protection, ADR-020 typed-rule path selectors remain independent,
+and retrieval ranking never becomes governance authority. Existing CLI,
+enforcer, ConflictDetector, hook, MCP, protection, Audit and readiness behavior
+remains unchanged until separately chartered.
+
+No waiver representation, authority transition, CLI flag, MCP API, automatic
+context inference, new evidence persistence, schema change or benchmark
+methodology change is authorized by this sequencing amendment.
 
 ### 12. Waiver slot (semantics fixed now, implementation deferred)
 

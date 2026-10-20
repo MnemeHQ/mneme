@@ -49,6 +49,7 @@ import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from mneme.adr_diagnostics import collect_adr_diagnostics
 from mneme.adr_freshness import FreshnessIssue
@@ -59,19 +60,9 @@ from mneme.adr_import import (
     detect_continuity_effects,
     format_preview,
 )
-from mneme.integrations.eventcatalog import (
-    apply_import as ec_apply_import,
-    compile_for_import as ec_compile_for_import,
-    detect_collisions as ec_detect_collisions,
-    format_preview as ec_format_preview,
-    refuse_canonical_apply as ec_refuse_canonical_apply,
-)
-from mneme.benchmark import BenchmarkRunner, ScenarioVerdict
-from mneme.benchmark_report import format_json, format_markdown, format_terminal
+from mneme.adr_schema import ADRParseError, ADRValidationError
 from mneme.context_builder import DEFAULT_MAX_DECISIONS, format_decisions
-from mneme.cursor_generator import generate_mdc
-from mneme.decision_add import AddDecisionError, add_canonical_decision
-from mneme.decision_authority import DecisionAuthorityError, DecisionAuthorityService
+from mneme.decision_governance import GovernanceContext, resolve_effective
 from mneme.decision_index_persistence import (
     DecisionIndexMigrationRefused,
     DecisionIndexMigrationRequired,
@@ -83,7 +74,6 @@ from mneme.decision_index_persistence import (
     plan_memory_migration,
     refuse_legacy_decisions_write,
 )
-from mneme.decision_proposal_store import JsonFileDecisionProposalStore
 from mneme.decision_retriever import DecisionRetriever
 from mneme.enforcer import (
     EnforcementResult,
@@ -92,20 +82,13 @@ from mneme.enforcer import (
     generate_protection_report,
 )
 from mneme.memory_store import MemoryStore
-from mneme.protection import (
-    ENFORCEMENT_BEHAVIOR,
-    ProtectionError,
-    activate_protection,
-    activation_precheck,
-    find_candidates,
-    find_decision,
-    load_decisions,
-    protection_status,
-    validate_proposal,
-)
-from mneme.readiness import READINESS_LABELS, READINESS_ORDER
-from mneme.setup import SetupError, SetupOutcome, run_setup
-from mneme.setup_state import STATE_ACTIVE, scaffold_project_memory
+
+if TYPE_CHECKING:
+    # Annotation-only. Subcommand-only modules are imported inside their
+    # command functions so `mneme check` (run by mneme-hook on every write)
+    # does not pay for them; see tests/test_cli_import_budget.py.
+    from mneme.decision_proposal_store import JsonFileDecisionProposalStore
+    from mneme.setup import SetupOutcome
 
 
 def _utc_now() -> str:
@@ -138,6 +121,7 @@ def _scaffold_memory() -> dict:
     enforce). meta.name and meta.description are the only fields the loader
     requires; created_by is recorded for provenance.
     """
+    from mneme.setup_state import scaffold_project_memory
     return scaffold_project_memory(created_by="mneme init")
 
 
@@ -166,6 +150,7 @@ def _cmd_init(args: argparse.Namespace) -> int:
 
 def _print_setup_summary(outcome: SetupOutcome) -> None:
     """Render the human-readable setup summary (ASCII, existing CLI style)."""
+    from mneme.readiness import READINESS_LABELS, READINESS_ORDER
     print("Mneme setup")
     print()
     print("Repository")
@@ -230,6 +215,8 @@ def _print_setup_summary(outcome: SetupOutcome) -> None:
 
 
 def _cmd_setup(args: argparse.Namespace) -> int:
+    from mneme.setup import SetupError, run_setup
+    from mneme.setup_state import STATE_ACTIVE
     audit_ref = args.audit_ref if args.audit_ref is not None else ""
     if args.audit_ref is not None and not audit_ref.strip():
         return _error_exit("audit reference must not be empty")
@@ -285,6 +272,7 @@ def _cmd_list(args: argparse.Namespace) -> int:
 # ── Subcommand: add_decision ─────────────────────────────────────────────────
 
 def _cmd_add(args: argparse.Namespace) -> int:
+    from mneme.decision_add import AddDecisionError, add_canonical_decision
     path = Path(args.memory)
     if not path.exists():
         return _error_exit(f"memory file {path} does not exist")
@@ -446,6 +434,43 @@ def _collect_adr_diagnostics(
     return collect_adr_diagnostics(memory_path=memory_path, adr_dir=adr_dir)
 
 
+def _print_applicability_preview(store: MemoryStore, labels: list[str]) -> None:
+    """Report DG1F-C1a applicability without changing enforcement inputs.
+
+    Labels are unauthenticated caller assertions. Use only the validated
+    canonical index retained by MemoryStore.load (the exact snapshot projected
+    into runtime Decisions); never perform a second file read. An invalid
+    preview, including unresolved governance-integrity findings, is isolated
+    from the ordinary check result and its exit code.
+    """
+    try:
+        index = store.canonical_index
+        if index is None:
+            raise ValueError("no canonical decision_index section")
+        resolution = resolve_effective(index, GovernanceContext(labels=tuple(labels)))
+        if resolution.findings:
+            raise ValueError("governance integrity findings prevent complete preview")
+        lines = [
+            "NON-AUTHORITATIVE applicability preview (caller-asserted labels; "
+            "no effect on enforcement)",
+            "  labels: " + json.dumps(list(resolution.context.labels), ensure_ascii=True),
+        ]
+        for decision in resolution.decisions:
+            reason = decision.cause or "effective"
+            lines.append(
+                f"  [{decision.decision_id}] {decision.status} "
+                f"(cause={reason}; version={decision.decision_version_id})"
+            )
+    except Exception:
+        print(
+            "NON-AUTHORITATIVE applicability preview: PREVIEW UNAVAILABLE",
+            file=sys.stderr,
+            flush=True,
+        )
+        return
+    print("\n".join(lines), file=sys.stderr, flush=True)
+
+
 def _cmd_check(args: argparse.Namespace) -> int:
     input_path = Path(args.input)
     if not input_path.exists():
@@ -467,6 +492,24 @@ def _cmd_check(args: argparse.Namespace) -> int:
         top=args.top,
         input_path=target_path,
     )
+
+    # DG1F-C1a: informational stderr-only side channel; never feed this
+    # resolution to DecisionRetriever, check_prompt, stdout or JSON.
+    preview_labels = getattr(args, "applicability_preview", None)
+    if preview_labels is not None:
+        try:
+            _print_applicability_preview(store, preview_labels)
+        except Exception:
+            # Even a broken diagnostic output stream must not change the
+            # enforcement result: this channel is strictly best effort.
+            try:
+                print(
+                    "NON-AUTHORITATIVE applicability preview: PREVIEW UNAVAILABLE",
+                    file=sys.stderr,
+                    flush=True,
+                )
+            except Exception:
+                pass
 
     if getattr(args, "json", False):
         # Machine-readable mode: the payload must be the only thing on stdout,
@@ -657,6 +700,7 @@ def _require_memory(
             return 2
         memory_path, decisions = loaded
     """
+    from mneme.protection import ProtectionError, load_decisions
     memory_path = Path(memory)
     if not memory_path.exists():
         _error_exit(f"memory file {memory_path} does not exist")
@@ -670,6 +714,7 @@ def _require_memory(
 
 
 def _cmd_protect_list(args: argparse.Namespace) -> int:
+    from mneme.protection import ENFORCEMENT_BEHAVIOR, find_candidates
     loaded = _require_memory(args.memory)
     if loaded is None:
         return 2
@@ -719,6 +764,7 @@ def _cmd_protect_list(args: argparse.Namespace) -> int:
 
 
 def _cmd_protect_status(args: argparse.Namespace) -> int:
+    from mneme.protection import ProtectionError, protection_status
     loaded = _require_memory(args.memory)
     if loaded is None:
         return 2
@@ -751,6 +797,7 @@ def _cmd_protect_status(args: argparse.Namespace) -> int:
 
 
 def _cmd_protect_validate(args: argparse.Namespace) -> int:
+    from mneme.protection import activation_precheck, find_decision, validate_proposal
     loaded = _require_memory(args.memory)
     if loaded is None:
         return 2
@@ -787,6 +834,7 @@ def _cmd_protect_validate(args: argparse.Namespace) -> int:
 
 
 def _cmd_protect_activate(args: argparse.Namespace) -> int:
+    from mneme.protection import ProtectionError, activate_protection
     loaded = _require_memory(args.memory)
     if loaded is None:
         return 2
@@ -849,6 +897,7 @@ def _cmd_protect_activate(args: argparse.Namespace) -> int:
 # ── Subcommand: cursor generate ──────────────────────────────────────────────
 
 def _cmd_cursor_generate(args: argparse.Namespace) -> int:
+    from mneme.cursor_generator import generate_mdc
     memory_path = Path(args.memory)
     if not memory_path.exists():
         return _error_exit(f"memory file {memory_path} does not exist")
@@ -876,6 +925,8 @@ def _cmd_cursor_generate(args: argparse.Namespace) -> int:
 
 def _cmd_benchmark(args: argparse.Namespace) -> int:
     """Run all benchmark scenarios in a directory and report results."""
+    from mneme.benchmark import BenchmarkRunner, ScenarioVerdict
+    from mneme.benchmark_report import format_json, format_markdown, format_terminal
     import sys
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
@@ -987,7 +1038,11 @@ def _cmd_adr_import(args: argparse.Namespace) -> int:
             "with --apply --update-existing"
         )
 
-    report = compile_for_import(adr_dir)
+    try:
+        report = compile_for_import(adr_dir)
+    except (ADRParseError, ADRValidationError) as exc:
+        return _error_exit(str(exc))
+
     target_memory = json.loads(target_path.read_text(encoding="utf-8"))
     collisions = detect_collisions(report.active_nodes, target_memory)
     continuity = detect_continuity_effects(report, target_memory)
@@ -1029,6 +1084,7 @@ def _preservation_validator(memory_path: Path):
     Shapes the validator does not support (anything but a global
     ``FORBID_LITERAL``) cannot be preserved.
     """
+    from mneme.protection import validate_proposal
 
     import dataclasses
 
@@ -1056,6 +1112,13 @@ def _preservation_validator(memory_path: Path):
 
 def _cmd_eventcatalog_import(args: argparse.Namespace) -> int:
     """Import EventCatalog ADRs from an index into target memory."""
+    from mneme.integrations.eventcatalog import (
+        apply_import as ec_apply_import,
+        compile_for_import as ec_compile_for_import,
+        detect_collisions as ec_detect_collisions,
+        format_preview as ec_format_preview,
+        refuse_canonical_apply as ec_refuse_canonical_apply,
+    )
     import sys
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
@@ -1132,6 +1195,16 @@ def _format_migration_preview(plan: MemoryMigrationPlan) -> str:
             "  Already migrated: decision_index is authoritative and valid; "
             "nothing to do."
         )
+    if plan.state == "upgrade_to_v2":
+        return (
+            f"Decision Index migration: {plan.path}\n"
+            "  Canonical schema: mneme.decision-index/v1 -> "
+            "mneme.decision-index/v2\n"
+            "  Only the schema tag changes; no semantic features are declared, "
+            "so every decision stays globally eligible.\n"
+            "  Decisions, versions, rules, and the compatibility snapshot are "
+            "unchanged."
+        )
     native = len(plan.native_decision_ids)
     non_active = len(plan.non_active_decisions)
     items = len(plan.legacy_item_ids)
@@ -1173,7 +1246,7 @@ def _cmd_decision_index_migrate(args: argparse.Namespace) -> int:
     if not memory.is_file():
         return _error_exit(f"memory file {memory} does not exist")
     try:
-        plan = plan_memory_migration(memory)
+        plan = plan_memory_migration(memory, to_v2=args.to_v2)
     except DecisionIndexMigrationRefused as exc:
         return _error_exit(f"migration refused: {exc}")
     except DecisionIndexPersistenceError as exc:
@@ -1280,6 +1353,7 @@ def _require_proposal_store(
     document. Nothing is created implicitly and no in-memory fallback
     exists — human authority must act on an existing durable record.
     """
+    from mneme.decision_proposal_store import JsonFileDecisionProposalStore
     if not proposals:
         _error_exit(
             "--proposals requires a path to an existing "
@@ -1414,6 +1488,7 @@ def _cmd_decision_accept(args: argparse.Namespace) -> int:
     live in Core; the CLI implements none of them and activates no
     protection and runs no Audit.
     """
+    from mneme.decision_authority import DecisionAuthorityError, DecisionAuthorityService
     store = _require_proposal_store(args.proposals)
     if store is None:
         return 2
@@ -1452,6 +1527,7 @@ def _cmd_decision_reject(args: argparse.Namespace) -> int:
     CLI memory precheck exists and no memory file is created or
     modified. Exit codes follow the decision-command contract.
     """
+    from mneme.decision_authority import DecisionAuthorityError, DecisionAuthorityService
     store = _require_proposal_store(args.proposals)
     if store is None:
         return 2
@@ -1847,6 +1923,14 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p_check.add_argument("--query", required=True, help="Context query for retrieval")
     p_check.add_argument(
+        "--applicability-preview", action="append", default=None, metavar="LABEL",
+        help=(
+            "NON-AUTHORITATIVE preview of canonical decision applicability "
+            "for a caller-asserted label (repeatable). Reports only on stderr; "
+            "does not change enforcement or JSON results."
+        ),
+    )
+    p_check.add_argument(
         "--top", type=int, default=DEFAULT_MAX_DECISIONS,
         help=(
             "Size of the retrieval-gated tier. Bounds how many decisions have "
@@ -2160,6 +2244,15 @@ def _build_parser() -> argparse.ArgumentParser:
         help=(
             "Write exactly the previewed migration (refused if the file "
             "changed after it was read)"
+        ),
+    )
+    p_di_migrate.add_argument(
+        "--to-v2",
+        action="store_true",
+        help=(
+            "Explicitly upgrade an already-canonical mneme.decision-index/v1 "
+            "file to v2 (DG1B1, ADR-031 §8). No-op once the section is v2. "
+            "Valid v1 files are never upgraded implicitly."
         ),
     )
     p_di_migrate.set_defaults(func=_cmd_decision_index_migrate)

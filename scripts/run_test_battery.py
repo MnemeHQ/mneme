@@ -76,6 +76,7 @@ GATE_CORE_PATHS: tuple[str, ...] = (
     "tests/test_decision_index_persistence.py",
     "tests/test_d1_legacy_writer_containment.py",
     "tests/test_d1e1_migration.py",
+    "tests/test_legacy_memory_compatibility.py",
     "tests/test_d1e2a_continuity.py",
     "tests/test_d1e2b_canonical_protect.py",
     "tests/test_d1e3_canonical_add_decision.py",
@@ -83,6 +84,10 @@ GATE_CORE_PATHS: tuple[str, ...] = (
     "tests/test_d1e5_canonical_init_setup.py",
     "tests/test_d1e6_closeout_parity.py",
     "tests/test_dg1a_compatibility_characterization.py",
+    "tests/test_dg1b1_decision_applicability.py",
+    "tests/test_dg1b1_functional_acceptance.py",
+    "tests/test_dg1f_c1a_preview.py",
+    "tests/test_dg1f_g4_cli_memory_failures.py",
     "tests/test_dg1c_effective_resolver.py",
     "tests/test_dg1d_change_resolution.py",
     "tests/test_dg1e_evidence_identity.py",
@@ -106,11 +111,15 @@ GATE_CORE_PATHS: tuple[str, ...] = (
     "tests/test_memory_store_decisions.py",
     "tests/test_check_modes.py",
     "tests/test_check_json.py",
+    "tests/test_ci1_contract_fixtures.py",
+    "tests/test_ci1_contract_matrix.py",
+    "tests/test_ci1_evaluator_preflight.py",
     "tests/test_smoke.py",
 )
 
 GATE_CLI_PATHS: tuple[str, ...] = (
     "tests/test_cli.py",
+    "tests/test_cli_import_budget.py",
     "tests/test_cli_init.py",
     "tests/test_cli_setup.py",
     "tests/test_cli_missing_paths.py",
@@ -229,6 +238,10 @@ GATE_EXCLUSIONS: tuple[tuple[str, str], ...] = (
     ),
     ("tests/test_check_worktree_context.py", "main-only: repo tooling"),
     ("tests/test_pre_push_main_guard.py", "main-only: repo tooling"),
+    (
+        "tests/test_hook_latency_harness.py",
+        "main-only: benchmark tooling (hook latency harness, issue #60)",
+    ),
     ("tests/test_eventcatalog_import.py", "main-only: experimental integration"),
     ("tests/integrations/hermes", "main-only: experimental integration"),
     (

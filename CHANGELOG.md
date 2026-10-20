@@ -26,6 +26,18 @@
 
 ### Additions (no verdict changes)
 
+- **Actionable refusal for free-text decision sources.** `mneme decision-index
+  migrate` still refuses a legacy `decisions[]` row whose `source` is a
+  free-text note (it has no canonical provenance form, ADR-030 §12), and
+  still writes nothing. The refusal now names the lossless route: move the
+  decision into an ADR file that records the note, remove its row, re-run the
+  migration, then `mneme adr import` the file. A new gate regression test
+  (`tests/test_legacy_memory_compatibility.py`) pins the upgrade path for a
+  repository written by 0.9.x: its memory stays readable, writers point to the
+  migration preview, lossy rows are refused with a route forward, and the
+  route migrates with byte-identical repeat imports. Found on mnemehq-site,
+  whose governance CI stopped working on the 0.10.0 upgrade.
+
 - **Canonical evidence identity (DG1E).** `mneme check --json` adds
   `rule_id` and `decision_version_id` to every `applicability[]` and typed
   `violations[]` entry (`mneme.check/v1` is unchanged; keys are additive).
@@ -40,6 +52,60 @@
   integrity findings), `evidence_identity_of`, and `resolve_change` (the
   governance delta between two supplied memory snapshots). Nothing in
   retrieval or enforcement consumes them yet.
+- **Decision applicability and `mneme.decision-index/v2` (DG1B1).** A
+  canonical decision may declare optional exact project-local
+  `required_labels` (governance applicability, never retrieval metadata and
+  never ADR-020 rule applicability). `resolve_effective` gains a deterministic
+  `not_applicable` cause, evaluated only after lifecycle eligibility;
+  `resolve_change` reports `governed_scope_changed`. No runtime consumer
+  changes which decisions it enforces yet (DG1F); waivers remain gated (DG1B2).
+  - **Migration:** `mneme decision-index migrate --to-v2` explicitly upgrades
+    canonical v1 memory (a no-op once v2, and never implicit); section-less
+    migration and newly created memory now produce v2 directly. The upgrade is
+    lossless or refuses, and migrating a v1 document grants no decision any
+    applicability, so every decision stays globally eligible.
+  - **Namespaced `extensions` (ADR-031 §8a).** The v2 `extensions` object now
+    enforces its key namespace: keys are dotted lowercase ASCII namespaces,
+    reverse-DNS with at least three segments for producers, with two-segment
+    keys reserved to the `mneme` root. Validation is syntactic only; it does
+    not authenticate ownership. The object stays optional and strictly
+    non-semantic.
+  - **Compatibility (ADR-031 §8).** Binaries at or below `0.10.x` cannot read
+    `mneme.decision-index/v2` memory: they refuse a v2 document at load instead
+    of misresolving it. Do not open v2 memory with an older binary.
+
+**Claude Code direct-write memory selection (T-08 slice 1)**
+
+### Behavior change
+
+- **Direct-write memory discovery starts at the edited file.** For Claude
+  Code direct-file mutations (`Edit`, `Write`, `MultiEdit`), Mneme now starts
+  decision-memory discovery at the edited file's resolved directory (a
+  relative path is resolved against the session `cwd` and a symlink is
+  followed) rather than the session's working directory. Existing
+  memory-discovery precedence remains unchanged. This closes the
+  live-confirmed T-08 case in which a session started in a sibling
+  repository had a forbidden edit to a protected repository checked against
+  the sibling's memory and silently permitted (see the
+  [T-08 evidence record](docs/validation/dg1f-t08-cwd-memory-selection-2026-10-15.md)).
+  It does not resolve every repository-identity bypass: `MNEME_MEMORY`
+  overrides, nested-memory shadowing and the parent-directory fallback can
+  still select memory from outside the edited repository, and remain
+  deferred (charter D4–D6).
+  - **Narrowing:** a session rooted in a protected repository no longer
+    applies that repository's rules to edits of files in other repositories
+    or of files outside any memory. Those edits are checked against the
+    memory discovered from their own directory, or none. If you relied on the
+    session `cwd` to block cross-repository edits, add a memory to the other
+    repository.
+  - **Unchanged:** `MNEME_MEMORY` still takes precedence when set; the search
+    still selects the nearest memory walking up (including parent directories
+    outside a repository); an edit with no file path still searches from the
+    session `cwd`. The Bash preflight, SessionStart and Stop boundaries, the
+    `mneme check` CLI and `mneme.check/v1`, and other integrations are
+    unchanged. See the
+    [slice-1 charter](docs/plans/2026-10-15-t08-target-path-memory-resolution-charter.md)
+    for the deferred items.
 
 ## v0.10.0 — 2026-10-07
 

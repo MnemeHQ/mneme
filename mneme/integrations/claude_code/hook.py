@@ -201,6 +201,17 @@ def find_memory(start: Path) -> Optional[Path]:
 
 _CHECK_TIMEOUT_SECONDS = 10
 
+# Benchmark-only (issue #60): how the PreToolUse path runs ``mneme check``.
+# Unset/unknown -> "subprocess", today's behaviour. "inprocess" runs the CLI
+# inside this interpreter. Not a supported user option.
+_TRANSPORT_ENV_VAR = "MNEME_HOOK_CHECK_TRANSPORT"
+_VALID_TRANSPORTS = ("subprocess", "inprocess")
+
+
+def resolve_transport() -> str:
+    value = os.environ.get(_TRANSPORT_ENV_VAR, "").strip().lower()
+    return value if value in _VALID_TRANSPORTS else "subprocess"
+
 _VALID_MODES = ("strict", "warn")
 
 # Environment variables consulted for the enforcement mode, in precedence order.
@@ -273,9 +284,155 @@ def parse_verdict(stdout: str) -> Optional[Dict[str, Any]]:
         return None
     if payload.get("schema") != _CHECK_JSON_SCHEMA:
         return None
-    if payload.get("verdict") not in _KNOWN_VERDICTS:
+    verdict = payload.get("verdict")
+    # The isinstance guard matters: an unhashable value (list, dict) would
+    # raise TypeError on the frozenset membership test instead of failing open.
+    if not isinstance(verdict, str) or verdict not in _KNOWN_VERDICTS:
         return None
     return payload
+
+
+# Exit status of a complete ``mneme check --json`` run, by requested mode and
+# verdict. Mirrors ``mneme.cli._EXIT_CODES_BY_MODE`` (a test pins the two
+# together); duplicated rather than imported so the hook does not load the
+# whole CLI module on every tool call.
+_EXIT_CODES_BY_MODE: Dict[str, Dict[str, int]] = {
+    "strict": {"PASS": 0, "WARN": 1, "FAIL": 2},
+    "warn":   {"PASS": 0, "WARN": 0, "FAIL": 0},
+}
+
+# Incomplete path applicability is an operational exit 2 in either mode,
+# whatever the nominal verdict (ADR-020). It is not a policy verdict, so it
+# must not be judged against the complete-result matrix above.
+_INCOMPLETE_EXIT_CODE = 2
+
+_VIOLATION_SEVERITIES = frozenset({"WARN", "FAIL"})
+
+
+@dataclass(frozen=True)
+class VerdictAssessment:
+    """Outcome of validating one ``mneme check --json`` result (#260).
+
+    ``payload`` is set only for a coherent verdict. Otherwise ``problem``
+    explains why, without echoing proposed content, and the caller fails open:
+    an untrusted result proves enforcement failed, not that the edit violated
+    policy.
+    """
+
+    payload: Optional[Dict[str, Any]]
+    problem: str = ""
+    inconsistent: bool = False
+
+
+def _nonempty_str(value: Any) -> bool:
+    return isinstance(value, str) and bool(value.strip())
+
+
+def _verdict_inconsistency(
+    payload: Dict[str, Any],
+    returncode: Any,
+    requested_mode: str,
+) -> str:
+    """Return why a schema-valid payload is incoherent, or ``""`` if it is not.
+
+    Unknown extra keys stay permitted for compatible evolution within v1.
+    """
+    verdict = payload["verdict"]
+
+    # Envelope.
+    mode = payload.get("mode")
+    if mode not in _VALID_MODES:
+        return "missing or invalid mode"
+    if mode != requested_mode:
+        return f"mode {mode}, requested {requested_mode}"
+    violations = payload.get("violations")
+    if not isinstance(violations, list):
+        return "violations is not a list"
+    if "freshness" in payload and not isinstance(payload["freshness"], list):
+        return "freshness is not a list"
+    complete = payload.get("evaluation_complete", True)
+    if not isinstance(complete, bool):
+        return "evaluation_complete is not a boolean"
+    applicability = payload.get("applicability")
+    if applicability is not None:
+        if not isinstance(applicability, list) or not all(
+            isinstance(item, dict) for item in applicability
+        ):
+            return "applicability is not a list of objects"
+        unknown = any(item.get("outcome") == "UNKNOWN" for item in applicability)
+        if unknown == complete:
+            return (
+                "evaluation_complete disagrees with applicability outcomes"
+            )
+
+    # Violation records.
+    for index, v in enumerate(violations):
+        if not isinstance(v, dict):
+            return f"violation {index} is not an object"
+        if not _nonempty_str(v.get("decision_id")):
+            return f"violation {index} has no decision_id"
+        if not isinstance(v.get("decision_text"), str):
+            return f"violation {index} has no decision_text"
+        severity = v.get("severity")
+        if not isinstance(severity, str) or severity not in _VIOLATION_SEVERITIES:
+            return f"violation {index} has invalid severity"
+        if not _nonempty_str(v.get("rule")):
+            return f"violation {index} has no rule"
+        if not _nonempty_str(v.get("trigger")):
+            return f"violation {index} has no trigger"
+
+    # Aggregate consistency (mirrors the enforcer's verdict derivation).
+    severities = [v["severity"] for v in violations]
+    if verdict == "PASS" and severities:
+        return f"PASS with {len(severities)} violation(s)"
+    if verdict == "WARN" and (not severities or "FAIL" in severities):
+        return (
+            "WARN with a FAIL violation" if severities
+            else "WARN with no violations"
+        )
+    if verdict == "FAIL" and "FAIL" not in severities:
+        return "FAIL with no FAIL violation"
+
+    # Process consistency.
+    if not isinstance(returncode, int) or isinstance(returncode, bool):
+        return "exit status unavailable"
+    if not complete:
+        if returncode != _INCOMPLETE_EXIT_CODE:
+            return f"incomplete evaluation with exit {returncode}"
+        return ""
+    expected = _EXIT_CODES_BY_MODE[mode][verdict]
+    if returncode != expected:
+        return f"{verdict} with exit {returncode} in {mode} mode"
+    return ""
+
+
+def assess_verdict(
+    stdout: str,
+    returncode: Any,
+    requested_mode: str,
+) -> VerdictAssessment:
+    """Trust a ``mneme check --json`` result only if it is coherent (#260).
+
+    ``parse_verdict`` answers "is there a payload at all?". This adds what
+    needs stdout, exit status and the requested mode together: a valid-looking
+    payload whose mode, violations, or exit status contradict it means the
+    child broke its own contract, which is not a verdict. Both outcomes fail
+    open; only the diagnostic differs.
+    """
+    payload = parse_verdict(stdout)
+    if payload is None:
+        return VerdictAssessment(
+            None, f"no parseable verdict from mneme check (exit {returncode})"
+        )
+    inconsistency = _verdict_inconsistency(payload, returncode, requested_mode)
+    if inconsistency:
+        return VerdictAssessment(
+            None,
+            f"inconsistent verdict payload ({inconsistency}); "
+            "enforcement inactive for this check",
+            inconsistent=True,
+        )
+    return VerdictAssessment(payload)
 
 
 def _is_stale_runtime(child_stderr: str) -> bool:
@@ -354,17 +511,38 @@ def _resolve_target(event: ToolEvent) -> tuple[str, str]:
     return rel, target_path
 
 
+def _direct_write_memory_start(event: ToolEvent) -> Path:
+    """Where the direct-write gate starts its ``find_memory`` walk (T-08 slice 1).
+
+    The repository being modified governs, not the session ``cwd``: the walk
+    starts at the parent of the fully resolved target, so the selected
+    memory's policy root always contains the checked path (a final-component
+    symlink is followed, exactly as ``mneme check`` resolves it). With no
+    resolvable target -- no ``file_path``, or a relative one and an empty
+    payload ``cwd`` -- the start stays the payload ``cwd`` as before.
+    """
+    _, target_path = _resolve_target(event)
+    if target_path and (event.cwd or Path(target_path).is_absolute()):
+        return Path(target_path).resolve().parent
+    return Path(event.cwd or ".")
+
+
 def _invoke_check(
     memory: Path,
     rel_label: str,
     target_path: str,
     checked_content: str,
     stderr: TextIO = sys.stderr,
+    transport: str = "subprocess",
 ) -> Optional[subprocess.CompletedProcess]:
     """Run ``mneme check`` over one proposed delta; return the child result.
 
     Returns ``None`` when the child could not be launched or timed out; the
     caller owns verdict interpretation and its fail-open policy.
+
+    ``transport="inprocess"`` is benchmark-only and used solely by the
+    PreToolUse path: a timeout there ends this hook process with exit 0
+    (fail open), which is what that path does with ``None`` anyway.
     """
     mode = resolve_mode()
 
@@ -385,6 +563,8 @@ def _invoke_check(
         ]
         if target_path:
             command.extend(["--target-path", target_path])
+        if transport == "inprocess":
+            return _invoke_check_inprocess(command[3:])
         try:
             return subprocess.run(
                 command,
@@ -411,6 +591,36 @@ def _invoke_check(
             pass
 
 
+def _inprocess_timeout(timeout: float) -> None:
+    sys.__stderr__.write(
+        f"mneme-hook: check could not run (timed out after {timeout:g}s, "
+        "in-process). Failing open.\n"
+    )
+    sys.__stderr__.flush()
+    os._exit(0)
+
+
+def _invoke_check_inprocess(argv: list) -> subprocess.CompletedProcess:
+    # Imported here so the default subprocess path never pays for them.
+    import threading
+    import time
+
+    from mneme.integrations.claude_code.inprocess_check import run_check_inprocess
+
+    # benchmark/test seam: both variables are read only on this branch.
+    timeout = float(os.environ.get("MNEME_HOOK_CHECK_TIMEOUT_TEST", _CHECK_TIMEOUT_SECONDS))
+    watchdog = threading.Timer(timeout, _inprocess_timeout, args=(timeout,))
+    watchdog.daemon = True
+    watchdog.start()
+    try:
+        stall = os.environ.get("MNEME_HOOK_TEST_STALL_SECONDS")
+        if stall:
+            time.sleep(float(stall))
+        return run_check_inprocess(argv)
+    finally:
+        watchdog.cancel()
+
+
 def _run_check(
     event: ToolEvent,
     proposed_content: str,
@@ -421,14 +631,20 @@ def _run_check(
     mode = resolve_mode()
 
     rel, target_path = _resolve_target(event)
-    proc = _invoke_check(memory, rel, target_path, proposed_content, stderr=stderr)
+    # Default path passes no transport, so the call is exactly today's.
+    extra = {"transport": "inprocess"} if resolve_transport() == "inprocess" else {}
+    proc = _invoke_check(memory, rel, target_path, proposed_content, stderr=stderr, **extra)
     if proc is None:
         return 0
 
-    payload = parse_verdict(proc.stdout)
+    assessment = assess_verdict(proc.stdout, proc.returncode, mode)
+    payload = assessment.payload
     if payload is None:
-        # No trusted verdict: a crash, a traceback, or an unexpected exit
-        # code. Never block on this.
+        # No trusted verdict: a crash, a traceback, or a payload that
+        # contradicts itself or its exit status. Never block on this.
+        if assessment.inconsistent:
+            print(f"mneme-hook: {assessment.problem}. Failing open.", file=stderr)
+            return 0
         if _is_stale_runtime(proc.stderr):
             # Silence here would mean enforcement is off with nobody told.
             print(
@@ -439,11 +655,7 @@ def _run_check(
                 file=stderr,
             )
             return 0
-        print(
-            "mneme-hook: no parseable verdict from mneme check "
-            f"(exit {proc.returncode}). Failing open.",
-            file=stderr,
-        )
+        print(f"mneme-hook: {assessment.problem}. Failing open.", file=stderr)
         if proc.stderr:
             print(proc.stderr, file=stderr)
         return 0
@@ -609,6 +821,20 @@ def _applicability_outcomes(payload: Dict[str, Any]) -> Dict[tuple, str]:
     return out
 
 
+def _trusted_payload(
+    proc: Optional[subprocess.CompletedProcess],
+    mode: str,
+    stderr: TextIO,
+) -> Optional[Dict[str, Any]]:
+    """Return a coherent verdict payload, reporting inconsistency loudly."""
+    if proc is None:
+        return None
+    assessment = assess_verdict(proc.stdout, proc.returncode, mode)
+    if assessment.inconsistent:
+        print(f"mneme-hook: {assessment.problem}.", file=stderr)
+    return assessment.payload
+
+
 def _evaluate_renamed(
     memory: Path,
     root: Path,
@@ -636,8 +862,9 @@ def _evaluate_renamed(
 
     # Identical query label for both runs so retrieval gating is identical;
     # only --target-path differs.
+    mode = resolve_mode()
     proc_new = _invoke_check(memory, new_rel, str(root / new_rel), body, stderr=stderr)
-    payload_new = parse_verdict(proc_new.stdout) if proc_new else None
+    payload_new = _trusted_payload(proc_new, mode, stderr)
     if payload_new is None:
         return None, "rename target could not be evaluated (untrusted checker result)"
     if payload_new.get("evaluation_complete") is False:
@@ -645,7 +872,7 @@ def _evaluate_renamed(
         return None, "rename target had incomplete rule-path evaluation"
 
     proc_old = _invoke_check(memory, new_rel, str(root / old_rel), body, stderr=stderr)
-    payload_old = parse_verdict(proc_old.stdout) if proc_old else None
+    payload_old = _trusted_payload(proc_old, mode, stderr)
     if payload_old is None:
         return None, (
             "rename could not be compared against its previous path "
@@ -778,10 +1005,13 @@ def stop_event(
         if proc is None:
             untrusted += 1
             continue
-        payload = parse_verdict(proc.stdout)
+        assessment = assess_verdict(proc.stdout, proc.returncode, mode)
+        payload = assessment.payload
         if payload is None:
             untrusted += 1
-            if _is_stale_runtime(proc.stderr):
+            if assessment.inconsistent:
+                print(f"mneme-hook: {rel}: {assessment.problem}.", file=stderr)
+            elif _is_stale_runtime(proc.stderr):
                 print(
                     "mneme-hook: installed CLI lacks required JSON/path-aware "
                     "options; ENFORCEMENT IS INACTIVE. Upgrade with: "
@@ -891,7 +1121,7 @@ def handle_event(
     if not should_check(event.tool_name):
         return 0
 
-    memory = find_memory(Path(event.cwd or "."))
+    memory = find_memory(_direct_write_memory_start(event))
     if memory is None:
         return 0
 

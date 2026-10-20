@@ -1,0 +1,167 @@
+{
+  "meta": {
+    "name": "ci1-fixture",
+    "description": "CI1.2.1 path-scoped fixture"
+  },
+  "items": [],
+  "examples": [],
+  "decisions": [
+    {
+      "id": "ADR-901",
+      "decision": "CI1 fixture - forbid the legacy client installer in documentation",
+      "rationale": "## Context\n\nSynthetic decision for the CI1.2.1 path-scoped enforcement fixture. It is not\na Mneme product decision and exists only inside this fixture.\n\n## Decision\n\nDocumentation must not tell readers to install the legacy client.\n\n## Constraints\n\n- FORBID_LITERAL:\n    value: install legacy-client\n    include_paths:\n      - docs/**\n    exclude_paths:\n      - docs/history/**\n",
+      "scope": [
+        "enforcement"
+      ],
+      "constraints": [],
+      "anti_patterns": [],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "install legacy-client",
+          "include_paths": [
+            "docs/**"
+          ],
+          "exclude_paths": [
+            "docs/history/**"
+          ]
+        }
+      ],
+      "test_evidence": [],
+      "created_at": "2026-10-17",
+      "updated_at": "2026-10-17",
+      "status": "active",
+      "source": {
+        "type": "adr",
+        "path": "adr/ADR-901-ci1-fixture-scoped-installer.md",
+        "sha256": "78b23497a1cac28946dbfe9c426a4bcbca2102c3b4dbab13547069a861ddb3a4"
+      }
+    },
+    {
+      "id": "ADR-902",
+      "decision": "CI1 fixture - retrieval decoy for storage and caching",
+      "rationale": "## Context\n\nSynthetic decoy decision for the CI1.2.1 fixture. Its vocabulary is chosen so\nthat storage and caching queries rank it above ADR-901.\n\n## Decision\n\nStorage and caching layers keep durable state in the primary database.\n",
+      "scope": [
+        "storage"
+      ],
+      "constraints": [],
+      "anti_patterns": [],
+      "rules": [],
+      "test_evidence": [],
+      "created_at": "2026-10-17",
+      "updated_at": "2026-10-17",
+      "status": "active",
+      "source": {
+        "type": "adr",
+        "path": "adr/ADR-902-ci1-fixture-retrieval-decoy.md",
+        "sha256": "00b2595a621ce90ac0f9c1cb4816e060e9212f7ce86e80658e945bc9d1caf2dd"
+      }
+    }
+  ],
+  "decision_index": {
+    "schema": "mneme.decision-index/v2",
+    "semantic_features": [],
+    "decisions": [
+      {
+        "decision_id": "ADR-901",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-d3d431ff6d5edba8b555a040a7b85f9b",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": "2026-10-17"
+      },
+      {
+        "decision_id": "ADR-902",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-6b6f50ae9b08223608640b42f8215adf",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": "2026-10-17"
+      }
+    ],
+    "versions": [
+      {
+        "version_id": "dver-d3d431ff6d5edba8b555a040a7b85f9b",
+        "decision_id": "ADR-901",
+        "revision": "1",
+        "content_digest": "3fc4867f594be76d2ca9ecac266f01364a2865874c636251ec96edfc7b00ff45",
+        "statement": "CI1 fixture - forbid the legacy client installer in documentation",
+        "rationale": "## Context\n\nSynthetic decision for the CI1.2.1 path-scoped enforcement fixture. It is not\na Mneme product decision and exists only inside this fixture.\n\n## Decision\n\nDocumentation must not tell readers to install the legacy client.\n\n## Constraints\n\n- FORBID_LITERAL:\n    value: install legacy-client\n    include_paths:\n      - docs/**\n    exclude_paths:\n      - docs/history/**\n",
+        "context_scope": [
+          "enforcement"
+        ],
+        "constraints": [],
+        "anti_patterns": [],
+        "source_evidence": [
+          {
+            "source_type": "adr",
+            "source_locator": "adr/ADR-901-ci1-fixture-scoped-installer.md",
+            "source_revision": "78b23497a1cac28946dbfe9c426a4bcbca2102c3b4dbab13547069a861ddb3a4",
+            "observed_at": "",
+            "verification_status": ""
+          }
+        ],
+        "occurrence_source_identity": [
+          "ADR-901",
+          "78b23497a1cac28946dbfe9c426a4bcbca2102c3b4dbab13547069a861ddb3a4",
+          "adr-import"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-10-17"
+      },
+      {
+        "version_id": "dver-6b6f50ae9b08223608640b42f8215adf",
+        "decision_id": "ADR-902",
+        "revision": "1",
+        "content_digest": "ef4307664f2e12a3846335d9e3950bbac084d8b94a146d46e309c0bec895e3bd",
+        "statement": "CI1 fixture - retrieval decoy for storage and caching",
+        "rationale": "## Context\n\nSynthetic decoy decision for the CI1.2.1 fixture. Its vocabulary is chosen so\nthat storage and caching queries rank it above ADR-901.\n\n## Decision\n\nStorage and caching layers keep durable state in the primary database.\n",
+        "context_scope": [
+          "storage"
+        ],
+        "constraints": [],
+        "anti_patterns": [],
+        "source_evidence": [
+          {
+            "source_type": "adr",
+            "source_locator": "adr/ADR-902-ci1-fixture-retrieval-decoy.md",
+            "source_revision": "00b2595a621ce90ac0f9c1cb4816e060e9212f7ce86e80658e945bc9d1caf2dd",
+            "observed_at": "",
+            "verification_status": ""
+          }
+        ],
+        "occurrence_source_identity": [
+          "ADR-902",
+          "00b2595a621ce90ac0f9c1cb4816e060e9212f7ce86e80658e945bc9d1caf2dd",
+          "adr-import"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-10-17"
+      }
+    ],
+    "rules": [
+      {
+        "rule_id": "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b",
+        "decision_id": "ADR-901",
+        "decision_version_id": "dver-d3d431ff6d5edba8b555a040a7b85f9b",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "install legacy-client"
+        },
+        "applicability": {
+          "include_paths": [
+            "docs/**"
+          ],
+          "exclude_paths": [
+            "docs/history/**"
+          ]
+        },
+        "binding_authority": "version"
+      }
+    ]
+  }
+}

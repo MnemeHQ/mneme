@@ -1,0 +1,43 @@
+probe=D6-C2-V5-own A=protected B=permissive override=v5 topology=own
+channel=C2 committed project settings env (session repo .claude/settings.json), committed before the session
+override_configured=<LIVE>\D6-C2-V5-own\B\repo_a\.mneme\project_memory.json
+settings_env_repo=<LIVE>\D6-C2-V5-own\A\repo_a
+MNEME_MEMORY(launching shell)=<unset>
+date=2026-10-15T19:07:32Z
+claude=2.1.202 (Claude Code)
+mneme_src=<MNEME_SRC> head=c5e1028d1ba97b5a409553dcc06197cec91dfbd9 mneme_dir_equals_40ab0dd12c3f02b960d66c6fd08ab146ac5d369e=yes
+python=<PYTHON>
+claude_bin=<CLAUDE_BIN>
+setting_sources=project,local
+session_dir=<LIVE>\D6-C2-V5-own\A\repo_a
+added_dir=none
+repo_a=<LIVE>\D6-C2-V5-own\A\repo_a
+repo_b=<LIVE>\D6-C2-V5-own\B\repo_a
+BEFORE A/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+BEFORE A/.claude/settings   b232da3340dd827eff3bcc30dd52296ae55ccf399ad1bdf3d888d5eda8b88df2
+BEFORE A/.claude/local      absent
+BEFORE B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+BEFORE B/.claude/settings   5aff1827e4f4f2036e60f1e54ec2c662def6d9cd3bb04708ae04a81510d4b3b1
+BEFORE B/.claude/local      absent
+BEFORE A/HEAD               ed43525efe6338ae4b6adc8d5bce3eea83b84f61
+BEFORE B/HEAD               2997637db7241e1579402268dca4a809119d1f90
+session repo settings-env commit:
+  ed43525efe6338ae4b6adc8d5bce3eea83b84f61 configure MNEME_MEMORY in project settings env
+claude_exit=0
+AFTER A/app.py             4d581c9351487d87270ea52e7adc11ee256e7ba14460980e0f80f5e3f1bd707b
+AFTER A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+AFTER A/.claude/settings   b232da3340dd827eff3bcc30dd52296ae55ccf399ad1bdf3d888d5eda8b88df2
+AFTER A/.claude/local      absent
+AFTER B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+AFTER B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+AFTER B/.claude/settings   5aff1827e4f4f2036e60f1e54ec2c662def6d9cd3bb04708ae04a81510d4b3b1
+AFTER B/.claude/local      absent
+AFTER A/HEAD               ed43525efe6338ae4b6adc8d5bce3eea83b84f61
+AFTER B/HEAD               2997637db7241e1579402268dca4a809119d1f90
+A/app.py contains psycopg2: 1
+A git status:
+ M app.py
+B git status:
+init_model=claude-opus-4-8[1m]

@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pytest
 
+from tests.integrations.check_contract import check_result_for, violation
 from mneme.integrations.langchain import (
     ACTION_ALLOW,
     ACTION_DENY,
@@ -20,8 +21,6 @@ from mneme.integrations.langchain import (
     ACTION_WARN,
     MnemeLangChain,
 )
-
-SCHEMA = "mneme.check/v1"
 
 MEMORY = {
     "meta": {
@@ -49,32 +48,12 @@ def completed(stdout: str = "", stderr: str = "", returncode: int = 0):
     return subprocess.CompletedProcess([], returncode, stdout, stderr)
 
 
-def verdict_payload(verdict: str, *, complete: bool = True, violations=None):
-    payload = {
-        "schema": SCHEMA,
-        "verdict": verdict,
-        "violations": violations or [],
-        "evaluation_complete": complete,
-    }
-    if not complete:
-        payload["applicability"] = [
-            {
-                "decision_id": "scoped_001",
-                "rule_type": "FORBID_LITERAL",
-                "rule_value": "install legacy-client",
-                "outcome": "UNKNOWN",
-                "reason": "input path outside policy root",
-            }
-        ]
-    return json.dumps(payload)
+def check_runner(verdict: str, **kwargs):
+    """A runner answering every check as the real CLI would, in its mode."""
+    return lambda command, **_: check_result_for(command, verdict, **kwargs)
 
 
-FAIL_VIOLATION = {
-    "decision_id": "store_001",
-    "severity": "FAIL",
-    "rule": "psycopg2",
-    "trigger": "psycopg2",
-}
+FAIL_VIOLATION = violation("FAIL", decision_id="store_001", rule="psycopg2")
 
 
 @pytest.fixture()
@@ -100,7 +79,7 @@ class TestContextPath:
         assert "store_001" in injection.text
 
     def test_trace_distinguishes_context_from_enforcement(self, project):
-        gate = make_gate(project, lambda *a, **k: completed(verdict_payload("PASS")))
+        gate = make_gate(project, check_runner("PASS"))
         gate.context_for_task("sqlite storage")
         gate.evaluate_tool_call(
             "edit_file",
@@ -118,9 +97,7 @@ class TestWriteTranslation:
             seen["command"] = command
             input_path = command[command.index("--input") + 1]
             seen["checked_content"] = Path(input_path).read_text(encoding="utf-8")
-            return completed(
-                verdict_payload("FAIL", violations=[FAIL_VIOLATION])
-            )
+            return check_result_for(command, "FAIL", violations=[FAIL_VIOLATION])
 
         gate = make_gate(project, runner)
         result = gate.evaluate_tool_call(
@@ -141,7 +118,7 @@ class TestWriteTranslation:
 
         def runner(command, **kwargs):
             calls.append(command)
-            return completed(verdict_payload("PASS"))
+            return check_result_for(command, "PASS")
 
         gate = make_gate(project, runner)
         result = gate.evaluate_tool_call(
@@ -163,7 +140,7 @@ class TestEditTranslation:
         def runner(command, **kwargs):
             input_path = command[command.index("--input") + 1]
             seen["checked_content"] = Path(input_path).read_text(encoding="utf-8")
-            return completed(verdict_payload("PASS"))
+            return check_result_for(command, "PASS")
 
         gate = make_gate(project, runner)
         result = gate.evaluate_tool_call(
@@ -181,7 +158,7 @@ class TestEditTranslation:
 
     def test_edit_introducing_violation_is_denied(self, project):
         def runner(command, **kwargs):
-            return completed(verdict_payload("FAIL", violations=[FAIL_VIOLATION]))
+            return check_result_for(command, "FAIL", violations=[FAIL_VIOLATION])
 
         gate = make_gate(project, runner)
         result = gate.evaluate_tool_call(
@@ -217,13 +194,12 @@ class TestVerdictPolicy:
 
         def runner(command, **kwargs):
             assert "warn" in command
-            return completed(
-                verdict_payload(
-                    "WARN",
-                    violations=[
-                        {"decision_id": "store_001", "severity": "WARN", "rule": "no postgres", "trigger": "postgres"}
-                    ],
-                )
+            return check_result_for(
+                command,
+                "WARN",
+                violations=[
+                    violation("WARN", decision_id="store_001", rule="no postgres", trigger="postgres")
+                ],
             )
 
         gate = make_gate(project, runner)
@@ -236,7 +212,7 @@ class TestVerdictPolicy:
 
         def runner(command, **kwargs):
             calls["mode"] = command[command.index("--mode") + 1]
-            return completed(verdict_payload("FAIL", violations=[FAIL_VIOLATION]))
+            return check_result_for(command, "FAIL", violations=[FAIL_VIOLATION])
 
         gate = make_gate(project, runner, mode="strict")
         assert gate.evaluate_tool_call("write_file", self.write(project)).action == ACTION_DENY
@@ -244,13 +220,23 @@ class TestVerdictPolicy:
 
     def test_unknown_evaluation_never_becomes_pass(self, project):
         def runner(command, **kwargs):
-            return completed(verdict_payload("PASS", complete=False))
+            return check_result_for(command, "PASS", complete=False)
 
         gate = make_gate(project, runner)
         result = gate.evaluate_tool_call("write_file", self.write(project))
         assert result.action == ACTION_FAIL_OPEN
         assert result.evaluation_complete is False
         assert "unknown" in result.reason.lower()
+
+    def test_contradictory_verdict_fails_open_visibly(self, project):
+        """A FAIL payload exiting 1 in strict mode is not a verdict (#260)."""
+        def runner(command, **kwargs):
+            return completed(check_result_for(command, "FAIL").stdout, returncode=1)
+
+        gate = make_gate(project, runner)
+        result = gate.evaluate_tool_call("write_file", self.write(project))
+        assert result.action == ACTION_FAIL_OPEN
+        assert "inconsistent verdict payload" in result.reason
 
     def test_unparseable_verdict_fails_open_visibly(self, project):
         def runner(command, **kwargs):
@@ -288,7 +274,7 @@ class TestClosedSurface:
 
         def runner(command, **kwargs):
             ran.append(command)
-            return completed(verdict_payload("PASS"))
+            return check_result_for(command, "PASS")
 
         gate = MnemeLangChain(project_dir=tmp_path, check_runner=runner)
         result = gate.evaluate_tool_call(
@@ -302,7 +288,7 @@ class TestClosedSurface:
 
         def runner(command, **kwargs):
             ran.append(command)
-            return completed(verdict_payload("PASS"))
+            return check_result_for(command, "PASS")
 
         gate = make_gate(project, runner)
         result = gate.evaluate_tool_call("write_file", None)

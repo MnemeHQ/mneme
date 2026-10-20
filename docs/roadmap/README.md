@@ -38,6 +38,22 @@ Extend the existing benchmark discipline toward externally legible comparisons o
 
 Prefer frozen fixtures, deterministic scoring, clear treatment/control boundaries, and explicit separation of functional completion from architectural compliance.
 
+### P0 — Four-layer decision-conformance validation
+
+Validate the **existing** governance model end to end: **Guidance → Pre-mutation enforcement → CI checks → Evidence**. This is a cross-cutting acceptance test for the current benchmark, DG1, integration and CI assurance work, **not** a fifth layer, a new policy engine, or DG2 scope.
+
+The Decision Index supplies the common decision authority and applicability semantics to each layer. A process or ADR-acknowledgment marker may be useful workflow evidence, but must not count as proof that code conforms to an architectural decision.
+
+**Minimum reproducible test**
+
+- Freeze one sample repository, one human-reviewed decision and one verified typed rule. Test both a compliant change and an ADR-acknowledged change that still violates the actual constraint.
+- Demonstrate the supported pre-mutation boundary really prevents a forbidden mutation; where a host lacks a blocking seam, explicitly report detection-only or **unevaluated** rather than claiming protection.
+- Independently check the resulting change through CI. Record whether the CI result uses the same applicable decision and rule revision, and distinguish warn from blocking mode.
+- Include a valid scoped exception, an invalid/expired exception, benign-change controls, missing/stale decision binding and unavailable current-byte cases.
+- Produce decision-linked evidence: effective decision and source/version, target scope, rule lineage, enforcement surface, evaluated input/revision, verdict, reasons and limitations. Measure architectural compliance **and** functional completion, false blocks and setup friction.
+
+**Exit evidence:** a repeatable trace showing permitted work succeeds, a documented-but-noncompliant change is caught at each *supported* control point, and a complete record of unevaluated or unsupported surfaces. Reuse the production governance trace (#282), DG1 tracker (#497) and separate CI1 enforcement-assurance tracker (#540). Do not claim universal mutation coverage or directly compare an external product without a reproduced baseline.
+
 ### P0 — Decision Index authority completion (D1)
 
 D0 is shipped: Mneme has a canonical, source-independent Decision Index boundary with Layer 1 runtime projection parity.
@@ -64,9 +80,9 @@ See accepted [ADR-023](../adr/ADR-023-canonical-decision-index-and-runtime-proje
 
 ### P1 — DG1: Decision governance semantics (post-D1)
 
-DG1 is now partly implemented. DG1A, DG1C, DG1E, DG1D and DG1P have landed: the governance contract is accepted, the effective-decision resolver matches v1 projection, canonical evidence identity is threaded through enforcement traces, snapshot-to-snapshot governance change is available, and ADR `date` no longer carries precedence authority.
+DG1 is now partly implemented. DG1A, DG1C, DG1E, DG1D, DG1P and DG1B1 have landed: the governance contract is accepted, the effective-decision resolver matches v1 projection, canonical evidence identity is threaded through enforcement traces, snapshot-to-snapshot governance change is available, ADR `date` no longer carries precedence authority, and canonical decision applicability now resolves deterministically under `mneme.decision-index/v2`.
 
-The governing architecture remains accepted [ADR-031](../adr/ADR-031-decision-governance-semantics.md). The remaining sequence is intentionally gated: decision applicability (DG1B1) and waivers (DG1B2) start only with concrete repository evidence and a Layer 1 charter amendment, each introducing persisted semantics under `mneme.decision-index/v2`; DG1F then converges runtime consumers onto the shared governance result, followed by DG1G adversarial closeout. Until those gates are met, no new applicability or waiver semantics should be added.
+The governing architecture remains accepted [ADR-031](../adr/ADR-031-decision-governance-semantics.md). Decision applicability (DG1B1) landed under its [merged charter](../plans/2026-10-08-dg1b1-decision-applicability-charter.md) and [Layer 1 freeze amendment](../architecture/layer1-freeze-e73ff7d.md): optional exact project-local `required_labels` persist under `mneme.decision-index/v2`, an explicit v1 → v2 migration preserves global eligibility, and the shared resolver gains a `not_applicable` cause. Waivers (DG1B2) remain evidence- and target-binding-gated. DG1F then converges runtime consumers onto the shared governance result, followed by DG1G adversarial closeout. Until DG1F lands, no runtime consumer changes which decisions it enforces.
 
 DG1 defines a public, versioned semantic contract for:
 
@@ -101,6 +117,8 @@ The publication boundary is: **OSS owns decision execution; enterprise owns deci
 - retained organization-wide evidence history;
 - hosted multi-tenant governance, approval/admin workflows, fleet propagation; and
 - organization-wide analytics/control-plane behavior.
+
+**Shared resolution contract:** as DG1 runtime convergence is accepted, CLI, hook, CI, MCP retrieval/explanation and evidence should consume one versioned authority/applicability result rather than independently interpreting documents or policy. Track exact decision/rule revision, repository binding and supported override semantics. Distinguish `ALLOW`, `DENY`, `UNEVALUATED` (or the existing contract's equivalent explicit outcomes); never turn missing context, unavailable policy, or a retrieval hint into a positive enforcement verdict. Changes to behavior remain gated by the accepted ADR and Layer 1 freeze amendment process.
 
 ### P1.5 — DG2: deterministic decision federation (public OSS)
 
@@ -145,6 +163,8 @@ structured architecture review
 **Constraint:** the Skill is an interface over Mneme retrieval and deterministic enforcement. It must not become a second policy engine or substitute model judgment for `mneme check` verdicts.
 
 Initial work should reuse the shipped `/mneme:context`, `/mneme:check`, `/mneme:record`, and `/mneme:review` surfaces before adding new runtime behavior.
+
+**First protected change onboarding:** package one short, maintained example that starts with a reviewed decision, activates an existing verified typed rule, then shows an allowed and a prohibited change with their actual enforcement/evidence output. Optimize for a first useful architectural protection outcome, not install completion or a new multipurpose coding harness. Label curated/example decisions separately from automatically discovered decision candidates; verify the workflow under a pinned supported integration and show any unsupported host mutation path.
 
 ### P1 — Source-independent decision ingestion contract
 
@@ -198,7 +218,7 @@ Enforcement / evidence
 
 Proposal state is separate from canonical decision lifecycle. P0 supports `proposed -> accepted` or `proposed -> rejected`, but acceptance is a Mneme-owned authority action and is not exposed as a generic producer mutation.
 
-Proposal ingestion must be idempotent by stable producer/source/version identity. Semantic similarity may flag likely duplicates for review but must not auto-merge canonical decisions.
+Proposal ingestion must be idempotent by stable producer/source/version identity. Preserve decision context available **at creation time** (known rationale, rejected alternatives, reversibility/exit cost, intended scope and provenance), alongside evidence reconstructed later. Both are non-authoritative until the explicit human-reviewed Mneme authority transition. Capture is not autonomous promotion or a second authoritative store. Semantic similarity may flag likely duplicates for review but must not auto-merge canonical decisions.
 
 Use `sagarika29/ai-system-architect` as the first producer-workflow compatibility test after the generic contract exists. Do not add Sagarika-specific logic to the Decision Index/MCP core.
 
@@ -215,6 +235,12 @@ The experiment should test whether the consumer can retrieve applicable Mneme de
 This is a compatibility/reference integration, not a dependency. Mneme must continue to operate independently through its existing agent, CLI, hook, and CI surfaces.
 
 Do not add CodeRabbit-specific logic to the Decision Index or enforcement core.
+
+### P1 — Explainable enforcement and observable coverage
+
+Improve the existing Audit, enforcement evidence and readiness reporting without duplicating the Core evaluator. A blocked change should identify the actual violated decision/rule and offer a compliant path or an authorized, scoped waiver route—not an untracked bypass. Expose coverage and **negative space**: applicable decisions evaluated and not evaluated, failed and passed checks, supported pre-mutation versus CI-only detection, benign false blocks, waiver validity, stale policy and unsupported operations. Process-marker compliance and retrieval success are distinct from semantic conformance.
+
+Use version-pinned decisions and rule/evaluator contracts across supported surfaces. Maintain a tested compatibility matrix, explicit timeout/failure behavior and rollback guidance; do not silently alter active enforcement via tool updates. This work refines the existing four layers (especially Enforcement, CI and Evidence) and builds on CI1 (#540), rather than adding a new layer.
 
 ### P1 — Migration-aware Architecture Audit
 

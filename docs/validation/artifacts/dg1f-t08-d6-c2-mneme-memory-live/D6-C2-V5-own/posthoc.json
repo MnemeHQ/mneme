@@ -1,0 +1,23 @@
+[
+  {
+    "tool_use_id": "toolu_D6-C2-V5-own_1",
+    "file_path": "<LIVE>\\D6-C2-V5-own\\A\\repo_a\\app.py",
+    "hook_exit": 0,
+    "against_hook_selected_memory": {
+      "memory": "<LIVE>\\D6-C2-V5-own\\B\\repo_a\\.mneme\\project_memory.json",
+      "exit": 0,
+      "verdict": "PASS",
+      "evaluation_complete": true,
+      "violations": []
+    },
+    "against_repo_a_own_memory": {
+      "memory": "<LIVE>\\D6-C2-V5-own\\A\\repo_a\\.mneme\\project_memory.json",
+      "exit": 2,
+      "verdict": "FAIL",
+      "evaluation_complete": true,
+      "violations": [
+        "T08-DEC"
+      ]
+    }
+  }
+]

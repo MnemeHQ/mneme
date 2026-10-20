@@ -95,6 +95,16 @@ def test_compliant_change_completes_silently(tmp_path):
     assert code == 0 and wire is None
 
 
+def test_missing_memory_is_a_silent_no_op(tmp_path):
+    """S1: with no canonical authority the Stop audit is inactive and silent."""
+    import subprocess
+    (tmp_path / "seed.py").write_text("x = 1\n", encoding="utf-8")
+    subprocess.run(["git", "init"], cwd=tmp_path, capture_output=True, check=True)
+    code, wire = _run_handler(_stop(tmp_path), tmp_path)
+    assert code == 0
+    assert wire is None  # no block and no claim of coverage
+
+
 def test_preexisting_dirty_file_untouched_by_codex_is_not_blamed(tmp_path):
     dirty = f'keep = "{FORBIDDEN}"\n'
     project = _project(tmp_path, seed=dirty)  # dirty before session: baseline
@@ -139,6 +149,26 @@ def test_unevaluated_artifact_disclosed_not_claimed_governed(
     wire = json.loads(text)
     assert wire.get("decision") != "block"
     assert "systemMessage" in wire and "Unevaluated" in wire["systemMessage"]
+
+
+def test_contradictory_checker_result_is_disclosed_not_blocked(
+        tmp_path, monkeypatch):
+    """A FAIL payload exiting 1 in strict mode broke the CLI contract (#260)."""
+    import subprocess
+    from tests.integrations.check_contract import check_payload
+
+    project = _project(tmp_path)
+    stop_audit.ensure_session_baseline(_pretooluse(project))
+    (project / "shell_made.py").write_text(f'x = "{FORBIDDEN}"\n',
+                                           encoding="utf-8")
+    monkeypatch.setattr(
+        stop_audit, "_run_whole_file_check",
+        lambda *a, **k: subprocess.CompletedProcess(
+            [], 1, json.dumps(check_payload("FAIL")), ""))
+    code, wire = _run_handler(_stop(project), project)
+    assert code == 0
+    assert wire.get("decision") != "block"
+    assert "inconsistent verdict payload (FAIL with exit 1" in wire["systemMessage"]
 
 
 def test_remediation_passes_and_block_cap_bounds_loops(tmp_path):

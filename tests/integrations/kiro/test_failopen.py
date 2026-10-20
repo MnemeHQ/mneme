@@ -8,6 +8,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from tests.integrations.check_contract import check_result_for, violation
 from mneme.integrations.kiro.hook import main
 
 FIXTURE = Path(__file__).parent / "fixtures" / "project_memory.json"
@@ -38,39 +39,51 @@ def _envelope(cwd, path="f.py", content="x\n"):
 
 
 def _verdict(verdict="FAIL", evaluation_complete=True):
-    payload = {
-        "schema": "mneme.check/v1",
-        "verdict": verdict,
-        "mode": "strict",
-        "violations": [{
-            "decision_id": "test_002",
-            "severity": verdict,
-            "rule_type": "FORBID_LITERAL",
-            "rule": VIOLATION,
-            "trigger": VIOLATION,
-        }],
-        "freshness": [],
-    }
-    if not evaluation_complete:
-        payload["evaluation_complete"] = False
-        payload["applicability"] = [{
-            "decision_id": "test_003",
-            "rule_type": "FORBID_LITERAL",
-            "rule_value": "EXPERIMENTAL_MARKER_XY",
-            "outcome": "UNKNOWN",
-            "reason": "outside policy root",
-        }]
-    return json.dumps(payload)
+    """Answer as the real CLI would, in whatever mode the hook requested."""
+    violations = [] if verdict == "PASS" else [
+        violation(
+            verdict,
+            decision_id="test_002",
+            decision_text="Do not call the legacy client directly",
+            rule=VIOLATION,
+            kind="typed_rule",
+            rule_type="FORBID_LITERAL",
+        )
+    ]
+    applicability = None if evaluation_complete else [{
+        "decision_id": "test_003",
+        "rule_type": "FORBID_LITERAL",
+        "rule_value": "EXPERIMENTAL_MARKER_XY",
+        "outcome": "UNKNOWN",
+        "reason": "outside policy root",
+    }]
+
+    def answer(command):
+        return check_result_for(
+            command,
+            verdict,
+            violations=violations,
+            complete=evaluation_complete,
+            applicability=applicability,
+        )
+
+    return answer
+
+
+def _answer(stdout, stderr, command):
+    """A scripted ``mneme check`` reply: a contract answer or raw stdout."""
+    if callable(stdout):
+        return stdout(command)
+    return MagicMock(returncode=0, stdout=stdout, stderr=stderr)
 
 
 def _gate(tmp_path, stdout="", stderr="", exc=None, envelope=None):
-    fake = MagicMock(returncode=0, stdout=stdout, stderr=stderr)
     out, err = io.StringIO(), io.StringIO()
 
     def _runner(command, **kwargs):
         if exc is not None:
             raise exc
-        return fake
+        return _answer(stdout, stderr, command)
 
     with patch("mneme.integrations.kiro.hook.subprocess.run", _runner):
         rc = main(stdin=io.StringIO(envelope or _envelope(tmp_path)), stderr=err, stdout=out)
@@ -180,6 +193,20 @@ def test_stale_cli_detected_and_reported_visibly(tmp_path):
     assert rc == 0
     assert "ENFORCEMENT IS INACTIVE" in err
     assert "UNEVALUATED" in out
+
+
+def test_contradictory_verdict_fails_open_visibly(tmp_path):
+    """A FAIL payload exiting 1 in strict mode is not a verdict (#260)."""
+    project = _project(tmp_path)
+
+    def contradictory(command):
+        proc = _verdict("FAIL")(command)
+        return subprocess.CompletedProcess([], 1, proc.stdout, "")
+
+    rc, out, err = _gate(project, stdout=contradictory)
+    assert rc == 0
+    assert "UNEVALUATED" in out
+    assert "inconsistent verdict payload (FAIL with exit 1" in err
 
 
 def test_incomplete_applicability_fails_open_visibly(tmp_path):

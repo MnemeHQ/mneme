@@ -39,7 +39,7 @@ from mneme.integrations.claude_code.hook import (
     find_memory,
     format_applicability_reason,
     format_reason,
-    parse_verdict,
+    assess_verdict,
     resolve_mode,
 )
 from mneme.path_selectors import policy_root
@@ -362,12 +362,18 @@ def _finish_check(memory, rel_label, target_abs, introduced, mode,
             target_path=target_abs,
         )
 
-    verdict_payload = parse_verdict(proc.stdout)
+    assessment = assess_verdict(proc.stdout, proc.returncode, mode)
+    verdict_payload = assessment.payload
     if verdict_payload is None:
+        problem = assessment.problem
+        if not assessment.inconsistent:
+            problem = (
+                "no parseable mneme.check/v1 verdict from mneme check "
+                f"(exit {proc.returncode})"
+            )
         return GateResult(
             FAIL_OPEN,
-            "no parseable mneme.check/v1 verdict from mneme check "
-            f"(exit {proc.returncode}). Failing open.",
+            f"{problem}. Failing open.",
             target_path=target_abs,
             details={"stderr": proc.stderr},
         )

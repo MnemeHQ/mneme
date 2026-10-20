@@ -1,0 +1,4 @@
+mneme: FAIL - architectural decision violated
+  [G1-DEC] FAIL "psycopg2" - trigger: psycopg2
+      The application uses SQLite; do not introduce a PostgreSQL client.
+      path: app.py

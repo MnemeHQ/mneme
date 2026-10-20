@@ -58,6 +58,76 @@ def test_adr_import_default_is_dry_run(tmp_path):
     assert target.read_text(encoding="utf-8") == before
 
 
+@pytest.mark.parametrize("apply", [False, True], ids=["dry-run", "apply"])
+@pytest.mark.parametrize(
+    ("priority_line", "status_line", "expected_error"),
+    [
+        ("", "status: accepted\n", "missing required field 'priority'"),
+        ("priority: urgent\n", "status: accepted\n", "invalid priority 'urgent'"),
+        ("priority: normal\n", "", "missing required field 'status'"),
+    ],
+    ids=["missing-priority", "invalid-priority", "missing-status"],
+)
+def test_adr_import_schema_error_is_clean_and_non_mutating(
+    tmp_path, capsys, apply, priority_line, status_line, expected_error
+):
+    """Invalid ADR metadata must fail closed without a Python traceback."""
+    adr_dir = tmp_path / "adrs"
+    adr_dir.mkdir()
+    (adr_dir / "ADR-901.md").write_text(
+        "---\n"
+        "id: ADR-901\n"
+        "title: CLI validation test\n"
+        f"{status_line}"
+        f"{priority_line}"
+        "date: 2026-10-15\n"
+        "scope: storage\n"
+        "---\n\n"
+        "A test architectural decision.\n",
+        encoding="utf-8",
+    )
+    target = tmp_path / "project_memory.json"
+    _seed_empty_memory(target)
+    before = target.read_bytes()
+    mode = "--apply" if apply else "--dry-run"
+
+    rc = main(["adr", "import", str(adr_dir), "--memory", str(target), mode])
+
+    captured = capsys.readouterr()
+    assert rc == 2
+    assert captured.out == ""
+    assert "ERROR: ADR validation failed" in captured.err
+    assert "ADR-901" in captured.err
+    assert expected_error in captured.err
+    assert "Traceback" not in captured.err
+    assert target.read_bytes() == before
+
+
+@pytest.mark.parametrize("apply", [False, True], ids=["dry-run", "apply"])
+def test_adr_import_parse_error_is_clean_and_non_mutating(tmp_path, capsys, apply):
+    """A malformed ADR remains invalid, but the CLI reports it cleanly."""
+    adr_dir = tmp_path / "adrs"
+    adr_dir.mkdir()
+    (adr_dir / "ADR-902.md").write_text(
+        "# ADR-902\n\nNo YAML frontmatter.\n", encoding="utf-8"
+    )
+    target = tmp_path / "project_memory.json"
+    _seed_empty_memory(target)
+    before = target.read_bytes()
+    mode = "--apply" if apply else "--dry-run"
+
+    rc = main(["adr", "import", str(adr_dir), "--memory", str(target), mode])
+
+    captured = capsys.readouterr()
+    assert rc == 2
+    assert captured.out == ""
+    assert "ERROR:" in captured.err
+    assert "ADR-902.md" in captured.err
+    assert "missing YAML frontmatter" in captured.err
+    assert "Traceback" not in captured.err
+    assert target.read_bytes() == before
+
+
 def test_adr_import_apply_writes_decisions(tmp_path):
     target = tmp_path / "project_memory.json"
     _seed_empty_memory(target)

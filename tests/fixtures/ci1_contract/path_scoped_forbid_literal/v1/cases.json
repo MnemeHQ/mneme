@@ -1,0 +1,64 @@
+{
+  "fixture": "ci1_contract/path_scoped_forbid_literal",
+  "version": "v1",
+  "contract": "mneme.check/v1",
+  "memory": "project_memory.json",
+  "adr_dir": "adr",
+  "rule": {
+    "rule_id": "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b",
+    "decision_id": "ADR-901",
+    "decision_version_id": "dver-d3d431ff6d5edba8b555a040a7b85f9b"
+  },
+  "query_variants": [
+    {"query": "storage caching database", "top": 1},
+    {"query": "install legacy-client documentation", "top": 3},
+    {"query": "unrelated words entirely", "top": 1}
+  ],
+  "cases": [
+    {
+      "id": "applied_pass",
+      "input": "docs/guide_compliant.md",
+      "target_path": null,
+      "mode": "strict",
+      "expected_exit": 0,
+      "expected_classification": "VERIFIED_PASS",
+      "expected": "expected/applied_pass.json"
+    },
+    {
+      "id": "applied_fail",
+      "input": "docs/guide_violating.md",
+      "target_path": null,
+      "mode": "strict",
+      "expected_exit": 2,
+      "expected_classification": "VIOLATION",
+      "expected": "expected/applied_fail.json"
+    },
+    {
+      "id": "excluded_by_exclude_selector",
+      "input": "docs/history/migration.md",
+      "target_path": null,
+      "mode": "strict",
+      "expected_exit": 0,
+      "expected_classification": "VERIFIED_PASS",
+      "expected": "expected/excluded_by_exclude_selector.json"
+    },
+    {
+      "id": "excluded_by_no_include_match",
+      "input": "src/notes.md",
+      "target_path": null,
+      "mode": "strict",
+      "expected_exit": 0,
+      "expected_classification": "VERIFIED_PASS",
+      "expected": "expected/excluded_by_no_include_match.json"
+    },
+    {
+      "id": "unknown_target_outside_policy_root",
+      "input": "docs/guide_violating.md",
+      "target_path": "../README.md",
+      "mode": "strict",
+      "expected_exit": 2,
+      "expected_classification": "UNEVALUATED",
+      "expected": "expected/unknown_target_outside_policy_root.json"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "fixture": "ci1_contract/warn_verdict",
+  "version": "v1",
+  "contract": "mneme.check/v1",
+  "memory": "project_memory.json",
+  "adr_dir": null,
+  "query_variants": [
+    {"query": "storage", "top": 3}
+  ],
+  "cases": [
+    {
+      "id": "pass_strict",
+      "input": "inputs/pass.md",
+      "target_path": null,
+      "mode": "strict",
+      "expected_exit": 0,
+      "expected_classification": "VERIFIED_PASS",
+      "expected": "expected/pass_strict.json"
+    },
+    {
+      "id": "warn_strict",
+      "input": "inputs/warn.md",
+      "target_path": null,
+      "mode": "strict",
+      "expected_exit": 1,
+      "expected_classification": "VIOLATION",
+      "expected": "expected/warn_strict.json"
+    },
+    {
+      "id": "warn_warn_mode",
+      "input": "inputs/warn.md",
+      "target_path": null,
+      "mode": "warn",
+      "expected_exit": 0,
+      "expected_classification": "VIOLATION",
+      "expected": "expected/warn_warn_mode.json"
+    },
+    {
+      "id": "fail_warn_mode",
+      "input": "inputs/fail.md",
+      "target_path": null,
+      "mode": "warn",
+      "expected_exit": 0,
+      "expected_classification": "VIOLATION",
+      "expected": "expected/fail_warn_mode.json"
+    }
+  ]
+}

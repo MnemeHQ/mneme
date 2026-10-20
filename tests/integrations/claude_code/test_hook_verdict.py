@@ -26,11 +26,11 @@ from mneme.integrations.claude_code.hook import (
 )
 
 
-def _payload(verdict="FAIL", violations=None):
+def _payload(verdict="FAIL", violations=None, mode="strict"):
     return json.dumps({
         "schema": "mneme.check/v1",
         "verdict": verdict,
-        "mode": "strict",
+        "mode": mode,
         "violations": violations if violations is not None else [{
             "decision_id": "storage_json",
             "decision_text": "Use JSON storage only",
@@ -151,13 +151,20 @@ def test_pass_verdict_does_not_block_or_emit(tmp_path):
     assert out == ""
 
 
-def test_pass_verdict_trusted_over_nonzero_exit(tmp_path):
-    """A PASS payload wins even if the child exits non-zero for some other reason."""
+def test_pass_verdict_with_nonzero_exit_is_untrusted(tmp_path):
+    """A PASS payload with exit 1 means the child broke its own contract (#260).
+
+    It is not a verdict: the hook fails open, but says so instead of treating
+    the PASS as authoritative.
+    """
     mem, target = _project_with_memory(tmp_path)
-    rc, _err, _out = _run(
+    rc, err, out = _run(
         tmp_path, target, returncode=1, stdout=_payload("PASS", violations=[]),
     )
     assert rc == 0
+    assert out == ""
+    assert "inconsistent verdict payload (PASS with exit 1" in err
+    assert "enforcement inactive" in err
 
 
 # ── warn mode surfaces violations without blocking ───────────────────────────
@@ -165,7 +172,9 @@ def test_pass_verdict_trusted_over_nonzero_exit(tmp_path):
 def test_warn_mode_emits_structured_output(tmp_path, monkeypatch):
     monkeypatch.setenv("MNEME_HOOK_MODE", "warn")
     mem, target = _project_with_memory(tmp_path)
-    rc, _err, out = _run(tmp_path, target, returncode=0, stdout=_payload("FAIL"))
+    rc, _err, out = _run(
+        tmp_path, target, returncode=0, stdout=_payload("FAIL", mode="warn"),
+    )
     assert rc == 0
     emitted = json.loads(out)
     hso = emitted["hookSpecificOutput"]
@@ -178,7 +187,9 @@ def test_warn_mode_defers_never_allows(tmp_path, monkeypatch):
     permission prompt. A warning must never weaken permissions."""
     monkeypatch.setenv("MNEME_HOOK_MODE", "warn")
     mem, target = _project_with_memory(tmp_path)
-    _rc, _err, out = _run(tmp_path, target, returncode=0, stdout=_payload("FAIL"))
+    _rc, _err, out = _run(
+        tmp_path, target, returncode=0, stdout=_payload("FAIL", mode="warn"),
+    )
     decision = json.loads(out)["hookSpecificOutput"]["permissionDecision"]
     assert decision == "defer"
     assert decision != "allow"
@@ -188,17 +199,22 @@ def test_warn_mode_pass_emits_nothing(tmp_path, monkeypatch):
     monkeypatch.setenv("MNEME_HOOK_MODE", "warn")
     mem, target = _project_with_memory(tmp_path)
     rc, _err, out = _run(
-        tmp_path, target, returncode=0, stdout=_payload("PASS", violations=[]),
+        tmp_path, target, returncode=0,
+        stdout=_payload("PASS", violations=[], mode="warn"),
     )
     assert rc == 0
     assert out == ""
+    assert "inconsistent" not in _err
 
 
 def test_warn_mode_never_blocks_on_fail(tmp_path, monkeypatch):
     monkeypatch.setenv("MNEME_HOOK_MODE", "warn")
     mem, target = _project_with_memory(tmp_path)
-    rc, _err, _out = _run(tmp_path, target, returncode=0, stdout=_payload("FAIL"))
+    rc, _err, out = _run(
+        tmp_path, target, returncode=0, stdout=_payload("FAIL", mode="warn"),
+    )
     assert rc == 0
+    assert "storage_json" in out  # a trusted verdict, surfaced, not failed open
 
 
 # ── the hook asks for JSON ───────────────────────────────────────────────────

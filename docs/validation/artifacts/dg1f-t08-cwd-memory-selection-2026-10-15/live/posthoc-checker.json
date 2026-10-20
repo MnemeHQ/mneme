@@ -1,0 +1,22 @@
+[
+  {
+    "probe": "L0-control",
+    "selected_memory": "<LIVE>\\L0-control\\repo_a\\.mneme\\project_memory.json",
+    "target": "<LIVE>\\L0-control\\repo_a\\app.py",
+    "exit": 2,
+    "verdict": "FAIL",
+    "evaluation_complete": true,
+    "violations": [
+      "T08-DEC"
+    ]
+  },
+  {
+    "probe": "L4-session-in-sibling-v1",
+    "selected_memory": "<LIVE>\\L4-session-in-sibling-v1\\B\\repo_a\\.mneme\\project_memory.json",
+    "target": "<LIVE>\\L4-session-in-sibling-v1\\A\\repo_a\\app.py",
+    "exit": 0,
+    "verdict": "PASS",
+    "evaluation_complete": true,
+    "violations": []
+  }
+]

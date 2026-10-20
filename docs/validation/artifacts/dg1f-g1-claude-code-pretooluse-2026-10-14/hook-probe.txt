@@ -1,0 +1,13 @@
+# Probe A — hook level (mneme-hook.exe), governed repo, decision G1-DEC (FORBID_LITERAL "psycopg2")
+
+HOOK VIOLATING: exit 2
+stderr: 'mneme: FAIL - architectural decision violated\n  [G1-DEC] FAIL "psycopg2" - trigger: psycopg2\n      The application uses SQLite; do not introduce a PostgreSQL client.\n      path: app.py\n'
+sha256 before: bc9a8440418b934ba44b9ecdf50db57f8da76138096d0990ccada9afcce038a8
+sha256 after : bc9a8440418b934ba44b9ecdf50db57f8da76138096d0990ccada9afcce038a8
+unchanged: True
+
+HOOK CONTROL: exit 0 stdout '' stderr ''
+sha256 after control: bc9a8440418b934ba44b9ecdf50db57f8da76138096d0990ccada9afcce038a8
+
+# Harness: claude --version -> 2.1.202 (Claude Code)
+# Hook binary: C:\Users\hi\.local\bin\mneme-hook.exe

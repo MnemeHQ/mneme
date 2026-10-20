@@ -50,7 +50,7 @@ from mneme.integrations.claude_code.hook import (
     introduced_between,
     introduced_content,
     MaterializeError,
-    parse_verdict,
+    assess_verdict,
     resolve_mode,
 )
 from mneme.integrations.claude_code.shell_preflight import (
@@ -325,14 +325,14 @@ class MnemeHermes:
                 "mneme-hermes: could not run mneme check. Failing open.",
             )
 
-        payload = parse_verdict(proc.stdout)
+        assessment = assess_verdict(proc.stdout, proc.returncode, mode)
+        payload = assessment.payload
         if payload is None:
             return self._gate(
                 ACTION_FAIL_OPEN,
                 tool_label,
                 file_path,
-                "mneme-hermes: no parseable verdict from mneme check "
-                f"(exit {proc.returncode}). Failing open.",
+                f"mneme-hermes: {assessment.problem}. Failing open.",
             )
 
         verdict = payload["verdict"]

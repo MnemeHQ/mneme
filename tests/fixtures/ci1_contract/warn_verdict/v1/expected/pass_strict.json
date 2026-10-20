@@ -1,0 +1,9 @@
+{
+  "applicability": [],
+  "evaluation_complete": true,
+  "freshness": [],
+  "mode": "strict",
+  "schema": "mneme.check/v1",
+  "verdict": "PASS",
+  "violations": []
+}
