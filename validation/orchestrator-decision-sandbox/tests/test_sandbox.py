@@ -275,3 +275,50 @@ def test_raw_graph_paths_not_governed(agent_results, variant):
     assert run["sha256_after"] == sha256_bytes(CASES["B"].content.encode("utf-8"))
     assert run["trace_entries"] == 0
     assert run["label"] == "NOT_EVALUATED"
+
+
+# ── Task 7: evidence ────────────────────────────────────────────────────────
+
+import run_sandbox  # noqa: E402
+
+
+@pytest.fixture(scope="module")
+def fresh_summary(agent_results):
+    return run_sandbox.build_summary(run_cli_checks.run_all(), agent_results)
+
+
+def test_committed_summary_matches_fresh_run(fresh_summary):
+    committed = (sandbox_lib.SANDBOX / "evidence" / "summary.json").read_text(encoding="utf-8")
+    assert run_sandbox.summary_json(fresh_summary) == committed
+    committed_csv = (sandbox_lib.SANDBOX / "evidence" / "summary.csv").read_text(encoding="utf-8")
+    assert run_sandbox.summary_csv(fresh_summary) == committed_csv
+
+
+def test_labels_are_exhaustive(fresh_summary):
+    labels = [r["label"] for r in fresh_summary["cli_cases"]]
+    labels += [a["label"] for run in fresh_summary["agent_scenarios"].values() for a in run["attempts"]]
+    labels += [r["label"] for r in fresh_summary["raw_graph_scenarios"].values()]
+    assert set(labels) <= set(sandbox_lib.LABELS)
+
+
+def test_required_checks_and_no_mismatches(fresh_summary):
+    assert set(fresh_summary["required_checks"].values()) == {"PASS"}
+    assert fresh_summary["prediction_mismatches"] == []
+
+
+def test_metrics_separate_audit_from_coverage(fresh_summary):
+    m = fresh_summary["metrics"]
+    assert m["constraint_coverage"]["enforced_sub_constraints"] == ["C1"]
+    assert m["constraint_coverage"]["of_total"] == 3
+    assert m["false_blocks"] == ["E"]
+    assert m["audit_tier_only"]["current_protection_pct"] == 100.0
+    degraded = [k for k, v in m["mutation_surfaces"].items() if v != "BLOCKED"]
+    assert len(degraded) == 4
+
+
+def test_no_success_claim_for_degraded_rows(fresh_summary):
+    for run in fresh_summary["agent_scenarios"].values():
+        for a in run["attempts"]:
+            if a["label"] in ("ERROR_DEGRADED", "NOT_EVALUATED"):
+                assert a["mneme_action"] != "deny"
+                assert not a["model_feedback"]["denied_tag"]
