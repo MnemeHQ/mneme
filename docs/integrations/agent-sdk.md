@@ -62,6 +62,11 @@ Constructor options:
 | `mode` | `"strict"` or `"warn"`; falls back to `MNEME_HOOK_MODE`, then `strict` |
 | `check_runner` | Test seam replacing the `mneme check` subprocess |
 
+A relative tool `file_path` is resolved against the PreToolUse payload's
+`cwd` (the `cwd` argument of `evaluate_mutation`), for both the file Mneme
+diffs against and the `--target-path` it checks; the host process cwd is not
+used. With an empty `cwd`, relative paths stay relative to the process cwd.
+
 ## Policy
 
 | Mneme outcome | strict mode | warn mode |
