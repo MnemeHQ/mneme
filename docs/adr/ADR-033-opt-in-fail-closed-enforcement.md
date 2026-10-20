@@ -1,7 +1,7 @@
 ---
 id: ADR-033
 title: "Opt-In Fail-Closed Handling for Unavailable Enforcement Evaluations"
-status: proposed
+status: accepted
 priority: foundational
 date: 2026-10-13
 scope: enforcement.availability_policy
@@ -9,14 +9,14 @@ scope: enforcement.availability_policy
 
 # ADR-033: Opt-In Fail-Closed Handling for Unavailable Enforcement Evaluations
 
-**Status:** Proposed (revision 2, 2026-10-20). Authorization architecture A
-chosen; CI merge-gate semantics added. No implementation authority,
-implementation charter or Layer 1 amendment is conferred.
-**Date:** 2026-10-13 (revised 2026-10-20)
-**Deciders:** Pending review
-**Charter:** none. The earlier bundled C0 charter was removed from this
-proposal as stale; a bounded implementation charter is written only after this
-ADR is accepted, under the Layer 1 freeze procedure.
+**Status:** Accepted as a design decision. Authorization architecture A; CI
+merge-gate semantics included. Acceptance confers **no** implementation
+authority, implementation charter or Layer 1 amendment.
+**Date:** 2026-10-13 (revised and accepted 2026-10-20)
+**Deciders:** Theo Valmis
+**Charter:** none yet. The earlier bundled C0 charter was removed as stale. A
+bounded implementation charter, with its `[layer1-freeze]` amendment, is a
+separate decision under the Layer 1 freeze procedure.
 **Verdict-trust prerequisite:** [#260](https://github.com/MnemeHQ/mneme/issues/260),
 resolved by merged PR #484 (`60b02af3`).
 
@@ -60,7 +60,7 @@ postures:
   is "lab policy, not product policy" pending this ADR (CI1.4 §6.5, §7
   condition 3).
 
-## Proposed decision
+## Decision
 
 ### 1. Two independent policy dimensions (all surfaces)
 
@@ -438,10 +438,10 @@ different trust boundary.
 - Data Engine work, hosted services, organizational governance, or a redesigned
   public evidence schema.
 
-## Implementation gates (not authorized by proposed or accepted status)
+## Implementation gates (not authorized by acceptance)
 
-1. **ADR review and acceptance** as a design decision. Acceptance does not
-   authorize implementation.
+1. **ADR review and acceptance** as a design decision (done, 2026-10-20).
+   Acceptance does not authorize implementation.
 2. **Bounded implementation charter** and matching **`[layer1-freeze]`
    amendment**, written after acceptance. Pin baseline verification,
    enrollment and revocation design before any behavior change.
