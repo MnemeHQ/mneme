@@ -68,7 +68,8 @@ postures:
   *trusted, complete* results.
 - **Availability policy** is a separate `open|closed` policy. `closed` means a
   change within the protected boundary is refused when an applicable check
-  could not be completed or its result cannot be trusted. A failure to
+  could not be completed or its result cannot be trusted, where `closed` is
+  verified as authorized (§4) or configured by administrators (§5). A failure to
   evaluate is reported as **UNEVALUATED**, never as a decision violation.
 - A trusted `SKIP` or non-applicable boundary remains a skip, not an evaluation
   failure. Never manufacture a PASS for a skipped or unevaluated operation.
@@ -151,21 +152,33 @@ enrollment record or other durable state outside the repository is introduced.
 
 Threat model, using the spec's levels:
 
-- **In scope:** ADV-0 (no adversary: network outage, accidental deletion,
-  expired token, shallow clone) and ADV-1 (an agent using Edit/Write inside the
-  project to alter `.mneme/` or project files) **when authorization is
-  successfully verified**.
-- **Not guaranteed:** ADV-2 (arbitrary shell as the same OS user, able to make
-  verification unavailable, redirect it through git configuration, proxies or
-  environment, or re-initialize the repository), ADV-3 (ADV-2 plus the
-  developer's forge credentials) and ADV-4.
+- **In scope:** ADV-0 (no adversary: network outage, accidental loss, expired
+  token, shallow clone) and the part of ADV-1 that edits canonical memory or
+  source files, or alters (but does not delete) the local declaration, **while
+  the local declaration is present and authorization is successfully
+  verified**.
+- **Not guaranteed:** deletion of the local declaration or of `.mneme/` as a
+  whole (spec T-01 to T-03, BP-1); edits to project host settings, including
+  removing the hook or setting proxy or `MNEME_MEMORY` values through the
+  project settings `env` (ADV-1 via BP-6, BP-2, T-07); ADV-2 (arbitrary shell
+  as the same OS user, able to make verification unavailable, redirect it
+  through git configuration, or re-initialize the repository); ADV-3 (ADV-2
+  plus the developer's forge credentials); and ADV-4.
 
-**The guarantee, stated plainly:** fail-closed applies when authorization is
-successfully verified and local memory or the local declaration is then lost or
-altered. There is **no guarantee against an agent able to make verification
-unavailable, redirect it, or re-initialize the repository.** When
-authorization cannot be verified, the hook reports the problem and proceeds
-(§4.3).
+**Verification trigger.** Under Architecture A the only trigger for
+authorization verification is the **presence of the local declaration**.
+Nothing else (memory contents, activation state, a configured remote) starts
+verification, which preserves default-open parity (§4.3). Consequently a
+repository whose declaration has been deleted is indistinguishable from one
+that was never enrolled.
+
+**The guarantee, stated plainly:** fail-closed applies while the local
+declaration is present and verified as authorized, when canonical memory is
+then missing or altered, or the declaration is altered, replaced or rolled
+back. There is **no guarantee against deletion of the declaration, removal of
+the hook, or an agent able to make verification unavailable, redirect it, or
+re-initialize the repository.** When authorization cannot be verified, the
+hook reports the problem and proceeds (§4.3).
 
 Architecture B (a host-scoped enrollment record outside the agent's reach)
 remains a possible later hardening decision. It is not a prerequisite, is not
@@ -176,8 +189,8 @@ amendment.
 
 - The policy declaration is a **small, explicit, human-issued, review-gated
   artifact under `.mneme/`**, managed by an explicit Mneme-owned authority
-  operation. Issuance and revocation need human approval and a verified review
-  event (§4.5). No agent, inference, producer, hook, environment flag or
+  operation. Issuance and revocation need human approval and a **recorded
+  review event** on the protected baseline (§4.5). No agent, inference, producer, hook, environment flag or
   decision retrieval can grant or withdraw authorization.
 - It binds the **intended repository identity** and the **exact effective
   memory path** within that root, as recorded at the verified baseline.
@@ -194,17 +207,22 @@ amendment.
 - **Memory-path mismatch (pins SS-3).** When authorization is verified as
   AUTHORIZED and the effective memory (for example via `MNEME_MEMORY` or
   parent-directory discovery) differs from the bound path, the outcome is
-  "removed/tampered without approval" (§4.4). When authorization cannot be
+  "tampered without approval" (§4.4). When authorization cannot be
   verified, the binding cannot be established; the mismatch is reported
   visibly and the repository is treated as **inactive** for availability
-  purposes (G3 §4.3), never as a PASS.
+  purposes (G3 §4.3). The deterministic check may still run against the
+  effective memory, but its result is reported as **not bound to the
+  authorized memory** and never as verified enforcement.
 - **Memory selection is a precondition.** The binding is meaningful only if the
   hook selects memory from the edited target's repository, not from the
   payload `cwd`. T-08 showed `cwd`-based selection producing a complete,
   trusted PASS against the wrong memory. Slice 1 (#517, `2a445142`; live
-  re-probe #518) fixed this for direct writes, the only surface this ADR
-  covers. Other hook seams (Bash, SessionStart, Stop) still select from `cwd`
-  and stay outside this contract until their T-08 slices land.
+  re-probe #518) fixed the payload-`cwd` case for direct writes, the only
+  surface this ADR covers. It did not change `MNEME_MEMORY`, which still takes
+  precedence in `find_memory`; an override pointing at other memory (T-08 V5)
+  is handled only by the mismatch rule above, and only when authorization is
+  verified. Other hook seams (Bash, SessionStart, Stop) still select from
+  `cwd` and stay outside this contract until their T-08 slices land.
 - The concrete schema, enrollment command and verifier belong to a **future
   bounded charter**, which must preserve these invariants.
 
@@ -223,10 +241,12 @@ amendment.
   URL and ref) is read from repository configuration, which an ADV-2 agent can
   change, and no verification result is cached in trusted storage. Revision
   selection is therefore protected against ADV-0/ADV-1 only.
-- When a **verified AUTHORIZED** baseline governs, deleting, corrupting,
-  replacing or rolling back the local `.mneme/` declaration or canonical memory
-  cannot turn protection off. An invalid, mismatching or missing **local**
-  declaration is "removed/tampered without approval".
+- When a **verified AUTHORIZED** baseline governs, corrupting, replacing or
+  rolling back the local declaration, or deleting or altering canonical
+  memory, cannot turn protection off. A present but invalid or mismatching
+  local declaration is "tampered without approval". **Deleting** the local
+  declaration removes the verification trigger and does turn protection off
+  without detection (§4.0).
 
 #### 4.3 Revocation, positive absence and unavailable verification (G3-B R8–R10)
 
@@ -252,15 +272,18 @@ amendment.
   - a reason code from a closed set: `NETWORK`, `DNS`,
     `TLS_IDENTITY_MISMATCH`, `AUTH`, `TIMEOUT`, `VERIFIER_CRASH`,
     `REF_MISSING`, `HISTORY_INCOMPLETE`, `EVIDENCE_INVALID`,
-    `ROLLBACK_DETECTED`, `CLOCK_REGRESSION`, `VERIFIER_CONFIG_MISSING`;
+    `VERIFIER_CONFIG_MISSING`. `ROLLBACK_DETECTED` and `CLOCK_REGRESSION`
+    are reserved: detecting them needs a trusted high-water mark, which only
+    Architecture B keeps;
   - the existing deterministic check **still runs** when memory is present; a
     trusted complete strict `FAIL` still blocks with today's semantics;
   - the diagnostic reaches a host-visible channel, does not echo submitted
     content, and is never counted as relevant enforcement observed (ADR-029).
-- A previously authorized repository whose verification becomes unavailable
-  does **not revert silently**: the reversion to non-refusing behavior is
-  always reported. Under Architecture A it cannot be prevented, because no
-  trusted record that the repository was enrolled survives an ADV-2 agent.
+- While the local declaration is present, a repository whose verification
+  becomes unavailable does **not revert silently**: each non-refusing proceed
+  is reported. If the declaration is deleted there is no trigger and nothing
+  is reported; Architecture A keeps no trusted record that the repository was
+  ever enrolled (§4.0, BP-1).
 - A repository with no configured verifiable baseline is **not eligible** for
   `closed`. Because this is read from repository configuration, it is a
   configuration fact, not an adversarial guarantee.
@@ -276,11 +299,12 @@ mutation seam in §6.
 | Verified B | Local L / memory M | Availability consequence |
 |---|---|---|
 | **AUTHORIZED** | Valid matching local declaration; memory present at the bound path | Existing deterministic check and strict/warn for trusted complete results. Unavailability handled per §3 `closed` column |
-| **AUTHORIZED** | Memory missing (declaration present or absent) | **Refuse supported mutation**: authorized missing-memory failure, operational UNEVALUATED; never a skip or rule violation |
-| **AUTHORIZED** | Local declaration absent, invalid, replaced, rolled back or identity-mismatched, or effective memory differs from the bound path | **Refuse supported mutation**: removed/tampered without approval. No silent downgrade |
+| **AUTHORIZED** | Declaration present and valid; memory missing | **Refuse supported mutation**: authorized missing-memory failure, operational UNEVALUATED; never a skip or rule violation |
+| **AUTHORIZED** | Declaration present but invalid, replaced, rolled back or identity-mismatched, or effective memory differs from the bound path | **Refuse supported mutation**: tampered without approval. No silent downgrade |
+| *(not verified)* | Declaration absent | No verification trigger (§4.0). Existing behavior, identical to a never-enrolled repository. **Disclosed limit**, not protection |
 | **REVOKED** | Any | No availability-policy refusal. Existing enforcement still applies when memory exists. Stale local declarations cannot reauthorize |
 | **VERIFIED_ABSENT** | Any | No availability-policy refusal. Existing enforcement runs when valid memory exists; missing memory keeps ordinary unprotected behavior |
-| **AUTHORIZATION_UNVERIFIABLE** | Any | **Visible proceed** with the reason code (§4.3). Deterministic check still runs when memory is present. No fabricated PASS, no "never authorized", no claim that protection was enforced |
+| **AUTHORIZATION_UNVERIFIABLE** | Declaration present; any memory state | **Visible proceed** with the reason code (§4.3). Deterministic check still runs when memory is present. No fabricated PASS, no "never authorized", no claim that protection was enforced |
 
 **Precedence:** first establish `B` and identity/activation eligibility; then
 apply the local-tamper/missing-memory row; only if AUTHORIZED with intact local
@@ -288,16 +312,20 @@ policy and memory does the §3 `closed` column decide an operational refusal. A
 valid, complete decision violation keeps strict/warn semantics. A local
 artifact never overrides `B`.
 
-#### 4.5 Verified review event
+#### 4.5 Review event
 
-A review event counts toward issuing or revoking authorization only if the
-approving identity's credentials are **not reachable from the governed agent's
-environment**. A protected ref alone is not review independence: Mneme's own
-ruleset requires zero approvals, and agent and human merges are recorded under
-the same identity when credentials are shared (T-08 merge-attribution caveat;
-spec ADV-3). Where no independent approver exists, as in single-developer use,
-the implementation must say that the declaration does not resist ADV-3, rather
-than present it as review-gated.
+Issuance and revocation require a **review event recorded on the protected
+baseline** (G3-B R1, review-gated). Mneme records the event; it cannot
+mechanically verify that the approver is independent of the agent, because it
+cannot tell whether the approver's credentials are reachable from the agent's
+environment (spec BP-4).
+
+A protected ref alone is therefore not review independence: Mneme's own
+ruleset requires zero approvals (ADR-022), and agent and human merges are
+recorded under the same identity when credentials are shared (T-08
+merge-attribution caveat; spec ADV-3). The declaration **does not resist
+ADV-3**. Single-developer repositories may enroll, but diagnostics and
+documentation must not present their declaration as independently reviewed.
 
 ### 5. CI merge-gate surface
 
@@ -311,12 +339,17 @@ different trust boundary.
   `.mneme/` and to the gate's own trusted surface. This is proven in an
   isolated lab only (CI1.3, C1, V11 Option A; #540). This ADR makes no claim
   about Core's production CI.
+- **Trusted-surface refusals are not availability states.** A refused change
+  to `.mneme/` or to the gate's own trusted surface is a **policy refusal**. It
+  produces a non-success conclusion under **every** posture, including `open`,
+  and is reported as a refusal, not as UNEVALUATED or a rule FAIL. Otherwise an
+  `open` posture would let a PR replace the inputs that judge later PRs.
 - **State → check conclusion under `closed`.** A trusted complete result keeps
   strict/warn semantics. UNEVALUATED (incoherent payload, incomplete
   evaluation, crash or launch error, missing or unreadable memory at the
-  trusted base, a refused path, a gate error) produces a **non-success**
-  conclusion, reported as an operational failure, never as a rule FAIL or as
-  relevant enforcement observed.
+  trusted base, a non-regular or unmaterializable path, a gate error) produces
+  a **non-success** conclusion, reported as an operational failure, never as a
+  rule FAIL or as relevant enforcement observed.
 - **State → check conclusion under `open`.** The conclusion may satisfy the
   required check, but the report must state UNEVALUATED and its reason and must
   never record a verified PASS. Because the host treats several non-failure
@@ -325,16 +358,21 @@ different trust boundary.
 - **Authorization.** The CI posture is set by whoever controls the workflow,
   the required checks and the ruleset: **administrative trust (P7/P8)**, not a
   `.mneme/` declaration. The trusted base and ruleset take the place of §4's
-  verified baseline. Because the authority to require the check is held by
-  administrators rather than by repository content the agent controls, a
+  verified baseline. **This holds only where the gate's own trusted surface is
+  protected from ordinary PRs** (as the C1 refusal does in the lab). Without
+  that protection, CI configuration is agent-editable and is not an authority
+  (G3-B M3). Where it holds, the authority to require the check sits with
+  administrators rather than with repository content the agent controls, so a
   non-success on unavailability is not a refusal grounded in unverified
-  authority. The Architecture A limits in §4 do not apply to CI; P7/P8
-  limits (administrators can change the ruleset, policy or workflow) do.
+  authority. The Architecture A limits in §4 do not apply to CI; P7/P8 limits
+  do. Administrators can change the ruleset, policy or workflow, and in a
+  setup where the agent's token has administrator rights, the agent can too.
+  That is outside what this ADR can constrain.
 - **Existing advisory CI.** A check that suppresses exit codes or passes when
-  memory is missing (Core's current `mneme-check.yml`) is neither `open` nor
-  `closed` under this ADR. It manufactures a pass on unavailability, contrary
-  to §1, and is recorded as a known gap until reconfigured under a separate,
-  approved change.
+  memory is missing (Core's current `mneme-check.yml`) is an **implicit,
+  undeclared `open`**: its success conclusion carries no visible UNEVALUATED,
+  contrary to the `open` rule above. It is recorded as a known gap until
+  reconfigured under a separate, approved change.
 - **CI is not pre-write prevention.** It verifies a proposed merge; it does not
   stop an agent from writing (ADR-021).
 
@@ -346,6 +384,10 @@ different trust boundary.
   handling may be a separately enumerated follow-up; arbitrary class-B Bash
   mutations must not be blocked on a guessed future write. No claim of
   universal interception.
+- **Relationship to ADR-021.** ADR-021 makes checker transport failures fail
+  open with visible diagnostics. Opt-in `closed` narrows that rule **for the
+  PreToolUse direct-write surface only**, and only for authorized repositories
+  (§4). ADR-021's Stop and session-delta behavior is unchanged.
 - For a running hook, an operational refusal uses the documented host blocking
   transport with actionable UNEVALUATED feedback. If the hook never runs, Python
   cannot enforce anything. Host-level handling of a hook that fails to launch,
@@ -410,7 +452,8 @@ different trust boundary.
    with E1–E10, including verifier denial (T-06, T-07), substitution (T-05),
    the reverse bypass (U-10) and host-boundary probes (S-02 to S-04). Under
    Architecture A, scenarios the spec marks as bypasses are expected to show a
-   **visible** proceed, which confirms the disclosed limit; they are not
+   **visible** proceed, or, where the declaration is deleted (T-01 to T-03), no
+   trigger at all. Either result confirms a disclosed limit; neither is
    reclassified as protection. The prior G1 violation proof alone does not
    suffice.
 6. **C4:** adversarial regressions, canonical benchmark parity, CI
