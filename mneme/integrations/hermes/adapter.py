@@ -44,6 +44,7 @@ from mneme.integrations.claude_code.hook import (
     ToolEvent,
     _CHECK_TIMEOUT_SECONDS,
     _child_env,
+    _resolve_target,
     find_memory,
     format_applicability_reason,
     format_reason,
@@ -169,14 +170,17 @@ class MnemeHermes:
     ) -> GateResult:
         """Evaluate one proposed Hermes tool call through the existing path."""
         args = args if isinstance(args, dict) else {}
+        # Same base as the V4A and terminal paths below: relative targets
+        # resolve against the call's cwd, else project_dir (#571).
+        base = cwd or self.project_dir
 
         if tool_name == "write_file":
-            return self._gate_event(self._write_file_event(args, cwd))
+            return self._gate_event(self._write_file_event(args, base))
 
         if tool_name == "patch":
             patch_mode = args.get("mode", "replace")
             if patch_mode == "replace":
-                return self._gate_event(self._patch_replace_event(args, cwd))
+                return self._gate_event(self._patch_replace_event(args, base))
             if patch_mode == "patch":
                 return self._gate_v4a_patch(args.get("patch", ""), cwd)
             return self._gate(
@@ -298,8 +302,10 @@ class MnemeHermes:
                 f"mneme-hermes: cannot materialize content, failing open: {e}",
             )
 
+        # Check the same resolved file the snapshot was read from (#571).
+        _, target_path = _resolve_target(event)
         return self._check_introduced(
-            event.tool_name, event.file_path, checked_content, memory
+            event.tool_name, target_path, checked_content, memory
         )
 
     def _check_introduced(

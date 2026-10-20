@@ -100,9 +100,15 @@ def _read_current(file_path: str, *, missing_ok: bool) -> str:
 
 
 def _materialize_change(event: ToolEvent) -> tuple[str, str]:
-    """Return ``(current, proposed)`` from a single current-file snapshot."""
+    """Return ``(current, proposed)`` from a single current-file snapshot.
+
+    The snapshot is read from the same resolved path ``mneme check`` receives
+    as ``--target-path``: a relative ``file_path`` is joined to ``event.cwd``,
+    never left to the host process cwd, so a same-named file elsewhere cannot
+    stand in for the target (#571).
+    """
     ti = event.tool_input
-    file_path = ti.get("file_path", "")
+    _, file_path = _resolve_target(event)
 
     if event.tool_name == "Write":
         return _read_current(file_path, missing_ok=True), ti.get("content", "")
