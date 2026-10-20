@@ -124,6 +124,11 @@ Observed consequences when the host process cwd is not the project root:
 - **Write, same-named file in the cwd with the same content:** no introduced
   lines, the gate records `skip`, the handler runs and the literal lands with
   **no model-visible marker**. This is a silent bypass.
+- **Write, same-named file in the cwd that only shares the forbidden lines:**
+  the introduced lines exclude the literal, so the gate records a trusted
+  `allow` / `PASS` and the literal lands. The audit trail then shows a clean
+  governed pass. Observed by the independent reviewer's probe, not by a
+  committed scenario.
 - **Edit:** the read fails, the gate fails open with `[mneme] UNEVALUATED ...
   cannot materialize content`, and the edit runs unchecked (visible).
 
