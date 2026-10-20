@@ -277,24 +277,29 @@ def test_relative_write_with_empty_cwd_blocked(agent_results):
     assert first["label"] == "BLOCKED" and first["handler_calls"] == 0
 
 
-def test_relative_write_with_decoy_cwd_silently_skipped(agent_results):
-    """Discovered defect: the hook diffs against the cwd's same-named file,
-    finds no introduced lines, skips, and the literal lands with no marker."""
-    run = agent_results["relative_write_literal_decoy_cwd"]
+def _denied_unchanged(run):
     first = run["attempts"][0]
-    assert first["label"] == "NOT_EVALUATED" and first["mneme_action"] == "skip"
-    assert first["handler_calls"] == 1
-    assert "[mneme]" not in first["tool_message"]
-    assert run["final_sha256"] == B_SHA
+    assert first["label"] == "BLOCKED" and first["mneme_action"] == "deny"
+    assert first["handler_calls"] == 0
+    assert first["sha256_before"] == first["sha256_after"]
+    assert "[mneme] DENIED" in first["tool_message"] and "ADR-001" in first["tool_message"]
+    assert run["final_oracle_accept"] is True
 
 
-def test_relative_edit_fails_open_visibly(agent_results):
-    run = agent_results["relative_edit_literal_empty_cwd"]
-    first = run["attempts"][0]
-    assert first["label"] == "ERROR_DEGRADED" and first["handler_calls"] == 1
-    assert "[mneme] UNEVALUATED" in first["tool_message"]
-    assert "cannot materialize content" in first["tool_message"]
-    assert run["final_oracle_failures"] == ["C1_DISABLED"]
+def test_relative_write_with_decoy_cwd_blocked_post_fix(agent_results):
+    """Pre-fix (evidence/pre-fix): silent skip, literal landed. After #573 the
+    current file is read from project_dir, so the cwd decoy is irrelevant."""
+    _denied_unchanged(agent_results["relative_write_literal_decoy_cwd"])
+
+
+def test_relative_write_with_partial_decoy_cwd_blocked_post_fix(agent_results):
+    """Pre-fix this shape yielded a trusted PASS in the reviewer's probe."""
+    _denied_unchanged(agent_results["relative_write_literal_partial_decoy_cwd"])
+
+
+def test_relative_edit_blocked_post_fix(agent_results):
+    """Pre-fix (evidence/pre-fix): fail-open UNEVALUATED and the edit ran."""
+    _denied_unchanged(agent_results["relative_edit_literal_empty_cwd"])
 
 
 def test_unmapped_tool_not_governed(agent_results):
@@ -374,9 +379,38 @@ def fresh_summary(agent_results):
 
 
 def test_committed_summary_matches_fresh_run(fresh_summary):
-    evidence = sandbox_lib.SANDBOX / "evidence"
-    assert (evidence / "summary.json").read_bytes() == run_sandbox.summary_json(fresh_summary).encode("utf-8")
-    assert (evidence / "summary.csv").read_bytes() == run_sandbox.summary_csv(fresh_summary).encode("utf-8")
+    current = sandbox_lib.SANDBOX / "evidence" / "post-fix"
+    assert (current / "summary.json").read_bytes() == run_sandbox.summary_json(fresh_summary).encode("utf-8")
+    assert (current / "summary.csv").read_bytes() == run_sandbox.summary_csv(fresh_summary).encode("utf-8")
+
+
+def test_pre_fix_evidence_is_unchanged():
+    pre = sandbox_lib.SANDBOX / "evidence" / "pre-fix"
+    provenance = json.loads((pre / "PROVENANCE.json").read_text(encoding="utf-8"))
+    for name, digest in provenance["files_sha256"].items():
+        assert sha256_file(pre / name) == digest, name
+    historical = json.loads((pre / "summary.json").read_text(encoding="utf-8"))
+    assert historical["metrics"]["literal_rule_sensitivity"]["middleware_all_attempts"] == "4/8"
+    assert provenance["runtime"]["contains_relative_path_fix_cf6bc40b"] is False
+
+
+def test_checkout_contains_fix_commit():
+    assert run_sandbox.contains_fix()
+
+
+def test_post_fix_changes_are_limited_to_relative_paths(fresh_summary):
+    """Only the three relative-path scenarios may differ from pre-fix."""
+    pre = json.loads((sandbox_lib.SANDBOX / "evidence" / "pre-fix" / "summary.json").read_text(encoding="utf-8"))
+    changed = {
+        k for k, run in fresh_summary["agent_scenarios"].items()
+        if k in pre["agent_scenarios"]
+        and [a["label"] for a in run["attempts"]] != [a["label"] for a in pre["agent_scenarios"][k]["attempts"]]
+    }
+    assert changed == {"relative_write_literal_decoy_cwd", "relative_edit_literal_empty_cwd"}
+    assert [
+        (r["case"], r["label"]) for r in fresh_summary["cli_cases"]
+    ] == [(r["case"], r["label"]) for r in pre["cli_cases"]]
+    assert fresh_summary["raw_graph_scenarios"] == pre["raw_graph_scenarios"]
 
 
 def test_labels_are_exhaustive(fresh_summary):
@@ -398,9 +432,15 @@ def test_metrics_separate_audit_from_coverage(fresh_summary):
     assert m["false_blocks"] == ["E"]
     assert m["audit_tier_only"]["current_protection_pct"] == 100.0
     assert m["literal_rule_sensitivity"]["middleware_absolute_in_project_paths"] == "3/3"
-    assert m["literal_rule_sensitivity"]["middleware_all_attempts"] == "4/8"
+    assert m["literal_rule_sensitivity"]["middleware_all_attempts"] == "6/8"
+    assert m["literal_rule_sensitivity"]["middleware_all_attempts_including_post_fix_only"] == "7/9"
     not_blocked = sorted(k for k, v in m["mutation_surfaces"].items() if v != "BLOCKED")
-    assert len(not_blocked) == 6
+    assert not_blocked == [
+        "custom tool outside the governed tool map",
+        "raw StateGraph function node",
+        "raw ToolNode outside create_agent",
+        "write_file, path outside project_dir",
+    ]
 
 
 def test_no_success_claim_for_degraded_rows(fresh_summary):

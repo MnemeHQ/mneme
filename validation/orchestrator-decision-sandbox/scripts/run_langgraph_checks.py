@@ -387,6 +387,7 @@ AGENT_SCENARIOS = {
     "edit_removes_fallback": ("edit_removes_fallback", True, "empty"),
     "relative_write_literal_empty_cwd": ("relative_write_literal", True, "empty"),
     "relative_write_literal_decoy_cwd": ("relative_write_literal", True, "decoy"),
+    "relative_write_literal_partial_decoy_cwd": ("relative_write_literal", True, "partial_decoy"),
     "relative_edit_literal_empty_cwd": ("relative_edit_literal", True, "empty"),
     "unmapped_tool_literal": ("unmapped_tool_literal", True, "empty"),
 }
@@ -401,7 +402,10 @@ def run_all() -> dict:
     """Run every agent/graph scenario from a pinned, empty process cwd.
 
     The "decoy" cwd holds a src/router.py identical to case B, standing in for
-    an unrelated checkout the host process happens to run from.
+    an unrelated checkout the host process happens to run from. The
+    "partial_decoy" cwd holds a file that shares B's forbidden lines but
+    differs elsewhere (added after #573; pre-fix it produced a trusted PASS
+    in an independent reviewer's probe).
     """
     assert_pinned()
     assert_repo_mneme()
@@ -410,10 +414,15 @@ def run_all() -> dict:
     with tempfile.TemporaryDirectory(prefix="ods-cwd-") as cwd_root:
         empty = Path(cwd_root) / "empty"
         decoy = Path(cwd_root) / "decoy"
+        partial = Path(cwd_root) / "partial_decoy"
         empty.mkdir()
         (decoy / "src").mkdir(parents=True)
         (decoy / "src" / "router.py").write_bytes(b.encode("utf-8"))
-        cwds = {"empty": empty, "decoy": decoy}
+        (partial / "src").mkdir(parents=True)
+        (partial / "src" / "router.py").write_bytes(
+            b.replace('"""Synthetic routing validator', '"""Unrelated router in another checkout', 1).encode("utf-8")
+        )
+        cwds = {"empty": empty, "decoy": decoy, "partial_decoy": partial}
 
         for name, (key, governed, cwd) in AGENT_SCENARIOS.items():
             tmp, base = _fresh(f"ods-agent-{name}-")

@@ -4,7 +4,11 @@
 
 Raw output goes to evidence/runs/<UTC stamp>/ (git-ignored). The deterministic
 summary is always written there; --write-summary also refreshes the committed
-evidence/summary.json and evidence/summary.csv.
+current-runtime summary in evidence/post-fix/. The pre-fix evidence in
+evidence/pre-fix/ is historical and never written by this script.
+
+Expectations describe the runtime after MnemeHQ/mneme#573 (cf6bc40b); the
+runner refuses to run on a checkout that does not contain that commit.
 
 Exit codes: 0 all expectations met; 1 an expectation failed; 3 blocker.
 """
@@ -34,8 +38,11 @@ from sandbox_lib import (  # noqa: E402
 )
 
 EVIDENCE = SANDBOX / "evidence"
+CURRENT = EVIDENCE / "post-fix"
+FIX_COMMIT = "cf6bc40b3d8ba593dbbee5baa0306ccff11b80a8"
 
-# Expected label of every attempt, per agent scenario.
+# Expected label of every attempt, per agent scenario, on the post-fix
+# runtime. Pre-fix labels are preserved in evidence/pre-fix/summary.json.
 AGENT_EXPECTED = {
     "governed_b_then_a": ["BLOCKED", "ALLOWED"],
     "unguided_b_then_a": ["NOT_EVALUATED", "NOT_EVALUATED"],
@@ -43,14 +50,16 @@ AGENT_EXPECTED = {
     "edit_introduces_literal": ["BLOCKED"],
     "edit_removes_fallback": ["ALLOWED"],
     "relative_write_literal_empty_cwd": ["BLOCKED"],
-    "relative_write_literal_decoy_cwd": ["NOT_EVALUATED"],
-    "relative_edit_literal_empty_cwd": ["ERROR_DEGRADED"],
+    "relative_write_literal_decoy_cwd": ["BLOCKED"],
+    "relative_write_literal_partial_decoy_cwd": ["BLOCKED"],
+    "relative_edit_literal_empty_cwd": ["BLOCKED"],
     "unmapped_tool_literal": ["NOT_EVALUATED"],
     "write_outside_project_dir": ["ERROR_DEGRADED"],
     "embedded_6a": ["BLOCKED", "ALLOWED"],
 }
 # Agent attempts whose first call introduces the forbidden literal.
 SUPPORTED_LITERAL_ATTEMPTS = ("governed_b_then_a", "edit_introduces_literal", "embedded_6a")
+# The five other literal attempts measured pre-fix (same set, comparable).
 OTHER_LITERAL_ATTEMPTS = (
     "relative_write_literal_empty_cwd",
     "relative_write_literal_decoy_cwd",
@@ -58,12 +67,15 @@ OTHER_LITERAL_ATTEMPTS = (
     "unmapped_tool_literal",
     "write_outside_project_dir",
 )
+# Added after #573; not in the pre-fix set, reported separately.
+POST_FIX_ONLY_LITERAL_ATTEMPTS = ("relative_write_literal_partial_decoy_cwd",)
 SURFACES = {
     "write_file, absolute path inside project_dir": "governed_b_then_a",
     "edit_file, absolute path inside project_dir": "edit_introduces_literal",
     "governed agent embedded as StateGraph node": "embedded_6a",
     "write_file, relative path, process cwd without the file": "relative_write_literal_empty_cwd",
     "write_file, relative path, process cwd holding a same-named file": "relative_write_literal_decoy_cwd",
+    "write_file, relative path, process cwd holding a file sharing the forbidden lines": "relative_write_literal_partial_decoy_cwd",
     "edit_file, relative path": "relative_edit_literal_empty_cwd",
     "custom tool outside the governed tool map": "unmapped_tool_literal",
     "write_file, path outside project_dir": "write_outside_project_dir",
@@ -205,10 +217,14 @@ def build_summary(cli: dict, agent: dict) -> dict:
             "cli_in_scope": f"{int(rows['B']['label'] == 'BLOCKED')}/1",
             "middleware_absolute_in_project_paths": blocked(SUPPORTED_LITERAL_ATTEMPTS),
             "middleware_all_attempts": blocked(SUPPORTED_LITERAL_ATTEMPTS + OTHER_LITERAL_ATTEMPTS),
+            "middleware_all_attempts_including_post_fix_only": blocked(
+                SUPPORTED_LITERAL_ATTEMPTS + OTHER_LITERAL_ATTEMPTS + POST_FIX_ONLY_LITERAL_ATTEMPTS
+            ),
             "note": (
-                "All agent attempts that introduce the literal. Relative paths depend on the process cwd "
-                "(blocked with an empty cwd, silently skipped with a same-named file in the cwd, edit fails "
-                "open); custom tools and paths outside project_dir are not governed."
+                "middleware_all_attempts uses the same eight scenarios as the pre-fix evidence. After #573, "
+                "relative paths resolve against project_dir and are blocked regardless of the process cwd; "
+                "a custom tool and a path outside project_dir remain ungoverned. Counts describe synthetic "
+                "scenarios, not production reliability."
             ),
         },
         "false_blocks": sorted(c for c, r in rows.items() if r["oracle_accept"] and r["label"] == "BLOCKED"),
@@ -233,6 +249,8 @@ def build_summary(cli: dict, agent: dict) -> dict:
     }
     return {
         "schema": "mneme.orchestrator-decision-sandbox/summary-v1",
+        "runtime": f"post-fix: includes MnemeHQ/mneme#573 ({FIX_COMMIT[:8]})",
+        "historical_evidence": "evidence/pre-fix/ (immutable, pre-#573 runtime)",
         "decision": "ADR-001 (synthetic)",
         "rule_id": rule_id,
         "baseline_sha256": rows["B"]["baseline_sha256"],
@@ -281,6 +299,13 @@ def _git(*args) -> str:
     return subprocess.run(["git", *args], cwd=REPO_ROOT, capture_output=True, text=True).stdout.strip()
 
 
+def contains_fix() -> bool:
+    proc = subprocess.run(
+        ["git", "merge-base", "--is-ancestor", FIX_COMMIT, "HEAD"], cwd=REPO_ROOT, capture_output=True
+    )
+    return proc.returncode == 0
+
+
 def environment() -> dict:
     freeze = subprocess.run([sys.executable, "-m", "pip", "freeze"], capture_output=True, text=True).stdout
     return {
@@ -288,6 +313,7 @@ def environment() -> dict:
         "platform": platform.platform(),
         "git_head": _git("rev-parse", "HEAD"),
         "git_dirty": bool(_git("status", "--porcelain")),
+        "contains_fix_commit": contains_fix(),
         "mneme_hq_metadata_version": metadata.version("mneme-hq"),
         "pinned_packages": pinned_packages(),
         "pip_freeze": freeze.splitlines(),
@@ -320,6 +346,8 @@ def main(argv=None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     try:
         assert_pinned()
+        if not contains_fix():
+            raise BlockerError(f"checkout does not contain {FIX_COMMIT}; post-fix expectations do not apply")
         stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
         run_dir = EVIDENCE / "runs" / stamp
         run_dir.mkdir(parents=True, exist_ok=False)
@@ -331,7 +359,7 @@ def main(argv=None) -> int:
 
     summary = build_summary(cli, agent)
     fresh = summary_json(summary).encode("utf-8")
-    committed = EVIDENCE / "summary.json"
+    committed = CURRENT / "summary.json"
     report = {
         "run_id": stamp,
         "environment": environment(),
@@ -349,8 +377,9 @@ def main(argv=None) -> int:
     _write(run_dir / "summary.csv", summary_csv(summary))
     _write(run_dir / "transcript.txt", transcript(summary))
     if "--write-summary" in argv:
+        CURRENT.mkdir(parents=True, exist_ok=True)
         _write(committed, summary_json(summary))
-        _write(EVIDENCE / "summary.csv", summary_csv(summary))
+        _write(CURRENT / "summary.csv", summary_csv(summary))
     manifest = "".join(
         f"{sha256_file(p)}  {p.relative_to(run_dir).as_posix()}\n"
         for p in sorted(run_dir.rglob("*"))
