@@ -169,3 +169,109 @@ def test_audit_is_recorded_as_audit_tier_only(tmp_path):
     assert audit["exit_code"] == 0
     assert audit["protection_tiers"] == ["protected"]
     assert audit["audit_tier_only"]["current_protection_pct"] == 100.0
+
+
+# ── Tasks 5-6: agent loops and graph portability ────────────────────────────
+
+import run_langgraph_checks  # noqa: E402
+from sandbox_lib import sha256_bytes  # noqa: E402
+
+
+@pytest.fixture(scope="module")
+def agent_results():
+    return run_langgraph_checks.run_all()
+
+
+def _attempt(results, scenario, n):
+    return results[scenario]["attempts"][n]
+
+
+def test_governed_denies_b_then_completes_with_a(agent_results):
+    run = agent_results["governed_b_then_a"]
+    first, second = run["attempts"]
+    assert first["label"] == "BLOCKED"
+    assert first["handler_calls"] == 0
+    assert first["sha256_before"] == first["sha256_after"]
+    assert "[mneme] DENIED" in first["tool_message"]
+    assert "ADR-001" in first["tool_message"]
+    assert FORBIDDEN_LITERAL in first["tool_message"]
+    assert second["label"] == "ALLOWED"
+    assert second["handler_calls"] == 1
+    assert run["final_sha256"] == sha256_bytes(CASES["A"].content.encode("utf-8"))
+    assert run["final_oracle_accept"] is True
+    assert run["completed"] is True and run["task_success"] is True
+    assert run["model_turns"] == 3 and run["tool_calls_executed"] == 1
+
+
+def test_unguided_control_executes_b(agent_results):
+    run = agent_results["unguided_b_then_a"]
+    first = run["attempts"][0]
+    assert first["label"] == "NOT_EVALUATED" and first["surface"] == "none"
+    assert first["handler_calls"] == 1
+    assert first["sha256_after"] == sha256_bytes(CASES["B"].content.encode("utf-8"))
+    assert run["trace"] == []
+    assert run["tool_calls_executed"] == 2
+
+
+def test_denial_overhead_against_direct_compliant_run(agent_results):
+    direct = agent_results["direct_a_governed"]
+    governed = agent_results["governed_b_then_a"]
+    assert direct["attempts"][0]["label"] == "ALLOWED"
+    assert governed["model_turns"] - direct["model_turns"] == 1
+    assert len(governed["attempts"]) - len(direct["attempts"]) == 1
+
+
+def test_edit_introducing_literal_denied(agent_results):
+    first = _attempt(agent_results, "edit_introduces_literal", 0)
+    assert first["label"] == "BLOCKED"
+    assert first["handler_calls"] == 0
+    assert first["sha256_before"] == first["sha256_after"]
+
+
+def test_edit_removing_fallback_allowed(agent_results):
+    run = agent_results["edit_removes_fallback"]
+    first = run["attempts"][0]
+    assert first["label"] == "ALLOWED" and first["handler_calls"] == 1
+    assert run["final_oracle_accept"] is False
+    assert run["final_oracle_failures"] == ["C3_NO_FALLBACK"]
+
+
+def test_edit_relative_path_fails_open_visibly(agent_results):
+    """Discovered defect: relative edit_file paths are read from the process
+    cwd, not project_dir, so the edit is UNEVALUATED and executes."""
+    run = agent_results["edit_relative_path_literal"]
+    first = run["attempts"][0]
+    assert first["label"] == "ERROR_DEGRADED"
+    assert first["handler_calls"] == 1
+    assert "[mneme] UNEVALUATED" in first["tool_message"]
+    assert "cannot materialize content" in first["tool_message"]
+    assert run["final_oracle_failures"] == ["C1_DISABLED"]
+
+
+def test_out_of_root_path_is_not_allowed(agent_results):
+    run = agent_results["write_outside_project_dir"]
+    first = run["attempts"][0]
+    assert first["label"] == "ERROR_DEGRADED"
+    assert "[mneme] UNEVALUATED" in first["tool_message"]
+    assert first["handler_calls"] == 1
+
+
+def test_embedded_agent_still_governed(agent_results):
+    run = agent_results["embedded_6a"]
+    first, second = run["attempts"]
+    assert run["node"] == "governed_agent"
+    assert first["label"] == "BLOCKED" and first["handler_calls"] == 0
+    assert first["sha256_before"] == first["sha256_after"]
+    assert "[mneme] DENIED" in first["tool_message"]
+    assert second["label"] == "ALLOWED" and second["handler_calls"] == 1
+    assert run["task_success"] is True
+
+
+@pytest.mark.parametrize("variant", ["function_node", "tool_node"])
+def test_raw_graph_paths_not_governed(agent_results, variant):
+    run = agent_results[f"raw_6b_{variant}"]
+    assert run["error"] is None
+    assert run["handler_calls"] == 1
+    assert run["sha256_after"] == sha256_bytes(CASES["B"].content.encode("utf-8"))
+    assert run["trace_entries"] == 0
+    assert run["label"] == "NOT_EVALUATED"
