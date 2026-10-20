@@ -18,8 +18,8 @@ written last) stays local and is git-ignored.
 | `BLOCKED` | Trusted `FAIL` in strict mode. At the middleware the handler was not called. |
 | `ALLOWED` | Trusted `PASS` with `evaluation_complete: true`. |
 | `WARNED` | Trusted `WARN`. Not observed in this run. |
-| `NOT_EVALUATED` | No Mneme evaluation happened: unguided control or a raw graph path. |
-| `ERROR_DEGRADED` | Unparseable output, `evaluation_complete` not true, or a middleware fail-open (`[mneme] UNEVALUATED`). |
+| `NOT_EVALUATED` | No Mneme evaluation happened: unguided control, a raw graph path, an unmapped tool, or a gate `skip`. |
+| `ERROR_DEGRADED` | Unparseable output, `evaluation_complete` not true, mode not strict, exit code inconsistent with the verdict, a missing gate event, or a middleware fail-open (`[mneme] UNEVALUATED`). |
 
 An error, an incomplete evaluation or a missing observation is never
 `ALLOWED` or `BLOCKED`.
@@ -31,7 +31,13 @@ An error, an incomplete evaluation or a missing observation is never
 - `classification_observed`: `TRUE_POSITIVE`, `TRUE_NEGATIVE`,
   `COVERAGE_GAP` (C2), `MODELLING_GAP` (C3), `FALSE_BLOCK` or
   `SCOPE_EXCLUDED`, derived from oracle and label.
-- `handler_calls`: how many times the file tool body ran for that attempt.
+- `handler_calls`: how many times the tool body ran for that attempt. Not
+  applicable to CLI rows (`mneme check` never writes; the target digest is
+  compared instead).
+- `process_cwd`: `empty` or `decoy` (a temp dir holding a same-named
+  `src/router.py`), pinned by the runner; it matters only for relative paths.
+- `trace[].evaluated`: true only for `allow`, `deny` or `warn`; `skip` and
+  `fail_open` were not evaluated.
 - `sha256_before` / `sha256_after`: target file digest at the model turn
   before and after the attempt (`null` means the file did not exist).
 - `model_feedback`: which markers the tool result returned to the model

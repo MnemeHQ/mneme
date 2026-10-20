@@ -2,8 +2,15 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** PROPOSED. Nothing in this plan has been executed, apart from the
-pre-plan probe recorded in "Pre-plan probe" below.
+**Status:** EXECUTED on this branch. Results:
+[`validation/orchestrator-decision-sandbox/RESULTS.md`](../../validation/orchestrator-decision-sandbox/RESULTS.md).
+Deviations from the tasks below, made after an independent adversarial
+review: supported-path agent scenarios pass absolute in-project paths;
+relative-path writes and edits are measured as separate scenarios (empty and
+decoy process cwd) because the hook materializes relative paths against the
+process cwd; the runner pins its process cwd, scrubs `MNEME_MEMORY` and mode
+env, and asserts the middleware's memory is the fixture's; an unmapped custom
+tool scenario was added for H4; the pin gate checks all eight pinned packages.
 
 **Goal:** Show, with one synthetic accepted decision and reproducible evidence,
 whether a governed decision changes an agent's file-mutation outcome, how much
@@ -24,9 +31,8 @@ contrasts. No enforcement, adapter or canonical-memory code changes.
 langchain 1.3.17 / langchain-core 1.6.0 / langgraph 1.2.11 (exact pin from
 `validation/langgraph/pinned-build.json`), pytest.
 
-**Spec:** Section "Spec (restated)" below. It restates, public-safe, the
-internal brief "One-Decision Sandbox Validation" v2.0 (2026-10-20). Executors
-work from this section only.
+**Spec:** Section "Spec (restated)" below. Executors work from this section
+only.
 
 ## Spec (restated)
 

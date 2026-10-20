@@ -27,7 +27,13 @@ Results: [RESULTS.md](RESULTS.md). Plan:
 
 Nothing in `mneme/`, `docs/adr/`, the repository's `.mneme/` memory, or CI is
 modified. Each case runs in a fresh temp fixture whose memory is created with
-`mneme init` and `mneme adr import --dry-run` then `--apply`.
+`mneme init` and `mneme adr import --dry-run` then `--apply`, and is verified
+(one active decision, one rule with the expected scope, `APPLIED`
+applicability, strict mode) before use. CLI calls run with the fixture as
+cwd. Agent runs pin the process cwd to a temp dir, remove `MNEME_MEMORY`,
+`MNEME_HOOK_MODE` and `CLAUDE_PLUGIN_OPTION_MODE`, and stop with a blocker if
+the middleware resolves any memory other than the fixture's. Any ambiguity
+exits 3 rather than recording a result.
 
 ## Out of scope
 
