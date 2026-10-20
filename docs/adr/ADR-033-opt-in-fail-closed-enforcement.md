@@ -187,7 +187,7 @@ amendment.
 
 #### 4.1 Declaration, scope and existing authority (G3-B R1, R3, R5, R6)
 
-- The policy declaration is a **small, explicit, human-issued, review-gated
+- The policy declaration is a **small, explicit, human-issued, review-recorded
   artifact under `.mneme/`**, managed by an explicit Mneme-owned authority
   operation. Issuance and revocation need human approval and a **recorded
   review event** on the protected baseline (§4.5). No agent, inference, producer, hook, environment flag or
@@ -240,7 +240,8 @@ amendment.
 - **Disclosed limit of Architecture A:** the location of the baseline (remote
   URL and ref) is read from repository configuration, which an ADV-2 agent can
   change, and no verification result is cached in trusted storage. Revision
-  selection is therefore protected against ADV-0/ADV-1 only.
+  selection is therefore protected against ADV-0 and the in-scope part of
+  ADV-1 only (§4.0).
 - When a **verified AUTHORIZED** baseline governs, corrupting, replacing or
   rolling back the local declaration, or deleting or altering canonical
   memory, cannot turn protection off. A present but invalid or mismatching
@@ -302,11 +303,13 @@ mutation seam in §6.
 | **AUTHORIZED** | Declaration present and valid; memory missing | **Refuse supported mutation**: authorized missing-memory failure, operational UNEVALUATED; never a skip or rule violation |
 | **AUTHORIZED** | Declaration present but invalid, replaced, rolled back or identity-mismatched, or effective memory differs from the bound path | **Refuse supported mutation**: tampered without approval. No silent downgrade |
 | *(not verified)* | Declaration absent | No verification trigger (§4.0). Existing behavior, identical to a never-enrolled repository. **Disclosed limit**, not protection |
-| **REVOKED** | Any | No availability-policy refusal. Existing enforcement still applies when memory exists. Stale local declarations cannot reauthorize |
-| **VERIFIED_ABSENT** | Any | No availability-policy refusal. Existing enforcement runs when valid memory exists; missing memory keeps ordinary unprotected behavior |
+| **REVOKED** | Declaration present; any memory state | No availability-policy refusal. Existing enforcement still applies when memory exists. Stale local declarations cannot reauthorize |
+| **VERIFIED_ABSENT** | Declaration present; any memory state | No availability-policy refusal. Existing enforcement runs when valid memory exists; missing memory keeps ordinary unprotected behavior |
 | **AUTHORIZATION_UNVERIFIABLE** | Declaration present; any memory state | **Visible proceed** with the reason code (§4.3). Deterministic check still runs when memory is present. No fabricated PASS, no "never authorized", no claim that protection was enforced |
 
-**Precedence:** first establish `B` and identity/activation eligibility; then
+**Precedence:** if there is no local declaration, existing behavior applies
+(the "(not verified)" row). Otherwise first establish `B` and
+identity/activation eligibility; then
 apply the local-tamper/missing-memory row; only if AUTHORIZED with intact local
 policy and memory does the §3 `closed` column decide an operational refusal. A
 valid, complete decision violation keeps strict/warn semantics. A local
@@ -315,7 +318,8 @@ artifact never overrides `B`.
 #### 4.5 Review event
 
 Issuance and revocation require a **review event recorded on the protected
-baseline** (G3-B R1, review-gated). Mneme records the event; it cannot
+baseline** (G3-B R1). R1's "review-gated" is fully met only where an
+independent approver exists; otherwise the declaration is review-recorded. Mneme records the event; it cannot
 mechanically verify that the approver is independent of the agent, because it
 cannot tell whether the approver's credentials are reachable from the agent's
 environment (spec BP-4).
