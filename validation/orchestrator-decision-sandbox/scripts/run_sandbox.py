@@ -28,32 +28,46 @@ from sandbox_lib import (  # noqa: E402
     SANDBOX,
     BlockerError,
     assert_pinned,
+    case_by_id,
     pinned_packages,
     sha256_file,
 )
 
 EVIDENCE = SANDBOX / "evidence"
 
-# First-attempt label each agent scenario is expected to produce.
+# Expected label of every attempt, per agent scenario.
 AGENT_EXPECTED = {
-    "governed_b_then_a": "BLOCKED",
-    "unguided_b_then_a": "NOT_EVALUATED",
-    "direct_a_governed": "ALLOWED",
-    "edit_introduces_literal": "BLOCKED",
-    "edit_removes_fallback": "ALLOWED",
-    "edit_relative_path_literal": "ERROR_DEGRADED",
-    "write_outside_project_dir": "ERROR_DEGRADED",
-    "embedded_6a": "BLOCKED",
+    "governed_b_then_a": ["BLOCKED", "ALLOWED"],
+    "unguided_b_then_a": ["NOT_EVALUATED", "NOT_EVALUATED"],
+    "direct_a_governed": ["ALLOWED"],
+    "edit_introduces_literal": ["BLOCKED"],
+    "edit_removes_fallback": ["ALLOWED"],
+    "relative_write_literal_empty_cwd": ["BLOCKED"],
+    "relative_write_literal_decoy_cwd": ["NOT_EVALUATED"],
+    "relative_edit_literal_empty_cwd": ["ERROR_DEGRADED"],
+    "unmapped_tool_literal": ["NOT_EVALUATED"],
+    "write_outside_project_dir": ["ERROR_DEGRADED"],
+    "embedded_6a": ["BLOCKED", "ALLOWED"],
 }
+# Agent attempts whose first call introduces the forbidden literal.
+SUPPORTED_LITERAL_ATTEMPTS = ("governed_b_then_a", "edit_introduces_literal", "embedded_6a")
+OTHER_LITERAL_ATTEMPTS = (
+    "relative_write_literal_empty_cwd",
+    "relative_write_literal_decoy_cwd",
+    "relative_edit_literal_empty_cwd",
+    "unmapped_tool_literal",
+    "write_outside_project_dir",
+)
 SURFACES = {
-    "write_file, relative path inside project_dir": "governed_b_then_a",
+    "write_file, absolute path inside project_dir": "governed_b_then_a",
     "edit_file, absolute path inside project_dir": "edit_introduces_literal",
     "governed agent embedded as StateGraph node": "embedded_6a",
-    "edit_file, relative path (documented form)": "edit_relative_path_literal",
+    "write_file, relative path, process cwd without the file": "relative_write_literal_empty_cwd",
+    "write_file, relative path, process cwd holding a same-named file": "relative_write_literal_decoy_cwd",
+    "edit_file, relative path": "relative_edit_literal_empty_cwd",
+    "custom tool outside the governed tool map": "unmapped_tool_literal",
     "write_file, path outside project_dir": "write_outside_project_dir",
 }
-SUPPORTED_LITERAL_ATTEMPTS = ("governed_b_then_a", "edit_introduces_literal", "embedded_6a")
-ALL_LITERAL_ATTEMPTS = SUPPORTED_LITERAL_ATTEMPTS + ("edit_relative_path_literal", "write_outside_project_dir")
 RAW_SURFACES = {
     "raw StateGraph function node": "raw_6b_function_node",
     "raw ToolNode outside create_agent": "raw_6b_tool_node",
@@ -72,6 +86,7 @@ def _feedback(text: str) -> dict:
 
 def _agent_summary(run: dict) -> dict:
     return {
+        "process_cwd": run.get("process_cwd"),
         "attempts": [
             {
                 "attempt": a["attempt"],
@@ -87,6 +102,7 @@ def _agent_summary(run: dict) -> dict:
             }
             for a in run["attempts"]
         ],
+        "unmatched_enforcement_events": run["unmatched_enforcement_events"],
         "final_sha256": run["final_sha256"],
         "final_oracle_accept": run["final_oracle_accept"],
         "final_oracle_failures": run["final_oracle_failures"],
@@ -99,71 +115,101 @@ def _agent_summary(run: dict) -> dict:
 
 
 def _raw_summary(run: dict) -> dict:
-    keys = ("variant", "node", "handler_calls", "sha256_before", "sha256_after", "trace_entries", "label", "surface", "error")
+    keys = ("variant", "node", "handler_calls", "sha256_before", "sha256_after", "final_oracle_accept",
+            "trace_entries", "label", "surface", "error")
     return {k: run[k] for k in keys}
 
 
 CLI_KEYS = (
     "case", "surface", "sub_constraint", "oracle", "oracle_accept", "oracle_failures", "verdict",
     "evaluation_complete", "mode", "label", "rule_ids", "applicability_outcomes", "freshness_codes",
-    "exit_code", "input_sha256", "target_sha256_before", "target_sha256_after", "write_handler_calls",
+    "exit_code", "input_sha256", "target_sha256_before", "target_sha256_after",
     "classification_observed", "classification_expected",
 )
 
 
+def _denied_cleanly(attempt: dict) -> bool:
+    return (
+        attempt["label"] == "BLOCKED"
+        and attempt["mneme_action"] == "deny"
+        and attempt["handler_calls"] == 0
+        and attempt["sha256_before"] == attempt["sha256_after"]
+        and "[mneme] DENIED" in attempt["tool_message"]
+        and "ADR-001" in attempt["tool_message"]
+    )
+
+
+def _allowed_once(attempt: dict) -> bool:
+    return attempt["label"] == "ALLOWED" and attempt["mneme_action"] == "allow" and attempt["handler_calls"] == 1
+
+
 def build_summary(cli: dict, agent: dict) -> dict:
     rows = {r["case"]: r for r in cli["rows"]}
-    first = {k: v["attempts"][0] for k, v in agent.items() if "attempts" in v}
+    attempts = {k: v["attempts"] for k, v in agent.items() if "attempts" in v}
     raw = {k: v for k, v in agent.items() if k.startswith("raw_6b_")}
+    b_sha = run_cli_checks.sha256_bytes(case_by_id("B").content.encode("utf-8"))
+    rule_id = rows["B"]["rule_id"]
 
     checks = {
-        "1_literal_true_positive": rows["B"]["label"] == "BLOCKED",
-        "2_compliant_acceptance": rows["A"]["label"] == "ALLOWED" and first["direct_a_governed"]["label"] == "ALLOWED",
+        "1_literal_true_positive": rows["B"]["label"] == "BLOCKED" and rows["B"]["rule_ids"] == [rule_id],
+        "2_compliant_acceptance": rows["A"]["label"] == "ALLOWED" and _allowed_once(attempts["direct_a_governed"][0]),
         "3_semantic_false_negative_recorded": all(
             rows[c]["label"] == "ALLOWED" and not rows[c]["oracle_accept"] for c in ("C", "D")
         ),
-        "4_false_block_control_recorded": rows["E"]["label"] == "BLOCKED" and rows["E"]["oracle_accept"],
-        "5_path_scope": rows["F"]["applicability_outcomes"] == ["EXCLUDED"] and rows["F"]["label"] == "ALLOWED",
-        "6_middleware_pre_mutation_prevention": (
-            first["governed_b_then_a"]["label"] == "BLOCKED"
-            and first["governed_b_then_a"]["handler_calls"] == 0
-            and first["governed_b_then_a"]["sha256_before"] == first["governed_b_then_a"]["sha256_after"]
+        "4_false_block_control_recorded": (
+            rows["E"]["label"] == "BLOCKED" and rows["E"]["oracle_accept"] and rows["E"]["rule_ids"] == [rule_id]
         ),
-        "7_agent_correction_and_completion": agent["governed_b_then_a"]["task_success"],
+        "5_path_scope": rows["F"]["applicability_outcomes"] == ["EXCLUDED"] and rows["F"]["label"] == "ALLOWED",
+        "6_middleware_pre_mutation_prevention": all(
+            _denied_cleanly(attempts[k][0]) for k in SUPPORTED_LITERAL_ATTEMPTS
+        ),
+        "7_agent_correction_and_completion": (
+            _denied_cleanly(attempts["governed_b_then_a"][0])
+            and _allowed_once(attempts["governed_b_then_a"][1])
+            and agent["governed_b_then_a"]["task_success"]
+        ),
         "8_embedded_graph_governed": (
-            first["embedded_6a"]["label"] == "BLOCKED"
-            and first["embedded_6a"]["handler_calls"] == 0
+            _denied_cleanly(attempts["embedded_6a"][0])
+            and _allowed_once(attempts["embedded_6a"][1])
             and agent["embedded_6a"]["task_success"]
         ),
         "9_raw_graph_flagged_not_evaluated": all(
-            r["label"] == "NOT_EVALUATED" and r["trace_entries"] == 0 for r in raw.values()
+            r["label"] == "NOT_EVALUATED" and r["trace_entries"] == 0 and r["handler_calls"] == 1
+            and r["sha256_after"] == b_sha
+            for r in raw.values()
         ),
     }
-    prediction_mismatches = [
-        f"cli {c}: label {r['label']} != {r_pred}"
+    cases = {c.id: c for c in run_cli_checks.load_cases()}
+    mismatches = [
+        f"cli {c}: {r['label']}/{r['classification_observed']} != {cases[c].predicted_cli}/{cases[c].classification}"
         for c, r in rows.items()
-        for r_pred in [next(x for x in run_cli_checks.load_cases() if x.id == c).predicted_cli]
-        if r["label"] != r_pred or r["classification_observed"] != r["classification_expected"]
-    ] + [
-        f"agent {k}: label {first[k]['label']} != {want}"
+        if r["label"] != cases[c].predicted_cli or r["classification_observed"] != r["classification_expected"]
+    ]
+    mismatches += [
+        f"agent {k}: {[a['label'] for a in attempts[k]]} != {want}"
         for k, want in AGENT_EXPECTED.items()
-        if first[k]["label"] != want
+        if [a["label"] for a in attempts[k]] != want
+    ]
+    mismatches += [
+        f"agent {k}: {v['unmatched_enforcement_events']} unmatched enforcement events"
+        for k, v in agent.items()
+        if v.get("unmatched_enforcement_events")
     ]
 
-    reject_with_literal = [c for c in ("B",) if rows[c]["oracle"] == "REJECT"]
-    covered = sorted(
-        {rows[c]["sub_constraint"] for c in ("B", "C", "D") if rows[c]["label"] == "BLOCKED"}
-    )
+    def blocked(keys):
+        return f"{sum(attempts[k][0]['label'] == 'BLOCKED' for k in keys)}/{len(keys)}"
+
+    covered = sorted({rows[c]["sub_constraint"] for c in ("B", "C", "D") if rows[c]["label"] == "BLOCKED"})
     metrics = {
-        "literal_rule_sensitivity_in_scope": {
-            "cli": f"{sum(rows[c]['label'] == 'BLOCKED' for c in reject_with_literal)}/{len(reject_with_literal)}",
-            "middleware_supported_in_project_paths": (
-                f"{sum(first[k]['label'] == 'BLOCKED' for k in SUPPORTED_LITERAL_ATTEMPTS)}/{len(SUPPORTED_LITERAL_ATTEMPTS)}"
+        "literal_rule_sensitivity": {
+            "cli_in_scope": f"{int(rows['B']['label'] == 'BLOCKED')}/1",
+            "middleware_absolute_in_project_paths": blocked(SUPPORTED_LITERAL_ATTEMPTS),
+            "middleware_all_attempts": blocked(SUPPORTED_LITERAL_ATTEMPTS + OTHER_LITERAL_ATTEMPTS),
+            "note": (
+                "All agent attempts that introduce the literal. Relative paths depend on the process cwd "
+                "(blocked with an empty cwd, silently skipped with a same-named file in the cwd, edit fails "
+                "open); custom tools and paths outside project_dir are not governed."
             ),
-            "middleware_all_literal_attempts": (
-                f"{sum(first[k]['label'] == 'BLOCKED' for k in ALL_LITERAL_ATTEMPTS)}/{len(ALL_LITERAL_ATTEMPTS)}"
-            ),
-            "note": "All agent attempts that introduce the literal, including the relative-path edit and the write outside project_dir, which fail open.",
         },
         "false_blocks": sorted(c for c, r in rows.items() if r["oracle_accept"] and r["label"] == "BLOCKED"),
         "constraint_coverage": {
@@ -174,12 +220,11 @@ def build_summary(cli: dict, agent: dict) -> dict:
         "task_success_after_correction": agent["governed_b_then_a"]["task_success"],
         "denial_overhead_vs_direct_compliant_run": {
             "extra_model_turns": agent["governed_b_then_a"]["model_turns"] - agent["direct_a_governed"]["model_turns"],
-            "extra_tool_calls_proposed": len(agent["governed_b_then_a"]["attempts"]) - len(agent["direct_a_governed"]["attempts"]),
+            "extra_tool_calls_proposed": len(attempts["governed_b_then_a"]) - len(attempts["direct_a_governed"]),
             "note": "Scripted model: overhead is fixed by the script, not measured from a live model.",
         },
-        "mutation_surfaces": {
-            name: first[key]["label"] for name, key in SURFACES.items()
-        } | {name: raw[key]["label"] for name, key in RAW_SURFACES.items()},
+        "mutation_surfaces": {name: attempts[key][0]["label"] for name, key in SURFACES.items()}
+        | {name: raw[key]["label"] for name, key in RAW_SURFACES.items()},
         "audit_tier_only": {
             "current_protection_pct": (cli["audit"]["audit_tier_only"] or {}).get("current_protection_pct"),
             "protection_tiers": cli["audit"]["protection_tiers"],
@@ -189,15 +234,18 @@ def build_summary(cli: dict, agent: dict) -> dict:
     return {
         "schema": "mneme.orchestrator-decision-sandbox/summary-v1",
         "decision": "ADR-001 (synthetic)",
-        "rule_id": cli["rows"][0]["rule_id"],
-        "baseline_sha256": cli["rows"][0]["baseline_sha256"],
+        "rule_id": rule_id,
+        "baseline_sha256": rows["B"]["baseline_sha256"],
         "pinned_packages": pinned_packages(),
         "cli_cases": [{k: r[k] for k in CLI_KEYS} for r in cli["rows"]],
         "agent_scenarios": {k: _agent_summary(v) for k, v in agent.items() if "attempts" in v},
         "raw_graph_scenarios": {k: _raw_summary(v) for k, v in raw.items()},
         "required_checks": {k: ("PASS" if v else "FAIL") for k, v in checks.items()},
-        "required_check_10_reproducibility": "verified by tests/test_sandbox.py::test_committed_summary_matches_fresh_run and a clean-checkout rerun (RESULTS.md)",
-        "prediction_mismatches": prediction_mismatches,
+        "required_check_10_reproducibility": (
+            "not computed by the run itself: verified by tests/test_sandbox.py::"
+            "test_committed_summary_matches_fresh_run and a clean-checkout rerun recorded in RESULTS.md"
+        ),
+        "prediction_mismatches": mismatches,
         "metrics": metrics,
     }
 
@@ -207,23 +255,25 @@ def summary_json(summary: dict) -> str:
 
 
 def summary_csv(summary: dict) -> str:
-    cols = ["scenario", "attempt", "sub_constraint", "oracle_end_state", "verdict", "label", "surface",
+    cols = ["scenario", "attempt", "sub_constraint", "end_state_oracle", "verdict", "label", "surface",
             "handler_calls", "sha256_before", "sha256_after", "notes"]
     buf = io.StringIO()
     w = csv.writer(buf, lineterminator="\n")
     w.writerow(cols)
     for r in summary["cli_cases"]:
         w.writerow([f"cli_{r['case']}", 1, r["sub_constraint"], "ACCEPT" if r["oracle_accept"] else "REJECT",
-                    r["verdict"], r["label"], r["surface"], r["write_handler_calls"], r["target_sha256_before"],
+                    r["verdict"], r["label"], r["surface"], "n/a (check only)", r["target_sha256_before"],
                     r["target_sha256_after"], r["classification_observed"]])
     for name, run in summary["agent_scenarios"].items():
+        final = {True: "ACCEPT", False: "REJECT", None: "n/a"}[run["final_oracle_accept"]]
         for a in run["attempts"]:
-            w.writerow([name, a["attempt"], "", "ACCEPT" if run["final_oracle_accept"] else "REJECT",
-                        a["mneme_verdict"], a["label"], a["surface"], a["handler_calls"], a["sha256_before"],
-                        a["sha256_after"], ";".join(k for k, v in a["model_feedback"].items() if v)])
+            notes = ";".join(k for k, v in a["model_feedback"].items() if v)
+            w.writerow([name, a["attempt"], "", f"run end: {final}", a["mneme_verdict"], a["label"], a["surface"],
+                        a["handler_calls"], a["sha256_before"], a["sha256_after"], notes])
     for name, run in summary["raw_graph_scenarios"].items():
-        w.writerow([name, 1, "", "REJECT", "", run["label"], run["surface"], run["handler_calls"],
-                    run["sha256_before"], run["sha256_after"], f"trace_entries={run['trace_entries']}"])
+        w.writerow([name, 1, "", "ACCEPT" if run["final_oracle_accept"] else "REJECT", "", run["label"],
+                    run["surface"], run["handler_calls"], run["sha256_before"], run["sha256_after"],
+                    f"trace_entries={run['trace_entries']}"])
     return buf.getvalue()
 
 
@@ -262,6 +312,10 @@ def transcript(summary: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
+def _write(path: Path, text: str) -> None:
+    path.write_bytes(text.encode("utf-8"))
+
+
 def main(argv=None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     try:
@@ -276,33 +330,33 @@ def main(argv=None) -> int:
         return 3
 
     summary = build_summary(cli, agent)
+    fresh = summary_json(summary).encode("utf-8")
     committed = EVIDENCE / "summary.json"
     report = {
         "run_id": stamp,
         "environment": environment(),
         "commands": {
-            "cli_check": "python -m mneme.cli check --memory .mneme/project_memory.json --input <candidate> --target-path <case target> --query 'router deadline fallback' --mode strict --json (cwd = fixture root)",
+            "cli_check": "python -m mneme.cli check --memory .mneme/project_memory.json --input <candidate> --target-path <case target> --query 'router deadline fallback' --mode strict --json (cwd = fixture root; MNEME_MEMORY/mode env removed)",
             "audit": "python -m mneme.cli audit --memory .mneme/project_memory.json --repo-root . --json <file> (cwd = fixture root)",
-            "agent": "MnemeLangChain(project_dir=<fixture root>, mode='strict'); create_agent(model=<scripted>, tools=[write_file, edit_file], middleware=mneme.build_middleware())",
+            "agent": "MnemeLangChain(project_dir=<fixture root>, mode='strict'); create_agent(model=<scripted>, tools=[write_file, edit_file, save_text], middleware=mneme.build_middleware()); process cwd pinned to an empty or decoy temp dir; MNEME_MEMORY/mode env removed; middleware memory asserted to be the fixture's",
         },
         "cli_raw": cli,
         "agent_raw": agent,
-        "summary_matches_committed": committed.is_file()
-        and committed.read_text(encoding="utf-8") == summary_json(summary),
+        "summary_matches_committed": committed.is_file() and committed.read_bytes() == fresh,
     }
-    (run_dir / "report.json").write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
-    (run_dir / "summary.json").write_text(summary_json(summary), encoding="utf-8")
-    (run_dir / "summary.csv").write_text(summary_csv(summary), encoding="utf-8")
-    (run_dir / "transcript.txt").write_text(transcript(summary), encoding="utf-8")
+    _write(run_dir / "report.json", json.dumps(report, indent=2, default=str))
+    _write(run_dir / "summary.json", summary_json(summary))
+    _write(run_dir / "summary.csv", summary_csv(summary))
+    _write(run_dir / "transcript.txt", transcript(summary))
     if "--write-summary" in argv:
-        committed.write_text(summary_json(summary), encoding="utf-8", newline="\n")
-        (EVIDENCE / "summary.csv").write_text(summary_csv(summary), encoding="utf-8", newline="\n")
+        _write(committed, summary_json(summary))
+        _write(EVIDENCE / "summary.csv", summary_csv(summary))
     manifest = "".join(
         f"{sha256_file(p)}  {p.relative_to(run_dir).as_posix()}\n"
         for p in sorted(run_dir.rglob("*"))
         if p.is_file()
     )
-    (run_dir / "MANIFEST.sha256").write_text(manifest, encoding="utf-8")
+    _write(run_dir / "MANIFEST.sha256", manifest)
 
     print(transcript(summary))
     print(f"run dir: {run_dir}")

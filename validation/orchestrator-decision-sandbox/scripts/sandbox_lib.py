@@ -4,6 +4,7 @@ Every fixture is built in a caller-owned temp directory. Nothing here writes
 to the repository's own memory, ADRs or source.
 """
 
+import contextlib
 import hashlib
 import json
 import os
@@ -105,11 +106,41 @@ def router_source(root: Path) -> str:
 # ── CLI invocation ──────────────────────────────────────────────────────────
 
 
+SCRUBBED_ENV = ("MNEME_MEMORY", "MNEME_HOOK_MODE", "CLAUDE_PLUGIN_OPTION_MODE")
+
+
 def child_env() -> dict:
     env = dict(os.environ)
     env["PYTHONPATH"] = str(REPO_ROOT) + os.pathsep + env.get("PYTHONPATH", "")
-    env.pop("MNEME_HOOK_MODE", None)
+    for name in SCRUBBED_ENV:
+        env.pop(name, None)
     return env
+
+
+@contextlib.contextmanager
+def pinned_process(cwd: Path):
+    """Run in-process scenarios from a known cwd with memory/mode env scrubbed.
+
+    The in-process middleware materializes relative paths against the process
+    cwd and honours MNEME_MEMORY, so both are pinned for every agent run.
+    """
+    saved_cwd = os.getcwd()
+    saved_env = {name: os.environ.pop(name) for name in SCRUBBED_ENV if name in os.environ}
+    os.chdir(cwd)
+    try:
+        yield Path(cwd)
+    finally:
+        os.chdir(saved_cwd)
+        os.environ.update(saved_env)
+
+
+def assert_repo_mneme() -> None:
+    """The in-process mneme package must be this checkout's source."""
+    import mneme
+
+    loaded = Path(mneme.__file__).resolve()
+    if REPO_ROOT.resolve() not in loaded.parents:
+        raise BlockerError(f"in-process mneme is {loaded}, not from {REPO_ROOT}")
 
 
 def mneme(args: list, cwd: Path) -> subprocess.CompletedProcess:
@@ -148,20 +179,28 @@ def check(root: Path, input_path: Path, target_path: str) -> tuple:
     return proc, payload
 
 
+STRICT_EXIT = {"PASS": 0, "WARN": 1, "FAIL": 2}
+
+
 def label_from_check(payload, exit_code: int) -> str:
-    """Map a check payload to an outcome label; never upgrade a gap to a pass."""
+    """Map a strict check payload to an outcome label.
+
+    Anything inconsistent (not strict, incomplete, exit code disagreeing with
+    the verdict, FAIL/WARN without violations, PASS with violations) is
+    ERROR_DEGRADED: a gap is never upgraded to a pass or a block.
+    """
     if not isinstance(payload, dict) or "verdict" not in payload:
         return "ERROR_DEGRADED"
-    if payload.get("evaluation_complete") is not True:
-        return "ERROR_DEGRADED"
     verdict = payload["verdict"]
-    if verdict == "FAIL":
-        return "BLOCKED"
-    if verdict == "WARN":
-        return "WARNED"
-    if verdict == "PASS":
-        return "ALLOWED"
-    return "ERROR_DEGRADED"
+    violations = payload.get("violations") or []
+    if (
+        payload.get("evaluation_complete") is not True
+        or payload.get("mode") != "strict"
+        or STRICT_EXIT.get(verdict) != exit_code
+        or (verdict == "PASS") == bool(violations)
+    ):
+        return "ERROR_DEGRADED"
+    return {"FAIL": "BLOCKED", "WARN": "WARNED", "PASS": "ALLOWED"}[verdict]
 
 
 # ── Baseline ────────────────────────────────────────────────────────────────

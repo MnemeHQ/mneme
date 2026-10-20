@@ -84,7 +84,6 @@ def run_cli_case(case, workdir: Path, out_dir=None) -> dict:
         "input_sha256": sha256_bytes(data),
         "target_sha256_before": before,
         "target_sha256_after": after,
-        "write_handler_calls": 0,
         "classification_observed": classify(verdict_oracle.accept, label, verdict_oracle.failures, outcomes),
         "classification_expected": case.classification,
         "baseline_sha256": baseline.baseline_sha256,

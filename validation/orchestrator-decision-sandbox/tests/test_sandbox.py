@@ -5,6 +5,8 @@ Run explicitly with the pinned interpreter (not collected by default CI):
     <pinned-python> -m pytest validation/orchestrator-decision-sandbox/tests -v
 """
 
+import json
+import os
 import sys
 from importlib import metadata
 from pathlib import Path
@@ -26,10 +28,12 @@ from sandbox_lib import (  # noqa: E402
     check,
     load_cases,
     pin_drift,
+    sha256_bytes,
     sha256_file,
 )
 
 CASES = {c.id: c for c in load_cases()}
+B_SHA = sha256_bytes(CASES["B"].content.encode("utf-8"))
 
 
 # ── Task 1: pins ────────────────────────────────────────────────────────────
@@ -50,23 +54,29 @@ def test_drift_raises_blocker(monkeypatch):
         assert_pinned()
 
 
+def test_in_process_mneme_is_this_checkout():
+    sandbox_lib.assert_repo_mneme()
+
+
 # ── Task 2: fixture and oracle ──────────────────────────────────────────────
 
 
+def _baseline_router() -> str:
+    return (sandbox_lib.SANDBOX / "synthetic_app" / "src" / "router.py").read_text(encoding="utf-8")
+
+
 def test_oracle_matches_case_table():
-    baseline_router = (sandbox_lib.SANDBOX / "synthetic_app" / "src" / "router.py").read_text(encoding="utf-8")
     expected_failures = {"B": ["C1_DISABLED"], "C": ["C2_DEADLINE_EXCEEDS_5S"], "D": ["C3_NO_FALLBACK"]}
     for case in CASES.values():
-        source = case.content if case.target_path == "src/router.py" else baseline_router
+        source = case.content if case.target_path == "src/router.py" else _baseline_router()
         result = oracle.evaluate(source)
         assert result.accept == (case.oracle == "ACCEPT"), (case.id, result)
         assert result.failures == expected_failures.get(case.id, []), (case.id, result)
-    assert oracle.evaluate(baseline_router).accept
+    assert oracle.evaluate(_baseline_router()).accept
 
 
 def test_case_literal_placement():
-    baseline_router = (sandbox_lib.SANDBOX / "synthetic_app" / "src" / "router.py").read_text(encoding="utf-8")
-    assert FORBIDDEN_LITERAL not in baseline_router
+    assert FORBIDDEN_LITERAL not in _baseline_router()
     for case_id, case in CASES.items():
         assert (FORBIDDEN_LITERAL in case.content) == (case_id in {"B", "E", "F"}), case_id
 
@@ -114,6 +124,13 @@ def test_baseline_refuses_non_empty_destination(tmp_path):
         build_baseline(dest)
 
 
+def test_child_env_scrubs_memory_and_mode(monkeypatch):
+    monkeypatch.setenv("MNEME_MEMORY", "elsewhere.json")
+    monkeypatch.setenv("MNEME_HOOK_MODE", "warn")
+    env = sandbox_lib.child_env()
+    assert "MNEME_MEMORY" not in env and "MNEME_HOOK_MODE" not in env
+
+
 # ── Task 4: CLI scenarios ───────────────────────────────────────────────────
 
 
@@ -126,6 +143,7 @@ def test_cli_case_outcomes(case_id, tmp_path):
     assert row["label"] == case.predicted_cli, row
     assert row["classification_observed"] == case.classification, row
     assert row["target_sha256_before"] == row["target_sha256_after"]
+    assert row["exit_code"] == {"BLOCKED": 2, "ALLOWED": 0}[row["label"]]
     if case_id in {"B", "E"}:
         assert row["rule_ids"] == [row["rule_id"]]
     else:
@@ -135,14 +153,29 @@ def test_cli_case_outcomes(case_id, tmp_path):
     assert row["freshness_codes"] == []
 
 
-def test_incomplete_evaluation_is_degraded():
+def _payload(verdict, **extra):
+    base = {"verdict": verdict, "evaluation_complete": True, "mode": "strict", "violations": []}
+    if verdict in ("FAIL", "WARN"):
+        base["violations"] = [{"rule_id": "x"}]
+    base.update(extra)
+    return base
+
+
+def test_incomplete_or_inconsistent_evaluation_is_degraded():
     label = sandbox_lib.label_from_check
-    assert label({"verdict": "PASS", "evaluation_complete": False}, 2) == "ERROR_DEGRADED"
+    assert label(_payload("PASS", evaluation_complete=False), 2) == "ERROR_DEGRADED"
     assert label({"verdict": "PASS"}, 0) == "ERROR_DEGRADED"
     assert label(None, 0) == "ERROR_DEGRADED"
     assert label({}, 0) == "ERROR_DEGRADED"
-    assert label({"verdict": "BOGUS", "evaluation_complete": True}, 0) == "ERROR_DEGRADED"
-    assert label({"verdict": "WARN", "evaluation_complete": True}, 1) == "WARNED"
+    assert label(_payload("BOGUS"), 0) == "ERROR_DEGRADED"
+    assert label(_payload("PASS"), 2) == "ERROR_DEGRADED"
+    assert label(_payload("FAIL"), 0) == "ERROR_DEGRADED"
+    assert label(_payload("FAIL", mode="warn"), 2) == "ERROR_DEGRADED"
+    assert label(_payload("FAIL", violations=[]), 2) == "ERROR_DEGRADED"
+    assert label(_payload("PASS", violations=[{"rule_id": "x"}]), 0) == "ERROR_DEGRADED"
+    assert label(_payload("WARN"), 1) == "WARNED"
+    assert label(_payload("FAIL"), 2) == "BLOCKED"
+    assert label(_payload("PASS"), 0) == "ALLOWED"
 
 
 def test_wrong_cwd_target_path_is_degraded_not_allowed(baseline, tmp_path):
@@ -157,8 +190,6 @@ def test_wrong_cwd_target_path_is_degraded_not_allowed(baseline, tmp_path):
         ],
         cwd=tmp_path,
     )
-    import json
-
     payload = json.loads(proc.stdout)
     assert payload["evaluation_complete"] is False
     assert sandbox_lib.label_from_check(payload, proc.returncode) == "ERROR_DEGRADED"
@@ -174,33 +205,39 @@ def test_audit_is_recorded_as_audit_tier_only(tmp_path):
 # ── Tasks 5-6: agent loops and graph portability ────────────────────────────
 
 import run_langgraph_checks  # noqa: E402
-from sandbox_lib import sha256_bytes  # noqa: E402
 
 
 @pytest.fixture(scope="module")
 def agent_results():
-    return run_langgraph_checks.run_all()
+    """Run from a directory that holds a src/router.py: results must not depend
+    on the invoking cwd because run_all pins the process cwd itself."""
+    saved = os.getcwd()
+    os.chdir(sandbox_lib.SANDBOX / "synthetic_app")
+    try:
+        return run_langgraph_checks.run_all()
+    finally:
+        os.chdir(saved)
 
 
-def _attempt(results, scenario, n):
-    return results[scenario]["attempts"][n]
+def _labels(run):
+    return [a["label"] for a in run["attempts"]]
 
 
 def test_governed_denies_b_then_completes_with_a(agent_results):
     run = agent_results["governed_b_then_a"]
     first, second = run["attempts"]
-    assert first["label"] == "BLOCKED"
+    assert first["label"] == "BLOCKED" and first["mneme_action"] == "deny"
     assert first["handler_calls"] == 0
     assert first["sha256_before"] == first["sha256_after"]
     assert "[mneme] DENIED" in first["tool_message"]
     assert "ADR-001" in first["tool_message"]
     assert FORBIDDEN_LITERAL in first["tool_message"]
-    assert second["label"] == "ALLOWED"
-    assert second["handler_calls"] == 1
+    assert second["label"] == "ALLOWED" and second["handler_calls"] == 1
     assert run["final_sha256"] == sha256_bytes(CASES["A"].content.encode("utf-8"))
     assert run["final_oracle_accept"] is True
     assert run["completed"] is True and run["task_success"] is True
     assert run["model_turns"] == 3 and run["tool_calls_executed"] == 1
+    assert run["unmatched_enforcement_events"] == 0
 
 
 def test_unguided_control_executes_b(agent_results):
@@ -208,7 +245,7 @@ def test_unguided_control_executes_b(agent_results):
     first = run["attempts"][0]
     assert first["label"] == "NOT_EVALUATED" and first["surface"] == "none"
     assert first["handler_calls"] == 1
-    assert first["sha256_after"] == sha256_bytes(CASES["B"].content.encode("utf-8"))
+    assert first["sha256_after"] == B_SHA
     assert run["trace"] == []
     assert run["tool_calls_executed"] == 2
 
@@ -216,41 +253,61 @@ def test_unguided_control_executes_b(agent_results):
 def test_denial_overhead_against_direct_compliant_run(agent_results):
     direct = agent_results["direct_a_governed"]
     governed = agent_results["governed_b_then_a"]
-    assert direct["attempts"][0]["label"] == "ALLOWED"
+    assert _labels(direct) == ["ALLOWED"]
     assert governed["model_turns"] - direct["model_turns"] == 1
     assert len(governed["attempts"]) - len(direct["attempts"]) == 1
 
 
 def test_edit_introducing_literal_denied(agent_results):
-    first = _attempt(agent_results, "edit_introduces_literal", 0)
-    assert first["label"] == "BLOCKED"
-    assert first["handler_calls"] == 0
+    first = agent_results["edit_introduces_literal"]["attempts"][0]
+    assert first["label"] == "BLOCKED" and first["handler_calls"] == 0
     assert first["sha256_before"] == first["sha256_after"]
 
 
 def test_edit_removing_fallback_allowed(agent_results):
     run = agent_results["edit_removes_fallback"]
-    first = run["attempts"][0]
-    assert first["label"] == "ALLOWED" and first["handler_calls"] == 1
+    assert _labels(run) == ["ALLOWED"] and run["attempts"][0]["handler_calls"] == 1
     assert run["final_oracle_accept"] is False
     assert run["final_oracle_failures"] == ["C3_NO_FALLBACK"]
 
 
-def test_edit_relative_path_fails_open_visibly(agent_results):
-    """Discovered defect: relative edit_file paths are read from the process
-    cwd, not project_dir, so the edit is UNEVALUATED and executes."""
-    run = agent_results["edit_relative_path_literal"]
+def test_relative_write_with_empty_cwd_blocked(agent_results):
+    """Blocked only because nothing named src/router.py exists in the cwd."""
+    first = agent_results["relative_write_literal_empty_cwd"]["attempts"][0]
+    assert first["label"] == "BLOCKED" and first["handler_calls"] == 0
+
+
+def test_relative_write_with_decoy_cwd_silently_skipped(agent_results):
+    """Discovered defect: the hook diffs against the cwd's same-named file,
+    finds no introduced lines, skips, and the literal lands with no marker."""
+    run = agent_results["relative_write_literal_decoy_cwd"]
     first = run["attempts"][0]
-    assert first["label"] == "ERROR_DEGRADED"
+    assert first["label"] == "NOT_EVALUATED" and first["mneme_action"] == "skip"
     assert first["handler_calls"] == 1
+    assert "[mneme]" not in first["tool_message"]
+    assert run["final_sha256"] == B_SHA
+
+
+def test_relative_edit_fails_open_visibly(agent_results):
+    run = agent_results["relative_edit_literal_empty_cwd"]
+    first = run["attempts"][0]
+    assert first["label"] == "ERROR_DEGRADED" and first["handler_calls"] == 1
     assert "[mneme] UNEVALUATED" in first["tool_message"]
     assert "cannot materialize content" in first["tool_message"]
     assert run["final_oracle_failures"] == ["C1_DISABLED"]
 
 
-def test_out_of_root_path_is_not_allowed(agent_results):
-    run = agent_results["write_outside_project_dir"]
+def test_unmapped_tool_not_governed(agent_results):
+    run = agent_results["unmapped_tool_literal"]
     first = run["attempts"][0]
+    assert first["tool"] == "save_text"
+    assert first["label"] == "NOT_EVALUATED" and first["mneme_action"] == "skip"
+    assert first["handler_calls"] == 1
+    assert run["final_sha256"] == B_SHA
+
+
+def test_out_of_root_path_is_not_allowed(agent_results):
+    first = agent_results["write_outside_project_dir"]["attempts"][0]
     assert first["label"] == "ERROR_DEGRADED"
     assert "[mneme] UNEVALUATED" in first["tool_message"]
     assert first["handler_calls"] == 1
@@ -272,9 +329,38 @@ def test_raw_graph_paths_not_governed(agent_results, variant):
     run = agent_results[f"raw_6b_{variant}"]
     assert run["error"] is None
     assert run["handler_calls"] == 1
-    assert run["sha256_after"] == sha256_bytes(CASES["B"].content.encode("utf-8"))
+    assert run["sha256_after"] == B_SHA
     assert run["trace_entries"] == 0
     assert run["label"] == "NOT_EVALUATED"
+
+
+def test_memory_override_env_is_a_blocker(tmp_path, monkeypatch):
+    """MNEME_MEMORY pointing elsewhere must stop the run, not relabel it."""
+    base = build_baseline(tmp_path / "fixture")
+    other = build_baseline(tmp_path / "other")
+    monkeypatch.setenv("MNEME_MEMORY", str(other.memory))
+    script = run_langgraph_checks.scripts(base.root)["direct_a"]
+    with pytest.raises(BlockerError, match="middleware memory"):
+        run_langgraph_checks.run_agent(base.root, script, True)
+
+
+def test_parallel_tool_calls_are_refused(tmp_path):
+    base = build_baseline(tmp_path / "fixture")
+    one = run_langgraph_checks.write_call("x = 1\n", "p1", str(base.root / "src" / "router.py"))
+    two = run_langgraph_checks.write_call("y = 2\n", "p2", str(base.root / "docs" / "notes.md"))
+    script = [{"content": "", "tool_calls": one["tool_calls"] + two["tool_calls"]}, {"content": "done"}]
+    with pytest.raises(BlockerError, match="one tool call per model turn"):
+        run_langgraph_checks.run_agent(base.root, script, True)
+
+
+def test_pinned_process_restores_cwd_and_env(tmp_path, monkeypatch):
+    monkeypatch.setenv("MNEME_MEMORY", "elsewhere.json")
+    before = os.getcwd()
+    with sandbox_lib.pinned_process(tmp_path):
+        assert Path(os.getcwd()).resolve() == tmp_path.resolve()
+        assert "MNEME_MEMORY" not in os.environ
+    assert os.getcwd() == before
+    assert os.environ["MNEME_MEMORY"] == "elsewhere.json"
 
 
 # ── Task 7: evidence ────────────────────────────────────────────────────────
@@ -288,10 +374,9 @@ def fresh_summary(agent_results):
 
 
 def test_committed_summary_matches_fresh_run(fresh_summary):
-    committed = (sandbox_lib.SANDBOX / "evidence" / "summary.json").read_text(encoding="utf-8")
-    assert run_sandbox.summary_json(fresh_summary) == committed
-    committed_csv = (sandbox_lib.SANDBOX / "evidence" / "summary.csv").read_text(encoding="utf-8")
-    assert run_sandbox.summary_csv(fresh_summary) == committed_csv
+    evidence = sandbox_lib.SANDBOX / "evidence"
+    assert (evidence / "summary.json").read_bytes() == run_sandbox.summary_json(fresh_summary).encode("utf-8")
+    assert (evidence / "summary.csv").read_bytes() == run_sandbox.summary_csv(fresh_summary).encode("utf-8")
 
 
 def test_labels_are_exhaustive(fresh_summary):
@@ -312,8 +397,10 @@ def test_metrics_separate_audit_from_coverage(fresh_summary):
     assert m["constraint_coverage"]["of_total"] == 3
     assert m["false_blocks"] == ["E"]
     assert m["audit_tier_only"]["current_protection_pct"] == 100.0
-    degraded = [k for k, v in m["mutation_surfaces"].items() if v != "BLOCKED"]
-    assert len(degraded) == 4
+    assert m["literal_rule_sensitivity"]["middleware_absolute_in_project_paths"] == "3/3"
+    assert m["literal_rule_sensitivity"]["middleware_all_attempts"] == "4/8"
+    not_blocked = sorted(k for k, v in m["mutation_surfaces"].items() if v != "BLOCKED")
+    assert len(not_blocked) == 6
 
 
 def test_no_success_claim_for_degraded_rows(fresh_summary):
@@ -322,3 +409,5 @@ def test_no_success_claim_for_degraded_rows(fresh_summary):
             if a["label"] in ("ERROR_DEGRADED", "NOT_EVALUATED"):
                 assert a["mneme_action"] != "deny"
                 assert not a["model_feedback"]["denied_tag"]
+        for event in run["trace"]:
+            assert event["evaluated"] == (event["action"] in ("deny", "allow", "warn"))
