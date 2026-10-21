@@ -833,6 +833,119 @@ def _cmd_protect_validate(args: argparse.Namespace) -> int:
     return 1
 
 
+def _availability_is_interactive() -> bool:
+    """Seam for tests; the authority commands need a human at a terminal."""
+    return sys.stdin.isatty() and sys.stdout.isatty()
+
+
+def _availability_prompt(text: str) -> str:
+    return input(text)
+
+
+def _availability_root(args: argparse.Namespace):
+    from mneme.availability_authority import find_policy_root
+    start = Path(args.repo_root) if args.repo_root else Path.cwd()
+    if not start.exists():
+        return None, _error_exit(f"repo root {start} does not exist")
+    root = find_policy_root(start)
+    if root is None:
+        return None, _error_exit(f"no .mneme directory at or above {start}")
+    return root, 0
+
+
+def _print_verification(result) -> None:
+    print(f"authorization: {result.authorization}"
+          + (f" ({result.reason})" if result.reason else ""))
+    if result.detail:
+        print(f"  detail:   {result.detail}")
+    if result.url:
+        print(f"  remote:   {result.url}")
+    if result.tip:
+        print(f"  baseline: {result.branch} @ {result.tip}")
+
+
+def _cmd_availability_status(args: argparse.Namespace) -> int:
+    """Read-only (charter §6): never writes anything."""
+    from mneme.availability_authority import (
+        AUTHORIZED, DECLARATION_PATH, local_relation, verify,
+    )
+    root, rc = _availability_root(args)
+    if root is None:
+        return rc
+    result = verify(root)
+    print(f"policy root: {root}")
+    _print_verification(result)
+    if result.baseline is not None:
+        last = result.baseline["authority"]["events"][-1]
+        review = last["review"]
+        print(f"  last event: #{last['seq']} {last['op']}, recorded by "
+              f"{review['recorded_by']} (review attested, not verified)")
+        print("  independent approver attested: "
+              + ("yes" if review["independent_approver_attested"] else "no")
+              + "; branch protection attested: "
+              + ("yes" if review["baseline_protection_attested"] else "no"))
+    path = root / DECLARATION_PATH
+    if not path.exists():
+        print("  local declaration: absent (no verification trigger)")
+    elif result.authorization == AUTHORIZED and result.baseline is not None:
+        try:
+            data, problem = json.loads(path.read_text(encoding="utf-8")), ""
+        except (OSError, UnicodeError, ValueError):
+            data, problem = None, "unreadable"
+        print(f"  local declaration: {local_relation(data, problem, result.baseline)}")
+    else:
+        print("  local declaration: present")
+    return 0
+
+
+def _cmd_availability_event(args: argparse.Namespace, op: str) -> int:
+    from mneme.availability_authority import (
+        Attestation, AuthorityRefused, prepare_event,
+    )
+    root, rc = _availability_root(args)
+    if root is None:
+        return rc
+    if not _availability_is_interactive():
+        return _error_exit(
+            f"`mneme availability {op}` needs an interactive terminal; "
+            "there is no non-interactive mode"
+        )
+    print(f"This prepares an availability {op} event for {root}.")
+    print("It takes effect only after a reviewed merge to the baseline branch.")
+    name = _availability_prompt("Your name (recorded as review.recorded_by): ").strip()
+    if not name:
+        return _error_exit("a name is required")
+    independent = _availability_prompt(
+        "Will an approver other than you review this change? [y/N]: "
+    ).strip().lower() == "y"
+    protected = _availability_prompt(
+        "Is the baseline branch protected (PR-only merges)? [y/N]: "
+    ).strip().lower() == "y"
+    if _availability_prompt(f"Type {op.upper()} to confirm: ").strip() != op.upper():
+        return _error_exit("not confirmed; nothing written")
+    try:
+        path, document, result = prepare_event(
+            root, op, Attestation(name, independent, protected),
+            replace_local=args.replace_local,
+        )
+    except AuthorityRefused as exc:
+        return _error_exit(f"{op} refused: {exc}")
+    event = document["authority"]["events"][-1]
+    print(f"Wrote {path} (event #{event['seq']} {op}) against "
+          f"{result.branch} @ {result.tip[:7]}.")
+    print("Next: commit this file, open a PR, have it reviewed and merged. "
+          "Nothing was committed, pushed or merged.")
+    return 0
+
+
+def _cmd_availability_authorize(args: argparse.Namespace) -> int:
+    return _cmd_availability_event(args, "authorize")
+
+
+def _cmd_availability_revoke(args: argparse.Namespace) -> int:
+    return _cmd_availability_event(args, "revoke")
+
+
 def _cmd_protect_activate(args: argparse.Namespace) -> int:
     from mneme.protection import ProtectionError, activate_protection
     loaded = _require_memory(args.memory)
@@ -2042,6 +2155,43 @@ def _build_parser() -> argparse.ArgumentParser:
     p_protect_activate.add_argument("--repo-root", dest="repo_root", default=None,
                                     help=_REPO_ROOT_HELP)
     p_protect_activate.set_defaults(func=_cmd_protect_activate)
+
+    # availability (ADR-033 C2b authority operations)
+    p_availability = sub.add_parser(
+        "availability",
+        help=(
+            "Opt-in fail-closed availability authorization (ADR-033 C2b): "
+            "verify the baseline, or prepare a reviewed authorize/revoke event"
+        ),
+    )
+    availability_sub = p_availability.add_subparsers(
+        dest="availability_cmd", required=True,
+    )
+    _AVAILABILITY_ROOT_HELP = (
+        "Directory inside the repository (default: current directory); the "
+        "policy root is the first ancestor containing .mneme/"
+    )
+    p_availability_status = availability_sub.add_parser(
+        "status",
+        help="Read-only: verify the live baseline and compare the local declaration",
+    )
+    p_availability_status.add_argument("--repo-root", dest="repo_root", default=None,
+                                       help=_AVAILABILITY_ROOT_HELP)
+    p_availability_status.set_defaults(func=_cmd_availability_status)
+    for _op, _func, _help in (
+        ("authorize", _cmd_availability_authorize,
+         "Write a reviewed-authorization event into .mneme/availability.json "
+         "(interactive; never commits)"),
+        ("revoke", _cmd_availability_revoke,
+         "Write a reviewed-revocation event into .mneme/availability.json "
+         "(interactive; never commits)"),
+    ):
+        _p = availability_sub.add_parser(_op, help=_help)
+        _p.add_argument("--repo-root", dest="repo_root", default=None,
+                        help=_AVAILABILITY_ROOT_HELP)
+        _p.add_argument("--replace-local", dest="replace_local", action="store_true",
+                        help="Overwrite a local declaration that differs from the baseline")
+        _p.set_defaults(func=_func)
 
     # cursor (parent for cursor subcommands)
     p_cursor = sub.add_parser("cursor", help="Cursor.ai integration commands")
