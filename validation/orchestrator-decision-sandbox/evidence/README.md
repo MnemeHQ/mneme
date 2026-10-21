@@ -39,8 +39,10 @@ An error, an incomplete evaluation or a missing observation is never
 - `handler_calls`: how many times the tool body ran for that attempt. Not
   applicable to CLI rows (`mneme check` never writes; the target digest is
   compared instead).
-- `process_cwd`: `empty` or `decoy` (a temp dir holding a same-named
-  `src/router.py`), pinned by the runner; it matters only for relative paths.
+- `process_cwd`: `empty`, `decoy` (a temp dir holding a same-named
+  `src/router.py` identical to case B) or `partial_decoy` (one that shares
+  B's forbidden lines but differs elsewhere), pinned by the runner; it
+  matters only for relative paths.
 - `trace[].evaluated`: true only for `allow`, `deny` or `warn`; `skip` and
   `fail_open` were not evaluated.
 - `sha256_before` / `sha256_after`: target file digest at the model turn
