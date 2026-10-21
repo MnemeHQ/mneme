@@ -767,6 +767,117 @@ unchanged.
 
 ---
 
+## Amendment — authorize ADR-033 C2b verified availability authorization (2026-10-21)
+
+> This authorizes **one verifier, one declaration extension, three authority
+> commands and one refusal route at one boundary**. It does not authorize
+> Architecture B, any cache, credential use, forge API, CI change, or any
+> change to other boundaries.
+
+**Change:** at the Claude Code direct-write boundary (`Edit|Write|MultiEdit`,
+`handle_event` in `mneme/integrations/claude_code/hook.py`), replace the C2a
+verifier stub with a live verifier of the remote default-branch tip, per
+charter §§3-5. Refuse a supported direct write with an operational
+UNEVALUATED diagnostic only when authorization is verified as `AUTHORIZED`
+and a charter §5.3 R3-R6 condition holds. Add
+`mneme availability status|authorize|revoke` per charter §6. Without a local
+declaration, behavior is byte-identical to `main`.
+
+**Sections referenced:** the Freeze Anchor **Status** clause ("No behavioral
+change to retrieval or enforcement without an explicit charter amendment") and
+the Amendment Procedure below.
+
+**Rationale (Amendment Procedure §3(b)).** A distinct behavioral charter was
+**already merged** before this amendment:
+[Reliable Enforcement C2b verified availability authorization charter](../plans/2026-10-21-reliable-enforcement-c2b-availability-authorization-charter.md),
+PR [#587](https://github.com/MnemeHQ/mneme/pull/587), squash `90dc7cab`,
+accepted with every §16 decision pinned. It sits under accepted
+[ADR-033](../adr/ADR-033-opt-in-fail-closed-enforcement.md) (PR
+[#483](https://github.com/MnemeHQ/mneme/pull/483), squash `78459d1a`) and
+follows C2a (PR [#576](https://github.com/MnemeHQ/mneme/pull/576), squash
+`72b6d04a`). Charter §14 requires this amendment before implementation. No
+behavior change is retroactively justified.
+
+**Governing authority:** accepted ADR-033 (Architecture A), ADR-021, ADR-022,
+ADR-029, ADR-030; the merged C1 (#260) verdict-consistency, T-08 slice-1, C2a
+and C2b charters.
+
+### Authorized change — C2b only (charter §§3-9)
+
+- **Verifier** (charter §3): runs only when a local declaration is present.
+  `origin` URL from the repository's own config file; HTTPS only; Git run in
+  a temporary bare repository with a constructed environment (no system or
+  global config, proxies, `insteadOf`, credential helpers or remote-tracking
+  refs); revision is the live remote `HEAD` symref tip, fetched by object id;
+  one 15-second budget; reasons from ADR-033 §4.3's closed set; no persistent
+  cache.
+- **Declaration extension** (charter §4): additive `repository` and
+  `authority.events` fields on `mneme.availability/v1`; hash-chained,
+  append-only events ordered by position, never by timestamps; activation
+  evidence bound by `activated_at` and the protected decision set; review
+  fields recorded as attested, never presented as verified.
+- **State resolution** (charter §5): `AUTHORIZED` and `REVOKED` from the tip's
+  event list; first-parent history walked only when the tip has no
+  declaration, for `VERIFIED_ABSENT` or RR-7 `EVIDENCE_INVALID`; local
+  relation `MATCH|BEHIND|DIVERGES|INVALID`; routing R0-R8.
+- **Authority operations** (charter §6): `mneme availability status` is
+  read-only. `authorize` and `revoke` require their respective live
+  authorization preconditions and interactive TTY confirmation. Only the
+  mutating commands write `.mneme/availability.json`. None commits, pushes,
+  merges or modifies canonical memory.
+- **Hook integration** (charter §7): the default verifier replaced; one
+  `local_relation` input added to `routing_refuses`; the verifier seam stays
+  test-only; the in-process benchmark transport documented as unsupported
+  under `AUTHORIZED`.
+- **Diagnostics** (charter §8): operational UNEVALUATED refusals that never
+  carry `architectural decision violated` or submitted content, claimed as
+  emitted, not delivered.
+- **The charter §9 regression matrix** (V1-V18, H1-H15, A1-A5) and the
+  charter §12 acceptance evidence, including the latency measurement.
+
+No other code path is authorized. **The only new refusals are charter §5.3
+R3-R6 under a verified `AUTHORIZED` baseline.**
+
+### Explicitly preserved (unchanged)
+
+This restates merged charter §10.
+
+1. **No declaration → today's behavior,** byte-identical output, the same exit
+   codes, and zero verifier calls.
+2. **`REVOKED`, `VERIFIED_ABSENT` and `AUTHORIZATION_UNVERIFIABLE` never
+   refuse on availability.** A trusted complete strict `FAIL` still blocks
+   exactly as today under every authorization state.
+3. **The `mneme check` CLI,** its output, exit codes, the `mneme.check/v1`
+   payload, and the malformed-memory crash path (CI1.4 §7 condition 4).
+4. **`find_memory`,** `MNEME_MEMORY` precedence, T-08 slice-1 selection, and
+   C2a declaration discovery and policy-root rule.
+5. **strict/warn semantics,** `assess_verdict`, `DecisionRetriever`,
+   `ConflictDetector` and ADR-020 applicability.
+6. **Bash, SessionStart and Stop** behavior (ADR-021).
+7. **Canonical decision authority** (ADR-030 §1), `setup → active` and
+   `mneme protect activate`. The declaration holds no decisions or rules.
+8. **Frozen benchmark fixtures and methodology; `.mneme/project_memory.json`.**
+
+### Not authorized by this amendment
+
+- Architecture B: any host enrollment record, high-water mark or other trusted
+  state outside the repository; any persistent cache.
+- Any verification trigger other than the local declaration.
+- Credential helpers, tokens, SSH or any non-HTTPS verifier transport; forge
+  API calls.
+- Refusals outside `PreToolUse` `Edit|Write|MultiEdit`; Bash class-A handling.
+- Live host validation (ADR-033 gate C3) and CI implementation (gate C4).
+- Any change to other boundaries or integrations, CI workflows, rulesets or
+  Actions policy.
+- Any claim beyond charter §13. C2b's evidence is hook-level only, and the
+  Architecture A limitation stands: **deleting the local declaration can
+  silently disable opt-in fail-closed protection.**
+
+The existing DG1B1, DG1F-C1a, #260, T-08 slice-1 and C2a freeze amendments
+remain unchanged.
+
+---
+
 ## Amendment Procedure
 
 This document is frozen at `e73ff7d`. To amend it:
