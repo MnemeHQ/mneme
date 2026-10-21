@@ -26,6 +26,15 @@ def main() -> int:
     if args[:1] == ["--version"]:
         print("selftest-stub (not Claude Code)")
         return 0
+    # Real `claude -p` reads piped stdin as extra input. The live ABSENT batch on
+    # 2026-10-21 fed the batch runner's row list into Claude this way, so the
+    # stub refuses any stdin content: the self-test must catch a leak.
+    if not sys.stdin.isatty():
+        leaked = sys.stdin.read()
+        if leaked:
+            print(f"stub claude: unexpected stdin ({len(leaked)} chars): {leaked[:80]!r}",
+                  file=sys.stderr)
+            return 3
     model = args[args.index("--model") + 1] if "--model" in args else "stub"
     repo = Path.cwd()
     setup = json.loads((repo.parent / "setup.json").read_text(encoding="utf-8"))

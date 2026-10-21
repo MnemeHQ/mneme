@@ -123,9 +123,11 @@ for k, v in json.load(open(sys.argv[1], encoding='utf-8'))['env'].items():
 } > "$OUT/observer.txt" || die "cannot write observer.txt"
 
 if [ "$ARM" = headless ]; then
+  # stdin closed: `claude -p` treats piped stdin as extra input and waits on a
+  # console stdin, so the prompt argument must be its only input.
   (cd "$REPO" && claude -p "$PROMPT" --output-format stream-json --verbose \
      --permission-mode acceptEdits --setting-sources "$SOURCES" --model "$PIN_MODEL") \
-     > "$OUT/events.jsonl" 2> "$OUT/claude.stderr"
+     < /dev/null > "$OUT/events.jsonl" 2> "$OUT/claude.stderr"
   echo "claude_exit=$?" >> "$OUT/observer.txt"
 else
   START=$(date +%s)
