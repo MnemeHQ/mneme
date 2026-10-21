@@ -21,6 +21,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Optional, TextIO
 
+from mneme.integrations.claude_code.availability import (
+    LocalDeclaration,
+    classify_observation,
+    discover_declaration,
+    emit_availability,
+)
 from mneme.integrations.claude_code.session_state import (
     MAX_FILE_BYTES,
     capture_baseline,
@@ -633,6 +639,7 @@ def _run_check(
     memory: Path,
     stderr: TextIO,
     stdout: TextIO,
+    availability: Optional[LocalDeclaration] = None,
 ) -> int:
     mode = resolve_mode()
 
@@ -641,10 +648,17 @@ def _run_check(
     extra = {"transport": "inprocess"} if resolve_transport() == "inprocess" else {}
     proc = _invoke_check(memory, rel, target_path, proposed_content, stderr=stderr, **extra)
     if proc is None:
+        if emit_availability(availability, "NOT_RUN", stderr, memory=memory):
+            return 2
         return 0
 
     assessment = assess_verdict(proc.stdout, proc.returncode, mode)
     payload = assessment.payload
+    if emit_availability(
+        availability, classify_observation(payload), stderr,
+        memory=memory, payload=payload,
+    ):
+        return 2
     if payload is None:
         # No trusted verdict: a crash, a traceback, or a payload that
         # contradicts itself or its exit status. Never block on this.
@@ -1127,8 +1141,15 @@ def handle_event(
     if not should_check(event.tool_name):
         return 0
 
-    memory = find_memory(_direct_write_memory_start(event))
+    start = _direct_write_memory_start(event)
+    # ADR-033 C2a: local policy detection precedes the missing-memory return.
+    # The shipped verifier cannot authorize a refusal. With no declaration,
+    # output, check behavior and exit codes remain identical to the old path.
+    availability = discover_declaration(start)
+    memory = find_memory(start)
     if memory is None:
+        if emit_availability(availability, "NOT_RUN", stderr, detail="check not run"):
+            return 2
         return 0
 
     try:
@@ -1137,15 +1158,23 @@ def handle_event(
         # edit to it, including the one that removes it (#259, ADR-018).
         checked_content = introduced_content(event)
     except MaterializeError as e:
+        if emit_availability(
+            availability, "NOT_RUN", stderr, memory=memory,
+            detail="proposed content could not be materialized",
+        ):
+            return 2
         print(f"mneme-hook: cannot materialize content, failing open: {e}", file=stderr)
         return 0
 
     if not checked_content.strip():
         # The edit introduces no non-blank lines (for example, a pure
         # deletion). Mechanically enforceable typed rules cannot be blank.
+        emit_availability(availability, "SKIPPED", stderr, memory=memory)
         return 0
 
-    return _run_check(event, checked_content, memory, stderr, stdout)
+    return _run_check(
+        event, checked_content, memory, stderr, stdout, availability=availability,
+    )
 
 
 def main(
