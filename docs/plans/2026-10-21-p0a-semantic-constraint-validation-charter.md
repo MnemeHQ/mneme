@@ -1,16 +1,20 @@
 # P0-A: Semantic constraint enforcement — validation charter
 
-**Status:** **DRAFT, revision 3**, for final owner confirmation. Validation only.
-The owner resolved D1–D5 in the
-[PR #578 review](https://github.com/MnemeHQ/mneme/pull/578#issuecomment-6310714497)
-(2026-10-21), and section 10 records those decisions. This revision also
-incorporates the four requested wording and measurement corrections, and
-revision 3 defines the M3 recognition contract (section 4.1) per the
+**Status:** **ACCEPTED** by the owner on 2026-10-21
+([final review](https://github.com/MnemeHQ/mneme/pull/578#issuecomment-6310914125)
+of revision 3; merged via #578, `443823b9`). Validation only. The owner
+resolved D1–D5 in the
+[PR #578 review](https://github.com/MnemeHQ/mneme/pull/578#issuecomment-6310714497),
+and section 10 records those decisions. Revision 2 incorporated the four
+requested wording and measurement corrections. Revision 3 defined the M3
+recognition contract (section 4.1) per the
 [revision 2 review](https://github.com/MnemeHQ/mneme/pull/578#issuecomment-6310847609).
-Accepting this charter authorizes **no** change to `mneme/`, `docs/adr/`,
-`.mneme/`, the benchmark suites, CI, or the Layer 1 freeze document. **No
-experiment implementation is authorized** until this charter is approved and
-the independently frozen Set 1 commit exists (section 12).
+Acceptance approves the charter's architecture and content only. It authorizes
+**no** change to `mneme/`, `docs/adr/`, `.mneme/`, the benchmark suites, CI, or
+the Layer 1 freeze document. The independent G–U fixture-and-oracle freeze
+(section 12, step 3) needs its own authorization. **No M1–M3 implementation is
+authorized** until that freeze commit exists and has been separately
+reviewed.
 **Source anchor:** `MnemeHQ/mneme` `origin/main` @ `04a1f989`.
 **Baseline evidence:** MnemeHQ/mneme#570 (`04a1f989`,
 `validation/orchestrator-decision-sandbox/`), measured on the runtime that
@@ -354,7 +358,8 @@ Recorded from the
 
 D1–D5 are resolved. The remaining steps run in this order:
 
-1. The owner gives final review of this revised charter.
+1. The owner gives final review of this revised charter. **Done
+   2026-10-21.**
 2. The owner authorizes the independent fixture-and-oracle freeze.
 3. A separate session writes Set 1 and the corrected oracle and freezes them as
    their own commit.
