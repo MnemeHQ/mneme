@@ -203,6 +203,12 @@ def build_summary(cli: dict, agent: dict) -> dict:
         if [a["label"] for a in attempts[k]] != want
     ]
     mismatches += [
+        f"agent {k}: attempt {a['attempt']} BLOCKED without a clean pre-handler denial"
+        for k, rows_ in attempts.items()
+        for a in rows_
+        if a["label"] == "BLOCKED" and not _denied_cleanly(a)
+    ]
+    mismatches += [
         f"agent {k}: {v['unmatched_enforcement_events']} unmatched enforcement events"
         for k, v in agent.items()
         if v.get("unmatched_enforcement_events")
@@ -366,7 +372,7 @@ def main(argv=None) -> int:
         "commands": {
             "cli_check": "python -m mneme.cli check --memory .mneme/project_memory.json --input <candidate> --target-path <case target> --query 'router deadline fallback' --mode strict --json (cwd = fixture root; MNEME_MEMORY/mode env removed)",
             "audit": "python -m mneme.cli audit --memory .mneme/project_memory.json --repo-root . --json <file> (cwd = fixture root)",
-            "agent": "MnemeLangChain(project_dir=<fixture root>, mode='strict'); create_agent(model=<scripted>, tools=[write_file, edit_file, save_text], middleware=mneme.build_middleware()); process cwd pinned to an empty or decoy temp dir; MNEME_MEMORY/mode env removed; middleware memory asserted to be the fixture's",
+            "agent": "MnemeLangChain(project_dir=<fixture root>, mode='strict'); create_agent(model=<scripted>, tools=[write_file, edit_file, save_text], middleware=mneme.build_middleware()); process cwd pinned to an empty, decoy or partial_decoy temp dir; MNEME_MEMORY/mode env removed; middleware memory asserted to be the fixture's",
         },
         "cli_raw": cli,
         "agent_raw": agent,
@@ -376,10 +382,14 @@ def main(argv=None) -> int:
     _write(run_dir / "summary.json", summary_json(summary))
     _write(run_dir / "summary.csv", summary_csv(summary))
     _write(run_dir / "transcript.txt", transcript(summary))
+    ok = all(v == "PASS" for v in summary["required_checks"].values()) and not summary["prediction_mismatches"]
     if "--write-summary" in argv:
-        CURRENT.mkdir(parents=True, exist_ok=True)
-        _write(committed, summary_json(summary))
-        _write(CURRENT / "summary.csv", summary_csv(summary))
+        if ok:
+            CURRENT.mkdir(parents=True, exist_ok=True)
+            _write(committed, summary_json(summary))
+            _write(CURRENT / "summary.csv", summary_csv(summary))
+        else:
+            print("not writing committed summary: expectations failed", file=sys.stderr)
     manifest = "".join(
         f"{sha256_file(p)}  {p.relative_to(run_dir).as_posix()}\n"
         for p in sorted(run_dir.rglob("*"))
@@ -390,7 +400,6 @@ def main(argv=None) -> int:
     print(transcript(summary))
     print(f"run dir: {run_dir}")
     print(f"summary matches committed: {report['summary_matches_committed']}")
-    ok = all(v == "PASS" for v in summary["required_checks"].values()) and not summary["prediction_mismatches"]
     return 0 if ok else 1
 
 

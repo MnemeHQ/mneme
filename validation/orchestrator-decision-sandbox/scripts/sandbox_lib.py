@@ -121,8 +121,9 @@ def child_env() -> dict:
 def pinned_process(cwd: Path):
     """Run in-process scenarios from a known cwd with memory/mode env scrubbed.
 
-    The in-process middleware materializes relative paths against the process
-    cwd and honours MNEME_MEMORY, so both are pinned for every agent run.
+    Relative-path materialization depended on the process cwd before
+    MnemeHQ/mneme#573, and memory discovery honours MNEME_MEMORY, so both are
+    pinned for every agent run.
     """
     saved_cwd = os.getcwd()
     saved_env = {name: os.environ.pop(name) for name in SCRUBBED_ENV if name in os.environ}

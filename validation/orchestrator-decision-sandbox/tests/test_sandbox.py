@@ -394,6 +394,32 @@ def test_pre_fix_evidence_is_unchanged():
     assert provenance["runtime"]["contains_relative_path_fix_cf6bc40b"] is False
 
 
+# Digests of the files as first committed at ddddf352 (original locations),
+# pinned here independently of PROVENANCE.json.
+PRE_FIX_ORIGINALS = {
+    "summary.json": ("validation/orchestrator-decision-sandbox/evidence/summary.json",
+                     "6a95035528b62875a1dd0e341db03b759486927d637b59603ee99bba202849d1"),
+    "summary.csv": ("validation/orchestrator-decision-sandbox/evidence/summary.csv",
+                    "fbe98a73ec01e6d08876e5d316cb226e068c8ce116d9974b4726d2959cee69b2"),
+    "RESULTS.md": ("validation/orchestrator-decision-sandbox/RESULTS.md",
+                   "0a8d422ae0200b3781eef2fa42663313e51fdbd6d88b83b60ed36bccd1b5498b"),
+}
+
+
+@pytest.mark.parametrize("name", sorted(PRE_FIX_ORIGINALS))
+def test_pre_fix_evidence_matches_original_commit(name):
+    import subprocess
+
+    original_path, digest = PRE_FIX_ORIGINALS[name]
+    pre = sandbox_lib.SANDBOX / "evidence" / "pre-fix"
+    assert sha256_file(pre / name) == digest
+    blob = subprocess.run(
+        ["git", "show", f"ddddf3527672c729ae8710d12be7241ca1a073b4:{original_path}"],
+        cwd=REPO_ROOT, capture_output=True, check=True,
+    ).stdout
+    assert sha256_bytes(blob) == digest
+
+
 def test_checkout_contains_fix_commit():
     assert run_sandbox.contains_fix()
 

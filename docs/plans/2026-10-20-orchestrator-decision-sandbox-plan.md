@@ -474,7 +474,8 @@ them. Adding them to CI is a later, separate change.
 - [ ] **Step 1:** `python scripts/run_test_battery.py gate` and
   `mneme check --mode warn` per repo instructions. Expected: no new failures.
 - [ ] **Step 2:** Confidentiality pass: scan the diff, commit messages and PR
-  body for non-synthetic identifiers. Expected: zero hits.
+  body for non-synthetic identifiers, using a term list kept outside the
+  repository (the list itself never enters the repo). Expected: zero hits.
 - [ ] **Step 3:** Open the PR titled
   `feat(validation): synthetic orchestrator decision sandbox (A-F, LangGraph 6A/6B)`
   with an `## Execution provenance` block, validated with

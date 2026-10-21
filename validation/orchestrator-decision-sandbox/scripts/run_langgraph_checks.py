@@ -6,8 +6,10 @@ Also contrasts an embedded governed agent (6A) with raw graph nodes (6B).
 No new interception mechanism is built here.
 
 Supported-path scenarios pass absolute in-project paths (the form the
-pinned live fixture proves). Relative paths are measured separately because
-the hook materializes them against the process cwd, not project_dir.
+pinned live fixture proves). Relative paths are measured separately, from
+pinned process cwds, because before MnemeHQ/mneme#573 the hook materialized
+them against the process cwd; after #573 they resolve against the event cwd
+(project_dir on this middleware path).
 """
 
 import json
@@ -378,7 +380,7 @@ def scripts(root: Path) -> dict:
     }
 
 
-# name -> (script key, governed, process cwd: "empty" or "decoy")
+# name -> (script key, governed, process cwd: "empty", "decoy" or "partial_decoy")
 AGENT_SCENARIOS = {
     "governed_b_then_a": ("governed_b_then_a", True, "empty"),
     "unguided_b_then_a": ("governed_b_then_a", False, "empty"),
@@ -419,9 +421,10 @@ def run_all() -> dict:
         (decoy / "src").mkdir(parents=True)
         (decoy / "src" / "router.py").write_bytes(b.encode("utf-8"))
         (partial / "src").mkdir(parents=True)
-        (partial / "src" / "router.py").write_bytes(
-            b.replace('"""Synthetic routing validator', '"""Unrelated router in another checkout', 1).encode("utf-8")
-        )
+        partial_text = b.replace('"""Synthetic routing validator', '"""Unrelated router in another checkout', 1)
+        if partial_text == b or "DISABLE_ROUTER_TIMEOUT = True" not in partial_text:
+            raise BlockerError("partial decoy must differ from case B while keeping its forbidden lines")
+        (partial / "src" / "router.py").write_bytes(partial_text.encode("utf-8"))
         cwds = {"empty": empty, "decoy": decoy, "partial_decoy": partial}
 
         for name, (key, governed, cwd) in AGENT_SCENARIOS.items():
