@@ -9,9 +9,21 @@ scope: enforcement.typed_rules
 
 # ADR-034: Static Numeric Upper-Bound Typed Rule for Python
 
-**Status:** **Proposed.** This is a draft for owner review. It is **not
-accepted**. A proposed ADR is imported as inactive and has no enforcement
-effect.
+**Status:** **Proposed, revision 2.** This is a draft for owner review. It is
+**not accepted**. A proposed ADR is imported as inactive and has no
+enforcement effect.
+
+Revision 2 records the owner's O1–O5 rulings and resolves the blocking
+repairs from the
+[review of `e4f2fd2a`](https://github.com/MnemeHQ/mneme/pull/590#issuecomment-6317687350):
+
+- numeric evaluation semantics (new §5a);
+- the authoring grammar for `max`;
+- the mixed-source scoring precedence.
+
+That review also recorded that drafting this ADR had not been separately
+authorized after #589. Revising this draft in place is permitted; nothing
+beyond that is.
 
 Acceptance of this ADR would confer **no** implementation authority, held-out
 corpus freeze, implementation charter or Layer 1 amendment. Each of those is a
@@ -98,7 +110,7 @@ A structured directive under `## Constraints`:
 | `symbol` | at least one of `symbol` and `call` | A Python identifier. Its module-level bare-name assignment is a value source |
 | `call.function` | with `call` | A Python identifier. Only **direct bare-name** calls `function(...)` are sources |
 | `call.position` | with `call` | A non-negative integer, **0-based** positional index. Keyword matching is **not** part of this slice |
-| `max` | yes | A finite number, normalized to the canonical decimal form of §5. `bool`, NaN, Infinity and non-numbers are rejected |
+| `max` | yes | A **plain, unquoted** YAML scalar whose **raw text** matches the authoring grammar of §5. It must be strictly greater than zero (O5) |
 | `inclusive` | yes | Must be literally `true`. Exclusive bounds are **not** part of this slice; `false` is an authoring error, not a silent default |
 | `unit` | yes | A non-empty label for documentation and diagnostics. It is **never** converted |
 | `include_paths` | yes | ADR-020 selectors. There is no global form |
@@ -111,8 +123,8 @@ is valid.
 
 ### 3. Recognition scope and positive source discovery
 
-**Recognized value forms are exactly M2's** (P0-A `m2_static_bound.py`
-1.0.0):
+**Recognized value forms are syntactically M2's** (P0-A
+`m2_static_bound.py` 1.0.0):
 
 - numeric literals;
 - unary `+`/`-`;
@@ -120,7 +132,10 @@ is valid.
 - **not folded:** `bool` operands; `**` with an exponent above 64 in
   magnitude; division by zero; overflow.
 
-Folding never executes source.
+Folding never executes source. How a recognized form is **evaluated and
+compared** is defined in §5a. That is **not** identical to M2: M2 compared
+the folded value with a float bound, while this ADR compares it exactly with
+the authored decimal bound. §5a states where the two differ.
 
 **Value sources:**
 
@@ -145,8 +160,8 @@ following makes the source `UNKNOWN`:
   infinite or NaN). That is a C1-type question, which this rule does not
   claim.
 
-**Open question O2:** is a declared source that is absent always `UNKNOWN`, or
-may the author mark a source optional? This ADR proposes **always `UNKNOWN`**.
+There are no optional sources (O2 ruling): a declared source that is absent
+is always `UNKNOWN`.
 
 ### 4. Outcome semantics
 
@@ -172,7 +187,24 @@ There are three dimensions, and they are never collapsed into one another:
 2. Otherwise, any `UNKNOWN` source: `MATCHER_UNEVALUATED`, with a reason.
 3. Otherwise: no violation.
 
-A violation is a deterministic FAIL, as in ADR-019 §5.
+A violation is a deterministic FAIL, as in ADR-019 §5. The precedence in
+rule 1 applies to label authoring and scoring as well: a case with a
+recognized `EXCEEDS` source is a **violation**, whatever unsupported forms
+appear elsewhere in it.
+
+**Reason priority.** When several `MATCHER_UNEVALUATED` reasons apply, the
+**primary** reason, the one reported first and scored, is the first that
+applies in this order:
+
+1. `INCOMPLETE_SOURCE_INPUT`: decided from the input contract, before parsing.
+2. `PARSE_FAILURE`.
+3. `AMBIGUOUS_BINDING`: rebinding, shadowing, or the function escaping as a
+   value.
+4. `SOURCE_NOT_FOUND`.
+5. `UNRECOGNIZED_FORM`: this also covers out-of-range values and disabled
+   values under §5a.
+
+All applicable reasons may be listed, but only the primary one is scored.
 
 **`evaluation_complete`** remains a *derived aggregate*: false if any rule's
 applicability is `UNKNOWN` or any rule's matcher status is
@@ -199,15 +231,87 @@ ASCII) of the object below.
 | `inclusive` | `true` |
 | `unit` | As authored |
 
-**Canonical decimal string for `max`:**
+**Authoring grammar for `max`.** The grammar is checked on the YAML node's
+**raw scalar text before type construction**. That is necessary because the
+YAML loader turns `05`, `0x5` and `1_000` into integers, `.5` and `5.` into
+floats, and `5e0` into a string, so the parsed value cannot distinguish them.
 
-- **Grammar:** `^-?(0|[1-9][0-9]*)(\.[0-9]*[1-9])?$`. `-0` is rejected.
-- **Normalization:** authored numbers are converted exactly, so `5`, `5.0`
-  and `"5"` all normalize to `"5"`.
-- **Rejected:** exponent notation, non-finite values and `bool`.
+| Rule | Detail |
+|---|---|
+| Must be a plain scalar | Quoted scalars are rejected, so `"5"` and `'5'` are not accepted |
+| Raw text grammar | `^(0|[1-9][0-9]{0,17})(\.[0-9]{1,9})?$`: up to 18 integer digits and up to 9 fraction digits |
+| Rejected spellings | Sign, leading zeros, a bare `.5` or `5.`, exponent notation (`5e0`, `5.0e0`), underscores, hex or octal, `.inf`/`.nan`, booleans, null |
+| Value | Must be strictly greater than zero (O5) |
 
-**Comparison** uses exact rational arithmetic between the folded source value
-and `max`, so it is deterministic and has no float rounding.
+**Canonical stored form.** The authored text is normalized textually, never
+through a float:
+
+- trailing fractional zeros are stripped;
+- a fraction that becomes empty is dropped.
+
+So `5`, `5.0` and `5.000` all store as `"5"`, and `2.50` stores as `"2.5"`.
+The stored string must match `^(0|[1-9][0-9]*)(\.[0-9]*[1-9])?$` and be
+greater than zero. The loader re-validates it and never rewrites it.
+
+### 5a. Numeric evaluation semantics
+
+**Decision: the value the pinned Python runtime would compute, compared
+exactly with the authored decimal bound.**
+
+1. **Evaluation.** A recognized expression is evaluated with **pinned CPython
+   numeric semantics**, by applying the corresponding `operator` functions to
+   `int` and `float` operands. Folding never executes the module.
+   - `int` has arbitrary precision; `float` is IEEE-754 binary64 with
+     round-half-even.
+   - Mixed `int`/`float` operations produce a float.
+   - `/` is true division; `//` and `%` use Python floor semantics.
+   - `**` with an integer exponent of magnitude at most 64.
+   - These are exactly the values the program would produce at runtime.
+2. **Operand and result bounds.** Any of the following makes the source
+   `UNKNOWN`, with reason `UNRECOGNIZED_FORM` (out of range), and is never
+   judged:
+   - any intermediate or final `int` whose magnitude exceeds 10^30;
+   - any `float` operation that raises `OverflowError` or
+     `ZeroDivisionError`;
+   - a result that is infinite or NaN.
+3. **Comparison.** The resulting runtime value `x` is compared **exactly**
+   with the stored decimal `max`, as `Fraction(x)` against `Fraction(max)`.
+   `x` violates when `Fraction(x) > Fraction(max)`. Any `x <= 0` (disabled)
+   makes the source `UNKNOWN`.
+
+**Rationale.** The rule governs the value the program actually uses. Exact
+rational evaluation of the *source text* would judge `0.1 + 0.2` as equal to
+`0.3`, but the program computes `0.30000000000000004`, which exceeds a bound
+of `0.3`. Comparing that runtime value exactly against the *authored* decimal
+avoids a second rounding of the bound.
+
+**Where this differs from M2.** M2 compared against the bound as a Python
+float. The two disagree only when `max` is not exactly representable in
+binary64. Two examples:
+
+- A literal `0.3` against `max: 0.3`: here the runtime value
+  `0.299999999999999988898` is **within** the bound.
+- `0.1 + 0.2` against `max: 0.3`: a **violation** here, and also under M2.
+
+**Pre-registered boundary behavior** (CPython 3.12; part of the contract and
+of the evaluation corpus):
+
+| Source expression | Runtime value | `max` | Result |
+|---|---|---|---|
+| `0.1 + 0.2` | `0.30000000000000004` | `0.3` | violation |
+| `0.3` | `0.3` (binary64, below 0.3 exactly) | `0.3` | within |
+| `5.000000000000001` | `5.000000000000001` | `5` | violation |
+| `5.0000000000000001` | `5.0` (rounded at parse) | `5` | within |
+| `10 / 2`, `4.5 + 0.5`, `1 / 3 * 15` | `5.0` | `5` | within |
+| `11 // 2`, `-1 % 6` | `5` | `5` | within |
+| `2 ** 3` | `8` | `5` | violation |
+| `2 ** 65` | not folded (exponent above 64) | `5` | `UNKNOWN` |
+| `10 ** 31` | an `int` above 10^30 | `5` | `UNKNOWN` |
+| `1e308 * 10` | infinite | `5` | `UNKNOWN` |
+| `1 / 0` | `ZeroDivisionError` | `5` | `UNKNOWN` |
+
+The pinned runtime is recorded with every evaluation. A change of interpreter
+needs this table re-verified before any claim.
 
 **Identity:** `rule_id_of` is unchanged:
 `<decision>:FORBID_NUMERIC_ABOVE:sha256([value, applicability])[:32]`. The
@@ -348,15 +452,15 @@ only, documented" or "extended":
 - `UNEVALUATED` rates may be high. The pre-registered criteria make that
   visible rather than hiding it.
 
-## Open questions for the owner
+## Owner rulings (provisional, 2026-10-21; binding only if this ADR is accepted)
 
-| ID | Question | Proposed answer |
-|---|---|---|
-| O1 | Type name | `FORBID_NUMERIC_ABOVE`. Alternatives: `NUMERIC_UPPER_BOUND`, `MAX_NUMERIC` |
-| O2 | Optional sources | No: every declared source must be positively discovered |
-| O3 | `semantic_features` value | `numeric_upper_bound_rule` |
-| O4 | `call.position` base | 0-based, matching Python's `ast` `args` index |
-| O5 | Negative `max` | Permitted by the grammar. Disabled source values (zero or negative) are `UNEVALUATED` regardless, so a non-positive `max` would make every recognized source either disabled or exceeding. Reject `max <= 0` at authoring? Proposed: **reject** |
+| ID | Ruling |
+|---|---|
+| O1 | Type name **`FORBID_NUMERIC_ABOVE`** |
+| O2 | **No optional sources.** Every declared source must be positively found and inspected. Absence or ambiguity without another recognized violation is `MATCHER_UNEVALUATED`, never a pass |
+| O3 | v2 `semantic_features` value **`numeric_upper_bound_rule`**. It requires backwards-reader refusal tests, no v1 semantics and golden tests. It does not by itself approve the persistence implementation |
+| O4 | `call.position` is **0-based** |
+| O5 | **`max <= 0` is rejected at authoring.** Positivity is consistent across `max` (§5 grammar), recognized source values (`x <= 0` is disabled, so `UNKNOWN`, §5a) and diagnostics |
 
 ## Not decided here
 
