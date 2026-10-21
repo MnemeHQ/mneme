@@ -111,6 +111,15 @@ def test_self_proposal_relative_path_uses_project_dir(tmp_path, monkeypatch):
     assert layout.real().read_bytes() == before
     assert decoy.read_bytes() == decoy_before
 
+    # The tool submits an absolute path; pin the adapter's own resolution of
+    # a relative path against cwd=root as well.
+    direct = sdk.evaluate_mutation(
+        "Write", {"file_path": TARGET, "content": VIOLATING}, cwd=str(layout.project)
+    )
+    assert direct.action == ACTION_DENY
+    assert runner.sent[-1].target_path == str(layout.real())
+    assert FORBIDDEN in runner.sent[-1].content
+
 
 class TestEmptyCwdRelativePathDocumented:
     """``docs/integrations/agent-sdk.md``: with an empty ``cwd``, relative

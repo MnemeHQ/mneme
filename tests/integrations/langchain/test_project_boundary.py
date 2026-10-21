@@ -102,6 +102,12 @@ def test_out_of_root_unscoped_rule_applies(layout):
     assert unknown_rules(runner.sent[0]) == [("router_001", "APPLIED")]
     assert "router_001" in result.reason
 
+    # Compliant content out of root is then a complete, trusted PASS.
+    compliant = write(make_gate(layout, runner), layout.outside / "other.py", BASELINE)
+    assert compliant.action == ACTION_ALLOW
+    assert compliant.evaluation_complete is True
+    assert unknown_rules(runner.sent[1]) == [("router_001", "APPLIED")]
+
 
 def test_dotdot_relative_escape_is_out_of_root(layout):
     runner = RecordingRunner()
@@ -180,6 +186,50 @@ def test_orchestrator_refuse_on_unevaluated_wrapper(layout):
     assert counts["unevaluated"] == 1
     assert counts["mneme_blocked"] == 0
     assert counts["trusted_pass"] == 0
+
+
+def test_wrapper_does_not_refuse_operational_fail_open(layout):
+    # Exactly the proposal's condition: only fail_open with
+    # evaluation_complete False is refused. A MaterializeError fail-open
+    # (evaluation_complete True in the existing GateResult) is not.
+    runner = RecordingRunner()
+    gate = make_gate(layout, runner)
+    handler_runs = []
+    run = refuse_on_unevaluated(
+        langchain_evaluator(gate), lambda: handler_runs.append(1) or "edited"
+    )
+
+    outcome = run(
+        "edit",
+        {"file_path": str(layout.project / "src" / "missing.py"),
+         "old_string": "a", "new_string": "b"},
+    )
+
+    assert outcome.mneme_action == ACTION_FAIL_OPEN
+    assert outcome.orchestrator_refused is False
+    assert handler_runs == [1]
+    assert runner.sent == []
+
+
+def test_wrapper_deny_does_not_run_handler(layout):
+    runner = RecordingRunner()
+    gate = make_gate(layout, runner)
+    handler_runs = []
+    run = refuse_on_unevaluated(
+        langchain_evaluator(gate), lambda: handler_runs.append(1) or "wrote"
+    )
+
+    outcome = run(
+        "write", {"file_path": str(layout.real()), "content": VIOLATING}
+    )
+
+    assert outcome.mneme_action == ACTION_DENY
+    assert outcome.orchestrator_refused is False
+    assert outcome.text.startswith(DENY_TAG)
+    assert handler_runs == []
+    counts = count_outcomes([outcome])
+    assert counts["mneme_blocked"] == 1
+    assert counts["orchestrator_refused"] == 0
 
 
 def test_orchestrator_refusals_counted_separately_from_mneme_blocks(layout):

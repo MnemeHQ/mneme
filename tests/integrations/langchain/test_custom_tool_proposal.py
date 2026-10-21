@@ -302,12 +302,14 @@ class TestSamePathSameBytes:
         outcome = open_tool.save_text(link_path, VIOLATING)
         assert len(runner.sent) == 1
         assert runner.sent[0].target_path == str((outside / "router.py").resolve())
-        assert runner.sent[0].target_path != str(layout.project / link_path)
         assert outcome.mneme_action == ACTION_FAIL_OPEN
         assert outcome.mneme_action != ACTION_ALLOW
         assert UNEVALUATED_TAG in outcome.text
 
     def test_self_proposal_relative_path_uses_project_dir(self, tmp_path, monkeypatch):
+        """The tool joins a relative agent path to its root itself, so the gate
+        receives an absolute path; the final call also hands the relative
+        path straight to the adapter to pin ``project_dir`` resolution."""
         layout = make_layout(tmp_path, monkeypatch)
         # An identical decoy in the process cwd: if it were read as the
         # current snapshot, nothing would be introduced and the gate would skip.
@@ -327,6 +329,23 @@ class TestSamePathSameBytes:
         assert layout.real().read_bytes() == before
         assert decoy.read_bytes() == decoy_before
 
+        direct = gate.evaluate_tool_call("write_file", {"file_path": TARGET, "content": VIOLATING})
+        assert direct.action == ACTION_DENY
+        assert runner.sent[-1].target_path == str(layout.real())
+        assert FORBIDDEN in runner.sent[-1].content
+
+
+def spied_tool(gate, root):
+    """Reference tool whose proposals to the gate are recorded."""
+    proposals = []
+    evaluate = langchain_evaluator(gate)
+
+    def spying_evaluate(kind, tool_input):
+        proposals.append(dict(tool_input))
+        return evaluate(kind, tool_input)
+
+    return ReferenceFileTool(spying_evaluate, root), proposals
+
 
 class TestFullContentSubmission:
     def test_self_proposal_append_submitted_as_full_content(self, tmp_path, monkeypatch):
@@ -334,28 +353,33 @@ class TestFullContentSubmission:
         before = layout.real().read_bytes()
         runner = RecordingRunner()
         gate = MnemeLangChain(project_dir=str(layout.project), mode="strict", check_runner=runner)
-        tool = ReferenceFileTool(langchain_evaluator(gate), layout.project)
+        tool, proposals = spied_tool(gate, layout.project)
 
-        outcome = tool.append_text(TARGET, f"{FORBIDDEN} = True\n")
+        appended = f"{FORBIDDEN} = True\n"
+        outcome = tool.append_text(TARGET, appended)
 
         assert outcome.mneme_action == ACTION_DENY
-        # Only the appended line is introduced (ADR-018).
+        # The full resulting file is submitted, not just the appended text...
+        assert proposals[0]["content"].encode("utf-8") == before + appended.encode("utf-8")
+        # ...and only the appended line is introduced (ADR-018).
         assert runner.sent[0].content == f"{FORBIDDEN} = True"
         assert layout.real().read_bytes() == before
 
     def test_self_proposal_preexisting_literal_not_attributed(self, tmp_path, monkeypatch):
         layout = make_layout(tmp_path, monkeypatch)
-        layout.real().write_text(VIOLATING, encoding="utf-8")
+        layout.real().write_bytes(VIOLATING.encode("utf-8"))
         runner = RecordingRunner()
         gate = MnemeLangChain(project_dir=str(layout.project), mode="strict", check_runner=runner)
-        tool = ReferenceFileTool(langchain_evaluator(gate), layout.project)
+        tool, proposals = spied_tool(gate, layout.project)
 
         outcome = tool.append_text(TARGET, "RETRIES = 2\n")
 
         # No #259-shape false block on the pre-existing literal.
         assert outcome.mneme_action == ACTION_ALLOW
         assert runner.sent[0].content == "RETRIES = 2"
-        assert layout.real().read_text(encoding="utf-8") == VIOLATING + "RETRIES = 2\n"
+        written = layout.real().read_bytes()
+        assert written == (VIOLATING + "RETRIES = 2\n").encode("utf-8")
+        assert proposals[0]["content"].encode("utf-8") == written
 
 
 class TestTraceShape:
