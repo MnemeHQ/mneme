@@ -177,8 +177,8 @@ neither universally ungoverned nor universally blocked:
 | Contains any path-scoped typed rule (`include_paths`) | that rule's applicability is `UNKNOWN` (ADR-020), so the whole evaluation is incomplete | `fail_open` (rendered `[mneme] UNEVALUATED` by the middleware or the reference tool), never `allow`, **even when an unscoped rule in the same memory is violated** (`test_out_of_root_scoped_rule_unknown_fails_open`, `test_dotdot_relative_escape_is_out_of_root`, `test_out_of_root_never_labeled_allowed`) |
 | Only unscoped typed rules | each rule is `APPLIED` without path normalization | evaluated against the project's memory: in strict mode a violation is `deny` (`warn` in warn mode) and compliant content is `allow` (`test_out_of_root_unscoped_rule_applies`, single-rule memory) |
 
-Most projects mix both rule kinds, so expect the first row: an out-of-root
-write is unevaluated, not blocked. The unscoped row characterizes current
+A memory that mixes both rule kinds gets the first row: an out-of-root write
+is unevaluated, not blocked. The unscoped row characterizes current
 behavior for an all-unscoped memory; the mixed-memory case follows from the
 adapter checking evaluation completeness before the verdict and is not yet
 pinned by its own test. If either changes, this page must change with it.
