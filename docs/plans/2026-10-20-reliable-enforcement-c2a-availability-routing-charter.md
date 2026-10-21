@@ -1,7 +1,9 @@
-# Reliable Enforcement C2a — PreToolUse availability routing charter (proposal)
+# Reliable Enforcement C2a — PreToolUse availability routing charter
 
-**Status:** **PROPOSED.** Documentation only. **Nothing here is implemented or
-authorized.** This charter does not edit the Layer 1 freeze document; the
+**Status:** **ACCEPTED** by the owner on 2026-10-20 (merges via PR #574).
+Documentation only. Acceptance authorizes **no implementation** until the
+section 9 `[layer1-freeze]` amendment merges. This charter does not edit the
+Layer 1 freeze document; the
 matching `[layer1-freeze]` amendment is drafted in section 9 and is opened as a
 separate PR only after this charter merges (Amendment Procedure §3(b)). No code,
 test, hook, plugin, CI, ruleset or `.mneme/` change.
