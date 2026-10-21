@@ -1,9 +1,11 @@
-# Reliable Enforcement C3: live Claude Code validation scope (proposal)
+# Reliable Enforcement C3: live Claude Code validation scope
 
-**Status:** **DRAFT** scope proposal. Documentation only. It authorizes no run,
-no harness, no test repository, no runtime change and no ADR-033 or Layer 1
-change. Section 9 lists four open decisions for the owner; nothing in sections
-4-8 may run until they are resolved and this document merges.
+**Status:** **ACCEPTED** by the owner on 2026-10-21 (merges via PR #592), with
+every section 9 recommendation accepted as pinned. Documentation only.
+Acceptance authorizes no run, no harness, no test repository, no runtime
+change and no ADR-033 or Layer 1 change. Each later step in section 8 needs
+the owner's explicit go-ahead, and nothing in sections 4-8 runs before this
+document merges.
 **Governing decision:** [ADR-033](../adr/ADR-033-opt-in-fail-closed-enforcement.md),
 implementation gate 5 (C3 live proof, PreToolUse).
 **Anchor:** `MnemeHQ/mneme` `main` @ `7d1a8bb7` (C2b, #591).
@@ -190,15 +192,19 @@ latency acceptability, or host behavior under H-1/H-2 beyond what is recorded.
 
 ## 8. Sequence
 
-1. This scope PR: review, resolve section 9, merge (documentation only).
-2. If Q4 requires it: a `[layer1-freeze]` amendment PR.
+1. This scope PR: review and merge (documentation only). Section 9 resolved
+   2026-10-21.
+2. No `[layer1-freeze]` amendment (Q4, accepted).
 3. Test repository set up as decided in Q1, by the owner or with the owner's
    explicit go-ahead.
 4. Harness PR (scripts and pinned settings, no product code).
 5. Operator-run batches, each with its own evidence record PR.
 6. C3 summary record. C4 stays separately authorized.
 
-## 9. Open decisions for the owner
+## 9. Owner decisions (resolved)
+
+The owner accepted every recommendation below as pinned on 2026-10-21.
+Changing one needs an amendment to this document.
 
 - **Q1. Public test repository.** The verifier reads only anonymously readable
   HTTPS remotes, and the hook cannot use the test transport, so C3 needs a
@@ -206,14 +212,14 @@ latency acceptability, or host behavior under H-1/H-2 beyond what is recorded.
   PR. Creating it is an outward-facing action. Options: (a) a new public
   repository under `MnemeHQ` dedicated to C3, archived afterwards; (b) a
   public repository on a personal account; (c) defer C3 until private-remote
-  support exists (C2b Q1). *Recommendation:* (a), with a branch-protection
+  support exists (C2b Q1). *Accepted:* (a), with a branch-protection
   ruleset matching `main-pr-only`, created by the owner or on the owner's
   explicit go-ahead.
 - **Q2. User-visible delivery.** Headless runs prove delivery to the model
   only. Showing that Claude Code displays the refusal to the user needs an
   interactive session captured by the operator (screen recording or terminal
   log plus E1). This has never been done (A1-interactive is unrun).
-  *Recommendation:* add one interactive arm for R-1 and P-2 only, and keep
+  *Accepted:* add one interactive arm for R-1 and P-2 only, and keep
   every other row headless.
 - **Q3. Verifier observation and fault induction (E4, R-7, U-1).** The
   verifier ignores proxies, so a logging proxy cannot observe it.
@@ -222,11 +228,11 @@ latency acceptability, or host behavior under H-1/H-2 beyond what is recorded.
   argv and endpoint, which is Mneme's own output and never sufficient alone;
   (c) both. For U-1: a host firewall rule or hosts-file entry set by the
   operator. For R-7: a stall injected by the operator's wrapper around the
-  checker command, not a product change. *Recommendation:* (c) for E4, a
+  checker command, not a product change. *Accepted:* (c) for E4, a
   firewall rule for U-1, and the wrapper stall for R-7, all recorded in the
   harness PR.
 - **Q4. Freeze amendment.** No evidence-only live run so far needed a
   `[layer1-freeze]` amendment. Both ADR-033 amendments list C3 among things
   they do not authorize, and no document says whether an evidence-only C3
-  needs its own. C3 changes no behavior. *Recommendation:* no amendment;
+  needs its own. C3 changes no behavior. *Accepted:* no amendment;
   record the owner's decision in this document instead.
