@@ -9,7 +9,14 @@ scope: enforcement.typed_rules
 
 # ADR-034: Static Numeric Upper-Bound Typed Rule for Python
 
-**Status:** **Proposed, revision 2.** This is a draft for owner review. It is
+**Status:** **Proposed, revision 3.**
+
+Revision 3, per the
+[review of `3b671664`](https://github.com/MnemeHQ/mneme/pull/590#issuecomment-6317899163):
+
+- a normative mixed-source record (`PARTIAL`, §4);
+- value-based equality and new boundary rows (§5a);
+- open question O6. This is a draft for owner review. It is
 **not accepted**. A proposed ADR is imported as inactive and has no
 enforcement effect.
 
