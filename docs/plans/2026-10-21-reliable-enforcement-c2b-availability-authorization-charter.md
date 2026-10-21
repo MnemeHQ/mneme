@@ -1,7 +1,8 @@
 # Reliable Enforcement C2b: verified availability authorization charter
 
-**Status:** **DRAFT**, proposed for review. Documentation only. Merging this
-charter authorizes **no implementation**. Implementation needs the separate
+**Status:** **ACCEPTED** by the owner on 2026-10-21 (merges via PR #587), with
+every section 16 recommendation accepted as pinned. Documentation only.
+Acceptance authorizes **no implementation**. Implementation needs the separate
 section 14 `[layer1-freeze]` amendment, opened only after this charter merges
 (Amendment Procedure §3(b)). No code, test, hook, plugin, CI, ruleset or
 `.mneme/` change.
@@ -580,19 +581,21 @@ merges:
 
 ## 15. Sequence
 
-1. This charter PR: review, resolve section 16, merge (documentation only).
+1. This charter PR: review and merge (documentation only). Section 16
+   resolved 2026-10-21.
 2. The section 14 `[layer1-freeze]` PR: review and merge.
 3. One implementation PR meeting section 12.
 4. Separately authorized: C3 live proof (host non-mutation, diagnostic
    delivery, spec U/T/RV/S/P groups with E1-E10), then C4.
 
-## 16. Open questions for review
+## 16. Review decisions (resolved)
 
-Each has a recommendation. Any change to a recommendation is pinned in this
-document before merge.
+The owner accepted every recommendation below as pinned on 2026-10-21. Each
+is now part of the charter's contract; changing one needs a charter
+amendment.
 
 - **Q1. Private repositories.** C2b reads no credentials (F3), so private
-  remotes cannot enroll. *Recommendation:* accept for C2b and take the
+  remotes cannot enroll. *Accepted:* accept for C2b and take the
   credential source as a separate decision. Every option (user-global helper,
   a token in user-scope config) widens the ADV-2 surface ADR-033 already
   discloses, so it needs its own review.
@@ -600,23 +603,23 @@ document before merge.
   `AUTHORIZED`/`REVOKED` from the tip's event list and walks history only
   when the tip has no declaration. Walking full history on every edit would
   also catch reviewed rewrites of the list, at a per-edit cost that grows
-  with the repository. *Recommendation:* tip chain, as pinned. Every refusal
+  with the repository. *Accepted:* tip chain, as pinned. Every refusal
   already depends only on the tip, and reviewed changes to the baseline are
   authority by definition under the in-scope threat model.
 - **Q3. Forge evidence.** Review and protection are attested, not verified
-  (F1, F2). *Recommendation:* defer forge API verification. It is
+  (F1, F2). *Accepted:* defer forge API verification. It is
   forge-specific, needs credentials (Q1), and would still not prove reviewer
   independence (ADR-033 §4.5).
-- **Q4. Fixed remote `origin`.** *Recommendation:* pin `origin`. Reading the
+- **Q4. Fixed remote `origin`.** *Accepted:* pin `origin`. Reading the
   remote name from the declaration lets an ADV-1 edit point verification at
   another configured remote, such as a fork.
 - **Q5. `BEHIND` refuses.** A clone that has not pulled the latest authority
-  event is refused until it updates. *Recommendation:* keep. ADR-033 §4.2
+  event is refused until it updates. *Accepted:* keep. ADR-033 §4.2
   treats rollback as tampering, the two are indistinguishable, and authority
   events are rare.
 - **Q6. Edits to `.git/config` by direct-write tools.** They can redirect
-  verification (section 13). *Recommendation:* disclose in C2b. Refusing
+  verification (section 13). *Accepted:* disclose in C2b. Refusing
   edits under `.git/` is a new protected-surface rule and needs its own
   decision.
-- **Q7. Declaration filename (C2a Q2).** *Recommendation:* keep
+- **Q7. Declaration filename (C2a Q2).** *Accepted:* keep
   `availability.json`; C2b's additive fields fit it.
