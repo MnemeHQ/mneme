@@ -1,6 +1,6 @@
 # Orchestrator decision sandbox: results
 
-**Status:** measured, synthetic, single decision. Not a customer result.
+**Status:** measured, synthetic, single decision. Not a production result.
 
 This report has two measurement sets, kept apart:
 
@@ -16,13 +16,13 @@ The original pre-fix report is preserved verbatim at
 links refer to its original location).
 
 **Current run record:** clean clone of `feat/orchestrator-decision-sandbox` at
-`083c1937dc8f2b44fb528357e2c7a40801cbb745` (contains `cf6bc40b`; working tree
-clean), fresh pinned venv, Python 3.12.10, Windows 11 (10.0.26300), `mneme-hq`
+`3ea6308a` (contains `cf6bc40b`; working tree clean with `core.longpaths`
+enabled; later commits are docs-only), pinned venv, Python 3.12.10, Windows 11 (10.0.26300), `mneme-hq`
 0.10.0 from source, strict mode, langchain 1.3.17 / langchain-core 1.6.0 /
 langgraph 1.2.11 (full pin in
 [`pinned-build.json`](../langgraph/pinned-build.json)), scripted offline
 model, invoked from a directory containing a decoy `src/router.py`. Fresh
-summary byte-identical to the committed one; 45/45 sandbox tests passed. Rule
+summary byte-identical to the committed one; 48/48 sandbox tests passed. Rule
 under test: `ADR-001:FORBID_LITERAL:c3c126b4ac2aa3b9acc80f70ec5cf262`.
 
 **Historical run record:** clean clone at `405d9c72` on the pre-fix runtime;
@@ -33,7 +33,8 @@ under test: `ADR-001:FORBID_LITERAL:c3c126b4ac2aa3b9acc80f70ec5cf262`.
 On the current runtime, Mneme stops the one thing ADR-001 declares
 mechanically, before the write, for governed `write_file`/`edit_file` calls
 inside the project, with absolute or relative paths and regardless of the host
-process's working directory. It still does not stop the other two ways of
+process's working directory (#573 resolves relative paths against the event
+cwd, which this middleware sets to `project_dir`). It still does not stop the other two ways of
 breaking the decision (C2, C3), still blocks one harmless change (E), and
 still does not see custom tools, paths outside `project_dir`, or raw graph
 steps. The audit calls the decision "protected" (100%); measured constraint
