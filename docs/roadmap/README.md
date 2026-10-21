@@ -54,6 +54,21 @@ The Decision Index supplies the common decision authority and applicability sema
 
 **Exit evidence:** a repeatable trace showing permitted work succeeds, a documented-but-noncompliant change is caught at each *supported* control point, and a complete record of unevaluated or unsupported surfaces. Reuse the production governance trace (#282), DG1 tracker (#497) and separate CI1 enforcement-assurance tracker (#540). Do not claim universal mutation coverage or directly compare an external product without a reproduced baseline.
 
+#### Bounded Evidence & Evaluation validation slice (P0, OSS; proposed)
+
+**Purpose:** Prove that pre-mutation enforcement and CI produce separately attributable, decision-linked evidence under the existing four-layer validation programme. Reuse ADR-029's six binding dimensions and D1/DG1 canonical decision-version and rule identity; this is **not** a new evidence subsystem, policy engine, or workstream. Pre-mutation and CI evaluate different subjects at different checkpoints and their verdicts must not be conflated.
+
+**Smallest scope (planning estimate: 3–6 engineering days, subject to the mapping gate):**
+
+1. **Contract mapping (0.5–1 day):** map existing Agent SDK/LangChain gate traces, CLI `mneme.check/v1` output and CI1 evidence to ADR-029's control/provenance, exact subject, decision, rule, applicability and outcome bindings. Record missing/untrusted fields; do not infer their values.
+2. **Read-only completeness assessment (1–2 days):** use existing records to distinguish configured protection, execution observed and relevant enforcement observed. Missing, mismatched or stale bindings stay incomplete; `SKIP`/`UNEVALUATED` never become PASS. No public schema, persistent evidence store or separate verdict parser.
+3. **Frozen validation fixture (1–2 days):** one reviewed decision and typed rule; one supported proposed file mutation and one independent CI evaluation of the resulting revision. Test allow, deny with observed non-mutation, incomplete evaluation, missing decision/rule identity and stale subject or policy revision. Record the distinct attempted-action digest and CI-evaluated revision, supported coverage, functional completion and negative space. A gate returning `deny` without proving non-mutation is not proof of prevention.
+4. **Independent review (0.5–1 day):** replay artifacts, check hashes/provenance, run existing test gates and document which of ADR-029's bindings are actually established.
+
+**Exit evidence:** a reproducible report showing which authoritative decision/rule revision governed each checkpoint, its exact evaluated subject, applicable rule, verified verdict and control outcome, plus explicit unproven bindings. Do not claim a unified enforcement event or end-to-end protection where the traces cannot establish it. Reuse CI1.4 in [#540](https://github.com/MnemeHQ/mneme/issues/540), the [#282](https://github.com/MnemeHQ/mneme/issues/282) governance trace and the separate custom-tool coverage proposal [#577](https://github.com/MnemeHQ/mneme/pull/577); do not duplicate their implementation.
+
+**Ownership and boundaries:** fully **public OSS Core**: evidence semantics, identity/provenance binding, completeness assessment and reproducible validation. Organization-wide evidence collection, cross-system reconciliation, retained fleet history and fleet analytics remain enterprise decision operations. No Core runtime, CLI, DecisionRetriever, ConflictDetector, frozen benchmark or enforcement-behavior changes are authorized by this roadmap entry. If the mapping exposes a missing runtime field or requires an API change, stop and seek a separate reviewed charter and Layer 1 freeze amendment as applicable.
+
 ### P0 — Decision Index authority completion (D1)
 
 D0 is shipped: Mneme has a canonical, source-independent Decision Index boundary with Layer 1 runtime projection parity.
