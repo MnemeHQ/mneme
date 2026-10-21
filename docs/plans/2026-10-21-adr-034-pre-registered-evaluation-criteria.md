@@ -1,15 +1,23 @@
-# ADR-034 pre-registered evaluation criteria (draft, revision 3)
+# ADR-034 pre-registered evaluation criteria (draft, revision 4)
 
-**Status:** **DRAFT for owner review, revision 3. Documentation only.**
-Revision 3 addresses the
+**Status:** **DRAFT for owner review, revision 4. Documentation only.**
+
+Revision 3 addressed the
 [review of `3b671664`](https://github.com/MnemeHQ/mneme/pull/590#issuecomment-6317899163):
 
 - a hard gate for unsupported (U) and non-decidable (N) cases;
 - value-based equality for boundaries;
 - independently pinned contracts for set R;
 - normative expectations for mixed-source results;
-- per-shape headline denominators. These
-are the pre-registered criteria, proposed for the held-out validation of an
+- per-shape headline denominators.
+
+Revision 4 follows the
+[review of `394371c1`](https://github.com/MnemeHQ/mneme/pull/590#issuecomment-6318200921):
+
+- O6 is resolved as (a);
+- set R gains two non-`int` exponent cases.
+
+These are the pre-registered criteria, proposed for the held-out validation of an
 implementation of
 [ADR-034](../adr/ADR-034-static-numeric-upper-bound-typed-rule.md)
 (Proposed).
@@ -159,7 +167,7 @@ Set R is **separate from the five shapes and excluded from their quotas**.
 Each R case has its **own** single-source contract (symbol only, `language:
 python`, its own `max`). The contract is pinned in the freeze next to the
 case, and each case is source-adjudicated and scored against its expected
-outcome. **Minimum: 16 cases**, exactly these:
+outcome. **Minimum: 18 cases**, exactly these:
 
 | R | Source expression | Contract `max` | Expected |
 |---|---|---|---|
@@ -178,11 +186,13 @@ outcome. **Minimum: 16 cases**, exactly these:
 | R13 | `1e308 * 10` | `5` | `MATCHER_UNEVALUATED` / `UNRECOGNIZED_FORM` |
 | R14 | `1 / 0` | `5` | `MATCHER_UNEVALUATED` / `UNRECOGNIZED_FORM` |
 | R15 | `2 ** 2` (`**` exactly at the bound) | `4` | within |
-| R16 | `0.1` (same spelling as a non-dyadic bound) | `0.1` | violation (pending O6) |
+| R16 | `0.1` (same spelling as a non-dyadic bound) | `0.1` | violation (O6 (a): exact authored bound) |
+| R17 | `4 ** 0.5` (fractional exponent; M2 would fold it to `2.0`) | `5` | `MATCHER_UNEVALUATED` / `UNRECOGNIZED_FORM` |
+| R18 | `2 ** 2.0` (integer-valued float exponent) | `5` | `MATCHER_UNEVALUATED` / `UNRECOGNIZED_FORM` |
 
-R1–R14 are the 14 source expressions in ADR-034 §5a's boundary table. These
-expectations hold under O6 option (a). If the owner chooses (b), R2 and R16
-(and any other affected row) are re-adjudicated **before** the freeze.
+R1–R14 are the 14 original source expressions in ADR-034 §5a's boundary
+table. R17 and R18 pre-register the intentional narrowing to `int` exponents
+(ADR-034 §3). All expectations follow O6, resolved as option (a).
 
 ### 2.7 Stratum W: representative supported workload (E3)
 
@@ -253,7 +263,7 @@ The implementation **passes** only if **every** gate holds:
 6. **Coverage A = 100%.**
 7. **Coverage W ≥ 95%** (E3). The owner may tighten this before the freeze.
    It must not be relaxed after the freeze.
-8. **Every set R case** (R1–R16) matches its pre-registered expected outcome
+8. **Every set R case** (R1–R18) matches its pre-registered expected outcome
    and, where unevaluated, its primary reason.
 9. **Determinism:** two byte-identical runs.
 10. **Binding completeness = 100%.**
@@ -268,7 +278,7 @@ unevaluated rates, and stratum O. The headline states, per shape:
 > "W decided X of 10; A decided Y of N_A; U unevaluated Z of 5 (expected 5)."
 
 N_A is that shape's actual stratum A quota: 9 for S1 and S2, 10 for S3–S5.
-Set R is reported as "R matched M of 16".
+Set R is reported as "R matched M of 18".
 
 **On failure:**
 

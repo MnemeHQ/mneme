@@ -9,7 +9,15 @@ scope: enforcement.typed_rules
 
 # ADR-034: Static Numeric Upper-Bound Typed Rule for Python
 
-**Status:** **Proposed, revision 3.**
+**Status:** **Proposed, revision 4.**
+
+Revision 4, per the
+[review of `394371c1`](https://github.com/MnemeHQ/mneme/pull/590#issuecomment-6318200921):
+
+- O6 is resolved as (a), the exact authored decimal bound;
+- `int`-only exponents, stated as an intentional subset of M2;
+- the M2 parity statement is narrowed to the comparison step, with
+  recognition-domain differences listed separately.
 
 Revision 3, per the
 [review of `3b671664`](https://github.com/MnemeHQ/mneme/pull/590#issuecomment-6317899163):
@@ -130,19 +138,26 @@ is valid.
 
 ### 3. Recognition scope and positive source discovery
 
-**Recognized value forms are syntactically M2's** (P0-A
+**Recognized value forms are an intentional subset of M2's syntax** (P0-A
 `m2_static_bound.py` 1.0.0):
 
 - numeric literals;
 - unary `+`/`-`;
 - binary `+ - * / // % **` over recognized operands;
-- **not folded:** `bool` operands; `**` with an exponent above 64 in
-  magnitude; division by zero; overflow.
+- **`**` only with an `int` exponent** (by type) of magnitude at most 64.
+
+**Narrower than M2.** M2 accepted any finite numeric exponent of magnitude at
+most 64, including fractional or float exponents. This first slice treats
+every **non-`int` exponent** as `UNKNOWN` with `UNRECOGNIZED_FORM`. That
+covers fractional exponents (`4 ** 0.5`), integer-valued floats (`2 ** 2.0`)
+and anything that could produce a complex result (`(-8) ** 0.5`).
+
+**Not folded:** `bool` operands; division by zero; overflow; the range
+guards of §5a.
 
 Folding never executes source. How a recognized form is **evaluated and
-compared** is defined in §5a. That is **not** identical to M2: M2 compared
-the folded value with a float bound, while this ADR compares it exactly with
-the authored decimal bound. §5a states where the two differ.
+compared** is defined in §5a. That is **not** equivalent to M2, either in
+recognition domain or in comparison; §5a lists both kinds of difference.
 
 **Value sources:**
 
@@ -294,7 +309,8 @@ exactly with the authored decimal bound.**
      round-half-even.
    - Mixed `int`/`float` operations produce a float.
    - `/` is true division; `//` and `%` use Python floor semantics.
-   - `**` with an integer exponent of magnitude at most 64.
+   - `**` only with an `int` exponent of magnitude at most 64 (§3). Any
+     other exponent is `UNKNOWN`.
    - These are exactly the values the program would produce at runtime.
 2. **Operand and result bounds.** Any of the following makes the source
    `UNKNOWN`, with reason `UNRECOGNIZED_FORM` (out of range), and is never
@@ -314,13 +330,30 @@ rational evaluation of the *source text* would judge `0.1 + 0.2` as equal to
 of `0.3`. Comparing that runtime value exactly against the *authored* decimal
 avoids a second rounding of the bound.
 
-**Where this differs from M2.** M2 compared against the bound as a Python
-float. The two disagree only when `max` is not exactly representable in
-binary64. Two examples:
+**Where this differs from M2.** This is **not** a detector-equivalence
+claim. The differences fall into two kinds.
 
-- A literal `0.3` against `max: 0.3`: here the runtime value
-  `0.299999999999999988898` is **within** the bound.
-- `0.1 + 0.2` against `max: 0.3`: a **violation** here, and also under M2.
+1. **Comparison step only.** When both M2 and this rule successfully
+   evaluate the *same finite source value*, they disagree only when `max` is
+   not exactly representable in binary64, because M2 compared against the
+   bound as a Python float.
+   - A literal `0.1` against `max: 0.1` is within under M2 and a
+     **violation** here.
+   - A literal `0.3` against `max: 0.3` is within under both.
+   - `0.1 + 0.2` against `max: 0.3` is a violation under both.
+2. **Recognition domain.** This rule recognizes fewer forms, so some sources
+   M2 judged are `UNKNOWN` here:
+   - `10 ** 31` exceeds `max: 5` under M2, but is `UNKNOWN` here because of
+     the int range guard above 10^30;
+   - `4 ** 0.5` (`2.0`) is within `max: 5` under M2, but is `UNKNOWN` here
+     because the exponent is not an `int`;
+   - `2 ** 2.0` is `UNKNOWN` here for the same reason;
+   - an overflowing or non-finite result was a disabled value (C1) under M2,
+     and is `UNKNOWN` here.
+
+   Other restrictions in §2–§6 can also yield `UNKNOWN` where M2 decided:
+   positive source discovery, complete-source input and the O5 positivity
+   rules.
 
 **Pre-registered boundary behavior** (CPython 3.12; part of the contract and
 of the evaluation corpus):
@@ -335,9 +368,11 @@ of the evaluation corpus):
 | `11 // 2`, `-1 % 6` | `5` | `5` | within |
 | `2 ** 3` | `8` | `5` | violation |
 | `2 ** 2` | `4` | `4` | within (exactly equal) |
-| `0.1` | `0.1000000000000000055511…` | `0.1` | **violation**: the matching text is not an equal value (see O6) |
+| `0.1` | `0.1000000000000000055511…` | `0.1` | **violation**: the matching text is not an equal value (O6 (a)) |
 | `2.5`, `0.75` | exactly `2.5`, `0.75` (dyadic) | the same | within (exactly equal) |
 | `2 ** 65` | not folded (exponent above 64) | `5` | `UNKNOWN` |
+| `4 ** 0.5` | not folded (non-`int` exponent) | `5` | `UNKNOWN` |
+| `2 ** 2.0` | not folded (non-`int` exponent) | `5` | `UNKNOWN` |
 | `10 ** 31` | an `int` above 10^30 | `5` | `UNKNOWN` |
 | `1e308 * 10` | infinite | `5` | `UNKNOWN` |
 | `1 / 0` | `ZeroDivisionError` | `5` | `UNKNOWN` |
@@ -351,22 +386,26 @@ is equal only when its binary64 value is exactly the decimal, which requires
 `max` to be dyadic (for example `2.5` or `0.75`). For a non-dyadic `max`, a
 same-spelled float literal is either above it (`0.1`) or below it (`0.3`).
 
-**Open question O6 (a consequence of the exact-comparison decision above).** Under exact
-comparison, an author who writes `max: 0.1` and code that sets `0.1` gets a
-violation. Two options:
+**O6, resolved (owner ruling, 2026-10-21): option (a), the exact authored
+decimal bound.** The author-declared canonical decimal is the authority. The
+bound is never converted to binary64 or otherwise rounded.
 
-- **(a) Keep exact comparison** with the authored decimal (the current text).
-  It is faithful to the computed value, and its non-dyadic behavior is
-  documented here and pre-registered.
-- **(b) Round the bound once to the nearest binary64**, comparing
-  `Fraction(x) > Fraction(float(max))`, with the authoring grammar limited to
-  15 significant digits so that `float(max)` round-trips. Same-spelled
-  literals are then equal, and `0.1 + 0.2` against `0.3` is still a
-  violation.
+Consequences:
 
-This ADR keeps **(a)** pending the owner's decision. If (b) is chosen, this
-table and the criteria's boundary labels must be regenerated **before** any
-freeze.
+- An author who writes `max: 0.1`, with code that sets the literal `0.1`,
+  gets a **violation**, because Python's `0.1` is slightly above the exact
+  decimal. This is the rule as declared, not a matcher false positive. It is
+  deliberately strict and may surprise authors.
+- **Diagnostics must state it:** for a violation, show the exact runtime value
+  next to the authored bound, and say that no implicit tolerance applies.
+- **Documentation must explain** that for non-dyadic bounds a same-spelled
+  float literal may be above or below the bound.
+- **Any tolerance or rounded-bound policy** would be a separate, explicit
+  future contract. It is never an implicit default and never a relaxation of
+  this one.
+
+The alternative, considered and rejected for this slice, was rounding the
+bound once to the nearest binary64.
 
 **Identity:** `rule_id_of` is unchanged:
 `<decision>:FORBID_NUMERIC_ABOVE:sha256([value, applicability])[:32]`. The
@@ -516,7 +555,7 @@ only, documented" or "extended":
 | O3 | v2 `semantic_features` value **`numeric_upper_bound_rule`**. It requires backwards-reader refusal tests, no v1 semantics and golden tests. It does not by itself approve the persistence implementation |
 | O4 | `call.position` is **0-based** |
 | O5 | **`max <= 0` is rejected at authoring.** Positivity is consistent across `max` (§5 grammar), recognized source values (`x <= 0` is disabled, so `UNKNOWN`, §5a) and diagnostics |
-| O6 | **Open:** exact decimal bound (a, current) or bound rounded once to binary64 (b). See §5a |
+| O6 | **Resolved: (a), the exact authored decimal bound.** No implicit tolerance or rounding. Diagnostics and documentation must make the consequence explicit. See §5a |
 
 ## Not decided here
 
