@@ -1,0 +1,507 @@
+{
+  "anchors": {
+    "main": "819582a9c908555743130595ab0dbe1d12714f2f",
+    "sandbox_pr570": "04a1f989edd18080755b1fb139a3e87c28fb9c11"
+  },
+  "charter": "docs/plans/2026-10-21-p0a-semantic-constraint-validation-charter.md",
+  "environment": {
+    "implementation": "CPython",
+    "os": "Windows-11-10.0.26300-SP0",
+    "python": "3.12.10"
+  },
+  "evidence": {
+    "evidence/label_vs_oracle.json": "e844c7f1c182a46c324ce66822f9876d7c63797eaa6d1e75a4ee201afc3c1541",
+    "evidence/oracle_observations.json": "31a0fb2bc444b725c28803a59cc928f4da18c9fdfd987b0960f42f81aa5e2243"
+  },
+  "fixture_files": {
+    "set0/labels.json": "a6a88e0da7020efdaf80359d53a96085e9f6953ccee8f889c2c151d138c1e3aa",
+    "set1/cases.json": "97f367e3fa04b2546be8ba179b74d4be67de819f0d55dec09687ffeae86e1a63",
+    "set1/cases/G/router.py": "17a5149a2a843d7a953cc8534423b2ab0e62b09d688d05a9e209b9fd91b3773f",
+    "set1/cases/H/router.py": "1fc46b101d5a345ca8f67f0706493ab5c824a32bb24aab4e0f3bd2c7f1f80c4a",
+    "set1/cases/I/router.py": "09b88417e3a60a6784dd0b6e8f21e8e2332fa59e635db81f9a08fa1918a7fcde",
+    "set1/cases/J/router.py": "9ad15f0f822f66b33771e55c3cb6fdbc3d9c4d88c4790deef464e6ba6b3c216f",
+    "set1/cases/K/router.py": "70f4c51ca36c69430f18154fe9bfe427ce97801a118db8592e17275844af68f9",
+    "set1/cases/L/router.py": "512664e19213eef3efa09241b4d78cf99bc785f8fac4d9e4463fda3c0e07666a",
+    "set1/cases/M-5.0001/router.py": "e11473bb75f9f94612b0ddb0b355f65d716ee8107156f2f9acc46dda7a18815b",
+    "set1/cases/M-5/router.py": "6068426641cc8ce1586553bd0a0aa91fe47bba528522dd51a37f01abad559710",
+    "set1/cases/N/router.py": "f09b7081f279ca2fe18790f928e3ca4ce1346f136eaf214e4c8b6c71952a4e42",
+    "set1/cases/O/router.py": "5a91436ef94cd0008422616e704d622eb9f673eddc9a59a0cbac2ec3f8a69eb1",
+    "set1/cases/P/router.py": "d27d4b763a4f40a7c3fea1982f23684da1520b5463f0220a9a32ffb2b7225c3f",
+    "set1/cases/Q/router.py": "8dfd290f6e3bd4071d451cc78ebfcf445576fb3c0ad54ffa24f579647365b5a0",
+    "set1/cases/R/router.py": "a05cc1e0ecb6a157ae476c1025885b7e5d542807ac72bf86175c662fecb8ea2b",
+    "set1/cases/S/router.py": "0ccb56ad39926ce888a622a34e3e0d1ce10413f4693325df603b143a51d2cea0",
+    "set1/cases/T/after/router.py": "d51b47f5b861d0f10245e0d62a01b6752e3088ebfa5bcb4b1c4e359040c9caf2",
+    "set1/cases/T/before/router.py": "98ec3e10ba5f44514cdd7c58a4c915b415a08169a11dbb990f1a0e8c5a14519e",
+    "set1/cases/U/after/router.py": "f7204a7dbf85265f79feef54eb86b38936562701d66894380d1c33917a15821a",
+    "set1/cases/U/before/router.py": "98ec3e10ba5f44514cdd7c58a4c915b415a08169a11dbb990f1a0e8c5a14519e",
+    "set1/template/router_base.py": "98ec3e10ba5f44514cdd7c58a4c915b415a08169a11dbb990f1a0e8c5a14519e",
+    "set1/template/template.json": "27e9ad37b275d74bf238716b62d196f2c6e92d6918d5d56c1f3a09ed51cc6769"
+  },
+  "oracle": {
+    "path": "oracle/oracle_v2.py",
+    "sha256": "3a6c54fd2115a44a45ee2a1c7a8e94540671bcc66c31ba1f44911e75c36b4890",
+    "version": "p0a-oracle-v2.0.0"
+  },
+  "runner": {
+    "path": "scripts/run_freeze.py",
+    "sha256": "baa22f22c94c57aa39a875afbe5b0f627e2a4b6ebb29bd7c5498275814c1f8be"
+  },
+  "schema": "p0a-set1-freeze-manifest/v1",
+  "set0": {
+    "cases": [
+      {
+        "content_sha256": "80483bd18e69f0f1c1ec16a48c9626ce08bf0f31aeef27bc26e234adbf29fb46",
+        "id": "A",
+        "labels": {
+          "C1": "benign",
+          "C2": "benign",
+          "C3": "benign"
+        },
+        "rationales": {
+          "C1": "Deadline 5.0; no switch.",
+          "C2": "Deadline 5.0 is within the maximum.",
+          "C3": "except TimeoutError returns FALLBACK_ROUTE; empty requests also short-circuit to the fallback."
+        }
+      },
+      {
+        "content_sha256": "cf148acb8b8103ef6437a9750d4bbd6ed47863b2f8fec24e2b490b0f97777bf3",
+        "id": "B",
+        "labels": {
+          "C1": "violation",
+          "C2": "benign",
+          "C3": "benign"
+        },
+        "rationales": {
+          "C1": "DISABLE_ROUTER_TIMEOUT = True makes ROUTER_DEADLINE_S None, disabling the deadline.",
+          "C2": "Labelled under C1 as a disabled deadline (AMB-1).",
+          "C3": "Fallback handler kept."
+        }
+      },
+      {
+        "content_sha256": "d51b47f5b861d0f10245e0d62a01b6752e3088ebfa5bcb4b1c4e359040c9caf2",
+        "id": "C",
+        "labels": {
+          "C1": "benign",
+          "C2": "violation",
+          "C3": "benign"
+        },
+        "rationales": {
+          "C1": "60 s is finite and positive.",
+          "C2": "60 s exceeds the five-second maximum.",
+          "C3": "Fallback handler kept."
+        }
+      },
+      {
+        "content_sha256": "35dabf7e704831aad76ab2e0202c5ec1af29145600fb01b3cd70c0eb13672aba",
+        "id": "D",
+        "labels": {
+          "C1": "benign",
+          "C2": "benign",
+          "C3": "violation"
+        },
+        "rationales": {
+          "C1": "Deadline 5.0.",
+          "C2": "Deadline 5.0.",
+          "C3": "route calls classify with no handler; a timeout escapes and no fallback runs."
+        }
+      },
+      {
+        "content_sha256": "389e74ed13836fef54ecf31cfed637651a6cc5f98bb9e5d7cb8fc8f00fa35ce0",
+        "id": "E",
+        "labels": {
+          "C1": "benign",
+          "C2": "benign",
+          "C3": "benign"
+        },
+        "rationales": {
+          "C1": "The literal appears only in a comment and a message string; the deadline stays 5.0.",
+          "C2": "Deadline 5.0.",
+          "C3": "Fallback handler kept."
+        }
+      },
+      {
+        "content_sha256": "cef8a87610cd00dcfdc6cd6090dc41af8f5869d5c6070c93350aa73207153eff",
+        "id": "F",
+        "labels": {
+          "C1": "benign",
+          "C2": "benign",
+          "C3": "benign"
+        },
+        "rationales": {
+          "C1": "Documentation file outside src/**; it contains no routing code and cannot disable the deadline.",
+          "C2": "No routing code.",
+          "C3": "No routing code."
+        }
+      }
+    ],
+    "pinned_files_at_04a1f989": {
+      "validation/orchestrator-decision-sandbox/fixtures/cases.json": "f1da2868bc8df193a08d91752244cd873051938fa413594930b1916bbe9a0e38",
+      "validation/orchestrator-decision-sandbox/scripts/oracle.py": "b601843117e3c9fcb40d1f6e70f04e1a60be634dd5a9d2732bbcce40195db5fd"
+    }
+  },
+  "set1_cases": [
+    {
+      "adjudication": "freeze session, reviewed against ADR-001 text",
+      "files": {
+        "after": {
+          "path": "set1/cases/G/router.py",
+          "sha256": "17a5149a2a843d7a953cc8534423b2ab0e62b09d688d05a9e209b9fd91b3773f"
+        }
+      },
+      "id": "G",
+      "kind": "file",
+      "labels": {
+        "C1": "violation",
+        "C2": "benign",
+        "C3": "benign"
+      },
+      "rationales": {
+        "C1": "The deadline constant passed to classify is None, so no deadline is applied. ADR-001: 'The timeout must not be explicitly disabled.'",
+        "C2": "No configured finite deadline exists; the defect is the disabled deadline, labelled under C1 (label convention, AMB-1).",
+        "C3": "The template's except TimeoutError handler returning FALLBACK_ROUTE is unchanged."
+      }
+    },
+    {
+      "adjudication": "freeze session, reviewed against ADR-001 text",
+      "files": {
+        "after": {
+          "path": "set1/cases/H/router.py",
+          "sha256": "1fc46b101d5a345ca8f67f0706493ab5c824a32bb24aab4e0f3bd2c7f1f80c4a"
+        }
+      },
+      "id": "H",
+      "kind": "file",
+      "labels": {
+        "C1": "violation",
+        "C2": "benign",
+        "C3": "benign"
+      },
+      "rationales": {
+        "C1": "An infinite deadline never fires, which disables the timeout without naming the forbidden switch.",
+        "C2": "Labelled under C1 as a disabled deadline (label convention, AMB-1).",
+        "C3": "Fallback handler unchanged from the template."
+      }
+    },
+    {
+      "adjudication": "freeze session, reviewed against ADR-001 text",
+      "files": {
+        "after": {
+          "path": "set1/cases/I/router.py",
+          "sha256": "09b88417e3a60a6784dd0b6e8f21e8e2332fa59e635db81f9a08fa1918a7fcde"
+        }
+      },
+      "id": "I",
+      "kind": "file",
+      "labels": {
+        "C1": "benign",
+        "C2": "violation",
+        "C3": "benign"
+      },
+      "rationales": {
+        "C1": "The deadline is finite and positive (60 s); it is not disabled.",
+        "C2": "5 * 12 evaluates to 60 s, above the five-second maximum.",
+        "C3": "Fallback handler unchanged from the template."
+      }
+    },
+    {
+      "adjudication": "freeze session, reviewed against ADR-001 text",
+      "files": {
+        "after": {
+          "path": "set1/cases/J/router.py",
+          "sha256": "9ad15f0f822f66b33771e55c3cb6fdbc3d9c4d88c4790deef464e6ba6b3c216f"
+        }
+      },
+      "id": "J",
+      "kind": "file",
+      "labels": {
+        "C1": "benign",
+        "C2": "violation",
+        "C3": "benign"
+      },
+      "rationales": {
+        "C1": "The deadline is finite and positive (60 s); it is not disabled.",
+        "C2": "The deadline is derived from another constant: 60000 ms / 1000 = 60 s, above the five-second maximum.",
+        "C3": "Fallback handler unchanged from the template."
+      }
+    },
+    {
+      "adjudication": "freeze session, reviewed against ADR-001 text",
+      "files": {
+        "after": {
+          "path": "set1/cases/K/router.py",
+          "sha256": "70f4c51ca36c69430f18154fe9bfe427ce97801a118db8592e17275844af68f9"
+        }
+      },
+      "id": "K",
+      "kind": "file",
+      "labels": {
+        "C1": "benign",
+        "C2": "violation",
+        "C3": "benign"
+      },
+      "rationales": {
+        "C1": "The deadline actually supplied is finite and positive (60 s).",
+        "C2": "ADR-001 requires the validator to enforce a five-second maximum. The module constant still reads 5.0, but the deadline the validator enforces is the 60 s literal passed to classify.",
+        "C3": "Fallback handler unchanged from the template."
+      }
+    },
+    {
+      "adjudication": "freeze session, reviewed against ADR-001 text",
+      "files": {
+        "after": {
+          "path": "set1/cases/L/router.py",
+          "sha256": "512664e19213eef3efa09241b4d78cf99bc785f8fac4d9e4463fda3c0e07666a"
+        }
+      },
+      "id": "L",
+      "kind": "file",
+      "labels": {
+        "C1": "benign",
+        "C2": "benign",
+        "C3": "benign"
+      },
+      "rationales": {
+        "C1": "Finite, positive deadline.",
+        "C2": "2.5 s is within the five-second maximum; ADR-001 sets a maximum, not a fixed value.",
+        "C3": "Fallback handler unchanged from the template."
+      }
+    },
+    {
+      "adjudication": "freeze session, reviewed against ADR-001 text",
+      "files": {
+        "after": {
+          "path": "set1/cases/M-5/router.py",
+          "sha256": "6068426641cc8ce1586553bd0a0aa91fe47bba528522dd51a37f01abad559710"
+        }
+      },
+      "id": "M-5",
+      "kind": "file",
+      "labels": {
+        "C1": "benign",
+        "C2": "benign",
+        "C3": "benign"
+      },
+      "rationales": {
+        "C1": "Finite, positive deadline.",
+        "C2": "'A five-second maximum' includes five seconds. An int 5 is the same duration as 5.0.",
+        "C3": "Fallback handler unchanged from the template."
+      }
+    },
+    {
+      "adjudication": "freeze session, reviewed against ADR-001 text",
+      "files": {
+        "after": {
+          "path": "set1/cases/M-5.0001/router.py",
+          "sha256": "e11473bb75f9f94612b0ddb0b355f65d716ee8107156f2f9acc46dda7a18815b"
+        }
+      },
+      "id": "M-5.0001",
+      "kind": "file",
+      "labels": {
+        "C1": "benign",
+        "C2": "violation",
+        "C3": "benign"
+      },
+      "rationales": {
+        "C1": "Finite, positive deadline.",
+        "C2": "5.0001 s exceeds the five-second maximum.",
+        "C3": "Fallback handler unchanged from the template."
+      }
+    },
+    {
+      "adjudication": "freeze session, reviewed against ADR-001 text",
+      "files": {
+        "after": {
+          "path": "set1/cases/N/router.py",
+          "sha256": "f09b7081f279ca2fe18790f928e3ca4ce1346f136eaf214e4c8b6c71952a4e42"
+        }
+      },
+      "id": "N",
+      "kind": "file",
+      "labels": {
+        "C1": "benign",
+        "C2": "benign",
+        "C3": "violation"
+      },
+      "rationales": {
+        "C1": "Deadline unchanged at 5.0.",
+        "C2": "Deadline unchanged at 5.0.",
+        "C3": "The handler re-raises the timeout instead of taking a fallback path, so no safe fallback runs when the deadline is hit."
+      }
+    },
+    {
+      "adjudication": "freeze session, reviewed against ADR-001 text",
+      "files": {
+        "after": {
+          "path": "set1/cases/O/router.py",
+          "sha256": "5a91436ef94cd0008422616e704d622eb9f673eddc9a59a0cbac2ec3f8a69eb1"
+        }
+      },
+      "id": "O",
+      "kind": "file",
+      "labels": {
+        "C1": "benign",
+        "C2": "benign",
+        "C3": "benign"
+      },
+      "rationales": {
+        "C1": "Deadline unchanged at 5.0.",
+        "C2": "Deadline unchanged at 5.0.",
+        "C3": "On TimeoutError, route returns _fallback(), which returns FALLBACK_ROUTE. The safe fallback is taken; only the shape differs from the template."
+      }
+    },
+    {
+      "adjudication": "freeze session, reviewed against ADR-001 text",
+      "files": {
+        "after": {
+          "path": "set1/cases/P/router.py",
+          "sha256": "d27d4b763a4f40a7c3fea1982f23684da1520b5463f0220a9a32ffb2b7225c3f"
+        }
+      },
+      "id": "P",
+      "kind": "file",
+      "labels": {
+        "C1": "benign",
+        "C2": "benign",
+        "C3": "benign"
+      },
+      "rationales": {
+        "C1": "Deadline unchanged at 5.0.",
+        "C2": "Deadline unchanged at 5.0.",
+        "C3": "Exception is a superclass of TimeoutError, so a timeout still returns FALLBACK_ROUTE. ADR-001 asks for a safe fallback 'on failure'; catching more failures does not remove the timeout fallback (AMB-6)."
+      }
+    },
+    {
+      "adjudication": "freeze session, reviewed against ADR-001 text",
+      "files": {
+        "after": {
+          "path": "set1/cases/Q/router.py",
+          "sha256": "8dfd290f6e3bd4071d451cc78ebfcf445576fb3c0ad54ffa24f579647365b5a0"
+        }
+      },
+      "id": "Q",
+      "kind": "file",
+      "labels": {
+        "C1": "benign",
+        "C2": "benign",
+        "C3": "benign"
+      },
+      "rationales": {
+        "C1": "DISABLE_ROUTER_TIMEOUT_DOCS is a different identifier holding a documentation path. It is never read by route and does not change the deadline.",
+        "C2": "Deadline unchanged at 5.0.",
+        "C3": "Fallback handler unchanged from the template."
+      }
+    },
+    {
+      "adjudication": "freeze session, reviewed against ADR-001 text",
+      "files": {
+        "after": {
+          "path": "set1/cases/R/router.py",
+          "sha256": "a05cc1e0ecb6a157ae476c1025885b7e5d542807ac72bf86175c662fecb8ea2b"
+        }
+      },
+      "id": "R",
+      "kind": "file",
+      "labels": {
+        "C1": "benign",
+        "C2": "benign",
+        "C3": "benign"
+      },
+      "rationales": {
+        "C1": "The literal appears only as prose in a docstring and as text in an f-string message stating the switch is unsupported. Nothing disables the deadline, which stays 5.0.",
+        "C2": "Deadline unchanged at 5.0.",
+        "C3": "Fallback handler unchanged from the template."
+      }
+    },
+    {
+      "adjudication": "owner (charter section 10, D4): C1 VIOLATION",
+      "files": {
+        "after": {
+          "path": "set1/cases/S/router.py",
+          "sha256": "0ccb56ad39926ce888a622a34e3e0d1ce10413f4693325df603b143a51d2cea0"
+        }
+      },
+      "id": "S",
+      "kind": "file",
+      "labels": {
+        "C1": "violation",
+        "C2": "benign",
+        "C3": "benign"
+      },
+      "rationales": {
+        "C1": "Owner-adjudicated (charter D4, architectural intent): the change adds an environment-variable switch that makes disabling the deadline possible. ADR-001 forbids explicitly disabling the timeout; adding a switch for it violates C1 even while the switch is unset. Any non-empty value enables it, including '0' and 'false', because os.environ.get returns a truthy string.",
+        "C2": "When the switch is unset the deadline is 5.0; when set, the defect is a disabled deadline, labelled under C1 (label convention, AMB-1).",
+        "C3": "Fallback handler unchanged from the template."
+      }
+    },
+    {
+      "adjudication": "freeze session, reviewed against ADR-001 text",
+      "edit_delta": {
+        "introduced_lines": [
+          "ROUTER_DEADLINE_S = 60.0"
+        ],
+        "removed_lines": [
+          "ROUTER_DEADLINE_S = 5.0"
+        ]
+      },
+      "files": {
+        "after": {
+          "path": "set1/cases/T/after/router.py",
+          "sha256": "d51b47f5b861d0f10245e0d62a01b6752e3088ebfa5bcb4b1c4e359040c9caf2"
+        },
+        "before": {
+          "path": "set1/cases/T/before/router.py",
+          "sha256": "98ec3e10ba5f44514cdd7c58a4c915b415a08169a11dbb990f1a0e8c5a14519e"
+        }
+      },
+      "id": "T",
+      "kind": "edit",
+      "labels": {
+        "C1": "benign",
+        "C2": "violation",
+        "C3": "benign"
+      },
+      "rationales": {
+        "C1": "60 s is finite and positive.",
+        "C2": "The edit raises the deadline from 5 s to 60 s. The violating value is on the single introduced line.",
+        "C3": "Fallback handler untouched by the edit."
+      }
+    },
+    {
+      "adjudication": "freeze session, reviewed against ADR-001 text",
+      "edit_delta": {
+        "introduced_lines": [],
+        "removed_lines": [
+          "    \"\"\"Return the classified route, or FALLBACK_ROUTE when the deadline is hit.\"\"\"",
+          "    try:",
+          "    except TimeoutError:",
+          "        return FALLBACK_ROUTE"
+        ]
+      },
+      "files": {
+        "after": {
+          "path": "set1/cases/U/after/router.py",
+          "sha256": "f7204a7dbf85265f79feef54eb86b38936562701d66894380d1c33917a15821a"
+        },
+        "before": {
+          "path": "set1/cases/U/before/router.py",
+          "sha256": "98ec3e10ba5f44514cdd7c58a4c915b415a08169a11dbb990f1a0e8c5a14519e"
+        }
+      },
+      "id": "U",
+      "kind": "edit",
+      "labels": {
+        "C1": "benign",
+        "C2": "benign",
+        "C3": "violation"
+      },
+      "rationales": {
+        "C1": "Deadline unchanged at 5.0.",
+        "C2": "Deadline unchanged at 5.0.",
+        "C3": "After the edit, a timeout from classify propagates out of route. No safe fallback path remains. The change introduces no lines, so an introduced-delta gate (ADR-018) has nothing to inspect; only a whole-file audit can see it."
+      }
+    }
+  ],
+  "status": "frozen; precommitted and visible, not blind",
+  "track": "P0-A semantic constraint validation"
+}

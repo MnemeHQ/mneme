@@ -1,0 +1,12 @@
+"""Synthetic routing validator (orchestrator decision sandbox)."""
+
+ROUTER_DEADLINE_S = 5.0
+FALLBACK_ROUTE = "safe-default"
+
+
+def route(request, classify):
+    """Return the classified route, or FALLBACK_ROUTE when the deadline is hit."""
+    try:
+        return classify(request, 60)
+    except TimeoutError:
+        return FALLBACK_ROUTE

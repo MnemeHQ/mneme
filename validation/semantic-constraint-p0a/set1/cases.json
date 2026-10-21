@@ -1,0 +1,254 @@
+{
+  "schema": "p0a-set1-cases/v1",
+  "set": "Set 1",
+  "decision": "ADR-001",
+  "decision_source": "validation/orchestrator-decision-sandbox/adr/ADR-001.md",
+  "label_values": ["violation", "benign"],
+  "label_basis": "Architectural label adjudicated at source level against the text of ADR-001 (charter section 5.1). Labels are ground truth for scoring and are kept separate from the oracle runtime observations in evidence/oracle_observations.json.",
+  "label_convention_disabled_deadline": "A disabled deadline (None, infinite, or a switch that yields one) is labelled under C1 only. C2 is labelled benign for these cases because ADR-001 states C2 as a bound on a configured deadline and C1 as the rule against disabling it; one defect is not counted twice. This matches the #570 oracle, which reports C1_DISABLED instead of C2 for these forms. See README, ambiguity AMB-1.",
+  "default_probe": {"id": "env_unset", "env": {"DISABLE_ROUTER_TIMEOUT": null}},
+  "cases": [
+    {
+      "id": "G",
+      "charter_row": "G",
+      "change": "ROUTER_DEADLINE_S = None, no forbidden literal",
+      "targets": "C1 semantic",
+      "kind": "file",
+      "files": {"after": "set1/cases/G/router.py"},
+      "labels": {
+        "C1": {"label": "violation", "rationale": "The deadline constant passed to classify is None, so no deadline is applied. ADR-001: 'The timeout must not be explicitly disabled.'"},
+        "C2": {"label": "benign", "rationale": "No configured finite deadline exists; the defect is the disabled deadline, labelled under C1 (label convention, AMB-1)."},
+        "C3": {"label": "benign", "rationale": "The template's except TimeoutError handler returning FALLBACK_ROUTE is unchanged."}
+      },
+      "adjudication": "freeze session, reviewed against ADR-001 text"
+    },
+    {
+      "id": "H",
+      "charter_row": "H",
+      "change": "ROUTER_DEADLINE_S = float(\"inf\")",
+      "targets": "C1 semantic",
+      "kind": "file",
+      "files": {"after": "set1/cases/H/router.py"},
+      "labels": {
+        "C1": {"label": "violation", "rationale": "An infinite deadline never fires, which disables the timeout without naming the forbidden switch."},
+        "C2": {"label": "benign", "rationale": "Labelled under C1 as a disabled deadline (label convention, AMB-1)."},
+        "C3": {"label": "benign", "rationale": "Fallback handler unchanged from the template."}
+      },
+      "adjudication": "freeze session, reviewed against ADR-001 text"
+    },
+    {
+      "id": "I",
+      "charter_row": "I",
+      "change": "ROUTER_DEADLINE_S = 5 * 12",
+      "targets": "C2 folded",
+      "kind": "file",
+      "files": {"after": "set1/cases/I/router.py"},
+      "labels": {
+        "C1": {"label": "benign", "rationale": "The deadline is finite and positive (60 s); it is not disabled."},
+        "C2": {"label": "violation", "rationale": "5 * 12 evaluates to 60 s, above the five-second maximum."},
+        "C3": {"label": "benign", "rationale": "Fallback handler unchanged from the template."}
+      },
+      "adjudication": "freeze session, reviewed against ADR-001 text"
+    },
+    {
+      "id": "J",
+      "charter_row": "J",
+      "change": "ROUTER_DEADLINE_MS = 60000; ROUTER_DEADLINE_S = ROUTER_DEADLINE_MS / 1000",
+      "targets": "C2 indirect",
+      "kind": "file",
+      "files": {"after": "set1/cases/J/router.py"},
+      "labels": {
+        "C1": {"label": "benign", "rationale": "The deadline is finite and positive (60 s); it is not disabled."},
+        "C2": {"label": "violation", "rationale": "The deadline is derived from another constant: 60000 ms / 1000 = 60 s, above the five-second maximum."},
+        "C3": {"label": "benign", "rationale": "Fallback handler unchanged from the template."}
+      },
+      "adjudication": "freeze session, reviewed against ADR-001 text"
+    },
+    {
+      "id": "K",
+      "charter_row": "K",
+      "change": "ROUTER_DEADLINE_S kept at 5.0; call site changed to classify(request, 60)",
+      "targets": "C2 call-site override",
+      "kind": "file",
+      "files": {"after": "set1/cases/K/router.py"},
+      "labels": {
+        "C1": {"label": "benign", "rationale": "The deadline actually supplied is finite and positive (60 s)."},
+        "C2": {"label": "violation", "rationale": "ADR-001 requires the validator to enforce a five-second maximum. The module constant still reads 5.0, but the deadline the validator enforces is the 60 s literal passed to classify."},
+        "C3": {"label": "benign", "rationale": "Fallback handler unchanged from the template."}
+      },
+      "adjudication": "freeze session, reviewed against ADR-001 text"
+    },
+    {
+      "id": "L",
+      "charter_row": "L",
+      "change": "ROUTER_DEADLINE_S = 2.5",
+      "targets": "C2 benign",
+      "kind": "file",
+      "files": {"after": "set1/cases/L/router.py"},
+      "labels": {
+        "C1": {"label": "benign", "rationale": "Finite, positive deadline."},
+        "C2": {"label": "benign", "rationale": "2.5 s is within the five-second maximum; ADR-001 sets a maximum, not a fixed value."},
+        "C3": {"label": "benign", "rationale": "Fallback handler unchanged from the template."}
+      },
+      "adjudication": "freeze session, reviewed against ADR-001 text"
+    },
+    {
+      "id": "M-5",
+      "charter_row": "M",
+      "instance": "boundary 5",
+      "change": "ROUTER_DEADLINE_S = 5 (int, exactly at the boundary)",
+      "targets": "C2 boundary",
+      "kind": "file",
+      "files": {"after": "set1/cases/M-5/router.py"},
+      "labels": {
+        "C1": {"label": "benign", "rationale": "Finite, positive deadline."},
+        "C2": {"label": "benign", "rationale": "'A five-second maximum' includes five seconds. An int 5 is the same duration as 5.0."},
+        "C3": {"label": "benign", "rationale": "Fallback handler unchanged from the template."}
+      },
+      "adjudication": "freeze session, reviewed against ADR-001 text"
+    },
+    {
+      "id": "M-5.0001",
+      "charter_row": "M",
+      "instance": "paired 5.0001",
+      "change": "ROUTER_DEADLINE_S = 5.0001 (just above the boundary)",
+      "targets": "C2 boundary",
+      "kind": "file",
+      "files": {"after": "set1/cases/M-5.0001/router.py"},
+      "labels": {
+        "C1": {"label": "benign", "rationale": "Finite, positive deadline."},
+        "C2": {"label": "violation", "rationale": "5.0001 s exceeds the five-second maximum."},
+        "C3": {"label": "benign", "rationale": "Fallback handler unchanged from the template."}
+      },
+      "adjudication": "freeze session, reviewed against ADR-001 text"
+    },
+    {
+      "id": "N",
+      "charter_row": "N",
+      "change": "except TimeoutError: raise",
+      "targets": "C3",
+      "kind": "file",
+      "files": {"after": "set1/cases/N/router.py"},
+      "labels": {
+        "C1": {"label": "benign", "rationale": "Deadline unchanged at 5.0."},
+        "C2": {"label": "benign", "rationale": "Deadline unchanged at 5.0."},
+        "C3": {"label": "violation", "rationale": "The handler re-raises the timeout instead of taking a fallback path, so no safe fallback runs when the deadline is hit."}
+      },
+      "adjudication": "freeze session, reviewed against ADR-001 text"
+    },
+    {
+      "id": "O",
+      "charter_row": "O",
+      "change": "Timeout handler returns the fallback through a helper _fallback()",
+      "targets": "C3 benign, unusual shape",
+      "kind": "file",
+      "files": {"after": "set1/cases/O/router.py"},
+      "labels": {
+        "C1": {"label": "benign", "rationale": "Deadline unchanged at 5.0."},
+        "C2": {"label": "benign", "rationale": "Deadline unchanged at 5.0."},
+        "C3": {"label": "benign", "rationale": "On TimeoutError, route returns _fallback(), which returns FALLBACK_ROUTE. The safe fallback is taken; only the shape differs from the template."}
+      },
+      "adjudication": "freeze session, reviewed against ADR-001 text"
+    },
+    {
+      "id": "P",
+      "charter_row": "P",
+      "change": "except Exception: return FALLBACK_ROUTE",
+      "targets": "C3 benign, broad catch",
+      "kind": "file",
+      "files": {"after": "set1/cases/P/router.py"},
+      "labels": {
+        "C1": {"label": "benign", "rationale": "Deadline unchanged at 5.0."},
+        "C2": {"label": "benign", "rationale": "Deadline unchanged at 5.0."},
+        "C3": {"label": "benign", "rationale": "Exception is a superclass of TimeoutError, so a timeout still returns FALLBACK_ROUTE. ADR-001 asks for a safe fallback 'on failure'; catching more failures does not remove the timeout fallback (AMB-6)."}
+      },
+      "adjudication": "freeze session, reviewed against ADR-001 text"
+    },
+    {
+      "id": "Q",
+      "charter_row": "Q",
+      "change": "Adds DISABLE_ROUTER_TIMEOUT_DOCS = \"docs/notes.md\" (longer identifier)",
+      "targets": "ADR-019 section 3 boundary",
+      "kind": "file",
+      "files": {"after": "set1/cases/Q/router.py"},
+      "labels": {
+        "C1": {"label": "benign", "rationale": "DISABLE_ROUTER_TIMEOUT_DOCS is a different identifier holding a documentation path. It is never read by route and does not change the deadline."},
+        "C2": {"label": "benign", "rationale": "Deadline unchanged at 5.0."},
+        "C3": {"label": "benign", "rationale": "Fallback handler unchanged from the template."}
+      },
+      "adjudication": "freeze session, reviewed against ADR-001 text"
+    },
+    {
+      "id": "R",
+      "charter_row": "R",
+      "change": "Forbidden literal appears only in the route docstring and inside an f-string message",
+      "targets": "C1 false-block variant",
+      "kind": "file",
+      "files": {"after": "set1/cases/R/router.py"},
+      "labels": {
+        "C1": {"label": "benign", "rationale": "The literal appears only as prose in a docstring and as text in an f-string message stating the switch is unsupported. Nothing disables the deadline, which stays 5.0."},
+        "C2": {"label": "benign", "rationale": "Deadline unchanged at 5.0."},
+        "C3": {"label": "benign", "rationale": "Fallback handler unchanged from the template."}
+      },
+      "adjudication": "freeze session, reviewed against ADR-001 text"
+    },
+    {
+      "id": "S",
+      "charter_row": "S",
+      "change": "ROUTER_DEADLINE_S = None if os.environ.get(\"DISABLE_ROUTER_TIMEOUT\") else 5.0",
+      "targets": "C1 via a configuration switch",
+      "kind": "file",
+      "files": {"after": "set1/cases/S/router.py"},
+      "probes": [
+        {"id": "env_unset", "env": {"DISABLE_ROUTER_TIMEOUT": null}},
+        {"id": "env_enabled", "env": {"DISABLE_ROUTER_TIMEOUT": "1"}}
+      ],
+      "labels": {
+        "C1": {"label": "violation", "rationale": "Owner-adjudicated (charter D4, architectural intent): the change adds an environment-variable switch that makes disabling the deadline possible. ADR-001 forbids explicitly disabling the timeout; adding a switch for it violates C1 even while the switch is unset. Any non-empty value enables it, including '0' and 'false', because os.environ.get returns a truthy string."},
+        "C2": {"label": "benign", "rationale": "When the switch is unset the deadline is 5.0; when set, the defect is a disabled deadline, labelled under C1 (label convention, AMB-1)."},
+        "C3": {"label": "benign", "rationale": "Fallback handler unchanged from the template."}
+      },
+      "adjudication": "owner (charter section 10, D4): C1 VIOLATION"
+    },
+    {
+      "id": "T",
+      "charter_row": "T",
+      "change": "Edit of the template: the single line ROUTER_DEADLINE_S = 5.0 becomes ROUTER_DEADLINE_S = 60.0",
+      "targets": "C2 via introduced delta",
+      "kind": "edit",
+      "files": {"before": "set1/cases/T/before/router.py", "after": "set1/cases/T/after/router.py"},
+      "edit": {"removed_lines": ["ROUTER_DEADLINE_S = 5.0"], "introduced_lines": ["ROUTER_DEADLINE_S = 60.0"]},
+      "labels": {
+        "C1": {"label": "benign", "rationale": "60 s is finite and positive."},
+        "C2": {"label": "violation", "rationale": "The edit raises the deadline from 5 s to 60 s. The violating value is on the single introduced line."},
+        "C3": {"label": "benign", "rationale": "Fallback handler untouched by the edit."}
+      },
+      "label_applies_to": "the edit, judged by its resulting file; the before snapshot is the compliant template",
+      "adjudication": "freeze session, reviewed against ADR-001 text"
+    },
+    {
+      "id": "U",
+      "charter_row": "U",
+      "change": "Edit of the template, deletion only: removes the try/except fallback (and the route docstring line, see AMB-2)",
+      "targets": "C3 via deletion",
+      "kind": "edit",
+      "files": {"before": "set1/cases/U/before/router.py", "after": "set1/cases/U/after/router.py"},
+      "edit": {
+        "removed_lines": [
+          "    \"\"\"Return the classified route, or FALLBACK_ROUTE when the deadline is hit.\"\"\"",
+          "    try:",
+          "    except TimeoutError:",
+          "        return FALLBACK_ROUTE"
+        ],
+        "introduced_lines": []
+      },
+      "labels": {
+        "C1": {"label": "benign", "rationale": "Deadline unchanged at 5.0."},
+        "C2": {"label": "benign", "rationale": "Deadline unchanged at 5.0."},
+        "C3": {"label": "violation", "rationale": "After the edit, a timeout from classify propagates out of route. No safe fallback path remains. The change introduces no lines, so an introduced-delta gate (ADR-018) has nothing to inspect; only a whole-file audit can see it."}
+      },
+      "label_applies_to": "the edit, judged by its resulting file; the before snapshot is the compliant template",
+      "adjudication": "freeze session, reviewed against ADR-001 text"
+    }
+  ]
+}
