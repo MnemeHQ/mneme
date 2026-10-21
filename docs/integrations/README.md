@@ -49,6 +49,12 @@ at what level, with what evidence. The website's
   remote backends ARE intercepted but carry unsupported/unvalidated backend
   semantics (local-path assumptions may not describe the mutation target).
   See [langchain-langgraph.md](langchain-langgraph.md).
+- **Custom tools and project boundaries** (LangChain and Agent SDK): a custom
+  tool can self-govern by calling the existing gate before it mutates. This
+  is an opt-in reference pattern, not interception; an unwired custom tool
+  stays ungoverned. Writes outside `project_dir` fail open visibly under a
+  path-scoped rule and are evaluated under an unscoped one; confinement is
+  the orchestrator's policy. See [custom-tools.md](custom-tools.md).
 - **Antigravity**: tested against Antigravity IDE 2.8.1; three file-mutation
   tools covered; deny-only response policy. See [antigravity.md](antigravity.md).
 - **Kiro CLI 3.0 / v3**: validated live on CLI 2.19.2 `--v3` (v3 engine / CLI 3.0).
