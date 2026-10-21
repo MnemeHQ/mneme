@@ -485,9 +485,12 @@ def verify(policy_root: Path, *, allow_file: bool = False,
         return Verification(UNVERIFIABLE, exc.reason, exc.detail)
     except Exception as exc:  # noqa: BLE001 -- a verifier crash is a reason, not an error
         return Verification(UNVERIFIABLE, VERIFIER_CRASH, type(exc).__name__)
-    session = _GitSession(url, allow_file=allow_file, timeout=timeout)
     normalized = normalize_url(url)
     branch = tip = ""
+    try:
+        session = _GitSession(url, allow_file=allow_file, timeout=timeout)
+    except OSError as exc:
+        return Verification(UNVERIFIABLE, VERIFIER_CRASH, type(exc).__name__, normalized)
     try:
         session.init()
         branch, tip = session.tip()
