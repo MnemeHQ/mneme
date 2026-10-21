@@ -4,7 +4,7 @@ title: "Static Numeric Upper-Bound Typed Rule for Python"
 status: accepted
 priority: normal
 date: 2026-10-21
-scope: enforcement.typed_rules
+scope: enforcement.typed_rules.numeric_upper_bound
 ---
 
 # ADR-034: Static Numeric Upper-Bound Typed Rule for Python
@@ -29,11 +29,17 @@ no `FORBID_NUMERIC_ABOVE` matcher exists.
 - an implementation charter or Layer 1 amendment;
 - any production enforcement claim.
 
-**Activation boundary.** An accepted ADR becomes eligible as active decision
-authority on a future ADR import. **No authority import, project-memory
-update, typed-rule registration or enforcement activation is authorized** as
-part of this acceptance. ADR-034 has no `## Constraints` directives, so it
-declares no mechanically enforceable rule in any case.
+**Activation boundary.** ADR-034's scope, `enforcement.typed_rules.numeric_upper_bound`,
+is distinct from ADR-019's `enforcement.typed_rules`. ADR precedence keeps
+one winner per exact scope, so a shared scope would leave ADR-034 silently
+shadowed by ADR-019, or, at equal priority, would drop both. With the
+distinct scope, ADR-034 becomes eligible as active decision authority on a
+future ADR import, alongside ADR-019, as a **retrieval-only** decision: it
+has no `## Constraints` directives and declares no mechanically enforceable
+rule.
+
+**No authority import, project-memory update, typed-rule registration or
+enforcement activation is authorized** as part of this acceptance.
 
 Any later change to the contract is a separately reviewed amendment, never a
 post-hoc adjustment.
