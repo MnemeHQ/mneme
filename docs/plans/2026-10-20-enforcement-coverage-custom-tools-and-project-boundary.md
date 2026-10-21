@@ -6,6 +6,9 @@ regression-test proposal; authorizes no implementation. No change to
 sandbox evidence. Any runtime or policy change named below needs its own
 charter and, where it touches enforcement behavior, a `[layer1-freeze]`
 amendment under the Amendment Procedure.
+**Review:** direction approved in design review (1B; 2A + 2C; 1A, 1C, 2B and
+2D deferred pending evidence and separate architecture authorization). This
+revision applies the review's corrections; still PROPOSED, no implementation.
 **Workstream:** P1 enforcement coverage. Feeds the separate P0 orchestrator
 governance track; does not cover semantic enforcement (deadline or fallback
 rules, C2/C3 in the sandbox), which is a separate effort.
@@ -114,6 +117,10 @@ against the project's literal rules and can be denied. The sandbox rule is
 scoped to `src/**`, so it only exercised the UNKNOWN branch. Boundary behavior
 therefore depends on how each rule is authored, not on the boundary itself.
 Section 6 proposes a characterization test before anyone relies on this.
+Until that test exists, out-of-root writes must not be described as either
+universally ungoverned or universally blocked: a scoped typed rule can return
+`UNKNOWN` (visible fail-open), while an unscoped typed rule currently returns
+`APPLIED` without path normalization and is evaluated.
 
 ### 2.4 ADR-033 does not cover this surface
 
@@ -168,33 +175,85 @@ text)` is translated to `Write(file_path, content)` by the middleware.
   a wrong introduced delta: false blocks on pre-existing content, or missed
   literals. Mneme cannot detect the mismatch.
 
-### Option 1B: documented "propose mutation" call (recommended)
+### Option 1B: opt-in explicit mutation evaluation (recommended)
 
-The custom tool, or the orchestrator code that executes it, computes the
-proposed result in a canonical shape and asks the gate before mutating:
+**What 1B is, and is not.** 1B is opt-in self-governance. Mneme evaluates a
+custom tool's operation only when that tool (or the orchestrator code that
+runs it) explicitly calls the gate before mutating, and only has effect when
+the tool honors the result. A custom tool that never calls Mneme stays
+ungoverned, exactly as `unmapped_tool_literal` measured. 1B is not automatic
+interception, and it does not close the custom-tool gap in general: it gives
+orchestrator authors a documented, tested way to close it for the tools they
+choose to wire.
+
+The tool computes the proposed result in a canonical shape and asks the gate
+before mutating. Reference shape (illustrative application code, not a Mneme
+API; the DENIED, WARN and UNEVALUATED tags are the strings the shipped
+middleware already emits, `mneme/integrations/langchain/middleware.py:27` and
+`100-126`; the middleware emits nothing for a skip, so the `NOT EVALUATED`
+note is application wording):
 
 ```python
-mneme = MnemeLangChain(project_dir=root)          # same instance as the middleware
+mneme = MnemeLangChain(project_dir=root)            # same instance as the middleware
+ROOT = Path(root).resolve(strict=True)
 
 def save_text(path: str, text: str) -> str:
-    target = resolve_inside(root, path)            # orchestrator's own boundary policy
+    target = (ROOT / path).resolve()                 # canonical path, symlinks followed
+    if not target.is_relative_to(ROOT):              # orchestrator's own boundary policy
+        return "[orchestrator] REFUSED - target outside project root"
+    data = text.encode("utf-8")                      # the exact bytes that will be written
     result = mneme.evaluate_tool_call(
-        "write_file", {"file_path": str(target), "content": text}
+        "write_file", {"file_path": str(target), "content": data.decode("utf-8")}
     )
     if result.action == "deny":
-        return result.reason                       # returned to the model, nothing written
-    note = unevaluated_note(result)                # required when action == "fail_open"
-    target.write_text(text, encoding="utf-8")
+        return "[mneme] DENIED - " + (result.reason or "architectural decision violated")
+    if result.action == "skip":
+        note = "\n[mneme] NOT EVALUATED - " + result.reason   # never a PASS
+    elif result.action == "fail_open":
+        note = ("\n[mneme] UNEVALUATED - failing open, this mutation was "
+                "NOT checked:\n" + result.reason)
+    elif result.action == "warn":
+        note = ("\n[mneme] WARN - architectural decision flagged "
+                "(warn mode; not blocked):\n" + result.reason)
+    else:                                            # "allow": trusted, complete PASS
+        note = ""
+    target.write_bytes(data)                         # same resolved path, same bytes
     return "saved" + note
 ```
-
-(Illustrative only; `resolve_inside` and `unevaluated_note` are application
-code, not Mneme APIs.)
 
 Any custom operation (append, template render, patch) is submitted as the
 **full proposed file content** under `write_file`/`Write`; the gate computes
 the introduced delta against the current file itself. `edit_file`/`Edit` is
 only correct when the tool really performs a single exact replacement.
+
+**Required outcome handling for the reference integration.** Every
+`GateResult.action` has exactly one treatment:
+
+| Action | Mutation | Feedback to the agent | May be reported as |
+|---|---|---|---|
+| `deny` | **not performed** | `[mneme] DENIED - <reason>` naming the decision and rule | Mneme block |
+| `allow` | may proceed | none required | trusted, complete PASS |
+| `warn` | proceeds (existing warn-mode semantics) | `[mneme] WARN ... not blocked` kept visible | flagged, not blocked |
+| `fail_open` | proceeds under the documented fail-open policy; the orchestrator may separately refuse (option 2C) | `[mneme] UNEVALUATED ... NOT checked` with the reason | unevaluated |
+| `skip` (unmapped name, no project memory, empty introduced delta) | not decided by Mneme | the skip reason; never presented as approval | not evaluated |
+
+An unevaluated or skipped operation, and an operation in a project with no
+policy memory, must never be presented as a trusted PASS or as evidence of a
+successful architectural check. Only `allow` is a PASS.
+
+**Acceptance condition for the local-filesystem reference example.** The
+evaluated target and proposed content must be the actual mutation: the same
+resolved path and the same bytes. Concretely, the example canonicalizes the
+target once (`resolve()`, which follows symlinks and removes `..`), applies
+its root check to that canonical path, passes that same path to the gate, and
+writes exactly the bytes it submitted to that same path. A tool must not be
+able to appear in-project to the gate while changing a file elsewhere (a
+symlink inside the root pointing outside it, or a `..` segment, resolves to
+the outside path and is refused or evaluated as out-of-root). Tests in 6.1
+pin this. This is a condition on the reference example, not a new
+filesystem-security subsystem in Mneme; the window between check and write
+(for example a symlink swapped after evaluation) is a known limit of any
+check-then-act tool and is recorded, not solved, here.
 
 - **6C fit:** action and wait guarantee are owned by the orchestrator; target,
   content, decision channel and applicability context reuse the gate
@@ -209,7 +268,7 @@ only correct when the tool really performs a single exact replacement.
 - **Risk:** governance depends on the orchestrator author calling the gate and
   honoring the result. Mneme cannot prove a custom tool is wired, so a custom
   tool that does this is "self-governed", not "Mneme-intercepted", in every
-  coverage claim.
+  coverage claim, and an unwired custom tool is still counted as ungoverned.
 
 ### Option 1C: a Mneme-supplied tool wrapper
 
@@ -240,10 +299,10 @@ would amend ADR-027. Rejected for this workstream.
 
 ### Recommendation for Gap 1
 
-**1B**, documentation and tests only. It closes the gap for any orchestrator
-willing to call the gate, needs no runtime or frozen-semantics change, keeps
-the tool map closed, and keeps coverage claims honest (self-governed, not
-intercepted). Revisit 1A in its own charter only if 1B regression evidence
+**1B**, documentation and tests only. It gives an orchestrator that opts in
+a tested way to have its custom tools evaluated, needs no runtime or
+frozen-semantics change, keeps the tool map closed, and keeps coverage claims
+honest (self-governed, not intercepted; unwired tools remain ungoverned). Revisit 1A in its own charter only if 1B regression evidence
 shows the argument-mapping step is where integrators make mistakes.
 
 Two known limits stay open and are recorded rather than fixed here:
@@ -285,9 +344,10 @@ evaluation, so unscoped rules no longer apply outside the root either.
 The orchestrator, not Mneme, decides that writes outside the project root are
 not allowed. Two layers, both outside `mneme/`:
 
-1. **Root confinement in the tool.** File tools resolve the target and refuse
-   any path outside their configured root before calling the gate (the
-   `resolve_inside(root, path)` step in option 1B). This is the strongest
+1. **Root confinement in the tool.** File tools canonicalize the target and
+   refuse any path outside their configured root before calling the gate (the
+   `resolve()` and `is_relative_to` step in the option 1B example, subject to
+   its same-path, same-bytes acceptance condition). This is the strongest
    control and does not depend on Mneme at all.
 2. **Refusal on UNEVALUATED (optional).** An outer middleware or the
    orchestrator loop calls `evaluate_tool_call` and refuses when `action ==
@@ -327,6 +387,51 @@ confinement in orchestrator tools, and describe the optional refuse-on-
 UNEVALUATED wrapper as orchestrator policy. 2B and 2D need architectural
 approval and are not proposed here.
 
+### Orchestrator refusals are not Mneme violations
+
+In every metric, summary and evidence record, an orchestrator refusal (root
+confinement, refuse-on-UNEVALUATED) is recorded in its own field and counted
+in its own row. It is never counted as a Mneme block, a rule violation or
+relevant enforcement observed (ADR-029), and it never changes the Mneme label
+of the same attempt. Conversely, a Mneme `fail_open` or `skip` that the
+orchestrator refused stays unevaluated in Mneme's evidence.
+
+## 5A. Alignment with CI1 (tracker #540)
+
+CI1 (tracker #540) investigates a trusted decision-enforcement merge gate and
+revision-bound evidence. This proposal sits at a different execution
+boundary and reuses CI1's principles rather than defining new ones.
+
+**Separate boundaries.** Mneme's governance runs at four distinct points,
+and none substitutes for another:
+
+```text
+Guidance        decision context before work (retrieval, ADR-017)
+  -> Pre-mutation  this proposal: the gate before a tool changes a file
+  -> CI             CI1: a configured verification boundary on the change set
+  -> Evidence       ADR-029 / CI1.4: what was evaluated, at which revision
+```
+
+Pre-mutation evaluation prevents an agent's intermediate writes; CI catches
+what reached the change set, after files changed, and cannot prevent
+intermediate mutations (RESULTS.md 6C). Closing a pre-mutation gap does not
+make CI blocking, and CI blocking does not make an ungoverned tool governed.
+CI1 production merge blocking is **not adopted**: its adoption decision is
+still deferred on the tracker, and nothing here implies otherwise.
+
+**Principles reused, not reimplemented.**
+
+| CI1 principle | Applied here |
+|---|---|
+| Trusted-result classification (payload-first `mneme.check/v1`, requested mode checked, VERIFIED_PASS / VIOLATION / UNEVALUATED; #484 coherence) | The reference integration consumes `GateResult`, which already applies `assess_verdict`; only `allow` is a PASS. No second verdict parser, no exit-code-only mapping |
+| Evaluation completeness (`evaluation_complete` false is UNEVALUATED, never PASS) | `fail_open` with `evaluation_complete: false` stays UNEVALUATED in the outcome table and in every metric |
+| Revision provenance (exact evaluated revision, policy and evaluator identity) | Same-path, same-bytes acceptance condition: the evaluated target and content are the mutation. Recording rule ID and memory path per attempt, as the sandbox already does; any new correlation field needs its own charter |
+| Negative-space evidence (what was not evaluated, unsupported operations, coverage limits) | Sandbox coverage set reports unwired custom tools, skips, UNKNOWN out-of-root and orchestrator refusals as their own rows, never folded into block or pass counts |
+
+No second governance resolver or evidence model is introduced: applicability
+stays ADR-020's, decision authority stays DG1's (ADR-031), and evidence uses
+the existing trace and ADR-029 concepts.
+
 ## 6. Regression-test proposal
 
 All fixtures synthetic. Two homes, kept apart so the merged post-fix sandbox
@@ -344,12 +449,17 @@ path helpers in `tests/integrations/relative_paths.py`.
 | Test | Setup | Expected |
 |---|---|---|
 | `test_unmapped_tool_still_skipped` | `evaluate_tool_call("save_text", …)` | `skip`, 0 checker calls (control; complements `test_unlisted_tools_skipped_with_zero_checker_calls`) |
-| `test_self_proposal_deny_prevents_mutation` | reference `save_text` calls `evaluate_tool_call("write_file", {abs path, B})`, runner FAIL | `deny`; file digest unchanged; 1 checker call; `--target-path` == resolved target |
-| `test_self_proposal_pass_executes` | same with A, runner PASS | `allow`; file written; 1 checker call |
+| `test_self_proposal_deny_prevents_mutation` | reference `save_text` calls `evaluate_tool_call("write_file", {abs path, B})`, runner FAIL | `deny`; file digest unchanged; 1 checker call; `--target-path` == resolved target; tool result starts with `[mneme] DENIED` and names the decision |
+| `test_self_proposal_pass_executes` | same with A, runner PASS | `allow`; file written; 1 checker call; no `[mneme]` tag |
+| `test_self_proposal_warn_mode_proceeds_visibly` | `mode="warn"`, runner WARN | `warn`; file written; result carries `[mneme] WARN ... not blocked` |
+| `test_self_proposal_no_memory_is_not_a_pass` | project without `.mneme/project_memory.json` | `skip` (`no project memory`); 0 checker calls; result says not evaluated; never `allow` or a PASS |
+| `test_self_proposal_evaluated_path_and_bytes_match_mutation` | spy on the gate input and the write | `--target-path`, materialized content and written bytes refer to the same resolved path and are byte-identical |
+| `test_self_proposal_symlink_out_of_root_refused` | symlink under the root pointing outside it | canonical path is outside root: refused by confinement (0 checker calls) or, with confinement disabled, evaluated as out-of-root; never evaluated as the in-root link path |
 | `test_self_proposal_relative_path_uses_project_dir` | relative path, process cwd holds a decoy (real checker) | `deny`; decoy not read; target unchanged |
 | `test_self_proposal_append_submitted_as_full_content` | tool appends a line with the literal; submits full resulting content as `write_file` | `deny`; only the appended line is introduced (ADR-018) |
 | `test_self_proposal_preexisting_literal_not_attributed` | target already contains the literal; tool appends a compliant line | `allow` (no #259-shape false block) |
-| `test_self_proposal_fail_open_is_visible` | runner `complete=False` | `fail_open`; tool result carries `[mneme] UNEVALUATED`; never reported as `allow` |
+| `test_self_proposal_fail_open_is_visible` | runner `complete=False` | `fail_open`; tool result carries `[mneme] UNEVALUATED ... NOT checked`; never reported as `allow` or PASS |
+| `test_self_proposal_untrusted_output_is_not_a_pass` | runner returns contradictory or unparseable output | `fail_open` via the existing `assess_verdict`; no verdict parsed by the reference code |
 | `test_self_proposal_edit_missing_file_fails_open` | `edit_file` shape on a missing target | `fail_open` from `MaterializeError` |
 | `test_middleware_skip_plus_inner_evaluation_counted_once` | custom tool under `build_middleware()`, shared instance | trace has 1 `skip` (`save_text`) and 1 evaluated entry; 1 checker call |
 | `test_trace_has_no_correlation_id` | inspect trace entry | records `Write`, not `save_text`, and no call ID (characterizes the open limit) |
@@ -395,7 +505,10 @@ Measurement rules for the new set:
   on a deny. Add `mutations_executed` (digest changed) and use it, with the
   `[mneme] DENIED` tag, as the BLOCKED evidence.
 - `orchestrator_outcome` is separate from the Mneme label. An orchestrator
-  refusal never counts as a Mneme block in any metric.
+  refusal never counts as a Mneme block or rule violation in any metric or
+  evidence record (section 5).
+- `NOT_EVALUATED` and `ERROR_DEGRADED` rows are reported as negative space
+  (section 5A), never folded into ALLOWED or BLOCKED counts.
 - Report "self-governed custom tool" and "orchestrator-refused out-of-root"
   as their own metric rows. The existing 6/8 (7/9) literal-sensitivity figures
   are not recomputed with these scenarios.
