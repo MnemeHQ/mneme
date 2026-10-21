@@ -1,7 +1,7 @@
 ---
 id: ADR-034
-title: "Static Numeric Upper-Bound Typed Rule for Python (Proposed)"
-status: proposed
+title: "Static Numeric Upper-Bound Typed Rule for Python"
+status: accepted
 priority: normal
 date: 2026-10-21
 scope: enforcement.typed_rules
@@ -9,40 +9,59 @@ scope: enforcement.typed_rules
 
 # ADR-034: Static Numeric Upper-Bound Typed Rule for Python
 
-**Status:** **Proposed, revision 4.**
+**Status:** **Accepted as an architectural design contract** (owner decision,
+2026-10-21,
+[authorization on #590](https://github.com/MnemeHQ/mneme/pull/590#issuecomment-6318845775)).
 
-Revision 4, per the
-[review of `394371c1`](https://github.com/MnemeHQ/mneme/pull/590#issuecomment-6318200921):
+The accepted content is revision 4, as reviewed and merged in #590. That is
+squash commit `17e69f7f`, from approved head `311b297b`. This acceptance
+changes only the status wording.
 
-- O6 is resolved as (a), the exact authored decimal bound;
-- `int`-only exponents, stated as an intentional subset of M2;
-- the M2 parity statement is narrowed to the comparison step, with
-  recognition-domain differences listed separately.
+**What acceptance means.** Acceptance establishes what a future implementation
+must satisfy. It does **not** establish that Mneme enforces numeric bounds:
+no `FORBID_NUMERIC_ABOVE` matcher exists.
 
-Revision 3, per the
-[review of `3b671664`](https://github.com/MnemeHQ/mneme/pull/590#issuecomment-6317899163):
+**What acceptance does not authorize** (each is a separate decision):
 
-- a normative mixed-source record (`PARTIAL`, §4);
-- value-based equality and new boundary rows (§5a);
-- open question O6. This is a draft for owner review. It is
-**not accepted**. A proposed ADR is imported as inactive and has no
-enforcement effect.
+- a held-out corpus;
+- a matcher, runner, CLI, SDK, hook or CI change;
+- v2 feature activation or memory migration;
+- an implementation charter or Layer 1 amendment;
+- any production enforcement claim.
 
-Revision 2 records the owner's O1–O5 rulings and resolves the blocking
-repairs from the
-[review of `e4f2fd2a`](https://github.com/MnemeHQ/mneme/pull/590#issuecomment-6317687350):
+**Activation boundary.** An accepted ADR becomes eligible as active decision
+authority on a future ADR import. **No authority import, project-memory
+update, typed-rule registration or enforcement activation is authorized** as
+part of this acceptance. ADR-034 has no `## Constraints` directives, so it
+declares no mechanically enforceable rule in any case.
 
-- numeric evaluation semantics (new §5a);
-- the authoring grammar for `max`;
-- the mixed-source scoring precedence.
+Any later change to the contract is a separately reviewed amendment, never a
+post-hoc adjustment.
 
-That review also recorded that drafting this ADR had not been separately
-authorized after #589. Revising this draft in place is permitted; nothing
-beyond that is.
+**Revision history (#590):**
 
-Acceptance of this ADR would confer **no** implementation authority, held-out
-corpus freeze, implementation charter or Layer 1 amendment. Each of those is a
-separate decision. The pre-registered evaluation criteria are in
+- **Revision 4,** per the
+  [review of `394371c1`](https://github.com/MnemeHQ/mneme/pull/590#issuecomment-6318200921):
+  - O6 resolved as (a), the exact authored decimal bound;
+  - `int`-only exponents, an intentional subset of M2;
+  - the M2 parity statement narrowed to the comparison step.
+- **Revision 3,** per the
+  [review of `3b671664`](https://github.com/MnemeHQ/mneme/pull/590#issuecomment-6317899163):
+  - the normative mixed-source record (`PARTIAL`, §4);
+  - value-based equality (§5a);
+  - O6 raised.
+- **Revision 2,** per the
+  [review of `e4f2fd2a`](https://github.com/MnemeHQ/mneme/pull/590#issuecomment-6317687350):
+  - O1–O5 rulings;
+  - numeric evaluation semantics (§5a);
+  - the authoring grammar for `max`;
+  - mixed-source scoring precedence.
+
+  That review also recorded that the first draft had not been separately
+  authorized after #589.
+
+The pre-registered evaluation criteria, **frozen** together with this
+acceptance, are in
 [`docs/plans/2026-10-21-adr-034-pre-registered-evaluation-criteria.md`](../plans/2026-10-21-adr-034-pre-registered-evaluation-criteria.md).
 
 **Date:** 2026-10-21
@@ -91,12 +110,12 @@ It also confirmed two hazards:
 - The hook's trust validator would treat a matcher-incomplete payload as
   *inconsistent* (untrusted) rather than as unevaluated.
 
-## Decision (proposed)
+## Decision
 
 ### 1. A new, separately specified rule type
 
-The proposed type name is `FORBID_NUMERIC_ABOVE`, following the `FORBID_`
-family. **Open question O1** lists the alternatives.
+The type name is `FORBID_NUMERIC_ABOVE`, following the `FORBID_` family
+(O1 ruling).
 
 It is a new rule type under ADR-019 §9. `FORBID_LITERAL`'s parsing, matching,
 identity and payloads are unchanged.
@@ -443,8 +462,8 @@ regression matrix:
    JSON;
 7. old readers fail closed and downgrade is refused. Persisting this type
    requires schema **v2** with a declared `semantic_features` value. The
-   proposed value is `numeric_upper_bound_rule` (**open question O3**). It
-   must never appear in v1 memory.
+   value is `numeric_upper_bound_rule` (O3 ruling). It must never appear in
+   v1 memory.
 
 If any gate cannot be met, the fallback is P2 (a structured `rule_payload`
 with an extended identity hash). P2 would be a separate amendment to this
@@ -546,7 +565,7 @@ only, documented" or "extended":
 - `UNEVALUATED` rates may be high. The pre-registered criteria make that
   visible rather than hiding it.
 
-## Owner rulings (provisional, 2026-10-21; binding only if this ADR is accepted)
+## Owner rulings (2026-10-21; binding with this ADR's acceptance)
 
 | ID | Ruling |
 |---|---|

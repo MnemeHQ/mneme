@@ -1,29 +1,40 @@
-# ADR-034 pre-registered evaluation criteria (draft, revision 4)
+# ADR-034 pre-registered evaluation criteria (FROZEN)
 
-**Status:** **DRAFT for owner review, revision 4. Documentation only.**
+**Status:** **FROZEN** on 2026-10-21, by owner decision
+([authorization on #590](https://github.com/MnemeHQ/mneme/pull/590#issuecomment-6318845775)),
+together with the acceptance of
+[ADR-034](../adr/ADR-034-static-numeric-upper-bound-typed-rule.md).
 
-Revision 3 addressed the
-[review of `3b671664`](https://github.com/MnemeHQ/mneme/pull/590#issuecomment-6317899163):
+The frozen content is revision 4, as reviewed and merged in #590. That is
+squash commit `17e69f7f`, from approved head `311b297b`. Freezing changes only
+the status wording. These evaluation definitions, case categories, quotas,
+denominators and thresholds are the pre-registered protocol for a held-out
+validation of a future implementation of ADR-034.
 
-- a hard gate for unsupported (U) and non-decidable (N) cases;
-- value-based equality for boundaries;
-- independently pinned contracts for set R;
-- normative expectations for mixed-source results;
-- per-shape headline denominators.
+Any later change is a **separately reviewed protocol amendment**, never
+post-hoc tuning. The freeze commit is the squash commit of the PR that
+records this status; it is not self-referenced here.
 
-Revision 4 follows the
-[review of `394371c1`](https://github.com/MnemeHQ/mneme/pull/590#issuecomment-6318200921):
+**This freeze is not a corpus.** No held-out case exists yet. Creating,
+adjudicating or freezing the corpus needs its own explicit authorization. Its
+author must be independent of the implementer, and the cases stay concealed
+from the implementer until scoring.
 
-- O6 is resolved as (a);
-- set R gains two non-`int` exponent cases.
+**Revision history (#590):**
 
-These are the pre-registered criteria, proposed for the held-out validation of an
-implementation of
-[ADR-034](../adr/ADR-034-static-numeric-upper-bound-typed-rule.md)
-(Proposed).
-
-Revision 2 records the owner's E1–E4 rulings and repairs from the
-[review of `e4f2fd2a`](https://github.com/MnemeHQ/mneme/pull/590#issuecomment-6317687350).
+- **Revision 4,** per the
+  [review of `394371c1`](https://github.com/MnemeHQ/mneme/pull/590#issuecomment-6318200921):
+  O6 resolved as (a); set R gains two non-`int` exponent cases.
+- **Revision 3,** per the
+  [review of `3b671664`](https://github.com/MnemeHQ/mneme/pull/590#issuecomment-6317899163):
+  - the U/N hard gate;
+  - value-based boundary equality;
+  - independently pinned set R contracts;
+  - mixed-source expectations;
+  - per-shape headline denominators.
+- **Revision 2,** per the
+  [review of `e4f2fd2a`](https://github.com/MnemeHQ/mneme/pull/590#issuecomment-6317687350):
+  E1–E4 rulings and repairs.
 
 This document does **not** authorize:
 
@@ -35,8 +46,8 @@ This document does **not** authorize:
 **Sequence** (design proposal §8, owner ruling N8):
 
 1. ADR-034 is accepted, which freezes the rule contract, including the §5a
-   numeric semantics.
-2. These criteria are approved and frozen.
+   numeric semantics. **Done, 2026-10-21.**
+2. These criteria are approved and frozen. **Done, 2026-10-21.**
 3. An independent session authors and freezes the held-out corpus.
 4. Only then is the matcher implemented.
 5. The implementation is scored against the frozen corpus.
@@ -261,8 +272,9 @@ The implementation **passes** only if **every** gate holds:
    `evaluation_complete=false`.
 5. **Zero wrong primary reasons** on adjudicated cases (E2).
 6. **Coverage A = 100%.**
-7. **Coverage W ≥ 95%** (E3). The owner may tighten this before the freeze.
-   It must not be relaxed after the freeze.
+7. **Coverage W ≥ 95%** (E3). This value is frozen; any change is a
+   separately reviewed protocol amendment, made before scoring and never
+   after it.
 8. **Every set R case** (R1–R18) matches its pre-registered expected outcome
    and, where unevaluated, its primary reason.
 9. **Determinism:** two byte-identical runs.
@@ -302,7 +314,7 @@ It states plainly:
 - that no pre-write protection is claimed;
 - that no generalization beyond the synthetic held-out corpus is claimed.
 
-## 7. Owner rulings (provisional, 2026-10-21)
+## 7. Owner rulings (2026-10-21; frozen with this protocol)
 
 | ID | Ruling | Where reflected |
 |---|---|---|
