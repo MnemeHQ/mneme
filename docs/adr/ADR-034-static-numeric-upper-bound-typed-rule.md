@@ -170,22 +170,43 @@ There are three dimensions, and they are never collapsed into one another:
 1. **Path applicability (ADR-020):** `APPLIED`, `EXCLUDED` or `UNKNOWN`.
    Unchanged and type-independent.
 2. **Per-rule matcher status (new):**
-   - `RECOGNIZED`;
-   - `MATCHER_UNEVALUATED`, with one reason from `PARSE_FAILURE`,
-     `UNRECOGNIZED_FORM`, `SOURCE_NOT_FOUND`, `AMBIGUOUS_BINDING` or
-     `INCOMPLETE_SOURCE_INPUT`.
+   - `RECOGNIZED`: every declared source was positively recognized;
+   - `PARTIAL`: at least one source was recognized as `EXCEEDS` **and** at
+     least one source is `UNKNOWN`;
+   - `MATCHER_UNEVALUATED`: there is no recognized `EXCEEDS` source and at
+     least one source is `UNKNOWN`.
+
+   `PARTIAL` and `MATCHER_UNEVALUATED` carry the `UNKNOWN` sources, each with
+   a reason from `PARSE_FAILURE`, `UNRECOGNIZED_FORM`, `SOURCE_NOT_FOUND`,
+   `AMBIGUOUS_BINDING` or `INCOMPLETE_SOURCE_INPUT`.
 
    Matcher uncertainty is never expressed as path `UNKNOWN`.
 3. **Operational checker status:** unchanged trust and ADR-033 availability
    handling. It is never relabelled as a rule outcome.
 
-**Rule outcome** for an `APPLIED` rule on trusted complete-source input:
+**Per-rule record (normative).** For an `APPLIED` rule on trusted
+complete-source input, the outcome and the matcher status are recorded as
+separate fields. The unknown sources are never discarded because a violation
+is decisive.
 
-1. Any `EXCEEDS` source: **violation**, even if another source is `UNKNOWN`.
-   The trigger reports the source line, the recognized value, `max` and
-   `unit`.
-2. Otherwise, any `UNKNOWN` source: `MATCHER_UNEVALUATED`, with a reason.
-3. Otherwise: no violation.
+| Sources | Outcome | Matcher status | Unknown sources recorded | Contributes `evaluation_complete=false` |
+|---|---|---|---|---|
+| Any `EXCEEDS`, no `UNKNOWN` | **violation** | `RECOGNIZED` | none | no |
+| Any `EXCEEDS`, any `UNKNOWN` | **violation** | `PARTIAL` | each, with reasons; primary reason by the priority below | **yes** |
+| No `EXCEEDS`, any `UNKNOWN` | unevaluated | `MATCHER_UNEVALUATED` | each, with reasons; primary reason by priority | **yes** |
+| All `WITHIN` | no violation | `RECOGNIZED` | none | no |
+
+The violation trigger reports the source line, the recognized runtime value,
+`max` and `unit`. A `PARTIAL` result is therefore a **FAIL verdict with
+`evaluation_complete=false`**.
+
+- **CLI:** reports both the violation and the unknown sources. The exit code
+  follows the M-a target (§8); today's incomplete exit 2 already coincides
+  with strict FAIL.
+- **Trust validators:** must accept FAIL together with
+  `evaluation_complete=false` when the incompleteness is attributable to
+  `PARTIAL`/`MATCHER_UNEVALUATED` records or applicability `UNKNOWN`. They
+  must reject it otherwise.
 
 A violation is a deterministic FAIL, as in ADR-019 §5. The precedence in
 rule 1 applies to label authoring and scoring as well: a case with a
@@ -207,11 +228,12 @@ applies in this order:
 All applicable reasons may be listed, but only the primary one is scored.
 
 **`evaluation_complete`** remains a *derived aggregate*: false if any rule's
-applicability is `UNKNOWN` or any rule's matcher status is
+applicability is `UNKNOWN` or any rule's matcher status is `PARTIAL` or
 `MATCHER_UNEVALUATED`. The JSON payload must carry each rule's matcher status
 and reason explicitly. Every consumer's consistency validator must accept a
-matcher-incomplete payload as **trusted unevaluated**, by checking that the
-aggregate equals "applicability `UNKNOWN` or matcher `MATCHER_UNEVALUATED`".
+matcher-incomplete payload as **trusted** (unevaluated, or a violation with
+`PARTIAL`), by checking that the aggregate equals "applicability `UNKNOWN`
+or matcher `PARTIAL`/`MATCHER_UNEVALUATED`".
 That covers the hook (`hook.py:365-378`), the Agent SDK and LangChain. The
 validator change belongs to the implementation charter.
 
@@ -305,6 +327,9 @@ of the evaluation corpus):
 | `10 / 2`, `4.5 + 0.5`, `1 / 3 * 15` | `5.0` | `5` | within |
 | `11 // 2`, `-1 % 6` | `5` | `5` | within |
 | `2 ** 3` | `8` | `5` | violation |
+| `2 ** 2` | `4` | `4` | within (exactly equal) |
+| `0.1` | `0.1000000000000000055511…` | `0.1` | **violation**: the matching text is not an equal value (see O6) |
+| `2.5`, `0.75` | exactly `2.5`, `0.75` (dyadic) | the same | within (exactly equal) |
 | `2 ** 65` | not folded (exponent above 64) | `5` | `UNKNOWN` |
 | `10 ** 31` | an `int` above 10^30 | `5` | `UNKNOWN` |
 | `1e308 * 10` | infinite | `5` | `UNKNOWN` |
@@ -312,6 +337,29 @@ of the evaluation corpus):
 
 The pinned runtime is recorded with every evaluation. A change of interpreter
 needs this table re-verified before any claim.
+
+**Equality is defined on values, not on source text.** A source equals the
+bound only when `Fraction(x) == Fraction(max)`. A literal spelled like `max`
+is equal only when its binary64 value is exactly the decimal, which requires
+`max` to be dyadic (for example `2.5` or `0.75`). For a non-dyadic `max`, a
+same-spelled float literal is either above it (`0.1`) or below it (`0.3`).
+
+**Open question O6 (a consequence of the exact-comparison decision above).** Under exact
+comparison, an author who writes `max: 0.1` and code that sets `0.1` gets a
+violation. Two options:
+
+- **(a) Keep exact comparison** with the authored decimal (the current text).
+  It is faithful to the computed value, and its non-dyadic behavior is
+  documented here and pre-registered.
+- **(b) Round the bound once to the nearest binary64**, comparing
+  `Fraction(x) > Fraction(float(max))`, with the authoring grammar limited to
+  15 significant digits so that `float(max)` round-trips. Same-spelled
+  literals are then equal, and `0.1 + 0.2` against `0.3` is still a
+  violation.
+
+This ADR keeps **(a)** pending the owner's decision. If (b) is chosen, this
+table and the criteria's boundary labels must be regenerated **before** any
+freeze.
 
 **Identity:** `rule_id_of` is unchanged:
 `<decision>:FORBID_NUMERIC_ABOVE:sha256([value, applicability])[:32]`. The
@@ -461,6 +509,7 @@ only, documented" or "extended":
 | O3 | v2 `semantic_features` value **`numeric_upper_bound_rule`**. It requires backwards-reader refusal tests, no v1 semantics and golden tests. It does not by itself approve the persistence implementation |
 | O4 | `call.position` is **0-based** |
 | O5 | **`max <= 0` is rejected at authoring.** Positivity is consistent across `max` (§5 grammar), recognized source values (`x <= 0` is disabled, so `UNKNOWN`, §5a) and diagnostics |
+| O6 | **Open:** exact decimal bound (a, current) or bound rounded once to binary64 (b). See §5a |
 
 ## Not decided here
 

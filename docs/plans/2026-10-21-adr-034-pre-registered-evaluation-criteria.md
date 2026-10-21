@@ -1,6 +1,14 @@
-# ADR-034 pre-registered evaluation criteria (draft, revision 2)
+# ADR-034 pre-registered evaluation criteria (draft, revision 3)
 
-**Status:** **DRAFT for owner review, revision 2. Documentation only.** These
+**Status:** **DRAFT for owner review, revision 3. Documentation only.**
+Revision 3 addresses the
+[review of `3b671664`](https://github.com/MnemeHQ/mneme/pull/590#issuecomment-6317899163):
+
+- a hard gate for unsupported (U) and non-decidable (N) cases;
+- value-based equality for boundaries;
+- independently pinned contracts for set R;
+- normative expectations for mixed-source results;
+- per-shape headline denominators. These
 are the pre-registered criteria, proposed for the held-out validation of an
 implementation of
 [ADR-034](../adr/ADR-034-static-numeric-upper-bound-typed-rule.md)
@@ -70,11 +78,17 @@ positive `max`:
 
 | Shape | Source mode | Example decision |
 |---|---|---|
-| S1 | symbol only | request timeout in seconds, `max` a decimal such as `2.5` |
+| S1 | symbol only | request timeout in seconds, **`max: 2.5`** (dyadic) |
 | S2 | call only, single call site | retry count, integer `max` |
-| S3 | symbol and call | connection-pool size |
-| S4 | symbol and call | rate limit per second, decimal `max` |
-| S5 | call only, **multiple call sites** (at least 3 per positive case) | batch size |
+| S3 | symbol and call | connection-pool size, integer `max` |
+| S4 | symbol and call | rate limit per second, **`max: 0.75`** (dyadic) |
+| S5 | call only, **multiple call sites** (at least 3 per positive case) | batch size, integer `max` |
+
+Shape maxima must be integers or dyadic decimals, so that a value exactly
+equal to `max` is constructible (ADR-034 §5a: equality is defined on values,
+not on source text). The freeze verifies `Fraction(float(literal)) ==
+Fraction(max)` for every A4 case. Non-dyadic bounds are exercised only in set
+R (§2.6a).
 
 ### 2.3 Stratum A: adjudicated recognized cases (per-shape quotas)
 
@@ -86,10 +100,10 @@ the category does not apply to that mode.
 | A1 Literal above `max`, symbol source | violation | 2 | – | 1 | – |
 | A2 Literal above `max`, call source | violation | – | 2 | 1 | 2 (exactly one call site above) |
 | A3 Folded literal arithmetic above `max` | violation | 1 | 1 | 1 | 1 |
-| A4 Boundary: exactly `max` | benign | 1 | 1 | 1 | 1 |
-| A5 Boundary: `max` plus the pre-registered increment (§2.6) | violation | 1 | 1 | 1 | 1 |
+| A4 Boundary: a runtime value **provably equal** to `max` (`Fraction(x) == Fraction(max)`, verified at the freeze) | benign | 1 | 1 | 1 | 1 |
+| A5 Boundary: `max` plus the pre-registered increment (§2.6), whose runtime value is **verified** to exceed `max` exactly | violation | 1 | 1 | 1 | 1 |
 | A6 Within `max`, all declared sources found | benign | 2 | 2 | 2 | 2 (all call sites within) |
-| A7 Mixed: one recognized source above `max`, another `UNKNOWN` | violation | – | – | 1 | 1 |
+| A7 Mixed: one recognized source above `max`, another `UNKNOWN` | violation, with matcher status `PARTIAL`, the expected unknown source and primary reason, and `evaluation_complete=false` (ADR-034 §4) | – | – | 1 | 1 |
 | A8 Benign look-alikes (other symbol or function, comment, string, docstring) | benign | 2 | 2 | 2 | 2 |
 | A9 Out-of-scope path (ADR-020 `EXCLUDED`) | applicability only | 1 | 1 | 1 | 1 |
 
@@ -132,15 +146,43 @@ literal source expression frozen with the corpus:
 
 - **Integer `max`** (S2, S3, S5): the source literal `max + 1`, for example
   `4` against `max: 3`.
-- **Decimal `max` with k fraction digits** (S1, S4): the source literal `max`
-  plus 10^-(k+1), written as a decimal literal whose binary64 value exceeds
-  `max` exactly. For example, `2.51` against `max: 2.5`. The freeze records
-  the literal and its runtime value.
+- **Dyadic decimal `max` with k fraction digits** (S1, S4): the source
+  literal `max` plus 10^-(k+1). For example, `2.51` against `max: 2.5`, and
+  `0.751` against `max: 0.75`. The freeze **must verify**
+  `Fraction(float(literal)) > Fraction(max)` and record the literal, its
+  runtime value and the check. If the check fails, a larger pre-registered
+  increment is chosen and recorded before the freeze.
 
-**Corpus-wide numeric-semantics set R.** At least 12 cases, **in addition to**
-the per-shape quotas, scored under stratum A's rules. They include every row of ADR-034 §5a's boundary table, applied to
-a single-source shape, plus at least one case each of `/`, `//`, `%` and
-`**` landing exactly on `max`.
+### 2.6a Set R: numeric-semantics cases with independent contracts
+
+Set R is **separate from the five shapes and excluded from their quotas**.
+Each R case has its **own** single-source contract (symbol only, `language:
+python`, its own `max`). The contract is pinned in the freeze next to the
+case, and each case is source-adjudicated and scored against its expected
+outcome. **Minimum: 16 cases**, exactly these:
+
+| R | Source expression | Contract `max` | Expected |
+|---|---|---|---|
+| R1 | `0.1 + 0.2` | `0.3` | violation |
+| R2 | `0.3` | `0.3` | within |
+| R3 | `5.000000000000001` | `5` | violation |
+| R4 | `5.0000000000000001` | `5` | within |
+| R5 | `10 / 2` | `5` | within |
+| R6 | `4.5 + 0.5` | `5` | within |
+| R7 | `1 / 3 * 15` | `5` | within |
+| R8 | `11 // 2` | `5` | within |
+| R9 | `-1 % 6` | `5` | within |
+| R10 | `2 ** 3` | `5` | violation |
+| R11 | `2 ** 65` | `5` | `MATCHER_UNEVALUATED` / `UNRECOGNIZED_FORM` |
+| R12 | `10 ** 31` | `5` | `MATCHER_UNEVALUATED` / `UNRECOGNIZED_FORM` |
+| R13 | `1e308 * 10` | `5` | `MATCHER_UNEVALUATED` / `UNRECOGNIZED_FORM` |
+| R14 | `1 / 0` | `5` | `MATCHER_UNEVALUATED` / `UNRECOGNIZED_FORM` |
+| R15 | `2 ** 2` (`**` exactly at the bound) | `4` | within |
+| R16 | `0.1` (same spelling as a non-dyadic bound) | `0.1` | violation (pending O6) |
+
+R1–R14 are the 14 source expressions in ADR-034 §5a's boundary table. These
+expectations hold under O6 option (a). If the owner chooses (b), R2 and R16
+(and any other affected row) are re-adjudicated **before** the freeze.
 
 ### 2.7 Stratum W: representative supported workload (E3)
 
@@ -168,12 +210,12 @@ toward any gate or toward generalization.
 |---|---|
 | **Operational failure** (check not run, crash, timeout, untrusted payload) | Invalidates the run. Scoring needs **zero** operational failures; it is never counted as any outcome |
 | **ADR-020 `EXCLUDED`** (A9) | Scored for applicability only. Excluded from every matcher denominator |
-| **Strata A and W** (`APPLIED`, trusted, complete source) | Matcher outcome scored against the label |
+| **Strata A, W and set R** (`APPLIED`, trusted, complete source) | Matcher outcome scored against the label. For A7, matcher status and unknown-source reason are also scored |
 | **Stratum U** | Correct only if `MATCHER_UNEVALUATED` with the expected primary reason. Excluded from the coverage denominators |
 | **Stratum N** | Correct only if `MATCHER_UNEVALUATED` with the expected primary reason. Excluded from the coverage denominators. Any no-violation counts as an unsafe pass |
 
 A compliant (no-violation) result is credited **only** for `APPLIED`, trusted,
-complete-source cases in strata A or W.
+complete-source cases in strata A or W, or in set R.
 
 ## 4. Metrics
 
@@ -185,6 +227,7 @@ question only.
 | Misses | Recognized violations (A, W) reported as no violation or as unevaluated |
 | False blocks | Benign cases (A, W) reported as a violation |
 | Unsafe passes | Any no-violation on U or N, or on a case whose label requires unevaluated |
+| Unexpected violations on U/N | Any violation reported on a U or N case. U and N contain no recognized `EXCEEDS` source by construction |
 | Wrong primary reason | Unevaluated cases (U, N, and any A/W case expected unevaluated) whose primary reason differs from the pre-registered one |
 | Coverage A | Decided outcomes ÷ stratum A cases |
 | Coverage W | Decided outcomes ÷ stratum W cases |
@@ -199,12 +242,19 @@ The implementation **passes** only if **every** gate holds:
 1. **Zero misses** in strata A and W.
 2. **Zero false blocks** in strata A and W.
 3. **Zero unsafe passes.**
-4. **Every A7 mixed case** is reported as a violation.
+3a. **Every U and N case returns `MATCHER_UNEVALUATED` with its expected
+    primary reason.** Both a violation and a no-violation are failures. The
+    separately reported counts of unsafe passes and of unexpected violations
+    on U/N remain visible.
+4. **Every A7 mixed case** is reported as a violation, with matcher status
+   `PARTIAL`, the expected unknown source and primary reason, and
+   `evaluation_complete=false`.
 5. **Zero wrong primary reasons** on adjudicated cases (E2).
 6. **Coverage A = 100%.**
 7. **Coverage W ≥ 95%** (E3). The owner may tighten this before the freeze.
    It must not be relaxed after the freeze.
-8. **Numeric-semantics set R** matches ADR-034 §5a exactly.
+8. **Every set R case** (R1–R16) matches its pre-registered expected outcome
+   and, where unevaluated, its primary reason.
 9. **Determinism:** two byte-identical runs.
 10. **Binding completeness = 100%.**
 11. **Golden vectors:** every ADR-034 §5 vector reproduces, and existing
@@ -215,7 +265,10 @@ The implementation **passes** only if **every** gate holds:
 **Always reported, never a gate:** U and N outcome counts, the aggregate
 unevaluated rates, and stratum O. The headline states, per shape:
 
-> "W decided X of 10; A decided Y of 10; U unevaluated Z of 5 (expected 5)."
+> "W decided X of 10; A decided Y of N_A; U unevaluated Z of 5 (expected 5)."
+
+N_A is that shape's actual stratum A quota: 9 for S1 and S2, 10 for S3–S5.
+Set R is reported as "R matched M of 16".
 
 **On failure:**
 
