@@ -1,10 +1,12 @@
 # P0-A: Semantic constraint enforcement — validation charter
 
-**Status:** **DRAFT, revision 2**, for final owner review. Validation only.
+**Status:** **DRAFT, revision 3**, for final owner confirmation. Validation only.
 The owner resolved D1–D5 in the
 [PR #578 review](https://github.com/MnemeHQ/mneme/pull/578#issuecomment-6310714497)
 (2026-10-21), and section 10 records those decisions. This revision also
-incorporates the four requested wording and measurement corrections.
+incorporates the four requested wording and measurement corrections, and
+revision 3 defines the M3 recognition contract (section 4.1) per the
+[revision 2 review](https://github.com/MnemeHQ/mneme/pull/578#issuecomment-6310847609).
 Accepting this charter authorizes **no** change to `mneme/`, `docs/adr/`,
 `.mneme/`, the benchmark suites, CI, or the Layer 1 freeze document. **No
 experiment implementation is authorized** until this charter is approved and
@@ -117,11 +119,40 @@ source (`tokenize`, `ast`) but must **never** execute it.
 | M0 | Shipped `FORBID_LITERAL` via `mneme check --mode strict --json` (the #570 path) | C1-literal | Gate and audit (baseline) |
 | M1 | Lexical-context literal: Python `tokenize`, matching `NAME` tokens only; comments, strings and docstrings excluded | C1-literal, E | Gate (introduced lines) and audit |
 | M2 | Static bound: `ast`, module-level assignment to the declared symbol plus the deadline argument at each `classify` call; VIOLATION if not `0 < value ≤ 5` or a disabled form; recognized forms are numeric literals and constant folding of literal arithmetic only; anything else is `UNEVALUATED` | C2, semantic C1 | Audit (whole file); gate result reported separately |
-| M3 | Static structural fallback: `ast`, `route` must contain a `try` whose handler catches `TimeoutError` (or a declared superclass) and returns the declared fallback symbol; any other shape is `UNEVALUATED` | C3 | Audit (whole file) |
+| M3 | Static structural fallback: `ast` analysis of `route` against the frozen simple router template. Its recognized positive, negative and unevaluated forms are defined in section 4.1 | C3 | Audit (whole file) |
 | M4 | Behavioral: the oracle's timeout and normal-path probes, run as a project test after the mutation | C3, C2 | Post-mutation (not pre-execution) |
 
 M4 is included only to measure the gap between what the static methods claim
 and what behavior shows. Passing M4 never supports a pre-execution claim.
+
+### 4.1 M3 recognition contract
+
+M3 analyzes only the **frozen simple router template**. That template is a
+module-level function `route` that calls `classify`, together with a declared
+fallback symbol `FALLBACK_ROUTE`, as in the A–F fixtures. The template and
+symbol names are frozen in the Set 1 commit. M3 has exactly four outcomes:
+
+| Recognized form | M3 verdict (C3) | Cases |
+|---|---|---|
+| On the template, the `classify` call has **no enclosing timeout handler** | `VIOLATION` | D; U at the whole-file audit |
+| A recognized timeout handler (`except TimeoutError` or a declared superclass such as `Exception`) that **re-raises** instead of returning the fallback | `VIOLATION` | N |
+| A recognized timeout handler that **returns `FALLBACK_ROUTE`** | `NO_VIOLATION`, for static structure only | A, P |
+| Any other routing or fallback form, including delegation through a helper such as `_fallback()` | `UNEVALUATED` | O |
+
+M3 never infers a violation just because the syntax is unfamiliar. A form
+missing from the first three rows is `UNEVALUATED`, never `VIOLATION`. That
+includes a handler that returns some other value, a non-timeout exception
+type, a `route` that differs from the template, or `classify` reached
+indirectly.
+
+`NO_VIOLATION` from M3 means that a recognized fallback **structure** is
+present. It does not mean the fallback **behaves** safely, which only M4 can
+observe, after the mutation.
+
+**Gate vs audit (ADR-018).** M3 answers the whole-file audit question. A
+deletion-only change (U) leaves the template with no handler, so the audit
+reports `VIOLATION`. The introduced-delta gate sees no added content for U,
+however, so U must never be reported as stopped at the gate.
 
 No method may call a model. Determinism is a requirement, not a metric.
 
@@ -253,11 +284,14 @@ results describe performance on Set 0 and Set 1 only. They do not show how a
 detector would generalize to unseen changes.
 
 **C3 limit (D5, owner decision):** pre-execution behavioral enforcement of C3
-is excluded. On the whole-file audit question, M3 may report evidence that a
-*recognized static fallback structure is present*. M4 tests behavior *after
-the mutation*. Neither establishes pre-execution behavioral enforcement of
-C3. Case U, a deletion-only change, stays outside the ADR-018 introduced-delta
-gate.
+is excluded. On the whole-file audit question, M3 reports only the recognized
+forms in section 4.1. That is either a recognized violation (no handler on the
+template, or a re-raising handler) or a *recognized static fallback structure*.
+Every other form is `UNEVALUATED`. M4 tests behavior *after the mutation*.
+Neither establishes pre-execution behavioral enforcement of C3. Case U, a
+deletion-only change, may be detected by the whole-file audit but stays
+outside the ADR-018 introduced-delta gate. It is never reported as stopped at
+the gate.
 
 ## 8. Hypotheses
 
@@ -267,8 +301,13 @@ gate.
   strings, misses it.
 - **HA2:** M2 catches C, I, K, T and the violating half of M, raises no false
   blocks on L or boundary-5, and returns `UNEVALUATED` on J.
-- **HA3:** M3 catches D and N, returns `UNEVALUATED` on O rather than a false
-  block, and on the gate question it cannot see U.
+- **HA3:** Under the section 4.1 contract, M3:
+  - returns `VIOLATION` on D (no handler on the template) and on N (a handler
+    that re-raises);
+  - returns `NO_VIOLATION`, for static structure only, on A and P;
+  - returns `UNEVALUATED` on O, not a false block;
+  - returns `VIOLATION` on U at the whole-file audit, while U is not reported
+    as stopped at the introduced-delta gate.
 - **HA4:** Unrecognized shapes leave a residual that no static method in M1–M3
   closes without widening its recognized forms. The size of that residual is
   the main input to any later rule-type decision.
