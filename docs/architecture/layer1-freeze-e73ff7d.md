@@ -674,6 +674,99 @@ The existing DG1B1, DG1F-C1a and #260 freeze amendments remain unchanged.
 
 ---
 
+## Amendment — authorize ADR-033 C2a PreToolUse availability routing (2026-10-20)
+
+> This is an authorization for **routing, classification and diagnostics at one
+> boundary**. It does not authorize any availability refusal, verifier,
+> enrollment or revocation, fail-closed enforcement, or any change to other
+> boundaries.
+
+**Change:** at the Claude Code direct-write boundary (`Edit|Write|MultiEdit`,
+`handle_event` in `mneme/integrations/claude_code/hook.py`), detect a local
+`.mneme/availability.json` declaration before the memory early return. Without
+a declaration, behavior is byte-identical to `main`. With one, run today's
+check path unchanged and emit a diagnostic that names
+`AUTHORIZATION_UNVERIFIABLE(VERIFIER_CONFIG_MISSING)`, the evaluation state,
+and any SS-3 mismatch or partial-evaluation violations.
+
+**Sections referenced:** the Freeze Anchor **Status** clause ("No behavioral
+change to retrieval or enforcement without an explicit charter amendment") and
+the Amendment Procedure below.
+
+**Rationale (Amendment Procedure §3(b)).** A distinct behavioral charter was
+**already merged** before this amendment:
+[Reliable Enforcement C2a PreToolUse availability routing charter](../plans/2026-10-20-reliable-enforcement-c2a-availability-routing-charter.md),
+PR [#574](https://github.com/MnemeHQ/mneme/pull/574), squash `c49d7008`, under
+accepted [ADR-033](../adr/ADR-033-opt-in-fail-closed-enforcement.md) (PR
+[#483](https://github.com/MnemeHQ/mneme/pull/483), squash `78459d1a`). Charter
+§9 requires this amendment before implementation. No behavior change is
+retroactively justified.
+
+**Governing authority:** accepted ADR-033, ADR-021 (fail-open transport
+policy), ADR-017, ADR-020, ADR-029, ADR-030, ADR-031; the merged C1 (#260)
+verdict-consistency and T-08 slice-1 charters; the merged C2a charter.
+
+### Authorized change — C2a only (charter §3)
+
+- **Declaration detection** (charter §3.1): before the memory early return in
+  `handle_event`, walk up from the T-08 slice-1 start directory to the first
+  ancestor containing `.mneme/`, and look for `.mneme/availability.json`
+  there, whether or not memory exists. `MNEME_MEMORY` is not consulted for
+  this.
+- **Declaration format v1** (charter §3.2): the three required keys only;
+  unknown keys preserved and ignored; any other content is "present but
+  invalid".
+- **Verifier interface** (charter §3.3) whose only implementation returns
+  `AUTHORIZATION_UNVERIFIABLE(VERIFIER_CONFIG_MISSING)`, with no network
+  access and no git configuration read. Other outcomes are reachable only
+  through a test seam.
+- **Evaluation-state classifier** (charter §3.4) built on `assess_verdict`,
+  internal only.
+- **Historical payloads and mixed partial results** (charter §§3.5, 3.6):
+  diagnostics on the declaration path only.
+- **Diagnostics** (charter §3.7) on the existing stderr channel, claimed as
+  emitted, not delivered.
+- **The charter §4 regression matrix**, including byte-identical default-open
+  parity (P1) and no network activity (P2).
+
+No other code path is authorized. **No C2a code path may produce an
+availability refusal.**
+
+### Explicitly preserved (unchanged)
+
+This restates merged charter §5.
+
+1. **No declaration → today's behavior,** byte-identical output, the same exit
+   codes, and zero network activity.
+2. **Default fail-open (ADR-021)** for every untrusted, incomplete,
+   missing-memory or error outcome. A trusted complete strict `FAIL` still
+   blocks exactly as today.
+3. **The `mneme check` CLI,** its output, exit codes, the `mneme.check/v1`
+   payload, and the malformed-memory crash path (CI1.4 §7 condition 4).
+4. **`find_memory`,** `MNEME_MEMORY` precedence and T-08 slice-1 selection.
+5. **strict/warn semantics** and the #260 coherence rules in `assess_verdict`.
+6. **Bash, SessionStart and Stop** behavior.
+7. **Canonical decision authority** (ADR-030 §1). The declaration holds no
+   decisions or rules.
+8. **Frozen benchmark fixtures and methodology; `.mneme/project_memory.json`.**
+
+### Not authorized by this amendment
+
+- Any availability refusal; any verifier that contacts a remote or reads git
+  configuration; any enrollment, issuance or revocation command; the C2b
+  declaration fields. These belong to a C2b charter and its own amendment.
+- Live host validation (ADR-033 gate C3) and CI implementation (gate C4).
+- Any change to other boundaries or integrations, CI workflows, rulesets or
+  Actions policy.
+- Any claim that a diagnostic is delivered or that a repository is protected
+  by C2a. The Architecture A limitation stands: **deleting the local
+  declaration can silently disable opt-in fail-closed protection.**
+
+The existing DG1B1, DG1F-C1a, #260 and T-08 slice-1 freeze amendments remain
+unchanged.
+
+---
+
 ## Amendment Procedure
 
 This document is frozen at `e73ff7d`. To amend it:
