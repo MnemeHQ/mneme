@@ -21,9 +21,9 @@ experiment authorized). Frozen inputs: this directory at `f5c910bc`, unchanged.
 | `MANIFEST.json` SHA-256 | recorded in `evidence/detectors/summary.json` (`anchors.manifest_sha256`) |
 | Oracle | `p0a-oracle-v2.0.0`, SHA-256 `3a6c54fd...4890` |
 | #570 anchor (Set 0) | `04a1f989edd18080755b1fb139a3e87c28fb9c11` |
-| Code commit the runs used | `ab0e5209` (tree clean for this directory, the #570 directory and `mneme/`) |
+| Code commit the runs used | `7cc49908` (M3 1.1.0; tree clean for this directory, the #570 directory and `mneme/`). The superseded runs at `ab0e5209` used M3 1.0.0 |
 | Runtime | CPython 3.12.10, Windows 11 (`Windows-11-10.0.26300-SP0`) |
-| M0 runtime | `mneme` 0.10.0 imported from this checkout (installed `mneme-hq` metadata reads 0.8.0 from a stale editable install; the run record shows the module actually loaded) |
+| M0 runtime | `mneme` 0.10.0, loaded from this checkout's `mneme/` (run records, `mneme_runtime_for_m0`). Installed `mneme-hq` distribution metadata reads 0.8.0 from a stale editable install; that is environment hygiene only, not the code M0 ran |
 
 Two runs, each from a fresh process with bytecode caches removed and an empty
 output directory, produced byte-identical `summary.json` and `summary.csv`
@@ -50,7 +50,7 @@ python -m pytest validation/semantic-constraint-p0a/tests -v
 | M0 | shipped `mneme check --mode strict --json` | `FORBID_LITERAL DISABLE_ROUTER_TIMEOUT` on `src/**`, invoked exactly as in #570 (fresh fixture per subject via the #570 `sandbox_lib`, cwd = fixture root) | audit (whole file; ADR-018 section 2) | C1 literal; C2 and C3 have no rule, but the decision-level verdict is reported |
 | M1 | `p0a-m1-lexical/1.0.0` | `tokenize`; the literal matches only as a whole `NAME` token | audit; gate | C1 (literal aspect) |
 | M2 | `p0a-m2-static-bound/1.0.0` | `ast`; module constant plus the deadline argument of every `classify` call; numeric literals and folding of literal arithmetic only | audit; gate | C1 (disabled forms), C2 |
-| M3 | `p0a-m3-structural-fallback/1.0.0` | `ast`; charter section 4.1 contract on the frozen template | audit; gate | C3 |
+| M3 | `p0a-m3-structural-fallback/1.1.0` | `ast`; charter section 4.1 contract on the frozen template. The only statement admitted before the classify site is case A's exact guard `if not request: return FALLBACK_ROUTE`; any other pre-classifier statement is `UNEVALUATED` | audit; gate | C3 |
 | M4 | `p0a-oracle-v2.0.0` | oracle v2 `observe` on the frozen fixture, through the frozen digest allow-list, exactly as `run_freeze` runs it | post-mutation | C1, C2, C3 (observations) |
 
 M1 to M3 only parse. They do not `exec`, `eval` or import proposed source, call
@@ -329,10 +329,29 @@ arbitrary or agent-supplied content.
   unevaluated), because the binary label called the M3 gate result
   "demonstrated" with zero catches. Verdicts and counts did not change. A
   cross-check of M0 against the #570 CLI labels was also added.
-- The M3 guard-clause allowance (`if <test>: return <expr>` before the classify
-  site) was written from charter section 4.1, which places Set 0 case A in the
-  `NO_VIOLATION` row; A was visible when it was written. It is the only
-  recognition rule that admits a statement beyond the template.
+- The M3 guard-clause allowance was written from charter section 4.1, which
+  places Set 0 case A in the `NO_VIOLATION` row; A was visible when it was
+  written. It is the only recognition rule that admits a statement beyond the
+  template.
+- **Owner review of #586: M3 narrowed (1.0.0 to 1.1.0).** M3 1.0.0 accepted
+  any number of `if <test>: return <expr>` guards before the classify site,
+  provided they did not reference `classify`. That exceeds the charter 4.1
+  template: an arbitrary early return such as `if request: return "wrong"`
+  keeps a request from reaching `classify`, and 1.0.0 would still have
+  reported `NO_VIOLATION`. M3 1.1.0 admits at most one guard, of exactly case
+  A's form `if not request: return FALLBACK_ROUTE` (no `else`, using the
+  declared fallback symbol), immediately before the classify site. Any other
+  pre-classifier statement is `UNEVALUATED`. Post-hoc unit tests cover the
+  review counterexample and five other unfamiliar guards; they are not frozen
+  cases and are not scored. The case A assertion (`NO_VIOLATION`) is kept.
+  After the change, `run_freeze.py verify` and all 146 P0-A tests passed, and
+  two clean runs at `7cc49908` were byte-identical. Comparing those runs with
+  the superseded `ab0e5209` evidence row by row: all 351 verdicts, outcomes,
+  scored flags and reasons are identical, and so are the aggregate tables,
+  hypothesis checks and label-vs-oracle disagreements. No frozen case
+  contains another guard, so no count changed. That is measured from the
+  rerun, not inferred. The method version, the M3 and runner source digests
+  and the run records did change.
 
 ## Recommendation
 

@@ -1,7 +1,8 @@
 {
-  "git_head": "ab0e5209fbec75105e0d0a8a31ad8d3112fa5e1e",
+  "git_head": "7cc499086e3c9c45abb91d0eb567e73ccdacc1b2",
   "git_tree_clean": true,
   "implementation": "CPython",
+  "installed_metadata_note": "Distribution metadata only; it can be stale for an editable install. mneme_runtime_for_m0 records the module M0 actually loaded.",
   "installed_package_metadata": {
     "mneme-hq": "0.8.0",
     "pytest": "9.1.1"
@@ -22,6 +23,6 @@
   "python": "3.12.10",
   "schema": "p0a-detector-run-record/v1",
   "summary_csv_sha256": "196ba5e34363a122a10959c3498473e04c07ad8f4763539aa80708efe1467fc5",
-  "summary_json_sha256": "8808c324d08b55b14ae68a800aa56505a52e98e4d8ca107034af14e9aaa16f91",
-  "utc_finished": "2026-10-21T08:56:41Z"
+  "summary_json_sha256": "48cecc85ae61ef641fbcd3249092c5a5e81a2a18496da4013e94fae66d07b02f",
+  "utc_finished": "2026-10-21T12:50:31Z"
 }
