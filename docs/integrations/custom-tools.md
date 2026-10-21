@@ -180,8 +180,12 @@ neither universally ungoverned nor universally blocked:
 A memory that mixes both rule kinds gets the first row: an out-of-root write
 is unevaluated, not blocked. The unscoped row characterizes current
 behavior for an all-unscoped memory; the mixed-memory case follows from the
-adapter checking evaluation completeness before the verdict and is not yet
-pinned by its own test. If either changes, this page must change with it.
+adapter checking evaluation completeness before the verdict and is pinned by
+`test_out_of_root_mixed_rules_unscoped_violation_fails_open`,
+`test_out_of_root_mixed_rules_warn_mode_fails_open` and
+`test_out_of_root_mixed_rules_compliant_is_not_allow` (the violation stays in
+the checker payload; the adapter still returns `fail_open`). If either
+changes, this page must change with it.
 
 **Confinement is the orchestrator's policy (option 2C).** Mneme does not
 decide which directories an orchestrator may write to. Orchestrators that
