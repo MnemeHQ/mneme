@@ -1,9 +1,14 @@
 # P0-A: Semantic constraint enforcement — validation charter
 
-**Status:** **DRAFT** for owner review. Validation only. Accepting this charter
-authorizes **no** change to `mneme/`, `docs/adr/`, `.mneme/`, the benchmark
-suites, CI, or the Layer 1 freeze document. The decisions in section 10 must be
-resolved before any experiment code is written.
+**Status:** **DRAFT, revision 2**, for final owner review. Validation only.
+The owner resolved D1–D5 in the
+[PR #578 review](https://github.com/MnemeHQ/mneme/pull/578#issuecomment-6310714497)
+(2026-10-21), and section 10 records those decisions. This revision also
+incorporates the four requested wording and measurement corrections.
+Accepting this charter authorizes **no** change to `mneme/`, `docs/adr/`,
+`.mneme/`, the benchmark suites, CI, or the Layer 1 freeze document. **No
+experiment implementation is authorized** until this charter is approved and
+the independently frozen Set 1 commit exists (section 12).
 **Source anchor:** `MnemeHQ/mneme` `origin/main` @ `04a1f989`.
 **Baseline evidence:** MnemeHQ/mneme#570 (`04a1f989`,
 `validation/orchestrator-decision-sandbox/`), measured on the runtime that
@@ -66,13 +71,21 @@ missing from it or understated, and the experiment design depends on them.
    change that keeps `ROUTER_DEADLINE_S = 5.0` but calls
    `classify(request, 60)` passes the oracle while violating C2. The oracle has
    to be corrected and frozen before any method is scored (section 10, D2).
+   More generally, a behavioral oracle cannot ground every label: case S
+   shows a change that the oracle accepts but that still violates the
+   decision's intent. Labels are therefore adjudicated at the source level
+   and reported alongside the oracle's runtime observations (section 5.1).
 5. **A–F supports one observation per gap.** Tuning methods against A–F alone
    overfits; the freeze's benchmark section calls adding scenarios to push a
    metric overfitting. Extension cases must therefore be authored and frozen
-   **before** any method exists (section 5).
+   **before** any method exists (section 5). A precommitted set is still
+   visible to the detector author, though. It protects against fixtures being
+   changed after the fact, but it is **not** a blind evaluation and does not
+   show generalization.
 6. **A gate must not execute proposed code.** The oracle runs candidate source
-   with `exec`. That is fine for a synthetic offline oracle, but proposed agent
-   content can never be executed as gate input. So behavioral evidence for C3
+   with `exec`. That is acceptable only for the known, frozen synthetic
+   fixtures in this offline experiment; proposed agent content can never be
+   executed as gate input. So behavioral evidence for C3
    belongs to a post-mutation boundary (tests or CI), not the pre-execution
    gate.
 7. **An unrecognized form must not produce PASS.** A static checker that
@@ -118,9 +131,13 @@ No method may call a model. Determinism is a requirement, not a metric.
 checks their digests against `validation/orchestrator-decision-sandbox/fixtures/cases.json`
 at `04a1f989`.
 
-**Set 1 (held-out extension):** authored, labelled by the corrected oracle,
-digest-frozen and committed **before** any M1–M3 code is written, by an author
-who does not write the detectors (D3). Proposed initial set:
+**Set 1 (precommitted extension):** a separate author or session that does not
+write the detectors creates G–U and labels them (D3). The labels are reviewed
+against ADR-001. The fixture bytes, the labels, the digests and the oracle
+version are then frozen in their **own commit**, before any M1–M3 code exists.
+Set 1 is visible, not held out: it guards against fixtures changing after the
+fact, and results on it are not evidence of generalization. Proposed initial
+set:
 
 | ID | Change | Targets | Expected label |
 |---|---|---|---|
@@ -136,7 +153,7 @@ who does not write the detectors (D3). Proposed initial set:
 | P | `except Exception: return FALLBACK_ROUTE` | C3 benign, broad catch | benign |
 | Q | Longer identifier `DISABLE_ROUTER_TIMEOUT_DOCS` | ADR-019 §3 boundary | benign |
 | R | Literal only in a docstring and an f-string | C1 false-block variant | benign |
-| S | `os.environ.get("DISABLE_ROUTER_TIMEOUT")` controls the deadline | C1 via string key | adjudicated (D4): the oracle ACCEPTs with the env var unset, though the intent is violated |
+| S | `os.environ.get("DISABLE_ROUTER_TIMEOUT")` controls the deadline | C1 via a configuration switch | **violation** (D4, owner-adjudicated). Runtime observation: the oracle ACCEPTs with the variable unset; an enabled-switch probe is required (section 5.1) |
 | T | Edit: the single line `5.0` → `60.0` | C2 via introduced delta | violation |
 | U | Edit: deletion-only removal of the `except` block | C3 via deletion | violation (gate structurally blind, audit only) |
 
@@ -144,21 +161,51 @@ Set 1 should hold roughly equal numbers of benign and violation cases. A case
 added after methods exist goes into a separate, clearly marked **post-hoc** set
 that never counts toward the section 7 criteria.
 
+### 5.1 Labels and oracle observations
+
+Each case carries two separate records. Neither is quietly merged into the
+other.
+
+- **Architectural label** (`violation` or `benign`, per sub-constraint): the
+  ground truth for scoring. It is adjudicated at the source level against
+  ADR-001's text and reviewed before the freeze. Where the owner adjudicated a
+  label (S), the rationale is recorded with the fixture.
+- **Oracle runtime observations:** what the corrected oracle observed when it
+  executed the frozen fixture. For example: the deadline actually supplied to
+  `classify`, the result on the timeout path, and the result on the normal
+  path. These are observations under stated conditions, not labels.
+
+Wherever the two disagree, both are reported, together with the reason. For
+S, the oracle runs twice: once with the variable unset, where ACCEPT is
+expected, and once with the switch enabled, where it is expected to find
+`C1_DISABLED`. If the enabled-switch probe cannot be evaluated, the fixture
+documents why, and the label still stands.
+
+**Corrected oracle (D2).** This is a new, versioned synthetic oracle. The #570
+`oracle.py` stays byte-identical as historical evidence. The new oracle
+records the deadline actually passed to `classify`, including call-site
+overrides (K), as well as the module constant. Its semantics and version are
+frozen in the Set 1 commit, before any scoring. It executes only the known,
+frozen synthetic fixtures.
+
 ## 6. Verdicts and scoring
 
 Each (method, case, question) triple yields exactly one verdict:
 `VIOLATION`, `NO_VIOLATION` or `UNEVALUATED`. Each verdict is compared with the
-oracle label:
+architectural label (section 5.1). Where the oracle observation disagrees with
+the label, it is reported next to the verdict:
 
-| Oracle \ Method | VIOLATION | NO_VIOLATION | UNEVALUATED |
+| Label \ Method | VIOLATION | NO_VIOLATION | UNEVALUATED |
 |---|---|---|---|
 | violation | caught | **missed** (false negative) | unevaluated violation |
 | benign | **false block** (`FALSE_POSITIVE`) | correct allow | unevaluated benign |
 
 Reported per sub-constraint, per method, per question (gate vs audit):
 
-- Violation catch rate, miss count, and unevaluated count (`UNEVALUATED` is
-  never folded into either PASS or block).
+- Violation catch rate, miss count, and unevaluated count. `UNEVALUATED` is a
+  separate metric, always reported, and never folded into either PASS or
+  block.
+- Label and oracle disagreements, listed per case.
 - False-block count on benign cases.
 - Determinism: two clean runs, byte-identical summaries.
 - Evidence binding (ADR-029): each verdict records the decision ID, the rule or
@@ -168,11 +215,22 @@ Reported per sub-constraint, per method, per question (gate vs audit):
 
 ## 7. What counts as sufficient semantic proof
 
-This section answers the prerequisite left open in Step 1. A method may be
-described as **enforcing Cn for this decision shape** only if, across Set 0
-and Set 1:
+This section answers the prerequisite left open in Step 1.
 
-1. It misses **zero** oracle-labelled violations of Cn.
+**Detection capability is not enforcement.** M1–M3 are offline detectors that
+are not connected to any mutation gate. Passing this experiment shows
+**detector capability in an offline experiment**. It does not show that Mneme
+enforces C1, C2 or C3, and no result may be described as shipped enforcement.
+Turning a detector into enforcement requires its own ADR (a new rule type,
+per ADR-019 §9), a Layer 1 behavioral charter, and integration evidence under
+ADR-029.
+
+A method may be described as **having demonstrated offline detection
+capability for Cn, on this decision shape and within its declared recognition
+scope** only if, across Set 0 and Set 1:
+
+1. It misses **zero** violations of Cn, scored against the architectural
+   labels (section 5.1).
 2. It raises **zero** false blocks on benign cases.
 3. Every form outside its declared recognition scope returns `UNEVALUATED`,
    never `NO_VIOLATION`.
@@ -185,16 +243,28 @@ A method that fails any of these is reported as **partial**, with its misses,
 false blocks and unevaluated forms listed. A method that meets them on the
 audit question but not the gate question is reported for the audit only.
 
-**C3 limit stated in advance:** static methods can at most establish that a
-*recognized fallback form is present*. Showing that the fallback *behaves*
-safely needs execution, which only a post-mutation boundary can do (M4). Unless
-the owner decides otherwise (D5), P0-A does not claim pre-execution
-enforcement of C3.
+Meeting the criteria never removes the `UNEVALUATED` count. A method that
+meets every in-scope assertion while returning `UNEVALUATED` on J or O is
+still reported with those cases listed. Its result is bounded by its
+recognition scope and must not be stated as a general compliance claim.
+
+Because Set 1 is visible and precommitted rather than blind (section 5),
+results describe performance on Set 0 and Set 1 only. They do not show how a
+detector would generalize to unseen changes.
+
+**C3 limit (D5, owner decision):** pre-execution behavioral enforcement of C3
+is excluded. On the whole-file audit question, M3 may report evidence that a
+*recognized static fallback structure is present*. M4 tests behavior *after
+the mutation*. Neither establishes pre-execution behavioral enforcement of
+C3. Case U, a deletion-only change, stays outside the ADR-018 introduced-delta
+gate.
 
 ## 8. Hypotheses
 
 - **HA1:** M1 removes the E and R false blocks without missing B, and catches
-  none of the non-literal C1 cases (G, H, S).
+  none of the non-literal C1 cases (G, H, S). For S, the literal appears only
+  inside a string: M0's exact match catches it, while M1, which excludes
+  strings, misses it.
 - **HA2:** M2 catches C, I, K, T and the violating half of M, raises no false
   blocks on L or boundary-5, and returns `UNEVALUATED` on J.
 - **HA3:** M3 catches D and N, returns `UNEVALUATED` on O rather than a false
@@ -215,20 +285,24 @@ enforcement of C3.
 - Amending the Layer 1 freeze. If results justify new rule types, each one
   gets its own ADR and behavioral charter (Amendment Procedure §4).
 
-## 10. Decisions required before any experiment code
+## 10. Owner decisions (resolved 2026-10-21)
 
-| ID | Decision | Recommendation |
+Recorded from the
+[PR #578 review](https://github.com/MnemeHQ/mneme/pull/578#issuecomment-6310714497).
+
+| ID | Decision | Disposition |
 |---|---|---|
-| D1 | Authorize prototype detectors M1–M3 under `validation/semantic-constraint-p0a/`, never imported by `mneme/` | Authorize; it is the minimum needed to answer the question |
-| D2 | Correct the oracle to record the deadline actually passed to `classify` (case K) before anything is frozen | Correct it, version it, keep the #570 oracle byte-identical as historical |
-| D3 | Separate the Set 1 author from the detector author | Required: a separate agent session or reviewer writes and freezes Set 1 |
-| D4 | Adjudicate the label for case S, where the oracle and intent disagree | The owner labels it before the freeze, and the rationale is recorded |
-| D5 | Whether pre-execution C3 is in scope at all | No: report the static presence check and M4 behavior separately |
+| D1 | Offline M1–M3 prototypes | **Design scope conditionally authorized**, only under `validation/semantic-constraint-p0a/`. No runtime imports, rules, hooks, CLI, CI, benchmark or freeze changes. **Not implementation authorization** until this charter passes final review and the independently frozen Set 1 commit exists. |
+| D2 | Oracle correction | **Approved.** A new, versioned synthetic oracle; #570's oracle preserved byte-identically. It captures the deadline actually supplied to `classify`, including call-site overrides, and keeps runtime observations separate from labels. Its semantics are frozen before scoring, and it executes only known synthetic fixtures (section 5.1). |
+| D3 | Independent Set 1 | **Required.** A separate author or session creates and labels G–U. The labels are reviewed against ADR-001, and the fixture bytes, digests and oracle version are frozen in their own prior commit. This is a precommitted evaluation set, not evidence of generalization. |
+| D4 | Case S | **VIOLATION (C1, architectural intent).** The new environment-variable switch makes disabling the deadline possible. The unset-environment ACCEPT is kept as a runtime observation, and an enabled-switch probe is added or documented as unevaluable (section 5.1). |
+| D5 | Pre-execution C3 | **Excluded.** M3 reports recognized static fallback structure on the audit question, and M4 tests behavior after mutation. U stays outside the introduced-delta gate (section 7). |
 
-## 11. Deliverables (after D1–D5 are resolved)
+## 11. Deliverables (after final charter approval)
 
-1. The Set 1 fixtures, the corrected oracle and the digests, committed first
-   in a separate commit.
+1. The Set 1 fixtures, labels and adjudication rationale, the corrected and
+   versioned oracle, and the digests. They are written by an author
+   independent of the detectors and committed first, in their own commit.
 2. Prototype methods M1–M3, a runner, and evidence (summary JSON/CSV, run
    records with versions and anchors).
 3. `RESULTS.md` with per-method, per-constraint, per-question tables, the
@@ -239,5 +313,10 @@ enforcement of C3.
 
 ## 12. Smallest next step
 
-The owner resolves D1–D5. Then the Set 1 fixtures and the corrected oracle are
-written and frozen as their own commit, before any detector exists.
+D1–D5 are resolved. The remaining steps run in this order:
+
+1. The owner gives final review of this revised charter.
+2. The owner authorizes the independent fixture-and-oracle freeze.
+3. A separate session writes Set 1 and the corrected oracle and freezes them as
+   their own commit.
+4. Only after that commit exists may M1–M3 implementation be authorized.
