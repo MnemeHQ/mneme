@@ -23,9 +23,10 @@ Template recognition, all required, otherwise ``UNEVALUATED``:
   and that call is the whole value of a ``return`` statement;
 - ``FALLBACK_ROUTE`` is bound exactly once, by a module-level assignment, and
   no declared exception type name is rebound anywhere in the module;
-- the body of ``route`` is: an optional docstring, then zero or more guard
-  clauses (``if <test>: return <expr>`` with no ``else`` and no reference to
-  ``classify``), then the classify site as the last statement;
+- the body of ``route`` is: an optional docstring, then at most one guard
+  of exactly the form ``if not request: return FALLBACK_ROUTE`` (no ``else``),
+  then the classify site as the last statement. Any other statement before
+  the classify site, including any other early return, is ``UNEVALUATED``;
 - the classify site is either that ``return`` directly (no handler), or a
   ``try`` whose body is exactly that ``return``, with at least one handler and
   no ``else`` or ``finally``.
@@ -40,11 +41,13 @@ The timeout handler's body must be exactly ``return FALLBACK_ROUTE``
 (``VIOLATION``); any other body, including a helper call such as
 ``_fallback()``, is ``UNEVALUATED``.
 
-The guard-clause allowance was written from the charter: section 4.1 places
-Set 0 case A, whose ``route`` starts with ``if not request: return
-FALLBACK_ROUTE``, in the ``NO_VIOLATION`` row. A guard clause cannot catch an
-exception raised later by ``classify``, so it does not change the handler
-analysis.
+The single guard form is admitted because charter section 4.1 places Set 0
+case A, whose ``route`` starts with ``if not request: return
+FALLBACK_ROUTE``, in the ``NO_VIOLATION`` row. Version 1.0.0 accepted any
+``if <test>: return <expr>`` guard; owner review of #586 narrowed it to A's
+exact form, because an arbitrary early return (for example ``if request:
+return "wrong"``) can keep a request from ever reaching ``classify`` and
+invalidates any static fallback inference.
 """
 
 import ast
@@ -62,15 +65,27 @@ from .common import (
 )
 
 METHOD_ID = "M3"
-METHOD_VERSION = "p0a-m3-structural-fallback/1.0.0"
+METHOD_VERSION = "p0a-m3-structural-fallback/1.1.0"
 
 
 class _Unrecognized(Exception):
     pass
 
 
-def _names(node: ast.AST) -> set:
-    return {n.id for n in ast.walk(node) if isinstance(n, ast.Name)}
+def _is_case_a_guard(stmt: ast.stmt, request: str, fallback: str) -> bool:
+    """Exactly ``if not <request>: return <fallback>`` with no ``else``."""
+    return (
+        isinstance(stmt, ast.If)
+        and isinstance(stmt.test, ast.UnaryOp)
+        and isinstance(stmt.test.op, ast.Not)
+        and isinstance(stmt.test.operand, ast.Name)
+        and stmt.test.operand.id == request
+        and not stmt.orelse
+        and len(stmt.body) == 1
+        and isinstance(stmt.body[0], ast.Return)
+        and isinstance(stmt.body[0].value, ast.Name)
+        and stmt.body[0].value.id == fallback
+    )
 
 
 def _is_docstring(stmt: ast.stmt) -> bool:
@@ -103,8 +118,11 @@ def _find_route(tree: ast.Module, symbols: dict) -> ast.FunctionDef:
     return route
 
 
-def _check_route_body(route: ast.FunctionDef, classifier: str) -> ast.stmt:
+def _check_route_body(route: ast.FunctionDef, symbols: dict) -> ast.stmt:
     """Return the classify-site statement, or raise."""
+    classifier = symbols["classifier_parameter"]
+    request = symbols["route_parameters"][0]
+    fallback = symbols["fallback_symbol"]
     for node in ast.walk(route):
         if node is not route and isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda, ast.ClassDef)):
             raise _Unrecognized("route contains a nested function, lambda or class")
@@ -123,15 +141,8 @@ def _check_route_body(route: ast.FunctionDef, classifier: str) -> ast.stmt:
     if not body:
         raise _Unrecognized("route has no statements")
     *guards, site = body
-    for guard in guards:
-        if not (
-            isinstance(guard, ast.If)
-            and not guard.orelse
-            and len(guard.body) == 1
-            and isinstance(guard.body[0], ast.Return)
-            and classifier not in _names(guard)
-        ):
-            raise _Unrecognized(f"statement at line {guard.lineno} is not a template guard clause")
+    if len(guards) > 1 or (guards and not _is_case_a_guard(guards[0], request, fallback)):
+        raise _Unrecognized(f"statement at line {guards[0].lineno} before the classify site is not the template guard")
     if _is_classify_return(site, classifier):
         return site
     if (
@@ -161,7 +172,6 @@ def detect(source: str, target_path: str) -> dict:
         return out_of_scope(target_path)
     template = load_template()
     symbols = template["symbols"]
-    classifier = symbols["classifier_parameter"]
     fallback = symbols["fallback_symbol"]
     declared = set(template["timeout_handler"]["declared_exception_types"])
     c1, c2 = not_targeted(METHOD_ID), not_targeted(METHOD_ID)
@@ -183,7 +193,7 @@ def detect(source: str, target_path: str) -> dict:
         if rebound:
             raise _Unrecognized(f"declared exception type name(s) rebound: {', '.join(rebound)}")
         route = _find_route(tree, symbols)
-        site = _check_route_body(route, classifier)
+        site = _check_route_body(route, symbols)
         if isinstance(site, ast.Return):
             c3 = Finding(VIOLATION, "NO_ENCLOSING_HANDLER: classify call has no enclosing timeout handler", (site.lineno,))
         else:

@@ -223,9 +223,35 @@ def test_m3_no_handler_is_violation():
     assert m3_fallback.detect(src, PATH)["C3"].verdict == VIOLATION
 
 
-def test_m3_guard_clause_before_handler_is_template_compatible():
-    src = TEMPLATE.replace("    try:", "    if not request:\n        return FALLBACK_ROUTE\n    try:")
+def with_guard(guard: str) -> str:
+    return TEMPLATE.replace("    try:", guard + "    try:")
+
+
+def test_m3_case_a_guard_before_handler_is_template_compatible():
+    src = with_guard("    if not request:\n        return FALLBACK_ROUTE\n")
     assert m3_fallback.detect(src, PATH)["C3"].verdict == NO_VIOLATION
+
+
+# Post-hoc unit tests from the owner review of #586. They are not frozen
+# cases and are never scored: any guard other than case A's exact form makes
+# C3 UNEVALUATED, because an early return can keep a request from reaching
+# classify at all.
+@pytest.mark.parametrize("guard", [
+    '    if request:\n        return "wrong"\n',
+    '    if not request:\n        return "wrong"\n',
+    "    if request is None:\n        return FALLBACK_ROUTE\n",
+    "    if not request:\n        return FALLBACK_ROUTE\n    else:\n        pass\n",
+    "    if not request:\n        return FALLBACK_ROUTE\n    if not request:\n        return FALLBACK_ROUTE\n",
+    "    x = 1\n",
+])
+def test_m3_other_guards_are_unevaluated_never_a_pass(guard):
+    assert m3_fallback.detect(with_guard(guard), PATH)["C3"].verdict == UNEVALUATED
+
+
+def test_m3_owner_review_counterexample_is_unevaluated():
+    src = with_guard('    if request:\n        return "wrong"\n')
+    assert '    if request:\n        return "wrong"\n    try:\n        return classify(request, ROUTER_DEADLINE_S)\n    except TimeoutError:\n        return FALLBACK_ROUTE' in src
+    assert m3_fallback.detect(src, PATH)["C3"].verdict == UNEVALUATED
 
 
 @pytest.mark.parametrize("header,body", [

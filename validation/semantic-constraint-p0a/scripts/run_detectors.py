@@ -608,6 +608,7 @@ def run_record(methods: tuple, summary_bytes: bytes, csv_bytes: bytes) -> dict:
         "implementation": platform.python_implementation(),
         "os": platform.platform(),
         "installed_package_metadata": packages,
+        "installed_metadata_note": "Distribution metadata only; it can be stale for an editable install. mneme_runtime_for_m0 records the module M0 actually loaded.",
         "mneme_runtime_for_m0": mneme_identity() if "M0" in methods else None,
         "summary_json_sha256": sha256_bytes(summary_bytes),
         "summary_csv_sha256": sha256_bytes(csv_bytes),
