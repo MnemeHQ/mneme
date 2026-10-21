@@ -257,3 +257,88 @@ def test_orchestrator_refusals_counted_separately_from_mneme_blocks(layout):
         "not_evaluated": 1,
         "orchestrator_refused": 2,
     }
+
+
+# ── Mixed scoped + unscoped memory (review finding on the #583 docs) ───────
+#
+# One path-scoped rule (router_001, include_paths src/**) plus one unscoped
+# rule. For an out-of-root target the scoped rule is UNKNOWN, so the whole
+# evaluation is incomplete and the adapter fails open before reading the
+# verdict, even when the unscoped rule is violated. The violation stays in
+# the checker payload; it is not turned into a deny, and never into an allow.
+
+UNSCOPED_LITERAL = "import psycopg2"
+UNSCOPED_VIOLATING = BASELINE + UNSCOPED_LITERAL + "\n"
+
+
+def mixed(layout):
+    """Fixture memory plus one unscoped FORBID_LITERAL decision."""
+    memory = copy.deepcopy(MEMORY)
+    memory["decisions"].append(
+        {
+            "id": "store_002",
+            "decision": "Use SQLite for local storage",
+            "rationale": "single-file portability",
+            "scope": ["storage"],
+            "rules": [{"type": "FORBID_LITERAL", "value": UNSCOPED_LITERAL}],
+        }
+    )
+    (layout.project / ".mneme" / "project_memory.json").write_text(
+        json.dumps(memory), encoding="utf-8"
+    )
+
+
+def applicability(sent):
+    return sorted(unknown_rules(sent))
+
+
+def violated_decisions(sent):
+    return sorted(
+        v.get("decision_id") for v in sent.payload.get("violations", []) if isinstance(v, dict)
+    )
+
+
+def test_out_of_root_mixed_rules_unscoped_violation_fails_open(layout):
+    mixed(layout)
+    runner = RecordingRunner()
+    result = write(make_gate(layout, runner), layout.outside / "store.py", UNSCOPED_VIOLATING)
+
+    (sent,) = runner.sent
+    assert applicability(sent) == [("router_001", "UNKNOWN"), ("store_002", "APPLIED")]
+    assert sent.payload["evaluation_complete"] is False
+    # The unscoped rule did fire: the violation is retained in the checker
+    # evidence...
+    assert sent.payload["verdict"] == "FAIL"
+    assert violated_decisions(sent) == ["store_002"]
+    # ...but the incomplete evaluation is what the adapter acts on.
+    assert result.action == ACTION_FAIL_OPEN
+    assert result.action not in (ACTION_DENY, ACTION_ALLOW)
+    assert result.evaluation_complete is False
+    assert "router_001" in result.reason
+    # Inside the root the same memory and content are a complete deny.
+    inside = write(make_gate(layout, runner), layout.project / "src" / "store.py", UNSCOPED_VIOLATING)
+    assert inside.action == ACTION_DENY
+    assert inside.evaluation_complete is True
+
+
+def test_out_of_root_mixed_rules_warn_mode_fails_open(layout):
+    mixed(layout)
+    runner = RecordingRunner()
+    gate = MnemeLangChain(project_dir=str(layout.project), mode="warn", check_runner=runner)
+    result = write(gate, layout.outside / "store.py", UNSCOPED_VIOLATING)
+
+    assert runner.sent[0].payload["evaluation_complete"] is False
+    assert violated_decisions(runner.sent[0]) == ["store_002"]
+    assert result.action == ACTION_FAIL_OPEN
+    assert result.evaluation_complete is False
+
+
+def test_out_of_root_mixed_rules_compliant_is_not_allow(layout):
+    mixed(layout)
+    runner = RecordingRunner()
+    result = write(make_gate(layout, runner), layout.outside / "store.py", BASELINE)
+
+    assert applicability(runner.sent[0]) == [("router_001", "UNKNOWN"), ("store_002", "APPLIED")]
+    assert violated_decisions(runner.sent[0]) == []
+    assert result.action == ACTION_FAIL_OPEN
+    assert result.action != ACTION_ALLOW
