@@ -820,10 +820,11 @@ and C2b charters.
   event list; first-parent history walked only when the tip has no
   declaration, for `VERIFIED_ABSENT` or RR-7 `EVIDENCE_INVALID`; local
   relation `MATCH|BEHIND|DIVERGES|INVALID`; routing R0-R8.
-- **Authority operations** (charter §6): `mneme availability status`
-  (read-only), `authorize` and `revoke`, each with a live precondition and an
-  interactive confirmation. They write only `.mneme/availability.json` and
-  never commit, push, merge or touch canonical memory.
+- **Authority operations** (charter §6): `mneme availability status` is
+  read-only. `authorize` and `revoke` require their respective live
+  authorization preconditions and interactive TTY confirmation. Only the
+  mutating commands write `.mneme/availability.json`. None commits, pushes,
+  merges or modifies canonical memory.
 - **Hook integration** (charter §7): the default verifier replaced; one
   `local_relation` input added to `routing_refuses`; the verifier seam stays
   test-only; the in-process benchmark transport documented as unsupported
