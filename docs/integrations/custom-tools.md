@@ -89,7 +89,10 @@ def save_text(path: str, text: str) -> str:
         note = "\n[mneme] NOT EVALUATED - " + result.reason
     else:
         raise ValueError(f"unhandled gate action: {result.action!r}")
-    target.write_bytes(data)                   # same resolved path, same bytes
+    try:
+        target.write_bytes(data)               # same resolved path, same bytes
+    except OSError as exc:
+        return f"error: {exc}{note}"           # not mutated; keep the Mneme note
     return "saved" + note
 ```
 
@@ -144,14 +147,17 @@ recorded here, not solved.
 
 ### Relative paths
 
-Relative tool paths are resolved against the gate's `cwd`:
-`project_dir` for `MnemeLangChain`, and the `cwd` argument for
+Relative tool paths are resolved against the gate's `cwd`: `project_dir`
+for `MnemeLangChain` (unless an explicit `cwd` is passed to
+`evaluate_tool_call`), and the `cwd` argument for
 `MnemeAgentSdk.evaluate_mutation`, never the host process's working directory
 (`test_self_proposal_relative_path_uses_project_dir`). With an empty `cwd`,
 the Agent SDK leaves relative paths relative to the process cwd (see
-[agent-sdk.md](agent-sdk.md)); the result can be a `skip` or an UNKNOWN
-applicability (`TestEmptyCwdRelativePathDocumented`). The reference pattern
-avoids this by always submitting an absolute canonical path.
+[agent-sdk.md](agent-sdk.md)): the current-file snapshot is read from the
+process cwd, so the introduced lines can be computed against the wrong file,
+and the result can be `skip` or `fail_open` with UNKNOWN applicability
+(`TestEmptyCwdRelativePathDocumented`). The reference pattern avoids this by
+always submitting an absolute canonical path.
 
 ### Under the shipped middleware
 
@@ -166,13 +172,16 @@ and ignore the middleware `skip` for coverage
 What happens to a write outside `project_dir` depends on the rule. It is
 neither universally ungoverned nor universally blocked:
 
-| Rule | Out-of-root target | Result |
+| Project memory | Out-of-root target | Result |
 |---|---|---|
-| Path-scoped typed rule (`include_paths`) | applicability is `UNKNOWN` (ADR-020) | `fail_open`, `[mneme] UNEVALUATED`, never `allow` (`test_out_of_root_scoped_rule_unknown_fails_open`, `test_dotdot_relative_escape_is_out_of_root`, `test_out_of_root_never_labeled_allowed`) |
-| Unscoped typed rule | currently `APPLIED` without path normalization | evaluated against the project's memory: a violation is `deny`, compliant content is `allow` (`test_out_of_root_unscoped_rule_applies`) |
+| Contains any path-scoped typed rule (`include_paths`) | that rule's applicability is `UNKNOWN` (ADR-020), so the whole evaluation is incomplete | `fail_open` (rendered `[mneme] UNEVALUATED` by the middleware or the reference tool), never `allow`, **even when an unscoped rule in the same memory is violated** (`test_out_of_root_scoped_rule_unknown_fails_open`, `test_dotdot_relative_escape_is_out_of_root`, `test_out_of_root_never_labeled_allowed`) |
+| Only unscoped typed rules | each rule is `APPLIED` without path normalization | evaluated against the project's memory: in strict mode a violation is `deny` (`warn` in warn mode) and compliant content is `allow` (`test_out_of_root_unscoped_rule_applies`, single-rule memory) |
 
-The unscoped row characterizes current behavior. If it changes, this page
-must change with it.
+Most projects mix both rule kinds, so expect the first row: an out-of-root
+write is unevaluated, not blocked. The unscoped row characterizes current
+behavior for an all-unscoped memory; the mixed-memory case follows from the
+adapter checking evaluation completeness before the verdict and is not yet
+pinned by its own test. If either changes, this page must change with it.
 
 **Confinement is the orchestrator's policy (option 2C).** Mneme does not
 decide which directories an orchestrator may write to. Orchestrators that
@@ -202,7 +211,9 @@ existing `GateResult`, and the handler runs
 the handler (`test_wrapper_deny_does_not_run_handler`).
 
 Do not describe this wrapper as universal fail-closed protection. Mneme's own
-fail-open policy is unchanged.
+fail-open policy is unchanged; opt-in fail-closed handling is
+[ADR-033](../adr/ADR-033-opt-in-fail-closed-enforcement.md)'s separate track
+and is not provided by this pattern.
 
 ## Reporting and evidence
 
@@ -220,12 +231,19 @@ these rows (`test_orchestrator_refusals_counted_separately_from_mneme_blocks`):
 | `not_evaluated` | `skip`, or the gate was not called |
 | `orchestrator_refused` | the orchestrator's own refusal, counted separately |
 
+`orchestrator_refused` is an extra tally: each attempt also keeps its Mneme
+row (`not_evaluated` when a confined tool refused before calling the gate,
+`unevaluated` when the wrapper refused a `fail_open`). Row totals can
+therefore exceed the number of attempts.
+
 Use the existing evidence concepts rather than a new contract: Mneme's
-trace and the enforcement-evidence semantics of
-[ADR-029](../adr/ADR-029-enforcement-evidence-binding-semantics.md). Its
-trusted-result, completeness and negative-space principles apply here as
-they do in the CI1 work (tracker #540): only a trusted, complete result is a
-PASS, and what was not evaluated is reported as such.
+trace, the evidence dimensions of
+[ADR-029](../adr/ADR-029-enforcement-evidence-binding-semantics.md), and the
+CI1 principles (tracker #540) reused in the design's section 5A: trusted
+result, evaluation completeness and negative space. Only a trusted, complete
+result is a PASS, and what was not evaluated is reported as such. CI1
+production merge blocking is not adopted; this page describes the
+pre-mutation boundary only.
 
 One limit is open: the trace records the canonical tool (`Write`) with no
 call ID and no custom tool name (`test_trace_has_no_correlation_id`). Keep
@@ -252,8 +270,9 @@ All on `main` since MnemeHQ/mneme#581:
 
 The original measurement of the gap is the orchestrator decision sandbox
 ([`validation/orchestrator-decision-sandbox/RESULTS.md`](../../validation/orchestrator-decision-sandbox/RESULTS.md)):
-a custom tool and a write outside `project_dir` were the two literal attempts
-the shipped middleware did not block.
+of its 8-attempt literal set, a custom tool and a write outside
+`project_dir` were the two the shipped middleware did not block (raw graph
+paths, outside that set, were also ungoverned).
 
 ## Out of scope
 
