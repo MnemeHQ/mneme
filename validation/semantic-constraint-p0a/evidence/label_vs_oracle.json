@@ -1,0 +1,639 @@
+{
+  "disagreements": [
+    {
+      "case": "S",
+      "label": "violation",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "DISAGREE",
+      "sub_constraint": "C1"
+    }
+  ],
+  "note": "Mechanical comparison of architectural labels with oracle_v2 observations on the resulting file. Reasons for each disagreement are in README.md.",
+  "oracle_version": "p0a-oracle-v2.0.0",
+  "rows": [
+    {
+      "case": "A",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "content",
+      "status": "AGREE",
+      "sub_constraint": "C1"
+    },
+    {
+      "case": "A",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "content",
+      "status": "AGREE",
+      "sub_constraint": "C2"
+    },
+    {
+      "case": "A",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "content",
+      "status": "AGREE",
+      "sub_constraint": "C3"
+    },
+    {
+      "case": "B",
+      "label": "violation",
+      "oracle_violation_observed": true,
+      "probe": "env_unset",
+      "snapshot": "content",
+      "status": "AGREE",
+      "sub_constraint": "C1"
+    },
+    {
+      "case": "B",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "content",
+      "status": "AGREE",
+      "sub_constraint": "C2"
+    },
+    {
+      "case": "B",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "content",
+      "status": "AGREE",
+      "sub_constraint": "C3"
+    },
+    {
+      "case": "C",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "content",
+      "status": "AGREE",
+      "sub_constraint": "C1"
+    },
+    {
+      "case": "C",
+      "label": "violation",
+      "oracle_violation_observed": true,
+      "probe": "env_unset",
+      "snapshot": "content",
+      "status": "AGREE",
+      "sub_constraint": "C2"
+    },
+    {
+      "case": "C",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "content",
+      "status": "AGREE",
+      "sub_constraint": "C3"
+    },
+    {
+      "case": "D",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "content",
+      "status": "AGREE",
+      "sub_constraint": "C1"
+    },
+    {
+      "case": "D",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "content",
+      "status": "AGREE",
+      "sub_constraint": "C2"
+    },
+    {
+      "case": "D",
+      "label": "violation",
+      "oracle_violation_observed": true,
+      "probe": "env_unset",
+      "snapshot": "content",
+      "status": "AGREE",
+      "sub_constraint": "C3"
+    },
+    {
+      "case": "E",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "content",
+      "status": "AGREE",
+      "sub_constraint": "C1"
+    },
+    {
+      "case": "E",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "content",
+      "status": "AGREE",
+      "sub_constraint": "C2"
+    },
+    {
+      "case": "E",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "content",
+      "status": "AGREE",
+      "sub_constraint": "C3"
+    },
+    {
+      "case": "F",
+      "label": "benign",
+      "oracle_violation_observed": null,
+      "probe": "env_unset",
+      "snapshot": "content",
+      "status": "ORACLE_NOT_APPLICABLE",
+      "sub_constraint": "C1"
+    },
+    {
+      "case": "F",
+      "label": "benign",
+      "oracle_violation_observed": null,
+      "probe": "env_unset",
+      "snapshot": "content",
+      "status": "ORACLE_NOT_APPLICABLE",
+      "sub_constraint": "C2"
+    },
+    {
+      "case": "F",
+      "label": "benign",
+      "oracle_violation_observed": null,
+      "probe": "env_unset",
+      "snapshot": "content",
+      "status": "ORACLE_NOT_APPLICABLE",
+      "sub_constraint": "C3"
+    },
+    {
+      "case": "G",
+      "label": "violation",
+      "oracle_violation_observed": true,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C1"
+    },
+    {
+      "case": "G",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C2"
+    },
+    {
+      "case": "G",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C3"
+    },
+    {
+      "case": "H",
+      "label": "violation",
+      "oracle_violation_observed": true,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C1"
+    },
+    {
+      "case": "H",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C2"
+    },
+    {
+      "case": "H",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C3"
+    },
+    {
+      "case": "I",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C1"
+    },
+    {
+      "case": "I",
+      "label": "violation",
+      "oracle_violation_observed": true,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C2"
+    },
+    {
+      "case": "I",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C3"
+    },
+    {
+      "case": "J",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C1"
+    },
+    {
+      "case": "J",
+      "label": "violation",
+      "oracle_violation_observed": true,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C2"
+    },
+    {
+      "case": "J",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C3"
+    },
+    {
+      "case": "K",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C1"
+    },
+    {
+      "case": "K",
+      "label": "violation",
+      "oracle_violation_observed": true,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C2"
+    },
+    {
+      "case": "K",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C3"
+    },
+    {
+      "case": "L",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C1"
+    },
+    {
+      "case": "L",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C2"
+    },
+    {
+      "case": "L",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C3"
+    },
+    {
+      "case": "M-5",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C1"
+    },
+    {
+      "case": "M-5",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C2"
+    },
+    {
+      "case": "M-5",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C3"
+    },
+    {
+      "case": "M-5.0001",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C1"
+    },
+    {
+      "case": "M-5.0001",
+      "label": "violation",
+      "oracle_violation_observed": true,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C2"
+    },
+    {
+      "case": "M-5.0001",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C3"
+    },
+    {
+      "case": "N",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C1"
+    },
+    {
+      "case": "N",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C2"
+    },
+    {
+      "case": "N",
+      "label": "violation",
+      "oracle_violation_observed": true,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C3"
+    },
+    {
+      "case": "O",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C1"
+    },
+    {
+      "case": "O",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C2"
+    },
+    {
+      "case": "O",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C3"
+    },
+    {
+      "case": "P",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C1"
+    },
+    {
+      "case": "P",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C2"
+    },
+    {
+      "case": "P",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C3"
+    },
+    {
+      "case": "Q",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C1"
+    },
+    {
+      "case": "Q",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C2"
+    },
+    {
+      "case": "Q",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C3"
+    },
+    {
+      "case": "R",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C1"
+    },
+    {
+      "case": "R",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C2"
+    },
+    {
+      "case": "R",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C3"
+    },
+    {
+      "case": "S",
+      "label": "violation",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "DISAGREE",
+      "sub_constraint": "C1"
+    },
+    {
+      "case": "S",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C2"
+    },
+    {
+      "case": "S",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C3"
+    },
+    {
+      "case": "S",
+      "label": "violation",
+      "oracle_violation_observed": true,
+      "probe": "env_enabled",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C1"
+    },
+    {
+      "case": "S",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_enabled",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C2"
+    },
+    {
+      "case": "S",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_enabled",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C3"
+    },
+    {
+      "case": "T",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C1"
+    },
+    {
+      "case": "T",
+      "label": "violation",
+      "oracle_violation_observed": true,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C2"
+    },
+    {
+      "case": "T",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C3"
+    },
+    {
+      "case": "U",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C1"
+    },
+    {
+      "case": "U",
+      "label": "benign",
+      "oracle_violation_observed": false,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C2"
+    },
+    {
+      "case": "U",
+      "label": "violation",
+      "oracle_violation_observed": true,
+      "probe": "env_unset",
+      "snapshot": "after",
+      "status": "AGREE",
+      "sub_constraint": "C3"
+    }
+  ],
+  "schema": "p0a-label-vs-oracle/v1"
+}
