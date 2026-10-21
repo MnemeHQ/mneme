@@ -184,7 +184,61 @@ The hook **never blocks** on execution errors. It exits 0 (allow) when:
 
 The last case emits an explicit applicability reason before failing open; an
 unknown path is never reported as `PASS`. Only a complete, trusted verdict
-returned by `mneme check` can cause a block.
+returned by `mneme check` can cause a block, unless the repository opts in
+to fail-closed availability (next section).
+
+---
+
+## Opt-in fail-closed availability (ADR-033)
+
+A repository can opt in to refusing direct writes (`Edit|Write|MultiEdit`)
+when the check cannot run or cannot be trusted. The opt-in is the file
+`.mneme/availability.json`. It counts only when the live default branch of
+the repository's `origin` holds a reviewed authorization event for it
+([ADR-033](../adr/ADR-033-opt-in-fail-closed-enforcement.md), Architecture A;
+[C2b charter](../plans/2026-10-21-reliable-enforcement-c2b-availability-authorization-charter.md)).
+
+```bash
+mneme availability status      # read-only: verify the baseline, compare the local file
+mneme availability authorize   # interactive; writes the declaration, never commits
+mneme availability revoke      # interactive; writes the declaration, never commits
+```
+
+`authorize` needs protection already activated (`mneme protect activate`) and
+merged to the default branch. It writes one event into the declaration and
+stops. You commit it, open a PR, and have it reviewed and merged.
+Authorization starts only when the event is on the default branch. `revoke`
+works the same way. Deleting the file is not a revocation.
+
+While the baseline is verified as authorized, the hook refuses a direct write
+(exit 2, "operational refusal (UNEVALUATED: ...)", never a decision violation)
+when:
+
+- canonical memory is missing,
+- the check did not run, was untrusted, or was incomplete,
+- the local declaration differs from the baseline (including an older copy:
+  update from the default branch), or
+- `MNEME_MEMORY` selects memory other than `.mneme/project_memory.json`.
+
+If the baseline cannot be verified (network, DNS, TLS, authentication,
+timeout, missing ref, invalid evidence, or no usable `origin`), the hook says
+so and proceeds. A trusted strict `FAIL` still blocks as usual. A revoked or
+never-authorized baseline never refuses on availability.
+
+Limits:
+
+- **Deleting the local declaration can silently disable opt-in fail-closed
+  protection.**
+- Only `origin` remotes that can be read anonymously over HTTPS are supported.
+  Private repositories cannot enroll yet.
+- Nothing is cached. Every direct write in an enrolled repository makes
+  live Git requests: about 2 s median to github.com in our measurements, with
+  a 15 s budget.
+- Review, approver independence and branch protection are recorded as
+  attestations and never verified. Edits to `.git/config`, removal of the
+  hook, and verifier denial are not protected against.
+- The benchmark-only `MNEME_HOOK_CHECK_TRANSPORT=inprocess` transport exits 0
+  on its own timeout and is not supported in an authorized repository.
 
 ---
 

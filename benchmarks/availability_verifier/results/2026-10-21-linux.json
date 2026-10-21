@@ -1,0 +1,38 @@
+{
+  "platform": "Linux-5.15.167.4-microsoft-standard-WSL2-x86_64-with-glibc2.41",
+  "python": "3.12.14",
+  "git": "git version 2.47.3",
+  "url": "https://github.com/MnemeHQ/mneme",
+  "cells": {
+    "https_tip": {
+      "n": 20,
+      "median_ms": 2083.1,
+      "p95_ms": 2235.2,
+      "min_ms": 1960.7
+    },
+    "https_absent": {
+      "n": 5,
+      "median_ms": 2779.2,
+      "p95_ms": 3663.3,
+      "min_ms": 2590.6
+    },
+    "hook_no_declaration": {
+      "n": 20,
+      "median_ms": 443.8,
+      "p95_ms": 510.5,
+      "min_ms": 403.9
+    },
+    "hook_h2_authorized_pass": {
+      "n": 20,
+      "median_ms": 511.1,
+      "p95_ms": 545.2,
+      "min_ms": 475.6
+    },
+    "hook_h1_authorized_missing_memory": {
+      "n": 20,
+      "median_ms": 62.0,
+      "p95_ms": 64.6,
+      "min_ms": 56.6
+    }
+  }
+}
