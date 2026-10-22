@@ -19,7 +19,11 @@ Fields:
 from __future__ import annotations
 
 FIXTURE_URL = "https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture"
-TOOLS = ("Write", "Edit", "MultiEdit")
+# Tools scheduled for the pinned host. Claude Code 2.1.303 does not offer
+# MultiEdit (scope Amendment 1); edit_plan keeps its plan for a later pin that
+# offers it again, which needs its own host validation.
+TOOLS = ("Write", "Edit")
+NOT_OFFERED_BY_PIN = ("MultiEdit",)
 
 ROWS = {
     # Batch R: required refusals (B = AUTHORIZED)

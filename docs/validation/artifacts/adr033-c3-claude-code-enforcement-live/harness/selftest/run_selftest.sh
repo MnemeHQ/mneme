@@ -59,8 +59,8 @@ phase() {
 phase ABSENT && run P-6 Edit PASS
 (cd "$SEED" && EVENT authorize && GIT add -A && GIT commit -qm "authorize" && GIT push -q origin main)
 if phase AUTHORIZED; then
-  for case in "R-1 Write PASS" "R-2 Edit PASS" "R-3 Edit PASS" "R-4 MultiEdit PASS" \
-              "R-5 Edit PASS" "R-6 Write PASS" "R-7 Edit PASS" "P-1 MultiEdit PASS" \
+  for case in "R-1 Write PASS" "R-2 Edit PASS" "R-3 Edit PASS" "R-4 Edit PASS" \
+              "R-5 Edit PASS" "R-6 Write PASS" "R-7 Edit PASS" "P-1 Write PASS" \
               "P-2 Edit PASS" "P-3 Write PASS" "P-4 Write PASS" "P-7 Edit PASS" \
               "D-1 Write PASS" "D-2 Edit PASS" "D-3 Edit PASS" "D-4 Write PASS" \
               "D-5 Edit PASS" "H-1 Edit RECORDED"; do
@@ -72,6 +72,8 @@ fi
 C3_STUB_IGNORE_HOOK=1 run R-1 Write FAIL
 C3_STUB_IGNORE_HOOK=1 run P-2 Edit FAIL
 C3_STUB_SKIP_CALL=1 run P-1 Edit PROTOCOL_DEVIATION
+# Scope Amendment 1: a tool missing from the host inventory is N/A.
+C3_STUB_DROP_TOOL=Edit run R-2 Edit NOT_OFFERED
 # One whole batch through the batch runner (D rows, 2 repetitions each). It
 # must reach BATCH_DONE with every expected row x tool x rep line PASS: a
 # stdin leak (2026-10-21) skipped rows yet still ended in BATCH_DONE. The

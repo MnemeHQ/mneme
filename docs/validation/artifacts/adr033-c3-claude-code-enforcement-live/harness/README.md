@@ -21,6 +21,10 @@ fixture repository, and it authorizes no live run: seeding the fixture (step
 
 A hook exit code alone is never sufficient.
 
+**Scope Amendment 1 (2026-10-22):** Claude Code 2.1.303 does not offer MultiEdit, so the
+matrix schedules `Write` and `Edit` only. A tool missing from the host's init tool list is
+labelled `NOT_OFFERED` (N/A, neither PASS nor FAIL).
+
 ## Files
 
 | File | Role |

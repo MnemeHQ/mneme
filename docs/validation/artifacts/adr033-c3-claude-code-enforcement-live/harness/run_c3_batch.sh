@@ -40,7 +40,7 @@ while read -r probe tool; do
     line=$(bash "$BASE/run_c3_probe.sh" "$probe" "$tool" "$rep" < /dev/null 2>&1 | tail -1 | tr -d '\r')
     echo "$line" | tee -a "$SUMMARY"
     case "$line" in
-      *" PASS"|*" FAIL"|*" EVIDENCE_INCOMPLETE"|*" PROTOCOL_DEVIATION"|*" RECORDED") ;;
+      *" PASS"|*" FAIL"|*" EVIDENCE_INCOMPLETE"|*" PROTOCOL_DEVIATION"|*" RECORDED"|*" NOT_OFFERED") ;;
       *) echo "ABORT: harness failure on $probe $tool $rep (see its out/harness_failure.txt)" | tee -a "$SUMMARY"; exit 1 ;;
     esac
   done
