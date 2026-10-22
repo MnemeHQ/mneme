@@ -876,6 +876,92 @@ This restates merged charter §10.
 The existing DG1B1, DG1F-C1a, #260, T-08 slice-1 and C2a freeze amendments
 remain unchanged.
 
+## Amendment — authorize ADR-034 G1 whole-file numeric audit (2026-10-22)
+
+> This authorizes **one new typed rule, `FORBID_NUMERIC_ABOVE`, evaluated only
+> as a whole-file Python audit (G1)**, together with the schema, CLI and
+> result-consumer extensions it needs and explicit `ConflictDetector`
+> noncoverage diagnostics. It does not authorize pre-write numeric
+> enforcement, CI, agent orchestration, or any availability-policy change.
+
+**Change:** implement `FORBID_NUMERIC_ABOVE` exactly as specified by the
+accepted behavioral charter:
+
+- authoring, canonical persistence and identity under schema v2 with the
+  `numeric_upper_bound_rule` semantic feature (§4);
+- the deterministic matcher (§5);
+- per-rule matcher status, evidence binding, and an additive
+  `mneme.check/v1` payload (§6);
+- the `mneme check --source-file` complete-source audit transport, under the
+  single ADR-020 policy root (§3);
+- consumer-trust adaptation in the Claude Code hook, the Agent SDK and
+  LangChain, so that trusted violations stay actionable alongside matcher
+  incompleteness (§6);
+- `ConflictDetectionResult.noncoverage`, which does not change
+  `evaluation_complete` (§7).
+
+Checks that involve no numeric rule must produce byte-identical
+`mneme.check/v1` payloads and exit codes.
+
+**Sections referenced:** the Freeze Anchor **Status** clause ("No behavioral
+change to retrieval or enforcement without an explicit charter amendment") and
+the Amendment Procedure below.
+
+**Rationale (Amendment Procedure §3(b)).** Two charter-level decisions were
+**already made** before this amendment:
+
+- [ADR-034](../adr/ADR-034-static-numeric-upper-bound-typed-rule.md), accepted
+  as a design contract with its evaluation criteria frozen (PR
+  [#594](https://github.com/MnemeHQ/mneme/pull/594), squash `2298c946`). Its
+  held-out corpus v1 is frozen (PR
+  [#600](https://github.com/MnemeHQ/mneme/pull/600), squash `e2998742`).
+- The distinct
+  [ADR-034 G1 behavioral charter](../plans/2026-10-22-adr-034-g1-behavioral-charter.md),
+  accepted by the owner after two architecture reviews and merged (PR
+  [#602](https://github.com/MnemeHQ/mneme/pull/602), squash `83af67ba`).
+
+Charter §1 and §9 require this amendment before implementation. No behavior
+change is retroactively justified.
+
+**Pinned regressions:** charter §8.C items 1–9. They cover:
+
+- old-reader and downgrade refusal;
+- golden rule IDs;
+- the R1–R18 numeric vectors;
+- byte-identical no-numeric payloads;
+- the hook, Agent SDK and LangChain mixed-result matrix, including the
+  closed-availability refusal;
+- `ConflictDetector` noncoverage with `evaluation_complete` unchanged.
+
+Held-out scoring (§8.D) runs only after the implementation commit is frozen,
+under a separate owner authorization.
+
+**Recorded operating consequence (charter §6, F2).** At the edit gate, any
+applicable numeric rule yields `MATCHER_UNEVALUATED` /
+`INCOMPLETE_SOURCE_INPUT`, so a repository with an authorized closed
+availability declaration (ADR-033/C2b) refuses every nonempty edit on an
+APPLIED numeric path as `EVALUATION_INCOMPLETE`. **`FORBID_NUMERIC_ABOVE` must
+not be activated on such paths until a separate G2 authorization.**
+
+### Not authorized by this amendment
+
+- Pre-write numeric denial or any G2 edit-gate numeric evaluation.
+- CI integration or workflow changes.
+- Any ADR-033 availability-policy change, or any exception added for numeric
+  rules.
+- Agent orchestration, MCP enforcement, or new numeric forms (keyword
+  matching, exclusive bounds, unit conversion, constant propagation) or other
+  languages.
+- Changes to `DecisionRetriever` ranking, `ConflictDetector` response-text
+  matching, governance authority, or memory import of ADR-034.
+- Any enforcement or production claim before independent held-out scoring
+  passes.
+- Implementation by any session or person with access to the held-out corpus,
+  its answer key, or the corpus-author or orchestrating session transcripts.
+
+The existing DG1B1, DG1F-C1a, #260, T-08 slice-1, C2a and C2b freeze
+amendments remain unchanged.
+
 ---
 
 ## Amendment Procedure
