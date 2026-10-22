@@ -9,6 +9,8 @@ Writes ``<out-dir>/outcome.json`` and prints its label. Labels:
   EVIDENCE_INCOMPLETE  a required evidence item is missing (never a pass)
   PROTOCOL_DEVIATION   the agent did not make exactly the requested call
   RECORDED             batch H: host behavior recorded, no expectation
+  NOT_OFFERED          the host's init tool list lacks the requested tool and
+                       no call was made: N/A, neither PASS nor FAIL
 
 Mneme's own output (E3) is never sufficient alone: a refusal needs the
 unchanged file (E1) and the host's error result (E2) as well.
@@ -55,11 +57,11 @@ def walk(value):
             yield from walk(item)
 
 
-def host_events(out: Path) -> tuple[list[dict], str | None, str]:
-    """tool_use / tool_result blocks and the init model, from E2 sources."""
+def host_events(out: Path) -> tuple[list[dict], str | None, str, list | None]:
+    """tool_use / tool_result blocks, init model and init tool list (E2)."""
     files = [out / "events.jsonl"] if (out / "events.jsonl").exists() else sorted(
         out.glob("transcript-*.jsonl"))
-    blocks, model = [], None
+    blocks, model, tools = [], None, None
     for path in files:
         for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
             try:
@@ -68,12 +70,14 @@ def host_events(out: Path) -> tuple[list[dict], str | None, str]:
                 continue
             if event.get("type") == "system" and event.get("subtype") == "init":
                 model = event.get("model")
+                if isinstance(event.get("tools"), list):
+                    tools = event["tools"]
             for item in walk(event):
                 if item.get("type") in ("tool_use", "tool_result"):
                     blocks.append(item)
     source = "stream-json" if (out / "events.jsonl").exists() else (
         "transcript" if files else "none")
-    return blocks, model, source
+    return blocks, model, source, tools
 
 
 def result_text(block: dict) -> str:
@@ -133,7 +137,7 @@ def main() -> int:
             failures.append(f"E1: target {'changed' if changed else 'unchanged'}")
 
     # E2: the host's tool_use and matching tool_result.
-    blocks, model, source = host_events(out)
+    blocks, model, source, host_tools = host_events(out)
     facts["e2_source"] = source
     uses = [b for b in blocks if b.get("type") == "tool_use"
             and norm_path((b.get("input") or {}).get("file_path", "")) == norm_path(setup["target"])]
@@ -280,7 +284,14 @@ def main() -> int:
                 "user_visible": level("Q2_user_delivery")} \
         if expect.startswith("refuse") or expect == "block" else "not_applicable"
 
-    if expect == "record":
+    # Scope Amendment 1: a tool absent from the host's own inventory, with no
+    # call made, is N/A. Only the host's init tool list can establish this.
+    not_offered = (host_tools is not None and plan["tool"] not in host_tools
+                   and not uses)
+    facts["host_offers_tool"] = None if host_tools is None else plan["tool"] in host_tools
+    if not_offered:
+        label = "NOT_OFFERED"
+    elif expect == "record":
         label = "RECORDED" if not missing else "EVIDENCE_INCOMPLETE"
     elif deviations:
         label = "PROTOCOL_DEVIATION"

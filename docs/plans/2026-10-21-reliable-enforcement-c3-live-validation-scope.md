@@ -83,7 +83,8 @@ and is never reclassified as protection (ADR-033 gate 5).
   creation is decision Q1.** No test repository exists, and this document
   creates none.
 - **Probe edits:** violating `import psycopg2`; compliant `return 2`. Each is
-  issued as `Write`, `Edit` and `MultiEdit`.
+  issued as `Write`, `Edit` and `MultiEdit` (but see Amendment 1: MultiEdit is
+  not offered by Claude Code 2.1.303).
 - **Host:** Claude Code at a pinned version, run headless as
   `claude -p … --output-format stream-json --verbose --permission-mode
   acceptEdits --setting-sources project` (decision Q2 covers the interactive
@@ -236,3 +237,30 @@ Changing one needs an amendment to this document.
   they do not authorize, and no document says whether an evidence-only C3
   needs its own. C3 changes no behavior. *Accepted:* no amendment;
   record the owner's decision in this document instead.
+
+## Amendment 1: MultiEdit not offered by Claude Code 2.1.303 (2026-10-22)
+
+**Decided by the owner on 2026-10-22,** after the ABSENT batch evidence record
+([`adr033-c3-absent-batch-2026-10-22.md`](../validation/adr033-c3-absent-batch-2026-10-22.md),
+finding F1).
+
+- **Fact.** The init event of every Claude Code 2.1.303 session in that batch
+  lists the available tools. `Write` and `Edit` are present, and `MultiEdit` is
+  not. Asked for a MultiEdit call, the model reported that the tool does not
+  exist and did not substitute another tool.
+- **Decision.** For Claude Code 2.1.303, MultiEdit is **`NOT_OFFERED` (N/A)**.
+  N/A counts as neither PASS nor FAIL: the host cannot exercise that
+  enforcement surface. Coverage under this pin is `Write` and `Edit` only. This
+  is a version-specific coverage limitation, recorded in every claim.
+- **Historical evidence is unchanged.** The two ABSENT-batch MultiEdit probes
+  stay recorded as `PROTOCOL_DEVIATION`, an accurate description of what
+  happened. Reported as: 4/4 supported probes PASS; 2/2 MultiEdit probes N/A
+  after review. Never "6/6 PASS".
+- **Harness.** The matrix no longer schedules MultiEdit for this pin. If a
+  requested tool is missing from the init event's tool list, the classifier
+  labels the probe `NOT_OFFERED` instead of PASS or FAIL.
+- **Unchanged.** The hook matcher (`Edit|Write|MultiEdit`) and all Mneme
+  runtime behavior. If a later Claude Code version offers MultiEdit again, it
+  needs its own host validation before any MultiEdit claim.
+- **Not affected.** Every other section of this scope, and the separate gates
+  for the AUTHORIZED and REVOKED phases, interactive arms and C4.

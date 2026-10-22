@@ -42,7 +42,13 @@ def main() -> int:
     tool = plan["tool"]
     tool_input = {k: v for k, v in plan.items() if k != "tool"}
     use_id = "toolu_" + uuid.uuid4().hex[:20]
-    emit({"type": "system", "subtype": "init", "model": model, "session_id": "selftest"})
+    offered = [t for t in ("Write", "Edit", "NotebookEdit")
+               if t != os.environ.get("C3_STUB_DROP_TOOL")]
+    emit({"type": "system", "subtype": "init", "model": model, "session_id": "selftest",
+          "tools": offered})
+    if tool not in offered:  # a real host cannot call a tool it does not offer
+        emit({"type": "result", "subtype": "success", "result": f"no {tool} tool"})
+        return 0
     # Negative self-tests: a stub that never calls the tool, or ignores the hook.
     if os.environ.get("C3_STUB_SKIP_CALL") == "1":
         emit({"type": "result", "subtype": "success", "result": "declined"})
