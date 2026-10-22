@@ -72,8 +72,21 @@ fi
 C3_STUB_IGNORE_HOOK=1 run R-1 Write FAIL
 C3_STUB_IGNORE_HOOK=1 run P-2 Edit FAIL
 C3_STUB_SKIP_CALL=1 run P-1 Edit PROTOCOL_DEVIATION
-# One whole batch through the batch runner (D rows, 2 repetitions each).
-bash "$BASE/run_c3_batch.sh" D 2 2>&1 | tail -1 | grep -q '^BATCH_DONE D$'   && echo "ok   batch D x2 -> BATCH_DONE" || { echo "FAIL batch D"; fail=1; }
+# One whole batch through the batch runner (D rows, 2 repetitions each). It
+# must reach BATCH_DONE with every expected row x tool x rep line PASS: a
+# stdin leak (2026-10-21) skipped rows yet still ended in BATCH_DONE. The
+# batch runs with a non-empty stdin on purpose, so a leak cannot hide.
+BATCH_OUT=$(echo "stdin that no probe may read" | bash "$BASE/run_c3_batch.sh" D 2 2>&1)
+WANT=$("$PY" -E -P -c "
+import sys; sys.path.insert(0, sys.argv[1]); import matrix
+print(2 * sum(len(s.get('tools', matrix.TOOLS)) for p, s in matrix.ROWS.items() if p[0] == 'D'))" \
+  "$(cygpath -w "$BASE" 2>/dev/null || echo "$BASE")" | tr -d '\r')
+GOT=$(echo "$BATCH_OUT" | grep -cE '^D-[0-9] [A-Za-z]+ [0-9]+ headless PASS$')
+if echo "$BATCH_OUT" | tail -1 | grep -q '^BATCH_DONE D$' && [ "$GOT" = "$WANT" ]; then
+  echo "ok   batch D x2 -> BATCH_DONE, $GOT/$WANT PASS"
+else
+  echo "FAIL batch D: $GOT/$WANT PASS lines"; fail=1
+fi
 (cd "$SEED" && EVENT revoke && GIT add -A && GIT commit -qm "revoke" && GIT push -q origin main)
 phase REVOKED && run P-5 Write PASS
 

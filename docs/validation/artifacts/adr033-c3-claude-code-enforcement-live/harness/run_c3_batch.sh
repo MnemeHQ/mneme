@@ -35,7 +35,9 @@ echo "batch=$BATCH reps=$REPS harness_head=$(git -C "$BASE" rev-parse HEAD)" > "
 while read -r probe tool; do
   [ -n "$probe" ] || continue
   for rep in $(seq 1 "$REPS"); do
-    line=$(bash "$BASE/run_c3_probe.sh" "$probe" "$tool" "$rep" 2>&1 | tail -1 | tr -d '\r')
+    # stdin closed: a probe (and the `claude -p` inside it) must never read the
+    # row list this loop iterates over (2026-10-21 ABSENT batch defect).
+    line=$(bash "$BASE/run_c3_probe.sh" "$probe" "$tool" "$rep" < /dev/null 2>&1 | tail -1 | tr -d '\r')
     echo "$line" | tee -a "$SUMMARY"
     case "$line" in
       *" PASS"|*" FAIL"|*" EVIDENCE_INCOMPLETE"|*" PROTOCOL_DEVIATION"|*" RECORDED") ;;
