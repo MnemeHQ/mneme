@@ -23,9 +23,11 @@ from typing import Any, Dict, Optional, TextIO
 
 from mneme.integrations.claude_code.availability import (
     LocalDeclaration,
+    ProceedNote,
     classify_observation,
     discover_declaration,
     emit_availability,
+    write_proceed_context,
 )
 from mneme.integrations.claude_code.session_state import (
     MAX_FILE_BYTES,
@@ -640,6 +642,7 @@ def _run_check(
     stderr: TextIO,
     stdout: TextIO,
     availability: Optional[LocalDeclaration] = None,
+    note: Optional[ProceedNote] = None,
 ) -> int:
     mode = resolve_mode()
 
@@ -648,7 +651,7 @@ def _run_check(
     extra = {"transport": "inprocess"} if resolve_transport() == "inprocess" else {}
     proc = _invoke_check(memory, rel, target_path, proposed_content, stderr=stderr, **extra)
     if proc is None:
-        if emit_availability(availability, "NOT_RUN", stderr, memory=memory):
+        if emit_availability(availability, "NOT_RUN", stderr, memory=memory, note=note):
             return 2
         return 0
 
@@ -656,7 +659,7 @@ def _run_check(
     payload = assessment.payload
     if emit_availability(
         availability, classify_observation(payload), stderr,
-        memory=memory, payload=payload,
+        memory=memory, payload=payload, note=note,
     ):
         return 2
     if payload is None:
@@ -689,6 +692,11 @@ def _run_check(
 
     reason = format_reason(payload)
     if mode == "warn":
+        if note is not None and note.text:
+            # C2b section 17.3: one object only. The host ignores additionalContext
+            # alongside defer, so the UNVERIFIABLE text rides in the reason.
+            reason = reason + "\n" + note.text
+            note.consumed = True
         _emit_defer(reason, stdout)
         return 0
 
@@ -1141,14 +1149,31 @@ def handle_event(
     if not should_check(event.tool_name):
         return 0
 
+    # C2b section 17: an UNVERIFIABLE proceed is reported to Claude as one
+    # additionalContext object, written only when the hook exits 0 and warn
+    # mode has not already carried the text in its defer object.
+    note = ProceedNote()
+    rc = _direct_write_event(event, stderr, stdout, note)
+    if rc == 0:
+        write_proceed_context(note, stdout)
+    return rc
+
+
+def _direct_write_event(
+    event: ToolEvent,
+    stderr: TextIO,
+    stdout: TextIO,
+    note: ProceedNote,
+) -> int:
     start = _direct_write_memory_start(event)
     # ADR-033 C2a: local policy detection precedes the missing-memory return.
-    # The shipped verifier cannot authorize a refusal. With no declaration,
-    # output, check behavior and exit codes remain identical to the old path.
+    # With no declaration, output, check behavior and exit codes remain
+    # identical to the old path.
     availability = discover_declaration(start)
     memory = find_memory(start)
     if memory is None:
-        if emit_availability(availability, "NOT_RUN", stderr, detail="check not run"):
+        if emit_availability(availability, "NOT_RUN", stderr, detail="check not run",
+                             note=note):
             return 2
         return 0
 
@@ -1160,7 +1185,7 @@ def handle_event(
     except MaterializeError as e:
         if emit_availability(
             availability, "NOT_RUN", stderr, memory=memory,
-            detail="proposed content could not be materialized",
+            detail="proposed content could not be materialized", note=note,
         ):
             return 2
         print(f"mneme-hook: cannot materialize content, failing open: {e}", file=stderr)
@@ -1169,11 +1194,12 @@ def handle_event(
     if not checked_content.strip():
         # The edit introduces no non-blank lines (for example, a pure
         # deletion). Mechanically enforceable typed rules cannot be blank.
-        emit_availability(availability, "SKIPPED", stderr, memory=memory)
+        emit_availability(availability, "SKIPPED", stderr, memory=memory, note=note)
         return 0
 
     return _run_check(
         event, checked_content, memory, stderr, stdout, availability=availability,
+        note=note,
     )
 
 
