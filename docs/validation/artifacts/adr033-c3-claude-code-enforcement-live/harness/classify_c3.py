@@ -1,6 +1,7 @@
 """Classify one C3 probe against its matrix row (scope #592 §§5-6).
 
 usage: classify_c3.py <out-dir> <model-pin>
+       classify_c3.py --pair <diagnostic-out-dir> <control-out-dir>
 
 Writes ``<out-dir>/outcome.json`` and prints its label. Labels:
 
@@ -14,6 +15,21 @@ Writes ``<out-dir>/outcome.json`` and prints its label. Labels:
 
 Mneme's own output (E3) is never sufficient alone: a refusal needs the
 unchanged file (E1) and the host's error result (E2) as well.
+
+F-R2 (C2b charter §17.5). On a headless proceed row whose verifier is
+UNVERIFIABLE, the §17.2 diagnostic must be in a model-bound session-transcript
+entry under the H1 rules (R1: a `hook_additional_context` attachment). The
+hook's stdout, `hook_success` attachments (R2), stream-json `system` events,
+stderr and debug logs are emitted or host output, never delivery. Every other
+proceed row is a control and must show no diagnostic at all. A missing
+transcript is EVIDENCE_INCOMPLETE. `outcome.json` reports this under
+`diagnostic`, apart from the refusal `delivery` levels; `user_visible` is
+always `not_tested` (headless).
+
+``--pair`` compares a diagnostic probe with a paired control of the same tool
+(R3: stream-json `system` subtypes other than init and `thinking_tokens`, and
+the permission indicators in them) and writes ``pair-<control>.json`` in the
+diagnostic probe's directory. It prints PAIR_OK or PAIR_MISMATCH.
 """
 from __future__ import annotations
 
@@ -85,6 +101,111 @@ def result_text(block: dict) -> str:
     if isinstance(content, str):
         return content
     return "\n".join(item.get("text", "") for item in walk(content) if isinstance(item, dict))
+
+
+# C2b charter §17.2: the fixed text of the UNVERIFIABLE-proceed diagnostic.
+# Copied, not imported: the classifier never loads the runtime it judges.
+DIAG_MARKER = "Mneme availability:"
+DIAG_MISMATCH = " The effective memory differs from the declared memory."
+
+
+def diagnostic_text(reason: str, mismatch: bool) -> str:
+    text = (f"{DIAG_MARKER} authorization could not be verified "
+            f"(AUTHORIZATION_UNVERIFIABLE, reason {reason}). "
+            "This edit proceeded without fail-closed availability enforcement.")
+    return text + DIAG_MISMATCH if mismatch else text
+
+
+def diagnostic_expectation(spec: dict) -> str | None:
+    """§17.2: every exit-0 proceed under UNVERIFIABLE carries the diagnostic;
+    no other proceed does. Refusals and blocks exit 2 and are not checked."""
+    if spec["expect"] != "proceed":
+        return None
+    return "delivered" if (spec["verifier"] or "").startswith("UNVERIFIABLE:") else "absent"
+
+
+def jsonl_entries(path: Path) -> list[dict]:
+    rows = []
+    if path.exists():
+        for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+            try:
+                rows.append(json.loads(line))
+            except ValueError:
+                continue
+    return [r for r in rows if isinstance(r, dict)]
+
+
+def strings(value, path: str = ""):
+    if isinstance(value, dict):
+        for key, item in value.items():
+            yield from strings(item, f"{path}.{key}" if path else key)
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            yield from strings(item, f"{path}[{index}]")
+    elif isinstance(value, str):
+        yield path, value
+
+
+def categorise(source: str, entry: dict, path: str, use_id: str | None,
+               emitted_for: set) -> str:
+    """The H1 category table with rules R1, R2 and R4 (H1 record §7; #551, #561).
+
+    model_bound   user-role text or a tool_result, or (R1) a transcript
+                  `hook_additional_context` attachment for a PreToolUse call whose
+                  hook emitted the diagnostic, with the text in `attachment.content`
+    echo          text the model produced; agent_reuse: a model tool input
+    host_output   a stream-json `system` event, (R2) a `hook_success` attachment
+                  (the hook's own stdout), or (R4) a `hook_system_message` attachment
+    unclassified  anything else; never delivery
+
+    The R1/R4 narrow conditions are H1's (probed event, emitter invoked, content
+    path), plus: an attachment that names a `toolUseID` must name the probed call.
+    """
+    kind = entry.get("type")
+    if source == "transcript" and kind == "attachment":
+        att = entry.get("attachment") or {}
+        narrow = (att.get("hookEvent") == "PreToolUse" and use_id in emitted_for
+                  and att.get("toolUseID", use_id) == use_id
+                  and (path == "attachment.content" or path.startswith("attachment.content[")))
+        if att.get("type") == "hook_additional_context":  # R1
+            return "model_bound" if narrow else "unclassified"
+        if att.get("type") == "hook_success":  # R2
+            return "host_output"
+        if att.get("type") == "hook_system_message":  # R4
+            return "host_output" if narrow else "unclassified"
+        return "unclassified"
+    if kind == "assistant":
+        return "agent_reuse" if ".input" in path else "echo"
+    if kind == "result":
+        return "echo"
+    if kind == "user":
+        return "model_bound"
+    if source == "events" and kind == "system":
+        return "host_output"
+    return "unclassified"
+
+
+# R3 (#551): left out of the strict subtype comparison only; still scanned for indicators.
+EXCLUDED_FROM_SUBTYPE_COMPARISON = ("thinking_tokens",)
+INDICATOR_KEYS = ("decision", "permissionDecision", "permission_decision", "blocked", "block",
+                  "retry", "continue", "stopReason", "stop_reason")
+
+
+def host_system(events: list[dict]) -> dict:
+    """Stream-json `system` events except init (R3), for the paired-control comparison."""
+    subtypes, indicators = [], {}
+    for event in events:
+        if event.get("type") != "system" or event.get("subtype") == "init":
+            continue
+        sub = str(event.get("subtype"))
+        if sub not in EXCLUDED_FROM_SUBTYPE_COMPARISON:
+            subtypes.append(sub)
+        for item in walk(event):
+            for key, value in item.items():
+                if key in INDICATOR_KEYS:
+                    indicators.setdefault(f"{sub}.{key}", set()).add(json.dumps(value, sort_keys=True))
+    return {"subtypes": sorted(subtypes),
+            "indicators": {k: sorted(v) for k, v in sorted(indicators.items())}}
 
 
 def expected_after_ok(plan: dict, after: str | None) -> bool:
@@ -245,6 +366,79 @@ def main() -> int:
             else:
                 missing.append("E4 OS capture (netcap-sni.txt)")
 
+    # F-R2 (C2b charter §17.5): the UNVERIFIABLE-proceed diagnostic must reach a
+    # model-bound transcript entry (R1). The hook's stdout (emitted), a
+    # `hook_success` attachment (R2), stream-json, stderr and debug logs are not
+    # delivery. Every other proceed row is a control: no diagnostic anywhere.
+    diag_expect = diagnostic_expectation(spec)
+    diagnostic: dict | str = "not_applicable"
+    if diag_expect is not None and arm == "headless":
+        use_id = facts.get("tool_use_id")
+        emitted_for = {e.get("tool_use_id") for e in mine if DIAG_MARKER in (e.get("stdout") or "")}
+        transcript = out / "transcript.jsonl"
+        sources = [("events", e) for e in jsonl_entries(out / "events.jsonl")] + \
+                  [("transcript", e) for e in jsonl_entries(transcript)]
+        locations = [{"source": src, "entry_type": entry.get("type"),
+                      "attachment_type": (entry.get("attachment") or {}).get("type"),
+                      "json_path": path, "text": text,
+                      "category": categorise(src, entry, path, use_id, emitted_for)}
+                     for src, entry in sources for path, text in strings(entry)
+                     if DIAG_MARKER in text]
+        facts["host_system"] = host_system([e for s, e in sources if s == "events"])
+        facts["transcript_collected"] = transcript.exists()
+        diagnostic = {"expected": diag_expect, "user_visible": "not_tested",
+                      "locations": [{k: v for k, v in loc.items() if k != "text"}
+                                    for loc in locations]}
+        if diag_expect == "delivered":
+            got = [v for e in mine for v in e.get("verifications", [])]
+            reason = got[-1].get("reason") if got else None
+            text = diagnostic_text(reason, "mneme_memory_env" in spec["mutate"]) if reason else None
+            facts["diagnostic_text_expected"] = text
+            want = {"hookSpecificOutput": {"hookEventName": "PreToolUse", "additionalContext": text}}
+            entry = next((e for e in mine if e.get("tool_use_id") == use_id), None) \
+                or (mine[-1] if mine else None)
+            if entry is None or text is None:
+                diagnostic["emitted"] = "not_tested"
+            else:
+                lines = [ln for ln in (entry.get("stdout") or "").splitlines() if ln.strip()]
+                try:
+                    ok = len(lines) == 1 and json.loads(lines[0]) == want
+                except ValueError:
+                    ok = False
+                diagnostic["emitted"] = "observed" if ok else "contradicted"
+                checks["FR2_emitted"] = "ok" if ok else "contradicts"
+                if not ok:
+                    failures.append("F-R2: hook stdout is not exactly the §17.2 object")
+            bound = [loc for loc in locations if loc["category"] == "model_bound"
+                     and text is not None and text in loc["text"]]
+            hosted = [loc for loc in locations if loc["category"] == "host_output"]
+            diagnostic["host_output"] = "observed" if hosted else "not_observed"
+            if not transcript.exists():
+                diagnostic["model_delivered"] = "not_tested"
+                missing.append("F-R2 session transcript")
+            elif bound:
+                diagnostic["model_delivered"] = "stub_only" if selftest else "observed"
+                checks["FR2_model_bound"] = "ok"
+            else:
+                diagnostic["model_delivered"] = "contradicted"
+                checks["FR2_model_bound"] = "contradicts"
+                failures.append("F-R2: no model-bound diagnostic"
+                                + (" (host output only)" if hosted else ""))
+        else:
+            noisy = [e for e in mine if (e.get("stdout") or "").strip()]
+            diagnostic["emitted"] = "contradicted" if noisy else "absent"
+            checks["FR2_emitted_absent"] = "contradicts" if noisy else "ok"
+            if noisy:
+                failures.append("F-R2 control: the hook wrote stdout on a non-UNVERIFIABLE proceed")
+            if not transcript.exists():
+                diagnostic["model_delivered"] = "not_tested"
+                missing.append("F-R2 session transcript")
+            else:
+                diagnostic["model_delivered"] = "contradicted" if locations else "absent"
+                checks["FR2_absent"] = "contradicts" if locations else "ok"
+                if locations:
+                    failures.append("F-R2 control: an availability diagnostic appeared")
+
     # E7: model pin from the init event (headless only).
     if arm == "headless" and source == "stream-json":
         if model is None:
@@ -304,7 +498,7 @@ def main() -> int:
     outcome = {
         "probe": setup["probe"], "tool": setup["tool"], "rep": setup["rep"], "arm": arm,
         "selftest": selftest, "expect": expect, "verifier_expect": verifier_expect,
-        "label": label, "delivery": delivery,
+        "label": label, "delivery": delivery, "diagnostic": diagnostic,
         "checks": checks, "failures": failures, "missing": missing,
         "deviations": deviations, "facts": facts,
     }
@@ -313,5 +507,37 @@ def main() -> int:
     return 0
 
 
+def pair(diag_out: Path, control_out: Path) -> int:
+    diag = json.loads((diag_out / "outcome.json").read_text(encoding="utf-8"))
+    ctl = json.loads((control_out / "outcome.json").read_text(encoding="utf-8"))
+    problems = []
+    if diag["tool"] != ctl["tool"]:
+        problems.append(f"tools differ: {diag['tool']} vs {ctl['tool']}")
+    if not isinstance(diag["diagnostic"], dict) or diag["diagnostic"]["expected"] != "delivered":
+        problems.append(f"{diag['probe']} is not a diagnostic row")
+    if not isinstance(ctl["diagnostic"], dict) or ctl["diagnostic"]["expected"] != "absent":
+        problems.append(f"{ctl['probe']} is not a control row")
+    for outcome in (diag, ctl):
+        if outcome["label"] != "PASS":
+            problems.append(f"{outcome['probe']} {outcome['tool']} {outcome['rep']} is {outcome['label']}")
+    a, b = diag["facts"].get("host_system"), ctl["facts"].get("host_system")
+    if a is None or b is None:
+        problems.append("host_system facts missing")
+    else:
+        if a["subtypes"] != b["subtypes"]:
+            problems.append(f"system subtypes differ: {a['subtypes']} vs {b['subtypes']}")
+        if a["indicators"] != b["indicators"]:
+            problems.append(f"indicators differ: {a['indicators']} vs {b['indicators']}")
+    name = f"{ctl['probe']}-{ctl['tool']}-{ctl['rep']}"
+    label = "PAIR_MISMATCH" if problems else "PAIR_OK"
+    record = {"diagnostic": f"{diag['probe']}-{diag['tool']}-{diag['rep']}", "control": name,
+              "rules": "R3 (#551)", "label": label, "problems": problems}
+    (diag_out / f"pair-{name}.json").write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+    print(label)
+    return 0
+
+
 if __name__ == "__main__":
+    if sys.argv[1:2] == ["--pair"]:
+        raise SystemExit(pair(Path(sys.argv[2]), Path(sys.argv[3])))
     raise SystemExit(main())

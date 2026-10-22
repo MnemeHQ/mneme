@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 # Run one scope §5 batch: every row, every allowed tool, REPS repetitions.
 #
-# usage: run_c3_batch.sh <R|P|U|D|H|ABSENT|REVOKED> [reps=2]
+# usage: run_c3_batch.sh <R|P|U|D|H|ABSENT|REVOKED|FR2> [reps=2]
 #
 #   R, P, U, D, H  rows of that batch needing the AUTHORIZED phase (P-3/P-4 too)
+#   FR2            C2b charter §17.5 live proof (matrix.FR2_ROWS, AUTHORIZED
+#                  phase): the D-2 UNVERIFIABLE proceed with its paired controls,
+#                  then classify_c3.py --pair for each control, same tool and rep
 #   ABSENT         P-6 (golden must be ABSENT)
 #   REVOKED        P-5 (golden must be REVOKED)
 #
@@ -15,7 +18,7 @@ BASE=$(cd "$(dirname "$0")" && pwd)
 . "$BASE/pins.env"
 BATCH=${1:-}; REPS=${2:-2}
 LIVE_ROOT="${C3_SELFTEST_LIVE:-$LIVE}"
-case "$BATCH" in R|P|U|D|H|ABSENT|REVOKED) ;; *) echo "usage: $0 <R|P|U|D|H|ABSENT|REVOKED> [reps]"; exit 1;; esac
+case "$BATCH" in R|P|U|D|H|ABSENT|REVOKED|FR2) ;; *) echo "usage: $0 <R|P|U|D|H|ABSENT|REVOKED|FR2> [reps]"; exit 1;; esac
 [ "$REPS" -ge 2 ] 2>/dev/null || { echo "ABORT: E9 needs at least 2 repetitions"; exit 1; }
 bash "$BASE/preflight.sh" || { echo "ABORT: preflight failed"; exit 1; }
 
@@ -24,7 +27,8 @@ import sys; sys.path.insert(0, sys.argv[1]); import matrix
 batch = sys.argv[2]
 for probe, spec in matrix.ROWS.items():
     phase = spec['phase']
-    if batch == 'ABSENT': ok = phase == 'ABSENT'
+    if batch == 'FR2': ok = probe in matrix.FR2_ROWS
+    elif batch == 'ABSENT': ok = phase == 'ABSENT'
     elif batch == 'REVOKED': ok = phase == 'REVOKED'
     else: ok = probe[0] == batch and phase in ('AUTHORIZED', None)
     if ok:
@@ -45,4 +49,17 @@ while read -r probe tool; do
     esac
   done
 done <<< "$ROWS"
+if [ "$BATCH" = FR2 ]; then
+  # R3 paired comparison: the diagnostic row against each control, same tool and rep.
+  DIAG_ROW=$("$PY" -E -P -c "import sys; sys.path.insert(0, sys.argv[1]); import matrix; print(matrix.FR2_ROWS[0])" "$(cygpath -w "$BASE")" | tr -d '\r')
+  while read -r probe tool; do
+    [ -n "$probe" ] && [ "$probe" != "$DIAG_ROW" ] || continue
+    for rep in $(seq 1 "$REPS"); do
+      res=$("$PY" -E -P "$BASE/classify_c3.py" --pair "$(cygpath -w "$LIVE_ROOT/$DIAG_ROW-$tool-$rep/out")" \
+            "$(cygpath -w "$LIVE_ROOT/$probe-$tool-$rep/out")" | tr -d '\r') \
+        || { echo "ABORT: pair classification failed for $probe $tool $rep" | tee -a "$SUMMARY"; exit 1; }
+      echo "PAIR $DIAG_ROW/$probe $tool $rep $res" | tee -a "$SUMMARY"
+    done
+  done <<< "$ROWS"
+fi
 echo "BATCH_DONE $BATCH" | tee -a "$SUMMARY"

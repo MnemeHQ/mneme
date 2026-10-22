@@ -23,7 +23,8 @@ from pathlib import Path
 
 FILES = ("observer.txt", "prompt.txt", "setup.json", "hook-registration.json",
          "events.jsonl", "hook-log.jsonl", "outcome.json", "target.before",
-         "target.after", "operator-attestation.txt", "netcap-sni.txt")
+         "target.after", "operator-attestation.txt", "netcap-sni.txt",
+         "transcript.jsonl")
 LEAKS = re.compile(r"(gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|"
                    r"sk-ant-[A-Za-z0-9_\-]{10,}|Authorization:\s*\S+|"
                    r"-----BEGIN [A-Z ]*PRIVATE KEY-----)")
@@ -35,7 +36,10 @@ def sha(data: bytes) -> str:
 
 def variants(path: str) -> list[str]:
     p = path.rstrip("\\/")
-    out = {p, p.replace("\\", "/"), p.replace("\\", "\\\\"), p.replace("/", "\\")}
+    # Raw, forward-slash, JSON-escaped, and JSON-in-JSON escaped (tool results
+    # quoting a JSON string, as in events.jsonl and session transcripts).
+    out = {p, p.replace("\\", "/"), p.replace("\\", "\\\\"), p.replace("\\", "\\\\\\\\"),
+           p.replace("/", "\\")}
     if len(p) > 1 and p[1] == ":":
         out.add("/" + p[0].lower() + p[2:].replace("\\", "/"))
     return sorted(out, key=len, reverse=True)
@@ -56,7 +60,8 @@ def main() -> int:
     for outcome in sorted(live.glob("*/out/outcome.json")):
         out = outcome.parent
         probe_dest = dest / out.parent.name
-        transcripts = sorted(p.name for p in out.glob("transcript-*.jsonl"))
+        transcripts = sorted(p.name for p in (*out.glob("transcript-*.jsonl"),
+                                              *out.glob("pair-*.json")))
         for name in (*FILES, *transcripts):
             source = out / name
             if not source.exists():

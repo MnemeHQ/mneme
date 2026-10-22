@@ -25,6 +25,13 @@ A hook exit code alone is never sufficient.
 matrix schedules `Write` and `Edit` only. A tool missing from the host's init tool list is
 labelled `NOT_OFFERED` (N/A, neither PASS nor FAIL).
 
+**C2b charter §17.5 (F-R2 live proof, harness only; the run needs its own
+authorization):** `PIN_MNEME_BASE` is `5a20b360` (#608), so live probes run the
+F-R2 hook, which writes the §17.2 `additionalContext` object on an
+UNVERIFIABLE proceed. The pin also carries #607 (ADR-034 numeric audit), the
+only other `mneme/` change since the C2b pin `7d1a8bb7`. See
+[F-R2 delivery](#f-r2-delivery-c2b-charter-175).
+
 ## Files
 
 | File | Role |
@@ -35,11 +42,11 @@ labelled `NOT_OFFERED` (N/A, neither PASS nor FAIL).
 | `seed_fixture.sh` | Prepares one fixture change (`activate`, `authorize`, `revoke`) on a local branch with the real CLI. **Never pushes** |
 | `refresh_golden.sh` | One HTTPS clone of the fixture per phase; aborts unless the live baseline is in that phase |
 | `setup_c3_probe.py` | Builds one probe repository from the golden clone and applies the row's operator mutations |
-| `hookwrap_c3.py` | Observation wrapper around the unmodified hook: E3, verifier results and Git argv (E4 wrapper half), R-7/H-2 stalls |
-| `run_c3_probe.sh` | One probe: hashes before/after (E1), `claude -p` stream-json (E2), classification. `--interactive` for Q2 |
-| `run_c3_batch.sh` | All rows of a batch × tools × repetitions (default 2, E9) |
-| `classify_c3.py` | Labels each probe PASS, FAIL, EVIDENCE_INCOMPLETE, PROTOCOL_DEVIATION or RECORDED |
-| `collect_transcript.py` | Copies the session transcript of an interactive arm (E2 stand-in) |
+| `hookwrap_c3.py` | Observation wrapper around the unmodified hook: E3 (exit, stderr, stdout, envelope session and transcript path), verifier results and Git argv (E4 wrapper half), R-7/H-2 stalls |
+| `run_c3_probe.sh` | One probe: hashes before/after (E1), `claude -p` stream-json (E2) plus the session transcript, classification. `--interactive` for Q2 |
+| `run_c3_batch.sh` | All rows of a batch × tools × repetitions (default 2, E9). `FR2`: D-2 with its paired controls, then the R3 pair comparison |
+| `classify_c3.py` | Labels each probe PASS, FAIL, EVIDENCE_INCOMPLETE, PROTOCOL_DEVIATION, RECORDED or NOT_OFFERED; checks F-R2 delivery on proceed rows; `--pair` compares a D-2 probe with a control |
+| `collect_transcript.py` | Copies the session transcript: the interactive arm's (E2 stand-in) and, with `--headless`, the `claude -p` session's (F-R2 delivery) |
 | `collect_redacted.py` | Copies evidence into the repo with paths and user name redacted; fails on credential-shaped text |
 | `safe_rmtree.py` | The only recursive delete, confined to the live root |
 | `selftest/` | Offline self-test with a stub `claude` and a local `file://` remote. Not evidence |
@@ -97,6 +104,7 @@ call must be a PROTOCOL_DEVIATION.
 
 | Rows | Offline self-test | Live only |
 |---|---|---|
+| F-R2 (D-2 with P-1 and D-1 controls, batch `FR2`) | Delivered, host-output-only, missing, no-transcript and injected-control cases; the FR2 batch with its pair comparisons | The real 2.1.303 transcript (whether the host records the attachment at all) |
 | R-1..R-7, P-1..P-7, D-1..D-5, H-1 (20) | Exercised with the stub host and the `file://` remote; labels must match the matrix | Real host (E2, E7), HTTPS verifier path, E4 OS capture, E9 repetitions |
 | U-1, U-2, U-3 (3) | Not exercised (needs a Git-only network block) | All evidence |
 | H-2 (1) | Not exercised (host hook-timeout behavior cannot be stubbed meaningfully) | All evidence |
@@ -178,12 +186,68 @@ summary, the as-run harness head, and the merge record of each fixture PR
 (E5: who merged, merge order; read with a credential the agent does not
 hold).
 
+## F-R2 delivery (C2b charter §17.5)
+
+**Status: harness ready, NOT RUN.** The live run needs the owner's separate
+authorization. It does not re-run R-1, resume Batch R or change the fixture.
+
+**What counts.** On a headless proceed row whose verifier is UNVERIFIABLE (D-2,
+and U-1/U-3 if they are run), `classify_c3.py` requires the §17.2 text in a
+**model-bound** entry of the session transcript, under the H1 rules (H1 record
+§7; #551, #561):
+
+- **R1:** a transcript `hook_additional_context` attachment for `PreToolUse`,
+  with the text in `attachment.content`, whose hook invocation emitted the
+  object (`hook-log.jsonl` stdout). If the attachment names a `toolUseID`, it
+  must be the probed call.
+- **R2, R4:** a `hook_success` attachment (the hook's own stdout) or a
+  `hook_system_message` attachment is host output, never delivery. So are
+  stream-json `system` events, the hook's stdout and stderr, and debug logs.
+- **R3:** the pair comparison leaves `thinking_tokens` out of the
+  stream-json `system` subtypes, and still compares permission indicators.
+
+The hook's stdout must also be exactly the one §17.2 object (`emitted`). A
+missing transcript is `EVIDENCE_INCOMPLETE`. Text found only as host output is
+a `FAIL` ("host output only"). `outcome.json` reports this under
+`diagnostic` (`expected`, `emitted`, `model_delivered`, `host_output`,
+`user_visible`, and every location of the text with its category), separate
+from the refusal `delivery` levels. `user_visible` is always `not_tested`: a
+headless run never shows user delivery.
+
+**Controls.** Every other headless proceed row must show no diagnostic: empty
+hook stdout and no `Mneme availability:` text in stream-json or the transcript.
+The §17.5 pair is set in `matrix.FR2_ROWS`, all in phase AUTHORIZED:
+
+| Row | Role | Verifier | Diagnostic |
+|---|---|---|---|
+| D-2 | `origin` removed, memory deleted, compliant edit | `UNVERIFIABLE:VERIFIER_CONFIG_MISSING` | delivered (R1) |
+| P-1 | AUTHORIZED control: compliant edit | `AUTHORIZED` | absent |
+| D-1 | ABSENT control: local declaration deleted (C2a no-declaration path) | not run | absent |
+
+The VERIFIED_ABSENT proceed (P-6) needs the fixture in phase ABSENT. The
+fixture stays AUTHORIZED, so P-6 is checked offline only (and by its own
+`ABSENT` batch if the fixture is ever in that phase again).
+
+**Run (only after authorization).** After `refresh_golden.sh AUTHORIZED`, with
+E4 capture for D-2 (row `e4=True`):
+
+```bash
+bash run_c3_batch.sh FR2 2
+```
+
+Each probe line must be `PASS`, and each `PAIR D-2/<control> <tool> <rep>` line
+`PAIR_OK` (written to `D-2-<tool>-<rep>/out/pair-<control>.json`). Passing
+establishes model-bound delivery on 2.1.303 headless only. It does not
+establish user-visible delivery, and it does not fix F-R1: an unverifiable
+baseline still lets the edit proceed.
+
 ## Evidence per row (scope §6)
 
 | ID | Source here |
 |---|---|
 | E1 | `observer.txt` BEFORE/AFTER target hashes, taken by the runner outside the session |
 | E2 | `events.jsonl` (headless) or `transcript-*.jsonl` (interactive): the `tool_use` and its `tool_result`, bound by `tool_use_id` |
+| F-R2 | `transcript.jsonl` (headless session transcript): the R1 `hook_additional_context` attachment; `pair-*.json` for the R3 comparison |
 | E3 | `hook-log.jsonl` from `hookwrap_c3.py` |
 | E4 | `hook-log.jsonl` verifier Git argv (wrapper half) and `netcap-sni.txt` (OS half) |
 | E5 | Fixture PR merge records, added to the evidence record |
