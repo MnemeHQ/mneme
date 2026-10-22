@@ -48,9 +48,14 @@ MemoryItemType = Literal[
 
 Priority = Literal["high", "medium", "low"]
 
-RuleType = Literal["FORBID_LITERAL"]
+RuleType = Literal["FORBID_LITERAL", "FORBID_NUMERIC_ABOVE"]
 
-VALID_RULE_TYPES: frozenset[str] = frozenset({"FORBID_LITERAL"})
+# ``FORBID_NUMERIC_ABOVE`` (ADR-034) joins only together with its matcher,
+# per-rule matcher status and consumer validators (ADR-034 §10).
+VALID_RULE_TYPES: frozenset[str] = frozenset({
+    "FORBID_LITERAL",
+    "FORBID_NUMERIC_ABOVE",
+})
 
 PRIORITY_WEIGHT: dict[str, float] = {
     "high": 1.5,
@@ -136,10 +141,13 @@ class DecisionExample:
 class Rule:
     """A mechanically enforceable rule with explicit runtime semantics.
 
-    ``FORBID_LITERAL`` is intentionally the first and only rule type. Its
-    value is matched as an exact, case-sensitive token sequence by the
-    deterministic enforcer. New rule types must define equally precise
-    semantics before joining ``VALID_RULE_TYPES``.
+    ``FORBID_LITERAL`` value is matched as an exact, case-sensitive token
+    sequence by the deterministic enforcer. ``FORBID_NUMERIC_ABOVE``
+    (ADR-034) carries a canonical serialized contract in ``value`` and is
+    evaluated only as a whole-file Python audit (G1); its value is validated
+    strictly here, so a malformed contract can never be constructed, loaded
+    or projected. New rule types must define equally precise semantics before
+    joining ``VALID_RULE_TYPES``.
 
     Attributes:
         type:          One of ``VALID_RULE_TYPES``.
@@ -161,6 +169,15 @@ class Rule:
             )
         if not isinstance(self.value, str) or not self.value.strip():
             raise ValueError("rule value must be a non-empty string")
+        if self.type == "FORBID_NUMERIC_ABOVE":
+            from mneme.numeric_rule import parse_rule_value
+
+            parse_rule_value(self.value)
+            if self.include_paths is None:
+                raise ValueError(
+                    "FORBID_NUMERIC_ABOVE requires include_paths "
+                    "(there is no global form)"
+                )
         if self.include_paths is not None:
             if (
                 not isinstance(self.include_paths, tuple)

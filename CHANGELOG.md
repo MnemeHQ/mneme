@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+**`FORBID_NUMERIC_ABOVE`: whole-file numeric audit (ADR-034 G1)**
+
+- **New typed rule, audit only.** `FORBID_NUMERIC_ABOVE` declares an
+  inclusive upper bound on a Python module-level symbol and/or a positional
+  argument of direct calls. It is decided only by the new
+  `mneme check --source-file <file.py>` complete-source audit; every other
+  input reports it `MATCHER_UNEVALUATED` / `INCOMPLETE_SOURCE_INPUT`, never
+  PASS. No pre-write numeric enforcement and no production claim until
+  independent held-out scoring passes. See `docs/integrations/adr-import.md`.
+- **Persistence.** The type is stored only under `mneme.decision-index/v2`
+  with the `numeric_upper_bound_rule` semantic feature. Older Mneme versions
+  refuse such memory; v1 and section-less memory cannot carry the type.
+- **`mneme.check/v1` additions.** Additive per-rule matcher fields on numeric
+  traces, numeric violation details and a top-level `subject` record.
+  Payloads and exit codes for checks without numeric rules are
+  byte-identical.
+- **Behavior change for mixed results (M-a).** When a check is incomplete
+  only because numeric rules are unevaluated, the Claude Code hook, the Agent
+  SDK and LangChain now keep a trusted violation actionable (deny in strict
+  mode) instead of failing open. Incomplete payloads without numeric records
+  keep their previous behavior.
+- **`ConflictDetector`.** `evaluate()` reports numeric rules in a new
+  `noncoverage` list (and `PipelineResult.noncoverage`) without changing
+  `evaluation_complete`; `detect()` raises `NumericRuleNoncoverageError` for
+  decision sets containing numeric rules.
+
 **Decision governance semantics (ADR-031, DG1)**
 
 ### Behavior change

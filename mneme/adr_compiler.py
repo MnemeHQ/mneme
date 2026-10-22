@@ -26,13 +26,17 @@ from mneme.adr_schema import (
     ADRValidationError,
 )
 from mneme.schemas import Decision, Rule
-from mneme.adr_constraints import ConstraintDirective, parse_constraints_section
+from mneme.adr_constraints import (
+    TYPED_RULE_KINDS,
+    ConstraintDirective,
+    parse_constraints_section,
+)
 
 
 def _directive_to_constraint_string(d: ConstraintDirective) -> str:
     """Render a directive as a Decision.constraint string.
 
-    FORBID_LITERAL is routed to ``_directive_to_rule`` before this helper is
+    Typed rule kinds are routed to ``_directive_to_rule`` before this helper is
     called. FORBID_DEPENDENCY is rendered in the ``"no X"`` form so the
     existing enforcer (mneme.enforcer.check_prompt) triggers a WARN when the
     forbidden term appears in a checked input. FORBID_PATH and REQUIRE_PATH
@@ -45,10 +49,14 @@ def _directive_to_constraint_string(d: ConstraintDirective) -> str:
 
 
 def _directive_to_rule(d: ConstraintDirective) -> Rule | None:
-    """Compile a directive whose semantics are implemented as a typed rule."""
-    if d.kind == "FORBID_LITERAL":
+    """Compile a directive whose semantics are implemented as a typed rule.
+
+    ``FORBID_NUMERIC_ABOVE`` (ADR-034) carries its canonical contract in
+    ``d.value``; ``Rule`` re-validates it strictly.
+    """
+    if d.kind in TYPED_RULE_KINDS:
         return Rule(
-            type="FORBID_LITERAL",
+            type=d.kind,
             value=d.value,
             include_paths=d.include_paths,
             exclude_paths=d.exclude_paths,

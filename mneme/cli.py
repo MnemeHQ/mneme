@@ -76,8 +76,10 @@ from mneme.decision_index_persistence import (
 )
 from mneme.decision_retriever import DecisionRetriever
 from mneme.enforcer import (
+    INPUT_KIND_COMPLETE_SOURCE,
     EnforcementResult,
     Severity,
+    SourceSubject,
     check_prompt,
     generate_protection_report,
 )
@@ -380,49 +382,94 @@ def _check_payload(
     uncaught exception -- so the verdict is stated explicitly here, behind a
     versioned ``schema`` key. Anything a consumer cannot parse should be
     treated as "no verdict" and failed open.
+
+    ADR-034 additions are strictly additive and appear only when a numeric
+    rule or a ``--source-file`` audit is involved: the per-rule matcher
+    record on each applied ``FORBID_NUMERIC_ABOVE`` trace, the numeric
+    violation details, and a top-level ``subject`` record. Payloads with no
+    numeric rule stay byte-identical.
     """
-    return {
+    payload: dict = {
         "schema": CHECK_JSON_SCHEMA,
         "verdict": result.verdict.value,
         "mode": mode,
         "evaluation_complete": result.evaluation_complete,
         "applicability": [
-            {
-                "decision_id": item.decision_id,
-                "rule_type": item.rule_type,
-                "rule_value": item.rule_value,
-                "rule_index": item.rule_index,
-                "path_scoped": item.path_scoped,
-                "input_path": item.input_path,
-                "outcome": item.outcome.value,
-                "selector": item.selector,
-                "reason": item.reason,
-                "rule_id": item.rule_id,
-                "decision_version_id": item.decision_version_id,
-            }
-            for item in result.applicability
+            _applicability_record(item) for item in result.applicability
         ],
-        "violations": [
-            {
-                "decision_id": v.decision_id,
-                "decision_text": v.decision_text,
-                "severity": v.severity.value,
-                "rule": v.rule,
-                "trigger": v.trigger,
-                "kind": v.kind,
-                "rule_type": v.rule_type,
-                "input_path": v.input_path,
-                "selector": v.selector,
-                "rule_id": v.rule_id,
-                "decision_version_id": v.decision_version_id,
-            }
-            for v in result.violations
-        ],
+        "violations": [_violation_record(v) for v in result.violations],
         "freshness": [
             {"code": i.code, "adr_id": i.adr_id, "message": i.message,
              "path": str(i.path) if i.path else None}
             for i in freshness
         ],
+    }
+    subject = result.subject
+    if subject is not None and (
+        subject.input_kind == INPUT_KIND_COMPLETE_SOURCE
+        or result.has_numeric_rules
+    ):
+        payload["subject"] = _subject_record(subject)
+    return payload
+
+
+def _applicability_record(item) -> dict:
+    record = {
+        "decision_id": item.decision_id,
+        "rule_type": item.rule_type,
+        "rule_value": item.rule_value,
+        "rule_index": item.rule_index,
+        "path_scoped": item.path_scoped,
+        "input_path": item.input_path,
+        "outcome": item.outcome.value,
+        "selector": item.selector,
+        "reason": item.reason,
+        "rule_id": item.rule_id,
+        "decision_version_id": item.decision_version_id,
+    }
+    if item.matcher_status is not None:
+        record.update({
+            "matcher_status": item.matcher_status,
+            "matcher_outcome": item.matcher_outcome,
+            "primary_reason": item.primary_reason,
+            "unknown_sources": [u.as_dict() for u in item.unknown_sources],
+            "subject_sha256": item.subject_sha256,
+        })
+    return record
+
+
+def _violation_record(v) -> dict:
+    record = {
+        "decision_id": v.decision_id,
+        "decision_text": v.decision_text,
+        "severity": v.severity.value,
+        "rule": v.rule,
+        "trigger": v.trigger,
+        "kind": v.kind,
+        "rule_type": v.rule_type,
+        "input_path": v.input_path,
+        "selector": v.selector,
+        "rule_id": v.rule_id,
+        "decision_version_id": v.decision_version_id,
+    }
+    if v.details is not None:
+        record["numeric"] = v.details
+    return record
+
+
+def _subject_record(subject: SourceSubject) -> dict:
+    from mneme import __version__
+    from mneme.numeric_rule import runtime_label
+
+    return {
+        "input_kind": subject.input_kind,
+        "subject_sha256": subject.sha256,
+        "source_path": subject.source_path,
+        "memory_path": subject.memory_path,
+        "governed_path": subject.governed_path,
+        "surface": "mneme check",
+        "surface_version": __version__,
+        "runtime": runtime_label(),
     }
 
 
@@ -471,27 +518,136 @@ def _print_applicability_preview(store: MemoryStore, labels: list[str]) -> None:
     print("\n".join(lines), file=sys.stderr, flush=True)
 
 
+class _SourceFileError(ValueError):
+    """A ``--source-file`` request cannot be safely read or bound."""
+
+
+def _read_source_file(source_file: str, memory: str) -> tuple[str, SourceSubject]:
+    """Resolve, validate and snapshot one complete source file (charter §3).
+
+    The only root is the ADR-020 policy root of the memory actually loaded.
+    The file is read once; its exact bytes are hashed and are the snapshot
+    the matcher evaluates. Nothing is imported or executed.
+    """
+    import hashlib
+    import os
+    import stat
+
+    from mneme.path_selectors import normalize_input_path, policy_root
+
+    requested = Path(source_file)
+    if requested.is_symlink():
+        raise _SourceFileError(f"source file {source_file} is a symlink")
+    try:
+        resolved = requested.resolve(strict=True)
+    except (OSError, RuntimeError) as exc:
+        raise _SourceFileError(
+            f"source file {source_file} does not exist or cannot be resolved"
+        ) from exc
+    lexical = Path(os.path.abspath(requested))
+    if os.path.normcase(str(lexical)) != os.path.normcase(str(resolved)):
+        raise _SourceFileError(
+            f"source file {source_file} resolves through a link"
+        )
+    try:
+        mode = resolved.stat().st_mode
+    except OSError as exc:
+        raise _SourceFileError(f"source file {source_file} cannot be read") from exc
+    if not stat.S_ISREG(mode):
+        raise _SourceFileError(f"source file {source_file} is not a regular file")
+    if resolved.suffix != ".py":
+        raise _SourceFileError(
+            f"source file {source_file} is not a Python (.py) source file"
+        )
+    root = policy_root(memory)
+    try:
+        resolved.relative_to(root)
+    except ValueError as exc:
+        raise _SourceFileError(
+            f"source file {source_file} is outside the policy root {root}"
+        ) from exc
+    try:
+        governed = normalize_input_path(resolved, memory)
+    except ValueError as exc:
+        raise _SourceFileError(str(exc)) from exc
+    try:
+        data = resolved.read_bytes()
+    except OSError as exc:
+        raise _SourceFileError(f"source file {source_file} cannot be read") from exc
+    try:
+        text = data.decode("utf-8", errors="strict")
+    except UnicodeDecodeError as exc:
+        raise _SourceFileError(
+            f"source file {source_file} is not valid UTF-8"
+        ) from exc
+    return text, SourceSubject(
+        input_kind=INPUT_KIND_COMPLETE_SOURCE,
+        sha256=hashlib.sha256(data).hexdigest(),
+        source=data,
+        source_path=str(resolved),
+        memory_path=str(Path(memory).resolve()),
+        governed_path=governed,
+    )
+
+
 def _cmd_check(args: argparse.Namespace) -> int:
-    input_path = Path(args.input)
-    if not input_path.exists():
-        return _error_exit(f"input file {input_path} does not exist")
+    source_file = getattr(args, "source_file", None)
+    if source_file is not None and args.target_path is not None:
+        return _error_exit("--source-file cannot be combined with --target-path")
     memory_path = Path(args.memory)
+    if source_file is None:
+        input_path = Path(args.input)
+        if not input_path.exists():
+            return _error_exit(f"input file {input_path} does not exist")
     if not memory_path.exists():
         return _error_exit(f"memory file {memory_path} does not exist")
-    input_text = input_path.read_text(encoding="utf-8")
+
+    subject: SourceSubject | None = None
+    if source_file is not None:
+        try:
+            input_text, subject = _read_source_file(source_file, args.memory)
+        except _SourceFileError as exc:
+            return _error_exit(str(exc))
+        target_path = subject.source_path
+    else:
+        input_text = input_path.read_text(encoding="utf-8")
+        target_path = args.target_path or args.input
 
     store = MemoryStore(args.memory)
     store.load()
     retriever = DecisionRetriever(store.decisions())
     scored = retriever.retrieve(args.query)
 
-    target_path = args.target_path or args.input
+    if subject is None and any(
+        rule.type == "FORBID_NUMERIC_ABOVE"
+        for decision in store.decisions()
+        for rule in decision.rules
+    ):
+        # Bind what was actually checked. Never complete source: the numeric
+        # rule stays MATCHER_UNEVALUATED / INCOMPLETE_SOURCE_INPUT.
+        subject = SourceSubject.unverified(input_text.encode("utf-8"))
+
     result = check_prompt(
         input_text,
         scored,
         top=args.top,
         input_path=target_path,
+        subject=subject,
     )
+
+    if source_file is not None:
+        # The selector evaluator must have used exactly the governed path
+        # that was hashed; any mismatch is operational, never a verdict.
+        mismatched = [
+            item for item in result.applicability
+            if item.input_path is not None
+            and item.input_path != subject.governed_path
+        ]
+        if mismatched:
+            return _error_exit(
+                "source file applicability path does not match the governed "
+                f"path {subject.governed_path!r}"
+            )
 
     # DG1F-C1a: informational stderr-only side channel; never feed this
     # resolution to DecisionRetriever, check_prompt, stdout or JSON.
@@ -523,23 +679,61 @@ def _cmd_check(args: argparse.Namespace) -> int:
     if result.violations:
         for v in result.violations:
             kind = v.rule_type or v.kind
-            print(
-                f"{v.severity.value:4}  [{v.decision_id}] "
-                f"{kind} \"{v.rule}\" -- trigger: {v.trigger}"
-            )
+            if v.details is not None:
+                # ADR-034 P1 gate 6: render the contract in human terms.
+                details = v.details
+                print(
+                    f"{v.severity.value:4}  [{v.decision_id}] {kind}: "
+                    f"{details['contract']}"
+                )
+                print(
+                    f"      line {details['source_line']} "
+                    f"({details['source_kind']}): runtime value "
+                    f"{details['value']} (exactly {details['value_exact']}) "
+                    f"> max {details['max']} {details['unit']}"
+                )
+                print(f"      {details['comparison']}")
+            else:
+                print(
+                    f"{v.severity.value:4}  [{v.decision_id}] "
+                    f"{kind} \"{v.rule}\" -- trigger: {v.trigger}"
+                )
             print(f"      {v.decision_text}")
             if v.input_path:
                 selector = f" via {v.selector}" if v.selector else ""
                 print(f"      path: {v.input_path}{selector}")
         print()
 
+    matcher_traces = [
+        item for item in result.applicability if item.matcher_status is not None
+    ]
+    if matcher_traces:
+        for item in matcher_traces:
+            reason = f" {item.primary_reason}" if item.primary_reason else ""
+            print(
+                f"MATCH {item.matcher_status:19} [{item.decision_id}] "
+                f"{item.rule_type} -> {item.matcher_outcome}{reason}"
+            )
+            for unknown in item.unknown_sources:
+                line = unknown.line if unknown.line is not None else "-"
+                print(
+                    f"      unknown {unknown.kind} source (line {line}): "
+                    f"{unknown.reason}"
+                )
+        print()
+
     scoped_traces = [item for item in result.applicability if item.path_scoped]
     if scoped_traces:
         for item in scoped_traces:
             if item.outcome.value == "UNKNOWN":
+                value = (
+                    "(numeric contract)"
+                    if item.rule_type == "FORBID_NUMERIC_ABOVE"
+                    else repr(item.rule_value)
+                )
                 print(
                     f"ERROR PATH_APPLICABILITY_UNKNOWN [{item.decision_id}] "
-                    f"{item.rule_type} {item.rule_value!r} -- {item.reason}"
+                    f"{item.rule_type} {value} -- {item.reason}"
                 )
                 continue
             path = item.input_path or "(unknown)"
@@ -561,6 +755,10 @@ def _cmd_check(args: argparse.Namespace) -> int:
         print()
 
     if not result.evaluation_complete:
+        if result.has_numeric_rules and result.verdict == Severity.FAIL:
+            # M-a: a proved violation stays visible next to incompleteness.
+            print("Result: FAIL (evaluation incomplete)")
+            return 2
         print("Result: INCOMPLETE")
         return 2
     print(f"Result: {result.verdict.value}")
@@ -2025,7 +2223,19 @@ def _build_parser() -> argparse.ArgumentParser:
     # check
     p_check = sub.add_parser("check", help="Enforce decisions against an input prompt")
     p_check.add_argument("--memory", required=True, help="Path to project_memory.json")
-    p_check.add_argument("--input", required=True, help="Path to input file to check")
+    check_input = p_check.add_mutually_exclusive_group(required=True)
+    check_input.add_argument("--input", help="Path to input file to check")
+    check_input.add_argument(
+        "--source-file",
+        dest="source_file",
+        default=None,
+        help=(
+            "Whole-file audit (ADR-034 G1): a complete Python source file "
+            "inside the memory's policy root. Read once, hashed, never "
+            "executed; the only input that can decide FORBID_NUMERIC_ABOVE. "
+            "Cannot be combined with --input or --target-path."
+        ),
+    )
     p_check.add_argument(
         "--target-path",
         default=None,

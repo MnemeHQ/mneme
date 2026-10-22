@@ -30,6 +30,13 @@ Policy (mirrors the documented Claude Code hook policy):
                              reason is injected as additionalContext so
                              an unevaluated mutation is never silently
                              reported as governed.
+- trusted WARN/FAIL plus
+  numeric matcher
+  incompleteness          -> M-a (ADR-034 §8): the violation stays
+                             actionable (deny in strict, warn in warn mode),
+                             with the unevaluated numeric rules listed.
+                             Delta input never decides a numeric rule; no
+                             pre-write numeric detection is claimed.
 
 Usage::
 
@@ -61,6 +68,7 @@ from mneme.integrations.claude_code.hook import (
     introduced_content,
     MaterializeError,
     assess_verdict,
+    mixed_violation_actionable,
     resolve_mode,
     should_check,
 )
@@ -234,7 +242,8 @@ class MnemeAgentSdk:
             )
 
         verdict = payload["verdict"]
-        if payload.get("evaluation_complete") is False:
+        complete = payload.get("evaluation_complete") is not False
+        if not complete and not mixed_violation_actionable(payload):
             return self._gate(
                 ACTION_FAIL_OPEN,
                 tool_name,
@@ -251,12 +260,18 @@ class MnemeAgentSdk:
             )
 
         reason = format_reason(payload)
+        if not complete:
+            # M-a (ADR-034 §8): the trusted violation stays actionable; the
+            # unevaluated numeric rules are reported alongside it.
+            reason = reason + "\n" + format_applicability_reason(payload)
         if mode == "warn":
             return self._gate(
-                ACTION_WARN, tool_name, file_path, reason, verdict=verdict, payload=payload
+                ACTION_WARN, tool_name, file_path, reason, verdict=verdict,
+                evaluation_complete=complete, payload=payload,
             )
         return self._gate(
-            ACTION_DENY, tool_name, file_path, reason, verdict=verdict, payload=payload
+            ACTION_DENY, tool_name, file_path, reason, verdict=verdict,
+            evaluation_complete=complete, payload=payload,
         )
 
     def pre_tool_use(self, input_data: Dict[str, Any]) -> Dict[str, Any]:

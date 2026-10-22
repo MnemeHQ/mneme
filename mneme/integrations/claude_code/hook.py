@@ -340,6 +340,159 @@ def _nonempty_str(value: Any) -> bool:
     return isinstance(value, str) and bool(value.strip())
 
 
+# ── ADR-034 numeric matcher records ──────────────────────────────────────────
+# Kept literal here (not imported) so the hook does not load the matcher on
+# every tool call; tests pin these to ``mneme.numeric_rule``.
+_NUMERIC_RULE_TYPE = "FORBID_NUMERIC_ABOVE"
+_MATCHER_KEYS = (
+    "matcher_status", "matcher_outcome", "primary_reason",
+    "unknown_sources", "subject_sha256",
+)
+_MATCHER_REASON_PRIORITY = (
+    "INCOMPLETE_SOURCE_INPUT", "PARSE_FAILURE", "AMBIGUOUS_BINDING",
+    "SOURCE_NOT_FOUND", "UNRECOGNIZED_FORM",
+)
+_MATCHER_OUTCOME_BY_STATUS = {
+    "RECOGNIZED": frozenset({"VIOLATION", "NO_VIOLATION"}),
+    "PARTIAL": frozenset({"VIOLATION"}),
+    "MATCHER_UNEVALUATED": frozenset({"UNEVALUATED"}),
+}
+_MATCHER_INCOMPLETE = frozenset({"PARTIAL", "MATCHER_UNEVALUATED"})
+_SOURCE_KINDS = frozenset({"symbol", "call", "input", "module"})
+
+
+def _is_sha256(value: Any) -> bool:
+    return (
+        isinstance(value, str)
+        and len(value) == 64
+        and all(c in "0123456789abcdef" for c in value)
+    )
+
+
+def matcher_incomplete_records(payload: Dict[str, Any]) -> list:
+    """Applied numeric traces whose matcher status leaves evaluation open."""
+    return [
+        item for item in payload.get("applicability") or []
+        if isinstance(item, dict)
+        and item.get("rule_type") == _NUMERIC_RULE_TYPE
+        and item.get("outcome") == "APPLIED"
+        and item.get("matcher_status") in _MATCHER_INCOMPLETE
+    ]
+
+
+def _numeric_trace_problem(item: Dict[str, Any], index: int) -> str:
+    """Why one numeric trace's matcher record is not trustworthy, or ``""``."""
+    label = f"numeric rule trace {index}"
+    if not _nonempty_str(item.get("rule_id")):
+        return f"{label} has no rule_id"
+    if item.get("outcome") != "APPLIED":
+        if any(key in item for key in _MATCHER_KEYS):
+            return f"{label} carries a matcher record without APPLIED applicability"
+        return ""
+    if any(key not in item for key in _MATCHER_KEYS):
+        return f"{label} is APPLIED without a complete matcher record"
+    status = item["matcher_status"]
+    outcomes = _MATCHER_OUTCOME_BY_STATUS.get(status) if isinstance(status, str) else None
+    if outcomes is None:
+        return f"{label} has an invalid matcher_status"
+    if item["matcher_outcome"] not in outcomes:
+        return f"{label} matcher_outcome contradicts matcher_status"
+    if not _is_sha256(item["subject_sha256"]):
+        return f"{label} has no subject digest"
+    sources = item["unknown_sources"]
+    if not isinstance(sources, list):
+        return f"{label} unknown_sources is not a list"
+    reasons = []
+    for source in sources:
+        if not isinstance(source, dict) or set(source) != {"kind", "line", "reason"}:
+            return f"{label} has a malformed unknown source"
+        line = source["line"]
+        if source["kind"] not in _SOURCE_KINDS or source["reason"] not in _MATCHER_REASON_PRIORITY:
+            return f"{label} has an invalid unknown source"
+        if line is not None and (
+            not isinstance(line, int) or isinstance(line, bool) or line < 1
+        ):
+            return f"{label} has an invalid unknown source line"
+        reasons.append(source["reason"])
+    if status == "RECOGNIZED":
+        if sources or item["primary_reason"] is not None:
+            return f"{label} is RECOGNIZED with unknown sources"
+    else:
+        if not sources:
+            return f"{label} is {status} without unknown sources"
+        primary = next(r for r in _MATCHER_REASON_PRIORITY if r in reasons)
+        if item["primary_reason"] != primary:
+            return f"{label} primary_reason disagrees with its unknown sources"
+    return ""
+
+
+def _numeric_record_problem(
+    payload: Dict[str, Any],
+    applicability: list,
+) -> str:
+    """Validate ADR-034 records; ``""`` for any payload without them.
+
+    A numeric trace with missing or invalid matcher fields is never read as
+    complete or trusted, and every numeric violation must join an applied
+    trace that recorded it, and vice versa.
+    """
+    numeric = [
+        (index, item) for index, item in enumerate(applicability)
+        if item.get("rule_type") == _NUMERIC_RULE_TYPE
+    ]
+    if not numeric:
+        return ""
+    for index, item in numeric:
+        problem = _numeric_trace_problem(item, index)
+        if problem:
+            return problem
+    subject = payload.get("subject")
+    if not isinstance(subject, dict) or not _is_sha256(subject.get("subject_sha256")):
+        return "numeric rule payload has no subject record"
+    for index, item in numeric:
+        if "subject_sha256" in item and item["subject_sha256"] != subject["subject_sha256"]:
+            return f"numeric rule trace {index} is bound to a different subject"
+    violated = {
+        item["rule_id"] for _, item in numeric
+        if item.get("matcher_outcome") == "VIOLATION"
+    }
+    reported: set = set()
+    for v in payload.get("violations") or []:
+        if isinstance(v, dict) and v.get("rule_type") == _NUMERIC_RULE_TYPE:
+            if v.get("severity") != "FAIL" or v.get("kind") != "typed_rule":
+                return "numeric violation is not a typed FAIL"
+            reported.add(v.get("rule_id"))
+    if reported != violated:
+        return "numeric violations disagree with matcher outcomes"
+    applied = {
+        item.get("rule_id") for item in applicability
+        if item.get("outcome") == "APPLIED"
+    }
+    for v in payload.get("violations") or []:
+        if (
+            isinstance(v, dict)
+            and v.get("kind") == "typed_rule"
+            and v.get("rule_id")
+            and v.get("rule_id") not in applied
+        ):
+            return "typed violation is not bound to an APPLIED rule"
+    return ""
+
+
+def mixed_violation_actionable(payload: Dict[str, Any]) -> bool:
+    """ADR-034 §8 M-a: does a trusted violation stay actionable?
+
+    Only for payloads whose incompleteness includes numeric matcher records
+    (a legacy payload without them keeps its existing fail-open semantics).
+    The payload must already have passed ``assess_verdict``.
+    """
+    return (
+        payload.get("evaluation_complete") is False
+        and payload.get("verdict") in _BLOCKING_VERDICTS
+        and bool(matcher_incomplete_records(payload))
+    )
+
+
 def _verdict_inconsistency(
     payload: Dict[str, Any],
     returncode: Any,
@@ -372,7 +525,14 @@ def _verdict_inconsistency(
         ):
             return "applicability is not a list of objects"
         unknown = any(item.get("outcome") == "UNKNOWN" for item in applicability)
-        if unknown == complete:
+        numeric_problem = _numeric_record_problem(payload, applicability)
+        if numeric_problem:
+            return numeric_problem
+        # ADR-034 §4: the aggregate is "path UNKNOWN or matcher PARTIAL /
+        # MATCHER_UNEVALUATED". Without numeric records this is exactly the
+        # pre-ADR-034 path-only comparison.
+        incomplete = unknown or bool(matcher_incomplete_records(payload))
+        if incomplete == complete:
             return (
                 "evaluation_complete disagrees with applicability outcomes"
             )
@@ -466,10 +626,19 @@ def format_reason(payload: Dict[str, Any]) -> str:
     # punctuation arrives mojibaked.
     lines = [f"mneme: {payload.get('verdict')} - architectural decision violated"]
     for v in violations:
-        lines.append(
-            f"  [{v.get('decision_id')}] {v.get('severity')} "
-            f"\"{v.get('rule')}\" - trigger: {v.get('trigger')}"
-        )
+        numeric = v.get("numeric")
+        if isinstance(numeric, dict) and numeric.get("contract"):
+            # ADR-034: render the contract in human terms, not raw JSON.
+            lines.append(
+                f"  [{v.get('decision_id')}] {v.get('severity')} "
+                f"{v.get('rule_type')}: {numeric['contract']} - "
+                f"trigger: {v.get('trigger')}"
+            )
+        else:
+            lines.append(
+                f"  [{v.get('decision_id')}] {v.get('severity')} "
+                f"\"{v.get('rule')}\" - trigger: {v.get('trigger')}"
+            )
         if v.get("decision_text"):
             lines.append(f"      {v['decision_text']}")
         if v.get("input_path"):
@@ -484,12 +653,36 @@ def format_applicability_reason(payload: Dict[str, Any]) -> str:
         item for item in (payload.get("applicability") or [])
         if isinstance(item, dict) and item.get("outcome") == "UNKNOWN"
     ]
-    lines = ["mneme-hook: typed-rule path applicability is unknown; failing open."]
+    matcher = matcher_incomplete_records(payload)
+    lines: list = []
+    if traces or not matcher:
+        lines.append(
+            "mneme-hook: typed-rule path applicability is unknown; failing open."
+        )
     for item in traces:
+        value = (
+            "(numeric contract)"
+            if item.get("rule_type") == _NUMERIC_RULE_TYPE
+            else repr(item.get("rule_value"))
+        )
         lines.append(
             f"  [{item.get('decision_id')}] {item.get('rule_type')} "
-            f"{item.get('rule_value')!r}: {item.get('reason')}"
+            f"{value}: {item.get('reason')}"
         )
+    if matcher:
+        # ADR-034 G1: numeric rules are decided only by a whole-file audit
+        # (`mneme check --source-file`). Delta input is never complete
+        # source, so no pre-write numeric detection is claimed here.
+        lines.append(
+            "mneme-hook: numeric typed rule(s) not evaluated on this input "
+            "(whole-file audit only: mneme check --source-file)."
+        )
+        for item in matcher:
+            lines.append(
+                f"  [{item.get('decision_id')}] {item.get('rule_type')} "
+                f"{item.get('rule_id')}: {item.get('matcher_status')} "
+                f"({item.get('primary_reason')})"
+            )
     return "\n".join(lines)
 
 
@@ -683,7 +876,10 @@ def _run_check(
     verdict = payload["verdict"]
     if payload.get("evaluation_complete") is False:
         print(format_applicability_reason(payload), file=stderr)
-        return 0
+        if not mixed_violation_actionable(payload):
+            return 0
+        # M-a (ADR-034 §8): a trusted violation stays actionable even when
+        # numeric rules are unevaluated on this delta.
     if verdict == "PASS":
         return 0
 
@@ -887,9 +1083,12 @@ def _evaluate_renamed(
     payload_new = _trusted_payload(proc_new, mode, stderr)
     if payload_new is None:
         return None, "rename target could not be evaluated (untrusted checker result)"
+    incomplete_note: Optional[str] = None
     if payload_new.get("evaluation_complete") is False:
         print(format_applicability_reason(payload_new), file=stderr)
-        return None, "rename target had incomplete rule-path evaluation"
+        if not mixed_violation_actionable(payload_new):
+            return None, "rename target had incomplete rule-path evaluation"
+        incomplete_note = "rename target had incomplete rule-path evaluation"
 
     proc_old = _invoke_check(memory, new_rel, str(root / old_rel), body, stderr=stderr)
     payload_old = _trusted_payload(proc_old, mode, stderr)
@@ -909,11 +1108,11 @@ def _evaluate_renamed(
         if new_map.get(key) == "APPLIED" and old_map.get(key) != "APPLIED":
             changed.append(v)
     if not changed:
-        return None, None
+        return None, incomplete_note
 
     filtered = dict(payload_new)
     filtered["violations"] = changed
-    return format_reason(filtered), None
+    return format_reason(filtered), incomplete_note
 
 
 def stop_event(
@@ -1042,7 +1241,8 @@ def stop_event(
         if payload.get("evaluation_complete") is False:
             incomplete += 1
             print(format_applicability_reason(payload), file=stderr)
-            continue
+            if not mixed_violation_actionable(payload):
+                continue
         if payload["verdict"] in _BLOCKING_VERDICTS:
             offenders.append((rel, format_reason(payload)))
 
