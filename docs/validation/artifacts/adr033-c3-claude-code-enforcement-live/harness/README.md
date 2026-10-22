@@ -47,7 +47,7 @@ only other `mneme/` change since the C2b pin `7d1a8bb7`. See
 | `run_c3_batch.sh` | All rows of a batch × tools × repetitions (default 2, E9). `FR2`: D-2 with its paired controls, then the R3 pair comparison |
 | `classify_c3.py` | Labels each probe PASS, FAIL, EVIDENCE_INCOMPLETE, PROTOCOL_DEVIATION, RECORDED or NOT_OFFERED; checks F-R2 delivery on proceed rows; `--pair` compares a D-2 probe with a control |
 | `collect_transcript.py` | Copies the session transcript: the interactive arm's (E2 stand-in) and, with `--headless`, the `claude -p` session's (F-R2 delivery) |
-| `collect_redacted.py` | Copies evidence into the repo with paths and user name redacted; fails on credential-shaped text |
+| `collect_redacted.py` | Copies evidence into the repo with paths, user and host name redacted; publishes session transcripts only as `*.selected.jsonl` (H1 rule; raw SHA-256 in the manifest); `--probes`/`--extra` select probes and batch summaries from a shared live root; fails on credential-shaped text |
 | `safe_rmtree.py` | The only recursive delete, confined to the live root |
 | `selftest/` | Offline self-test with a stub `claude` and a local `file://` remote. Not evidence |
 
@@ -257,7 +257,7 @@ baseline still lets the edit proceed.
 |---|---|
 | E1 | `observer.txt` BEFORE/AFTER target hashes, taken by the runner outside the session |
 | E2 | `events.jsonl` (headless) or `transcript-*.jsonl` (interactive): the `tool_use` and its `tool_result`, bound by `tool_use_id` |
-| F-R2 | `transcript.jsonl` (headless session transcript): the R1 `hook_additional_context` attachment; `pair-*.json` for the R3 comparison |
+| F-R2 | `transcript.jsonl` (headless session transcript, kept by the operator; published as `transcript.selected.jsonl`): the R1 `hook_additional_context` attachment; `pair-*.json` for the R3 comparison |
 | E3 | `hook-log.jsonl` from `hookwrap_c3.py` |
 | E4 | `hook-log.jsonl` verifier Git argv (wrapper half) and `netcap-sni.txt` (OS half) |
 | E5 | Fixture PR merge records, added to the evidence record |
