@@ -113,6 +113,43 @@ def memory_mismatch(declaration: LocalDeclaration, memory: Optional[Path]) -> bo
     return memory.resolve() != (declaration.root / declaration.memory_path).resolve()
 
 
+@dataclass
+class ProceedNote:
+    """C2b §17: the UNVERIFIABLE-proceed text for one hook invocation.
+
+    ``emit_availability`` fills ``text``; the hook writes it as a single
+    PreToolUse ``additionalContext`` object only on an exit-0 outcome, unless
+    warn mode already appended it to its ``defer`` reason (``consumed``).
+    """
+
+    text: Optional[str] = None
+    consumed: bool = False
+
+
+def unverifiable_context(reason: str, mismatch: bool) -> str:
+    """The fixed §17.2 text: factual, ASCII, no submitted content."""
+    text = (
+        "Mneme availability: authorization could not be verified "
+        f"(AUTHORIZATION_UNVERIFIABLE, reason {reason}). "
+        "This edit proceeded without fail-closed availability enforcement."
+    )
+    if mismatch:
+        text += " The effective memory differs from the declared memory."
+    return text
+
+
+def write_proceed_context(note: Optional[ProceedNote], stdout: TextIO) -> None:
+    """Write the one §17.2 object, if this exit-0 invocation has a note."""
+    if note is None or not note.text or note.consumed:
+        return
+    json.dump({"hookSpecificOutput": {
+        "hookEventName": "PreToolUse",
+        "additionalContext": note.text,
+    }}, stdout)
+    stdout.write("\n")
+    note.consumed = True
+
+
 _TAMPERED = frozenset({"BEHIND", "DIVERGES", "INVALID"})
 _STATE_CATEGORY = {
     "NOT_RUN": "CHECK_NOT_RUN",
@@ -188,6 +225,7 @@ def emit_availability(
     payload: Optional[dict[str, Any]] = None,
     detail: str = "",
     verifier: Optional[Callable[[LocalDeclaration], Any]] = None,
+    note: Optional[ProceedNote] = None,
 ) -> bool:
     """Emit an operational diagnostic and return whether to refuse (exit 2).
 
@@ -219,6 +257,8 @@ def emit_availability(
         local_relation=relation,
     )
     refusal = category is not None
+    if note is not None and authorization == UNVERIFIABLE and not refusal:
+        note.text = unverifiable_context(reason, mismatch)
     detailed = bool(baseline_label) or relation is not None
     if category is None:
         verdict = "availability did not refuse."
