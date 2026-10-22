@@ -964,6 +964,100 @@ amendments remain unchanged.
 
 ---
 
+## Amendment — authorize ADR-033 C2b Amendment 1: UNVERIFIABLE diagnostic delivery (2026-10-22)
+
+> This authorizes **one additional stdout output at one boundary**. It does
+> not authorize any refusal, permission or exit-code change, any other
+> availability state, `systemMessage`, or any warn-mode change beyond the
+> charter's 17.3 append.
+
+**Change:** at the Claude Code direct-write boundary (`handle_event`, the
+`emit_availability` path in `mneme/integrations/claude_code/`), when a local
+declaration is present, authorization is `AUTHORIZATION_UNVERIFIABLE` and the
+hook exits 0, write exactly one stdout object
+`{"hookSpecificOutput": {"hookEventName": "PreToolUse", "additionalContext": <17.2 text>}}`.
+In the warn-mode `defer` case, append the 17.2 text to the existing
+`permissionDecisionReason` instead, still as one object. Exit codes, stderr
+and permission behavior are unchanged. Without a declaration, behavior is
+byte-identical to `main`.
+
+**Sections referenced:** the Freeze Anchor **Status** clause ("No behavioral
+change to retrieval or enforcement without an explicit charter amendment") and
+the Amendment Procedure below.
+
+**Rationale (Amendment Procedure §3(b)).** A distinct charter amendment was
+**already merged** before this amendment:
+[C2b charter section 17](../plans/2026-10-21-reliable-enforcement-c2b-availability-authorization-charter.md),
+PR [#605](https://github.com/MnemeHQ/mneme/pull/605), squash `faec11cb`. It
+follows the C3 Batch R evidence record
+([#601](https://github.com/MnemeHQ/mneme/pull/601), squash `be88c133`;
+R-1 Edit-2, finding F-R2) and the F-R2 assessment
+([#604](https://github.com/MnemeHQ/mneme/pull/604), squash `f774dbde`), whose
+Option 1 the owner accepted on 2026-10-22, under accepted
+[ADR-033](../adr/ADR-033-opt-in-fail-closed-enforcement.md). Charter §17.8
+requires this amendment before implementation. No behavior change is
+retroactively justified.
+
+**Governing authority:** accepted ADR-033 §4.3 ("a visible proceed") and §7
+(no submitted content in diagnostics); the merged C2a and C2b charters,
+including C2b section 17.
+
+### Authorized change — C2b Amendment 1 only (charter §§17.2-17.4)
+
+- **Trigger** (17.2): a local declaration is present, the verification result
+  is `AUTHORIZATION_UNVERIFIABLE` (any reason), and the hook exits 0 on that
+  invocation.
+- **Output** (17.2): exactly one stdout JSON object with
+  `hookSpecificOutput.hookEventName = "PreToolUse"` and `additionalContext`
+  set to the fixed, factual, ASCII-only 17.2 text (reason code; one extra
+  sentence on an SS-3 mismatch). No `permissionDecision`, no
+  `permissionDecisionReason`, no `systemMessage`. The text never contains
+  submitted content, decision text, rule values, triggers or paths, and never
+  states or implies the edit was checked, verified, compliant or safe.
+- **Warn-mode `defer` case** (17.3): one object only. The existing warn-mode
+  object is kept as it is, with the 17.2 text appended to
+  `permissionDecisionReason` on a new line, and no `additionalContext`.
+  Delivery to the model is not claimed for this case.
+- **The charter §17.4 regression matrix** (A1-A10), including byte-identical
+  no-declaration parity (C2a P1/P2) and unchanged refusals.
+
+No other code path is authorized.
+
+### Explicitly preserved (unchanged)
+
+This restates merged charter §17.6.
+
+1. **No declaration → today's behavior,** byte-identical output, the same exit
+   codes, and zero verifier calls.
+2. **ADR-033 Architecture A, including F-R1:** an unverifiable baseline still
+   produces no availability refusal. There is no cache, no retry, no grace
+   window and no Architecture B.
+3. **All refusals and exit codes** (C2b §5.3), **every existing stderr line,**
+   and **permission behavior.** No permission decision is added, removed or
+   altered.
+4. **`AUTHORIZED`, `REVOKED` and `VERIFIED_ABSENT`** outputs.
+5. **Warn-mode output,** except the 17.3 append.
+6. **`mneme check`,** the verifier, the declaration schema, and the
+   `mneme availability` commands.
+7. **Bash, SessionStart and Stop** behavior (ADR-021).
+8. **Frozen benchmark fixtures and methodology; `.mneme/project_memory.json`.**
+
+### Not authorized by this amendment
+
+- Any `systemMessage` (user-facing) output.
+- `additionalContext` for any state other than `AUTHORIZATION_UNVERIFIABLE`.
+- Any warn-mode change beyond the 17.3 append, including the separate finding
+  F-W1 (`defer` semantics).
+- Any claim that F-R2 is closed before the charter §17.5 live proof on Claude
+  Code 2.1.303. That proof, and its harness change, are authorized
+  separately.
+- Any C3 run, R-1 re-run or C4 work. The #601 record is never rewritten.
+
+The existing DG1B1, DG1F-C1a, #260, T-08 slice-1, C2a, C2b and ADR-034 G1
+freeze amendments remain unchanged.
+
+---
+
 ## Amendment Procedure
 
 This document is frozen at `e73ff7d`. To amend it:
