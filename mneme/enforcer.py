@@ -94,6 +94,10 @@ class SourceSubject:
     source_path: str | None = None
     memory_path: str | None = None
     governed_path: str | None = None
+    # Unverified input only: whether the caller named the artifact the text
+    # belongs to (``--target-path``). Without one, the input file's own path
+    # says nothing about the governed source (ADR-034 §6, F-1).
+    target_path_declared: bool = True
 
     @property
     def complete_source(self) -> bool:
@@ -102,11 +106,24 @@ class SourceSubject:
             and self.source is not None
         )
 
+    @property
+    def non_source_without_target(self) -> bool:
+        return (
+            self.input_kind == INPUT_KIND_UNVERIFIED
+            and not self.target_path_declared
+        )
+
     @classmethod
-    def unverified(cls, data: bytes) -> "SourceSubject":
+    def unverified(
+        cls,
+        data: bytes,
+        *,
+        target_path_declared: bool = True,
+    ) -> "SourceSubject":
         return cls(
             input_kind=INPUT_KIND_UNVERIFIED,
             sha256=hashlib.sha256(data).hexdigest(),
+            target_path_declared=target_path_declared,
         )
 
 
@@ -332,15 +349,26 @@ def check_prompt(
                 policy_paths=(d.source_path, d.memory_path),
             )
             match: numeric_rule.MatcherResult | None = None
+            if rule.type == numeric_rule.RULE_TYPE and numeric_subject is None:
+                numeric_subject = SourceSubject.unverified(
+                    input_text.encode("utf-8"),
+                    target_path_declared=input_path is not None,
+                )
             if (
+                rule.type == numeric_rule.RULE_TYPE
+                and selection.outcome != SelectorOutcome.APPLIED
+                and numeric_subject.non_source_without_target
+            ):
+                # ADR-034 §6 (F-1): text with no target path is never complete
+                # source. Wherever the input file sits, the numeric rule is
+                # unevaluated, never a clean result. The applicability trace
+                # still reports the input path's ADR-020 outcome unchanged.
+                match = numeric_rule.incomplete_input_result()
+            elif (
                 rule.type == numeric_rule.RULE_TYPE
                 and selection.outcome == SelectorOutcome.APPLIED
             ):
                 contract = numeric_rule.parse_rule_value(rule.value)
-                if numeric_subject is None:
-                    numeric_subject = SourceSubject.unverified(
-                        input_text.encode("utf-8")
-                    )
                 if numeric_subject.complete_source:
                     match = numeric_rule.evaluate_source(
                         contract, numeric_subject.source

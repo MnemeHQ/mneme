@@ -1146,3 +1146,123 @@ def test_real_baseline_binary_refuses_numeric_memory(tmp_path):
         pytest.skip("baseline commit not available")
     assert '"numeric_upper_bound_rule"' not in base.stdout
     assert "SUPPORTED_SEMANTIC_FEATURES = frozenset({APPLICABILITY_FEATURE})" in base.stdout
+
+
+# ── F-1 (post-scoring): --input without --target-path is never source ───────
+#
+# Fixed AFTER held-out scoring. These public tests, not the blind holdout,
+# verify this behavior (ADR-034 §6; charter §3 item 4 erratum).
+
+NON_SOURCE_TEXTS = {
+    "prompt": "Please set the router deadline to 3 seconds and keep classify fast.",
+    "code_fragment": "    return classify(x, 2)\n",
+    "introduced_delta": "+ROUTER_DEADLINE_S = 3\n",
+    "stdin_style": "ROUTER_DEADLINE_S = 3\ndef run(x):\n    return classify(x, 2)\n",
+}
+NON_SOURCE_RECORD = {
+    "matcher_status": "MATCHER_UNEVALUATED",
+    "matcher_outcome": "UNEVALUATED",
+    "primary_reason": "INCOMPLETE_SOURCE_INPUT",
+    "unknown_sources": [
+        {"kind": "input", "line": None, "reason": "INCOMPLETE_SOURCE_INPUT"},
+    ],
+}
+
+
+@pytest.mark.parametrize("mode", ["strict", "warn"])
+@pytest.mark.parametrize("rel,outcome", [
+    ("src/request.txt", "APPLIED"),     # inside include_paths
+    ("lib/request.txt", "EXCLUDED"),    # outside include_paths
+    ("request.txt", "EXCLUDED"),        # root-level file
+])
+@pytest.mark.parametrize("kind", sorted(NON_SOURCE_TEXTS))
+def test_f1_input_without_target_path_is_never_clean(
+    tmp_path, capsys, kind, rel, outcome, mode,
+):
+    _project(tmp_path, {"ADR-001": [_rule()]})
+    inp = _write(tmp_path, rel, NON_SOURCE_TEXTS[kind])
+    code, payload, _ = _check(tmp_path, capsys, input_file=inp, mode=mode)
+    trace = _numeric_trace(payload)
+    assert trace["outcome"] == outcome
+    assert {key: trace[key] for key in NON_SOURCE_RECORD} == NON_SOURCE_RECORD
+    assert payload["verdict"] == "PASS"
+    assert payload["evaluation_complete"] is False
+    assert payload["subject"]["input_kind"] == "unverified_input"
+    assert payload["subject"]["target_path_declared"] is False
+    assert code == 2
+    assert assess_verdict(json.dumps(payload), code, mode).payload == payload
+
+
+def test_f1_input_outside_the_policy_root_is_never_clean(tmp_path, capsys):
+    project = tmp_path / "project"
+    memory = _project(project, {"ADR-001": [_rule()]})
+    inp = _write(tmp_path, "elsewhere/request.txt", NON_SOURCE_TEXTS["prompt"])
+    code, payload, _ = _check(tmp_path, capsys, input_file=inp, memory=memory)
+    trace = _numeric_trace(payload)
+    assert trace["outcome"] == "UNKNOWN"
+    assert {key: trace[key] for key in NON_SOURCE_RECORD} == NON_SOURCE_RECORD
+    assert payload["evaluation_complete"] is False and code == 2
+    assert assess_verdict(json.dumps(payload), code, "strict").payload == payload
+
+
+def test_f1_human_output_is_incomplete(tmp_path, capsys):
+    _project(tmp_path, {"ADR-001": [_rule()]})
+    inp = _write(tmp_path, "notes.txt", NON_SOURCE_TEXTS["prompt"])
+    code, _, captured = _check(tmp_path, capsys, input_file=inp, json_out=False)
+    assert code == 2
+    assert "INCOMPLETE_SOURCE_INPUT" in captured.out
+    assert captured.out.rstrip().splitlines()[-1] == "Result: INCOMPLETE"
+
+
+def test_f1_literal_violation_keeps_its_verdict_next_to_non_source(tmp_path, capsys):
+    literal = Rule(type="FORBID_LITERAL", value="psycopg2")
+    _project(tmp_path, {"ADR-001": [_rule()], "LIT-1": [literal]})
+    inp = _write(tmp_path, "notes.txt", "use psycopg2 here\n")
+    code, payload, _ = _check(tmp_path, capsys, input_file=inp)
+    assert payload["verdict"] == "FAIL" and payload["evaluation_complete"] is False
+    assert code == 2
+    assert assess_verdict(json.dumps(payload), code, "strict").payload == payload
+
+
+@pytest.mark.parametrize("target,outcome,complete,exit_code", [
+    ("lib/router.py", "EXCLUDED", True, 0),
+    ("src/router.py", "APPLIED", False, 2),
+])
+def test_f1_unchanged_input_with_target_path(tmp_path, capsys, target, outcome,
+                                             complete, exit_code):
+    _project(tmp_path, {"ADR-001": [_rule()]})
+    inp = _write(tmp_path, "delta.txt", "ROUTER_DEADLINE_S = 3\n")
+    code, payload, _ = _check(tmp_path, capsys, input_file=inp, target=tmp_path / target)
+    trace = _numeric_trace(payload)
+    assert trace["outcome"] == outcome
+    assert ("matcher_status" in trace) is (outcome == "APPLIED")
+    assert payload["evaluation_complete"] is complete and code == exit_code
+    assert payload["subject"]["target_path_declared"] is True
+
+
+def test_f1_unchanged_source_file_excluded(tmp_path, capsys):
+    _project(tmp_path, {"ADR-001": [_rule()]})
+    path = _write(tmp_path, "lib/router.py", "ROUTER_DEADLINE_S = 60\n")
+    code, payload, _ = _check(tmp_path, capsys, source=path)
+    trace = _numeric_trace(payload)
+    assert trace["outcome"] == "EXCLUDED" and "matcher_status" not in trace
+    assert "target_path_declared" not in payload["subject"]
+    assert code == 0
+
+
+@pytest.mark.parametrize("tamper", ["drop_record", "claim_target_declared"])
+def test_f1_contradictory_non_source_payloads_are_untrusted(tmp_path, capsys, tamper):
+    _project(tmp_path, {"ADR-001": [_rule()]})
+    inp = _write(tmp_path, "lib/request.txt", NON_SOURCE_TEXTS["prompt"])
+    code, payload, _ = _check(tmp_path, capsys, input_file=inp)
+    tampered = copy.deepcopy(payload)
+    trace = _numeric_trace(tampered)
+    if tamper == "drop_record":
+        for key in NON_SOURCE_RECORD:
+            trace.pop(key)
+        trace.pop("subject_sha256")
+        tampered["evaluation_complete"] = True
+        code = 0
+    else:
+        tampered["subject"]["target_path_declared"] = True
+    assert assess_verdict(json.dumps(tampered), code, "strict").payload is None

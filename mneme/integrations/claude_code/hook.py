@@ -372,21 +372,58 @@ def _is_sha256(value: Any) -> bool:
 
 
 def matcher_incomplete_records(payload: Dict[str, Any]) -> list:
-    """Applied numeric traces whose matcher status leaves evaluation open."""
+    """Numeric traces whose matcher status leaves evaluation open.
+
+    Applied traces, plus every numeric trace of a non-source input without a
+    target path (F-1); ``assess_verdict`` has already checked which traces
+    may carry a record.
+    """
     return [
         item for item in payload.get("applicability") or []
         if isinstance(item, dict)
         and item.get("rule_type") == _NUMERIC_RULE_TYPE
-        and item.get("outcome") == "APPLIED"
         and item.get("matcher_status") in _MATCHER_INCOMPLETE
     ]
 
 
-def _numeric_trace_problem(item: Dict[str, Any], index: int) -> str:
+_NON_SOURCE_RECORD = {
+    "matcher_status": "MATCHER_UNEVALUATED",
+    "matcher_outcome": "UNEVALUATED",
+    "primary_reason": "INCOMPLETE_SOURCE_INPUT",
+    "unknown_sources": [
+        {"kind": "input", "line": None, "reason": "INCOMPLETE_SOURCE_INPUT"},
+    ],
+}
+
+
+def _is_non_source_without_target(payload: Dict[str, Any]) -> bool:
+    subject = payload.get("subject")
+    return (
+        isinstance(subject, dict)
+        and subject.get("input_kind") == "unverified_input"
+        and subject.get("target_path_declared") is False
+    )
+
+
+def _numeric_trace_problem(
+    item: Dict[str, Any],
+    index: int,
+    non_source: bool = False,
+) -> str:
     """Why one numeric trace's matcher record is not trustworthy, or ``""``."""
     label = f"numeric rule trace {index}"
     if not _nonempty_str(item.get("rule_id")):
         return f"{label} has no rule_id"
+    if non_source:
+        # ADR-034 §6 (F-1): text without a target path is never source, so
+        # every numeric rule, whatever the input path's applicability, must
+        # carry exactly the non-source record. Anything else would let the
+        # input file's own location turn into a clean result.
+        if any(item.get(key) != value for key, value in _NON_SOURCE_RECORD.items()):
+            return f"{label} lacks the non-source record for input without a target path"
+        if not _is_sha256(item.get("subject_sha256")):
+            return f"{label} has no subject digest"
+        return ""
     if item.get("outcome") != "APPLIED":
         if any(key in item for key in _MATCHER_KEYS):
             return f"{label} carries a matcher record without APPLIED applicability"
@@ -444,8 +481,9 @@ def _numeric_record_problem(
     ]
     if not numeric:
         return ""
+    non_source = _is_non_source_without_target(payload)
     for index, item in numeric:
-        problem = _numeric_trace_problem(item, index)
+        problem = _numeric_trace_problem(item, index, non_source)
         if problem:
             return problem
     subject = payload.get("subject")
