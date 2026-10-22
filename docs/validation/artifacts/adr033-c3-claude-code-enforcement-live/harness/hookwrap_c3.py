@@ -2,7 +2,8 @@
 
 It records, without changing any decision:
 
-- the hook's exit code, stdout and stderr (E3), relayed unchanged;
+- the hook's exit code, stdout and stderr (E3), relayed unchanged, and the
+  envelope's ``session_id`` and ``transcript_path``;
 - each ``live_verifier`` result: authorization, reason, branch, tip, URL;
 - each verifier Git call: argv with the endpoint, and the env key names
   (E4, the wrapper half; the OS capture is the other half).
@@ -107,6 +108,9 @@ try:
         "hook_event_name": envelope.get("hook_event_name"),
         "tool_name": envelope.get("tool_name"),
         "tool_use_id": envelope.get("tool_use_id"),
+        # Where the host keeps this session's transcript (C2b §17.5 delivery check).
+        "session_id": envelope.get("session_id"),
+        "transcript_path": envelope.get("transcript_path"),
         "file_path": tool_input.get("file_path"),
         "MNEME_MEMORY": os.environ.get("MNEME_MEMORY"),
         "proxy_env_present": sorted(k for k in os.environ
