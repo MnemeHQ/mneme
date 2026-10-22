@@ -461,7 +461,7 @@ def _subject_record(subject: SourceSubject) -> dict:
     from mneme import __version__
     from mneme.numeric_rule import runtime_label
 
-    return {
+    record = {
         "input_kind": subject.input_kind,
         "subject_sha256": subject.sha256,
         "source_path": subject.source_path,
@@ -471,6 +471,11 @@ def _subject_record(subject: SourceSubject) -> dict:
         "surface_version": __version__,
         "runtime": runtime_label(),
     }
+    if subject.input_kind != INPUT_KIND_COMPLETE_SOURCE:
+        # F-1: consumers verify that an unverified input without a target
+        # path carries a non-source matcher record on every numeric rule.
+        record["target_path_declared"] = subject.target_path_declared
+    return record
 
 
 def _collect_adr_diagnostics(
@@ -625,7 +630,10 @@ def _cmd_check(args: argparse.Namespace) -> int:
     ):
         # Bind what was actually checked. Never complete source: the numeric
         # rule stays MATCHER_UNEVALUATED / INCOMPLETE_SOURCE_INPUT.
-        subject = SourceSubject.unverified(input_text.encode("utf-8"))
+        subject = SourceSubject.unverified(
+            input_text.encode("utf-8"),
+            target_path_declared=args.target_path is not None,
+        )
 
     result = check_prompt(
         input_text,
