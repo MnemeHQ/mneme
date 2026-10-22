@@ -1,0 +1,12 @@
+== 20261022T092104Z ABSENT batch (P-6) with per-probe E4 capture ==
+harness_head=49e2c19a68232b54fe2dd31b92da50bb466590b8
+tshark=TShark (Wireshark) 4.6.9 (v4.6.9-0-g2d548b197c75).
+golden={"phase": "ABSENT", "tip": "2ddec27a72bde96fc110c0f87a3cf6b9243c5ac7", "url": "https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture", "date": "2026-10-22T09:21:14Z"}
+
+P-6-Write-1 headless PASS  (probe-run label before E4: P-6 Write 1 headless EVIDENCE_INCOMPLETE)
+P-6-Write-2 headless PASS  (probe-run label before E4: P-6 Write 2 headless EVIDENCE_INCOMPLETE)
+P-6-Edit-1 headless PASS  (probe-run label before E4: P-6 Edit 1 headless EVIDENCE_INCOMPLETE)
+P-6-Edit-2 headless PASS  (probe-run label before E4: P-6 Edit 2 headless EVIDENCE_INCOMPLETE)
+P-6-MultiEdit-1 headless PROTOCOL_DEVIATION  (probe-run label before E4: P-6 MultiEdit 1 headless PROTOCOL_DEVIATION)
+P-6-MultiEdit-2 headless PROTOCOL_DEVIATION  (probe-run label before E4: P-6 MultiEdit 2 headless PROTOCOL_DEVIATION)
+== done 2026-10-22T09:23:18Z ==
