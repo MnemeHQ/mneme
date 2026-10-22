@@ -242,6 +242,22 @@ Improve the existing Audit, enforcement evidence and readiness reporting without
 
 Use version-pinned decisions and rule/evaluator contracts across supported surfaces. Maintain a tested compatibility matrix, explicit timeout/failure behavior and rollback guidance; do not silently alter active enforcement via tool updates. This work refines the existing four layers (especially Enforcement, CI and Evidence) and builds on CI1 (#540), rather than adding a new layer.
 
+### P1 — OpenShell + OpenCode reference integration (experimental; bounded)
+
+**Status (2026-10-22):** a pinned OpenShell 0.1.5 / OpenCode 1.19.3 / Mneme 0.10.0 / Sonnet 5.5 experiment passed *scoped* independent review for complete-content OpenCode `write`: a forbidden literal was blocked before mutation, a compliant write was applied and functional, and the same forbidden payload was applied with no active external plugin hook. This is **not** a shipped/native integration or a full 14-probe PASS. Evidence remains local and some original traces are missing. The [canonical support matrix](../integrations/README.md) remains unchanged until maintained code and tests land.
+
+**First integration deliverable:** a version-pinned, opt-in **Mneme-maintained OpenShell sandbox/reference setup** that installs and verifies OpenCode hook activation, calls the existing canonical Mneme checker, documents the supported `write` path, provides one BLOCK/one ALLOW/one hook-absent control with independently verified file results, and labels every other mutation surface as unsupported or unevaluated. Publish reproducible setup, teardown, redacted evidence, code/image provenance, failure-mode checks and the operational caveat that `--pure` disables external hooks. This is an agent/tool integration *inside* OpenShell, not a native OpenShell gateway interceptor or new decision authority.
+
+**Cross-workstream issues exposed by the experiment:**
+
+- **Evidence binding and identity — prioritize under DG1F / ADR-029 / ADR-030 and existing [explainable enforcement](#p1--explainable-enforcement-and-observable-coverage):** live per-call ALLOW/BLOCK evidence must bind evaluated input hash, applicable decision/version/rule, completeness and outcome; independently verify the executed adapter, bridge and package identities. Do not claim a version-bound live decision record based solely on replay.
+- **Typed semantic coverage and benign false blocks — route through the existing [P0-A semantic constraint validation charter](../plans/2026-10-21-p0a-semantic-constraint-validation-charter.md) and [#259](https://github.com/MnemeHQ/mneme/issues/259):** static/dynamic alternative driver imports were missed, while benign documentation containing the forbidden literal was blocked. Preserve ADR-019 literal semantics; any AST/import-aware rule needs its own typed contract, oracle, false-positive assessment and approval.
+- **Adapter semantics — align with ADR-018, ADR-021 and ADR-033 before widening support:** whole-file checking is not introduced-delta enforcement; blanket `bash`/`edit` denial is a tool allowlist, not canonical evaluation. Distinguish hook omission, unsupported payload, checker degradation and a decision BLOCK in evidence and messages. Keep supported and unsupported mutation paths explicit.
+
+**Demand-gated, not prerequisites for the initial reference integration:** `edit`/partial-patch materialization, shell/session-delta coverage, alternate hosts, OpenShell resource admission (ADR-002), native gateway interceptors and supervisor middleware. These require a separate verified contract and authority mapping before implementation; do not expand OpenShell policy to manufacture a passing result.
+
+**Upstream path:** maintain the reference setup in Mneme first; only after reproducibility and support-boundary verification, consider an OpenShell example/skill proposal under NVIDIA's contribution and issue-acceptance process. No upstream acceptance or official OpenShell support is implied.
+
 ### P1 — Migration-aware Architecture Audit
 
 Extend the existing Audit workflow for long-running migrations and modernization, where legacy and target architectures coexist and path applicability matters.
