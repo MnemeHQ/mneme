@@ -1,0 +1,29 @@
+{
+  "evidence": "E5",
+  "step": "C3 step 3a: fixture activation",
+  "repository": "MnemeHQ/mneme-claude-code-enforcement-fixture",
+  "pull_request": 1,
+  "title": "c3: seed app.py and activate protection for C3-DEC",
+  "prepared_by": "agent (Claude Code) via harness seed_fixture.sh activate at MnemeHQ/mneme@91abddb5",
+  "pr_author": "TheoV823",
+  "reviewed_head": "9808470b918c732901aae61d721c0b0745ebbc8c",
+  "merged_by": "TheoV823 (human; stated by the owner in chat)",
+  "merged_at": "2026-10-21T22:17:21Z",
+  "merge_method": "squash",
+  "merge_commit": "2ddec27a72bde96fc110c0f87a3cf6b9243c5ac7",
+  "merge_commit_parent": "929ded61d948107135dc6fbdd0b2ca2b3de155ab",
+  "merge_commit_signature_verified": true,
+  "files": [".mneme/project_memory.json", "app.py"],
+  "github_reviews_recorded": 0,
+  "review_status": "human-attested; not independent review (ADR-033 section 4.5). The PR author and merger share one identity, so GitHub cannot distinguish a human merge from an agent merge under shared credentials; the human merge rests on the owner's statement.",
+  "ruleset": {"id": 25553918, "enforcement": "active", "bypass_actors": [], "rules": ["pull_request", "deletion", "non_fast_forward"]},
+  "baseline_after_merge": {
+    "verifier": "mneme.availability_authority.verify (shipped HTTPS path, no file transport)",
+    "authorization": "VERIFIED_ABSENT",
+    "branch": "main",
+    "tip": "2ddec27a72bde96fc110c0f87a3cf6b9243c5ac7",
+    "activation": {"state": "active", "activated_at": "2026-10-21T22:13:30Z", "protected_decisions": ["C3-DEC"]}
+  },
+  "read_with": "gh CLI under the owner's account (not a credential separate from the agent's; disclosed for E5)",
+  "recorded_at": "2026-10-21"
+}
