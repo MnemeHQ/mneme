@@ -61,6 +61,7 @@ rather than being silently dropped -- a typo should not defeat governance.
 |---|---|---|
 | `FORBID_LITERAL: text` | Yes, as a global typed entry in `Decision.rules` | Yes -- exact, case-sensitive, boundary-aware match triggers FAIL |
 | Structured `FORBID_LITERAL` with path selectors | Yes, including `include_paths` / `exclude_paths` | Yes when the artifact path is included and not excluded |
+| Structured `FORBID_NUMERIC_ABOVE` (ADR-034) | Yes, as a typed rule; requires `mneme.decision-index/v2` with the `numeric_upper_bound_rule` feature | Only as a whole-file audit: `mneme check --source-file <file.py>`. Any other input reports it unevaluated, never PASS |
 | `FORBID_DEPENDENCY: X` | Yes, as `"no X"` in Decision.constraints | Yes -- triggers WARN |
 | `FORBID_PATH: glob` | Yes, as `"FORBID_PATH glob"` in Decision.constraints | No (stored for visibility) |
 | `REQUIRE_PATH: glob` | Yes, as `"REQUIRE_PATH glob"` in Decision.constraints | No (stored for visibility) |
@@ -83,6 +84,64 @@ Patterns are repository-relative, forward-slash, and case-sensitive. `*`
 matches within one segment and a complete `**` segment matches zero or more
 segments. Absolute paths, backslashes, `.`, `..`, empty segments, negation,
 bracket syntax, `?`, and embedded `**` are rejected during compilation.
+
+### Numeric upper bounds (`FORBID_NUMERIC_ABOVE`, ADR-034 G1)
+
+A Python value must not exceed an inclusive bound. Only the structured form
+exists:
+
+```markdown
+## Constraints
+- FORBID_NUMERIC_ABOVE:
+    language: python
+    symbol: ROUTER_DEADLINE_S      # module-level assignment, and/or
+    call:
+      function: classify           # direct bare-name calls classify(...)
+      position: 1                  # 0-based positional argument
+    max: 5
+    inclusive: true
+    unit: seconds
+    include_paths:
+      - "src/**"
+```
+
+- `language: python`, `inclusive: true`, `unit` and `include_paths` are
+  required; at least one of `symbol` and `call` is required. Unknown,
+  duplicate or missing keys are errors.
+- `max` must be a plain, unquoted decimal greater than zero (up to 18 integer
+  and 9 fraction digits). Signs, leading zeros, `.5`, `5.`, exponents,
+  underscores, hex and quoted values are rejected. It is stored as canonical
+  decimal text (`5.000` becomes `5`), never as a float.
+- `unit` is a label for diagnostics. It is never converted.
+
+**How it is evaluated.** Only `mneme check --source-file path/to/file.py`
+decides this rule. The file must be a regular `.py` file inside the memory's
+policy root; it is read once, hashed, parsed with the running CPython's
+`ast`, and never imported or executed. Literal arithmetic
+(`+ - * / // % **` with an `int` exponent of at most 64) is folded with
+CPython semantics. Every declared source must be found: a missing,
+rebound, shadowed or unrecognized source makes the rule
+`MATCHER_UNEVALUATED` (exit 2), never a pass. A recognized source above
+`max` is a FAIL even if another source is unevaluated (`PARTIAL`). The
+`--json` payload carries `matcher_status`, `matcher_outcome`,
+`primary_reason`, `unknown_sources` and `subject_sha256` on the rule's
+applicability trace, plus a top-level `subject` record.
+
+**The comparison is exact, with no tolerance.** The value the program
+computes is compared with the decimal you wrote. For a bound that is not
+exactly representable in binary floating point, a float literal spelled the
+same way can be above or below it: `0.1` violates `max: 0.1` (Python's
+`0.1` is slightly above one tenth), while `0.3` satisfies `max: 0.3`. Prefer
+integer or dyadic bounds (`2.5`, `0.75`) when that matters.
+
+**Not covered.** The pre-write edit gate (Claude Code hook, Agent SDK,
+LangChain) sees only introduced text, so it reports this rule as
+unevaluated and never blocks on it; a literal violation in the same edit
+still blocks. In a repository with an authorized closed availability
+declaration (ADR-033), every nonempty edit on a path where a numeric rule
+applies is refused as `EVALUATION_INCOMPLETE`, so do not activate numeric
+rules there. The response-text conflict detector reports numeric rules as
+not covered. Numeric rules never make a decision Protected in the Audit.
 
 An active ADR with no mechanically enforceable rules is still importable for
 retrieval, but preview prints a `Retrieval-only ADR warnings` diagnostic. A

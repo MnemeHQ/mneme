@@ -254,6 +254,23 @@ def emit_availability(
             "evaluation, not a complete rule verdict"
             + (": " + ", ".join(decision_ids) if decision_ids else "") + "."
         )
+        # ADR-034 charter §6 (F2): name the numeric matcher records that made
+        # the evaluation incomplete. Rule identity and reason only; this is
+        # an availability refusal, never a numeric violation.
+        unevaluated = sorted({
+            f"{item['rule_id']} {item.get('matcher_status')} "
+            f"({item.get('primary_reason')})"
+            for item in payload.get("applicability") or []
+            if isinstance(item, dict)
+            and item.get("rule_type") == "FORBID_NUMERIC_ABOVE"
+            and item.get("matcher_status") in ("PARTIAL", "MATCHER_UNEVALUATED")
+            and isinstance(item.get("rule_id"), str)
+        })
+        if unevaluated:
+            lines.append(
+                "mneme-hook: numeric rule(s) unevaluated on this input "
+                "(whole-file audit only): " + "; ".join(unevaluated) + "."
+            )
     if category is not None and detailed:
         lines.append(
             "mneme-hook: not a decision violation; remediation: "

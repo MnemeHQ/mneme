@@ -47,18 +47,37 @@ from mneme.path_selectors import validate_path_pattern
 
 VALID_KINDS: Final[frozenset[str]] = frozenset({
     "FORBID_LITERAL",
+    "FORBID_NUMERIC_ABOVE",
     "FORBID_DEPENDENCY",
     "FORBID_PATH",
     "REQUIRE_PATH",
 })
 
+# Kinds compiled into typed ``Rule`` records rather than constraint strings.
+TYPED_RULE_KINDS: Final[frozenset[str]] = frozenset({
+    "FORBID_LITERAL",
+    "FORBID_NUMERIC_ABOVE",
+})
+
+# ADR-034 §2: the structured-only numeric directive.
+_NUMERIC_KIND = "FORBID_NUMERIC_ABOVE"
+_NUMERIC_REQUIRED = frozenset({
+    "language", "max", "inclusive", "unit", "include_paths",
+})
+_NUMERIC_ALLOWED = _NUMERIC_REQUIRED | {"symbol", "call", "exclude_paths"}
+_NON_NEGATIVE_INT_RAW = re.compile(r"^(0|[1-9][0-9]*)$")
+
 
 @dataclass(frozen=True)
 class ConstraintDirective:
-    """One parsed directive from a ``## Constraints`` section."""
+    """One parsed directive from a ``## Constraints`` section.
+
+    For ``FORBID_NUMERIC_ABOVE`` ``value`` is the canonical serialized
+    contract (ADR-034 §5), already strictly validated.
+    """
 
     kind: str   # one of VALID_KINDS
-    value: str  # raw value, trimmed
+    value: str  # raw value, trimmed; canonical contract for numeric rules
     include_paths: tuple[str, ...] | None = None
     exclude_paths: tuple[str, ...] = ()
 
@@ -150,22 +169,23 @@ def _string_list(
     key: str,
     *,
     required: bool,
+    kind: str = "FORBID_LITERAL",
 ) -> tuple[str, ...]:
     if key not in mapping:
         if required:
             raise ConstraintParseError(
-                f"structured FORBID_LITERAL requires {key!r}"
+                f"structured {kind} requires {key!r}"
             )
         return ()
     value = mapping[key]
     if not isinstance(value, list) or (required and not value):
         qualifier = "non-empty " if required else ""
         raise ConstraintParseError(
-            f"structured FORBID_LITERAL {key!r} must be a {qualifier}list"
+            f"structured {kind} {key!r} must be a {qualifier}list"
         )
     if any(not isinstance(item, str) or not item.strip() for item in value):
         raise ConstraintParseError(
-            f"structured FORBID_LITERAL {key!r} must contain non-empty strings"
+            f"structured {kind} {key!r} must contain non-empty strings"
         )
     patterns = tuple(item.strip() for item in value)
     try:
@@ -173,9 +193,134 @@ def _string_list(
             validate_path_pattern(pattern)
     except ValueError as exc:
         raise ConstraintParseError(
-            f"invalid structured FORBID_LITERAL {key!r}: {exc}"
+            f"invalid structured {kind} {key!r}: {exc}"
         ) from exc
     return patterns
+
+
+def _plain_scalar_text(
+    root: yaml.MappingNode,
+    key: str,
+) -> str:
+    """Raw text of a plain (unquoted) scalar value, before YAML coercion."""
+    for key_node, value_node in root.value:
+        if isinstance(key_node, yaml.ScalarNode) and key_node.value == key:
+            if not isinstance(value_node, yaml.ScalarNode) or value_node.style:
+                raise ConstraintParseError(
+                    f"structured {_NUMERIC_KIND} {key!r} must be a plain, "
+                    "unquoted scalar"
+                )
+            return value_node.value
+    raise ConstraintParseError(f"structured {_NUMERIC_KIND} requires {key!r}")
+
+
+def _parse_numeric_directive(text: str) -> ConstraintDirective:
+    """Parse the ADR-034 §2 structured ``FORBID_NUMERIC_ABOVE`` directive.
+
+    ``max``, ``inclusive`` and ``call.position`` are checked on the YAML
+    node's raw scalar text before type construction (ADR-034 §5), because
+    the loader would otherwise coerce ``05``, ``0x5``, ``1_000``, ``.5`` or
+    ``yes`` into values that can no longer be told apart.
+    """
+    from mneme.numeric_rule import (
+        NumericContract,
+        NumericContractError,
+        canonicalize_max,
+        is_identifier,
+    )
+
+    kind = _NUMERIC_KIND
+    try:
+        data = yaml.load(text, Loader=_UniqueKeyLoader)
+        root = yaml.compose(text, Loader=yaml.SafeLoader)
+    except (yaml.YAMLError, TypeError) as exc:
+        raise ConstraintParseError(f"invalid structured {kind}: {exc}") from exc
+    if not isinstance(data, dict) or not isinstance(root, yaml.MappingNode):
+        raise ConstraintParseError(f"structured {kind} body must be a mapping")
+    unknown = [key for key in data if key not in _NUMERIC_ALLOWED]
+    if unknown:
+        raise ConstraintParseError(
+            f"unknown structured {kind} fields: {sorted(unknown, key=str)!r}"
+        )
+    missing = sorted(_NUMERIC_REQUIRED - set(data))
+    if missing:
+        raise ConstraintParseError(f"structured {kind} requires {missing!r}")
+    if "symbol" not in data and "call" not in data:
+        raise ConstraintParseError(
+            f"structured {kind} requires at least one of 'symbol' and 'call'"
+        )
+    if data["language"] != "python":
+        raise ConstraintParseError(
+            f"structured {kind} 'language' must be exactly 'python'"
+        )
+    if _plain_scalar_text(root, "inclusive") != "true":
+        raise ConstraintParseError(
+            f"structured {kind} 'inclusive' must be literally true "
+            "(exclusive bounds are not supported)"
+        )
+    try:
+        max_text = canonicalize_max(_plain_scalar_text(root, "max"))
+    except NumericContractError as exc:
+        raise ConstraintParseError(f"invalid structured {kind} 'max': {exc}") from exc
+    unit = data["unit"]
+    if not isinstance(unit, str) or not unit.strip():
+        raise ConstraintParseError(
+            f"structured {kind} 'unit' must be a non-empty string"
+        )
+    symbol = data.get("symbol")
+    if "symbol" in data and not is_identifier(symbol):
+        raise ConstraintParseError(
+            f"structured {kind} 'symbol' must be a Python identifier"
+        )
+    call_function: str | None = None
+    call_position: int | None = None
+    if "call" in data:
+        call = data["call"]
+        if not isinstance(call, dict) or set(call) != {"function", "position"}:
+            raise ConstraintParseError(
+                f"structured {kind} 'call' must be a mapping with exactly "
+                "'function' and 'position'"
+            )
+        if not is_identifier(call["function"]):
+            raise ConstraintParseError(
+                f"structured {kind} 'call.function' must be a Python identifier"
+            )
+        call_node = next(
+            value for key, value in root.value
+            if isinstance(key, yaml.ScalarNode) and key.value == "call"
+        )
+        position_raw = next(
+            (
+                value for key, value in call_node.value
+                if isinstance(key, yaml.ScalarNode) and key.value == "position"
+            ),
+            None,
+        )
+        if (
+            not isinstance(position_raw, yaml.ScalarNode)
+            or position_raw.style
+            or not _NON_NEGATIVE_INT_RAW.fullmatch(position_raw.value)
+        ):
+            raise ConstraintParseError(
+                f"structured {kind} 'call.position' must be a plain "
+                "non-negative integer (0-based)"
+            )
+        call_function, call_position = call["function"], int(position_raw.value)
+    include_paths = _string_list(data, "include_paths", required=True, kind=kind)
+    exclude_paths = _string_list(data, "exclude_paths", required=False, kind=kind)
+    contract = NumericContract(
+        max=max_text,
+        unit=unit,
+        symbol=symbol,
+        call_function=call_function,
+        call_position=call_position,
+    )
+    return ConstraintDirective(
+        kind=kind,
+        value=contract.canonical_value(),
+        include_paths=include_paths,
+        exclude_paths=exclude_paths,
+    )
 
 
 def _parse_structured_directive(
@@ -187,6 +332,8 @@ def _parse_structured_directive(
             f"unknown constraint directive {kind!r} "
             f"(expected one of {sorted(VALID_KINDS)})"
         )
+    if kind == _NUMERIC_KIND:
+        return _parse_numeric_directive(textwrap.dedent("\n".join(block_lines)))
     if kind != "FORBID_LITERAL":
         raise ConstraintParseError(
             f"structured form is not supported for constraint directive {kind!r}"
@@ -286,6 +433,11 @@ def parse_constraints_section(body: str) -> list[ConstraintDirective]:
                 raise ConstraintParseError(
                     f"constraint directive {kind!r} has an empty value: "
                     f"{line.strip()!r}"
+                )
+            if kind == _NUMERIC_KIND:
+                raise ConstraintParseError(
+                    f"{_NUMERIC_KIND} has no scalar form; use the structured "
+                    "mapping (ADR-034 §2)"
                 )
             out.append(ConstraintDirective(kind=kind, value=value))
             index += 1

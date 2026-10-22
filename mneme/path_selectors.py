@@ -52,6 +52,11 @@ class RuleEvaluation:
     binding is different (stale or mismatched) evidence (ADR-029 §2), even
     when the outcome is identical. Behavioral comparisons across load paths
     must exclude them explicitly.
+
+    The ``matcher_*`` fields are the ADR-034 per-rule matcher record. They
+    are set only on an ``APPLIED`` ``FORBID_NUMERIC_ABOVE`` trace and stay
+    ``None``/empty for every other trace, so literal traces are unchanged.
+    Matcher uncertainty is never expressed through ``outcome``.
     """
 
     decision_id: str
@@ -65,6 +70,16 @@ class RuleEvaluation:
     reason: str = ""
     rule_id: str = ""
     decision_version_id: str = ""
+    matcher_status: str | None = None
+    matcher_outcome: str | None = None
+    primary_reason: str | None = None
+    unknown_sources: tuple = ()
+    subject_sha256: str | None = None
+
+    @property
+    def matcher_incomplete(self) -> bool:
+        """Whether this trace's matcher record leaves the evaluation open."""
+        return self.matcher_status in ("PARTIAL", "MATCHER_UNEVALUATED")
 
 
 _WINDOWS_ABSOLUTE = re.compile(r"^[A-Za-z]:/")

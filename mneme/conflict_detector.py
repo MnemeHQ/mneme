@@ -55,10 +55,32 @@ class Conflict:
     snippet: str
 
 
+NONCOVERAGE_NOT_EVALUATED_ON_RESPONSE_TEXT = "NOT_EVALUATED_ON_RESPONSE_TEXT"
+
+
+@dataclass(frozen=True)
+class RuleNoncoverage:
+    """A typed rule the response-text detector does not evaluate (ADR-034 §9).
+
+    ``FORBID_NUMERIC_ABOVE`` is decided only by a whole-file source audit, so
+    response text never covers it. The skip is reported, never presented as
+    a conflict-free check.
+    """
+
+    decision_id: str
+    decision_version_id: str
+    rule_id: str
+    rule_type: str
+    reason: str = NONCOVERAGE_NOT_EVALUATED_ON_RESPONSE_TEXT
+
+
 @dataclass
 class ConflictDetectionResult:
     conflicts: list[Conflict] = field(default_factory=list)
     applicability: list[RuleEvaluation] = field(default_factory=list)
+    # Additive (charter §7, F3). Reported, but deliberately not part of
+    # ``evaluation_complete``: noncoverage is a stated limit of this surface.
+    noncoverage: list[RuleNoncoverage] = field(default_factory=list)
 
     @property
     def evaluation_complete(self) -> bool:
@@ -66,6 +88,35 @@ class ConflictDetectionResult:
             item.outcome == SelectorOutcome.UNKNOWN
             for item in self.applicability
         )
+
+
+def noncoverage_note(noncoverage: list[RuleNoncoverage]) -> str:
+    """Human note callers show next to any conflict result (F3)."""
+    rule_ids = ", ".join(item.rule_id for item in noncoverage)
+    return (
+        f"{len(noncoverage)} numeric typed rule(s) not evaluated on response "
+        f"text ({NONCOVERAGE_NOT_EVALUATED_ON_RESPONSE_TEXT}); the absence of "
+        f"conflicts does not cover them: {rule_ids}"
+    )
+
+
+class NumericRuleNoncoverageError(RuntimeError):
+    """Raised when list-only ``detect()`` would hide numeric noncoverage.
+
+    ``detect()`` returns a bare list that cannot carry a note, so a decision
+    set containing ``FORBID_NUMERIC_ABOVE`` rules is refused rather than
+    returned as an apparently complete (possibly empty) conflict list. Use
+    ``evaluate()`` for the explicit ``noncoverage`` trace.
+    """
+
+    def __init__(
+        self,
+        noncoverage: list[RuleNoncoverage],
+        result: "ConflictDetectionResult",
+    ) -> None:
+        self.noncoverage = noncoverage
+        self.result = result
+        super().__init__(noncoverage_note(noncoverage))
 
 
 class PathApplicabilityUnknownError(RuntimeError):
@@ -135,10 +186,20 @@ class ConflictDetector:
         """
         conflicts: list[Conflict] = []
         applicability: list[RuleEvaluation] = []
+        noncoverage: list[RuleNoncoverage] = []
         seen: set[tuple[str, str]] = set()  # (decision_id, phrase)
 
         for d in decisions:
             for rule_index, rule in enumerate(d.rules):
+                if rule.type == "FORBID_NUMERIC_ABOVE":
+                    # No numeric matching on response text (ADR-034 §9).
+                    noncoverage.append(RuleNoncoverage(
+                        decision_id=d.id,
+                        decision_version_id=d.version_id,
+                        rule_id=rule_id_for(d.id, rule),
+                        rule_type=rule.type,
+                    ))
+                    continue
                 if rule.type != "FORBID_LITERAL":
                     continue
                 selection = evaluate_path_selectors(
@@ -204,6 +265,7 @@ class ConflictDetector:
         return ConflictDetectionResult(
             conflicts=conflicts,
             applicability=applicability,
+            noncoverage=noncoverage,
         )
 
     def detect(
@@ -212,10 +274,16 @@ class ConflictDetector:
         decisions: Iterable[Decision],
         target_path: str | Path | None = None,
     ) -> list[Conflict]:
-        """Return conflicts, raising if scoped applicability is unknown."""
+        """Return conflicts, raising if scoped applicability is unknown.
+
+        Raises ``NumericRuleNoncoverageError`` for a decision set containing
+        numeric rules: a bare list cannot say they were not checked.
+        """
         result = self.evaluate(response, decisions, target_path=target_path)
         if not result.evaluation_complete:
             raise PathApplicabilityUnknownError(result.applicability)
+        if result.noncoverage:
+            raise NumericRuleNoncoverageError(result.noncoverage, result)
         return result.conflicts
 
 
@@ -223,5 +291,9 @@ __all__ = [
     "Conflict",
     "ConflictDetectionResult",
     "ConflictDetector",
+    "NONCOVERAGE_NOT_EVALUATED_ON_RESPONSE_TEXT",
+    "NumericRuleNoncoverageError",
     "PathApplicabilityUnknownError",
+    "RuleNoncoverage",
+    "noncoverage_note",
 ]

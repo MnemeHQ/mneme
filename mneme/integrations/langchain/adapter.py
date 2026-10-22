@@ -37,6 +37,11 @@ Policy (identical to the documented Agent SDK adapter policy):
                              the tool result carries a UNEVALUATED marker
                              so an unchecked mutation is never silently
                              reported as governed.
+- trusted WARN/FAIL plus
+  numeric matcher
+  incompleteness          -> M-a (ADR-034 §8): deny (strict) or warn, with
+                             the unevaluated numeric rules listed; no
+                             pre-write numeric detection is claimed.
 - unlisted/read-only tool -> no opinion, zero checker invocations
 
 Usage::

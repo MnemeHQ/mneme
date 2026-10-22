@@ -12,6 +12,10 @@ happens to share no token with the decision's scope. See ADR-017.
 
 Severity semantics:
     A typed FORBID_LITERAL match is a FAIL.
+    A FORBID_NUMERIC_ABOVE source above its bound is a FAIL (ADR-034). That
+    rule is decided only on a verified complete Python source file
+    (``mneme check --source-file``); any other input leaves it
+    MATCHER_UNEVALUATED / INCOMPLETE_SOURCE_INPUT, never PASS.
     FAIL  — input contains a single-term anti-pattern term, or the complete
             ordered term sequence of a multi-term anti-pattern (ADR-017
             amendment, 2026-08-24).
@@ -25,6 +29,7 @@ Exit codes for the CLI:
 
 from __future__ import annotations
 
+import hashlib
 import re
 from dataclasses import dataclass, field
 from enum import Enum
@@ -36,6 +41,7 @@ from mneme.path_selectors import (
     SelectorOutcome,
     evaluate_path_selectors,
 )
+from mneme import numeric_rule
 from mneme.rule_identity import rule_id_for
 from mneme.rule_matcher import literal_in_text
 
@@ -62,6 +68,46 @@ class Violation:
     selector: str | None = None
     rule_id: str | None = None             # typed rules only (ADR-031 §10)
     decision_version_id: str | None = None  # typed rules only; "" if unknown
+    # FORBID_NUMERIC_ABOVE only: the recognized violation's source line,
+    # exact runtime value, authored bound, unit and strict-comparison note.
+    details: dict | None = None
+
+
+# Source input kinds (ADR-034 §6, charter §3). Only a complete source file
+# read from a verified path can decide a numeric rule.
+INPUT_KIND_COMPLETE_SOURCE = "complete_source_file"
+INPUT_KIND_UNVERIFIED = "unverified_input"
+
+
+@dataclass(frozen=True)
+class SourceSubject:
+    """The exact checked snapshot, bound into the audit record (ADR-029).
+
+    ``source`` holds the byte snapshot only for a verified complete source
+    file. The digest identifies the bytes that were checked; it is not a
+    promise that the live file stayed unchanged afterwards.
+    """
+
+    input_kind: str
+    sha256: str
+    source: bytes | None = None
+    source_path: str | None = None
+    memory_path: str | None = None
+    governed_path: str | None = None
+
+    @property
+    def complete_source(self) -> bool:
+        return (
+            self.input_kind == INPUT_KIND_COMPLETE_SOURCE
+            and self.source is not None
+        )
+
+    @classmethod
+    def unverified(cls, data: bytes) -> "SourceSubject":
+        return cls(
+            input_kind=INPUT_KIND_UNVERIFIED,
+            sha256=hashlib.sha256(data).hexdigest(),
+        )
 
 
 @dataclass
@@ -69,13 +115,54 @@ class EnforcementResult:
     verdict: Severity
     violations: list[Violation] = field(default_factory=list)
     applicability: list[RuleEvaluation] = field(default_factory=list)
+    subject: SourceSubject | None = None
 
     @property
     def evaluation_complete(self) -> bool:
+        """Derived aggregate (ADR-034 §4): false on path UNKNOWN or on an
+        applied rule whose matcher status is PARTIAL / MATCHER_UNEVALUATED."""
         return not any(
-            item.outcome == SelectorOutcome.UNKNOWN
+            item.outcome == SelectorOutcome.UNKNOWN or item.matcher_incomplete
             for item in self.applicability
         )
+
+    @property
+    def has_numeric_rules(self) -> bool:
+        return any(
+            item.rule_type == numeric_rule.RULE_TYPE
+            for item in self.applicability
+        )
+
+
+def _numeric_violation_details(
+    contract: numeric_rule.NumericContract,
+    match: numeric_rule.MatcherResult,
+) -> dict:
+    first = match.exceeding_sources[0]
+    return {
+        "contract": contract.describe(),
+        "max": contract.max,
+        "unit": contract.unit,
+        "source_kind": first.kind,
+        "source_line": first.line,
+        "value": first.value,
+        "value_exact": first.value_exact,
+        "comparison": numeric_rule.STRICT_COMPARISON_NOTE,
+        "exceeding_sources": [item.as_dict() for item in match.exceeding_sources],
+        "matcher_status": match.status,
+    }
+
+
+def _numeric_trigger(
+    contract: numeric_rule.NumericContract,
+    match: numeric_rule.MatcherResult,
+) -> str:
+    first = match.exceeding_sources[0]
+    return (
+        f"line {first.line}: {first.kind} value {first.value} "
+        f"(exactly {first.value_exact}) exceeds max {contract.max} "
+        f"{contract.unit}; no implicit tolerance applies"
+    )
 
 
 # Words that appear frequently in rule descriptions but carry no domain signal.
@@ -199,6 +286,7 @@ def check_prompt(
     scored: list[ScoredDecision],
     top: int = 3,
     input_path: str | Path | None = None,
+    subject: SourceSubject | None = None,
 ) -> EnforcementResult:
     """Check input_text against the decision corpus.
 
@@ -218,12 +306,18 @@ def check_prompt(
         input_path: Optional checked-file path. A typed rule does not enforce
                     against its declaring ADR or policy-memory source, both of
                     which must be able to contain the literal it defines.
+        subject:    The checked snapshot. Only a verified complete source
+                    file (``INPUT_KIND_COMPLETE_SOURCE``) can decide a
+                    ``FORBID_NUMERIC_ABOVE`` rule; without one every applied
+                    numeric rule is MATCHER_UNEVALUATED /
+                    INCOMPLETE_SOURCE_INPUT, decided before any parsing.
 
     Returns:
         EnforcementResult with verdict and list of Violations.
     """
     violations: list[Violation] = []
     applicability: list[RuleEvaluation] = []
+    numeric_subject = subject  # resolved lazily: literal-only checks skip it
 
     for s, literal_only in _enforcement_scope(scored, top):
         d = s.decision
@@ -237,6 +331,29 @@ def check_prompt(
                 memory_path=d.memory_path,
                 policy_paths=(d.source_path, d.memory_path),
             )
+            match: numeric_rule.MatcherResult | None = None
+            if (
+                rule.type == numeric_rule.RULE_TYPE
+                and selection.outcome == SelectorOutcome.APPLIED
+            ):
+                contract = numeric_rule.parse_rule_value(rule.value)
+                if numeric_subject is None:
+                    numeric_subject = SourceSubject.unverified(
+                        input_text.encode("utf-8")
+                    )
+                if numeric_subject.complete_source:
+                    match = numeric_rule.evaluate_source(
+                        contract, numeric_subject.source
+                    )
+                else:
+                    match = numeric_rule.incomplete_input_result()
+            matcher_fields = {} if match is None else {
+                "matcher_status": match.status,
+                "matcher_outcome": match.outcome,
+                "primary_reason": match.primary_reason,
+                "unknown_sources": match.unknown_sources,
+                "subject_sha256": numeric_subject.sha256,
+            }
             applicability.append(RuleEvaluation(
                 decision_id=d.id,
                 rule_type=rule.type,
@@ -249,7 +366,26 @@ def check_prompt(
                 reason=selection.reason,
                 rule_id=rule_id,
                 decision_version_id=d.version_id,
+                **matcher_fields,
             ))
+            if (
+                match is not None
+                and match.outcome == numeric_rule.OUTCOME_VIOLATION
+            ):
+                violations.append(Violation(
+                    decision_id=d.id,
+                    decision_text=d.decision,
+                    severity=Severity.FAIL,
+                    rule=rule.value,
+                    trigger=_numeric_trigger(contract, match),
+                    kind="typed_rule",
+                    rule_type=rule.type,
+                    input_path=selection.input_path,
+                    selector=selection.selector,
+                    rule_id=rule_id,
+                    decision_version_id=d.version_id,
+                    details=_numeric_violation_details(contract, match),
+                ))
             if (
                 selection.outcome == SelectorOutcome.APPLIED
                 and rule.type == "FORBID_LITERAL"
@@ -326,6 +462,7 @@ def check_prompt(
         verdict=verdict,
         violations=violations,
         applicability=applicability,
+        subject=subject,
     )
 
 
@@ -367,6 +504,9 @@ class GovernabilityAssessment:
     has_no_constraints: bool
     applicable_paths: tuple[str, ...]  # paths where typed rules apply
     confidence: float  # 1.0 = fully enforceable, 0.7 = partial, 0.0 = guidance only
+    # ADR-034 G1 numeric rules are whole-file audit only: reported here as
+    # noncoverage, never counted toward the enforceable tier (charter §7).
+    numeric_audit_only_rules: int = 0
 
 
 def assess_governability(decision: "Decision") -> GovernabilityAssessment:
@@ -439,6 +579,9 @@ def assess_governability(decision: "Decision") -> GovernabilityAssessment:
         has_no_constraints=has_no_constraints,
         applicable_paths=tuple(sorted(applicable_paths)),
         confidence=confidence,
+        numeric_audit_only_rules=sum(
+            1 for rule in decision.rules if rule.type == numeric_rule.RULE_TYPE
+        ),
     )
 
 
@@ -934,6 +1077,35 @@ def assess_protection(
 
 
 def _assess_protection(
+    decision: "Decision",
+    repo_root: str | Path | None,
+    test_evidence_results: "dict[str, list] | None",
+) -> ProtectionDecisionReport:
+    """Tier assessment plus explicit numeric-rule noncoverage (charter §7).
+
+    Protection scoring stays literal-only: a ``FORBID_NUMERIC_ABOVE`` rule is
+    a whole-file audit (G1) with no pre-write enforcement, so it never makes
+    a decision Protected. Each one is listed in ``evidence_sources`` as
+    audit-only noncoverage instead of silently disappearing.
+    """
+    from dataclasses import replace
+
+    from mneme.rule_identity import rule_id_for
+
+    report = _assess_protection_tier(decision, repo_root, test_evidence_results)
+    audit_only = [
+        f"numeric:g1-audit-only-not-protected:{rule_id_for(decision.id, rule)}"
+        for rule in decision.rules
+        if rule.type == numeric_rule.RULE_TYPE
+    ]
+    if not audit_only:
+        return report
+    return replace(
+        report, evidence_sources=[*report.evidence_sources, *audit_only],
+    )
+
+
+def _assess_protection_tier(
     decision: "Decision",
     repo_root: str | Path | None,
     test_evidence_results: "dict[str, list] | None",

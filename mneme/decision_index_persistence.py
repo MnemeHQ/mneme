@@ -55,7 +55,15 @@ SUPPORTED_DECISION_INDEX_SCHEMAS = frozenset({
 # ADR-031 §8: the v2 root names every governance semantic the document uses
 # beyond the v2 baseline. Decision applicability is the first such feature.
 APPLICABILITY_FEATURE = "decision_applicability"
-SUPPORTED_SEMANTIC_FEATURES = frozenset({APPLICABILITY_FEATURE})
+# ADR-034 §5 / O3: persisted ``FORBID_NUMERIC_ABOVE`` rules require schema v2
+# with this declared feature. It never appears in v1 memory, and a reader that
+# does not support it refuses the whole document instead of skipping rules.
+NUMERIC_UPPER_BOUND_FEATURE = "numeric_upper_bound_rule"
+NUMERIC_RULE_TYPE = "FORBID_NUMERIC_ABOVE"
+SUPPORTED_SEMANTIC_FEATURES = frozenset({
+    APPLICABILITY_FEATURE,
+    NUMERIC_UPPER_BOUND_FEATURE,
+})
 
 # Closed semantic key sets (ADR-031 §8). Present only for v2; v1 keeps its
 # permissive unknown-key behavior so every 0.10.0 decision is unchanged.
@@ -356,6 +364,34 @@ def _memory_item_from_record(record: object) -> MemoryItem:
         )
     except (KeyError, TypeError, ValueError) as exc:
         raise DecisionIndexPersistenceError(f"invalid memory item: {exc}") from exc
+
+
+def _declare_rule_features(section: dict[str, Any]) -> None:
+    """Declare the semantic features the section's rule bindings require.
+
+    A ``FORBID_NUMERIC_ABOVE`` binding needs schema v2 with the
+    ``numeric_upper_bound_rule`` feature (ADR-034 §5, O3). v1 memory is
+    refused rather than written with a rule its readers cannot represent.
+    Mutates ``section`` in place; the caller validates it afterwards.
+    """
+    rows = section.get("rules")
+    if not isinstance(rows, list):
+        return
+    if not any(
+        isinstance(row, dict) and row.get("rule_type") == NUMERIC_RULE_TYPE
+        for row in rows
+    ):
+        return
+    if section.get("schema") != DECISION_INDEX_SCHEMA_V2:
+        raise DecisionIndexMigrationRequired(
+            f"{NUMERIC_RULE_TYPE} rules require {DECISION_INDEX_SCHEMA_V2}; "
+            "upgrade project memory with `mneme decision-index migrate "
+            "--to-v2` first"
+        )
+    features = list(section.get("semantic_features", []))
+    if NUMERIC_UPPER_BOUND_FEATURE not in features:
+        features.append(NUMERIC_UPPER_BOUND_FEATURE)
+    section["semantic_features"] = sorted(set(features))
 
 
 def _applicability_of(rule: Rule) -> dict[str, Any]:
@@ -806,6 +842,7 @@ def _migrate_memory_document(document: dict[str, Any]) -> dict[str, Any]:
         "versions": versions,
         "rules": bindings,
     }
+    _declare_rule_features(section)
     load_persisted_decision_index(section)
 
     migrated = copy.deepcopy(document)
@@ -1078,6 +1115,7 @@ def append_initial_canonical_decision(
             binding_authority=BINDING_AUTHORITY_VERSION,
         )
     )
+    _declare_rule_features(section)
     migrated["decision_index"] = section
     index = load_persisted_decision_index(section)
     projected = project_canonical_index(index)
@@ -1259,6 +1297,7 @@ def append_canonical_version_occurrence(
     )
     logical["active_version_id"] = version_id
     logical["updated_at"] = updated_at
+    _declare_rule_features(section)
     migrated["decision_index"] = section
     load_persisted_decision_index(section)
     return migrated, version_id, True
@@ -1974,6 +2013,14 @@ def load_persisted_decision_index(
             f"rules[{index}].rule_type",
             non_empty=True,
         )
+        if rule_type == NUMERIC_RULE_TYPE and (
+            not is_v2 or NUMERIC_UPPER_BOUND_FEATURE not in semantic_features
+        ):
+            raise DecisionIndexPersistenceError(
+                f"rule {rule_id!r} is {NUMERIC_RULE_TYPE} but the document "
+                f"is not {DECISION_INDEX_SCHEMA_V2} declaring the "
+                f"{NUMERIC_UPPER_BOUND_FEATURE!r} semantic feature"
+            )
         payload = _require_dict(
             raw.get("rule_payload"),
             f"rules[{index}].rule_payload",
@@ -2621,6 +2668,7 @@ __all__ = [
     "NO_PREDECESSOR",
     "SUPPORTED_DECISION_INDEX_SCHEMAS",
     "SUPPORTED_SEMANTIC_FEATURES",
+    "NUMERIC_UPPER_BOUND_FEATURE",
     "DecisionIndexContinuityError",
     "DecisionIndexMigrationRefused",
     "DecisionIndexMigrationRequired",

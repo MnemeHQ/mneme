@@ -1,0 +1,1 @@
+STORE = "LEGACY_STORE"
