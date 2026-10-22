@@ -1,0 +1,32 @@
+{
+  "evidence": "E5",
+  "step": "C3: fixture fail-closed authorization",
+  "repository": "MnemeHQ/mneme-claude-code-enforcement-fixture",
+  "pull_request": 2,
+  "title": "c3: authorize fail-closed availability (ADR-033)",
+  "prepared_by": "owner ran seed_fixture.sh authorize (mneme availability authorize, interactive) in their own terminal; agent validated, pushed and opened the PR",
+  "attestation": {"recorded_by": "Theo Valmis", "independent_approver_attested": false, "baseline_protection_attested": true},
+  "authorize_event": {"seq": 1, "prev": null, "activation": {"activated_at": "2026-10-21T22:13:30Z", "protected_decisions": ["C3-DEC"]}},
+  "pr_author": "TheoV823",
+  "reviewed_head": "91e9dce790fe359ac673aea1d1c3b0c37540f5ef",
+  "merged_by": "TheoV823 (human; stated by the owner in chat)",
+  "merged_at": "2026-10-22T12:13:47Z",
+  "merge_method": "squash",
+  "merge_commit": "0530b644d5f695869af6b264cce12b29783bf443",
+  "merge_commit_parent": "2ddec27a72bde96fc110c0f87a3cf6b9243c5ac7",
+  "merge_commit_signature_verified": true,
+  "files": [".mneme/availability.json"],
+  "github_reviews_recorded": 0,
+  "review_status": "human-attested; NOT independent review (ADR-033 section 4.5). independent_approver_attested is false; PR author and merger share one identity.",
+  "ruleset": {"id": 25553918, "enforcement": "active", "bypass_actors": [], "rules": ["pull_request", "deletion", "non_fast_forward"]},
+  "baseline_after_merge": {
+    "verifier": "mneme.availability_authority.verify (shipped HTTPS path, no file transport), fresh clone of the tip",
+    "authorization": "AUTHORIZED",
+    "branch": "main",
+    "tip": "0530b644d5f695869af6b264cce12b29783bf443",
+    "activation": {"state": "active", "activated_at": "2026-10-21T22:13:30Z", "protected_decisions": ["C3-DEC"]},
+    "local_relation_of_fresh_clone": "MATCH"
+  },
+  "read_with": "gh CLI under the owner's account (not a credential separate from the agent's; disclosed for E5)",
+  "recorded_at": "2026-10-22"
+}
