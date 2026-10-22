@@ -17,8 +17,9 @@ Mneme's own output (E3) is never sufficient alone: a refusal needs the
 unchanged file (E1) and the host's error result (E2) as well.
 
 F-R2 (C2b charter §17.5). On a headless proceed row whose verifier is
-UNVERIFIABLE, the §17.2 diagnostic must be in a model-bound session-transcript
-entry under the H1 rules (R1: a `hook_additional_context` attachment). The
+UNVERIFIABLE, the §17.2 diagnostic must be in an R1 session-transcript entry:
+a `hook_additional_context` attachment. Text in any other model-bound entry
+(a user turn or tool_result) is recorded but does not pass. The
 hook's stdout, `hook_success` attachments (R2), stream-json `system` events,
 stderr and debug logs are emitted or host output, never delivery. Every other
 proceed row is a control and must show no diagnostic at all. A missing
@@ -409,9 +410,15 @@ def main() -> int:
                 checks["FR2_emitted"] = "ok" if ok else "contradicts"
                 if not ok:
                     failures.append("F-R2: hook stdout is not exactly the §17.2 object")
+            # §17.5 names the proof: an R1 `hook_additional_context` attachment.
+            # Other model-bound entries (a user turn, a tool_result) are recorded
+            # in `locations` but never establish delivery.
             bound = [loc for loc in locations if loc["category"] == "model_bound"
+                     and loc["attachment_type"] == "hook_additional_context"
                      and text is not None and text in loc["text"]]
             hosted = [loc for loc in locations if loc["category"] == "host_output"]
+            other = [loc for loc in locations if loc["category"] == "model_bound"
+                     and loc not in bound]
             diagnostic["host_output"] = "observed" if hosted else "not_observed"
             if not transcript.exists():
                 diagnostic["model_delivered"] = "not_tested"
@@ -422,8 +429,9 @@ def main() -> int:
             else:
                 diagnostic["model_delivered"] = "contradicted"
                 checks["FR2_model_bound"] = "contradicts"
-                failures.append("F-R2: no model-bound diagnostic"
-                                + (" (host output only)" if hosted else ""))
+                failures.append("F-R2: no R1 hook_additional_context diagnostic"
+                                + (" (other model-bound entry only)" if other
+                                   else " (host output only)" if hosted else ""))
         else:
             noisy = [e for e in mine if (e.get("stdout") or "").strip()]
             diagnostic["emitted"] = "contradicted" if noisy else "absent"

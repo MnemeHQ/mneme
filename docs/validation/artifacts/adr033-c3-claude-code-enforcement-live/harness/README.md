@@ -104,7 +104,7 @@ call must be a PROTOCOL_DEVIATION.
 
 | Rows | Offline self-test | Live only |
 |---|---|---|
-| F-R2 (D-2 with P-1 and D-1 controls, batch `FR2`) | Delivered, host-output-only, missing, no-transcript and injected-control cases; the FR2 batch with its pair comparisons | The real 2.1.303 transcript (whether the host records the attachment at all) |
+| F-R2 (D-2 with P-1 and D-1 controls, batch `FR2`) | Delivered, host-output-only, tool_result-only, missing, no-transcript and injected-control cases; the FR2 batch with its pair comparisons and its gate (failed, incomplete, done, `--recheck`) | The real 2.1.303 transcript (whether the host records the attachment at all) |
 | R-1..R-7, P-1..P-7, D-1..D-5, H-1 (20) | Exercised with the stub host and the `file://` remote; labels must match the matrix | Real host (E2, E7), HTTPS verifier path, E4 OS capture, E9 repetitions |
 | U-1, U-2, U-3 (3) | Not exercised (needs a Git-only network block) | All evidence |
 | H-2 (1) | Not exercised (host hook-timeout behavior cannot be stubbed meaningfully) | All evidence |
@@ -192,9 +192,10 @@ hold).
 authorization. It does not re-run R-1, resume Batch R or change the fixture.
 
 **What counts.** On a headless proceed row whose verifier is UNVERIFIABLE (D-2,
-and U-1/U-3 if they are run), `classify_c3.py` requires the §17.2 text in a
-**model-bound** entry of the session transcript, under the H1 rules (H1 record
-§7; #551, #561):
+and U-1/U-3 if they are run), `classify_c3.py` requires the §17.2 text in the
+R1 entry of the session transcript. The text in any other model-bound entry,
+such as a user turn or a `tool_result`, is recorded but never passes. The H1
+rules apply (H1 record §7; #551, #561):
 
 - **R1:** a transcript `hook_additional_context` attachment for `PreToolUse`,
   with the text in `attachment.content`, whose hook invocation emitted the
@@ -236,7 +237,16 @@ bash run_c3_batch.sh FR2 2
 ```
 
 Each probe line must be `PASS`, and each `PAIR D-2/<control> <tool> <rep>` line
-`PAIR_OK` (written to `D-2-<tool>-<rep>/out/pair-<control>.json`). Passing
+`PAIR_OK` (written to `D-2-<tool>-<rep>/out/pair-<control>.json`). Only then does
+the batch end `BATCH_DONE FR2`. Otherwise it ends, with exit 1, either:
+
+- `BATCH_FAILED FR2`: any FAIL, deviation or pair mismatch;
+- `BATCH_INCOMPLETE FR2`: only missing evidence.
+
+D-2 is always incomplete at first, because its `netcap-sni.txt` is added after
+the probe (E4 OS capture, above). Add it, then run
+`bash run_c3_batch.sh FR2 2 --recheck`. This re-classifies the existing
+evidence and re-applies the gate without running Claude Code again. Passing
 establishes model-bound delivery on 2.1.303 headless only. It does not
 establish user-visible delivery, and it does not fix F-R1: an unverifiable
 baseline still lets the edit proceed.

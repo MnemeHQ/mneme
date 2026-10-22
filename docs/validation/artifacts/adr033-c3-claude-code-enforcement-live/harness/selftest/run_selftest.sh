@@ -83,13 +83,28 @@ fr2() {  # stub-mode probe tool expected-label outcome-fragment
     && echo "ok   F-R2 $1 $2 $3: $5" || { echo "FAIL F-R2 $1 $2 $3: no '$5'"; fail=1; }
 }
 fr2 host       D-2 Edit  PASS                 '"model_delivered": "stub_only"'
-fr2 host_only  D-2 Edit  FAIL                 'no model-bound diagnostic (host output only)'
-fr2 missing    D-2 Write FAIL                 'F-R2: no model-bound diagnostic"'
+fr2 host_only  D-2 Edit  FAIL                 'no R1 hook_additional_context diagnostic (host output only)'
+fr2 missing    D-2 Write FAIL                 'F-R2: no R1 hook_additional_context diagnostic"'
+# Model-bound but not the R1 attachment (here: the tool_result) never passes.
+fr2 tool_result D-2 Edit FAIL                 'no R1 hook_additional_context diagnostic (other model-bound entry only)'
 fr2 no_transcript D-2 Edit EVIDENCE_INCOMPLETE 'F-R2 session transcript'
 fr2 host       P-1 Write PASS                 '"FR2_absent": "ok"'
 fr2 host       D-1 Edit  PASS                 '"FR2_emitted_absent": "ok"'
 fr2 inject     P-1 Edit  FAIL                 'F-R2 control: an availability diagnostic appeared'
 fr2 no_transcript P-1 Write EVIDENCE_INCOMPLETE 'F-R2 session transcript'
+# The FR2 batch gate: BATCH_DONE only when every probe is PASS and every pair
+# PAIR_OK. A FAIL ends BATCH_FAILED; missing evidence ends BATCH_INCOMPLETE.
+fr2_gate() {  # stub-mode expected-last-line-prefix
+  local out rc
+  out=$(C3_STUB_DIAG=$1 bash "$BASE/run_c3_batch.sh" FR2 2 < /dev/null 2>&1); rc=$?
+  if [ $rc -ne 0 ] && echo "$out" | tail -1 | grep -q "^$2" && ! echo "$out" | grep -q '^BATCH_DONE'; then
+    echo "ok   batch FR2 with stub $1 -> $2, exit $rc"
+  else
+    echo "FAIL batch FR2 with stub $1: exit $rc, last line: $(echo "$out" | tail -1)"; fail=1
+  fi
+}
+fr2_gate host_only     'BATCH_FAILED FR2'
+fr2_gate no_transcript 'BATCH_INCOMPLETE FR2'
 # The §17.5 batch: D-2 with its paired controls (P-1, D-1), 2 repetitions, and
 # the R3 pair comparison of D-2 against each control, same tool and rep.
 FR2_OUT=$(echo "stdin that no probe may read" | bash "$BASE/run_c3_batch.sh" FR2 2 2>&1)
@@ -100,6 +115,10 @@ if echo "$FR2_OUT" | tail -1 | grep -q '^BATCH_DONE FR2$' && [ "$FR2_PASS" = 12 
 else
   echo "FAIL batch FR2: $FR2_PASS/12 PASS, $FR2_PAIR/8 PAIR_OK"; echo "$FR2_OUT" | tail -5; fail=1
 fi
+# --recheck re-classifies the same evidence without running a probe.
+RECHECK=$(bash "$BASE/run_c3_batch.sh" FR2 2 --recheck < /dev/null 2>&1 | tail -1 | tr -d '\r')
+[ "$RECHECK" = "BATCH_DONE FR2" ] && echo "ok   batch FR2 --recheck -> BATCH_DONE" \
+  || { echo "FAIL batch FR2 --recheck -> $RECHECK"; fail=1; }
 # A pair whose control failed is never PAIR_OK.
 C3_STUB_DIAG=inject run P-1 Edit FAIL
 PAIR=$("$PY" -E -P "$BASE/classify_c3.py" --pair "$(cygpath -w "$ROOT/live/D-2-Edit-1/out")" \

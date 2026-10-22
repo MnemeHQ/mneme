@@ -13,8 +13,9 @@ entries Claude Code 2.1.202 recorded in H1a-edit: the hook's stdout as a
 `hookSpecificOutput.additionalContext`, a `hook_additional_context`
 attachment. ``C3_STUB_DIAG`` makes the negative cases: ``host_only`` (no
 `hook_additional_context` attachment), ``missing`` (no hook attachments),
-``no_transcript`` (the file is never written) and ``inject`` (a diagnostic
-attachment the hook never emitted).
+``no_transcript`` (the file is never written), ``inject`` (a diagnostic
+attachment the hook never emitted) and ``tool_result`` (the diagnostic only in
+the tool_result, a model-bound entry that is not the R1 attachment).
 """
 from __future__ import annotations
 
@@ -81,7 +82,7 @@ def main() -> int:
                            "tool_input": tool_input, "tool_use_id": use_id,
                            "session_id": session, "transcript_path": str(transcript_path),
                            "cwd": str(repo)})
-    blocked, message = False, ""
+    blocked, message, in_result = False, "", ""
     for group in settings.get("hooks", {}).get("PreToolUse", []):
         if tool not in group.get("matcher", "").split("|"):
             continue
@@ -110,7 +111,9 @@ def main() -> int:
             if diag_mode == "inject" and context is None:
                 context = (f"{DIAG_MARKER} authorization could not be verified "
                            "(AUTHORIZATION_UNVERIFIABLE, reason INJECTED).")
-            if context is not None and diag_mode not in ("host_only", "missing"):
+            if context is not None and diag_mode == "tool_result":
+                in_result = "\n" + context
+            elif context is not None and diag_mode not in ("host_only", "missing"):
                 transcript.append({"type": "attachment", "sessionId": session, "attachment": dict(
                     hook, type="hook_additional_context", content=[context])})
 
@@ -127,7 +130,8 @@ def main() -> int:
             target.write_text(text, encoding="utf-8")
         message = f"The file {target} has been updated."
     result = {"type": "user", "message": {"content": [
-        {"type": "tool_result", "tool_use_id": use_id, "is_error": blocked, "content": message}]}}
+        {"type": "tool_result", "tool_use_id": use_id, "is_error": blocked,
+         "content": message + in_result}]}}
     emit(result)
     transcript.append(dict(result, sessionId=session))
     if diag_mode != "no_transcript":
