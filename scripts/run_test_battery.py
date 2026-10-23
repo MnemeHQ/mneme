@@ -244,6 +244,15 @@ GATE_EXCLUSIONS: tuple[tuple[str, str], ...] = (
         "tests/test_hook_latency_harness.py",
         "main-only: benchmark tooling (hook latency harness, issue #60)",
     ),
+    (
+        "tests/test_adr034_m4_harness.py",
+        "main-only: benchmark tooling (ADR-034 M4 scoring harness, charter §6)",
+    ),
+    (
+        "tests/test_adr034_m4_harness_old_reader.py",
+        "main-only: opt-in, needs a mneme-hq==0.10.0 old-reader environment "
+        "(skipped unless MNEME_M4_OLD_READER_PYTHON and MNEME_M4_OLD_READER_WHEEL are set)",
+    ),
     ("tests/test_eventcatalog_import.py", "main-only: experimental integration"),
     ("tests/integrations/hermes", "main-only: experimental integration"),
     (
