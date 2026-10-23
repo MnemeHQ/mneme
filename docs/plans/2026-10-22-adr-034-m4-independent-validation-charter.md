@@ -1,10 +1,11 @@
 # ADR-034 / M4: independent validation charter (corrected whole-file numeric audit)
 
 **Date:** 2026-10-22
-**Status:** **PROPOSED.** The owner accepts it by merging this PR. Merging
-freezes the M4 design below and nominates the implementation pin. It does
-**not** authorize corpus authoring, harness work or scoring; each of those
-needs its own owner authorization (§9).
+**Status:** **ACCEPTED** by owner decision through merged PR
+[#614](https://github.com/MnemeHQ/mneme/pull/614) (`d1159c89`, 2026-10-22).
+The M4 validation design is frozen and the implementation pin nominated.
+Corpus authoring, harness work and scoring each require separate
+authorization under §9.
 
 **Repository baseline examined:** `MnemeHQ/mneme` `main` at
 `f25f0e845f344944dc25d085bffafbd1855c5a7d`.
