@@ -1058,6 +1058,88 @@ freeze amendments remain unchanged.
 
 ---
 
+## Amendment — record the ADR-034 G1 F-1 conformance correction (#613) (2026-10-22)
+
+> This is a **record**, not a new authorization. It states that #613 brought
+> shipped behavior into line with the ADR-034 G1 amendment above, after this
+> document's description of that amendment's charter became inaccurate. It
+> authorizes no further behavior.
+
+**What happened.** The ADR-034 G1 amendment authorizes implementing
+`FORBID_NUMERIC_ABOVE` "exactly as specified by the accepted behavioral
+charter", citing that charter at squash `83af67ba`. That charter's §3 item 4
+conditioned the non-source result on "an APPLIED numeric rule". It therefore
+let `mneme check --input <file>` without `--target-path` return a clean PASS
+when the input file's own path was EXCLUDED, which contradicts accepted
+ADR-034 §6 ("never a clean result"). Held-out scoring found this as F-1
+([results record](../validation/adr-034-g1-heldout-scoring-2026-10-22.md),
+#612, squash `f25f0e84`).
+
+PR [#613](https://github.com/MnemeHQ/mneme/pull/613) (squash `b0dc1a14`),
+owner-approved, corrected it:
+
+- in `mneme/enforcer.py` and `mneme/cli.py`, for `--input` without
+  `--target-path`, every numeric rule yields `MATCHER_UNEVALUATED` /
+  `INCOMPLETE_SOURCE_INPUT`, whatever the input path's applicability;
+- in the shared trust validator (`mneme/integrations/claude_code/hook.py`,
+  also used by the Agent SDK and LangChain), that record is accepted on an
+  EXCLUDED or UNKNOWN trace only in that case, and contradictory payloads stay
+  untrusted;
+- a dated erratum to the charter's §3 item 4 records the correction.
+
+**Sections referenced:** the ADR-034 G1 amendment above, the Freeze Anchor
+**Status** clause, and the Amendment Procedure below.
+
+**Rationale (Amendment Procedure §3(a) and §3(b)).**
+
+- **(a)** The G1 amendment's description of the authorized behavior relied on
+  charter text that was defective against ADR-034 §6, the governing contract.
+  This record corrects that description.
+- **(b)** The charter correction was already made, in the §3 item 4 erratum
+  merged with #613.
+
+**On Amendment Procedure §4.** #613 merged before this record. This entry
+does not justify a new behavioral change after the fact. The corrected
+behavior is the behavior ADR-034 §6 already required, and the G1 amendment
+already authorized implementing ADR-034. Whether that reading satisfies §4 is
+the owner's decision when merging this record.
+
+**Verification (from #613, not re-run here):** public regression tests only.
+The F-1 behavior has **no** blind held-out evidence. G1 stays FAIL, and sealed
+v1 is not re-scored. Independent validation of the corrected implementation
+is planned separately as ADR-034 M4.
+
+### Explicitly preserved (unchanged by #613)
+
+1. `--input` **with** `--target-path`: APPLIED is non-source, and EXCLUDED
+   stays EXCLUDED with no matcher record.
+2. `--source-file` behavior.
+3. `FORBID_LITERAL` behavior and identities.
+4. Payloads and exit codes of checks involving no numeric rule, which stay
+   byte-identical.
+5. Gate surfaces (hook, Agent SDK, LangChain): they always pass
+   `--target-path`, so their behavior is unchanged.
+
+### Recorded consequence
+
+With numeric rules in memory, `mneme check --input` without `--target-path`
+exits 2 for every input file, including a decision's own policy source. This
+repository's memory contains no numeric rule today.
+
+### Not authorized by this record
+
+- Any behavior beyond #613 as merged.
+- G2 pre-write numeric evaluation, CI integration, any ADR-033
+  availability-policy change, or new numeric forms.
+- Any blind-validation, enforcement or production claim for the corrected
+  implementation.
+- Re-scoring or reuse of sealed v1.
+
+The existing DG1B1, DG1F-C1a, #260, T-08 slice-1, C2a, C2b, ADR-034 G1 and
+C2b Amendment 1 freeze amendments remain unchanged.
+
+---
+
 ## Amendment Procedure
 
 This document is frozen at `e73ff7d`. To amend it:
