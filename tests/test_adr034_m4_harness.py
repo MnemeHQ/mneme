@@ -226,6 +226,28 @@ def test_f1_shape_n2_clean_pass_fails_3_3a_5():
     assert g["3"] == g["3a"] == g["5"] == "FAIL"
 
 
+@pytest.mark.parametrize("case_id", ["u1", "n1"])
+@pytest.mark.parametrize("outcome", ["VIOLATION", "NO_VIOLATION"])
+def test_gate_3a_requires_the_unevaluated_outcome_not_only_status(case_id, outcome):
+    """Review F-1: MATCHER_UNEVALUATED with the expected reason but a decided
+    outcome is an inconsistent record and fails 3a."""
+    rows = perfect_rows()
+    case = next(c for c, _, _ in rows if c.case_id == case_id)
+    reason = case.expected["primary_reason"]
+    obs = make_obs(outcome, matcher_status="MATCHER_UNEVALUATED", primary_reason=reason,
+                   unknown_sources=[{"kind": "symbol", "line": 1, "reason": reason}])
+    s = h.score_case(case, obs)
+    assert s["un_correct"] is False
+    assert "un_not_unevaluated_with_expected_reason" in s["failures"]
+    assert gates(rescore(rows, case_id, obs))["3a"] == "FAIL"
+
+
+def test_gate_3a_passes_on_the_fully_correct_record():
+    rows = perfect_rows()
+    assert all(s["un_correct"] for c, _, s in rows if c.role == "unevaluated")
+    assert h.compute_gates(rows, PINS)["3a"]["value"]["correct"] == 3
+
+
 def test_unexpected_violation_on_u_fails_3a_not_3():
     rows = rescore(perfect_rows(), "u1", make_obs("VIOLATION"))
     detail = h.compute_gates(rows, PINS)
@@ -364,6 +386,47 @@ def test_set_r_is_scored_against_the_criteria_table_not_the_manifest():
 def test_binding_incomplete_fails_gate_10(override):
     obs = make_obs("VIOLATION", **override)
     assert gates(rescore(perfect_rows(), "a1", obs))["10"] == "FAIL"
+
+
+A9_CASE = dict(category="A9", expected={"applicability": "EXCLUDED", "matcher_status": None,
+                                        "matcher_outcome": None})
+
+
+def test_binding_exemption_covers_a9_excluded_only():
+    """Review F-2: only applicability-only A9 may bind no matcher record."""
+    a9 = make_case(case_id="a9", **A9_CASE)
+    assert h.binding_complete(make_obs("EXCLUDED"), a9)
+    # A9 still needs digest, rule id, version and a consistent excluded result.
+    assert not h.binding_complete(make_obs("EXCLUDED", subject_sha256=None), a9)
+    assert not h.binding_complete(make_obs("EXCLUDED", decision_version_id=""), a9)
+    assert not h.binding_complete(make_obs("EXCLUDED", numeric_violations=[
+        {"rule_id": "x", "decision_version_id": "y", "severity": "FAIL"}]), a9)
+    # An A9 trace that is not EXCLUDED needs the full record.
+    applied_bare = make_obs("NO_VIOLATION", matcher_status=None, matcher_outcome=None,
+                            has_matcher_record=False, primary_reason_key_present=False,
+                            trace_subject_sha256=None)
+    assert not h.binding_complete(applied_bare, a9)
+
+
+@pytest.mark.parametrize("case_kwargs", [
+    {"category": "A6", "expected": {"matcher_outcome": "NO_VIOLATION"}},
+    {"stratum": "W", "category": "W"},
+    U_CASE,
+    {"stratum": "N", "category": "N1", "expected": {"primary_reason": "PARSE_FAILURE"}},
+    {"stratum": "R", "category": "R", "shape": "R2",
+     "expected": {"matcher_outcome": "NO_VIOLATION"}},
+])
+def test_excluded_source_file_without_record_is_binding_incomplete_outside_a9(case_kwargs):
+    case = make_case(case_id="x", **case_kwargs)
+    assert case.transport == "source_file"
+    for obs in (make_obs("EXCLUDED"),
+                make_obs("PATH_UNKNOWN", applicability="UNKNOWN", matcher_status=None,
+                         matcher_outcome=None, has_matcher_record=False,
+                         primary_reason_key_present=False, trace_subject_sha256=None)):
+        s = h.score_case(case, obs)
+        assert s["binding_complete"] is False and "binding_incomplete" in s["failures"]
+    rows = perfect_rows() + [(case, make_obs("EXCLUDED"), h.score_case(case, make_obs("EXCLUDED")))]
+    assert gates(rows)["10"] == "FAIL"
 
 
 def test_a9_is_scored_for_applicability_only():
@@ -721,6 +784,23 @@ def test_a_crash_during_a_pass_is_invalid_never_scored(corpus, tmp_path, monkeyp
     assert not list(tmp_path.glob("m4-run-*"))
 
 
+def test_second_pass_refuses_a_run_root_that_was_not_removed(corpus, tmp_path, monkeypatch):
+    """Ruling Q14: the repeated root path is valid only after full removal."""
+    root, pins = corpus
+    calls = []
+
+    def leaky_pass(prep, number, run_root, out_dir, keep):
+        calls.append(number)
+        run_root.mkdir()
+        return "{}\n", str(run_root), {}
+
+    monkeypatch.setattr(h, "run_pass", leaky_pass)
+    final = _score(root, pins, tmp_path / "out", work_dir=tmp_path)
+    assert calls == [1]
+    assert final["result"] == "INVALID" and final["refusal"]["check"] == "run_root"
+    assert "previous pass was not removed" in final["refusal"]["detail"]
+
+
 def test_old_reader_must_lack_the_numeric_type(corpus, tmp_path):
     root, pins = corpus
     wheel = tmp_path / h.M4_PINS.old_reader_wheel_name
@@ -753,6 +833,9 @@ def test_e2e_every_gate_but_12_passes_on_the_synthetic_corpus(e2e):
     assert set(results.values()) == {"PASS"}, final["gates"]
     assert final["result"] == "INCOMPLETE"
     assert final["failures"] == []
+    assert final["disclosures"] == list(h.DISCLOSURES)
+    assert final["a9_applicability"]["gating"] is False
+    assert final["a9_applicability"]["matched"] == final["a9_applicability"]["of"] == 1
     assert final["headline"] == {
         "S1": "W decided 2 of 2; A decided 3 of 3; U unevaluated 2 of 2 (expected 2).",
         "S3": "W decided 2 of 2; A decided 3 of 3; U unevaluated 1 of 1 (expected 1).",

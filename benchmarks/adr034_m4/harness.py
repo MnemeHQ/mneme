@@ -74,6 +74,21 @@ CASE_RECORD_SCHEMA = "mneme.adr034-m4.case/v1"
 SUMMARY_SCHEMA = "mneme.adr034-m4.summary/v1"
 ROOT_TOKEN = "<RUN_ROOT>"
 
+# Reported in every summary (owner rulings on PR #621, questions 5, 11, 14).
+DISCLOSURES = (
+    "A9 is scored for applicability only (criteria §3) and no frozen §5 gate covers "
+    "A9 correctness. A9 matched/of and every A9 mismatch are reported (failure "
+    "classification a9_applicability_mismatch) but do not change PASS/FAIL; an "
+    "unmatched A9 case is not correct.",
+    "Gate 10: only an applicability-only A9 case with a consistent EXCLUDED trace may "
+    "bind no matcher record (digest, rule_id, version and applicability still "
+    "required). Every other case must carry the full matcher record.",
+    "Gate 9: both passes run at the same temporary root path. Each pass creates it "
+    "fresh, copies the corpus in, and removes it; the harness verifies the root is "
+    "absent before each pass and after the last. Determinism is therefore tested at a "
+    "repeated path, and only the run-root string is normalized.",
+)
+
 NUMERIC = "FORBID_NUMERIC_ABOVE"
 QUERY = "audit"
 CHILD_TIMEOUT_S = 300
@@ -1147,7 +1162,13 @@ def _is_sha256(value: Any) -> bool:
 
 def binding_complete(obs: dict, case: Case) -> bool:
     """ADR-029 binding (criteria §4): digest, rule id, version, applicability,
-    matcher status and primary reason, and outcome, bound in one record."""
+    matcher status and primary reason, and outcome, bound in one record.
+
+    The only case allowed to bind no matcher evidence is an applicability-only
+    A9 case whose trace is a consistent ``EXCLUDED`` result: an excluded rule
+    makes no matching claim (G1 charter §6). Every other case, whatever its
+    applicability or transport, must carry the full matcher record.
+    """
     if not _is_sha256(obs["subject_sha256"]):
         return False
     if not (isinstance(obs["rule_id"], str) and obs["rule_id"]):
@@ -1156,16 +1177,22 @@ def binding_complete(obs: dict, case: Case) -> bool:
         return False
     if obs["applicability"] not in APPLICABILITY:
         return False
-    needs_record = obs["applicability"] == "APPLIED" or case.transport == "input"
-    if needs_record or obs["has_matcher_record"]:
-        if obs["matcher_status"] not in MATCHER_STATUSES:
-            return False
-        if obs["matcher_outcome"] not in MATCHER_OUTCOMES:
-            return False
-        if not obs["primary_reason_key_present"]:
-            return False
-        if obs["trace_subject_sha256"] != obs["subject_sha256"]:
-            return False
+    a9_excluded = (
+        case.role == "applicability"
+        and obs["applicability"] == "EXCLUDED"
+        and obs["result"] == "EXCLUDED"
+        and not obs["has_matcher_record"]
+    )
+    if a9_excluded:
+        return not obs["numeric_violations"]
+    if obs["matcher_status"] not in MATCHER_STATUSES:
+        return False
+    if obs["matcher_outcome"] not in MATCHER_OUTCOMES:
+        return False
+    if not obs["primary_reason_key_present"]:
+        return False
+    if obs["trace_subject_sha256"] != obs["subject_sha256"]:
+        return False
     for violation in obs["numeric_violations"]:
         if (violation["rule_id"] != obs["rule_id"]
                 or violation["decision_version_id"] != obs["decision_version_id"]):
@@ -1218,7 +1245,10 @@ def score_case(case: Case, obs: dict) -> dict:
     s["decided"] = result in ("VIOLATION", "NO_VIOLATION") and obs["applicability"] == "APPLIED"
     s["unevaluated"] = result == "UNEVALUATED"
     if case.role == "unevaluated":
+        # Gate 3a: the unevaluated outcome itself, not only status and reason;
+        # an inconsistent status/outcome pair fails.
         s["un_correct"] = (obs["matcher_status"] == "MATCHER_UNEVALUATED"
+                           and obs["matcher_outcome"] == "UNEVALUATED"
                            and obs["primary_reason"] == exp["primary_reason"])
     if case.category == "A7" and case.stratum == "A":
         expected_sources = sorted(_source_key(u) for u in case.expected["unknown_sources"] or [])
@@ -1798,7 +1828,10 @@ def run_pass(prep: Prepared, number: int, root: Path, out_dir: Path,
             "a9_applicability": {
                 "matched": sum(s.get("a9_match", False) for _, _, s in rows),
                 "of": sum(1 for c, _, _ in rows if c.role == "applicability"),
+                "gating": False,
+                "note": DISCLOSURES[0],
             },
+            "disclosures": list(DISCLOSURES),
             "n2_applicability_recorded": [
                 {"case_id": c.case_id, "form": c.form, "location": c.location,
                  "applicability": o["applicability"]}
@@ -1922,7 +1955,14 @@ def score(*, corpus: Path, template: str, out_dir: Path, build: Interpreter,
         root = reserve_run_root(work_dir)
         try:
             for number in (1, 2):
+                # Ruling Q14: the repeated root path is acceptable only for a
+                # separately created, fully removed run root.
+                if root.exists():
+                    raise Refusal("run_root", f"run {number}: run root {root} still exists; "
+                                              "the previous pass was not removed")
                 runs.append(run_pass(prep, number, root, out_dir, keep_run_roots))
+            if root.exists():
+                raise Refusal("run_root", f"run root {root} was not removed after run 2")
         except Refusal as refusal:
             final.update({"result": "INVALID", "refusal": {"check": refusal.check,
                                                            "detail": refusal.detail}})
@@ -1968,6 +2008,7 @@ def score(*, corpus: Path, template: str, out_dir: Path, build: Interpreter,
         "scope": ("Audit-only, Python-only, first-slice (G1) whole-file numeric audit on the "
                   "M4 synthetic corpus. No pre-write (G2) protection, CI enforcement or "
                   "generalization beyond the synthetic corpus is claimed."),
+        "disclosures": list(DISCLOSURES),
     })
     return _finish(out_dir, final)
 

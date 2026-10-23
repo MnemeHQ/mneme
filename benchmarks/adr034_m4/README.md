@@ -155,14 +155,20 @@ manifest's primary reason. Every other case uses its manifest label.
 | Wrong primary reason | U, N, or A/W labelled unevaluated, whose `primary_reason` differs (including `null`) |
 | Decided (coverage) | applicability `APPLIED` and result `VIOLATION` or `NO_VIOLATION`; a `PARTIAL` violation is decided |
 | Unevaluated rates | result `UNEVALUATED`, over violation and benign labels in A+W, and separately over U and N |
-| Binding completeness | subject digest, `rule_id`, `decision_version_id`, applicability; for an `APPLIED` or `--input` trace also `matcher_status`, `matcher_outcome`, a `primary_reason` field and the same subject digest; any numeric violation joins that trace |
-| Gate 3a | every U and N case: `MATCHER_UNEVALUATED` and the expected primary reason |
+| Binding completeness | subject digest, `rule_id`, `decision_version_id`, applicability, `matcher_status`, `matcher_outcome`, a `primary_reason` field and the same subject digest on the trace; any numeric violation joins that trace. The **only** exemption from the matcher fields is an applicability-only A9 case whose trace is a consistent `EXCLUDED` result with no numeric violation (ruling Q11) |
+| Gate 3a | every U and N case: `matcher_status` `MATCHER_UNEVALUATED`, `matcher_outcome` `UNEVALUATED` and the expected primary reason; a decided outcome or an inconsistent status/outcome pair fails |
 | Gate 4 | every A7 case: `VIOLATION`, `PARTIAL`, `evaluation_complete=false`, the expected primary reason, and `unknown_sources` equal to the expected list as a multiset of `(kind, line, reason)` |
 | Gate 7 | decided W / W cases >= 95/100, compared exactly |
 | Gate 8 | all 18 set R cases match outcome and, where unevaluated, reason |
 | Gate 9 | the two run summaries are byte-identical after replacing the run-root string |
 | Gate 11 | each ADR-034 §5 vector reproduces three ways: the shipped `rule_identity`, the persisted memory after a real import, and the check trace (plus the canonical value text) |
 | Gate 12 | 0.10.0 reads its own v1 literal memory (control); on the pinned build's v2 numeric memory it exits non-zero, prints no verdict payload, raises `DecisionIndexPersistenceError` and leaves the file unchanged |
+
+**A9 (ruling Q5).** A9 is scored for applicability only, and no frozen §5
+gate covers A9 correctness; the harness adds none. `a9_applicability`
+(matched k of 5, `gating: false`) and an `a9_applicability_mismatch` row for
+every mismatch are always reported, even when all twelve gates pass. An
+unmatched A9 case is not correct.
 
 Reported but never gating: A9 applicability (matched k of 5), N2
 applicability per case, `evaluation_complete` outside A7, matcher status
@@ -189,6 +195,14 @@ than widen normalization, both passes use the **same** root path, created
 fresh and removed each time, so the summaries are expected to be
 byte-identical even before normalization. Both raw and normalized digests
 are reported.
+
+Disclosure (ruling Q14): determinism is therefore tested at a repeated path.
+This is valid only because each run root is separately created, freshly
+copied and fully removed. The harness refuses, and the run is INVALID, if the
+root exists before either pass or after the last one.
+
+Every summary carries these A9, binding and gate 9 statements under
+`disclosures`.
 
 ## Tests
 
