@@ -108,46 +108,54 @@ is setup, not a scoring rule. An import failure is an operational failure.
   temporary file lists, using Git's `shred -u -z`. On an SSD this is
   best-effort only and erasure is not provable.
 
-### Owner ruling O-1: integrity verification is not decryption for scoring
+### Owner-accepted procedural variances V-1 and V-2
 
-Charter §8 requires owner integrity verification, while charter §7 says the
-owner "decrypts only after the pre-scoring record is merged". The owner rules
-that the two decryptions above were **integrity verification under §8 only,
-not a release of plaintext for scoring** under §7 and §9.
+The process above departed from the accepted M4 charter in two places. These
+are **procedural variances that the owner accepted on 2026-10-23**. They are
+not reinterpretations: charter §7 and §8 stay as written and binding. Neither
+variance changes any scoring gate, corpus label or implementation behavior.
 
-- Each decryption was one command: decrypt to a temporary file, print its
-  SHA-256, then delete that file.
-- Nothing was extracted or opened, and no case content was inspected.
-- No plaintext was given to any scorer, implementer or harness author. None
+**V-1: owner decryption before the pre-scoring record (charter §7).**
+Charter §7 says the owner "decrypts only after the pre-scoring record is
+merged", and it makes no exception for verification. The owner decrypted both
+archives before any harness or pre-scoring record existed. The owner
+confirmed:
+
+- each decryption was one command: decrypt to a temporary file, print its
+  SHA-256, then delete that file;
+- nothing was extracted or opened, and no case content was inspected;
+- no plaintext was given to any scorer, implementer or harness author. None
   of those roles had a session at the time.
-
-The §7 restriction governs decryption for scoring and is unchanged.
 
 **Disclosed exposure window.** The plaintext corpus existed on the owner's
 machine, outside the repository, from authoring (01:24Z) until the owner's
 shred on 2026-10-23. There is no evidence that any other session read it, but
 that cannot be proved.
 
-### Owner ruling O-2: inner-file and W-spec verification move to the scoring step
-
-The owner verified the ciphertext and plaintext-tar hashes only. Two §8
-checks were **not** performed by the owner:
+**V-2: incomplete owner integrity verification (charter §8).** The owner
+verified the ciphertext and plaintext-tar hashes only. Two §8 checks were
+**not** performed before this freeze:
 
 - all 195 inner files against `FILES.sha256`;
 - the W-spec bytes against the frozen W-spec hash.
 
 The author generated `FILES.sha256` from the files at sealing and confirmed
-the W spec still matched its hash at the provenance step. Because the
-owner-verified plaintext-tar hash matches the author's sealed tar, the inner
-bytes are those the author sealed. The owner rules that these two checks are
-not repeated now, because that would mean another decryption. They become the
-**first step after the authorized decryption for scoring**, before any case
-runs:
+the W spec still matched its hash at the provenance step. The owner-verified
+plaintext-tar hash matches the author's sealed tar, so the inner bytes are
+those the author sealed. These two checks were not run now because that would
+need another decryption.
 
-1. `sha256sum -c FILES.sha256` must report 195 OK;
-2. the W spec must match `6abeabfe…cfd9`.
+**What stays binding:**
 
-Any mismatch is an operational failure that invalidates the run (criteria §3).
+1. **Scorer access is unchanged.** The §7 and §9 restrictions still govern
+   decryption for scoring. The scorer receives the corpus only after the
+   harness and pre-scoring record are merged, and only the owner decrypts.
+2. **The two checks are outstanding and mandatory.** Before the first scoring
+   invocation, `sha256sum -c FILES.sha256` must report 195 OK and the W spec
+   must match `6abeabfe…cfd9`. Any mismatch is an operational failure that
+   invalidates the run (criteria §3).
+3. **Any M4 validation claim is conditional** on both checks passing.
+4. **The M4 results record must disclose V-1 and V-2.**
 
 ## Isolation and chronology
 
