@@ -68,6 +68,15 @@ This charter adds only what the criteria leave to a validation run:
 - roles and isolation (§7);
 - corpus composition choices within the criteria floors, and custody (§8).
 
+**Procedural sequence (M4-specific).** The criteria's sequence (owner ruling
+N8) puts the corpus freeze before the implementation. In M4 the corrected
+implementation already exists, so M4 pre-registers its own prospective
+sequence (§9): pin the implementation, then author and freeze a new corpus
+under the §7 isolation rules, then pin the harness, then decrypt and score.
+This is an M4-only procedure. It reuses the criteria's scoring definitions
+and gates unchanged, and it does not revise the historical G1 protocol or its
+outcome.
+
 Where this charter and the criteria disagree, the criteria win, and the
 disagreement is a defect to be fixed by a reviewed amendment **before**
 decryption.
@@ -161,16 +170,20 @@ disclosed limitation, not a scored stdin path.
   invalidates the run.
 - Gate 11 (golden rule IDs) and gate 12 (old-reader refusal) are run by the
   harness against the pinned build and the §4 old reader.
-- After decryption the harness is not edited. A harness defect found after
-  decryption invalidates the run; it is fixed in a reviewed PR and the run is
-  repeated from scratch, with the defect disclosed in the results record.
+- **After decryption the harness is not edited.** A harness defect found
+  after decryption that would change any scored outcome, metric or gate
+  **invalidates the M4 blind claim**. The results record reports the run as
+  invalidated, with the defect disclosed. A corrected harness may replay the
+  revealed cases for **diagnostics only**; a replay is never a blind result
+  and never counts toward any gate. Any further blind claim needs a fresh,
+  newly concealed corpus under a new pre-registration.
 
 **Manifest schema.** One JSON object per case, in `manifest.jsonl` inside the
 sealed archive. The author writes to this schema; the harness reads it.
 
 | Field | Content |
 |---|---|
-| `case_id` | Opaque ID, not derived from any v1 ID |
+| `case_id` | Opaque ID, not derived from any v1 ID and revealing nothing about the case content or label. Withheld from the freeze record; published only in the results record (§10) |
 | `stratum`, `category`, `shape` | As in criteria §2 (`shape` is `R<n>` for set R) |
 | `contract` | Relative path to the case's ADR markdown directory |
 | `invocation` | `{transport: source_file \| input, path, target_path?, location?}`; `location` is `L1`..`L4` for N2a |
@@ -265,11 +278,17 @@ Each step needs its own explicit owner authorization.
 3. **Harness PR** (public), pinned by commit and SHA-256.
 4. **Pre-scoring record** (public), with the §9 step 3 hashes.
 5. **Results record** (public, metadata only): all twelve gates, the
-   per-shape headline in the criteria §5 wording, every failure by category
-   and stratum, both summary SHA-256 values, operational-failure count, and the
-   §11 disclosures.
+   per-shape headline in the criteria §5 wording, both summary SHA-256 values,
+   operational-failure count, and the §11 disclosures. As criteria §6
+   requires, it lists **every** miss, false block, unsafe pass, unexpected U/N
+   violation and wrong primary reason **by case**: one row per failure with
+   the opaque `case_id`, stratum, category, shape, failure classification,
+   and expected versus observed matcher status, outcome and primary reason
+   (for N2, also the invocation form and location). No case source,
+   rationale or other label content is published.
 6. **Private evidence** (owner custody, outside the repository): per-case JSONL
-   with the full ADR-029 binding for each verdict, and both raw summaries.
+   with the full ADR-029 binding for each verdict, both raw summaries, and the
+   case bytes behind every listed failure.
 
 ## 11. Disclosures and limits
 
@@ -277,7 +296,7 @@ Each step needs its own explicit owner authorization.
   means the implementation was not fitted to these case bytes or labels, not
   that the failure class was unknown.
 - **Order is inverted.** The criteria's sequence (owner ruling N8) put the
-  corpus before the implementation.
+  corpus before the implementation; M4's own sequence is in §3.
   In M4 the implementation exists first, so independence is enforced on the
   corpus author's reading (§7).
 - **Session isolation, not organizational independence.** All roles are AI
@@ -311,3 +330,15 @@ Each step needs its own explicit owner authorization.
 | B1 | N2 invocation is pre-registered: N2a `--input` without `--target-path` at four locations, and N2b `--input` with an APPLIED `--target-path`; N2 = 12 | §5, §8 |
 | B2 | The scoring harness is public, written by the scorer before decryption, pinned by commit and SHA-256, and reads a pre-registered manifest schema | §6 |
 | B3 | #613 (enforcer, CLI and shared hook validator) is recorded in the Layer 1 freeze document as a conformance correction to the existing ADR-034 G1 amendment, citing ADR-034 §6 and the charter §3 erratum. It authorizes nothing new and is a precondition for scoring the pin | §4; separate `[layer1-freeze]` PR |
+
+## 14. Review history
+
+- **First review (2026-10-22): ACCEPT WITH REQUIRED CORRECTIONS.**
+  - R1: M4's prospective sequence is pre-registered as M4-specific; the
+    scoring definitions and gates are reused unchanged and the G1 protocol is
+    not revised (§3).
+  - R2: a post-decryption harness correction that changes any scored result
+    invalidates the blind claim; replays on revealed cases are diagnostic
+    only (§6).
+  - R3: the public results record lists every failure by opaque case ID, as
+    criteria §6 requires, with case content kept private (§6, §10).
