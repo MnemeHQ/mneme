@@ -26,11 +26,21 @@ matrix schedules `Write` and `Edit` only. A tool missing from the host's init to
 labelled `NOT_OFFERED` (N/A, neither PASS nor FAIL).
 
 **C2b charter §17.5 (F-R2 live proof, harness only; the run needs its own
-authorization):** `PIN_MNEME_BASE` is `5a20b360` (#608), so live probes run the
-F-R2 hook, which writes the §17.2 `additionalContext` object on an
-UNVERIFIABLE proceed. The pin also carries #607 (ADR-034 numeric audit), the
-only other `mneme/` change since the C2b pin `7d1a8bb7`. See
-[F-R2 delivery](#f-r2-delivery-c2b-charter-175).
+authorization):** the F-R2 live proof (#616) ran with `mneme/` at `5a20b360`
+(#608). That result stays pinned to `5a20b360`.
+
+**Runtime pin history:**
+
+| Pin | Change | Used by |
+|---|---|---|
+| `7d1a8bb7` | C2b (#591) | ABSENT batch, Batch R (#601) |
+| `5a20b360` | F-R2 (#608), plus #607 | F-R2 live proof (#616) |
+| `b0dc1a14` | #613 (ADR-034 F-1), current | Later C3 batches |
+
+The impact of #613 on C3 is assessed in
+[`2026-10-22-c3-runtime-repin-613-assessment.md`](../../../../plans/2026-10-22-c3-runtime-repin-613-assessment.md).
+Moving the pin does not validate #613 live; each later batch records the pin
+it ran with. See [F-R2 delivery](#f-r2-delivery-c2b-charter-175).
 
 ## Files
 
