@@ -61,7 +61,7 @@ The sealed tar carries directory entries so that the two N2a L4 case
 directories, which are policy roots with no files of their own, exist after
 extraction.
 
-## Owner rulings (2026-10-22; no ADR-034 amendment)
+## Owner rulings (2026-10-22 local time, UTC-5; recorded about 02:05Z on 2026-10-23; no ADR-034 amendment)
 
 The sanitized brief has 11 entries (2 medium, 9 low). An independent
 architecture review accepted 10 preferred readings and modified 1 custody
@@ -108,6 +108,47 @@ is setup, not a scoring rule. An import failure is an operational failure.
   temporary file lists, using Git's `shred -u -z`. On an SSD this is
   best-effort only and erasure is not provable.
 
+### Owner ruling O-1: integrity verification is not decryption for scoring
+
+Charter §8 requires owner integrity verification, while charter §7 says the
+owner "decrypts only after the pre-scoring record is merged". The owner rules
+that the two decryptions above were **integrity verification under §8 only,
+not a release of plaintext for scoring** under §7 and §9.
+
+- Each decryption was one command: decrypt to a temporary file, print its
+  SHA-256, then delete that file.
+- Nothing was extracted or opened, and no case content was inspected.
+- No plaintext was given to any scorer, implementer or harness author. None
+  of those roles had a session at the time.
+
+The §7 restriction governs decryption for scoring and is unchanged.
+
+**Disclosed exposure window.** The plaintext corpus existed on the owner's
+machine, outside the repository, from authoring (01:24Z) until the owner's
+shred on 2026-10-23. There is no evidence that any other session read it, but
+that cannot be proved.
+
+### Owner ruling O-2: inner-file and W-spec verification move to the scoring step
+
+The owner verified the ciphertext and plaintext-tar hashes only. Two §8
+checks were **not** performed by the owner:
+
+- all 195 inner files against `FILES.sha256`;
+- the W-spec bytes against the frozen W-spec hash.
+
+The author generated `FILES.sha256` from the files at sealing and confirmed
+the W spec still matched its hash at the provenance step. Because the
+owner-verified plaintext-tar hash matches the author's sealed tar, the inner
+bytes are those the author sealed. The owner rules that these two checks are
+not repeated now, because that would mean another decryption. They become the
+**first step after the authorized decryption for scoring**, before any case
+runs:
+
+1. `sha256sum -c FILES.sha256` must report 195 OK;
+2. the W spec must match `6abeabfe…cfd9`.
+
+Any mismatch is an operational failure that invalidates the run (criteria §3).
+
 ## Isolation and chronology
 
 **Author:** a new session (Claude Opus 5.5 in Claude Code), not the v1
@@ -148,7 +189,7 @@ machine; procedural evidence, not independent timestamps):
 |---|---|
 | W spec written (the first file in the corpus folder), then hashed | 01:24:33Z, 01:24:37Z |
 | First non-W case written | 01:30:18Z |
-| All W cases written | 01:32:32Z |
+| Latest W-case file modification time, as reported by the author as "all W cases written" | 01:32:32Z |
 | Manifest finalized; brief hashed | about 01:33–01:55Z (not timestamped) |
 | Owner rulings recorded; preflight | about 02:05–02:10Z (not timestamped) |
 | Provenance archive built and encrypted | 02:12:36Z, 02:12:56Z |
