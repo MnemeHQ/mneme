@@ -104,8 +104,39 @@ applicability-only cases.
 | N2a | 8 of 8 unevaluated |
 | N2b | 4 of 4 unevaluated |
 
-Per shape, every scored stratum has 0 misses, 0 false blocks, 0 unsafe
-passes and 0 wrong reasons; the headline gives the per-shape coverage.
+**Per shape** (criteria §4; review R-1). The values below were read, not
+recomputed, from the run summaries' `metrics.shape` blocks, with set R from
+`metrics.stratum.R` and the totals from `metrics.aggregate`. The run-1 and
+run-2 summaries are byte-identical (SHA-256
+`b12fde7783fb5c196dede5650fb8cabe242eb3370256db6b5ae2e8e9a69f3d4a`).
+
+Each shape row covers every case of that shape:
+
+- its stratum A cases, including its one A9 case, which counts only toward
+  the case total and binding completeness;
+- its 5 U cases and 10 W cases;
+- the N cases that use that shape's contract.
+
+A ratio is numerator over denominator. `0/0` means the metric does not
+apply.
+
+| Shape | Cases | Misses | False blocks | Unsafe passes | Unexpected U/N violations | Wrong primary reasons | Coverage A | Coverage W | Unevaluated, violation labels (A+W) | Unevaluated, benign labels (A+W) | Unevaluated, U | Unevaluated, N | Binding completeness |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| S1 | 28 | 0 | 0 | 0 | 0 | 0 | 9/9 | 10/10 | 0/7 | 0/12 | 5/5 | 3/3 | 28/28 |
+| S2 | 28 | 0 | 0 | 0 | 0 | 0 | 9/9 | 10/10 | 0/7 | 0/12 | 5/5 | 3/3 | 28/28 |
+| S3 | 29 | 0 | 0 | 0 | 0 | 0 | 10/10 | 10/10 | 0/8 | 0/12 | 5/5 | 3/3 | 29/29 |
+| S4 | 28 | 0 | 0 | 0 | 0 | 0 | 10/10 | 10/10 | 0/8 | 0/12 | 5/5 | 2/2 | 28/28 |
+| S5 | 30 | 0 | 0 | 0 | 0 | 0 | 10/10 | 10/10 | 0/8 | 0/12 | 5/5 | 4/4 | 30/30 |
+| Set R (own contracts, not a shape) | 18 | 0 | 0 | 0 | 0/0 | 0/0 | 0/0 | 0/0 | 0/0 | 0/0 | 0/0 | 0/0 | 18/18 |
+| **Aggregate** | **161** | **0** | **0** | **0** | **0** | **0** | **48/48** | **50/50** | **0/38** | **0/60** | **25/25** | **15/15** | **161/161** |
+
+Notes on the table:
+
+- Set R is scored by gate 8 (18 of 18 matched). Its unsafe-pass count of 0
+  covers its 6 cases labelled unevaluated; the criteria do not apply its
+  other metrics, hence `0/0`.
+- The per-shape N counts (3, 3, 3, 2, 4) sum to the 15 N cases.
+- Unevaluated rates are reported and never gate (criteria §5).
 
 **Aggregate unevaluated rates (reported, never a gate):**
 
