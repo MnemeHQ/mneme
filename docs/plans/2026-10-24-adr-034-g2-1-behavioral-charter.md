@@ -1,9 +1,12 @@
 # ADR-034 / G2-1: Layer 1 behavioral charter (pre-write numeric check, new-file `Write`)
 
 **Date:** 2026-10-24
-**Status:** **PROPOSED.** This charter is not accepted. Accepting it would
-authorize **no implementation**. Implementation would also need the
-separate, reviewed `[layer1-freeze]` amendment in §9.
+**Status:** **ACCEPTED** by the owner on 2026-10-24: G2C-O1 to G2C-O6, as in
+`9a0c886a`, after the architecture review of revision 2. The prerequisite
+ADR-034 amendment #631 merged as `@@MERGE_631@@`.
+
+Accepting this charter authorizes **no implementation**. Implementation needs
+the separate, reviewed `[layer1-freeze]` amendment in §9.
 
 **Revision 2** (2026-10-24) responds to the architecture review of draft 1,
 which was ACCEPT WITH REQUIRED CORRECTIONS:
@@ -26,7 +29,7 @@ here are unchanged between the two commits.
 
 - [ADR-034](../adr/ADR-034-static-numeric-upper-bound-typed-rule.md) §6a,
   §7a and owner rulings G2-O1 to G2-O6, as folded in #631 (head `b49b0ba4`).
-  **This charter can be accepted only after #631 merges.**
+  #631 merged as `@@MERGE_631@@` before this charter was accepted.
 - The [G2 proposal](2026-10-24-adr-034-g2-new-file-write-amendment-proposal.md),
   revision 2, `08e0f9ac`, merged in #630 as `97143065`. Its §6 is the
   validation scope this charter freezes.
@@ -663,4 +666,6 @@ a bounded authorization.
   - the routed byte carrier is an authorized, routed-only correction, with
     no hook-level historical parity claim (ADR-034 §7a, §4.1 here).
 
-  Recommended: accept G2C-O1 to G2C-O6 together. Still PROPOSED.
+  Recommended: accept G2C-O1 to G2C-O6 together.
+- **Owner acceptance:** 2026-10-24, G2C-O1 to G2C-O6 as in `9a0c886a`,
+  recorded after #631 merged. No implementation is authorized.
