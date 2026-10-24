@@ -153,8 +153,9 @@ mneme check --memory .mneme/project_memory.json \
    - The legacy `--input` path has no defined result for undecodable text: it
      raises from `read_text`. So there is no legacy verdict to stay identical
      to.
-   - This realizes ADR-034 §6a's "unverified" requirement in the stricter
-     direction: no complete-source claim, and no result.
+   - ADR-034 §6a, as reconciled in #631, permits this explicitly for
+     precondition 5. It is stricter than "unverified": no complete-source
+     claim, and no result.
    - The hook never sends such a carrier (§4.1).
 3. **When preconditions 1–4 fail, the result is legacy.** The run is
    evaluated exactly as `--input <same carrier> --target-path <same target>`
@@ -245,8 +246,15 @@ is the join digest (§5.2 rule 4, §6.2).
 The unrouted path keeps its text-mode carrier byte for byte (§2, §7). On
 Windows, a routed event whose content contains CR may therefore see
 different text than today's text-mode path would give it. Today's path
-doubles CRLF line breaks. This difference is deliberate, limited to routed
-events, and pinned by §8.C.10.
+doubles CRLF line breaks.
+
+This is an **explicitly authorized, routed-only correction** (ADR-034 §7a,
+"Routed carrier encoding", as reconciled in #631).
+- **Parity is at the checker level only.** It holds between
+  `--proposed-new-file` and `--input` on the same carrier (§3.3, §3.5).
+- **No hook-level historical parity claim.** None is made for routed events
+  whose content contains CR.
+- **Pinned by tests:** §8.C.10.
 
 The hook's probe is advisory: it only selects which call to make. The checker
 re-establishes every precondition (§3.2), so the hook's probe never makes a
@@ -600,7 +608,9 @@ a bounded authorization.
 - the `--proposed-new-file` input (§3);
 - the hook routing (§4);
 - the trust rules (§5);
-- the evidence record and seam (§6), as ruled.
+- the evidence record and seam (§6), as ruled;
+- the byte-exact routed carrier, as the authorized routed-only correction of
+  today's text-mode line-ending handling (§4.1).
 
 **It pins** this charter and the §8.C regressions.
 
@@ -646,3 +656,11 @@ a bounded authorization.
 - **Revision 2** (2026-10-24): resolves F1–F3, adds G2C-O6, and extends §5.1
   to every `assess_verdict` consumer (`antigravity`, `codex_cli`, `hermes`
   and `kiro`, in addition to the Agent SDK and LangChain). Still PROPOSED.
+- **Status review of revision 2:** F1–F3 closed. Two wording conflicts were
+  reconciled in one pass, with the ADR text in #631:
+  - an invalid UTF-8 carrier is an operational error, explicitly permitted
+    by ADR-034 §6a;
+  - the routed byte carrier is an authorized, routed-only correction, with
+    no hook-level historical parity claim (ADR-034 §7a, §4.1 here).
+
+  Recommended: accept G2C-O1 to G2C-O6 together. Still PROPOSED.
