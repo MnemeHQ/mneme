@@ -1,0 +1,3 @@
+api.github.com
+github.com
+# 2 other host(s) observed, not published
