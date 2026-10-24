@@ -51,7 +51,7 @@ it ran with. See [F-R2 delivery](#f-r2-delivery-c2b-charter-175).
 | `matrix.py` | The scope §5 rows: phase, mutations, expected outcome, expected verifier result, E4 need |
 | `seed_fixture.sh` | Prepares one fixture change (`activate`, `authorize`, `revoke`) on a local branch with the real CLI. **Never pushes** |
 | `refresh_golden.sh` | One HTTPS clone of the fixture per phase; aborts unless the live baseline is in that phase |
-| `setup_c3_probe.py` | Builds one probe repository from the golden clone and applies the row's operator mutations |
+| `setup_c3_probe.py` | Builds one probe repository from the golden clone and applies the row's operator mutations. R-3 (`behind_declaration`) is guarded (#623): it refuses unless the baseline and the copy shortened by one event both pass the shipped validator and the copy is a nonempty strict prefix with all other fields unchanged. It records `declaration_history` in `setup.json` |
 | `hookwrap_c3.py` | Observation wrapper around the unmodified hook: E3 (exit, stderr, stdout, envelope session and transcript path), verifier results and Git argv (E4 wrapper half), R-7/H-2 stalls |
 | `run_c3_probe.sh` | One probe: hashes before/after (E1), `claude -p` stream-json (E2) plus the session transcript, classification. `--interactive` for Q2 |
 | `run_c3_batch.sh` | All rows of a batch × tools × repetitions (default 2, E9). `FR2`: D-2 with its paired controls, then the R3 pair comparison |
@@ -116,6 +116,7 @@ call must be a PROTOCOL_DEVIATION.
 |---|---|---|
 | F-R2 (D-2 with P-1 and D-1 controls, batch `FR2`) | Delivered, host-output-only, tool_result-only, missing, no-transcript and injected-control cases; the FR2 batch with its pair comparisons and its gate (failed, incomplete, done, `--recheck`) | The real 2.1.303 transcript (whether the host records the attachment at all) |
 | R-1..R-7, P-1..P-7, D-1..D-5, H-1 (20) | Exercised with the stub host and the `file://` remote; labels must match the matrix | Real host (E2, E7), HTTPS verifier path, E4 OS capture, E9 repetitions |
+| R-3 (rollback, #623) | Against the one-event AUTHORIZED baseline, it must stop in setup (harness failure, Claude Code not run). After authorize, revoke (P-5 runs here) and authorize, it must PASS with local `[authorize, revoke]` and the relation "behind" | A three-event live fixture history (two human-merged fixture PRs), not yet authorized |
 | U-1, U-2, U-3 (3) | Not exercised (needs a Git-only network block) | All evidence |
 | H-2 (1) | Not exercised (host hook-timeout behavior cannot be stubbed meaningfully) | All evidence |
 | Interactive arms R-1, P-2 | Not exercised | Q2 recording and operator attestation |

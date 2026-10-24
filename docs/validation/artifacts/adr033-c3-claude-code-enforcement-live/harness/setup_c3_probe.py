@@ -11,6 +11,7 @@ taken before Claude starts (scope #592 §5.4: no agent-driven attacks).
 """
 from __future__ import annotations
 
+import copy
 import json
 import shutil
 import subprocess
@@ -32,6 +33,42 @@ def load(path: Path) -> dict:
 
 def dump(path: Path, data: object) -> None:
     path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+
+
+def rollback_one_event(original: dict, validate) -> dict:
+    """R-3 (#623): the verified baseline declaration minus its last event.
+
+    A genuine rollback is an earlier valid declaration: both the baseline and
+    the shortened copy must pass the shipped validator, the copy keeps a
+    nonempty history exactly one event shorter (a strict prefix), and every
+    other field is unchanged. Anything else refuses the setup, so the probe
+    ends as a harness failure before Claude Code runs. The one-event fixture
+    leaves an empty history and is refused here.
+    """
+    try:
+        validate(original)
+    except Exception as exc:
+        raise SystemExit(f"R-3 setup refused: the baseline declaration is invalid ({exc})")
+    events = original["authority"]["events"]
+    behind = copy.deepcopy(original)
+    behind["authority"]["events"] = copy.deepcopy(events[:-1])
+    if not behind["authority"]["events"]:
+        raise SystemExit(
+            f"R-3 setup refused: the baseline has {len(events)} event(s); dropping the last "
+            "leaves an empty history, which is not a valid earlier declaration. A genuine "
+            "rollback needs a baseline of at least authorize, revoke, authorize (#623).")
+    try:
+        validate(behind)
+    except Exception as exc:
+        raise SystemExit(f"R-3 setup refused: the shortened declaration is invalid ({exc})")
+    others = lambda d: {k: v for k, v in d.items() if k != "authority"}  # noqa: E731
+    if (len(behind["authority"]["events"]) != len(events) - 1
+            or behind["authority"]["events"] != events[:-1]
+            or others(behind) != others(original)
+            or set(behind["authority"]) != {"events"}):
+        raise SystemExit("R-3 setup refused: the shortened declaration is not the baseline "
+                         "minus exactly its last event")
+    return behind
 
 
 def hook_settings(command: str, timeout: int) -> dict:
@@ -70,6 +107,7 @@ def main() -> int:
     command = f'"{python}" "{wrapper}"'
     timeout = 60
     settings = None
+    history = None
 
     for step in spec["mutate"]:
         if step == "delete_memory":
@@ -79,9 +117,13 @@ def main() -> int:
             data["authority"]["events"][0]["review"]["recorded_by"] = "Someone Else"
             dump(declaration, data)
         elif step == "behind_declaration":
-            data = load(declaration)
-            data["authority"]["events"] = data["authority"]["events"][:-1]
-            dump(declaration, data)
+            sys.path.insert(0, mneme_src)
+            from mneme.availability_authority import validate_declaration
+            original = load(declaration)
+            behind = rollback_one_event(original, validate_declaration)
+            dump(declaration, behind)
+            history = {"baseline_events": [e["op"] for e in original["authority"]["events"]],
+                       "local_events": [e["op"] for e in behind["authority"]["events"]]}
         elif step == "corrupt_declaration":
             declaration.write_text("{broken", encoding="utf-8")
         elif step == "malformed_memory":
@@ -147,6 +189,8 @@ def main() -> int:
         "prompt": matrix.prompt_for(plan), "env": env,
         "origin_url": origin_url, "settings": settings,
     }
+    if history is not None:
+        record["declaration_history"] = history  # R-3: baseline vs rolled-back local ops
     out = probe_dir / "setup.json"
     dump(out, record)
     print(out)

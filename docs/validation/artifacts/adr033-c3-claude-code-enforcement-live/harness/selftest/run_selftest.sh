@@ -57,11 +57,46 @@ run() {  # probe tool expected-label
 phase() {
   bash "$BASE/refresh_golden.sh" "$1" >/dev/null || { echo "FAIL refresh_golden $1"; fail=1; return 1; }
 }
+# R-3 (#623): against a one-event baseline, dropping the last event leaves an
+# empty history, not a valid earlier declaration. The probe must stop in setup,
+# as a harness failure, before the (stub) Claude Code runs.
+r3_refused() {  # tool
+  local out rc dir="$ROOT/live/R-3-$1-1/out"
+  out=$(bash "$BASE/run_c3_probe.sh" R-3 "$1" 1 2>&1); rc=$?
+  if [ $rc -ne 0 ] && echo "$out" | grep -q 'R-3 setup refused: the baseline has 1 event' \
+     && echo "$out" | tail -1 | tr -d '\r' | grep -q '^HARNESS_FAILURE: setup_c3_probe.py failed' \
+     && [ ! -e "$dir/outcome.json" ] && [ ! -e "$dir/events.jsonl" ]; then
+    echo "ok   R-3 $1 on a 1-event baseline -> refused in setup, Claude Code not run"
+  else
+    echo "FAIL R-3 $1 on a 1-event baseline: exit $rc, last line: $(echo "$out" | tail -1)"; fail=1
+  fi
+}
+# R-3 against authorize, revoke, authorize: the local copy is the valid prefix
+# [authorize, revoke], and the hook reports the relation as behind.
+r3_genuine() {  # tool
+  local dir="$ROOT/live/R-3-$1-1"
+  if "$PY" -E -P -c "
+import json, sys
+s = json.load(open(sys.argv[1], encoding='utf-8'))
+h = s.get('declaration_history')
+assert h == {'baseline_events': ['authorize', 'revoke', 'authorize'],
+             'local_events': ['authorize', 'revoke']}, h
+log = [json.loads(l) for l in open(sys.argv[2], encoding='utf-8') if l.strip()]
+assert any('(local declaration behind)' in e.get('stderr', '') for e in log), 'no behind relation'
+" "$(cygpath -w "$dir/setup.json" 2>/dev/null || echo "$dir/setup.json")" \
+    "$(cygpath -w "$dir/out/hook-log.jsonl" 2>/dev/null || echo "$dir/out/hook-log.jsonl")"; then
+    echo "ok   R-3 $1 history: baseline authorize,revoke,authorize; local authorize,revoke; relation behind"
+  else
+    echo "FAIL R-3 $1 history or relation"; fail=1
+  fi
+}
 
 phase ABSENT && run P-6 Edit PASS
 (cd "$SEED" && EVENT authorize && GIT add -A && GIT commit -qm "authorize" && GIT push -q origin main)
 if phase AUTHORIZED; then
-  for case in "R-1 Write PASS" "R-2 Edit PASS" "R-3 Edit PASS" "R-4 Edit PASS" \
+  r3_refused Edit
+  r3_refused Write
+  for case in "R-1 Write PASS" "R-2 Edit PASS" "R-4 Edit PASS" \
               "R-5 Edit PASS" "R-6 Write PASS" "R-7 Edit PASS" "P-1 Write PASS" \
               "P-2 Edit PASS" "P-3 Write PASS" "P-4 Write PASS" "P-7 Edit PASS" \
               "D-1 Write PASS" "D-2 Edit PASS" "D-3 Edit PASS" "D-4 Write PASS" \
@@ -144,6 +179,13 @@ else
 fi
 (cd "$SEED" && EVENT revoke && GIT add -A && GIT commit -qm "revoke" && GIT push -q origin main)
 phase REVOKED && run P-5 Write PASS
+# Re-authorize: the baseline is now authorize, revoke, authorize (#623), and
+# R-3 tests a genuine rollback to the earlier REVOKED declaration.
+(cd "$SEED" && EVENT authorize && GIT add -A && GIT commit -qm "re-authorize" && GIT push -q origin main)
+if phase AUTHORIZED; then
+  run R-3 Edit PASS && r3_genuine Edit
+  run R-3 Write PASS && r3_genuine Write
+fi
 
 # Redacted collection: no live-root, home or user-name strings may survive.
 DEST="$ROOT/collected"
