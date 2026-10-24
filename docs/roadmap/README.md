@@ -256,6 +256,20 @@ Promotion requires evidence; no support claim before the capability gate passes.
 
 ## RESEARCH — evidence before integration
 
+### P1 — NVIDIA OpenShell runtime policy interoperability (evidence gate)
+
+Qualify NVIDIA OpenShell as a **complementary agent-runtime policy and evidence substrate**, not a shipped Mneme adapter. OpenShell provides sandbox isolation, policy verification, access controls, selected control-plane interceptors and network middleware. Test whether Mneme's authoritative, applicable *engineering decisions* produce additional, measurable semantic-conformance value beyond those perimeter controls.
+
+**Minimal qualification, without displacing P0 pilot, DG1 or CI1 work:**
+
+- Pin one OpenShell release, public sample/synthetic workload and supported agent/sandbox interface. Map filesystem/process/network policies, policy proving, the gateway's explicitly allowlisted mutation RPC interception, supervisor middleware's supported HTTP/WebSocket egress, audit records, failure modes and gaps. Do **not** assume either extension intercepts arbitrary local source-file writes.
+- Test **OpenShell alone** and **OpenShell plus Mneme** on two human-reviewed decisions: one approved storage-adapter boundary in application code and one approved resource/profile constraint at a deployment/control-plane interface *only if that interface exposes a real supported gate*. Include compliant, forbidden and benign false-block cases, unsupported mutation paths, stale/ambiguous policy binding, valid/invalid exceptions and failures/timeouts.
+- Bind all evaluations to the same DG1 decision authority, effective applicability, decision/rule revisions, target identity and scope. Distinguish pre-mutation blocking, gateway/API pre-action blocking, CI-only post-change detection and advisory/**UNEVALUATED** surfaces. Preserve the existing **Guidance → Pre-mutation → CI → Evidence** model; no second policy evaluator and no DG2 expansion.
+- Where supported, test whether OpenShell event/audit exports can be correlated with decision-linked enforcement evidence, preserving revision/trace identity and local/no-source-egress expectations. Record missing evidence and unsupported operation classes rather than fabricating comprehensive coverage.
+- Measure decision compliance, functional completion, false blocks, missed violations, added review/maintenance effort, latency and replayability against the OpenShell-only baseline. Only a reproducible incremental result and a documented mandatory extension seam justify a later thin-adapter charter or support-matrix change.
+
+**Boundaries:** OpenShell's reference architecture is not proof of a Mneme integration or partner relationship. Do not claim coverage of all writes, remote commands or infrastructure actions, nor position Mneme as an agent sandbox or physical-systems safety controller. See the [OpenShell technical overview](https://developer.nvidia.com/blog/how-nvidia-openshell-reference-architecture-secures-and-governs-ai-agent-workloads-at-scale/), [gateway configuration](https://docs.nvidia.com/openshell/latest/reference/gateway-config) and [supervisor middleware](https://docs.nvidia.com/openshell/latest/extensibility/supervisor-middleware). Reuse DG1 (#497), CI1 (#540) and the governance trace (#282).
+
 ### P2 — Slack Code and shared multi-agent constraints
 
 Investigate whether a shared coding workspace can consume one project architectural contract across multiple coding agents and sessions.
