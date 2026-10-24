@@ -77,6 +77,10 @@ class Violation:
 # read from a verified path can decide a numeric rule.
 INPUT_KIND_COMPLETE_SOURCE = "complete_source_file"
 INPUT_KIND_UNVERIFIED = "unverified_input"
+# ADR-034 §6a (G2-1): the complete proposed source of a new file whose target
+# the checker verified absent. Never reported as ``complete_source_file``.
+INPUT_KIND_PROPOSED_NEW = "proposed_new_source"
+_COMPLETE_SOURCE_KINDS = frozenset({INPUT_KIND_COMPLETE_SOURCE, INPUT_KIND_PROPOSED_NEW})
 
 
 @dataclass(frozen=True)
@@ -98,13 +102,26 @@ class SourceSubject:
     # belongs to (``--target-path``). Without one, the input file's own path
     # says nothing about the governed source (ADR-034 §6, F-1).
     target_path_declared: bool = True
+    # ``proposed_new_source`` only: the resolved absolute target the checker
+    # verified absent (ADR-034 §6a precondition 1).
+    target_path: str | None = None
 
     @property
     def complete_source(self) -> bool:
         return (
-            self.input_kind == INPUT_KIND_COMPLETE_SOURCE
+            self.input_kind in _COMPLETE_SOURCE_KINDS
             and self.source is not None
         )
+
+    @property
+    def matcher_input(self) -> bytes | str | None:
+        """What the matcher parses. ``proposed_new_source`` is evaluated as
+        its strict UTF-8 decoding (G2-1 charter §3.5): no byte-order-mark
+        stripping and no PEP 263 re-decoding, the same text the literal rules
+        see. ``complete_source_file`` keeps its G1 byte snapshot."""
+        if self.input_kind == INPUT_KIND_PROPOSED_NEW and self.source is not None:
+            return self.source.decode("utf-8")
+        return self.source
 
     @property
     def non_source_without_target(self) -> bool:
@@ -371,7 +388,7 @@ def check_prompt(
                 contract = numeric_rule.parse_rule_value(rule.value)
                 if numeric_subject.complete_source:
                     match = numeric_rule.evaluate_source(
-                        contract, numeric_subject.source
+                        contract, numeric_subject.matcher_input
                     )
                 else:
                     match = numeric_rule.incomplete_input_result()

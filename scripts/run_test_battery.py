@@ -112,6 +112,7 @@ GATE_CORE_PATHS: tuple[str, ...] = (
     "tests/test_check_modes.py",
     "tests/test_check_json.py",
     "tests/test_numeric_upper_bound_g1.py",
+    "tests/test_numeric_upper_bound_g2_prewrite.py",
     "tests/test_ci1_contract_fixtures.py",
     "tests/test_ci1_contract_matrix.py",
     "tests/test_ci1_evaluator_preflight.py",
@@ -208,6 +209,7 @@ GATE_SHIPPED_PATHS: tuple[str, ...] = (
     "tests/integrations/agent_sdk",
     "tests/integrations/antigravity",
     "tests/integrations/test_numeric_upper_bound_consumers.py",
+    "tests/integrations/test_numeric_upper_bound_g2_hook.py",
 )
 
 GATE_AUDIT_EVIDENCE_PATHS: tuple[str, ...] = (

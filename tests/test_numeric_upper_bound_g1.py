@@ -838,8 +838,15 @@ def test_exit_matrix_and_payload_coherence(tmp_path, capsys, source, mode, verdi
     assert (payload["verdict"], payload["evaluation_complete"], code) == (
         verdict, complete, exit_code
     )
+    # ADR-034 G2-1 charter §5.1: no consumer requests --source-file, so the
+    # shared validator never trusts that subject kind. The kind check runs
+    # last, so this problem shows the rest of the payload is coherent.
     assessment = assess_verdict(json.dumps(payload), code, mode)
-    assert assessment.payload is not None, assessment.problem
+    assert assessment.payload is None
+    assert assessment.problem == (
+        "inconsistent verdict payload (subject input_kind 'complete_source_file' "
+        "was not requested); enforcement inactive for this check"
+    )
 
 
 @pytest.mark.parametrize("source,result_line", [

@@ -396,6 +396,69 @@ _NON_SOURCE_RECORD = {
 }
 
 
+# ── ADR-034 G2-1 consumer trust (charter §5) ─────────────────────────────────
+_INPUT_KIND_UNVERIFIED = "unverified_input"
+_INPUT_KIND_PROPOSED_NEW = "proposed_new_source"
+_COMPLETE_SOURCE_KINDS = frozenset({"complete_source_file", _INPUT_KIND_PROPOSED_NEW})
+
+# §5.1: the subject kinds each requested input may legitimately receive.
+# ``None`` is a payload with no subject record.
+_ACCEPTED_SUBJECT_KINDS = {
+    "input": frozenset({None, _INPUT_KIND_UNVERIFIED}),
+    "proposed_new_file": frozenset({
+        None, _INPUT_KIND_UNVERIFIED, _INPUT_KIND_PROPOSED_NEW,
+    }),
+}
+
+
+def _subject_kind_problem(
+    payload: Dict[str, Any],
+    applicability: list,
+    expected_input: str,
+) -> str:
+    """Why the subject kind contradicts the request or its traces, or ``""``.
+
+    G2-1 charter §5.1 (expected-input contract) and §5.2 rules 1-3. Rules 4
+    and 5 need hook-side knowledge and run in ``_routed_join_problem``.
+    """
+    subject = payload.get("subject")
+    if subject is None:
+        kind = None
+    elif isinstance(subject, dict) and isinstance(subject.get("input_kind"), str):
+        kind = subject["input_kind"]
+    else:
+        return "subject record has no input_kind"
+    if kind not in _ACCEPTED_SUBJECT_KINDS[expected_input]:
+        return f"subject input_kind {kind!r} was not requested"
+    applied = [
+        (index, item) for index, item in enumerate(applicability)
+        if item.get("rule_type") == _NUMERIC_RULE_TYPE
+        and item.get("outcome") == "APPLIED"
+    ]
+    for index, item in applied:
+        if kind == _INPUT_KIND_UNVERIFIED and any(
+            item.get(key) != value for key, value in _NON_SOURCE_RECORD.items()
+        ):
+            # Rule 1: unverified input never claims a source evaluation.
+            return f"numeric rule trace {index} claims a source evaluation of unverified input"
+        if kind in _COMPLETE_SOURCE_KINDS:
+            sources = item.get("unknown_sources")
+            reasons = [
+                source.get("reason") for source in sources
+                if isinstance(source, dict)
+            ] if isinstance(sources, list) else []
+            if (
+                item.get("primary_reason") == "INCOMPLETE_SOURCE_INPUT"
+                or "INCOMPLETE_SOURCE_INPUT" in reasons
+            ):
+                # Rule 2: complete source is never incomplete input.
+                return f"numeric rule trace {index} reports complete source as incomplete input"
+    if kind == _INPUT_KIND_PROPOSED_NEW and not applied:
+        # Rule 3: the kind is reported only when a numeric rule applied.
+        return "proposed_new_source subject without an APPLIED numeric rule"
+    return ""
+
+
 def _is_non_source_without_target(payload: Dict[str, Any]) -> bool:
     subject = payload.get("subject")
     return (
@@ -537,6 +600,25 @@ def _verdict_inconsistency(
     payload: Dict[str, Any],
     returncode: Any,
     requested_mode: str,
+    expected_input: str = "input",
+) -> str:
+    """Return why a schema-valid payload is incoherent, or ``""`` if it is not.
+
+    The subject-kind rules (ADR-034 G2-1 charter §5) run last, on a payload
+    that is otherwise coherent.
+    """
+    problem = _payload_inconsistency(payload, returncode, requested_mode)
+    if problem:
+        return problem
+    return _subject_kind_problem(
+        payload, payload.get("applicability") or [], expected_input
+    )
+
+
+def _payload_inconsistency(
+    payload: Dict[str, Any],
+    returncode: Any,
+    requested_mode: str,
 ) -> str:
     """Return why a schema-valid payload is incoherent, or ``""`` if it is not.
 
@@ -576,7 +658,6 @@ def _verdict_inconsistency(
             return (
                 "evaluation_complete disagrees with applicability outcomes"
             )
-
     # Violation records.
     for index, v in enumerate(violations):
         if not isinstance(v, dict):
@@ -622,6 +703,8 @@ def assess_verdict(
     stdout: str,
     returncode: Any,
     requested_mode: str,
+    *,
+    expected_input: str = "input",
 ) -> VerdictAssessment:
     """Trust a ``mneme check --json`` result only if it is coherent (#260).
 
@@ -630,13 +713,23 @@ def assess_verdict(
     payload whose mode, violations, or exit status contradict it means the
     child broke its own contract, which is not a verdict. Both outcomes fail
     open; only the diagnostic differs.
+
+    ``expected_input`` names the check input the caller requested (ADR-034
+    G2-1 charter §5.1): ``"input"`` (every ``--input`` caller) accepts no
+    subject or ``unverified_input``; ``"proposed_new_file"`` (routed Claude
+    Code ``Write`` events only) also accepts ``proposed_new_source``. Any
+    other subject kind is untrusted.
     """
+    if expected_input not in _ACCEPTED_SUBJECT_KINDS:
+        raise ValueError(f"unknown expected_input {expected_input!r}")
     payload = parse_verdict(stdout)
     if payload is None:
         return VerdictAssessment(
             None, f"no parseable verdict from mneme check (exit {returncode})"
         )
-    inconsistency = _verdict_inconsistency(payload, returncode, requested_mode)
+    inconsistency = _verdict_inconsistency(
+        payload, returncode, requested_mode, expected_input
+    )
     if inconsistency:
         return VerdictAssessment(
             None,
@@ -687,8 +780,17 @@ def format_reason(payload: Dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def format_applicability_reason(payload: Dict[str, Any]) -> str:
-    """Render scoped-rule UNKNOWN traces for fail-open diagnostics."""
+def format_applicability_reason(
+    payload: Dict[str, Any],
+    *,
+    routed_new_file: bool = False,
+) -> str:
+    """Render scoped-rule UNKNOWN traces for fail-open diagnostics.
+
+    ``routed_new_file`` is passed only by the Claude Code hook for a routed
+    ``Write`` whose numeric rules were evaluated on the proposed new file
+    (ADR-034 G2-1 charter §4.3); every other caller keeps today's text.
+    """
     traces = [
         item for item in (payload.get("applicability") or [])
         if isinstance(item, dict) and item.get("outcome") == "UNKNOWN"
@@ -709,7 +811,12 @@ def format_applicability_reason(payload: Dict[str, Any]) -> str:
             f"  [{item.get('decision_id')}] {item.get('rule_type')} "
             f"{value}: {item.get('reason')}"
         )
-    if matcher:
+    if matcher and routed_new_file:
+        lines.append(
+            "mneme-hook: numeric typed rule(s) evaluated on the proposed new "
+            "file; evaluation incomplete."
+        )
+    elif matcher:
         # ADR-034 G1: numeric rules are decided only by a whole-file audit
         # (`mneme check --source-file`). Delta input is never complete
         # source, so no pre-write numeric detection is claimed here.
@@ -717,6 +824,7 @@ def format_applicability_reason(payload: Dict[str, Any]) -> str:
             "mneme-hook: numeric typed rule(s) not evaluated on this input "
             "(whole-file audit only: mneme check --source-file)."
         )
+    if matcher:
         for item in matcher:
             lines.append(
                 f"  [{item.get('decision_id')}] {item.get('rule_type')} "
@@ -779,6 +887,8 @@ def _invoke_check(
     checked_content: str,
     stderr: TextIO = sys.stderr,
     transport: str = "subprocess",
+    *,
+    carrier: Optional[bytes] = None,
 ) -> Optional[subprocess.CompletedProcess]:
     """Run ``mneme check`` over one proposed delta; return the child result.
 
@@ -788,20 +898,32 @@ def _invoke_check(
     ``transport="inprocess"`` is benchmark-only and used solely by the
     PreToolUse path: a timeout there ends this hook process with exit 0
     (fail open), which is what that path does with ``None`` anyway.
+
+    ``carrier`` is set only for a routed new-file ``Write`` (ADR-034 G2-1
+    charter §4.1): those exact bytes go to ``--proposed-new-file`` through a
+    binary carrier, with no newline translation. Unrouted calls keep the
+    text-mode ``--input`` carrier byte for byte.
     """
     mode = resolve_mode()
 
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".txt", delete=False, encoding="utf-8"
-    ) as tf:
-        tf.write(checked_content)
-        input_path = tf.name
+    if carrier is None:
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".txt", delete=False, encoding="utf-8"
+        ) as tf:
+            tf.write(checked_content)
+            input_path = tf.name
+        input_flag = "--input"
+    else:
+        with tempfile.NamedTemporaryFile(mode="wb", suffix=".txt", delete=False) as tf:
+            tf.write(carrier)
+            input_path = tf.name
+        input_flag = "--proposed-new-file"
 
     try:
         command = [
             sys.executable, "-m", "mneme", "check",
             "--memory", str(memory),
-            "--input", input_path,
+            input_flag, input_path,
             "--query", f"edit to {rel_label}",
             "--mode", mode,
             "--json",
@@ -866,6 +988,276 @@ def _invoke_check_inprocess(argv: list) -> subprocess.CompletedProcess:
         watchdog.cancel()
 
 
+# ── ADR-034 G2-1: new-file Write routing and host-event evidence ────────────
+
+
+@dataclass
+class _RoutedWrite:
+    """One ``Write`` event routed to ``--proposed-new-file`` (charter §4.1)."""
+
+    target: str
+    carrier: bytes
+    carrier_sha256: str
+    assessment: Optional[VerdictAssessment] = None
+    deferred: bool = False
+
+
+def _route_new_file(event: ToolEvent) -> Optional[_RoutedWrite]:
+    """Select the ``--proposed-new-file`` call for a qualifying ``Write``.
+
+    The probe is advisory: it only picks which single call to make. The
+    checker re-establishes every precondition itself, so nothing here can
+    make a result trusted (G2-O3). Never uses ``_read_current``, which
+    collapses missing, unreadable and non-UTF-8 targets into ``""`` (H1).
+    """
+    import hashlib
+
+    if event.tool_name != "Write":
+        return None
+    _, target = _resolve_target(event)
+    if not target or not Path(target).is_absolute():
+        return None
+    if Path(target).suffix != ".py":
+        return None
+    content = event.tool_input.get("content")
+    if not isinstance(content, str):
+        return None
+    try:
+        os.lstat(target)
+    except FileNotFoundError:
+        pass
+    except (OSError, ValueError):
+        return None
+    else:
+        return None
+    try:
+        carrier = content.encode("utf-8")
+    except UnicodeEncodeError:
+        # A lone surrogate: not routed; today's path is unchanged.
+        return None
+    return _RoutedWrite(
+        target=target,
+        carrier=carrier,
+        carrier_sha256=hashlib.sha256(carrier).hexdigest(),
+    )
+
+
+def _subject_kind(payload: Dict[str, Any]) -> Optional[str]:
+    subject = payload.get("subject")
+    return subject.get("input_kind") if isinstance(subject, dict) else None
+
+
+def _routed_join_problem(payload: Dict[str, Any], routed: _RoutedWrite) -> str:
+    """Charter §5.2 rules 4 (digest join) and 5 (path join), or ``""``."""
+    if _subject_kind(payload) != _INPUT_KIND_PROPOSED_NEW:
+        return ""
+    subject = payload["subject"]
+    if subject.get("subject_sha256") != routed.carrier_sha256:
+        return "subject digest does not match the routed carrier"
+    for index, item in enumerate(payload.get("applicability") or []):
+        if (
+            item.get("rule_type") == _NUMERIC_RULE_TYPE
+            and "subject_sha256" in item
+            and item["subject_sha256"] != routed.carrier_sha256
+        ):
+            return f"numeric rule trace {index} does not match the routed carrier"
+    target_path = subject.get("target_path")
+    if not isinstance(target_path, str) or os.path.normcase(target_path) != (
+        os.path.normcase(str(Path(routed.target).resolve()))
+    ):
+        return "subject target_path does not match the routed target"
+    if subject.get("absence_verified") is not True:
+        return "subject absence is not verified"
+    return ""
+
+
+def _assess_routed(
+    proc: subprocess.CompletedProcess,
+    mode: str,
+    routed: _RoutedWrite,
+) -> VerdictAssessment:
+    assessment = assess_verdict(
+        proc.stdout, proc.returncode, mode, expected_input="proposed_new_file"
+    )
+    if assessment.payload is not None:
+        problem = _routed_join_problem(assessment.payload, routed)
+        if problem:
+            assessment = VerdictAssessment(
+                None,
+                f"inconsistent verdict payload ({problem}); "
+                "enforcement inactive for this check",
+                inconsistent=True,
+            )
+    routed.assessment = assessment
+    return assessment
+
+
+# Validation-only (G2-1 charter §6.3, ruling G2C-O2): when set, each routed
+# event appends its §6.2 record as one JSON line. Unset -> nothing is written.
+# The host identity comes from the validation harness, never the envelope.
+# None of these is a supported user option.
+_EVIDENCE_LOG_ENV_VAR = "MNEME_HOOK_EVIDENCE_LOG"
+_HOST_VERSION_ENV_VAR = "MNEME_HOOK_EVIDENCE_HOST_VERSION"
+_HOST_SHA256_ENV_VAR = "MNEME_HOOK_EVIDENCE_HOST_SHA256"
+_EVIDENCE_SCHEMA = "mneme.hook_evidence/v1"
+_EVIDENCE_SURFACE = "claude_code.PreToolUse"
+_HOOK_OUTCOMES = frozenset({"refused", "proceeded", "deferred"})
+
+
+def event_identifiers(envelope: Dict[str, Any]) -> Dict[str, str]:
+    """Every host-supplied ``*_id`` string in the envelope, as received."""
+    return {
+        key: value for key, value in envelope.items()
+        if isinstance(key, str) and key.endswith("_id") and isinstance(value, str)
+    }
+
+
+def build_evidence_record(
+    event: ToolEvent,
+    identifiers: Dict[str, str],
+    routed: _RoutedWrite,
+    hook_outcome: str,
+) -> Dict[str, Any]:
+    """The §6.2 host-event binding record. Never carries source content."""
+    from mneme import __version__
+
+    host_version = os.environ.get(_HOST_VERSION_ENV_VAR) or None
+    host_sha256 = os.environ.get(_HOST_SHA256_ENV_VAR) or None
+    assessment = routed.assessment
+    payload = assessment.payload if assessment is not None else None
+    subject = None
+    rules: list = []
+    if payload is not None and _subject_kind(payload) == _INPUT_KIND_PROPOSED_NEW:
+        raw = payload["subject"]
+        subject = {
+            key: raw.get(key) for key in (
+                "input_kind", "subject_sha256", "target_path",
+                "governed_path", "absence_verified",
+            )
+        }
+        rules = [
+            {
+                "rule_id": item.get("rule_id"),
+                "decision_version_id": item.get("decision_version_id"),
+                "governed_path": item.get("input_path"),
+                "applicability": item.get("outcome"),
+                "matcher_status": item.get("matcher_status"),
+                "matcher_outcome": item.get("matcher_outcome"),
+                "primary_reason": item.get("primary_reason"),
+            }
+            for item in payload.get("applicability") or []
+            if item.get("rule_type") == _NUMERIC_RULE_TYPE
+            and item.get("outcome") == "APPLIED"
+        ]
+    return {
+        "schema": _EVIDENCE_SCHEMA,
+        "surface": _EVIDENCE_SURFACE,
+        "mneme_version": __version__,
+        "host": {"version": host_version, "executable_sha256": host_sha256},
+        "event": {
+            "tool_name": event.tool_name,
+            "file_path": event.file_path,
+            "cwd": event.cwd,
+            "identifiers": dict(identifiers),
+        },
+        "carrier_sha256": routed.carrier_sha256,
+        "checker": {
+            "trusted": payload is not None,
+            "problem": assessment.problem if assessment is not None else "check not run",
+            "subject": subject,
+        },
+        "rules": rules,
+        "hook_outcome": hook_outcome,
+    }
+
+
+def relevant_enforcement_observed(
+    record: Any,
+    pinned_host: tuple,
+) -> bool:
+    """Can this record support "relevant enforcement observed" (ADR-029)?
+
+    Fail closed: only a complete record from this surface, carrying the
+    pinned host identity ``(version, executable_sha256)``, whose carrier
+    digest joins a trusted ``proposed_new_source`` subject with at least one
+    bound APPLIED numeric rule. Anything else stays at "execution observed"
+    or below. Recording the identity does not authenticate it.
+    """
+    try:
+        pinned_version, pinned_sha256 = pinned_host
+        host = record["host"]
+        if not (_nonempty_str(pinned_version) and _is_sha256(pinned_sha256)):
+            return False
+        if (host.get("version"), host.get("executable_sha256")) != (
+            pinned_version, pinned_sha256
+        ):
+            return False
+        if record.get("schema") != _EVIDENCE_SCHEMA or record.get("surface") != _EVIDENCE_SURFACE:
+            return False
+        if not _nonempty_str(record.get("mneme_version")):
+            return False
+        event = record["event"]
+        if event.get("tool_name") != "Write" or not _nonempty_str(event.get("file_path")):
+            return False
+        if not isinstance(event.get("identifiers"), dict):
+            return False
+        if record.get("hook_outcome") not in _HOOK_OUTCOMES:
+            return False
+        checker = record["checker"]
+        subject = checker.get("subject")
+        digest = record.get("carrier_sha256")
+        if checker.get("trusted") is not True or not isinstance(subject, dict):
+            return False
+        if subject.get("input_kind") != _INPUT_KIND_PROPOSED_NEW:
+            return False
+        if not _is_sha256(digest) or subject.get("subject_sha256") != digest:
+            return False
+        if subject.get("absence_verified") is not True:
+            return False
+        rules = record["rules"]
+        if not isinstance(rules, list) or not rules:
+            return False
+        return all(
+            isinstance(rule, dict)
+            and _nonempty_str(rule.get("rule_id"))
+            and _nonempty_str(rule.get("decision_version_id"))
+            and rule.get("applicability") == "APPLIED"
+            and _nonempty_str(rule.get("matcher_status"))
+            and rule.get("governed_path") == subject.get("governed_path")
+            for rule in rules
+        )
+    except (AttributeError, KeyError, TypeError, ValueError):
+        return False
+
+
+def _write_evidence(
+    event: ToolEvent,
+    identifiers: Dict[str, str],
+    routed: _RoutedWrite,
+    rc: int,
+    stderr: TextIO,
+) -> None:
+    path = os.environ.get(_EVIDENCE_LOG_ENV_VAR)
+    if not path:
+        return
+    if rc == 2:
+        outcome = "refused"
+    elif routed.deferred:
+        outcome = "deferred"
+    else:
+        outcome = "proceeded"
+    try:
+        record = build_evidence_record(event, identifiers, routed, outcome)
+        line = json.dumps(record, sort_keys=True, ensure_ascii=True)
+        with open(path, "a", encoding="utf-8", newline="\n") as fh:
+            fh.write(line + "\n")
+    except Exception as exc:  # never changes the hook outcome
+        print(
+            f"mneme-hook: evidence record could not be written ({type(exc).__name__}).",
+            file=stderr,
+        )
+
+
 def _run_check(
     event: ToolEvent,
     proposed_content: str,
@@ -874,19 +1266,25 @@ def _run_check(
     stdout: TextIO,
     availability: Optional[LocalDeclaration] = None,
     note: Optional[ProceedNote] = None,
+    routed: Optional["_RoutedWrite"] = None,
 ) -> int:
     mode = resolve_mode()
 
     rel, target_path = _resolve_target(event)
     # Default path passes no transport, so the call is exactly today's.
     extra = {"transport": "inprocess"} if resolve_transport() == "inprocess" else {}
+    if routed is not None:
+        extra["carrier"] = routed.carrier
     proc = _invoke_check(memory, rel, target_path, proposed_content, stderr=stderr, **extra)
     if proc is None:
         if emit_availability(availability, "NOT_RUN", stderr, memory=memory, note=note):
             return 2
         return 0
 
-    assessment = assess_verdict(proc.stdout, proc.returncode, mode)
+    if routed is None:
+        assessment = assess_verdict(proc.stdout, proc.returncode, mode)
+    else:
+        assessment = _assess_routed(proc, mode, routed)
     payload = assessment.payload
     if emit_availability(
         availability, classify_observation(payload), stderr,
@@ -916,7 +1314,10 @@ def _run_check(
 
     verdict = payload["verdict"]
     if payload.get("evaluation_complete") is False:
-        print(format_applicability_reason(payload), file=stderr)
+        if routed is not None and _subject_kind(payload) == _INPUT_KIND_PROPOSED_NEW:
+            print(format_applicability_reason(payload, routed_new_file=True), file=stderr)
+        else:
+            print(format_applicability_reason(payload), file=stderr)
         if not mixed_violation_actionable(payload):
             return 0
         # M-a (ADR-034 §8): a trusted violation stays actionable even when
@@ -932,6 +1333,8 @@ def _run_check(
             reason = reason + "\n" + note.text
             note.consumed = True
         _emit_defer(reason, stdout)
+        if routed is not None:
+            routed.deferred = True
         return 0
 
     if verdict in _BLOCKING_VERDICTS:
@@ -1391,7 +1794,9 @@ def handle_event(
     # additionalContext object, written only when the hook exits 0 and warn
     # mode has not already carried the text in its defer object.
     note = ProceedNote()
-    rc = _direct_write_event(event, stderr, stdout, note)
+    rc = _direct_write_event(
+        event, stderr, stdout, note, identifiers=event_identifiers(envelope)
+    )
     if rc == 0:
         write_proceed_context(note, stdout)
     return rc
@@ -1402,6 +1807,7 @@ def _direct_write_event(
     stderr: TextIO,
     stdout: TextIO,
     note: ProceedNote,
+    identifiers: Optional[Dict[str, str]] = None,
 ) -> int:
     start = _direct_write_memory_start(event)
     # ADR-033 C2a: local policy detection precedes the missing-memory return.
@@ -1434,6 +1840,19 @@ def _direct_write_event(
         # deletion). Mechanically enforceable typed rules cannot be blank.
         emit_availability(availability, "SKIPPED", stderr, memory=memory, note=note)
         return 0
+
+    routed = _route_new_file(event)
+    if routed is not None:
+        # ADR-034 G2-1: one call, with the complete proposed source of a
+        # verified-new file in place of the introduced delta. For a missing
+        # target that delta is the same content (introduced_between("", c));
+        # a blank one keeps its skip above.
+        rc = _run_check(
+            event, event.tool_input["content"], memory, stderr, stdout,
+            availability=availability, note=note, routed=routed,
+        )
+        _write_evidence(event, identifiers or {}, routed, rc, stderr)
+        return rc
 
     return _run_check(
         event, checked_content, memory, stderr, stdout, availability=availability,

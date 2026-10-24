@@ -77,6 +77,7 @@ from mneme.decision_index_persistence import (
 from mneme.decision_retriever import DecisionRetriever
 from mneme.enforcer import (
     INPUT_KIND_COMPLETE_SOURCE,
+    INPUT_KIND_PROPOSED_NEW,
     EnforcementResult,
     Severity,
     SourceSubject,
@@ -461,6 +462,20 @@ def _subject_record(subject: SourceSubject) -> dict:
     from mneme import __version__
     from mneme.numeric_rule import runtime_label
 
+    if subject.input_kind == INPUT_KIND_PROPOSED_NEW:
+        # ADR-034 §7a / G2-1 charter §3.5: additive keys, this kind only.
+        return {
+            "input_kind": subject.input_kind,
+            "subject_sha256": subject.sha256,
+            "source_path": None,
+            "target_path": subject.target_path,
+            "memory_path": subject.memory_path,
+            "governed_path": subject.governed_path,
+            "absence_verified": True,
+            "surface": "mneme check",
+            "surface_version": __version__,
+            "runtime": runtime_label(),
+        }
     record = {
         "input_kind": subject.input_kind,
         "subject_sha256": subject.sha256,
@@ -595,25 +610,110 @@ def _read_source_file(source_file: str, memory: str) -> tuple[str, SourceSubject
     )
 
 
+def _proposed_new_target(target_path: str, memory: str) -> tuple[str, str] | None:
+    """Establish ADR-034 §6a preconditions 1-4 for ``--proposed-new-file``.
+
+    Returns ``(resolved_target, governed_path)``, or ``None`` when any
+    precondition fails; the caller then evaluates exactly as ``--input``
+    would (G2-1 charter §3.3). Only the checker's own probe counts: whatever
+    the caller observed about the target is never trusted (G2-O3).
+    """
+    import os
+    import stat
+
+    from mneme.path_selectors import normalize_input_path, policy_root
+
+    # Lexical form keeps ``..`` components, so they can never pass the
+    # link-component comparison below.
+    lexical = Path(target_path).absolute()
+    # 1. Verified absence: only "not found" is absence.
+    try:
+        os.lstat(lexical)
+    except FileNotFoundError:
+        pass
+    except (OSError, ValueError):
+        return None
+    else:
+        return None
+    # 2. The parent directory resolves strictly, through no link.
+    try:
+        parent = lexical.parent.resolve(strict=True)
+        parent_mode = os.stat(parent).st_mode
+    except (OSError, RuntimeError, ValueError):
+        return None
+    if not stat.S_ISDIR(parent_mode) or (
+        os.path.normcase(str(lexical.parent)) != os.path.normcase(str(parent))
+    ):
+        return None
+    resolved = parent / lexical.name
+    # 3. Inside the policy root of the memory actually loaded.
+    try:
+        resolved.relative_to(policy_root(memory))
+        governed = normalize_input_path(resolved, memory)
+    except ValueError:
+        return None
+    # 4. Python file kind, from the target path alone.
+    if resolved.suffix != ".py":
+        return None
+    return str(resolved), governed
+
+
+def _legacy_text(data: bytes) -> str:
+    """Decode exactly as ``Path.read_text(encoding="utf-8")`` would."""
+    import io
+
+    return io.TextIOWrapper(io.BytesIO(data), encoding="utf-8").read()
+
+
 def _cmd_check(args: argparse.Namespace) -> int:
     source_file = getattr(args, "source_file", None)
+    proposed_file = getattr(args, "proposed_new_file", None)
     if source_file is not None and args.target_path is not None:
         return _error_exit("--source-file cannot be combined with --target-path")
+    if proposed_file is not None and args.target_path is None:
+        return _error_exit("--proposed-new-file requires --target-path")
     memory_path = Path(args.memory)
     if source_file is None:
-        input_path = Path(args.input)
+        input_path = Path(args.input if proposed_file is None else proposed_file)
         if not input_path.exists():
             return _error_exit(f"input file {input_path} does not exist")
     if not memory_path.exists():
         return _error_exit(f"memory file {memory_path} does not exist")
 
     subject: SourceSubject | None = None
+    proposed: SourceSubject | None = None
     if source_file is not None:
         try:
             input_text, subject = _read_source_file(source_file, args.memory)
         except _SourceFileError as exc:
             return _error_exit(str(exc))
         target_path = subject.source_path
+    elif proposed_file is not None:
+        # G2-1 charter §3.5: one byte read; both decodings derive from it.
+        import hashlib
+
+        try:
+            data = input_path.read_bytes()
+        except OSError:
+            return _error_exit(f"input file {input_path} cannot be read")
+        try:
+            proposed_text = data.decode("utf-8", errors="strict")
+        except UnicodeDecodeError:
+            # Precondition 5 (G2C-O6): never a legacy fallback or PASS.
+            return _error_exit(f"input file {input_path} is not valid UTF-8")
+        input_text = _legacy_text(data)
+        target_path = args.target_path
+        established = _proposed_new_target(args.target_path, args.memory)
+        if established is not None:
+            resolved_target, governed = established
+            proposed = SourceSubject(
+                input_kind=INPUT_KIND_PROPOSED_NEW,
+                sha256=hashlib.sha256(data).hexdigest(),
+                source=data,
+                memory_path=str(Path(args.memory).resolve()),
+                governed_path=governed,
+                target_path=resolved_target,
+            )
     else:
         input_text = input_path.read_text(encoding="utf-8")
         target_path = args.target_path or args.input
@@ -623,25 +723,54 @@ def _cmd_check(args: argparse.Namespace) -> int:
     retriever = DecisionRetriever(store.decisions())
     scored = retriever.retrieve(args.query)
 
-    if subject is None and any(
-        rule.type == "FORBID_NUMERIC_ABOVE"
-        for decision in store.decisions()
-        for rule in decision.rules
-    ):
-        # Bind what was actually checked. Never complete source: the numeric
-        # rule stays MATCHER_UNEVALUATED / INCOMPLETE_SOURCE_INPUT.
-        subject = SourceSubject.unverified(
-            input_text.encode("utf-8"),
-            target_path_declared=args.target_path is not None,
+    result: EnforcementResult | None = None
+    if proposed is not None:
+        result = check_prompt(
+            proposed_text,
+            scored,
+            top=args.top,
+            input_path=proposed.target_path,
+            subject=proposed,
         )
+        # ADR-034 §6a target binding, owned by this input kind.
+        mismatched = [
+            item for item in result.applicability
+            if item.input_path is not None
+            and item.input_path != proposed.governed_path
+        ]
+        if mismatched:
+            return _error_exit(
+                "proposed new file applicability path does not match the "
+                f"governed path {proposed.governed_path!r}"
+            )
+        if not any(
+            item.rule_type == "FORBID_NUMERIC_ABOVE"
+            and item.outcome.value == "APPLIED"
+            for item in result.applicability
+        ):
+            # No numeric rule applied: exactly the legacy --input result.
+            result = None
 
-    result = check_prompt(
-        input_text,
-        scored,
-        top=args.top,
-        input_path=target_path,
-        subject=subject,
-    )
+    if result is None:
+        if subject is None and any(
+            rule.type == "FORBID_NUMERIC_ABOVE"
+            for decision in store.decisions()
+            for rule in decision.rules
+        ):
+            # Bind what was actually checked. Never complete source: the
+            # numeric rule stays MATCHER_UNEVALUATED / INCOMPLETE_SOURCE_INPUT.
+            subject = SourceSubject.unverified(
+                input_text.encode("utf-8"),
+                target_path_declared=args.target_path is not None,
+            )
+
+        result = check_prompt(
+            input_text,
+            scored,
+            top=args.top,
+            input_path=target_path,
+            subject=subject,
+        )
 
     if source_file is not None:
         # The selector evaluator must have used exactly the governed path
@@ -2242,6 +2371,19 @@ def _build_parser() -> argparse.ArgumentParser:
             "inside the memory's policy root. Read once, hashed, never "
             "executed; the only input that can decide FORBID_NUMERIC_ABOVE. "
             "Cannot be combined with --input or --target-path."
+        ),
+    )
+    check_input.add_argument(
+        "--proposed-new-file",
+        dest="proposed_new_file",
+        default=None,
+        metavar="CARRIER",
+        help=(
+            "Pre-write check (ADR-034 G2-1): a text carrier holding the "
+            "complete proposed source of a new file at --target-path "
+            "(required). The checker verifies the target absent, link-free, "
+            "inside the policy root and .py; otherwise the result is exactly "
+            "the --input result. Invalid UTF-8 is an error."
         ),
     )
     p_check.add_argument(
