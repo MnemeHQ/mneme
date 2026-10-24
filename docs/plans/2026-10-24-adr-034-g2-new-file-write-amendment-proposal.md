@@ -1,10 +1,12 @@
 # ADR-034 G2 amendment proposal: pre-write numeric evaluation of new-file `Write`
 
 **Date:** 2026-10-24
-**Status:** **PROPOSED.** Not accepted. Nothing here is normative until the
-owner accepts it, and acceptance would be recorded by folding §4 into
-ADR-034 as §6a and §7a with an `**Amended:**` line, following the ADR-031 §8a
-precedent (#490).
+**Status:** **ACCEPTED** by the owner on 2026-10-24: G2-O1 to G2-O6 as in
+revision 2 (`08e0f9ac`), after the architecture review approved that
+revision. §4 is folded into
+[ADR-034](../adr/ADR-034-static-numeric-upper-bound-typed-rule.md) as §6a
+and §7a, which are now the normative text. This document remains the design
+record. Acceptance authorizes no implementation (§9).
 
 **Revision 2** (2026-10-24), per the architecture review of revision 1
 (ACCEPT WITH REQUIRED CORRECTIONS):

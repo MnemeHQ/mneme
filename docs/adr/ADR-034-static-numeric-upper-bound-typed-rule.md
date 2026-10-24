@@ -17,6 +17,11 @@ The accepted content is revision 4, as reviewed and merged in #590. That is
 squash commit `17e69f7f`, from approved head `311b297b`. This acceptance
 changes only the status wording.
 
+**Amended:** 2026-10-24 — G2 pre-write evaluation of new-file `Write`
+(§6a, §7a), owner rulings G2-O1 to G2-O6. The amendment is a design
+contract only: it authorizes no implementation and claims no pre-write
+protection (see "G2 amendment (2026-10-24)" below).
+
 **What acceptance means.** Acceptance establishes what a future implementation
 must satisfy. It does **not** establish that Mneme enforces numeric bounds:
 no `FORBID_NUMERIC_ABOVE` matcher exists.
@@ -493,6 +498,73 @@ How the check surface conveys "complete Python source at path P" is decided in
 the implementation charter. It could be a flag, a subcommand or a payload
 field.
 
+### 6a. Complete proposed source for a new file (amendment 2026-10-24)
+
+Accepted with owner rulings G2-O1 to G2-O6 below. Source anchors in §6a and
+§7a refer to `main` @ `0d367fc6`. The reviewed design record is the
+[G2 proposal](../plans/2026-10-24-adr-034-g2-new-file-write-amendment-proposal.md)
+(revision 2, `08e0f9ac`; merged in #630 as `97143065`).
+
+A second complete-source input kind, **`proposed_new_source`**, is
+recognized. It is distinct from `complete_source_file` (G1) and never
+reported as it.
+
+**Preconditions.** The checker establishes all of these itself, at
+evaluation time, from the governed target path. If any one fails, the input
+is unverified and §6's `INCOMPLETE_SOURCE_INPUT` applies.
+
+1. **Verified absence.** An `lstat` of the governed target raises "not
+   found". Any other outcome is not absence and never becomes a
+   `proposed_new_source` subject:
+   - the target exists (any file type, including an empty file);
+   - the target is a symlink or dangling link;
+   - the check raises permission, I/O or other errors.
+2. **No link components.** The parent directory resolves strictly. Its
+   lexical and resolved forms are equal under `os.path.normcase`, as for G1
+   (`cli.py:546-556`).
+3. **Inside the policy root.** The target is under the ADR-020 policy root of
+   the memory actually loaded, and normalizes to a policy-root-relative
+   governed path.
+4. **Python file kind.** The target suffix is `.py`. File kind comes from the
+   contract and target path, never from whether the bytes parse (§6).
+5. **UTF-8.** The proposed text decodes as strict UTF-8.
+
+**Subject.** The subject is the UTF-8 encoding of the complete proposed text,
+exactly as the checker received it. Its SHA-256 is the subject digest. It is
+evaluated once by the unchanged M4 matcher, without import or execution.
+
+**Target binding.** This invariant belongs to the
+`proposed_new_source` kind itself. It is not inherited from the G1
+`--source-file` branch, whose guard (`cli.py:646-658`) runs only when
+`source_file is not None` and would never run on the new path.
+
+The subject records one governed path: the policy-root-relative
+normalization of the absence-verified target from precondition 3. ADR-020
+applicability for every typed rule must be evaluated against exactly that
+governed path. Every applicability record that carries an `input_path` must
+equal it.
+
+Any mismatch, or a governed path that cannot be established, is an
+operational error (non-verdict exit, untrusted under ADR-033 §2). It is never
+a verdict and never a fallback to unverified input.
+
+**Evidence class.** The subject record names `proposed_new_source` as
+its input kind. On its own, it is an evaluation of a hypothetical subject (any caller can
+submit any bytes for an absent path), never "relevant
+enforcement observed".
+
+**Outcomes.** §4 applies unchanged, including O2:
+
+- a proposed file missing any declared source is `MATCHER_UNEVALUATED` /
+  `SOURCE_NOT_FOUND`, never `NO_VIOLATION`;
+- a proposed file that does not parse is `PARSE_FAILURE`;
+- a recognized `EXCEEDS` alongside an unknown source is `PARTIAL`, which is a
+  FAIL.
+
+**Digest scope.** The digest identifies the bytes that were evaluated. It is
+not a claim about the bytes the host later writes, which may differ (for
+example in line endings or a byte-order mark).
+
 ### 7. Surface: whole-file audit only (G1)
 
 The first slice runs only as a complete-source audit or check.
@@ -504,8 +576,97 @@ The first slice runs only as a complete-source audit or check.
   `MATCHER_UNEVALUATED` / `INCOMPLETE_SOURCE_INPUT`. They must never pass it
   silently.
 - **No CI integration** is claimed or authorized.
+- **Amended 2026-10-24:** §7a specifies the pre-write contract for new-file
+  `Write` only. Nothing is claimed until it is implemented and independently
+  validated.
 - **Delta-attributed evaluation (G2)** would need a separate ADR amendment and
   charter.
+
+### 7a. Surface: pre-write gate for new-file `Write` (G2, amendment 2026-10-24)
+
+**Routing.** On the Claude Code `PreToolUse` direct-write surface, a `Write`
+event is routed to the `proposed_new_source` input kind when its resolved
+target meets the §6a preconditions. That routing is single-path: when it
+applies, it replaces the `--input` delta invocation for that event.
+
+**Unchanged events.** Every other direct-write event keeps today's ADR-018
+delta path, and its numeric rules stay `INCOMPLETE_SOURCE_INPUT`:
+
+- `Write` to an existing, empty, unreadable or ambiguous target;
+- `Edit` and `MultiEdit`.
+
+The hook's "unreadable `Write` target is new" shortcut (`hook.py:93-107`) stays in force
+for literal rules, but it never establishes §6a absence.
+
+**Legacy parity.** The G1 freeze requires byte-identical
+`mneme.check/v1` payloads and exit codes for checks with no numeric rule
+(`layer1-freeze-e73ff7d.md:903-904`). G2 keeps this guarantee and makes it
+stricter: parity holds whenever no `FORBID_NUMERIC_ABOVE` rule is
+**`APPLIED`** at the governed target.
+
+In that case, the routed check must produce exactly the stdout payload and
+exit status of the legacy invocation: the same text as `--input`, with
+`--target-path` set to the same target. This covers each of these cases:
+
+- memory with no numeric rule (no `subject` record, as today);
+- numeric rules that are all `EXCLUDED` or `UNKNOWN` at the target (today's
+  unverified `subject` record, unchanged).
+
+Unlike G1's `--source-file`, which emits a `subject` record even when no
+numeric rule exists (`cli.py:407-412`), the G2 path never adds or relabels a
+`subject` record unless a numeric rule is applied.
+
+Literal-rule verdicts are unaffected by construction, because for a
+verified-absent target the checked text is identical to today's introduced
+content (`hook.py:156`). Any departure from parity would be a separate reviewed
+behavioral change. None is proposed.
+
+**Host-event binding.** A claim that a real `Write` was governed needs
+one record, made by the hook as the enforcing control, that binds all of the
+following:
+
+- **Control provenance:** surface (Claude Code `PreToolUse` hook), Mneme
+  version, and the pinned host version.
+- **Host event:** `tool_name` `Write`, the `file_path` and `cwd` as received,
+  and the host-supplied event identifiers that the pinned host provides (for
+  example `session_id`, and a tool-call id where present), as established by
+  a pinned live test before any support claim.
+- **Join:** the SHA-256 of the UTF-8 `tool_input.content` the hook passed to
+  the checker. It must equal the checker's subject digest.
+- **Rule and outcome:** rule ID, decision version, governed path,
+  applicability, matcher status, and the hook's allow/refuse outcome.
+
+Without this record, or if any field mismatches, evidence stays at
+"execution observed" or below (ADR-029 §2, fail closed).
+
+This record is the control's own provenance, not an authenticated host
+attestation. No ADR-025 attestation is claimed. Its representation is left to
+the G2-1 charter, with no new persistence, telemetry or event system
+(ADR-029 §3, ADR-033 §7).
+
+**Verdict handling.** The existing trust validation (`assess_verdict`), M-a
+precedence (§8, `hook.py:522-533`) and strict/warn behavior apply unchanged:
+
+| Matcher result on `proposed_new_source` | Hook outcome (strict) |
+|---|---|
+| `RECOGNIZED` / `VIOLATION` | Block before mutation (exit 2), actionable reason |
+| `PARTIAL` / `VIOLATION` | Block before mutation; unknown sources reported; never "fully verified" |
+| `RECOGNIZED` / `NO_VIOLATION` | Proceed (subject to other rules) |
+| `MATCHER_UNEVALUATED` | Unevaluated. ADR-033 availability policy decides; never a compliance PASS |
+| Untrusted or crashed checker | Unchanged ADR-033 / #260 handling |
+
+**Availability.** G2 changes no ADR-033 policy. Under default `open`,
+unevaluated results proceed with diagnostics. Under AUTHORIZED `closed`, they
+are refused as `EVALUATION_INCOMPLETE`.
+
+Because of O2, an in-scope new file that lacks a declared source (a
+helper, a test) is unevaluated, so under `closed` it is refused. G2 narrows
+the Layer 1 freeze's recorded F2 consequence
+(`layer1-freeze-e73ff7d.md:939-944`) only for verified-new files that contain every declared source. The
+F2 activation restriction stays in force for closed-availability paths.
+
+**Other consumers.** The Agent SDK and LangChain consumers are out of scope.
+They keep §7's delta semantics.
 
 ### 8. Mixed results (M-a, target contract)
 
@@ -565,7 +726,8 @@ only, documented" or "extended":
 - Python-only and recognition-bound: many real forms (keyword arguments,
   derived constants, aliases, attribute calls) are `UNEVALUATED` in the first
   slice.
-- Audit-only: no pre-write protection.
+- Audit-only: no pre-write protection. §7a (2026-10-24) specifies a
+  pre-write contract for new-file `Write`; it is not implemented.
 - Requires a check-payload and validator contract change across three
   consumers, and a schema v2 feature.
 - `UNEVALUATED` rates may be high. The pre-registered criteria make that
@@ -582,13 +744,53 @@ only, documented" or "extended":
 | O5 | **`max <= 0` is rejected at authoring.** Positivity is consistent across `max` (§5 grammar), recognized source values (`x <= 0` is disabled, so `UNKNOWN`, §5a) and diagnostics |
 | O6 | **Resolved: (a), the exact authored decimal bound.** No implicit tolerance or rounding. Diagnostics and documentation must make the consequence explicit. See §5a |
 
+## G2 amendment (2026-10-24)
+
+Owner acceptance: 2026-10-24, of revision 2 (`08e0f9ac`) of the
+[G2 proposal](../plans/2026-10-24-adr-034-g2-new-file-write-amendment-proposal.md),
+after two architecture reviews: ACCEPT WITH REQUIRED CORRECTIONS (F1–F3) on
+revision 1, then APPROVE on revision 2. §6a and §7a are that revision's §4
+text, with proposal-internal references replaced by source anchors.
+
+| ID | Ruling |
+|---|---|
+| G2-O1 | **Verified-absent `Write` only.** Existing files, including empty ones, stay on the ADR-018 delta path |
+| G2-O2 | **`proposed_new_source`** is a distinct input kind, never reported as `complete_source_file` |
+| G2-O3 | **The checker establishes absence** at evaluation time, never the caller. Submitted bytes are a hypothetical subject; only the hook's host-event binding (§7a) supports "relevant enforcement observed" |
+| G2-O4 | **Single-path routing** for qualifying events, no double invocation, with the §6a target-binding invariant and exact legacy parity when no numeric rule is `APPLIED` |
+| G2-O5 | **ADR-033 unchanged.** The Layer 1 freeze's F2 activation restriction stays in force for closed-availability paths |
+| G2-O6 | **Transport spelling deferred** to the G2-1 charter, which must define the precise trust and invocation boundary before implementation |
+
+**Claim boundary.** Once implemented and independently validated, the claim
+would be: on Claude Code `PreToolUse`, a `Write` to a verified-absent `.py`
+target inside the policy root is blocked before mutation, in strict mode, when
+the complete proposed source has a recognized `FORBID_NUMERIC_ABOVE`
+violation. Explicitly not covered: the race between evaluation and write;
+equality of evaluated and landed bytes; existing-file `Write`, `Edit`,
+`MultiEdit`, deletion, renames and shell mutations; the Agent SDK, LangChain,
+Stop and CI; and host behavior when the hook fails to run.
+
+**Not authorized by this amendment** (each is a separate decision):
+
+- any hook, CLI, matcher, enforcer, SDK, LangChain or CI change;
+- the G2-1 behavioral charter, a `[layer1-freeze]` amendment, or a G2
+  validation corpus;
+- any change to M4 matcher semantics, `DecisionRetriever`, `ConflictDetector`,
+  `FORBID_LITERAL` semantics, memory persistence, or ADR-018, ADR-020,
+  ADR-029 or ADR-033;
+- import of ADR-034 into project memory, or activation of
+  `FORBID_NUMERIC_ABOVE` on any path;
+- any enforcement or production claim.
+
+
 ## Not decided here
 
 - The held-out corpus.
 - The implementation charter and `[layer1-freeze]` amendment.
 - The JSON payload field names.
 - The complete-source flag spelling.
-- G2.
+- G2 beyond the §6a/§7a new-file `Write` contract: the G2-1 charter, the
+  transport spelling (G2-O6), existing-file delta attribution and CI.
 - Keyword arguments, exclusive bounds, ranges, units, constant propagation and
   other languages.
 - P0-B.
@@ -605,3 +807,4 @@ only, documented" or "extended":
 - ADR-033 (availability)
 - Design proposal (#589)
 - P0-A (#578, #582, #586)
+- G2 proposal (#630) and M4 results (#628)
