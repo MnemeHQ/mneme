@@ -1,0 +1,60 @@
+CM-01 S1-A1 M7 exact commands
+
+Worktree:
+  C:\dev\mneme\.worktrees\feat-cm01-s1a1-e0-local-executor
+
+Directory:
+  validation/cm01/s1a-local/m7
+
+Commands:
+  npm install --ignore-scripts --no-audit --no-fund
+  npm run m7
+
+Observed:
+  npm install: 98 packages added
+  npm run m7: pass=true, failed=[]
+  M7-UPSTREAM-SIX-1: true
+  M7-UPSTREAM-SIX-2: true
+  M7-PARITY-1: true
+  M7-PARITY-2: true
+  M7-CALL-SEQUENCE: true
+  M7-ONE-EXECUTE: true
+  M7-DERIVED-ARGS: true
+  M7-IDENTITY: true
+  M7-NO-PROPOSAL-CALLS: true
+  M7-REPEAT: true
+  M7-NO-MUTATION: true
+  M7-M4: true
+
+Chain:
+  decision.search({query:"cache"})
+  decision.get({record_id: selected.decision_id})
+  decision.trace({record_id: get.canonical_decision.decision_id})
+
+Selected:
+  ADR-9901
+  version_id dver-3c2da75d06c5a5ce73807f025fc1d5c9
+  content_digest 662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650
+  derived_rule_ids [ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584]
+
+Versions:
+  Node 24.13.1
+  npm 11.8.0
+  @cloudflare/codemode 0.5.5
+  @modelcontextprotocol/sdk 1.32.2
+  ajv 8.17.1
+  zod 4.6.7
+  Python 3.12.10
+  mneme 0.10.0
+  mcp 2.2.0
+
+Fixture:
+  m4/fixture/canonical/project_memory.json
+  sha256 b4d83d0cc0f70f442e2a62bd0e527220ae99b07cba1238e39d0ad8c5685d4e7f
+
+Evidence:
+  evidence/m7.json
+  evidence/run1.json
+  evidence/run2.json
+  evidence/run1-stderr.log
+  evidence/run2-stderr.log

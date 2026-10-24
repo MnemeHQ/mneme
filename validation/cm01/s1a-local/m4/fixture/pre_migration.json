@@ -1,0 +1,39 @@
+{
+  "meta": {
+    "name": "cm01-m4-f1-synthetic",
+    "description": "M4-F1 synthetic fixture. ADR-9901 is copied unchanged from the frozen M1 fixture; ADR-9902 is a deprecated lifecycle control. Not repository project memory."
+  },
+  "items": [],
+  "examples": [],
+  "decisions": [
+    {
+      "id": "ADR-9901",
+      "decision": "Synthetic M1 cache adapter uses the in-memory backend.",
+      "rationale": "Inventory and stdio handshake fixture only.",
+      "scope": ["cache"],
+      "constraints": ["no external cache service"],
+      "anti_patterns": ["external_cache_client"],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "external_cache_client"
+        }
+      ],
+      "created_at": "2026-01-01T00:00:00Z",
+      "updated_at": "2026-01-01T00:00:00Z",
+      "status": "active"
+    },
+    {
+      "id": "ADR-9902",
+      "decision": "Synthetic deprecated cache policy for M4-F1 lifecycle coverage.",
+      "rationale": "Deprecated lifecycle control only; no typed rules.",
+      "scope": ["cache"],
+      "constraints": [],
+      "anti_patterns": [],
+      "rules": [],
+      "created_at": "2026-01-01T00:00:00Z",
+      "updated_at": "2026-01-01T00:00:00Z",
+      "status": "deprecated"
+    }
+  ]
+}

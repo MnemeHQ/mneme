@@ -1,0 +1,258 @@
+{
+  "run": "run1",
+  "pid": 32612,
+  "upstream_inventory": {
+    "count": 6,
+    "names": [
+      "decision.applicable_to",
+      "decision.get",
+      "decision.propose",
+      "decision.propose_batch",
+      "decision.search",
+      "decision.trace"
+    ],
+    "exact_six": true
+  },
+  "e1": {
+    "direct_get": {
+      "raw": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"record_type\": \"not_found\",\n  \"record_id\": \"ADR-9999\"\n}"
+          }
+        ],
+        "structuredContent": {
+          "record_type": "not_found",
+          "record_id": "ADR-9999"
+        },
+        "isError": false
+      },
+      "normalized": {
+        "record_type": "not_found",
+        "record_id": "ADR-9999"
+      },
+      "is_error": false
+    },
+    "direct_trace": {
+      "raw": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"result_type\": \"trace_not_found\",\n  \"record_id\": \"ADR-9999\",\n  \"missing_links\": [\n    \"record: not found ('ADR-9999' is neither a proposal id nor a canonical decision id)\",\n    \"proposal: not found\",\n    \"canonical_decision: not found\",\n    \"record_type: unknown (no proposal/canonical classification is asserted for an unresolved identifier)\"\n  ]\n}"
+          }
+        ],
+        "structuredContent": {
+          "result_type": "trace_not_found",
+          "record_id": "ADR-9999",
+          "missing_links": [
+            "record: not found ('ADR-9999' is neither a proposal id nor a canonical decision id)",
+            "proposal: not found",
+            "canonical_decision: not found",
+            "record_type: unknown (no proposal/canonical classification is asserted for an unresolved identifier)"
+          ]
+        },
+        "isError": false
+      },
+      "normalized": {
+        "result_type": "trace_not_found",
+        "record_id": "ADR-9999",
+        "missing_links": [
+          "record: not found ('ADR-9999' is neither a proposal id nor a canonical decision id)",
+          "proposal: not found",
+          "canonical_decision: not found",
+          "record_type: unknown (no proposal/canonical classification is asserted for an unresolved identifier)"
+        ]
+      },
+      "is_error": false
+    },
+    "code_mode": {
+      "raw": {
+        "get": {
+          "record_type": "not_found",
+          "record_id": "ADR-9999"
+        },
+        "trace": {
+          "result_type": "trace_not_found",
+          "record_id": "ADR-9999",
+          "missing_links": [
+            "record: not found ('ADR-9999' is neither a proposal id nor a canonical decision id)",
+            "proposal: not found",
+            "canonical_decision: not found",
+            "record_type: unknown (no proposal/canonical classification is asserted for an unresolved identifier)"
+          ]
+        }
+      },
+      "normalized": {
+        "get": {
+          "record_type": "not_found",
+          "record_id": "ADR-9999"
+        },
+        "trace": {
+          "result_type": "trace_not_found",
+          "record_id": "ADR-9999",
+          "missing_links": [
+            "record: not found ('ADR-9999' is neither a proposal id nor a canonical decision id)",
+            "proposal: not found",
+            "canonical_decision: not found",
+            "record_type: unknown (no proposal/canonical classification is asserted for an unresolved identifier)"
+          ]
+        }
+      }
+    },
+    "parity": {
+      "get_differences": [],
+      "trace_differences": []
+    },
+    "typed_not_found": true,
+    "adapter_calls": [
+      {
+        "name": "decision.get",
+        "arguments": {
+          "record_id": "ADR-9999"
+        }
+      },
+      {
+        "name": "decision.trace",
+        "arguments": {
+          "record_id": "ADR-9999"
+        }
+      }
+    ]
+  },
+  "e2": {
+    "result": null,
+    "error": "Code execution failed: Error: Argument validation failed for decision.get: [{\"instancePath\":\"/record_id\",\"schemaPath\":\"#/properties/record_id/type\",\"keyword\":\"type\",\"params\":{\"type\":\"string\"},\"message\":\"must be string\"}]",
+    "stats": {
+      "hostCalls": 1,
+      "resolvedCalls": 0,
+      "failedCalls": 1,
+      "rejectedCalls": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "pendingAtEnd": 0,
+      "deferredDisposed": 1,
+      "cleanupErrors": []
+    },
+    "origin": "host_validation",
+    "kind": "argument_validation_error",
+    "result_returned": false,
+    "upstream_calls": 0,
+    "adapter_log": [],
+    "is_not_found": false
+  },
+  "e3": {
+    "direct": {
+      "raw": {
+        "content": [
+          {
+            "type": "text",
+            "text": "Error executing tool decision.search: 1 validation error for decision_searchArguments\ncanonical_lifecycle_status\n  Input should be 'active', 'superseded', 'deprecated' or 'inactive' [type=literal_error, input_value='bogus', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/literal_error"
+          }
+        ],
+        "isError": true
+      },
+      "is_error": true,
+      "structured_content": null,
+      "text": "Error executing tool decision.search: 1 validation error for decision_searchArguments\ncanonical_lifecycle_status\n  Input should be 'active', 'superseded', 'deprecated' or 'inactive' [type=literal_error, input_value='bogus', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/literal_error"
+    },
+    "code_mode": {
+      "result": null,
+      "error": "Code execution failed: Error: MCP decision.search error: Error executing tool decision.search: 1 validation error for decision_searchArguments\ncanonical_lifecycle_status\n  Input should be 'active', 'superseded', 'deprecated' or 'inactive' [type=literal_error, input_value='bogus', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/literal_error",
+      "stats": {
+        "hostCalls": 1,
+        "resolvedCalls": 0,
+        "failedCalls": 1,
+        "rejectedCalls": 0,
+        "timedOut": false,
+        "interrupted": false,
+        "pendingAtEnd": 0,
+        "deferredDisposed": 1,
+        "cleanupErrors": []
+      },
+      "result_returned": false,
+      "upstream_calls": 1,
+      "adapter_log": [
+        {
+          "seq": 1,
+          "tool": "decision.search",
+          "args": {
+            "canonical_lifecycle_status": "bogus"
+          },
+          "isError": true,
+          "structuredContent": null,
+          "toolResult": null,
+          "text": "Error executing tool decision.search: 1 validation error for decision_searchArguments\ncanonical_lifecycle_status\n  Input should be 'active', 'superseded', 'deprecated' or 'inactive' [type=literal_error, input_value='bogus', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/literal_error"
+        }
+      ]
+    },
+    "origin": "mcp_tool",
+    "kind": "mcp_tool_rejection"
+  },
+  "e4": {
+    "result": null,
+    "error": "Code execution failed: Error: Not connected",
+    "stats": {
+      "hostCalls": 1,
+      "resolvedCalls": 0,
+      "failedCalls": 1,
+      "rejectedCalls": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "pendingAtEnd": 0,
+      "deferredDisposed": 1,
+      "cleanupErrors": []
+    },
+    "origin": "transport",
+    "kind": "transport_failure",
+    "result_returned": false,
+    "upstream_calls": 1,
+    "adapter_log": [],
+    "pid": null,
+    "stderr": "",
+    "cleanup": {
+      "pending_at_end": 0,
+      "client_closed": true
+    }
+  },
+  "e5": {
+    "connected": false,
+    "server_info": null,
+    "error": "MCP error -32000: Connection closed",
+    "pid": null,
+    "stderr": "ERROR: project memory C:\\dev\\mneme\\.worktrees\\feat-cm01-s1a1-e0-local-executor\\validation\\cm01\\s1a-local\\m8\\fixture\\sectionless.json has no authoritative decision_index section.\r\n  Preview the migration:  mneme decision-index migrate --memory C:\\dev\\mneme\\.worktrees\\feat-cm01-s1a1-e0-local-executor\\validation\\cm01\\s1a-local\\m8\\fixture\\sectionless.json\r\n  After reviewing it, apply: mneme decision-index migrate --memory C:\\dev\\mneme\\.worktrees\\feat-cm01-s1a1-e0-local-executor\\validation\\cm01\\s1a-local\\m8\\fixture\\sectionless.json --apply\r\n",
+    "origin": "startup",
+    "kind": "migration_required",
+    "sectionless_sha256_before": "2e149a0e3cc191520d84af5a2f210194dbcde0197a592bd6d0e9c3c62c9482f1",
+    "sectionless_sha256_after": "2e149a0e3cc191520d84af5a2f210194dbcde0197a592bd6d0e9c3c62c9482f1",
+    "still_sectionless": true,
+    "migration_or_index_reported": true,
+    "fallback_handshake": false,
+    "fallback_repository_memory": false
+  },
+  "e6": {
+    "result": null,
+    "error": "Code execution failed: execution exceeded 60ms",
+    "stats": {
+      "hostCalls": 1,
+      "resolvedCalls": 0,
+      "failedCalls": 1,
+      "rejectedCalls": 1,
+      "timedOut": true,
+      "interrupted": true,
+      "pendingAtEnd": 0,
+      "deferredDisposed": 1,
+      "cleanupErrors": []
+    },
+    "origin": "executor",
+    "kind": "executor_timeout",
+    "result_returned": false,
+    "timed_out": true,
+    "cleanup": {
+      "pending_at_end": 0,
+      "host_active_calls": 0,
+      "host_pending_timers": 0
+    }
+  },
+  "stderr": "[10/23/26 21:07:28] INFO     Tool 'decision.search' rejected      server.py:441\r\n                             arguments:                                        \r\n                             ['canonical_lifecycle_status']                    \r\n                    INFO     Tool 'decision.search' rejected      server.py:441\r\n                             arguments:                                        \r\n                             ['canonical_lifecycle_status']                    \r\n"
+}

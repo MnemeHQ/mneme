@@ -1,0 +1,9 @@
+{
+  "meta": {
+    "name": "cm01-m8-sectionless",
+    "description": "Disposable section-less memory for M8 startup refusal. No decision_index section. Not repository project memory."
+  },
+  "items": [],
+  "examples": [],
+  "decisions": []
+}

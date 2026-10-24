@@ -1,0 +1,48 @@
+CM-01 S1-A1 M1 exact commands
+
+Worktree:
+  C:\dev\mneme\.worktrees\feat-cm01-s1a1-e0-local-executor
+
+Directory:
+  validation/cm01/s1a-local/m1
+
+Fixture creation (from m1/empty-cwd, PYTHONPATH=<worktree root>):
+  python -m mneme decision-index migrate --memory <m1>/fixture/work/project_memory.json
+  python -m mneme decision-index migrate --memory <m1>/fixture/work/project_memory.json --apply
+  Copy-Item <m1>/fixture/work/project_memory.json <m1>/fixture/canonical/project_memory.json -Force
+
+M1:
+  npm install --ignore-scripts --no-audit --no-fund
+  npm run m1
+
+Observed:
+  npm install: 95 packages added
+  npm run m1: pass=true, failed=[]
+  M1-HANDSHAKE-1: true
+  M1-HANDSHAKE-2: true
+  M1-SIX-TOOLS-1: true
+  M1-SIX-TOOLS-2: true
+  M1-REPEAT-INVENTORY: true
+  M1-NO-TOOL-CALLS: true
+  M1-NO-MUTATION: true
+  M1-M4: true
+
+Pinned versions:
+  Node 24.13.1
+  npm 11.8.0
+  @modelcontextprotocol/sdk 1.32.2
+  zod 4.6.7
+  Python 3.12.10
+  mneme 0.10.0
+  mcp 2.2.0
+
+Fixture hashes:
+  pre_migration: 1923f12bdef0cec4a3c6bc56704e8e03f0d8531313574bff0ae010b5ce2a2a5c
+  canonical:     8f73429e70e04a6876b965bb00a1777fc90409f9da2889c72dab9ac26b9621ea
+
+Evidence:
+  evidence/m1.json
+  evidence/run1-tools.json
+  evidence/run2-tools.json
+  evidence/run1-stderr.log
+  evidence/run2-stderr.log
