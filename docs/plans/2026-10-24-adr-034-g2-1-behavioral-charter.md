@@ -5,6 +5,18 @@
 authorize **no implementation**. Implementation would also need the
 separate, reviewed `[layer1-freeze]` amendment in §9.
 
+**Revision 2** (2026-10-24) responds to the architecture review of draft 1,
+which was ACCEPT WITH REQUIRED CORRECTIONS:
+
+- **G2C-F1:** strict rules tying the subject kind to each matcher reason,
+  plus an explicit expected-input contract for every consumer of
+  `assess_verdict` (§5).
+- **G2C-F2:** a byte-preserving carrier and an exact byte contract. Invalid
+  UTF-8 is an operational error (§3.2, §3.5, §4.1), and CRLF, LF,
+  byte-order-mark and non-ASCII cases are pinned (§8.C).
+- **G2C-F3:** the pinned host version is mandatory in the host-event record
+  (§6.2).
+
 **Repository baseline examined:** `MnemeHQ/mneme` `main` at
 `adf50933d0beac255ac2a134e00ee13d40442302`. Line numbers refer to
 `0d367fc6`, where they were verified for the G2 proposal. The files cited
@@ -75,7 +87,9 @@ amendment (§9).
 | G1 binding guard | Runs only under `source_file is not None` (`cli.py:646-658`) | The new input has its own guard (§3.4) |
 | Hook materialization | `_read_current(missing_ok=True)` collapses "missing", "unreadable" and "not UTF-8" into `""` (`hook.py:93-107`). An empty existing file also diffs as new (`hook.py:156`) | Routing uses a separate absence probe and never relies on `_read_current` (§4.1) |
 | Hook memory selection | Starts at `Path(target).resolve().parent` (`hook.py:759-772`) | Unchanged. The probe resolves the same target |
-| Hook trust validation | `_numeric_trace_problem` / `_numeric_record_problem` check matcher records and subject digest agreement (`hook.py:408-519`). Nothing checks that a `RECOGNIZED` record comes with a complete-source subject kind | Add the kind and join checks (§5) |
+| Hook trust validation | `_numeric_trace_problem` / `_numeric_record_problem` check matcher records and subject digest agreement (`hook.py:408-519`). Nothing checks that a matcher status or reason agrees with the subject kind. The non-source record is required only for input with no target path (`hook.py:399-426`) | Add the kind/reason coherence and join checks (§5) |
+| Shared validator | `assess_verdict(stdout, returncode, requested_mode)` (`hook.py:621-647`) has no expected-input parameter. It is imported by the Agent SDK adapter (which LangChain uses), `antigravity`, `codex_cli` (gate and stop audit), `hermes` and `kiro`. Most of these also render `format_applicability_reason` | Add a keyword-only expected-input contract whose default keeps every existing caller's coherent results unchanged (§5). Routed wording is changed only through a caller-side option (§4.3) |
+| Hook carrier encoding | The carrier is written in text mode (`NamedTemporaryFile(mode="w", encoding="utf-8")`, `hook.py:794-798`), and `--input` reads it with `read_text` (`cli.py:618`). On Windows, LF becomes CRLF on disk, and a CRLF in the content becomes CR CR LF, which reads back as two newlines. Content containing an unencodable lone surrogate raises inside `_invoke_check` | Routed events use a byte-preserving binary carrier (§4.1). The unrouted path is unchanged. The CRLF doubling is a pre-existing defect, recorded for a separate fix and not changed here (§7) |
 | M-a | A trusted, coherent violation stays actionable while evaluation is incomplete (`hook.py:522-533`, `917-923`) | Unchanged |
 | Availability | Under an AUTHORIZED declaration, `INCOMPLETE` routes to `EVALUATION_INCOMPLETE` (`availability.py:154-197`) | Unchanged (G2-O5) |
 | Benchmark seam precedent | `MNEME_HOOK_CHECK_TRANSPORT` is benchmark-only and unset by default (`hook.py:218-227`) | Model for the §6.3 evidence seam |
@@ -92,6 +106,11 @@ change. That breaks F3 parity. §3.5 prevents this.
 **Hazard H3: trust by assertion.** A hook-side absence check must never be
 what makes a result complete. Only the checker's own verification counts
 (G2-O3). §3.2 and §5 enforce this.
+
+**Hazard H4: digest drift.** A text-mode carrier would make the digest of the
+bytes on disk differ from the SHA-256 of the `Write` content, and would
+change the text the matcher sees. That breaks the §5 digest join. §4.1
+requires a binary carrier.
 
 ## 3. Input and invocation contract
 
@@ -124,9 +143,24 @@ mneme check --memory .mneme/project_memory.json \
    **Consequence of precondition 2:** a new file in a directory that does
    not exist yet fails it, so its write stays on the legacy path. This is
    accepted, conservative noncoverage (§7).
-3. **When a precondition fails, the result is legacy.** The run is
+
+   **Precondition 5 is handled separately (G2C-F2, ruling G2C-O6).** If the
+   carrier is not valid UTF-8, the result is an **operational error**: an
+   `_error_exit`, a non-verdict exit, and no payload, so it is untrusted
+   under ADR-033 §2.
+   - It is never a legacy fallback and never PASS.
+   - This matches `--source-file` (`cli.py:584-586`).
+   - The legacy `--input` path has no defined result for undecodable text: it
+     raises from `read_text`. So there is no legacy verdict to stay identical
+     to.
+   - This realizes ADR-034 §6a's "unverified" requirement in the stricter
+     direction: no complete-source claim, and no result.
+   - The hook never sends such a carrier (§4.1).
+3. **When preconditions 1–4 fail, the result is legacy.** The run is
    evaluated exactly as `--input <same carrier> --target-path <same target>`
-   would be today, and its output is byte-identical to that.
+   would be today, and its output is byte-identical to that. Text is read
+   through the same strict UTF-8, universal-newline decoding as
+   `read_text`.
    - Numeric rules become `INCOMPLETE_SOURCE_INPUT` wherever they are
      `APPLIED`.
    - This is not an error. ADR-018 already checks a missing or unreadable
@@ -144,8 +178,18 @@ mneme check --memory .mneme/project_memory.json \
    This guard is implemented for this input. It is not reached through the
    `source_file` branch.
 5. **Subject and legacy parity (ADR-034 §7a).** The checker reads the
-   carrier once, hashes the exact bytes with SHA-256 and evaluates that
-   snapshot. It never imports or executes it.
+   carrier **once, as bytes** (`read_bytes`) and never imports or executes
+   it. Both paths below derive from that one read.
+   - **Complete-source path** (a numeric rule is `APPLIED`):
+     - the subject digest is the SHA-256 of those exact bytes;
+     - the evaluated text is their strict UTF-8 decoding, with no newline
+       translation and no byte-order-mark stripping, as with G1
+       `--source-file`;
+     - the matcher and the literal rules both evaluate that same text.
+   - **Legacy path** (no numeric rule `APPLIED`, or preconditions 1–4
+     failed): the text is decoded exactly as `read_text(encoding="utf-8")`
+     would decode it, so the result is byte-identical to `--input` on the
+     same carrier.
    - **If at least one `FORBID_NUMERIC_ABOVE` rule is `APPLIED` at the
      governed path,** numeric evaluation uses complete-source semantics, and
      the payload's `subject` record is:
@@ -188,7 +232,21 @@ following hold. Otherwise the event takes today's path unchanged.
 - `_resolve_target` yields an absolute target;
 - the target's suffix is `.py`;
 - a dedicated probe, `os.lstat(target)`, raises `FileNotFoundError`. This
-  probe never uses `_read_current`.
+  probe never uses `_read_current`;
+- `tool_input["content"].encode("utf-8")` succeeds under strict errors.
+  Content with a lone surrogate is not routed, and keeps today's behavior on
+  the unrouted path unchanged.
+
+**Byte-preserving carrier (G2C-F2).** For a routed event, the hook writes
+exactly `content.encode("utf-8")` to the carrier in **binary** mode, with no
+newline translation and no added byte-order mark. The SHA-256 of those bytes
+is the join digest (§5.2 rule 4, §6.2).
+
+The unrouted path keeps its text-mode carrier byte for byte (§2, §7). On
+Windows, a routed event whose content contains CR may therefore see
+different text than today's text-mode path would give it. Today's path
+doubles CRLF line breaks. This difference is deliberate, limited to routed
+events, and pinned by §8.C.10.
 
 The hook's probe is advisory: it only selects which call to make. The checker
 re-establishes every precondition (§3.2), so the hook's probe never makes a
@@ -230,40 +288,79 @@ The `format_applicability_reason` diagnostic, which currently says
 - on a routed event, numeric rules are evaluated on the proposed new file;
 - on an unrouted event, it keeps the current text.
 
-This is an output change, and its scope is limited to events that have a
-numeric record.
+`format_applicability_reason` is shared by every integration listed in §2.
+The routed wording is therefore selected by a keyword-only caller option,
+whose default is today's text. It is never a global replacement. Only the
+Claude Code hook's routed calls pass the option, so every other
+integration's output stays byte-identical.
 
-## 5. Consumer trust (hook)
+## 5. Consumer trust (all `assess_verdict` consumers)
 
-The following additions to `_verdict_inconsistency` /
-`_numeric_record_problem` are required. Each violation makes the result
-**untrusted**, so ADR-033 handling applies and it is never a verdict:
+Every rule below makes a result **untrusted**: it is never a verdict, and
+ADR-033 handling applies. A payload that already conforms today stays
+trusted and unchanged. These rules reject only contradictory payloads.
 
-1. **Kind/status coherence.** A numeric trace with `matcher_status`
-   `RECOGNIZED` or `PARTIAL` requires `subject.input_kind` to be
-   `complete_source_file` or `proposed_new_source`.
-   - A `RECOGNIZED` or `PARTIAL` record on an `unverified_input` subject is
-     contradictory.
-   - This rule applies to every hook call, not just routed ones.
-2. **Requested-kind coherence.** If the hook sent `--proposed-new-file`, the
-   subject kind must be either:
-   - `proposed_new_source`, with at least one `APPLIED` numeric trace; or
-   - the legacy record (`unverified_input`, or no subject), with no
-     `APPLIED` numeric trace that has a non-`INCOMPLETE_SOURCE_INPUT` status.
+### 5.1 Expected-input contract (G2C-F1)
 
-   Anything else is contradictory.
-3. **Digest join.** For `proposed_new_source`, `subject_sha256` must equal
-   the SHA-256 of the UTF-8 encoding of the `tool_input["content"]` the hook
-   wrote to the carrier. It must also equal every numeric trace's
-   `subject_sha256`.
-4. **Path join.** For `proposed_new_source`, the subject's `target_path` must
-   equal the hook's resolved target (compared under `os.path.normcase`), and
+`assess_verdict` gains a keyword-only `expected_input` parameter, with values
+`"input"` (the default) and `"proposed_new_file"`. Its spelling is fixed in
+implementation; the semantics are fixed here.
+
+| `expected_input` | Acceptable `subject.input_kind` |
+|---|---|
+| `"input"` (default; every existing caller) | no `subject`, or `unverified_input` |
+| `"proposed_new_file"` (Claude Code hook, routed events only) | no `subject`, `unverified_input` (legacy result, §3.3/§3.5), or `proposed_new_source` |
+
+**Any other kind is untrusted.** That includes `proposed_new_source` or
+`complete_source_file` arriving at a default caller.
+
+**Who uses the default.** No current consumer sends `--source-file` or
+`--proposed-new-file`. So the Agent SDK (and LangChain), `antigravity`,
+`codex_cli`, `hermes`, `kiro` and the hook's own unrouted, `Stop`, Bash and
+rename calls keep the default. They get exactly today's result for every
+payload they can legitimately receive.
+
+**Mechanism for unrequested payloads.** An Agent SDK or LangChain caller
+that receives an unrequested `proposed_new_source` payload rejects it
+through this default. That is the mechanism the draft lacked.
+
+### 5.2 Subject-kind / matcher-reason coherence (G2C-F1)
+
+These rules apply on every call, whatever `expected_input` is. They cover
+every `FORBID_NUMERIC_ABOVE` trace with `outcome == "APPLIED"`.
+
+1. **Unverified subject: only the non-source record.** On an
+   `unverified_input` subject, every such trace must carry exactly the
+   non-source record:
+   - `matcher_status` `MATCHER_UNEVALUATED`;
+   - `matcher_outcome` `UNEVALUATED`;
+   - `primary_reason` `INCOMPLETE_SOURCE_INPUT`;
+   - `unknown_sources` exactly
+     `[{"kind": "input", "line": null, "reason": "INCOMPLETE_SOURCE_INPUT"}]`.
+
+   That covers both input with a declared target path and input without
+   one. It extends today's no-target check (`hook.py:399-426`).
+
+   **What is rejected.** Unverified input can never claim a source-specific
+   evaluation. That includes `RECOGNIZED`, `PARTIAL`, and any source-derived
+   reason such as `PARSE_FAILURE` or `SOURCE_NOT_FOUND`.
+2. **Complete-source subject: `INCOMPLETE_SOURCE_INPUT` is forbidden.** On a
+   `complete_source_file` or `proposed_new_source` subject, no trace may
+   carry `INCOMPLETE_SOURCE_INPUT`, either as the primary reason or among
+   the unknown sources.
+3. **Requested-kind coherence.** For `expected_input="proposed_new_file"`:
+   - `proposed_new_source` requires at least one `APPLIED` numeric trace;
+   - a legacy result (`unverified_input`, or no subject) must satisfy
+     rule 1.
+4. **Digest join.** For `proposed_new_source`, `subject_sha256` must equal
+   the SHA-256 of the exact carrier bytes the hook wrote (§4.1). It must
+   also equal every numeric trace's `subject_sha256`.
+5. **Path join.** For `proposed_new_source`, `subject.target_path` must equal
+   the hook's resolved target under `os.path.normcase`, and
    `absence_verified` must be `true`.
 
-The Agent SDK and LangChain validators are unchanged. They never send the new
-input. If one of them receives a `proposed_new_source` payload it did not
-request, it must treat that payload as untrusted rather than as a verdict. A
-regression test pins this (§8.C.6).
+Rules 4 and 5 need hook-side knowledge, so the hook checks them after
+`assess_verdict`, on routed events.
 
 ## 6. Evidence
 
@@ -281,13 +378,25 @@ The hook builds one record per routed event, covering every field ADR-034
 §7a requires:
 
 - **Control:** `surface` (`"claude_code.PreToolUse"`), Mneme version, and
-  the host version, when the pinned host exposes it.
+  the **pinned host version, which is mandatory** (G2C-F3, ADR-034 §7a).
+  - The event envelope is not relied on to carry the host version.
+  - The version comes from the validation context. Before the run, the §8
+    harness establishes the pinned Claude Code binary's identity: its
+    reported version and the SHA-256 of the executable. The harness supplies
+    that identity to the record, for example through a companion
+    validation-only variable.
+  - The validation report repeats the same identity.
+  - If the host identity is missing, cannot be established, or differs from
+    the pinned identity, the record **cannot** support "relevant enforcement
+    observed". Evidence stays at "execution observed" or below.
+  - Recording this identity does not make it an authenticated attestation.
 - **Event:** `tool_name`, `file_path` and `cwd` as received, plus every
   host-supplied event identifier present in the envelope (for example
   `session_id`, and a tool-call id). Which identifiers the pinned host
   supplies is established by the §8.B live test, never assumed.
-- **Join:** the SHA-256 of the UTF-8 `tool_input["content"]`. This must equal
-  the checker's subject digest (§5.3).
+- **Join:** the SHA-256 of the exact carrier bytes, which are
+  `tool_input["content"].encode("utf-8")` (§4.1). This must equal the
+  checker's subject digest (§5.2 rule 4).
 - **Rule and outcome:** for each applied numeric rule, `rule_id`,
   `decision_version_id`, governed path, applicability, matcher status and
   reason, and the hook outcome (`refused` / `proceeded` / `deferred`).
@@ -338,7 +447,13 @@ observed" only when §6.2 binds it.
   in-scope file that lacks a declared source is still refused as
   `EVALUATION_INCOMPLETE`. The F2 activation restriction stays in force;
 - **Hook failure:** what the host does when the hook fails to launch,
-  crashes or times out.
+  crashes or times out;
+- **Unencodable content:** `Write` content with a lone surrogate is not
+  routed (§4.1);
+- **Pre-existing carrier defect (not fixed here):** on Windows, the unrouted
+  path's text-mode carrier doubles CRLF line breaks (§2). It is recorded for
+  a separate, reviewed fix, because changing it here would alter legacy
+  hook behavior outside this slice.
 
 ## 8. Acceptance tests and sequencing
 
@@ -357,7 +472,9 @@ It establishes:
 - that a `Write` to a new path in an existing directory reaches `PreToolUse`
   with the complete `content`;
 - that exit 2 leaves the target absent;
-- what the host does for a missing parent directory.
+- what the host does for a missing parent directory;
+- the pinned host identity used by §6.2: its reported version and the
+  SHA-256 of the executable.
 
 It must not use the §8.D corpus.
 
@@ -369,14 +486,16 @@ It must not use the §8.D corpus.
    - numeric rules that are all `EXCLUDED`;
    - numeric rules that are all `UNKNOWN`;
    - any failed precondition (existing file, existing empty file, symlink,
-     dangling link, link component, missing parent, out of root, non-`.py`,
-     non-UTF-8 carrier).
+     dangling link, link component, missing parent, out of root, non-`.py`).
 
    Existing `--input` and `--source-file` goldens stay unchanged.
 2. **Preconditions.** One positive case and one negative case for each of
    the §3.2 preconditions, including a permission error on `lstat` (it must
    not count as absence), Windows case-insensitive normalization, and a
-   missing `--target-path` (an operational error).
+   missing `--target-path` (an operational error). An invalid UTF-8 carrier,
+   such as a lone continuation byte or an overlong encoding, gives an
+   operational error with no payload, never a fallback verdict. Existing
+   `--input` and `--source-file` behavior on invalid UTF-8 is unchanged.
 3. **Binding guard.** An injected applicability `input_path` mismatch gives a
    non-verdict exit with no payload.
 4. **Numeric outcomes on `proposed_new_source`.** `EXCEEDS` → FAIL;
@@ -391,10 +510,18 @@ It must not use the §8.D corpus.
    - H1: unreadable or non-UTF-8 existing files are never routed.
    - Race: a file created between the hook's probe and the checker's gives
      the legacy result.
-6. **Consumer trust (§5).** Each of rules 1–4 is violated in turn, giving an
-   untrusted result. A `RECOGNIZED` record on an unverified subject is
-   rejected on every call. The Agent SDK and LangChain treat an unrequested
-   `proposed_new_source` payload as untrusted.
+6. **Consumer trust (§5).**
+   - **Expected-input contract (§5.1).** Each acceptable and unacceptable
+     subject kind, under both `expected_input` values. A
+     `proposed_new_source` or `complete_source_file` payload sent to each
+     default consumer is untrusted: the Agent SDK, LangChain, `antigravity`,
+     `codex_cli` gate and stop audit, `hermes` and `kiro`. Every existing
+     coherent payload golden for those consumers is unchanged.
+   - **Coherence rules (§5.2).** Rules 1–5 are each violated in turn. On an
+     `unverified_input` subject, with and without a declared target,
+     `RECOGNIZED`, `PARTIAL`, `PARSE_FAILURE`, `SOURCE_NOT_FOUND`,
+     `AMBIGUOUS_BINDING` and `UNRECOGNIZED_FORM` are each rejected. On a
+     complete-source subject, `INCOMPLETE_SOURCE_INPUT` is rejected.
 7. **Hook outcomes.** Strict mode blocks with exit 2 and the numeric
    contract reason. Warn mode defers. Unevaluated results under availability
    `open` proceed with a diagnostic. Under AUTHORIZED `closed`, the refusal
@@ -405,10 +532,30 @@ It must not use the §8.D corpus.
    - Mismatched or missing records never count as relevant enforcement
      observed.
    - The seam is inert when unset (if G2C-O2 adopts it).
+   - A record with a missing, unestablished or mismatched host identity never
+     supports relevant enforcement observed (§6.2).
    - No diagnostic contains source content.
-9. **Untouched surfaces.** Stop, Bash, the Agent SDK and LangChain gate
-   paths, `ConflictDetector`, `DecisionRetriever` and the M4 matcher modules
-   have no diff.
+9. **Untouched surfaces.** These have no diff: Stop, Bash,
+   `ConflictDetector`, `DecisionRetriever`, the M4 matcher modules, and the
+   adapters of the other integrations. Those integrations change only
+   through the shared validator's default-preserving parameter (§5.1) and the
+   default-preserving `format_applicability_reason` option (§4.3).
+10. **Byte contract (G2C-F2).** Cases, run on Windows and POSIX for both
+    `--proposed-new-file` and the routed hook:
+    - LF-only, CRLF, a lone CR, and mixed line endings;
+    - a leading UTF-8 byte-order mark, which gives `PARSE_FAILURE` on the
+      pinned CPython 3.12.10, never a clean result;
+    - non-ASCII identifiers, strings and comments;
+    - an empty file.
+
+    For each case:
+    - the carrier bytes equal `content.encode("utf-8")`;
+    - the subject digest equals their SHA-256;
+    - the matcher sees the strict decoding with no newline translation;
+    - parity cases still match `--input` on the same carrier;
+    - content with a lone surrogate is not routed, and its unrouted behavior
+      matches `main`;
+    - the unrouted text-mode carrier stays byte-identical to `main`.
 
 **D. Independent validation (proposal §6 scope, now frozen here).**
 
@@ -480,10 +627,22 @@ a bounded authorization.
 |---|---|---|
 | G2C-O1 | Transport spelling (completes G2-O6) | `--proposed-new-file <carrier>`, which requires `--target-path` and is mutually exclusive with `--input` and `--source-file` |
 | G2C-O2 | Where the host-event record goes | The validation-only `MNEME_HOOK_EVIDENCE_LOG` seam, inert by default (§6.3). Alternative: capture by an external harness only, with no hook change |
-| G2C-O3 | Precondition failure under the new input | Legacy-equivalent evaluation, byte-identical (§3.3), not an operational error |
+| G2C-O3 | Precondition failure under the new input | For preconditions 1–4: legacy-equivalent evaluation, byte-identical to `--input` on the same carrier (§3.3), not an operational error |
 | G2C-O4 | Missing parent directory | Not routed; stated noncoverage (§3.2, §7) |
-| G2C-O5 | Hook diagnostic wording for routed events | Update `format_applicability_reason` only on routed events that have numeric records (§4.3) |
+| G2C-O5 | Hook diagnostic wording for routed events | Update `format_applicability_reason` only on routed events that have numeric records, through a default-preserving caller option (§4.3) |
+| G2C-O6 | Invalid UTF-8 carrier (precondition 5) | An operational error with no payload, as for `--source-file`. Never a legacy fallback or PASS (§3.2) |
 
 ## 11. Review history
 
-- Draft 1 (2026-10-24): PROPOSED, not yet reviewed.
+- **Draft 1** (2026-10-24): PROPOSED.
+- **Review of draft 1: ACCEPT WITH REQUIRED CORRECTIONS.**
+  - G2C-F1: subject-kind and reason coherence; expected-input contract.
+  - G2C-F2: byte-preserving carrier; invalid-UTF-8 semantics; pinned byte
+    cases.
+  - G2C-F3: mandatory pinned host identity.
+
+  Recommended dispositions: G2C-O1, O4 and O5 accept; O2 accept subject to
+  F3; O3 accept subject to F2.
+- **Revision 2** (2026-10-24): resolves F1–F3, adds G2C-O6, and extends §5.1
+  to every `assess_verdict` consumer (`antigravity`, `codex_cli`, `hermes`
+  and `kiro`, in addition to the Agent SDK and LangChain). Still PROPOSED.
