@@ -103,6 +103,20 @@ if phase AUTHORIZED; then
               "D-5 Edit PASS" "H-1 Edit RECORDED"; do
     run $case
   done
+  # D-4: the settings env exempts Claude Code's API host and carries the GIT_*
+  # redirect; the probe still passes, so the verifier ignored both.
+  if "$PY" -E -P -c "
+import json, sys
+env = json.load(open(sys.argv[1], encoding='utf-8'))['settings']['env']
+assert env['HTTPS_PROXY'] == env['HTTP_PROXY'] == env['ALL_PROXY'] == 'http://127.0.0.1:9', env
+assert env['NO_PROXY'] == env['no_proxy'] == 'api.anthropic.com', env
+assert env['GIT_CONFIG_COUNT'] == '1' and env['GIT_CONFIG_KEY_0'] == 'url.https://blackhole.invalid/.insteadOf', env
+assert env['GIT_CONFIG_VALUE_0'], env
+" "$(cygpath -w "$ROOT/live/D-4-Write-1/setup.json" 2>/dev/null || echo "$ROOT/live/D-4-Write-1/setup.json")"; then
+    echo "ok   D-4 settings env: proxies, NO_PROXY api.anthropic.com, GIT_CONFIG_* redirect"
+  else
+    echo "FAIL D-4 settings env"; fail=1
+  fi
 fi
 # Negative controls: the classifier must not pass a host that ignores the hook,
 # or an agent that never makes the call. (C3_STUB_* pass through the runner.)
