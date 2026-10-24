@@ -202,6 +202,7 @@ GATE_BENCHMARK_UNIT_PATHS: tuple[str, ...] = (
 
 GATE_SHIPPED_PATHS: tuple[str, ...] = (
     "tests/test_cursor_generate.py",
+    "tests/usage",
     "tests/integrations/claude_code",
     "tests/integrations/codex_cli",
     "tests/integrations/kiro",
