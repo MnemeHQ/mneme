@@ -6,6 +6,18 @@ owner accepts it, and acceptance would be recorded by folding §4 into
 ADR-034 as §6a and §7a with an `**Amended:**` line, following the ADR-031 §8a
 precedent (#490).
 
+**Revision 2** (2026-10-24), per the architecture review of revision 1
+(ACCEPT WITH REQUIRED CORRECTIONS):
+
+- **F1:** a proposed-source checker result is separated from evidence that a
+  real host `Write` was governed (§3, §6a "Evidence class", §7a "Host-event
+  binding").
+- **F2:** the target-binding invariant is stated for the new kind itself,
+  rather than inherited from the G1 `--source-file` branch (§6a "Target
+  binding").
+- **F3:** exact legacy parity applies whenever no numeric rule is `APPLIED`.
+  The additive-`subject` exception is withdrawn (§7a "Legacy parity").
+
 This is the G2-0 deliverable: a read-only, source-anchored decision on
 whether the Claude Code new-file `Write` path can carry a trusted
 proposed-source contract, and the exact boundary of that claim.
@@ -91,6 +103,24 @@ G1 claim and nearly certifies itself:
   never assert it.
 - The kind never claims that the bytes will land on disk, or that they did.
 
+**What absence does not prove (F1).** A verified-absent target says nothing
+about where the bytes came from. Any caller can submit any bytes for an
+absent path.
+
+A `proposed_new_source` result is therefore an evaluation of a hypothetical
+subject. On its own, it is never evidence that a real host operation was
+governed. ADR-029 keeps these apart:
+
+- **Checker result:** "these bytes, at P, would or would not violate". It is
+  valid for any caller.
+- **Relevant enforcement observed** (ADR-029 §2): a real Claude Code `Write`
+  was evaluated and allowed or refused. This needs the host-event binding of
+  §7a, made by the enforcing control itself, and joined to the checker
+  subject by digest.
+
+A standalone checker invocation, including a manual or test run of the same
+flag, never upgrades to the second claim.
+
 ## 4. Proposed amendment text (to become ADR-034 §6a and §7a)
 
 ### §6a. Proposed new-file source (amendment, proposed 2026-10-24)
@@ -122,8 +152,25 @@ is unverified and §6's `INCOMPLETE_SOURCE_INPUT` applies.
 **Subject.** The subject is the UTF-8 encoding of the complete proposed text,
 exactly as the checker received it. Its SHA-256 is the subject digest. It is
 evaluated once by the unchanged M4 matcher, without import or execution.
-Applicability is evaluated at the governed target path, and the
-source-file mismatch guard (`cli.py:646-658`) applies unchanged.
+
+**Target binding (F2).** This invariant belongs to the
+`proposed_new_source` kind itself. It is not inherited from the G1
+`--source-file` branch, whose guard (`cli.py:646-658`) runs only when
+`source_file is not None` and would never run on the new path.
+
+The subject records one governed path: the policy-root-relative
+normalization of the absence-verified target from precondition 3. ADR-020
+applicability for every typed rule must be evaluated against exactly that
+governed path. Every applicability record that carries an `input_path` must
+equal it.
+
+Any mismatch, or a governed path that cannot be established, is an
+operational error (non-verdict exit, untrusted under ADR-033 §2). It is never
+a verdict and never a fallback to unverified input.
+
+**Evidence class (F1).** The subject record names `proposed_new_source` as
+its input kind. On its own, it is a checker result under §3, never "relevant
+enforcement observed".
 
 **Outcomes.** §4 applies unchanged, including O2:
 
@@ -153,10 +200,51 @@ delta path, and its numeric rules stay `INCOMPLETE_SOURCE_INPUT`:
 The hook's "unreadable `Write` target is new" shortcut (B5) stays in force
 for literal rules, but it never establishes §6a absence.
 
-**`FORBID_LITERAL` parity.** For a verified-absent target, the text checked
-for literal rules is identical to today's introduced content (B6), at the
-same target path. Literal verdicts, applicability and payloads must stay
-byte-identical apart from the additive `subject` record.
+**Legacy parity (F3).** The G1 freeze requires byte-identical
+`mneme.check/v1` payloads and exit codes for checks with no numeric rule
+(`layer1-freeze-e73ff7d.md:903-904`). G2 keeps this guarantee and makes it
+stricter: parity holds whenever no `FORBID_NUMERIC_ABOVE` rule is
+**`APPLIED`** at the governed target.
+
+In that case, the routed check must produce exactly the stdout payload and
+exit status of the legacy invocation: the same text as `--input`, with
+`--target-path` set to the same target. This covers each of these cases:
+
+- memory with no numeric rule (no `subject` record, as today);
+- numeric rules that are all `EXCLUDED` or `UNKNOWN` at the target (today's
+  unverified `subject` record, unchanged).
+
+Unlike G1's `--source-file`, which emits a `subject` record even when no
+numeric rule exists (`cli.py:407-412`), the G2 path never adds or relabels a
+`subject` record unless a numeric rule is applied.
+
+Literal-rule verdicts are unaffected by construction, because for a
+verified-absent target the checked text is identical to today's introduced
+content (B6). Any departure from parity would be a separate reviewed
+behavioral change. None is proposed.
+
+**Host-event binding (F1).** A claim that a real `Write` was governed needs
+one record, made by the hook as the enforcing control, that binds all of the
+following:
+
+- **Control provenance:** surface (Claude Code `PreToolUse` hook), Mneme
+  version, and the pinned host version.
+- **Host event:** `tool_name` `Write`, the `file_path` and `cwd` as received,
+  and the host-supplied event identifiers that the pinned host provides (for
+  example `session_id`, and a tool-call id where present), as established by
+  the live test in §6.
+- **Join:** the SHA-256 of the UTF-8 `tool_input.content` the hook passed to
+  the checker. It must equal the checker's subject digest.
+- **Rule and outcome:** rule ID, decision version, governed path,
+  applicability, matcher status, and the hook's allow/refuse outcome.
+
+Without this record, or if any field mismatches, evidence stays at
+"execution observed" or below (ADR-029 §2, fail closed).
+
+This record is the control's own provenance, not an authenticated host
+attestation. No ADR-025 attestation is claimed. Its representation is left to
+the G2-1 charter, with no new persistence, telemetry or event system
+(ADR-029 §3, ADR-033 §7).
 
 **Verdict handling.** The existing trust validation (`assess_verdict`), M-a
 precedence (B7) and strict/warn behavior apply unchanged:
@@ -225,7 +313,10 @@ proposed source blocks the write before mutation, in strict mode.
 | Target out of scope (ADR-020 `EXCLUDED`) | No numeric enforcement; applicability recorded |
 | Target exists, is empty, unreadable, a symlink, behind a link component, outside the root or not `.py` | Not `proposed_new_source`; today's delta behavior, byte-for-byte |
 | Existing `FORBID_LITERAL` rules | No behavioral or payload regression |
+| No numeric rule `APPLIED` (none in memory, or all `EXCLUDED` / `UNKNOWN`) | stdout payload and exit status byte-identical to the legacy `--input` + `--target-path` invocation (F3) |
+| Applicability evaluated at a path other than the subject's governed path | Operational error; never a verdict, never a fallback (F2) |
 | Evidence | rule ID, decision version, subject digest, governed path, input kind and outcome all bound to one evaluation (ADR-029 §2) |
+| Host-event binding | Hook record joins host event fields to the checker subject digest. A standalone checker run, or a digest mismatch, never counts as relevant enforcement observed (F1) |
 
 **Proposed acceptance criteria:**
 
@@ -251,8 +342,8 @@ by a pinned live test before any support claim, as in ADR-033 §6.
 |---|---|---|
 | G2-O1 | First-slice surface | Verified-absent `Write` only. Existing-empty files excluded (B6) |
 | G2-O2 | Input-kind name | `proposed_new_source`, never reported as `complete_source_file` |
-| G2-O3 | Who establishes absence | The checker, at evaluation time. Never the caller |
-| G2-O4 | Routing | Single path: replaces the delta call for qualifying events. No double invocation |
+| G2-O3 | Who establishes absence | The checker, at evaluation time. Never the caller. Submitted bytes are a hypothetical subject; only the hook's host-event binding supports "enforcement observed" (F1) |
+| G2-O4 | Routing | Single path: replaces the delta call for qualifying events, with no double invocation. Exact legacy parity when no numeric rule is `APPLIED` (F3); its own target-binding invariant (F2) |
 | G2-O5 | Availability | ADR-033 unchanged. Score under `open`. The F2 restriction stays for `closed` |
 | G2-O6 | Flag or payload spelling | Deferred to the G2-1 charter, as ADR-034 §6 deferred the G1 spelling |
 
