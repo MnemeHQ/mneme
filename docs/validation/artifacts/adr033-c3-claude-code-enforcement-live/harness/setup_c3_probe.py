@@ -161,9 +161,17 @@ def main() -> int:
             git("config", "http.proxy", "http://127.0.0.1:9", cwd=repo)
         elif step == "settings_env_proxy":
             settings = hook_settings(command, timeout)
+            # Claude Code applies settings env to itself too, so its API host is
+            # exempted (NO_PROXY), or the model never runs (first live D-4 run).
+            # GIT_CONFIG_* points Git at a blackhole; the verifier must ignore both.
             settings["env"] = {"HTTPS_PROXY": "http://127.0.0.1:9",
                                "HTTP_PROXY": "http://127.0.0.1:9",
-                               "ALL_PROXY": "http://127.0.0.1:9"}
+                               "ALL_PROXY": "http://127.0.0.1:9",
+                               "NO_PROXY": "api.anthropic.com",
+                               "no_proxy": "api.anthropic.com",
+                               "GIT_CONFIG_COUNT": "1",
+                               "GIT_CONFIG_KEY_0": "url.https://blackhole.invalid/.insteadOf",
+                               "GIT_CONFIG_VALUE_0": origin_url}
         elif step == "remove_hook":
             settings = {"hooks": {}}
         elif step == "hook_missing_command":
