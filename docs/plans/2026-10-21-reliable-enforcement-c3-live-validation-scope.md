@@ -315,10 +315,10 @@ fixture change and no run.
     merge commits, who merged them, the merge order, and the attestation
     (human-attested, not independent review);
   - **a content match:** the R-3 local declaration, parsed, equals the
-    declaration file at the phase 3 (REVOKED) fixture merge commit. That shows
-    the rolled-back copy is a declaration that was actually reviewed and
-    merged, not one constructed by the harness. Anyone can check it against
-    the public fixture.
+    declaration file at the phase 3 (REVOKED) fixture merge commit. This
+    demonstrates that the harness-generated rollback copy matches, as a parsed
+    object, a declaration that previously existed in the public fixture's
+    merged history. Anyone can check it against the public fixture.
 - **Preserved, not rerun or reinterpreted.**
   - R-1 (revalidated 4/4, #620), R-2 and the P-1/P-3/P-4 controls (16/16,
     #622), and the F-R2 record (#616) stand as recorded on the one-event
