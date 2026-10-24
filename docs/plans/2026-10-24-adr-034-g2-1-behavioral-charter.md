@@ -3,7 +3,7 @@
 **Date:** 2026-10-24
 **Status:** **ACCEPTED** by the owner on 2026-10-24: G2C-O1 to G2C-O6, as in
 `9a0c886a`, after the architecture review of revision 2. The prerequisite
-ADR-034 amendment #631 merged as `@@MERGE_631@@`.
+ADR-034 amendment #631 merged as `f0c16773`.
 
 Accepting this charter authorizes **no implementation**. Implementation needs
 the separate, reviewed `[layer1-freeze]` amendment in §9.
@@ -29,7 +29,7 @@ here are unchanged between the two commits.
 
 - [ADR-034](../adr/ADR-034-static-numeric-upper-bound-typed-rule.md) §6a,
   §7a and owner rulings G2-O1 to G2-O6, as folded in #631 (head `b49b0ba4`).
-  #631 merged as `@@MERGE_631@@` before this charter was accepted.
+  #631 merged as `f0c16773` before this charter was accepted.
 - The [G2 proposal](2026-10-24-adr-034-g2-new-file-write-amendment-proposal.md),
   revision 2, `08e0f9ac`, merged in #630 as `97143065`. Its §6 is the
   validation scope this charter freezes.
