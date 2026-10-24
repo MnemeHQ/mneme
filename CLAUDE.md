@@ -1,5 +1,13 @@
 # Mneme Repo Instructions
 
+## Repository scope and agent retrieval
+
+This repository is the **public OSS authority and deterministic execution kernel** for Mneme. Only Core owns canonical decision identity/authority, applicability/precedence/lifecycle/waivers, proposals/Decision MCP contracts, rule enforcement and trustworthy conformance evidence. For full cross-repository task routing see `AGENTS.md`.
+
+- Evidence extraction, architecture/decision recovery, experiments, annotator review and frozen benchmarks belong to private `MnemeHQ/mneme-data-engine` (non-authoritative, no canonical writes).
+- Confluence/Jira/Slack and other organisation-specific adapters, identity/ACL/RBAC, approval operations, retained organisation-wide evidence and hosted UI belong to private `MnemeHQ/mneme-enterprise`.
+- Neither private repository may replace the Core resolver/authority. Core imports neither. Changes to shared primitives must be implemented/reviewed here before consumed downstream.
+
 ## Branch Naming
 
 Use conventional prefixes: `feat/`, `fix/`, `site/`, `ci/`, `docs/`, `refactor/`. Keep slugs short, kebab-case, no random suffixes unless required for uniqueness.

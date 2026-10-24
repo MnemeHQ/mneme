@@ -36,6 +36,18 @@ The same input and governed decision state produce the same enforcement result. 
 
 Mneme is not a general-purpose vector store, conversational memory system, autonomous coding agent, or deployment observability platform.
 
+## Repository ownership and agent routing
+
+This **public OSS repository is the authoritative decision and execution kernel**, not the organisation-wide integration or research engine. It owns the canonical Decision Index; approved decision identity, authority, scope/applicability, precedence, lifecycle, supersession and waiver semantics (DG1/DG2); deterministic rule evaluation; proposal/MCP contracts; and verifiable enforcement/evidence across local agent, CLI, and CI surfaces. An external source may submit a *proposal*; only Mneme's explicit authority path may accept it.
+
+**Related repositories and task routing:**
+
+- [`MnemeHQ/mneme-data-engine`](https://github.com/MnemeHQ/mneme-data-engine) (private): research-only acquisition, extraction, reconstruction, classification, annotation, frozen benchmarks and evidence quality. **No canonical decision writes, rule activation or trusted enforcement verdicts.**
+- [`MnemeHQ/mneme-enterprise`](https://github.com/MnemeHQ/mneme-enterprise) (private): organisational source connectors and sync, identity/permissions, approval workflows, retained audit evidence, dashboards and hosted operations. **Consumes Core authority; never reimplements its resolver/enforcement.**
+- **Put a task here** when it changes source-independent decision contracts or enforcement. Put experimental discovery/evaluation in Data Engine; organisation-specific integrations, permissions and approval operations in Enterprise. A need discovered in another repository for a shared decision primitive requires a reviewed public Core change before adoption.
+
+See [`AGENTS.md`](AGENTS.md), [the current roadmap](docs/roadmap/README.md) and [ADR-031](docs/adr/ADR-031-decision-governance-semantics.md). **Do not claim planned integrations or safeguards are already supported.**
+
 ## Install
 
 Requires Python 3.11+.
