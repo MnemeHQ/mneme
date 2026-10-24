@@ -1,0 +1,12 @@
+{"seq":1,"ts":"2026-10-24T13:48:33.262Z","pid":44408,"type":"relay_start","mode":"passthrough","target_tool":"decision.get","target_record":"ADR-9901","upstream_pid":62748,"control_port":54409,"event_log":"C:\\dev\\mneme\\validation\\cm01\\p0-cancellation\\evidence\\raw\\run1-control-relay-relay.jsonl"}
+{"seq":2,"ts":"2026-10-24T13:48:35.118Z","pid":44408,"type":"upstream_message_forwarded_downstream","requestId":0}
+{"seq":3,"ts":"2026-10-24T13:48:35.125Z","pid":44408,"type":"upstream_message_forwarded_downstream","requestId":1}
+{"seq":4,"ts":"2026-10-24T13:48:35.175Z","pid":44408,"type":"tools_call_from_client","requestId":2,"tool":"decision.get","record":"ADR-9901"}
+{"seq":5,"ts":"2026-10-24T13:48:35.186Z","pid":44408,"type":"target_request_seen","requestId":2,"tool":"decision.get","record":"ADR-9901"}
+{"seq":6,"ts":"2026-10-24T13:48:35.187Z","pid":44408,"type":"target_request_forwarded","requestId":2}
+{"seq":7,"ts":"2026-10-24T13:48:35.195Z","pid":44408,"type":"upstream_response_received","requestId":2,"has_result":true,"has_error":false}
+{"seq":8,"ts":"2026-10-24T13:48:35.195Z","pid":44408,"type":"upstream_message_forwarded_downstream","requestId":2}
+{"seq":9,"ts":"2026-10-24T13:48:35.199Z","pid":44408,"type":"status","child_alive":true,"upstream_pid":62748,"target_request_id":2,"target_request_forwarded":true,"upstream_response_received":true,"held_request_id":null,"mode":"passthrough","cancellation_events":[],"requested_at":"2026-10-24T13:48:35.198Z"}
+{"seq":10,"ts":"2026-10-24T13:48:35.201Z","pid":44408,"type":"relay_finishing","reason":"control_shutdown","held_request_id":null,"withheld_response_discarded":false}
+{"seq":11,"ts":"2026-10-24T13:48:35.543Z","pid":44408,"type":"child_exit","code":0,"signal":null,"upstream_pid":62748,"observed_by":"top_level"}
+{"seq":12,"ts":"2026-10-24T13:48:35.545Z","pid":44408,"type":"client_stdin_end","held_request_id":null}
