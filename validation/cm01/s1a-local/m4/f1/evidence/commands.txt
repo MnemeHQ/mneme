@@ -1,0 +1,55 @@
+CM-01 S1-A1 M4-F1 exact commands
+
+Worktree:
+  C:\dev\mneme\.worktrees\feat-cm01-s1a1-e0-local-executor
+
+Directory:
+  validation/cm01/s1a-local/m4
+
+Fixture creation:
+  Copy-Item m4/fixture/pre_migration.json m4/fixture/work/project_memory.json -Force
+  python -m mneme decision-index migrate --memory <m4>/fixture/work/project_memory.json
+  python -m mneme decision-index migrate --memory <m4>/fixture/work/project_memory.json --apply
+  Copy-Item m4/fixture/work/project_memory.json m4/fixture/canonical/project_memory.json -Force
+
+Audit note:
+  An intermediate migration check was mistakenly pointed at the already-migrated
+  M1 work copy. The migration command reported "Already migrated ... nothing to do"
+  and was a byte-identical no-op. All M1 pre/work/canonical/evidence hashes were
+  re-verified unchanged.
+
+Validation:
+  node f1/run-m4-f1.mjs
+
+Observed:
+  migration preview: 2 native decisions; 1 active; 1 non-active (ADR-9902 deprecated)
+  npm packages: reused m4/node_modules
+  run: pass=true, failed=[]
+  M4F1-LINK-ORIGINAL-FAIL: true
+  M4F1-PREFLIGHT: true
+  M4F1-UPSTREAM-SIX-1: true
+  M4F1-UPSTREAM-SIX-2: true
+  M4F1-PARITY-1: true
+  M4F1-PARITY-2: true
+  M4F1-SEPARATION: true
+  M4F1-LIFECYCLE: true
+  M4F1-IDENTITY: true
+  M4F1-NO-PROPOSAL-CALLS: true
+  M4F1-REPEAT: true
+  M4F1-NO-MUTATION: true
+  M4F1-M4: true
+
+Fixture:
+  pre_migration sha256 6746f86c7164fbb06ec4d3eb99678dcdc6a96a7b2b55b8d2e5b51ddaf5c57537
+  canonical     sha256 b4d83d0cc0f70f442e2a62bd0e527220ae99b07cba1238e39d0ad8c5685d4e7f
+
+Original M4 evidence:
+  sha256 dde0f195ef6f38e7d239a13c3a2b932b834b8e166a7ba32fe59b0787376878dd
+  status FAIL (preserved)
+
+Evidence:
+  f1/evidence/m4-f1.json
+  f1/evidence/run1.json
+  f1/evidence/run2.json
+  f1/evidence/run1-stderr.log
+  f1/evidence/run2-stderr.log

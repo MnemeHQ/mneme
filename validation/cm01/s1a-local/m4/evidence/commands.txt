@@ -1,0 +1,54 @@
+CM-01 S1-A1 M4 exact commands
+
+Worktree:
+  C:\dev\mneme\.worktrees\feat-cm01-s1a1-e0-local-executor
+
+Directory:
+  validation/cm01/s1a-local/m4
+
+Commands:
+  npm install --ignore-scripts --no-audit --no-fund
+  npm run m4
+
+Observed:
+  npm install: 98 packages added
+  npm run m4: pass=false, failed=[M4-ADR9902-DEPRECATED, M4-IDENTITY]
+  M4-UPSTREAM-SIX-1: true
+  M4-UPSTREAM-SIX-2: true
+  M4-PARITY-1: true
+  M4-PARITY-2: true
+  M4-SEPARATION: true
+  M4-ADR9901-ACTIVE: true
+  M4-ADR9902-DEPRECATED: false
+  M4-IDENTITY: false
+  M4-NO-PROPOSAL-CALLS: true
+  M4-REPEAT: true
+  M4-NO-MUTATION: true
+  M4-M4: true
+
+Blocker:
+  Frozen M1 canonical fixture contains only ADR-9901; ADR-9902 is absent.
+  Deprecated search canonical_decisions is empty.
+  Fixture cannot be changed under M4's preservation boundary.
+
+Versions:
+  Node 24.13.1
+  npm 11.8.0
+  @cloudflare/codemode 0.5.5
+  @modelcontextprotocol/sdk 1.32.2
+  ajv 8.17.1
+  zod 4.6.7
+  Python 3.12.10
+  mneme 0.10.0
+  mcp 2.2.0
+
+Fixture:
+  m1/fixture/canonical/project_memory.json
+  sha256 8f73429e70e04a6876b965bb00a1777fc90409f9da2889c72dab9ac26b9621ea
+
+Evidence:
+  evidence/m4.json
+  evidence/run1.json
+  evidence/run2.json
+  evidence/run1-stderr.log
+  evidence/run2-stderr.log

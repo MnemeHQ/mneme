@@ -1,0 +1,405 @@
+{
+  "run": "run2",
+  "pid": 48400,
+  "upstream_inventory": {
+    "count": 6,
+    "names": [
+      "decision.applicable_to",
+      "decision.get",
+      "decision.propose",
+      "decision.propose_batch",
+      "decision.search",
+      "decision.trace"
+    ],
+    "exact_six": true
+  },
+  "adapter": {
+    "allowlist": [
+      "decision.get",
+      "decision.search",
+      "decision.applicable_to",
+      "decision.trace"
+    ],
+    "call_log": [
+      {
+        "seq": 1,
+        "tool": "decision.applicable_to",
+        "args": {
+          "context": [
+            "cache"
+          ]
+        },
+        "isError": false,
+        "structuredContent": {
+          "proposal_hint_matches": [],
+          "canonical_scope_matches": [
+            {
+              "decision_id": "ADR-9901",
+              "version": "1",
+              "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+              "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+              "lifecycle_status": "active",
+              "context_scope": [
+                "cache"
+              ]
+            }
+          ]
+        },
+        "toolResult": null,
+        "text": "{\n  \"proposal_hint_matches\": [],\n  \"canonical_scope_matches\": [\n    {\n      \"decision_id\": \"ADR-9901\",\n      \"version\": \"1\",\n      \"version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n      \"statement\": \"Synthetic M1 cache adapter uses the in-memory backend.\",\n      \"lifecycle_status\": \"active\",\n      \"context_scope\": [\n        \"cache\"\n      ]\n    }\n  ]\n}"
+      },
+      {
+        "seq": 2,
+        "tool": "decision.applicable_to",
+        "args": {
+          "paths": [
+            "src/cache.py"
+          ]
+        },
+        "isError": false,
+        "structuredContent": {
+          "proposal_hint_matches": [],
+          "canonical_scope_matches": [
+            {
+              "decision_id": "ADR-9901",
+              "version": "1",
+              "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+              "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+              "lifecycle_status": "active",
+              "context_scope": [
+                "cache"
+              ]
+            }
+          ]
+        },
+        "toolResult": null,
+        "text": "{\n  \"proposal_hint_matches\": [],\n  \"canonical_scope_matches\": [\n    {\n      \"decision_id\": \"ADR-9901\",\n      \"version\": \"1\",\n      \"version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n      \"statement\": \"Synthetic M1 cache adapter uses the in-memory backend.\",\n      \"lifecycle_status\": \"active\",\n      \"context_scope\": [\n        \"cache\"\n      ]\n    }\n  ]\n}"
+      },
+      {
+        "seq": 3,
+        "tool": "decision.applicable_to",
+        "args": {
+          "context": [],
+          "paths": []
+        },
+        "isError": false,
+        "structuredContent": {
+          "proposal_hint_matches": [],
+          "canonical_scope_matches": []
+        },
+        "toolResult": null,
+        "text": "{\n  \"proposal_hint_matches\": [],\n  \"canonical_scope_matches\": []\n}"
+      },
+      {
+        "seq": 4,
+        "tool": "decision.applicable_to",
+        "args": {
+          "context": [
+            "unrelated"
+          ]
+        },
+        "isError": false,
+        "structuredContent": {
+          "proposal_hint_matches": [],
+          "canonical_scope_matches": []
+        },
+        "toolResult": null,
+        "text": "{\n  \"proposal_hint_matches\": [],\n  \"canonical_scope_matches\": []\n}"
+      }
+    ],
+    "schema_passthrough": {
+      "decision.get": true,
+      "decision.search": true,
+      "decision.applicable_to": true,
+      "decision.trace": true
+    }
+  },
+  "fixture_identity": {
+    "decision_id": "ADR-9901",
+    "version": "1",
+    "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+    "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+    "lifecycle_status": "active",
+    "context_scope": [
+      "cache"
+    ]
+  },
+  "cases": {
+    "matching-context": {
+      "args": {
+        "context": [
+          "cache"
+        ]
+      },
+      "direct_normalized": {
+        "proposal_hint_matches": [],
+        "canonical_scope_matches": [
+          {
+            "decision_id": "ADR-9901",
+            "version": "1",
+            "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+            "lifecycle_status": "active",
+            "context_scope": [
+              "cache"
+            ]
+          }
+        ]
+      },
+      "code_mode_normalized": {
+        "proposal_hint_matches": [],
+        "canonical_scope_matches": [
+          {
+            "decision_id": "ADR-9901",
+            "version": "1",
+            "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+            "lifecycle_status": "active",
+            "context_scope": [
+              "cache"
+            ]
+          }
+        ]
+      },
+      "differences": [],
+      "equal": true
+    },
+    "opaque-path": {
+      "args": {
+        "paths": [
+          "src/cache.py"
+        ]
+      },
+      "direct_normalized": {
+        "proposal_hint_matches": [],
+        "canonical_scope_matches": [
+          {
+            "decision_id": "ADR-9901",
+            "version": "1",
+            "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+            "lifecycle_status": "active",
+            "context_scope": [
+              "cache"
+            ]
+          }
+        ]
+      },
+      "code_mode_normalized": {
+        "proposal_hint_matches": [],
+        "canonical_scope_matches": [
+          {
+            "decision_id": "ADR-9901",
+            "version": "1",
+            "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+            "lifecycle_status": "active",
+            "context_scope": [
+              "cache"
+            ]
+          }
+        ]
+      },
+      "differences": [],
+      "equal": true
+    },
+    "empty-context": {
+      "args": {
+        "context": [],
+        "paths": []
+      },
+      "direct_normalized": {
+        "proposal_hint_matches": [],
+        "canonical_scope_matches": []
+      },
+      "code_mode_normalized": {
+        "proposal_hint_matches": [],
+        "canonical_scope_matches": []
+      },
+      "differences": [],
+      "equal": true
+    },
+    "unmatched-context": {
+      "args": {
+        "context": [
+          "unrelated"
+        ]
+      },
+      "direct_normalized": {
+        "proposal_hint_matches": [],
+        "canonical_scope_matches": []
+      },
+      "code_mode_normalized": {
+        "proposal_hint_matches": [],
+        "canonical_scope_matches": []
+      },
+      "differences": [],
+      "equal": true
+    }
+  },
+  "direct_raw": {
+    "matching-context": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"proposal_hint_matches\": [],\n  \"canonical_scope_matches\": [\n    {\n      \"decision_id\": \"ADR-9901\",\n      \"version\": \"1\",\n      \"version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n      \"statement\": \"Synthetic M1 cache adapter uses the in-memory backend.\",\n      \"lifecycle_status\": \"active\",\n      \"context_scope\": [\n        \"cache\"\n      ]\n    }\n  ]\n}"
+        }
+      ],
+      "structuredContent": {
+        "proposal_hint_matches": [],
+        "canonical_scope_matches": [
+          {
+            "decision_id": "ADR-9901",
+            "version": "1",
+            "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+            "lifecycle_status": "active",
+            "context_scope": [
+              "cache"
+            ]
+          }
+        ]
+      },
+      "isError": false
+    },
+    "opaque-path": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"proposal_hint_matches\": [],\n  \"canonical_scope_matches\": [\n    {\n      \"decision_id\": \"ADR-9901\",\n      \"version\": \"1\",\n      \"version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n      \"statement\": \"Synthetic M1 cache adapter uses the in-memory backend.\",\n      \"lifecycle_status\": \"active\",\n      \"context_scope\": [\n        \"cache\"\n      ]\n    }\n  ]\n}"
+        }
+      ],
+      "structuredContent": {
+        "proposal_hint_matches": [],
+        "canonical_scope_matches": [
+          {
+            "decision_id": "ADR-9901",
+            "version": "1",
+            "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+            "lifecycle_status": "active",
+            "context_scope": [
+              "cache"
+            ]
+          }
+        ]
+      },
+      "isError": false
+    },
+    "empty-context": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"proposal_hint_matches\": [],\n  \"canonical_scope_matches\": []\n}"
+        }
+      ],
+      "structuredContent": {
+        "proposal_hint_matches": [],
+        "canonical_scope_matches": []
+      },
+      "isError": false
+    },
+    "unmatched-context": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"proposal_hint_matches\": [],\n  \"canonical_scope_matches\": []\n}"
+        }
+      ],
+      "structuredContent": {
+        "proposal_hint_matches": [],
+        "canonical_scope_matches": []
+      },
+      "isError": false
+    }
+  },
+  "code_mode_raw": {
+    "result": {
+      "matching-context": {
+        "proposal_hint_matches": [],
+        "canonical_scope_matches": [
+          {
+            "decision_id": "ADR-9901",
+            "version": "1",
+            "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+            "lifecycle_status": "active",
+            "context_scope": [
+              "cache"
+            ]
+          }
+        ]
+      },
+      "opaque-path": {
+        "proposal_hint_matches": [],
+        "canonical_scope_matches": [
+          {
+            "decision_id": "ADR-9901",
+            "version": "1",
+            "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+            "lifecycle_status": "active",
+            "context_scope": [
+              "cache"
+            ]
+          }
+        ]
+      },
+      "empty-context": {
+        "proposal_hint_matches": [],
+        "canonical_scope_matches": []
+      },
+      "unmatched-context": {
+        "proposal_hint_matches": [],
+        "canonical_scope_matches": []
+      }
+    }
+  },
+  "structure": {
+    "top_level_keys": [
+      "canonical_scope_matches",
+      "proposal_hint_matches"
+    ],
+    "proposal_hint_matches_is_array": true,
+    "canonical_scope_matches_is_array": true,
+    "all_canonical_refs_exact_slim_fields": true,
+    "canonical_ref_key_sets": [
+      "[\"context_scope\",\"decision_id\",\"lifecycle_status\",\"statement\",\"version\",\"version_id\"]"
+    ],
+    "contains_typed_rule_fields": false
+  },
+  "matching": {
+    "context_match_ids": [
+      "ADR-9901"
+    ],
+    "opaque_path_match_ids": [
+      "ADR-9901"
+    ],
+    "empty_context_ids": [],
+    "unmatched_context_ids": [],
+    "matching_ref": {
+      "decision_id": "ADR-9901",
+      "version": "1",
+      "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+      "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+      "lifecycle_status": "active",
+      "context_scope": [
+        "cache"
+      ]
+    },
+    "opaque_path_ref": {
+      "decision_id": "ADR-9901",
+      "version": "1",
+      "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+      "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+      "lifecycle_status": "active",
+      "context_scope": [
+        "cache"
+      ]
+    },
+    "matching_ref_matches_fixture": true,
+    "opaque_path_ref_matches_fixture": true,
+    "path_semantics": "opaque path string substring match; no ADR-020 selector or glob evaluation"
+  },
+  "stderr": ""
+}

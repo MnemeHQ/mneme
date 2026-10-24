@@ -1,0 +1,50 @@
+CM-01 S1-A1 M2 exact commands
+
+Worktree:
+  C:\dev\mneme\.worktrees\feat-cm01-s1a1-e0-local-executor
+
+Directory:
+  validation/cm01/s1a-local/m2
+
+Commands:
+  npm install --ignore-scripts --no-audit --no-fund
+  npm run m2
+
+Observed:
+  npm install: 98 packages added
+  npm run m2: pass=true, failed=[] (two independent server startups inside the run)
+  M2-UPSTREAM-SIX-1: true
+  M2-UPSTREAM-SIX-2: true
+  M2-ALLOWLIST: true
+  M2-NO-COLLISIONS: true
+  M2-SCHEMA-PASSTHROUGH: true
+  M2-SUCCESS-1: true
+  M2-SUCCESS-2: true
+  M2-NO-PROPOSAL-METHODS: true
+  M2-MCP-ERROR-PROPAGATES: true
+  M2-HOST-VALIDATION: true
+  M2-REPEAT: true
+  M2-NO-MUTATION: true
+  M2-M4: true
+
+Versions:
+  Node 24.13.1
+  npm 11.8.0
+  @cloudflare/codemode 0.5.5
+  @modelcontextprotocol/sdk 1.32.2
+  ajv 8.17.1
+  zod 4.6.7
+  Python 3.12.10
+  mneme 0.10.0
+  mcp 2.2.0
+
+Fixture:
+  m1/fixture/canonical/project_memory.json
+  sha256 8f73429e70e04a6876b965bb00a1777fc90409f9da2889c72dab9ac26b9621ea
+
+Evidence:
+  evidence/m2.json
+  evidence/run1.json
+  evidence/run2.json
+  evidence/run1-stderr.log
+  evidence/run2-stderr.log

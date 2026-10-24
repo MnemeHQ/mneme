@@ -1,0 +1,494 @@
+{
+  "schema": "mneme.cm01.s1a1.e0/v1",
+  "started_at": "2026-10-23T23:47:21.145Z",
+  "finished_at": "2026-10-23T23:47:22.946Z",
+  "repository": {
+    "base_sha": "942de7b121994647e99e9b862b44cda784c0ae84",
+    "s0_sha": "9eb4057a290795883076ab05bf11c92038c6ca13",
+    "branch": "feat/cm01-s1a1-e0-local-executor",
+    "head_sha": "942de7b121994647e99e9b862b44cda784c0ae84"
+  },
+  "versions": {
+    "node": "v24.13.1",
+    "npm": "11.8.0",
+    "codemode": "0.5.5",
+    "quickjs": "0.32.0",
+    "platform": "win32 x64"
+  },
+  "native_probe": {
+    "pass": true,
+    "native_bridge_supported": true,
+    "asyncify_selected": false,
+    "result": [
+      "a",
+      "b",
+      "c"
+    ],
+    "error": null,
+    "starts": [
+      "a",
+      "b",
+      "c"
+    ],
+    "ends": [
+      "a",
+      "b",
+      "c"
+    ],
+    "stats": {
+      "hostCalls": 3,
+      "resolvedCalls": 3,
+      "failedCalls": 0,
+      "rejectedCalls": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "pendingAtEnd": 0,
+      "deferredDisposed": 3,
+      "cleanupErrors": []
+    }
+  },
+  "details": {
+    "order": {
+      "tool_name": "codemode",
+      "result": [
+        "a",
+        "b",
+        "c"
+      ],
+      "error": null,
+      "stats": {
+        "hostCalls": 3,
+        "resolvedCalls": 3,
+        "failedCalls": 0,
+        "rejectedCalls": 0,
+        "timedOut": false,
+        "interrupted": false,
+        "pendingAtEnd": 0,
+        "deferredDisposed": 3,
+        "cleanupErrors": []
+      },
+      "host": {
+        "calls": [
+          {
+            "phase": "start",
+            "key": "a"
+          },
+          {
+            "phase": "end",
+            "key": "a"
+          },
+          {
+            "phase": "start",
+            "key": "b"
+          },
+          {
+            "phase": "end",
+            "key": "b"
+          },
+          {
+            "phase": "start",
+            "key": "c"
+          },
+          {
+            "phase": "end",
+            "key": "c"
+          }
+        ],
+        "starts": [
+          "a",
+          "b",
+          "c"
+        ],
+        "ends": [
+          "a",
+          "b",
+          "c"
+        ],
+        "activeCalls": 0,
+        "pendingTimers": 0
+      }
+    },
+    "error": {
+      "tool_name": "codemode",
+      "result": null,
+      "error": "Code execution failed: Error: synthetic failure at b",
+      "stats": {
+        "hostCalls": 2,
+        "resolvedCalls": 1,
+        "failedCalls": 1,
+        "rejectedCalls": 0,
+        "timedOut": false,
+        "interrupted": false,
+        "pendingAtEnd": 0,
+        "deferredDisposed": 2,
+        "cleanupErrors": []
+      },
+      "host": {
+        "calls": [
+          {
+            "phase": "start",
+            "key": "a"
+          },
+          {
+            "phase": "end",
+            "key": "a"
+          },
+          {
+            "phase": "start",
+            "key": "b"
+          },
+          {
+            "phase": "end",
+            "key": "b"
+          }
+        ],
+        "starts": [
+          "a",
+          "b"
+        ],
+        "ends": [
+          "a",
+          "b"
+        ],
+        "activeCalls": 0,
+        "pendingTimers": 0
+      }
+    },
+    "timeout": {
+      "tool_name": "codemode",
+      "result": null,
+      "error": "Code execution failed: execution exceeded 60ms",
+      "stats": {
+        "hostCalls": 1,
+        "resolvedCalls": 0,
+        "failedCalls": 1,
+        "rejectedCalls": 1,
+        "timedOut": true,
+        "interrupted": true,
+        "pendingAtEnd": 0,
+        "deferredDisposed": 1,
+        "cleanupErrors": []
+      },
+      "host": {
+        "calls": [
+          {
+            "phase": "start",
+            "key": "never"
+          }
+        ],
+        "starts": [
+          "never"
+        ],
+        "ends": [],
+        "activeCalls": 0,
+        "pendingTimers": 0
+      }
+    },
+    "memory": {
+      "tool_name": "codemode",
+      "result": null,
+      "error": "Code execution failed: InternalError: out of memory",
+      "stats": {
+        "hostCalls": 0,
+        "resolvedCalls": 0,
+        "failedCalls": 0,
+        "rejectedCalls": 0,
+        "timedOut": false,
+        "interrupted": false,
+        "pendingAtEnd": 0,
+        "deferredDisposed": 0,
+        "cleanupErrors": []
+      },
+      "host": {
+        "calls": [],
+        "starts": [],
+        "ends": [],
+        "activeCalls": 0,
+        "pendingTimers": 0
+      }
+    },
+    "globals": {
+      "tool_name": "codemode",
+      "result": {
+        "process": "undefined",
+        "require": "undefined",
+        "fetch": "undefined",
+        "Buffer": "undefined",
+        "module": "undefined",
+        "exports": "undefined",
+        "__dirname": "undefined",
+        "Deno": "undefined",
+        "Bun": "undefined",
+        "codemode": "object",
+        "globalThis": "object"
+      },
+      "error": null,
+      "stats": {
+        "hostCalls": 0,
+        "resolvedCalls": 0,
+        "failedCalls": 0,
+        "rejectedCalls": 0,
+        "timedOut": false,
+        "interrupted": false,
+        "pendingAtEnd": 0,
+        "deferredDisposed": 0,
+        "cleanupErrors": []
+      },
+      "host": {
+        "calls": [],
+        "starts": [],
+        "ends": [],
+        "activeCalls": 0,
+        "pendingTimers": 0
+      }
+    },
+    "cleanup": {
+      "timeout_pending_at_end": 0,
+      "timeout_active_host_calls": 0,
+      "timeout_pending_timers": 0,
+      "error_pending_at_end": 0,
+      "error_active_host_calls": 0,
+      "error_pending_timers": 0
+    },
+    "repeatability": {
+      "run_a": {
+        "tool_name": "codemode",
+        "result": [
+          "a",
+          "b",
+          "c"
+        ],
+        "error": null,
+        "stats": {
+          "hostCalls": 3,
+          "resolvedCalls": 3,
+          "failedCalls": 0,
+          "rejectedCalls": 0,
+          "timedOut": false,
+          "interrupted": false,
+          "pendingAtEnd": 0,
+          "deferredDisposed": 3,
+          "cleanupErrors": []
+        },
+        "host": {
+          "calls": [
+            {
+              "phase": "start",
+              "key": "a"
+            },
+            {
+              "phase": "end",
+              "key": "a"
+            },
+            {
+              "phase": "start",
+              "key": "b"
+            },
+            {
+              "phase": "end",
+              "key": "b"
+            },
+            {
+              "phase": "start",
+              "key": "c"
+            },
+            {
+              "phase": "end",
+              "key": "c"
+            }
+          ],
+          "starts": [
+            "a",
+            "b",
+            "c"
+          ],
+          "ends": [
+            "a",
+            "b",
+            "c"
+          ],
+          "activeCalls": 0,
+          "pendingTimers": 0
+        }
+      },
+      "run_b": {
+        "tool_name": "codemode",
+        "result": [
+          "a",
+          "b",
+          "c"
+        ],
+        "error": null,
+        "stats": {
+          "hostCalls": 3,
+          "resolvedCalls": 3,
+          "failedCalls": 0,
+          "rejectedCalls": 0,
+          "timedOut": false,
+          "interrupted": false,
+          "pendingAtEnd": 0,
+          "deferredDisposed": 3,
+          "cleanupErrors": []
+        },
+        "host": {
+          "calls": [
+            {
+              "phase": "start",
+              "key": "a"
+            },
+            {
+              "phase": "end",
+              "key": "a"
+            },
+            {
+              "phase": "start",
+              "key": "b"
+            },
+            {
+              "phase": "end",
+              "key": "b"
+            },
+            {
+              "phase": "start",
+              "key": "c"
+            },
+            {
+              "phase": "end",
+              "key": "c"
+            }
+          ],
+          "starts": [
+            "a",
+            "b",
+            "c"
+          ],
+          "ends": [
+            "a",
+            "b",
+            "c"
+          ],
+          "activeCalls": 0,
+          "pendingTimers": 0
+        }
+      },
+      "repeatable": true
+    }
+  },
+  "checks": [
+    {
+      "id": "E0-ORDER",
+      "pass": true
+    },
+    {
+      "id": "E0-ERROR",
+      "pass": true
+    },
+    {
+      "id": "E0-TIMEOUT",
+      "pass": true
+    },
+    {
+      "id": "E0-MEMORY",
+      "pass": true
+    },
+    {
+      "id": "E0-GLOBALS",
+      "pass": true
+    },
+    {
+      "id": "E0-CLEANUP",
+      "pass": true
+    },
+    {
+      "id": "E0-REPEAT",
+      "pass": true
+    },
+    {
+      "id": "E0-M4",
+      "pass": true
+    }
+  ],
+  "verdict": {
+    "pass": true,
+    "failed": []
+  },
+  "m4_guard": {
+    "before": {
+      "schema": "mneme.cm01.s1a1.e0.m4-guard/v1",
+      "s0_sha": "9eb4057a290795883076ab05bf11c92038c6ca13",
+      "base_sha": "942de7b121994647e99e9b862b44cda784c0ae84",
+      "head_sha": "942de7b121994647e99e9b862b44cda784c0ae84",
+      "base_to_head_is_clean": true,
+      "inherited_m4_diff": "benchmarks/adr034_m4/README.md             |  222 +++\n benchmarks/adr034_m4/harness.py            | 2067 ++++++++++++++++++++++++++++\n benchmarks/adr034_m4/m4_child.py           |  153 ++\n scripts/run_test_battery.py                |    9 +\n tests/adr034_m4_synthetic_corpus.py        |  226 +++\n tests/test_adr034_m4_harness.py            |  926 +++++++++++++\n tests/test_adr034_m4_harness_old_reader.py |   47 +\n 7 files changed, 3650 insertions(+)",
+      "groups": {
+        "committed_vs_base": [],
+        "staged": [],
+        "unstaged": [],
+        "untracked": [
+          "validation/cm01/s1a-local/.gitignore",
+          "validation/cm01/s1a-local/README.md",
+          "validation/cm01/s1a-local/e0/probe-native-promise.mjs",
+          "validation/cm01/s1a-local/e0/quickjs-executor.mjs",
+          "validation/cm01/s1a-local/e0/run-e0.mjs",
+          "validation/cm01/s1a-local/e0/synthetic-host.mjs",
+          "validation/cm01/s1a-local/evidence/e0-run1.json",
+          "validation/cm01/s1a-local/evidence/e0.json",
+          "validation/cm01/s1a-local/m4-guard.mjs",
+          "validation/cm01/s1a-local/package-lock.json",
+          "validation/cm01/s1a-local/package.json"
+        ]
+      },
+      "protected_patterns": [
+        "^benchmarks\\/adr034_m4\\/",
+        "^tests\\/adr034_m4_",
+        "^tests\\/test_adr034_m4_",
+        "^scripts\\/run_test_battery\\.py$",
+        "^docs\\/validation\\/adr-034-m4-",
+        "^docs\\/plans\\/.*adr-034-m4"
+      ],
+      "violations": [],
+      "pass": true
+    },
+    "after": {
+      "schema": "mneme.cm01.s1a1.e0.m4-guard/v1",
+      "s0_sha": "9eb4057a290795883076ab05bf11c92038c6ca13",
+      "base_sha": "942de7b121994647e99e9b862b44cda784c0ae84",
+      "head_sha": "942de7b121994647e99e9b862b44cda784c0ae84",
+      "base_to_head_is_clean": true,
+      "inherited_m4_diff": "benchmarks/adr034_m4/README.md             |  222 +++\n benchmarks/adr034_m4/harness.py            | 2067 ++++++++++++++++++++++++++++\n benchmarks/adr034_m4/m4_child.py           |  153 ++\n scripts/run_test_battery.py                |    9 +\n tests/adr034_m4_synthetic_corpus.py        |  226 +++\n tests/test_adr034_m4_harness.py            |  926 +++++++++++++\n tests/test_adr034_m4_harness_old_reader.py |   47 +\n 7 files changed, 3650 insertions(+)",
+      "groups": {
+        "committed_vs_base": [],
+        "staged": [],
+        "unstaged": [],
+        "untracked": [
+          "validation/cm01/s1a-local/.gitignore",
+          "validation/cm01/s1a-local/README.md",
+          "validation/cm01/s1a-local/e0/probe-native-promise.mjs",
+          "validation/cm01/s1a-local/e0/quickjs-executor.mjs",
+          "validation/cm01/s1a-local/e0/run-e0.mjs",
+          "validation/cm01/s1a-local/e0/synthetic-host.mjs",
+          "validation/cm01/s1a-local/evidence/e0-run1.json",
+          "validation/cm01/s1a-local/evidence/e0.json",
+          "validation/cm01/s1a-local/m4-guard.mjs",
+          "validation/cm01/s1a-local/package-lock.json",
+          "validation/cm01/s1a-local/package.json"
+        ]
+      },
+      "protected_patterns": [
+        "^benchmarks\\/adr034_m4\\/",
+        "^tests\\/adr034_m4_",
+        "^tests\\/test_adr034_m4_",
+        "^scripts\\/run_test_battery\\.py$",
+        "^docs\\/validation\\/adr-034-m4-",
+        "^docs\\/plans\\/.*adr-034-m4"
+      ],
+      "violations": [],
+      "pass": true
+    }
+  },
+  "limitations": [
+    "Local Code Mode orchestration only; no Cloudflare CodemodeRuntime, McpConnector, codemode.search/describe, approvals, replay, or rollback.",
+    "No Mneme MCP connection, credentials, project memory, or proposal tools.",
+    "Fixed synthetic host calls only; no live model-generated code."
+  ]
+}

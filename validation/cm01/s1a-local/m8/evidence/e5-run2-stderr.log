@@ -1,0 +1,4 @@
+ERROR: project memory C:\dev\mneme\.worktrees\feat-cm01-s1a1-e0-local-executor\validation\cm01\s1a-local\m8\fixture\sectionless.json has no authoritative decision_index section.
+  Preview the migration:  mneme decision-index migrate --memory C:\dev\mneme\.worktrees\feat-cm01-s1a1-e0-local-executor\validation\cm01\s1a-local\m8\fixture\sectionless.json
+  After reviewing it, apply: mneme decision-index migrate --memory C:\dev\mneme\.worktrees\feat-cm01-s1a1-e0-local-executor\validation\cm01\s1a-local\m8\fixture\sectionless.json --apply
+
