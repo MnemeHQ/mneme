@@ -1212,7 +1212,7 @@ consequence), and the Amendment Procedure below.
   [#631](https://github.com/MnemeHQ/mneme/pull/631), squash `f0c16773`).
 - **The G2-1 behavioral charter,** accepted by the owner after two
   architecture reviews, with rulings G2C-O1 to G2C-O6 (PR
-  [#634](https://github.com/MnemeHQ/mneme/pull/634), squash `@@MERGE_634@@`).
+  [#634](https://github.com/MnemeHQ/mneme/pull/634), squash `673b8ee0`).
 
 Charter §1 and §9 require this amendment before implementation. No behavior
 change is retroactively justified.
