@@ -142,6 +142,13 @@ Required properties include stable source identity/namespaces, pinned source rev
 
 "Bounded" describes the architecture (a finite set of declared sources at pinned revisions, a deterministic graph), never a limit on what OSS may do. The enterprise boundary begins where Mneme would have to discover, reconcile, infer, synchronize or administrate organizational decision truth rather than resolve declared sources.
 
+**OSS–Enterprise Boundary Validation checkpoint (DG1 → DG2; review-only).** At DG1G closeout, and again before DG2 implementation, validate the proposed surfaces against accepted [ADR-031](../adr/ADR-031-decision-governance-semantics.md) and the publication boundary above. Record the outcome in the **existing** DG1G closeout / DG2 architecture review; this is **not** a new implementation workstream or authorization.
+
+- **OSS completeness:** DG1 authority, applicability, precedence, lifecycle, waivers, provenance, evidence identity, deterministic resolution/enforcement, and explanation remain public. DG2 federation of declared, revision-pinned decision sources remains production-capable without requiring an enterprise service.
+- **Enterprise separation:** automated organizational decision discovery, source synchronization, cross-system identity/reconciliation/deduplication, inferred authority or relationships, organization-wide RBAC/SSO and administration, retained evidence history, and hosted/fleet control-plane operations remain outside OSS.
+- **Authority preservation:** source adapters and external producers can supply evidence or proposals, but cannot promote their own decisions or waivers to authority. DG2 uses the ADR-031 resolver rather than introducing a second policy engine.
+- **Evidence and disposition:** identify the interfaces and dependencies inspected, record any cross-boundary ambiguity and its disposition, and require a separately reviewed architecture decision before moving an operation across the boundary. No runtime, schema, ADR, freeze, or implementation change is approved by this checkpoint.
+
 ### P1 — Architecture Review Skill
 
 Evolve the existing Claude Code `mneme` Skill into a clearer executable architecture-review interface over existing Mneme capabilities.
