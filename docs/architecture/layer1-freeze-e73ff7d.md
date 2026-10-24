@@ -1140,6 +1140,151 @@ C2b Amendment 1 freeze amendments remain unchanged.
 
 ---
 
+## Amendment — authorize ADR-034 G2-1 pre-write numeric check for new-file Write (2026-10-24)
+
+> This authorizes **one bounded G2 slice**: a pre-write
+> `FORBID_NUMERIC_ABOVE` check for a Claude Code `Write` that creates a new
+> `.py` file whose target path the checker has verified absent. It covers
+> the new check input, hook routing, consumer-trust rules and evidence the
+> slice needs. It does not authorize existing-file delta attribution, CI,
+> other mutation surfaces, any availability-policy change, or any
+> enforcement claim before independent validation passes.
+
+**Change:** implement exactly what the accepted
+[ADR-034 G2-1 behavioral charter](../plans/2026-10-24-adr-034-g2-1-behavioral-charter.md)
+specifies:
+
+- **The new check input (§3).** `mneme check --proposed-new-file <carrier>
+  --target-path <P>`, a third member of the required input group.
+  - The checker establishes ADR-034 §6a preconditions 1–4 itself: verified
+    absence, no link components, inside the policy root, `.py`.
+  - If any of those fail, the result is the legacy `--input` result,
+    byte-identical.
+  - An invalid UTF-8 carrier (precondition 5) is an operational error.
+  - The input has its own target-binding guard.
+  - The subject is relabelled `proposed_new_source` only when a numeric rule
+    is `APPLIED`. Otherwise the result is byte-identical to `--input` on the
+    same carrier.
+- **Claude Code `PreToolUse` routing for `Write` only (§4).**
+  - A dedicated `lstat` absence probe, a `.py` target, and content that
+    encodes strictly as UTF-8 are all required.
+  - One checker call per event.
+  - The routed carrier holds exactly `content.encode("utf-8")`, written in
+    binary mode. This is the authorized, routed-only correction of today's
+    text-mode line-ending handling (ADR-034 §7a). No hook-level historical
+    parity is claimed for routed events whose content contains CR.
+  - Routed diagnostic wording comes through a keyword-only caller option
+    whose default keeps today's text.
+  - Every unrouted event is unchanged.
+- **Consumer trust (§5).**
+  - A keyword-only `expected_input` parameter on the shared `assess_verdict`.
+    Its default keeps every existing caller's coherent results unchanged:
+    the Agent SDK/LangChain, `antigravity`, `codex_cli`, `hermes`, `kiro`,
+    and the hook's own unrouted, Stop, Bash and rename calls.
+  - Subject-kind / matcher-reason coherence rules.
+  - Digest and path joins for routed events.
+- **Evidence (§6).**
+  - A host-event binding record per routed event, with a **mandatory** pinned
+    host identity (version and SHA-256 of the executable).
+  - If G2C-O2 adopts it, a validation-only `MNEME_HOOK_EVIDENCE_LOG` seam
+    that is inert when unset.
+
+**Byte-identical guarantees.** Whenever no `FORBID_NUMERIC_ABOVE` rule is
+`APPLIED`, `mneme.check/v1` payloads and exit codes stay byte-identical. That
+includes checks with no numeric rule, as the ADR-034 G1 amendment above
+already requires. The same holds for every unrouted hook event and for every
+other integration's coherent results.
+
+**Sections referenced:** the Freeze Anchor **Status** clause ("No behavioral
+change to retrieval or enforcement without an explicit charter amendment"),
+the ADR-034 G1 amendment above (including its recorded F2 operating
+consequence), and the Amendment Procedure below.
+
+**Rationale (Amendment Procedure §3(b)).** Every charter-level decision was
+**already made** before this amendment:
+
+- **The G2 design proposal,** reviewed twice and merged (PR
+  [#630](https://github.com/MnemeHQ/mneme/pull/630), squash `97143065`).
+- **The ADR-034 amendment.** §6a and §7a, with owner rulings G2-O1 to G2-O6,
+  accepted and folded into
+  [ADR-034](../adr/ADR-034-static-numeric-upper-bound-typed-rule.md),
+  including the reconciliation of precondition 5 and the routed carrier (PR
+  [#631](https://github.com/MnemeHQ/mneme/pull/631), squash `f0c16773`).
+- **The G2-1 behavioral charter,** accepted by the owner after two
+  architecture reviews, with rulings G2C-O1 to G2C-O6 (PR
+  [#634](https://github.com/MnemeHQ/mneme/pull/634), squash `@@MERGE_634@@`).
+
+Charter §1 and §9 require this amendment before implementation. No behavior
+change is retroactively justified.
+
+**Pinned regressions:** charter §8.C items 1–10. They cover:
+
+- legacy-parity goldens;
+- the preconditions, including permission errors and invalid UTF-8;
+- the binding guard;
+- numeric outcomes on `proposed_new_source`;
+- hook routing, including the race and H1 cases;
+- the expected-input and coherence trust rules, across every
+  `assess_verdict` consumer;
+- the hook outcome matrix under availability `open` and AUTHORIZED `closed`;
+- evidence, including the mandatory host identity;
+- untouched surfaces;
+- the byte contract (LF, CRLF, lone CR, byte-order mark, non-ASCII, empty).
+
+**Separate authorizations.** These each still need their own owner
+authorization:
+
+- the pinned live host characterization (§8.B);
+- the independent validation corpus, harness and scoring (§8.D), which run
+  only after the implementation commit is frozen.
+
+Implementation and corpus authoring are done by separate sessions. Neither
+gets the other's private evaluation material.
+
+**Recorded operating consequences.**
+
+- **The F2 restriction stays in force.** Under an AUTHORIZED closed
+  availability declaration, a new in-scope file that lacks a declared source
+  is still refused as `EVALUATION_INCOMPLETE`, and any edit to an existing
+  file on an APPLIED numeric path is refused as before. G2-1 narrows F2 only
+  for verified-new files that contain every declared source.
+  `FORBID_NUMERIC_ABOVE` must still not be activated on closed-availability
+  paths.
+- **The unrouted defect is not fixed here.** On Windows, the unrouted path's
+  text-mode carrier doubles CRLF line breaks. This is a pre-existing finding,
+  recorded for a separate reviewed fix.
+
+### Not authorized by this amendment
+
+- Existing-file `Write`, `Edit`, `MultiEdit`, deletion or rename numeric
+  evaluation, or any existing-file delta attribution.
+- Bash (including class-A heredoc new-file writes) or Stop/session-delta
+  numeric evaluation.
+- Agent SDK, LangChain, `antigravity`, `codex_cli`, `hermes`, `kiro` or MCP
+  pre-write coverage. Those integrations change only through the
+  default-preserving validator parameter and the default-preserving
+  diagnostic option.
+- CI integration or workflow changes.
+- Any ADR-033 availability-policy change, or any exception added for numeric
+  rules.
+- A fix to the unrouted carrier's CRLF handling.
+- Changes to the M4 matcher semantics, `DecisionRetriever` ranking,
+  `ConflictDetector`, `FORBID_LITERAL` semantics, persistence or rule
+  identity. No new numeric forms or other languages.
+- `MNEME_HOOK_EVIDENCE_LOG` as a supported user option or as a production
+  evidence store.
+- Activating `FORBID_NUMERIC_ABOVE` in this repository's memory, or
+  importing ADR-034 into it.
+- Any enforcement, "relevant enforcement observed" or production claim
+  before §8.D passes.
+- Implementation by any session or person with access to the G2 validation
+  corpus, its answer key, or the corpus author's transcripts.
+
+The existing DG1B1, DG1F-C1a, #260, T-08 slice-1, C2a, C2b, ADR-034 G1 and
+C2b Amendment 1 freeze amendments, and the G1 F-1 record, remain unchanged.
+
+---
+
 ## Amendment Procedure
 
 This document is frozen at `e73ff7d`. To amend it:
