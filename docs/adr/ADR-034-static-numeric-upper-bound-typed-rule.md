@@ -510,8 +510,21 @@ recognized. It is distinct from `complete_source_file` (G1) and never
 reported as it.
 
 **Preconditions.** The checker establishes all of these itself, at
-evaluation time, from the governed target path. If any one fails, the input
-is unverified and §6's `INCOMPLETE_SOURCE_INPUT` applies.
+evaluation time, from the governed target path. If any of preconditions 1–4
+fails, the input is unverified and §6's `INCOMPLETE_SOURCE_INPUT` applies.
+
+If precondition 5 fails, the result is an **operational error**: a
+non-verdict exit, untrusted under ADR-033 §2.
+
+- **Never a verdict or PASS.** The result is never a verdict, never PASS and
+  never a legacy fallback.
+- **No legacy result exists.** The legacy `--input` path has no defined
+  verdict for undecodable text, so there is no unverified result to fall
+  back to.
+- **Same as G1.** This matches `--source-file`.
+- **Stricter, not wider.** It is still "unverified" in the sense of §6,
+  because no complete-source claim is made. It is realized in the stricter
+  direction (no result at all).
 
 1. **Verified absence.** An `lstat` of the governed target raises "not
    found". Any other outcome is not absence and never becomes a
@@ -605,8 +618,9 @@ stricter: parity holds whenever no `FORBID_NUMERIC_ABOVE` rule is
 **`APPLIED`** at the governed target.
 
 In that case, the routed check must produce exactly the stdout payload and
-exit status of the legacy invocation: the same text as `--input`, with
-`--target-path` set to the same target. This covers each of these cases:
+exit status of the legacy invocation: the same carrier bytes passed as
+`--input`, with `--target-path` set to the same target. Parity is defined at
+this checker level, on the same carrier. This covers each of these cases:
 
 - memory with no numeric rule (no `subject` record, as today);
 - numeric rules that are all `EXCLUDED` or `UNKNOWN` at the target (today's
@@ -618,8 +632,27 @@ numeric rule exists (`cli.py:407-412`), the G2 path never adds or relabels a
 
 Literal-rule verdicts are unaffected by construction, because for a
 verified-absent target the checked text is identical to today's introduced
-content (`hook.py:156`). Any departure from parity would be a separate reviewed
+content (`hook.py:156`). The one exception is the carrier-encoding correction
+below. Any other departure from parity would be a separate reviewed
 behavioral change. None is proposed.
+
+**Routed carrier encoding (authorized, routed-only correction).** A routed
+event's carrier holds exactly `content.encode("utf-8")`, written in binary
+mode.
+
+Today's hook writes its carrier in text mode (`hook.py:794-798`). On Windows
+that translates line endings, and CRLF content comes back with doubled line
+breaks. For a routed event whose content contains CR, the text checked (by
+both literal and numeric rules) can therefore differ from what today's hook
+would have checked.
+
+- **Explicitly authorized.** This difference is authorized and limited to
+  routed events.
+- **No historical parity claim.** No hook-level parity with today's behavior
+  is claimed for such events.
+- **Unrouted path unchanged.** It keeps its text-mode carrier byte for byte.
+  Its CRLF defect is a pre-existing finding, left for a separate reviewed
+  fix.
 
 **Host-event binding.** A claim that a real `Write` was governed needs
 one record, made by the hook as the enforcing control, that binds all of the
@@ -769,6 +802,16 @@ violation. Explicitly not covered: the race between evaluation and write;
 equality of evaluated and landed bytes; existing-file `Write`, `Edit`,
 `MultiEdit`, deletion, renames and shell mutations; the Agent SDK, LangChain,
 Stop and CI; and host behavior when the hook fails to run.
+
+**Reconciliation (2026-10-24, from the review of the G2-1 charter, #634).**
+Two clarifications are folded into §6a/§7a in the same docs pass. They make
+the contract stricter and do not widen it:
+
+1. **Precondition 5.** An invalid UTF-8 carrier is an operational error,
+   never `INCOMPLETE_SOURCE_INPUT` (§6a, ruling G2C-O6).
+2. **Routed carrier.** The routed carrier is byte-exact. This is an
+   authorized, routed-only correction of today's Windows text-mode line
+   ending handling, with no hook-level historical parity claim (§7a).
 
 **Not authorized by this amendment** (each is a separate decision):
 
