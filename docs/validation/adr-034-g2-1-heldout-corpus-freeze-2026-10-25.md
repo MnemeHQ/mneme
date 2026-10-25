@@ -96,8 +96,26 @@ harness development only. They are excluded from every gate denominator.
    - The self-check then reported 0 errors.
 5. **Sealing.** The corpus was sealed after #647 merged.
 
-**Plaintext deletion.** Recorded in the deletion addendum below once the
-author confirms it.
+**Plaintext deletion (author-confirmed, 2026-10-25).** The owner had
+decrypt-verified both tars. After that, the author deleted every plaintext
+copy and confirmed each was absent:
+
+- **The authoring folder:** `C:/dev/mneme-heldout-034-g2/`, including its
+  bytecode cache.
+- **The author's scratchpad seal workspace:** both plaintext tars and their
+  rebuilds.
+- **The tar member lists.**
+- **An earlier pre-Amendment-1 snapshot.**
+
+**Temporary directories.** The author removed the temporary rebuild
+directories as each was used. A scan of the temp directories found no
+leftover case or authoring folders.
+
+- **Incomplete check:** the author stopped a slower full-text search of the
+  temp area before it finished, so that part of the check is incomplete.
+
+**The sealed folder** is unchanged at 28 files. Both ciphertexts re-hash to
+their recorded values: `016a6134…5ae4` and `d8750c4e…0585`.
 
 ## Not authorized by this record
 
