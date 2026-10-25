@@ -1007,6 +1007,10 @@ class _RoutedWrite:
     carrier_sha256: str
     assessment: Optional[VerdictAssessment] = None
     deferred: bool = False
+    # Disposition provenance for the §6.2 record (G2I-F3): the mode the hook
+    # ran in and which control decided the outcome.
+    mode: str = ""
+    cause: str = ""
 
 
 def _route_new_file(event: ToolEvent) -> Optional[_RoutedWrite]:
@@ -1117,6 +1121,25 @@ _HOST_SHA256_ENV_VAR = "MNEME_HOOK_EVIDENCE_HOST_SHA256"
 _EVIDENCE_SCHEMA = "mneme.hook_evidence/v1"
 _EVIDENCE_SURFACE = "claude_code.PreToolUse"
 _HOOK_OUTCOMES = frozenset({"refused", "proceeded", "deferred"})
+# Which control decided a routed event's disposition (G2I-F3, ADR-029):
+# - numeric_violation: a reported FORBID_NUMERIC_ABOVE violation (block/defer);
+# - other_rule: a block/defer with no numeric violation reported;
+# - availability_refusal: ADR-033 availability refused, whatever the verdict;
+# - no_violation: a complete trusted PASS;
+# - fail_open: an untrusted or incomplete result that proceeded;
+# - not_run: the checker could not run.
+_DISPOSITION_CAUSES = frozenset({
+    "numeric_violation", "other_rule", "availability_refusal",
+    "no_violation", "fail_open", "not_run",
+})
+
+
+def _verdict_cause(payload: Dict[str, Any]) -> str:
+    numeric = any(
+        isinstance(v, dict) and v.get("rule_type") == _NUMERIC_RULE_TYPE
+        for v in payload.get("violations") or []
+    )
+    return "numeric_violation" if numeric else "other_rule"
 
 
 def event_identifiers(envelope: Dict[str, Any]) -> Dict[str, str]:
@@ -1192,6 +1215,7 @@ def build_evidence_record(
         "rules": rules,
         "violations": violations,
         "hook_outcome": hook_outcome,
+        "disposition": {"mode": routed.mode or None, "cause": routed.cause or None},
     }
 
 
@@ -1310,9 +1334,18 @@ def relevant_enforcement_observed(
         }
         if reported_numeric != violated:
             return False
-        if outcome in ("refused", "deferred"):
-            return bool(violated)
-        return not violated and not reported
+        # The disposition must be the numeric result's own (G2I-F3): an
+        # availability refusal or another rule's block is never attributed
+        # to the numeric rule, whatever the matcher found.
+        disposition = record["disposition"]
+        mode, cause = disposition.get("mode"), disposition.get("cause")
+        if mode not in _VALID_MODES or cause not in _DISPOSITION_CAUSES:
+            return False
+        if outcome == "refused":
+            return mode == "strict" and cause == "numeric_violation" and bool(violated)
+        if outcome == "deferred":
+            return mode == "warn" and cause == "numeric_violation" and bool(violated)
+        return cause == "no_violation" and not violated and not reported
     except (AttributeError, KeyError, TypeError, ValueError, OSError):
         return False
 
@@ -1362,11 +1395,19 @@ def _run_check(
     extra = {"transport": "inprocess"} if resolve_transport() == "inprocess" else {}
     if routed is not None:
         extra["carrier"] = routed.carrier
+        routed.mode = mode
+
+    def caused(cause: str, rc: int) -> int:
+        # Evidence provenance only; never changes the returned exit code.
+        if routed is not None:
+            routed.cause = cause
+        return rc
+
     proc = _invoke_check(memory, rel, target_path, proposed_content, stderr=stderr, **extra)
     if proc is None:
         if emit_availability(availability, "NOT_RUN", stderr, memory=memory, note=note):
-            return 2
-        return 0
+            return caused("availability_refusal", 2)
+        return caused("not_run", 0)
 
     if routed is None:
         assessment = assess_verdict(proc.stdout, proc.returncode, mode)
@@ -1377,13 +1418,13 @@ def _run_check(
         availability, classify_observation(payload), stderr,
         memory=memory, payload=payload, note=note,
     ):
-        return 2
+        return caused("availability_refusal", 2)
     if payload is None:
         # No trusted verdict: a crash, a traceback, or a payload that
         # contradicts itself or its exit status. Never block on this.
         if assessment.inconsistent:
             print(f"mneme-hook: {assessment.problem}. Failing open.", file=stderr)
-            return 0
+            return caused("fail_open", 0)
         if _is_stale_runtime(proc.stderr):
             # Silence here would mean enforcement is off with nobody told.
             print(
@@ -1393,11 +1434,11 @@ def _run_check(
                 "INACTIVE. Upgrade with: pipx upgrade mneme-hq",
                 file=stderr,
             )
-            return 0
+            return caused("fail_open", 0)
         print(f"mneme-hook: {assessment.problem}. Failing open.", file=stderr)
         if proc.stderr:
             print(proc.stderr, file=stderr)
-        return 0
+        return caused("fail_open", 0)
 
     verdict = payload["verdict"]
     if payload.get("evaluation_complete") is False:
@@ -1406,11 +1447,11 @@ def _run_check(
         else:
             print(format_applicability_reason(payload), file=stderr)
         if not mixed_violation_actionable(payload):
-            return 0
+            return caused("fail_open", 0)
         # M-a (ADR-034 §8): a trusted violation stays actionable even when
         # numeric rules are unevaluated on this delta.
     if verdict == "PASS":
-        return 0
+        return caused("no_violation", 0)
 
     reason = format_reason(payload)
     if mode == "warn":
@@ -1422,14 +1463,14 @@ def _run_check(
         _emit_defer(reason, stdout)
         if routed is not None:
             routed.deferred = True
-        return 0
+        return caused(_verdict_cause(payload), 0)
 
     if verdict in _BLOCKING_VERDICTS:
         # Exit 2 is the documented blocking path: Claude Code feeds stderr
         # back to the model as the reason the edit was refused.
         print(reason, file=stderr)
-        return 2
-    return 0
+        return caused(_verdict_cause(payload), 2)
+    return caused("no_violation", 0)
 
 
 # ── ADR-021: Bash pre-execution gate ─────────────────────────────────────────

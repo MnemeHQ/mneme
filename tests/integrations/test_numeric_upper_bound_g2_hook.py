@@ -1173,3 +1173,104 @@ def test_g2i_f2_relative_file_path_binds_through_the_recorded_cwd(project, evide
     record, = _records(evidence)
     assert record["event"]["file_path"] == "src/new.py"
     assert hook.relevant_enforcement_observed(record, HOST)
+
+
+# ── G2I-F3: disposition provenance (attributable outcome, ADR-029) ──────────
+
+
+def test_g2i_f3_warn_closed_partial_refusal_is_availability_not_numeric(
+    closed, evidence, monkeypatch,
+):
+    monkeypatch.setenv("MNEME_HOOK_MODE", "warn")
+    rc, _, err = _hook(closed, "src/new.py", "ROUTER_DEADLINE_S = 60\nclassify(x, y)\n")
+    record, = _records(evidence)
+    assert rc == 2 and "operational refusal" in err
+    assert record["hook_outcome"] == "refused"
+    assert record["rules"][0]["matcher_status"] == "PARTIAL"
+    assert record["disposition"] == {"mode": "warn", "cause": "availability_refusal"}
+    assert not hook.relevant_enforcement_observed(record, HOST)
+
+
+def test_g2i_f3_strict_closed_partial_refusal_is_availability_not_numeric(closed, evidence):
+    """Under closed availability the incomplete result is refused before the
+    numeric disposition applies, so the refusal is never the numeric rule's."""
+    rc, _, _ = _hook(closed, "src/new.py", "ROUTER_DEADLINE_S = 60\nclassify(x, y)\n")
+    record, = _records(evidence)
+    assert rc == 2
+    assert record["disposition"] == {"mode": "strict", "cause": "availability_refusal"}
+    assert not hook.relevant_enforcement_observed(record, HOST)
+
+
+def test_g2i_f3_strict_recognized_violation_refused_by_the_numeric_rule_is_relevant(
+    project, evidence,
+):
+    rc, _, _ = _hook(project, "src/new.py", ABOVE)
+    record, = _records(evidence)
+    assert rc == 2 and record["hook_outcome"] == "refused"
+    assert record["disposition"] == {"mode": "strict", "cause": "numeric_violation"}
+    assert hook.relevant_enforcement_observed(record, HOST)
+
+
+def test_g2i_f3_closed_complete_violation_is_still_the_numeric_rules(closed, evidence):
+    """A complete trusted FAIL is not an availability refusal (unchanged)."""
+    rc, _, _ = _hook(closed, "src/new.py", ABOVE)
+    record, = _records(evidence)
+    assert rc == 2
+    assert record["disposition"] == {"mode": "strict", "cause": "numeric_violation"}
+    assert hook.relevant_enforcement_observed(record, HOST)
+
+
+@pytest.mark.parametrize("content,mode,disposition", [
+    (WITHIN, "strict", {"mode": "strict", "cause": "no_violation"}),
+    (MISSING_CALL, "strict", {"mode": "strict", "cause": "fail_open"}),
+    (LITERAL_WITHIN, "strict", {"mode": "strict", "cause": "other_rule"}),
+    (ABOVE, "warn", {"mode": "warn", "cause": "numeric_violation"}),
+    (LITERAL_WITHIN, "warn", {"mode": "warn", "cause": "other_rule"}),
+])
+def test_g2i_f3_disposition_is_recorded(project, evidence, monkeypatch, content, mode,
+                                        disposition):
+    monkeypatch.setenv("MNEME_HOOK_MODE", mode)
+    _hook(project, "src/new.py", content)
+    record, = _records(evidence)
+    assert record["disposition"] == disposition
+
+
+def test_g2i_f3_provenance_never_changes_the_hook_outcome(closed, monkeypatch, tmp_path_factory):
+    monkeypatch.setenv("MNEME_HOOK_MODE", "warn")
+    content = "ROUTER_DEADLINE_S = 60\nclassify(x, y)\n"
+    unset = _hook(closed, "src/new.py", content)
+    monkeypatch.setenv("MNEME_HOOK_EVIDENCE_LOG", str(tmp_path_factory.mktemp("f3") / "e.jsonl"))
+    assert _hook(closed, "src/new.py", content) == unset
+
+
+DISPOSITION_TAMPERS = {
+    "cause_availability": lambda r: r["disposition"].update(cause="availability_refusal"),
+    "cause_other_rule": lambda r: r["disposition"].update(cause="other_rule"),
+    "cause_fail_open": lambda r: r["disposition"].update(cause="fail_open"),
+    "cause_unknown": lambda r: r["disposition"].update(cause="numeric"),
+    "cause_missing": lambda r: r["disposition"].pop("cause"),
+    "mode_warn_for_refusal": lambda r: r["disposition"].update(mode="warn"),
+    "mode_missing": lambda r: r["disposition"].pop("mode"),
+    "disposition_missing": lambda r: r.pop("disposition"),
+    "deferred_in_strict": lambda r: r.update(hook_outcome="deferred"),
+}
+
+
+@pytest.mark.parametrize("name", sorted(DISPOSITION_TAMPERS))
+def test_g2i_f3_contradictory_disposition_never_counts(project, evidence, name):
+    _hook(project, "src/new.py", ABOVE)
+    record, = _records(evidence)
+    assert hook.relevant_enforcement_observed(record, HOST)
+    tampered = copy.deepcopy(record)
+    DISPOSITION_TAMPERS[name](tampered)
+    assert not hook.relevant_enforcement_observed(tampered, HOST)
+
+
+def test_g2i_f3_proceed_requires_a_no_violation_cause(project, evidence):
+    _hook(project, "src/new.py", WITHIN)
+    record, = _records(evidence)
+    assert hook.relevant_enforcement_observed(record, HOST)
+    for cause in ("fail_open", "availability_refusal", "not_run", "other_rule"):
+        tampered = copy.deepcopy(record)
+        tampered["disposition"]["cause"] = cause
+        assert not hook.relevant_enforcement_observed(tampered, HOST), cause
