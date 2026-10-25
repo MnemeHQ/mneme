@@ -318,6 +318,56 @@ def test_shim_records_without_changing_stdout_stderr_or_exit(tmp_path):
     assert other.stdout.strip() == b"1" and not (tmp_path / "none.jsonl").exists()
 
 
+def test_shim_preserves_stdout_and_stderr_bytes_exactly(tmp_path):
+    # Q6: CRLF, a lone CR, non-ASCII, no final newline, and a direct buffer write.
+    fake = tmp_path / "fake"
+    (fake / "mneme").mkdir(parents=True)
+    (fake / "mneme" / "__init__.py").write_text("")
+    (fake / "mneme" / "__main__.py").write_text(
+        "import sys\n"
+        "sys.stdout.reconfigure(encoding='utf-8', errors='replace')\n"
+        "sys.stdout.write('a\\r\\nb\\rc \\u00e9\\u2192')\n"
+        "sys.stdout.flush()\n"
+        "sys.stdout.buffer.write(b'\\xff\\x00raw')\n"
+        "sys.stderr.write('e\\r\\n\\u00e9')\n"
+        "sys.exit(7)\n", encoding="utf-8")
+    log = tmp_path / "observe.jsonl"
+    env = {k: v for k, v in os.environ.items() if not k.startswith("PYTHON")}
+    argv = [sys.executable, "-m", "mneme", "check", "--input", str(tmp_path / "c"), "--json"]
+    (tmp_path / "c").write_bytes(b"")
+    without = subprocess.run(argv, capture_output=True, cwd=tmp_path,
+                             env=dict(env, PYTHONPATH=str(fake)))
+    observed = subprocess.run(argv, capture_output=True, cwd=tmp_path, env=dict(
+        env, PYTHONPATH=os.pathsep.join([str(h.SHIM_DIR), str(fake)]),
+        MNEME_G2H_OBSERVE_LOG=str(log)))
+    assert without.returncode == observed.returncode == 7
+    assert observed.stdout == without.stdout and b"\xff\x00raw" in observed.stdout
+    assert observed.stderr == without.stderr
+    (record,) = [json.loads(line) for line in log.read_text().splitlines()]
+    assert record["stdout"] == "a\r\nb\rc é→"  # the text the child wrote
+
+
+def test_relevance_is_reported_per_rule_beside_the_case_value():
+    impl = hook_obs(2, "refused", records=[record("refused")],
+                    payload=_payload("RECOGNIZED", "VIOLATION", None))
+    result = h.score_case(make_case("V", **V_EXPECTED), obs_of(impl), HOST)
+    assert result["diagnostics"]["relevance"] == [{"case": True, "per_rule": {"ADR-701": True}}]
+
+
+def test_label_conformance_is_counted_separately_from_the_gates(tmp_path, monkeypatch):
+    # A case can pass every gate and still disagree with an ungated label.
+    agreeing = make_case("C", hook_exit=0, g2_false_block_gate_applies=True)
+    disagreeing = dataclasses.replace(
+        make_case("C", hook_exit=1, g2_false_block_gate_applies=True), case_id="g2h-5555555555")
+    monkeypatch.setattr(h, "execute_case", lambda case, ctx: obs_of(hook_obs(0)))
+    ctx = h.Context(sys.executable, sys.executable, *HOST, tmp_path / "w")
+    summary = h.run_pass([agreeing, disagreeing], ctx, HOST, tmp_path / "run")
+    assert all(g["pass"] for g in summary["gates"].values())
+    assert summary["label_conformance"] == {"cases": 2, "cases_with_mismatch": 1,
+                                            "cases_in_full_agreement": 1, "gating": False}
+    assert summary["label_conformance_mismatches"]["hook_exit"] == 1
+
+
 # ── scoring: evidence relevance (Amendment 1 A1.3) ───────────────────────────
 
 CONTENT = "X = 1\n"
@@ -479,8 +529,31 @@ def test_g1a_expected_block_observed_proceeding_is_unsafe_whatever_the_labels():
     assert "a:expected_block_not_refused" in result["gates"]["G1"]["why"]
     lit = make_case("LIT", hook_exit=2, literal_violation=True)
     assert failing(h.score_case(lit, obs_of(hook_obs(0)), HOST), "G1")
-    warn = make_case("V", mode="warn", **{**V_EXPECTED, "hook_exit": 0})
+    warn = make_case("V", mode="warn", **{**V_EXPECTED, "hook_exit": 0,
+                                           "evidence_hook_outcome": "deferred"})
     assert not failing(h.score_case(warn, obs_of(hook_obs(0)), HOST), "G1")
+
+
+@pytest.mark.parametrize("klass", ["C", "US", "UF", "UP", "X", "L", "W", "P", "LIT", "VP"])
+@pytest.mark.parametrize("label", [{"hook_exit": 2}, {"hook_disposition": "refused"},
+                                   {"evidence_hook_outcome": "refused"}])
+def test_g1a_any_labelled_block_expectation_in_any_class_counts(klass, label):
+    # G2H-F2: revision 2 G2V-F1 counts every case labelled to block, whatever its class.
+    case = make_case(klass, mode="warn", **label)
+    result = h.score_case(case, obs_of(hook_obs(0, "proceeded")), HOST)
+    assert "a:expected_block_not_refused" in result["gates"]["G1"]["why"]
+    blocked = h.score_case(case, obs_of(hook_obs(2, "refused")), HOST)
+    assert "a:expected_block_not_refused" not in blocked["gates"]["G1"]["why"]
+
+
+def test_g1a_a14_baseline_observed_error_is_not_a_block_expectation():
+    case = make_case("L", expected_from_baseline=True, hook_exit="observed_from_baseline",
+                     hook_disposition="observed_from_baseline")
+    assert h.expects_block(case) is False
+    strict_v_a14 = make_case("V", expected_from_baseline=True)
+    assert h.expects_block(strict_v_a14) is False
+    assert h.expects_block(make_case("V")) is True
+    assert h.expects_block(make_case("C")) is False
 
 
 def test_g1b_nonclean_expected_observed_no_violation():
@@ -570,7 +643,12 @@ def test_a2_surrogate_style_case_in_scope_passes_on_frame_only_differences():
     assert result["gates"]["G5"]["applies"] and result["gates"]["G5"]["pass"]
     a2 = result["diagnostics"]["amendment_2"]
     assert a2["in_scope"] and a2["pass"] and a2["raw_bytes_identical"] is False
-    assert a2["raw_stderr_diff"]  # the raw diff is recorded (A2.3)
+    raw = a2["raw_bytes"]  # byte-exact evidence (A2.3)
+    assert base64.b64decode(raw["implementation_stderr_b64"]) == stderr_impl.encode()
+    assert base64.b64decode(raw["baseline_stderr_b64"]) == stderr_base.encode()
+    assert raw["stderr_first_difference_offset"] == stderr_base.index("/venv-")+ len("/venv-")
+    assert raw["stdout_first_difference_offset"] is None
+    assert a2["text_stderr_diff"]  # readable extra only
 
 
 def test_a2_message_mismatch_fails():
@@ -621,6 +699,46 @@ def test_a2_non_traceback_stderr_and_stdout_are_compared():
     assert set(why) == {"a2:non_traceback_stderr", "a2:stdout"}
 
 
+def test_a2_is_byte_preserving_outside_traceback_blocks():
+    # G2H-F1: line endings and the final newline are part of the comparison.
+    base_err = "mneme-hook: note\n" + tb("/b", 1)
+    for impl_err in ("mneme-hook: note\r\n" + tb("/a", 2),            # CRLF vs LF
+                     "mneme-hook: note\n" + tb("/a", 2).rstrip("\n")):  # no final newline
+        result = h.score_case(make_case("L", **A2_CASE),
+                              obs_of(hook_obs(1, stderr=impl_err.encode()),
+                                     hook_obs(1, stderr=base_err.encode())), HOST)
+        assert failing(result, "G5"), impl_err
+    crlf_summary = tb("/a", 2).replace("ValueError: boom\n", "ValueError: boom\r\n")
+    why = h.score_case(make_case("L", **A2_CASE),
+                       obs_of(hook_obs(1, stderr=("mneme-hook: note\n" + crlf_summary).encode()),
+                              hook_obs(1, stderr=base_err.encode())), HOST)["gates"]["G5"]["why"]
+    assert "a2:exception_summaries" in why
+    parsed = h.parse_tracebacks(b"x\r\n" + tb("/a", 1).encode())
+    assert parsed["outside"] == [b"x\r\n"] and parsed["summaries"] == [b"ValueError: boom\n"]
+
+
+def test_a2_needs_a_complete_block_in_the_baseline():
+    truncated = 'Traceback (most recent call last):\n  File "/b", line 1, in f\n'
+    assert h.parse_tracebacks(truncated.encode())["complete_blocks"] == 0
+    assert h.parse_tracebacks(truncated.encode())["incomplete_blocks"] == 1
+    base = hook_obs(1, stderr=truncated.encode())
+    assert not h.a2_in_scope(base)
+    impl = hook_obs(1, stderr=truncated.replace("/b", "/a").encode())
+    result = h.score_case(make_case("L", **A2_CASE), obs_of(impl, base), HOST)
+    assert "amendment_2" not in result["diagnostics"]  # raw bytes decide
+    assert "hook_stderr" in result["gates"]["G5"]["why"]
+    # A header followed by an unindented non-summary line is not a complete block.
+    broken = b"Traceback (most recent call last):\nnot a summary line here!\n"
+    assert not h.a2_in_scope(hook_obs(1, stderr=broken))
+    # A complete block plus a trailing truncated one keeps the case out of scope.
+    assert not h.a2_in_scope(hook_obs(1, stderr=tb("/b", 1).encode() + truncated.encode()))
+    # In scope, a current build whose own block is truncated fails.
+    why = h.score_case(make_case("L", **A2_CASE),
+                       obs_of(hook_obs(1, stderr=tb("/a", 2).encode() + truncated.encode()),
+                              hook_obs(1, stderr=tb("/b", 1).encode())), HOST)["gates"]["G5"]["why"]
+    assert "a2:incomplete_block" in why
+
+
 def test_a2_summary_counts_in_scope_cases_by_class(tmp_path, monkeypatch):
     base = hook_obs(1, stderr=tb("/b", 1).encode())
     observations = {"g2h-0000000000": obs_of(hook_obs(1, stderr=tb("/b", 1).encode()), base),
@@ -653,6 +771,26 @@ def test_g5_routed_cr_exception_keeps_checker_level_parity():
     assert {"checker_exit", "checker_stdout"} <= set(why)
     assert "checker_pair_missing" in h.score_case(routed_p, obs_of(impl, impl, None, facts),
                                                   HOST)["gates"]["G5"]["why"]
+
+
+@pytest.mark.parametrize("label", [{"parity_with_baseline_hook": True},
+                                   {"expected_from_baseline": True}])
+@pytest.mark.parametrize("klass", ["P", "X", "L", "C"])
+def test_g5_routed_cr_exception_overrides_label_added_hook_parity(klass, label):
+    # G2H-F3: a label can never switch hook-level parity back on for routed CR content.
+    facts = {**FACTS, "content_has_cr": True}
+    case = make_case(klass, hook_routed=True, **label)
+    assert h.hook_parity_applies(case, has_cr=True) is False
+    impl, base = hook_obs(0, stdout=b"a"), hook_obs(0, stdout=b"b")
+    pair_ok = {"proposed": {"exit": 0, "stdout_sha256": "x"},
+               "input": {"exit": 0, "stdout_sha256": "x"}}
+    result = h.score_case(case, obs_of(impl, base, pair_ok, facts), HOST)
+    assert not {"hook_exit", "hook_stdout", "hook_stderr"} & set(result["gates"]["G5"]["why"])
+    # Checker-level parity still applies where registered (routed P and X, or labelled).
+    checker = h.checker_parity_applies(case)
+    assert checker is (klass in ("P", "X"))
+    # Without CR, the same labels do add hook-level parity.
+    assert h.hook_parity_applies(case, has_cr=False) is True
 
 
 def test_g6_record_count_cause_and_unrouted_records():

@@ -150,11 +150,11 @@ in the same passes but written to separate files (`smoke_cases.jsonl`,
 
 | Gate | Applies to | Fails when |
 |---|---|---|
-| **G1** | every case | (a) a strict V or VP case, or a LIT case with expected `hook_exit` 2, is observed with any exit other than 2; (b) a numeric rule expected non-clean (outcome `VIOLATION`/`UNEVALUATED` or status `PARTIAL`/`MATCHER_UNEVALUATED`) has any observed trace (checker payload or evidence record) with `NO_VIOLATION`; (c) the scorer-computed relevance is true where the label is not true, for the case or any rule |
+| **G1** | every case | (a) a case expected to block is observed with any exit other than 2. Expected to block: every strict V or VP case, and every case of any class labelled `hook_exit` 2, `hook_disposition` `refused` or `evidence_hook_outcome` `refused`, except an A1.4 case (`expected_from_baseline`), whose outcome is observed from the baseline; (b) a numeric rule expected non-clean (outcome `VIOLATION`/`UNEVALUATED` or status `PARTIAL`/`MATCHER_UNEVALUATED`) has any observed trace (checker payload or evidence record) with `NO_VIOLATION`; (c) the scorer-computed relevance is true where the label is not true, for the case or any rule |
 | **G2** | classes C, US, UF, UP, X, L, W, P; not `expected_from_baseline`; no expected literal violation | observed exit 2 |
 | **G3** | every case | after an exit 2 the target exists; the target state changed at all; or the `target_after_hook` label does not hold (`absent`, `unchanged`, `unchanged_link_and_referent`, `unchanged_dangling_link`) |
 | **G4** | classes US, UF, UP, VP | for a rule with an expected primary reason: no observed trace, or any trace with a different `primary_reason` |
-| **G5** hook level | P, X, L except routed with CR content; plus any case labelled `parity_with_baseline_hook` or `expected_from_baseline` | **Amendment 2 scope** (the baseline's own run exited nonzero with at least one traceback block): the builds differ in stdout, exit, the ordered exception summary lines, the ordered chain separators, or any stderr line outside a traceback block, or the current build did not raise. **Otherwise:** they differ in exit, raw stdout bytes or raw stderr bytes; a traceback-normalized comparison is then recorded as a diagnostic (`gating: false`) |
+| **G5** hook level | P, X, L, plus any case labelled `parity_with_baseline_hook` or `expected_from_baseline`; **never** a routed case whose content contains CR, whatever the labels add (the routed-CR exception takes precedence) | **Amendment 2 scope** (the baseline's own run exited nonzero with at least one traceback block): the builds differ in stdout, exit, the ordered exception summary lines, the ordered chain separators, or any stderr line outside a traceback block, or the current build did not raise. **Otherwise:** they differ in exit, raw stdout bytes or raw stderr bytes; a traceback-normalized comparison is then recorded as a diagnostic (`gating: false`) |
 | **G5** checker level | routed P and X; plus any case labelled `parity_with_input_carrier` | `--proposed-new-file` and `--input` differ in exit or stdout bytes |
 | **G6** | every case | routed (`g2_evidence_record_expected`): not exactly one record; any binding problem; `hook_outcome` differs from the observed disposition or the label; `disposition.mode` differs from the case mode; `disposition.cause` differs from the expected cause; relevance differs from the label, for the case or per rule. Unrouted: any record |
 | **G7** | the run | the two passes' `cases.jsonl` or `summary.json` differ in any byte |
@@ -170,13 +170,19 @@ in the same passes but written to separate files (`smoke_cases.jsonl`,
 **Amendment 2 (G5, #652).** Scope is decided only by the pinned baseline's
 observed run of the case, never by the labels or the current build. A
 traceback block runs from `Traceback (most recent call last):` to its
-summary line, the first following line that is not indented. Only the
-lines between the two (the frames) are left out. For every case in scope
-the harness records:
+summary line: the first following line that is not indented and has the
+form `ExceptionType` or `ExceptionType: message`. Only the lines between the
+two (the frames) are left out. The parse works on raw bytes and keeps every
+line's own line-ending bytes, so CRLF against LF, or a missing final newline,
+is a difference. Only a **complete** block (header through summary line)
+brings a case into scope. A baseline stderr with a truncated or incomplete
+block is out of scope and compared as raw bytes, and a current build whose
+block is incomplete fails. For every case in scope the harness records:
 
-- both builds' raw stdout and stderr;
-- the raw stdout and stderr diffs;
-- the A2.2 result and its failure reasons.
+- both builds' raw stdout and stderr, as base64;
+- the offset of the first differing byte in each stream;
+- the A2.2 result and its failure reasons;
+- text-decoded unified diffs, as a readable extra only.
 
 The summary's `amendment_2` block gives the cases in scope per class, how
 many had identical raw bytes, and how many passed A2.2, plus a description
@@ -221,6 +227,11 @@ See open question Q1.
 
 **Reported, never gating:**
 
+- the **label-conformance count**: how many concealed cases disagree with at
+  least one ungated label (`label_conformance` in each summary, and in the
+  headline). A G1-G8 PASS is never a statement of 100% label agreement;
+- each evidence record's relevance per rule, beside the case value;
+
 - label conformance: `hook_exit`, `hook_disposition`, `hook_invokes`,
   `hook_routed`, `subject_kind`, `trusted_proposed_source`, the numeric rule
   fields, the `unknown_source_reasons` multiset, `content_utf8_sha256`, and
@@ -260,56 +271,30 @@ See open question Q1.
   It runs the full `score` protocol over the seven public smoke cases, on
   the pinned builds.
 
-## Open questions (for the owner, before decryption)
+## Owner and reviewer decisions on the open questions (review of `072f1956`)
 
-These are listed in the harness PR. Each is implemented as described above
-until ruled otherwise. A ruling that changes scoring means a harness change
-**before** decryption.
-
-- **Q1 (G6 cause).** G6 requires the "expected cause". No label carries one,
-  and the cause vocabulary (`numeric_violation`, `other_rule`,
-  `no_violation`, `fail_open`, …) is the implementation's, not the charter's.
-  The harness derives it as above. Should G6 score the cause this way, or
-  score only outcome, mode and relevance?
-- **Q2 (relevance, several rules).** Case-level relevance for a case with
-  more than one applied numeric rule is taken as the conjunction (false if
-  none). Per-rule values are compared to `…_per_rule`.
-- **Q3 (G1(a) set).** G1(a) is taken literally: strict V and VP, and LIT
-  with expected exit 2. A case of another class labelled `refused` is not in
-  G1(a); it appears only in label conformance.
-- **Q4 (G5 and the labels).** Labels can add cases to G5, never remove them:
-  the class rule ∪ `parity_with_baseline_hook` ∪ `expected_from_baseline` at
-  hook level, and routed P/X ∪ `parity_with_input_carrier` at checker level.
-  The routed-CR exception uses the `hook_routed` label.
-- **Q5 (G3 and the label).** G3 also requires `target_after_hook` to hold,
-  beyond "absent after a block, never changed".
-- **Q6 (how matcher results are observed).** G1(b) and G4 read the checker
-  payload that the hook's own child wrote, captured by the shim (plus the
-  evidence record rules for G1(b)). Is a `PYTHONPATH` observation shim on the
-  scored run acceptable? The alternative is an uninstrumented hook run plus a
-  separate checker replay.
-- **Q7 (environment pins).** Hook-level bytes depend on the constructed
-  environment: the locale encoding (no `PYTHONIOENCODING`/`PYTHONUTF8`; cp1252
-  on the pinned Windows host), the envelope `cwd` as process cwd, and
-  per-run `TEMP`. The completion record should state these.
-- **Q8 (lone-surrogate cases): resolved by Amendment 2 (#652).** Both
-  builds raise `UnicodeEncodeError` on lone-surrogate content, with frames
-  that differ (line 920 against 797, and different site-packages paths).
-  Under raw-byte A1.4 every such case would have failed G5 by construction.
-  The owner adopted Amendment 2 before decryption, and the harness
-  implements it. On the pinned wheels, a synthetic lone-surrogate case is
-  now in scope: its raw stderr differs, and it passes A2.2.
-- **Q9 (symlinks).** This machine cannot create symlinks without privilege
-  (`WinError 1314`). Scoring here would be INCOMPLETE. The scoring
-  environment needs Developer Mode or an elevated shell, shown by
-  `probe-symlinks` in the completion record.
-- **Q10 (fixture details LAYOUT leaves open).**
-  - symlink targets are created with native separators on Windows;
-  - `memory: null` means no memory file;
-  - with no `docs/adr`, only `mneme init` runs;
-  - the memory is compiled with the repo as cwd;
-  - `mneme init` writes a wall-clock `meta.created`, so raw memory bytes are
-    outside G7.
-- **Q11 (G7 scope).** G7 compares the concealed per-case records (raw
-  output bytes included) and the run summary. The final `summary.json` has
-  timestamps and is not compared.
+- **Q1 (G6 cause):** the label-derived expected cause is accepted
+  provisionally. The mapping is pinned by tests, and it is computed from the
+  labels only, never inferred from the observed record.
+- **Q2 (relevance, several rules):** the case-level conjunction is accepted.
+  Each rule's result is kept and reported separately.
+- **Q3 (G1(a) set):** fixed as G2H-F2. Every labelled block expectation in any
+  class counts, except the A1.4 baseline-observed cases.
+- **Q4 (G5 and the labels):** label-based additions are accepted. The
+  routed-CR exception takes precedence over them (G2H-F3).
+- **Q5 (G3 and the label):** accepted. The target-state label is an extra
+  assertion and never replaces the no-mutation requirement.
+- **Q6 (observation shim):** accepted for synthetic scoring, subject to the
+  byte-preservation tests. Its exact SHA-256 is in every summary
+  (`harness` digests). It is not live-host evidence.
+- **Q7 (environment):** accepted. The completion record states the OS, the
+  Python version, the effective encodings, the working-directory convention
+  and the constructed environment.
+- **Q8 (lone-surrogate cases):** resolved by Amendment 2. No PASS is presumed.
+- **Q9 (symlinks):** the symlink probe must pass before decryption.
+- **Q10 (fixture construction):** accepted. The wall-clock `meta.created`
+  memory field stays explicitly outside G7; the typed rule content is still
+  checked.
+- **Q11 (G7 scope):** accepted. G7 compares the concealed case records and
+  the per-run summaries; timestamps live only in the final administrative
+  summary, which is not compared.

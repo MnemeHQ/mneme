@@ -961,10 +961,27 @@ def checker_parity_applies(case: Case) -> bool:
 
 
 def hook_parity_applies(case: Case, has_cr: bool) -> bool:
+    """G5 hook level. Labels may add cases; the routed-CR exception overrides
+    every addition (revision 2, G2H-F3). Checker-level parity is separate."""
     e = case.expected
-    by_class = case.klass in HOOK_PARITY_CLASSES and not (e.get("hook_routed") is True and has_cr)
-    return by_class or e.get("parity_with_baseline_hook") is True \
+    if e.get("hook_routed") is True and has_cr:
+        return False
+    return case.klass in HOOK_PARITY_CLASSES or e.get("parity_with_baseline_hook") is True \
         or e.get("expected_from_baseline") is True
+
+
+def expects_block(case: Case) -> bool:
+    """G1(a) (revision 2, G2V-F1; G2H-F2): every strict V and VP case, and every
+    case of any class whose labels expect a block (exit 2 or a refusal). An
+    A1.4 case, whose outcome is observed from the baseline, carries no block
+    expectation."""
+    e = case.expected
+    if e.get("expected_from_baseline") is True:
+        return False
+    if case.klass in ("V", "VP") and e.get("hook_mode") == "strict":
+        return True
+    return e.get("hook_exit") == 2 or e.get("hook_disposition") == "refused" \
+        or e.get("evidence_hook_outcome") == "refused"
 
 
 def execute_case(case: Case, ctx: Context) -> dict:
@@ -1179,55 +1196,95 @@ CHAIN_SEPARATORS = (
 )
 
 
-def parse_tracebacks(stderr: bytes) -> dict:
-    """Split stderr into traceback blocks and everything else (Amendment 2).
+_SUMMARY_LINE = re.compile(rb"^[A-Za-z_][A-Za-z0-9_.]*(:( .*)?)?$")
 
-    A block starts at ``Traceback (most recent call last):`` and ends at its
-    exception summary line, the first following line that is not indented.
-    Only the lines strictly between the two (the frames) are dropped; the
-    summary lines, the chain separators and every line outside a block are
-    kept, in order. Bytes that are not UTF-8 survive through
-    ``surrogateescape``, so equal results mean equal bytes.
+
+def _bare(line: bytes) -> bytes:
+    """A line without its line-ending bytes (for recognition only, never comparison)."""
+    return line.rstrip(b"\r\n")
+
+
+def parse_tracebacks(stderr: bytes) -> dict:
+    """Split raw stderr bytes into traceback blocks and everything else (Amendment 2).
+
+    Byte-preserving (G2H-F1): every kept line keeps its own line-ending bytes,
+    so CRLF against LF, or a missing final newline, still compares unequal.
+
+    A block starts at a line ``Traceback (most recent call last):`` and is
+    complete only when it reaches its exception summary line: the first
+    following line that is not indented and has the form ``ExceptionType`` or
+    ``ExceptionType: message``. Only the lines strictly between the two (the
+    frames) are dropped. The summary lines, the chain separators and every
+    line outside a block are kept, in order. A block with no summary line is
+    reported as ``incomplete`` and its lines are kept as non-traceback text.
     """
-    text = stderr.decode("utf-8", "surrogateescape")
-    summaries: list[str | None] = []
-    separators: list[str] = []
-    outside: list[str] = []
-    in_block = False
-    for line in text.splitlines():
-        if in_block:
-            if line[:1] in (" ", "\t") or line == "":
-                continue  # a frame line
-            summaries[-1] = line
-            in_block = False
+    summaries: list[bytes] = []
+    separators: list[bytes] = []
+    outside: list[bytes] = []
+    pending: list[bytes] | None = None  # the lines of an open block
+    incomplete = 0
+    for line in stderr.splitlines(keepends=True):
+        bare = _bare(line)
+        if pending is not None:
+            if bare[:1] in (b" ", b"\t") or bare == b"":
+                pending.append(line)  # a frame line
+                continue
+            if _SUMMARY_LINE.match(bare):
+                summaries.append(line)
+                pending = None
+                continue
+            # Not a summary line: the block never completed.
+            incomplete += 1
+            outside.extend(pending)
+            pending = None
+        if bare == TRACEBACK_HEADER.encode("ascii"):
+            pending = [line]
             continue
-        if line == TRACEBACK_HEADER:
-            summaries.append(None)  # replaced by its summary line
-            in_block = True
-            continue
-        if line in CHAIN_SEPARATORS:
+        if bare.decode("utf-8", "replace") in CHAIN_SEPARATORS:
             separators.append(line)
         outside.append(line)
-    return {"blocks": len(summaries), "summaries": summaries, "separators": separators,
-            "outside": outside, "unterminated_block": in_block}
+    if pending is not None:
+        incomplete += 1
+        outside.extend(pending)
+    return {"complete_blocks": len(summaries), "incomplete_blocks": incomplete,
+            "summaries": summaries, "separators": separators, "outside": outside}
 
 
 def a2_in_scope(base: dict) -> bool:
-    """A2.1: the pinned baseline's own run exited nonzero with a traceback."""
+    """A2.1: the pinned baseline's own run exited nonzero with a complete traceback block.
+
+    A truncated or otherwise incomplete block never brings a case into scope
+    (G2H-F1); neither does a stderr that also holds an incomplete block.
+    """
     if base.get("exit") in (0, None):
         return False
-    return parse_tracebacks(base64.b64decode(base["stderr_b64"]))["blocks"] > 0
+    parsed = parse_tracebacks(base64.b64decode(base["stderr_b64"]))
+    return parsed["complete_blocks"] > 0 and parsed["incomplete_blocks"] == 0
+
+
+def first_difference(a: bytes, b: bytes) -> int | None:
+    """Offset of the first differing byte, or None when the streams are equal."""
+    if a == b:
+        return None
+    for index, (x, y) in enumerate(zip(a, b)):
+        if x != y:
+            return index
+    return min(len(a), len(b))
 
 
 def a2_compare(impl: dict, base: dict) -> dict:
     """A2.2 for a case in scope: everything but the frame lines, byte for byte."""
     impl_stderr = base64.b64decode(impl["stderr_b64"])
     base_stderr = base64.b64decode(base["stderr_b64"])
+    impl_stdout = base64.b64decode(impl["stdout_b64"])
+    base_stdout = base64.b64decode(base["stdout_b64"])
     mine, theirs = parse_tracebacks(impl_stderr), parse_tracebacks(base_stderr)
     failures = []
-    if impl["exit"] in (0, None) or mine["blocks"] == 0:
+    if impl["exit"] in (0, None) or mine["complete_blocks"] == 0:
         failures.append("a2:current_build_did_not_raise")
-    if impl["stdout_sha256"] != base["stdout_sha256"]:
+    if mine["incomplete_blocks"]:
+        failures.append("a2:incomplete_block")
+    if impl_stdout != base_stdout:
         failures.append("a2:stdout")
     if impl["exit"] != base["exit"]:
         failures.append("a2:exit")
@@ -1237,15 +1294,27 @@ def a2_compare(impl: dict, base: dict) -> dict:
         failures.append("a2:chain_separators")
     if mine["outside"] != theirs["outside"]:
         failures.append("a2:non_traceback_stderr")
-    raw = {"stdout": impl["stdout_sha256"] == base["stdout_sha256"],
-           "stderr": impl_stderr == base_stderr, "exit": impl["exit"] == base["exit"]}
-    return {"in_scope": True, "pass": not failures, "failures": failures,
-            "raw_bytes_identical": all(raw.values()), "raw": raw,
-            "raw_stderr_diff": stderr_diagnostic(impl_stderr, base_stderr)["raw_diff"],
-            "raw_stdout_diff": list(difflib.unified_diff(
-                base64.b64decode(base["stdout_b64"]).decode("utf-8", "replace").splitlines(),
-                base64.b64decode(impl["stdout_b64"]).decode("utf-8", "replace").splitlines(),
-                "baseline", "implementation", lineterm=""))}
+    raw = {"stdout": impl_stdout == base_stdout, "stderr": impl_stderr == base_stderr,
+           "exit": impl["exit"] == base["exit"]}
+    return {
+        "in_scope": True, "pass": not failures, "failures": failures,
+        "raw_bytes_identical": all(raw.values()), "raw": raw,
+        # Byte-exact evidence (A2.3): both raw streams and the first differing offset.
+        "raw_bytes": {
+            "implementation_stdout_b64": impl["stdout_b64"],
+            "baseline_stdout_b64": base["stdout_b64"],
+            "implementation_stderr_b64": impl["stderr_b64"],
+            "baseline_stderr_b64": base["stderr_b64"],
+            "stdout_first_difference_offset": first_difference(impl_stdout, base_stdout),
+            "stderr_first_difference_offset": first_difference(impl_stderr, base_stderr),
+        },
+        # Readable extras only; the comparison above is on bytes.
+        "text_stderr_diff": stderr_diagnostic(impl_stderr, base_stderr)["raw_diff"],
+        "text_stdout_diff": list(difflib.unified_diff(
+            base_stdout.decode("utf-8", "replace").splitlines(),
+            impl_stdout.decode("utf-8", "replace").splitlines(),
+            "baseline", "implementation", lineterm="")),
+    }
 
 
 def stderr_diagnostic(impl: bytes, base: bytes) -> dict:
@@ -1298,11 +1367,12 @@ def score_case(case: Case, obs: dict, host: tuple[str, str]) -> dict:
     traces = numeric_traces(impl)
     records = impl.get("evidence_records") or []
     relevance = [scorer_relevance(r, facts, host, mode) for r in records]
-    diagnostics: dict = {}
+    # Q2: the case value is the conjunction; every rule's own result is kept.
+    diagnostics: dict = {"relevance": [{"case": cv, "per_rule": dict(sorted(pr.items()))}
+                                       for cv, pr in relevance]}
 
     # G1 unsafe pass (§5, G2V-F1).
-    expected_block = (case.klass in ("V", "VP") and mode == "strict") or (
-        case.klass == "LIT" and e.get("hook_exit") == 2)
+    expected_block = expects_block(case)
     nonclean = {d for d, r in (e.get("numeric_rules") or {}).items() if isinstance(r, dict) and (
         r.get("matcher_outcome") in ("VIOLATION", "UNEVALUATED")
         or r.get("matcher_status") in ("PARTIAL", "MATCHER_UNEVALUATED"))}
@@ -1489,6 +1559,13 @@ A2_COMPARISON = (
 )
 
 
+def conformance_count(scored: list[tuple[Case, dict]]) -> dict:
+    """Non-gating: how many cases disagree with at least one ungated label."""
+    mismatched = [c.case_id for c, s in scored if s["diagnostics"].get("conformance")]
+    return {"cases": len(scored), "cases_with_mismatch": len(mismatched),
+            "cases_in_full_agreement": len(scored) - len(mismatched), "gating": False}
+
+
 def amendment_2_summary(scored: list[tuple[Case, dict]]) -> dict:
     """A2.3: cases in scope by class, and whether their raw bytes matched."""
     by_class: dict[str, dict[str, int]] = {}
@@ -1529,6 +1606,7 @@ def run_pass(cases: list[Case], ctx: Context, host: tuple[str, str], out_dir: Pa
         item for c, s in smoke for item in s["diagnostics"].get("conformance", []))
     smoke_summary = {"cases": len(smoke), "gating": False, "gates": aggregate(smoke),
                      "label_conformance_mismatches": dict(sorted(smoke_conformance.items())),
+                     "label_conformance": conformance_count(smoke),
                      "amendment_2": amendment_2_summary(smoke)}
     (out_dir / "smoke_summary.json").write_text(dump_json(smoke_summary), encoding="ascii",
                                                 newline="\n")
@@ -1537,6 +1615,7 @@ def run_pass(cases: list[Case], ctx: Context, host: tuple[str, str], out_dir: Pa
         "concealed_cases": len(concealed),
         "gates": aggregate(concealed),
         "label_conformance_mismatches": dict(sorted(conformance.items())),
+        "label_conformance": conformance_count(concealed),
         "g5_stderr_diagnostics": [
             {"case_id": c.case_id, "class": c.klass,
              "normalized_equal": s["diagnostics"]["stderr"]["normalized_equal"]}
@@ -1643,6 +1722,10 @@ def score(*, corpus: Path, out_dir: Path, impl_python: str, impl_wheel: Path,
     final["headline"] = " ".join(
         f"{g} {'PASS' if gates[g]['pass'] else 'FAIL'} "
         f"({gates[g]['failures']}/{gates[g]['applicable']} failing)." for g in GATES)
+    lc = final["label_conformance"]
+    # A gate PASS is never label agreement: report the mismatch count beside it.
+    final["headline"] += (f" Label conformance (non-gating): {lc['cases_with_mismatch']} of "
+                          f"{lc['cases']} concealed cases have at least one label mismatch.")
     return _finish(out_dir, final)
 
 
@@ -1669,6 +1752,7 @@ def score_passes(cases: list[Case], ctx: Context, root: Path, out_dir: Path) -> 
         "gates": {g: gates[g] for g in GATES},
         "public_smoke": summaries[0]["public_smoke"],
         "label_conformance_mismatches": summaries[0]["label_conformance_mismatches"],
+        "label_conformance": summaries[0]["label_conformance"],
         "g5_stderr_diagnostics": summaries[0]["g5_stderr_diagnostics"],
         "amendment_2": summaries[0]["amendment_2"],
     }
