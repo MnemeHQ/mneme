@@ -230,16 +230,19 @@ See proposed [ADR-027](../adr/ADR-027-decision-mcp-proposal-ingestion-and-author
 
 Maintain **Code Mode as a parallel, optional Decision MCP consumer integration** for orchestration efficiency, programmable decision-context composition, and software-factory interoperability. This workstream supports—not gates or replaces—the Decision Index, `DecisionRetriever`, `ConflictDetector`, deterministic enforcement, or independent architecture benchmarks. See [CM-01 tracker #640](https://github.com/MnemeHQ/mneme/issues/640).
 
-**Recorded status (2026-10-24):**
+**Recorded status (2026-10-25):**
 
 - **S1-A1:** merged local OSS compatibility experiment using a sandboxed QuickJS executor and the four read-only Decision MCP methods. M7 demonstrated data-dependent `search → get → trace` composition within one Code Mode execution with output parity; model-turn, token and end-to-end efficiency gains are **not yet measured**.
 - **P0-01:** genuine MCP cancellation defect reproduced; original **FAIL** preserved with independently verified evidence, merged in [PR #633](https://github.com/MnemeHQ/mneme/pull/633) (`adf50933`).
-- **P0-01-F1:** isolated per-call cancellation correction **PASS** (20/20 checks in each of two local runs); independent evidence verification **VERIFIED** (32 static and 5 reproduction checks, zero discrepancies). F1 remains **uncommitted/unmerged** pending a separate evidence-record PR. Its 50 ms cleanup grace is a tested-environment result, not a cross-platform guarantee. The original P0 FAIL remains unchanged. **S1-A2 stays blocked** until separately authorized.
+- **P0-01-F1:** isolated per-call cancellation correction **PASS** (20/20 checks in each of two local runs); independent evidence verification **VERIFIED** (32 static and 5 reproduction checks, zero discrepancies). F1 evidence is merged in [PR #642](https://github.com/MnemeHQ/mneme/pull/642) at `f8591102` and remains independently **VERIFIED**. Its 50 ms cleanup grace is a tested-environment result, not a cross-platform guarantee. The original P0 FAIL remains unchanged. **S1-A2 stays blocked** until separately authorized.
+- **CM-01-B0-M:** model-free mechanical benchmark **PASS** (39/39 checks in each original run), merged in [PR #650](https://github.com/MnemeHQ/mneme/pull/650) at `34d75bec`. The original evidence manifest `94dd0ee381fba2e9775634e0fc8f005dfeb59c9b874fd022227c6fcb92ed17ac` is preserved and supplemental raw-transport verification is **VERIFIED** (98/98). B0-M is mechanical only: model turns, tokens, model-visible context and efficiency remain **not measured**. **B0-A is not authorized.**
 
 **Sequential gates (authorize one at a time):**
 
-1. Record F1 verified evidence in a separate PR, preserving frozen S1-A1/P0 files, hashes and the original failure.
+1. **Complete.** F1 verified evidence was recorded in [PR #642](https://github.com/MnemeHQ/mneme/pull/642) at `f8591102`, preserving frozen S1-A1/P0 files, hashes and the original failure.
 2. Benchmark direct MCP versus Code Mode on pinned, representative read-only decision workflows. Measure **model turns, tokens/context transferred, wall-clock latency, MCP requests, correctness/decision identity, error recovery, and cleanup**; retain a no-benefit outcome if overhead outweighs gains.
+   - **Mechanical foundation complete:** B0-M is merged in [PR #650](https://github.com/MnemeHQ/mneme/pull/650) at `34d75bec`; original verdict PASS (39/39 in each run), supplemental verification VERIFIED (98/98), original evidence manifest preserved. B0-M used 24 deterministic synthetic decisions and does not establish B0-A dataset adequacy or sample size.
+   - **Next authorization:** B0-A remains unauthorized. Before model API calls, finalize its primary metric, sample size, model selection, approved endpoint/budget and evidence plan. B0-M does not demonstrate model-mediated benefit.
 3. Evaluate one portable agent-orchestrator/software-factory reference integration only after the benchmark shows a defensible benefit. Validate reliable cancellation, method allowlisting, argument checks, parity, and host isolation. No support or production-readiness claim from local compatibility alone.
 4. Reassess MCP capability gaps as DG1/DG2 and decision-linked evidence mature (for example effective-decision explanations, protection/evidence reads, version history, or read-only conflict findings). **Prefer composition of existing tools** first; any new MCP method requires an independent, versioned ADR-027 authority/capability review and protocol validation.
 
