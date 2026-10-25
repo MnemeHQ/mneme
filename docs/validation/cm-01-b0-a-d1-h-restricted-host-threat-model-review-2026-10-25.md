@@ -73,7 +73,7 @@ The model API client and credentials stay in the trusted orchestrator. The guest
 - Linux OCI container, or microVM if the reviewed container boundary is insufficient. The final runtime choice is **TBD** and must be security-reviewed.
 - Rootless runtime where supported; otherwise a dedicated non-root UID/GID with all Linux capabilities dropped.
 - Read-only root filesystem; no general host mounts; only a dedicated broker socket or VM channel and a small no-exec/no-suid tmpfs.
-- No network namespace or egress. The guest must not resolve DNS, open sockets or reach the model provider.
+- A **private isolated network namespace** with no host-network mode, no external interface or route, and no DNS or network egress. Loopback is disabled or tightly controlled. The guest must not reach the model provider or any external endpoint; its single explicitly mounted Unix-domain broker socket (or separately approved VM channel) is the only IPC exception. Confirm network isolation from outside the guest.
 - PID, mount and user namespaces; cgroup v2 CPU, memory, PID, IO and wall-clock limits.
 - `no_new_privs`, deny-by-default seccomp and AppArmor/SELinux confinement.
 - One execution per guest; never reuse a guest across arms, scenarios, repetitions or users.
@@ -116,6 +116,12 @@ The upstream MCP inventory remains exactly six tools. The guest sees only four.
 - The in-process QuickJS executor is not relied on for filesystem/network/process isolation; the guest boundary provides it.
 - F1 client cancellation is not accepted as proof of server-thread or child-process termination. The host must kill the guest cgroup/process tree and verify no survivors.
 
+### 3.5 Broker-backed F1 cancellation contract — proposed test requirements
+
+The broker-backed `client` shim must preserve the F1 client-call lifecycle without changing the F1 executor/adapter source. The review must specify and later test how the original `callTool` request and its per-call cancellation signal reach the bridge, how request IDs correlate across shim, broker and genuine MCP, and how an abort/timeout produces exactly one settled rejection and the required matching cancellation notification if the upstream request is still pending. If a request already completed, no cancellation is sent. Late results must never revive a settled call; disposal must reject all pending calls and prohibit post-disposal callbacks.
+
+Tests must exercise abort during an in-flight read, abort after completion, broker transport close, guest timeout, and a racing late upstream response. They must verify explicit **OS-level termination/no survivor** independently from F1 client-side promise settlement and must not infer server-side cancellation from the notification alone. Capture separate host and broker evidence plus pinned F1 hashes. These tests are **requirements only**; no restricted host or shim has been implemented or validated.
+
 ## 4. Isolation controls
 
 ### 4.1 Filesystem
@@ -127,7 +133,7 @@ The upstream MCP inventory remains exactly six tools. The guest sees only four.
 
 ### 4.2 Network
 
-- No network namespace or egress.
+- Private isolated network namespace; **never** inherit host networking. No external interfaces, routes, DNS or egress; only approved Unix-domain broker IPC.
 - No DNS.
 - Broker only over a dedicated Unix socket or VM channel, not a network listener.
 - Host verifies egress denial with an independent test.
@@ -180,6 +186,12 @@ The host is **not demonstrated** by this design. Before any pilot, an independen
 | Runtime drift | Missing seccomp/AppArmor/cgroup | Start blocked | Host preflight |
 
 A test passes only when the attempt is denied or terminated **and** the evidence is complete. A benign error without containment evidence is not a pass.
+
+### 5.1 Red-team negative probes versus production security incidents
+
+The deliberate prohibited actions in Section 5 are **authorized negative test inputs**, not automatically benchmark incidents. A negative test **PASSES containment** only if the action is denied/terminated **and** the external observer records complete evidence with no access, leaked process or surviving resource. A missing audit record is not a containment pass. An actual successful prohibited access, escaped resource limit, missing termination evidence or unexpected host exposure during a red-team run is a **security-test FAIL** and stops that suite. The red-team ledger is separate from the future B0-A trial/outcome ledger.
+
+During any subsequently authorized model-mediated benchmark, **unplanned attempts** to invoke a forbidden method, reach external network/host files, access a secret or bypass an isolation rule follow the preapproved incident-stop and study-FAIL policy, even if individual attempts were blocked. Do not convert deliberate red-team denial events into a falsely failed benchmark or convert actual benchmark incidents into benign test passes.
 
 ## 6. Cleanup and termination
 
