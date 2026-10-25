@@ -1,7 +1,7 @@
 # ADR-034 G2-1 validation pre-registration (§8.B live host, §8.D blind validation)
 
 **Date:** 2026-10-25
-**Amended:** 2026-10-25, Amendment 1 (clarifications from the owner's ambiguity rulings; see the end of this file)
+**Amended:** 2026-10-25, Amendment 1 (clarifications from the owner's ambiguity rulings) and Amendment 2 (an owner protocol change to G5 for cases where the baseline raises an uncaught exception); see the end of this file
 **Status:** PROPOSED. Once merged, this pre-registration is frozen. Changing
 it afterwards needs a dated, owner-approved amendment that is merged
 **before** decryption. No change is allowed after unblinding.
@@ -421,3 +421,111 @@ The corpus author reconciles the affected labels against this amendment
 (A1.1 lists the affected classes). It then rechecks every concealed class
 floor and reports counts only. Sealing waits for this amendment to merge and
 for that report.
+
+## Amendment 2: G5 for cases where the baseline raises an uncaught exception (owner, 2026-10-25)
+
+**Status:** an owner-approved protocol change. It must merge **before
+decryption**. It changes the G5 pass criterion for one narrowly defined
+kind of case. No other gate, floor or rule changes.
+
+**Why it is needed.** Before decryption, the scorer ran the pinned wheels
+on **its own synthetic content**, not on the corpus (harness PR #651,
+finding FND-1). For content containing a lone surrogate, both builds stop
+with an uncaught Python exception. The traceback frame line numbers differ
+between the builds, because the hook source changed (line 920 against 797).
+
+Under the raw byte rule kept in A1.4 (review finding G2V-F5), every such
+case would fail G5 whatever G2-1 does. The pre-registration requires at
+least two such cases in class L, so the validation would fail by
+construction. It would then say nothing about the behavior G2-1 is meant to
+validate.
+
+The owner adopts this rule now, before any corpus content is revealed, as
+an explicit, disclosed protocol change. It is not a clarification of
+Amendment 1.
+
+### A2.1 Scope
+
+This rule applies to a case **only when the pinned pre-G2 baseline's
+observed run of that case** meets both conditions:
+
+1. it ends with a nonzero exit status;
+2. its stderr contains at least one Python traceback block that the
+   interpreter emitted for an uncaught exception.
+
+A traceback block starts at a line `Traceback (most recent call last):` and
+ends at its exception summary line (`ExceptionType: message`, or
+`ExceptionType` alone).
+
+**Who decides scope.** The baseline's observed output decides whether this
+rule applies. Corpus labels and the current build's output never decide it.
+
+**Every other case** keeps the raw byte G5 of revision 2 and A1.4, including
+the routed-CR exception.
+
+### A2.2 What G5 compares for a case in scope
+
+A case in scope passes G5 only if **every** item below is byte-identical
+between the current build and the baseline:
+
+1. **stdout**, compared whole.
+2. **The exit status.**
+3. **The exception summary lines**, compared as an ordered sequence. This
+   covers every traceback block, including chained ones.
+4. **The chain separators** between blocks. These are the lines
+   `During handling of the above exception, another exception occurred:` and
+   `The above exception was the direct cause of the following exception:`,
+   compared in order.
+5. **Every stderr line outside a traceback block.**
+
+**Excluded:** only the frame lines inside each traceback block, meaning
+everything from the `Traceback (most recent call last):` line up to, but
+not including, the exception summary line.
+
+**Anything else that differs is a G5 failure.** That includes the exception
+type or message, the number of blocks, any non-traceback stderr, stdout,
+and the exit status.
+
+**A case can also fail because only one build raised.** The case fails G5
+when:
+
+- the current build exits 0, or exits nonzero without a traceback, where
+  the baseline raised; or
+- the current build raises where the baseline did not. A2.1 then doesn't
+  apply, and the raw byte rule decides.
+
+### A2.3 Disclosure and evidence
+
+For every case in scope, the scorer records:
+
+- the full raw stdout and stderr of both builds;
+- the raw byte diff;
+- the result of the A2.2 comparison.
+
+The results record must:
+
+- state that Amendment 2 applied;
+- give the number of cases in scope, by class only (no case IDs beyond the
+  opaque IDs used for failures);
+- say for each whether the raw bytes matched;
+- describe the comparison above.
+
+No case is excluded from any gate because of this rule.
+
+### A2.4 What this does not change
+
+- **G2:** a matching baseline error is still not a false block (A1.4).
+- **G6:** no record is still expected for such unrouted cases.
+- **G8:** the split between a scoring-process failure and a legacy error the
+  scorer observed is unchanged.
+- **Everything else:** no other gate, class, floor, pin or corpus anchor
+  changes.
+- **The defect stays a defect.** The lone-surrogate crash is a hook defect
+  that predates G2 and is recorded as out-of-scope noncoverage (charter
+  §7). This amendment neither fixes it nor makes it a supported behavior.
+
+### A2.5 Effect on the harness
+
+The harness (PR #651) is updated to implement A2.1–A2.3 **before** it is
+pinned in the pre-scoring completion record. A harness change made after
+decryption would still void blind status (§6).
