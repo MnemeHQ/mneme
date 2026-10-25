@@ -94,8 +94,8 @@ def spy(monkeypatch):
     calls = []
     real = hook._invoke_check
 
-    def _spy(memory, rel_label, target_path, checked_content, stderr=None):
-        proc = real(memory, rel_label, target_path, checked_content, stderr=stderr)
+    def _spy(memory, rel_label, target_path, checked_content, stderr=None, **kwargs):
+        proc = real(memory, rel_label, target_path, checked_content, stderr=stderr, **kwargs)
         calls.append({
             "memory": Path(memory),
             "target_path": target_path,

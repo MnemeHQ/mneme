@@ -812,6 +812,24 @@ def test_old_reader_must_lack_the_numeric_type(corpus, tmp_path):
 
 # ── end to end against the pinned build (two passes, no old reader) ──────────
 
+# Charter §5.1 erratum (owner ruling G2C-R1, MnemeHQ/mneme#638): from G2-1 on,
+# the shared validator trusts a ``complete_source_file`` payload only when the
+# caller passes ``expected_input="source_file"``. The unmodified M4 child
+# (benchmarks/adr034_m4/m4_child.py) calls the default, so these end-to-end
+# cases that score trust through it are historical validation of the build
+# M4 pinned. They are kept unedited; the current-build regression is
+# tests/test_adr034_post_m4_source_file_compat.py.
+PINNED_M4_BUILD_TRUST = pytest.mark.xfail(
+    strict=True,
+    raises=AssertionError,
+    reason=(
+        "historical pinned-build validation: the unmodified M4 child applies the "
+        "default assess_verdict, which rejects complete_source_file after G2-1 "
+        "(charter §5.1 erratum G2C-R1, MnemeHQ/mneme#638)"
+    ),
+)
+
+
 @pytest.fixture(scope="module")
 def e2e(tmp_path_factory):
     base = tmp_path_factory.mktemp("m4e2e")
@@ -825,6 +843,7 @@ def e2e(tmp_path_factory):
     return final, out, root
 
 
+@PINNED_M4_BUILD_TRUST
 def test_e2e_every_gate_but_12_passes_on_the_synthetic_corpus(e2e):
     final, out, _ = e2e
     assert final["operational_failures"]["count"] == 0
@@ -858,6 +877,7 @@ def test_e2e_run_roots_are_removed_and_corpus_untouched(e2e):
     assert not list(root.rglob("project_memory.json"))
 
 
+@PINNED_M4_BUILD_TRUST
 def test_e2e_records_transport_trust_and_unnormalized_unknown(e2e):
     _, out, _ = e2e
     records = {r["case_id"]: r for r in map(json.loads, (out / "run-1" / "cases.jsonl")
@@ -899,6 +919,7 @@ def test_gate11_fails_on_a_wrong_golden_id(tmp_path):
     assert gate["value"]["forbid_literal_ids_stable"] is True
 
 
+@PINNED_M4_BUILD_TRUST
 def test_e2e_mislabelled_corpus_reports_failures_by_case(tmp_path):
     """A wrong label must surface as a failure row, never be absorbed."""
     records = syn.manifest_records()
