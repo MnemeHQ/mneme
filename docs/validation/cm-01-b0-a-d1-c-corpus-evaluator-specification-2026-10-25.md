@@ -1,4 +1,4 @@
-# CM-01-B0-A D1-C - Synthetic Scenario Corpus and Independent Evaluator Specification
+# CM-01-B0-A D1-Corpus - Synthetic Scenario Corpus and Independent Evaluator Specification
 
 **Status:** PROPOSAL FOR REVIEW - **not built, not frozen, not accepted, and not authorized for execution**.
 
@@ -8,7 +8,7 @@
 **D1 resolution:** PR #655, squash-merged at `4b8471149d49f6f4a2a4ddfd0d3601d59355c337`.  
 **Governing architecture:** ADR-017, ADR-022, ADR-023 and ADR-027.
 
-This document specifies the B0-A synthetic scenario corpus and the independent deterministic answer evaluator. It does not build them, freeze them or select final counts. No model/API call, benchmark run, production change, new MCP method, B0-A pilot, confirmatory execution or S1-A2 work is authorized.
+This document specifies the B0-A synthetic scenario corpus and the independent deterministic answer evaluator. **D1-Corpus is the corpus workstream; it is not the separate D1-C frozen preregistration.** It does not build them, freeze them or select final counts. No model/API call, benchmark run, production change, new MCP method, B0-A pilot, confirmatory execution or S1-A2 work is authorized.
 
 B0-M remains a mechanical regression corpus only. Its 24 decisions, eight fixed examples, expected answers and hashes are not B0-A confirmatory data.
 
@@ -318,7 +318,7 @@ Exact or near-duplicate overlap with B0-M scenarios, prompts or expected answers
 - The pilot manifest is frozen before pilot execution; the confirmatory manifest is frozen before confirmatory execution.
 - Pilot scenarios are never relabeled or reused as confirmatory.
 - Pilot results may calibrate variance/instrumentation but may not tune confirmatory prompts, expected answers, thresholds or evaluator logic.
-- Confirmatory scenario selection is fixed before any model call.
+- Confirmatory scenario **selection rule and eligible scenario bank** must be approved before any pilot model call. The final number and identities of confirmatory scenarios may be frozen **after the non-confirmatory pilot** only via the predeclared variance-to-`N_f` calculation, fixed eligibility rules and an independent randomized selection seed, without inspecting confirmatory outcomes. The final confirmatory manifest and its hashes must be frozen **before the first confirmatory model call**. No pilot scenario may be reused.
 - The confirmatory corpus is not regenerated after confirmatory data are observed.
 
 ## 9. Hashes, rejection evidence and sign-off
